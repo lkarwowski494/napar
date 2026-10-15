@@ -16,8 +16,10 @@ import {
 } from 'react-native';
 import { exportAllDataJson, importDataJson } from '../src/core/database';
 import { theme } from '../src/core/theme';
+import { useTranslation, SupportedLanguage } from '../src/core/i18n';
 
 export default function SettingsScreen() {
+  const { t, language, setLanguage } = useTranslation();
   const [isPro, setIsPro] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -59,12 +61,41 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      {/* Przełącznik Języka (PL / EN) */}
+      <Text style={styles.sectionTitle}>{t.settings.languageSection}</Text>
+      <View style={styles.langSelectorRow}>
+        <Pressable
+          style={[
+            styles.langTab,
+            language === 'pl' && styles.langTabActive,
+          ]}
+          onPress={() => setLanguage('pl')}
+        >
+          <Text style={[styles.langTabText, language === 'pl' && styles.langTabTextActive]}>
+            🇵🇱 Polski (Napar)
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[
+            styles.langTab,
+            language === 'en' && styles.langTabActive,
+          ]}
+          onPress={() => setLanguage('en')}
+        >
+          <Text style={[styles.langTabText, language === 'en' && styles.langTabTextActive]}>
+            🇬🇧 English (Steepwise)
+          </Text>
+        </Pressable>
+      </View>
+
       {/* Karta Filozofii Apps4Brew */}
       <View style={styles.manifestoCard}>
         <Text style={styles.manifestoBadge}>FILOZOFIA APPS4BREW</Text>
         <Text style={styles.manifestoTitle}>Prywatność i Rzemiosło</Text>
         <Text style={styles.manifestoBody}>
-          Napar nie wymaga logowania, nie łączy się z żadnym zewnętrznym serwerem i nie zbiera Twoich danych (etykieta „Data Not Collected”). Cała spiżarnia, dziennik i kalkulatory działają w 100% lokalnie na Twoim urządzeniu.
+          {language === 'pl'
+            ? 'Napar nie wymaga logowania, nie łączy się z żadnym zewnętrznym serwerem i nie zbiera Twoich danych (etykieta „Data Not Collected”). Cała spiżarnia, dziennik i kalkulatory działają w 100% lokalnie na Twoim urządzeniu.'
+            : 'Steepwise requires no login, connects to no external servers, and collects zero data (Apple "Data Not Collected" badge). Your stash, journal, and calculators run 100% locally on your device.'}
         </Text>
       </View>
 
@@ -476,5 +507,32 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 15,
+  },
+  langSelectorRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  langTab: {
+    flex: 1,
+    paddingVertical: 12,
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  langTabActive: {
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    borderColor: theme.colors.copper,
+  },
+  langTabText: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+  },
+  langTabTextActive: {
+    color: theme.colors.copper,
+    fontWeight: '700',
   },
 });

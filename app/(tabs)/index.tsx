@@ -14,14 +14,18 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
 import { getRecipes, getInventoryItems } from '../../src/core/database';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
 import { InventoryItem, SavedRecipe } from '../../src/core/database-schema';
 import { FlavorWheelPicker } from '../../src/core/flavor-wheel-picker';
 import { theme } from '../../src/core/theme';
+import { useTranslation } from '../../src/core/i18n';
 
 export default function BrewScreen() {
+  const router = useRouter();
+  const { t } = useTranslation();
   const {
     recipe,
     selectedInventoryItem,
@@ -56,7 +60,7 @@ export default function BrewScreen() {
   const [notes, setNotes] = useState<string>('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  useEffect(() => {
+  const refreshData = () => {
     try {
       const dbRecipes = getRecipes();
       if (dbRecipes && dbRecipes.length > 0) {
@@ -67,6 +71,10 @@ export default function BrewScreen() {
     } catch {
       // fallback do predefiniowanych
     }
+  };
+
+  useEffect(() => {
+    refreshData();
   }, []);
 
   // Automatyczne otwarcie arkusza oceniania po zakończeniu parzenia
@@ -115,7 +123,10 @@ export default function BrewScreen() {
       <View style={styles.selectorRow}>
         <Pressable
           style={styles.selectorCard}
-          onPress={() => setShowRecipeModal(true)}
+          onPress={() => {
+            refreshData();
+            setShowRecipeModal(true);
+          }}
           accessibilityRole="button"
           accessibilityLabel={`Wybrany przepis: ${recipe.name}`}
         >
@@ -288,12 +299,23 @@ export default function BrewScreen() {
       <Modal visible={showRecipeModal} animationType="slide" transparent={false}>
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Wybierz Recepturę</Text>
+            <Text style={styles.modalTitle}>{t.brew.chooseRecipe}</Text>
             <Pressable onPress={() => setShowRecipeModal(false)}>
-              <Text style={styles.modalCloseText}>Zamknij</Text>
+              <Text style={styles.modalCloseText}>{t.common.close}</Text>
             </Pressable>
           </View>
           <ScrollView>
+            {/* Przycisk dodania własnej receptury */}
+            <Pressable
+              style={styles.addCustomRecipeBtn}
+              onPress={() => {
+                setShowRecipeModal(false);
+                router.push('/recipe-builder');
+              }}
+            >
+              <Text style={styles.addCustomRecipeBtnText}>{t.brew.customRecipe}</Text>
+            </Pressable>
+
             {allRecipes.map((r) => (
               <Pressable
                 key={r.id}
@@ -307,12 +329,31 @@ export default function BrewScreen() {
                 }}
               >
                 <View style={styles.recipeOptionHeader}>
-                  <Text style={styles.recipeOptionName}>{r.name}</Text>
-                  <Text style={styles.recipeOptionMethod}>
-                    {'beverageType' in r ? r.beverageType : r.type} · {r.method}
-                  </Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.recipeOptionName}>{r.name}</Text>
+                    <Text style={styles.recipeOptionMethod}>
+                      {'beverageType' in r ? r.beverageType : r.type} · {r.method}
+                      {r.isCustom ? ' · Autorska' : ''}
+                    </Text>
+                  </View>
+                  {r.isCustom && (
+                    <Pressable
+                      style={styles.editRecipeBtn}
+                      hitSlop={8}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        setShowRecipeModal(false);
+                        router.push({
+                          pathname: '/recipe-builder',
+                          params: { id: r.id },
+                        });
+                      }}
+                    >
+                      <Text style={styles.editRecipeBtnText}>✏️</Text>
+                    </Pressable>
+                  )}
                 </View>
-                <Text style={styles.recipeOptionAuthor}>{r.author}</Text>
+                <Text style={styles.recipeOptionAuthor}>{r.author || 'Receptura własna'}</Text>
                 <Text style={styles.recipeOptionDetails}>
                   {'doseGrams' in r ? r.doseGrams : r.coffeeOrTeaDoseGrams}g kawy/herbaty ·{' '}
                   {'waterGrams' in r ? r.waterGrams : r.waterWeightGrams}g wody ·{' '}
@@ -916,5 +957,30 @@ const styles = StyleSheet.create({
   finishSaveText: {
     color: '#FFFFFF',
     fontWeight: '700',
+  },
+  addCustomRecipeBtn: {
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    borderRadius: theme.borderRadius.md,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  addCustomRecipeBtnText: {
+    color: theme.colors.copper,
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  editRecipeBtn: {
+    padding: 6,
+    borderRadius: 6,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginLeft: 8,
+  },
+  editRecipeBtnText: {
+    fontSize: 14,
   },
 });

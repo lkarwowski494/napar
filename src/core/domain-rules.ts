@@ -52,6 +52,16 @@ export function calculateBrewDose(waterGrams: number, ratio: number): number {
 }
 
 /**
+ * RD-01c: Oblicza współczynnik ratio dla zadanej dozy i wody (np. 15g, 250g -> 16.7)
+ */
+export function calculateBrewRatio(doseGrams: number, waterGrams: number): number {
+  if (doseGrams <= 0 || waterGrams <= 0) {
+    return 0;
+  }
+  return Number((waterGrams / doseGrams).toFixed(1));
+}
+
+/**
  * RD-02: Absorpcja wody przez zmieloną kawę (Water Retention Index)
  * Domyślny współczynnik: 2.0g wody na każdy 1g zmielonej kawy
  */
