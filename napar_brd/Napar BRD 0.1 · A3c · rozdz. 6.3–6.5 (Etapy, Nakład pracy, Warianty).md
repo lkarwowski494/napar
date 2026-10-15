@@ -6,7 +6,7 @@
 
 * **Wersja 1.0 (MVP):**
   - Kompletny silnik parzenia kawy (V60, Aeropress, Chemex, French Press) i herbaty (Gongfu Cha, Western).
-  - Baza 12 sprawdzonych receptur mistrzowskich.
+  - Baza 24 sprawdzonych receptur mistrzowskich (kawa specialty i herbata rzemieślnicza).
   - Magazyn ziaren i liści herbaty ze wskaźnikiem świeżości (Resting).
   - Podstawowy Dial-in Doctor (deterministyczne drzewo korekty smaku).
   - Estymator kofeiny z wykresem stężenia i zapisem do Apple HealthKit.

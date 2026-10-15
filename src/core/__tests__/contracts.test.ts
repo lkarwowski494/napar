@@ -113,8 +113,8 @@ describe('Kontrakt Kompletności i Symetrii Tłumaczeń i18n', () => {
 });
 
 describe('Kontrakt Danych: Receptury Mistrzowskie (MASTER_RECIPES)', () => {
-  test('Każda z 12 receptur mistrzowskich spełnia aksjomaty parzenia specialty', () => {
-    expect(MASTER_RECIPES.length).toBeGreaterThanOrEqual(10);
+  test('Każda z 24 receptur mistrzowskich spełnia aksjomaty parzenia specialty', () => {
+    expect(MASTER_RECIPES.length).toBe(24);
 
     const recipeIds = new Set<string>();
 

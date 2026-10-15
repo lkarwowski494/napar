@@ -56,19 +56,35 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
 
 ## 🧪 Wzorcowe Receptury w Bazie (Master Recipes)
 
-Aplikacja zawiera 12 fabrycznych, zweryfikowanych receptur:
+Aplikacja zawiera **24 fabryczne, zweryfikowane receptury specialty** dla kawy i herbaty rzemieślniczej:
+
+### ☕ Kawa Specialty (14 receptur)
 - **V60 — Metoda 4:6** (Tetsu Kasuya, Mistrz Świata Brewers Cup 2016)
 - **V60 — Single Cup Technique** (James Hoffmann)
-- **AeroPress — Mistrzowski Drip** (World AeroPress Championship)
-- **AeroPress — Inverted (Odwrócony)**
-- **Chemex — Klasyczny Przelew Trzyczęściowy**
-- **French Press — Technika Jamesa Hoffmanna**
+- **AeroPress — Inverted Champion** (World AeroPress Championship)
+- **AeroPress — Klasyk Tima Wendelboe** (Tim Wendelboe, World Barista Champion)
+- **AeroPress — Koncentrat Espresso-Style** (Fellow Prismo)
+- **Hario Switch — Hybryda Kasuya (God/Devil)** (Imersja + Perkolacja)
+- **Origami Dripper — Maksymalna Słodycz** (Du Jianing, World Brewers Cup 2019)
+- **Clever Dripper — Czysta Imersja** (Water-First Technique)
+- **Chemex — Czysty i Soczysty** (Klasyczny przelew 30g / 500g)
 - **Kalita Wave 185 — Trzy Zalania** (George Howell Coffee)
-- **Espresso — Specialty Double Shot (1:2)** (WBC Protocol)
+- **French Press — Czysty Napar** (James Hoffmann Technique)
+- **Espresso — Specialty Double Shot (1:2)** (WBC Standard Protocol)
+- **Espresso — Turbo Shot 1:3** (Prof. Christopher Hendon & Barista Hustle)
 - **Cupping — Standard SCA Protocol** (Specialty Coffee Association)
-- **Gongfu Cha — Da Hong Pao (Wielka Czerwona Szata)** (Wuyi Oolong)
-- **Gongfu Cha — Sheng Puerh (Raw Puerh)** (Yunnan)
-- **Sencha Japońska — Rytuał Kyusu** & **Biała Herbata Pai Mu Tan**
+
+### 🍃 Herbata Rzemieślnicza (10 receptur)
+- **Gongfu Cha — Wulong Skalny Da Hong Pao** (Tradycja Wuyi Shan)
+- **Gongfu Cha — Sheng Puerh (Młody)** (Tradycja Yunnan)
+- **Dong Ding Oolong — Mroźny Szczyt** (Tradycja Nantou, Taiwan Gongfu)
+- **Tie Guan Yin — Żelazna Bogini Miłosierdzia** (Anxi Gongfu)
+- **Gyokuro Uji — Kropla Rosy (Shizuku-cha)** (Rytuał Kyusu, 60°C)
+- **Matcha Ceremonialna — Ubijanie Usucha** (Tradycja Urasenke, Chasen)
+- **Sencha Japońska — Rytuał Kyusu** (Tradycyjne igły parowane)
+- **Hojicha — Prażone Liście i Łodyżki** (Kyoto Roast)
+- **Biała Herbata — Pai Mu Tan (Biała Piwonia)** (Fujian Artisan)
+- **Masala Chai — Autentyczny Dekokt Korzenny** (Tradycja Dhaba Punjab)
 
 ---
 
@@ -112,13 +128,13 @@ napar/
 ├── src/
 │   └── core/                   # Czysta logika biznesowa i persystencja
 │       ├── domain-rules.ts     # Deterministyczne reguły RD-01…RD-30
-│       ├── recipes-data.ts     # 12 wzorcowych receptur
+│       ├── recipes-data.ts     # 24 wzorcowe receptury specialty i herbaty
 │       ├── database-schema.ts  # DDL i schemat SQLite
 │       ├── database.ts         # Klient expo-sqlite i repozytoria
 │       ├── timer-engine.ts     # Maszyna stanów stopera i haptyka
 │       ├── brew-context.tsx    # Główny React Context aktywnej sesji
 │       ├── theme.ts            # Tokeny stylistyczne (Apps4Brew artisanal)
-│       └── __tests__/          # Zestaw 33 testów jednostkowych i integracyjnych
+│       └── __tests__/          # 27 zestawów testowych (219 testów, mutacje i PBT)
 └── napar_brd/                  # Pełna dokumentacja wymagań biznesowych BRD 0.1
 ```
 

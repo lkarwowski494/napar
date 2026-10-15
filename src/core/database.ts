@@ -37,11 +37,11 @@ export function initDatabase(db: SQLite.SQLiteDatabase): void {
     // Column already exists
   }
 
-  // Sprawdź czy tabela recipes ma dane początkowe z master recipes
+  // Sprawdź czy tabela recipes ma dane początkowe z master recipes lub wymaga uzupełnienia
   const countRow = db.getFirstSync<{ count: number }>(
-    'SELECT COUNT(*) as count FROM recipes'
+    'SELECT COUNT(*) as count FROM recipes WHERE is_custom = 0'
   );
-  if (!countRow || countRow.count === 0) {
+  if (!countRow || countRow.count < MASTER_RECIPES.length) {
     seedMasterRecipes(db);
   }
 }

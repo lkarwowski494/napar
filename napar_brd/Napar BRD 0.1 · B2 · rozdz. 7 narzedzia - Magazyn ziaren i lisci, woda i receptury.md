@@ -34,19 +34,37 @@
 * **Priorytet:** SHOULD | **Etap:** MVP
 
 ### **BR-MAG-005: Wzorcowa biblioteka receptur mistrzowskich**
-* **Opis:** Wbudowany zestaw 12 zweryfikowanych receptur z opisem kroków i parametrów:
-  1. V60 Tetsu Kasuya 4:6 (kawa)
-  2. V60 James Hoffmann Single Cup (kawa)
-  3. V60 Scott Rao (kawa)
-  4. Aeropress Inverted Championship Recipe (kawa)
-  5. Aeropress Standard Classic (kawa)
-  6. Chemex Classic 3-Cup (kawa)
-  7. French Press Hoffmann Technique (kawa)
-  8. Kalita Wave 155 (kawa)
-  9. Gongfu Cha: Wulong skalny Da Hong Pao (herbata)
-  10. Gongfu Cha: Sheng Puerh (herbata)
-  11. Sencha japońska tradycyjna (herbata)
-  12. Biała herbata Pai Mu Tan (herbata)
+* **Opis:** Wbudowany zestaw 24 zweryfikowanych receptur specialty dla kawy i herbaty rzemieślniczej z precyzyjnym opisem kroków, wag, czasów i parametrów ekstrakcji:
+  *Kawa (14 receptur):*
+  1. V60 Tetsu Kasuya 4:6 (Brewers Cup 2016)
+  2. V60 James Hoffmann Single Cup Technique
+  3. AeroPress Inverted (World AeroPress Championship)
+  4. French Press James Hoffmann Technique (Czysty Napar)
+  5. Chemex Classic 3-Cup (Klasyk Specialty)
+  6. Kalita Wave 185 (George Howell Coffee)
+  7. Espresso Specialty Double Shot 1:2 (WBC Standard Protocol)
+  8. Cupping SCA Standard Protocol (Ocena sensoryczna)
+  9. Hario Switch Hybryda Kasuya God/Devil (Imersja + Perkolacja)
+  10. AeroPress Tim Wendelboe Classic (Standard)
+  11. Origami Dripper High Extraction Sweetness (Du Jianing WBrC 2019)
+  12. Clever Dripper Czysta Imersja Water-First (Hoffmann)
+  13. Espresso Turbo Shot o wysokim uzysku 1:3 (Hendon / Barista Hustle)
+  14. AeroPress Fellow Prismo Espresso-Style Concentrate
+  *Herbata rzemieślnicza (10 receptur):*
+  15. Gongfu Cha: Wulong skalny Da Hong Pao (Wuyi Shan)
+  16. Gongfu Cha: Młody Sheng Puerh (Yunnan)
+  17. Sencha japońska tradycyjna (Rytuał Kyusu)
+  18. Biała herbata Pai Mu Tan (Fujian Artisan)
+  19. Gyokuro Uji Shizuku-cha (Ekstrakcja kropla po kropli, 60°C)
+  20. Matcha Ceremonialna Usucha (Ubijanie Chasen, Urasenke)
+  21. Hojicha Kyoto Roast (Prażone liście i łodyżki w Kyusu)
+  22. Dong Ding Oolong Mroźny Szczyt (Taiwan High Mountain Gongfu)
+  23. Tie Guan Yin Żelazna Bogini Miłosierdzia (Anxi Gongfu)
+  24. Masala Chai Tradycyjny Dekokt Korzenny (Dhaba Punjab)
+* **Kryteria akceptacji:**
+  1. Każda receptura definiuje: dozę (g), wagę wody (g), temperaturę wody (°C), zalecany przemiał, rekomendowane ratio oraz sekwencję kroków.
+  2. Suma wagi wody w ostatnim kroku jest ściśle równa docelowej objętości wody receptury.
+  3. Zgodność z aksjomatami parzenia specialty weryfikowana kontraktem testowym (contracts.test.ts).
 * **Priorytet:** MUST | **Etap:** MVP
 
 ---
