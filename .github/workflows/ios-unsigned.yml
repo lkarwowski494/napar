@@ -1,0 +1,57 @@
+# Sprawdzenie kompilacji natywnej (bez podpisu) na darmowej maszynie macOS w GitHub Actions
+# Weryfikuje poprawność generowania projektu natywnego, Podfile, i kompilacji binarki Napar.app
+name: iOS — kompilacja
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'src/**'
+      - 'app.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/ios-unsigned.yml'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - name: Select Xcode 26.x
+        run: bash scripts/ci/select-xcode.sh 26
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Checks (TypeScript i testy logiki)
+        run: npm run verify
+      - name: Generate native iOS project (expo prebuild)
+        run: npx expo prebuild --platform ios --no-install --clean
+      - name: Build number = numer przebiegu
+        run: /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${{ github.run_number }}" ios/Napar/Info.plist
+      - name: Install pods
+        run: cd ios && pod install
+      - name: Platforma iOS zgodna z SDK wybranego Xcode
+        run: bash scripts/ci/ensure-ios-platform.sh
+      - name: Build (no code signing)
+        run: |
+          set -o pipefail
+          cd ios
+          xcodebuild -workspace Napar.xcworkspace -scheme Napar -configuration Release -sdk iphoneos \
+            -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" PROVISIONING_PROFILE_SPECIFIER="" \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            2>&1 | tee xcodebuild.log
+          APP=build/Build/Products/Release-iphoneos/Napar.app
+          test -f "$APP/Napar" && test -f "$APP/main.jsbundle"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: xcodebuild-log
+          retention-days: 1
+          path: ios/xcodebuild.log

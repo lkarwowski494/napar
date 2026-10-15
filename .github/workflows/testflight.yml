@@ -1,0 +1,127 @@
+# TestFlight — automatyczny build i wysyłka do App Store Connect narzędziami Apple
+# Uruchamianie: Zakładka Actions → „TestFlight (Napar)” → Run workflow
+#
+# Wymagane sekrety repozytorium (Settings → Secrets and variables → Actions):
+#   ASC_KEY_ID     — identyfikator klucza API App Store Connect (10 znaków)
+#   ASC_ISSUER_ID  — Issuer ID (UUID z App Store Connect → Users and Access → Integrations)
+#   ASC_KEY_P8     — pełna treść klucza AuthKey_XXXX.p8 (wraz z liniami BEGIN i END)
+name: TestFlight (Napar)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: testflight
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+      - name: Select Xcode 26.x
+        run: bash scripts/ci/select-xcode.sh 26
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Sprawdzenie obecności sekretów
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          for v in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8; do
+            [ -n "${!v}" ] || { echo "::error::Brak wymaganego sekretu $v w Settings -> Secrets and variables -> Actions"; exit 1; };
+          done
+      - run: npm ci
+      - name: Weryfikacja jakości (TypeScript + testy jednostkowe)
+        run: npm run verify
+      - name: Generowanie natywnego projektu iOS (expo prebuild)
+        run: npx expo prebuild --platform ios --no-install --clean
+      - name: Ustalenie numeru buildu (BUILD_BASE + GITHUB_RUN_NUMBER)
+        env:
+          BUILD_BASE: ${{ vars.BUILD_BASE || '1000' }}
+        run: |
+          BUILD_NUM=$((BUILD_BASE + GITHUB_RUN_NUMBER))
+          echo "BUILD_NUMBER=$BUILD_NUM" >> "$GITHUB_ENV"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUM" ios/Napar/Info.plist
+      - name: Instalacja CocoaPods
+        run: cd ios && pod install
+      - name: Platforma iOS zgodna z SDK wybranego Xcode
+        run: bash scripts/ci/ensure-ios-platform.sh
+      - name: Zapisanie klucza API do bezpiecznego pliku tymczasowego
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: umask 077; printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/AuthKey.p8"
+      - name: Archiwizacja (xcodebuild archive)
+        run: |
+          set -o pipefail
+          TEAM=$(node -p "require('./app.json').expo.ios.appleTeamId")
+          cd ios
+          xcodebuild -workspace Napar.xcworkspace -scheme Napar -configuration Release -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Napar.xcarchive" archive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM="$TEAM" CURRENT_PROJECT_VERSION=$BUILD_NUMBER \
+            2>&1 | tee xcodebuild.log
+      - name: Eksport i wysyłka do App Store Connect
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -o pipefail
+          KID="$ASC_KEY_ID"; ISS="$ASC_ISSUER_ID"; unset ASC_KEY_ID ASC_ISSUER_ID
+          TEAM=$(node -p "require('./app.json').expo.ios.appleTeamId")
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$TEAM</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          EOF
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Napar.xcarchive" -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export" -allowProvisioningUpdates -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
+            -authenticationKeyID "$KID" -authenticationKeyIssuerID "$ISS" 2>&1 | tee export.log
+          echo "## TestFlight: build $BUILD_NUMBER został wysłany do App Store Connect" >> "$GITHUB_STEP_SUMMARY"
+          echo "Po przetworzeniu przez Apple (zwykle 10–25 minut) pojawi się w Twojej aplikacji TestFlight." >> "$GITHUB_STEP_SUMMARY"
+      - name: Bezpieczne usunięcie klucza prywatnego z maszyny
+        if: always()
+        run: rm -f "$RUNNER_TEMP/AuthKey.p8"
+      - name: Maskowanie identyfikatorów klucza przed uploadem logów
+        if: failure()
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          [ -n "$ASC_KEY_ID" ] && [ -n "$ASC_ISSUER_ID" ] || exit 0
+          for f in ios/xcodebuild.log export.log; do
+            [ -f "$f" ] || continue
+            sed -i '' -e "s/${ASC_KEY_ID}/<KEY_ID>/g" -e "s/${ASC_ISSUER_ID}/<ISSUER_ID>/g" "$f"
+            if grep -qF -e "$ASC_KEY_ID" -e "$ASC_ISSUER_ID" "$f"; then rm -f "$f"; echo "::warning::$f usunięty — maskowanie nie zadziałało"; fi
+          done
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: testflight-logi
+          retention-days: 1
+          path: |
+            ios/xcodebuild.log
+            export.log
+  tag:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Tagowanie wydania
+        env:
+          BUILD_BASE: ${{ vars.BUILD_BASE || '1000' }}
+        run: |
+          V=$(node -p "require('./app.json').expo.version")
+          T="v$V-b$((BUILD_BASE + GITHUB_RUN_NUMBER))"
+          git tag "$T" && git push origin "$T"
+          echo "## Utworzono tag wydania: $T" >> "$GITHUB_STEP_SUMMARY"
