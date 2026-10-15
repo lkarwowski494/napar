@@ -60,6 +60,7 @@ export interface BrewSession {
   doseGrams: number;
   waterGrams: number;
   waterTempCelsius: number;
+  waterProfile?: string;
   grindSetting?: string;
   totalTimeSeconds: number;
   rating?: number;
@@ -134,6 +135,7 @@ CREATE TABLE IF NOT EXISTS brew_sessions (
   dose_g REAL NOT NULL,
   water_g REAL NOT NULL,
   water_temp_c REAL NOT NULL,
+  water_profile TEXT,
   grind_setting TEXT,
   total_time_seconds INTEGER NOT NULL,
   rating REAL,

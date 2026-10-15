@@ -21,7 +21,9 @@ import {
 } from '../../src/core/domain-rules';
 import {
   WATER_RECIPES,
+  BOTTLED_WATER_BENCHMARKS,
   calculateWaterMinerals,
+  diagnoseWaterSensoryImpact,
   WaterRecipe,
 } from '../../src/core/water-chemistry';
 import {
@@ -65,6 +67,11 @@ export default function DialInScreen() {
     customKhInput,
     selectedRecipeObj,
   ]);
+
+  const waterDiagnosis = React.useMemo(
+    () => diagnoseWaterSensoryImpact(waterCalc.targetGhPpm, waterCalc.targetKhPpm),
+    [waterCalc]
+  );
 
   // Stan: Przelicznik Młynków
   const [selectedGrindCategoryId, setSelectedGrindCategoryId] = useState<string>('pourover_v60');
@@ -650,6 +657,44 @@ export default function DialInScreen() {
               <Text style={styles.drySaltAmount}>{waterCalc.dryCalciumChlorideCaCl2Grams} g</Text>
             </View>
           </View>
+
+          {/* DIAGNOZA SENSORYCZNA WODY */}
+          <View style={styles.waterInfoCard} testID="water-diagnosis-card">
+            <Text style={styles.waterInfoHeader}>{t.water.diagnosisHeader}</Text>
+            <Text style={styles.waterInfoLabel}>{t.water.diagnosisProblem}</Text>
+            <Text style={styles.waterInfoText}>
+              {language === 'pl' ? waterDiagnosis.problemPl : waterDiagnosis.problemEn}
+            </Text>
+            <Text style={styles.waterInfoLabel}>{t.water.diagnosisCause}</Text>
+            <Text style={styles.waterInfoText}>
+              {language === 'pl' ? waterDiagnosis.causePl : waterDiagnosis.causeEn}
+            </Text>
+            <Text style={styles.waterInfoLabel}>{t.water.diagnosisRemedy}</Text>
+            <Text style={styles.waterInfoText}>
+              {language === 'pl' ? waterDiagnosis.recommendationPl : waterDiagnosis.recommendationEn}
+            </Text>
+          </View>
+
+          {/* BENCHMARK WÓD BUTELKOWANYCH */}
+          <View style={styles.waterInfoCard} testID="bottled-water-card">
+            <Text style={styles.waterInfoHeader}>{t.water.bottledHeader}</Text>
+            <Text style={styles.waterInfoText}>{t.water.bottledSubtitle}</Text>
+            {BOTTLED_WATER_BENCHMARKS.map((b) => (
+              <View key={b.id} style={styles.bottledRow}>
+                <View style={{ flex: 1, flexShrink: 1 }}>
+                  <Text style={styles.bottledName}>
+                    {b.brandName} · TDS {b.tdsPpm} · GH {b.estimatedGhPpm} · KH {b.estimatedKhPpm}
+                  </Text>
+                  <Text style={styles.waterInfoText}>
+                    {language === 'pl' ? b.verdictPl : b.verdictEn}
+                  </Text>
+                </View>
+                <Text style={styles.bottledBadge}>
+                  {t.water[`suitability${b.suitability}` as keyof typeof t.water]}
+                </Text>
+              </View>
+            ))}
+          </View>
         </View>
       )}
     </ScrollView>
@@ -657,6 +702,51 @@ export default function DialInScreen() {
 }
 
 const styles = StyleSheet.create({
+  waterInfoCard: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 16,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  waterInfoHeader: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginBottom: 8,
+  },
+  waterInfoLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    marginTop: 8,
+    textTransform: 'uppercase',
+  },
+  waterInfoText: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    lineHeight: 18,
+  },
+  bottledRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    marginTop: 8,
+  },
+  bottledName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+  },
+  bottledBadge: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,

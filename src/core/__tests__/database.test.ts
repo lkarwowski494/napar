@@ -100,10 +100,10 @@ const mockDb: any = {
     } else if (query.includes('DELETE FROM recipes WHERE id = ?')) {
       mockDb.recipes.delete(params![0]);
     } else if (query.includes('INSERT OR REPLACE INTO brew_sessions')) {
-      const [id, rId, rName, iId, iName, type, method, dose, water, temp, grind, time, rating, tags, balance, tds, ey, caff, notes, inf, sensory, brewed] = params!;
+      const [id, rId, rName, iId, iName, type, method, dose, water, temp, waterProfile, grind, time, rating, tags, balance, tds, ey, caff, notes, inf, sensory, brewed] = params!;
       mockDb.sessions.set(id, {
         id, recipe_id: rId, recipe_name: rName, inventory_item_id: iId, inventory_item_name: iName,
-        beverage_type: type, method, dose_g: dose, water_g: water, water_temp_c: temp, grind_setting: grind,
+        beverage_type: type, method, dose_g: dose, water_g: water, water_temp_c: temp, water_profile: waterProfile, grind_setting: grind,
         total_time_seconds: time, rating, flavor_tags_json: tags, taste_balance: balance, tds_percentage: tds,
         extraction_yield_percentage: ey, caffeine_content_mg: caff, notes, infusion_number: inf,
         sensory_scores_json: sensory, brewed_at: brewed

@@ -32,6 +32,8 @@ export interface BrewContextType {
   // Actions
   selectRecipe: (recipe: SavedRecipe | MasterRecipe) => void;
   selectInventoryItem: (item: InventoryItem | null) => void;
+  waterProfile: string;
+  setWaterProfile: (profile: string) => void;
   setDoseGrams: (grams: number) => void;
   setWaterGrams: (grams: number) => void;
   setWaterTempCelsius: (temp: number) => void;
@@ -49,6 +51,7 @@ export interface BrewContextType {
     tdsPercentage?: number;
     notes?: string;
     sensory?: SensoryProfile;
+    waterProfile?: string;
     logToCaffeineTracker?: boolean;
   }) => BrewSession;
 }
@@ -90,6 +93,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [doseGrams, setDoseGrams] = useState<number>(initialDose);
   const [waterGrams, setWaterGrams] = useState<number>(initialWater);
   const [waterTempCelsius, setWaterTempCelsius] = useState<number>(initialTemp);
+  const [waterProfile, setWaterProfile] = useState<string>('sca_standard');
   const [grindSetting, setGrindSetting] = useState<string>(initialGrind);
 
   // Parsuj kroki przepisu
@@ -163,6 +167,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     tdsPercentage?: number;
     notes?: string;
     sensory?: SensoryProfile;
+    waterProfile?: string;
     logToCaffeineTracker?: boolean;
   }): BrewSession => {
     engineRef.current?.finish();
@@ -200,6 +205,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       doseGrams,
       waterGrams,
       waterTempCelsius,
+      waterProfile: data.waterProfile || waterProfile,
       grindSetting,
       totalTimeSeconds: snapshot.totalElapsedSeconds,
       rating: data.rating,
@@ -242,6 +248,8 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         recipe,
         selectedInventoryItem,
+        waterProfile,
+        setWaterProfile,
         doseGrams,
         waterGrams,
         waterTempCelsius,

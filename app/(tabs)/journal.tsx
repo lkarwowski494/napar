@@ -18,6 +18,7 @@ import { BrewSession } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
 import { SensoryRadarChart } from '../../src/core/radar-chart';
+import { getWaterProfileName } from '../../src/core/water-chemistry';
 
 export default function JournalScreen() {
   const { t, language } = useTranslation();
@@ -202,6 +203,12 @@ export default function JournalScreen() {
                   <Text style={styles.metricValHighlight}>
                     ~{Math.round(session.caffeineContentMg)} mg
                   </Text>
+                </View>
+              )}
+              {session.waterProfile && (
+                <View style={styles.metricItem} testID={`journal-water-${session.id}`}>
+                  <Text style={styles.metricLabel}>{t.water.sessionWaterLabel}</Text>
+                  <Text style={styles.metricVal}>{getWaterProfileName(session.waterProfile, language)}</Text>
                 </View>
               )}
             </View>

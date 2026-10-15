@@ -29,6 +29,7 @@ import {
   SensoryProfile,
 } from '../../src/core/radar-chart';
 import { calculateBatchScaling } from '../../src/core/domain-rules';
+import { WATER_RECIPES } from '../../src/core/water-chemistry';
 
 export default function BrewScreen() {
   const router = useRouter();
@@ -52,6 +53,8 @@ export default function BrewScreen() {
     nextStep,
     previousStep,
     finishAndSaveSession,
+    waterProfile,
+    setWaterProfile,
   } = useBrew();
 
   const [allRecipes, setAllRecipes] = useState<any[]>(MASTER_RECIPES);
@@ -642,6 +645,29 @@ export default function BrewScreen() {
                 onToggleDescriptor={toggleTag}
               />
 
+              {/* Profil wody użytej do parzenia */}
+              <Text style={[styles.finishSectionLabel, { marginTop: 14 }]}>Woda użyta do parzenia</Text>
+              <View style={styles.waterChipsRow}>
+                {WATER_RECIPES.map((w) => {
+                  const active = waterProfile === w.id;
+                  return (
+                    <Pressable
+                      key={w.id}
+                      testID={`water-chip-${w.id}`}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: active }}
+                      accessibilityLabel={`Woda ${w.namePl}, GH ${w.targetGhPpm}, KH ${w.targetKhPpm}`}
+                      style={[styles.waterChip, active && styles.waterChipActive]}
+                      onPress={() => setWaterProfile(w.id)}
+                    >
+                      <Text style={[styles.waterChipText, active && styles.waterChipTextActive]}>
+                        {w.namePl}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
               {/* Opcjonalny TDS */}
               <View style={styles.tdsInputRow}>
                 <Text style={styles.tdsInputLabel}>Odczyt TDS refractometru (%):</Text>
@@ -1084,6 +1110,34 @@ const styles = StyleSheet.create({
   flavorTagTextActive: {
     color: theme.colors.emeraldLight,
     fontWeight: '600',
+  },
+  waterChipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  waterChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    minHeight: 44,
+    justifyContent: 'center',
+    borderRadius: theme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.bgCardSecondary,
+  },
+  waterChipActive: {
+    borderColor: theme.colors.copper,
+    backgroundColor: theme.colors.copperMuted,
+  },
+  waterChipText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  waterChipTextActive: {
+    color: theme.colors.textPrimary,
+    fontWeight: '700',
   },
   tdsInputRow: {
     flexDirection: 'row',

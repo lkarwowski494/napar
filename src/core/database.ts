@@ -31,6 +31,12 @@ export function initDatabase(db: SQLite.SQLiteDatabase): void {
     // Column already exists
   }
 
+  try {
+    db.runSync('ALTER TABLE brew_sessions ADD COLUMN water_profile TEXT');
+  } catch {
+    // Column already exists
+  }
+
   // Sprawdź czy tabela recipes ma dane początkowe z master recipes
   const countRow = db.getFirstSync<{ count: number }>(
     'SELECT COUNT(*) as count FROM recipes'
@@ -286,11 +292,11 @@ export function saveBrewSession(session: BrewSession): void {
   db.runSync(
     `INSERT OR REPLACE INTO brew_sessions (
       id, recipe_id, recipe_name, inventory_item_id, inventory_item_name,
-      beverage_type, method, dose_g, water_g, water_temp_c,
+      beverage_type, method, dose_g, water_g, water_temp_c, water_profile,
       grind_setting, total_time_seconds, rating, flavor_tags_json,
       taste_balance, tds_percentage, extraction_yield_percentage,
       caffeine_content_mg, notes, infusion_number, sensory_scores_json, brewed_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       session.id,
       session.recipeId ?? null,
@@ -302,6 +308,7 @@ export function saveBrewSession(session: BrewSession): void {
       session.doseGrams,
       session.waterGrams,
       session.waterTempCelsius,
+      session.waterProfile ?? null,
       session.grindSetting ?? null,
       session.totalTimeSeconds,
       session.rating ?? null,
@@ -351,6 +358,7 @@ function mapRowToBrewSession(row: any): BrewSession {
     doseGrams: row.dose_g,
     waterGrams: row.water_g,
     waterTempCelsius: row.water_temp_c,
+    waterProfile: row.water_profile || undefined,
     grindSetting: row.grind_setting || undefined,
     totalTimeSeconds: row.total_time_seconds,
     rating: row.rating !== null ? row.rating : undefined,

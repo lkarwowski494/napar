@@ -38,10 +38,47 @@
 
 ---
 
-### **RD-04: Skład i mineralizacja wody baristycznej**
-* **Poziom pewności:** **STANDARD** (SCA Water Quality Standard).
-* **Definicja reguły:** Woda idealna do parzenia kawy specialty powinna posiadać:
-  - Twardość ogólna (General Hardness - GH): 50–175 ppm CaCO3 (optimum ~100–120 ppm). Jon magnezu ($Mg^{2+}$) i wapnia ($Ca^{2+}$) wyciągają związki smakowe.
-  - Zasadowość / Bufor (Alkalinity - KH): 40–75 ppm CaCO3 (optimum ~40–50 ppm). Wodorowęglany neutralizują nadmiar kwasowości.
-  - pH: 6.5 – 7.5.
-  - TDS: 75 – 250 ppm (optimum ~150 ppm).
+### **RD-04: Parametry chemiczne wody baristycznej wg standardu SCA**
+* **Poziom pewności:** **STANDARD** (SCA Water Quality Standard / Hendon & Colonna-Dashwood *Water for Coffee*).
+* **Definicja reguły:** Woda stanowi ok. 98.5% naparu kawowego i 99.5% herbaty. O jej zdolności ekstrakcyjnej decydują dwa niezależne filary:
+  1. **Twardość ogólna (General Hardness - GH):** Stężenie kationów dwuwartościowych, głównie magnezu ($Mg^{2+}$) i wapnia ($Ca^{2+}$), wyrażone w równoważnikach $\text{ppm CaCO}_3$. Kationy te tworzą wiązania koordynacyjne z tlenowymi grupami funkcyjnymi lotnych związków aromatycznych i kwasów organicznych, wyciągając je z komórek ziarna do naparu. Magnez preferuje ekstrakcję jasnych, owocowych nut kwasowych, wapń nadaje cięższe, kremowe body.
+     - *Zakres dopuszczalny SCA:* $50\text{--}175\,\text{ppm CaCO}_3$.
+     - *Optimum:* $68\text{--}85\,\text{ppm CaCO}_3$.
+  2. **Zasadowość / Bufor węglanowy (Alkalinity - KH):** Zdolność roztworu do neutralizacji kwasów, warunkowana obecnością anionów wodorowęglanowych ($HCO_3^-$), wyrażona w $\text{ppm CaCO}_3$.
+     - *Zbyt wysoki bufor ($KH > 75$ ppm):* Całkowita neutralizacja kwasów jabłkowego i cytrynowego, napar staje się płaski, tępy i kredowy.
+     - *Zbyt niski bufor ($KH < 20$ ppm):* Brak zdolności buforującej sprawia, że nawet niewielka ilość kwasów dramatycznie obniża pH naparu, dając ostry, ściągający posmak.
+     - *Optimum:* $40\text{--}45\,\text{ppm CaCO}_3$.
+  3. **Wskaźnik TDS całkowitej mineralizacji:** $75\text{--}250\,\text{ppm}$ (optimum $150\,\text{ppm}$).
+  4. **pH wody:** $6.5\text{--}7.5$ (optimum $7.0$).
+
+---
+
+### **RD-05: Matematyka remineralizacji wody Barista Hustle i suchych soli**
+* **Poziom pewności:** **CHEMIA / STANDARD** (Matt Perger, Barista Hustle Water Recipes).
+* **Definicja reguły:** Precyzyjne dozowanie minerałów do chemicznie czystej wody (destylowanej lub po odwróconej osmozie RO o przewodności $< 5\,\mu\text{S/cm}$):
+  1. **System Koncentratów Płynnych (Barista Hustle):**
+     - *Butelka Bufora (Buffer A):* Rozpuszczenie $1.68\,\text{g NaHCO}_3$ w $500\,\text{g}$ wody demineralizowanej.
+     - *Butelka Magnezu (Hardness B):* Rozpuszczenie $2.45\,\text{g MgSO}_4\cdot 7\text{H}_2\text{O}$ w $500\,\text{g}$ wody demineralizowanej.
+     - *Wzór przeliczeniowy:*
+       $$\text{Masa Bufora A (g)} = \frac{KH_{\text{target}}}{2.0} \times V_{\text{woda (L)}}$$
+       $$\text{Masa Magnezu B (g)} = \frac{GH_{\text{target}}}{2.0} \times V_{\text{woda (L)}}$$
+  2. **Bezpośrednie odważanie soli suchych:**
+     - $\text{Masa NaHCO}_3\text{ (g)} = KH_{\text{target}} \times 0.00168 \times V_{\text{woda (L)}}$
+     - $\text{Masa MgSO}_4\cdot 7\text{H}_2\text{O}\text{ (g)} = GH_{\text{target}} \times 0.002465 \times V_{\text{woda (L)}}$
+     - $\text{Masa CaCl}_2\cdot 2\text{H}_2\text{O}\text{ (g)} = GH_{\text{target}} \times 0.00147 \times V_{\text{woda (L)}}$
+* **Wektory testowe:**
+  - *Wejście:* Receptura Barista Hustle 80/40 ($GH = 80$, $KH = 40$), Objętość $V = 1.0\,\text{L}$.
+    - *Bufor A:* $(40 / 2) \times 1 = 20.0\,\text{g}$.
+    - *Magnez B:* $(80 / 2) \times 1 = 40.0\,\text{g}$.
+  - *Wejście:* Baniak 5L ($V = 5.0\,\text{L}$), Receptura 80/40:
+    - *Bufor A:* $100.0\,\text{g}$, *Magnez B:* $200.0\,\text{g}$.
+    - *Suche NaHCO3:* $40 \times 0.00168 \times 5 = 0.336\,\text{g}$.
+    - *Suchy MgSO4:* $80 \times 0.002465 \times 5 = 0.986\,\text{g}$.
+
+---
+
+### **RD-06: Wymagania chemiczne wody dla herbaty rzemieślniczej**
+* **Poziom pewności:** **STANDARD** (Tradycyjne traktaty herbaciane Lu Yu / Współczesne badania chemii herbaty).
+* **Definicja reguły:** Herbata wymaga znacznie delikatniejszej mineralizacji niż kawa specialty ze względu na wrażliwość katechin (EGCG) oraz aminokwasów (L-teaniny):
+  - *Herbaty zielone i białe (Sencha, Gyokuro, Silver Needle):* Woda bardzo miękka ($GH = 20\text{--}35\,\text{ppm}$, $KH = 10\text{--}20\,\text{ppm}$, $\text{TDS} < 50\,\text{ppm}$). Minerały powyżej $50\,\text{ppm}$ powodują mętność likieru (*tea scum*) w wyniku łączenia polifenoli z wapniem i tłumią delikatną słodycz umami.
+  - *Herbaty Wulong skalne (Yan Cha) i dojrzałe Puerh:* Woda średnio zmineralizowana, z przewagą magnezu i krzemionki ($GH = 50\text{--}70\,\text{ppm}$, $KH = 25\text{--}35\,\text{ppm}$, $\text{TDS} \approx 80\text{--}120\,\text{ppm}$), imitująca naturalną wodę ze źródeł górskich pasma Wuyi Shan.
