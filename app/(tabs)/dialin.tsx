@@ -139,7 +139,7 @@ export default function DialInScreen() {
     const tds = parseFloat(eyTds);
     if (!isNaN(w) && !isNaN(d) && !isNaN(tds) && w > 0 && d > 0 && tds > 0) {
       try {
-        return calculateExtractionYield(w, d, tds);
+        return calculateExtractionYield(w, tds, d);
       } catch {
         return null;
       }

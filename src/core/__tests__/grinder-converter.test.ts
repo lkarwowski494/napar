@@ -32,11 +32,73 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(timemore.formatted).toContain('21 klików');
   });
 
-  test('Prawidłowo przelicza nastawę między dwoma młynkami', () => {
+  test('Prawidłowo przelicza mikrony dla 1Zpresso K-Ultra, Fellow Ode, Baratza Encore i Kingrinder K6', () => {
+    // 1Zpresso K-Ultra: 720um / 20um = 36 klików (3.6)
+    const kUltra = convertMicronsToGrinder(720, '1zpresso_k_ultra');
+    expect(kUltra.rawValue).toBe(36);
+    expect(kUltra.formatted).toBe('3.6 (36 klików)');
+
+    // Fellow Ode Gen 2: (720 - 200) / 40 = 13 klików
+    const ode = convertMicronsToGrinder(720, 'fellow_ode_gen2');
+    expect(ode.rawValue).toBe(13);
+    expect(ode.formatted).toBe('5');
+
+    // Baratza Encore: (720 - 150) / 35 = 16.28 -> 16
+    const encore = convertMicronsToGrinder(720, 'baratza_encore');
+    expect(encore.rawValue).toBe(16);
+    expect(encore.formatted).toBe('Nastawa #16');
+
+    // Kingrinder K6: 720um / 16um = 45 klików
+    const k6 = convertMicronsToGrinder(720, 'kingrinder_k6');
+    expect(k6.rawValue).toBe(45);
+    expect(k6.formatted).toBe('45 klików');
+  });
+
+  test('Prawidłowo parsuje nastawy tekstowe dla każdego młynka', () => {
+    for (const grinder of SUPPORTED_GRINDERS) {
+      const parsedFromNumber = grinder.parseSetting('20');
+      expect(parsedFromNumber).toBeGreaterThan(0);
+    }
+
+    const kUltra = SUPPORTED_GRINDERS.find((g) => g.id === '1zpresso_k_ultra')!;
+    expect(kUltra.parseSetting('3.5')).toBe(700); // 3.5 * 10 * 20um = 700um
+    expect(kUltra.parseSetting('50')).toBe(1000); // 50 * 20um = 1000um
+
+    const ode = SUPPORTED_GRINDERS.find((g) => g.id === 'fellow_ode_gen2')!;
+    expect(ode.parseSetting('4')).toBe(200 + 4 * 3 * 40);
+
+    const encore = SUPPORTED_GRINDERS.find((g) => g.id === 'baratza_encore')!;
+    expect(encore.parseSetting('#18')).toBe(150 + 18 * 35);
+  });
+
+  test('Prawidłowo przelicza nastawę między dwoma młynkami (liczba oraz tekst)', () => {
     // 24 kliki Comandante (720um) -> Timemore C2 (21 klików)
-    const res = convertBetweenGrinders('comandante_c40', 24, 'timemore_c2_c3');
-    expect(res.microns).toBe(720);
-    expect(res.targetFormatted).toContain('21 klików');
+    const resNumber = convertBetweenGrinders('comandante_c40', 24, 'timemore_c2_c3');
+    expect(resNumber.microns).toBe(720);
+    expect(resNumber.targetFormatted).toContain('21 klików');
+
+    // Tekstowo: '24' Comandante -> Fellow Ode
+    const resText = convertBetweenGrinders('comandante_c40', '24 kliki', 'fellow_ode_gen2');
+    expect(resText.microns).toBe(720);
+    expect(resText.targetFormatted).toBe('5');
+  });
+
+  test('Prawidłowo ogranicza nastawy skrajne (min/max clamping)', () => {
+    // Ekstremalnie drobny przemiał (np. 50 um) -> clamp do minSetting
+    const ultraFine = convertMicronsToGrinder(50, 'comandante_c40');
+    expect(ultraFine.rawValue).toBe(5); // minSetting Comandante
+
+    // Ekstremalnie gruby przemiał (np. 3000 um) -> clamp do maxSetting
+    const ultraCoarse = convertMicronsToGrinder(3000, 'comandante_c40');
+    expect(ultraCoarse.rawValue).toBe(45); // maxSetting Comandante
+  });
+
+  test('Obsługuje fallback dla nieznanego identyfikatora młynka', () => {
+    const fallback = convertMicronsToGrinder(720, 'unknown_grinder_999');
+    expect(fallback.grinderName).toBe(SUPPORTED_GRINDERS[0].name);
+
+    const fallbackBetween = convertBetweenGrinders('unknown_src', 20, 'unknown_tgt');
+    expect(fallbackBetween.targetFormatted).toBeTruthy();
   });
 
   test('Zwraca kategorie grubości mielenia od espresso do cold brew', () => {

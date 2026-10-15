@@ -166,9 +166,11 @@ export default function GongfuScreen() {
 
   const handleAdjustTime = (delta: number) => {
     if (isSteeping) return;
-    const newTarget = Math.max(5, targetSeconds + delta);
-    setTargetSeconds(newTarget);
-    setRemainingSeconds(newTarget);
+    setTargetSeconds((prev) => {
+      const newTarget = Math.max(5, prev + delta);
+      setRemainingSeconds(newTarget);
+      return newTarget;
+    });
   };
 
   const handleFinishAndSaveSession = () => {

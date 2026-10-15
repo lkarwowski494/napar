@@ -4,6 +4,10 @@
 
 import React from 'react';
 import renderer from 'react-test-renderer';
+import { Alert } from 'react-native';
+
+const mockPush = jest.fn();
+const mockBack = jest.fn();
 
 // Mock in-memory DB for SQLite
 const mockDb: any = {
@@ -13,6 +17,9 @@ const mockDb: any = {
     if (query.includes('FROM recipes WHERE id = ?')) {
       return mockDb.recipes.get(params?.[0]) || null;
     }
+    if (query.includes('COUNT(*) as count FROM recipes')) {
+      return { count: mockDb.recipes.size };
+    }
     return null;
   }),
   getAllSync: jest.fn((query: string) => {
@@ -21,6 +28,10 @@ const mockDb: any = {
     }
     return [];
   }),
+  prepareSync: jest.fn(() => ({
+    executeSync: jest.fn(),
+    finalizeSync: jest.fn(),
+  })),
   runSync: jest.fn((query: string, params?: any[]) => {
     if (query.includes('INSERT OR REPLACE INTO recipes')) {
       const [id, name, type, method, author, desc, dose, water, temp, grind, ratio, steps, custom, fav, created] = params!;
@@ -54,8 +65,8 @@ jest.mock('expo-sqlite', () => ({
 // Mock expo-router
 jest.mock('expo-router', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    back: jest.fn(),
+    push: mockPush,
+    back: mockBack,
   }),
   useLocalSearchParams: () => ({}),
 }));
@@ -68,12 +79,13 @@ import { calculateBrewRatio } from '../domain-rules';
 describe('Custom Recipe Builder & Persistence', () => {
   const testRecipeId = 'custom-test-recipe-1';
 
+  beforeEach(() => {
+    jest.spyOn(Alert, 'alert');
+    mockDb.recipes.clear();
+  });
+
   afterEach(() => {
-    try {
-      deleteRecipe(testRecipeId);
-    } catch {
-      // cleanup
-    }
+    jest.restoreAllMocks();
   });
 
   test('Prawidłowo wylicza proporcję RD-01 dla parametrów receptury', () => {
@@ -149,5 +161,109 @@ describe('Custom Recipe Builder & Persistence', () => {
     expect(str).toContain('Kawa');
     expect(str).toContain('Herbata');
     expect(str).toContain('Zapisz');
+  });
+
+  test('Waliduje brakujące pola i wyświetla Alert', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    // Kliknij przycisk Zapisz w nagłówku (z pustą nazwą)
+    const saveText = tree.root.findAll((node: any) => {
+      return node.props && node.props.children === 'Zapisz';
+    })[0];
+
+    let saveBtn = saveText.parent;
+    while (saveBtn && !saveBtn.props.onPress) {
+      saveBtn = saveBtn.parent;
+    }
+
+    renderer.act(() => {
+      saveBtn.props.onPress();
+    });
+
+    expect(Alert.alert).toHaveBeenCalledWith(
+      'Nowa Receptura',
+      'Wypełnij nazwę i dodaj przynajmniej jeden krok parzenia.'
+    );
+  });
+
+  test('Dodaje i usuwa krok parzenia w kreatorze', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    const getStepCount = () =>
+      tree.root.findAll((n: any) => typeof n.type !== 'string' && n.props && n.props.children === 'Nazwa kroku').length;
+
+    // Domyślnie kreator startuje z 2 krokami (Bloom + Główne zalanie)
+    expect(getStepCount()).toBe(2);
+
+    // Kliknij '+ Dodaj kolejny krok'
+    const addStepText = tree.root.findAll((node: any) => {
+      return node.props && node.props.children === '+ Dodaj kolejny krok';
+    })[0];
+
+    let addStepBtn = addStepText.parent;
+    while (addStepBtn && !addStepBtn.props.onPress) {
+      addStepBtn = addStepBtn.parent;
+    }
+
+    renderer.act(() => {
+      addStepBtn.props.onPress();
+    });
+
+    // Po dodaniu są 3 kroki
+    expect(getStepCount()).toBe(3);
+
+    // Usuń krok 3 (ostatni przycisk z akcją usuwania)
+    const removeCrosses = tree.root.findAll((node: any) => {
+      return node.props && node.props.children === '✕';
+    });
+    let removeBtn = removeCrosses[removeCrosses.length - 1].parent;
+    while (removeBtn && !removeBtn.props.onPress) {
+      removeBtn = removeBtn.parent;
+    }
+
+    renderer.act(() => {
+      removeBtn.props.onPress();
+    });
+
+    expect(getStepCount()).toBe(2);
+  });
+
+  test('Wpisanie nazwy receptury i pomyślny zapis do bazy', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    // Znajdź input nazwy receptury
+    const nameInput = tree.root.findByProps({
+      placeholder: 'np. Mój Ulubiony V60 3-Pour',
+    });
+
+    renderer.act(() => {
+      nameInput.props.onChangeText('Mój Kalita Wave');
+    });
+
+    // Kliknij Zapisz w nagłówku
+    const saveText = tree.root.findAll((node: any) => {
+      return node.props && node.props.children === 'Zapisz';
+    })[0];
+
+    let saveBtn = saveText.parent;
+    while (saveBtn && !saveBtn.props.onPress) {
+      saveBtn = saveBtn.parent;
+    }
+
+    renderer.act(() => {
+      saveBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalled();
+    expect(mockBack).toHaveBeenCalled();
   });
 });

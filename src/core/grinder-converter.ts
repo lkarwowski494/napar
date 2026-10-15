@@ -136,8 +136,8 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     name: 'Fellow Ode Gen 2',
     burrType: 'Gen 2 Flat Burrs (64mm płaskie)',
     stepMicrons: 40.0, // ok. 40 mikronów na 1 krok (1/3 numeru)
-    minSetting: 1.0,
-    maxSetting: 11.0,
+    minSetting: 1,
+    maxSetting: 31,
     micronsPerSettingOffset: 200,
     formatSetting: (clicks: number) => {
       // clicks reprezentuje pozycję od 1.0 do 11.0 (krok co 1/3)
