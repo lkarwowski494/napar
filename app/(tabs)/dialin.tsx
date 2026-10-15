@@ -19,13 +19,47 @@ import {
   calculateLiquidYield,
   calculateExtractionYield,
 } from '../../src/core/domain-rules';
+import {
+  WATER_RECIPES,
+  calculateWaterMinerals,
+  WaterRecipe,
+} from '../../src/core/water-chemistry';
 import { theme } from '../../src/core/theme';
+import { useTranslation } from '../../src/core/i18n';
 
 export default function DialInScreen() {
-  const [activeTab, setActiveTab] = useState<'doctor' | 'ratio' | 'ey'>('doctor');
+  const { t, language } = useTranslation();
+  const [activeTab, setActiveTab] = useState<'doctor' | 'ratio' | 'ey' | 'water'>('doctor');
 
   // Stan: Dial-in Doctor
   const [selectedIssue, setSelectedIssue] = useState<string>('sour');
+
+  // Stan: Kalkulator Mineralizacji Wody
+  const [selectedWaterRecipeId, setSelectedWaterRecipeId] = useState<string>('barista_hustle_80_40');
+  const [waterVolumeInput, setWaterVolumeInput] = useState<string>('1.0');
+  const [customGhInput, setCustomGhInput] = useState<string>('80');
+  const [customKhInput, setCustomKhInput] = useState<string>('40');
+  const [isCustomWater, setIsCustomWater] = useState<boolean>(false);
+
+  const selectedRecipeObj =
+    WATER_RECIPES.find((r) => r.id === selectedWaterRecipeId) || WATER_RECIPES[0];
+
+  const waterCalc = React.useMemo(() => {
+    const vol = parseFloat(waterVolumeInput) || 1.0;
+    const gh = isCustomWater
+      ? parseFloat(customGhInput) || 80
+      : selectedRecipeObj.targetGhPpm;
+    const kh = isCustomWater
+      ? parseFloat(customKhInput) || 40
+      : selectedRecipeObj.targetKhPpm;
+    return calculateWaterMinerals(vol, gh, kh);
+  }, [
+    waterVolumeInput,
+    isCustomWater,
+    customGhInput,
+    customKhInput,
+    selectedRecipeObj,
+  ]);
 
   // Stan: Kalkulator Ratio
   const [doseInput, setDoseInput] = useState('18');
@@ -146,6 +180,20 @@ export default function DialInScreen() {
             ]}
           >
             🔬 TDS & EY%
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.segmentBtn, activeTab === 'water' && styles.segmentBtnActive]}
+          onPress={() => setActiveTab('water')}
+        >
+          <Text
+            style={[
+              styles.segmentBtnText,
+              activeTab === 'water' && styles.segmentBtnTextActive,
+            ]}
+          >
+            {t.water.tabTitle}
           </Text>
         </Pressable>
       </View>
@@ -366,6 +414,173 @@ export default function DialInScreen() {
                 </Text>
               </View>
             )}
+          </View>
+        </View>
+      )}
+
+      {/* 4. MINERALIZACJA WODY (SCA WATER CHEMISTRY) */}
+      {activeTab === 'water' && (
+        <View>
+          <Text style={styles.sectionHeader}>{t.water.title}</Text>
+          <Text style={styles.sectionSub}>{t.water.subtitle}</Text>
+
+          {/* Szybki wybór objętości wody bazowej */}
+          <View style={styles.waterVolumeCard}>
+            <Text style={styles.cardSectionTitle}>{t.water.waterVolumeLabel}</Text>
+            <View style={styles.volumeChipsRow}>
+              {['1.0', '2.0', '5.0'].map((vol) => (
+                <Pressable
+                  key={vol}
+                  style={[
+                    styles.volumeChip,
+                    waterVolumeInput === vol && styles.volumeChipActive,
+                  ]}
+                  onPress={() => setWaterVolumeInput(vol)}
+                >
+                  <Text
+                    style={[
+                      styles.volumeChipText,
+                      waterVolumeInput === vol && styles.volumeChipTextActive,
+                    ]}
+                  >
+                    {vol} L
+                  </Text>
+                </Pressable>
+              ))}
+              <View style={styles.volumeInputBox}>
+                <TextInput
+                  style={styles.volumeCustomInput}
+                  keyboardType="decimal-pad"
+                  value={waterVolumeInput}
+                  onChangeText={setWaterVolumeInput}
+                />
+                <Text style={styles.volumeCustomUnit}>L</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Profile mineralizacji wody */}
+          <Text style={styles.cardSectionTitle}>{t.water.recipeSelectLabel}</Text>
+          <View style={styles.waterRecipesList}>
+            {WATER_RECIPES.map((recipe) => {
+              const isSelected = !isCustomWater && selectedWaterRecipeId === recipe.id;
+              return (
+                <Pressable
+                  key={recipe.id}
+                  style={[
+                    styles.waterRecipeCard,
+                    isSelected && styles.waterRecipeCardActive,
+                  ]}
+                  onPress={() => {
+                    setIsCustomWater(false);
+                    setSelectedWaterRecipeId(recipe.id);
+                  }}
+                >
+                  <View style={styles.waterRecipeHeader}>
+                    <Text style={styles.waterRecipeName}>
+                      {language === 'pl' ? recipe.namePl : recipe.nameEn}
+                    </Text>
+                    <View style={styles.waterGhKhBadges}>
+                      <Text style={styles.waterGhBadge}>GH {recipe.targetGhPpm}</Text>
+                      <Text style={styles.waterKhBadge}>KH {recipe.targetKhPpm}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.waterRecipeDesc}>
+                    {language === 'pl' ? recipe.descriptionPl : recipe.descriptionEn}
+                  </Text>
+                  <Text style={styles.waterRecipeBestFor}>
+                    🎯 {language === 'pl' ? recipe.bestForPl : recipe.bestForEn}
+                  </Text>
+                </Pressable>
+              );
+            })}
+
+            {/* Opcja własnego profilu (Custom GH/KH) */}
+            <Pressable
+              style={[
+                styles.waterRecipeCard,
+                isCustomWater && styles.waterRecipeCardActive,
+              ]}
+              onPress={() => setIsCustomWater(true)}
+            >
+              <Text style={styles.waterRecipeName}>Własny profil (Custom GH / KH)</Text>
+              {isCustomWater && (
+                <View style={styles.customWaterInputsRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.customInputSubLabel}>GH (ppm CaCO₃)</Text>
+                    <TextInput
+                      style={styles.customWaterInput}
+                      keyboardType="number-pad"
+                      value={customGhInput}
+                      onChangeText={setCustomGhInput}
+                    />
+                  </View>
+                  <View style={{ flex: 1, marginLeft: 12 }}>
+                    <Text style={styles.customInputSubLabel}>KH (ppm CaCO₃)</Text>
+                    <TextInput
+                      style={styles.customWaterInput}
+                      keyboardType="number-pad"
+                      value={customKhInput}
+                      onChangeText={setCustomKhInput}
+                    />
+                  </View>
+                </View>
+              )}
+            </Pressable>
+          </View>
+
+          {/* KARTA METODY A: SYSTEM KONCENTRATÓW BARISTA HUSTLE */}
+          <View style={styles.methodCard}>
+            <View style={styles.methodHeaderBadge}>
+              <Text style={styles.methodBadgeText}>REKOMENDOWANA METODA A</Text>
+            </View>
+            <Text style={styles.methodTitle}>{t.water.methodAHeader}</Text>
+            <Text style={styles.methodDesc}>{t.water.methodADesc}</Text>
+
+            <View style={styles.concentrateDoseRow}>
+              <View style={styles.concentrateBox}>
+                <Text style={styles.concentrateLabel}>{t.water.bufferGrams}</Text>
+                <Text style={styles.concentrateValue}>
+                  {waterCalc.concentrateBufferGrams} g
+                </Text>
+                <Text style={styles.concentrateSub}>KH {waterCalc.targetKhPpm} ppm (bufor)</Text>
+              </View>
+
+              <View style={styles.concentrateBox}>
+                <Text style={styles.concentrateLabel}>{t.water.hardnessGrams}</Text>
+                <Text style={styles.concentrateValue}>
+                  {waterCalc.concentrateHardnessGrams} g
+                </Text>
+                <Text style={styles.concentrateSub}>GH {waterCalc.targetGhPpm} ppm (magnez)</Text>
+              </View>
+            </View>
+
+            <Text style={styles.concentrateHelpText}>
+              💡 {t.water.concentrateHelp}
+            </Text>
+          </View>
+
+          {/* KARTA METODY B: SUCHE SOLE */}
+          <View style={[styles.methodCard, { marginTop: 12 }]}>
+            <Text style={styles.methodTitle}>{t.water.methodBHeader}</Text>
+            <Text style={styles.methodDesc}>
+              Ważenie suchych soli prosto do {waterCalc.waterVolumeLiters}L wody:
+            </Text>
+
+            <View style={styles.drySaltRow}>
+              <Text style={styles.drySaltName}>{t.water.dryBakingSoda}</Text>
+              <Text style={styles.drySaltAmount}>{waterCalc.dryBakingSodaNaHCO3Grams} g</Text>
+            </View>
+
+            <View style={styles.drySaltRow}>
+              <Text style={styles.drySaltName}>{t.water.dryEpsom}</Text>
+              <Text style={styles.drySaltAmount}>{waterCalc.dryEpsomSaltMgSO4Grams} g</Text>
+            </View>
+
+            <View style={styles.drySaltRow}>
+              <Text style={styles.drySaltName}>{t.water.dryCalcium} (opcja)</Text>
+              <Text style={styles.drySaltAmount}>{waterCalc.dryCalciumChlorideCaCl2Grams} g</Text>
+            </View>
           </View>
         </View>
       )}
@@ -640,5 +855,233 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     textAlign: 'center',
     lineHeight: 18,
+  },
+  cardSectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginBottom: 8,
+  },
+  waterVolumeCard: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginBottom: 16,
+  },
+  volumeChipsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  volumeChip: {
+    flex: 1,
+    paddingVertical: 10,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  volumeChipActive: {
+    backgroundColor: 'rgba(217, 119, 54, 0.2)',
+    borderColor: theme.colors.copper,
+  },
+  volumeChipText: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+  },
+  volumeChipTextActive: {
+    color: theme.colors.copper,
+    fontWeight: '700',
+  },
+  volumeInputBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingHorizontal: 8,
+    width: 65,
+    height: 38,
+  },
+  volumeCustomInput: {
+    flex: 1,
+    color: theme.colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  volumeCustomUnit: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
+  waterRecipesList: {
+    gap: 10,
+    marginBottom: 16,
+  },
+  waterRecipeCard: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  waterRecipeCardActive: {
+    borderColor: theme.colors.copper,
+    backgroundColor: 'rgba(217, 119, 54, 0.08)',
+  },
+  waterRecipeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  waterRecipeName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    flex: 1,
+  },
+  waterGhKhBadges: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  waterGhBadge: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  waterKhBadge: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.emeraldLight,
+    backgroundColor: 'rgba(42, 123, 98, 0.15)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  waterRecipeDesc: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginBottom: 6,
+    lineHeight: 16,
+  },
+  waterRecipeBestFor: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+    fontWeight: '600',
+  },
+  customWaterInputsRow: {
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  customInputSubLabel: {
+    fontSize: 10,
+    color: theme.colors.textMuted,
+    marginBottom: 4,
+  },
+  customWaterInput: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    color: theme.colors.textPrimary,
+    fontSize: 14,
+  },
+  methodCard: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  methodHeaderBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  methodBadgeText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: theme.colors.copper,
+    letterSpacing: 0.5,
+  },
+  methodTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginBottom: 4,
+  },
+  methodDesc: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginBottom: 12,
+    lineHeight: 16,
+  },
+  concentrateDoseRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
+  },
+  concentrateBox: {
+    flex: 1,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  concentrateLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.textMuted,
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  concentrateValue: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: theme.colors.copper,
+    marginBottom: 2,
+    fontVariant: ['tabular-nums'],
+  },
+  concentrateSub: {
+    fontSize: 10,
+    color: theme.colors.textSecondary,
+  },
+  concentrateHelpText: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+    lineHeight: 16,
+  },
+  drySaltRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  drySaltName: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  drySaltAmount: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
   },
 });
