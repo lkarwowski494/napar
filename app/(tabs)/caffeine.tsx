@@ -20,6 +20,7 @@ import {
   evaluateBedtimeCaffeine,
   calculateHoursUntilSafeCaffeine,
 } from '../../src/core/domain-rules';
+import { CaffeineCurveChart } from '../../src/core/caffeine-chart';
 import { theme } from '../../src/core/theme';
 
 export default function CaffeineScreen() {
@@ -124,6 +125,13 @@ export default function CaffeineScreen() {
           />
         </View>
       </View>
+
+      {/* Wykres Kinetyki Kofeiny i Snu (SVG) */}
+      <CaffeineCurveChart
+        logs={logs}
+        bedtimeHour={bedtimeHour}
+        thresholdMg={25.0}
+      />
 
       {/* Kalkulator Godziny Snu (Bedtime Curfew) */}
       <View style={styles.curfewCard}>

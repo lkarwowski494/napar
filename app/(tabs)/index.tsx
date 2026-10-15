@@ -18,6 +18,7 @@ import { useBrew } from '../../src/core/brew-context';
 import { getRecipes, getInventoryItems } from '../../src/core/database';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
 import { InventoryItem, SavedRecipe } from '../../src/core/database-schema';
+import { FlavorWheelPicker } from '../../src/core/flavor-wheel-picker';
 import { theme } from '../../src/core/theme';
 
 export default function BrewScreen() {
@@ -418,31 +419,12 @@ export default function BrewScreen() {
               ))}
             </View>
 
-            {/* Nuty smakowe */}
-            <Text style={styles.finishSectionLabel}>Nuty Smakowe</Text>
-            <View style={styles.tagsRow}>
-              {['Jaśmin', 'Brzoskwinia', 'Cytrusy', 'Czekolada', 'Karmel', 'Jagoda'].map(
-                (tag) => (
-                  <Pressable
-                    key={tag}
-                    style={[
-                      styles.flavorTag,
-                      selectedTags.includes(tag) && styles.flavorTagActive,
-                    ]}
-                    onPress={() => toggleTag(tag)}
-                  >
-                    <Text
-                      style={[
-                        styles.flavorTagText,
-                        selectedTags.includes(tag) && styles.flavorTagTextActive,
-                      ]}
-                    >
-                      {tag}
-                    </Text>
-                  </Pressable>
-                )
-              )}
-            </View>
+            {/* Hierarchiczne Koło Smaków SCA */}
+            <Text style={styles.finishSectionLabel}>Koło Smaków SCA</Text>
+            <FlavorWheelPicker
+              selectedDescriptors={selectedTags}
+              onToggleDescriptor={toggleTag}
+            />
 
             {/* Opcjonalny TDS */}
             <View style={styles.tdsInputRow}>
