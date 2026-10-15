@@ -24,6 +24,12 @@ import {
 import { InventoryItem } from '../../src/core/database-schema';
 import { evaluateRestingWindow } from '../../src/core/domain-rules';
 import { theme } from '../../src/core/theme';
+import {
+  searchCoffeeVarieties,
+  searchCoffeeProcesses,
+  searchCoffeeOrigins,
+  searchTeaCategories,
+} from '../../src/core/knowledge-data';
 
 export default function BeansScreen() {
   const router = useRouter();
@@ -32,6 +38,9 @@ export default function BeansScreen() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [filter, setFilter] = useState<'all' | 'coffee' | 'tea' | 'archived'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showCompendium, setShowCompendium] = useState(false);
+  const [compendiumTab, setCompendiumTab] = useState<'varieties' | 'processes' | 'origins' | 'tea'>('varieties');
+  const [compendiumSearch, setCompendiumSearch] = useState('');
 
   // Formularz nowej paczki
   const [name, setName] = useState('');
@@ -42,6 +51,25 @@ export default function BeansScreen() {
   const [roastProfile, setRoastProfile] = useState('light');
   const [initialWeight, setInitialWeight] = useState('250');
   const [notesStr, setNotesStr] = useState('');
+
+  const filteredVarieties = searchCoffeeVarieties(compendiumSearch);
+  const filteredProcesses = searchCoffeeProcesses(compendiumSearch);
+  const filteredOrigins = searchCoffeeOrigins(compendiumSearch);
+  const filteredTeas = searchTeaCategories(compendiumSearch);
+
+  const handleUseKnowledgeTemplate = (template: {
+    name: string;
+    type: 'coffee' | 'tea';
+    origin?: string;
+    notes: string[];
+  }) => {
+    setName(template.name);
+    setType(template.type);
+    if (template.origin) setOrigin(template.origin);
+    setNotesStr(template.notes.join(', '));
+    setShowCompendium(false);
+    setShowAddModal(true);
+  };
 
   const loadData = () => {
     try {
@@ -170,6 +198,13 @@ export default function BeansScreen() {
           </Pressable>
         </ScrollView>
 
+        <Pressable
+          testID="compendium-open-button"
+          style={styles.compendiumButton}
+          onPress={() => setShowCompendium(true)}
+        >
+          <Text style={styles.compendiumButtonText}>📚 Baza wiedzy</Text>
+        </Pressable>
         <Pressable style={styles.addButton} onPress={() => setShowAddModal(true)}>
           <Text style={styles.addButtonText}>+ Dodaj</Text>
         </Pressable>
@@ -321,6 +356,18 @@ export default function BeansScreen() {
               </Pressable>
             </View>
 
+            <Pressable
+              style={styles.compendiumPromptBtn}
+              onPress={() => {
+                setShowAddModal(false);
+                setShowCompendium(true);
+              }}
+            >
+              <Text style={styles.compendiumPromptText}>
+                💡 Szukasz inspiracji? Otwórz 📚 Bazę Wiedzy (odmiany, terroir, herbata)
+              </Text>
+            </Pressable>
+
             <Text style={styles.inputLabel}>Nazwa ziaren / herbaty *</Text>
             <TextInput
               style={styles.textInput}
@@ -385,6 +432,187 @@ export default function BeansScreen() {
             <Pressable style={styles.saveSubmitBtn} onPress={handleAddItem}>
               <Text style={styles.saveSubmitText}>Zapisz w Spiżarni</Text>
             </Pressable>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Modal: Kompendium Wiedzy (BR-WIEDZA-001 & BR-WIEDZA-002) */}
+      <Modal visible={showCompendium} animationType="slide" presentationStyle="pageSheet">
+        <View style={styles.compendiumModalContainer}>
+          <View style={styles.modalHeader}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.modalTitle}>📚 Kompendium Wiedzy</Text>
+              <Text style={styles.compendiumHeaderSub}>Odmiany botaniczne, obróbki, terroir i herbaty</Text>
+            </View>
+            <Pressable testID="compendium-close-button" onPress={() => setShowCompendium(false)} hitSlop={10}>
+              <Text style={styles.modalCloseText}>Zamknij</Text>
+            </Pressable>
+          </View>
+
+          {/* Wyszukiwarka */}
+          <View style={styles.compendiumSearchBox}>
+            <TextInput
+              style={styles.compendiumSearchInput}
+              placeholder="Szukaj odmiany, kraju, nuty lub herbaty..."
+              placeholderTextColor={theme.colors.textMuted}
+              value={compendiumSearch}
+              onChangeText={setCompendiumSearch}
+            />
+          </View>
+
+          {/* Przełącznik zakładek */}
+          <View style={styles.compendiumTabsRow}>
+            <Pressable
+              style={[styles.compTabBtn, compendiumTab === 'varieties' && styles.compTabBtnActive]}
+              onPress={() => setCompendiumTab('varieties')}
+            >
+              <Text style={[styles.compTabText, compendiumTab === 'varieties' && styles.compTabTextActive]}>
+                ☕ Odmiany ({filteredVarieties.length})
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.compTabBtn, compendiumTab === 'processes' && styles.compTabBtnActive]}
+              onPress={() => setCompendiumTab('processes')}
+            >
+              <Text style={[styles.compTabText, compendiumTab === 'processes' && styles.compTabTextActive]}>
+                ⚗️ Obróbki ({filteredProcesses.length})
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.compTabBtn, compendiumTab === 'origins' && styles.compTabBtnActive]}
+              onPress={() => setCompendiumTab('origins')}
+            >
+              <Text style={[styles.compTabText, compendiumTab === 'origins' && styles.compTabTextActive]}>
+                🌍 Terroir ({filteredOrigins.length})
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.compTabBtn, compendiumTab === 'tea' && styles.compTabBtnActive]}
+              onPress={() => setCompendiumTab('tea')}
+            >
+              <Text style={[styles.compTabText, compendiumTab === 'tea' && styles.compTabTextActive]}>
+                🍃 Herbaty ({filteredTeas.length})
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Zawartość zakładek */}
+          <ScrollView style={styles.compendiumContent} contentContainerStyle={{ paddingBottom: 40 }}>
+            {compendiumTab === 'varieties' &&
+              filteredVarieties.map((v) => (
+                <View key={v.id} style={styles.compCard}>
+                  <View style={styles.compCardHeader}>
+                    <Text style={styles.compCardTitle}>{v.name}</Text>
+                    <Text style={styles.compCardTag}>{v.recommendedRoast}</Text>
+                  </View>
+                  <Text style={styles.compCardSub}>Pochodzenie: {v.nativeRegion}</Text>
+                  <Text style={styles.compCardLineage}>Rodowód: {v.geneticLineage}</Text>
+                  <Text style={styles.compCardSensory}>{v.sensoryProfilePl}</Text>
+                  <Text style={styles.compCardDesc}>{v.descriptionPl}</Text>
+
+                  <View style={styles.badgesRow}>
+                    <View style={styles.badgePill}><Text style={styles.badgeText}>Kwasowość: {v.cupCharacteristics.acidity}</Text></View>
+                    <View style={styles.badgePill}><Text style={styles.badgeText}>Body: {v.cupCharacteristics.body}</Text></View>
+                    <View style={styles.badgePill}><Text style={styles.badgeText}>Słodycz: {v.cupCharacteristics.sweetness}</Text></View>
+                  </View>
+
+                  <View style={styles.notesTagsRow}>
+                    {v.keyNotesPl.map((n, i) => (
+                      <View key={i} style={styles.noteTag}><Text style={styles.noteTagText}>#{n}</Text></View>
+                    ))}
+                  </View>
+
+                  <Pressable
+                    style={styles.compUseBtn}
+                    onPress={() =>
+                      handleUseKnowledgeTemplate({
+                        name: `${v.name} Specialty`,
+                        type: 'coffee',
+                        origin: v.nativeRegion.split('/')[0].trim(),
+                        notes: v.keyNotesPl,
+                      })
+                    }
+                  >
+                    <Text style={styles.compUseBtnText}>+ Użyj jako szablon w spiżarni</Text>
+                  </Pressable>
+                </View>
+              ))}
+
+            {compendiumTab === 'processes' &&
+              filteredProcesses.map((p) => (
+                <View key={p.id} style={styles.compCard}>
+                  <View style={styles.compCardHeader}>
+                    <Text style={styles.compCardTitle}>{p.name}</Text>
+                    <Text style={styles.compCardTag}>Suszenie: {p.dryingDurationDays}</Text>
+                  </View>
+                  <Text style={styles.compCardSub}>Zużycie wody: {p.waterConsumption}</Text>
+                  <Text style={styles.compCardSensory}>{p.sensoryImpactPl}</Text>
+                  <Text style={styles.compCardDesc}>{p.descriptionPl}</Text>
+
+                  <View style={styles.notesTagsRow}>
+                    {p.keyNotesPl.map((n, i) => (
+                      <View key={i} style={styles.noteTag}><Text style={styles.noteTagText}>#{n}</Text></View>
+                    ))}
+                  </View>
+                </View>
+              ))}
+
+            {compendiumTab === 'origins' &&
+              filteredOrigins.map((o) => (
+                <View key={o.id} style={styles.compCard}>
+                  <View style={styles.compCardHeader}>
+                    <Text style={styles.compCardTitle}>{`${o.country} (${o.countryCode})`}</Text>
+                    <Text style={styles.compCardTag}>{o.typicalAltitudeMeters}</Text>
+                  </View>
+                  <Text style={styles.compCardSub}>Główne regiony: {o.primaryRegions.join(', ')}</Text>
+                  <Text style={styles.compCardLineage}>Zbiory: {o.harvestMonths} · Odmiany: {o.mainVarieties.join(', ')}</Text>
+                  <Text style={styles.compCardSensory}>{o.flavorProfilePl}</Text>
+                  <Text style={styles.compCardDesc}>{o.descriptionPl}</Text>
+
+                  <Pressable
+                    style={styles.compUseBtn}
+                    onPress={() =>
+                      handleUseKnowledgeTemplate({
+                        name: `${o.country} ${o.primaryRegions[0]} Washed`,
+                        type: 'coffee',
+                        origin: `${o.primaryRegions[0]}, ${o.country}`,
+                        notes: o.keyNotesPl,
+                      })
+                    }
+                  >
+                    <Text style={styles.compUseBtnText}>+ Użyj jako szablon w spiżarni</Text>
+                  </Pressable>
+                </View>
+              ))}
+
+            {compendiumTab === 'tea' &&
+              filteredTeas.map((t) => (
+                <View key={t.id} style={styles.compCard}>
+                  <View style={styles.compCardHeader}>
+                    <Text style={styles.compCardTitle}>{`${t.namePl} · ${t.traditionalName}`}</Text>
+                    <Text style={styles.compCardTag}>Oksydacja: {t.oxidationRangePercent}</Text>
+                  </View>
+                  <Text style={styles.compCardSub}>Temperatura parzenia: {t.waterTemperatureCelsius}°C</Text>
+                  <Text style={styles.compCardLineage}>Metoda Sha Qing: {t.killGreenMethod}</Text>
+                  <Text style={styles.compCardSensory}>{t.sensoryProfilePl}</Text>
+                  <Text style={styles.compCardDesc}>Słynne odmiany: {t.famousVarietiesPl.join(', ')}</Text>
+                  <Text style={styles.compCardHealth}>✨ {t.healthAttributesPl}</Text>
+
+                  <Pressable
+                    style={styles.compUseBtn}
+                    onPress={() =>
+                      handleUseKnowledgeTemplate({
+                        name: t.famousVarietiesPl[0].split('(')[0].trim(),
+                        type: 'tea',
+                        origin: t.famousRegions[0].split('(')[0].trim(),
+                        notes: [t.namePl, 'Tradycyjna'],
+                      })
+                    }
+                  >
+                    <Text style={styles.compUseBtnText}>+ Użyj jako szablon w spiżarni</Text>
+                  </Pressable>
+                </View>
+              ))}
           </ScrollView>
         </View>
       </Modal>
@@ -697,6 +925,195 @@ const styles = StyleSheet.create({
   saveSubmitText: {
     color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: '700',
+  },
+  compendiumButton: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: theme.borderRadius.full,
+    marginLeft: 8,
+  },
+  compendiumButtonText: {
+    color: theme.colors.copper,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  compendiumPromptBtn: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.md,
+    padding: 12,
+    marginBottom: 16,
+  },
+  compendiumPromptText: {
+    color: theme.colors.copperLight,
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  compendiumModalContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.bg,
+    padding: theme.spacing.md,
+  },
+  compendiumHeaderSub: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    marginTop: 2,
+  },
+  compendiumSearchBox: {
+    marginBottom: 12,
+  },
+  compendiumSearchInput: {
+    backgroundColor: theme.colors.bgCard,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.md,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    color: theme.colors.textPrimary,
+    fontSize: 14,
+  },
+  compendiumTabsRow: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    gap: 6,
+  },
+  compTabBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: theme.borderRadius.sm,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  compTabBtnActive: {
+    backgroundColor: theme.colors.copperMuted,
+    borderColor: theme.colors.copper,
+  },
+  compTabText: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+  },
+  compTabTextActive: {
+    color: theme.colors.copper,
+    fontWeight: '700',
+  },
+  compendiumContent: {
+    flex: 1,
+  },
+  compCard: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  compCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  compCardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    flex: 1,
+  },
+  compCardTag: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: theme.colors.copper,
+    backgroundColor: theme.colors.copperMuted,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.borderRadius.full,
+    overflow: 'hidden',
+  },
+  compCardSub: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  compCardLineage: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+    fontStyle: 'italic',
+    marginBottom: 8,
+  },
+  compCardSensory: {
+    fontSize: 13,
+    color: theme.colors.textPrimary,
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  compCardDesc: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    lineHeight: 16,
+    marginBottom: 8,
+  },
+  compCardHealth: {
+    fontSize: 12,
+    color: '#4ade80',
+    marginBottom: 8,
+    fontStyle: 'italic',
+  },
+  badgesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 8,
+  },
+  badgePill: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  badgeText: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    fontWeight: '500',
+  },
+  notesTagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 12,
+  },
+  noteTag: {
+    backgroundColor: theme.colors.copperMuted,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: theme.borderRadius.sm,
+  },
+  noteTagText: {
+    fontSize: 11,
+    color: theme.colors.copperLight,
+    fontWeight: '600',
+  },
+  compUseBtn: {
+    backgroundColor: theme.colors.copper,
+    paddingVertical: 8,
+    borderRadius: theme.borderRadius.sm,
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  compUseBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
     fontWeight: '700',
   },
 });

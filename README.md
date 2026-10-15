@@ -23,10 +23,16 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Wskaźnik tempa nalewania (g/s) i dynamiczny pasek postępu wody dla każdego etapu.
    - Płynne skalowanie gramatur przy zmianie dozy z zachowaniem właściwych proporcji.
    - Karta degustacyjna po zakończeniu: ocena w gwiazdkach, profil balansu smaku, nuty smakowe, wybór profilu użytej wody, odczyt refractometru TDS.
-2. **🫘 Spiżarnia Ziaren i Liści (Inventory / Stash):**
+2. **🫘 Spiżarnia Ziaren & Liści (Stash) & Kompendium Wiedzy:**
    - Śledzenie świeżości ziaren kawy (okno *Resting Window*: odgazowywanie CO₂, szczyt smaku *Peak*, stabilne okno, dojrzałe ziarna).
    - Dynamiczny ubytek wagi w paczce po każdym parzeniu.
    - Filtrowanie: Wszystkie, Kawa ziarnista, Herbata liściasta, Archiwum.
+   - **📚 Kompendium Wiedzy (Encyklopedia Specialty & Herbaty):**
+     - *Odmiany botaniczne kawy (10 odmian):* Geisha, SL28 & SL34, Pink Bourbon, Ethiopian Heirloom, Bourbon, Typica, Caturra/Catuai, Pacamara, Castillo, Eugenioides.
+     - *Metody obróbki ziaren (6 procesów):* Washed, Natural, Honey (Yellow/Red/Black), Anaerobic, Carbonic Maceration, Wet-Hulled.
+     - *Terroir & Kraje (7 eksporterów):* Etiopia, Kenia, Kolumbia, Gwatemala, Kostaryka, Brazylia, Panama (wysokości, zbiory, profile sensoryczne).
+     - *Klasyfikacja herbaty (6 wielkich tradycji):* Biała (Bai Cha), Zielona (Lü Cha / Ryokucha), Żółta (Huang Cha), Wulong (Oolong), Czarna/Czerwona (Hong Cha), Ciemna (Heicha / Puerh).
+     - Funkcja *„+ Użyj jako szablon w spiżarni”* natychmiast predefiniująca kartotekę surowca.
    - Natychmiastowe przejście do parzenia z wybranej paczki.
 3. **📖 Dziennik Degustacji (Brew Journal):**
    - Pełna historia zaparzonych filiżanek z datą, recepturą, parametrami (czas, doza, woda, temperatura, użyty profil wody).
@@ -129,12 +135,13 @@ napar/
 │   └── core/                   # Czysta logika biznesowa i persystencja
 │       ├── domain-rules.ts     # Deterministyczne reguły RD-01…RD-30
 │       ├── recipes-data.ts     # 24 wzorcowe receptury specialty i herbaty
+│       ├── knowledge-data.ts   # Kompendium wiedzy o odmianach, obróbkach, terroir i herbatach
 │       ├── database-schema.ts  # DDL i schemat SQLite
 │       ├── database.ts         # Klient expo-sqlite i repozytoria
 │       ├── timer-engine.ts     # Maszyna stanów stopera i haptyka
 │       ├── brew-context.tsx    # Główny React Context aktywnej sesji
 │       ├── theme.ts            # Tokeny stylistyczne (Apps4Brew artisanal)
-│       └── __tests__/          # 27 zestawów testowych (219 testów, mutacje i PBT)
+│       └── __tests__/          # 28 zestawów testowych (228 testów, mutacje i PBT)
 └── napar_brd/                  # Pełna dokumentacja wymagań biznesowych BRD 0.1
 ```
 

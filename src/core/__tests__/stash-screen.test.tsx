@@ -365,4 +365,103 @@ describe('BeansScreen (Stash & Inventory)', () => {
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Etiopia Yirgacheffe Washed');
   });
+
+  test('Otwiera i obsługuje interaktywne Kompendium Wiedzy (odmiany, obróbki, terroir, herbata)', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    // 1. Otwórz kompendium z paska głównego
+    const compendiumBtn = tree.root.findByProps({ testID: 'compendium-open-button' });
+    expect(compendiumBtn).toBeTruthy();
+
+    renderer.act(() => {
+      compendiumBtn.props.onPress();
+    });
+
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Kompendium Wiedzy');
+    expect(str).toContain('Geisha (Gesha)');
+
+    // 2. Przełącz na zakładkę Obróbki
+    const processTabBtn = findPressableWithText(tree.root, 'Obróbki');
+    expect(processTabBtn).toBeTruthy();
+    renderer.act(() => {
+      processTabBtn.props.onPress();
+    });
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Washed (Mokra / Myta)');
+    expect(str).toContain('Carbonic Maceration');
+
+    // 3. Przełącz na zakładkę Terroir
+    const terroirTabBtn = findPressableWithText(tree.root, 'Terroir');
+    expect(terroirTabBtn).toBeTruthy();
+    renderer.act(() => {
+      terroirTabBtn.props.onPress();
+    });
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Etiopia (ET)');
+    expect(str).toContain('Kenia (KE)');
+
+    // 4. Przełącz na zakładkę Herbaty
+    const teaTabBtn = findPressableWithText(tree.root, 'Herbaty');
+    expect(teaTabBtn).toBeTruthy();
+    renderer.act(() => {
+      teaTabBtn.props.onPress();
+    });
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Biała Herbata');
+    expect(str).toContain('Wulong (Oolong)');
+
+    // 5. Użyj szablonu herbacianego
+    const useBtn = findPressableWithText(tree.root, '+ Użyj jako szablon w spiżarni');
+    expect(useBtn).toBeTruthy();
+    renderer.act(() => {
+      useBtn.props.onPress();
+    });
+
+    // Po kliknięciu powinien otworzyć się modal dodawania z wypełnionymi danymi
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Dodaj do Spiżarni');
+
+    // 6. Zamknij formularz i przetestuj przycisk podpowiedzi wewnątrz Add Modal
+    const cancelBtn = findPressableWithText(tree.root, 'Anuluj');
+    renderer.act(() => {
+      cancelBtn.props.onPress();
+    });
+
+    // Ponownie otwórz Add Modal
+    renderer.act(() => {
+      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
+    });
+
+    const promptBtn = findPressableWithText(tree.root, 'Szukasz inspiracji?');
+    expect(promptBtn).toBeTruthy();
+    renderer.act(() => {
+      promptBtn.props.onPress();
+    });
+
+    // Z powrotem w kompendium
+    expect(JSON.stringify(tree.toJSON())).toContain('Kompendium Wiedzy');
+
+    // Przetestuj wyszukiwarkę w kompendium
+    const searchInput = tree.root.findByProps({ placeholder: 'Szukaj odmiany, kraju, nuty lub herbaty...' });
+    expect(searchInput).toBeTruthy();
+    renderer.act(() => {
+      searchInput.props.onChangeText('Puerh');
+    });
+
+    // Zamknij kompendium przyciskiem Zamknij
+    const closeBtn = tree.root.findByProps({ testID: 'compendium-close-button' });
+    renderer.act(() => {
+      closeBtn.props.onPress();
+    });
+
+    expect(JSON.stringify(tree.toJSON())).not.toContain('Odmiany botaniczne, obróbki, terroir i herbaty');
+  });
 });

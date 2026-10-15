@@ -107,3 +107,29 @@
   - Zbyt mała twardość (GH < 35 ppm): cienkie body, wodnisty finisz -> zalecenie dodania magnezu.
   - Zbyt duża twardość (GH > 150 ppm): sucha gorycz, nadekstrakcja garbników -> zalecenie zmiękczenia.
 * **Priorytet:** MUST | **Etap:** MVP
+
+---
+
+### **BR-WIEDZA-001: Encyklopedia odmian botanicznych, metod obróbki i terroir kawy**
+* **Opis:** Wbudowane kompendium wiedzy specialty oparte na danych botanicznych i agronomicznych (World Coffee Research, SCA):
+  1. *Odmiany botaniczne (10 odmian):* Geisha/Gesha, SL28 & SL34, Pink Bourbon, Ethiopian Heirloom/Landraces, Bourbon, Typica, Caturra & Catuai, Pacamara & Maragogype, Castillo & Colombia, Coffea Eugenioides.
+  2. *Metody obróbki (6 procesów):* Washed (Myta/Mokra), Natural (Sucha), Honey (Yellow, Red, Black), Anaerobic (Maceracja beztlenowa w tankach), Carbonic Maceration (Maceracja węglowa CO2), Wet-Hulled (Giling Basah Sumatra).
+  3. *Terroir & Kraje (7 głównych eksporterów specialty):* Etiopia, Kenia, Kolumbia, Gwatemala, Kostaryka, Brazylia, Panama z wysokościami upraw, oknami zbiorów i unikalnymi profilami sensorycznymi.
+* **Kryteria akceptacji:**
+  1. Dostęp do bazy wiedzy bezpośrednio z zakładki Spiżarnia (przycisk „📚 Baza wiedzy”) oraz w formularzu dodawania nowej paczki.
+  2. Możliwość jednym stuknięciem przeniesienia parametrów odmiany/kraju jako szablonu do formularza nowej paczki w spiżarni.
+  3. Wyszukiwarka dynamiczna filtrująca wg nazwy, kraju lub nut sensorycznych w czasie < 5 ms.
+* **Priorytet:** MUST | **Etap:** MVP
+
+### **BR-WIEDZA-002: Kompendium tradycji i klasyfikacji herbaty rzemieślniczej**
+* **Opis:** Usystematyzowany przewodnik po 6 tradycyjnych kategoriach herbaty z kręgu chińskiego i japońskiego:
+  1. *Biała (Bai Cha):* Pąki Silver Needle, liście Pai Mu Tan, minimalna oksydacja 5-10%, parzenie 80°C.
+  2. *Zielona (Lü Cha / Ryokucha):* Sha Qing w woku (Long Jing) vs parowanie wodne (Sencha, Gyokuro, Matcha), 0% oksydacji, aminokwasy L-teaniny, parzenie 70-75°C.
+  3. *Żółta (Huang Cha):* Unikalna autooksydacja Men Huang (duszenie w wilgotnym płótnie), znikoma goryczka, parzenie 85°C.
+  4. *Wulong (Oolong / Wulong Cha):* Skalne Yan Cha (Da Hong Pao, Rou Gui), tajwańskie Oolongi wysokogórskie (Dong Ding, Ali Shan), oksydacja 15-70%, parzenie 95°C.
+  5. *Czarna / Czerwona (Hong Cha):* Zheng Shan Xiao Zhong, Keemun, Yunnan Dian Hong, Darjeeling, pełna oksydacja 100%, parzenie 98°C.
+  6. *Ciemna / Puerh (Heicha / Puerh Cha):* Dojrzewanie mikrobiologiczne Sheng (Raw) vs Wo Dui Shou (Ripe), parzenie 98°C.
+* **Kryteria akceptacji:**
+  1. Każda kategoria podaje: stopień utlenienia, temperaturę parzenia, metodę Sha Qing, słynne odmiany i regiony oraz właściwości prozdrowotne.
+  2. Dedykowany szablon herbaty umożliwiający natychmiastowe utworzenie karty w spiżarni.
+* **Priorytet:** MUST | **Etap:** MVP

@@ -147,6 +147,8 @@ export const translations = {
       variety: 'Botaniczna odmiana',
       process: 'Obróbka',
       roastDate: 'Data palenia / Zbioru',
+      compendium: 'Kompendium Wiedzy',
+      compendiumSubtitle: 'Odmiany botaniczne, obróbki, terroir i tradycje herbaty',
     },
     journal: {
       title: 'Dziennik Degustacji',
@@ -390,6 +392,8 @@ export const translations = {
       variety: 'Botanical Variety',
       process: 'Process',
       roastDate: 'Roast / Harvest Date',
+      compendium: 'Knowledge Compendium',
+      compendiumSubtitle: 'Botanical varieties, processing, terroir & tea traditions',
     },
     journal: {
       title: 'Tasting Journal',

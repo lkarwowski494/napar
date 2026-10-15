@@ -9,6 +9,12 @@ import { MASTER_RECIPES } from '../recipes-data';
 import { SCA_FLAVOR_WHEEL } from '../flavor-wheel-data';
 import { SUPPORTED_GRINDERS } from '../grinder-converter';
 import { WATER_RECIPES } from '../water-chemistry';
+import {
+  COFFEE_VARIETIES,
+  COFFEE_PROCESSES,
+  COFFEE_ORIGINS,
+  TEA_CATEGORIES,
+} from '../knowledge-data';
 import { translations } from '../i18n';
 
 const rootDir = path.resolve(__dirname, '../../../');
@@ -220,3 +226,13 @@ describe('Kontrakt Urządzeń: Młynki Specialty & Mineralizacja Wody', () => {
     }
   });
 });
+
+describe('Kontrakt Edukacyjny: Baza Wiedzy Specialty (Knowledge Base)', () => {
+  test('Kompendium zawiera spójne taksonomicznie bazy odmian, obróbek, terroir i herbat', () => {
+    expect(COFFEE_VARIETIES.length).toBe(10);
+    expect(COFFEE_PROCESSES.length).toBe(6);
+    expect(COFFEE_ORIGINS.length).toBe(7);
+    expect(TEA_CATEGORIES.length).toBe(6);
+  });
+});
+
