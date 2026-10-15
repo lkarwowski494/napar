@@ -1,0 +1,251 @@
+// ============================================================================
+// Napar (Steepwise) — Unit Tests: Database & Repositories
+// ============================================================================
+
+import {
+  initDatabase,
+  getInventoryItems,
+  saveInventoryItem,
+  deductInventoryWeight,
+  deleteInventoryItem,
+  getRecipes,
+  saveRecipe,
+  getBrewSessions,
+  saveBrewSession,
+  getCaffeineLogs,
+  logCaffeine,
+  exportAllDataJson,
+  importDataJson,
+} from '../database';
+import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../database-schema';
+
+// Mock expo-sqlite with in-memory SQLite emulation
+const mockDb: any = {
+  inventory: new Map<string, any>(),
+  recipes: new Map<string, any>(),
+  sessions: new Map<string, any>(),
+  caffeine: new Map<string, any>(),
+
+  execSync: jest.fn(),
+  getFirstSync: jest.fn((query: string, params?: any[]) => {
+    if (query.includes('COUNT(*) as count FROM recipes')) {
+      return { count: mockDb.recipes.size };
+    }
+    if (query.includes('FROM inventory_items WHERE id = ?')) {
+      return mockDb.inventory.get(params?.[0]) || null;
+    }
+    if (query.includes('FROM recipes WHERE id = ?')) {
+      return mockDb.recipes.get(params?.[0]) || null;
+    }
+    if (query.includes('FROM brew_sessions WHERE id = ?')) {
+      return mockDb.sessions.get(params?.[0]) || null;
+    }
+    return null;
+  }),
+  getAllSync: jest.fn((query: string, params?: any[]) => {
+    if (query.includes('FROM inventory_items')) {
+      return Array.from(mockDb.inventory.values());
+    }
+    if (query.includes('FROM recipes')) {
+      return Array.from(mockDb.recipes.values());
+    }
+    if (query.includes('FROM brew_sessions')) {
+      return Array.from(mockDb.sessions.values());
+    }
+    if (query.includes('FROM caffeine_logs')) {
+      return Array.from(mockDb.caffeine.values());
+    }
+    return [];
+  }),
+  runSync: jest.fn((query: string, params?: any[]) => {
+    if (query.includes('INSERT OR REPLACE INTO inventory_items')) {
+      const [id, name, type, roaster, origin, roastDate, profile, process, variety, initW, remW, notes, rating, isFav, isArch, created, updated] = params!;
+      mockDb.inventory.set(id, {
+        id, name, type, roaster_or_producer: roaster, origin, roast_or_harvest_date: roastDate,
+        roast_profile: profile, process, variety, initial_weight_g: initW, remaining_weight_g: remW,
+        flavor_notes_json: notes, rating, is_favorite: isFav, is_archived: isArch, created_at: created, updated_at: updated
+      });
+    } else if (query.includes('UPDATE inventory_items SET remaining_weight_g = ?')) {
+      const [newW, updated, id] = params!;
+      const existing = mockDb.inventory.get(id);
+      if (existing) {
+        existing.remaining_weight_g = newW;
+        existing.updated_at = updated;
+      }
+    } else if (query.includes('DELETE FROM inventory_items WHERE id = ?')) {
+      mockDb.inventory.delete(params![0]);
+    } else if (query.includes('INSERT OR REPLACE INTO recipes')) {
+      const [id, name, type, method, author, desc, dose, water, temp, grind, ratio, steps, custom, fav, created] = params!;
+      mockDb.recipes.set(id, {
+        id, name, beverage_type: type, method, author, description: desc,
+        dose_g: dose, water_g: water, water_temp_c: temp, grind_size_description: grind,
+        recommended_ratio: ratio, steps_json: steps, is_custom: custom, is_favorite: fav, created_at: created
+      });
+    } else if (query.includes('DELETE FROM recipes WHERE id = ?')) {
+      mockDb.recipes.delete(params![0]);
+    } else if (query.includes('INSERT OR REPLACE INTO brew_sessions')) {
+      const [id, rId, rName, iId, iName, type, method, dose, water, temp, grind, time, rating, tags, balance, tds, ey, caff, notes, inf, brewed] = params!;
+      mockDb.sessions.set(id, {
+        id, recipe_id: rId, recipe_name: rName, inventory_item_id: iId, inventory_item_name: iName,
+        beverage_type: type, method, dose_g: dose, water_g: water, water_temp_c: temp, grind_setting: grind,
+        total_time_seconds: time, rating, flavor_tags_json: tags, taste_balance: balance, tds_percentage: tds,
+        extraction_yield_percentage: ey, caffeine_content_mg: caff, notes, infusion_number: inf, brewed_at: brewed
+      });
+    } else if (query.includes('DELETE FROM brew_sessions WHERE id = ?')) {
+      mockDb.sessions.delete(params![0]);
+    } else if (query.includes('INSERT OR REPLACE INTO caffeine_logs')) {
+      const [id, bId, name, type, consumed, dose, caff] = params!;
+      mockDb.caffeine.set(id, {
+        id, brew_session_id: bId, beverage_name: name, beverage_type: type,
+        consumed_at: consumed, dose_g: dose, caffeine_mg: caff
+      });
+    } else if (query.includes('DELETE FROM caffeine_logs WHERE id = ?')) {
+      mockDb.caffeine.delete(params![0]);
+    }
+  }),
+  prepareSync: jest.fn(() => ({
+    executeSync: jest.fn((params: any) => {
+      mockDb.recipes.set(params.$id, {
+        id: params.$id,
+        name: params.$name,
+        beverage_type: params.$beverageType,
+        method: params.$method,
+        author: params.$author,
+        description: params.$description,
+        dose_g: params.$doseG,
+        water_g: params.$waterG,
+        water_temp_c: params.$waterTempC,
+        grind_size_description: params.$grindSize,
+        recommended_ratio: params.$ratio,
+        steps_json: params.$stepsJson,
+        is_custom: 0,
+        is_favorite: 0,
+        created_at: params.$createdAt,
+      });
+    }),
+    finalizeSync: jest.fn(),
+  })),
+};
+
+jest.mock('expo-sqlite', () => ({
+  openDatabaseSync: jest.fn(() => mockDb),
+}));
+
+describe('Napar SQLite Database & Repositories', () => {
+  beforeEach(() => {
+    mockDb.inventory.clear();
+    mockDb.recipes.clear();
+    mockDb.sessions.clear();
+    mockDb.caffeine.clear();
+  });
+
+  test('Inicjalizacja bazy i seeding domyślnych przepisów', () => {
+    initDatabase(mockDb as any);
+    expect(mockDb.execSync).toHaveBeenCalled();
+    // Powinno zainicjalizować przepisy wzorcowe
+    expect(mockDb.recipes.size).toBeGreaterThanOrEqual(10);
+  });
+
+  test('Operacje na spiżarni (Inventory): dodanie, odjęcie gramatury, pobranie, usunięcie', () => {
+    const item: InventoryItem = {
+      id: 'bean-1',
+      name: 'Etiopia Yirgacheffe Washed',
+      type: 'coffee',
+      roasterOrProducer: 'Hard Beans',
+      origin: 'Yirgacheffe, Etiopia',
+      roastOrHarvestDate: '2026-10-01',
+      roastProfile: 'light',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 250,
+      flavorNotes: ['jaśmin', 'brzoskwinia', 'bergamotka'],
+      rating: 5,
+      isFavorite: true,
+      isArchived: false,
+      createdAt: '2026-10-10T10:00:00Z',
+      updatedAt: '2026-10-10T10:00:00Z',
+    };
+
+    saveInventoryItem(item);
+    let items = getInventoryItems();
+    expect(items.length).toBe(1);
+    expect(items[0].name).toBe('Etiopia Yirgacheffe Washed');
+    expect(items[0].flavorNotes).toContain('jaśmin');
+
+    // Odjęcie gramatury po parzeniu (np. 18g)
+    deductInventoryWeight('bean-1', 18);
+    items = getInventoryItems();
+    expect(items[0].remainingWeightGrams).toBe(232);
+
+    deleteInventoryItem('bean-1');
+    expect(getInventoryItems().length).toBe(0);
+  });
+
+  test('Zapis sesji parzenia i rejestru kofeiny', () => {
+    const session: BrewSession = {
+      id: 'sess-100',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      recipeName: 'V60 Kasuya 4:6',
+      doseGrams: 20,
+      waterGrams: 300,
+      waterTempCelsius: 92,
+      totalTimeSeconds: 210,
+      rating: 4.8,
+      flavorTags: ['brzoskwinia', 'miód'],
+      tasteBalance: 'balanced',
+      tdsPercentage: 1.35,
+      extractionYieldPercentage: 19.8,
+      caffeineContentMg: 140,
+      brewedAt: new Date().toISOString(),
+    };
+
+    saveBrewSession(session);
+    const sessions = getBrewSessions();
+    expect(sessions.length).toBe(1);
+    expect(sessions[0].method).toBe('V60');
+    expect(sessions[0].caffeineContentMg).toBe(140);
+
+    const caffLog: CaffeineLog = {
+      id: 'caff-1',
+      brewSessionId: session.id,
+      beverageName: 'V60 Kasuya',
+      beverageType: 'coffee',
+      consumedAt: new Date().toISOString(),
+      doseGrams: 20,
+      caffeineMg: 140,
+    };
+
+    logCaffeine(caffLog);
+    const logs = getCaffeineLogs();
+    expect(logs.length).toBe(1);
+    expect(logs[0].caffeineMg).toBe(140);
+  });
+
+  test('Eksport i import kopii zapasowej w formacie JSON', () => {
+    const item: InventoryItem = {
+      id: 'tea-1',
+      name: 'Da Hong Pao Oolong',
+      type: 'tea',
+      initialWeightGrams: 50,
+      remainingWeightGrams: 42,
+      flavorNotes: ['dym', 'prażony orzech'],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-10-12T10:00:00Z',
+      updatedAt: '2026-10-12T10:00:00Z',
+    };
+    saveInventoryItem(item);
+
+    const exportedJson = exportAllDataJson();
+    expect(exportedJson).toContain('Da Hong Pao Oolong');
+    expect(exportedJson).toContain('"version": 1');
+
+    // Wyczyść i zaimportuj
+    mockDb.inventory.clear();
+    expect(getInventoryItems().length).toBe(0);
+
+    importDataJson(exportedJson);
+    expect(getInventoryItems().length).toBe(1);
+    expect(getInventoryItems()[0].name).toBe('Da Hong Pao Oolong');
+  });
+});

@@ -1,0 +1,34 @@
+node_modules/
+.expo/
+dist/
+/ios/
+/android/
+*.log
+.DS_Store
+.stryker-tmp
+reports/
+*.ipa
+coverage/
+.secrets/
+__pycache__/
+
+# Bezpieczeństwo: sekrety i certyfikaty nigdy w repozytorium
+.env*
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+credentials.json
+*.pem
+*.key
+*.jks
+*.keystore
+*.xcarchive/
+upload.json
+build.json
+build.err
+
+# Skrypty pomocnicze migracji i uploadu Google Drive
+generate_part_*.py
+upload_*.py
+upload_remaining.ps1

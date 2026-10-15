@@ -1,0 +1,291 @@
+// ============================================================================
+// Napar (Steepwise) — Core Domain Rules (RD-01…RD-30)
+// Deterministic formulas for extraction, kinetics, water, and grind adjustments.
+// ============================================================================
+
+export interface ExtractionYieldResult {
+  extractionYieldPercent: number;
+  rating: 'under' | 'ideal' | 'over';
+  descriptionPl: string;
+}
+
+export interface RestingWindowResult {
+  daysSinceRoast: number;
+  stage: 'degassing' | 'peak' | 'stable' | 'aging';
+  messagePl: string;
+  badgeColor: 'amber' | 'green' | 'blue' | 'gray';
+}
+
+export interface BedtimeCaffeineEvaluation {
+  totalRemainingMg: number;
+  safeThresholdMg: number;
+  isSafeForSleep: boolean;
+  messagePl: string;
+}
+
+export interface TasteDiagnosis {
+  issue: string;
+  recommendationPl: string;
+  grindAdjustment?: 'finer' | 'coarser';
+  tempAdjustment?: 'higher' | 'lower';
+}
+
+/**
+ * RD-01: Proporcja parzenia (Brew Ratio)
+ * Oblicza masę wody dla zadanej dozy i współczynnika (np. 1:16.6)
+ */
+export function calculateBrewWater(doseGrams: number, ratio: number): number {
+  if (doseGrams <= 0 || ratio <= 0) {
+    throw new Error('Doza i ratio muszą być większe od zera');
+  }
+  return Number((doseGrams * ratio).toFixed(1));
+}
+
+/**
+ * RD-01b: Oblicza dozę kawy/herbaty dla zadanej objętości wody
+ */
+export function calculateBrewDose(waterGrams: number, ratio: number): number {
+  if (waterGrams <= 0 || ratio <= 0) {
+    throw new Error('Woda i ratio muszą być większe od zera');
+  }
+  return Number((waterGrams / ratio).toFixed(1));
+}
+
+/**
+ * RD-02: Absorpcja wody przez zmieloną kawę (Water Retention Index)
+ * Domyślny współczynnik: 2.0g wody na każdy 1g zmielonej kawy
+ */
+export function calculateLiquidYield(waterGrams: number, doseGrams: number, retentionFactor = 2.0): number {
+  if (waterGrams <= 0 || doseGrams <= 0 || retentionFactor < 0) {
+    throw new Error('Nieprawidłowe parametry wyliczania uzysku');
+  }
+  const retained = doseGrams * retentionFactor;
+  const yieldGrams = Math.max(0, waterGrams - retained);
+  return Number(yieldGrams.toFixed(1));
+}
+
+/**
+ * RD-03: Wydajność ekstrakcji (Extraction Yield - EY %)
+ * EY = (Masa naparu * TDS%) / Doza sucha
+ * Standard SCA Golden Cup: 18.0% - 22.0%
+ */
+export function calculateExtractionYield(
+  beverageWeightGrams: number,
+  tdsPercent: number,
+  doseGrams: number
+): ExtractionYieldResult {
+  if (beverageWeightGrams <= 0 || tdsPercent <= 0 || doseGrams <= 0) {
+    throw new Error('Parametry ekstrakcji muszą być większe od zera');
+  }
+
+  const ey = Number(((beverageWeightGrams * tdsPercent) / doseGrams).toFixed(2));
+
+  let rating: 'under' | 'ideal' | 'over';
+  let descriptionPl: string;
+
+  if (ey < 18.0) {
+    rating = 'under';
+    descriptionPl = 'Niedoparzenie (Under-extracted) — dominacja kwasowości, brak słodyczy';
+  } else if (ey > 22.0) {
+    rating = 'over';
+    descriptionPl = 'Przeparzenie (Over-extracted) — suchość, posmak popiołowy i gorycz';
+  } else {
+    rating = 'ideal';
+    descriptionPl = 'Zrównoważona ekstrakcja (Golden Cup) — pełna słodycz, czysty bukiet';
+  }
+
+  return {
+    extractionYieldPercent: ey,
+    rating,
+    descriptionPl,
+  };
+}
+
+/**
+ * RD-07: Wskaźnik świeżości i okna degustacyjnego (Resting Window)
+ * Dni od daty palenia:
+ * 1-5: odgazowywanie CO2
+ * 6-30: okno szczytowe (peak)
+ * 31-60: stabilna dojrzałość
+ * >60: utrata lotnych aromatów (aging)
+ */
+export function evaluateRestingWindow(roastDateInput: Date | string, currentDateInput?: Date | string): RestingWindowResult {
+  const roastDate = new Date(roastDateInput);
+  const now = currentDateInput ? new Date(currentDateInput) : new Date();
+
+  const diffTime = now.getTime() - roastDate.getTime();
+  const daysSinceRoast = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+
+  if (daysSinceRoast <= 5) {
+    return {
+      daysSinceRoast,
+      stage: 'degassing',
+      messagePl: 'Intensywne odgazowywanie CO₂ — zalecana dłuższa preinfuzja (blooming)',
+      badgeColor: 'amber',
+    };
+  } else if (daysSinceRoast <= 30) {
+    return {
+      daysSinceRoast,
+      stage: 'peak',
+      messagePl: 'Szczytowa jakość degustacyjna (Peak Flavor) — pełnia aromatów',
+      badgeColor: 'green',
+    };
+  } else if (daysSinceRoast <= 60) {
+    return {
+      daysSinceRoast,
+      stage: 'stable',
+      messagePl: 'Stabilna jakość ziaren — optymalny czas do codziennego parzenia',
+      badgeColor: 'blue',
+    };
+  } else {
+    return {
+      daysSinceRoast,
+      stage: 'aging',
+      messagePl: 'Ziarna dojrzałe — zalecane wcześniejsze zużycie lub przechowywanie w zamrażarce',
+      badgeColor: 'gray',
+    };
+  }
+}
+
+/**
+ * RD-17 & RD-18: Estymacja dawki kofeiny w filiżance kawy
+ * Średnio 1g suchej Arabiki = 10.5 mg wyekstrahowanej kofeiny w przelewie
+ * Robusta = 18.7 mg/g
+ */
+export function estimateCoffeeCaffeineMg(
+  doseGrams: number,
+  beanType: 'arabica' | 'robusta' = 'arabica',
+  method: 'filter' | 'espresso' | 'immersion' | 'cold_brew' = 'filter'
+): number {
+  if (doseGrams <= 0) return 0;
+
+  const baseRatePerGram = beanType === 'robusta' ? 22.0 : 12.0;
+
+  let extractionEfficiency = 0.88; // Domyślnie filtr/drip
+  if (method === 'espresso') extractionEfficiency = 0.75;
+  if (method === 'immersion') extractionEfficiency = 0.85;
+  if (method === 'cold_brew') extractionEfficiency = 0.92;
+
+  const totalMg = doseGrams * baseRatePerGram * extractionEfficiency;
+  return Number(totalMg.toFixed(1));
+}
+
+/**
+ * RD-19: Uwalnianie kofeiny w wielokrotnych zalaniach herbaty Gongfu Cha
+ * 1 zalanie: 45%, 2 zalanie: 30%, 3 zalanie: 15%, kolejne: 10% łącznie
+ */
+export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number, infusionNumber: number): number {
+  if (totalLeafCaffeineMg <= 0 || infusionNumber <= 0) return 0;
+
+  let fraction = 0.05;
+  if (infusionNumber === 1) fraction = 0.45;
+  else if (infusionNumber === 2) fraction = 0.30;
+  else if (infusionNumber === 3) fraction = 0.15;
+  else if (infusionNumber === 4) fraction = 0.05;
+  else fraction = 0.02;
+
+  return Number((totalLeafCaffeineMg * fraction).toFixed(1));
+}
+
+/**
+ * RD-17: Farmakokinetyka eliminacji kofeiny (model jedno-kompartmentowy)
+ * C(t) = C0 * (1/2)^(t / t1/2)
+ */
+export function calculateRemainingCaffeineMg(initialDoseMg: number, hoursPassed: number, halfLifeHours = 5.0): number {
+  if (initialDoseMg <= 0 || hoursPassed < 0 || halfLifeHours <= 0) return 0;
+  const remaining = initialDoseMg * Math.pow(0.5, hoursPassed / halfLifeHours);
+  return Number(remaining.toFixed(1));
+}
+
+/**
+ * RD-20: Obliczenie stężenia kofeiny przed snem
+ */
+export function evaluateBedtimeCaffeine(
+  intakes: Array<{ doseMg: number; hoursUntilBedtime: number }>,
+  safeThresholdMg = 25.0,
+  halfLifeHours = 5.0
+): BedtimeCaffeineEvaluation {
+  let totalRemaining = 0;
+
+  for (const intake of intakes) {
+    if (intake.hoursUntilBedtime >= 0) {
+      totalRemaining += calculateRemainingCaffeineMg(intake.doseMg, intake.hoursUntilBedtime, halfLifeHours);
+    }
+  }
+
+  totalRemaining = Number(totalRemaining.toFixed(1));
+  const isSafeForSleep = totalRemaining <= safeThresholdMg;
+
+  let messagePl: string;
+  if (isSafeForSleep) {
+    messagePl = `Poziom kofeiny o porze snu (${totalRemaining} mg) jest bezpieczny dla fazy głębokiej NREM.`;
+  } else {
+    messagePl = `Poziom kofeiny (${totalRemaining} mg) przekracza próg ${safeThresholdMg} mg — ryzyko spłycenia snu.`;
+  }
+
+  return {
+    totalRemainingMg: totalRemaining,
+    safeThresholdMg,
+    isSafeForSleep,
+    messagePl,
+  };
+}
+
+/**
+ * RD-21: Oblicza minimalną liczbę godzin przed snem, po której można wypić daną dawkę
+ */
+export function calculateHoursUntilSafeCaffeine(doseMg: number, safeThresholdMg = 25.0, halfLifeHours = 5.0): number {
+  if (doseMg <= safeThresholdMg) return 0;
+  // dose * (0.5)^(t / halfLife) = threshold
+  // t / halfLife = log2(dose / threshold)
+  const ratio = doseMg / safeThresholdMg;
+  const hours = halfLifeHours * (Math.log(ratio) / Math.LN2);
+  return Number(hours.toFixed(1));
+}
+
+/**
+ * RD-05: Deterministyczny kompas ekstrakcji (Dial-in Doctor)
+ */
+export function diagnoseExtractionTaste(params: {
+  isSour?: boolean;
+  isBitter?: boolean;
+  isAstringent?: boolean;
+  isWatery?: boolean;
+  isTooIntense?: boolean;
+}): TasteDiagnosis[] {
+  const diagnoses: TasteDiagnosis[] = [];
+
+  if (params.isSour) {
+    diagnoses.push({
+      issue: 'Zbyt kwaśna / cierpka (Niedoparzenie)',
+      recommendationPl: 'Zmiel drobniej (np. -2 kliki na młynku) lub podwyższ temperaturę wody o 2°C, aby zwiększyć ekstrakcję cukrów.',
+      grindAdjustment: 'finer',
+      tempAdjustment: 'higher',
+    });
+  }
+
+  if (params.isBitter || params.isAstringent) {
+    diagnoses.push({
+      issue: 'Gorzka / sucha w ustach (Przeparzenie)',
+      recommendationPl: 'Zmiel grubiej (np. +2 kliki na młynku) lub obniż temperaturę wody o 2-3°C, aby ograniczyć wymywanie tanin i gorzkich kwasów.',
+      grindAdjustment: 'coarser',
+      tempAdjustment: 'lower',
+    });
+  }
+
+  if (params.isWatery) {
+    diagnoses.push({
+      issue: 'Płaska / rozwodniona (Za niska doza lub za gruby przemiał)',
+      recommendationPl: 'Zwiększ dozę kawy o +1g lub zmniejsz współczynnik ratio (np. z 1:17 na 1:15.5).',
+    });
+  }
+
+  if (params.isTooIntense) {
+    diagnoses.push({
+      issue: 'Zbyt ciężka / przytłaczająca',
+      recommendationPl: 'Wydłuż ratio (np. z 1:15 na 1:16.6) dodając więcej wody, by otworzyć bukiet aromatyczny.',
+    });
+  }
+
+  return diagnoses;
+}

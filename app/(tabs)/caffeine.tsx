@@ -1,0 +1,519 @@
+// ============================================================================
+// Napar (Steepwise) — Monitor Kofeiny i Kalkulator Snu (Caffeine & Sleep Curfew)
+// Kinetyka eliminacji (t1/2 = 5.0h), próg bezpiecznego snu i dobowy bilans EFSA
+// ============================================================================
+
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Modal,
+  Alert,
+} from 'react-native';
+import { getCaffeineLogs, logCaffeine, deleteCaffeineLog } from '../../src/core/database';
+import { CaffeineLog } from '../../src/core/database-schema';
+import {
+  calculateRemainingCaffeineMg,
+  evaluateBedtimeCaffeine,
+  calculateHoursUntilSafeCaffeine,
+} from '../../src/core/domain-rules';
+import { theme } from '../../src/core/theme';
+
+export default function CaffeineScreen() {
+  const [logs, setLogs] = useState<CaffeineLog[]>([]);
+  const [bedtimeHour, setBedtimeHour] = useState(23); // 23:00
+  const [showQuickAddModal, setShowQuickAddModal] = useState(false);
+
+  const loadLogs = () => {
+    try {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const data = getCaffeineLogs(todayStart.toISOString());
+      setLogs(data);
+    } catch {
+      // fallback
+    }
+  };
+
+  useEffect(() => {
+    loadLogs();
+  }, []);
+
+  const now = new Date();
+
+  // Obliczenie aktualnej ilości kofeiny w organizmie
+  const currentTotalMg = logs.reduce((sum, item) => {
+    const intakeTime = new Date(item.consumedAt).getTime();
+    const hoursPassed = Math.max(0, (now.getTime() - intakeTime) / (1000 * 3600));
+    return sum + calculateRemainingCaffeineMg(item.caffeineMg, hoursPassed, 5.0);
+  }, 0);
+
+  // Całkowita spożyta dzisiaj kofeina
+  const totalConsumedTodayMg = logs.reduce((sum, item) => sum + item.caffeineMg, 0);
+
+  // Predykcja na godzinę snu (np. 23:00)
+  const targetBedtime = new Date();
+  targetBedtime.setHours(bedtimeHour, 0, 0, 0);
+  if (targetBedtime.getTime() < now.getTime()) {
+    targetBedtime.setDate(targetBedtime.getDate() + 1);
+  }
+
+  const intakesForEvaluation = logs.map((item) => {
+    const intakeTime = new Date(item.consumedAt).getTime();
+    const hoursUntilBedtime = (targetBedtime.getTime() - intakeTime) / (1000 * 3600);
+    return {
+      doseMg: item.caffeineMg,
+      hoursUntilBedtime: Math.max(0, hoursUntilBedtime),
+    };
+  });
+
+  const bedtimeEval = evaluateBedtimeCaffeine(intakesForEvaluation, 25.0, 5.0);
+
+  // Curfew (godzina graniczna dla nowej filiżanki 140mg)
+  const hoursUntilSafe = calculateHoursUntilSafeCaffeine(140, 25.0, 5.0);
+  const curfewDate = new Date(targetBedtime.getTime() - hoursUntilSafe * 3600 * 1000);
+  const curfewTimeString = `${curfewDate.getHours().toString().padStart(2, '0')}:${curfewDate
+    .getMinutes()
+    .toString()
+    .padStart(2, '0')}`;
+
+  const handleQuickAdd = (name: string, type: 'coffee' | 'tea', doseG: number, mg: number) => {
+    const log: CaffeineLog = {
+      id: `caff-${Date.now()}`,
+      beverageName: name,
+      beverageType: type,
+      consumedAt: new Date().toISOString(),
+      doseGrams: doseG,
+      caffeineMg: mg,
+    };
+    logCaffeine(log);
+    loadLogs();
+    setShowQuickAddModal(false);
+  };
+
+  const handleDeleteLog = (log: CaffeineLog) => {
+    deleteCaffeineLog(log.id);
+    loadLogs();
+  };
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      {/* Karta Stężenia Kofeiny Teraz */}
+      <View style={styles.summaryCard}>
+        <Text style={styles.summaryLabel}>AKTYWNA KOFEINA W KRWIOBIEGU</Text>
+        <Text style={styles.activeCaffeineNumber}>
+          {Math.round(currentTotalMg)} mg
+        </Text>
+        <Text style={styles.summarySub}>
+          Dobowy bilans: {Math.round(totalConsumedTodayMg)} mg / 400 mg (Zalecenie EFSA)
+        </Text>
+
+        <View style={styles.efsaProgressBar}>
+          <View
+            style={[
+              styles.efsaProgressFill,
+              {
+                width: `${Math.min(100, Math.round((totalConsumedTodayMg / 400) * 100))}%`,
+                backgroundColor:
+                  totalConsumedTodayMg > 400 ? theme.colors.danger : theme.colors.copper,
+              },
+            ]}
+          />
+        </View>
+      </View>
+
+      {/* Kalkulator Godziny Snu (Bedtime Curfew) */}
+      <View style={styles.curfewCard}>
+        <View style={styles.curfewHeader}>
+          <Text style={styles.curfewTitle}>Predykcja Jakości Snu</Text>
+          <View style={styles.bedtimeStepper}>
+            <Pressable
+              style={styles.hourBtn}
+              onPress={() => setBedtimeHour(Math.max(20, bedtimeHour - 1))}
+            >
+              <Text style={styles.hourBtnText}>−</Text>
+            </Pressable>
+            <Text style={styles.bedtimeHourText}>{bedtimeHour}:00</Text>
+            <Pressable
+              style={styles.hourBtn}
+              onPress={() => setBedtimeHour(Math.min(26, bedtimeHour + 1))}
+            >
+              <Text style={styles.hourBtnText}>+</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        <View
+          style={[
+            styles.curfewVerdictBadge,
+            bedtimeEval.isSafeForSleep
+              ? styles.curfewVerdictSafe
+              : styles.curfewVerdictDanger,
+          ]}
+        >
+          <Text style={styles.curfewVerdictText}>
+            {bedtimeEval.isSafeForSleep ? '✓ ' : '⚠ '}
+            Poziom kofeiny o {bedtimeHour}:00: {bedtimeEval.totalRemainingMg} mg
+          </Text>
+        </View>
+
+        <Text style={styles.curfewDescription}>
+          {bedtimeEval.messagePl} Próg bezpieczeństwa dla fazy NREM wynosi 25 mg.
+        </Text>
+
+        <View style={styles.curfewAdviceBox}>
+          <Text style={styles.curfewAdviceLabel}>BEZPIECZNA GODZINA (CURFEW)</Text>
+          <Text style={styles.curfewAdviceVal}>
+            Ostatni przelew (140 mg) wypij do {curfewTimeString}
+          </Text>
+        </View>
+      </View>
+
+      {/* Historia dzisiejszych dawek */}
+      <View style={styles.listHeaderRow}>
+        <Text style={styles.listTitle}>Dzisiejsze Porcje Kofeiny</Text>
+        <Pressable
+          style={styles.quickAddBtn}
+          onPress={() => setShowQuickAddModal(true)}
+        >
+          <Text style={styles.quickAddBtnText}>+ Dodaj</Text>
+        </Pressable>
+      </View>
+
+      {logs.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Brak zarejestrowanych porcji dzisiaj.</Text>
+        </View>
+      ) : (
+        logs.map((item) => {
+          const timeStr = new Date(item.consumedAt).toLocaleTimeString('pl-PL', {
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+          return (
+            <View key={item.id} style={styles.logItem}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.logName}>{item.beverageName}</Text>
+                <Text style={styles.logMeta}>
+                  {timeStr} · {item.doseGrams}g suszu
+                </Text>
+              </View>
+              <Text style={styles.logMg}>{Math.round(item.caffeineMg)} mg</Text>
+              <Pressable
+                onPress={() => handleDeleteLog(item)}
+                style={styles.logDeleteBtn}
+                hitSlop={8}
+              >
+                <Text style={styles.logDeleteText}>✕</Text>
+              </Pressable>
+            </View>
+          );
+        })
+      )}
+
+      {/* Modal szybkiego dodania */}
+      <Modal visible={showQuickAddModal} animationType="fade" transparent={true}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalCardTitle}>Szybkie dodanie kofeiny</Text>
+
+            <Pressable
+              style={styles.quickOption}
+              onPress={() => handleQuickAdd('Kawa przelewowa (V60 / Drip)', 'coffee', 18, 140)}
+            >
+              <Text style={styles.quickOptionName}>☕ Przelew / Drip (V60, Chemex)</Text>
+              <Text style={styles.quickOptionMg}>~140 mg (18g)</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.quickOption}
+              onPress={() => handleQuickAdd('Podwójne Espresso', 'coffee', 18, 130)}
+            >
+              <Text style={styles.quickOptionName}>☕ Podwójne Espresso (Doppio)</Text>
+              <Text style={styles.quickOptionMg}>~130 mg (18g)</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.quickOption}
+              onPress={() => handleQuickAdd('Pojedyncze Espresso', 'coffee', 9, 65)}
+            >
+              <Text style={styles.quickOptionName}>☕ Pojedyncze Espresso</Text>
+              <Text style={styles.quickOptionMg}>~65 mg (9g)</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.quickOption}
+              onPress={() => handleQuickAdd('AeroPress', 'coffee', 15, 110)}
+            >
+              <Text style={styles.quickOptionName}>☕ AeroPress</Text>
+              <Text style={styles.quickOptionMg}>~110 mg (15g)</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.quickOption}
+              onPress={() => handleQuickAdd('Herbata Gongfu / Liściasta', 'tea', 5, 45)}
+            >
+              <Text style={styles.quickOptionName}>🍵 Herbata liściasta (infuzja)</Text>
+              <Text style={styles.quickOptionMg}>~45 mg (5g)</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.modalCancelBtn}
+              onPress={() => setShowQuickAddModal(false)}
+            >
+              <Text style={styles.modalCancelText}>Anuluj</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.bg,
+  },
+  content: {
+    padding: theme.spacing.md,
+    paddingBottom: 40,
+  },
+  summaryCard: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.lg,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginBottom: 16,
+  },
+  summaryLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.textMuted,
+    letterSpacing: 0.5,
+  },
+  activeCaffeineNumber: {
+    fontSize: 54,
+    fontWeight: '800',
+    color: theme.colors.copper,
+    marginVertical: 4,
+    fontVariant: ['tabular-nums'],
+  },
+  summarySub: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    marginBottom: 14,
+  },
+  efsaProgressBar: {
+    width: '100%',
+    height: 6,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  efsaProgressFill: {
+    height: '100%',
+  },
+  curfewCard: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.lg,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginBottom: 20,
+  },
+  curfewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  curfewTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  bedtimeStepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+  },
+  hourBtn: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  hourBtnText: {
+    color: theme.colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  bedtimeHourText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.copperLight,
+  },
+  curfewVerdictBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: theme.borderRadius.sm,
+    marginBottom: 10,
+  },
+  curfewVerdictSafe: {
+    backgroundColor: theme.colors.statusPeakMuted,
+  },
+  curfewVerdictDanger: {
+    backgroundColor: theme.colors.dangerMuted,
+  },
+  curfewVerdictText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  curfewDescription: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+  curfewAdviceBox: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    padding: 12,
+    borderRadius: theme.borderRadius.sm,
+    borderLeftWidth: 3,
+    borderLeftColor: theme.colors.copper,
+  },
+  curfewAdviceLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.textMuted,
+    marginBottom: 2,
+  },
+  curfewAdviceVal: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  listHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  listTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  quickAddBtn: {
+    backgroundColor: theme.colors.copperMuted,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: theme.borderRadius.full,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+  },
+  quickAddBtnText: {
+    color: theme.colors.copperLight,
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  emptyContainer: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: theme.colors.textMuted,
+    fontSize: 13,
+  },
+  logItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.bgCard,
+    padding: 14,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginBottom: 8,
+  },
+  logName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+  },
+  logMeta: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    marginTop: 2,
+  },
+  logMg: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    marginRight: 12,
+  },
+  logDeleteBtn: {
+    padding: 6,
+  },
+  logDeleteText: {
+    color: theme.colors.textMuted,
+    fontSize: 14,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  modalCard: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.lg,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  modalCardTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  quickOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  quickOptionName: {
+    fontSize: 14,
+    color: theme.colors.textPrimary,
+    fontWeight: '500',
+  },
+  quickOptionMg: {
+    fontSize: 14,
+    color: theme.colors.copper,
+    fontWeight: '700',
+  },
+  modalCancelBtn: {
+    marginTop: 16,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  modalCancelText: {
+    color: theme.colors.textSecondary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+});
