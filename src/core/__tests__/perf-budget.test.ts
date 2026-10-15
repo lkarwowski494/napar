@@ -1,0 +1,147 @@
+// ============================================================================
+// Napar (Steepwise) — Performance & Time Budget Tests
+// Pattern: Performance Regression Guards & Execution Budgets (cf. organizer perf-budget)
+// ============================================================================
+
+import {
+  calculateBrewRatio,
+  calculateLiquidYield,
+  calculateExtractionYield,
+  estimateCoffeeCaffeineMg,
+  estimateTeaInfusionCaffeineMg,
+} from '../domain-rules';
+import { createGongfuSession, recordGongfuInfusion } from '../gongfu-session';
+import { convertMicronsToGrinder, SUPPORTED_GRINDERS } from '../grinder-converter';
+import { calculateWaterMinerals, WATER_RECIPES } from '../water-chemistry';
+
+jest.mock('expo-sqlite', () => ({
+  openDatabaseSync: jest.fn(() => ({
+    execSync: jest.fn(),
+    getFirstSync: jest.fn(),
+    getAllSync: jest.fn(() => []),
+    runSync: jest.fn(),
+  })),
+}));
+
+import { escapeCsvValue } from '../database';
+
+function measureMedianMs(fn: () => unknown, runs = 5): number {
+  fn(); // Rozgrzewka JIT
+  const times: number[] = [];
+  for (let i = 0; i < runs; i++) {
+    const start = process.hrtime.bigint();
+    fn();
+    const end = process.hrtime.bigint();
+    times.push(Number(end - start) / 1_000_000);
+  }
+  times.sort((a, b) => a - b);
+  return times[Math.floor(runs / 2)]; // Mediana z 5 przebiegów
+}
+
+describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () => {
+  test('Budżet 1: 10 000 obliczeń ekstrakcji i proporcji parzenia (< 50 ms)', () => {
+    const ms = measureMedianMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        const ratio = calculateBrewRatio(15.0 + (i % 5), 250.0 + (i % 20));
+        const yieldGrams = calculateLiquidYield(250.0, 15.0);
+        const ey = calculateExtractionYield(250.0, 1.35, 15.0);
+      }
+    });
+
+    expect(ms).toBeLessThan(50);
+  });
+
+  test('Budżet 2: 10 000 estymacji kinetyki kofeiny dla kawy i herbaty (< 50 ms)', () => {
+    const ms = measureMedianMs(() => {
+      for (let i = 0; i < 5000; i++) {
+        estimateCoffeeCaffeineMg(18.0);
+        estimateTeaInfusionCaffeineMg(150, 1 + (i % 8));
+      }
+    });
+
+    expect(ms).toBeLessThan(50);
+  });
+
+  test('Budżet 3: 1 000 ceremonii Gongfu Cha po 5 zalań (5 000 rejestracji infuzji i kinetyki kofeiny, < 50 ms)', () => {
+    const ms = measureMedianMs(() => {
+      for (let i = 0; i < 1000; i++) {
+        let session = createGongfuSession({
+          teaName: 'Da Hong Pao',
+          teaType: 'wulong_rock',
+          leafDoseGrams: 7,
+          vesselCapacityMl: 110,
+          waterTempCelsius: 96,
+        });
+        for (let infusion = 1; infusion <= 5; infusion++) {
+          session = recordGongfuInfusion(session, { durationSeconds: 15 + infusion * 5 });
+        }
+      }
+    });
+
+    expect(ms).toBeLessThan(50);
+  });
+
+  test('Budżet 4: 2 000 punktów przemiału konwertowanych na 6 młynków specialty (12 000 nastaw, < 60 ms)', () => {
+    const ms = measureMedianMs(() => {
+      for (let i = 0; i < 2000; i++) {
+        const microns = 200 + (i % 800);
+        for (const grinder of SUPPORTED_GRINDERS) {
+          convertMicronsToGrinder(microns, grinder.id);
+        }
+      }
+    });
+
+    expect(ms).toBeLessThan(60);
+  });
+
+  test('Budżet 5: 5 000 obliczeń mineralizacji wody dla różnych profili i objętości (< 50 ms)', () => {
+    const recipe = WATER_RECIPES[0];
+    const ms = measureMedianMs(() => {
+      for (let i = 0; i < 5000; i++) {
+        const volumeLiters = 1.0 + (i % 10) * 0.5;
+        calculateWaterMinerals(volumeLiters, recipe.targetGhPpm, recipe.targetKhPpm);
+      }
+    });
+
+    expect(ms).toBeLessThan(50);
+  });
+
+  test('Budżet 6: Eksport i ucieczka znaków CSV dla 5 000 komórek z tekstem (< 40 ms)', () => {
+    const sampleStrings = [
+      'Normal text',
+      'Text, with, commas',
+      'Text "with quotes"',
+      'Text\nwith\nnewlines',
+      null,
+      undefined,
+    ];
+
+    const ms = measureMedianMs(() => {
+      for (let i = 0; i < 5000; i++) {
+        const val = sampleStrings[i % sampleStrings.length];
+        escapeCsvValue(val as any);
+      }
+    });
+
+    expect(ms).toBeLessThan(40);
+  });
+
+  test('Budżet 7: Serializacja i parsowanie dużej kolekcji JSON (1 000 wpisów, < 60 ms)', () => {
+    const largeDataset = Array.from({ length: 1000 }, (_, i) => ({
+      id: `session-${i}`,
+      recipeName: `V60 Recipe ${i}`,
+      dose: 15.5,
+      water: 250,
+      tags: ['jaśmin', 'brzoskwinia', 'bergamotka'],
+      timestamp: Date.now() + i,
+    }));
+
+    const ms = measureMedianMs(() => {
+      const serialized = JSON.stringify(largeDataset);
+      const parsed = JSON.parse(serialized);
+      expect(parsed.length).toBe(1000);
+    });
+
+    expect(ms).toBeLessThan(60);
+  });
+});
