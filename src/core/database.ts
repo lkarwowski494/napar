@@ -463,3 +463,100 @@ export function importDataJson(jsonStr: string): void {
     logCaffeine(log);
   }
 }
+
+// ----------------------------------------------------------------------------
+// Eksport danych do otwartego formatu CSV (Z-152, ZP-07)
+// ----------------------------------------------------------------------------
+
+export function escapeCsvValue(val: any): string {
+  if (val === null || val === undefined) return '';
+  const str = String(val);
+  if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+export function exportSessionsCsv(): string {
+  const sessions = getBrewSessions(10000);
+  const headers = [
+    'id',
+    'brewed_at',
+    'beverage_type',
+    'method',
+    'recipe_name',
+    'bean_name',
+    'dose_g',
+    'water_g',
+    'temp_c',
+    'time_seconds',
+    'rating',
+    'taste_balance',
+    'tds_pct',
+    'ey_pct',
+    'caffeine_mg',
+    'flavor_tags',
+    'notes',
+  ];
+
+  const rows = sessions.map((s) =>
+    [
+      escapeCsvValue(s.id),
+      escapeCsvValue(s.brewedAt),
+      escapeCsvValue(s.beverageType),
+      escapeCsvValue(s.method),
+      escapeCsvValue(s.recipeName || ''),
+      escapeCsvValue(s.inventoryItemName || ''),
+      escapeCsvValue(s.doseGrams),
+      escapeCsvValue(s.waterGrams),
+      escapeCsvValue(s.waterTempCelsius),
+      escapeCsvValue(s.totalTimeSeconds),
+      escapeCsvValue(s.rating ?? ''),
+      escapeCsvValue(s.tasteBalance ?? ''),
+      escapeCsvValue(s.tdsPercentage ?? ''),
+      escapeCsvValue(s.extractionYieldPercentage ?? ''),
+      escapeCsvValue(s.caffeineContentMg ?? ''),
+      escapeCsvValue(s.flavorTags ? s.flavorTags.join('; ') : ''),
+      escapeCsvValue(s.notes || ''),
+    ].join(',')
+  );
+
+  return [headers.join(','), ...rows].join('\n');
+}
+
+export function exportInventoryCsv(): string {
+  const items = getInventoryItems(true);
+  const headers = [
+    'id',
+    'name',
+    'type',
+    'roaster_or_producer',
+    'origin',
+    'roast_or_harvest_date',
+    'roast_profile',
+    'initial_weight_g',
+    'remaining_weight_g',
+    'flavor_notes',
+    'is_favorite',
+    'is_archived',
+  ];
+
+  const rows = items.map((item) =>
+    [
+      escapeCsvValue(item.id),
+      escapeCsvValue(item.name),
+      escapeCsvValue(item.type),
+      escapeCsvValue(item.roasterOrProducer || ''),
+      escapeCsvValue(item.origin || ''),
+      escapeCsvValue(item.roastOrHarvestDate || ''),
+      escapeCsvValue(item.roastProfile || ''),
+      escapeCsvValue(item.initialWeightGrams),
+      escapeCsvValue(item.remainingWeightGrams),
+      escapeCsvValue(item.flavorNotes ? item.flavorNotes.join('; ') : ''),
+      escapeCsvValue(item.isFavorite ? '1' : '0'),
+      escapeCsvValue(item.isArchived ? '1' : '0'),
+    ].join(',')
+  );
+
+  return [headers.join(','), ...rows].join('\n');
+}

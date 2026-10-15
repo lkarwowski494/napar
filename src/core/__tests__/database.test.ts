@@ -17,6 +17,9 @@ import {
   logCaffeine,
   exportAllDataJson,
   importDataJson,
+  exportSessionsCsv,
+  exportInventoryCsv,
+  escapeCsvValue,
 } from '../database';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../database-schema';
 
@@ -286,5 +289,74 @@ describe('Napar SQLite Database & Repositories', () => {
     importDataJson(exportedJson);
     expect(getInventoryItems().length).toBe(1);
     expect(getInventoryItems()[0].name).toBe('Da Hong Pao Oolong');
+  });
+
+  test('escapeCsvValue prawidłowo zabezpiecza znaki specjalne (przecinki, cudzysłowy, entery)', () => {
+    expect(escapeCsvValue(null)).toBe('');
+    expect(escapeCsvValue(undefined)).toBe('');
+    expect(escapeCsvValue('normal_text')).toBe('normal_text');
+    expect(escapeCsvValue('text,with,comma')).toBe('"text,with,comma"');
+    expect(escapeCsvValue('text"with"quotes')).toBe('"text""with""quotes"');
+    expect(escapeCsvValue("text\nwith\nnewline")).toBe("\"text\nwith\nnewline\"");
+  });
+
+  test('exportSessionsCsv generuje poprawny plik CSV z nagłówkami i wierszami sesji', () => {
+    const session: BrewSession = {
+      id: 'sess-csv-1',
+      recipeName: 'V60 Sweet Bloom',
+      inventoryItemName: 'Etiopia Guji, Natural',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      totalTimeSeconds: 165,
+      rating: 4.8,
+      tasteBalance: 'balanced',
+      tdsPercentage: 1.38,
+      extractionYieldPercentage: 23.0,
+      caffeineContentMg: 135,
+      flavorTags: ['brzoskwinia', 'jaśmin'],
+      notes: 'Bardzo czysty napar, słodki finisz',
+      brewedAt: '2026-10-15T10:00:00Z',
+    };
+    saveBrewSession(session);
+
+    const csv = exportSessionsCsv();
+    expect(csv).toContain('id,brewed_at,beverage_type,method');
+    expect(csv).toContain('sess-csv-1');
+    expect(csv).toContain('V60 Sweet Bloom');
+    expect(csv).toContain('"Etiopia Guji, Natural"');
+    expect(csv).toContain('15,250,93,165,4.8,balanced,1.38,23,135');
+    expect(csv).toContain('brzoskwinia; jaśmin');
+  });
+
+  test('exportInventoryCsv generuje poprawny plik CSV z pozycjami spiżarni', () => {
+    const item: InventoryItem = {
+      id: 'inv-csv-1',
+      name: 'Kenya Nyeri Peaberry',
+      type: 'coffee',
+      roasterOrProducer: 'Specialty Roastery, Warsaw',
+      origin: 'Kenia',
+      roastOrHarvestDate: '2026-10-01',
+      roastProfile: 'light',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 210,
+      flavorNotes: ['czarna porzeczka', 'rabarbar'],
+      isFavorite: true,
+      isArchived: false,
+      createdAt: '2026-10-01T10:00:00Z',
+      updatedAt: '2026-10-01T10:00:00Z',
+    };
+    saveInventoryItem(item);
+
+    const csv = exportInventoryCsv();
+    expect(csv).toContain('id,name,type,roaster_or_producer');
+    expect(csv).toContain('inv-csv-1');
+    expect(csv).toContain('Kenya Nyeri Peaberry');
+    expect(csv).toContain('"Specialty Roastery, Warsaw"');
+    expect(csv).toContain('250,210');
+    expect(csv).toContain('czarna porzeczka; rabarbar');
+    expect(csv).toContain(',1,0'); // isFavorite: 1, isArchived: 0
   });
 });

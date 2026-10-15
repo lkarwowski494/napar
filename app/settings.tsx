@@ -14,7 +14,12 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import { exportAllDataJson, importDataJson } from '../src/core/database';
+import {
+  exportAllDataJson,
+  importDataJson,
+  exportSessionsCsv,
+  exportInventoryCsv,
+} from '../src/core/database';
 import { theme } from '../src/core/theme';
 import { useTranslation, SupportedLanguage } from '../src/core/i18n';
 
@@ -23,14 +28,39 @@ export default function SettingsScreen() {
   const [isPro, setIsPro] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showCsvModal, setShowCsvModal] = useState(false);
+  const [csvModalTitle, setCsvModalTitle] = useState('');
   const [exportedJsonText, setExportedJsonText] = useState('');
   const [importJsonText, setImportJsonText] = useState('');
+  const [exportedCsvText, setExportedCsvText] = useState('');
 
   const handleExport = () => {
     try {
       const json = exportAllDataJson();
       setExportedJsonText(json);
       setShowExportModal(true);
+    } catch (e: any) {
+      Alert.alert('Błąd eksportu', e?.message || 'Nie udało się wyeksportować danych.');
+    }
+  };
+
+  const handleExportSessionsCsv = () => {
+    try {
+      const csv = exportSessionsCsv();
+      setExportedCsvText(csv);
+      setCsvModalTitle('Eksport Dziennika (CSV)');
+      setShowCsvModal(true);
+    } catch (e: any) {
+      Alert.alert('Błąd eksportu', e?.message || 'Nie udało się wyeksportować danych.');
+    }
+  };
+
+  const handleExportInventoryCsv = () => {
+    try {
+      const csv = exportInventoryCsv();
+      setExportedCsvText(csv);
+      setCsvModalTitle('Eksport Spiżarni (CSV)');
+      setShowCsvModal(true);
     } catch (e: any) {
       Alert.alert('Błąd eksportu', e?.message || 'Nie udało się wyeksportować danych.');
     }
@@ -122,6 +152,30 @@ export default function SettingsScreen() {
             </Text>
           </View>
           <Text style={styles.actionArrow}>↙</Text>
+        </Pressable>
+
+        <View style={styles.divider} />
+
+        <Pressable style={styles.actionRow} onPress={handleExportSessionsCsv}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.actionTitle}>Eksportuj Dziennik (CSV)</Text>
+            <Text style={styles.actionSubtitle}>
+              Arkusz kalkulacyjny (Excel, Google Sheets) z historią zaparzeń i sensoryką
+            </Text>
+          </View>
+          <Text style={styles.actionArrow}>📊</Text>
+        </Pressable>
+
+        <View style={styles.divider} />
+
+        <Pressable style={styles.actionRow} onPress={handleExportInventoryCsv}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.actionTitle}>Eksportuj Spiżarnię (CSV)</Text>
+            <Text style={styles.actionSubtitle}>
+              Zestawienie paczek ziaren, herbat, palarni, dat palenia i zapasów
+            </Text>
+          </View>
+          <Text style={styles.actionArrow}>🫙</Text>
         </Pressable>
       </View>
 
@@ -257,6 +311,27 @@ export default function SettingsScreen() {
           <Pressable style={styles.submitImportBtn} onPress={handleImport}>
             <Text style={styles.submitImportBtnText}>Zaimportuj i Zastąp Dane</Text>
           </Pressable>
+        </View>
+      </Modal>
+
+      {/* Modal Eksportu CSV (Z-152, ZP-07) */}
+      <Modal visible={showCsvModal} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>{csvModalTitle}</Text>
+            <Pressable onPress={() => setShowCsvModal(false)}>
+              <Text style={styles.modalCloseText}>Zamknij</Text>
+            </Pressable>
+          </View>
+          <Text style={styles.modalSub}>
+            Poniższy tekst w formacie CSV możesz skopiować do schowka i otworzyć w Excelu, Numbers lub Arkuszach Google:
+          </Text>
+          <TextInput
+            style={styles.jsonTextInput}
+            multiline
+            editable={false}
+            value={exportedCsvText}
+          />
         </View>
       </Modal>
     </ScrollView>

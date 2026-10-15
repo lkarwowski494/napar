@@ -225,4 +225,54 @@ describe('SettingsScreen Component', () => {
       'Sprawdzanie lokalnych uprawnień StoreKit... Twoja licencja jest aktywna.'
     );
   });
+
+  test('Eksport dziennika i spiżarni do CSV: wywołuje exportSessionsCsv / exportInventoryCsv i otwiera modal', () => {
+    const exportSessionsSpy = jest
+      .spyOn(databaseModule, 'exportSessionsCsv')
+      .mockReturnValue('id,brewed_at,method\nsess-1,2026-10-15,V60');
+    const exportInventorySpy = jest
+      .spyOn(databaseModule, 'exportInventoryCsv')
+      .mockReturnValue('id,name,type\ninv-1,Etiopia,coffee');
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <SettingsScreen />
+        </LanguageProvider>
+      );
+    });
+
+    // 1. Eksport dziennika CSV
+    const exportJournalCsvBtn = findPressableWithText(tree.root, 'Eksportuj Dziennik (CSV)');
+    expect(exportJournalCsvBtn).toBeTruthy();
+
+    renderer.act(() => {
+      exportJournalCsvBtn.props.onPress();
+    });
+
+    expect(exportSessionsSpy).toHaveBeenCalled();
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Eksport Dziennika (CSV)');
+    expect(str).toContain('sess-1,2026-10-15,V60');
+
+    // Zamknij modal
+    const closeBtn1 = findPressableWithText(tree.root, 'Zamknij');
+    renderer.act(() => {
+      closeBtn1.props.onPress();
+    });
+
+    // 2. Eksport spiżarni CSV
+    const exportInventoryCsvBtn = findPressableWithText(tree.root, 'Eksportuj Spiżarnię (CSV)');
+    expect(exportInventoryCsvBtn).toBeTruthy();
+
+    renderer.act(() => {
+      exportInventoryCsvBtn.props.onPress();
+    });
+
+    expect(exportInventorySpy).toHaveBeenCalled();
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Eksport Spiżarni (CSV)');
+    expect(str).toContain('inv-1,Etiopia,coffee');
+  });
 });
