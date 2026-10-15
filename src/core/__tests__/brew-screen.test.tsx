@@ -658,6 +658,128 @@ describe('BrewScreen UI Integration', () => {
     str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Zakończono Parzenie!');
   });
+
+  test('Szybki wybór ulubionej receptury z poziomu chipów nagłówka', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const favChip = findPressableWithText(tree.root, 'V60 — Metoda 4:6');
+    expect(favChip).toBeTruthy();
+    act(() => {
+      favChip.props.onPress();
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('V60 — Metoda 4:6');
+  });
+
+  test('Otwarcie modalu wyboru receptur oraz modalu wyboru ziaren ze spiżarni', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // 1. Otwórz modal receptur
+    const recipeCard = findPressableWithText(tree.root, 'RECEPTURA');
+    expect(recipeCard).toBeTruthy();
+    act(() => {
+      recipeCard.props.onPress();
+    });
+
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Wybierz Recepturę');
+
+    // Wybierz przepis z modalu
+    const option = findPressableWithText(tree.root, 'Autorskie V60');
+    expect(option).toBeTruthy();
+    act(() => {
+      option.props.onPress();
+    });
+
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Autorskie V60');
+
+    // 2. Otwórz modal spiżarni
+    const inventoryCard = findPressableWithText(tree.root, 'SPIŻARNIA');
+    expect(inventoryCard).toBeTruthy();
+    act(() => {
+      inventoryCard.props.onPress();
+    });
+
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Wybierz ze Spiżarni');
+
+    // Wybierz ziarno wewnątrz modalu
+    const allBeanTexts = tree.root.findAll((n: any) => {
+      const c = n.props?.children;
+      return typeof c === 'string' && c.includes('Kolumbia Geisha');
+    });
+    let beanOption = allBeanTexts[allBeanTexts.length - 1];
+    while (beanOption && !beanOption.props?.onPress) {
+      beanOption = beanOption.parent;
+    }
+    expect(beanOption).toBeTruthy();
+    act(() => {
+      beanOption.props.onPress();
+    });
+
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Kolumbia Geisha');
+  });
+
+  test('Wybór receptury herbaty wyświetla baner Gongfu Cha nawigujący do /gongfu', () => {
+    mockDb.recipes.set('rec-tea-1', {
+      id: 'rec-tea-1',
+      name: 'Sencha Kyusu',
+      beverage_type: 'TEA',
+      method: 'WESTERN',
+      author: 'Japan Master',
+      dose_g: 4,
+      water_g: 200,
+      water_temp_c: 75,
+      recommended_ratio: 50.0,
+      steps_json: '[]',
+      is_custom: 0,
+      is_favorite: 1,
+      created_at: '2026-10-10',
+    });
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const teaChip = findPressableWithText(tree.root, 'Sencha Kyusu');
+    expect(teaChip).toBeTruthy();
+    act(() => {
+      teaChip.props.onPress();
+    });
+
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Gongfu Cha Tracker');
+
+    const gongfuBanner = findPressableWithText(tree.root, 'Gongfu Cha Tracker');
+    expect(gongfuBanner).toBeTruthy();
+    act(() => {
+      gongfuBanner.props.onPress();
+    });
+
+    expect(mockPush).toHaveBeenCalledWith('/gongfu');
+  });
 });
 
 function findPressableWithText(root: any, text: string) {

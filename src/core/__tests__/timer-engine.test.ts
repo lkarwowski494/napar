@@ -140,4 +140,66 @@ describe('BrewTimerEngine', () => {
 
     engine.destroy();
   });
+
+  test('setSteps, setCallbacks, setHapticsEnabled, setSoundEnabled oraz reset()', () => {
+    const engine = new BrewTimerEngine(testSteps);
+    engine.setHapticsEnabled(false);
+    engine.setSoundEnabled(false);
+
+    const onTick = jest.fn();
+    engine.setCallbacks({ onTick });
+
+    engine.start();
+    expect(onTick).toHaveBeenCalled();
+
+    engine.reset();
+    expect(engine.getSnapshot().status).toBe('idle');
+    expect(engine.getSnapshot().totalElapsedSeconds).toBe(0);
+
+    const newSteps: RecipeStep[] = [
+      {
+        stepNumber: 1,
+        namePl: 'Pojedynczy Krok',
+        targetWaterGrams: 100,
+        durationSeconds: 40,
+        instructionPl: 'Zalej',
+      },
+    ];
+    engine.setSteps(newSteps);
+    expect(engine.getSnapshot().totalSteps).toBe(1);
+    expect(engine.getSnapshot().currentStep?.namePl).toBe('Pojedynczy Krok');
+
+    engine.destroy();
+  });
+
+  test('onStepChange oraz ostrzeżenie haptyczne warning na 3 sekundy przed końcem', () => {
+    const onStepChange = jest.fn();
+    const Haptics = require('expo-haptics');
+    const engine = new BrewTimerEngine(testSteps, { onStepChange });
+
+    engine.start();
+    expect(onStepChange).toHaveBeenCalledWith(0, expect.objectContaining({ namePl: 'Preinfuzja' }));
+
+    // Przeskocz do 27s (3s przed końcem kroku trwającego 30s)
+    jest.advanceTimersByTime(27000);
+    expect(Haptics.impactAsync).toHaveBeenCalledWith('light');
+
+    // Kolejny krok
+    jest.advanceTimersByTime(3000);
+    expect(onStepChange).toHaveBeenCalledWith(1, expect.objectContaining({ namePl: 'Główne zalanie' }));
+
+    engine.destroy();
+  });
+
+  test('Obsługa silnika timera z pustą listą kroków', () => {
+    const engine = new BrewTimerEngine([]);
+    expect(engine.getSnapshot().totalSteps).toBe(0);
+    expect(engine.getSnapshot().currentStep).toBeNull();
+
+    // Próba startu nie powinna zmienić statusu na running
+    engine.start();
+    expect(engine.getSnapshot().status).toBe('idle');
+
+    engine.destroy();
+  });
 });

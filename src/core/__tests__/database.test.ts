@@ -5,16 +5,22 @@
 import {
   initDatabase,
   getInventoryItems,
+  getInventoryItemById,
   saveInventoryItem,
   deductInventoryWeight,
   deleteInventoryItem,
   getRecipes,
+  getRecipeById,
   saveRecipe,
   toggleRecipeFavorite,
+  updateRecipeFavorite,
   getBrewSessions,
+  getBrewSessionById,
   saveBrewSession,
+  deleteBrewSession,
   getCaffeineLogs,
   logCaffeine,
+  deleteCaffeineLog,
   exportAllDataJson,
   importDataJson,
   exportSessionsCsv,
@@ -263,7 +269,7 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(logs[0].caffeineMg).toBe(140);
   });
 
-  test('Eksport i import kopii zapasowej w formacie JSON', () => {
+  test('Eksport i import kopii zapasowej w formacie JSON (inventory, recipes, sessions, caffeine)', () => {
     const item: InventoryItem = {
       id: 'tea-1',
       name: 'Da Hong Pao Oolong',
@@ -278,17 +284,68 @@ describe('Napar SQLite Database & Repositories', () => {
     };
     saveInventoryItem(item);
 
+    const recipe: SavedRecipe = {
+      id: 'rec-custom-backup',
+      name: 'Backup Recipe',
+      beverageType: 'COFFEE',
+      method: 'Kalita',
+      doseGrams: 16,
+      waterGrams: 260,
+      waterTempCelsius: 92,
+      recommendedRatio: 16.25,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: new Date().toISOString(),
+    };
+    saveRecipe(recipe);
+
+    const session: BrewSession = {
+      id: 'sess-backup-1',
+      beverageType: 'COFFEE',
+      method: 'Kalita',
+      recipeName: 'Backup Recipe',
+      doseGrams: 16,
+      waterGrams: 260,
+      waterTempCelsius: 92,
+      totalTimeSeconds: 180,
+      flavorTags: [],
+      brewedAt: new Date().toISOString(),
+    };
+    saveBrewSession(session);
+
+    const caffLog: CaffeineLog = {
+      id: 'caff-backup-1',
+      beverageName: 'Backup Recipe',
+      beverageType: 'coffee',
+      consumedAt: new Date().toISOString(),
+      doseGrams: 16,
+      caffeineMg: 110,
+    };
+    logCaffeine(caffLog);
+
     const exportedJson = exportAllDataJson();
     expect(exportedJson).toContain('Da Hong Pao Oolong');
+    expect(exportedJson).toContain('Backup Recipe');
     expect(exportedJson).toContain('"version": 1');
 
     // Wyczyść i zaimportuj
     mockDb.inventory.clear();
+    mockDb.recipes.clear();
+    mockDb.sessions.clear();
+    mockDb.caffeine.clear();
     expect(getInventoryItems().length).toBe(0);
+    expect(getRecipes().length).toBe(0);
+    expect(getBrewSessions().length).toBe(0);
+    expect(getCaffeineLogs().length).toBe(0);
 
     importDataJson(exportedJson);
     expect(getInventoryItems().length).toBe(1);
     expect(getInventoryItems()[0].name).toBe('Da Hong Pao Oolong');
+    expect(getRecipes().length).toBe(1);
+    expect(getRecipes()[0].name).toBe('Backup Recipe');
+    expect(getBrewSessions().length).toBe(1);
+    expect(getCaffeineLogs().length).toBe(1);
   });
 
   test('escapeCsvValue prawidłowo zabezpiecza znaki specjalne (przecinki, cudzysłowy, entery)', () => {
@@ -358,5 +415,156 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(csv).toContain('250,210');
     expect(csv).toContain('czarna porzeczka; rabarbar');
     expect(csv).toContain(',1,0'); // isFavorite: 1, isArchived: 0
+  });
+
+  test('getInventoryItemById pobiera paczkę lub zwraca null gdy brak', () => {
+    const itemToSave: InventoryItem = {
+      id: 'inv-get-test',
+      name: 'Kenya Nyeri Peaberry',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 210,
+      flavorNotes: ['porzeczka'],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    saveInventoryItem(itemToSave);
+
+    const item = getInventoryItemById('inv-get-test');
+    expect(item).not.toBeNull();
+    expect(item?.name).toBe('Kenya Nyeri Peaberry');
+
+    const notFound = getInventoryItemById('non-existent-id-999');
+    expect(notFound).toBeNull();
+  });
+
+  test('getBrewSessionById pobiera sesję lub zwraca null gdy brak', () => {
+    const sessionToSave: BrewSession = {
+      id: 'sess-get-test',
+      recipeName: 'V60 Sweet Bloom',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      totalTimeSeconds: 165,
+      flavorTags: [],
+      brewedAt: new Date().toISOString(),
+    };
+    saveBrewSession(sessionToSave);
+
+    const session = getBrewSessionById('sess-get-test');
+    expect(session).not.toBeNull();
+    expect(session?.recipeName).toBe('V60 Sweet Bloom');
+
+    const notFound = getBrewSessionById('non-existent-sess-999');
+    expect(notFound).toBeNull();
+  });
+
+  test('updateRecipeFavorite jawnie aktualizuje flagę isFavorite', () => {
+    const recipe: SavedRecipe = {
+      id: 'rec-fav-test',
+      name: 'Test Fav Recipe',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      recommendedRatio: 16.6,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: new Date().toISOString(),
+    };
+    saveRecipe(recipe);
+
+    updateRecipeFavorite('rec-fav-test', true);
+    expect(getRecipeById('rec-fav-test')?.isFavorite).toBe(true);
+
+    updateRecipeFavorite('rec-fav-test', false);
+    expect(getRecipeById('rec-fav-test')?.isFavorite).toBe(false);
+  });
+
+  test('deleteBrewSession usuwa sesję z bazy', () => {
+    const sessionToSave: BrewSession = {
+      id: 'sess-del-test',
+      recipeName: 'V60 Delete Test',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      totalTimeSeconds: 165,
+      flavorTags: [],
+      brewedAt: new Date().toISOString(),
+    };
+    saveBrewSession(sessionToSave);
+    expect(mockDb.sessions.has('sess-del-test')).toBe(true);
+
+    deleteBrewSession('sess-del-test');
+    expect(mockDb.sessions.has('sess-del-test')).toBe(false);
+  });
+
+  test('deleteCaffeineLog usuwa wpis kofeiny z bazy', () => {
+    const log: CaffeineLog = {
+      id: 'caff-del-test',
+      beverageName: 'Espresso',
+      beverageType: 'coffee',
+      consumedAt: new Date().toISOString(),
+      doseGrams: 18,
+      caffeineMg: 130,
+    };
+    logCaffeine(log);
+    expect(mockDb.caffeine.has('caff-del-test')).toBe(true);
+
+    deleteCaffeineLog('caff-del-test');
+    expect(mockDb.caffeine.has('caff-del-test')).toBe(false);
+  });
+
+  test('importDataJson walidacja błędów: niepoprawny JSON oraz version !== 1', () => {
+    expect(() => importDataJson('invalid json string :::')).toThrow();
+    expect(() => importDataJson(JSON.stringify({ version: 2 }))).toThrow(
+      'Nieprawidłowy format pliku kopii zapasowej'
+    );
+  });
+
+  test('mapowanie uszkodzonego JSON w flavor_notes_json oraz sensory_scores_json zwraca wartości domyślne', () => {
+    mockDb.inventory.set('corrupted-bean', {
+      id: 'corrupted-bean',
+      name: 'Corrupted Bean',
+      type: 'coffee',
+      initial_weight_g: 250,
+      remaining_weight_g: 200,
+      flavor_notes_json: '{ bad json',
+      is_favorite: 0,
+      is_archived: 0,
+      created_at: '2026-10-15',
+      updated_at: '2026-10-15',
+    });
+
+    const item = getInventoryItemById('corrupted-bean');
+    expect(item).not.toBeNull();
+    expect(item?.flavorNotes).toEqual([]);
+
+    mockDb.sessions.set('corrupted-sess', {
+      id: 'corrupted-sess',
+      recipe_name: 'Corrupted Session',
+      beverage_type: 'COFFEE',
+      method: 'V60',
+      dose_g: 15,
+      water_g: 250,
+      water_temp_c: 93,
+      total_time_seconds: 180,
+      flavor_tags_json: '{ bad tags',
+      sensory_scores_json: '{ bad sensory',
+      brewed_at: '2026-10-15T12:00:00Z',
+    });
+
+    const session = getBrewSessionById('corrupted-sess');
+    expect(session).not.toBeNull();
+    expect(session?.flavorTags).toEqual([]);
+    expect(session?.sensory).toBeUndefined();
   });
 });

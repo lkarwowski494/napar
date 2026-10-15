@@ -1,6 +1,7 @@
 import {
   calculateBrewWater,
   calculateBrewDose,
+  calculateBrewRatio,
   calculateLiquidYield,
   calculateExtractionYield,
   evaluateRestingWindow,
@@ -192,6 +193,76 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(result.scaledWaterGrams).toBe(1000);
       expect(result.grindAdjustmentClicks).toBe(4);
       expect(result.recommendationPl).toContain('+4 kliki');
+    });
+
+    it('clamps portions between 1 and 4 when input is outside bounds', () => {
+      const under = calculateBatchScaling(15, 250, 0);
+      expect(under.multiplier).toBe(1);
+      const over = calculateBatchScaling(15, 250, 99);
+      expect(over.multiplier).toBe(4);
+    });
+  });
+
+  describe('Edge cases, boundaries & zero handling across domain rules', () => {
+    it('calculateBrewRatio returns 0 on non-positive input', () => {
+      expect(calculateBrewRatio(0, 250)).toBe(0);
+      expect(calculateBrewRatio(15, 0)).toBe(0);
+      expect(calculateBrewRatio(-5, -100)).toBe(0);
+    });
+
+    it('calculateLiquidYield throws on non-positive water/dose or negative factor', () => {
+      expect(() => calculateLiquidYield(0, 15)).toThrow();
+      expect(() => calculateLiquidYield(250, 0)).toThrow();
+      expect(() => calculateLiquidYield(250, 15, -1)).toThrow();
+    });
+    it('calculateExtractionYield throws on zero or negative dose/beverage', () => {
+      expect(() => calculateExtractionYield(0, 1.35, 15)).toThrow();
+      expect(() => calculateExtractionYield(250, 1.35, 0)).toThrow();
+      expect(() => calculateExtractionYield(-100, 1.35, 15)).toThrow();
+    });
+
+    it('estimateCoffeeCaffeineMg returns 0 on non-positive dose, and handles immersion/cold_brew', () => {
+      expect(estimateCoffeeCaffeineMg(0)).toBe(0);
+      expect(estimateCoffeeCaffeineMg(-5)).toBe(0);
+      // Immersion: 15 * 12 * 0.85 = 153.0
+      expect(estimateCoffeeCaffeineMg(15, 'arabica', 'immersion')).toBe(153.0);
+      // Cold brew: 15 * 12 * 0.92 = 165.6
+      expect(estimateCoffeeCaffeineMg(15, 'arabica', 'cold_brew')).toBe(165.6);
+    });
+
+    it('estimateTeaInfusionCaffeineMg handles 5th+ infusions and invalid inputs', () => {
+      expect(estimateTeaInfusionCaffeineMg(0, 1)).toBe(0);
+      expect(estimateTeaInfusionCaffeineMg(100, 0)).toBe(0);
+      expect(estimateTeaInfusionCaffeineMg(100, -1)).toBe(0);
+      // 5th infusion: 2%
+      expect(estimateTeaInfusionCaffeineMg(100, 5)).toBe(2.0);
+      // 6th infusion: 2%
+      expect(estimateTeaInfusionCaffeineMg(100, 6)).toBe(2.0);
+    });
+
+    it('calculateRemainingCaffeineMg edge cases', () => {
+      expect(calculateRemainingCaffeineMg(0, 5)).toBe(0);
+      expect(calculateRemainingCaffeineMg(100, -2)).toBe(0);
+      expect(calculateRemainingCaffeineMg(100, 5, 0)).toBe(0);
+    });
+
+    it('calculateHoursUntilSafeCaffeine returns 0 when dose is already safe', () => {
+      expect(calculateHoursUntilSafeCaffeine(20, 25)).toBe(0);
+      expect(calculateHoursUntilSafeCaffeine(25, 25)).toBe(0);
+    });
+
+    it('diagnoseExtractionTaste handles isTooIntense, isAstringent, and empty input', () => {
+      const intense = diagnoseExtractionTaste({ isTooIntense: true });
+      expect(intense.length).toBe(1);
+      expect(intense[0].issue).toContain('Zbyt ciężka');
+      expect(intense[0].recommendationPl).toContain('Wydłuż ratio');
+
+      const astringent = diagnoseExtractionTaste({ isAstringent: true });
+      expect(astringent.length).toBe(1);
+      expect(astringent[0].issue).toContain('Gorzka / sucha');
+
+      const empty = diagnoseExtractionTaste({});
+      expect(empty.length).toBe(0);
     });
   });
 });

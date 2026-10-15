@@ -295,6 +295,151 @@ describe('DialInScreen UI with Water Chemistry', () => {
     expect(str).toContain('Koncentrat Magnezu');
     expect(str).toContain('Koncentrat Bufora');
   });
+
+  test('Diagnoza Doctor: weryfikuje opcje Za gorzka, Płaska oraz Herbata ściągająca', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<DialInScreen />);
+    });
+
+    // 1. Za gorzka
+    const bitterBtn = findPressableWithText(tree.root, 'Za gorzka');
+    expect(bitterBtn).toBeTruthy();
+    renderer.act(() => {
+      bitterBtn.props.onPress();
+    });
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Zmiel grubiej');
+
+    // 2. Płaska / mdła / wodnista
+    const wateryBtn = findPressableWithText(tree.root, 'Płaska / mdła');
+    expect(wateryBtn).toBeTruthy();
+    renderer.act(() => {
+      wateryBtn.props.onPress();
+    });
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Zwiększ dozę');
+
+    // 3. Herbata ściągająca
+    const astringentBtn = findPressableWithText(tree.root, 'Herbata ściągająca');
+    expect(astringentBtn).toBeTruthy();
+    renderer.act(() => {
+      astringentBtn.props.onPress();
+    });
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('obniż temperaturę');
+  });
+
+  test('Zakładka TDS & EY: oblicza niedoparzenie (<18%), przeparzenie (>22%) i obsługuje zerowe wejścia', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<DialInScreen />);
+    });
+
+    // Przełącz na zakładkę TDS & EY%
+    const eyTab = findPressableWithText(tree.root, 'TDS & EY%');
+    expect(eyTab).toBeTruthy();
+    renderer.act(() => {
+      eyTab.props.onPress();
+    });
+
+    const inputs = tree.root.findAllByType('TextInput');
+    expect(inputs.length).toBeGreaterThanOrEqual(3);
+
+    // Domyślne wartości: woda=250, doza=15, tds=1.35
+    // 1. Zerowa doza -> eyResult === null
+    renderer.act(() => {
+      inputs[1].props.onChangeText('0');
+    });
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).not.toContain('WYDAJNOŚĆ EKSTRAKCJI (EY)');
+
+    // 2. Niedoparzenie: tds=0.8, woda=250, doza=15 -> EY ok. 11.6% (< 18%)
+    renderer.act(() => {
+      inputs[0].props.onChangeText('250');
+      inputs[1].props.onChangeText('15');
+      inputs[2].props.onChangeText('0.8');
+    });
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Niedoparzenie');
+
+    // 3. Przeparzenie: tds=1.8, woda=250, doza=15 -> EY ok. 26% (> 22%)
+    renderer.act(() => {
+      inputs[2].props.onChangeText('1.8');
+    });
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Przeparzenie');
+  });
+
+  test('Woda SCA: zmiana objętości za pomocą chipów (1L, 2L, 5L) oraz wybór profilu receptury', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<DialInScreen />);
+    });
+
+    // Przełącz na zakładkę Woda SCA
+    const waterTab = findPressableWithText(tree.root, 'Woda SCA');
+    expect(waterTab).toBeTruthy();
+    renderer.act(() => {
+      waterTab.props.onPress();
+    });
+
+    // Kliknij chip 1.0 L
+    const chip1L = findPressableWithText(tree.root, '1.0 L');
+    expect(chip1L).toBeTruthy();
+    renderer.act(() => {
+      chip1L.props.onPress();
+    });
+
+    // Kliknij chip 2.0 L
+    const chip2L = findPressableWithText(tree.root, '2.0 L');
+    expect(chip2L).toBeTruthy();
+    renderer.act(() => {
+      chip2L.props.onPress();
+    });
+
+    // Kliknij chip 5.0 L
+    const chip5L = findPressableWithText(tree.root, '5.0 L');
+    expect(chip5L).toBeTruthy();
+    renderer.act(() => {
+      chip5L.props.onPress();
+    });
+
+    // Kliknij inną recepturę wody np. "Standard SCA (Specialty Coffee)"
+    const scaRecipeBtn = findPressableWithText(tree.root, 'Standard SCA');
+    expect(scaRecipeBtn).toBeTruthy();
+    renderer.act(() => {
+      scaRecipeBtn.props.onPress();
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Standard SCA');
+    expect(str).toContain('68');
+  });
+
+  test('Przelicznik młynków: wybór innej kategorii grubości przemiału', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<DialInScreen />);
+    });
+
+    // Przełącz na zakładkę Ratio & Uzysk
+    const ratioTab = findPressableWithText(tree.root, 'Ratio & Uzysk');
+    expect(ratioTab).toBeTruthy();
+    renderer.act(() => {
+      ratioTab.props.onPress();
+    });
+
+    // Kliknij chip kategorii "Chemex / Cupping" lub "French Press"
+    const catChip = findPressableWithText(tree.root, 'Chemex');
+    expect(catChip).toBeTruthy();
+    renderer.act(() => {
+      catChip.props.onPress();
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Chemex');
+  });
 });
 
 function findPressableWithText(root: any, text: string) {

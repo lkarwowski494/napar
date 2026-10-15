@@ -121,4 +121,66 @@ describe('SensoryScoreEditor', () => {
       sweetness: 2,
     });
   });
+
+  it('obsługuje brakujące klucze profilu, clamping na 1 i 5 oraz język angielski', () => {
+    const onChange = jest.fn();
+    // Profil bez zdefiniowanych kluczy
+    const emptyProfile: any = {};
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <SensoryRadarChart profile={emptyProfile} />
+      );
+    });
+    expect(tree.toJSON()).toBeTruthy();
+
+    // Editor z profilem skrajnym (wartości 1 i 5) w języku angielskim
+    const clampedProfile: SensoryProfile = {
+      acidity: 1,
+      sweetness: 5,
+      body: 3,
+      clarity: 3,
+      finish: 3,
+    };
+
+    let editorTree: any;
+    renderer.act(() => {
+      editorTree = renderer.create(
+        <SensoryScoreEditor
+          profile={clampedProfile}
+          onChange={onChange}
+          language="en"
+        />
+      );
+    });
+
+    const str = JSON.stringify(editorTree.toJSON());
+    expect(str).toContain('Acidity');
+    expect(str).toContain('Sweetness');
+
+    // Próba zmniejszenia poniżej 1
+    const decAcidityBtn = editorTree.root.findByProps({
+      accessibilityLabel: 'Zmniejsz Acidity',
+    });
+    renderer.act(() => {
+      decAcidityBtn.props.onPress();
+    });
+    expect(onChange).toHaveBeenCalledWith({
+      ...clampedProfile,
+      acidity: 1,
+    });
+
+    // Próba zwiększenia powyżej 5
+    const incSweetnessBtn = editorTree.root.findByProps({
+      accessibilityLabel: 'Zwiększ Sweetness',
+    });
+    renderer.act(() => {
+      incSweetnessBtn.props.onPress();
+    });
+    expect(onChange).toHaveBeenCalledWith({
+      ...clampedProfile,
+      sweetness: 5,
+    });
+  });
 });

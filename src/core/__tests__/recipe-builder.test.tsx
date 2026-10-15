@@ -74,6 +74,7 @@ jest.mock('expo-router', () => ({
 }));
 
 import RecipeBuilderScreen from '../../../app/recipe-builder';
+import * as databaseModule from '../database';
 import { saveRecipe, deleteRecipe, getRecipeById } from '../database';
 import { SavedRecipe } from '../database-schema';
 import { calculateBrewRatio } from '../domain-rules';
@@ -297,8 +298,19 @@ describe('Custom Recipe Builder & Persistence', () => {
       teaBtn.props.onPress();
     });
 
-    const str = JSON.stringify(tree.toJSON());
+    let str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Herbata');
+
+    // Przełącz z powrotem na Kawę ☕
+    const coffeeBtn = findPressableWithText(tree.root, 'Kawa');
+    expect(coffeeBtn).toBeTruthy();
+
+    renderer.act(() => {
+      coffeeBtn.props.onPress();
+    });
+
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Kawa');
   });
 
   test('Edytuje istniejącą recepturę i usuwa ją w trybie edycji', () => {
@@ -464,5 +476,21 @@ describe('Custom Recipe Builder & Persistence', () => {
     });
 
     expect(mockBack).toHaveBeenCalled();
+  });
+
+  test('Obsługuje błąd bazy danych podczas wczytywania receptury do edycji', () => {
+    mockSearchParams = { id: 'error-recipe' };
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    jest.spyOn(databaseModule, 'getRecipeById').mockImplementation(() => {
+      throw new Error('Database locked');
+    });
+
+    renderer.act(() => {
+      renderer.create(<RecipeBuilderScreen />);
+    });
+
+    expect(warnSpy).toHaveBeenCalledWith('Błąd wczytywania receptury:', expect.any(Error));
+    warnSpy.mockRestore();
+    mockSearchParams = {};
   });
 });

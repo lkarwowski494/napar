@@ -341,4 +341,56 @@ describe('SettingsScreen Component', () => {
 
     expect(alertSpy).toHaveBeenCalledWith('Błąd importu', 'Niepoprawny format danych JSON.');
   });
+
+  test('Obsługa błędów eksportu JSON i CSV oraz zamykanie modalu importu', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+
+    // 1. Błąd eksportu JSON
+    jest.spyOn(databaseModule, 'exportAllDataJson').mockImplementation(() => {
+      throw new Error('Dysk pełny');
+    });
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <SettingsScreen />
+        </LanguageProvider>
+      );
+    });
+
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Eksportuj Kopię Zapasową (JSON)')?.props.onPress();
+    });
+    expect(alertSpy).toHaveBeenCalledWith('Błąd eksportu', 'Dysk pełny');
+
+    // 2. Błąd eksportu CSV sesji
+    jest.spyOn(databaseModule, 'exportSessionsCsv').mockImplementation(() => {
+      throw new Error('Błąd odczytu sesji');
+    });
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Eksportuj Dziennik (CSV)')?.props.onPress();
+    });
+    expect(alertSpy).toHaveBeenCalledWith('Błąd eksportu', 'Błąd odczytu sesji');
+
+    // 3. Błąd eksportu CSV spiżarni
+    jest.spyOn(databaseModule, 'exportInventoryCsv').mockImplementation(() => {
+      throw new Error('Błąd odczytu spiżarni');
+    });
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Eksportuj Spiżarnię (CSV)')?.props.onPress();
+    });
+    expect(alertSpy).toHaveBeenCalledWith('Błąd eksportu', 'Błąd odczytu spiżarni');
+
+    // 4. Zamknięcie modalu importu przyciskiem "Anuluj"
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Importuj Kopię z Pliku JSON')?.props.onPress();
+    });
+    const cancelBtn = findPressableWithText(tree.root, 'Anuluj');
+    expect(cancelBtn).toBeTruthy();
+    renderer.act(() => {
+      cancelBtn.props.onPress();
+    });
+  });
 });
+

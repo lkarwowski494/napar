@@ -62,4 +62,28 @@ describe('i18n System', () => {
     expect(translations.pl.brew.pauseBrew).toBe('PAUZA');
     expect(translations.en.brew.pauseBrew).toBe('PAUSE');
   });
+
+  test('detectSystemLanguage prawidłowo mapuje pl, en oraz błędy w try-catch', () => {
+    const originalDateTimeFormat = Intl.DateTimeFormat;
+
+    // 1. Polski locale
+    Intl.DateTimeFormat = jest.fn().mockImplementation(() => ({
+      resolvedOptions: () => ({ locale: 'pl-PL' }),
+    })) as any;
+    expect(detectSystemLanguage()).toBe('pl');
+
+    // 2. Angielski lub inny obcy locale
+    Intl.DateTimeFormat = jest.fn().mockImplementation(() => ({
+      resolvedOptions: () => ({ locale: 'de-DE' }),
+    })) as any;
+    expect(detectSystemLanguage()).toBe('en');
+
+    // 3. Rzucenie błędu wewnątrz try
+    Intl.DateTimeFormat = jest.fn().mockImplementation(() => {
+      throw new Error('Locale error');
+    }) as any;
+    expect(detectSystemLanguage()).toBe('en');
+
+    Intl.DateTimeFormat = originalDateTimeFormat;
+  });
 });

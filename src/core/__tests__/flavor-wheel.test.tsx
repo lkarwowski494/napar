@@ -54,4 +54,79 @@ describe('SCA Flavor Wheel Data & Picker Component', () => {
     expect(str).toContain('Jaśmin');
     expect(str).toContain('Bergamotka');
   });
+
+  test('Kliknięcie aktywnego chipa na górnym pasku wywołuje onToggleDescriptor', () => {
+    const onToggle = jest.fn();
+    let tree: any;
+
+    renderer.act(() => {
+      tree = renderer.create(
+        <FlavorWheelPicker
+          selectedDescriptors={['Jaśmin', 'Bergamotka']}
+          onToggleDescriptor={onToggle}
+        />
+      );
+    });
+
+    const activeChip = findPressableWithText(tree.root, 'Jaśmin');
+    expect(activeChip).toBeTruthy();
+
+    renderer.act(() => {
+      activeChip.props.onPress();
+    });
+
+    expect(onToggle).toHaveBeenCalledWith('Jaśmin');
+  });
+
+  test('Przełączanie kategorii koła smaków i kliknięcie nowego deskryptora', () => {
+    const onToggle = jest.fn();
+    let tree: any;
+
+    renderer.act(() => {
+      tree = renderer.create(
+        <FlavorWheelPicker
+          selectedDescriptors={[]}
+          onToggleDescriptor={onToggle}
+        />
+      );
+    });
+
+    // 1. Przełącz na kategorię Kwiatowe 🌸
+    const floralCatBtn = findPressableWithText(tree.root, 'Kwiatowe');
+    expect(floralCatBtn).toBeTruthy();
+
+    renderer.act(() => {
+      floralCatBtn.props.onPress();
+    });
+
+    // 2. Kliknij deskryptor Jaśmin w kategorii Kwiatowe
+    const jasmineChip = findPressableWithText(tree.root, 'Jaśmin');
+    expect(jasmineChip).toBeTruthy();
+
+    renderer.act(() => {
+      jasmineChip.props.onPress();
+    });
+
+    expect(onToggle).toHaveBeenCalledWith('Jaśmin');
+  });
 });
+
+function findPressableWithText(root: any, text: string) {
+  const match = root.findAll((node: any) => {
+    if (!node.props) return false;
+    if (typeof node.props.children === 'string' && node.props.children.includes(text)) return true;
+    if (Array.isArray(node.props.children)) {
+      const full = node.props.children
+        .map((c: any) => (typeof c === 'string' || typeof c === 'number' ? String(c) : ''))
+        .join('');
+      if (full.includes(text)) return true;
+    }
+    return false;
+  })[0];
+  if (!match) return null;
+  let curr = match;
+  while (curr && !curr.props?.onPress) {
+    curr = curr.parent;
+  }
+  return curr;
+}

@@ -93,6 +93,38 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(ultraCoarse.rawValue).toBe(45); // maxSetting Comandante
   });
 
+  test('Obsługuje ułamkowe nastawy Fellow Ode Gen 2 (⅓, ⅔ oraz brak ułamka)', () => {
+    const ode = SUPPORTED_GRINDERS.find((g) => g.id === 'fellow_ode_gen2')!;
+    // clicks = 1 -> major 1, sub 0 -> '1'
+    expect(ode.formatSetting(1)).toBe('1');
+    // clicks = 2 -> major 1, sub 1 -> '1⅓'
+    expect(ode.formatSetting(2)).toBe('1⅓');
+    // clicks = 3 -> major 1, sub 2 -> '1⅔'
+    expect(ode.formatSetting(3)).toBe('1⅔');
+    // clicks = 4 -> major 2, sub 0 -> '2'
+    expect(ode.formatSetting(4)).toBe('2');
+  });
+
+  test('Obsługuje domyślne fallbacki parseSetting dla nienumerycznych ciągów', () => {
+    const c40 = SUPPORTED_GRINDERS.find((g) => g.id === 'comandante_c40')!;
+    expect(c40.parseSetting('nieznana')).toBe(24 * 30.0);
+
+    const timemore = SUPPORTED_GRINDERS.find((g) => g.id === 'timemore_c2_c3')!;
+    expect(timemore.parseSetting('brak')).toBe(18 * 35.0);
+
+    const kUltra = SUPPORTED_GRINDERS.find((g) => g.id === '1zpresso_k_ultra')!;
+    expect(kUltra.parseSetting('tekst')).toBe(7.5 * 10 * 20.0);
+
+    const ode = SUPPORTED_GRINDERS.find((g) => g.id === 'fellow_ode_gen2')!;
+    expect(ode.parseSetting('brak_cyfr')).toBe(200 + 5.0 * 3 * 40.0);
+
+    const encore = SUPPORTED_GRINDERS.find((g) => g.id === 'baratza_encore')!;
+    expect(encore.parseSetting('brak')).toBe(150 + 16 * 35.0);
+
+    const k6 = SUPPORTED_GRINDERS.find((g) => g.id === 'kingrinder_k6')!;
+    expect(k6.parseSetting('brak')).toBe(90 * 16.0);
+  });
+
   test('Obsługuje fallback dla nieznanego identyfikatora młynka', () => {
     const fallback = convertMicronsToGrinder(720, 'unknown_grinder_999');
     expect(fallback.grinderName).toBe(SUPPORTED_GRINDERS[0].name);
@@ -110,4 +142,17 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(catIds).toContain('chemex_cupping');
     expect(catIds).toContain('frenchpress_coldbrew');
   });
+
+  test('Przelicza każdą kategorię mielenia na wszystkie 6 modeli młynków', () => {
+    for (const cat of GRIND_CATEGORIES) {
+      for (const grinder of SUPPORTED_GRINDERS) {
+        const res = convertMicronsToGrinder(cat.defaultMicrons, grinder.id);
+        expect(res.grinderName).toBe(grinder.name);
+        expect(res.rawValue).toBeGreaterThanOrEqual(grinder.minSetting);
+        expect(res.rawValue).toBeLessThanOrEqual(grinder.maxSetting);
+        expect(res.formatted).toBeTruthy();
+      }
+    }
+  });
 });
+
