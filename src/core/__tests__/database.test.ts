@@ -10,6 +10,7 @@ import {
   deleteInventoryItem,
   getRecipes,
   saveRecipe,
+  toggleRecipeFavorite,
   getBrewSessions,
   saveBrewSession,
   getCaffeineLogs,
@@ -81,15 +82,22 @@ const mockDb: any = {
         dose_g: dose, water_g: water, water_temp_c: temp, grind_size_description: grind,
         recommended_ratio: ratio, steps_json: steps, is_custom: custom, is_favorite: fav, created_at: created
       });
+    } else if (query.includes('UPDATE recipes SET is_favorite = ?')) {
+      const [fav, id] = params!;
+      const existing = mockDb.recipes.get(id);
+      if (existing) {
+        existing.is_favorite = fav;
+      }
     } else if (query.includes('DELETE FROM recipes WHERE id = ?')) {
       mockDb.recipes.delete(params![0]);
     } else if (query.includes('INSERT OR REPLACE INTO brew_sessions')) {
-      const [id, rId, rName, iId, iName, type, method, dose, water, temp, grind, time, rating, tags, balance, tds, ey, caff, notes, inf, brewed] = params!;
+      const [id, rId, rName, iId, iName, type, method, dose, water, temp, grind, time, rating, tags, balance, tds, ey, caff, notes, inf, sensory, brewed] = params!;
       mockDb.sessions.set(id, {
         id, recipe_id: rId, recipe_name: rName, inventory_item_id: iId, inventory_item_name: iName,
         beverage_type: type, method, dose_g: dose, water_g: water, water_temp_c: temp, grind_setting: grind,
         total_time_seconds: time, rating, flavor_tags_json: tags, taste_balance: balance, tds_percentage: tds,
-        extraction_yield_percentage: ey, caffeine_content_mg: caff, notes, infusion_number: inf, brewed_at: brewed
+        extraction_yield_percentage: ey, caffeine_content_mg: caff, notes, infusion_number: inf,
+        sensory_scores_json: sensory, brewed_at: brewed
       });
     } else if (query.includes('DELETE FROM brew_sessions WHERE id = ?')) {
       mockDb.sessions.delete(params![0]);
@@ -180,7 +188,29 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(getInventoryItems().length).toBe(0);
   });
 
-  test('Zapis sesji parzenia i rejestru kofeiny', () => {
+  test('Zarządzanie ulubionymi recepturami (toggleRecipeFavorite)', () => {
+    const recipe: SavedRecipe = {
+      id: 'rec-fav-1',
+      name: 'Aeropress Inverted',
+      beverageType: 'COFFEE',
+      method: 'Aeropress',
+      doseGrams: 15,
+      waterGrams: 200,
+      waterTempCelsius: 85,
+      recommendedRatio: 13.3,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-10T10:00:00Z',
+    };
+    saveRecipe(recipe);
+    expect(getRecipes().length).toBe(1);
+    const toggled = toggleRecipeFavorite('rec-fav-1');
+    expect(toggled).toBe(true);
+    expect(getRecipes()[0].isFavorite).toBe(true);
+  });
+
+  test('Zapis sesji parzenia i rejestru kofeiny z profilem sensorycznym', () => {
     const session: BrewSession = {
       id: 'sess-100',
       beverageType: 'COFFEE',
@@ -196,6 +226,13 @@ describe('Napar SQLite Database & Repositories', () => {
       tdsPercentage: 1.35,
       extractionYieldPercentage: 19.8,
       caffeineContentMg: 140,
+      sensory: {
+        acidity: 4,
+        sweetness: 5,
+        body: 3,
+        clarity: 4,
+        finish: 4,
+      },
       brewedAt: new Date().toISOString(),
     };
 
@@ -204,6 +241,8 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(sessions.length).toBe(1);
     expect(sessions[0].method).toBe('V60');
     expect(sessions[0].caffeineContentMg).toBe(140);
+    expect(sessions[0].sensory?.acidity).toBe(4);
+    expect(sessions[0].sensory?.sweetness).toBe(5);
 
     const caffLog: CaffeineLog = {
       id: 'caff-1',

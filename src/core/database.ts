@@ -25,6 +25,12 @@ export function getDatabase(): SQLite.SQLiteDatabase {
 export function initDatabase(db: SQLite.SQLiteDatabase): void {
   db.execSync(SCHEMA_SQL);
 
+  try {
+    db.runSync('ALTER TABLE brew_sessions ADD COLUMN sensory_scores_json TEXT');
+  } catch {
+    // Column already exists
+  }
+
   // Sprawdź czy tabela recipes ma dane początkowe z master recipes
   const countRow = db.getFirstSync<{ count: number }>(
     'SELECT COUNT(*) as count FROM recipes'
@@ -222,6 +228,20 @@ export function deleteRecipe(id: string): void {
   db.runSync('DELETE FROM recipes WHERE id = ?', [id]);
 }
 
+export function toggleRecipeFavorite(id: string): boolean {
+  const db = getDatabase();
+  const recipe = getRecipeById(id);
+  if (!recipe) return false;
+  const newFav = !recipe.isFavorite;
+  db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [newFav ? 1 : 0, id]);
+  return newFav;
+}
+
+export function updateRecipeFavorite(id: string, isFavorite: boolean): void {
+  const db = getDatabase();
+  db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [isFavorite ? 1 : 0, id]);
+}
+
 function mapRowToRecipe(row: any): SavedRecipe {
   return {
     id: row.id,
@@ -269,8 +289,8 @@ export function saveBrewSession(session: BrewSession): void {
       beverage_type, method, dose_g, water_g, water_temp_c,
       grind_setting, total_time_seconds, rating, flavor_tags_json,
       taste_balance, tds_percentage, extraction_yield_percentage,
-      caffeine_content_mg, notes, infusion_number, brewed_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      caffeine_content_mg, notes, infusion_number, sensory_scores_json, brewed_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       session.id,
       session.recipeId ?? null,
@@ -292,6 +312,7 @@ export function saveBrewSession(session: BrewSession): void {
       session.caffeineContentMg ?? null,
       session.notes ?? null,
       session.infusionNumber ?? 1,
+      session.sensory ? JSON.stringify(session.sensory) : null,
       session.brewedAt || new Date().toISOString(),
     ]
   );
@@ -309,6 +330,16 @@ function mapRowToBrewSession(row: any): BrewSession {
   } catch {
     flavorTags = [];
   }
+
+  let sensory: any = undefined;
+  if (row.sensory_scores_json) {
+    try {
+      sensory = JSON.parse(row.sensory_scores_json);
+    } catch {
+      sensory = undefined;
+    }
+  }
+
   return {
     id: row.id,
     recipeId: row.recipe_id || undefined,
@@ -332,6 +363,7 @@ function mapRowToBrewSession(row: any): BrewSession {
       row.caffeine_content_mg !== null ? row.caffeine_content_mg : undefined,
     notes: row.notes || undefined,
     infusionNumber: row.infusion_number || 1,
+    sensory,
     brewedAt: row.brewed_at,
   };
 }

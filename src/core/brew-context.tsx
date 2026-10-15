@@ -5,7 +5,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
 import { MasterRecipe, RecipeStep, MASTER_RECIPES } from './recipes-data';
-import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from './database-schema';
+import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog, SensoryProfile } from './database-schema';
 import { BrewTimerEngine, TimerSnapshot } from './timer-engine';
 import {
   saveBrewSession,
@@ -48,6 +48,7 @@ export interface BrewContextType {
     tasteBalance?: string;
     tdsPercentage?: number;
     notes?: string;
+    sensory?: SensoryProfile;
     logToCaffeineTracker?: boolean;
   }) => BrewSession;
 }
@@ -161,6 +162,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     tasteBalance?: string;
     tdsPercentage?: number;
     notes?: string;
+    sensory?: SensoryProfile;
     logToCaffeineTracker?: boolean;
   }): BrewSession => {
     engineRef.current?.finish();
@@ -207,6 +209,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       extractionYieldPercentage: eyPercent,
       caffeineContentMg: caffeineMg,
       notes: data.notes,
+      sensory: data.sensory,
       brewedAt: nowIso,
     };
 

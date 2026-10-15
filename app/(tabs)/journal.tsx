@@ -11,13 +11,19 @@ import {
   ScrollView,
   Pressable,
   Alert,
+  TextInput,
 } from 'react-native';
 import { getBrewSessions, deleteBrewSession } from '../../src/core/database';
 import { BrewSession } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
+import { useTranslation } from '../../src/core/i18n';
+import { SensoryRadarChart } from '../../src/core/radar-chart';
 
 export default function JournalScreen() {
+  const { t, language } = useTranslation();
   const [sessions, setSessions] = useState<BrewSession[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filterType, setFilterType] = useState<'all' | 'coffee' | 'tea' | 'high_rated'>('all');
 
   const loadSessions = () => {
     try {
@@ -52,7 +58,7 @@ export default function JournalScreen() {
 
   const formatDateTime = (iso: string) => {
     const d = new Date(iso);
-    return `${d.toLocaleDateString('pl-PL')} o ${d.toLocaleTimeString('pl-PL', {
+    return `${d.toLocaleDateString(language === 'pl' ? 'pl-PL' : 'en-US')} o ${d.toLocaleTimeString(language === 'pl' ? 'pl-PL' : 'en-US', {
       hour: '2-digit',
       minute: '2-digit',
     })}`;
@@ -64,25 +70,96 @@ export default function JournalScreen() {
     return `${mins}:${s.toString().padStart(2, '0')}`;
   };
 
+  const filteredSessions = sessions.filter((s) => {
+    if (filterType === 'coffee' && s.beverageType !== 'COFFEE') return false;
+    if (filterType === 'tea' && s.beverageType !== 'TEA') return false;
+    if (filterType === 'high_rated' && (!s.rating || s.rating < 4.5)) return false;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchRecipe = s.recipeName?.toLowerCase().includes(q) ?? false;
+      const matchMethod = s.method.toLowerCase().includes(q);
+      const matchBean = s.inventoryItemName?.toLowerCase().includes(q) ?? false;
+      const matchNotes = s.notes?.toLowerCase().includes(q) ?? false;
+      const matchTags = s.flavorTags.some((tag) => tag.toLowerCase().includes(q));
+      return matchRecipe || matchMethod || matchBean || matchNotes || matchTags;
+    }
+
+    return true;
+  });
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.headerBox}>
-        <Text style={styles.headerTitle}>Twoje Sesje Parzenia</Text>
+        <Text style={styles.headerTitle}>{t.journal.title}</Text>
         <Text style={styles.headerSub}>
-          Łącznie zapisanych sesji: {sessions.length}
+          {t.journal.totalBrews}: {sessions.length}
+          {filteredSessions.length !== sessions.length ? ` (widoczne: ${filteredSessions.length})` : ''}
         </Text>
+      </View>
+
+      {/* Wyszukiwarka sesji (search bar) */}
+      <View style={styles.searchBarContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder={t.journal.searchPlaceholder}
+          placeholderTextColor={theme.colors.textMuted}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          clearButtonMode="while-editing"
+        />
+      </View>
+
+      {/* Szybkie filtry */}
+      <View style={styles.filterChipsRow}>
+        {[
+          { key: 'all', label: t.journal.filterAll },
+          { key: 'coffee', label: `☕ ${t.journal.filterCoffee}` },
+          { key: 'tea', label: `🍵 ${t.journal.filterTea}` },
+          { key: 'high_rated', label: t.journal.filterHighRated },
+        ].map((f) => (
+          <Pressable
+            key={f.key}
+            style={[
+              styles.filterChip,
+              filterType === f.key && styles.filterChipActive,
+            ]}
+            onPress={() => setFilterType(f.key as any)}
+          >
+            <Text
+              style={[
+                styles.filterChipText,
+                filterType === f.key && styles.filterChipTextActive,
+              ]}
+            >
+              {f.label}
+            </Text>
+          </Pressable>
+        ))}
       </View>
 
       {sessions.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon}>☕</Text>
-          <Text style={styles.emptyTitle}>Brak wpisów w Dzienniku</Text>
-          <Text style={styles.emptySub}>
-            Zaparz swoją pierwszą kawę lub herbatę w zakładce Parzenie i zapisz swoje wrażenia sensoryczne.
-          </Text>
+          <Text style={styles.emptyTitle}>{t.journal.emptyTitle}</Text>
+          <Text style={styles.emptySub}>{t.journal.emptySub}</Text>
+        </View>
+      ) : filteredSessions.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyIcon}>🔍</Text>
+          <Text style={styles.emptyTitle}>{t.journal.noResults}</Text>
+          <Pressable
+            style={styles.clearSearchBtn}
+            onPress={() => {
+              setSearchQuery('');
+              setFilterType('all');
+            }}
+          >
+            <Text style={styles.clearSearchText}>Wyczyść filtry</Text>
+          </Pressable>
         </View>
       ) : (
-        sessions.map((session) => (
+        filteredSessions.map((session) => (
           <View key={session.id} style={styles.sessionCard}>
             <View style={styles.cardHeader}>
               <View style={{ flex: 1 }}>
@@ -161,6 +238,18 @@ export default function JournalScreen() {
                 </View>
               )}
             </View>
+
+            {/* Wykres Sensoryki SCA Spider Graph */}
+            {session.sensory && (
+              <View style={styles.sensoryChartWrapper}>
+                <Text style={styles.sensoryChartTitle}>{t.sensory.title}</Text>
+                <SensoryRadarChart
+                  profile={session.sensory}
+                  size={170}
+                  language={language}
+                />
+              </View>
+            )}
 
             {/* Tagi nut sensorycznych */}
             {session.flavorTags && session.flavorTags.length > 0 && (
@@ -372,5 +461,74 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.danger,
     fontWeight: '600',
+  },
+  searchBarContainer: {
+    marginBottom: 10,
+  },
+  searchInput: {
+    backgroundColor: theme.colors.bgCard,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.md,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    color: theme.colors.textPrimary,
+    fontSize: 13,
+  },
+  filterChipsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  filterChip: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  filterChipActive: {
+    backgroundColor: 'rgba(217, 119, 54, 0.2)',
+    borderColor: theme.colors.copper,
+  },
+  filterChipText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  filterChipTextActive: {
+    color: theme.colors.copper,
+    fontWeight: '800',
+  },
+  sensoryChartWrapper: {
+    alignItems: 'center',
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
+    paddingVertical: 10,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  sensoryChartTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    marginBottom: 4,
+    letterSpacing: 0.5,
+  },
+  clearSearchBtn: {
+    marginTop: 12,
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    borderRadius: theme.borderRadius.sm,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  clearSearchText: {
+    color: theme.colors.copper,
+    fontWeight: '700',
+    fontSize: 13,
   },
 });

@@ -10,6 +10,7 @@ import {
   evaluateBedtimeCaffeine,
   calculateHoursUntilSafeCaffeine,
   diagnoseExtractionTaste,
+  calculateBatchScaling,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -166,6 +167,31 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
     it('handles multiple taste descriptors', () => {
       const diagnoses = diagnoseExtractionTaste({ isSour: true, isWatery: true });
       expect(diagnoses.length).toBe(2);
+    });
+  });
+
+  describe('RD-06: Batch Scaling (Porcje 1–4 osób)', () => {
+    it('scales 1 cup with default grind recommendation', () => {
+      const result = calculateBatchScaling(15, 250, 1);
+      expect(result.scaledDoseGrams).toBe(15);
+      expect(result.scaledWaterGrams).toBe(250);
+      expect(result.grindAdjustmentClicks).toBe(0);
+    });
+
+    it('scales 2 cups with +2 clicks coarser recommendation', () => {
+      const result = calculateBatchScaling(15, 250, 2);
+      expect(result.scaledDoseGrams).toBe(30);
+      expect(result.scaledWaterGrams).toBe(500);
+      expect(result.grindAdjustmentClicks).toBe(2);
+      expect(result.recommendationPl).toContain('+2 kliki');
+    });
+
+    it('scales 3 or 4 cups with +4 clicks coarser recommendation', () => {
+      const result = calculateBatchScaling(15, 250, 4);
+      expect(result.scaledDoseGrams).toBe(60);
+      expect(result.scaledWaterGrams).toBe(1000);
+      expect(result.grindAdjustmentClicks).toBe(4);
+      expect(result.recommendationPl).toContain('+4 kliki');
     });
   });
 });

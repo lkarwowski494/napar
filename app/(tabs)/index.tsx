@@ -16,12 +16,19 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
-import { getRecipes, getInventoryItems } from '../../src/core/database';
+import { getRecipes, getInventoryItems, toggleRecipeFavorite } from '../../src/core/database';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
 import { InventoryItem, SavedRecipe } from '../../src/core/database-schema';
 import { FlavorWheelPicker } from '../../src/core/flavor-wheel-picker';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
+import {
+  SensoryRadarChart,
+  SensoryScoreEditor,
+  DEFAULT_SENSORY_PROFILE,
+  SensoryProfile,
+} from '../../src/core/radar-chart';
+import { calculateBatchScaling } from '../../src/core/domain-rules';
 
 export default function BrewScreen() {
   const router = useRouter();
@@ -59,6 +66,26 @@ export default function BrewScreen() {
   const [tdsInput, setTdsInput] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [sensoryProfile, setSensoryProfile] = useState<SensoryProfile>(DEFAULT_SENSORY_PROFILE);
+
+  // Skalowanie porcji (Batch Scaling 1–4 osób)
+  const [servings, setServings] = useState<number>(1);
+
+  const baseDose = 'doseGrams' in recipe ? recipe.doseGrams : recipe.coffeeOrTeaDoseGrams;
+  const baseWater = 'waterGrams' in recipe ? recipe.waterGrams : recipe.waterWeightGrams;
+  const batchScaling = calculateBatchScaling(baseDose, baseWater, servings);
+
+  const handleServingsChange = (n: number) => {
+    setServings(n);
+    const scaling = calculateBatchScaling(baseDose, baseWater, n);
+    setDoseGrams(scaling.scaledDoseGrams);
+  };
+
+  const handleSelectRecipe = (r: any) => {
+    selectRecipe(r);
+    setServings(1);
+    setShowRecipeModal(false);
+  };
 
   const refreshData = () => {
     try {
@@ -76,6 +103,16 @@ export default function BrewScreen() {
   useEffect(() => {
     refreshData();
   }, []);
+
+  // Smart preselection ziaren ze spiżarni
+  useEffect(() => {
+    if (!selectedInventoryItem && allInventory.length > 0) {
+      const defaultItem = allInventory.find((i) => i.isFavorite) || allInventory[0];
+      if (defaultItem) {
+        selectInventoryItem(defaultItem);
+      }
+    }
+  }, [allInventory, selectedInventoryItem]);
 
   // Automatyczne otwarcie arkusza oceniania po zakończeniu parzenia
   useEffect(() => {
@@ -96,6 +133,7 @@ export default function BrewScreen() {
       rating,
       tasteBalance,
       flavorTags: selectedTags,
+      sensory: sensoryProfile,
       tdsPercentage: isNaN(tdsNum) ? undefined : tdsNum,
       notes: notes.trim() || undefined,
       logToCaffeineTracker: true,
@@ -117,8 +155,50 @@ export default function BrewScreen() {
   const isPaused = snapshot.status === 'paused';
   const isIdle = snapshot.status === 'idle';
 
+  const favoriteRecipes = allRecipes.filter((r) => Boolean(r.isFavorite));
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      {/* 1-Click Szybkie Parzenie z Ulubionych Receptur */}
+      {favoriteRecipes.length > 0 && !isRunning && (
+        <View style={styles.favoritesSection}>
+          <Text style={styles.favoritesSectionTitle}>⭐ {t.favorites.title}</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.favoritesScroll}
+          >
+            {favoriteRecipes.map((fav) => {
+              const isSelected = recipe.id === fav.id;
+              const favDose = 'doseGrams' in fav ? fav.doseGrams : fav.coffeeOrTeaDoseGrams;
+              return (
+                <Pressable
+                  key={fav.id}
+                  style={[
+                    styles.favoriteChip,
+                    isSelected && styles.favoriteChipActive,
+                  ]}
+                  onPress={() => handleSelectRecipe(fav)}
+                >
+                  <Text
+                    style={[
+                      styles.favoriteChipText,
+                      isSelected && styles.favoriteChipTextActive,
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {fav.name}
+                  </Text>
+                  <Text style={styles.favoriteChipSub}>
+                    {fav.method} · {favDose}g
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </View>
+      )}
+
       {/* Pasek wyboru receptury i ziarna */}
       <View style={styles.selectorRow}>
         <Pressable
@@ -169,6 +249,49 @@ export default function BrewScreen() {
         </Pressable>
       )}
 
+      {/* Skalowanie porcji (Batch Scaling dla 1–4 osób) */}
+      <View style={styles.batchSection}>
+        <View style={styles.batchHeaderRow}>
+          <Text style={styles.batchTitle}>👥 {t.batch.label}</Text>
+          {servings > 1 && (
+            <View style={styles.batchBadge}>
+              <Text style={styles.batchBadgeText}>
+                +{batchScaling.grindAdjustmentClicks} kliki grubiej
+              </Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.batchChipsRow}>
+          {[1, 2, 3, 4].map((n) => (
+            <Pressable
+              key={n}
+              style={[
+                styles.batchChip,
+                servings === n && styles.batchChipActive,
+              ]}
+              onPress={() => handleServingsChange(n)}
+              disabled={isRunning}
+            >
+              <Text
+                style={[
+                  styles.batchChipText,
+                  servings === n && styles.batchChipTextActive,
+                ]}
+              >
+                {n === 1 ? t.batch.cup1 : n === 2 ? t.batch.cup2 : n === 3 ? t.batch.cup3 : t.batch.cup4}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        {servings > 1 && (
+          <Text style={styles.batchAdviceText}>
+            💡 {batchScaling.recommendationPl}
+          </Text>
+        )}
+      </View>
+
       {/* Skalowanie dozy i wody */}
       <View style={styles.parametersRow}>
         <View style={styles.paramBox}>
@@ -181,7 +304,7 @@ export default function BrewScreen() {
             >
               <Text style={styles.stepBtnText}>−</Text>
             </Pressable>
-            <Text style={styles.paramValue}>{doseGrams}g</Text>
+            <Text style={styles.paramValue}>{`${doseGrams}g`}</Text>
             <Pressable
               style={styles.stepBtn}
               onPress={() => setDoseGrams(doseGrams + 1)}
@@ -194,7 +317,7 @@ export default function BrewScreen() {
 
         <View style={styles.paramBox}>
           <Text style={styles.paramLabel}>WODA ŁĄCZNIE</Text>
-          <Text style={styles.paramValueLarge}>{waterGrams}g</Text>
+          <Text style={styles.paramValueLarge}>{`${waterGrams}g`}</Text>
         </View>
 
         <View style={styles.paramBox}>
@@ -360,6 +483,20 @@ export default function BrewScreen() {
                       {r.isCustom ? ' · Autorska' : ''}
                     </Text>
                   </View>
+                  <Pressable
+                    style={styles.favToggleBtn}
+                    hitSlop={10}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      toggleRecipeFavorite(r.id);
+                      refreshData();
+                    }}
+                    accessibilityLabel={`Ulubione: ${r.name}`}
+                  >
+                    <Text style={[styles.favToggleIcon, r.isFavorite && styles.favToggleIconActive]}>
+                      {r.isFavorite ? '★' : '☆'}
+                    </Text>
+                  </Pressable>
                   {r.isCustom && (
                     <Pressable
                       style={styles.editRecipeBtn}
@@ -438,86 +575,101 @@ export default function BrewScreen() {
       <Modal visible={showFinishModal} animationType="slide" transparent={true}>
         <View style={styles.finishModalOverlay}>
           <View style={styles.finishModalContent}>
-            <Text style={styles.finishModalTitle}>Zakończono Parzenie!</Text>
-            <Text style={styles.finishModalSub}>
-              Czas: {formatTime(snapshot.totalElapsedSeconds)} · Woda: {waterGrams}g
-            </Text>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 16 }}>
+              <Text style={styles.finishModalTitle}>Zakończono Parzenie!</Text>
+              <Text style={styles.finishModalSub}>
+                Czas: {formatTime(snapshot.totalElapsedSeconds)} · Woda: {waterGrams}g
+              </Text>
 
-            {/* Ocena w gwiazdkach */}
-            <Text style={styles.finishSectionLabel}>Twoja Ocena</Text>
-            <View style={styles.starRow}>
-              {[1, 2, 3, 4, 5].map((s) => (
-                <Pressable key={s} onPress={() => setRating(s)}>
-                  <Text style={[styles.starIcon, rating >= s && styles.starActive]}>
-                    ★
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
+              {/* Ocena w gwiazdkach */}
+              <Text style={styles.finishSectionLabel}>Twoja Ocena</Text>
+              <View style={styles.starRow}>
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Pressable key={s} onPress={() => setRating(s)}>
+                    <Text style={[styles.starIcon, rating >= s && styles.starActive]}>
+                      ★
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
 
-            {/* Balans smaku */}
-            <Text style={styles.finishSectionLabel}>Profil Balansu</Text>
-            <View style={styles.balanceRow}>
-              {[
-                { key: 'balanced', label: 'Zbalansowana' },
-                { key: 'sour', label: 'Za kwaśna' },
-                { key: 'bitter', label: 'Za gorzka' },
-                { key: 'weak', label: 'Wodnista' },
-              ].map((b) => (
-                <Pressable
-                  key={b.key}
-                  style={[
-                    styles.balanceChip,
-                    tasteBalance === b.key && styles.balanceChipActive,
-                  ]}
-                  onPress={() => setTasteBalance(b.key)}
-                >
-                  <Text
+              {/* Balans smaku */}
+              <Text style={styles.finishSectionLabel}>Profil Balansu</Text>
+              <View style={styles.balanceRow}>
+                {[
+                  { key: 'balanced', label: 'Zbalansowana' },
+                  { key: 'sour', label: 'Za kwaśna' },
+                  { key: 'bitter', label: 'Za gorzka' },
+                  { key: 'weak', label: 'Wodnista' },
+                ].map((b) => (
+                  <Pressable
+                    key={b.key}
                     style={[
-                      styles.balanceChipText,
-                      tasteBalance === b.key && styles.balanceChipTextActive,
+                      styles.balanceChip,
+                      tasteBalance === b.key && styles.balanceChipActive,
                     ]}
+                    onPress={() => setTasteBalance(b.key)}
                   >
-                    {b.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
+                    <Text
+                      style={[
+                        styles.balanceChipText,
+                        tasteBalance === b.key && styles.balanceChipTextActive,
+                      ]}
+                    >
+                      {b.label}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
 
-            {/* Hierarchiczne Koło Smaków SCA */}
-            <Text style={styles.finishSectionLabel}>Koło Smaków SCA</Text>
-            <FlavorWheelPicker
-              selectedDescriptors={selectedTags}
-              onToggleDescriptor={toggleTag}
-            />
-
-            {/* Opcjonalny TDS */}
-            <View style={styles.tdsInputRow}>
-              <Text style={styles.tdsInputLabel}>Odczyt TDS refractometru (%):</Text>
-              <TextInput
-                style={styles.tdsTextInput}
-                placeholder="np. 1.35"
-                placeholderTextColor={theme.colors.textMuted}
-                keyboardType="numeric"
-                value={tdsInput}
-                onChangeText={setTdsInput}
+              {/* Wykres Sensoryki SCA Spider Graph */}
+              <Text style={[styles.finishSectionLabel, { marginTop: 14 }]}>
+                {t.sensory.title}
+              </Text>
+              <Text style={styles.finishSectionSub}>
+                {t.sensory.subtitle}
+              </Text>
+              <SensoryRadarChart profile={sensoryProfile} size={190} />
+              <SensoryScoreEditor
+                profile={sensoryProfile}
+                onChange={setSensoryProfile}
               />
-            </View>
 
-            <View style={styles.finishButtonsRow}>
-              <Pressable
-                style={styles.finishCancelBtn}
-                onPress={() => {
-                  setShowFinishModal(false);
-                  resetTimer();
-                }}
-              >
-                <Text style={styles.finishCancelText}>Pomiń</Text>
-              </Pressable>
-              <Pressable style={styles.finishSaveBtn} onPress={handleFinishSave}>
-                <Text style={styles.finishSaveText}>Zapisz w Dzienniku</Text>
-              </Pressable>
-            </View>
+              {/* Hierarchiczne Koło Smaków SCA */}
+              <Text style={[styles.finishSectionLabel, { marginTop: 14 }]}>Koło Smaków SCA</Text>
+              <FlavorWheelPicker
+                selectedDescriptors={selectedTags}
+                onToggleDescriptor={toggleTag}
+              />
+
+              {/* Opcjonalny TDS */}
+              <View style={styles.tdsInputRow}>
+                <Text style={styles.tdsInputLabel}>Odczyt TDS refractometru (%):</Text>
+                <TextInput
+                  style={styles.tdsTextInput}
+                  placeholder="np. 1.35"
+                  placeholderTextColor={theme.colors.textMuted}
+                  keyboardType="numeric"
+                  value={tdsInput}
+                  onChangeText={setTdsInput}
+                />
+              </View>
+
+              <View style={styles.finishButtonsRow}>
+                <Pressable
+                  style={styles.finishCancelBtn}
+                  onPress={() => {
+                    setShowFinishModal(false);
+                    resetTimer();
+                  }}
+                >
+                  <Text style={styles.finishCancelText}>Pomiń</Text>
+                </Pressable>
+                <Pressable style={styles.finishSaveBtn} onPress={handleFinishSave}>
+                  <Text style={styles.finishSaveText}>Zapisz w Dzienniku</Text>
+                </Pressable>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -1040,5 +1192,128 @@ const styles = StyleSheet.create({
     color: theme.colors.emeraldLight,
     fontWeight: '700',
     fontSize: 14,
+  },
+  favoritesSection: {
+    marginBottom: 12,
+  },
+  favoritesSectionTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    letterSpacing: 0.5,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+  },
+  favoritesScroll: {
+    gap: 8,
+    paddingRight: 8,
+  },
+  favoriteChip: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    maxWidth: 160,
+  },
+  favoriteChipActive: {
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    borderColor: theme.colors.copper,
+  },
+  favoriteChipText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  favoriteChipTextActive: {
+    color: theme.colors.copper,
+  },
+  favoriteChipSub: {
+    fontSize: 10,
+    color: theme.colors.textMuted,
+    marginTop: 2,
+  },
+  batchSection: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  batchHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  batchTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  batchBadge: {
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  batchBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.copper,
+  },
+  batchChipsRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  batchChip: {
+    flex: 1,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.sm,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  batchChipActive: {
+    backgroundColor: 'rgba(217, 119, 54, 0.2)',
+    borderColor: theme.colors.copper,
+  },
+  batchChipText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  batchChipTextActive: {
+    color: theme.colors.copper,
+    fontWeight: '800',
+  },
+  batchAdviceText: {
+    fontSize: 11,
+    color: theme.colors.copper,
+    marginTop: 8,
+    lineHeight: 15,
+  },
+  favToggleBtn: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  favToggleIcon: {
+    fontSize: 20,
+    color: theme.colors.textMuted,
+  },
+  favToggleIconActive: {
+    color: theme.colors.copper,
+  },
+  finishSectionSub: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+    marginBottom: 8,
   },
 });

@@ -299,3 +299,51 @@ export function diagnoseExtractionTaste(params: {
 
   return diagnoses;
 }
+
+export interface BatchScalingResult {
+  multiplier: number;
+  scaledDoseGrams: number;
+  scaledWaterGrams: number;
+  grindAdjustmentClicks: number;
+  recommendationPl: string;
+  recommendationEn: string;
+}
+
+/**
+ * RD-06: Kalkulator Skalowania Porcji (Batch Scaling dla 1–4 osób)
+ * Większy zasyp (np. 30–60g zamiast 15g) zwiększa głębokość złoża (bed depth) i opór hydrauliczny,
+ * co wydłuża czas kontaktu (drawdown time). Wymaga to kompensacji grubszego mielenia (+2 do +4 klików),
+ * aby zapobiec nadmiernej ekstrakcji, zatykaniu filtra i goryczy.
+ */
+export function calculateBatchScaling(
+  baseDoseGrams: number,
+  baseWaterGrams: number,
+  servings: number
+): BatchScalingResult {
+  const count = Math.max(1, Math.min(4, Math.round(servings)));
+  const scaledDose = Number((baseDoseGrams * count).toFixed(1));
+  const scaledWater = Number((baseWaterGrams * count).toFixed(1));
+
+  let clicks = 0;
+  let recPl = 'Domyślne mielenie dla pojedynczej porcji.';
+  let recEn = 'Default grind setting for single serving.';
+
+  if (count === 2) {
+    clicks = 2;
+    recPl = 'Zalecane +2 kliki grubiej ze względu na wyższe złoże kawy i dłuższy czas przepływu.';
+    recEn = 'Recommended +2 clicks coarser due to deeper coffee bed and longer contact time.';
+  } else if (count >= 3) {
+    clicks = 4;
+    recPl = `Zalecane +4 kliki grubiej dla dużej porcji (${count} os.) w celu uniknięcia przeparzenia i zapychania filtra.`;
+    recEn = `Recommended +4 clicks coarser for large batch (${count} servings) to prevent over-extraction and stalling.`;
+  }
+
+  return {
+    multiplier: count,
+    scaledDoseGrams: scaledDose,
+    scaledWaterGrams: scaledWater,
+    grindAdjustmentClicks: clicks,
+    recommendationPl: recPl,
+    recommendationEn: recEn,
+  };
+}

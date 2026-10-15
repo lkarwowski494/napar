@@ -41,6 +41,14 @@ export interface SavedRecipe {
   createdAt: string;
 }
 
+export interface SensoryProfile {
+  acidity: number;
+  sweetness: number;
+  body: number;
+  clarity: number;
+  finish: number;
+}
+
 export interface BrewSession {
   id: string;
   recipeId?: string;
@@ -62,6 +70,7 @@ export interface BrewSession {
   caffeineContentMg?: number;
   notes?: string;
   infusionNumber?: number; // for Gongfu Cha
+  sensory?: SensoryProfile;
   brewedAt: string; // ISO 8601
 }
 
@@ -135,6 +144,7 @@ CREATE TABLE IF NOT EXISTS brew_sessions (
   caffeine_content_mg REAL,
   notes TEXT,
   infusion_number INTEGER DEFAULT 1,
+  sensory_scores_json TEXT,
   brewed_at TEXT NOT NULL
 );
 

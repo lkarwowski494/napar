@@ -78,5 +78,41 @@ describe('BrewScreen UI Integration', () => {
     expect(str).toContain('V60 — Metoda 4:6');
     expect(str).toContain('ROZPOCZNIJ PARZENIE');
     expect(str).toContain('00:00');
+    expect(str).toContain('Porcje');
+    expect(str).toContain('1 os.');
+    expect(str).toContain('2 os.');
+  });
+
+  test('Przełączenie skalowania porcji (2 os.) podwaja dozę i wyświetla rekomendację mielenia', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Znajdź przycisk 2 os.
+    const buttons = tree.root.findAllByProps({ accessibilityLabel: undefined });
+    const twoCupsBtn = tree.root.findAll((node: any) => {
+      return node.props && node.props.children === '2 os.';
+    })[0];
+
+    expect(twoCupsBtn).toBeDefined();
+
+    // Kliknij przycisk 2 os. (znajdź pressable parent)
+    let parent = twoCupsBtn.parent;
+    while (parent && !parent.props.onPress) {
+      parent = parent.parent;
+    }
+
+    act(() => {
+      parent.props.onPress();
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('+2 kliki grubiej');
+    expect(str).toContain('40g'); // 20g * 2
   });
 });
