@@ -157,6 +157,18 @@ export default function BrewScreen() {
         </Pressable>
       </View>
 
+      {/* Szybki przełącznik do trybu Gongfu Cha przy parzeniu herbaty */}
+      {('beverageType' in recipe ? recipe.beverageType === 'TEA' : (recipe as any).type === 'TEA') && (
+        <Pressable
+          style={styles.gongfuBanner}
+          onPress={() => router.push('/gongfu')}
+        >
+          <Text style={styles.gongfuBannerText}>
+            🍵 Przejdź do Trybu Wielokrotnych Zalań (Gongfu Cha Tracker) →
+          </Text>
+        </Pressable>
+      )}
+
       {/* Skalowanie dozy i wody */}
       <View style={styles.parametersRow}>
         <View style={styles.paramBox}>
@@ -305,16 +317,28 @@ export default function BrewScreen() {
             </Pressable>
           </View>
           <ScrollView>
-            {/* Przycisk dodania własnej receptury */}
-            <Pressable
-              style={styles.addCustomRecipeBtn}
-              onPress={() => {
-                setShowRecipeModal(false);
-                router.push('/recipe-builder');
-              }}
-            >
-              <Text style={styles.addCustomRecipeBtnText}>{t.brew.customRecipe}</Text>
-            </Pressable>
+            {/* Przyciski akcji: Własna receptura & Gongfu Cha */}
+            <View style={styles.modalActionButtonsRow}>
+              <Pressable
+                style={styles.addCustomRecipeBtn}
+                onPress={() => {
+                  setShowRecipeModal(false);
+                  router.push('/recipe-builder');
+                }}
+              >
+                <Text style={styles.addCustomRecipeBtnText}>{t.brew.customRecipe}</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.gongfuModalBtn}
+                onPress={() => {
+                  setShowRecipeModal(false);
+                  router.push('/gongfu');
+                }}
+              >
+                <Text style={styles.gongfuModalBtnText}>🍵 Gongfu Cha</Text>
+              </Pressable>
+            </View>
 
             {allRecipes.map((r) => (
               <Pressable
@@ -959,13 +983,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   addCustomRecipeBtn: {
+    flex: 1,
     backgroundColor: 'rgba(217, 119, 54, 0.15)',
     borderWidth: 1,
     borderColor: theme.colors.copper,
     borderRadius: theme.borderRadius.md,
     paddingVertical: 12,
     alignItems: 'center',
-    marginBottom: 14,
   },
   addCustomRecipeBtnText: {
     color: theme.colors.copper,
@@ -981,6 +1005,40 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   editRecipeBtnText: {
+    fontSize: 14,
+  },
+  gongfuBanner: {
+    backgroundColor: 'rgba(42, 123, 98, 0.15)',
+    borderWidth: 1,
+    borderColor: theme.colors.emerald,
+    borderRadius: theme.borderRadius.md,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  gongfuBannerText: {
+    color: theme.colors.emeraldLight,
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  modalActionButtonsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 14,
+  },
+  gongfuModalBtn: {
+    flex: 1,
+    backgroundColor: 'rgba(42, 123, 98, 0.15)',
+    borderWidth: 1,
+    borderColor: theme.colors.emerald,
+    borderRadius: theme.borderRadius.md,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  gongfuModalBtnText: {
+    color: theme.colors.emeraldLight,
+    fontWeight: '700',
     fontSize: 14,
   },
 });

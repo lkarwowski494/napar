@@ -28,6 +28,9 @@ describe('i18n System', () => {
     expect(Object.keys(translations.pl.recipeBuilder).sort()).toEqual(
       Object.keys(translations.en.recipeBuilder).sort()
     );
+    expect(Object.keys(translations.pl.gongfu).sort()).toEqual(
+      Object.keys(translations.en.gongfu).sort()
+    );
     expect(Object.keys(translations.pl.stash).sort()).toEqual(
       Object.keys(translations.en.stash).sort()
     );

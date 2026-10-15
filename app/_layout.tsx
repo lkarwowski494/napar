@@ -47,6 +47,13 @@ export default function RootLayout() {
                 headerShown: false,
               }}
             />
+            <Stack.Screen
+              name="gongfu"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
           </Stack>
         </BrewProvider>
       </LanguageProvider>
