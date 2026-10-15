@@ -1,20 +1,24 @@
-// ============================================================================
-// Napar (Steepwise) — Unit Tests: Confirm & Announce helpers
-// ============================================================================
-
+import React from 'react';
+import renderer from 'react-test-renderer';
 import { Alert, AccessibilityInfo } from 'react-native';
 import { cancelButton, okButton, confirmAction } from '../confirm';
-import { announce } from '../announce';
+import { announce, useAnnounce } from '../announce';
 
 describe('Confirm & Announce helpers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('cancelButton tworzy przycisk ze stylem cancel i etykietą Anuluj', () => {
+  test('cancelButton tworzy przycisk ze stylem cancel i opcjonalnym onPress', () => {
     const btn = cancelButton();
     expect(btn.text).toBe('Anuluj');
     expect(btn.style).toBe('cancel');
+
+    const onCancelMock = jest.fn();
+    const btnWithCallback = cancelButton(onCancelMock);
+    expect(btnWithCallback.onPress).toBe(onCancelMock);
+    btnWithCallback.onPress!();
+    expect(onCancelMock).toHaveBeenCalled();
   });
 
   test('okButton tworzy przycisk ze stylem cancel i etykietą OK', () => {
@@ -45,12 +49,39 @@ describe('Confirm & Announce helpers', () => {
     );
   });
 
-  test('announce wywołuje AccessibilityInfo.announceForAccessibility', () => {
+  test('announce wywołuje AccessibilityInfo.announceForAccessibility i obsługuje błędy', () => {
     const announceSpy = jest
       .spyOn(AccessibilityInfo, 'announceForAccessibility')
       .mockImplementation(() => {});
 
     announce('Krok 1 zakończony');
     expect(announceSpy).toHaveBeenCalledWith('Krok 1 zakończony');
+
+    // Obsługa błędu gdy announce rzuca wyjątek
+    announceSpy.mockImplementation(() => {
+      throw new Error('Accessibility error');
+    });
+    expect(() => announce('Test error')).not.toThrow();
+  });
+
+  test('useAnnounce wywołuje announce tylko wtedy, gdy przekazano tekst', () => {
+    const announceSpy = jest
+      .spyOn(AccessibilityInfo, 'announceForAccessibility')
+      .mockImplementation(() => {});
+
+    const TestComponent: React.FC<{ msg?: string | null }> = ({ msg }) => {
+      useAnnounce(msg);
+      return null;
+    };
+
+    renderer.act(() => {
+      renderer.create(React.createElement(TestComponent, { msg: null }));
+    });
+    expect(announceSpy).not.toHaveBeenCalled();
+
+    renderer.act(() => {
+      renderer.create(React.createElement(TestComponent, { msg: 'Komunikat głosowy' }));
+    });
+    expect(announceSpy).toHaveBeenCalledWith('Komunikat głosowy');
   });
 });

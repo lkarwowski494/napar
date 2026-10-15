@@ -62,19 +62,36 @@ jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => mockDb),
 }));
 
+let mockSearchParams: any = {};
+
 // Mock expo-router
 jest.mock('expo-router', () => ({
   useRouter: () => ({
     push: mockPush,
     back: mockBack,
   }),
-  useLocalSearchParams: () => ({}),
+  useLocalSearchParams: () => mockSearchParams,
 }));
 
 import RecipeBuilderScreen from '../../../app/recipe-builder';
 import { saveRecipe, deleteRecipe, getRecipeById } from '../database';
 import { SavedRecipe } from '../database-schema';
 import { calculateBrewRatio } from '../domain-rules';
+
+const findPressableWithText = (root: any, text: string) => {
+  const nodes = root.findAll((n: any) => {
+    const c = n.props?.children;
+    if (typeof c === 'string' && c.includes(text)) return true;
+    if (Array.isArray(c) && c.some((child) => typeof child === 'string' && child.includes(text))) return true;
+    return false;
+  });
+  if (nodes.length === 0) return null;
+  let curr = nodes[0];
+  while (curr && !curr.props?.onPress) {
+    curr = curr.parent;
+  }
+  return curr;
+};
 
 describe('Custom Recipe Builder & Persistence', () => {
   const testRecipeId = 'custom-test-recipe-1';
@@ -265,5 +282,91 @@ describe('Custom Recipe Builder & Persistence', () => {
 
     expect(mockDb.runSync).toHaveBeenCalled();
     expect(mockBack).toHaveBeenCalled();
+  });
+
+  test('Przełącza rodzaj naparu na Herbatę 🍵', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    const teaBtn = findPressableWithText(tree.root, 'Herbata');
+    expect(teaBtn).toBeTruthy();
+
+    renderer.act(() => {
+      teaBtn.props.onPress();
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Herbata');
+  });
+
+  test('Edytuje istniejącą recepturę i usuwa ją w trybie edycji', () => {
+    // 1. Zapisz recepturę w mockDb
+    mockDb.recipes.set('rec-edit-123', {
+      id: 'rec-edit-123',
+      name: 'V60 Truskawkowe Pole',
+      beverage_type: 'COFFEE',
+      method: 'V60',
+      author: 'Tester',
+      description: 'Bardzo owocowy profil',
+      dose_g: 16,
+      water_g: 260,
+      water_temp_c: 94,
+      grind_size_desc: '22 kliki',
+      recommended_ratio: 16.25,
+      steps_json: JSON.stringify([
+        {
+          stepNumber: 1,
+          namePl: 'Bloom',
+          targetWaterGrams: 50,
+          durationSeconds: 40,
+          instructionPl: 'Zalej 50g',
+        },
+      ]),
+      is_custom: 1,
+      is_favorite: 0,
+      created_at: new Date().toISOString(),
+    });
+
+    // Ustaw id w parametrach nawigacji
+    mockSearchParams = { id: 'rec-edit-123' };
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    // Weryfikacja wczytania pól
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('V60 Truskawkowe Pole');
+    expect(str).toContain('Edytuj Recepturę');
+
+    // Znajdź przycisk Usuń
+    const deleteText = tree.root.findAll((node: any) => {
+      return node.props && node.props.children === 'Usuń';
+    })[0];
+
+    let deleteBtn = deleteText.parent;
+    while (deleteBtn && !deleteBtn.props.onPress) {
+      deleteBtn = deleteBtn.parent;
+    }
+
+    // Mock Alert.alert aby zatwierdzić usunięcie
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, msg, buttons) => {
+      const confirmBtn = buttons?.find((b: any) => b.text === 'Usuń');
+      if (confirmBtn?.onPress) confirmBtn.onPress();
+    });
+
+    renderer.act(() => {
+      deleteBtn.props.onPress();
+    });
+
+    expect(alertSpy).toHaveBeenCalled();
+    expect(mockDb.recipes.has('rec-edit-123')).toBe(false);
+    expect(mockBack).toHaveBeenCalled();
+
+    // Resetuj search params
+    mockSearchParams = {};
   });
 });

@@ -269,4 +269,34 @@ describe('BrewScreen UI Integration', () => {
     expect(str).toContain('Wybierz ze Spiżarni');
     expect(str).toContain('Brak przypisania (ogólne)');
   });
+
+  test('Przełącza ulubione receptury (gwiazdka) w modalu wyboru receptury', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz modal receptury
+    const recipeCard = tree.root.findByProps({
+      accessibilityLabel: 'Wybrany przepis: V60 — Metoda 4:6',
+    });
+    act(() => {
+      recipeCard.props.onPress();
+    });
+
+    // Znajdź przycisk ulubionych dla receptury
+    const favBtn = tree.root.findByProps({
+      accessibilityLabel: 'Ulubione: V60 — Metoda 4:6',
+    });
+
+    act(() => {
+      favBtn.props.onPress({ stopPropagation: jest.fn() });
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalled();
+  });
 });
