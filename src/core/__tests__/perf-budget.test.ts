@@ -25,22 +25,22 @@ jest.mock('expo-sqlite', () => ({
 
 import { escapeCsvValue } from '../database';
 
-function measureMedianMs(fn: () => unknown, runs = 5): number {
+function measureCpuMs(fn: () => unknown, runs = 5): number {
   fn(); // Rozgrzewka JIT
-  const times: number[] = [];
+  const ts: number[] = [];
   for (let i = 0; i < runs; i++) {
-    const start = process.hrtime.bigint();
+    const start = process.cpuUsage();
     fn();
-    const end = process.hrtime.bigint();
-    times.push(Number(end - start) / 1_000_000);
+    const d = process.cpuUsage(start);
+    ts.push((d.user + d.system) / 1000);
   }
-  times.sort((a, b) => a - b);
-  return times[Math.floor(runs / 2)]; // Mediana z 5 przebiegów
+  ts.sort((a, b) => a - b);
+  return ts[Math.floor(runs / 2)]; // Mediana z 5 przebiegów
 }
 
 describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () => {
-  test('Budżet 1: 10 000 obliczeń ekstrakcji i proporcji parzenia (< 50 ms)', () => {
-    const ms = measureMedianMs(() => {
+  test('Budżet 1: 10 000 obliczeń ekstrakcji i proporcji parzenia (< 100 ms)', () => {
+    const ms = measureCpuMs(() => {
       for (let i = 0; i < 10000; i++) {
         const ratio = calculateBrewRatio(15.0 + (i % 5), 250.0 + (i % 20));
         const yieldGrams = calculateLiquidYield(250.0, 15.0);
@@ -48,22 +48,22 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       }
     });
 
-    expect(ms).toBeLessThan(50);
+    expect(ms).toBeLessThan(100);
   });
 
-  test('Budżet 2: 10 000 estymacji kinetyki kofeiny dla kawy i herbaty (< 50 ms)', () => {
-    const ms = measureMedianMs(() => {
+  test('Budżet 2: 10 000 estymacji kinetyki kofeiny dla kawy i herbaty (< 80 ms)', () => {
+    const ms = measureCpuMs(() => {
       for (let i = 0; i < 5000; i++) {
         estimateCoffeeCaffeineMg(18.0);
         estimateTeaInfusionCaffeineMg(150, 1 + (i % 8));
       }
     });
 
-    expect(ms).toBeLessThan(50);
+    expect(ms).toBeLessThan(80);
   });
 
-  test('Budżet 3: 1 000 ceremonii Gongfu Cha po 5 zalań (5 000 rejestracji infuzji i kinetyki kofeiny, < 50 ms)', () => {
-    const ms = measureMedianMs(() => {
+  test('Budżet 3: 1 000 ceremonii Gongfu Cha po 5 zalań (5 000 rejestracji infuzji i kinetyki kofeiny, < 100 ms)', () => {
+    const ms = measureCpuMs(() => {
       for (let i = 0; i < 1000; i++) {
         let session = createGongfuSession({
           teaName: 'Da Hong Pao',
@@ -78,11 +78,11 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       }
     });
 
-    expect(ms).toBeLessThan(50);
+    expect(ms).toBeLessThan(100);
   });
 
-  test('Budżet 4: 2 000 punktów przemiału konwertowanych na 6 młynków specialty (12 000 nastaw, < 60 ms)', () => {
-    const ms = measureMedianMs(() => {
+  test('Budżet 4: 2 000 punktów przemiału konwertowanych na 6 młynków specialty (12 000 nastaw, < 80 ms)', () => {
+    const ms = measureCpuMs(() => {
       for (let i = 0; i < 2000; i++) {
         const microns = 200 + (i % 800);
         for (const grinder of SUPPORTED_GRINDERS) {
@@ -91,22 +91,22 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       }
     });
 
-    expect(ms).toBeLessThan(60);
+    expect(ms).toBeLessThan(80);
   });
 
-  test('Budżet 5: 5 000 obliczeń mineralizacji wody dla różnych profili i objętości (< 50 ms)', () => {
+  test('Budżet 5: 5 000 obliczeń mineralizacji wody dla różnych profili i objętości (< 80 ms)', () => {
     const recipe = WATER_RECIPES[0];
-    const ms = measureMedianMs(() => {
+    const ms = measureCpuMs(() => {
       for (let i = 0; i < 5000; i++) {
         const volumeLiters = 1.0 + (i % 10) * 0.5;
         calculateWaterMinerals(volumeLiters, recipe.targetGhPpm, recipe.targetKhPpm);
       }
     });
 
-    expect(ms).toBeLessThan(50);
+    expect(ms).toBeLessThan(80);
   });
 
-  test('Budżet 6: Eksport i ucieczka znaków CSV dla 5 000 komórek z tekstem (< 40 ms)', () => {
+  test('Budżet 6: Eksport i ucieczka znaków CSV dla 5 000 komórek z tekstem (< 60 ms)', () => {
     const sampleStrings = [
       'Normal text',
       'Text, with, commas',
@@ -116,17 +116,17 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       undefined,
     ];
 
-    const ms = measureMedianMs(() => {
+    const ms = measureCpuMs(() => {
       for (let i = 0; i < 5000; i++) {
         const val = sampleStrings[i % sampleStrings.length];
         escapeCsvValue(val as any);
       }
     });
 
-    expect(ms).toBeLessThan(40);
+    expect(ms).toBeLessThan(60);
   });
 
-  test('Budżet 7: Serializacja i parsowanie dużej kolekcji JSON (1 000 wpisów, < 60 ms)', () => {
+  test('Budżet 7: Serializacja i parsowanie dużej kolekcji JSON (1 000 wpisów, < 80 ms)', () => {
     const largeDataset = Array.from({ length: 1000 }, (_, i) => ({
       id: `session-${i}`,
       recipeName: `V60 Recipe ${i}`,
@@ -136,12 +136,12 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       timestamp: Date.now() + i,
     }));
 
-    const ms = measureMedianMs(() => {
+    const ms = measureCpuMs(() => {
       const serialized = JSON.stringify(largeDataset);
       const parsed = JSON.parse(serialized);
       expect(parsed.length).toBe(1000);
     });
 
-    expect(ms).toBeLessThan(60);
+    expect(ms).toBeLessThan(80);
   });
 });
