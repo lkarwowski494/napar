@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Napar",
+    "slug": "napar",
+    "version": "0.1.0",
+    "scheme": "napar",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "bundleIdentifier": "pl.lukasz.napar",
+      "appleTeamId": "8NQ9GHY8GF",
+      "supportsTablet": false,
+      "infoPlist": {
+        "UIFileSharingEnabled": true,
+        "LSSupportsOpeningDocumentsInPlace": true,
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleAllowMixedLocalizations": true
+      }
+    },
+    "android": {
+      "package": "pl.lukasz.napar",
+      "adaptiveIcon": {
+        "backgroundColor": "#121214"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite"
+    ]
+  }
+}
