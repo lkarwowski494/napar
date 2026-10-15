@@ -4,9 +4,10 @@
 // ============================================================================
 
 import React from 'react';
+import { Alert } from 'react-native';
 import renderer, { act } from 'react-test-renderer';
 import JournalScreen from '../../../app/(tabs)/journal';
-import { getBrewSessions } from '../database';
+import { getBrewSessions, deleteBrewSession } from '../database';
 
 jest.mock('../database', () => ({
   getBrewSessions: jest.fn(),
@@ -115,4 +116,100 @@ describe('JournalScreen Integration', () => {
     expect(str).toContain('Etiopia Yirgacheffe');
     expect(str).not.toContain('Da Hong Pao Gongfu');
   });
+
+  test('Usuwanie sesji parzenia z potwierdzeniem w Alert.alert', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<JournalScreen />);
+    });
+
+    const deleteBtn = findPressableWithText(tree.root, 'Usuń');
+    expect(deleteBtn).toBeDefined();
+
+    act(() => {
+      deleteBtn.props.onPress();
+    });
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Usuń wpis',
+      expect.stringContaining('V60 Hoffmann'),
+      expect.any(Array)
+    );
+
+    // Wywołaj callback potwierdzenia usunięcia
+    const buttons = alertSpy.mock.calls[0][2] as any[];
+    const confirmBtn = buttons.find((b) => b.text === 'Usuń');
+    expect(confirmBtn).toBeDefined();
+
+    act(() => {
+      confirmBtn.onPress();
+    });
+
+    expect(deleteBrewSession).toHaveBeenCalledWith('sess-1');
+    alertSpy.mockRestore();
+  });
+
+  test('Przycisk Wyczyść filtry przy braku pasujących wyników wyszukiwania', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<JournalScreen />);
+    });
+
+    const searchInput = tree.root.findByProps({
+      placeholder: 'Szukaj po ziarnach, palarni, metodzie lub nutach...',
+    });
+
+    // Wpisz frazę niepasującą do niczego
+    act(() => {
+      searchInput.props.onChangeText('BrakujacaKawaXYZ');
+    });
+
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Wyczyść filtry');
+
+    // Kliknij "Wyczyść filtry"
+    const clearBtn = findPressableWithText(tree.root, 'Wyczyść filtry');
+    expect(clearBtn).toBeDefined();
+
+    act(() => {
+      clearBtn.props.onPress();
+    });
+
+    // Powinny znowu być widoczne wszystkie sesje
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Etiopia Yirgacheffe');
+    expect(str).toContain('Da Hong Pao Gongfu');
+  });
+
+  test('Ekran pustego dziennika gdy brak zapisanych sesji', () => {
+    (getBrewSessions as jest.Mock).mockReturnValue([]);
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<JournalScreen />);
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Brak wpisów w dzienniku');
+  });
 });
+
+function findPressableWithText(root: any, text: string) {
+  const match = root.findAll((node: any) => {
+    if (!node.props) return false;
+    if (typeof node.props.children === 'string' && node.props.children.includes(text)) return true;
+    if (Array.isArray(node.props.children)) {
+      const full = node.props.children
+        .map((c: any) => (typeof c === 'string' || typeof c === 'number' ? String(c) : ''))
+        .join('');
+      if (full.includes(text)) return true;
+    }
+    return false;
+  })[0];
+  if (!match) return null;
+  let curr = match;
+  while (curr && !curr.props?.onPress) {
+    curr = curr.parent;
+  }
+  return curr;
+}

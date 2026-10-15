@@ -279,6 +279,16 @@ describe('BeansScreen (Stash & Inventory)', () => {
       weightInput.props.onChangeText('350');
     });
 
+    // Przełącz typ na herbatę, a potem z powrotem na kawę
+    const teaTypeBtn = findPressableWithText(tree.root, 'Herbata liściasta');
+    const coffeeTypeBtn = findPressableWithText(tree.root, 'Kawa ziarnista');
+    renderer.act(() => {
+      teaTypeBtn?.props.onPress();
+    });
+    renderer.act(() => {
+      coffeeTypeBtn?.props.onPress();
+    });
+
     // 4. Kliknij 'Zapisz w Spiżarni'
     renderer.act(() => {
       saveBtn.props.onPress();
@@ -296,5 +306,63 @@ describe('BeansScreen (Stash & Inventory)', () => {
       'Dodano!',
       'Paczka "Kenya Nyeri AA" jest gotowa w spiżarni.'
     );
+  });
+
+  test('Stan pustej spiżarni wyświetla zachętę i przycisk + Dodaj pierwszą paczkę, który otwiera modal', () => {
+    jest.spyOn(databaseModule, 'getInventoryItems').mockReturnValue([]);
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Twoja spiżarnia jest pusta');
+
+    // Kliknij "+ Dodaj pierwszą paczkę"
+    const emptyAddBtn = findPressableWithText(tree.root, '+ Dodaj pierwszą paczkę');
+    expect(emptyAddBtn).toBeTruthy();
+
+    renderer.act(() => {
+      emptyAddBtn.props.onPress();
+    });
+
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Dodaj do Spiżarni');
+    expect(str).toContain('Nazwa ziaren / herbaty *');
+  });
+
+  test('Przycisk Anuluj w modalu dodawania zamyka formularz', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz modal dodawania
+    renderer.act(() => {
+      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
+    });
+
+    expect(JSON.stringify(tree.toJSON())).toContain('Dodaj do Spiżarni');
+
+    // Kliknij Anuluj
+    const cancelBtn = findPressableWithText(tree.root, 'Anuluj');
+    expect(cancelBtn).toBeTruthy();
+
+    renderer.act(() => {
+      cancelBtn.props.onPress();
+    });
+
+    // Po zamknięciu modala nadal widzimy listę pozycji
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Etiopia Yirgacheffe Washed');
   });
 });

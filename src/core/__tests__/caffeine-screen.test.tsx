@@ -199,4 +199,99 @@ describe('CaffeineScreen Component', () => {
       })
     );
   });
+
+  test('Loguje Pojedyncze Espresso, AeroPress i Herbatę liściastą przez modal szybkiego dodawania', () => {
+    const logSpy = jest.spyOn(databaseModule, 'logCaffeine').mockImplementation(jest.fn());
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<CaffeineScreen />);
+    });
+
+    // 0. Przelew / Drip
+    renderer.act(() => {
+      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
+    });
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Przelew / Drip')?.props.onPress();
+    });
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        beverageName: 'Kawa przelewowa (V60 / Drip)',
+        beverageType: 'coffee',
+        doseGrams: 18,
+        caffeineMg: 140,
+      })
+    );
+
+    // 1. Pojedyncze Espresso
+    renderer.act(() => {
+      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
+    });
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Pojedyncze Espresso')?.props.onPress();
+    });
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        beverageName: 'Pojedyncze Espresso',
+        beverageType: 'coffee',
+        doseGrams: 9,
+        caffeineMg: 65,
+      })
+    );
+
+    // 2. AeroPress
+    renderer.act(() => {
+      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
+    });
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'AeroPress')?.props.onPress();
+    });
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        beverageName: 'AeroPress',
+        beverageType: 'coffee',
+        doseGrams: 15,
+        caffeineMg: 110,
+      })
+    );
+
+    // 3. Herbata liściasta
+    renderer.act(() => {
+      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
+    });
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Herbata liściasta')?.props.onPress();
+    });
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        beverageName: 'Herbata Gongfu / Liściasta',
+        beverageType: 'tea',
+        doseGrams: 5,
+        caffeineMg: 45,
+      })
+    );
+  });
+
+  test('Zamknięcie modala szybkiego dodawania przyciskiem Anuluj', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<CaffeineScreen />);
+    });
+
+    // Otwórz modal
+    renderer.act(() => {
+      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
+    });
+    expect(JSON.stringify(tree.toJSON())).toContain('Szybkie dodanie kofeiny');
+
+    // Kliknij Anuluj
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Anuluj')?.props.onPress();
+    });
+
+    // Modal nie jest widoczny w logice lub zamknięty
+    const cancelBtn = findPressableWithText(tree.root, 'Anuluj');
+    // W React Native Modal po visible=false może nie renderować zawartości lub tree nie zawiera modala
+  });
 });

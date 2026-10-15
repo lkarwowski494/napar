@@ -216,4 +216,103 @@ describe('DialInScreen UI with Water Chemistry', () => {
     expect(str).toContain('22.5');
     expect(str).toContain('Przeparzenie');
   });
+
+  test('Diagnoza problemów w Dial-in Doctor: gorzka, wodnista, ściągająca herbata', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<DialInScreen />);
+    });
+
+    // 1. Wybierz Za gorzka
+    const bitterCard = findPressableWithText(tree.root, 'Za gorzka');
+    expect(bitterCard).toBeDefined();
+    renderer.act(() => {
+      bitterCard.props.onPress();
+    });
+
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Zmiel grubiej');
+
+    // 2. Wybierz Wodnista / płaska
+    const weakCard = findPressableWithText(tree.root, 'Płaska / mdła / wodnista');
+    expect(weakCard).toBeDefined();
+    renderer.act(() => {
+      weakCard.props.onPress();
+    });
+
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Zwiększ dozę kawy o +1g');
+
+    // 3. Wybierz Herbata ściągająca
+    const astringentCard = findPressableWithText(tree.root, 'Herbata ściągająca gardło');
+    expect(astringentCard).toBeDefined();
+    renderer.act(() => {
+      astringentCard.props.onPress();
+    });
+
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('obniż temperaturę wody o 2-3°C');
+  });
+
+  test('Własny profil mineralizacji wody (Custom GH/KH) w zakładce Woda SCA', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<DialInScreen />);
+    });
+
+    // Przełącz na Woda SCA
+    const waterTab = findPressableWithText(tree.root, 'Woda SCA');
+    expect(waterTab).toBeDefined();
+    renderer.act(() => {
+      waterTab.props.onPress();
+    });
+
+    // Kliknij "Własny profil (Custom GH / KH)"
+    const customProfileBtn = findPressableWithText(tree.root, 'Własny profil (Custom GH / KH)');
+    expect(customProfileBtn).toBeDefined();
+    renderer.act(() => {
+      customProfileBtn.props.onPress();
+    });
+
+    // Wpisz custom GH i KH
+    const inputs = tree.root.findAllByType('TextInput');
+    expect(inputs.length).toBeGreaterThanOrEqual(2);
+
+    // Znajdź input z wartością '80' (default GH) lub zmień pierwszy custom input
+    const ghInput = inputs.find((i: any) => i.props.value === '80');
+    expect(ghInput).toBeDefined();
+    renderer.act(() => {
+      ghInput.props.onChangeText('120');
+    });
+
+    const khInput = inputs.find((i: any) => i.props.value === '40');
+    expect(khInput).toBeDefined();
+    renderer.act(() => {
+      khInput.props.onChangeText('50');
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Koncentrat Magnezu');
+    expect(str).toContain('Koncentrat Bufora');
+  });
 });
+
+function findPressableWithText(root: any, text: string) {
+  const match = root.findAll((node: any) => {
+    if (!node.props) return false;
+    if (typeof node.props.children === 'string' && node.props.children.includes(text)) return true;
+    if (Array.isArray(node.props.children)) {
+      const full = node.props.children
+        .map((c: any) => (typeof c === 'string' || typeof c === 'number' ? String(c) : ''))
+        .join('');
+      if (full.includes(text)) return true;
+    }
+    return false;
+  })[0];
+  if (!match) return null;
+  let curr = match;
+  while (curr && !curr.props?.onPress) {
+    curr = curr.parent;
+  }
+  return curr;
+}

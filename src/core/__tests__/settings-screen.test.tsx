@@ -275,4 +275,70 @@ describe('SettingsScreen Component', () => {
     expect(str).toContain('Eksport Spiżarni (CSV)');
     expect(str).toContain('inv-1,Etiopia,coffee');
   });
+
+  test('Aktywacja planów subskrypcji Pro: Miesięczny oraz Roczny (Trial)', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <SettingsScreen />
+        </LanguageProvider>
+      );
+    });
+
+    // 1. Kliknij plan MIESIĘCZNY
+    const monthlyBtn = findPressableWithText(tree.root, 'MIESIĘCZNY');
+    expect(monthlyBtn).toBeTruthy();
+    renderer.act(() => {
+      monthlyBtn.props.onPress();
+    });
+    expect(alertSpy).toHaveBeenCalledWith('Dziękujemy!', 'Napar Pro został pomyślnie aktywowany.');
+
+    // 2. Kliknij plan ROCZNY
+    const annualBtn = findPressableWithText(tree.root, 'ROCZNY');
+    expect(annualBtn).toBeTruthy();
+    renderer.act(() => {
+      annualBtn.props.onPress();
+    });
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Dziękujemy!',
+      'Roczna subskrypcja Napar Pro (14 dni za darmo) została aktywowana.'
+    );
+  });
+
+  test('Obsługa błędu podczas importu uszkodzonego pliku JSON', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    jest.spyOn(databaseModule, 'importDataJson').mockImplementation(() => {
+      throw new Error('Niepoprawny format danych JSON.');
+    });
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <SettingsScreen />
+        </LanguageProvider>
+      );
+    });
+
+    // Otwórz modal importu
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Importuj Kopię z Pliku JSON')?.props.onPress();
+    });
+
+    // Wpisz niepoprawny JSON
+    const jsonInput = tree.root.findByProps({ placeholder: '{"version": 1, ...}' });
+    renderer.act(() => {
+      jsonInput.props.onChangeText('{ bad json :::');
+    });
+
+    // Kliknij import
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Zaimportuj i Zastąp Dane')?.props.onPress();
+    });
+
+    expect(alertSpy).toHaveBeenCalledWith('Błąd importu', 'Niepoprawny format danych JSON.');
+  });
 });

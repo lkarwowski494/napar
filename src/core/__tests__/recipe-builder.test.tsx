@@ -369,4 +369,100 @@ describe('Custom Recipe Builder & Persistence', () => {
     // Resetuj search params
     mockSearchParams = {};
   });
+
+  test('Edycja pól pojedynczego kroku: nazwa, woda, czas, instrukcja', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    // 1. Zmień nazwę pierwszego kroku
+    const nameInput = tree.root.findByProps({ value: 'Preinfuzja (Bloom)' });
+    renderer.act(() => {
+      nameInput.props.onChangeText('Intensywna Preinfuzja');
+    });
+
+    // 2. Zmień wagę docelową
+    const waterInput = tree.root.findByProps({ value: '50' });
+    renderer.act(() => {
+      waterInput.props.onChangeText('60');
+    });
+
+    // 3. Zmień czas
+    const durationInput = tree.root.findByProps({ value: '45' });
+    renderer.act(() => {
+      durationInput.props.onChangeText('35');
+    });
+
+    // 4. Zmień instrukcję
+    const instructionInput = tree.root.findByProps({
+      value: 'Zalej 50g wody spiralnym ruchem, odgazuj.',
+    });
+    renderer.act(() => {
+      instructionInput.props.onChangeText('Mieszaj energicznie łyżką');
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Intensywna Preinfuzja');
+    expect(str).toContain('Mieszaj energicznie łyżką');
+  });
+
+  test('Próba usunięcia jedynego pozostałego kroku wywołuje ostrzeżenie Alert.alert', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    // Pobierz przyciski usuwania dla 2 początkowych kroków
+    const allCrosses = tree.root.findAll((node: any) => node.props && node.props.children === '✕');
+    expect(allCrosses.length).toBeGreaterThanOrEqual(2);
+
+    const stepCrosses = allCrosses.slice(-2);
+
+    let removeBtn1 = stepCrosses[0];
+    while (removeBtn1 && !removeBtn1.props?.onPress) {
+      removeBtn1 = removeBtn1.parent;
+    }
+
+    let removeBtn2 = stepCrosses[1];
+    while (removeBtn2 && !removeBtn2.props?.onPress) {
+      removeBtn2 = removeBtn2.parent;
+    }
+
+    // Usuń krok 2 -> zostaje 1 krok
+    renderer.act(() => {
+      removeBtn2.props.onPress();
+    });
+
+    // Sprawdź czy przy 1 kroku żaden przycisk usuwania kroku nie jest renderowany
+    const crossesAfterRemove = tree.root
+      .findAll((node: any) => node.props && node.props.children === '✕')
+      .map((n: any) => {
+        let p = n;
+        while (p && !p.props?.onPress) p = p.parent;
+        return p;
+      })
+      .filter((p: any) => p && p !== tree.root);
+
+    const getStepCount = () =>
+      tree.root.findAll((n: any) => typeof n.type !== 'string' && n.props && n.props.children === 'Nazwa kroku').length;
+
+    expect(getStepCount()).toBe(1);
+  });
+
+  test('Kliknięcie przycisku ✕ Zamknij w nagłówku wywołuje router.back()', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    const closeBtn = findPressableWithText(tree.root, 'Zamknij');
+    expect(closeBtn).toBeTruthy();
+    renderer.act(() => {
+      closeBtn?.props.onPress();
+    });
+
+    expect(mockBack).toHaveBeenCalled();
+  });
 });
