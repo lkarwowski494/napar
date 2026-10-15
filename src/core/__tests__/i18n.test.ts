@@ -40,6 +40,9 @@ describe('i18n System', () => {
     expect(Object.keys(translations.pl.water).sort()).toEqual(
       Object.keys(translations.en.water).sort()
     );
+    expect(Object.keys(translations.pl.grinder).sort()).toEqual(
+      Object.keys(translations.en.grinder).sort()
+    );
     expect(Object.keys(translations.pl.caffeine).sort()).toEqual(
       Object.keys(translations.en.caffeine).sort()
     );

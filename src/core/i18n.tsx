@@ -189,6 +189,13 @@ export const translations = {
       ppmCaCO3: 'ppm CaCO₃',
       concentrateHelp: 'Dodaj odmierzone gramy koncentratów prosto do naczynia z wodą demineralizowaną.',
     },
+    grinder: {
+      title: 'Przelicznik Młynków (Grinder Dial-in)',
+      subtitle: 'Przeliczaj kliki i nastawy między młynkami Comandante, Timemore, 1Zpresso, Fellow Ode, Baratza i Kingrinder.',
+      categorySelect: 'Metoda i stopień mielenia',
+      allGrindersHeader: 'Odpowiedniki nastaw dla Twojego młynka',
+      micronsLabel: 'Szacowana grubość cząstek',
+    },
     caffeine: {
       title: 'Kinetyka Kofeiny',
       currentLevel: 'Aktualne stężenie w krwiobiegu',
@@ -383,6 +390,13 @@ export const translations = {
       dryCalcium: 'Calcium Chloride (CaCl₂ · 2H₂O)',
       ppmCaCO3: 'ppm CaCO₃',
       concentrateHelp: 'Weigh concentrate grams straight into your distilled/RO water container.',
+    },
+    grinder: {
+      title: 'Grinder Dial-in Converter',
+      subtitle: 'Convert clicks and settings across Comandante, Timemore, 1Zpresso, Fellow Ode, Baratza, and Kingrinder.',
+      categorySelect: 'Method & Grind Size',
+      allGrindersHeader: 'Target Settings by Grinder Model',
+      micronsLabel: 'Estimated particle size',
     },
     caffeine: {
       title: 'Caffeine Kinetics',

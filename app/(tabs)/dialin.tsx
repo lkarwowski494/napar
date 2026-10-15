@@ -24,6 +24,11 @@ import {
   calculateWaterMinerals,
   WaterRecipe,
 } from '../../src/core/water-chemistry';
+import {
+  SUPPORTED_GRINDERS,
+  GRIND_CATEGORIES,
+  convertMicronsToGrinder,
+} from '../../src/core/grinder-converter';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
 
@@ -60,6 +65,11 @@ export default function DialInScreen() {
     customKhInput,
     selectedRecipeObj,
   ]);
+
+  // Stan: Przelicznik Młynków
+  const [selectedGrindCategoryId, setSelectedGrindCategoryId] = useState<string>('pourover_v60');
+  const activeGrindCategory =
+    GRIND_CATEGORIES.find((c) => c.id === selectedGrindCategoryId) || GRIND_CATEGORIES[2];
 
   // Stan: Kalkulator Ratio
   const [doseInput, setDoseInput] = useState('18');
@@ -341,6 +351,64 @@ export default function DialInScreen() {
                   Po absorpcji 2.0g/g przez ciastko
                 </Text>
               </View>
+            </View>
+          </View>
+
+          {/* PRZELICZNIK MŁYNKÓW (GRINDER DIAL-IN CONVERTER) */}
+          <View style={[styles.calcCard, { marginTop: 16 }]}>
+            <Text style={styles.sectionHeader}>{t.grinder.title}</Text>
+            <Text style={styles.sectionSub}>{t.grinder.subtitle}</Text>
+
+            <Text style={styles.inputTitle}>{t.grinder.categorySelect}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 14 }}>
+              {GRIND_CATEGORIES.map((cat) => (
+                <Pressable
+                  key={cat.id}
+                  style={[
+                    styles.grindCategoryChip,
+                    selectedGrindCategoryId === cat.id && styles.grindCategoryChipActive,
+                  ]}
+                  onPress={() => setSelectedGrindCategoryId(cat.id)}
+                >
+                  <Text
+                    style={[
+                      styles.grindCategoryChipText,
+                      selectedGrindCategoryId === cat.id && styles.grindCategoryChipTextActive,
+                    ]}
+                  >
+                    {language === 'pl' ? cat.namePl : cat.nameEn}
+                  </Text>
+                  <Text style={styles.grindCategoryChipSub}>
+                    ~{cat.defaultMicrons} µm
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+
+            <View style={styles.grinderCategoryDetailsCard}>
+              <Text style={styles.grinderMethodsText}>
+                📌 Metody: {language === 'pl' ? activeGrindCategory.methodsPl : activeGrindCategory.methodsEn}
+              </Text>
+              <Text style={styles.grinderMicronsRange}>
+                Średnia cząstek: {activeGrindCategory.micronMin} – {activeGrindCategory.micronMax} µm (punkt odniesienia: {activeGrindCategory.defaultMicrons} µm)
+              </Text>
+            </View>
+
+            <Text style={[styles.inputTitle, { marginTop: 12 }]}>
+              {t.grinder.allGrindersHeader}
+            </Text>
+
+            <View style={styles.grindersGrid}>
+              {SUPPORTED_GRINDERS.map((grinder) => {
+                const setting = convertMicronsToGrinder(activeGrindCategory.defaultMicrons, grinder.id);
+                return (
+                  <View key={grinder.id} style={styles.grinderSettingCard}>
+                    <Text style={styles.grinderNameText}>{grinder.name}</Text>
+                    <Text style={styles.grinderBurrText}>{grinder.burrType}</Text>
+                    <Text style={styles.grinderSettingValue}>{setting.formatted}</Text>
+                  </View>
+                );
+              })}
             </View>
           </View>
         </View>
@@ -1083,5 +1151,81 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: theme.colors.textPrimary,
+  },
+  grindCategoryChip: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginRight: 8,
+    alignItems: 'center',
+  },
+  grindCategoryChipActive: {
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    borderColor: theme.colors.copper,
+  },
+  grindCategoryChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+  },
+  grindCategoryChipTextActive: {
+    color: theme.colors.copper,
+    fontWeight: '700',
+  },
+  grindCategoryChipSub: {
+    fontSize: 10,
+    color: theme.colors.textMuted,
+    marginTop: 2,
+  },
+  grinderCategoryDetailsCard: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginBottom: 8,
+  },
+  grinderMethodsText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginBottom: 4,
+    lineHeight: 16,
+  },
+  grinderMicronsRange: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
+  grindersGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  grinderSettingCard: {
+    width: '48%',
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  grinderNameText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  grinderBurrText: {
+    fontSize: 10,
+    color: theme.colors.textMuted,
+    marginBottom: 6,
+  },
+  grinderSettingValue: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: theme.colors.copper,
+    fontVariant: ['tabular-nums'],
   },
 });
