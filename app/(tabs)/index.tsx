@@ -27,6 +27,9 @@ import {
   saveRecipe,
   duplicateRecipe,
   getUnitSystem,
+  getHasCompletedOnboarding,
+  setHasCompletedOnboarding,
+  BeveragePreference,
 } from '../../src/core/database';
 import { StarIcon } from '../../src/components/icons/CraftIcons';
 import {
@@ -57,6 +60,7 @@ import { calculateBrewCost } from '../../src/core/cost-calculator';
 import { QrScannerModal } from '../../src/core/QrScannerModal';
 import { useAppAccess } from '../../src/core/app-access';
 import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
+import { OnboardingModal } from '../../src/components/OnboardingModal';
 import { BrewHeader } from '../../src/components/brew/BrewHeader';
 import { BrewQuickPrepCard } from '../../src/components/brew/BrewQuickPrepCard';
 import { BrewActiveFocusTimer } from '../../src/components/brew/BrewActiveFocusTimer';
@@ -97,6 +101,7 @@ export default function BrewScreen() {
     setGrinderId,
     grinderRecommendation,
     beveragePreference,
+    setBeveragePreference,
   } = useBrew();
 
   const [allRecipes, setAllRecipes] = useState<any[]>(MASTER_RECIPES);
@@ -109,6 +114,23 @@ export default function BrewScreen() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showQrScanner, setShowQrScanner] = useState(false);
   const [showPaywallModal, setShowPaywallModal] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(() => {
+    try {
+      return !getHasCompletedOnboarding();
+    } catch {
+      return false;
+    }
+  });
+
+  const handleCompleteOnboarding = (pref: BeveragePreference) => {
+    try {
+      setHasCompletedOnboarding(true);
+      setBeveragePreference(pref);
+    } catch {
+      // ignore
+    }
+    setShowOnboarding(false);
+  };
   const [importUrlInput, setImportUrlInput] = useState('');
   const [importParsedRecipe, setImportParsedRecipe] = useState<{
     recipe: SavedRecipe;
@@ -1079,6 +1101,12 @@ export default function BrewScreen() {
           setShowPaywallModal(false);
           refresh();
         }}
+      />
+
+      {/* 1-Screen Onboarding Personalization (First Launch) */}
+      <OnboardingModal
+        visible={showOnboarding}
+        onComplete={handleCompleteOnboarding}
       />
     </ScrollView>
   );

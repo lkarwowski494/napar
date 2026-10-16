@@ -753,3 +753,11 @@ export function getBeveragePreference(): BeveragePreference {
 export function setBeveragePreference(pref: BeveragePreference): void {
   setAppSetting('beverage_preference', pref);
 }
+
+export function getHasCompletedOnboarding(): boolean {
+  return getAppSetting('onboarding_completed') === 'true';
+}
+
+export function setHasCompletedOnboarding(completed: boolean): void {
+  setAppSetting('onboarding_completed', completed ? 'true' : 'false');
+}
