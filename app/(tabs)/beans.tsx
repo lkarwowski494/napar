@@ -47,10 +47,29 @@ export default function BeansScreen() {
   const [type, setType] = useState<'coffee' | 'tea'>('coffee');
   const [roaster, setRoaster] = useState('');
   const [origin, setOrigin] = useState('');
+  const [variety, setVariety] = useState('');
+  const [process, setProcess] = useState('');
   const [roastDate, setRoastDate] = useState(new Date().toISOString().slice(0, 10));
   const [roastProfile, setRoastProfile] = useState('light');
   const [initialWeight, setInitialWeight] = useState('250');
   const [notesStr, setNotesStr] = useState('');
+
+  // Stan edycji paczki (BR-MAG-001 & BR-MAG-004)
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editType, setEditType] = useState<'coffee' | 'tea'>('coffee');
+  const [editRoaster, setEditRoaster] = useState('');
+  const [editOrigin, setEditOrigin] = useState('');
+  const [editVariety, setEditVariety] = useState('');
+  const [editProcess, setEditProcess] = useState('');
+  const [editRoastDate, setEditRoastDate] = useState('');
+  const [editRoastProfile, setEditRoastProfile] = useState('light');
+  const [editInitialWeight, setEditInitialWeight] = useState('250');
+  const [editRemainingWeight, setEditRemainingWeight] = useState('250');
+  const [editNotesStr, setEditNotesStr] = useState('');
+  const [editRating, setEditRating] = useState<number | undefined>(undefined);
+  const [editIsArchived, setEditIsArchived] = useState(false);
 
   const filteredVarieties = searchCoffeeVarieties(compendiumSearch);
   const filteredProcesses = searchCoffeeProcesses(compendiumSearch);
@@ -61,11 +80,15 @@ export default function BeansScreen() {
     name: string;
     type: 'coffee' | 'tea';
     origin?: string;
+    variety?: string;
+    process?: string;
     notes: string[];
   }) => {
     setName(template.name);
     setType(template.type);
     if (template.origin) setOrigin(template.origin);
+    if (template.variety) setVariety(template.variety);
+    if (template.process) setProcess(template.process);
     setNotesStr(template.notes.join(', '));
     setShowCompendium(false);
     setShowAddModal(true);
@@ -101,6 +124,8 @@ export default function BeansScreen() {
       type,
       roasterOrProducer: roaster.trim() || undefined,
       origin: origin.trim() || undefined,
+      variety: variety.trim() || undefined,
+      process: process.trim() || undefined,
       roastOrHarvestDate: roastDate.trim() || undefined,
       roastProfile: roastProfile.trim() || undefined,
       initialWeightGrams: weightNum,
@@ -124,10 +149,114 @@ export default function BeansScreen() {
     setType('coffee');
     setRoaster('');
     setOrigin('');
+    setVariety('');
+    setProcess('');
     setRoastDate(new Date().toISOString().slice(0, 10));
     setRoastProfile('light');
     setInitialWeight('250');
     setNotesStr('');
+  };
+
+  const handleOpenEdit = (item: InventoryItem) => {
+    setEditingItem(item);
+    setEditName(item.name);
+    setEditType(item.type);
+    setEditRoaster(item.roasterOrProducer || '');
+    setEditOrigin(item.origin || '');
+    setEditVariety(item.variety || '');
+    setEditProcess(item.process || '');
+    setEditRoastDate(item.roastOrHarvestDate || '');
+    setEditRoastProfile(item.roastProfile || 'light');
+    setEditInitialWeight(item.initialWeightGrams.toString());
+    setEditRemainingWeight(item.remainingWeightGrams.toString());
+    setEditNotesStr((item.flavorNotes || []).join(', '));
+    setEditRating(item.rating);
+    setEditIsArchived(item.isArchived);
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingItem) return;
+    if (!editName.trim()) {
+      Alert.alert('Błąd', 'Podaj nazwę kawy lub herbaty.');
+      return;
+    }
+    const initW = parseFloat(editInitialWeight) || 250;
+    let remW = parseFloat(editRemainingWeight);
+    if (isNaN(remW) || remW < 0) remW = 0;
+
+    const notesArray = editNotesStr
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+
+    const isAutoArchived = remW === 0 ? true : editIsArchived;
+
+    const updatedItem: InventoryItem = {
+      ...editingItem,
+      name: editName.trim(),
+      type: editType,
+      roasterOrProducer: editRoaster.trim() || undefined,
+      origin: editOrigin.trim() || undefined,
+      variety: editVariety.trim() || undefined,
+      process: editProcess.trim() || undefined,
+      roastOrHarvestDate: editRoastDate.trim() || undefined,
+      roastProfile: editRoastProfile.trim() || undefined,
+      initialWeightGrams: initW,
+      remainingWeightGrams: remW,
+      flavorNotes: notesArray,
+      rating: editRating,
+      isArchived: isAutoArchived,
+      updatedAt: new Date().toISOString(),
+    };
+
+    saveInventoryItem(updatedItem);
+    loadData();
+    setShowEditModal(false);
+    setEditingItem(null);
+    Alert.alert('Zapisano!', `Paczka "${updatedItem.name}" została zaktualizowana.`);
+  };
+
+  const handleMarkAsFinished = () => {
+    if (!editingItem) return;
+    const updatedItem: InventoryItem = {
+      ...editingItem,
+      remainingWeightGrams: 0,
+      isArchived: true,
+      updatedAt: new Date().toISOString(),
+    };
+    saveInventoryItem(updatedItem);
+    loadData();
+    setShowEditModal(false);
+    setEditingItem(null);
+    Alert.alert('Zarchiwizowano', 'Paczka została oznaczona jako zużyta (0 g) i przeniesiona do archiwum.');
+  };
+
+  const handleDeleteItem = () => {
+    if (!editingItem) return;
+    Alert.alert(
+      'Usunąć paczkę?',
+      `Czy na pewno chcesz bezpowrotnie usunąć "${editingItem.name}" ze spiżarni?`,
+      [
+        { text: 'Anuluj', style: 'cancel' },
+        {
+          text: 'Usuń',
+          style: 'destructive',
+          onPress: () => {
+            deleteInventoryItem(editingItem.id);
+            loadData();
+            setShowEditModal(false);
+            setEditingItem(null);
+          },
+        },
+      ]
+    );
+  };
+
+  const handleAdjustRemainingWeight = (delta: number) => {
+    const current = parseFloat(editRemainingWeight) || 0;
+    const next = Math.max(0, Number((current + delta).toFixed(1)));
+    setEditRemainingWeight(next.toString());
   };
 
   const handleSelectForBrew = (item: InventoryItem) => {
@@ -291,6 +420,46 @@ export default function BeansScreen() {
                   </View>
                 </View>
 
+                {/* Alert o zużyciu paczki (BR-MAG-004) */}
+                {item.remainingWeightGrams === 0 && !item.isArchived && (
+                  <View style={styles.emptyAlertBanner}>
+                    <Text style={styles.emptyAlertText}>
+                      ⚠️ Paczka skończona (0 g). Przenieść do archiwum?
+                    </Text>
+                    <Pressable
+                      style={styles.emptyAlertBtn}
+                      onPress={() => handleToggleArchive(item)}
+                    >
+                      <Text style={styles.emptyAlertBtnText}>Archiwizuj teraz</Text>
+                    </Pressable>
+                  </View>
+                )}
+
+                {/* Odmiana botaniczna i obróbka (BR-MAG-001) */}
+                {(item.variety || item.process) && (
+                  <View style={styles.varietyProcessRow}>
+                    {item.variety ? (
+                      <View style={styles.varietyChip}>
+                        <Text style={styles.varietyChipText}>🌱 {item.variety}</Text>
+                      </View>
+                    ) : null}
+                    {item.process ? (
+                      <View style={styles.processChip}>
+                        <Text style={styles.processChipText}>⚗️ {item.process}</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                )}
+
+                {/* Ocena paczki */}
+                {item.rating !== undefined && item.rating > 0 && (
+                  <View style={styles.ratingBadge}>
+                    <Text style={styles.ratingBadgeText}>
+                      {'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}
+                    </Text>
+                  </View>
+                )}
+
                 {/* Nuty sensoryczne */}
                 {item.flavorNotes && item.flavorNotes.length > 0 && (
                   <View style={styles.notesRow}>
@@ -309,6 +478,12 @@ export default function BeansScreen() {
                     onPress={() => handleSelectForBrew(item)}
                   >
                     <Text style={styles.actionBrewText}>☕ Parz z tych ziaren</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.actionEditBtn}
+                    onPress={() => handleOpenEdit(item)}
+                  >
+                    <Text style={styles.actionEditText}>✏️ Edytuj</Text>
                   </Pressable>
                   <Pressable
                     style={styles.actionArchiveBtn}
@@ -397,6 +572,29 @@ export default function BeansScreen() {
 
             <View style={styles.formRow}>
               <View style={{ flex: 1 }}>
+                <Text style={styles.inputLabel}>Odmiana botaniczna</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="np. Geisha, SL28, Bourbon"
+                  placeholderTextColor={theme.colors.textMuted}
+                  value={variety}
+                  onChangeText={setVariety}
+                />
+              </View>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={styles.inputLabel}>Obróbka (Process)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="np. Washed, Natural, Honey"
+                  placeholderTextColor={theme.colors.textMuted}
+                  value={process}
+                  onChangeText={setProcess}
+                />
+              </View>
+            </View>
+
+            <View style={styles.formRow}>
+              <View style={{ flex: 1 }}>
                 <Text style={styles.inputLabel}>Data palenia / zbioru</Text>
                 <TextInput
                   style={styles.textInput}
@@ -431,6 +629,194 @@ export default function BeansScreen() {
 
             <Pressable style={styles.saveSubmitBtn} onPress={handleAddItem}>
               <Text style={styles.saveSubmitText}>Zapisz w Spiżarni</Text>
+            </Pressable>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Modal edycji paczki (BR-MAG-001 & BR-MAG-004) */}
+      <Modal visible={showEditModal} animationType="slide" transparent={false}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.modalTitle}>Edytuj Paczkę</Text>
+              <Text style={styles.modalHeaderSub}>Koryguj wagę, parametry lub zarchiwizuj</Text>
+            </View>
+            <Pressable onPress={() => { setShowEditModal(false); setEditingItem(null); }}>
+              <Text style={styles.modalCloseText}>Anuluj</Text>
+            </Pressable>
+          </View>
+
+          <ScrollView style={styles.formScroll}>
+            {/* Typ: Kawa vs Herbata */}
+            <View style={styles.typeSelectorRow}>
+              <Pressable
+                style={[styles.typeBtn, editType === 'coffee' && styles.typeBtnActive]}
+                onPress={() => setEditType('coffee')}
+              >
+                <Text style={[styles.typeBtnText, editType === 'coffee' && styles.typeBtnTextActive]}>
+                  ☕ Kawa ziarnista
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[styles.typeBtn, editType === 'tea' && styles.typeBtnActive]}
+                onPress={() => setEditType('tea')}
+              >
+                <Text style={[styles.typeBtnText, editType === 'tea' && styles.typeBtnTextActive]}>
+                  🍵 Herbata liściasta
+                </Text>
+              </Pressable>
+            </View>
+
+            <Text style={styles.inputLabel}>Nazwa ziaren / herbaty *</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="np. Etiopia Yirgacheffe Washed"
+              placeholderTextColor={theme.colors.textMuted}
+              value={editName}
+              onChangeText={setEditName}
+            />
+
+            <Text style={styles.inputLabel}>Palarnia / Producent</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="np. Hard Beans, Coffeedesk, Wuyi Star"
+              placeholderTextColor={theme.colors.textMuted}
+              value={editRoaster}
+              onChangeText={setEditRoaster}
+            />
+
+            <Text style={styles.inputLabel}>Kraj / Pochodzenie</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="np. Yirgacheffe, Etiopia"
+              placeholderTextColor={theme.colors.textMuted}
+              value={editOrigin}
+              onChangeText={setEditOrigin}
+            />
+
+            <View style={styles.formRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.inputLabel}>Odmiana botaniczna</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="np. Geisha, SL28, Bourbon"
+                  placeholderTextColor={theme.colors.textMuted}
+                  value={editVariety}
+                  onChangeText={setEditVariety}
+                />
+              </View>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={styles.inputLabel}>Obróbka (Process)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="np. Washed, Natural, Honey"
+                  placeholderTextColor={theme.colors.textMuted}
+                  value={editProcess}
+                  onChangeText={setEditProcess}
+                />
+              </View>
+            </View>
+
+            <View style={styles.formRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.inputLabel}>Data palenia / zbioru</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor={theme.colors.textMuted}
+                  value={editRoastDate}
+                  onChangeText={setEditRoastDate}
+                />
+              </View>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={styles.inputLabel}>Waga początkowa (g)</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="250"
+                  placeholderTextColor={theme.colors.textMuted}
+                  keyboardType="numeric"
+                  value={editInitialWeight}
+                  onChangeText={setEditInitialWeight}
+                />
+              </View>
+            </View>
+
+            {/* Pozostała waga z szybkimi przyciskami korekty (BR-MAG-004) */}
+            <View style={styles.weightEditSection}>
+              <Text style={styles.inputLabel}>Pozostała waga w paczce (g) *</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="np. 180"
+                placeholderTextColor={theme.colors.textMuted}
+                keyboardType="numeric"
+                value={editRemainingWeight}
+                onChangeText={setEditRemainingWeight}
+              />
+              <View style={styles.weightQuickButtonsRow}>
+                <Pressable
+                  style={styles.quickWeightBtn}
+                  onPress={() => handleAdjustRemainingWeight(-15)}
+                >
+                  <Text style={styles.quickWeightBtnText}>-15 g</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.quickWeightBtn}
+                  onPress={() => handleAdjustRemainingWeight(-18)}
+                >
+                  <Text style={styles.quickWeightBtnText}>-18 g</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.quickWeightBtn}
+                  onPress={() => handleAdjustRemainingWeight(15)}
+                >
+                  <Text style={styles.quickWeightBtnText}>+15 g</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.quickWeightBtn, styles.quickWeightZeroBtn]}
+                  onPress={() => setEditRemainingWeight('0')}
+                >
+                  <Text style={styles.quickWeightZeroText}>0 g (pusta)</Text>
+                </Pressable>
+              </View>
+            </View>
+
+            <Text style={styles.inputLabel}>Nuty smakowe (po przecinku)</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="np. jaśmin, brzoskwinia, bergamotka"
+              placeholderTextColor={theme.colors.textMuted}
+              value={editNotesStr}
+              onChangeText={setEditNotesStr}
+            />
+
+            {/* Ocena paczki */}
+            <Text style={styles.inputLabel}>Ocena paczki (1-5★)</Text>
+            <View style={styles.starRow}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Pressable
+                  key={star}
+                  onPress={() => setEditRating(editRating === star ? undefined : star)}
+                  hitSlop={8}
+                  style={styles.starBtn}
+                >
+                  <Text style={[styles.starIcon, (editRating || 0) >= star && styles.starIconActive]}>
+                    ★
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
+            <Pressable style={styles.saveSubmitBtn} onPress={handleSaveEdit}>
+              <Text style={styles.saveSubmitText}>Zapisz zmiany</Text>
+            </Pressable>
+
+            <Pressable style={styles.markFinishedBtn} onPress={handleMarkAsFinished}>
+              <Text style={styles.markFinishedText}>📦 Oznacz jako zużytą i zarchiwizuj</Text>
+            </Pressable>
+
+            <Pressable style={styles.deletePackBtn} onPress={handleDeleteItem}>
+              <Text style={styles.deletePackText}>🗑️ Usuń paczkę ze spiżarni</Text>
             </Pressable>
           </ScrollView>
         </View>
@@ -806,9 +1192,78 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: theme.colors.textSecondary,
   },
+  emptyAlertBanner: {
+    backgroundColor: 'rgba(255, 149, 0, 0.12)',
+    borderWidth: 1,
+    borderColor: '#FF9500',
+    borderRadius: theme.borderRadius.sm,
+    padding: 10,
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  emptyAlertText: {
+    fontSize: 12,
+    color: theme.colors.textPrimary,
+    fontWeight: '600',
+    flex: 1,
+    marginRight: 8,
+  },
+  emptyAlertBtn: {
+    backgroundColor: theme.colors.copper,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: theme.borderRadius.sm,
+  },
+  emptyAlertBtnText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  varietyProcessRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 8,
+  },
+  varietyChip: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  varietyChipText: {
+    fontSize: 11,
+    color: theme.colors.copperLight,
+    fontWeight: '600',
+  },
+  processChip: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  processChipText: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    fontWeight: '500',
+  },
+  ratingBadge: {
+    marginBottom: 8,
+  },
+  ratingBadgeText: {
+    color: '#FFD700',
+    fontSize: 14,
+    letterSpacing: 2,
+  },
   itemActionsRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
     paddingTop: 12,
@@ -827,6 +1282,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 13,
   },
+  actionEditBtn: {
+    flex: 1,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingVertical: 8,
+    borderRadius: theme.borderRadius.sm,
+    alignItems: 'center',
+  },
+  actionEditText: {
+    color: theme.colors.textPrimary,
+    fontSize: 12,
+    fontWeight: '600',
+  },
   actionArchiveBtn: {
     flex: 1,
     backgroundColor: theme.colors.bgCardSecondary,
@@ -838,6 +1307,81 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     fontSize: 12,
     fontWeight: '600',
+  },
+  weightEditSection: {
+    marginVertical: 4,
+  },
+  weightQuickButtonsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  quickWeightBtn: {
+    flex: 1,
+    backgroundColor: theme.colors.bgCardSecondary,
+    paddingVertical: 8,
+    borderRadius: theme.borderRadius.sm,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  quickWeightBtnText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+  },
+  quickWeightZeroBtn: {
+    borderColor: theme.colors.copperMuted,
+    backgroundColor: theme.colors.copperMuted,
+  },
+  quickWeightZeroText: {
+    fontSize: 12,
+    color: theme.colors.copperLight,
+    fontWeight: '700',
+  },
+  starRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginVertical: 8,
+  },
+  starBtn: {
+    padding: 4,
+  },
+  starIcon: {
+    fontSize: 26,
+    color: theme.colors.border,
+  },
+  starIconActive: {
+    color: '#FFD700',
+  },
+  markFinishedBtn: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    paddingVertical: 14,
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  markFinishedText: {
+    color: theme.colors.copper,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  deletePackBtn: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderWidth: 1,
+    borderColor: theme.colors.danger,
+    paddingVertical: 14,
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  deletePackText: {
+    color: theme.colors.danger,
+    fontSize: 14,
+    fontWeight: '700',
   },
   modalContainer: {
     flex: 1,
@@ -857,6 +1401,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: theme.colors.textPrimary,
+  },
+  modalHeaderSub: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    marginTop: 2,
   },
   modalCloseText: {
     fontSize: 16,

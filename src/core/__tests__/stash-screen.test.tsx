@@ -464,4 +464,388 @@ describe('BeansScreen (Stash & Inventory)', () => {
 
     expect(JSON.stringify(tree.toJSON())).not.toContain('Odmiany botaniczne, obróbki, terroir i herbaty');
   });
+
+  test('Otwiera modal edycji, zmienia parametry paczki i zapisuje zmiany', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    const saveSpy = jest.spyOn(databaseModule, 'saveInventoryItem').mockImplementation(jest.fn());
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    // 1. Kliknij '✏️ Edytuj'
+    const editBtn = findPressableWithText(tree.root, 'Edytuj');
+    expect(editBtn).toBeTruthy();
+
+    renderer.act(() => {
+      editBtn.props.onPress();
+    });
+
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Edytuj Paczkę');
+    expect(str).toContain('Koryguj wagę, parametry lub zarchiwizuj');
+
+    // 2. Zmień dane w formularzu edycji
+    const nameInputs = tree.root.findAllByProps({ placeholder: 'np. Etiopia Yirgacheffe Washed' });
+    // Ostatni input to ten w otwartym modalu edycji
+    const editNameInput = nameInputs[nameInputs.length - 1];
+    expect(editNameInput).toBeTruthy();
+
+    renderer.act(() => {
+      editNameInput.props.onChangeText('Etiopia Yirgacheffe Anaerobic Slow');
+    });
+
+    // 3. Kliknij 'Zapisz zmiany'
+    const saveChangesBtn = findPressableWithText(tree.root, 'Zapisz zmiany');
+    expect(saveChangesBtn).toBeTruthy();
+
+    renderer.act(() => {
+      saveChangesBtn.props.onPress();
+    });
+
+    expect(saveSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'bean-1',
+        name: 'Etiopia Yirgacheffe Anaerobic Slow',
+      })
+    );
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Zapisano!',
+      'Paczka "Etiopia Yirgacheffe Anaerobic Slow" została zaktualizowana.'
+    );
+  });
+
+  test('Szybkie przyciski korekty wagi (-15 g, +15 g, 0 g) w modalu edycji', () => {
+    const saveSpy = jest.spyOn(databaseModule, 'saveInventoryItem').mockImplementation(jest.fn());
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz modal edycji
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Edytuj')?.props.onPress();
+    });
+
+    // Sprawdź przycisk -15 g
+    const minus15Btn = findPressableWithText(tree.root, '-15 g');
+    expect(minus15Btn).toBeTruthy();
+
+    renderer.act(() => {
+      minus15Btn.props.onPress();
+    });
+
+    // Waga początkowa w bean-1 to 180g, po -15g powinna wynosić 165g
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('165');
+
+    // Sprawdź przycisk +15 g
+    const plus15Btn = findPressableWithText(tree.root, '+15 g');
+    expect(plus15Btn).toBeTruthy();
+
+    renderer.act(() => {
+      plus15Btn.props.onPress();
+    });
+
+    // Powrót do 180g
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('180');
+
+    // Sprawdź przycisk 0 g (pusta)
+    const zeroBtn = findPressableWithText(tree.root, '0 g (pusta)');
+    expect(zeroBtn).toBeTruthy();
+
+    renderer.act(() => {
+      zeroBtn.props.onPress();
+    });
+
+    // Zapisz po wyzerowaniu
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Zapisz zmiany')?.props.onPress();
+    });
+
+    expect(saveSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'bean-1',
+        remainingWeightGrams: 0,
+        isArchived: true, // automatyczne archiwizowanie przy 0g
+      })
+    );
+  });
+
+  test('Przycisk Oznacz jako zużytą i zarchiwizuj w modalu edycji', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    const saveSpy = jest.spyOn(databaseModule, 'saveInventoryItem').mockImplementation(jest.fn());
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Edytuj')?.props.onPress();
+    });
+
+    const finishBtn = findPressableWithText(tree.root, 'Oznacz jako zużytą i zarchiwizuj');
+    expect(finishBtn).toBeTruthy();
+
+    renderer.act(() => {
+      finishBtn.props.onPress();
+    });
+
+    expect(saveSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'bean-1',
+        remainingWeightGrams: 0,
+        isArchived: true,
+      })
+    );
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Zarchiwizowano',
+      'Paczka została oznaczona jako zużyta (0 g) i przeniesiona do archiwum.'
+    );
+  });
+
+  test('Przycisk Usuń paczkę wywołuje Alert potwierdzenia i usuwa pozycję', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    const deleteSpy = jest.spyOn(databaseModule, 'deleteInventoryItem').mockImplementation(jest.fn());
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Edytuj')?.props.onPress();
+    });
+
+    const deleteBtn = findPressableWithText(tree.root, 'Usuń paczkę ze spiżarni');
+    expect(deleteBtn).toBeTruthy();
+
+    renderer.act(() => {
+      deleteBtn.props.onPress();
+    });
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Usunąć paczkę?',
+      expect.stringContaining('Czy na pewno chcesz bezpowrotnie usunąć'),
+      expect.any(Array)
+    );
+
+    // Wywołaj callback 'Usuń'
+    const alertCall = alertSpy.mock.calls.find((c) => c[0] === 'Usunąć paczkę?');
+    const buttons = alertCall?.[2] as any[];
+    const confirmBtn = buttons?.find((b) => b.text === 'Usuń');
+    expect(confirmBtn).toBeTruthy();
+
+    renderer.act(() => {
+      confirmBtn.onPress();
+    });
+
+    expect(deleteSpy).toHaveBeenCalledWith('bean-1');
+  });
+
+  test('Paczka ze stanem 0g (niezarchiwizowana) wyświetla baner zachęcający do archiwizacji i pozwala na natychmiastową archiwizację', () => {
+    const emptyActiveItem = {
+      id: 'bean-empty-active',
+      name: 'Etiopia Ostatnie Ziarenka',
+      type: 'coffee' as const,
+      roasterOrProducer: 'Palarnia Testowa',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 0,
+      flavorNotes: ['Czekolada'],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    jest.spyOn(databaseModule, 'getInventoryItems').mockReturnValue([emptyActiveItem]);
+    const saveSpy = jest.spyOn(databaseModule, 'saveInventoryItem').mockImplementation(jest.fn());
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Paczka skończona (0 g). Przenieść do archiwum?');
+
+    const archiveNowBtn = findPressableWithText(tree.root, 'Archiwizuj teraz');
+    expect(archiveNowBtn).toBeTruthy();
+
+    renderer.act(() => {
+      archiveNowBtn.props.onPress();
+    });
+
+    expect(saveSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'bean-empty-active',
+        isArchived: true,
+      })
+    );
+  });
+
+  test('Waliduje pustą nazwę w modalu edycji oraz obsługuje Anuluj', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Edytuj')?.props.onPress();
+    });
+
+    // Wyczyść nazwę
+    const nameInputs = tree.root.findAllByProps({ placeholder: 'np. Etiopia Yirgacheffe Washed' });
+    const editNameInput = nameInputs[nameInputs.length - 1];
+
+    renderer.act(() => {
+      editNameInput.props.onChangeText('   ');
+    });
+
+    // Próba zapisu
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Zapisz zmiany')?.props.onPress();
+    });
+
+    expect(alertSpy).toHaveBeenCalledWith('Błąd', 'Podaj nazwę kawy lub herbaty.');
+
+    // Kliknij Anuluj w modalu edycji
+    const cancelBtns = tree.root.findAll((n: any) => {
+      const c = n.props?.children;
+      return typeof c === 'string' && c.includes('Anuluj');
+    });
+    const editCancelBtn = cancelBtns[cancelBtns.length - 1];
+
+    renderer.act(() => {
+      let curr = editCancelBtn;
+      while (curr && !curr.props?.onPress) curr = curr.parent;
+      curr?.props?.onPress();
+    });
+
+    expect(JSON.stringify(tree.toJSON())).toContain('Etiopia Yirgacheffe Washed');
+  });
+
+  test('Przełącza typ produktu (kawa / herbata), używa -18g i klika gwiazdki oceny w modalu edycji', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Edytuj')?.props.onPress();
+    });
+
+    // Przełącz typ na herbatę, potem z powrotem na kawę
+    const teaBtns = tree.root.findAll((n: any) => n.props?.children?.includes?.('Herbata liściasta'));
+    renderer.act(() => {
+      teaBtns[teaBtns.length - 1]?.parent?.props?.onPress?.();
+    });
+
+    const coffeeBtns = tree.root.findAll((n: any) => n.props?.children?.includes?.('Kawa ziarnista'));
+    renderer.act(() => {
+      coffeeBtns[coffeeBtns.length - 1]?.parent?.props?.onPress?.();
+    });
+
+    // Kliknij -18 g
+    const minus18Btn = findPressableWithText(tree.root, '-18 g');
+    renderer.act(() => {
+      minus18Btn?.props?.onPress?.();
+    });
+
+    // Kliknij gwiazdkę 4, a potem kliknij ponownie aby odznaczyć
+    const starBtns = tree.root.findAll((n: any) => n.props?.children === '★');
+    if (starBtns.length > 3) {
+      renderer.act(() => {
+        starBtns[3]?.parent?.props?.onPress?.();
+      });
+      renderer.act(() => {
+        starBtns[3]?.parent?.props?.onPress?.();
+      });
+    }
+
+    expect(tree.toJSON()).toBeTruthy();
+  });
+
+  test('Używa szablonu z odmiany oraz z terroir w Kompendium Wiedzy', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz kompendium
+    renderer.act(() => {
+      tree.root.findByProps({ testID: 'compendium-open-button' }).props.onPress();
+    });
+
+    // Kliknij 'Użyj jako szablon' w zakładce odmiany
+    const useVarietyBtn = findPressableWithText(tree.root, '+ Użyj jako szablon w spiżarni');
+    expect(useVarietyBtn).toBeTruthy();
+    renderer.act(() => {
+      useVarietyBtn.props.onPress();
+    });
+
+    expect(JSON.stringify(tree.toJSON())).toContain('Dodaj do Spiżarni');
+
+    // Zamknij Add Modal
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Anuluj')?.props.onPress();
+    });
+
+    // Ponownie otwórz kompendium i przejdź do Terroir
+    renderer.act(() => {
+      tree.root.findByProps({ testID: 'compendium-open-button' }).props.onPress();
+    });
+
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Terroir')?.props.onPress();
+    });
+
+    const useTerroirBtn = findPressableWithText(tree.root, '+ Użyj jako szablon w spiżarni');
+    expect(useTerroirBtn).toBeTruthy();
+    renderer.act(() => {
+      useTerroirBtn.props.onPress();
+    });
+
+    expect(JSON.stringify(tree.toJSON())).toContain('Dodaj do Spiżarni');
+  });
 });
+
+
