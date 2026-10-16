@@ -415,5 +415,38 @@ describe('SettingsScreen Component', () => {
       ['default_grinder', 'fellow_ode_gen2']
     );
   });
+
+  test('Przełącza układ jednostek miar (Metric / Imperial) i zapisuje w bazie', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <SettingsScreen />
+        </LanguageProvider>
+      );
+    });
+
+    const imperialBtn = tree.root.findByProps({ testID: 'unit-imperial-btn' });
+    expect(imperialBtn).toBeTruthy();
+
+    renderer.act(() => {
+      imperialBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['unit_system', 'imperial']
+    );
+
+    const metricBtn = tree.root.findByProps({ testID: 'unit-metric-btn' });
+    renderer.act(() => {
+      metricBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['unit_system', 'metric']
+    );
+  });
 });
 

@@ -21,6 +21,8 @@ import {
   exportInventoryCsv,
   getAppSetting,
   setAppSetting,
+  getUnitSystem,
+  setUnitSystem,
 } from '../src/core/database';
 import { SUPPORTED_GRINDERS } from '../src/core/grinder-converter';
 import { theme } from '../src/core/theme';
@@ -31,6 +33,9 @@ export default function SettingsScreen() {
   const [selectedGrinder, setSelectedGrinder] = useState<string>(() => {
     return getAppSetting('default_grinder', 'comandante_c40');
   });
+  const [unitSystem, setUnitSystemState] = useState<'metric' | 'imperial'>(() => {
+    return getUnitSystem();
+  });
   const [isPro, setIsPro] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -38,6 +43,11 @@ export default function SettingsScreen() {
   const handleSelectGrinder = (id: string) => {
     setSelectedGrinder(id);
     setAppSetting('default_grinder', id);
+  };
+
+  const handleSelectUnitSystem = (unit: 'metric' | 'imperial') => {
+    setUnitSystemState(unit);
+    setUnitSystem(unit);
   };
   const [showCsvModal, setShowCsvModal] = useState(false);
   const [csvModalTitle, setCsvModalTitle] = useState('');
@@ -125,6 +135,39 @@ export default function SettingsScreen() {
         >
           <Text style={[styles.langTabText, language === 'en' && styles.langTabTextActive]}>
             🇬🇧 English (Steepwise)
+          </Text>
+        </Pressable>
+      </View>
+
+      {/* Przełącznik Jednostek Miar (Metric / Imperial) */}
+      <Text style={styles.sectionTitle}>{t.settings.unitSection}</Text>
+      <View style={styles.langSelectorRow}>
+        <Pressable
+          testID="unit-metric-btn"
+          style={[
+            styles.langTab,
+            unitSystem === 'metric' && styles.langTabActive,
+          ]}
+          onPress={() => handleSelectUnitSystem('metric')}
+          accessibilityRole="button"
+          accessibilityLabel={t.settings.unitMetric}
+        >
+          <Text style={[styles.langTabText, unitSystem === 'metric' && styles.langTabTextActive]}>
+            {t.settings.unitMetric}
+          </Text>
+        </Pressable>
+        <Pressable
+          testID="unit-imperial-btn"
+          style={[
+            styles.langTab,
+            unitSystem === 'imperial' && styles.langTabActive,
+          ]}
+          onPress={() => handleSelectUnitSystem('imperial')}
+          accessibilityRole="button"
+          accessibilityLabel={t.settings.unitImperial}
+        >
+          <Text style={[styles.langTabText, unitSystem === 'imperial' && styles.langTabTextActive]}>
+            {t.settings.unitImperial}
           </Text>
         </Pressable>
       </View>

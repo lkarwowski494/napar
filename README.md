@@ -40,6 +40,8 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Pełna historia zaparzonych filiżanek z datą, recepturą, parametrami (czas, doza, woda, temperatura, nastawa młynka, użyty profil wody).
    - Obliczone wskaźniki ekstrakcji ($EY\%$) i szacowana zawartość kofeiny (mg).
    - Balans smaku, notatki degustacyjne, plakietka profilu wody i oceny.
+   - **🔁 Parz Ponownie (Brew Again — BR-DZIEN-004):** Błyskawiczne odtworzenie historycznej sesji jednym dotknięciem – załadowanie proporcji, dozy, temperatury, profilu wody i nastawy młynka bezpośrednio do aktywnego Asystenta Parzenia.
+   - **📤 Udostępnianie Notatek Degustacyjnych:** Generowanie sformatowanej, estetycznej karty parzenia z parametrami, balansem, nutami sensorycznymi i uzyskiem $EY\%$ do natywnego udostępnienia (`Share.share`) w 100% offline.
    - **📊 Statystyki & Trendy (Brew Analytics):** Przełącznik widoków `[ 📋 Sesje ]` / `[ 📊 Statystyki & Trendy ]`. Karty sumarycznego wolumenu (gramatura ziaren/liści, litry przelanej wody, przyjęta kofeina, średnia ocen ★), wykres rozkładu metod parzenia, uśredniony radar sensoryczny SCA (`SensoryRadarChart`), chmura najczęstszych nut smakowych oraz rozkład balansu w filiżance.
 4. **🧭 Dial-in Doctor & Kalkulatory:**
    - **Kompas Ekstrakcji (Dial-in Doctor):** Diagnozuje błędy smaku (za kwaśna, za gorzka, wodnista, cierpka herbata) i podaje fizyczną receptę na korektę mielenia młynka i temperatury wody.
@@ -56,7 +58,8 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Bieżące stężenie aktywnej kofeiny w krwiobiegu w czasie rzeczywistym.
    - Dobowy bilans kofeiny w relacji do normy EFSA (400 mg).
    - **Bedtime Sleep Curfew:** Prognoza stężenia kofeiny o wybranej godzinie snu (próg bezpieczny dla fazy głębokiej NREM $\le 25\,\text{mg}$) oraz wyznaczenie godziny ostatniej dopuszczalnej filiżanki.
-7. **⚙️ Ustawienia, Kopia Zapasowa i Młynek Domowy:**
+7. **⚙️ Ustawienia, Kopia Zapasowa i Jednostki:**
+   - **⚖️ Globalny Przełącznik Jednostek (Metric / Imperial — DEC-21 & BR-JEDN-001):** Płynne przełączanie między systemem metrycznym (°C, g, ml) i imperialnym (°F, oz, fl oz) z zachowaniem wewnętrznej precyzji obliczeniowej i trwałą persystencją w SQLite.
    - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite.
    - Eksport i import bazy w formacie JSON.
    - Model uczciwej monetyzacji (Darmowy rdzeń + Pro: 3,99 zł/mies., 19,99 zł/rok z 14-dniowym okresem próbnym, 59,99 zł Lifetime + Chmura rodzinna).
@@ -142,10 +145,14 @@ napar/
 │       ├── knowledge-data.ts   # Kompendium wiedzy o odmianach, obróbkach, terroir i herbatach
 │       ├── database-schema.ts  # DDL i schemat SQLite
 │       ├── database.ts         # Klient expo-sqlite i repozytoria
+│       ├── grinder-converter.ts# Baza modeli młynków i konwersja mikronów
+│       ├── recipe-share.ts     # Kodowanie receptur QR SVG i Deep Links
+│       ├── unit-converter.ts   # Dwukierunkowa konwersja jednostek Metric/Imperial
+│       ├── i18n.tsx            # Pełne wsparcie dwujęzyczne PL/EN
 │       ├── timer-engine.ts     # Maszyna stanów stopera i haptyka
 │       ├── brew-context.tsx    # Główny React Context aktywnej sesji
 │       ├── theme.ts            # Tokeny stylistyczne (Apps4Brew artisanal)
-│       └── __tests__/          # 28 zestawów testowych (228 testów, mutacje i PBT)
+│       └── __tests__/          # 30 zestawów testowych (259 testów, mutacje i PBT)
 └── napar_brd/                  # Pełna dokumentacja wymagań biznesowych BRD 0.1
 ```
 

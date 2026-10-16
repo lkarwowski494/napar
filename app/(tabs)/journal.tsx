@@ -12,8 +12,12 @@ import {
   Pressable,
   Alert,
   TextInput,
+  Share,
 } from 'react-native';
-import { getBrewSessions, deleteBrewSession } from '../../src/core/database';
+import { useRouter } from 'expo-router';
+import { useBrew } from '../../src/core/brew-context';
+import { MASTER_RECIPES } from '../../src/core/recipes-data';
+import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems } from '../../src/core/database';
 import { BrewSession } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
@@ -21,6 +25,16 @@ import { SensoryRadarChart, SensoryProfile } from '../../src/core/radar-chart';
 import { getWaterProfileName } from '../../src/core/water-chemistry';
 
 export default function JournalScreen() {
+  const router = useRouter();
+  const {
+    selectRecipe,
+    selectInventoryItem,
+    setDoseGrams,
+    setWaterGrams,
+    setWaterTempCelsius,
+    setGrindSetting,
+    setWaterProfile,
+  } = useBrew();
   const { t, language } = useTranslation();
   const [sessions, setSessions] = useState<BrewSession[]>([]);
   const [viewMode, setViewMode] = useState<'sessions' | 'analytics'>('sessions');
@@ -152,6 +166,74 @@ export default function JournalScreen() {
         },
       ]
     );
+  };
+
+  const handleBrewAgain = (session: BrewSession) => {
+    try {
+      const userRecipes = getRecipes();
+      const allRecipes = [...userRecipes, ...MASTER_RECIPES];
+      let foundRecipe = session.recipeId
+        ? allRecipes.find((r) => r.id === session.recipeId)
+        : undefined;
+
+      if (!foundRecipe && session.recipeName) {
+        foundRecipe = allRecipes.find(
+          (r) => r.name.toLowerCase() === session.recipeName!.toLowerCase()
+        );
+      }
+
+      if (!foundRecipe) {
+        foundRecipe =
+          allRecipes.find((r) => r.method.toLowerCase() === session.method.toLowerCase()) ||
+          MASTER_RECIPES[0];
+      }
+
+      selectRecipe(foundRecipe);
+
+      if (session.inventoryItemId || session.inventoryItemName) {
+        const inventory = getInventoryItems(true);
+        const foundItem = session.inventoryItemId
+          ? inventory.find((i) => i.id === session.inventoryItemId)
+          : inventory.find((i) => i.name.toLowerCase() === session.inventoryItemName!.toLowerCase());
+        selectInventoryItem(foundItem || null);
+      } else {
+        selectInventoryItem(null);
+      }
+
+      if (session.doseGrams) setDoseGrams(session.doseGrams);
+      if (session.waterGrams) setWaterGrams(session.waterGrams);
+      if (session.waterTempCelsius) setWaterTempCelsius(session.waterTempCelsius);
+      if (session.grindSetting) setGrindSetting(session.grindSetting);
+      if (session.waterProfile) setWaterProfile(session.waterProfile);
+
+      router.navigate('/');
+      Alert.alert(t.journal.sessionLoadedTitle, t.journal.sessionLoadedMsg);
+    } catch {
+      router.navigate('/');
+    }
+  };
+
+  const handleShareSession = (session: BrewSession) => {
+    const formattedDate = formatDateTime(session.brewedAt);
+    const title = session.recipeName || session.method;
+    const bean = session.inventoryItemName ? `\n🫘 Ziarno: ${session.inventoryItemName}` : '';
+    const ratingStr = session.rating ? `\n⭐ Ocena: ★ ${session.rating.toFixed(1)}/5` : '';
+    const balanceStr = session.tasteBalance ? `\n🎯 Balans: ${session.tasteBalance}` : '';
+    const eyStr = session.extractionYieldPercentage ? ` (EY: ${session.extractionYieldPercentage.toFixed(1)}%)` : '';
+    const tagsStr = session.flavorTags && session.flavorTags.length > 0 ? `\n🌸 Nuty: ${session.flavorTags.join(', ')}` : '';
+    const notesStr = session.notes ? `\n📝 Notatki: "${session.notes}"` : '';
+
+    const shareMessage = `☕ ${title} — Napar (Steepwise)
+📅 ${formattedDate}${bean}
+⚖️ Doza: ${session.doseGrams}g | Woda: ${session.waterGrams}g | Temp: ${session.waterTempCelsius}°C
+⏱️ Czas parzenia: ${formatSeconds(session.totalTimeSeconds)}${ratingStr}${balanceStr}${eyStr}${tagsStr}${notesStr}
+
+Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
+
+    Share.share({
+      title: `${title} · Notatka degustacyjna`,
+      message: shareMessage,
+    });
   };
 
   const formatDateTime = (iso: string) => {
@@ -397,9 +479,37 @@ export default function JournalScreen() {
 
             <View style={styles.cardFooter}>
               <Text style={styles.dateText}>{formatDateTime(session.brewedAt)}</Text>
-              <Pressable onPress={() => handleDelete(session)} hitSlop={10}>
-                <Text style={styles.deleteText}>Usuń</Text>
-              </Pressable>
+              <View style={styles.cardActionsRow}>
+                <Pressable
+                  testID={`brew-again-btn-${session.id}`}
+                  style={styles.cardActionBtn}
+                  onPress={() => handleBrewAgain(session)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${t.journal.brewAgain}: ${session.recipeName || session.method}`}
+                >
+                  <Text style={styles.cardActionBtnText}>🔁 {t.journal.brewAgain}</Text>
+                </Pressable>
+
+                <Pressable
+                  testID={`share-session-btn-${session.id}`}
+                  style={[styles.cardActionBtn, styles.cardActionBtnSecondary]}
+                  onPress={() => handleShareSession(session)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${t.journal.shareSession}: ${session.recipeName || session.method}`}
+                >
+                  <Text style={styles.cardActionBtnSecondaryText}>📤 {t.journal.shareSession}</Text>
+                </Pressable>
+
+                <Pressable
+                  testID={`delete-session-btn-${session.id}`}
+                  onPress={() => handleDelete(session)}
+                  hitSlop={10}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Usuń sesję: ${session.recipeName || session.method}`}
+                >
+                  <Text style={styles.deleteText}>Usuń</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
         ))
@@ -709,10 +819,38 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: theme.colors.textMuted,
   },
+  cardActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  cardActionBtn: {
+    backgroundColor: theme.colors.copperMuted,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: theme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+  },
+  cardActionBtnText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: theme.colors.copper,
+  },
+  cardActionBtnSecondary: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderColor: theme.colors.border,
+  },
+  cardActionBtnSecondaryText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
   deleteText: {
     fontSize: 12,
     color: theme.colors.danger,
     fontWeight: '600',
+    marginLeft: 4,
   },
   searchBarContainer: {
     marginBottom: 10,

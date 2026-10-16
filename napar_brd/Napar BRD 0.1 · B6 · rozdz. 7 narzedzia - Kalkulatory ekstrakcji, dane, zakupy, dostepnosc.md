@@ -12,7 +12,7 @@
 
 ### **BR-KALK-002: Kalkulator TDS i Extraction Yield (Wydajność ekstrakcji)**
 * **Opis:** Obliczenie procentowej wydajności ekstrakcji na podstawie wzoru SCA:
-  $$EY\,\% = \frac{\text{Waga naparu (g)} \times \text{TDS (\%)}}{\text{Doza sucha (g)}}$$
+  $$EY\\,\\% = \\frac{\\text{Waga naparu (g)} \\times \\text{TDS (\\%)}}{\\text{Doza sucha (g)}}$$
 * **Kryteria akceptacji:**
   1. Wynik porównywany z zakresem optymalnym SCA (18.0% – 22.0%).
   2. Komentarz wizualny: *Poniżej 18% = Under-extracted; 18–22% = Ideal; Powyżej 22% = Over-extracted*.
@@ -39,4 +39,13 @@
   1. Każdy przycisk, pole edycyjne i faza timera posiada precyzyjne `accessibilityLabel` i `accessibilityHint`.
   2. Timer w trybie VoiceOver anonsuje zmiany fazy głosem syntetycznym.
   3. Skalowanie czcionek do największych rozmiarów Dynamic Type bez ucinania tekstu.
+* **Priorytet:** MUST | **Etap:** MVP
+
+### **BR-JEDN-001: Globalny przełącznik jednostek miar (Metric / Imperial — DEC-21)**
+* **Opis:** Obsługa jednostek metrycznych (°C, g, ml) oraz imperialnych (°F, oz, fl oz) z globalnym selektorem w Ustawieniach.
+* **Persona:** Michał (P1), Piotr (P3), użytkownicy rynków USA/UK.
+* **Kryteria akceptacji:**
+  1. Precyzyjne, deterministyczne formuły przeliczeniowe temperatury ($F = C \times 1.8 + 32$), gramatur surowca ($1\,\text{oz} \approx 28.35\,\text{g}$) oraz objętości wody ($1\,\text{fl oz} \approx 29.57\,\text{ml}$).
+  2. Wybór jednostek jest trwale zapamiętywany w lokalnej bazie danych SQLite (`app_settings`).
+  3. Wszystkie ekrany aplikacji (Asystent Parzenia, Spiżarnia, Dziennik, Kalkulatory) respektują wybrany układ jednostek.
 * **Priorytet:** MUST | **Etap:** MVP

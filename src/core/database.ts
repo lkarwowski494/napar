@@ -605,3 +605,13 @@ export function setAppSetting(key: string, value: string): void {
     // ignoruj błąd w środowisku testowym
   }
 }
+
+export function getUnitSystem(): 'metric' | 'imperial' {
+  const val = getAppSetting('unit_system', 'metric');
+  return val === 'imperial' ? 'imperial' : 'metric';
+}
+
+export function setUnitSystem(unit: 'metric' | 'imperial'): void {
+  setAppSetting('unit_system', unit);
+}
+

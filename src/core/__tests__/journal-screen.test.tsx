@@ -4,14 +4,32 @@
 // ============================================================================
 
 import React from 'react';
-import { Alert } from 'react-native';
+import { Alert, Share } from 'react-native';
 import renderer, { act } from 'react-test-renderer';
 import JournalScreen from '../../../app/(tabs)/journal';
+import { BrewProvider } from '../brew-context';
 import { getBrewSessions, deleteBrewSession } from '../database';
+
+const mockPush = jest.fn();
+const mockNavigate = jest.fn();
+
+jest.mock('expo-router', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    navigate: mockNavigate,
+  }),
+  Link: ({ children }: any) => children,
+}));
+
+jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
 
 jest.mock('../database', () => ({
   getBrewSessions: jest.fn(),
   deleteBrewSession: jest.fn(),
+  getRecipes: jest.fn(() => []),
+  getInventoryItems: jest.fn(() => []),
+  getAppSetting: jest.fn(() => null),
+  setAppSetting: jest.fn(),
 }));
 
 const mockSessions = [
@@ -62,7 +80,11 @@ describe('JournalScreen Integration', () => {
   test('Renderuje sesje parzenia z wykrytym Spider Graph sensoryki', () => {
     let tree: any;
     act(() => {
-      tree = renderer.create(<JournalScreen />);
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
     });
 
     const str = JSON.stringify(tree.toJSON());
@@ -74,7 +96,11 @@ describe('JournalScreen Integration', () => {
   test('Filtruje listę sesji po wpisaniu frazy wyszukiwania w search bar', () => {
     let tree: any;
     act(() => {
-      tree = renderer.create(<JournalScreen />);
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
     });
 
     const searchInput = tree.root.findByProps({
@@ -94,7 +120,11 @@ describe('JournalScreen Integration', () => {
   test('Filtruje listę po wyborze chipa filtrów Kawa', () => {
     let tree: any;
     act(() => {
-      tree = renderer.create(<JournalScreen />);
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
     });
 
     const coffeeChip = tree.root.findAll((node: any) => {
@@ -121,7 +151,11 @@ describe('JournalScreen Integration', () => {
     const alertSpy = jest.spyOn(Alert, 'alert');
     let tree: any;
     act(() => {
-      tree = renderer.create(<JournalScreen />);
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
     });
 
     const deleteBtn = findPressableWithText(tree.root, 'Usuń');
@@ -153,7 +187,11 @@ describe('JournalScreen Integration', () => {
   test('Przycisk Wyczyść filtry przy braku pasujących wyników wyszukiwania', () => {
     let tree: any;
     act(() => {
-      tree = renderer.create(<JournalScreen />);
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
     });
 
     const searchInput = tree.root.findByProps({
@@ -185,7 +223,11 @@ describe('JournalScreen Integration', () => {
     (getBrewSessions as jest.Mock).mockReturnValue([]);
     let tree: any;
     act(() => {
-      tree = renderer.create(<JournalScreen />);
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
     });
 
     const str = JSON.stringify(tree.toJSON());
@@ -195,7 +237,11 @@ describe('JournalScreen Integration', () => {
   test('Przełącza widok na Statystyki & Trendy (Brew Analytics) i wyświetla wolumen, rozkład metod i średni radar', () => {
     let tree: any;
     act(() => {
-      tree = renderer.create(<JournalScreen />);
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
     });
 
     const analyticsTab = tree.root.findByProps({ testID: 'journal-tab-analytics' });
@@ -223,6 +269,52 @@ describe('JournalScreen Integration', () => {
 
     const strBack = JSON.stringify(tree.toJSON());
     expect(strBack).toContain('Etiopia Yirgacheffe');
+  });
+
+  test('Przycisk Parz ponownie ładuje recepturę i parametry sesji do asystenta i nawiguje do ekranu głównego', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
+    });
+
+    const brewAgainBtn = tree.root.findByProps({ testID: 'brew-again-btn-sess-1' });
+    expect(brewAgainBtn).toBeDefined();
+
+    act(() => {
+      brewAgainBtn.props.onPress();
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+    expect(alertSpy).toHaveBeenCalledWith('Wczytano parametry', expect.any(String));
+    alertSpy.mockRestore();
+  });
+
+  test('Przycisk Udostępnij wywołuje Share.share z estetyczną notatką degustacyjną', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
+    });
+
+    const shareBtn = tree.root.findByProps({ testID: 'share-session-btn-sess-1' });
+    expect(shareBtn).toBeDefined();
+
+    act(() => {
+      shareBtn.props.onPress();
+    });
+
+    expect(Share.share).toHaveBeenCalledWith({
+      title: expect.stringContaining('V60 Hoffmann'),
+      message: expect.stringContaining('15g | Woda: 250g'),
+    });
   });
 });
 

@@ -28,6 +28,8 @@ import {
   escapeCsvValue,
   getAppSetting,
   setAppSetting,
+  getUnitSystem,
+  setUnitSystem,
 } from '../database';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../database-schema';
 
@@ -586,5 +588,13 @@ describe('Napar SQLite Database & Repositories', () => {
     // Zapisz nowe ustawienie
     setAppSetting('default_grinder', 'fellow_ode_gen2');
     expect(getAppSetting('default_grinder', 'comandante_c40')).toBe('fellow_ode_gen2');
+  });
+
+  test('Pobiera i zapisuje jednostki miar (getUnitSystem, setUnitSystem)', () => {
+    expect(getUnitSystem()).toBe('metric');
+    setUnitSystem('imperial');
+    expect(getUnitSystem()).toBe('imperial');
+    setUnitSystem('metric');
+    expect(getUnitSystem()).toBe('metric');
   });
 });
