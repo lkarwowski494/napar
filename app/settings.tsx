@@ -38,7 +38,11 @@ import {
   getRecipes,
   getBrewSessions,
   getCaffeineLogs,
+  BeveragePreference,
+  getBeveragePreference,
+  setBeveragePreference,
 } from '../src/core/database';
+import { useBrew } from '../src/core/brew-context';
 import {
   getHealthKitSyncEnabled,
   setHealthKitSyncEnabled,
@@ -59,6 +63,26 @@ import {
 
 export default function SettingsScreen() {
   const { t, language, setLanguage } = useTranslation();
+
+  let brewCtx: any = null;
+  try {
+    brewCtx = useBrew();
+  } catch {
+    // isolated test environment without BrewProvider
+  }
+
+  const [beveragePreference, setBeveragePreferenceState] = useState<BeveragePreference>(() => {
+    return brewCtx?.beveragePreference || getBeveragePreference();
+  });
+
+  const handleSelectBeveragePreference = (pref: BeveragePreference) => {
+    setBeveragePreferenceState(pref);
+    setBeveragePreference(pref);
+    if (brewCtx?.setBeveragePreference) {
+      brewCtx.setBeveragePreference(pref);
+    }
+  };
+
   const [selectedGrinder, setSelectedGrinder] = useState<string>(() => {
     return getAppSetting('default_grinder', 'comandante_c40');
   });
@@ -230,6 +254,68 @@ export default function SettingsScreen() {
           <Text style={[styles.langTabText, language === 'en' && styles.langTabTextActive]}>
             🇬🇧 English (Steepwise)
           </Text>
+        </Pressable>
+      </View>
+
+      {/* Preferencje Naparów (Kawa / Herbata / Kawa i herbata) */}
+      <Text style={styles.sectionTitle}>{t.settings.beverageSection}</Text>
+      <View style={styles.cardGroup}>
+        <Pressable
+          testID="beverage-pref-both"
+          style={styles.actionRow}
+          onPress={() => handleSelectBeveragePreference('both')}
+          accessibilityRole="button"
+          accessibilityLabel={t.settings.beverageBoth}
+        >
+          <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
+            <Text style={[styles.actionTitle, beveragePreference === 'both' && styles.actionTitleActive]}>
+              ☕ + 🍵 {t.settings.beverageBoth}
+            </Text>
+            <Text style={styles.actionSubtitle}>{t.settings.beverageBothDesc}</Text>
+          </View>
+          {beveragePreference === 'both' && (
+            <Text style={styles.checkIcon}>✓</Text>
+          )}
+        </Pressable>
+
+        <View style={styles.divider} />
+
+        <Pressable
+          testID="beverage-pref-coffee"
+          style={styles.actionRow}
+          onPress={() => handleSelectBeveragePreference('coffee')}
+          accessibilityRole="button"
+          accessibilityLabel={t.settings.beverageCoffeeOnly}
+        >
+          <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
+            <Text style={[styles.actionTitle, beveragePreference === 'coffee' && styles.actionTitleActive]}>
+              ☕ {t.settings.beverageCoffeeOnly}
+            </Text>
+            <Text style={styles.actionSubtitle}>{t.settings.beverageCoffeeOnlyDesc}</Text>
+          </View>
+          {beveragePreference === 'coffee' && (
+            <Text style={styles.checkIcon}>✓</Text>
+          )}
+        </Pressable>
+
+        <View style={styles.divider} />
+
+        <Pressable
+          testID="beverage-pref-tea"
+          style={styles.actionRow}
+          onPress={() => handleSelectBeveragePreference('tea')}
+          accessibilityRole="button"
+          accessibilityLabel={t.settings.beverageTeaOnly}
+        >
+          <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
+            <Text style={[styles.actionTitle, beveragePreference === 'tea' && styles.actionTitleActive]}>
+              🍵 {t.settings.beverageTeaOnly}
+            </Text>
+            <Text style={styles.actionSubtitle}>{t.settings.beverageTeaOnlyDesc}</Text>
+          </View>
+          {beveragePreference === 'tea' && (
+            <Text style={styles.checkIcon}>✓</Text>
+          )}
         </Pressable>
       </View>
 
@@ -792,6 +878,16 @@ const styles = StyleSheet.create({
   },
   actionArrow: {
     fontSize: 18,
+    color: theme.colors.copper,
+    marginLeft: 12,
+  },
+  actionTitleActive: {
+    color: theme.colors.copper,
+    fontWeight: '700',
+  },
+  checkIcon: {
+    fontSize: 18,
+    fontWeight: '700',
     color: theme.colors.copper,
     marginLeft: 12,
   },

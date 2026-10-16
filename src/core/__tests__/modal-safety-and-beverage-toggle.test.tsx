@@ -416,4 +416,67 @@ describe('Modal Safety & Beverage Toggle Tests', () => {
     expect(str).toContain('Kinu M47');
     expect(str).toContain('Eureka Mignon');
   });
+
+  test('Dynamiczne dostosowanie interfejsu do preferencji naparów (Tylko kawa, Tylko herbata, Kawa i herbata)', () => {
+    // 1. Tryb: Tylko kawa ('coffee')
+    mockDb.app_settings.set('beverage_preference', 'coffee');
+    let treeCoffee: any;
+    act(() => {
+      treeCoffee = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const rootCoffee = treeCoffee.root;
+    // Przełącznik kawa/herbata w nagłówku jest ukryty
+    expect(rootCoffee.findAllByProps({ testID: 'beverage-toggle-coffee' }).length).toBe(0);
+    // Gongfu Cha jest ukryte
+    expect(rootCoffee.findAllByProps({ testID: 'gongfu-mode-btn' }).length).toBe(0);
+    // Młynek do kawy jest widoczny
+    expect(rootCoffee.findAllByProps({ testID: 'grinder-pill-btn' }).length).toBeGreaterThan(0);
+
+    // W modalu receptur nie ma filtrów Kawa / Herbata
+    const changeRecipeBtn = rootCoffee.findByProps({ testID: 'change-recipe-btn' });
+    act(() => {
+      changeRecipeBtn.props.onPress();
+    });
+    expect(rootCoffee.findAllByProps({ testID: 'recipe-filter-tea' }).length).toBe(0);
+
+    // 2. Tryb: Tylko herbata ('tea')
+    mockDb.app_settings.set('beverage_preference', 'tea');
+    let treeTea: any;
+    act(() => {
+      treeTea = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const rootTea = treeTea.root;
+    // Przełącznik kawa/herbata w nagłówku jest ukryty
+    expect(rootTea.findAllByProps({ testID: 'beverage-toggle-coffee' }).length).toBe(0);
+    // Młynek do kawy jest ukryty dla herbaty
+    expect(rootTea.findAllByProps({ testID: 'grinder-pill-btn' }).length).toBe(0);
+    // Gongfu Cha jest dostępne
+    expect(rootTea.findAllByProps({ testID: 'gongfu-mode-btn' }).length).toBeGreaterThan(0);
+
+    // 3. Tryb: Kawa i herbata ('both')
+    mockDb.app_settings.set('beverage_preference', 'both');
+    let treeBoth: any;
+    act(() => {
+      treeBoth = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const rootBoth = treeBoth.root;
+    // Przełącznik jest widoczny
+    expect(rootBoth.findAllByProps({ testID: 'beverage-toggle-coffee' }).length).toBeGreaterThan(0);
+  });
 });
+

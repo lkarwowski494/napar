@@ -35,17 +35,37 @@ import {
 import { CaffeineIcon } from '../../src/components/icons/CraftIcons';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
-import { getUnitSystem } from '../../src/core/database';
+import { getUnitSystem, getBeveragePreference } from '../../src/core/database';
+import { useBrew } from '../../src/core/brew-context';
 import { formatDoseWeight, formatWaterWeight } from '../../src/core/unit-converter';
 
 export default function DialInScreen() {
   const router = useRouter();
   const { t, language } = useTranslation();
   const unitSystem = getUnitSystem();
+  let brewCtx: ReturnType<typeof useBrew> | null = null;
+  try {
+    brewCtx = useBrew();
+  } catch {
+    brewCtx = null;
+  }
+  const beveragePreference = brewCtx?.beveragePreference ?? (() => {
+    try {
+      return getBeveragePreference();
+    } catch {
+      return 'both';
+    }
+  })();
   const [activeTab, setActiveTab] = useState<'doctor' | 'ratio' | 'ey' | 'water'>('doctor');
 
   // Stan: Dial-in Doctor
   const [selectedIssue, setSelectedIssue] = useState<string>('sour');
+
+  React.useEffect(() => {
+    if (beveragePreference === 'coffee' && selectedIssue === 'astringent_tea') {
+      setSelectedIssue('sour');
+    }
+  }, [beveragePreference, selectedIssue]);
 
   // Stan: Kalkulator Mineralizacji Wody
   const [selectedWaterRecipeId, setSelectedWaterRecipeId] = useState<string>('barista_hustle_80_40');
@@ -289,11 +309,15 @@ export default function DialInScreen() {
                 title: '💧 Płaska / mdła / wodnista',
                 desc: 'Brak ciała, herbaciana konsystencja bez wyrazistej słodyczy.',
               },
-              {
-                id: 'astringent_tea',
-                title: '🍵 Herbata ściągająca gardło',
-                desc: 'Zbyt wysoka temperatura zniszczyła subtelne katechiny i l-teaninę.',
-              },
+              ...(beveragePreference !== 'coffee'
+                ? [
+                    {
+                      id: 'astringent_tea',
+                      title: '🍵 Herbata ściągająca gardło',
+                      desc: 'Zbyt wysoka temperatura zniszczyła subtelne katechiny i l-teaninę.',
+                    },
+                  ]
+                : []),
             ].map((issue) => (
               <Pressable
                 key={issue.id}
@@ -421,12 +445,12 @@ export default function DialInScreen() {
             <Text style={styles.inputTitle}>{t.dialin.ratioSelectLabel || 'Wybierz Ratio (Kawa : Woda)'}</Text>
             <View style={styles.ratioPresetsRow}>
               {[
-                { r: 15.0, label: '1:15 (Mocna)' },
-                { r: 16.6, label: '1:16.6 (Standard)' },
-                { r: 17.5, label: '1:17.5 (Lekka)' },
-                { r: 20.0, label: '1:20 (Gongfu)' },
-                { r: 2.0, label: '1:2 (Espresso)' },
-                { r: 50.0, label: '1:50 (Herbata)' },
+                ...(beveragePreference !== 'tea' ? [{ r: 15.0, label: '1:15 (Mocna)' }] : []),
+                ...(beveragePreference !== 'tea' ? [{ r: 16.6, label: '1:16.6 (Standard)' }] : []),
+                ...(beveragePreference !== 'tea' ? [{ r: 17.5, label: '1:17.5 (Lekka)' }] : []),
+                ...(beveragePreference !== 'coffee' ? [{ r: 20.0, label: '1:20 (Gongfu)' }] : []),
+                ...(beveragePreference !== 'tea' ? [{ r: 2.0, label: '1:2 (Espresso)' }] : []),
+                ...(beveragePreference !== 'coffee' ? [{ r: 50.0, label: '1:50 (Herbata)' }] : []),
               ].map((item) => (
                 <Pressable
                   key={item.r}

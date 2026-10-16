@@ -96,6 +96,7 @@ export default function BrewScreen() {
     grinderId,
     setGrinderId,
     grinderRecommendation,
+    beveragePreference,
   } = useBrew();
 
   const [allRecipes, setAllRecipes] = useState<any[]>(MASTER_RECIPES);
@@ -119,15 +120,35 @@ export default function BrewScreen() {
       ? recipe.beverageType === 'TEA'
       : (recipe as any).type === 'TEA';
 
-  const [currentBeverageType, setCurrentBeverageType] = useState<'COFFEE' | 'TEA'>(
-    isCurrentRecipeTea ? 'TEA' : 'COFFEE'
-  );
+  const [currentBeverageType, setCurrentBeverageType] = useState<'COFFEE' | 'TEA'>(() => {
+    if (beveragePreference === 'tea') return 'TEA';
+    if (beveragePreference === 'coffee') return 'COFFEE';
+    return isCurrentRecipeTea ? 'TEA' : 'COFFEE';
+  });
 
   useEffect(() => {
-    setCurrentBeverageType(isCurrentRecipeTea ? 'TEA' : 'COFFEE');
-  }, [isCurrentRecipeTea]);
+    if (beveragePreference === 'tea') {
+      setCurrentBeverageType('TEA');
+    } else if (beveragePreference === 'coffee') {
+      setCurrentBeverageType('COFFEE');
+    } else {
+      setCurrentBeverageType(isCurrentRecipeTea ? 'TEA' : 'COFFEE');
+    }
+  }, [beveragePreference, isCurrentRecipeTea]);
 
-  const [recipeCategoryFilter, setRecipeCategoryFilter] = useState<'ALL' | 'COFFEE' | 'TEA'>('ALL');
+  const [recipeCategoryFilter, setRecipeCategoryFilter] = useState<'ALL' | 'COFFEE' | 'TEA'>(() => {
+    if (beveragePreference === 'tea') return 'TEA';
+    if (beveragePreference === 'coffee') return 'COFFEE';
+    return 'ALL';
+  });
+
+  useEffect(() => {
+    if (beveragePreference === 'tea') {
+      setRecipeCategoryFilter('TEA');
+    } else if (beveragePreference === 'coffee') {
+      setRecipeCategoryFilter('COFFEE');
+    }
+  }, [beveragePreference]);
 
   const handleBeverageTypeChange = (type: 'COFFEE' | 'TEA') => {
     setCurrentBeverageType(type);
@@ -145,22 +166,34 @@ export default function BrewScreen() {
   };
 
   const displayedRecipes = useMemo(() => {
+    if (beveragePreference === 'coffee') {
+      return allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'COFFEE' : r.type === 'COFFEE'));
+    }
+    if (beveragePreference === 'tea') {
+      return allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'TEA' : r.type === 'TEA'));
+    }
     if (recipeCategoryFilter === 'ALL') return allRecipes;
     return allRecipes.filter((r) => {
       const type = 'beverageType' in r ? r.beverageType : r.type;
       return type === recipeCategoryFilter;
     });
-  }, [allRecipes, recipeCategoryFilter]);
+  }, [allRecipes, recipeCategoryFilter, beveragePreference]);
 
   const recentFiveStarSession = useMemo(() => {
     try {
       const sessions = getBrewSessions();
       if (!sessions || sessions.length === 0) return null;
-      return sessions.find((s) => (s.rating || 0) >= 4.5) || sessions[0] || null;
+      const filtered = sessions.filter((s) => {
+        if (beveragePreference === 'coffee' && s.beverageType !== 'COFFEE') return false;
+        if (beveragePreference === 'tea' && s.beverageType !== 'TEA') return false;
+        return true;
+      });
+      if (filtered.length === 0) return null;
+      return filtered.find((s) => (s.rating || 0) >= 4.5) || filtered[0] || null;
     } catch {
       return null;
     }
-  }, [allRecipes]);
+  }, [allRecipes, beveragePreference]);
 
   const handleQuickReBrew = (s: any) => {
     const foundRecipe = allRecipes.find(
@@ -403,6 +436,7 @@ export default function BrewScreen() {
         grinderRecommendation={grinderRecommendation}
         favoriteRecipes={favoriteRecipes}
         isRunning={isRunning || isPaused}
+        beveragePreference={beveragePreference}
         beverageType={currentBeverageType}
         onBeverageTypeChange={handleBeverageTypeChange}
         onSelectRecipe={handleSelectRecipe}
@@ -495,8 +529,9 @@ export default function BrewScreen() {
             </Pressable>
           </View>
           <ScrollView>
-            {/* Filtr Kawa vs Herbata */}
-            <View style={styles.recipeFilterTabsRow} accessibilityRole="tablist">
+            {/* Filtr Kawa vs Herbata — widoczny wyłącznie gdy preferencja to 'Kawa i Herbata' (both) */}
+            {(!beveragePreference || beveragePreference === 'both') && (
+              <View style={styles.recipeFilterTabsRow} accessibilityRole="tablist">
               <Pressable
                 testID="recipe-filter-all"
                 style={[
@@ -558,6 +593,7 @@ export default function BrewScreen() {
                 </Text>
               </Pressable>
             </View>
+            )}
 
             <View style={styles.modalActionButtonsRow}>
               <Pressable
@@ -578,15 +614,17 @@ export default function BrewScreen() {
                 </Text>
               </Pressable>
 
-              <Pressable
-                style={styles.gongfuModalBtn}
-                onPress={() => {
-                  setShowRecipeModal(false);
-                  router.push('/gongfu');
-                }}
-              >
-                <Text style={styles.gongfuModalBtnText}>🍵 Gongfu Cha</Text>
-              </Pressable>
+              {beveragePreference !== 'coffee' && (
+                <Pressable
+                  style={styles.gongfuModalBtn}
+                  onPress={() => {
+                    setShowRecipeModal(false);
+                    router.push('/gongfu');
+                  }}
+                >
+                  <Text style={styles.gongfuModalBtnText}>🍵 Gongfu Cha</Text>
+                </Pressable>
+              )}
 
               <Pressable
                 style={styles.importRecipeModalBtn}

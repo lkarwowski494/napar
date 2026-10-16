@@ -610,6 +610,55 @@ describe('SettingsScreen Component', () => {
       ['healthkit_sync_enabled', 'false']
     );
   });
+
+  test('Przełącza preferencje naparów (Kawa i herbata / Tylko kawa / Tylko herbata)', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <SettingsScreen />
+        </LanguageProvider>
+      );
+    });
+
+    const coffeeOnlyBtn = tree.root.findByProps({ testID: 'beverage-pref-coffee' });
+    const teaOnlyBtn = tree.root.findByProps({ testID: 'beverage-pref-tea' });
+    const bothBtn = tree.root.findByProps({ testID: 'beverage-pref-both' });
+
+    expect(coffeeOnlyBtn).toBeTruthy();
+    expect(teaOnlyBtn).toBeTruthy();
+    expect(bothBtn).toBeTruthy();
+
+    // 1. Wybierz tylko kawę
+    renderer.act(() => {
+      coffeeOnlyBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['beverage_preference', 'coffee']
+    );
+
+    // 2. Wybierz tylko herbatę
+    renderer.act(() => {
+      teaOnlyBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['beverage_preference', 'tea']
+    );
+
+    // 3. Powrót do Kawa i herbata
+    renderer.act(() => {
+      bothBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['beverage_preference', 'both']
+    );
+  });
 });
 
 

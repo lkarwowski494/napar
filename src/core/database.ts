@@ -740,6 +740,16 @@ export function setHealthKitSyncEnabled(enabled: boolean): void {
   setAppSetting('healthkit_sync_enabled', enabled ? 'true' : 'false');
 }
 
+export type BeveragePreference = 'both' | 'coffee' | 'tea';
 
+export function getBeveragePreference(): BeveragePreference {
+  const val = getAppSetting('beverage_preference', 'both');
+  if (val === 'coffee' || val === 'tea') {
+    return val;
+  }
+  return 'both';
+}
 
-
+export function setBeveragePreference(pref: BeveragePreference): void {
+  setAppSetting('beverage_preference', pref);
+}

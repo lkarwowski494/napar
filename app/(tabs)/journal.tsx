@@ -30,15 +30,20 @@ import { StarIcon, JournalIcon } from '../../src/components/icons/CraftIcons';
 
 export default function JournalScreen() {
   const router = useRouter();
-  const {
-    selectRecipe,
-    selectInventoryItem,
-    setDoseGrams,
-    setWaterGrams,
-    setWaterTempCelsius,
-    setGrindSetting,
-    setWaterProfile,
-  } = useBrew();
+  let brewCtx: ReturnType<typeof useBrew> | null = null;
+  try {
+    brewCtx = useBrew();
+  } catch {
+    brewCtx = null;
+  }
+  const selectRecipe = brewCtx?.selectRecipe ?? (() => {});
+  const selectInventoryItem = brewCtx?.selectInventoryItem ?? (() => {});
+  const setDoseGrams = brewCtx?.setDoseGrams ?? (() => {});
+  const setWaterGrams = brewCtx?.setWaterGrams ?? (() => {});
+  const setWaterTempCelsius = brewCtx?.setWaterTempCelsius ?? (() => {});
+  const setGrindSetting = brewCtx?.setGrindSetting ?? (() => {});
+  const setWaterProfile = brewCtx?.setWaterProfile ?? (() => {});
+  const beveragePreference = brewCtx?.beveragePreference ?? 'both';
   const { t, language } = useTranslation();
   const { canCreate, isHistoryReadOnly, refresh } = useAppAccess();
   const [unitSystem] = useState<'metric' | 'imperial'>(() => {
@@ -54,13 +59,29 @@ export default function JournalScreen() {
   const [filterType, setFilterType] = useState<'all' | 'coffee' | 'tea' | 'high_rated'>('all');
   const [showPaywall, setShowPaywall] = useState(false);
 
+  useEffect(() => {
+    if (beveragePreference === 'coffee' && filterType === 'tea') {
+      setFilterType('all');
+    } else if (beveragePreference === 'tea' && filterType === 'coffee') {
+      setFilterType('all');
+    }
+  }, [beveragePreference, filterType]);
+
+  const relevantSessions = useMemo(() => {
+    return sessions.filter((s) => {
+      if (beveragePreference === 'coffee' && s.beverageType === 'TEA') return false;
+      if (beveragePreference === 'tea' && s.beverageType === 'COFFEE') return false;
+      return true;
+    });
+  }, [sessions, beveragePreference]);
+
   const analyticsData = useMemo(() => {
-    const totalBrews = sessions.length;
-    const totalDoseGrams = sessions.reduce((acc, s) => acc + (s.doseGrams || 0), 0);
-    const totalWaterGrams = sessions.reduce((acc, s) => acc + (s.waterGrams || 0), 0);
+    const totalBrews = relevantSessions.length;
+    const totalDoseGrams = relevantSessions.reduce((acc, s) => acc + (s.doseGrams || 0), 0);
+    const totalWaterGrams = relevantSessions.reduce((acc, s) => acc + (s.waterGrams || 0), 0);
     const totalWaterLiters = (totalWaterGrams / 1000).toFixed(1);
-    const totalCaffeineMg = Math.round(sessions.reduce((acc, s) => acc + (s.caffeineContentMg || 0), 0));
-    const ratedSessions = sessions.filter((s) => typeof s.rating === 'number' && s.rating > 0);
+    const totalCaffeineMg = Math.round(relevantSessions.reduce((acc, s) => acc + (s.caffeineContentMg || 0), 0));
+    const ratedSessions = relevantSessions.filter((s) => typeof s.rating === 'number' && s.rating > 0);
     const avgRating =
       ratedSessions.length > 0
         ? (ratedSessions.reduce((acc, s) => acc + s.rating!, 0) / ratedSessions.length).toFixed(1)
@@ -68,7 +89,7 @@ export default function JournalScreen() {
 
     // Rozkład metod
     const methodCounts: Record<string, number> = {};
-    for (const s of sessions) {
+    for (const s of relevantSessions) {
       const m = s.method || 'Inna';
       methodCounts[m] = (methodCounts[m] || 0) + 1;
     }
@@ -81,7 +102,7 @@ export default function JournalScreen() {
       .sort((a, b) => b.count - a.count);
 
     // Średni radar sensoryczny
-    const sensorySessions = sessions.filter((s) => s.sensory);
+    const sensorySessions = relevantSessions.filter((s) => s.sensory);
     let avgSensory: SensoryProfile | null = null;
     if (sensorySessions.length > 0) {
       const sumSensory = sensorySessions.reduce(
@@ -116,7 +137,7 @@ export default function JournalScreen() {
       weak: 0,
       too_strong: 0,
     };
-    for (const s of sessions) {
+    for (const s of relevantSessions) {
       if (s.tasteBalance && balanceCounts[s.tasteBalance] !== undefined) {
         balanceCounts[s.tasteBalance]++;
       }
@@ -124,7 +145,7 @@ export default function JournalScreen() {
 
     // Nuty smakowe (Top flavor tags)
     const tagCounts: Record<string, number> = {};
-    for (const s of sessions) {
+    for (const s of relevantSessions) {
       if (Array.isArray(s.flavorTags)) {
         for (const tg of s.flavorTags) {
           tagCounts[tg] = (tagCounts[tg] || 0) + 1;
@@ -148,7 +169,7 @@ export default function JournalScreen() {
       balanceCounts,
       topTags,
     };
-  }, [sessions]);
+  }, [relevantSessions]);
 
   const loadSessions = () => {
     try {
@@ -271,7 +292,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
     return `${mins}:${s.toString().padStart(2, '0')}`;
   };
 
-  const filteredSessions = sessions.filter((s) => {
+  const filteredSessions = relevantSessions.filter((s) => {
     if (filterType === 'coffee' && s.beverageType !== 'COFFEE') return false;
     if (filterType === 'tea' && s.beverageType !== 'TEA') return false;
     if (filterType === 'high_rated' && (!s.rating || s.rating < 4.5)) return false;
@@ -294,8 +315,8 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
       <View style={styles.headerBox}>
         <Text style={styles.headerTitle}>{t.journal.title}</Text>
         <Text style={styles.headerSub}>
-          {t.journal.totalBrews}: {sessions.length}
-          {filteredSessions.length !== sessions.length ? ` (widoczne: ${filteredSessions.length})` : ''}
+          {t.journal.totalBrews}: {relevantSessions.length}
+          {filteredSessions.length !== relevantSessions.length ? ` (widoczne: ${filteredSessions.length})` : ''}
         </Text>
       </View>
 
@@ -315,7 +336,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
           testID="journal-tab-sessions"
         >
           <Text style={[styles.viewModeTabText, viewMode === 'sessions' && styles.viewModeTabTextActive]}>
-            {`${t.journal.sessionsTab} (${sessions.length})`}
+            {`${t.journal.sessionsTab} (${relevantSessions.length})`}
           </Text>
         </Pressable>
         <Pressable
@@ -347,8 +368,8 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
       <View style={styles.filterChipsRow}>
         {[
           { key: 'all', label: t.journal.filterAll },
-          { key: 'coffee', label: t.journal.filterCoffee },
-          { key: 'tea', label: t.journal.filterTea },
+          ...(beveragePreference !== 'tea' ? [{ key: 'coffee', label: t.journal.filterCoffee }] : []),
+          ...(beveragePreference !== 'coffee' ? [{ key: 'tea', label: t.journal.filterTea }] : []),
           { key: 'high_rated', label: t.journal.filterHighRated },
         ].map((f) => (
           <Pressable
@@ -371,7 +392,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
         ))}
       </View>
 
-      {sessions.length === 0 ? (
+      {relevantSessions.length === 0 ? (
         <View style={styles.emptyContainer}>
           <JournalIcon size={44} color={theme.colors.copper} />
           <Text style={styles.emptyTitle}>{t.journal.emptyTitle}</Text>

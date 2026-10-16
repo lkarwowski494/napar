@@ -21,6 +21,9 @@ import {
   setAppSetting,
   getVoiceAnnounceEnabled,
   getHapticsEnabled,
+  BeveragePreference,
+  getBeveragePreference,
+  setBeveragePreference as setBeveragePreferenceDb,
 } from './database';
 import { autoBackup } from './backup';
 import {
@@ -40,6 +43,8 @@ export interface BrewContextType {
   grindSetting: string;
   scaledSteps: RecipeStep[];
   snapshot: TimerSnapshot;
+  beveragePreference: BeveragePreference;
+  setBeveragePreference: (pref: BeveragePreference) => void;
   // Actions
   selectRecipe: (recipe: SavedRecipe | MasterRecipe) => void;
   selectInventoryItem: (item: InventoryItem | null) => void;
@@ -71,7 +76,9 @@ export interface BrewContextType {
   }) => BrewSession;
 }
 
-const defaultRecipe = MASTER_RECIPES[0];
+const defaultCoffeeRecipe = MASTER_RECIPES.find((r) => r.type === 'COFFEE') || MASTER_RECIPES[0];
+const defaultTeaRecipe = MASTER_RECIPES.find((r) => r.type === 'TEA') || MASTER_RECIPES[3];
+const defaultRecipe = defaultCoffeeRecipe;
 
 const defaultInitialSnapshot: TimerSnapshot = {
   status: 'idle',
@@ -97,7 +104,22 @@ const defaultInitialSnapshot: TimerSnapshot = {
 const BrewContext = createContext<BrewContextType | undefined>(undefined);
 
 export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [recipe, setRecipe] = useState<SavedRecipe | MasterRecipe>(defaultRecipe);
+  const [beveragePreference, setBeveragePreferenceState] = useState<BeveragePreference>(() => {
+    try {
+      return typeof getBeveragePreference === 'function' ? getBeveragePreference() : 'both';
+    } catch {
+      return 'both';
+    }
+  });
+
+  const [recipe, setRecipe] = useState<SavedRecipe | MasterRecipe>(() => {
+    try {
+      const pref = typeof getBeveragePreference === 'function' ? getBeveragePreference() : 'both';
+      return pref === 'tea' ? defaultTeaRecipe : defaultCoffeeRecipe;
+    } catch {
+      return defaultCoffeeRecipe;
+    }
+  });
   const [selectedInventoryItem, setSelectedInventoryItem] = useState<InventoryItem | null>(null);
 
   const initialDose = 'doseGrams' in recipe ? recipe.doseGrams : recipe.coffeeOrTeaDoseGrams;
@@ -113,6 +135,28 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [grinderId, setGrinderIdState] = useState<string>(() => {
     return getAppSetting('default_grinder', 'comandante_c40');
   });
+
+  const handleSetBeveragePreference = (pref: BeveragePreference) => {
+    setBeveragePreferenceState(pref);
+    try {
+      if (typeof setBeveragePreferenceDb === 'function') {
+        setBeveragePreferenceDb(pref);
+      }
+    } catch {
+      // ignore
+    }
+    if (pref === 'coffee') {
+      const isTea = 'beverageType' in recipe ? recipe.beverageType === 'TEA' : (recipe as any).type === 'TEA';
+      if (isTea) {
+        selectRecipe(defaultCoffeeRecipe);
+      }
+    } else if (pref === 'tea') {
+      const isCoffee = 'beverageType' in recipe ? recipe.beverageType === 'COFFEE' : (recipe as any).type === 'COFFEE';
+      if (isCoffee) {
+        selectRecipe(defaultTeaRecipe);
+      }
+    }
+  };
 
   const setGrinderId = (id: string) => {
     setGrinderIdState(id);
@@ -362,6 +406,8 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
         previousStep,
         adjustStepDuration,
         finishAndSaveSession,
+        beveragePreference,
+        setBeveragePreference: handleSetBeveragePreference,
       }}
     >
       {children}

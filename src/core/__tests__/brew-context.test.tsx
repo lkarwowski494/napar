@@ -520,4 +520,61 @@ describe('BrewContext & BrewProvider', () => {
       })
     );
   });
+
+  test('Zarządza preferencjami naparów (beveragePreference) i automatycznie dostosowuje aktywny przepis', () => {
+    let brewData: any;
+    const Consumer = () => {
+      brewData = useBrew();
+      return null;
+    };
+
+    renderer.act(() => {
+      renderer.create(
+        <BrewProvider>
+          <Consumer />
+        </BrewProvider>
+      );
+    });
+
+    expect(brewData.beveragePreference).toBe('both');
+
+    // Przełącz na tylko herbatę: aktywny przepis powinien zmienić się na herbatę
+    renderer.act(() => {
+      brewData.setBeveragePreference('tea');
+    });
+
+    expect(brewData.beveragePreference).toBe('tea');
+    const isTea = 'beverageType' in brewData.recipe ? brewData.recipe.beverageType === 'TEA' : brewData.recipe.type === 'TEA';
+    expect(isTea).toBe(true);
+
+    // Przełącz z powrotem na tylko kawę: aktywny przepis powinien zmienić się na kawę
+    renderer.act(() => {
+      brewData.setBeveragePreference('coffee');
+    });
+
+    expect(brewData.beveragePreference).toBe('coffee');
+    const isCoffee = 'beverageType' in brewData.recipe ? brewData.recipe.beverageType === 'COFFEE' : brewData.recipe.type === 'COFFEE';
+    expect(isCoffee).toBe(true);
+  });
+
+  test('Inicjalizuje stan z przepisem na herbatę gdy beverage_preference w bazie to tea', () => {
+    settingsStore.set('beverage_preference', 'tea');
+    let brewData: any;
+    const Consumer = () => {
+      brewData = useBrew();
+      return null;
+    };
+
+    renderer.act(() => {
+      renderer.create(
+        <BrewProvider>
+          <Consumer />
+        </BrewProvider>
+      );
+    });
+
+    expect(brewData.beveragePreference).toBe('tea');
+    const isTea = 'beverageType' in brewData.recipe ? brewData.recipe.beverageType === 'TEA' : brewData.recipe.type === 'TEA';
+    expect(isTea).toBe(true);
+  });
 });

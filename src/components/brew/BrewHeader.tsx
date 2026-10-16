@@ -26,6 +26,7 @@ interface BrewHeaderProps {
   };
   favoriteRecipes?: any[];
   isRunning?: boolean;
+  beveragePreference?: 'both' | 'coffee' | 'tea';
   beverageType?: 'COFFEE' | 'TEA';
   onBeverageTypeChange?: (type: 'COFFEE' | 'TEA') => void;
   onSelectRecipe: (r: any) => void;
@@ -43,6 +44,7 @@ export function BrewHeader({
   grinderRecommendation,
   favoriteRecipes = [],
   isRunning = false,
+  beveragePreference = 'both',
   beverageType,
   onBeverageTypeChange,
   onSelectRecipe,
@@ -61,10 +63,17 @@ export function BrewHeader({
 
   const currentBeverageType = beverageType || (isTea ? 'TEA' : 'COFFEE');
 
+  const filteredFavorites = favoriteRecipes.filter((fav) => {
+    const favIsTea = 'beverageType' in fav ? fav.beverageType === 'TEA' : fav.type === 'TEA';
+    if (beveragePreference === 'coffee' && favIsTea) return false;
+    if (beveragePreference === 'tea' && !favIsTea) return false;
+    return true;
+  });
+
   return (
     <View style={styles.container}>
-      {/* Przełącznik Kawa vs Herbata */}
-      {!isRunning && onBeverageTypeChange && (
+      {/* Przełącznik Kawa vs Herbata — ukryty gdy użytkownik ustawił 'Tylko kawa' lub 'Tylko herbata' */}
+      {!isRunning && onBeverageTypeChange && (!beveragePreference || beveragePreference === 'both') && (
         <View style={styles.beverageToggleRow} accessibilityRole="tablist">
           <Pressable
             testID="beverage-toggle-coffee"
@@ -112,7 +121,7 @@ export function BrewHeader({
         </View>
       )}
       {/* 1-Click Szybkie Parzenie z Ulubionych Receptur */}
-      {favoriteRecipes.length > 0 && !isRunning && (
+      {filteredFavorites.length > 0 && !isRunning && (
         <View style={styles.favoritesSection}>
           <View style={styles.favoritesTitleRow}>
             <StarIcon size={13} color={theme.colors.copper} filled={true} />
@@ -123,7 +132,7 @@ export function BrewHeader({
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.favoritesScroll}
           >
-            {favoriteRecipes.map((fav) => {
+            {filteredFavorites.map((fav) => {
               const isSelected = recipe.id === fav.id;
               const favDose =
                 'doseGrams' in fav ? fav.doseGrams : fav.coffeeOrTeaDoseGrams;
@@ -155,14 +164,15 @@ export function BrewHeader({
         </View>
       )}
 
-      {/* Pigułka Młynka: Wyeksponowana na górze z dokładnymi klikami */}
-      <Pressable
-        testID="grinder-pill-btn"
-        style={styles.grinderPillCard}
-        onPress={onOpenGrinderModal}
-        accessibilityRole="button"
-        accessibilityLabel={`Młynek: ${grinderRecommendation.grinderName}, nastawa ${grinderRecommendation.formatted}`}
-      >
+      {/* Pigułka Młynka: Wyeksponowana na górze z dokładnymi klikami (tylko dla kawy) */}
+      {!isTea && beveragePreference !== 'tea' && (
+        <Pressable
+          testID="grinder-pill-btn"
+          style={styles.grinderPillCard}
+          onPress={onOpenGrinderModal}
+          accessibilityRole="button"
+          accessibilityLabel={`Młynek: ${grinderRecommendation.grinderName}, nastawa ${grinderRecommendation.formatted}`}
+        >
         <View style={styles.pillIconBox}>
           <GrinderIcon size={18} color={theme.colors.copper} />
         </View>
@@ -177,6 +187,7 @@ export function BrewHeader({
         </View>
         <Text style={styles.pillArrow}>›</Text>
       </Pressable>
+      )}
 
       {/* Rząd selektorów: Receptura i Spiżarnia */}
       <View style={styles.selectorRow}>
@@ -241,8 +252,12 @@ export function BrewHeader({
       </View>
 
       {/* Szybki przełącznik do trybu Gongfu Cha przy parzeniu herbaty */}
-      {isTea && (
-        <Pressable style={styles.gongfuBanner} onPress={onNavigateToGongfu}>
+      {isTea && beveragePreference !== 'coffee' && (
+        <Pressable
+          testID="gongfu-mode-btn"
+          style={styles.gongfuBanner}
+          onPress={onNavigateToGongfu}
+        >
           <Text style={styles.gongfuBannerText}>
             Przejdź do Trybu Wielokrotnych Zalań (Gongfu Cha Tracker) →
           </Text>

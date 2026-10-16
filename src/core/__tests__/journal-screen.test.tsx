@@ -34,6 +34,8 @@ jest.mock('../database', () => ({
   setHapticsEnabled: jest.fn(),
   getVoiceAnnounceEnabled: jest.fn(() => true),
   setVoiceAnnounceEnabled: jest.fn(),
+  getBeveragePreference: jest.fn(() => 'both'),
+  setBeveragePreference: jest.fn(),
 }));
 
 const mockSessions = [

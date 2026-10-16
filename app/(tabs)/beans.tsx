@@ -39,7 +39,7 @@ import { BeansIcon } from '../../src/components/icons/CraftIcons';
 
 export default function BeansScreen() {
   const router = useRouter();
-  const { selectInventoryItem } = useBrew();
+  const { selectInventoryItem, beveragePreference } = useBrew();
   const { canCreate, isHistoryReadOnly, refresh } = useAppAccess();
   const [unitSystem] = useState<'metric' | 'imperial'>(() => {
     try {
@@ -54,12 +54,30 @@ export default function BeansScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showCompendium, setShowCompendium] = useState(false);
-  const [compendiumTab, setCompendiumTab] = useState<'varieties' | 'processes' | 'origins' | 'tea'>('varieties');
+  const [compendiumTab, setCompendiumTab] = useState<'varieties' | 'processes' | 'origins' | 'tea'>(() => {
+    return beveragePreference === 'tea' ? 'tea' : 'varieties';
+  });
   const [compendiumSearch, setCompendiumSearch] = useState('');
 
   // Formularz nowej paczki
   const [name, setName] = useState('');
-  const [type, setType] = useState<'coffee' | 'tea'>('coffee');
+  const [type, setType] = useState<'coffee' | 'tea'>(() => {
+    return beveragePreference === 'tea' ? 'tea' : 'coffee';
+  });
+
+  useEffect(() => {
+    if (beveragePreference === 'tea') {
+      setType('tea');
+      setEditType('tea');
+      setCompendiumTab('tea');
+      if (filter === 'coffee') setFilter('all');
+    } else if (beveragePreference === 'coffee') {
+      setType('coffee');
+      setEditType('coffee');
+      setCompendiumTab('varieties');
+      if (filter === 'tea') setFilter('all');
+    }
+  }, [beveragePreference]);
   const [roaster, setRoaster] = useState('');
   const [origin, setOrigin] = useState('');
   const [variety, setVariety] = useState('');
@@ -346,6 +364,8 @@ export default function BeansScreen() {
   };
 
   const filteredItems = items.filter((item) => {
+    if (beveragePreference === 'coffee' && item.type !== 'coffee') return false;
+    if (beveragePreference === 'tea' && item.type !== 'tea') return false;
     if (filter === 'archived') return item.isArchived;
     if (item.isArchived) return false;
     if (filter === 'coffee') return item.type === 'coffee';
@@ -363,25 +383,29 @@ export default function BeansScreen() {
             onPress={() => setFilter('all')}
           >
             <Text style={[styles.filterChipText, filter === 'all' && styles.filterChipTextActive]}>
-              Wszystkie ({items.filter((i) => !i.isArchived).length})
+              Wszystkie ({items.filter((i) => !i.isArchived && (beveragePreference === 'coffee' ? i.type === 'coffee' : beveragePreference === 'tea' ? i.type === 'tea' : true)).length})
             </Text>
           </Pressable>
-          <Pressable
-            style={[styles.filterChip, filter === 'coffee' && styles.filterChipActive]}
-            onPress={() => setFilter('coffee')}
-          >
-            <Text style={[styles.filterChipText, filter === 'coffee' && styles.filterChipTextActive]}>
-              Kawa ☕
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.filterChip, filter === 'tea' && styles.filterChipActive]}
-            onPress={() => setFilter('tea')}
-          >
-            <Text style={[styles.filterChipText, filter === 'tea' && styles.filterChipTextActive]}>
-              Herbata 🍵
-            </Text>
-          </Pressable>
+          {beveragePreference !== 'tea' && (
+            <Pressable
+              style={[styles.filterChip, filter === 'coffee' && styles.filterChipActive]}
+              onPress={() => setFilter('coffee')}
+            >
+              <Text style={[styles.filterChipText, filter === 'coffee' && styles.filterChipTextActive]}>
+                Kawa ☕
+              </Text>
+            </Pressable>
+          )}
+          {beveragePreference !== 'coffee' && (
+            <Pressable
+              style={[styles.filterChip, filter === 'tea' && styles.filterChipActive]}
+              onPress={() => setFilter('tea')}
+            >
+              <Text style={[styles.filterChipText, filter === 'tea' && styles.filterChipTextActive]}>
+                Herbata 🍵
+              </Text>
+            </Pressable>
+          )}
           <Pressable
             style={[styles.filterChip, filter === 'archived' && styles.filterChipActive]}
             onPress={() => setFilter('archived')}
@@ -592,25 +616,27 @@ export default function BeansScreen() {
           </View>
 
           <ScrollView style={styles.formScroll}>
-            {/* Typ: Kawa vs Herbata */}
-            <View style={styles.typeSelectorRow}>
-              <Pressable
-                style={[styles.typeBtn, type === 'coffee' && styles.typeBtnActive]}
-                onPress={() => setType('coffee')}
-              >
-                <Text style={[styles.typeBtnText, type === 'coffee' && styles.typeBtnTextActive]}>
-                  ☕ Kawa ziarnista
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[styles.typeBtn, type === 'tea' && styles.typeBtnActive]}
-                onPress={() => setType('tea')}
-              >
-                <Text style={[styles.typeBtnText, type === 'tea' && styles.typeBtnTextActive]}>
-                  🍵 Herbata liściasta
-                </Text>
-              </Pressable>
-            </View>
+            {/* Typ: Kawa vs Herbata — widoczny wyłącznie gdy preferencja to 'both' */}
+            {(!beveragePreference || beveragePreference === 'both') && (
+              <View style={styles.typeSelectorRow}>
+                <Pressable
+                  style={[styles.typeBtn, type === 'coffee' && styles.typeBtnActive]}
+                  onPress={() => setType('coffee')}
+                >
+                  <Text style={[styles.typeBtnText, type === 'coffee' && styles.typeBtnTextActive]}>
+                    ☕ Kawa ziarnista
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.typeBtn, type === 'tea' && styles.typeBtnActive]}
+                  onPress={() => setType('tea')}
+                >
+                  <Text style={[styles.typeBtnText, type === 'tea' && styles.typeBtnTextActive]}>
+                    🍵 Herbata liściasta
+                  </Text>
+                </Pressable>
+              </View>
+            )}
 
             <Pressable
               style={styles.compendiumPromptBtn}
@@ -735,25 +761,27 @@ export default function BeansScreen() {
           </View>
 
           <ScrollView style={styles.formScroll}>
-            {/* Typ: Kawa vs Herbata */}
-            <View style={styles.typeSelectorRow}>
-              <Pressable
-                style={[styles.typeBtn, editType === 'coffee' && styles.typeBtnActive]}
-                onPress={() => setEditType('coffee')}
-              >
-                <Text style={[styles.typeBtnText, editType === 'coffee' && styles.typeBtnTextActive]}>
-                  ☕ Kawa ziarnista
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[styles.typeBtn, editType === 'tea' && styles.typeBtnActive]}
-                onPress={() => setEditType('tea')}
-              >
-                <Text style={[styles.typeBtnText, editType === 'tea' && styles.typeBtnTextActive]}>
-                  🍵 Herbata liściasta
-                </Text>
-              </Pressable>
-            </View>
+            {/* Typ: Kawa vs Herbata — widoczny wyłącznie gdy preferencja to 'both' */}
+            {(!beveragePreference || beveragePreference === 'both') && (
+              <View style={styles.typeSelectorRow}>
+                <Pressable
+                  style={[styles.typeBtn, editType === 'coffee' && styles.typeBtnActive]}
+                  onPress={() => setEditType('coffee')}
+                >
+                  <Text style={[styles.typeBtnText, editType === 'coffee' && styles.typeBtnTextActive]}>
+                    ☕ Kawa ziarnista
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.typeBtn, editType === 'tea' && styles.typeBtnActive]}
+                  onPress={() => setEditType('tea')}
+                >
+                  <Text style={[styles.typeBtnText, editType === 'tea' && styles.typeBtnTextActive]}>
+                    🍵 Herbata liściasta
+                  </Text>
+                </Pressable>
+              </View>
+            )}
 
             <Text style={styles.inputLabel}>Nazwa ziaren / herbaty *</Text>
             <TextInput
@@ -942,38 +970,44 @@ export default function BeansScreen() {
 
           {/* Przełącznik zakładek */}
           <View style={styles.compendiumTabsRow}>
-            <Pressable
-              style={[styles.compTabBtn, compendiumTab === 'varieties' && styles.compTabBtnActive]}
-              onPress={() => setCompendiumTab('varieties')}
-            >
-              <Text style={[styles.compTabText, compendiumTab === 'varieties' && styles.compTabTextActive]}>
-                ☕ Odmiany ({filteredVarieties.length})
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.compTabBtn, compendiumTab === 'processes' && styles.compTabBtnActive]}
-              onPress={() => setCompendiumTab('processes')}
-            >
-              <Text style={[styles.compTabText, compendiumTab === 'processes' && styles.compTabTextActive]}>
-                ⚗️ Obróbki ({filteredProcesses.length})
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.compTabBtn, compendiumTab === 'origins' && styles.compTabBtnActive]}
-              onPress={() => setCompendiumTab('origins')}
-            >
-              <Text style={[styles.compTabText, compendiumTab === 'origins' && styles.compTabTextActive]}>
-                🌍 Terroir ({filteredOrigins.length})
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.compTabBtn, compendiumTab === 'tea' && styles.compTabBtnActive]}
-              onPress={() => setCompendiumTab('tea')}
-            >
-              <Text style={[styles.compTabText, compendiumTab === 'tea' && styles.compTabTextActive]}>
-                🍃 Herbaty ({filteredTeas.length})
-              </Text>
-            </Pressable>
+            {beveragePreference !== 'tea' && (
+              <>
+                <Pressable
+                  style={[styles.compTabBtn, compendiumTab === 'varieties' && styles.compTabBtnActive]}
+                  onPress={() => setCompendiumTab('varieties')}
+                >
+                  <Text style={[styles.compTabText, compendiumTab === 'varieties' && styles.compTabTextActive]}>
+                    ☕ Odmiany ({filteredVarieties.length})
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.compTabBtn, compendiumTab === 'processes' && styles.compTabBtnActive]}
+                  onPress={() => setCompendiumTab('processes')}
+                >
+                  <Text style={[styles.compTabText, compendiumTab === 'processes' && styles.compTabTextActive]}>
+                    ⚗️ Obróbki ({filteredProcesses.length})
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.compTabBtn, compendiumTab === 'origins' && styles.compTabBtnActive]}
+                  onPress={() => setCompendiumTab('origins')}
+                >
+                  <Text style={[styles.compTabText, compendiumTab === 'origins' && styles.compTabTextActive]}>
+                    🌍 Terroir ({filteredOrigins.length})
+                  </Text>
+                </Pressable>
+              </>
+            )}
+            {beveragePreference !== 'coffee' && (
+              <Pressable
+                style={[styles.compTabBtn, compendiumTab === 'tea' && styles.compTabBtnActive]}
+                onPress={() => setCompendiumTab('tea')}
+              >
+                <Text style={[styles.compTabText, compendiumTab === 'tea' && styles.compTabTextActive]}>
+                  🍃 Herbaty ({filteredTeas.length})
+                </Text>
+              </Pressable>
+            )}
           </View>
 
           {/* Zawartość zakładek */}
