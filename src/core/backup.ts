@@ -4,7 +4,7 @@
 // operations, and standardized BackupEnvelope<T> format.
 // ============================================================================
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from './database-schema';
 

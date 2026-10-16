@@ -190,7 +190,7 @@ napar/
 │       ├── qr-code.tsx         # Generator kodów QR SVG
 │       ├── confirm.ts          # Zabezpieczenia sesji parzenia przed przerwaniem
 │       ├── theme.ts            # Tokeny stylistyczne (Apps4Brew artisanal)
-│       └── __tests__/          # 44 zestawy testowe (372 testy, 100% pass, 97.76% pokrycia)
+│       └── __tests__/          # 44 zestawy testowe (379 testów, 100% pass, >97% pokrycia)
 ├── NaparStoreKit.storekit      # Konfiguracja Xcode StoreKit Testing ($0.99 / $4.99 / $14.99)
 ├── scripts/
 │   ├── check-i18n.mjs          # Bramka CI weryfikująca 100% symetrii PL/EN

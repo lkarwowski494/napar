@@ -37,7 +37,7 @@ import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
 export default function GongfuScreen() {
   const router = useRouter();
   const { t, language } = useTranslation();
-  const { canCreate, recordBrew } = useAppAccess();
+  const { canCreate, recordBrew, refresh } = useAppAccess();
   const [showPaywall, setShowPaywall] = useState(false);
 
   // Stan sesji
@@ -438,6 +438,8 @@ export default function GongfuScreen() {
       <Apps4BrewPassModal
         visible={showPaywall}
         onClose={() => setShowPaywall(false)}
+        onPurchaseSuccess={refresh}
+        onSubscribed={refresh}
       />
     </SafeAreaView>
   );

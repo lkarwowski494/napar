@@ -8,6 +8,12 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 import { useTranslation } from '../../core/i18n';
+import {
+  formatDoseWeight,
+  formatWaterWeight,
+  formatTemperature,
+  UnitSystem,
+} from '../../core/unit-converter';
 
 interface BrewQuickPrepCardProps {
   doseGrams: number;
@@ -22,6 +28,7 @@ interface BrewQuickPrepCardProps {
     grindAdjustmentClicks: number;
     recommendationPl: string;
   };
+  unitSystem?: UnitSystem;
 }
 
 export function BrewQuickPrepCard({
@@ -34,6 +41,7 @@ export function BrewQuickPrepCard({
   onDoseChange,
   disabled = false,
   batchScaling,
+  unitSystem = 'metric',
 }: BrewQuickPrepCardProps) {
   const { t } = useTranslation();
 
@@ -102,7 +110,7 @@ export function BrewQuickPrepCard({
             >
               <Text style={styles.stepBtnText}>−</Text>
             </Pressable>
-            <Text style={styles.paramValue}>{`${doseGrams}g`}</Text>
+            <Text style={styles.paramValue}>{formatDoseWeight(doseGrams, unitSystem)}</Text>
             <Pressable
               style={styles.stepBtn}
               onPress={() => onDoseChange(doseGrams + 1)}
@@ -117,13 +125,13 @@ export function BrewQuickPrepCard({
 
         <View style={styles.paramBox}>
           <Text style={styles.paramLabel}>WODA ŁĄCZNIE</Text>
-          <Text style={styles.paramValueLarge}>{`${waterGrams}g`}</Text>
+          <Text style={styles.paramValueLarge}>{formatWaterWeight(waterGrams, unitSystem)}</Text>
         </View>
 
         <View style={styles.paramBox}>
           <Text style={styles.paramLabel}>TEMP / MIELENIE</Text>
           <Text style={styles.paramSubValue}>
-            {`${waterTempCelsius}°C · ${grindSetting || 'Średnio'}`}
+            {`${formatTemperature(waterTempCelsius, unitSystem)} · ${grindSetting || 'Średnio'}`}
           </Text>
         </View>
       </View>

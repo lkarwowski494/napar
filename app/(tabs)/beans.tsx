@@ -20,6 +20,7 @@ import {
   getInventoryItems,
   saveInventoryItem,
   deleteInventoryItem,
+  getUnitSystem,
 } from '../../src/core/database';
 import { InventoryItem } from '../../src/core/database-schema';
 import { evaluateRestingWindow } from '../../src/core/domain-rules';
@@ -32,11 +33,19 @@ import {
 } from '../../src/core/knowledge-data';
 import { useAppAccess } from '../../src/core/app-access';
 import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
+import { formatDoseWeight } from '../../src/core/unit-converter';
 
 export default function BeansScreen() {
   const router = useRouter();
   const { selectInventoryItem } = useBrew();
-  const { canCreate, isHistoryReadOnly } = useAppAccess();
+  const { canCreate, isHistoryReadOnly, refresh } = useAppAccess();
+  const [unitSystem] = useState<'metric' | 'imperial'>(() => {
+    try {
+      return getUnitSystem();
+    } catch {
+      return 'metric';
+    }
+  });
 
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [filter, setFilter] = useState<'all' | 'coffee' | 'tea' | 'archived'>('all');
@@ -180,6 +189,10 @@ export default function BeansScreen() {
   };
 
   const handleOpenEdit = (item: InventoryItem) => {
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
     setEditingItem(item);
     setEditName(item.name);
     setEditType(item.type);
@@ -199,6 +212,11 @@ export default function BeansScreen() {
 
   const handleSaveEdit = () => {
     if (!editingItem) return;
+    if (!canCreate) {
+      setShowEditModal(false);
+      setShowPaywall(true);
+      return;
+    }
     if (!editName.trim()) {
       Alert.alert('Błąd', 'Podaj nazwę kawy lub herbaty.');
       return;
@@ -241,6 +259,11 @@ export default function BeansScreen() {
 
   const handleMarkAsFinished = () => {
     if (!editingItem) return;
+    if (!canCreate) {
+      setShowEditModal(false);
+      setShowPaywall(true);
+      return;
+    }
     const updatedItem: InventoryItem = {
       ...editingItem,
       remainingWeightGrams: 0,
@@ -256,6 +279,11 @@ export default function BeansScreen() {
 
   const handleDeleteItem = () => {
     if (!editingItem) return;
+    if (!canCreate) {
+      setShowEditModal(false);
+      setShowPaywall(true);
+      return;
+    }
     Alert.alert(
       'Usunąć paczkę?',
       `Czy na pewno chcesz bezpowrotnie usunąć "${editingItem.name}" ze spiżarni?`,
@@ -276,6 +304,11 @@ export default function BeansScreen() {
   };
 
   const handleAdjustRemainingWeight = (delta: number) => {
+    if (!canCreate) {
+      setShowEditModal(false);
+      setShowPaywall(true);
+      return;
+    }
     const current = parseFloat(editRemainingWeight) || 0;
     const next = Math.max(0, Number((current + delta).toFixed(1)));
     setEditRemainingWeight(next.toString());
@@ -287,6 +320,10 @@ export default function BeansScreen() {
   };
 
   const handleToggleFavorite = (item: InventoryItem) => {
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
     saveInventoryItem({
       ...item,
       isFavorite: !item.isFavorite,
@@ -295,6 +332,10 @@ export default function BeansScreen() {
   };
 
   const handleToggleArchive = (item: InventoryItem) => {
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
     saveInventoryItem({
       ...item,
       isArchived: !item.isArchived,
@@ -433,7 +474,7 @@ export default function BeansScreen() {
                   <View style={styles.weightLabelRow}>
                     <Text style={styles.weightLabel}>Zapas w paczce:</Text>
                     <Text style={styles.weightValue}>
-                      {item.remainingWeightGrams} g / {item.initialWeightGrams} g ({remainingPercent}%)
+                      {formatDoseWeight(item.remainingWeightGrams, unitSystem)} / {formatDoseWeight(item.initialWeightGrams, unitSystem)} ({remainingPercent}%)
                     </Text>
                   </View>
                   <View style={styles.weightTrack}>
@@ -1037,6 +1078,8 @@ export default function BeansScreen() {
       <Apps4BrewPassModal
         visible={showPaywall}
         onClose={() => setShowPaywall(false)}
+        onPurchaseSuccess={refresh}
+        onSubscribed={refresh}
       />
     </View>
   );

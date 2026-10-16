@@ -1428,6 +1428,92 @@ describe('BrewScreen UI Integration', () => {
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('PAUZA');
   });
+
+  test('Wygasły trial: Ekran główny wyświetla baner Tryb Tylko do Odczytu', () => {
+    setTrialExpiredForTesting();
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Tryb Tylko do Odczytu');
+    expect(str).toContain('Twoje receptury i historia są bezpieczne');
+
+    resetTrialForTesting();
+  });
+
+  test('Wygasły trial: Próba duplikowania receptury w modalu blokuje akcję i otwiera Apps4BrewPassModal', () => {
+    setTrialExpiredForTesting();
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz modal wyboru receptury
+    const recipeCard = findPressableWithText(tree.root, 'RECEPTURA');
+    expect(recipeCard).toBeTruthy();
+    act(() => {
+      recipeCard.props.onPress();
+    });
+
+    // Kliknij duplikowanie pierwszej receptury
+    const dupBtns = tree.root.findAll((n: any) => n.props?.accessibilityLabel?.includes('Duplikuj recepturę'));
+    expect(dupBtns.length).toBeGreaterThan(0);
+
+    act(() => {
+      dupBtns[0].props.onPress();
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('APPS4BREW PASS');
+    expect(str).toContain('$4.99 / rok');
+
+    resetTrialForTesting();
+  });
+
+  test('Wygasły trial: Próba kliknięcia Import w modalu receptur otwiera Apps4BrewPassModal', () => {
+    setTrialExpiredForTesting();
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz modal wyboru receptury
+    const recipeCard = findPressableWithText(tree.root, 'RECEPTURA');
+    expect(recipeCard).toBeTruthy();
+    act(() => {
+      recipeCard.props.onPress();
+    });
+
+    // Kliknij Import
+    const importBtn = tree.root.findByProps({
+      testID: 'import-recipe-btn',
+    });
+    act(() => {
+      importBtn.props.onPress();
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('APPS4BREW PASS');
+
+    resetTrialForTesting();
+  });
 });
 
 function findPressableWithText(root: any, text: string) {

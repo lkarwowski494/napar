@@ -7,11 +7,24 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { Alert } from 'react-native';
 
+const mockSettings = new Map<string, string>();
+
 const mockDb: any = {
+  settings: mockSettings,
   execSync: jest.fn(),
-  getFirstSync: jest.fn(),
+  getFirstSync: jest.fn((query: string, params?: any[]) => {
+    if (query.includes('FROM app_settings WHERE key = ?')) {
+      const val = mockSettings.get(params?.[0]);
+      return val !== undefined ? { value: val } : null;
+    }
+    return null;
+  }),
   getAllSync: jest.fn(() => []),
-  runSync: jest.fn(),
+  runSync: jest.fn((query: string, params?: any[]) => {
+    if (query.includes('INSERT OR REPLACE INTO app_settings')) {
+      mockSettings.set(params![0], params![1]);
+    }
+  }),
 };
 
 jest.mock('expo-sqlite', () => ({
@@ -39,6 +52,7 @@ const findPressableWithText = (root: any, text: string) => {
 
 describe('SettingsScreen Component', () => {
   beforeEach(() => {
+    mockSettings.clear();
     jest.clearAllMocks();
   });
 
@@ -199,8 +213,15 @@ describe('SettingsScreen Component', () => {
       );
     });
 
+    // Otwórz modal Apps4Brew Pass
+    const openPassBtn = tree.root.findByProps({ testID: 'open-apps4brew-pass-btn' });
+    expect(openPassBtn).toBeTruthy();
+    renderer.act(() => {
+      openPassBtn.props.onPress();
+    });
+
     // Kliknij opcję zakupu Lifetime
-    const lifetimeBtn = findPressableWithText(tree.root, 'LIFETIME');
+    const lifetimeBtn = tree.root.findByProps({ testID: 'plan-lifetime-btn' });
     expect(lifetimeBtn).toBeTruthy();
 
     renderer.act(() => {
@@ -210,10 +231,13 @@ describe('SettingsScreen Component', () => {
     expect(alertSpy).toHaveBeenCalledWith('Dziękujemy!', 'Dożywotnia licencja Lifetime została aktywowana!');
 
     let str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('AKTYWNY PRO');
+    expect(str).toContain('PRO');
 
-    // Kliknij przywrócenie zakupów
-    const restoreBtn = findPressableWithText(tree.root, 'Przywróć wcześniejsze zakupy');
+    // Kliknij przywrócenie zakupów (po wcześniejszym zakupie)
+    renderer.act(() => {
+      openPassBtn.props.onPress();
+    });
+    const restoreBtn = tree.root.findByProps({ testID: 'restore-purchases-btn' });
     expect(restoreBtn).toBeTruthy();
 
     renderer.act(() => {
@@ -288,16 +312,25 @@ describe('SettingsScreen Component', () => {
       );
     });
 
-    // 1. Kliknij plan MIESIĘCZNY
-    const monthlyBtn = findPressableWithText(tree.root, 'MIESIĘCZNY');
+    const openPassBtn = tree.root.findByProps({ testID: 'open-apps4brew-pass-btn' });
+    expect(openPassBtn).toBeTruthy();
+
+    // 1. Otwórz modal i kliknij plan MIESIĘCZNY
+    renderer.act(() => {
+      openPassBtn.props.onPress();
+    });
+    const monthlyBtn = tree.root.findByProps({ testID: 'plan-monthly-btn' });
     expect(monthlyBtn).toBeTruthy();
     renderer.act(() => {
       monthlyBtn.props.onPress();
     });
     expect(alertSpy).toHaveBeenCalledWith('Dziękujemy!', 'Napar Pro został pomyślnie aktywowany.');
 
-    // 2. Kliknij plan ROCZNY
-    const annualBtn = findPressableWithText(tree.root, 'ROCZNY');
+    // 2. Otwórz ponownie i kliknij plan ROCZNY
+    renderer.act(() => {
+      openPassBtn.props.onPress();
+    });
+    const annualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
     expect(annualBtn).toBeTruthy();
     renderer.act(() => {
       annualBtn.props.onPress();

@@ -80,4 +80,15 @@ describe('Timer Audio & Chime Engine', () => {
     await notifyTimerFinished();
     expect(announceSpy).toHaveBeenCalledWith('Parzenie zakończone!');
   });
+
+  test('CHIME_AUDIO_DATA_URI zawiera prawidłowy plik audio RIFF WAV z rzeczywistymi próbkami PCM', () => {
+    expect(CHIME_AUDIO_DATA_URI.startsWith('data:audio/wav;base64,')).toBe(true);
+    const base64Data = CHIME_AUDIO_DATA_URI.replace('data:audio/wav;base64,', '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    expect(buffer.slice(0, 4).toString('ascii')).toBe('RIFF');
+    expect(buffer.slice(8, 12).toString('ascii')).toBe('WAVE');
+    expect(buffer.slice(12, 16).toString('ascii')).toBe('fmt ');
+    // Dane PCM muszą zawierać rzeczywiste próbki audio (> 1000 bajtów)
+    expect(buffer.length).toBeGreaterThan(1000);
+  });
 });

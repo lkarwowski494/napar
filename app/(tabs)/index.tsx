@@ -23,7 +23,13 @@ import {
   toggleRecipeFavorite,
   saveRecipe,
   duplicateRecipe,
+  getUnitSystem,
 } from '../../src/core/database';
+import {
+  formatDoseWeight,
+  formatWaterWeight,
+  formatTemperature,
+} from '../../src/core/unit-converter';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
 import { InventoryItem, SavedRecipe } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
@@ -56,7 +62,8 @@ import { BrewFinishModal } from '../../src/components/brew/BrewFinishModal';
 export default function BrewScreen() {
   const router = useRouter();
   const { t, language } = useTranslation();
-  const { canCreate, recordBrew, refresh } = useAppAccess();
+  const { canCreate, isHistoryReadOnly, recordBrew, refresh } = useAppAccess();
+  const unitSystem = getUnitSystem();
 
   const {
     recipe,
@@ -131,6 +138,10 @@ export default function BrewScreen() {
 
   const handleScanQrRecipe = (data: string) => {
     setShowQrScanner(false);
+    if (!canCreate) {
+      setShowPaywallModal(true);
+      return;
+    }
     const decoded = decodeRecipeFromShareUrl(data);
     if (!decoded) {
       Alert.alert(t.common.confirm, t.brew.importError);
@@ -219,6 +230,11 @@ export default function BrewScreen() {
   };
 
   const handleDuplicateRecipe = (r: any) => {
+    if (!canCreate) {
+      setShowRecipeModal(false);
+      setShowPaywallModal(true);
+      return;
+    }
     const cloned = duplicateRecipe(r);
     refreshData();
     Alert.alert(
@@ -293,6 +309,15 @@ export default function BrewScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      {/* Read-Only Status Banner when trial expired */}
+      {isHistoryReadOnly && (
+        <View style={styles.readOnlyBanner}>
+          <Text style={styles.readOnlyBannerText}>
+            🛡️ Tryb Tylko do Odczytu — Twoje receptury i historia są bezpieczne. Parzenie i edycja wymagają Apps4Brew Pass.
+          </Text>
+        </View>
+      )}
+
       {/* Nagłówek: Młynek z klikami, Ulubione, Receptura, Spiżarnia i Udostępnianie */}
       <BrewHeader
         recipe={recipe}
@@ -324,6 +349,7 @@ export default function BrewScreen() {
           onDoseChange={setDoseGrams}
           disabled={isRunning}
           batchScaling={batchScaling}
+          unitSystem={unitSystem}
         />
       )}
 
@@ -370,6 +396,11 @@ export default function BrewScreen() {
               <Pressable
                 style={styles.addCustomRecipeBtn}
                 onPress={() => {
+                  if (!canCreate) {
+                    setShowRecipeModal(false);
+                    setShowPaywallModal(true);
+                    return;
+                  }
                   setShowRecipeModal(false);
                   router.push('/recipe-builder');
                 }}
@@ -391,7 +422,14 @@ export default function BrewScreen() {
 
               <Pressable
                 style={styles.importRecipeModalBtn}
-                onPress={() => setShowImportModal(true)}
+                onPress={() => {
+                  if (!canCreate) {
+                    setShowRecipeModal(false);
+                    setShowPaywallModal(true);
+                    return;
+                  }
+                  setShowImportModal(true);
+                }}
                 testID="import-recipe-btn"
               >
                 <Text style={styles.importRecipeModalBtnText}>
@@ -401,7 +439,14 @@ export default function BrewScreen() {
 
               <Pressable
                 style={styles.scanQrModalBtn}
-                onPress={() => setShowQrScanner(true)}
+                onPress={() => {
+                  if (!canCreate) {
+                    setShowRecipeModal(false);
+                    setShowPaywallModal(true);
+                    return;
+                  }
+                  setShowQrScanner(true);
+                }}
                 testID="scan-qr-btn"
                 accessibilityRole="button"
                 accessibilityLabel="Skanuj kod QR receptury aparatem"
@@ -467,6 +512,11 @@ export default function BrewScreen() {
                       hitSlop={8}
                       onPress={(e) => {
                         e.stopPropagation();
+                        if (!canCreate) {
+                          setShowRecipeModal(false);
+                          setShowPaywallModal(true);
+                          return;
+                        }
                         setShowRecipeModal(false);
                         router.push({
                           pathname: '/recipe-builder',
@@ -482,9 +532,20 @@ export default function BrewScreen() {
                   {r.author || 'Receptura własna'}
                 </Text>
                 <Text style={styles.recipeOptionDetails}>
-                  {'doseGrams' in r ? r.doseGrams : r.coffeeOrTeaDoseGrams}g kawy/herbaty ·{' '}
-                  {'waterGrams' in r ? r.waterGrams : r.waterWeightGrams}g wody ·{' '}
-                  {'waterTempCelsius' in r ? r.waterTempCelsius : r.waterTemperatureCelsius}°C
+                  {formatDoseWeight(
+                    'doseGrams' in r ? r.doseGrams : r.coffeeOrTeaDoseGrams,
+                    unitSystem
+                  )}{' '}
+                  kawy/herbaty ·{' '}
+                  {formatWaterWeight(
+                    'waterGrams' in r ? r.waterGrams : r.waterWeightGrams,
+                    unitSystem
+                  )}{' '}
+                  wody ·{' '}
+                  {formatTemperature(
+                    'waterTempCelsius' in r ? r.waterTempCelsius : r.waterTemperatureCelsius,
+                    unitSystem
+                  )}
                 </Text>
               </Pressable>
             ))}
@@ -654,10 +715,16 @@ export default function BrewScreen() {
             <Text style={styles.shareRecipeName}>{recipe.name}</Text>
             <Text style={styles.shareRecipeDetails}>
               {recipe.method} ·{' '}
-              {'doseGrams' in recipe ? recipe.doseGrams : recipe.coffeeOrTeaDoseGrams}
-              g /{' '}
-              {'waterGrams' in recipe ? recipe.waterGrams : recipe.waterWeightGrams}
-              g · {waterTempCelsius}°C
+              {formatDoseWeight(
+                'doseGrams' in recipe ? recipe.doseGrams : recipe.coffeeOrTeaDoseGrams,
+                unitSystem
+              )}{' '}
+              /{' '}
+              {formatWaterWeight(
+                'waterGrams' in recipe ? recipe.waterGrams : recipe.waterWeightGrams,
+                unitSystem
+              )}{' '}
+              · {formatTemperature(waterTempCelsius, unitSystem)}
             </Text>
 
             <View style={styles.shareButtonsRow}>
@@ -728,9 +795,9 @@ export default function BrewScreen() {
                 </Text>
                 <Text style={styles.importPreviewSubtitle}>
                   {importParsedRecipe.recipe.method} ·{' '}
-                  {importParsedRecipe.recipe.doseGrams}g /{' '}
-                  {importParsedRecipe.recipe.waterGrams}g ·{' '}
-                  {importParsedRecipe.recipe.waterTempCelsius}°C
+                  {formatDoseWeight(importParsedRecipe.recipe.doseGrams, unitSystem)} /{' '}
+                  {formatWaterWeight(importParsedRecipe.recipe.waterGrams, unitSystem)} ·{' '}
+                  {formatTemperature(importParsedRecipe.recipe.waterTempCelsius, unitSystem)}
                 </Text>
                 <Text style={styles.importPreviewStepsCount}>
                   Liczba kroków parzenia: {importParsedRecipe.originalSteps.length}
@@ -738,6 +805,12 @@ export default function BrewScreen() {
                 <Pressable
                   style={styles.confirmImportBtn}
                   onPress={() => {
+                    if (!canCreate) {
+                      setShowImportModal(false);
+                      setShowRecipeModal(false);
+                      setShowPaywallModal(true);
+                      return;
+                    }
                     try {
                       saveRecipe(importParsedRecipe.recipe);
                       refreshData();
@@ -778,6 +851,10 @@ export default function BrewScreen() {
           setShowPaywallModal(false);
           refresh();
         }}
+        onSubscribed={() => {
+          setShowPaywallModal(false);
+          refresh();
+        }}
       />
     </ScrollView>
   );
@@ -791,6 +868,21 @@ const styles = StyleSheet.create({
   content: {
     padding: theme.spacing.md,
     paddingBottom: 40,
+  },
+  readOnlyBanner: {
+    backgroundColor: 'rgba(217, 119, 54, 0.12)',
+    borderRadius: theme.borderRadius.md,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+  },
+  readOnlyBannerText: {
+    color: theme.colors.copper,
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   modalContainer: {
     flex: 1,

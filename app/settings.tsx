@@ -33,6 +33,10 @@ import {
   setCaffeineHalfLife,
   getBedtimeHour,
   setBedtimeHour,
+  getInventoryItems,
+  getRecipes,
+  getBrewSessions,
+  getCaffeineLogs,
 } from '../src/core/database';
 import {
   getHealthKitSyncEnabled,
@@ -43,6 +47,14 @@ import {
 import { SUPPORTED_GRINDERS } from '../src/core/grinder-converter';
 import { theme } from '../src/core/theme';
 import { useTranslation, SupportedLanguage } from '../src/core/i18n';
+import { safetyBackup, NaparBackupData } from '../src/core/backup';
+import { useAppAccess } from '../src/core/app-access';
+import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
+import {
+  formatTemperature,
+  formatDoseWeight,
+  formatWaterWeight,
+} from '../src/core/unit-converter';
 
 export default function SettingsScreen() {
   const { t, language, setLanguage } = useTranslation();
@@ -70,6 +82,15 @@ export default function SettingsScreen() {
   const [healthKitSync, setHealthKitSync] = useState(() => {
     return getHealthKitSyncEnabled();
   });
+  const {
+    status: accessStatus,
+    isSubscribed,
+    subscriptionTier,
+    brewsRemaining,
+    daysRemaining,
+    refresh: refreshAccess,
+  } = useAppAccess();
+  const [showPassModal, setShowPassModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
 
@@ -160,22 +181,26 @@ export default function SettingsScreen() {
         Alert.alert('Błąd', 'Wklej prawidłowy tekst JSON kopii zapasowej.');
         return;
       }
+      // Apps4Brew SEC-09: Tworzenie kopii bezpieczeństwa przed niszczącym importem
+      try {
+        const currentData: NaparBackupData = {
+          inventory: getInventoryItems(true),
+          customRecipes: getRecipes(),
+          sessions: getBrewSessions(),
+          caffeineLogs: getCaffeineLogs(),
+        };
+        safetyBackup('import', currentData).catch(() => {});
+      } catch {
+        // Kontynuuj import nawet jeśli system plików napotkał problem
+      }
       importDataJson(importJsonText.trim());
       setShowImportModal(false);
       setImportJsonText('');
+      refreshAccess();
       Alert.alert('Sukces!', 'Dane zostały pomyślnie zaimportowane do Twojej lokalnej bazy.');
     } catch (e: any) {
       Alert.alert('Błąd importu', e?.message || 'Niepoprawny format danych JSON.');
     }
-  };
-
-  const handleRestorePurchases = () => {
-    setIsPro(true);
-    setIsProUser(true);
-    Alert.alert(
-      t.settings.restoreSuccessTitle,
-      t.settings.restoreSuccessMsg
-    );
   };
 
   return (
@@ -238,6 +263,22 @@ export default function SettingsScreen() {
             {t.settings.unitImperial}
           </Text>
         </Pressable>
+      </View>
+      <View style={styles.unitPreviewRow}>
+        <Text style={styles.unitPreviewText}>
+          {language === 'en' ? 'Standard recipe preview:' : 'Podgląd jednostek w przepisach:'}{' '}
+          <Text style={{ color: theme.colors.copper, fontWeight: '700' }}>
+            {formatDoseWeight(15, unitSystem)}
+          </Text>{' '}
+          /{' '}
+          <Text style={{ color: theme.colors.copper, fontWeight: '700' }}>
+            {formatWaterWeight(250, unitSystem)}
+          </Text>{' '}
+          ·{' '}
+          <Text style={{ color: theme.colors.copper, fontWeight: '700' }}>
+            {formatTemperature(93, unitSystem)}
+          </Text>
+        </Text>
       </View>
 
       {/* Dostępność i Sygnały (VoiceOver / Audio & Haptyka - BR-DOST-001, DEC-13) */}
@@ -503,84 +544,53 @@ export default function SettingsScreen() {
         </Pressable>
       </View>
 
-      {/* Oferta Apps4Brew Pro */}
-      <Text style={styles.sectionTitle}>{t.settings.proTitle}</Text>
+      {/* Oferta Apps4Brew Pass ("Cheaper than Espresso") */}
+      <Text style={styles.sectionTitle}>{t.settings.proTitle} — Apps4Brew Pass</Text>
       <View style={styles.proCard}>
         <View style={styles.proHeader}>
-          <Text style={styles.proTitle}>{t.settings.proUnlockTitle}</Text>
-          {isPro && (
+          <Text style={styles.proTitle}>{t.paywall.title}</Text>
+          {isSubscribed ? (
             <View style={styles.proActiveBadge}>
-              <Text style={styles.proActiveText}>{t.settings.proActiveBadge}</Text>
+              <Text style={styles.proActiveText}>
+                {subscriptionTier.toUpperCase()} PRO
+              </Text>
+            </View>
+          ) : accessStatus === 'trial_active' ? (
+            <View style={[styles.proActiveBadge, { backgroundColor: theme.colors.copperMuted }]}>
+              <Text style={[styles.proActiveText, { color: theme.colors.copper }]}>
+                TRIAL ({brewsRemaining} {brewsRemaining === 1 ? 'parzenie' : 'parzenia'})
+              </Text>
+            </View>
+          ) : (
+            <View style={[styles.proActiveBadge, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
+              <Text style={[styles.proActiveText, { color: '#ef4444' }]}>
+                TRIAL WYGASŁ
+              </Text>
             </View>
           )}
         </View>
 
-        <Text style={styles.proDesc}>{t.settings.proDesc}</Text>
+        <Text style={styles.proDesc}>{t.paywall.tagline}</Text>
 
         <View style={styles.proPerks}>
-          <Text style={styles.proPerkItem}>{t.settings.proPerk1}</Text>
-          <Text style={styles.proPerkItem}>{t.settings.proPerk2}</Text>
-          <Text style={styles.proPerkItem}>{t.settings.proPerk3}</Text>
-          <Text style={styles.proPerkItem}>{t.settings.proPerk4}</Text>
-        </View>
-
-        <View style={styles.pricingGrid}>
-          <Pressable
-            style={styles.priceOption}
-            onPress={() => {
-              setIsPro(true);
-              setIsProUser(true);
-              Alert.alert(t.settings.purchaseSuccessTitle, t.settings.purchaseSuccessMsg);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel={`${t.settings.priceMonthlyTerm}: ${t.settings.priceMonthlyValue}, ${t.settings.priceMonthlySub}`}
-          >
-            <Text style={styles.priceTerm}>{t.settings.priceMonthlyTerm}</Text>
-            <Text style={styles.priceValue}>{t.settings.priceMonthlyValue}</Text>
-            <Text style={styles.priceSub}>{t.settings.priceMonthlySub}</Text>
-          </Pressable>
-
-          <Pressable
-            style={[styles.priceOption, styles.priceOptionBest]}
-            onPress={() => {
-              setIsPro(true);
-              setIsProUser(true);
-              Alert.alert(t.settings.purchaseSuccessTitle, t.settings.purchaseAnnualSuccessMsg);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel={`${t.settings.priceAnnualTerm}: ${t.settings.priceAnnualValue}, ${t.settings.priceAnnualSub}, ${t.settings.trialBadge}`}
-          >
-            <View style={styles.bestBadge}>
-              <Text style={styles.bestBadgeText}>{t.settings.trialBadge}</Text>
-            </View>
-            <Text style={styles.priceTerm}>{t.settings.priceAnnualTerm}</Text>
-            <Text style={styles.priceValue}>{t.settings.priceAnnualValue}</Text>
-            <Text style={styles.priceSub}>{t.settings.priceAnnualSub}</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.priceOption}
-            onPress={() => {
-              setIsPro(true);
-              setIsProUser(true);
-              Alert.alert(t.settings.purchaseSuccessTitle, t.settings.purchaseLifetimeSuccessMsg);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel={`${t.settings.priceLifetimeTerm}: ${t.settings.priceLifetimeValue}, ${t.settings.priceLifetimeSub}`}
-          >
-            <Text style={styles.priceTerm}>{t.settings.priceLifetimeTerm}</Text>
-            <Text style={styles.priceValue}>{t.settings.priceLifetimeValue}</Text>
-            <Text style={styles.priceSub}>{t.settings.priceLifetimeSub}</Text>
-          </Pressable>
+          <Text style={styles.proPerkItem}>{t.paywall.perk1}</Text>
+          <Text style={styles.proPerkItem}>{t.paywall.perk2}</Text>
+          <Text style={styles.proPerkItem}>{t.paywall.perk3}</Text>
+          <Text style={styles.proPerkItem}>{t.paywall.perk4}</Text>
         </View>
 
         <Pressable
-          style={styles.restoreBtn}
-          onPress={handleRestorePurchases}
+          testID="open-apps4brew-pass-btn"
+          style={styles.passCtaBtn}
+          onPress={() => setShowPassModal(true)}
           accessibilityRole="button"
-          accessibilityLabel={t.settings.restorePurchases}
+          accessibilityLabel={isSubscribed ? 'Apps4Brew Pass: Aktywny' : 'Odblokuj Apps4Brew Pass ($0.99 / $4.99 / $14.99)'}
         >
-          <Text style={styles.restoreBtnText}>{t.settings.restorePurchases}</Text>
+          <Text style={styles.passCtaBtnText}>
+            {isSubscribed
+              ? '★ Licencja Aktywna — Zarządzaj Planem'
+              : '☕ Przejdź do planów ($0.99 / $4.99 / $14.99)'}
+          </Text>
         </Pressable>
       </View>
 
@@ -670,6 +680,14 @@ export default function SettingsScreen() {
           />
         </View>
       </Modal>
+
+      {/* Modal Apps4Brew Pass ("Cheaper than Espresso") */}
+      <Apps4BrewPassModal
+        visible={showPassModal}
+        onClose={() => setShowPassModal(false)}
+        onPurchaseSuccess={refreshAccess}
+        onSubscribed={refreshAccess}
+      />
     </ScrollView>
   );
 }
@@ -993,5 +1011,32 @@ const styles = StyleSheet.create({
     color: theme.colors.copperLight,
     minWidth: 44,
     textAlign: 'center',
+  },
+  unitPreviewRow: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  unitPreviewText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  passCtaBtn: {
+    backgroundColor: theme.colors.copper,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+  },
+  passCtaBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 14,
   },
 });

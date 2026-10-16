@@ -17,7 +17,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
-import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems } from '../../src/core/database';
+import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems, getUnitSystem } from '../../src/core/database';
 import { BrewSession } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
@@ -25,6 +25,7 @@ import { SensoryRadarChart, SensoryProfile } from '../../src/core/radar-chart';
 import { getWaterProfileName } from '../../src/core/water-chemistry';
 import { useAppAccess } from '../../src/core/app-access';
 import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
+import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../src/core/unit-converter';
 
 export default function JournalScreen() {
   const router = useRouter();
@@ -38,7 +39,14 @@ export default function JournalScreen() {
     setWaterProfile,
   } = useBrew();
   const { t, language } = useTranslation();
-  const { canCreate, isHistoryReadOnly } = useAppAccess();
+  const { canCreate, isHistoryReadOnly, refresh } = useAppAccess();
+  const [unitSystem] = useState<'metric' | 'imperial'>(() => {
+    try {
+      return getUnitSystem();
+    } catch {
+      return 'metric';
+    }
+  });
   const [sessions, setSessions] = useState<BrewSession[]>([]);
   const [viewMode, setViewMode] = useState<'sessions' | 'analytics'>('sessions');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -155,6 +163,10 @@ export default function JournalScreen() {
   }, []);
 
   const handleDelete = (session: BrewSession) => {
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
     Alert.alert(
       'Usuń wpis',
       `Czy na pewno chcesz usunąć sesję "${session.recipeName || session.method}"?`,
@@ -409,12 +421,12 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
               <View style={styles.metricItem}>
                 <Text style={styles.metricLabel}>DOZA / WODA</Text>
                 <Text style={styles.metricVal}>
-                  {session.doseGrams}g / {session.waterGrams}g
+                  {formatDoseWeight(session.doseGrams, unitSystem)} / {formatWaterWeight(session.waterGrams, unitSystem)}
                 </Text>
               </View>
               <View style={styles.metricItem}>
                 <Text style={styles.metricLabel}>TEMP</Text>
-                <Text style={styles.metricVal}>{session.waterTempCelsius}°C</Text>
+                <Text style={styles.metricVal}>{formatTemperature(session.waterTempCelsius, unitSystem)}</Text>
               </View>
               {session.caffeineContentMg && (
                 <View style={styles.metricItem}>
@@ -659,6 +671,8 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
       <Apps4BrewPassModal
         visible={showPaywall}
         onClose={() => setShowPaywall(false)}
+        onPurchaseSuccess={refresh}
+        onSubscribed={refresh}
       />
     </ScrollView>
   );

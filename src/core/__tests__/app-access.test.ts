@@ -113,13 +113,27 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(getAppAccessState().status).toBe('subscribed');
   });
 
-  test('Przywrócenie zakupów (Restore Purchases) aktywuje licencję Lifetime', () => {
+  test('Przywrócenie zakupów (Restore Purchases) bez wcześniejszego zakupu nie aktywuje licencji', () => {
     setTrialExpiredForTesting();
-    const state = restorePurchases();
-    expect(state.status).toBe('subscribed');
-    expect(state.isSubscribed).toBe(true);
-    expect(state.subscriptionTier).toBe('lifetime');
-    expect(state.canCreate).toBe(true);
+    const result = restorePurchases();
+    expect(result.restored).toBe(false);
+    expect(result.status).toBe('trial_expired');
+    expect(result.isSubscribed).toBe(false);
+    expect(result.canCreate).toBe(false);
+  });
+
+  test('Przywrócenie zakupów (Restore Purchases) po wcześniejszym zakupie poprawnie przywraca licencję', () => {
+    activateSubscription('annual');
+    // Symulacja utraty flagi sesyjnej przy zachowanym dowodzie zakupu
+    setAppSetting('is_pro_active', 'false');
+    setAppSetting('subscription_tier', 'none');
+
+    const result = restorePurchases();
+    expect(result.restored).toBe(true);
+    expect(result.status).toBe('subscribed');
+    expect(result.isSubscribed).toBe(true);
+    expect(result.subscriptionTier).toBe('annual');
+    expect(result.canCreate).toBe(true);
   });
 
   test('Hook useAppAccess reaguje na subskrypcję, odświeżenie i rejestrację parzeń', () => {
@@ -148,10 +162,12 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(hookData.isSubscribed).toBe(true);
     expect(hookData.subscriptionTier).toBe('monthly');
 
+    let restoredResult: boolean = false;
     act(() => {
-      hookData.restore();
+      restoredResult = hookData.restore();
     });
-    expect(hookData.subscriptionTier).toBe('lifetime');
+    expect(restoredResult).toBe(true);
+    expect(hookData.subscriptionTier).toBe('monthly');
 
     act(() => {
       hookData.refresh();

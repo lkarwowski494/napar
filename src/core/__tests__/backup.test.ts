@@ -2,7 +2,7 @@
 // Napar (Steepwise) — Unit Tests: Backup Engine
 // ============================================================================
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import {
   buildBackup,
@@ -21,9 +21,10 @@ jest.mock('expo-sharing', () => ({
   shareAsync: jest.fn().mockResolvedValue(true),
 }));
 
-jest.mock('expo-file-system', () => {
+jest.mock('expo-file-system/legacy', () => {
   const files: Record<string, string> = {};
   return {
+    __esModule: true,
     documentDirectory: 'file:///data/user/0/pl.lukasz.napar/files/',
     cacheDirectory: 'file:///data/user/0/pl.lukasz.napar/cache/',
     getInfoAsync: jest.fn(async (path: string) => ({

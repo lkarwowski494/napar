@@ -3,6 +3,7 @@
 // ============================================================================
 
 import React from 'react';
+import { Alert } from 'react-native';
 import renderer, { act } from 'react-test-renderer';
 import { Apps4BrewPassModal } from '../Apps4BrewPassModal';
 import { resetTrialForTesting } from '../../core/app-access';
@@ -96,7 +97,36 @@ describe('Apps4BrewPassModal Component', () => {
     expect(mockDb.runSync).toHaveBeenCalled();
   });
 
-  test('Przywrócenie zakupów (Restore) oraz zamknięcie modalem', () => {
+  test('Przywrócenie zakupów (Restore): informuje o braku aktywnych zakupów gdy brak weryfikacji', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    const handleClose = jest.fn();
+    const handlePurchase = jest.fn();
+    let tree: any;
+
+    act(() => {
+      tree = renderer.create(
+        <Apps4BrewPassModal
+          visible={true}
+          onClose={handleClose}
+          onPurchaseSuccess={handlePurchase}
+        />
+      );
+    });
+
+    const restoreBtn = tree.root.findByProps({ testID: 'restore-purchases-btn' });
+    act(() => restoreBtn.props.onPress());
+    expect(handlePurchase).not.toHaveBeenCalled();
+    expect(handleClose).not.toHaveBeenCalled();
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Brak zakupów do przywrócenia',
+      'Nie znaleziono wcześniejszych zakupów powiązanych z tym urządzeniem.'
+    );
+  });
+
+  test('Przywrócenie zakupów (Restore): przywraca licencję i wywołuje callbacki gdy zakup jest zweryfikowany', () => {
+    mockDb.app_settings.set('has_verified_purchase', '1');
+    mockDb.app_settings.set('verified_purchase_tier', 'lifetime');
+
     const handleClose = jest.fn();
     const handlePurchase = jest.fn();
     let tree: any;
@@ -115,7 +145,9 @@ describe('Apps4BrewPassModal Component', () => {
     act(() => restoreBtn.props.onPress());
     expect(handlePurchase).toHaveBeenCalled();
     expect(handleClose).toHaveBeenCalled();
+  });
 
+  test('Zamknięcie modala przyciskiem Zamknij wywołuje onClose', () => {
     let treeClose: any;
     const handleCloseOnly = jest.fn();
     act(() => {

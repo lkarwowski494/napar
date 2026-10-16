@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getRecipeById, saveRecipe, deleteRecipe, duplicateRecipe } from '../src/core/database';
+import { getRecipeById, saveRecipe, deleteRecipe, duplicateRecipe, getUnitSystem } from '../src/core/database';
 import { SavedRecipe } from '../src/core/database-schema';
 import { RecipeStep } from '../src/core/recipes-data';
 import { calculateBrewRatio } from '../src/core/domain-rules';
@@ -25,12 +25,20 @@ import { announce } from '../src/core/announce';
 import { useTranslation } from '../src/core/i18n';
 import { useAppAccess } from '../src/core/app-access';
 import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
+import { formatTemperature, formatDoseWeight, formatWaterWeight } from '../src/core/unit-converter';
 
 export default function RecipeBuilderScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { t, language } = useTranslation();
-  const { canCreate } = useAppAccess();
+  const { canCreate, refresh } = useAppAccess();
+  const [unitSystem] = useState<'metric' | 'imperial'>(() => {
+    try {
+      return getUnitSystem();
+    } catch {
+      return 'metric';
+    }
+  });
   const [showPaywall, setShowPaywall] = useState(false);
 
   const isEditing = Boolean(id);
@@ -188,6 +196,10 @@ export default function RecipeBuilderScreen() {
 
   const handleDelete = () => {
     if (!id) return;
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
     confirmAction({
       title: t.recipeBuilder.deleteRecipeConfirmTitle,
       message: t.recipeBuilder.deleteRecipeConfirmMsg,
@@ -353,6 +365,13 @@ export default function RecipeBuilderScreen() {
             </Text>
           </View>
 
+          {/* Podgląd w wybranym układzie jednostek */}
+          <View style={styles.unitPreviewBadge}>
+            <Text style={styles.unitPreviewBadgeText}>
+              {formatDoseWeight(doseNum, unitSystem)} / {formatWaterWeight(waterNum, unitSystem)} · {formatTemperature(parseFloat(waterTempCelsius) || 93, unitSystem)}
+            </Text>
+          </View>
+
           <Text style={styles.fieldLabel}>{t.recipeBuilder.grindLabel}</Text>
           <TextInput
             style={styles.input}
@@ -458,6 +477,8 @@ export default function RecipeBuilderScreen() {
       <Apps4BrewPassModal
         visible={showPaywall}
         onClose={() => setShowPaywall(false)}
+        onPurchaseSuccess={refresh}
+        onSubscribed={refresh}
       />
     </SafeAreaView>
   );
@@ -610,6 +631,21 @@ const styles = StyleSheet.create({
     color: theme.colors.copper,
     fontWeight: '700',
     fontSize: 15,
+  },
+  unitPreviewBadge: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  unitPreviewBadgeText: {
+    color: theme.colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '600',
   },
   stepsHeader: {
     flexDirection: 'row',

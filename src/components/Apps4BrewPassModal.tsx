@@ -56,15 +56,19 @@ export function Apps4BrewPassModal({
   };
 
   const handleRestore = () => {
-    restore();
-    Alert.alert(t.settings.restoreSuccessTitle, t.settings.restoreSuccessMsg);
-    if (onPurchaseSuccess) {
-      onPurchaseSuccess();
+    const success = restore();
+    if (success) {
+      Alert.alert(t.settings.restoreSuccessTitle, t.settings.restoreSuccessMsg);
+      if (onPurchaseSuccess) {
+        onPurchaseSuccess();
+      }
+      if (onSubscribed) {
+        onSubscribed();
+      }
+      onClose();
+    } else {
+      Alert.alert(t.settings.restoreNotFoundTitle, t.settings.restoreNotFoundMsg);
     }
-    if (onSubscribed) {
-      onSubscribed();
-    }
-    onClose();
   };
 
   return (
