@@ -53,6 +53,7 @@ export interface BrewContextType {
   resetTimer: () => void;
   nextStep: () => void;
   previousStep: () => void;
+  adjustStepDuration: (deltaSeconds: number) => void;
   finishAndSaveSession: (sessionData: {
     rating?: number;
     flavorTags?: string[];
@@ -218,6 +219,9 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const resetTimer = () => engineRef.current?.reset();
   const nextStep = () => engineRef.current?.nextStep();
   const previousStep = () => engineRef.current?.previousStep();
+  const adjustStepDuration = (deltaSeconds: number) => {
+    engineRef.current?.adjustStepDuration(deltaSeconds);
+  };
 
   const finishAndSaveSession = (data: {
     rating?: number;
@@ -330,6 +334,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
         resetTimer,
         nextStep,
         previousStep,
+        adjustStepDuration,
         finishAndSaveSession,
       }}
     >

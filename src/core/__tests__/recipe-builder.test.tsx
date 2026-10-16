@@ -493,4 +493,40 @@ describe('Custom Recipe Builder & Persistence', () => {
     warnSpy.mockRestore();
     mockSearchParams = {};
   });
+
+  test('Przycisk Duplikuj jako nową recepturę w trybie edycji tworzy kopię', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    const existingRecipe: SavedRecipe = {
+      id: 'recipe-to-clone',
+      name: 'V60 Original Hoffmann',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 95,
+      recommendedRatio: 16.67,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-10T10:00:00Z',
+    };
+    saveRecipe(existingRecipe);
+    mockSearchParams = { id: 'recipe-to-clone' };
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    const duplicateBtn = findPressableWithText(tree.root, 'Duplikuj jako nową');
+    expect(duplicateBtn).toBeTruthy();
+
+    renderer.act(() => {
+      duplicateBtn?.props.onPress();
+    });
+
+    expect(alertSpy).toHaveBeenCalledWith('Zduplikowano', expect.stringContaining('V60 Original Hoffmann (Kopia)'));
+    expect(mockBack).toHaveBeenCalled();
+    mockSearchParams = {};
+  });
 });

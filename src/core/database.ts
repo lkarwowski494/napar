@@ -256,6 +256,61 @@ export function updateRecipeFavorite(id: string, isFavorite: boolean): void {
   db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [isFavorite ? 1 : 0, id]);
 }
 
+export function duplicateRecipe(
+  recipe: {
+    id: string;
+    name: string;
+    type?: 'COFFEE' | 'TEA';
+    beverageType?: 'COFFEE' | 'TEA';
+    method: string;
+    author?: string;
+    description?: string;
+    coffeeOrTeaDoseGrams?: number;
+    doseGrams?: number;
+    waterWeightGrams?: number;
+    waterGrams?: number;
+    waterTemperatureCelsius?: number;
+    waterTempCelsius?: number;
+    grindSettingDescriptionPl?: string;
+    grindSizeDescription?: string;
+    recommendedRatio: number;
+    steps?: any[];
+    stepsJson?: string;
+  },
+  copySuffix = ' (Kopia)'
+): SavedRecipe {
+  const now = new Date().toISOString();
+  const id = `custom-clone-${Date.now()}`;
+  const name = `${recipe.name}${copySuffix}`;
+  const beverageType = recipe.beverageType || recipe.type || 'COFFEE';
+  const doseGrams = recipe.doseGrams ?? recipe.coffeeOrTeaDoseGrams ?? 15;
+  const waterGrams = recipe.waterGrams ?? recipe.waterWeightGrams ?? 250;
+  const waterTempCelsius = recipe.waterTempCelsius ?? recipe.waterTemperatureCelsius ?? 93;
+  const grindSizeDescription = recipe.grindSizeDescription || recipe.grindSettingDescriptionPl;
+  const stepsJson = recipe.stepsJson || (recipe.steps ? JSON.stringify(recipe.steps) : '[]');
+
+  const cloned: SavedRecipe = {
+    id,
+    name,
+    beverageType,
+    method: recipe.method,
+    author: recipe.author ? `${recipe.author} (Modyfikacja)` : 'Własna',
+    description: recipe.description,
+    doseGrams,
+    waterGrams,
+    waterTempCelsius,
+    grindSizeDescription,
+    recommendedRatio: recipe.recommendedRatio,
+    stepsJson,
+    isCustom: true,
+    isFavorite: false,
+    createdAt: now,
+  };
+
+  saveRecipe(cloned);
+  return cloned;
+}
+
 function mapRowToRecipe(row: any): SavedRecipe {
   return {
     id: row.id,

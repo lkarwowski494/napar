@@ -204,4 +204,24 @@ describe('BrewTimerEngine', () => {
 
     engine.destroy();
   });
+
+  test('Korekta czasu w locie (adjustStepDuration) dynamicznie wydłuża i skraca czas trwania etapu', () => {
+    const engine = new BrewTimerEngine(testSteps);
+    engine.start();
+    expect(engine.getSnapshot().currentStep?.durationSeconds).toBe(30);
+
+    // Dodaj 10 sekund
+    engine.adjustStepDuration(10);
+    expect(engine.getSnapshot().currentStep?.durationSeconds).toBe(40);
+
+    // Odejmij 20 sekund
+    engine.adjustStepDuration(-20);
+    expect(engine.getSnapshot().currentStep?.durationSeconds).toBe(20);
+
+    engine.destroy();
+
+    // Wywołanie na pustym silniku bez kroków nie rzuca błędu
+    const emptyEngine = new BrewTimerEngine([]);
+    expect(() => emptyEngine.adjustStepDuration(10)).not.toThrow();
+  });
 });

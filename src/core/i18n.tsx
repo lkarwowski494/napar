@@ -91,6 +91,10 @@ export const translations = {
       importActionBtn: 'Zaimportuj i Zapisz',
       importError: 'Nieprawidłowy format lub uszkodzony link receptury.',
       importSuccess: 'Receptura została zaimportowana i zapisana w Twojej bazie!',
+      duplicateRecipe: 'Duplikuj recepturę',
+      duplicateSuccess: 'Receptura została sklonowana do Twoich własnych receptur.',
+      addTime10: '+10s',
+      subTime10: '-10s',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha 🍵',
@@ -146,6 +150,7 @@ export const translations = {
       deleteRecipeConfirmTitle: 'Usunąć recepturę?',
       deleteRecipeConfirmMsg: 'Ta operacja jest nieodwracalna.',
       fillRequired: 'Wypełnij nazwę i dodaj przynajmniej jeden krok parzenia.',
+      duplicateBtn: 'Duplikuj jako nową recepturę',
     },
     stash: {
       title: 'Spiżarnia Ziaren & Herbat',
@@ -390,6 +395,10 @@ export const translations = {
       importActionBtn: 'Import and Save',
       importError: 'Invalid or corrupt recipe link.',
       importSuccess: 'Recipe imported and saved to your local database!',
+      duplicateRecipe: 'Duplicate Recipe',
+      duplicateSuccess: 'Recipe duplicated to your custom recipes.',
+      addTime10: '+10s',
+      subTime10: '-10s',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha 🍵',
@@ -445,6 +454,7 @@ export const translations = {
       deleteRecipeConfirmTitle: 'Delete Recipe?',
       deleteRecipeConfirmMsg: 'This action cannot be undone.',
       fillRequired: 'Please provide a recipe name and at least one pour step.',
+      duplicateBtn: 'Duplicate as New Recipe',
     },
     stash: {
       title: 'Coffee & Tea Stash',

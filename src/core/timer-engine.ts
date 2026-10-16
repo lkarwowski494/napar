@@ -150,6 +150,14 @@ export class BrewTimerEngine {
     }
   }
 
+  public adjustStepDuration(deltaSeconds: number): void {
+    const currentStep = this.getCurrentStep();
+    if (!currentStep) return;
+    const newDuration = Math.max(this.stepElapsedSeconds + 1, currentStep.durationSeconds + deltaSeconds);
+    currentStep.durationSeconds = newDuration;
+    this.notifyTick();
+  }
+
   public finish(): void {
     this.clearInterval();
     this.status = 'finished';

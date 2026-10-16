@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
-import { getRecipes, getInventoryItems, toggleRecipeFavorite, saveRecipe } from '../../src/core/database';
+import { getRecipes, getInventoryItems, toggleRecipeFavorite, saveRecipe, duplicateRecipe } from '../../src/core/database';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
 import { InventoryItem, SavedRecipe } from '../../src/core/database-schema';
 import { FlavorWheelPicker } from '../../src/core/flavor-wheel-picker';
@@ -57,6 +57,7 @@ export default function BrewScreen() {
     resetTimer,
     nextStep,
     previousStep,
+    adjustStepDuration,
     finishAndSaveSession,
     waterProfile,
     setWaterProfile,
@@ -144,6 +145,15 @@ export default function BrewScreen() {
     } else {
       resetTimer();
     }
+  };
+
+  const handleDuplicateRecipe = (r: any) => {
+    const cloned = duplicateRecipe(r);
+    refreshData();
+    Alert.alert(
+      t.brew.duplicateRecipe,
+      `${t.brew.duplicateSuccess} ("${cloned.name}")`
+    );
   };
 
   const refreshData = () => {
@@ -458,9 +468,33 @@ export default function BrewScreen() {
               <Text style={styles.stepBadge}>
                 Krok {snapshot.currentStepIndex + 1} z {snapshot.totalSteps}
               </Text>
-              <Text style={styles.stepCountdown}>
-                {snapshot.stepRemainingSeconds}s
-              </Text>
+              <View style={styles.countdownAdjustRow}>
+                {(snapshot.status === 'running' || snapshot.status === 'paused') && (
+                  <Pressable
+                    style={styles.timeAdjustPill}
+                    onPress={() => adjustStepDuration(-10)}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel="Odejmij 10 sekund"
+                  >
+                    <Text style={styles.timeAdjustPillText}>{t.brew.subTime10}</Text>
+                  </Pressable>
+                )}
+                <Text style={styles.stepCountdown}>
+                  {snapshot.stepRemainingSeconds}s
+                </Text>
+                {(snapshot.status === 'running' || snapshot.status === 'paused') && (
+                  <Pressable
+                    style={styles.timeAdjustPill}
+                    onPress={() => adjustStepDuration(10)}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel="Dodaj 10 sekund"
+                  >
+                    <Text style={styles.timeAdjustPillText}>{t.brew.addTime10}</Text>
+                  </Pressable>
+                )}
+              </View>
             </View>
 
             <Text style={styles.stepName}>
@@ -646,6 +680,18 @@ export default function BrewScreen() {
                     <Text style={[styles.favToggleIcon, r.isFavorite && styles.favToggleIconActive]}>
                       {r.isFavorite ? '★' : '☆'}
                     </Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.duplicateRecipeBtn}
+                    hitSlop={8}
+                    onPress={(e) => {
+                      e?.stopPropagation?.();
+                      handleDuplicateRecipe(r);
+                    }}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t.brew.duplicateRecipe}: ${r.name}`}
+                  >
+                    <Text style={styles.duplicateRecipeBtnText}>📋</Text>
                   </Pressable>
                   {r.isCustom && (
                     <Pressable
@@ -1531,6 +1577,35 @@ const styles = StyleSheet.create({
   },
   editRecipeBtnText: {
     fontSize: 14,
+  },
+  duplicateRecipeBtn: {
+    padding: 6,
+    borderRadius: 6,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginLeft: 8,
+  },
+  duplicateRecipeBtnText: {
+    fontSize: 14,
+  },
+  countdownAdjustRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  timeAdjustPill: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: theme.borderRadius.full,
+  },
+  timeAdjustPillText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.copperLight,
   },
   gongfuBanner: {
     backgroundColor: 'rgba(42, 123, 98, 0.15)',

@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getRecipeById, saveRecipe, deleteRecipe } from '../src/core/database';
+import { getRecipeById, saveRecipe, deleteRecipe, duplicateRecipe } from '../src/core/database';
 import { SavedRecipe } from '../src/core/database-schema';
 import { RecipeStep } from '../src/core/recipes-data';
 import { calculateBrewRatio } from '../src/core/domain-rules';
@@ -190,6 +190,16 @@ export default function RecipeBuilderScreen() {
         router.back();
       },
     });
+  };
+
+  const handleDuplicate = () => {
+    if (!id) return;
+    const existing = getRecipeById(id);
+    if (!existing) return;
+    const cloned = duplicateRecipe(existing);
+    announce(t.recipeBuilder.duplicateBtn);
+    Alert.alert('Zduplikowano', `Utworzono kopię: "${cloned.name}"`);
+    router.back();
   };
 
   return (
@@ -420,11 +430,16 @@ export default function RecipeBuilderScreen() {
           <Text style={styles.mainSaveBtnText}>{t.recipeBuilder.saveRecipeBtn}</Text>
         </Pressable>
 
-        {/* Przycisk usuwania (w trybie edycji) */}
+        {/* Przycisk usuwania i duplikowania (w trybie edycji) */}
         {isEditing && (
-          <Pressable style={styles.deleteBtn} onPress={handleDelete}>
-            <Text style={styles.deleteBtnText}>{t.common.delete}</Text>
-          </Pressable>
+          <>
+            <Pressable style={styles.duplicateBtn} onPress={handleDuplicate}>
+              <Text style={styles.duplicateBtnText}>📋 {t.recipeBuilder.duplicateBtn}</Text>
+            </Pressable>
+            <Pressable style={styles.deleteBtn} onPress={handleDelete}>
+              <Text style={styles.deleteBtnText}>{t.common.delete}</Text>
+            </Pressable>
+          </>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -639,6 +654,20 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 16,
+  },
+  duplicateBtn: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  duplicateBtnText: {
+    color: theme.colors.copperLight,
+    fontWeight: '600',
+    fontSize: 14,
   },
   deleteBtn: {
     backgroundColor: 'transparent',

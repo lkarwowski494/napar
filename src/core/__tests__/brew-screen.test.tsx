@@ -1138,6 +1138,75 @@ describe('BrewScreen UI Integration', () => {
 
     jest.useRealTimers();
   });
+
+  test('Duplikowanie receptury (📋) w modalu wyboru tworzy kopię receptury', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz modal wyboru receptury
+    const recipeCard = findPressableWithText(tree.root, 'RECEPTURA');
+    expect(recipeCard).toBeTruthy();
+    act(() => {
+      recipeCard.props.onPress();
+    });
+
+    // Znajdź przycisk 📋 (duplikuj)
+    const duplicateBtns = tree.root.findAll((n: any) => n.props?.accessibilityLabel?.includes('Duplikuj recepturę'));
+    expect(duplicateBtns.length).toBeGreaterThan(0);
+
+    act(() => {
+      duplicateBtns[0].props.onPress();
+    });
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Duplikuj recepturę',
+      expect.stringContaining('Receptura została sklonowana')
+    );
+  });
+
+  test('Przyciski -10s i +10s w trakcie parzenia dynamicznie korygują czas trwania etapu (Z-009)', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Rozpocznij parzenie
+    act(() => {
+      findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE')?.props.onPress();
+    });
+
+    // Sprawdź przycisk +10s
+    const plus10Btn = findPressableWithText(tree.root, '+10s');
+    expect(plus10Btn).toBeTruthy();
+    act(() => {
+      plus10Btn?.props.onPress();
+    });
+
+    // Czas trwania etapu wydłużył się
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('"55"'); // 45s + 10s = 55s
+
+    // Sprawdź przycisk -10s
+    const minus10Btn = findPressableWithText(tree.root, '-10s');
+    expect(minus10Btn).toBeTruthy();
+    act(() => {
+      minus10Btn?.props.onPress();
+    });
+
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('"45"'); // powrót do 45s
+  });
 });
 
 function findPressableWithText(root: any, text: string) {

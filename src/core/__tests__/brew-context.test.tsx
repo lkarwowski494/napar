@@ -415,4 +415,71 @@ describe('BrewContext & BrewProvider', () => {
     });
     databaseModule.setVoiceAnnounceEnabled(true);
   });
+
+  test('VoiceOver w języku angielskim, adjustStepDuration, zmiana profilu wody, młynka oraz fallbacks zapisu', () => {
+    jest.useFakeTimers();
+    const announceSpy = jest
+      .spyOn(require('react-native').AccessibilityInfo, 'announceForAccessibility')
+      .mockImplementation(() => {});
+
+    databaseModule.setVoiceAnnounceEnabled(true);
+    databaseModule.setAppSetting('app_language', 'en');
+
+    let brewData: any;
+    const Consumer = () => {
+      brewData = useBrew();
+      return null;
+    };
+
+    renderer.act(() => {
+      renderer.create(
+        <BrewProvider>
+          <Consumer />
+        </BrewProvider>
+      );
+    });
+
+    // Zmień młynek i profil wody
+    renderer.act(() => {
+      brewData.setGrinderId('timemore_c2_c3');
+      brewData.setWaterProfile('nordic_light');
+      brewData.setGrindSetting(''); // Pusty ciąg, aby wymusić fallback z rekomendacji młynka
+    });
+
+    expect(brewData.grinderId).toBe('timemore_c2_c3');
+    expect(brewData.waterProfile).toBe('nordic_light');
+
+    // Start timera w języku angielskim
+    renderer.act(() => {
+      brewData.startTimer();
+    });
+    expect(announceSpy).toHaveBeenCalledWith(expect.stringContaining('Step 1'));
+
+    // Korekta czasu etapu
+    renderer.act(() => {
+      brewData.adjustStepDuration(10);
+    });
+
+    // Ostrzeżenie przed końcem w języku angielskim
+    const stepDuration = brewData.snapshot.currentStep.durationSeconds;
+    renderer.act(() => {
+      jest.advanceTimersByTime((stepDuration - 3) * 1000);
+    });
+    expect(announceSpy).toHaveBeenCalledWith('3 seconds remaining in this step.');
+
+    // Zapisz sesję bez przypisania ziarna (fallback na recipe.name) i z jawnym waterProfile
+    let saved: any;
+    renderer.act(() => {
+      saved = brewData.finishAndSaveSession({
+        waterProfile: 'hendon_custom',
+      });
+    });
+
+    expect(saved.waterProfile).toBe('hendon_custom');
+    expect(saved.grindSetting).toContain('Timemore');
+    expect(announceSpy).toHaveBeenCalledWith(expect.stringContaining('finished. Total time:'));
+
+    jest.useRealTimers();
+    databaseModule.setAppSetting('app_language', 'pl');
+  });
 });

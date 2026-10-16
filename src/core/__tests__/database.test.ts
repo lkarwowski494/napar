@@ -14,6 +14,7 @@ import {
   saveRecipe,
   toggleRecipeFavorite,
   updateRecipeFavorite,
+  duplicateRecipe,
   getBrewSessions,
   getBrewSessionById,
   saveBrewSession,
@@ -76,7 +77,11 @@ const mockDb: any = {
       return Array.from(mockDb.sessions.values());
     }
     if (query.includes('FROM caffeine_logs')) {
-      return Array.from(mockDb.caffeine.values());
+      let rows = Array.from(mockDb.caffeine.values());
+      if (query.includes('WHERE consumed_at >= ?') && params && params[0]) {
+        rows = rows.filter((r: any) => r.consumed_at >= params[0]);
+      }
+      return rows;
     }
     return [];
   }),
@@ -234,6 +239,99 @@ describe('Napar SQLite Database & Repositories', () => {
     const toggled = toggleRecipeFavorite('rec-fav-1');
     expect(toggled).toBe(true);
     expect(getRecipes()[0].isFavorite).toBe(true);
+  });
+
+  test('Duplikowanie receptury tworzy nową recepturę autorską ze statusem isCustom=true', () => {
+    const original: SavedRecipe = {
+      id: 'rec-orig-1',
+      name: 'V60 Sweet Bloom',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      author: 'James H',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      recommendedRatio: 16.67,
+      stepsJson: '[]',
+      isCustom: false,
+      isFavorite: false,
+      createdAt: '2026-10-10T10:00:00Z',
+    };
+    saveRecipe(original);
+
+    const cloned = duplicateRecipe(original);
+    expect(cloned.id).not.toBe(original.id);
+    expect(cloned.name).toBe('V60 Sweet Bloom (Kopia)');
+    expect(cloned.isCustom).toBe(true);
+    expect(cloned.isFavorite).toBe(false);
+    expect(cloned.author).toBe('James H (Modyfikacja)');
+
+    const recipes = getRecipes();
+    expect(recipes.find((r) => r.id === cloned.id)).toBeTruthy();
+
+    // Pokrycie gałęzi z MasterRecipe (pola alternatywne: type, coffeeOrTeaDoseGrams, steps, brak autora)
+    const masterLike = {
+      id: 'master-tea-1',
+      name: 'Gyokuro Shizuku',
+      type: 'TEA' as const,
+      method: 'Kyusu',
+      coffeeOrTeaDoseGrams: 6,
+      waterWeightGrams: 60,
+      waterTemperatureCelsius: 50,
+      grindSettingDescriptionPl: 'Liście całe',
+      recommendedRatio: 10,
+      steps: [{ stepNamePl: 'Infuzja 1', durationSeconds: 90, waterGrams: 60 }],
+    };
+    const clonedTea = duplicateRecipe(masterLike, ' [Klon]');
+    expect(clonedTea.name).toBe('Gyokuro Shizuku [Klon]');
+    expect(clonedTea.beverageType).toBe('TEA');
+    expect(clonedTea.doseGrams).toBe(6);
+    expect(clonedTea.waterGrams).toBe(60);
+    expect(clonedTea.waterTempCelsius).toBe(50);
+    expect(clonedTea.author).toBe('Własna');
+    expect(clonedTea.stepsJson).toContain('Infuzja 1');
+
+    // Minimalny obiekt z wartościami domyślnymi
+    const minimal = {
+      id: 'minimal-1',
+      name: 'Minimal',
+      method: 'Drip',
+      recommendedRatio: 15,
+    };
+    const clonedMin = duplicateRecipe(minimal);
+    expect(clonedMin.beverageType).toBe('COFFEE');
+    expect(clonedMin.doseGrams).toBe(15);
+    expect(clonedMin.waterGrams).toBe(250);
+    expect(clonedMin.waterTempCelsius).toBe(93);
+  });
+
+  test('toggleRecipeFavorite zwraca false gdy receptura nie istnieje', () => {
+    expect(toggleRecipeFavorite('non-existent-rec-id')).toBe(false);
+  });
+
+  test('getCaffeineLogs filtruje według sinceIso', () => {
+    const log1: CaffeineLog = {
+      id: 'caff-iso-1',
+      beverageName: 'Kawa 1',
+      beverageType: 'coffee',
+      consumedAt: '2026-10-01T10:00:00Z',
+      doseGrams: 15,
+      caffeineMg: 100,
+    };
+    const log2: CaffeineLog = {
+      id: 'caff-iso-2',
+      beverageName: 'Kawa 2',
+      beverageType: 'coffee',
+      consumedAt: '2026-10-15T10:00:00Z',
+      doseGrams: 18,
+      caffeineMg: 130,
+    };
+    logCaffeine(log1);
+    logCaffeine(log2);
+
+    const filtered = getCaffeineLogs('2026-10-10T00:00:00Z');
+    expect(filtered.length).toBe(1);
+    expect(filtered[0].id).toBe('caff-iso-2');
   });
 
   test('Zapis sesji parzenia i rejestru kofeiny z profilem sensorycznym', () => {
@@ -396,9 +494,24 @@ describe('Napar SQLite Database & Repositories', () => {
     };
     saveBrewSession(session);
 
+    // Minimalna sesja bez opcjonalnych pól
+    const sessionMinimal: BrewSession = {
+      id: 'sess-csv-min',
+      beverageType: 'TEA',
+      method: 'Gongfu',
+      doseGrams: 5,
+      waterGrams: 100,
+      waterTempCelsius: 95,
+      totalTimeSeconds: 20,
+      flavorTags: [],
+      brewedAt: '2026-10-15T11:00:00Z',
+    };
+    saveBrewSession(sessionMinimal);
+
     const csv = exportSessionsCsv();
     expect(csv).toContain('id,brewed_at,beverage_type,method');
     expect(csv).toContain('sess-csv-1');
+    expect(csv).toContain('sess-csv-min');
     expect(csv).toContain('V60 Sweet Bloom');
     expect(csv).toContain('"Etiopia Guji, Natural"');
     expect(csv).toContain('15,250,93,165,4.8,balanced,1.38,23,135');
@@ -424,14 +537,31 @@ describe('Napar SQLite Database & Repositories', () => {
     };
     saveInventoryItem(item);
 
+    // Pozycja bez opcjonalnych właściwości
+    const itemMinimal: InventoryItem = {
+      id: 'inv-csv-min',
+      name: 'Simple Tea',
+      type: 'tea',
+      initialWeightGrams: 100,
+      remainingWeightGrams: 100,
+      flavorNotes: [],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-10-01T10:00:00Z',
+      updatedAt: '2026-10-01T10:00:00Z',
+    };
+    saveInventoryItem(itemMinimal);
+
     const csv = exportInventoryCsv();
     expect(csv).toContain('id,name,type,roaster_or_producer');
     expect(csv).toContain('inv-csv-1');
+    expect(csv).toContain('inv-csv-min');
     expect(csv).toContain('Kenya Nyeri Peaberry');
     expect(csv).toContain('"Specialty Roastery, Warsaw"');
     expect(csv).toContain('250,210');
     expect(csv).toContain('czarna porzeczka; rabarbar');
     expect(csv).toContain(',1,0'); // isFavorite: 1, isArchived: 0
+    expect(csv).toContain(',0,0'); // isFavorite: 0, isArchived: 0
   });
 
   test('getInventoryItemById pobiera paczkę lub zwraca null gdy brak', () => {
