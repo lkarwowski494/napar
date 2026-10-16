@@ -1,4 +1,4 @@
-name: CI: Typy, Kontrakty, Pokrycie i Zero-Telemetria
+name: "CI: Typy, Kontrakty, Pokrycie i Zero-Telemetria"
 
 on:
   push:
