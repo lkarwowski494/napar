@@ -34,10 +34,11 @@ import { WATER_RECIPES } from '../../src/core/water-chemistry';
 import { SUPPORTED_GRINDERS, getRecommendedGrindForRecipe } from '../../src/core/grinder-converter';
 import { encodeRecipeToShareUrl, decodeRecipeFromShareUrl } from '../../src/core/recipe-share';
 import { QrCodeSvg } from '../../src/core/qr-code';
+import { confirmAction } from '../../src/core/confirm';
 
 export default function BrewScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const {
     recipe,
     selectedInventoryItem,
@@ -105,9 +106,44 @@ export default function BrewScreen() {
   };
 
   const handleSelectRecipe = (r: any) => {
-    selectRecipe(r);
-    setServings(1);
-    setShowRecipeModal(false);
+    if (snapshot.totalElapsedSeconds > 0 && snapshot.status !== 'finished') {
+      confirmAction({
+        title: language === 'en' ? 'Change recipe?' : 'Zmienić recepturę?',
+        message:
+          language === 'en'
+            ? 'An active brew session is in progress. Changing recipe will reset timer progress.'
+            : 'Trwa aktywna sesja parzenia. Zmiana receptury zresetuje postęp stopera.',
+        actionText: language === 'en' ? 'Change' : 'Zmień',
+        destructive: true,
+        onConfirm: () => {
+          resetTimer();
+          selectRecipe(r);
+          setServings(1);
+          setShowRecipeModal(false);
+        },
+      });
+    } else {
+      selectRecipe(r);
+      setServings(1);
+      setShowRecipeModal(false);
+    }
+  };
+
+  const handleResetWithConfirm = () => {
+    if (snapshot.totalElapsedSeconds > 0) {
+      confirmAction({
+        title: language === 'en' ? 'Reset brew session?' : 'Zresetować sesję parzenia?',
+        message:
+          language === 'en'
+            ? 'Current brew progress will be cleared.'
+            : 'Bieżący postęp parzenia zostanie wyzerowany.',
+        actionText: language === 'en' ? 'Reset' : 'Zresetuj',
+        destructive: true,
+        onConfirm: resetTimer,
+      });
+    } else {
+      resetTimer();
+    }
   };
 
   const refreshData = () => {
@@ -505,7 +541,7 @@ export default function BrewScreen() {
           <>
             <Pressable
               style={styles.resetButton}
-              onPress={resetTimer}
+              onPress={handleResetWithConfirm}
               accessibilityRole="button"
               accessibilityLabel="Zresetuj stoper"
               accessibilityHint="Zeruje czas i wraca do stanu początkowego"

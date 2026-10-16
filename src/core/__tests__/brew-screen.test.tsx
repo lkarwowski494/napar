@@ -1058,6 +1058,86 @@ describe('BrewScreen UI Integration', () => {
 
     expect(waterChip.props.accessibilityState.selected).toBe(true);
   });
+
+  test('Ochrona przed przypadkowym przerwaniem sesji (BR-PARZ-004): potwierdzenie resetu i zmiany receptury', () => {
+    jest.useFakeTimers();
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Start timera
+    const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
+    act(() => startBtn.props.onPress());
+
+    // Przesuń czas o 2 sekundy, aby sesja miała postęp
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    // Pauza
+    const pauseBtn = findPressableWithText(tree.root, 'PAUZA');
+    act(() => pauseBtn.props.onPress());
+
+    // Próba zresetowania stopera wywołuje Alert.alert z potwierdzeniem
+    const resetBtn = findPressableWithText(tree.root, 'Reset');
+    act(() => resetBtn.props.onPress());
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Zresetować'),
+      expect.any(String),
+      expect.any(Array)
+    );
+
+    const resetAlertCall = alertSpy.mock.calls.find(
+      (call) => typeof call[0] === 'string' && call[0].includes('Zresetować')
+    );
+    expect(resetAlertCall).toBeDefined();
+    const confirmResetBtn = resetAlertCall![2]?.find((btn: any) => btn.text === 'Zresetuj');
+    if (confirmResetBtn?.onPress) {
+      act(() => confirmResetBtn.onPress!());
+    }
+
+    // Start ponownie, aby przetestować zmianę receptury
+    const startAgainBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
+    act(() => startAgainBtn.props.onPress());
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    // Otwarcie modalu receptur i próba zmiany w trakcie aktywnej sesji
+    const recipeCard = tree.root.findByProps({
+      accessibilityLabel: 'Wybrany przepis: V60 — Metoda 4:6',
+    });
+    act(() => recipeCard.props.onPress());
+
+    const recipeOption = findPressableWithText(tree.root, 'AeroPress Champion');
+    if (recipeOption) {
+      act(() => recipeOption.props.onPress());
+      expect(alertSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Zmienić recepturę'),
+        expect.any(String),
+        expect.any(Array)
+      );
+
+      const changeAlertCall = alertSpy.mock.calls.find(
+        (call) => typeof call[0] === 'string' && call[0].includes('Zmienić recepturę')
+      );
+      expect(changeAlertCall).toBeDefined();
+      const changeBtn = changeAlertCall![2]?.find((btn: any) => btn.text === 'Zmień');
+      if (changeBtn?.onPress) {
+        act(() => changeBtn.onPress!());
+      }
+    }
+
+    jest.useRealTimers();
+  });
 });
 
 function findPressableWithText(root: any, text: string) {
