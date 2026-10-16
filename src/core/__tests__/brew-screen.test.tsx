@@ -10,6 +10,7 @@ import { BrewProvider } from '../brew-context';
 import { QrScannerModal } from '../QrScannerModal';
 import { encodeRecipeToShareUrl } from '../recipe-share';
 import { MASTER_RECIPES } from '../recipes-data';
+import { resetTrialForTesting, setTrialExpiredForTesting } from '../app-access';
 
 jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
 jest.spyOn(Alert, 'alert').mockImplementation(() => {});
@@ -100,10 +101,15 @@ const mockDb: any = {
   ]),
   sessions: new Map(),
   caffeine: new Map(),
+  app_settings: new Map(),
   execSync: jest.fn(),
   getFirstSync: jest.fn((q, p) => {
     if (q.includes('COUNT(*) as count FROM recipes')) return { count: 2 };
     if (q.includes('FROM recipes WHERE id = ?')) return mockDb.recipes.get(p?.[0]) || null;
+    if (q.includes('FROM app_settings WHERE key = ?')) {
+      const val = mockDb.app_settings.get(p?.[0]);
+      return val !== undefined ? { value: val } : null;
+    }
     return null;
   }),
   getAllSync: jest.fn((q) => {
@@ -111,7 +117,11 @@ const mockDb: any = {
     if (q.includes('FROM inventory_items')) return Array.from(mockDb.inventory.values());
     return [];
   }),
-  runSync: jest.fn(),
+  runSync: jest.fn((q, p) => {
+    if (q.includes('INSERT OR REPLACE INTO app_settings')) {
+      mockDb.app_settings.set(p?.[0], p?.[1]);
+    }
+  }),
   prepareSync: jest.fn(() => ({
     executeSync: jest.fn(),
     finalizeSync: jest.fn(),
@@ -1363,6 +1373,60 @@ describe('BrewScreen UI Integration', () => {
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Ekonomia Rzemiosła');
     expect(str).toContain('Oszczędność vs kawiarnia');
+  });
+
+  test('Wygasły trial (trial_expired): Próba rozpoczęcia parzenia blokuje start i otwiera Apps4BrewPassModal', () => {
+    setTrialExpiredForTesting();
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Próba kliknięcia ROZPOCZNIJ PARZENIE
+    const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
+    expect(startBtn).toBeTruthy();
+
+    act(() => {
+      startBtn?.props.onPress();
+    });
+
+    // Paywall Modal powinien się pojawić z planami $0.99 / $4.99 / $14.99
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('APPS4BREW PASS');
+    expect(str).toContain('$4.99 / rok');
+    expect(str).toContain('Twoja historia parzeń');
+
+    // Reset dla kolejnych testów
+    resetTrialForTesting();
+  });
+
+  test('Aktywny trial: Pozwala rozpocząć parzenie i uruchamia stoper', () => {
+    resetTrialForTesting();
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
+    expect(startBtn).toBeTruthy();
+
+    act(() => {
+      startBtn?.props.onPress();
+    });
+
+    // Po starcie stoper przechodzi w tryb running z przyciskiem PAUZA
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('PAUZA');
   });
 });
 

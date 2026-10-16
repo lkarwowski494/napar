@@ -24,3 +24,13 @@ jest.mock('expo-camera', () => {
     ]),
   };
 });
+
+jest.mock(
+  'expo-asset',
+  () => ({
+    Asset: {
+      fromModule: jest.fn(),
+    },
+  }),
+  { virtual: true }
+);

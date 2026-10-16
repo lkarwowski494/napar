@@ -18,16 +18,14 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
 
 ## 📱 Moduły i Ekrany
 
-1. **☕ Asystent Parzenia (Active Brew Assistant):**
-   - Precyzyjny stoper z blokadą wygaszania ekranu (`expo-keep-awake`) i sygnałami wibracyjnymi (`expo-haptics`).
-   - Wskaźnik tempa nalewania (g/s) i dynamiczny pasek postępu wody dla każdego etapu.
-   - Płynne skalowanie gramatur przy zmianie dozy z zachowaniem właściwych proporcji (Batch Scaling 1–4 osób z korektą grubości przemiału).
-   - **⏱️ Korekta Czasu Etapu w Locie (Z-009):** Dotykowe pigułki `-10s` i `+10s` w nagłówku aktywnego kroku pozwalające w czasie rzeczywistym wydłużyć lub skrócić czas zalania bez resetowania timera.
-   - **📋 Klonowanie i Duplikacja Receptur (Z-024):** Przycisk `📋` przy każdej recepturze wzorcowej i autorskiej tworzący natychmiastową kopię w lokalnej bazie SQLite do swobodnej edycji i personalizacji.
-   - **⚙️ Młynek Domowy (Grinder Dial-in):** Precyzyjny selektor młynka specialty (Comandante C40 MK3/MK4, Timemore Chestnut C2/C3, 1Zpresso K-Ultra/K-Max, Fellow Ode Gen 2, Baratza Encore, Kingrinder K6) z automatycznym przeliczaniem mikronów ($\mu\text{m}$) na kliki/nastawę tarczy dla wybranej metody i trwałym zapamiętywaniem w SQLite.
-   - **📢 Dostępność VoiceOver & Haptyka (BR-DOST-001, DEC-13):** Automatyczne mówione anonsowanie zmian etapów (`AccessibilityInfo.announceForAccessibility`), wagi docelowej wody, 3-sekundowych ostrzeżeń przed końcem zalania, sygnałów haptycznych (`expo-haptics`) i podsumowania po zakończeniu sesji (stworzone z myślą o osobach niewidomych i słabowidzących, Persona Ewa P4).
-   - **📱 Wymiana Receptur Offline (Kody QR SVG & Universal Links — DEC-20):** Błyskawiczne udostępnianie i importowanie receptur w 100% offline (zero konta, zero chmury, zero telemetry). Wektorowy generator kodów QR SVG, protokół deep link `napar://recipe?v=1&d=...` oraz `https://napar.app/recipe?v=1&d=...`, natywne udostępnianie systemowe (`Share.share`) oraz modal importu z podglądem kroków.
-   - Karta degustacyjna po zakończeniu: ocena w gwiazdkach, profil balansu smaku, nuty smakowe, wybór profilu użytej wody, odczyt refractometru TDS.
+1. **☕ Asystent Parzenia Kitchen-Proof (Active Brew Assistant):**
+   - **Wyeksponowana Nastawa Młynka (`BrewHeader`):** Prominentna pigułka z dokładną liczbą klików (np. `Comandante C40: 22 kliki`, `Timemore: 18 klików`) widoczna na samej górze ekranu przed każdym zalaniem.
+   - **1-Tap Szybki Start (`BrewQuickPrepCard`):** Karta „Do drippera na wagę” z dużymi stepperami dozy (wysokość 44–52pt), wskaźnikiem wody, temperatury i natychmiastowym rozpoczęciem sesji poniżej 15 sekund.
+   - **Batch Scaling (👥 Porcje 1–4 osób):** Automatyczne przeliczanie dozy i wody wraz z dynamiczną rekomendacją przemiału (`+2 kliki grubiej`).
+   - **Focus Mode Stoper (`BrewActiveFocusTimer`):** Cyfrowy zegar z gigantycznymi cyframi (64pt) czytelnymi z odległości 1 metra, wskaźnikiem przepływu `~g/s`, pigułkami korekty w locie (`-10s` / `+10s`) oraz kontrolkami brudnego kciuka (`PAUZA`, `DALEJ ▶`, `WSTECZ`, `RESET`, `WZNÓW`, `ZAPISZ` $\ge 52\,\text{pt}$).
+   - **Progressive Disclosure (`BrewProAccordion`):** Schowany pod eleganckim, zwijanym panelem zaawansowany zestaw rzemieślniczy: chemia wody Barista Hustle / SCA, odczyt refractometru TDS (%) oraz radar sensoryczny SCA.
+   - **Karta Degustacyjna & Dial-in Doctor (`BrewFinishModal`):** 1-klikowa autodiagnoza smaku (kwasowość, gorycz, wodnistość) z natychmiastową receptą ratunkową oraz podsumowaniem **Ekonomii Rzemiosła** (koszt domowy vs 18 zł w kawiarni specialty).
+   - **Wymiana Receptur Offline (Kody QR SVG & Deep Linki `napar://`):** Szybkie skanowanie aparatem i udostępnianie receptur w 100% offline.
 2. **🫘 Spiżarnia Ziaren & Liści (Stash) & Kompendium Wiedzy:**
    - Śledzenie świeżości ziaren kawy (okno *Resting Window*: odgazowywanie CO₂, szczyt smaku *Peak*, stabilne okno, dojrzałe ziarna).
    - **✏️ Edycja Paczki & Szybkie Steppery Wagowe (BR-MAG-001):** Pełny modal edycji metadanych paczki (odmiana botaniczna, proces obróbki, data palenia, waga) oraz przyciski szybkiej korekty (`-15 g`, `-18 g`, `+15 g`, `0 g`).
@@ -69,7 +67,10 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - **📢 Dostępność i Sygnały (VoiceOver & Haptyka — BR-DOST-001, DEC-13):** Konfiguracja komunikatów głosowych czytnika ekranu oraz sygnałów wibracyjnych z natychmiastowym zapisem w SQLite. [Wdrożone]
    - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite. [Wdrożone]
    - Eksport i import bazy w formacie JSON oraz eksport do arkuszy CSV (Dziennik i Spiżarnia). [Wdrożone]
-   - **💎 Model Monetyzacji & StoreKit 2 (BR-ZAK-001, ZP-08):** Darmowy rdzeń + Napar Pro (Miesięczny 3,99 zł / 0,99 €, Roczny 19,99 zł / 4,99 € z 14-dniowym okresem próbnym Trial, Dożywotni Lifetime 59,99 zł / 14,99 € z Chmurą rodzinną Family Sharing oraz przycisk Przywróć wcześniejsze zakupy z persystencją statusu Pro w SQLite). [Wdrożone]
+   - **💎 Model Monetyzacji „Taniej niż espresso” (Apps4Brew Pass):**
+     - **Cennik:** $0.99 USD / mies. (~4,49 zł), $4.99 USD / rok (~22,99 zł, oferta główna!), $14.99 USD Lifetime (~69,99 zł na zawsze z Chmurą rodzinną Family Sharing).
+     - **Zero podziału Free/Pro:** W okresie próbnym (Free Trial: 7 dni lub 3 parzenia) użytkownik ma dostęp do 100% możliwości (brak sztucznie blokowanych funkcji).
+     - **Gwarancja Historii Read-Only (Ochrona 4.9★):** Po wygaśnięciu trialu blokowane jest jedynie tworzenie nowych sesji i parzeń, a cała historia, Dziennik i notatki pozostają ZAWSZE bezpłatne i czytelne w 100% offline. [Wdrożone]
 8. **⌚ Ekosystem Apple: Apple Watch, Live Activity & Widżety (BR-ZEG-001 do BR-ZEG-005):**
    - **Live Activity & Dynamic Island (BR-ZEG-003, BR-ZEG-004):** Natywny mostek ActivityKit (`ActivityAttributes` i `ContentState`) dla ekranu blokady i Dynamic Island (kompaktowy i rozszerzony podgląd z wagą wody, czasem etapu i stanem timera). [Wdrożone]
    - **Apple Watch & Widżety WidgetKit (BR-ZEG-001, BR-ZEG-002, BR-ZEG-005):** Mostek synchronizacji sesji i wzorców haptycznych na nadgarstku oraz kontener danych dla widżetów kofeiny. [W trakcie wdrażania]
