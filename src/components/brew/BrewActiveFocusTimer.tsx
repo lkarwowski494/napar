@@ -1,7 +1,7 @@
 // ============================================================================
-// Napar (Steepwise) — BrewActiveFocusTimer Component (Focus Mode UI)
-// Giant digits readable from 1 meter, live flow-rate, dirty thumb controls.
-// Apps4Brew Studio — 100% Offline-First.
+// Napar (Steepwise) — BrewActiveFocusTimer Component (Apps4Craft Design System)
+// Immersive Focus Mode: Clear typography readable from 1 meter, fat thumb controls.
+// 100% Offline-First.
 // ============================================================================
 
 import React from 'react';
@@ -46,9 +46,12 @@ export function BrewActiveFocusTimer({
 
   return (
     <View style={styles.container} testID="active-focus-timer">
-      {/* Główny stoper parzenia: Duże cyfry czytelne z 1 metra */}
+      {/* Główna karta stopera: Duże cyfry czytelne z 1,5 metra */}
       <View
-        style={styles.timerCard}
+        style={[
+          styles.timerCard,
+          (isRunning || isPaused) && styles.timerCardActive,
+        ]}
         accessible={true}
         accessibilityRole="timer"
         accessibilityLabel={`Całkowity czas: ${formatTime(snapshot.totalElapsedSeconds)}`}
@@ -171,7 +174,7 @@ export function BrewActiveFocusTimer({
             </Pressable>
 
             <Pressable
-              style={styles.secondaryButton}
+              style={styles.nextButton}
               onPress={onNextStep}
               accessibilityRole="button"
               accessibilityLabel={
@@ -183,7 +186,7 @@ export function BrewActiveFocusTimer({
                   : 'Przechodzi do kolejnego etapu zalewania'
               }
             >
-              <Text style={styles.secondaryButtonText}>
+              <Text style={styles.nextButtonText}>
                 {snapshot.isLastStep ? 'Zakończ ▶' : 'Dalej ▶'}
               </Text>
             </Pressable>
@@ -238,25 +241,30 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginBottom: 14,
+  },
+  timerCardActive: {
     borderColor: theme.colors.copper,
-    marginBottom: 16,
   },
   timerTotalLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 1.2,
     color: theme.colors.textMuted,
+    textTransform: 'uppercase',
   },
   timerDisplay: {
     ...theme.typography.timerDisplay,
-    fontSize: 64,
-    marginVertical: 8,
+    fontSize: 68,
+    marginVertical: 4,
+    color: theme.colors.textPrimary,
   },
   stepProgressContainer: {
     width: '100%',
-    height: 8,
-    backgroundColor: theme.colors.border,
-    borderRadius: 4,
+    height: 6,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: 3,
     overflow: 'hidden',
     marginBottom: 16,
   },
@@ -279,9 +287,11 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   stepBadge: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: theme.colors.copper,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   countdownAdjustRow: {
     flexDirection: 'row',
@@ -289,10 +299,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   timeAdjustPill: {
-    backgroundColor: theme.colors.bgCardSecondary,
+    backgroundColor: theme.colors.bgCard,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: theme.borderRadius.full,
     minHeight: 32,
@@ -310,10 +320,10 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   stepName: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '700',
     color: theme.colors.textPrimary,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   targetWaterRow: {
     flexDirection: 'row',
@@ -326,17 +336,18 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
   targetWaterValue: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
-    color: theme.colors.textPrimary,
+    color: theme.colors.copper,
+    fontVariant: ['tabular-nums'],
   },
   pourRateBadge: {
     fontSize: 11,
     color: theme.colors.copperLight,
-    backgroundColor: theme.colors.copperMuted,
-    paddingHorizontal: 6,
+    backgroundColor: 'rgba(217, 119, 54, 0.12)',
+    paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 4,
+    borderRadius: 6,
     fontWeight: '600',
   },
   stepInstruction: {
@@ -346,13 +357,13 @@ const styles = StyleSheet.create({
   },
   controlsRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
     justifyContent: 'center',
   },
   mainStartButton: {
     flex: 1,
     backgroundColor: theme.colors.copper,
-    paddingVertical: 18,
+    paddingVertical: 16,
     borderRadius: theme.borderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -360,14 +371,14 @@ const styles = StyleSheet.create({
   },
   mainStartButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   pauseButton: {
     flex: 1,
     backgroundColor: '#8C4C23',
-    paddingVertical: 16,
+    paddingVertical: 14,
     borderRadius: theme.borderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -375,12 +386,29 @@ const styles = StyleSheet.create({
   },
   pauseButtonText: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  nextButton: {
+    flex: 1,
+    backgroundColor: theme.colors.bgCard,
+    paddingVertical: 14,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 52,
+  },
+  nextButtonText: {
+    color: theme.colors.copper,
+    fontSize: 14,
     fontWeight: '700',
   },
   secondaryButton: {
     backgroundColor: theme.colors.bgCard,
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: theme.borderRadius.md,
     borderWidth: 1,
@@ -396,7 +424,7 @@ const styles = StyleSheet.create({
   },
   resetButton: {
     backgroundColor: theme.colors.bgCard,
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: theme.borderRadius.md,
     borderWidth: 1,

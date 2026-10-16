@@ -10,6 +10,7 @@ import { theme } from '../../core/theme';
 import { WATER_RECIPES } from '../../core/water-chemistry';
 import { SensoryProfile, SensoryRadarChart, SensoryScoreEditor } from '../../core/radar-chart';
 import { FlavorWheelPicker } from '../../core/flavor-wheel-picker';
+import { LabIcon } from '../icons/CraftIcons';
 
 interface BrewProAccordionProps {
   waterProfile: string;
@@ -48,7 +49,7 @@ export function BrewProAccordion({
         accessibilityLabel="Rozwiń parametry rzemieślnicze i chemię wody"
       >
         <View style={styles.headerTitleRow}>
-          <Text style={styles.headerIcon}>🔬</Text>
+          <LabIcon size={18} color={theme.colors.copper} />
           <Text style={styles.headerTitle}>Parametry Rzemieślnicze & Chemia Wody</Text>
         </View>
         <Text style={styles.headerArrow}>{isExpanded ? '▴' : '▾'}</Text>

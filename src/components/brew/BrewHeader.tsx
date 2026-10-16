@@ -1,7 +1,7 @@
 // ============================================================================
-// Napar (Steepwise) — BrewHeader Component (Kitchen-Proof UI)
-// Prominent Grinder Dial-in Clicks, Recipe & Stash Selectors, Quick Actions.
-// Apps4Brew Studio — 100% Offline-First.
+// Napar (Steepwise) — BrewHeader Component (Apps4Craft Design System)
+// Artisanal, calm header: Grinder Clicks, Recipe & Stash Selectors, Vector Icons.
+// 100% Offline-First. Zero Emojis.
 // ============================================================================
 
 import React from 'react';
@@ -9,6 +9,11 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../core/theme';
 import { useTranslation } from '../../core/i18n';
 import { InventoryItem } from '../../core/database-schema';
+import {
+  GrinderIcon,
+  QrIcon,
+  StarIcon,
+} from '../icons/CraftIcons';
 
 interface BrewHeaderProps {
   recipe: any;
@@ -55,7 +60,10 @@ export function BrewHeader({
       {/* 1-Click Szybkie Parzenie z Ulubionych Receptur */}
       {favoriteRecipes.length > 0 && !isRunning && (
         <View style={styles.favoritesSection}>
-          <Text style={styles.favoritesSectionTitle}>⭐ {t.favorites.title}</Text>
+          <View style={styles.favoritesTitleRow}>
+            <StarIcon size={13} color={theme.colors.copper} filled={true} />
+            <Text style={styles.favoritesSectionTitle}>{t.favorites.title}</Text>
+          </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -96,22 +104,24 @@ export function BrewHeader({
       {/* Pigułka Młynka: Wyeksponowana na górze z dokładnymi klikami */}
       <Pressable
         testID="grinder-pill-btn"
-        style={styles.actionPillCard}
+        style={styles.grinderPillCard}
         onPress={onOpenGrinderModal}
         accessibilityRole="button"
         accessibilityLabel={`Młynek: ${grinderRecommendation.grinderName}, nastawa ${grinderRecommendation.formatted}`}
       >
-        <Text style={styles.actionPillIcon}>⚙️</Text>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.actionPillLabel}>MŁYNEK</Text>
-          <Text style={styles.actionPillValue} numberOfLines={1}>
+        <View style={styles.pillIconBox}>
+          <GrinderIcon size={18} color={theme.colors.copper} />
+        </View>
+        <View style={{ flex: 1, marginLeft: 10 }}>
+          <Text style={styles.pillEyebrow}>MŁYNEK</Text>
+          <Text style={styles.pillValue} numberOfLines={1}>
             {grinderRecommendation.grinderName.split(' ')[0]}:{' '}
             <Text style={{ color: theme.colors.copper, fontWeight: '700' }}>
               {grinderRecommendation.formatted}
             </Text>
           </Text>
         </View>
-        <Text style={styles.actionPillArrow}>›</Text>
+        <Text style={styles.pillArrow}>›</Text>
       </Pressable>
 
       {/* Rząd selektorów: Receptura i Spiżarnia */}
@@ -122,7 +132,7 @@ export function BrewHeader({
           accessibilityRole="button"
           accessibilityLabel={`Wybrany przepis: ${recipe.name}`}
         >
-          <Text style={styles.selectorLabel}>RECEPTURA</Text>
+          <Text style={styles.selectorEyebrow}>RECEPTURA</Text>
           <Text style={styles.selectorValue} numberOfLines={1}>
             {recipe.name}
           </Text>
@@ -140,7 +150,7 @@ export function BrewHeader({
           accessibilityRole="button"
           accessibilityLabel="Wybierz ziarna ze spiżarni"
         >
-          <Text style={styles.selectorLabel}>SPIŻARNIA</Text>
+          <Text style={styles.selectorEyebrow}>SPIŻARNIA</Text>
           <Text style={styles.selectorValue} numberOfLines={1}>
             {selectedInventoryItem ? selectedInventoryItem.name : 'Wybierz ziarno...'}
           </Text>
@@ -161,14 +171,16 @@ export function BrewHeader({
           accessibilityLabel="Udostępnij recepturę przez kod QR"
           testID="share-recipe-btn"
         >
-          <Text style={styles.actionPillIcon}>📱</Text>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.actionPillLabel}>UDOSTĘPNIJ</Text>
-            <Text style={styles.actionPillValue} numberOfLines={1}>
+          <View style={styles.pillIconBox}>
+            <QrIcon size={16} color={theme.colors.copper} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 10 }}>
+            <Text style={styles.pillEyebrow}>UDOSTĘPNIJ</Text>
+            <Text style={styles.pillValue} numberOfLines={1}>
               Kod QR / Link
             </Text>
           </View>
-          <Text style={styles.actionPillArrow}>↗</Text>
+          <Text style={styles.pillArrow}>↗</Text>
         </Pressable>
       </View>
 
@@ -176,7 +188,7 @@ export function BrewHeader({
       {isTea && (
         <Pressable style={styles.gongfuBanner} onPress={onNavigateToGongfu}>
           <Text style={styles.gongfuBannerText}>
-            🍵 Przejdź do Trybu Wielokrotnych Zalań (Gongfu Cha Tracker) →
+            Przejdź do Trybu Wielokrotnych Zalań (Gongfu Cha Tracker) →
           </Text>
         </Pressable>
       )}
@@ -191,12 +203,17 @@ const styles = StyleSheet.create({
   favoritesSection: {
     marginBottom: 12,
   },
+  favoritesTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
   favoritesSectionTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: theme.colors.copper,
-    letterSpacing: 0.5,
-    marginBottom: 8,
+    letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
   favoritesScroll: {
@@ -204,16 +221,16 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   favoriteChip: {
-    backgroundColor: theme.colors.bgCardSecondary,
+    backgroundColor: theme.colors.bgCard,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.sm,
+    borderRadius: theme.borderRadius.md,
     paddingHorizontal: 12,
     paddingVertical: 8,
     maxWidth: 160,
   },
   favoriteChipActive: {
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    backgroundColor: 'rgba(217, 119, 54, 0.12)',
     borderColor: theme.colors.copper,
   },
   favoriteChipText: {
@@ -229,6 +246,43 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     marginTop: 2,
   },
+  grinderPillCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginBottom: 10,
+    minHeight: 52,
+  },
+  pillIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: 'rgba(217, 119, 54, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pillEyebrow: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    letterSpacing: 0.8,
+  },
+  pillValue: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+    marginTop: 1,
+  },
+  pillArrow: {
+    fontSize: 16,
+    color: theme.colors.textMuted,
+    marginLeft: 6,
+  },
   selectorRow: {
     flexDirection: 'row',
     gap: 10,
@@ -241,25 +295,27 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     borderColor: theme.colors.border,
+    minHeight: 68,
+    justifyContent: 'center',
   },
   selectorCardActive: {
     borderColor: theme.colors.copper,
   },
-  selectorLabel: {
-    fontSize: 10,
+  selectorEyebrow: {
+    fontSize: 9,
     fontWeight: '700',
     color: theme.colors.copper,
-    letterSpacing: 0.5,
-    marginBottom: 4,
+    letterSpacing: 0.8,
+    marginBottom: 3,
   },
   selectorValue: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: theme.colors.textPrimary,
     marginBottom: 2,
   },
   selectorSub: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSecondary,
   },
   actionPillsRow: {
@@ -268,37 +324,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   actionPillCard: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.md,
-    padding: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    marginBottom: 10,
-  },
-  actionPillIcon: {
-    fontSize: 16,
-    marginRight: 6,
-  },
-  actionPillLabel: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: theme.colors.copper,
-    letterSpacing: 0.5,
-  },
-  actionPillValue: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: theme.colors.textPrimary,
-  },
-  actionPillArrow: {
-    fontSize: 16,
-    color: theme.colors.textMuted,
-    marginLeft: 4,
+    minHeight: 52,
   },
   gongfuBanner: {
-    backgroundColor: 'rgba(42, 123, 98, 0.15)',
+    backgroundColor: 'rgba(42, 123, 98, 0.12)',
     borderWidth: 1,
     borderColor: theme.colors.emerald,
     borderRadius: theme.borderRadius.md,
@@ -306,10 +344,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     alignItems: 'center',
     marginBottom: 12,
+    minHeight: 48,
+    justifyContent: 'center',
   },
   gongfuBannerText: {
     color: theme.colors.emeraldLight,
     fontWeight: '700',
-    fontSize: 13,
+    fontSize: 12,
+    letterSpacing: 0.2,
   },
 });

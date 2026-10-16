@@ -1,20 +1,20 @@
 // ============================================================================
 // Napar (Steepwise) — Tabs Layout (Expo Router)
-// 5 core tabs: Parzenie, Spiżarnia, Dziennik, Klinika & Kalkulator, Kofeina & Sen
+// Apps4Craft Studio: Minimalist vector icons, warm artisanal aesthetic.
 // ============================================================================
 
 import React from 'react';
 import { Tabs, Link } from 'expo-router';
-import { Text, Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { theme } from '../../src/core/theme';
-
-function TabIcon({ symbol, focused }: { symbol: string; focused: boolean }) {
-  return (
-    <Text style={[styles.tabIcon, { opacity: focused ? 1 : 0.45 }]}>
-      {symbol}
-    </Text>
-  );
-}
+import {
+  BrewIcon,
+  BeansIcon,
+  JournalIcon,
+  LabIcon,
+  CaffeineIcon,
+  SettingsIcon,
+} from '../../src/components/icons/CraftIcons';
 
 function SettingsHeaderButton() {
   return (
@@ -22,9 +22,10 @@ function SettingsHeaderButton() {
       <Pressable
         hitSlop={12}
         style={styles.headerButton}
+        accessibilityRole="button"
         accessibilityLabel="Otwórz ustawienia i kopię zapasową"
       >
-        <Text style={styles.headerButtonText}>⚙️</Text>
+        <SettingsIcon size={20} color={theme.colors.textSecondary} />
       </Pressable>
     </Link>
   );
@@ -38,11 +39,14 @@ export default function TabLayout() {
           backgroundColor: theme.colors.bgCard,
           borderBottomColor: theme.colors.border,
           borderBottomWidth: 1,
+          elevation: 0,
+          shadowOpacity: 0,
         },
         headerTintColor: theme.colors.textPrimary,
         headerTitleStyle: {
           fontWeight: '700',
           fontSize: 18,
+          letterSpacing: -0.3,
           color: theme.colors.textPrimary,
         },
         headerRight: () => <SettingsHeaderButton />,
@@ -53,12 +57,14 @@ export default function TabLayout() {
           height: 64,
           paddingBottom: 8,
           paddingTop: 8,
+          elevation: 0,
         },
         tabBarActiveTintColor: theme.colors.copper,
         tabBarInactiveTintColor: theme.colors.textMuted,
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600',
+          letterSpacing: 0.2,
         },
       }}
     >
@@ -66,16 +72,26 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Parzenie',
-          headerTitle: 'Napar · Asystent Parzenia',
-          tabBarIcon: ({ focused }) => <TabIcon symbol="☕" focused={focused} />,
+          headerTitle: 'Napar',
+          tabBarIcon: ({ focused }) => (
+            <BrewIcon
+              size={22}
+              color={focused ? theme.colors.copper : theme.colors.textMuted}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="beans"
         options={{
           title: 'Spiżarnia',
-          headerTitle: 'Spiżarnia Ziaren i Liści',
-          tabBarIcon: ({ focused }) => <TabIcon symbol="🫘" focused={focused} />,
+          headerTitle: 'Spiżarnia',
+          tabBarIcon: ({ focused }) => (
+            <BeansIcon
+              size={22}
+              color={focused ? theme.colors.copper : theme.colors.textMuted}
+            />
+          ),
         }}
       />
       <Tabs.Screen
@@ -83,23 +99,38 @@ export default function TabLayout() {
         options={{
           title: 'Dziennik',
           headerTitle: 'Dziennik Degustacji',
-          tabBarIcon: ({ focused }) => <TabIcon symbol="📖" focused={focused} />,
+          tabBarIcon: ({ focused }) => (
+            <JournalIcon
+              size={22}
+              color={focused ? theme.colors.copper : theme.colors.textMuted}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="dialin"
         options={{
-          title: 'Klinika & Kalk',
-          headerTitle: 'Dial-in Doctor & Kalkulatory',
-          tabBarIcon: ({ focused }) => <TabIcon symbol="🧭" focused={focused} />,
+          title: 'Warsztat',
+          headerTitle: 'Warsztat & Dial-in',
+          tabBarIcon: ({ focused }) => (
+            <LabIcon
+              size={22}
+              color={focused ? theme.colors.copper : theme.colors.textMuted}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="caffeine"
         options={{
           title: 'Kofeina',
-          headerTitle: 'Monitor Kofeiny i Snu',
-          tabBarIcon: ({ focused }) => <TabIcon symbol="⚡" focused={focused} />,
+          headerTitle: 'Monitor Kofeiny',
+          tabBarIcon: ({ focused }) => (
+            <CaffeineIcon
+              size={22}
+              color={focused ? theme.colors.copper : theme.colors.textMuted}
+            />
+          ),
         }}
       />
     </Tabs>
@@ -107,15 +138,10 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  tabIcon: {
-    fontSize: 20,
-    marginBottom: 2,
-  },
   headerButton: {
     marginRight: 16,
-    padding: 4,
-  },
-  headerButtonText: {
-    fontSize: 20,
+    padding: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

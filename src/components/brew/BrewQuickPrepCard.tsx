@@ -1,7 +1,7 @@
 // ============================================================================
-// Napar (Steepwise) — BrewQuickPrepCard Component (Kitchen-Proof UI 1-Tap)
-// "Do drippera na wagę": Instant prep and batch scaling under 15 seconds.
-// Apps4Brew Studio — 100% Offline-First.
+// Napar (Steepwise) — BrewQuickPrepCard Component (Apps4Craft Design System)
+// "The Three Numbers": Dose, Water, Grind/Temp with batch scaling under 15 seconds.
+// 100% Offline-First.
 // ============================================================================
 
 import React from 'react';
@@ -50,7 +50,7 @@ export function BrewQuickPrepCard({
       {/* Skalowanie porcji (Batch Scaling dla 1–4 osób) */}
       <View style={styles.batchSection}>
         <View style={styles.batchHeaderRow}>
-          <Text style={styles.batchTitle}>{`👥 ${t.batch.label}`}</Text>
+          <Text style={styles.batchTitle}>{t.batch.label}</Text>
           {servings > 1 && (
             <View style={styles.batchBadge}>
               <Text style={styles.batchBadgeText}>
@@ -91,15 +91,16 @@ export function BrewQuickPrepCard({
 
         {servings > 1 && (
           <Text style={styles.batchAdviceText}>
-            {`💡 ${batchScaling.recommendationPl}`}
+            {batchScaling.recommendationPl}
           </Text>
         )}
       </View>
 
-      {/* Skalowanie dozy i wody */}
+      {/* Święta Trójca Parametrów: Doza, Woda, Mielenie & Temperatura */}
       <View style={styles.parametersRow}>
+        {/* 1. Doza */}
         <View style={styles.paramBox}>
-          <Text style={styles.paramLabel}>DOZA</Text>
+          <Text style={styles.paramEyebrow}>DOZA</Text>
           <View style={styles.stepperRow}>
             <Pressable
               style={styles.stepBtn}
@@ -123,13 +124,23 @@ export function BrewQuickPrepCard({
           </View>
         </View>
 
+        {/* Separator pionowy */}
+        <View style={styles.paramDivider} />
+
+        {/* 2. Woda łącznie */}
         <View style={styles.paramBox}>
-          <Text style={styles.paramLabel}>WODA ŁĄCZNIE</Text>
-          <Text style={styles.paramValueLarge}>{formatWaterWeight(waterGrams, unitSystem)}</Text>
+          <Text style={styles.paramEyebrow}>WODA</Text>
+          <Text style={styles.paramValueLarge}>
+            {formatWaterWeight(waterGrams, unitSystem)}
+          </Text>
         </View>
 
+        {/* Separator pionowy */}
+        <View style={styles.paramDivider} />
+
+        {/* 3. Temperatura i profil zmielenia */}
         <View style={styles.paramBox}>
-          <Text style={styles.paramLabel}>TEMP / MIELENIE</Text>
+          <Text style={styles.paramEyebrow}>TEMP / MIELENIE</Text>
           <Text style={styles.paramSubValue}>
             {`${formatTemperature(waterTempCelsius, unitSystem)} · ${grindSetting || 'Średnio'}`}
           </Text>
@@ -147,7 +158,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.md,
     padding: 12,
-    marginBottom: 12,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
@@ -158,17 +169,17 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   batchTitle: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '700',
-    color: theme.colors.textPrimary,
+    color: theme.colors.copper,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   batchBadge: {
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    backgroundColor: 'rgba(217, 119, 54, 0.12)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingVertical: 3,
+    borderRadius: 6,
   },
   batchBadgeText: {
     fontSize: 10,
@@ -184,14 +195,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.sm,
+    borderRadius: theme.borderRadius.md,
     paddingVertical: 8,
     alignItems: 'center',
-    minHeight: 44,
+    minHeight: 46,
     justifyContent: 'center',
   },
   batchChipActive: {
-    backgroundColor: 'rgba(217, 119, 54, 0.2)',
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
     borderColor: theme.colors.copper,
   },
   batchChipText: {
@@ -201,7 +212,7 @@ const styles = StyleSheet.create({
   },
   batchChipTextActive: {
     color: theme.colors.copper,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   batchAdviceText: {
     fontSize: 11,
@@ -213,53 +224,65 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.md,
-    padding: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    marginBottom: 14,
+    marginBottom: 12,
     alignItems: 'center',
   },
   paramBox: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  paramLabel: {
-    fontSize: 10,
+  paramDivider: {
+    width: 1,
+    height: 36,
+    backgroundColor: theme.colors.border,
+  },
+  paramEyebrow: {
+    fontSize: 9,
     fontWeight: '700',
     color: theme.colors.textMuted,
-    marginBottom: 4,
+    letterSpacing: 0.8,
+    marginBottom: 6,
   },
   stepperRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   stepBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: theme.colors.bgCardSecondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepBtnText: {
     color: theme.colors.textPrimary,
-    fontSize: 18,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 18,
     fontWeight: '600',
   },
   paramValue: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: theme.colors.textPrimary,
+    fontVariant: ['tabular-nums'],
+    marginHorizontal: 4,
   },
   paramValueLarge: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
     color: theme.colors.copper,
+    fontVariant: ['tabular-nums'],
   },
   paramSubValue: {
     fontSize: 12,
+    fontWeight: '500',
     color: theme.colors.textSecondary,
     textAlign: 'center',
   },
