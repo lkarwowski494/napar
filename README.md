@@ -22,12 +22,16 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Precyzyjny stoper z blokadą wygaszania ekranu (`expo-keep-awake`) i sygnałami wibracyjnymi (`expo-haptics`).
    - Wskaźnik tempa nalewania (g/s) i dynamiczny pasek postępu wody dla każdego etapu.
    - Płynne skalowanie gramatur przy zmianie dozy z zachowaniem właściwych proporcji (Batch Scaling 1–4 osób z korektą grubości przemiału).
+   - **⏱️ Korekta Czasu Etapu w Locie (Z-009):** Dotykowe pigułki `-10s` i `+10s` w nagłówku aktywnego kroku pozwalające w czasie rzeczywistym wydłużyć lub skrócić czas zalania bez resetowania timera.
+   - **📋 Klonowanie i Duplikacja Receptur (Z-024):** Przycisk `📋` przy każdej recepturze wzorcowej i autorskiej tworzący natychmiastową kopię w lokalnej bazie SQLite do swobodnej edycji i personalizacji.
    - **⚙️ Młynek Domowy (Grinder Dial-in):** Precyzyjny selektor młynka specialty (Comandante C40 MK3/MK4, Timemore Chestnut C2/C3, 1Zpresso K-Ultra/K-Max, Fellow Ode Gen 2, Baratza Encore, Kingrinder K6) z automatycznym przeliczaniem mikronów ($\mu\text{m}$) na kliki/nastawę tarczy dla wybranej metody i trwałym zapamiętywaniem w SQLite.
    - **📢 Dostępność VoiceOver & Haptyka (BR-DOST-001, DEC-13):** Automatyczne mówione anonsowanie zmian etapów (`AccessibilityInfo.announceForAccessibility`), wagi docelowej wody, 3-sekundowych ostrzeżeń przed końcem zalania, sygnałów haptycznych (`expo-haptics`) i podsumowania po zakończeniu sesji (stworzone z myślą o osobach niewidomych i słabowidzących, Persona Ewa P4).
    - **📱 Wymiana Receptur Offline (Kody QR SVG & Universal Links — DEC-20):** Błyskawiczne udostępnianie i importowanie receptur w 100% offline (zero konta, zero chmury, zero telemetry). Wektorowy generator kodów QR SVG, protokół deep link `napar://recipe?v=1&d=...` oraz `https://napar.app/recipe?v=1&d=...`, natywne udostępnianie systemowe (`Share.share`) oraz modal importu z podglądem kroków.
    - Karta degustacyjna po zakończeniu: ocena w gwiazdkach, profil balansu smaku, nuty smakowe, wybór profilu użytej wody, odczyt refractometru TDS.
 2. **🫘 Spiżarnia Ziaren & Liści (Stash) & Kompendium Wiedzy:**
    - Śledzenie świeżości ziaren kawy (okno *Resting Window*: odgazowywanie CO₂, szczyt smaku *Peak*, stabilne okno, dojrzałe ziarna).
+   - **✏️ Edycja Paczki & Szybkie Steppery Wagowe (BR-MAG-001):** Pełny modal edycji metadanych paczki (odmiana botaniczna, proces obróbki, data palenia, waga) oraz przyciski szybkiej korekty (`-15 g`, `-18 g`, `+15 g`, `0 g`).
+   - **⚠️ Archiwizacja Pustych Paczek (BR-MAG-004):** Automatyczny baner na karcie paczki po osiągnięciu 0 g z 1-tap archiwizacją oraz trwałym usuwaniem z potwierdzeniem.
    - Dynamiczny ubytek wagi w paczce po każdym parzeniu.
    - Filtrowanie: Wszystkie, Kawa ziarnista, Herbata liściasta, Archiwum.
    - **📚 Kompendium Wiedzy (Encyklopedia Specialty & Herbaty):**
@@ -63,9 +67,8 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - **⚖️ Globalny Przełącznik Jednostek (Metric / Imperial — DEC-21 & BR-JEDN-001):** Płynne przełączanie między systemem metrycznym (°C, g, ml) i imperialnym (°F, oz, fl oz) z zachowaniem wewnętrznej precyzji obliczeniowej i trwałą persystencją w SQLite.
    - **📢 Dostępność i Sygnały (VoiceOver & Haptyka — BR-DOST-001, DEC-13):** Konfiguracja komunikatów głosowych czytnika ekranu oraz sygnałów wibracyjnych z natychmiastowym zapisem w SQLite.
    - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite.
-   - Eksport i import bazy w formacie JSON.
-   - Model uczciwej monetyzacji (Darmowy rdzeń + Pro: 3,99 zł/mies., 19,99 zł/rok z 14-dniowym okresem próbnym, 59,99 zł Lifetime + Chmura rodzinna).
-   - Przywracanie zakupów StoreKit.
+   - Eksport i import bazy w formacie JSON oraz eksport do arkuszy CSV (Dziennik i Spiżarnia).
+   - **💎 Model Monetyzacji & StoreKit 2 (BR-ZAK-001, ZP-08):** Darmowy, w pełni funkcjonalny rdzeń bez limitów czasowych + Napar Pro (Miesięczny 3,99 zł / 0,99 €, Roczny 19,99 zł / 4,99 € z 14-dniowym okresem próbnym Trial, Dożywotni Lifetime 59,99 zł / 14,99 € z Chmurą rodzinną Family Sharing oraz przycisk Przywróć wcześniejsze zakupy z persystencją statusu Pro w SQLite).
 
 ---
 
@@ -132,21 +135,24 @@ npm run start
 napar/
 ├── app/                        # Ekrany Expo Router (file-based routing)
 │   ├── _layout.tsx             # Root layout z BrewProvider i SafeAreaProvider
-│   ├── settings.tsx            # Ustawienia, Kopia JSON, Model Pro Apps4Brew
+│   ├── settings.tsx            # Ustawienia, Kopia JSON/CSV, Model Pro Apps4Brew
+│   ├── gongfu.tsx              # Dedykowany wielonaparowy tracker Gongfu Cha
+│   ├── recipe-builder.tsx      # Kreator i edytor receptur autorskich z klonowaniem
 │   └── (tabs)/
 │       ├── _layout.tsx         # Dolny pasek 5 zakładek
-│       ├── index.tsx           # Asystent Parzenia (Active Brew Assistant)
-│       ├── beans.tsx           # Spiżarnia Ziaren i Liści (Resting Window)
-│       ├── journal.tsx         # Dziennik Degustacji i Oceny
-│       ├── dialin.tsx          # Dial-in Doctor & Kalkulatory Ratio / TDS
-│       └── caffeine.tsx        # Monitor Kofeiny i Kalkulator Snu
+│       ├── index.tsx           # Asystent Parzenia (Active Brew Assistant, QR, Młynek)
+│       ├── beans.tsx           # Spiżarnia Ziaren i Liści (Resting Window, Edycja)
+│       ├── journal.tsx         # Dziennik Degustacji, Oceny, Analityka i Parz Ponownie
+│       ├── dialin.tsx          # Dial-in Doctor, Kalkulatory Ratio, TDS/EY i Chemia Wody
+│       └── caffeine.tsx        # Monitor Kofeiny, Wykres Kinetyki i Kalkulator Snu
 ├── src/
 │   └── core/                   # Czysta logika biznesowa i persystencja
 │       ├── domain-rules.ts     # Deterministyczne reguły RD-01…RD-30
 │       ├── recipes-data.ts     # 24 wzorcowe receptury specialty i herbaty
 │       ├── knowledge-data.ts   # Kompendium wiedzy o odmianach, obróbkach, terroir i herbatach
+│       ├── water-chemistry.ts  # Profile wody Barista Hustle / SCA, kalkulator mineralizacji
 │       ├── database-schema.ts  # DDL i schemat SQLite
-│       ├── database.ts         # Klient expo-sqlite i repozytoria
+│       ├── database.ts         # Klient expo-sqlite, repozytoria i licencja Pro
 │       ├── grinder-converter.ts# Baza modeli młynków i konwersja mikronów
 │       ├── recipe-share.ts     # Kodowanie receptur QR SVG i Deep Links
 │       ├── unit-converter.ts   # Dwukierunkowa konwersja jednostek Metric/Imperial
@@ -154,8 +160,15 @@ napar/
 │       ├── i18n.tsx            # Pełne wsparcie dwujęzyczne PL/EN
 │       ├── timer-engine.ts     # Maszyna stanów stopera i haptyka
 │       ├── brew-context.tsx    # Główny React Context aktywnej sesji
+│       ├── gongfu-session.ts   # Matematyka i model kofeiny naparów Gongfu Cha
+│       ├── flavor-wheel-data.ts# Taksonomia koła smaków SCA (8 kategorii, 40 deskryptorów)
+│       ├── flavor-wheel-picker.tsx # Interaktywny selektor koła smaków
+│       ├── radar-chart.tsx     # Wektorowy radar sensoryczny SCA (SVG)
+│       ├── caffeine-chart.tsx  # Wektorowy wykres kinetyki kofeiny ze strefą snu
+│       ├── qr-code.tsx         # Generator kodów QR SVG
+│       ├── confirm.ts          # Zabezpieczenia sesji parzenia przed przerwaniem
 │       ├── theme.ts            # Tokeny stylistyczne (Apps4Brew artisanal)
-│       └── __tests__/          # 30 zestawów testowych (269 testów, mutacje i PBT)
+│       └── __tests__/          # 30 zestawów testowych (287 testów, mutacje i PBT)
 └── napar_brd/                  # Pełna dokumentacja wymagań biznesowych BRD 0.1
 ```
 

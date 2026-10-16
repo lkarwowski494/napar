@@ -48,7 +48,7 @@ Potok CI zdefiniowany w `.github/workflows/ci.yml` wymusza jakość przy każdym
 * **Kroki weryfikacji**:
   1. `npm ci`
   2. `npm run typecheck` (`tsc --noEmit`)
-  3. `npm run test:coverage -- --ci` (27 zestawów testowych, sprawdzanie progów pokrycia zapadkowego, zero-telemetria, budżety CPU).
+  3. `npm run test:coverage -- --ci` (30 zestawów testowych, 287 testów, sprawdzanie progów pokrycia zapadkowego, zero-telemetria, budżety CPU).
 
 ---
 
