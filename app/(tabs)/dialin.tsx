@@ -34,9 +34,12 @@ import {
 import { calculateBrewCost } from '../../src/core/cost-calculator';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
+import { getUnitSystem } from '../../src/core/database';
+import { formatDoseWeight, formatWaterWeight } from '../../src/core/unit-converter';
 
 export default function DialInScreen() {
   const { t, language } = useTranslation();
+  const unitSystem = getUnitSystem();
   const [activeTab, setActiveTab] = useState<'doctor' | 'ratio' | 'ey' | 'water' | 'cost'>('doctor');
 
   // Stan: Dial-in Doctor
@@ -490,12 +493,14 @@ export default function DialInScreen() {
                     : (t.dialin.calculatedDose || 'WYMAGANA DOZA ZIAREN')}
                 </Text>
                 <Text style={styles.resultVal}>
-                  {calcDirection === 'doseToWater' ? `${waterCalcResult} g` : `${doseCalcResult} g`}
+                  {calcDirection === 'doseToWater'
+                    ? formatWaterWeight(waterCalcResult, unitSystem)
+                    : formatDoseWeight(doseCalcResult, unitSystem)}
                 </Text>
               </View>
               <View style={styles.resultItem}>
                 <Text style={styles.resultLabel}>{t.dialin.calculatedYield || 'UZYSK W FILIŻANCE'}</Text>
-                <Text style={styles.resultValSecondary}>{yieldResult} g</Text>
+                <Text style={styles.resultValSecondary}>{formatWaterWeight(yieldResult, unitSystem)}</Text>
                 <Text style={styles.resultNote}>
                   {t.dialin.absorptionNote || 'Po absorpcji 2.0g/g przez ciastko'}
                 </Text>
@@ -924,14 +929,14 @@ export default function DialInScreen() {
 
             <View style={styles.costRow}>
               <Text style={styles.costRowLabel}>
-                {t.dialin.costCoffeeBeans} ({costDoseInput}g)
+                {t.dialin.costCoffeeBeans} ({formatDoseWeight(parseFloat(costDoseInput) || 0, unitSystem)})
               </Text>
               <Text style={styles.costRowVal}>{brewCostMetrics.coffeeCost.toFixed(2)} zł</Text>
             </View>
 
             <View style={styles.costRow}>
               <Text style={styles.costRowLabel}>
-                {t.dialin.costWaterSalts} ({costWaterVolInput}ml)
+                {t.dialin.costWaterSalts} ({formatWaterWeight(parseFloat(costWaterVolInput) || 0, unitSystem)})
               </Text>
               <Text style={styles.costRowVal}>{brewCostMetrics.waterCost.toFixed(2)} zł</Text>
             </View>

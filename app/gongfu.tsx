@@ -25,7 +25,16 @@ import {
   getRecommendedGongfuSteepSeconds,
   estimateTotalLeafCaffeineMg,
 } from '../src/core/gongfu-session';
-import { saveBrewSession, logCaffeine, deductInventoryWeight, getInventoryItems } from '../src/core/database';
+import {
+  saveBrewSession,
+  logCaffeine,
+  deductInventoryWeight,
+  getInventoryItems,
+  getBrewSessions,
+  getCaffeineLogs,
+  getRecipes,
+  getUnitSystem,
+} from '../src/core/database';
 import { InventoryItem } from '../src/core/database-schema';
 import { theme } from '../src/core/theme';
 import { confirmAction } from '../src/core/confirm';
@@ -33,12 +42,15 @@ import { announce } from '../src/core/announce';
 import { useTranslation } from '../src/core/i18n';
 import { useAppAccess } from '../src/core/app-access';
 import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
+import { autoBackup } from '../src/core/backup';
+import { playTimerChime } from '../src/core/timer-audio';
 
 export default function GongfuScreen() {
   const router = useRouter();
   const { t, language } = useTranslation();
   const { canCreate, recordBrew, refresh } = useAppAccess();
   const [showPaywall, setShowPaywall] = useState(false);
+  const unitSystem = getUnitSystem();
 
   // Stan sesji
   const [teaType, setTeaType] = useState<GongfuTeaType>('wulong_rock');
@@ -111,6 +123,7 @@ export default function GongfuScreen() {
             } catch {
               // fallback
             }
+            void playTimerChime();
             announce(t.gongfu.pourNow);
             return 0;
           }
@@ -119,6 +132,9 @@ export default function GongfuScreen() {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             } catch {
               // fallback
+            }
+            if (prev === 4) {
+              void playTimerChime();
             }
           }
           return prev - 1;
@@ -182,6 +198,10 @@ export default function GongfuScreen() {
   };
 
   const handleFinishAndSaveSession = () => {
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
     if (session.infusions.length === 0) {
       Alert.alert(t.gongfu.modeTitle, 'Przeprowadź przynajmniej jedno zalanie przed zapisem sesji.');
       return;
@@ -234,6 +254,16 @@ export default function GongfuScreen() {
         }
 
         recordBrew();
+        try {
+          void autoBackup({
+            inventory: getInventoryItems(true),
+            customRecipes: getRecipes().filter((r) => r.isCustom),
+            sessions: getBrewSessions(5000),
+            caffeineLogs: getCaffeineLogs(),
+          });
+        } catch {
+          // fallback
+        }
         announce(t.gongfu.finishSession);
         router.back();
       },
@@ -301,7 +331,7 @@ export default function GongfuScreen() {
                 onChangeText={setLeafDoseGrams}
                 keyboardType="decimal-pad"
               />
-              <Text style={styles.unitText}>g</Text>
+              <Text style={styles.unitText}>{unitSystem === 'imperial' ? 'oz' : 'g'}</Text>
             </View>
             <View style={styles.paramBox}>
               <Text style={styles.paramSub}>{t.gongfu.vesselCapacity}</Text>
@@ -311,7 +341,7 @@ export default function GongfuScreen() {
                 onChangeText={setVesselCapacityMl}
                 keyboardType="number-pad"
               />
-              <Text style={styles.unitText}>ml</Text>
+              <Text style={styles.unitText}>{unitSystem === 'imperial' ? 'fl oz' : 'ml'}</Text>
             </View>
             <View style={styles.paramBox}>
               <Text style={styles.paramSub}>{t.gongfu.waterTemp}</Text>
@@ -321,7 +351,7 @@ export default function GongfuScreen() {
                 onChangeText={setWaterTempCelsius}
                 keyboardType="number-pad"
               />
-              <Text style={styles.unitText}>°C</Text>
+              <Text style={styles.unitText}>{unitSystem === 'imperial' ? '°F' : '°C'}</Text>
             </View>
           </View>
         </View>

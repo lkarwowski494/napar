@@ -15,6 +15,8 @@ import {
   deductBeansForBrew,
   getInventoryItems,
   getRecipes,
+  getBrewSessions,
+  getCaffeineLogs,
   getAppSetting,
   setAppSetting,
   getVoiceAnnounceEnabled,
@@ -297,8 +299,8 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       void autoBackup({
         inventory: getInventoryItems(true),
         customRecipes: getRecipes().filter((r) => r.isCustom),
-        sessions: [session],
-        caffeineLogs: [],
+        sessions: getBrewSessions(5000),
+        caffeineLogs: getCaffeineLogs(),
       });
     } catch {
       // Ignoruj błędy kopii zapasowej w tle

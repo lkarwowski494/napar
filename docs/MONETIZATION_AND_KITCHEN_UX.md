@@ -72,7 +72,7 @@ Główny ekran parzenia (`app/(tabs)/index.tsx`) został zdekomponowany na wyspe
 - **i18n:** Pełna symetria 362 kluczy w językach PL i EN (`npm run check:i18n`).
 - **TypeScript:** 100% czystości typu w trybie ścisłym (`npm run typecheck`).
 - **Anty-exploit:** `restorePurchases()` weryfikuje faktyczny dowód zakupu w bazie SQLite (`has_verified_purchase`), uniemożliwiając darmowe rozdawnictwo licencji Lifetime.
-- **Audio Chime:** Generowanie pełnego sygnału akustycznego RIFF WAV PCM (880 Hz dzwonek kuchenny z harmoniczną 1760 Hz i zanikiem wykładniczym) zamiast 44-bajtowej pustej atrapy.
-- **Bezpieczeństwo danych:** Kopia bezpieczeństwa przed importem (`safetyBackup`) oraz automatyczna rotacja 10 kopii zapasowych w bezpiecznym katalogu bazy danych (`expo-file-system/legacy`).
-- **Unit Converter:** Globalna integracja przeliczników metrycznych i imperialnych (`formatDoseWeight`, `formatWaterWeight`, `formatTemperature`) w UI (Spiżarnia, Stoper, Karty Parzenia, Receptury, Ustawienia).
+- **Unit Converter:** Globalna integracja przeliczników metrycznych i imperialnych (`formatDoseWeight`, `formatWaterWeight`, `formatTemperature`) w UI (Spiżarnia, Stoper, Karty Parzenia, Receptury, Ustawienia, Gongfu Cha, Monitor Kofeiny i Dial-in Doctor).
+- **Gongfu Cha & Timer Audio:** Prawdziwy dzwonek kuchenny WAV (`playTimerChime`) zintegrowany ze stoperem Gongfu Cha (ostrzeżenie przed końcem i zakończenie ekstrakcji), zabezpieczenie trialu `canCreate` oraz automatyczny backup całego stanu aplikacji po zakończeniu sesji (`autoBackup`).
+
 

@@ -475,7 +475,7 @@ describe('DialInScreen UI with Water Chemistry', () => {
 
     // 500 / 16.6 = 30.1g dozy, yield = 500 - 30.1 * 2 = 439.8g
     str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('30.1 g');
+    expect(str).toContain('30.1g');
     expect(str).toContain('439.8');
 
     // Wybierz preset Gongfu 1:20
@@ -487,7 +487,7 @@ describe('DialInScreen UI with Water Chemistry', () => {
 
     // 500 / 20 = 25g dozy, yield = 500 - 25 * 2 = 450g
     str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('25 g');
+    expect(str).toContain('25g');
     expect(str).toContain('450');
 
     // Przełącz z powrotem na "Doza → Woda"
