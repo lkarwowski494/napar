@@ -26,6 +26,8 @@ interface BrewHeaderProps {
   };
   favoriteRecipes?: any[];
   isRunning?: boolean;
+  beverageType?: 'COFFEE' | 'TEA';
+  onBeverageTypeChange?: (type: 'COFFEE' | 'TEA') => void;
   onSelectRecipe: (r: any) => void;
   onOpenRecipeModal: () => void;
   onOpenInventoryModal: () => void;
@@ -41,6 +43,8 @@ export function BrewHeader({
   grinderRecommendation,
   favoriteRecipes = [],
   isRunning = false,
+  beverageType,
+  onBeverageTypeChange,
   onSelectRecipe,
   onOpenRecipeModal,
   onOpenInventoryModal,
@@ -55,8 +59,58 @@ export function BrewHeader({
       ? recipe.beverageType === 'TEA'
       : (recipe as any).type === 'TEA';
 
+  const currentBeverageType = beverageType || (isTea ? 'TEA' : 'COFFEE');
+
   return (
     <View style={styles.container}>
+      {/* Przełącznik Kawa vs Herbata */}
+      {!isRunning && onBeverageTypeChange && (
+        <View style={styles.beverageToggleRow} accessibilityRole="tablist">
+          <Pressable
+            testID="beverage-toggle-coffee"
+            style={[
+              styles.beverageToggleBtn,
+              currentBeverageType === 'COFFEE' && styles.beverageToggleBtnActiveCoffee,
+            ]}
+            onPress={() => onBeverageTypeChange('COFFEE')}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: currentBeverageType === 'COFFEE' }}
+            accessibilityLabel="Kategoria Kawa"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text
+              style={[
+                styles.beverageToggleText,
+                currentBeverageType === 'COFFEE' && styles.beverageToggleTextActiveCoffee,
+              ]}
+            >
+              ☕ Kawa Specialty
+            </Text>
+          </Pressable>
+
+          <Pressable
+            testID="beverage-toggle-tea"
+            style={[
+              styles.beverageToggleBtn,
+              currentBeverageType === 'TEA' && styles.beverageToggleBtnActiveTea,
+            ]}
+            onPress={() => onBeverageTypeChange('TEA')}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: currentBeverageType === 'TEA' }}
+            accessibilityLabel="Kategoria Herbata"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text
+              style={[
+                styles.beverageToggleText,
+                currentBeverageType === 'TEA' && styles.beverageToggleTextActiveTea,
+              ]}
+            >
+              🍵 Herbata Rzemieślnicza
+            </Text>
+          </Pressable>
+        </View>
+      )}
       {/* 1-Click Szybkie Parzenie z Ulubionych Receptur */}
       {favoriteRecipes.length > 0 && !isRunning && (
         <View style={styles.favoritesSection}>
@@ -127,6 +181,7 @@ export function BrewHeader({
       {/* Rząd selektorów: Receptura i Spiżarnia */}
       <View style={styles.selectorRow}>
         <Pressable
+          testID="change-recipe-btn"
           style={styles.selectorCard}
           onPress={onOpenRecipeModal}
           accessibilityRole="button"
@@ -142,6 +197,7 @@ export function BrewHeader({
         </Pressable>
 
         <Pressable
+          testID="open-inventory-modal-btn"
           style={[
             styles.selectorCard,
             selectedInventoryItem && styles.selectorCardActive,
@@ -199,6 +255,46 @@ export function BrewHeader({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 8,
+  },
+  beverageToggleRow: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.full,
+    padding: 3,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginBottom: 12,
+  },
+  beverageToggleBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: theme.borderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
+  },
+  beverageToggleBtnActiveCoffee: {
+    backgroundColor: 'rgba(200, 106, 40, 0.16)',
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+  },
+  beverageToggleBtnActiveTea: {
+    backgroundColor: 'rgba(42, 123, 98, 0.18)',
+    borderWidth: 1,
+    borderColor: theme.colors.emerald,
+  },
+  beverageToggleText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  beverageToggleTextActiveCoffee: {
+    color: theme.colors.copperLight,
+    fontWeight: '700',
+  },
+  beverageToggleTextActiveTea: {
+    color: theme.colors.emeraldLight,
+    fontWeight: '700',
   },
   favoritesSection: {
     marginBottom: 12,

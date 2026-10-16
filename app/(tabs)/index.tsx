@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
+  Platform,
   View,
   Text,
   StyleSheet,
@@ -15,6 +16,7 @@ import {
   Alert,
   Share,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
 import {
@@ -111,6 +113,44 @@ export default function BrewScreen() {
     recipe: SavedRecipe;
     originalSteps: any[];
   } | null>(null);
+
+  const isCurrentRecipeTea =
+    'beverageType' in recipe
+      ? recipe.beverageType === 'TEA'
+      : (recipe as any).type === 'TEA';
+
+  const [currentBeverageType, setCurrentBeverageType] = useState<'COFFEE' | 'TEA'>(
+    isCurrentRecipeTea ? 'TEA' : 'COFFEE'
+  );
+
+  useEffect(() => {
+    setCurrentBeverageType(isCurrentRecipeTea ? 'TEA' : 'COFFEE');
+  }, [isCurrentRecipeTea]);
+
+  const [recipeCategoryFilter, setRecipeCategoryFilter] = useState<'ALL' | 'COFFEE' | 'TEA'>('ALL');
+
+  const handleBeverageTypeChange = (type: 'COFFEE' | 'TEA') => {
+    setCurrentBeverageType(type);
+    setRecipeCategoryFilter(type);
+    const currentMatches =
+      'beverageType' in recipe ? recipe.beverageType === type : (recipe as any).type === type;
+    if (!currentMatches) {
+      const matchingRecipe = allRecipes.find((r) =>
+        'beverageType' in r ? r.beverageType === type : r.type === type
+      );
+      if (matchingRecipe) {
+        handleSelectRecipe(matchingRecipe);
+      }
+    }
+  };
+
+  const displayedRecipes = useMemo(() => {
+    if (recipeCategoryFilter === 'ALL') return allRecipes;
+    return allRecipes.filter((r) => {
+      const type = 'beverageType' in r ? r.beverageType : r.type;
+      return type === recipeCategoryFilter;
+    });
+  }, [allRecipes, recipeCategoryFilter]);
 
   const recentFiveStarSession = useMemo(() => {
     try {
@@ -363,9 +403,12 @@ export default function BrewScreen() {
         grinderRecommendation={grinderRecommendation}
         favoriteRecipes={favoriteRecipes}
         isRunning={isRunning || isPaused}
+        beverageType={currentBeverageType}
+        onBeverageTypeChange={handleBeverageTypeChange}
         onSelectRecipe={handleSelectRecipe}
         onOpenRecipeModal={() => {
           refreshData();
+          setRecipeCategoryFilter(currentBeverageType);
           setShowRecipeModal(true);
         }}
         onOpenInventoryModal={() => setShowInventoryModal(true)}
@@ -444,14 +487,84 @@ export default function BrewScreen() {
 
       {/* Modal wyboru receptury */}
       <Modal visible={showRecipeModal} animationType="slide" transparent={false}>
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{t.brew.chooseRecipe}</Text>
-            <Pressable onPress={() => setShowRecipeModal(false)}>
+            <Pressable
+              style={styles.modalCloseBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              onPress={() => setShowRecipeModal(false)}
+              accessibilityRole="button"
+              accessibilityLabel={t.common.close}
+            >
               <Text style={styles.modalCloseText}>{t.common.close}</Text>
             </Pressable>
           </View>
           <ScrollView>
+            {/* Filtr Kawa vs Herbata */}
+            <View style={styles.recipeFilterTabsRow} accessibilityRole="tablist">
+              <Pressable
+                testID="recipe-filter-all"
+                style={[
+                  styles.recipeFilterTab,
+                  recipeCategoryFilter === 'ALL' && styles.recipeFilterTabActive,
+                ]}
+                onPress={() => setRecipeCategoryFilter('ALL')}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: recipeCategoryFilter === 'ALL' }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text
+                  style={[
+                    styles.recipeFilterTabText,
+                    recipeCategoryFilter === 'ALL' && styles.recipeFilterTabTextActive,
+                  ]}
+                >
+                  Wszystkie ({allRecipes.length})
+                </Text>
+              </Pressable>
+              <Pressable
+                testID="recipe-filter-coffee"
+                style={[
+                  styles.recipeFilterTab,
+                  recipeCategoryFilter === 'COFFEE' && styles.recipeFilterTabActive,
+                ]}
+                onPress={() => setRecipeCategoryFilter('COFFEE')}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: recipeCategoryFilter === 'COFFEE' }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text
+                  style={[
+                    styles.recipeFilterTabText,
+                    recipeCategoryFilter === 'COFFEE' && styles.recipeFilterTabTextActive,
+                  ]}
+                >
+                  ☕ Kawa ({allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'COFFEE' : r.type === 'COFFEE')).length})
+                </Text>
+              </Pressable>
+              <Pressable
+                testID="recipe-filter-tea"
+                style={[
+                  styles.recipeFilterTab,
+                  recipeCategoryFilter === 'TEA' && styles.recipeFilterTabActive,
+                ]}
+                onPress={() => setRecipeCategoryFilter('TEA')}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: recipeCategoryFilter === 'TEA' }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text
+                  style={[
+                    styles.recipeFilterTabText,
+                    recipeCategoryFilter === 'TEA' && styles.recipeFilterTabTextActive,
+                  ]}
+                >
+                  🍵 Herbata ({allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'TEA' : r.type === 'TEA')).length})
+                </Text>
+              </Pressable>
+            </View>
+
             <View style={styles.modalActionButtonsRow}>
               <Pressable
                 style={styles.addCustomRecipeBtn}
@@ -515,7 +628,7 @@ export default function BrewScreen() {
               </Pressable>
             </View>
 
-            {allRecipes.map((r) => (
+            {displayedRecipes.map((r) => (
               <Pressable
                 key={r.id}
                 style={[
@@ -610,15 +723,21 @@ export default function BrewScreen() {
               </Pressable>
             ))}
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Modal wyboru ziaren ze spiżarni */}
       <Modal visible={showInventoryModal} animationType="slide" transparent={false}>
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Wybierz ze Spiżarni</Text>
-            <Pressable onPress={() => setShowInventoryModal(false)}>
+            <Pressable
+              style={styles.modalCloseBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              onPress={() => setShowInventoryModal(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Zamknij"
+            >
               <Text style={styles.modalCloseText}>Zamknij</Text>
             </Pressable>
           </View>
@@ -657,7 +776,7 @@ export default function BrewScreen() {
               </Pressable>
             ))}
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Modal Podsumowania Parzenia (Karta Degustacyjna & Dial-in Doctor) */}
@@ -689,12 +808,16 @@ export default function BrewScreen() {
 
       {/* Modal Wyboru Młynka */}
       <Modal visible={showGrinderModal} animationType="slide">
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{t.brew.grinderModalTitle}</Text>
             <Pressable
               testID="close-grinder-modal-btn"
+              style={styles.modalCloseBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               onPress={() => setShowGrinderModal(false)}
+              accessibilityRole="button"
+              accessibilityLabel={t.common.close}
             >
               <Text style={styles.modalCloseText}>{t.common.close}</Text>
             </Pressable>
@@ -748,17 +871,21 @@ export default function BrewScreen() {
               );
             })}
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Modal Udostępniania Receptury (Offline QR) */}
       <Modal visible={showShareModal} animationType="slide">
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{t.brew.qrModalTitle}</Text>
             <Pressable
               testID="close-share-modal-btn"
+              style={styles.modalCloseBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               onPress={() => setShowShareModal(false)}
+              accessibilityRole="button"
+              accessibilityLabel={t.common.close}
             >
               <Text style={styles.modalCloseText}>{t.common.close}</Text>
             </Pressable>
@@ -817,17 +944,21 @@ export default function BrewScreen() {
               </Pressable>
             </View>
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Modal Importu Receptury z Linku / QR */}
       <Modal visible={showImportModal} animationType="slide">
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{t.brew.importModalTitle}</Text>
             <Pressable
               testID="close-import-modal-btn"
+              style={styles.modalCloseBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               onPress={() => setShowImportModal(false)}
+              accessibilityRole="button"
+              accessibilityLabel={t.common.close}
             >
               <Text style={styles.modalCloseText}>{t.common.close}</Text>
             </Pressable>
@@ -893,7 +1024,7 @@ export default function BrewScreen() {
               </View>
             )}
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Skaner Aparatem Kodów QR */}
@@ -963,10 +1094,52 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.textPrimary,
   },
+  modalCloseBtn: {
+    minHeight: 44,
+    minWidth: 44,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   modalCloseText: {
-    fontSize: 16,
+    fontSize: 14,
     color: theme.colors.copper,
+    fontWeight: '700',
+  },
+  recipeFilterTabsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  recipeFilterTab: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
+  },
+  recipeFilterTabActive: {
+    backgroundColor: 'rgba(200, 106, 40, 0.16)',
+    borderColor: theme.colors.copper,
+  },
+  recipeFilterTabText: {
+    fontSize: 12,
     fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  recipeFilterTabTextActive: {
+    color: theme.colors.copperLight,
+    fontWeight: '700',
   },
   recipeOptionItem: {
     backgroundColor: theme.colors.bgCard,

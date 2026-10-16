@@ -14,6 +14,7 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   exportAllDataJson,
   importDataJson,
@@ -497,7 +498,11 @@ export default function SettingsScreen() {
       {/* Kopia Zapasowa i Własność Danych */}
       <Text style={styles.sectionTitle}>Twoje Dane (ZP-06 & ZP-07)</Text>
       <View style={styles.cardGroup}>
-        <Pressable style={styles.actionRow} onPress={handleExport}>
+        <Pressable
+          testID="export-json-btn"
+          style={styles.actionRow}
+          onPress={handleExport}
+        >
           <View style={{ flex: 1 }}>
             <Text style={styles.actionTitle}>Eksportuj Kopię Zapasową (JSON)</Text>
             <Text style={styles.actionSubtitle}>
@@ -509,7 +514,11 @@ export default function SettingsScreen() {
 
         <View style={styles.divider} />
 
-        <Pressable style={styles.actionRow} onPress={() => setShowImportModal(true)}>
+        <Pressable
+          testID="import-json-btn"
+          style={styles.actionRow}
+          onPress={() => setShowImportModal(true)}
+        >
           <View style={{ flex: 1 }}>
             <Text style={styles.actionTitle}>Importuj Kopię z Pliku JSON</Text>
             <Text style={styles.actionSubtitle}>
@@ -521,7 +530,11 @@ export default function SettingsScreen() {
 
         <View style={styles.divider} />
 
-        <Pressable style={styles.actionRow} onPress={handleExportSessionsCsv}>
+        <Pressable
+          testID="export-csv-sessions-btn"
+          style={styles.actionRow}
+          onPress={handleExportSessionsCsv}
+        >
           <View style={{ flex: 1 }}>
             <Text style={styles.actionTitle}>Eksportuj Dziennik (CSV)</Text>
             <Text style={styles.actionSubtitle}>
@@ -615,10 +628,16 @@ export default function SettingsScreen() {
 
       {/* Modal Eksportu JSON */}
       <Modal visible={showExportModal} animationType="slide">
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Kopia Zapasowa (JSON)</Text>
-            <Pressable onPress={() => setShowExportModal(false)}>
+            <Pressable
+              style={styles.modalCloseBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              onPress={() => setShowExportModal(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Zamknij"
+            >
               <Text style={styles.modalCloseText}>Zamknij</Text>
             </Pressable>
           </View>
@@ -631,15 +650,21 @@ export default function SettingsScreen() {
             editable={false}
             value={exportedJsonText}
           />
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Modal Importu JSON */}
       <Modal visible={showImportModal} animationType="slide">
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Importuj Dane JSON</Text>
-            <Pressable onPress={() => setShowImportModal(false)}>
+            <Pressable
+              style={styles.modalCloseBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              onPress={() => setShowImportModal(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Anuluj"
+            >
               <Text style={styles.modalCloseText}>Anuluj</Text>
             </Pressable>
           </View>
@@ -657,15 +682,21 @@ export default function SettingsScreen() {
           <Pressable style={styles.submitImportBtn} onPress={handleImport}>
             <Text style={styles.submitImportBtnText}>Zaimportuj i Zastąp Dane</Text>
           </Pressable>
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Modal Eksportu CSV (Z-152, ZP-07) */}
       <Modal visible={showCsvModal} animationType="slide">
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{csvModalTitle}</Text>
-            <Pressable onPress={() => setShowCsvModal(false)}>
+            <Pressable
+              style={styles.modalCloseBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              onPress={() => setShowCsvModal(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Zamknij"
+            >
               <Text style={styles.modalCloseText}>Zamknij</Text>
             </Pressable>
           </View>
@@ -678,7 +709,7 @@ export default function SettingsScreen() {
             editable={false}
             value={exportedCsvText}
           />
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Modal Apps4Brew Pass ("Cheaper than Espresso") */}
@@ -902,10 +933,22 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.textPrimary,
   },
+  modalCloseBtn: {
+    minHeight: 44,
+    minWidth: 44,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   modalCloseText: {
-    fontSize: 16,
+    fontSize: 14,
     color: theme.colors.copper,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   modalSub: {
     fontSize: 13,

@@ -14,6 +14,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
 import {
@@ -576,10 +577,16 @@ export default function BeansScreen() {
 
       {/* Modal dodawania nowej paczki */}
       <Modal visible={showAddModal} animationType="slide" transparent={false}>
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Dodaj do Spiżarni</Text>
-            <Pressable onPress={() => setShowAddModal(false)}>
+            <Pressable
+              style={styles.modalCloseBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              onPress={() => setShowAddModal(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Anuluj"
+            >
               <Text style={styles.modalCloseText}>Anuluj</Text>
             </Pressable>
           </View>
@@ -705,18 +712,24 @@ export default function BeansScreen() {
               <Text style={styles.saveSubmitText}>Zapisz w Spiżarni</Text>
             </Pressable>
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Modal edycji paczki (BR-MAG-001 & BR-MAG-004) */}
       <Modal visible={showEditModal} animationType="slide" transparent={false}>
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <View style={{ flex: 1 }}>
               <Text style={styles.modalTitle}>Edytuj Paczkę</Text>
               <Text style={styles.modalHeaderSub}>Koryguj wagę, parametry lub zarchiwizuj</Text>
             </View>
-            <Pressable onPress={() => { setShowEditModal(false); setEditingItem(null); }}>
+            <Pressable
+              style={styles.modalCloseBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              onPress={() => { setShowEditModal(false); setEditingItem(null); }}
+              accessibilityRole="button"
+              accessibilityLabel="Anuluj"
+            >
               <Text style={styles.modalCloseText}>Anuluj</Text>
             </Pressable>
           </View>
@@ -893,18 +906,25 @@ export default function BeansScreen() {
               <Text style={styles.deletePackText}>🗑️ Usuń paczkę ze spiżarni</Text>
             </Pressable>
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Modal: Kompendium Wiedzy (BR-WIEDZA-001 & BR-WIEDZA-002) */}
       <Modal visible={showCompendium} animationType="slide" presentationStyle="pageSheet">
-        <View style={styles.compendiumModalContainer}>
+        <SafeAreaView style={styles.compendiumModalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <View style={{ flex: 1 }}>
               <Text style={styles.modalTitle}>📚 Kompendium Wiedzy</Text>
               <Text style={styles.compendiumHeaderSub}>Odmiany botaniczne, obróbki, terroir i herbaty</Text>
             </View>
-            <Pressable testID="compendium-close-button" onPress={() => setShowCompendium(false)} hitSlop={10}>
+            <Pressable
+              testID="compendium-close-button"
+              style={styles.modalCloseBtn}
+              onPress={() => setShowCompendium(false)}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              accessibilityRole="button"
+              accessibilityLabel="Zamknij"
+            >
               <Text style={styles.modalCloseText}>Zamknij</Text>
             </Pressable>
           </View>
@@ -1074,7 +1094,7 @@ export default function BeansScreen() {
                 </View>
               ))}
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Apps4Brew Pass Paywall Modal */}
@@ -1502,10 +1522,22 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     marginTop: 2,
   },
+  modalCloseBtn: {
+    minHeight: 44,
+    minWidth: 44,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   modalCloseText: {
-    fontSize: 16,
+    fontSize: 14,
     color: theme.colors.copper,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   formScroll: {
     flex: 1,

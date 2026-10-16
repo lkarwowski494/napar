@@ -120,4 +120,31 @@ describe('BrewHeader Component', () => {
     act(() => parent.props.onPress());
     expect(defaultProps.onNavigateToGongfu).toHaveBeenCalled();
   });
+
+  test('Przełącznik Kawa vs Herbata wywołuje onBeverageTypeChange', () => {
+    const onBeverageTypeChangeMock = jest.fn();
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewHeader
+          {...defaultProps}
+          onBeverageTypeChange={onBeverageTypeChangeMock}
+          beverageType="COFFEE"
+        />
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Kawa Specialty');
+    expect(str).toContain('Herbata Rzemieślnicza');
+
+    const teaBtn = tree.root.findByProps({ testID: 'beverage-toggle-tea' });
+    const coffeeBtn = tree.root.findByProps({ testID: 'beverage-toggle-coffee' });
+
+    act(() => teaBtn.props.onPress());
+    expect(onBeverageTypeChangeMock).toHaveBeenCalledWith('TEA');
+
+    act(() => coffeeBtn.props.onPress());
+    expect(onBeverageTypeChangeMock).toHaveBeenCalledWith('COFFEE');
+  });
 });
