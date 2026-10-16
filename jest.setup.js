@@ -34,3 +34,21 @@ jest.mock(
   }),
   { virtual: true }
 );
+
+// Global deterministic locale mock for Jest across OS platforms (Linux CI, macOS, Windows)
+const OriginalDateTimeFormat = Intl.DateTimeFormat;
+Intl.DateTimeFormat = function (locales, options) {
+  const instance = new OriginalDateTimeFormat(locales || 'pl-PL', options);
+  return {
+    ...instance,
+    resolvedOptions: () => ({
+      ...instance.resolvedOptions(),
+      locale: locales ? String(locales) : 'pl-PL',
+    }),
+    format: instance.format.bind(instance),
+  };
+};
+Intl.DateTimeFormat.supportedLocalesOf = OriginalDateTimeFormat.supportedLocalesOf
+  ? OriginalDateTimeFormat.supportedLocalesOf.bind(OriginalDateTimeFormat)
+  : undefined;
+
