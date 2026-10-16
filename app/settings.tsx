@@ -60,6 +60,15 @@ import {
   formatDoseWeight,
   formatWaterWeight,
 } from '../src/core/unit-converter';
+import {
+  NaparAppIcon,
+  PiekarzAppIcon,
+  SloikAppIcon,
+  MasazAppIcon,
+  FermentAppIcon,
+  CraftFamilyEmblem,
+} from '../src/components/icons/CraftIcons';
+import { CRAFT_APPS } from '../src/core/craft-suite-theme';
 
 export default function SettingsScreen() {
   const { t, language, setLanguage } = useTranslation();
@@ -693,6 +702,110 @@ export default function SettingsScreen() {
         </Pressable>
       </View>
 
+      {/* Rodzina Apps4Craft Studio (Kuchenne Rzemiosło) */}
+      <Text style={styles.sectionTitle}>
+        {language === 'pl' ? 'Rodzina Apps4Craft Studio' : 'Apps4Craft Studio Family'}
+      </Text>
+      <View style={styles.cardGroup}>
+        {/* Napar */}
+        <View style={styles.craftAppRow}>
+          <View style={[styles.craftAppIconBox, { backgroundColor: 'rgba(200, 106, 40, 0.15)' }]}>
+            <NaparAppIcon size={24} color={CRAFT_APPS.napar.accent} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={styles.actionTitle}>Napar</Text>
+              <View style={styles.currentAppPill}>
+                <Text style={styles.currentAppPillText}>{language === 'pl' ? 'Zainstalowano' : 'Installed'}</Text>
+              </View>
+            </View>
+            <Text style={styles.actionSubtitle}>
+              {language === 'pl' ? 'Kawa Specialty & Herbata Rzemieślnicza' : 'Specialty Coffee & Artisan Tea'}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* Piekarz */}
+        <View style={styles.craftAppRow}>
+          <View style={[styles.craftAppIconBox, { backgroundColor: 'rgba(212, 155, 66, 0.15)' }]}>
+            <PiekarzAppIcon size={24} color={CRAFT_APPS.piekarz.accent} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={styles.actionTitle}>Piekarz</Text>
+              <View style={styles.upcomingAppPill}>
+                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
+              </View>
+            </View>
+            <Text style={styles.actionSubtitle}>
+              {language === 'pl' ? 'Chleb na Zakwasie, Hydratacja & Fermentacja' : 'Sourdough Bread, Hydration & Schedule'}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* Słoik */}
+        <View style={styles.craftAppRow}>
+          <View style={[styles.craftAppIconBox, { backgroundColor: 'rgba(91, 138, 97, 0.15)' }]}>
+            <SloikAppIcon size={24} color={CRAFT_APPS.sloik.accent} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={styles.actionTitle}>Słoik</Text>
+              <View style={styles.upcomingAppPill}>
+                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
+              </View>
+            </View>
+            <Text style={styles.actionSubtitle}>
+              {language === 'pl' ? 'Kiszonki, Solanki & Wekowanie Warzyw' : 'Fermented Pickles, Brine % & Canning'}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* Masaż */}
+        <View style={styles.craftAppRow}>
+          <View style={[styles.craftAppIconBox, { backgroundColor: 'rgba(164, 62, 56, 0.15)' }]}>
+            <MasazAppIcon size={24} color={CRAFT_APPS.masaz.accent} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={styles.actionTitle}>Masaż</Text>
+              <View style={styles.upcomingAppPill}>
+                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
+              </View>
+            </View>
+            <Text style={styles.actionSubtitle}>
+              {language === 'pl' ? 'Wędliny, Peklosól, Sezonowanie & Ubytek Masy' : 'Charcuterie, Curing Salt & Weight Loss'}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* Ferment */}
+        <View style={styles.craftAppRow}>
+          <View style={[styles.craftAppIconBox, { backgroundColor: 'rgba(224, 168, 56, 0.15)' }]}>
+            <FermentAppIcon size={24} color={CRAFT_APPS.ferment.accent} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={styles.actionTitle}>Ferment</Text>
+              <View style={styles.upcomingAppPill}>
+                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
+              </View>
+            </View>
+            <Text style={styles.actionSubtitle}>
+              {language === 'pl' ? 'Sery Rzemieślnicze, Podpuszczka & Dojrzewalnia' : 'Artisan Cheeses, Rennet & Aging Cellar'}
+            </Text>
+          </View>
+        </View>
+      </View>
+
       {/* O aplikacji */}
       <Text style={styles.sectionTitle}>O Aplikacji</Text>
       <View style={styles.cardGroup}>
@@ -1177,5 +1290,48 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 14,
+  },
+  craftAppRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+  craftAppIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  currentAppPill: {
+    backgroundColor: 'rgba(42, 123, 98, 0.18)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(42, 123, 98, 0.4)',
+  },
+  currentAppPillText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#4E9F3D',
+    textTransform: 'uppercase',
+  },
+  upcomingAppPill: {
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  upcomingAppPillText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: theme.colors.textMuted,
+    textTransform: 'uppercase',
   },
 });

@@ -265,3 +265,181 @@ export function StarIcon({ size = 18, color = '#D97736', filled = false, strokeW
     </Svg>
   );
 }
+
+// ============================================================================
+// Apps4Craft Family Emblems (The 5 Culinary Crafts)
+// ============================================================================
+
+/** ☕ 1. Napar — Ekstrakcja Kawy Specialty i Herbaty Rzemieślniczej */
+export function NaparAppIcon({ size = 28, color = '#C86A28', strokeWidth = 1.75 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      {/* Dripper stożkowy V60 z uchwytem */}
+      <Path
+        d="M4 5h16l-5.5 11h-5L4 5z"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M17.5 6.5c2 0 3.5 1.2 3.5 3.2s-1.5 3.2-3 3.2"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+      />
+      {/* Podstawa serwera */}
+      <Path d="M8 20h8" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+      {/* Kropla esencji */}
+      <Circle cx="12" cy="18.5" r="1.1" fill={color} />
+      {/* Subtelne żebra spiralne */}
+      <Path d="M9 7.5l2 5M15 7.5l-2 5" stroke={color} strokeWidth={strokeWidth * 0.7} strokeLinecap="round" opacity={0.7} />
+    </Svg>
+  );
+}
+
+/** 🥖 2. Piekarz — Chleb Rzemieślniczy, Zakwas i Piekarska Hydratacja */
+export function PiekarzAppIcon({ size = 28, color = '#D49B42', strokeWidth = 1.75 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      {/* Bochenek chleba boule (okrągły bochen na zakwasie) */}
+      <Path
+        d="M4 16c0-6 3.5-11 8-11s8 5 8 11H4z"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Podstawa z deski piekarskiej */}
+      <Path d="M3 18.5h18" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+      {/* Nacięcie żyletką (Scoring Ear / Kłos żyta) */}
+      <Path
+        d="M8.5 13.5c2.5-3 5-3.5 7-1"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path d="M10 10.5l1.5 2M12.5 9l1.5 2M14.5 10l1 1.5" stroke={color} strokeWidth={strokeWidth * 0.7} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+/** 🫙 3. Słoik — Kiszonki, Solanki, Octy i Fermentacja Warzyw */
+export function SloikAppIcon({ size = 28, color = '#5B8A61', strokeWidth = 1.75 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      {/* Korpus słoika Weck z zaokrąglonymi ramionami */}
+      <Path
+        d="M6 8h12v10a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V8z"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Szklana pokrywa */}
+      <Path
+        d="M7 5h10v3H7V5z"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Druciana klamra sprężynowa Weck */}
+      <Path d="M5 8h14M8 5V3.5h8V5" stroke={color} strokeWidth={strokeWidth * 0.85} strokeLinecap="round" />
+      {/* Pęcherzyki CO2 solanki */}
+      <Circle cx="10" cy="14" r="1.2" stroke={color} strokeWidth={strokeWidth * 0.7} />
+      <Circle cx="14" cy="11.5" r="0.9" stroke={color} strokeWidth={strokeWidth * 0.7} />
+      <Circle cx="12" cy="16.5" r="0.75" stroke={color} strokeWidth={strokeWidth * 0.7} />
+    </Svg>
+  );
+}
+
+/** 🥩 4. Masaż — Wędliny, Sezonowanie, Peklosól i Wędzenie */
+export function MasazAppIcon({ size = 28, color = '#A43E38', strokeWidth = 1.75 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      {/* Kawałek dojrzewającego mięsa / szynki */}
+      <Path
+        d="M5.5 16.5c-2-2-1.5-6 1-8.5s6.5-3 8.5-1c3 3 5 4 5 7.5 0 4-3.5 7.5-7.5 7.5-3.5 0-5-3.5-7-5.5z"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Sznurek wędzarniczy / oplot rzeźnicki */}
+      <Path
+        d="M8.5 10c1.5 2 4.5 3 7.5 2M7.5 14c2 1 4 0.5 6-1"
+        stroke={color}
+        strokeWidth={strokeWidth * 0.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Kość szpikowa */}
+      <Circle cx="15.5" cy="8.5" r="1.5" stroke={color} strokeWidth={strokeWidth * 0.85} />
+    </Svg>
+  );
+}
+
+/** 🧀 5. Ferment — Sery Rzemieślnicze, Skrzep, Dojrzewalnia i pH */
+export function FermentAppIcon({ size = 28, color = '#E0A838', strokeWidth = 1.75 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      {/* Krąg sera w rzucie z góry/izometrycznym */}
+      <Path
+        d="M12 4L3 8.5v7l9 4.5 9-4.5v-7L12 4z"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Wycięty klin serowy */}
+      <Path
+        d="M12 4v8l9-4.5"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M12 12l-7-3.5"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Oczka dojrzewania sera */}
+      <Circle cx="7.5" cy="14" r="1.1" stroke={color} strokeWidth={strokeWidth * 0.75} />
+      <Circle cx="15" cy="15" r="0.9" stroke={color} strokeWidth={strokeWidth * 0.75} />
+    </Svg>
+  );
+}
+
+/** 👑 6. Herb Rodziny Apps4Craft Studio */
+export function CraftFamilyEmblem({ size = 32, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      {/* Zewnętrzna rzemieślnicza tarcza (squircle) */}
+      <Rect
+        x="2.5"
+        y="2.5"
+        width="19"
+        height="19"
+        rx="5.5"
+        stroke={color}
+        strokeWidth={strokeWidth}
+      />
+      {/* Centralna geometryczna gwiazda 5 rzemiosł kuchennych */}
+      <Path
+        d="M12 6.5v11M6.5 12h11M8.5 8.5l7 7M15.5 8.5l-7 7"
+        stroke={color}
+        strokeWidth={strokeWidth * 0.75}
+        strokeLinecap="round"
+        opacity={0.6}
+      />
+      {/* Rdzeń tarczy */}
+      <Circle cx="12" cy="12" r="2.2" stroke={color} strokeWidth={strokeWidth} fill="#121214" />
+    </Svg>
+  );
+}
+

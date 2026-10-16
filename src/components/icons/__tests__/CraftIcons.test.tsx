@@ -19,6 +19,12 @@ import {
   ResetIcon,
   QrIcon,
   StarIcon,
+  NaparAppIcon,
+  PiekarzAppIcon,
+  SloikAppIcon,
+  MasazAppIcon,
+  FermentAppIcon,
+  CraftFamilyEmblem,
 } from '../CraftIcons';
 
 describe('CraftIcons Component Suite', () => {
@@ -38,6 +44,12 @@ describe('CraftIcons Component Suite', () => {
       <ResetIcon key="reset" />,
       <QrIcon key="qr" />,
       <StarIcon key="star" />,
+      <NaparAppIcon key="napar-app" />,
+      <PiekarzAppIcon key="piekarz-app" />,
+      <SloikAppIcon key="sloik-app" />,
+      <MasazAppIcon key="masaz-app" />,
+      <FermentAppIcon key="ferment-app" />,
+      <CraftFamilyEmblem key="family-emblem" />,
     ];
 
     iconsWithDefaults.forEach((icon) => {
@@ -66,6 +78,12 @@ describe('CraftIcons Component Suite', () => {
       <QrIcon key="qr-c" size={22} color="#C86A28" strokeWidth={2} />,
       <StarIcon key="star-c-empty" size={16} color="#C86A28" filled={false} strokeWidth={2} />,
       <StarIcon key="star-c-filled" size={16} color="#C86A28" filled={true} strokeWidth={2} />,
+      <NaparAppIcon key="napar-app-c" size={36} color="#C86A28" strokeWidth={2} />,
+      <PiekarzAppIcon key="piekarz-app-c" size={36} color="#D49B42" strokeWidth={2} />,
+      <SloikAppIcon key="sloik-app-c" size={36} color="#5B8A61" strokeWidth={2} />,
+      <MasazAppIcon key="masaz-app-c" size={36} color="#A43E38" strokeWidth={2} />,
+      <FermentAppIcon key="ferment-app-c" size={36} color="#E0A838" strokeWidth={2} />,
+      <CraftFamilyEmblem key="family-emblem-c" size={40} color="#F4EFEA" strokeWidth={2} />,
     ];
 
     iconsWithCustomProps.forEach((icon) => {
