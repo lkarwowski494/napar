@@ -27,6 +27,8 @@ import {
   setVoiceAnnounceEnabled,
   getHapticsEnabled,
   setHapticsEnabled,
+  getIsProUser,
+  setIsProUser,
 } from '../src/core/database';
 import { SUPPORTED_GRINDERS } from '../src/core/grinder-converter';
 import { theme } from '../src/core/theme';
@@ -46,7 +48,9 @@ export default function SettingsScreen() {
   const [haptics, setHaptics] = useState<boolean>(() => {
     return getHapticsEnabled();
   });
-  const [isPro, setIsPro] = useState(false);
+  const [isPro, setIsPro] = useState(() => {
+    return getIsProUser();
+  });
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
 
@@ -125,11 +129,12 @@ export default function SettingsScreen() {
   };
 
   const handleRestorePurchases = () => {
-    Alert.alert(
-      'Przywracanie zakupów',
-      'Sprawdzanie lokalnych uprawnień StoreKit... Twoja licencja jest aktywna.'
-    );
     setIsPro(true);
+    setIsProUser(true);
+    Alert.alert(
+      t.settings.restoreSuccessTitle,
+      t.settings.restoreSuccessMsg
+    );
   };
 
   return (
@@ -361,26 +366,24 @@ export default function SettingsScreen() {
       </View>
 
       {/* Oferta Apps4Brew Pro */}
-      <Text style={styles.sectionTitle}>Napar Pro (ZP-08)</Text>
+      <Text style={styles.sectionTitle}>{t.settings.proTitle}</Text>
       <View style={styles.proCard}>
         <View style={styles.proHeader}>
-          <Text style={styles.proTitle}>Odblokuj Pełnię Rzemiosła</Text>
+          <Text style={styles.proTitle}>{t.settings.proUnlockTitle}</Text>
           {isPro && (
             <View style={styles.proActiveBadge}>
-              <Text style={styles.proActiveText}>AKTYWNY PRO</Text>
+              <Text style={styles.proActiveText}>{t.settings.proActiveBadge}</Text>
             </View>
           )}
         </View>
 
-        <Text style={styles.proDesc}>
-          Darmowy rdzeń pozwala parzyć bez ograniczeń czasowych. Wersja Pro wspiera niezależny rozwój bez inwestorów i reklam:
-        </Text>
+        <Text style={styles.proDesc}>{t.settings.proDesc}</Text>
 
         <View style={styles.proPerks}>
-          <Text style={styles.proPerkItem}>✓ Nielimitowana spiżarnia ziaren i rzadkich herbat</Text>
-          <Text style={styles.proPerkItem}>✓ Zaawansowane wykresy kinetyki kofeiny i integracja Apple Health</Text>
-          <Text style={styles.proPerkItem}>✓ Niezależny stoper na Apple Watch z haptyką</Text>
-          <Text style={styles.proPerkItem}>✓ Live Activity na zablokowanym ekranie i Dynamic Island</Text>
+          <Text style={styles.proPerkItem}>{t.settings.proPerk1}</Text>
+          <Text style={styles.proPerkItem}>{t.settings.proPerk2}</Text>
+          <Text style={styles.proPerkItem}>{t.settings.proPerk3}</Text>
+          <Text style={styles.proPerkItem}>{t.settings.proPerk4}</Text>
         </View>
 
         <View style={styles.pricingGrid}>
@@ -388,44 +391,58 @@ export default function SettingsScreen() {
             style={styles.priceOption}
             onPress={() => {
               setIsPro(true);
-              Alert.alert('Dziękujemy!', 'Napar Pro został pomyślnie aktywowany.');
+              setIsProUser(true);
+              Alert.alert(t.settings.purchaseSuccessTitle, t.settings.purchaseSuccessMsg);
             }}
+            accessibilityRole="button"
+            accessibilityLabel={`${t.settings.priceMonthlyTerm}: ${t.settings.priceMonthlyValue}, ${t.settings.priceMonthlySub}`}
           >
-            <Text style={styles.priceTerm}>MIESIĘCZNY</Text>
-            <Text style={styles.priceValue}>3,99 zł</Text>
-            <Text style={styles.priceSub}>0,99 € / mies.</Text>
+            <Text style={styles.priceTerm}>{t.settings.priceMonthlyTerm}</Text>
+            <Text style={styles.priceValue}>{t.settings.priceMonthlyValue}</Text>
+            <Text style={styles.priceSub}>{t.settings.priceMonthlySub}</Text>
           </Pressable>
 
           <Pressable
             style={[styles.priceOption, styles.priceOptionBest]}
             onPress={() => {
               setIsPro(true);
-              Alert.alert('Dziękujemy!', 'Roczna subskrypcja Napar Pro (14 dni za darmo) została aktywowana.');
+              setIsProUser(true);
+              Alert.alert(t.settings.purchaseSuccessTitle, t.settings.purchaseAnnualSuccessMsg);
             }}
+            accessibilityRole="button"
+            accessibilityLabel={`${t.settings.priceAnnualTerm}: ${t.settings.priceAnnualValue}, ${t.settings.priceAnnualSub}, ${t.settings.trialBadge}`}
           >
             <View style={styles.bestBadge}>
-              <Text style={styles.bestBadgeText}>14 DNI TRIAL</Text>
+              <Text style={styles.bestBadgeText}>{t.settings.trialBadge}</Text>
             </View>
-            <Text style={styles.priceTerm}>ROCZNY</Text>
-            <Text style={styles.priceValue}>19,99 zł</Text>
-            <Text style={styles.priceSub}>4,99 € / rok</Text>
+            <Text style={styles.priceTerm}>{t.settings.priceAnnualTerm}</Text>
+            <Text style={styles.priceValue}>{t.settings.priceAnnualValue}</Text>
+            <Text style={styles.priceSub}>{t.settings.priceAnnualSub}</Text>
           </Pressable>
 
           <Pressable
             style={styles.priceOption}
             onPress={() => {
               setIsPro(true);
-              Alert.alert('Dziękujemy!', 'Dożywotnia licencja Lifetime została aktywowana!');
+              setIsProUser(true);
+              Alert.alert(t.settings.purchaseSuccessTitle, t.settings.purchaseLifetimeSuccessMsg);
             }}
+            accessibilityRole="button"
+            accessibilityLabel={`${t.settings.priceLifetimeTerm}: ${t.settings.priceLifetimeValue}, ${t.settings.priceLifetimeSub}`}
           >
-            <Text style={styles.priceTerm}>LIFETIME</Text>
-            <Text style={styles.priceValue}>59,99 zł</Text>
-            <Text style={styles.priceSub}>Raz na zawsze + Chmura rodzinna</Text>
+            <Text style={styles.priceTerm}>{t.settings.priceLifetimeTerm}</Text>
+            <Text style={styles.priceValue}>{t.settings.priceLifetimeValue}</Text>
+            <Text style={styles.priceSub}>{t.settings.priceLifetimeSub}</Text>
           </Pressable>
         </View>
 
-        <Pressable style={styles.restoreBtn} onPress={handleRestorePurchases}>
-          <Text style={styles.restoreBtnText}>Przywróć wcześniejsze zakupy</Text>
+        <Pressable
+          style={styles.restoreBtn}
+          onPress={handleRestorePurchases}
+          accessibilityRole="button"
+          accessibilityLabel={t.settings.restorePurchases}
+        >
+          <Text style={styles.restoreBtnText}>{t.settings.restorePurchases}</Text>
         </Pressable>
       </View>
 

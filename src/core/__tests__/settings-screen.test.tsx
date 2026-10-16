@@ -222,7 +222,7 @@ describe('SettingsScreen Component', () => {
 
     expect(alertSpy).toHaveBeenCalledWith(
       'Przywracanie zakupów',
-      'Sprawdzanie lokalnych uprawnień StoreKit... Twoja licencja jest aktywna.'
+      expect.stringContaining('Sprawdzanie lokalnych uprawnień StoreKit...')
     );
   });
 

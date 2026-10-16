@@ -35,6 +35,8 @@ import {
   setVoiceAnnounceEnabled,
   getHapticsEnabled,
   setHapticsEnabled,
+  getIsProUser,
+  setIsProUser,
 } from '../database';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../database-schema';
 
@@ -750,5 +752,18 @@ describe('Napar SQLite Database & Repositories', () => {
 
     setHapticsEnabled(true);
     expect(getHapticsEnabled()).toBe(true);
+  });
+
+  test('Pobiera i zapisuje status licencji Pro (getIsProUser, setIsProUser)', () => {
+    // Domyślnie false
+    expect(getIsProUser()).toBe(false);
+
+    // Aktywacja Pro
+    setIsProUser(true);
+    expect(getIsProUser()).toBe(true);
+
+    // Dezaktywacja Pro
+    setIsProUser(false);
+    expect(getIsProUser()).toBe(false);
   });
 });
