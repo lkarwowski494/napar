@@ -440,6 +440,65 @@ describe('DialInScreen UI with Water Chemistry', () => {
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Chemex');
   });
+
+  test('BR-KALK-001: Dwukierunkowy kalkulator ratio (Woda -> Doza) oraz preset Gongfu 1:20', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<DialInScreen />);
+    });
+
+    // Przełącz na zakładkę Ratio
+    const ratioTab = findPressableWithText(tree.root, 'Ratio & Uzysk');
+    renderer.act(() => {
+      ratioTab.props.onPress();
+    });
+
+    // Przełącz na kierunek "Woda → Doza"
+    const waterToDoseBtn = findPressableWithText(tree.root, 'Woda → Doza');
+    expect(waterToDoseBtn).toBeTruthy();
+    renderer.act(() => {
+      waterToDoseBtn.props.onPress();
+    });
+
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Docelowa objętość wody');
+    expect(str).toContain('WYMAGANA DOZA ZIAREN');
+
+    // Znajdź input wody (placeholder "300")
+    const waterInput = tree.root.findByProps({ placeholder: '300' });
+    expect(waterInput).toBeTruthy();
+
+    // Wpisz 500g wody
+    renderer.act(() => {
+      waterInput.props.onChangeText('500');
+    });
+
+    // 500 / 16.6 = 30.1g dozy, yield = 500 - 30.1 * 2 = 439.8g
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('30.1 g');
+    expect(str).toContain('439.8');
+
+    // Wybierz preset Gongfu 1:20
+    const gongfuPreset = findPressableWithText(tree.root, '1:20 (Gongfu)');
+    expect(gongfuPreset).toBeTruthy();
+    renderer.act(() => {
+      gongfuPreset.props.onPress();
+    });
+
+    // 500 / 20 = 25g dozy, yield = 500 - 25 * 2 = 450g
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('25 g');
+    expect(str).toContain('450');
+
+    // Przełącz z powrotem na "Doza → Woda"
+    const doseToWaterBtn = findPressableWithText(tree.root, 'Doza → Woda');
+    renderer.act(() => {
+      doseToWaterBtn.props.onPress();
+    });
+
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('WODA DO ZALANIA');
+  });
 });
 
 function findPressableWithText(root: any, text: string) {
