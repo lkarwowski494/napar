@@ -7,6 +7,9 @@ import { Share, Alert } from 'react-native';
 import renderer, { act } from 'react-test-renderer';
 import BrewScreen from '../../../app/(tabs)/index';
 import { BrewProvider } from '../brew-context';
+import { QrScannerModal } from '../QrScannerModal';
+import { encodeRecipeToShareUrl } from '../recipe-share';
+import { MASTER_RECIPES } from '../recipes-data';
 
 jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
 jest.spyOn(Alert, 'alert').mockImplementation(() => {});
@@ -1206,6 +1209,160 @@ describe('BrewScreen UI Integration', () => {
 
     str = JSON.stringify(tree.toJSON());
     expect(str).toContain('"45"'); // powrót do 45s
+  });
+
+  test('Ostrzeżenie o małej ilości ziaren w paczce (Zadanie N3)', () => {
+    mockDb.inventory.set('bean-low', {
+      id: 'bean-low',
+      name: 'Resztka Kenia',
+      type: 'coffee',
+      roaster_or_producer: 'Kawa',
+      origin: 'Kenia',
+      initial_weight_g: 250,
+      remaining_weight_g: 5,
+      flavor_notes_json: '[]',
+      is_favorite: 0,
+      is_archived: 0,
+      created_at: '2026-10-10',
+      updated_at: '2026-10-10',
+    });
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz modal spiżarni
+    const inventoryCard = findPressableWithText(tree.root, 'SPIŻARNIA');
+    act(() => {
+      inventoryCard?.props.onPress();
+    });
+
+    // Wybierz Resztka Kenia
+    const allBeanTexts = tree.root.findAll((n: any) => {
+      const c = n.props?.children;
+      return typeof c === 'string' && c.includes('Resztka Kenia');
+    });
+    let beanOption = allBeanTexts[allBeanTexts.length - 1];
+    while (beanOption && !beanOption.props?.onPress) {
+      beanOption = beanOption.parent;
+    }
+    act(() => {
+      beanOption?.props.onPress();
+    });
+
+    // Naciśnij start timer
+    const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
+    expect(startBtn).toBeTruthy();
+
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    act(() => {
+      startBtn?.props.onPress();
+    });
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Mało ziaren w paczce!',
+      expect.stringContaining('pozostało tylko 5g'),
+      expect.any(Array)
+    );
+
+    // Wywołaj akcję "Parz Blend"
+    const buttons = alertSpy.mock.calls[alertSpy.mock.calls.length - 1][2] as any[];
+    const blendBtn = buttons.find((b: any) => b.text === 'Parz Blend');
+    expect(blendBtn).toBeTruthy();
+    act(() => {
+      blendBtn.onPress();
+    });
+  });
+
+  test('Otwieranie skanera QR i obsługa odczytu receptury (Zadanie N6)', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz modal receptur
+    const recipeCard = findPressableWithText(tree.root, 'RECEPTURA');
+    act(() => {
+      recipeCard?.props.onPress();
+    });
+
+    // Znajdź przycisk Skanuj QR
+    const scanQrBtn = tree.root.findByProps({ testID: 'scan-qr-btn' });
+    expect(scanQrBtn).toBeTruthy();
+    act(() => {
+      scanQrBtn.props.onPress();
+    });
+
+    // Znajdź QrScannerModal
+    const scannerModal = tree.root.findByType(QrScannerModal);
+    expect(scannerModal.props.visible).toBe(true);
+
+    // Test błędnego kodu QR
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    act(() => {
+      scannerModal.props.onScanRecipe('invalid-data');
+    });
+    expect(alertSpy).toHaveBeenCalled();
+
+    // Test poprawnego kodu QR receptury
+    const validUrl = encodeRecipeToShareUrl(MASTER_RECIPES[0]);
+    act(() => {
+      scannerModal.props.onScanRecipe(validUrl);
+    });
+    expect(alertSpy).toHaveBeenCalled();
+
+    // Zamknij skaner
+    act(() => {
+      scannerModal.props.onClose();
+    });
+  });
+
+  test('Karta Degustacyjna wyświetla Ekonomię Rzemiosła (Zadanie N2)', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Rozpocznij parzenie
+    const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
+    expect(startBtn).toBeTruthy();
+    act(() => {
+      startBtn?.props.onPress();
+    });
+
+    // Wstrzymaj parzenie
+    const pauseBtn = findPressableWithText(tree.root, 'PAUZA');
+    expect(pauseBtn).toBeTruthy();
+    act(() => {
+      pauseBtn?.props.onPress();
+    });
+
+    // Kliknij "Zapisz" do arkusza degustacyjnego
+    const saveBtn = findPressableWithText(tree.root, 'Zapisz');
+    expect(saveBtn).toBeTruthy();
+    act(() => {
+      saveBtn?.props.onPress();
+    });
+
+    // Sprawdź czy finish-cost-card jest wyrenderowana
+    const costCard = tree.root.findByProps({ testID: 'finish-cost-card' });
+    expect(costCard).toBeTruthy();
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Ekonomia Rzemiosła');
+    expect(str).toContain('Oszczędność vs kawiarnia');
   });
 });
 

@@ -19,6 +19,7 @@ export const theme = {
     emerald: '#2A7B62',
     emeraldLight: '#3AA584',
     emeraldMuted: 'rgba(42, 123, 98, 0.15)',
+    sage: '#4E9F3D',
     
     // Teksty
     textPrimary: '#F4EFEA',

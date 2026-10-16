@@ -142,4 +142,18 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(qrResult.modules[0][6]).toBe(true);
     expect(qrResult.modules[6][0]).toBe(true);
   });
+
+  test('utf8ToBase64 i base64ToUtf8 działają poprawnie w środowisku bez globalnego Buffer', () => {
+    const origBuffer = global.Buffer;
+    try {
+      // @ts-ignore
+      global.Buffer = undefined;
+      const original = 'Zażółć gęślą jaźń ☕';
+      const encoded = utf8ToBase64(original);
+      const decoded = base64ToUtf8(encoded);
+      expect(decoded).toBe(original);
+    } finally {
+      global.Buffer = origBuffer;
+    }
+  });
 });

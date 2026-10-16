@@ -8,6 +8,7 @@ import {
   getInventoryItemById,
   saveInventoryItem,
   deductInventoryWeight,
+  deductBeansForBrew,
   deleteInventoryItem,
   getRecipes,
   getRecipeById,
@@ -41,6 +42,8 @@ import {
   setCaffeineHalfLife,
   getBedtimeHour,
   setBedtimeHour,
+  getHealthKitSyncEnabled,
+  setHealthKitSyncEnabled,
 } from '../database';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../database-schema';
 
@@ -220,6 +223,11 @@ describe('Napar SQLite Database & Repositories', () => {
     deductInventoryWeight('bean-1', 18);
     items = getInventoryItems();
     expect(items[0].remainingWeightGrams).toBe(232);
+
+    // Zadanie N3: deductBeansForBrew alias
+    deductBeansForBrew('bean-1', 12);
+    items = getInventoryItems();
+    expect(items[0].remainingWeightGrams).toBe(220);
 
     deleteInventoryItem('bean-1');
     expect(getInventoryItems().length).toBe(0);
@@ -803,5 +811,15 @@ describe('Napar SQLite Database & Repositories', () => {
     // Przywrócenie 23:00
     setBedtimeHour(23);
     expect(getBedtimeHour()).toBe(23);
+  });
+
+  test('BR-KOF-002: Pobiera i zapisuje flagę synchronizacji HealthKit w bazie', () => {
+    expect(getHealthKitSyncEnabled()).toBe(false);
+
+    setHealthKitSyncEnabled(true);
+    expect(getHealthKitSyncEnabled()).toBe(true);
+
+    setHealthKitSyncEnabled(false);
+    expect(getHealthKitSyncEnabled()).toBe(false);
   });
 });

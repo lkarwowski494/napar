@@ -3,6 +3,7 @@
 // ============================================================================
 
 import * as SQLite from 'expo-sqlite';
+import { dbDirectory } from './db-path';
 import {
   InventoryItem,
   SavedRecipe,
@@ -16,7 +17,10 @@ let dbInstance: SQLite.SQLiteDatabase | null = null;
 
 export function getDatabase(): SQLite.SQLiteDatabase {
   if (!dbInstance) {
-    dbInstance = SQLite.openDatabaseSync('napar.db');
+    const safeDir = dbDirectory(SQLite.defaultDatabaseDirectory);
+    dbInstance = safeDir
+      ? SQLite.openDatabaseSync('napar.db', undefined, safeDir)
+      : SQLite.openDatabaseSync('napar.db');
     initDatabase(dbInstance);
   }
   return dbInstance;
@@ -159,6 +163,10 @@ export function deductInventoryWeight(id: string, doseGrams: number): void {
     'UPDATE inventory_items SET remaining_weight_g = ?, updated_at = ? WHERE id = ?',
     [newRemaining, new Date().toISOString(), id]
   );
+}
+
+export function deductBeansForBrew(itemId: string, grams: number): void {
+  deductInventoryWeight(itemId, grams);
 }
 
 function mapRowToInventoryItem(row: any): InventoryItem {

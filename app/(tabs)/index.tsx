@@ -35,6 +35,8 @@ import { SUPPORTED_GRINDERS, getRecommendedGrindForRecipe } from '../../src/core
 import { encodeRecipeToShareUrl, decodeRecipeFromShareUrl } from '../../src/core/recipe-share';
 import { QrCodeSvg } from '../../src/core/qr-code';
 import { confirmAction } from '../../src/core/confirm';
+import { calculateBrewCost } from '../../src/core/cost-calculator';
+import { QrScannerModal } from '../../src/core/QrScannerModal';
 
 export default function BrewScreen() {
   const router = useRouter();
@@ -74,8 +76,48 @@ export default function BrewScreen() {
   const [showGrinderModal, setShowGrinderModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showQrScanner, setShowQrScanner] = useState(false);
   const [importUrlInput, setImportUrlInput] = useState('');
   const [importParsedRecipe, setImportParsedRecipe] = useState<{ recipe: SavedRecipe; originalSteps: any[] } | null>(null);
+
+  const brewCost = useMemo(() => {
+    return calculateBrewCost({
+      doseGrams,
+      waterWeightGrams: waterGrams,
+    });
+  }, [doseGrams, waterGrams]);
+
+  const handleStartTimer = () => {
+    if (
+      selectedInventoryItem &&
+      selectedInventoryItem.remainingWeightGrams < doseGrams
+    ) {
+      Alert.alert(
+        'Mało ziaren w paczce!',
+        `W paczce "${selectedInventoryItem.name}" pozostało tylko ${selectedInventoryItem.remainingWeightGrams}g, a doza wymaga ${doseGrams}g. Czy chcesz zaparzyć blend z innymi ziarnami?`,
+        [
+          { text: 'Anuluj', style: 'cancel' },
+          { text: 'Parz Blend', onPress: () => startTimer() },
+        ]
+      );
+      return;
+    }
+    startTimer();
+  };
+
+  const handleScanQrRecipe = (data: string) => {
+    setShowQrScanner(false);
+    const decoded = decodeRecipeFromShareUrl(data);
+    if (!decoded) {
+      Alert.alert(t.common.confirm, t.brew.importError);
+      return;
+    }
+    saveRecipe(decoded.recipe);
+    setAllRecipes(getRecipes());
+    selectRecipe(decoded.recipe);
+    setShowRecipeModal(false);
+    Alert.alert(t.common.save, t.brew.importSuccess);
+  };
 
   const shareUrl = useMemo(() => {
     try {
@@ -525,7 +567,7 @@ export default function BrewScreen() {
         {isIdle && (
           <Pressable
             style={styles.mainStartButton}
-            onPress={startTimer}
+            onPress={handleStartTimer}
             accessibilityRole="button"
             accessibilityLabel="Rozpocznij parzenie"
             accessibilityHint="Uruchamia stoper i pierwszy etap parzenia"
@@ -644,6 +686,16 @@ export default function BrewScreen() {
                 testID="import-recipe-btn"
               >
                 <Text style={styles.importRecipeModalBtnText}>📥 {t.brew.importRecipe}</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.scanQrModalBtn}
+                onPress={() => setShowQrScanner(true)}
+                testID="scan-qr-btn"
+                accessibilityRole="button"
+                accessibilityLabel="Skanuj kod QR receptury aparatem"
+              >
+                <Text style={styles.scanQrModalBtnText}>📷 QR</Text>
               </Pressable>
             </View>
 
@@ -874,6 +926,20 @@ export default function BrewScreen() {
                 />
               </View>
 
+              {/* Ekonomia Rzemiosła (Koszt vs Kawiarnia) */}
+              <View style={styles.finishCostCard} testID="finish-cost-card">
+                <Text style={styles.finishCostTitle}>💰 Ekonomia Rzemiosła</Text>
+                <Text style={styles.finishCostSubtitle}>
+                  Koszt tego naparu: {brewCost.totalHomeCost.toFixed(2)} PLN (ziarna: {brewCost.coffeeCost.toFixed(2)} zł, woda: {brewCost.waterCost.toFixed(2)} zł)
+                </Text>
+                <Text style={styles.finishCostSavings}>
+                  Oszczędność vs kawiarnia specialty (18 zł):{' '}
+                  <Text style={styles.finishCostSavingsBold}>
+                    +{brewCost.savingsPerCup.toFixed(2)} PLN
+                  </Text>
+                </Text>
+              </View>
+
               <View style={styles.finishButtonsRow}>
                 <Pressable
                   style={styles.finishCancelBtn}
@@ -1064,6 +1130,12 @@ export default function BrewScreen() {
           </ScrollView>
         </View>
       </Modal>
+
+      <QrScannerModal
+        visible={showQrScanner}
+        onClose={() => setShowQrScanner(false)}
+        onScanRecipe={handleScanQrRecipe}
+      />
     </ScrollView>
   );
 }
@@ -1818,6 +1890,47 @@ const styles = StyleSheet.create({
     color: theme.colors.copper,
     fontWeight: '600',
     fontSize: 13,
+  },
+  scanQrModalBtn: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.md,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+  },
+  scanQrModalBtnText: {
+    color: theme.colors.copper,
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  finishCostCard: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.md,
+    padding: 14,
+    marginTop: 14,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  finishCostTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    marginBottom: 4,
+  },
+  finishCostSubtitle: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginBottom: 6,
+  },
+  finishCostSavings: {
+    fontSize: 13,
+    color: theme.colors.textPrimary,
+  },
+  finishCostSavingsBold: {
+    fontWeight: '700',
+    color: '#4CAF50',
   },
   qrCard: {
     backgroundColor: '#FFFFFF',

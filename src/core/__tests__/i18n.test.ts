@@ -2,7 +2,15 @@
 // Napar (Steepwise) — Unit Tests: i18n & Language Localization
 // ============================================================================
 
-import { detectSystemLanguage, translations, SupportedLanguage } from '../i18n';
+import React from 'react';
+import renderer from 'react-test-renderer';
+import {
+  detectSystemLanguage,
+  translations,
+  SupportedLanguage,
+  LanguageProvider,
+  useTranslation,
+} from '../i18n';
 
 describe('i18n System', () => {
   test('Wykrywa język systemowy lub domyślny fallback', () => {
@@ -85,5 +93,32 @@ describe('i18n System', () => {
     expect(detectSystemLanguage()).toBe('en');
 
     Intl.DateTimeFormat = originalDateTimeFormat;
+  });
+
+  test('LanguageProvider i useTranslation hook', () => {
+    let contextValue: any;
+    const TestConsumer = () => {
+      contextValue = useTranslation();
+      return null;
+    };
+
+    renderer.act(() => {
+      renderer.create(
+        React.createElement(LanguageProvider, null, React.createElement(TestConsumer))
+      );
+    });
+
+    expect(contextValue.language).toBeDefined();
+    renderer.act(() => {
+      contextValue.setLanguage('en');
+    });
+    expect(contextValue.language).toBe('en');
+    expect(contextValue.t.appName).toBe('Steepwise');
+
+    renderer.act(() => {
+      contextValue.setLanguage('pl');
+    });
+    expect(contextValue.language).toBe('pl');
+    expect(contextValue.t.appName).toBe('Napar');
   });
 });

@@ -512,6 +512,17 @@ describe('SettingsScreen Component', () => {
       ['caffeine_half_life_hours', '5.5']
     );
 
+    // Kliknij '-' dla czasu półtrwania
+    const decHalfLifeBtn = tree.root.findByProps({ accessibilityLabel: 'Zmniejsz czas półtrwania' });
+    renderer.act(() => {
+      decHalfLifeBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['caffeine_half_life_hours', '5.0']
+    );
+
     // Kliknij '+' dla godziny snu
     const incBedtimeBtn = tree.root.findByProps({ accessibilityLabel: 'Późniejsza godzina snu' });
     renderer.act(() => {
@@ -521,6 +532,17 @@ describe('SettingsScreen Component', () => {
     expect(mockDb.runSync).toHaveBeenCalledWith(
       expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
       ['bedtime_hour', '24']
+    );
+
+    // Kliknij '-' dla godziny snu
+    const decBedtimeBtn = tree.root.findByProps({ accessibilityLabel: 'Wcześniejsza godzina snu' });
+    renderer.act(() => {
+      decBedtimeBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['bedtime_hour', '23']
     );
   });
 

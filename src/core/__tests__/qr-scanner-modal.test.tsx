@@ -1,0 +1,97 @@
+// ============================================================================
+// Napar (Steepwise) — Unit Tests: QrScannerModal
+// ============================================================================
+
+import React from 'react';
+import renderer from 'react-test-renderer';
+import { QrScannerModal } from '../QrScannerModal';
+import * as ExpoCamera from 'expo-camera';
+
+describe('QrScannerModal Component (Zadanie N6)', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
+
+  test('Zwraca null gdy visible jest false', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <QrScannerModal visible={false} onClose={jest.fn()} onScanRecipe={jest.fn()} />
+      );
+    });
+    expect(tree.toJSON()).toBeNull();
+    renderer.act(() => {
+      tree.unmount();
+    });
+  });
+
+  test('Renderuje kamerę gdy uprawnienia są przyznane i wywołuje onClose', () => {
+    const onCloseMock = jest.fn();
+    const onScanMock = jest.fn();
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <QrScannerModal visible={true} onClose={onCloseMock} onScanRecipe={onScanMock} />
+      );
+    });
+
+    const closeBtn = tree.root.findByProps({ testID: 'qr-scanner-close-btn' });
+    expect(closeBtn).toBeTruthy();
+
+    renderer.act(() => {
+      closeBtn.props.onPress();
+    });
+    expect(onCloseMock).toHaveBeenCalled();
+
+    const camera = tree.root.findByProps({ testID: 'qr-camera-view' });
+    expect(camera).toBeTruthy();
+
+    // Symulacja zeskanowania kodu QR
+    renderer.act(() => {
+      camera.props.onBarcodeScanned({ data: 'napar://recipe?v=1&d=test' });
+    });
+    expect(onScanMock).toHaveBeenCalledWith('napar://recipe?v=1&d=test');
+
+    renderer.act(() => {
+      jest.runAllTimers();
+    });
+    renderer.act(() => {
+      tree.unmount();
+    });
+  });
+
+  test('Renderuje ekran prośby o uprawnienia gdy brak zgody na aparat', () => {
+    const requestPermissionMock = jest.fn();
+    (ExpoCamera.useCameraPermissions as jest.Mock).mockReturnValue([
+      { granted: false, canAskAgain: true, status: 'undetermined' },
+      requestPermissionMock,
+      jest.fn(),
+    ]);
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <QrScannerModal visible={true} onClose={jest.fn()} onScanRecipe={jest.fn()} />
+      );
+    });
+
+    const permBtn = tree.root.findByProps({ testID: 'qr-scanner-permission-btn' });
+    expect(permBtn).toBeTruthy();
+
+    renderer.act(() => {
+      permBtn.props.onPress();
+    });
+    expect(requestPermissionMock).toHaveBeenCalled();
+
+    renderer.act(() => {
+      tree.unmount();
+    });
+  });
+});

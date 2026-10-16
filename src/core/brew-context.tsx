@@ -12,6 +12,7 @@ import {
   saveBrewSession,
   logCaffeine,
   deductInventoryWeight,
+  deductBeansForBrew,
   getInventoryItems,
   getRecipes,
   getAppSetting,
@@ -19,6 +20,7 @@ import {
   getVoiceAnnounceEnabled,
   getHapticsEnabled,
 } from './database';
+import { autoBackup } from './backup';
 import {
   calculateExtractionYield,
   estimateCoffeeCaffeineMg,
@@ -285,9 +287,21 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     saveBrewSession(session);
 
-    // Automatyczne odjęcie zużytej porcji ze spiżarni
+    // Automatyczne odjęcie zużytej porcji ze spiżarni (Zadanie N3)
     if (selectedInventoryItem?.id) {
       deductInventoryWeight(selectedInventoryItem.id, doseGrams);
+    }
+
+    // Apps4Brew SEC-09: Automatyczna rotacja 10 kopii JSON w tle (Zadanie N5)
+    try {
+      void autoBackup({
+        inventory: getInventoryItems(true),
+        customRecipes: getRecipes().filter((r) => r.isCustom),
+        sessions: [session],
+        caffeineLogs: [],
+      });
+    } catch {
+      // Ignoruj błędy kopii zapasowej w tle
     }
 
     // Zapis w rejestrze kofeiny

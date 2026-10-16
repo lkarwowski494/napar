@@ -6,6 +6,7 @@
 import * as Haptics from 'expo-haptics';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { RecipeStep } from './recipes-data';
+import { playTimerChime } from './timer-audio';
 
 export type TimerStatus = 'idle' | 'running' | 'paused' | 'finished';
 
@@ -167,6 +168,9 @@ export class BrewTimerEngine {
       // safe fallback
     }
     this.triggerHaptic('finish');
+    if (this.soundEnabled) {
+      void playTimerChime();
+    }
     if (this.callbacks.onFinish) {
       this.callbacks.onFinish();
     }
@@ -196,6 +200,9 @@ export class BrewTimerEngine {
     // Odliczanie ostatnich 3 sekund etapu
     if (remaining > 0 && remaining <= 3) {
       this.triggerHaptic('warning');
+      if (this.soundEnabled && remaining === 3) {
+        void playTimerChime();
+      }
       if (this.callbacks.onWarning) {
         this.callbacks.onWarning(remaining);
       }

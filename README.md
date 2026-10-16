@@ -48,27 +48,31 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - **🔁 Parz Ponownie (Brew Again — BR-DZIEN-004):** Błyskawiczne odtworzenie historycznej sesji jednym dotknięciem – załadowanie proporcji, dozy, temperatury, profilu wody i nastawy młynka bezpośrednio do aktywnego Asystenta Parzenia.
    - **📤 Udostępnianie Notatek Degustacyjnych:** Generowanie sformatowanej, estetycznej karty parzenia z parametrami, balansem, nutami sensorycznymi i uzyskiem $EY\%$ do natywnego udostępnienia (`Share.share`) w 100% offline.
    - **📊 Statystyki & Trendy (Brew Analytics):** Przełącznik widoków `[ 📋 Sesje ]` / `[ 📊 Statystyki & Trendy ]`. Karty sumarycznego wolumenu (gramatura ziaren/liści, litry przelanej wody, przyjęta kofeina, średnia ocen ★), wykres rozkładu metod parzenia, uśredniony radar sensoryczny SCA (`SensoryRadarChart`), chmura najczęstszych nut smakowych oraz rozkład balansu w filiżance.
-4. **🧭 Dial-in Doctor & Kalkulatory:**
-   - **Kompas Ekstrakcji (Dial-in Doctor):** Diagnozuje błędy smaku (za kwaśna, za gorzka, wodnista, cierpka herbata) i podaje fizyczną receptę na korektę mielenia młynka i temperatury wody.
-   - **Kalkulator Brew Ratio:** Dwukierunkowy przelicznik proporcji i szacowanego uzysku w filiżance z uwzględnieniem absorpcji $2.0\,\text{g/g}$.
-   - **Kalkulator TDS & Extraction Yield:** Weryfikacja czy napar trafia w Złote Okno SCA ($18.0\% - 22.0\%$).
-5. **💧 Chemia Wody i Mineralizacja (SCA & Barista Hustle):**
-   - 98.5% kawy i 99.5% herbaty to woda. Twardość ogólna (GH) i alkaliczność/bufor (KH) kształtują profil sensoryczny.
-   - Baza 7 zweryfikowanych profili (Barista Hustle 80/40, SCA Standard, Melbourne Sweet & Soft, Scott Rao Wonder Water, Hendon Hard Water, Herbata Szlachetna, Gongfu Wulong/Puerh).
-   - Dwutorowy kalkulator: roztwory koncentratów płynnych (1g/L = 2 ppm) oraz bezpośrednie odważanie soli suchych ($\text{NaHCO}_3, \text{MgSO}_4, \text{CaCl}_2$).
-   - Diagnoza chemiczna wody: wykrywanie wad smaku wynikających ze zbyt twardej lub niebuforowanej wody.
-   - Poradnik i benchmark powszechnie dostępnych wód butelkowanych (Volvic, Żywiecki Kryształ itp.).
-6. **⚡ Monitor Kofeiny i Kalkulator Snu:**
-   - Model jedno-kompartmentowej eliminacji kofeiny w organizmie ($t_{1/2} = 5.0\,\text{h}$).
-   - Bieżące stężenie aktywnej kofeiny w krwiobiegu w czasie rzeczywistym.
-   - Dobowy bilans kofeiny w relacji do normy EFSA (400 mg).
-   - **Bedtime Sleep Curfew:** Prognoza stężenia kofeiny o wybranej godzinie snu (próg bezpieczny dla fazy głębokiej NREM $\le 25\,\text{mg}$) oraz wyznaczenie godziny ostatniej dopuszczalnej filiżanki.
+4. **🧭 Dial-in Doctor & Kalkulatory Ekstrakcji:**
+   - **Kompas Ekstrakcji (Dial-in Doctor):** Diagnozuje błędy smaku (za kwaśna, za gorzka, wodnista, cierpka herbata) i podaje fizyczną receptę na korektę mielenia młynka i temperatury wody. [Wdrożone]
+   - **Kalkulator Brew Ratio (BR-KALK-001):** Pełny dwukierunkowy przelicznik proporcji (Doza → Woda oraz Woda → Doza `calculateBrewDose`) z presetami baristycznymi (1:15 intensywna, 1:16.6 SCA standard, 1:17.5 lekka, 1:20 Gongfu, 1:2 espresso, 1:50 herbata) oraz kalkulacją uzysku po absorpcji ciastka ($2.0\,\text{g/g}$). [Wdrożone]
+   - **Kalkulator TDS & Extraction Yield (BR-KALK-002):** Weryfikacja czy napar trafia w Złote Okno SCA ($18.0\% - 22.0\%$). [Wdrożone]
+5. **💧 Chemia Wody i Mineralizacja (SCA & Barista Hustle — BR-WODA-001 do BR-WODA-005):**
+   - 98.5% kawy i 99.5% herbaty to woda. Twardość ogólna (GH) i alkaliczność/bufor (KH) kształtują profil sensoryczny. [Wdrożone]
+   - Baza 7 zweryfikowanych profili (Barista Hustle 80/40, SCA Standard, Melbourne Sweet & Soft, Scott Rao Wonder Water, Hendon Hard Water, Herbata Szlachetna, Gongfu Wulong/Puerh). [Wdrożone]
+   - Dwutorowy kalkulator: roztwory koncentratów płynnych (1g/L = 2 ppm) oraz bezpośrednie odważanie soli suchych ($\text{NaHCO}_3, \text{MgSO}_4, \text{CaCl}_2$). [Wdrożone]
+   - Diagnoza chemiczna wody: wykrywanie wad smaku wynikających ze zbyt twardej lub niebuforowanej wody. [Wdrożone]
+   - Poradnik i benchmark powszechnie dostępnych wód butelkowanych (Volvic, Żywiecki Kryształ itp.). [Wdrożone]
+6. **⚡ Monitor Kofeiny, Kalkulator Snu & Apple HealthKit (BR-KOF-001 do BR-KOF-004):**
+   - Model jedno-kompartmentowej eliminacji kofeiny w organizmie. [Wdrożone]
+   - **Personalizacja Metabolizmu Kofeiny (D-02):** Regulacja indywidualnego czasu półtrwania kofeiny $t_{1/2}$ w zakresie 3.0h – 8.0h (domyślnie 5.0h) z zapisem w SQLite. [Wdrożone]
+   - **Kalkulator Snu i Godzina Odcięcia (Bedtime Curfew — BR-KOF-003):** Prognoza stężenia kofeiny o wybranej godzinie snu (próg bezpieczny dla fazy głębokiej NREM $\le 25\,\text{mg}$) z persystencją godziny snu. [Wdrożone]
+   - **Integracja z Apple HealthKit (BR-KOF-002, Z-096):** Bezpośredni eksport spożytej kofeiny do systemowej bazy Zdrowie (`HKQuantityTypeIdentifierDietaryCaffeine`) z oknem zgody i trybem offline. [Wdrożone]
+   - Dobowy bilans kofeiny w relacji do normy EFSA (400 mg). [Wdrożone]
 7. **⚙️ Ustawienia, Kopia Zapasowa i Jednostki:**
-   - **⚖️ Globalny Przełącznik Jednostek (Metric / Imperial — DEC-21 & BR-JEDN-001):** Płynne przełączanie między systemem metrycznym (°C, g, ml) i imperialnym (°F, oz, fl oz) z zachowaniem wewnętrznej precyzji obliczeniowej i trwałą persystencją w SQLite.
-   - **📢 Dostępność i Sygnały (VoiceOver & Haptyka — BR-DOST-001, DEC-13):** Konfiguracja komunikatów głosowych czytnika ekranu oraz sygnałów wibracyjnych z natychmiastowym zapisem w SQLite.
-   - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite.
-   - Eksport i import bazy w formacie JSON oraz eksport do arkuszy CSV (Dziennik i Spiżarnia).
-   - **💎 Model Monetyzacji & StoreKit 2 (BR-ZAK-001, ZP-08):** Darmowy, w pełni funkcjonalny rdzeń bez limitów czasowych + Napar Pro (Miesięczny 3,99 zł / 0,99 €, Roczny 19,99 zł / 4,99 € z 14-dniowym okresem próbnym Trial, Dożywotni Lifetime 59,99 zł / 14,99 € z Chmurą rodzinną Family Sharing oraz przycisk Przywróć wcześniejsze zakupy z persystencją statusu Pro w SQLite).
+   - **⚖️ Globalny Przełącznik Jednostek (Metric / Imperial — DEC-21 & BR-JEDN-001):** Płynne przełączanie między systemem metrycznym (°C, g, ml) i imperialnym (°F, oz, fl oz) z zachowaniem wewnętrznej precyzji obliczeniowej i trwałą persystencją w SQLite. [Wdrożone]
+   - **📢 Dostępność i Sygnały (VoiceOver & Haptyka — BR-DOST-001, DEC-13):** Konfiguracja komunikatów głosowych czytnika ekranu oraz sygnałów wibracyjnych z natychmiastowym zapisem w SQLite. [Wdrożone]
+   - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite. [Wdrożone]
+   - Eksport i import bazy w formacie JSON oraz eksport do arkuszy CSV (Dziennik i Spiżarnia). [Wdrożone]
+   - **💎 Model Monetyzacji & StoreKit 2 (BR-ZAK-001, ZP-08):** Darmowy rdzeń + Napar Pro (Miesięczny 3,99 zł / 0,99 €, Roczny 19,99 zł / 4,99 € z 14-dniowym okresem próbnym Trial, Dożywotni Lifetime 59,99 zł / 14,99 € z Chmurą rodzinną Family Sharing oraz przycisk Przywróć wcześniejsze zakupy z persystencją statusu Pro w SQLite). [Wdrożone]
+8. **⌚ Ekosystem Apple: Apple Watch, Live Activity & Widżety (BR-ZEG-001 do BR-ZEG-005):**
+   - **Live Activity & Dynamic Island (BR-ZEG-003, BR-ZEG-004):** Natywny mostek ActivityKit (`ActivityAttributes` i `ContentState`) dla ekranu blokady i Dynamic Island (kompaktowy i rozszerzony podgląd z wagą wody, czasem etapu i stanem timera). [Wdrożone]
+   - **Apple Watch & Widżety WidgetKit (BR-ZEG-001, BR-ZEG-002, BR-ZEG-005):** Mostek synchronizacji sesji i wzorców haptycznych na nadgarstku oraz kontener danych dla widżetów kofeiny. [W trakcie wdrażania]
 
 ---
 
@@ -151,13 +155,18 @@ napar/
 │       ├── recipes-data.ts     # 24 wzorcowe receptury specialty i herbaty
 │       ├── knowledge-data.ts   # Kompendium wiedzy o odmianach, obróbkach, terroir i herbatach
 │       ├── water-chemistry.ts  # Profile wody Barista Hustle / SCA, kalkulator mineralizacji
+│       ├── cost-calculator.ts  # Ekonomia rzemiosła: kalkulator kosztów parzenia vs kawiarnia
+│       ├── timer-audio.ts      # Dźwięki minutnika: dzwonek akustyczny A4 440Hz i haptyka
+│       ├── backup.ts           # Apps4Brew SEC-09: 10 rotacyjnych kopii JSON i safetyBackup
+│       ├── db-path.ts          # Zabezpieczenie ścieżki bazy SQLite (/Library/SQLite)
+│       ├── QrScannerModal.tsx  # Natywny skaner kodów QR receptur aparatem (expo-camera)
 │       ├── database-schema.ts  # DDL i schemat SQLite
 │       ├── database.ts         # Klient expo-sqlite, repozytoria i licencja Pro
 │       ├── grinder-converter.ts# Baza modeli młynków i konwersja mikronów
 │       ├── recipe-share.ts     # Kodowanie receptur QR SVG i Deep Links
 │       ├── unit-converter.ts   # Dwukierunkowa konwersja jednostek Metric/Imperial
 │       ├── announce.ts         # Asystujące komunikaty głosowe VoiceOver i dostępność
-│       ├── i18n.tsx            # Pełne wsparcie dwujęzyczne PL/EN
+│       ├── i18n.tsx            # Pełne wsparcie dwujęzyczne PL/EN (338 symetrycznych kluczy)
 │       ├── timer-engine.ts     # Maszyna stanów stopera i haptyka
 │       ├── brew-context.tsx    # Główny React Context aktywnej sesji
 │       ├── gongfu-session.ts   # Matematyka i model kofeiny naparów Gongfu Cha
@@ -168,7 +177,9 @@ napar/
 │       ├── qr-code.tsx         # Generator kodów QR SVG
 │       ├── confirm.ts          # Zabezpieczenia sesji parzenia przed przerwaniem
 │       ├── theme.ts            # Tokeny stylistyczne (Apps4Brew artisanal)
-│       └── __tests__/          # 30 zestawów testowych (287 testów, mutacje i PBT)
+│       └── __tests__/          # 37 zestawów testowych (339 testów, mutacje i PBT)
+├── scripts/
+│   └── check-i18n.mjs          # Bramka CI weryfikująca 100% symetrii PL/EN
 └── napar_brd/                  # Pełna dokumentacja wymagań biznesowych BRD 0.1
 ```
 

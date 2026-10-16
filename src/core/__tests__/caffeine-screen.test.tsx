@@ -61,6 +61,7 @@ jest.mock('react-native-svg', () => {
 
 import CaffeineScreen from '../../../app/(tabs)/caffeine';
 import * as databaseModule from '../database';
+import * as healthKitModule from '../healthkit';
 
 const findPressableWithText = (root: any, text: string) => {
   const nodes = root.findAll((n: any) => {
@@ -325,5 +326,54 @@ describe('CaffeineScreen Component', () => {
 
     expect(setBedtimeSpy).toHaveBeenCalledWith(24);
     expect(setHalfLifeSpy).toHaveBeenCalledWith(5.5);
+
+    // Kliknij '−' dla obu stepperów
+    const allMinus = tree.root.findAll((n: any) => n.props?.children === '−');
+    renderer.act(() => {
+      for (let i = 0; i < allMinus.length; i++) {
+        let p = allMinus[i];
+        while (p && !p.props?.onPress) {
+          p = p.parent;
+        }
+        if (p?.props?.onPress) {
+          p.props.onPress();
+        }
+      }
+    });
+
+    expect(setBedtimeSpy).toHaveBeenCalledWith(23);
+    expect(setHalfLifeSpy).toHaveBeenCalledWith(5.0);
+  });
+
+  test('BR-KOF-002: Szybkie dodanie kofeiny zapisuje próbkę w Apple HealthKit gdy włączone', () => {
+    jest.spyOn(healthKitModule, 'getHealthKitSyncEnabled').mockReturnValue(true);
+    const saveHkSpy = jest.spyOn(healthKitModule, 'saveDietaryCaffeineSample').mockResolvedValue({
+      success: true,
+      quantityType: 'HKQuantityTypeIdentifierDietaryCaffeine',
+      caffeineMg: 140,
+      consumedAt: new Date().toISOString(),
+    });
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<CaffeineScreen />);
+    });
+
+    // Otwórz modal
+    renderer.act(() => {
+      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
+    });
+
+    // Kliknij V60
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Przelew / Drip')?.props.onPress();
+    });
+
+    expect(saveHkSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        caffeineMg: 140,
+        beverageName: expect.stringContaining('przelewowa'),
+      })
+    );
   });
 });
