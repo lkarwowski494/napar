@@ -68,4 +68,50 @@ describe('BrewQuickPrepCard Component', () => {
     expect(str).toContain('+2 kliki grubiej');
     expect(str).toContain('Dla 2 porcji zwiększ mielenie o 2 kliki.');
   });
+
+  test('Steppery wody (+ / −) i chipsy proporcji wywołują onWaterChange', () => {
+    const onWaterChangeMock = jest.fn();
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewQuickPrepCard
+          {...defaultProps}
+          doseGrams={20}
+          waterGrams={300}
+          onWaterChange={onWaterChangeMock}
+        />
+      );
+    });
+
+    const plusWaterBtn = tree.root.findByProps({
+      accessibilityLabel: 'Zwiększ ilość wody',
+    });
+    const minusWaterBtn = tree.root.findByProps({
+      accessibilityLabel: 'Zmniejsz ilość wody',
+    });
+
+    act(() => plusWaterBtn.props.onPress());
+    expect(onWaterChangeMock).toHaveBeenCalledWith(310);
+
+    act(() => minusWaterBtn.props.onPress());
+    expect(onWaterChangeMock).toHaveBeenCalledWith(290);
+
+    // Kliknij chip 1:16.7
+    const ratioChips = tree.root.findAll((node: any) => {
+      return (
+        node.props &&
+        typeof node.props.children === 'string' &&
+        node.props.children.includes('1:16.7')
+      );
+    });
+    expect(ratioChips.length).toBeGreaterThan(0);
+
+    let parent = ratioChips[0].parent;
+    while (parent && !parent.props.onPress) {
+      parent = parent.parent;
+    }
+    act(() => parent.props.onPress());
+    // 20g * 16.7 = 334g
+    expect(onWaterChangeMock).toHaveBeenCalledWith(334);
+  });
 });

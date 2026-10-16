@@ -26,6 +26,7 @@ import { getWaterProfileName } from '../../src/core/water-chemistry';
 import { useAppAccess } from '../../src/core/app-access';
 import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../src/core/unit-converter';
+import { StarIcon, JournalIcon } from '../../src/components/icons/CraftIcons';
 
 export default function JournalScreen() {
   const router = useRouter();
@@ -314,7 +315,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
           testID="journal-tab-sessions"
         >
           <Text style={[styles.viewModeTabText, viewMode === 'sessions' && styles.viewModeTabTextActive]}>
-            📋 {t.journal.sessionsTab} ({sessions.length})
+            {`${t.journal.sessionsTab} (${sessions.length})`}
           </Text>
         </Pressable>
         <Pressable
@@ -323,7 +324,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
           testID="journal-tab-analytics"
         >
           <Text style={[styles.viewModeTabText, viewMode === 'analytics' && styles.viewModeTabTextActive]}>
-            📊 {t.journal.analyticsTab}
+            {t.journal.analyticsTab}
           </Text>
         </Pressable>
       </View>
@@ -346,8 +347,8 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
       <View style={styles.filterChipsRow}>
         {[
           { key: 'all', label: t.journal.filterAll },
-          { key: 'coffee', label: `☕ ${t.journal.filterCoffee}` },
-          { key: 'tea', label: `🍵 ${t.journal.filterTea}` },
+          { key: 'coffee', label: t.journal.filterCoffee },
+          { key: 'tea', label: t.journal.filterTea },
           { key: 'high_rated', label: t.journal.filterHighRated },
         ].map((f) => (
           <Pressable
@@ -372,7 +373,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
 
       {sessions.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>☕</Text>
+          <JournalIcon size={44} color={theme.colors.copper} />
           <Text style={styles.emptyTitle}>{t.journal.emptyTitle}</Text>
           <Text style={styles.emptySub}>{t.journal.emptySub}</Text>
         </View>
@@ -407,7 +408,8 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
 
               {session.rating && (
                 <View style={styles.ratingBadge}>
-                  <Text style={styles.ratingText}>★ {session.rating.toFixed(1)}</Text>
+                  <StarIcon size={12} color={theme.colors.copper} filled={true} />
+                  <Text style={styles.ratingText}>{session.rating.toFixed(1)}</Text>
                 </View>
               )}
             </View>
@@ -515,7 +517,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
                   accessibilityRole="button"
                   accessibilityLabel={`${t.journal.brewAgain}: ${session.recipeName || session.method}`}
                 >
-                  <Text style={styles.cardActionBtnText}>🔁 {t.journal.brewAgain}</Text>
+                  <Text style={styles.cardActionBtnText}>{t.journal.brewAgain}</Text>
                 </Pressable>
 
                 <Pressable
@@ -525,7 +527,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
                   accessibilityRole="button"
                   accessibilityLabel={`${t.journal.shareSession}: ${session.recipeName || session.method}`}
                 >
-                  <Text style={styles.cardActionBtnSecondaryText}>📤 {t.journal.shareSession}</Text>
+                  <Text style={styles.cardActionBtnSecondaryText}>{t.journal.shareSession}</Text>
                 </Pressable>
 
                 <Pressable

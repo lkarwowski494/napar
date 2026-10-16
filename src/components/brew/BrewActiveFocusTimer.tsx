@@ -112,20 +112,20 @@ export function BrewActiveFocusTimer({
               </View>
             </View>
 
-            <Text style={styles.stepName}>
-              {snapshot.currentStep.namePl}
-            </Text>
-
-            <View style={styles.targetWaterRow}>
-              <Text style={styles.targetWaterLabel}>Cel wody w tym kroku:</Text>
-              <Text style={styles.targetWaterValue}>
-                {`${snapshot.targetWaterGrams} g`}
+            <View style={styles.heroTargetContainer}>
+              <Text style={styles.heroTargetText}>
+                {`Zalej do: ${snapshot.targetWaterGrams} g`}
               </Text>
-              {snapshot.recommendedPourRate > 0 && (
-                <Text style={styles.pourRateBadge}>
-                  {`~${snapshot.recommendedPourRate} g/s`}
+              <View style={styles.heroTargetSubRow}>
+                <Text style={styles.heroTargetSubText}>
+                  {snapshot.currentStep.namePl}
                 </Text>
-              )}
+                {snapshot.recommendedPourRate > 0 && (
+                  <Text style={styles.pourRateBadge}>
+                    {`~${snapshot.recommendedPourRate} g/s`}
+                  </Text>
+                )}
+              </View>
             </View>
 
             <Text style={styles.stepInstruction}>
@@ -318,6 +318,28 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.textPrimary,
     fontVariant: ['tabular-nums'],
+  },
+  heroTargetContainer: {
+    marginVertical: 6,
+    alignItems: 'center',
+  },
+  heroTargetText: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: theme.colors.copper,
+    letterSpacing: -0.5,
+    marginBottom: 4,
+  },
+  heroTargetSubRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
+  },
+  heroTargetSubText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
   },
   stepName: {
     fontSize: 16,

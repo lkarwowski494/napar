@@ -34,6 +34,7 @@ import {
 import { useAppAccess } from '../../src/core/app-access';
 import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { formatDoseWeight } from '../../src/core/unit-converter';
+import { BeansIcon } from '../../src/components/icons/CraftIcons';
 
 export default function BeansScreen() {
   const router = useRouter();
@@ -414,7 +415,9 @@ export default function BeansScreen() {
       <ScrollView contentContainerStyle={styles.listContent}>
         {filteredItems.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>🫙</Text>
+            <View style={{ marginBottom: 12 }}>
+              <BeansIcon size={48} color={theme.colors.copper} />
+            </View>
             <Text style={styles.emptyTitle}>Twoja spiżarnia jest pusta</Text>
             <Text style={styles.emptySub}>
               Dodaj świeżo wypaloną kawę lub ulubioną herbatę liściastą, aby śledzić okno świeżości i gramaturę.

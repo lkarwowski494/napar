@@ -237,7 +237,7 @@ export default function DialInScreen() {
               activeTab === 'doctor' && styles.segmentBtnTextActive,
             ]}
           >
-            🧭 Dial-in Doctor
+            Dial-in Doctor
           </Text>
         </Pressable>
 
@@ -251,7 +251,7 @@ export default function DialInScreen() {
               activeTab === 'ratio' && styles.segmentBtnTextActive,
             ]}
           >
-            ⚖️ Ratio & Uzysk
+            Ratio & Uzysk
           </Text>
         </Pressable>
 
@@ -265,7 +265,7 @@ export default function DialInScreen() {
               activeTab === 'ey' && styles.segmentBtnTextActive,
             ]}
           >
-            🔬 TDS & EY%
+            TDS & EY%
           </Text>
         </Pressable>
 

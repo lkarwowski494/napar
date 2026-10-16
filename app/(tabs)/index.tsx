@@ -20,11 +20,13 @@ import { useBrew } from '../../src/core/brew-context';
 import {
   getRecipes,
   getInventoryItems,
+  getBrewSessions,
   toggleRecipeFavorite,
   saveRecipe,
   duplicateRecipe,
   getUnitSystem,
 } from '../../src/core/database';
+import { StarIcon } from '../../src/components/icons/CraftIcons';
 import {
   formatDoseWeight,
   formatWaterWeight,
@@ -76,6 +78,9 @@ export default function BrewScreen() {
     selectRecipe,
     selectInventoryItem,
     setDoseGrams,
+    setWaterGrams,
+    setWaterTempCelsius,
+    setGrindSetting,
     startTimer,
     pauseTimer,
     resumeTimer,
@@ -106,6 +111,38 @@ export default function BrewScreen() {
     recipe: SavedRecipe;
     originalSteps: any[];
   } | null>(null);
+
+  const recentFiveStarSession = useMemo(() => {
+    try {
+      const sessions = getBrewSessions();
+      if (!sessions || sessions.length === 0) return null;
+      return sessions.find((s) => (s.rating || 0) >= 4.5) || sessions[0] || null;
+    } catch {
+      return null;
+    }
+  }, [allRecipes]);
+
+  const handleQuickReBrew = (s: any) => {
+    const foundRecipe = allRecipes.find(
+      (r) => r.name === s.recipeName || r.namePl === s.recipeName
+    );
+    if (foundRecipe) {
+      selectRecipe(foundRecipe);
+    }
+    if (s.doseGrams) setDoseGrams(s.doseGrams);
+    if (s.waterGrams) setWaterGrams(s.waterGrams);
+    if (s.waterTempCelsius) setWaterTempCelsius(s.waterTempCelsius);
+    if (s.grindSetting) setGrindSetting(s.grindSetting);
+    if (s.waterProfile) setWaterProfile(s.waterProfile);
+    if (s.inventoryItemId) {
+      const item = allInventory.find((i) => i.id === s.inventoryItemId);
+      if (item) selectInventoryItem(item);
+    }
+    Alert.alert(
+      'Załadowano parametry!',
+      `Receptura "${s.recipeName || s.method}" (${s.doseGrams}g / ${s.waterGrams}g) jest gotowa.`
+    );
+  };
 
   const brewCost = useMemo(() => {
     return calculateBrewCost({
@@ -337,6 +374,28 @@ export default function BrewScreen() {
         onNavigateToGongfu={() => router.push('/gongfu')}
       />
 
+      {/* 1-Tap Quick Re-Brew (Bleary-Eyed Barista Shortcut) */}
+      {recentFiveStarSession && !isRunning && !isPaused && (
+        <Pressable
+          style={styles.reBrewBanner}
+          onPress={() => handleQuickReBrew(recentFiveStarSession)}
+          accessibilityRole="button"
+          accessibilityLabel={`Powtórz ostatni udany napar: ${recentFiveStarSession.recipeName || recentFiveStarSession.method}`}
+          testID="quick-rebrew-banner"
+        >
+          <View style={styles.reBrewIconBox}>
+            <StarIcon size={14} color={theme.colors.copper} filled />
+          </View>
+          <View style={styles.reBrewInfo}>
+            <Text style={styles.reBrewEyebrow}>POWTÓRZ OSTATNI NAPAR (1-TAP)</Text>
+            <Text style={styles.reBrewTitle} numberOfLines={1}>
+              {recentFiveStarSession.recipeName || recentFiveStarSession.method} · {recentFiveStarSession.doseGrams}g / {recentFiveStarSession.waterGrams}g
+            </Text>
+          </View>
+          <Text style={styles.reBrewArrow}>→</Text>
+        </Pressable>
+      )}
+
       {/* Stan Przygotowawczy (Przed parzeniem): Karta 1-Tap ze stepperami */}
       {!isRunning && !isPaused && (
         <BrewQuickPrepCard
@@ -347,6 +406,7 @@ export default function BrewScreen() {
           servings={servings}
           onServingsChange={handleServingsChange}
           onDoseChange={setDoseGrams}
+          onWaterChange={setWaterGrams}
           disabled={isRunning}
           batchScaling={batchScaling}
           unitSystem={unitSystem}
@@ -1164,5 +1224,45 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 14,
+  },
+  reBrewBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(217, 119, 54, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(217, 119, 54, 0.35)',
+    borderRadius: theme.borderRadius.md,
+    padding: 12,
+    marginBottom: 8,
+  },
+  reBrewIconBox: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  reBrewInfo: {
+    flex: 1,
+  },
+  reBrewEyebrow: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    letterSpacing: 0.6,
+    marginBottom: 2,
+  },
+  reBrewTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+  },
+  reBrewArrow: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.copper,
+    marginLeft: 8,
   },
 });

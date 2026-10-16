@@ -99,7 +99,28 @@ const mockDb: any = {
       },
     ],
   ]),
-  sessions: new Map(),
+  sessions: new Map([
+    [
+      'sess-recent-1',
+      {
+        id: 'sess-recent-1',
+        recipe_id: 'rec-1',
+        recipe_name: 'V60 — Metoda 4:6',
+        inventory_item_id: 'bean-1',
+        inventory_item_name: 'Kolumbia Geisha',
+        beverage_type: 'COFFEE',
+        method: 'V60',
+        dose_g: 20,
+        water_g: 300,
+        water_temp_c: 92,
+        water_profile: 'sca_standard',
+        grind_setting: '22 kliki',
+        rating: 5,
+        total_time_seconds: 210,
+        brewed_at: '2026-10-15T08:00:00Z',
+      },
+    ],
+  ]),
   caffeine: new Map(),
   app_settings: new Map(),
   execSync: jest.fn(),
@@ -115,6 +136,7 @@ const mockDb: any = {
   getAllSync: jest.fn((q) => {
     if (q.includes('FROM recipes')) return Array.from(mockDb.recipes.values());
     if (q.includes('FROM inventory_items')) return Array.from(mockDb.inventory.values());
+    if (q.includes('FROM brew_sessions')) return Array.from(mockDb.sessions.values());
     return [];
   }),
   runSync: jest.fn((q, p) => {
@@ -1513,6 +1535,27 @@ describe('BrewScreen UI Integration', () => {
     expect(str).toContain('APPS4BREW PASS');
 
     resetTrialForTesting();
+  });
+
+  test('Szybki Re-Brew 1-Tap: Kliknięcie baneru ostatniego udanego naparu ładuje parametry', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const banner = tree.root.findByProps({ testID: 'quick-rebrew-banner' });
+    expect(banner).toBeDefined();
+
+    act(() => {
+      banner.props.onPress();
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('POWTÓRZ OSTATNI NAPAR');
   });
 });
 

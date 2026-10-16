@@ -23,6 +23,7 @@ interface BrewQuickPrepCardProps {
   servings: number;
   onServingsChange: (n: number) => void;
   onDoseChange: (dose: number) => void;
+  onWaterChange?: (water: number) => void;
   disabled?: boolean;
   batchScaling: {
     grindAdjustmentClicks: number;
@@ -39,11 +40,14 @@ export function BrewQuickPrepCard({
   servings,
   onServingsChange,
   onDoseChange,
+  onWaterChange,
   disabled = false,
   batchScaling,
   unitSystem = 'metric',
 }: BrewQuickPrepCardProps) {
   const { t } = useTranslation();
+  const currentRatioNum = doseGrams > 0 ? (waterGrams / doseGrams).toFixed(1) : '16.7';
+  const currentRatioVal = parseFloat(currentRatioNum);
 
   return (
     <View style={styles.card} testID="quick-prep-card">
@@ -127,12 +131,36 @@ export function BrewQuickPrepCard({
         {/* Separator pionowy */}
         <View style={styles.paramDivider} />
 
-        {/* 2. Woda łącznie */}
+        {/* 2. Woda łącznie ze stepperem ±10g */}
         <View style={styles.paramBox}>
           <Text style={styles.paramEyebrow}>WODA</Text>
-          <Text style={styles.paramValueLarge}>
-            {formatWaterWeight(waterGrams, unitSystem)}
-          </Text>
+          <View style={styles.stepperRow}>
+            {onWaterChange && (
+              <Pressable
+                style={styles.stepBtn}
+                onPress={() => onWaterChange(Math.max(10, waterGrams - 10))}
+                disabled={disabled}
+                accessibilityRole="button"
+                accessibilityLabel="Zmniejsz ilość wody"
+              >
+                <Text style={styles.stepBtnText}>−</Text>
+              </Pressable>
+            )}
+            <Text style={styles.paramValueLarge}>
+              {formatWaterWeight(waterGrams, unitSystem)}
+            </Text>
+            {onWaterChange && (
+              <Pressable
+                style={styles.stepBtn}
+                onPress={() => onWaterChange(waterGrams + 10)}
+                disabled={disabled}
+                accessibilityRole="button"
+                accessibilityLabel="Zwiększ ilość wody"
+              >
+                <Text style={styles.stepBtnText}>+</Text>
+              </Pressable>
+            )}
+          </View>
         </View>
 
         {/* Separator pionowy */}
@@ -146,6 +174,40 @@ export function BrewQuickPrepCard({
           </Text>
         </View>
       </View>
+
+      {/* Szybki Wybór Proporcji SCA (Golden Ratio Selector) */}
+      {onWaterChange && (
+        <View style={styles.ratioSection}>
+          <View style={styles.ratioHeaderRow}>
+            <Text style={styles.ratioSectionTitle}>PROPORCJA (RATIO)</Text>
+            <Text style={styles.currentRatioBadge}>{`1 : ${currentRatioNum}`}</Text>
+          </View>
+          <View style={styles.ratioChipsRow}>
+            {[
+              { ratio: 15.0, label: '1:15', desc: 'Mocna' },
+              { ratio: 16.7, label: '1:16.7', desc: 'Złoty Standard' },
+              { ratio: 18.0, label: '1:18', desc: 'Lekka' },
+            ].map((r) => {
+              const isActive = Math.abs(currentRatioVal - r.ratio) < 0.35;
+              return (
+                <Pressable
+                  key={r.label}
+                  style={[styles.ratioChip, isActive && styles.ratioChipActive]}
+                  onPress={() => onWaterChange(Math.round(doseGrams * r.ratio))}
+                  disabled={disabled}
+                >
+                  <Text style={[styles.ratioChipText, isActive && styles.ratioChipTextActive]}>
+                    {r.label}
+                  </Text>
+                  <Text style={[styles.ratioChipDesc, isActive && styles.ratioChipDescActive]}>
+                    {r.desc}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -285,5 +347,67 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: theme.colors.textSecondary,
     textAlign: 'center',
+  },
+  ratioSection: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginBottom: 8,
+  },
+  ratioHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  ratioSectionTitle: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  currentRatioBadge: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    fontVariant: ['tabular-nums'],
+  },
+  ratioChipsRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  ratioChip: {
+    flex: 1,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.md,
+    paddingVertical: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ratioChipActive: {
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    borderColor: theme.colors.copper,
+  },
+  ratioChipText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    marginBottom: 2,
+  },
+  ratioChipTextActive: {
+    color: theme.colors.copper,
+  },
+  ratioChipDesc: {
+    fontSize: 9,
+    fontWeight: '500',
+    color: theme.colors.textMuted,
+  },
+  ratioChipDescActive: {
+    color: theme.colors.copperLight,
   },
 });
