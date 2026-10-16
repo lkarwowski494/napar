@@ -7,6 +7,8 @@ import {
   GRIND_CATEGORIES,
   convertMicronsToGrinder,
   convertBetweenGrinders,
+  getRecipeMicrons,
+  getRecommendedGrindForRecipe,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -153,6 +155,30 @@ describe('Grinder Dial-in Converter Module', () => {
         expect(res.formatted).toBeTruthy();
       }
     }
+  });
+
+  test('Prawidłowo wyznacza mikrony receptury (getRecipeMicrons)', () => {
+    expect(getRecipeMicrons({ method: 'ESPRESSO' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'AEROPRESS', grindSettingDescriptionPl: 'Drobno (16 klików)' })).toBe(520);
+    expect(getRecipeMicrons({ method: 'AEROPRESS' })).toBe(560);
+    expect(getRecipeMicrons({ method: 'V60', grindSettingDescriptionPl: 'Grubo (28 klików C40)' })).toBe(850);
+    expect(getRecipeMicrons({ method: 'V60', grindSettingDescriptionPl: 'Średnio (20 klików)' })).toBe(600);
+    expect(getRecipeMicrons({ method: 'V60' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'CHEMEX' })).toBe(880);
+    expect(getRecipeMicrons({ method: 'FRENCH_PRESS' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'UNKNOWN_METHOD' })).toBe(720);
+  });
+
+  test('Prawidłowo rekomenduje nastawę młynka dla wybranej receptury (getRecommendedGrindForRecipe)', () => {
+    const v60Recipe = { method: 'V60', grindSettingDescriptionPl: 'Średnio (24 kliki C40)' };
+    const c40Rec = getRecommendedGrindForRecipe(v60Recipe, 'comandante_c40');
+    expect(c40Rec.grinderName).toBe('Comandante C40 MK3/MK4');
+    expect(c40Rec.microns).toBe(720);
+    expect(c40Rec.rawValue).toBe(24);
+
+    const odeRec = getRecommendedGrindForRecipe(v60Recipe, 'fellow_ode_gen2');
+    expect(odeRec.grinderName).toBe('Fellow Ode Gen 2');
+    expect(odeRec.formatted).toBe('5');
   });
 });
 

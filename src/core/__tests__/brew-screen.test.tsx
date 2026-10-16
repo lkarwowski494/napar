@@ -3,9 +3,13 @@
 // ============================================================================
 
 import React from 'react';
+import { Share, Alert } from 'react-native';
 import renderer, { act } from 'react-test-renderer';
 import BrewScreen from '../../../app/(tabs)/index';
 import { BrewProvider } from '../brew-context';
+
+jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
+jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(),
@@ -779,6 +783,280 @@ describe('BrewScreen UI Integration', () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith('/gongfu');
+  });
+
+  test('Wybór młynka z poziomu pigułki MŁYNEK otwiera modal i aktualizuje rekomendację', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Znajdź przycisk pigułki młynka
+    const grinderPill = tree.root.findByProps({ testID: 'grinder-pill-btn' });
+    expect(grinderPill).toBeDefined();
+
+    // Domyślnie Comandante
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Comandante');
+
+    // Otwórz modal wyboru młynka
+    act(() => {
+      grinderPill.props.onPress();
+    });
+
+    // Wybierz Timemore
+    const timemoreOption = findPressableWithText(tree.root, 'Timemore');
+    expect(timemoreOption).toBeDefined();
+    act(() => {
+      timemoreOption.props.onPress();
+    });
+
+    // Pigułka powinna teraz pokazywać Timemore
+    str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Timemore');
+  });
+
+  test('Udostępnianie receptury otwiera modal z wektorowym kodem QR', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const shareBtn = tree.root.findByProps({ testID: 'share-recipe-btn' });
+    expect(shareBtn).toBeDefined();
+
+    act(() => {
+      shareBtn.props.onPress();
+    });
+
+    const qrSvg = tree.root.findByProps({ testID: 'recipe-qr-code-svg' });
+    expect(qrSvg).toBeDefined();
+    expect(JSON.stringify(tree.toJSON())).toContain('Wymiana Receptury (Offline QR)');
+  });
+
+  test('Importowanie receptury z linku napar:// dekoduje parametry i pozwala zapisać przepis', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz modal wyboru receptury
+    const recipeCard = tree.root.findByProps({ accessibilityLabel: 'Wybrany przepis: V60 — Metoda 4:6' });
+    act(() => {
+      recipeCard.props.onPress();
+    });
+
+    // Kliknij przycisk Importuj (QR / Link)
+    const importBtn = tree.root.findByProps({ testID: 'import-recipe-btn' });
+    expect(importBtn).toBeDefined();
+    act(() => {
+      importBtn.props.onPress();
+    });
+
+    // Wklej link receptury
+    const samplePayload = {
+      v: 1,
+      n: 'Kolumbia Geisha Special',
+      b: 'COFFEE',
+      m: 'Origami',
+      d: 16,
+      w: 240,
+      t: 91,
+      r: 15,
+      s: [{ n: 'Bloom', d: 30, w: 50, i: 'Zalej 50g' }],
+    };
+    const b64 = Buffer.from(JSON.stringify(samplePayload), 'utf-8').toString('base64');
+    const shareUrl = `napar://recipe?v=1&d=${encodeURIComponent(b64)}`;
+
+    const input = tree.root.findByProps({ testID: 'import-recipe-input' });
+    act(() => {
+      input.props.onChangeText(shareUrl);
+    });
+
+    // Podgląd powinien się pojawić
+    const preview = tree.root.findByProps({ testID: 'import-recipe-preview' });
+    expect(preview).toBeDefined();
+    expect(JSON.stringify(tree.toJSON())).toContain('Kolumbia Geisha Special');
+
+    // Kliknij "Zaimportuj i Zapisz"
+    const confirmBtn = tree.root.findByProps({ testID: 'confirm-import-btn' });
+    act(() => {
+      confirmBtn.props.onPress();
+    });
+
+    // Receptura została wybrana
+    expect(JSON.stringify(tree.toJSON())).toContain('Kolumbia Geisha Special');
+  });
+
+  test('Modal udostępniania QR i Linku pozwala udostępnić, skopiować link i zamknąć modal', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const sharePill = tree.root.findByProps({ testID: 'share-recipe-btn' });
+    expect(sharePill).toBeDefined();
+
+    act(() => {
+      sharePill.props.onPress();
+    });
+
+    expect(JSON.stringify(tree.toJSON())).toContain('Wymiana Receptury (Offline QR)');
+
+    // Kliknij udostępnij
+    const shareBtn = tree.root.findByProps({ testID: 'share-link-btn' });
+    expect(shareBtn).toBeDefined();
+    act(() => {
+      shareBtn.props.onPress();
+    });
+
+    // Kliknij kopiuj
+    const copyBtn = tree.root.findByProps({ testID: 'copy-link-btn' });
+    expect(copyBtn).toBeDefined();
+    act(() => {
+      copyBtn.props.onPress();
+    });
+
+    // Zamknij modal
+    const closeBtn = tree.root.findByProps({ testID: 'close-share-modal-btn' });
+    expect(closeBtn).toBeDefined();
+    act(() => {
+      closeBtn.props.onPress();
+    });
+  });
+
+  test('Modal wyboru młynka pozwala wybrać inny młynek i zamknąć modal', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // 1. Otwórz i zamknij przyciskiem Zamknij
+    const grinderPill = tree.root.findByProps({ testID: 'grinder-pill-btn' });
+    act(() => {
+      grinderPill.props.onPress();
+    });
+    expect(JSON.stringify(tree.toJSON())).toContain('Twój Młynek do Kawy');
+
+    const closeBtn = tree.root.findByProps({ testID: 'close-grinder-modal-btn' });
+    expect(closeBtn).toBeDefined();
+    act(() => {
+      closeBtn.props.onPress();
+    });
+
+    // 2. Otwórz ponownie i wybierz Timemore Chestnut
+    act(() => {
+      grinderPill.props.onPress();
+    });
+    const timemoreItem = tree.root.findByProps({ testID: 'grinder-item-timemore_c2_c3' });
+    expect(timemoreItem).toBeDefined();
+    act(() => {
+      timemoreItem.props.onPress();
+    });
+
+    expect(JSON.stringify(tree.toJSON())).toContain('Timemore');
+  });
+
+  test('Modal importu można zamknąć przyciskiem Zamknij oraz reaguje na błędne dane', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz modal receptury
+    const recipeCard = tree.root.findByProps({ accessibilityLabel: 'Wybrany przepis: V60 — Metoda 4:6' });
+    act(() => {
+      recipeCard.props.onPress();
+    });
+
+    // Otwórz modal importu
+    const importBtn = tree.root.findByProps({ testID: 'import-recipe-btn' });
+    act(() => {
+      importBtn.props.onPress();
+    });
+
+    // Zamknij modal importu
+    const closeBtn = tree.root.findByProps({ testID: 'close-import-modal-btn' });
+    act(() => {
+      closeBtn.props.onPress();
+    });
+
+    // Otwórz ponownie szukając przycisku z drzewa
+    const recipeCardAgain = tree.root.findByProps({ accessibilityLabel: 'Wybrany przepis: V60 — Metoda 4:6' });
+    act(() => {
+      recipeCardAgain.props.onPress();
+    });
+    const importBtnAgain = tree.root.findByProps({ testID: 'import-recipe-btn' });
+    act(() => {
+      importBtnAgain.props.onPress();
+    });
+
+    const input = tree.root.findByProps({ testID: 'import-recipe-input' });
+    act(() => {
+      input.props.onChangeText('invalid-link-text');
+    });
+
+    expect(tree.root.findAllByProps({ testID: 'import-recipe-preview' }).length).toBe(0);
+  });
+
+  test('Wybór profilu wody w modalu podsumowania parzenia aktualizuje aktywny profil', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Rozpocznij i zapauzuj, aby otworzyć modal zapisu
+    const startText = tree.root.findAll((node: any) => node.props && node.props.children === 'ROZPOCZNIJ PARZENIE')[0];
+    let startBtn = startText.parent;
+    while (startBtn && !startBtn.props.onPress) startBtn = startBtn.parent;
+    act(() => startBtn.props.onPress());
+
+    const pauseText = tree.root.findAll((node: any) => node.props && node.props.children === 'PAUZA')[0];
+    let pauseBtn = pauseText.parent;
+    while (pauseBtn && !pauseBtn.props.onPress) pauseBtn = pauseBtn.parent;
+    act(() => pauseBtn.props.onPress());
+
+    const saveText = tree.root.findAll((node: any) => node.props && node.props.children === 'Zapisz')[0];
+    let saveBtn = saveText.parent;
+    while (saveBtn && !saveBtn.props.onPress) saveBtn = saveBtn.parent;
+    act(() => saveBtn.props.onPress());
+
+    // Wybierz profil wody z chipa
+    const waterChip = tree.root.findByProps({ testID: 'water-chip-melbourne_soft' });
+    expect(waterChip).toBeDefined();
+    act(() => {
+      waterChip.props.onPress();
+    });
+
+    expect(waterChip.props.accessibilityState.selected).toBe(true);
   });
 });
 

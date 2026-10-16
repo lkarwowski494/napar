@@ -3,7 +3,7 @@
 // Historia sesji, oceny sensoryczne, balans smaku, TDS i Extraction Yield
 // ============================================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,14 +17,111 @@ import { getBrewSessions, deleteBrewSession } from '../../src/core/database';
 import { BrewSession } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
-import { SensoryRadarChart } from '../../src/core/radar-chart';
+import { SensoryRadarChart, SensoryProfile } from '../../src/core/radar-chart';
 import { getWaterProfileName } from '../../src/core/water-chemistry';
 
 export default function JournalScreen() {
   const { t, language } = useTranslation();
   const [sessions, setSessions] = useState<BrewSession[]>([]);
+  const [viewMode, setViewMode] = useState<'sessions' | 'analytics'>('sessions');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterType, setFilterType] = useState<'all' | 'coffee' | 'tea' | 'high_rated'>('all');
+
+  const analyticsData = useMemo(() => {
+    const totalBrews = sessions.length;
+    const totalDoseGrams = sessions.reduce((acc, s) => acc + (s.doseGrams || 0), 0);
+    const totalWaterGrams = sessions.reduce((acc, s) => acc + (s.waterGrams || 0), 0);
+    const totalWaterLiters = (totalWaterGrams / 1000).toFixed(1);
+    const totalCaffeineMg = Math.round(sessions.reduce((acc, s) => acc + (s.caffeineContentMg || 0), 0));
+    const ratedSessions = sessions.filter((s) => typeof s.rating === 'number' && s.rating > 0);
+    const avgRating =
+      ratedSessions.length > 0
+        ? (ratedSessions.reduce((acc, s) => acc + s.rating!, 0) / ratedSessions.length).toFixed(1)
+        : '—';
+
+    // Rozkład metod
+    const methodCounts: Record<string, number> = {};
+    for (const s of sessions) {
+      const m = s.method || 'Inna';
+      methodCounts[m] = (methodCounts[m] || 0) + 1;
+    }
+    const methodsList = Object.entries(methodCounts)
+      .map(([method, count]) => ({
+        method,
+        count,
+        percent: totalBrews > 0 ? Math.round((count / totalBrews) * 100) : 0,
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    // Średni radar sensoryczny
+    const sensorySessions = sessions.filter((s) => s.sensory);
+    let avgSensory: SensoryProfile | null = null;
+    if (sensorySessions.length > 0) {
+      const sumSensory = sensorySessions.reduce(
+        (acc, s) => {
+          const sc = s.sensory!;
+          return {
+            acidity: acc.acidity + (sc.acidity || 0),
+            sweetness: acc.sweetness + (sc.sweetness || 0),
+            body: acc.body + (sc.body || 0),
+            clarity: acc.clarity + (sc.clarity || 0),
+            finish: acc.finish + (sc.finish || 0),
+          };
+        },
+        { acidity: 0, sweetness: 0, body: 0, clarity: 0, finish: 0 }
+      );
+      const n = sensorySessions.length;
+      avgSensory = {
+        acidity: Number((sumSensory.acidity / n).toFixed(1)),
+        sweetness: Number((sumSensory.sweetness / n).toFixed(1)),
+        body: Number((sumSensory.body / n).toFixed(1)),
+        clarity: Number((sumSensory.clarity / n).toFixed(1)),
+        finish: Number((sumSensory.finish / n).toFixed(1)),
+      };
+    }
+
+    // Rozkład balansu smaku
+    const balanceCounts: Record<string, number> = {
+      balanced: 0,
+      sour: 0,
+      bitter: 0,
+      astringent: 0,
+      weak: 0,
+      too_strong: 0,
+    };
+    for (const s of sessions) {
+      if (s.tasteBalance && balanceCounts[s.tasteBalance] !== undefined) {
+        balanceCounts[s.tasteBalance]++;
+      }
+    }
+
+    // Nuty smakowe (Top flavor tags)
+    const tagCounts: Record<string, number> = {};
+    for (const s of sessions) {
+      if (Array.isArray(s.flavorTags)) {
+        for (const tg of s.flavorTags) {
+          tagCounts[tg] = (tagCounts[tg] || 0) + 1;
+        }
+      }
+    }
+    const topTags = Object.entries(tagCounts)
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    return {
+      totalBrews,
+      totalDoseGrams,
+      totalWaterLiters,
+      totalCaffeineMg,
+      avgRating,
+      methodsList,
+      avgSensory,
+      sensoryCount: sensorySessions.length,
+      balanceCounts,
+      topTags,
+    };
+  }, [sessions]);
 
   const loadSessions = () => {
     try {
@@ -99,17 +196,41 @@ export default function JournalScreen() {
         </Text>
       </View>
 
-      {/* Wyszukiwarka sesji (search bar) */}
-      <View style={styles.searchBarContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder={t.journal.searchPlaceholder}
-          placeholderTextColor={theme.colors.textMuted}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          clearButtonMode="while-editing"
-        />
+      {/* Przełącznik Widoku: Sesje vs Analityka */}
+      <View style={styles.viewModeRow}>
+        <Pressable
+          style={[styles.viewModeTab, viewMode === 'sessions' && styles.viewModeTabActive]}
+          onPress={() => setViewMode('sessions')}
+          testID="journal-tab-sessions"
+        >
+          <Text style={[styles.viewModeTabText, viewMode === 'sessions' && styles.viewModeTabTextActive]}>
+            📋 {t.journal.sessionsTab} ({sessions.length})
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[styles.viewModeTab, viewMode === 'analytics' && styles.viewModeTabActive]}
+          onPress={() => setViewMode('analytics')}
+          testID="journal-tab-analytics"
+        >
+          <Text style={[styles.viewModeTabText, viewMode === 'analytics' && styles.viewModeTabTextActive]}>
+            📊 {t.journal.analyticsTab}
+          </Text>
+        </Pressable>
       </View>
+
+      {viewMode === 'sessions' && (
+        <>
+          {/* Wyszukiwarka sesji (search bar) */}
+          <View style={styles.searchBarContainer}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder={t.journal.searchPlaceholder}
+              placeholderTextColor={theme.colors.textMuted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              clearButtonMode="while-editing"
+            />
+          </View>
 
       {/* Szybkie filtry */}
       <View style={styles.filterChipsRow}>
@@ -282,6 +403,130 @@ export default function JournalScreen() {
             </View>
           </View>
         ))
+      )}
+        </>
+      )}
+
+      {/* Widok Analityki i Trendów (Brew Analytics) */}
+      {viewMode === 'analytics' && (
+        <View style={styles.analyticsContainer} testID="journal-analytics-view">
+          {/* Karty podsumowania wolumenu */}
+          <View style={styles.statsGrid}>
+            <View style={styles.statCard}>
+              <Text style={styles.statIcon}>☕</Text>
+              <Text style={styles.statValue}>{`${analyticsData.totalDoseGrams}g`}</Text>
+              <Text style={styles.statLabel}>{t.journal.statTotalDose}</Text>
+            </View>
+
+            <View style={styles.statCard}>
+              <Text style={styles.statIcon}>💧</Text>
+              <Text style={styles.statValue}>{`${analyticsData.totalWaterLiters} L`}</Text>
+              <Text style={styles.statLabel}>{t.journal.statTotalWater}</Text>
+            </View>
+
+            <View style={styles.statCard}>
+              <Text style={styles.statIcon}>⚡</Text>
+              <Text style={styles.statValue}>{`${analyticsData.totalCaffeineMg} mg`}</Text>
+              <Text style={styles.statLabel}>{t.journal.statTotalCaffeine}</Text>
+            </View>
+
+            <View style={styles.statCard}>
+              <Text style={styles.statIcon}>★</Text>
+              <Text style={styles.statValue}>{`${analyticsData.avgRating}`}</Text>
+              <Text style={styles.statLabel}>{t.journal.statAvgRating}</Text>
+            </View>
+          </View>
+
+          {/* Rozkład metod parzenia */}
+          <View style={styles.analyticsSection}>
+            <Text style={styles.analyticsSectionTitle}>{t.journal.methodDistributionTitle}</Text>
+            {analyticsData.methodsList.length === 0 ? (
+              <Text style={styles.analyticsEmptyText}>Brak zarejestrowanych sesji</Text>
+            ) : (
+              analyticsData.methodsList.map((m) => (
+                <View key={m.method} style={styles.methodBarRow}>
+                  <View style={styles.methodInfoRow}>
+                    <Text style={styles.methodName}>{m.method}</Text>
+                    <Text style={styles.methodCount}>
+                      {m.count} ({m.percent}%)
+                    </Text>
+                  </View>
+                  <View style={styles.barBackground}>
+                    <View style={[styles.barFill, { width: `${m.percent}%` }]} />
+                  </View>
+                </View>
+              ))
+            )}
+          </View>
+
+          {/* Średni radar sensoryczny SCA */}
+          <View style={styles.analyticsSection}>
+            <Text style={styles.analyticsSectionTitle}>{t.journal.sensoryAverageTitle}</Text>
+            <Text style={styles.analyticsSectionSub}>
+              {analyticsData.sensoryCount > 0
+                ? `${t.journal.sensoryAverageDesc} (${analyticsData.sensoryCount} sesji)`
+                : 'Brak sesji z zanotowanym profilem sensorycznym'}
+            </Text>
+
+            {analyticsData.avgSensory && (
+              <View style={{ alignItems: 'center', marginVertical: 12 }}>
+                <SensoryRadarChart profile={analyticsData.avgSensory} size={220} />
+                <View style={styles.sensoryScoresSummary}>
+                  <Text style={styles.sensoryScorePill}>
+                    {`Kwasowość: ${analyticsData.avgSensory.acidity}`}
+                  </Text>
+                  <Text style={styles.sensoryScorePill}>
+                    {`Słodycz: ${analyticsData.avgSensory.sweetness}`}
+                  </Text>
+                  <Text style={styles.sensoryScorePill}>
+                    {`Ciało: ${analyticsData.avgSensory.body}`}
+                  </Text>
+                  <Text style={styles.sensoryScorePill}>
+                    {`Czystość: ${analyticsData.avgSensory.clarity}`}
+                  </Text>
+                  <Text style={styles.sensoryScorePill}>
+                    {`Finisz: ${analyticsData.avgSensory.finish}`}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* Dominujące nuty sensoryczne */}
+          {analyticsData.topTags.length > 0 && (
+            <View style={styles.analyticsSection}>
+              <Text style={styles.analyticsSectionTitle}>{t.journal.topFlavorsTitle}</Text>
+              <View style={styles.tagsCloud}>
+                {analyticsData.topTags.map((tag) => (
+                  <View key={tag.tag} style={styles.tagBadge}>
+                    <Text style={styles.tagBadgeText}>
+                      {`${tag.tag} (${tag.count})`}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Balans smakowy */}
+          <View style={styles.analyticsSection}>
+            <Text style={styles.analyticsSectionTitle}>{t.journal.balanceDistributionTitle}</Text>
+            <View style={styles.balanceGrid}>
+              <View style={styles.balanceItem}>
+                <Text style={styles.balanceCount}>{analyticsData.balanceCounts.balanced || 0}</Text>
+                <Text style={styles.balanceLabel}>Zbalansowana</Text>
+              </View>
+              <View style={styles.balanceItem}>
+                <Text style={styles.balanceCount}>{analyticsData.balanceCounts.sour || 0}</Text>
+                <Text style={styles.balanceLabel}>Kwaśna</Text>
+              </View>
+              <View style={styles.balanceItem}>
+                <Text style={styles.balanceCount}>{analyticsData.balanceCounts.bitter || 0}</Text>
+                <Text style={styles.balanceLabel}>Gorzka</Text>
+              </View>
+            </View>
+          </View>
+        </View>
       )}
     </ScrollView>
   );
@@ -537,5 +782,173 @@ const styles = StyleSheet.create({
     color: theme.colors.copper,
     fontWeight: '700',
     fontSize: 13,
+  },
+  viewModeRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  viewModeTab: {
+    flex: 1,
+    backgroundColor: theme.colors.bgCard,
+    paddingVertical: 12,
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  viewModeTabActive: {
+    borderColor: theme.colors.copper,
+    backgroundColor: theme.colors.bgCardSecondary,
+  },
+  viewModeTabText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  viewModeTabTextActive: {
+    color: theme.colors.copper,
+    fontWeight: '700',
+  },
+  analyticsContainer: {
+    gap: 16,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  statCard: {
+    flex: 1,
+    minWidth: '45%',
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+  },
+  statIcon: {
+    fontSize: 22,
+    marginBottom: 4,
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginBottom: 2,
+  },
+  statLabel: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+  },
+  analyticsSection: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  analyticsSectionTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginBottom: 4,
+  },
+  analyticsSectionSub: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginBottom: 12,
+  },
+  analyticsEmptyText: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+    fontStyle: 'italic',
+    paddingVertical: 8,
+  },
+  methodBarRow: {
+    marginBottom: 10,
+  },
+  methodInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  methodName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+  },
+  methodCount: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  barBackground: {
+    height: 8,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  barFill: {
+    height: '100%',
+    backgroundColor: theme.colors.copper,
+    borderRadius: 4,
+  },
+  sensoryScoresSummary: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    justifyContent: 'center',
+    marginTop: 8,
+  },
+  sensoryScorePill: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    backgroundColor: theme.colors.bgCardSecondary,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: theme.borderRadius.sm,
+  },
+  tagsCloud: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 8,
+  },
+  tagBadge: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: theme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  tagBadgeText: {
+    fontSize: 12,
+    color: theme.colors.copper,
+    fontWeight: '500',
+  },
+  balanceGrid: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 8,
+  },
+  balanceItem: {
+    flex: 1,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
+    padding: 10,
+    alignItems: 'center',
+  },
+  balanceCount: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginBottom: 2,
+  },
+  balanceLabel: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
   },
 });

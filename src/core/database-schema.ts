@@ -160,7 +160,13 @@ CREATE TABLE IF NOT EXISTS caffeine_logs (
   caffeine_mg REAL NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS app_settings (
+  key TEXT PRIMARY KEY NOT NULL,
+  value TEXT NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_inventory_archived ON inventory_items(is_archived);
 CREATE INDEX IF NOT EXISTS idx_sessions_brewed_at ON brew_sessions(brewed_at);
 CREATE INDEX IF NOT EXISTS idx_caffeine_consumed_at ON caffeine_logs(consumed_at);
 `;
+

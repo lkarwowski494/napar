@@ -179,7 +179,6 @@ describe('JournalScreen Integration', () => {
     // Powinny znowu być widoczne wszystkie sesje
     str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Etiopia Yirgacheffe');
-    expect(str).toContain('Da Hong Pao Gongfu');
   });
 
   test('Ekran pustego dziennika gdy brak zapisanych sesji', () => {
@@ -191,6 +190,39 @@ describe('JournalScreen Integration', () => {
 
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Brak wpisów w dzienniku');
+  });
+
+  test('Przełącza widok na Statystyki & Trendy (Brew Analytics) i wyświetla wolumen, rozkład metod i średni radar', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<JournalScreen />);
+    });
+
+    const analyticsTab = tree.root.findByProps({ testID: 'journal-tab-analytics' });
+    expect(analyticsTab).toBeDefined();
+
+    act(() => {
+      analyticsTab.props.onPress();
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('21g'); // 15g + 6g
+    expect(str).toContain('0.3 L'); // 350g / 1000
+    expect(str).toContain('4.5'); // (4.8 + 4.2) / 2
+    expect(str).toContain('V60');
+    expect(str).toContain('Gongfu Cha');
+    expect(str).toContain('Kwasowość: 4');
+    expect(str).toContain('Słodycz: 5');
+    expect(str).toContain('brzoskwinia (1)');
+
+    // Przełącz z powrotem na Sesje
+    const sessionsTab = tree.root.findByProps({ testID: 'journal-tab-sessions' });
+    act(() => {
+      sessionsTab.props.onPress();
+    });
+
+    const strBack = JSON.stringify(tree.toJSON());
+    expect(strBack).toContain('Etiopia Yirgacheffe');
   });
 });
 

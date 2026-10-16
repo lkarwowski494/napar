@@ -13,12 +13,15 @@ import {
   deductInventoryWeight,
   getInventoryItems,
   getRecipes,
+  getAppSetting,
+  setAppSetting,
 } from './database';
 import {
   calculateExtractionYield,
   estimateCoffeeCaffeineMg,
   estimateTeaInfusionCaffeineMg,
 } from './domain-rules';
+import { getRecommendedGrindForRecipe } from './grinder-converter';
 
 export interface BrewContextType {
   recipe: SavedRecipe | MasterRecipe;
@@ -34,6 +37,9 @@ export interface BrewContextType {
   selectInventoryItem: (item: InventoryItem | null) => void;
   waterProfile: string;
   setWaterProfile: (profile: string) => void;
+  grinderId: string;
+  setGrinderId: (grinderId: string) => void;
+  grinderRecommendation: { formatted: string; rawValue: number; grinderName: string; microns: number };
   setDoseGrams: (grams: number) => void;
   setWaterGrams: (grams: number) => void;
   setWaterTempCelsius: (temp: number) => void;
@@ -95,6 +101,18 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [waterTempCelsius, setWaterTempCelsius] = useState<number>(initialTemp);
   const [waterProfile, setWaterProfile] = useState<string>('sca_standard');
   const [grindSetting, setGrindSetting] = useState<string>(initialGrind);
+  const [grinderId, setGrinderIdState] = useState<string>(() => {
+    return getAppSetting('default_grinder', 'comandante_c40');
+  });
+
+  const setGrinderId = (id: string) => {
+    setGrinderIdState(id);
+    setAppSetting('default_grinder', id);
+  };
+
+  const grinderRecommendation = useMemo(() => {
+    return getRecommendedGrindForRecipe(recipe, grinderId);
+  }, [recipe, grinderId]);
 
   // Parsuj kroki przepisu
   const originalSteps = useMemo<RecipeStep[]>(() => {
@@ -206,7 +224,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       waterGrams,
       waterTempCelsius,
       waterProfile: data.waterProfile || waterProfile,
-      grindSetting,
+      grindSetting: grindSetting || `${grinderRecommendation.grinderName}: ${grinderRecommendation.formatted}`,
       totalTimeSeconds: snapshot.totalElapsedSeconds,
       rating: data.rating,
       flavorTags: data.flavorTags || [],
@@ -250,6 +268,9 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
         selectedInventoryItem,
         waterProfile,
         setWaterProfile,
+        grinderId,
+        setGrinderId,
+        grinderRecommendation,
         doseGrams,
         waterGrams,
         waterTempCelsius,

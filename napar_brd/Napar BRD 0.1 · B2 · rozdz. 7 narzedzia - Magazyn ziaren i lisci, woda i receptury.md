@@ -133,3 +133,13 @@
   1. Każda kategoria podaje: stopień utlenienia, temperaturę parzenia, metodę Sha Qing, słynne odmiany i regiony oraz właściwości prozdrowotne.
   2. Dedykowany szablon herbaty umożliwiający natychmiastowe utworzenie karty w spiżarni.
 * **Priorytet:** MUST | **Etap:** MVP
+
+### **BR-SHARE-001: Wymiana receptur offline (Kody QR SVG i Universal Links)**
+* **Opis:** Wymiana autorskich i zmodyfikowanych receptur peer-to-peer w 100% offline, bez konieczności logowania, chmury, rejestracji konta ani backendu (zgodnie z DEC-20 oraz filozofią Apps4Brew).
+* **Persona:** Michał (P1), Karolina (P2), Maciej (P3).
+* **Kryteria akceptacji:**
+  1. Generowanie wektorowego kodu QR SVG (`react-native-svg`) renderowanego bezpośrednio na ekranie urządzenia.
+  2. Generowanie kompaktowego łańcucha parametrów receptury i kroków w formacie Base64 (kodowanie UTF-8) z prefiksem schematu deep-link `napar://recipe?v=1&d=...` oraz universal link `https://napar.app/recipe?v=1&d=...`.
+  3. Obsługa natywnego udostępniania systemowego iOS/Android (`Share.share`) oraz kopiowania linku do schowka.
+  4. Wbudowany w asystencie modal importu z wklejaniem linku lub skanem QR, natychmiastowym podglądem parametrów i kroków oraz opcją jednoklikowego zapisu do lokalnej bazy danych SQLite użytkownika.
+* **Priorytet:** MUST | **Etap:** MVP

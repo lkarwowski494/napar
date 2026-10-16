@@ -37,6 +37,14 @@ export function initDatabase(db: SQLite.SQLiteDatabase): void {
     // Column already exists
   }
 
+  try {
+    db.runSync(
+      'CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL)'
+    );
+  } catch {
+    // Table already exists
+  }
+
   // Sprawdź czy tabela recipes ma dane początkowe z master recipes lub wymaga uzupełnienia
   const countRow = db.getFirstSync<{ count: number }>(
     'SELECT COUNT(*) as count FROM recipes WHERE is_custom = 0'
@@ -567,4 +575,33 @@ export function exportInventoryCsv(): string {
   );
 
   return [headers.join(','), ...rows].join('\n');
+}
+
+// ----------------------------------------------------------------------------
+// Ustawienia Aplikacji (Key-Value App Settings)
+// ----------------------------------------------------------------------------
+
+export function getAppSetting(key: string, defaultValue = ''): string {
+  try {
+    const db = getDatabase();
+    const row = db.getFirstSync<{ value: string }>(
+      'SELECT value FROM app_settings WHERE key = ?',
+      [key]
+    );
+    return row ? row.value : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+}
+
+export function setAppSetting(key: string, value: string): void {
+  try {
+    const db = getDatabase();
+    db.runSync(
+      'INSERT OR REPLACE INTO app_settings (key, value) VALUES (?, ?)',
+      [key, value]
+    );
+  } catch {
+    // ignoruj błąd w środowisku testowym
+  }
 }

@@ -3,7 +3,7 @@
 // Apps4Brew: Zero-login, instant start, precyzyjny stoper z haptyką i Live Guidance
 // ============================================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,10 +13,11 @@ import {
   Modal,
   TextInput,
   Alert,
+  Share,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
-import { getRecipes, getInventoryItems, toggleRecipeFavorite } from '../../src/core/database';
+import { getRecipes, getInventoryItems, toggleRecipeFavorite, saveRecipe } from '../../src/core/database';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
 import { InventoryItem, SavedRecipe } from '../../src/core/database-schema';
 import { FlavorWheelPicker } from '../../src/core/flavor-wheel-picker';
@@ -30,6 +31,9 @@ import {
 } from '../../src/core/radar-chart';
 import { calculateBatchScaling } from '../../src/core/domain-rules';
 import { WATER_RECIPES } from '../../src/core/water-chemistry';
+import { SUPPORTED_GRINDERS, getRecommendedGrindForRecipe } from '../../src/core/grinder-converter';
+import { encodeRecipeToShareUrl, decodeRecipeFromShareUrl } from '../../src/core/recipe-share';
+import { QrCodeSvg } from '../../src/core/qr-code';
 
 export default function BrewScreen() {
   const router = useRouter();
@@ -55,6 +59,9 @@ export default function BrewScreen() {
     finishAndSaveSession,
     waterProfile,
     setWaterProfile,
+    grinderId,
+    setGrinderId,
+    grinderRecommendation,
   } = useBrew();
 
   const [allRecipes, setAllRecipes] = useState<any[]>(MASTER_RECIPES);
@@ -62,6 +69,19 @@ export default function BrewScreen() {
   const [showRecipeModal, setShowRecipeModal] = useState(false);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
+  const [showGrinderModal, setShowGrinderModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importUrlInput, setImportUrlInput] = useState('');
+  const [importParsedRecipe, setImportParsedRecipe] = useState<{ recipe: SavedRecipe; originalSteps: any[] } | null>(null);
+
+  const shareUrl = useMemo(() => {
+    try {
+      return encodeRecipeToShareUrl(recipe);
+    } catch {
+      return '';
+    }
+  }, [recipe]);
 
   // Formularz podsumowania degustacji po parzeniu
   const [rating, setRating] = useState<number>(5);
@@ -237,6 +257,43 @@ export default function BrewScreen() {
               ? `${selectedInventoryItem.remainingWeightGrams}g w paczce`
               : 'Domyślna doza'}
           </Text>
+        </Pressable>
+      </View>
+
+      {/* Pasek Młynka i Udostępniania Receptury (Offline QR) */}
+      <View style={styles.actionPillsRow}>
+        <Pressable
+          style={styles.actionPillCard}
+          onPress={() => setShowGrinderModal(true)}
+          accessibilityRole="button"
+          accessibilityLabel={`Młynek: ${grinderRecommendation.grinderName}, nastawa ${grinderRecommendation.formatted}`}
+          testID="grinder-pill-btn"
+        >
+          <Text style={styles.actionPillIcon}>⚙️</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.actionPillLabel}>MŁYNEK</Text>
+            <Text style={styles.actionPillValue} numberOfLines={1}>
+              {grinderRecommendation.grinderName.split(' ')[0]}: {grinderRecommendation.formatted}
+            </Text>
+          </View>
+          <Text style={styles.actionPillArrow}>›</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.actionPillCard}
+          onPress={() => setShowShareModal(true)}
+          accessibilityRole="button"
+          accessibilityLabel="Udostępnij recepturę przez kod QR"
+          testID="share-recipe-btn"
+        >
+          <Text style={styles.actionPillIcon}>📱</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.actionPillLabel}>UDOSTĘPNIJ</Text>
+            <Text style={styles.actionPillValue} numberOfLines={1}>
+              Kod QR / Link
+            </Text>
+          </View>
+          <Text style={styles.actionPillArrow}>↗</Text>
         </Pressable>
       </View>
 
@@ -443,7 +500,7 @@ export default function BrewScreen() {
             </Pressable>
           </View>
           <ScrollView>
-            {/* Przyciski akcji: Własna receptura & Gongfu Cha */}
+            {/* Przyciski akcji: Własna receptura, Gongfu Cha & Import QR */}
             <View style={styles.modalActionButtonsRow}>
               <Pressable
                 style={styles.addCustomRecipeBtn}
@@ -463,6 +520,14 @@ export default function BrewScreen() {
                 }}
               >
                 <Text style={styles.gongfuModalBtnText}>🍵 Gongfu Cha</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.importRecipeModalBtn}
+                onPress={() => setShowImportModal(true)}
+                testID="import-recipe-btn"
+              >
+                <Text style={styles.importRecipeModalBtnText}>📥 {t.brew.importRecipe}</Text>
               </Pressable>
             </View>
 
@@ -697,6 +762,178 @@ export default function BrewScreen() {
               </View>
             </ScrollView>
           </View>
+        </View>
+      </Modal>
+
+      {/* Modal Wyboru Młynka */}
+      <Modal visible={showGrinderModal} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>{t.brew.grinderModalTitle}</Text>
+            <Pressable testID="close-grinder-modal-btn" onPress={() => setShowGrinderModal(false)}>
+              <Text style={styles.modalCloseText}>{t.common.close}</Text>
+            </Pressable>
+          </View>
+          <ScrollView contentContainerStyle={{ padding: 16 }}>
+            <Text style={styles.modalSub}>{t.brew.grinderModalDesc}</Text>
+            {SUPPORTED_GRINDERS.map((grinder) => {
+              const isSelected = grinderId === grinder.id;
+              const rec = getRecommendedGrindForRecipe(recipe, grinder.id);
+              return (
+                <Pressable
+                  key={grinder.id}
+                  testID={`grinder-item-${grinder.id}`}
+                  style={[
+                    styles.grinderItemCard,
+                    isSelected && styles.grinderItemCardActive,
+                  ]}
+                  onPress={() => {
+                    setGrinderId(grinder.id);
+                    setShowGrinderModal(false);
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${grinder.name}, ${rec.formatted}`}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={[
+                        styles.grinderItemName,
+                        isSelected && { color: theme.colors.copper, fontWeight: '700' },
+                      ]}
+                    >
+                      {grinder.name}
+                    </Text>
+                    <Text style={styles.grinderItemRecommendation}>
+                      Rekomendacja: {rec.formatted} ({rec.microns} µm)
+                    </Text>
+                  </View>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: '700',
+                      color: isSelected ? theme.colors.copper : theme.colors.textMuted,
+                    }}
+                  >
+                    {isSelected ? '✓' : '○'}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Modal Udostępniania Receptury (Offline QR) */}
+      <Modal visible={showShareModal} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>{t.brew.qrModalTitle}</Text>
+            <Pressable testID="close-share-modal-btn" onPress={() => setShowShareModal(false)}>
+              <Text style={styles.modalCloseText}>{t.common.close}</Text>
+            </Pressable>
+          </View>
+          <ScrollView contentContainerStyle={{ padding: 20, alignItems: 'center' }}>
+            <Text style={[styles.modalSub, { textAlign: 'center', marginBottom: 16 }]}>
+              {t.brew.qrModalDesc}
+            </Text>
+
+            <View style={styles.qrCard}>
+              <QrCodeSvg value={shareUrl} size={220} testID="recipe-qr-code-svg" />
+            </View>
+
+            <Text style={styles.shareRecipeName}>{recipe.name}</Text>
+            <Text style={styles.shareRecipeDetails}>
+              {recipe.method} · {'doseGrams' in recipe ? recipe.doseGrams : recipe.coffeeOrTeaDoseGrams}g / {'waterGrams' in recipe ? recipe.waterGrams : recipe.waterWeightGrams}g · {waterTempCelsius}°C
+            </Text>
+
+            <View style={styles.shareButtonsRow}>
+              <Pressable
+                testID="share-link-btn"
+                style={styles.shareActionBtn}
+                onPress={() => {
+                  Share.share({
+                    title: recipe.name,
+                    message: `${recipe.name} — receptura parzenia w Napar:\n${shareUrl}`,
+                    url: shareUrl,
+                  });
+                }}
+              >
+                <Text style={styles.shareActionBtnText}>📤 {t.brew.qrShareLink}</Text>
+              </Pressable>
+
+              <Pressable
+                testID="copy-link-btn"
+                style={[styles.shareActionBtn, styles.shareActionBtnSecondary]}
+                onPress={() => {
+                  Alert.alert('Link receptury', shareUrl);
+                }}
+              >
+                <Text style={styles.shareActionBtnTextSecondary}>📋 {t.brew.qrCopyLink}</Text>
+              </Pressable>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+
+      {/* Modal Importu Receptury z Linku / QR */}
+      <Modal visible={showImportModal} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>{t.brew.importModalTitle}</Text>
+            <Pressable testID="close-import-modal-btn" onPress={() => setShowImportModal(false)}>
+              <Text style={styles.modalCloseText}>{t.common.close}</Text>
+            </Pressable>
+          </View>
+          <ScrollView contentContainerStyle={{ padding: 16 }}>
+            <Text style={styles.modalSub}>{t.brew.importModalDesc}</Text>
+            <TextInput
+              style={[styles.importTextInput, { minHeight: 80 }]}
+              multiline
+              placeholder={t.brew.importInputPlaceholder}
+              placeholderTextColor={theme.colors.textMuted}
+              value={importUrlInput}
+              onChangeText={(txt) => {
+                setImportUrlInput(txt);
+                const dec = decodeRecipeFromShareUrl(txt);
+                setImportParsedRecipe(dec);
+              }}
+              testID="import-recipe-input"
+            />
+
+            {importParsedRecipe && (
+              <View style={styles.importPreviewCard} testID="import-recipe-preview">
+                <Text style={styles.importPreviewTitle}>
+                  {importParsedRecipe.recipe.name}
+                </Text>
+                <Text style={styles.importPreviewSubtitle}>
+                  {importParsedRecipe.recipe.method} · {importParsedRecipe.recipe.doseGrams}g / {importParsedRecipe.recipe.waterGrams}g · {importParsedRecipe.recipe.waterTempCelsius}°C
+                </Text>
+                <Text style={styles.importPreviewStepsCount}>
+                  Liczba kroków parzenia: {importParsedRecipe.originalSteps.length}
+                </Text>
+                <Pressable
+                  style={styles.confirmImportBtn}
+                  onPress={() => {
+                    try {
+                      saveRecipe(importParsedRecipe.recipe);
+                      refreshData();
+                      selectRecipe(importParsedRecipe.recipe);
+                      setShowImportModal(false);
+                      setShowRecipeModal(false);
+                      setImportUrlInput('');
+                      setImportParsedRecipe(null);
+                      Alert.alert('Sukces!', t.brew.importSuccess);
+                    } catch {
+                      Alert.alert('Błąd', t.brew.importError);
+                    }
+                  }}
+                  testID="confirm-import-btn"
+                >
+                  <Text style={styles.confirmImportBtnText}>{t.brew.importActionBtn}</Text>
+                </Pressable>
+              </View>
+            )}
+          </ScrollView>
         </View>
       </Modal>
     </ScrollView>
@@ -1369,5 +1606,178 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: theme.colors.textMuted,
     marginBottom: 8,
+  },
+  modalSub: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    marginBottom: 14,
+    lineHeight: 18,
+  },
+  actionPillsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: theme.spacing.md,
+  },
+  actionPillCard: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  actionPillIcon: {
+    fontSize: 16,
+    marginRight: 6,
+  },
+  actionPillLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    letterSpacing: 0.5,
+  },
+  actionPillValue: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+  },
+  actionPillArrow: {
+    fontSize: 16,
+    color: theme.colors.textMuted,
+    marginLeft: 4,
+  },
+  importRecipeModalBtn: {
+    flex: 1,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.md,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  importRecipeModalBtnText: {
+    color: theme.colors.copper,
+    fontWeight: '600',
+    fontSize: 13,
+  },
+  qrCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderRadius: theme.borderRadius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 16,
+  },
+  shareRecipeName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  shareRecipeDetails: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  shareButtonsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    width: '100%',
+    marginTop: 8,
+  },
+  shareActionBtn: {
+    flex: 1,
+    backgroundColor: theme.colors.copper,
+    borderRadius: theme.borderRadius.md,
+    padding: 14,
+    alignItems: 'center',
+  },
+  shareActionBtnSecondary: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  shareActionBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  shareActionBtnTextSecondary: {
+    color: theme.colors.textPrimary,
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  grinderItemCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginBottom: 10,
+  },
+  grinderItemCardActive: {
+    borderColor: theme.colors.copper,
+    backgroundColor: theme.colors.bgCardSecondary,
+  },
+  grinderItemName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+    marginBottom: 2,
+  },
+  grinderItemRecommendation: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+  },
+  importTextInput: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.md,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    color: theme.colors.textPrimary,
+    fontSize: 13,
+    marginBottom: 16,
+  },
+  importPreviewCard: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    marginBottom: 16,
+  },
+  importPreviewTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginBottom: 4,
+  },
+  importPreviewSubtitle: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    marginBottom: 6,
+  },
+  importPreviewStepsCount: {
+    fontSize: 12,
+    color: theme.colors.copper,
+    marginBottom: 14,
+  },
+  confirmImportBtn: {
+    backgroundColor: theme.colors.copper,
+    borderRadius: theme.borderRadius.md,
+    padding: 14,
+    alignItems: 'center',
+  },
+  confirmImportBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 14,
   },
 });

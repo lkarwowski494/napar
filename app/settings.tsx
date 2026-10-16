@@ -19,15 +19,26 @@ import {
   importDataJson,
   exportSessionsCsv,
   exportInventoryCsv,
+  getAppSetting,
+  setAppSetting,
 } from '../src/core/database';
+import { SUPPORTED_GRINDERS } from '../src/core/grinder-converter';
 import { theme } from '../src/core/theme';
 import { useTranslation, SupportedLanguage } from '../src/core/i18n';
 
 export default function SettingsScreen() {
   const { t, language, setLanguage } = useTranslation();
+  const [selectedGrinder, setSelectedGrinder] = useState<string>(() => {
+    return getAppSetting('default_grinder', 'comandante_c40');
+  });
   const [isPro, setIsPro] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+
+  const handleSelectGrinder = (id: string) => {
+    setSelectedGrinder(id);
+    setAppSetting('default_grinder', id);
+  };
   const [showCsvModal, setShowCsvModal] = useState(false);
   const [csvModalTitle, setCsvModalTitle] = useState('');
   const [exportedJsonText, setExportedJsonText] = useState('');
@@ -127,6 +138,51 @@ export default function SettingsScreen() {
             ? 'Napar nie wymaga logowania, nie łączy się z żadnym zewnętrznym serwerem i nie zbiera Twoich danych (etykieta „Data Not Collected”). Cała spiżarnia, dziennik i kalkulatory działają w 100% lokalnie na Twoim urządzeniu.'
             : 'Steepwise requires no login, connects to no external servers, and collects zero data (Apple "Data Not Collected" badge). Your stash, journal, and calculators run 100% locally on your device.'}
         </Text>
+      </View>
+
+      {/* Młynek Domowy (Domyślny młynek) */}
+      <Text style={styles.sectionTitle}>{t.settings.grinderSection}</Text>
+      <View style={styles.cardGroup}>
+        {SUPPORTED_GRINDERS.map((grinder, idx) => {
+          const isSelected = selectedGrinder === grinder.id;
+          return (
+            <React.Fragment key={grinder.id}>
+              {idx > 0 && <View style={styles.divider} />}
+              <Pressable
+                style={[
+                  styles.actionRow,
+                  isSelected && { backgroundColor: theme.colors.bgCardSecondary },
+                ]}
+                onPress={() => handleSelectGrinder(grinder.id)}
+                accessibilityRole="button"
+                accessibilityLabel={`${grinder.name}, ${isSelected ? 'wybrany' : 'wybierz'}`}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={[
+                      styles.actionTitle,
+                      isSelected && { color: theme.colors.copper, fontWeight: '700' },
+                    ]}
+                  >
+                    {grinder.name}
+                  </Text>
+                  <Text style={styles.actionSubtitle}>
+                    {grinder.stepMicrons} µm/klik · Zakres: {grinder.minSetting}–{grinder.maxSetting}
+                  </Text>
+                </View>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: '700',
+                    color: isSelected ? theme.colors.copper : theme.colors.textMuted,
+                  }}
+                >
+                  {isSelected ? '✓' : '○'}
+                </Text>
+              </Pressable>
+            </React.Fragment>
+          );
+        })}
       </View>
 
       {/* Kopia Zapasowa i Własność Danych */}

@@ -21,7 +21,9 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
 1. **☕ Asystent Parzenia (Active Brew Assistant):**
    - Precyzyjny stoper z blokadą wygaszania ekranu (`expo-keep-awake`) i sygnałami wibracyjnymi (`expo-haptics`).
    - Wskaźnik tempa nalewania (g/s) i dynamiczny pasek postępu wody dla każdego etapu.
-   - Płynne skalowanie gramatur przy zmianie dozy z zachowaniem właściwych proporcji.
+   - Płynne skalowanie gramatur przy zmianie dozy z zachowaniem właściwych proporcji (Batch Scaling 1–4 osób z korektą grubości przemiału).
+   - **⚙️ Młynek Domowy (Grinder Dial-in):** Precyzyjny selektor młynka specialty (Comandante C40 MK3/MK4, Timemore Chestnut C2/C3, 1Zpresso K-Ultra/K-Max, Fellow Ode Gen 2, Baratza Encore, Kingrinder K6) z automatycznym przeliczaniem mikronów ($\mu\text{m}$) na kliki/nastawę tarczy dla wybranej metody i trwałym zapamiętywaniem w SQLite.
+   - **📱 Wymiana Receptur Offline (Kody QR SVG & Universal Links — DEC-20):** Błyskawiczne udostępnianie i importowanie receptur w 100% offline (zero konta, zero chmury, zero telemetry). Wektorowy generator kodów QR SVG, protokół deep link `napar://recipe?v=1&d=...` oraz `https://napar.app/recipe?v=1&d=...`, natywne udostępnianie systemowe (`Share.share`) oraz modal importu z podglądem kroków.
    - Karta degustacyjna po zakończeniu: ocena w gwiazdkach, profil balansu smaku, nuty smakowe, wybór profilu użytej wody, odczyt refractometru TDS.
 2. **🫘 Spiżarnia Ziaren & Liści (Stash) & Kompendium Wiedzy:**
    - Śledzenie świeżości ziaren kawy (okno *Resting Window*: odgazowywanie CO₂, szczyt smaku *Peak*, stabilne okno, dojrzałe ziarna).
@@ -34,10 +36,11 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
      - *Klasyfikacja herbaty (6 wielkich tradycji):* Biała (Bai Cha), Zielona (Lü Cha / Ryokucha), Żółta (Huang Cha), Wulong (Oolong), Czarna/Czerwona (Hong Cha), Ciemna (Heicha / Puerh).
      - Funkcja *„+ Użyj jako szablon w spiżarni”* natychmiast predefiniująca kartotekę surowca.
    - Natychmiastowe przejście do parzenia z wybranej paczki.
-3. **📖 Dziennik Degustacji (Brew Journal):**
-   - Pełna historia zaparzonych filiżanek z datą, recepturą, parametrami (czas, doza, woda, temperatura, użyty profil wody).
+3. **📖 Dziennik Degustacji & Analityka (Brew Journal & Analytics):**
+   - Pełna historia zaparzonych filiżanek z datą, recepturą, parametrami (czas, doza, woda, temperatura, nastawa młynka, użyty profil wody).
    - Obliczone wskaźniki ekstrakcji ($EY\%$) i szacowana zawartość kofeiny (mg).
    - Balans smaku, notatki degustacyjne, plakietka profilu wody i oceny.
+   - **📊 Statystyki & Trendy (Brew Analytics):** Przełącznik widoków `[ 📋 Sesje ]` / `[ 📊 Statystyki & Trendy ]`. Karty sumarycznego wolumenu (gramatura ziaren/liści, litry przelanej wody, przyjęta kofeina, średnia ocen ★), wykres rozkładu metod parzenia, uśredniony radar sensoryczny SCA (`SensoryRadarChart`), chmura najczęstszych nut smakowych oraz rozkład balansu w filiżance.
 4. **🧭 Dial-in Doctor & Kalkulatory:**
    - **Kompas Ekstrakcji (Dial-in Doctor):** Diagnozuje błędy smaku (za kwaśna, za gorzka, wodnista, cierpka herbata) i podaje fizyczną receptę na korektę mielenia młynka i temperatury wody.
    - **Kalkulator Brew Ratio:** Dwukierunkowy przelicznik proporcji i szacowanego uzysku w filiżance z uwzględnieniem absorpcji $2.0\,\text{g/g}$.
@@ -53,7 +56,8 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Bieżące stężenie aktywnej kofeiny w krwiobiegu w czasie rzeczywistym.
    - Dobowy bilans kofeiny w relacji do normy EFSA (400 mg).
    - **Bedtime Sleep Curfew:** Prognoza stężenia kofeiny o wybranej godzinie snu (próg bezpieczny dla fazy głębokiej NREM $\le 25\,\text{mg}$) oraz wyznaczenie godziny ostatniej dopuszczalnej filiżanki.
-7. **⚙️ Ustawienia, Kopia Zapasowa i Pro:**
+7. **⚙️ Ustawienia, Kopia Zapasowa i Młynek Domowy:**
+   - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite.
    - Eksport i import bazy w formacie JSON.
    - Model uczciwej monetyzacji (Darmowy rdzeń + Pro: 3,99 zł/mies., 19,99 zł/rok z 14-dniowym okresem próbnym, 59,99 zł Lifetime + Chmura rodzinna).
    - Przywracanie zakupów StoreKit.

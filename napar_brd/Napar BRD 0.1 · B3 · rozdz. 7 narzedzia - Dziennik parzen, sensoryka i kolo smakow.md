@@ -29,3 +29,14 @@
   1. Płynne przewijanie listy 500+ wpisów bez opóźnień (SwiftUI lazy loading).
   2. Kliknięcie w historyczną sesję pozwala wybrać opcję *„Parz ponownie z tymi samymi parametrami”*.
 * **Priorytet:** MUST | **Etap:** MVP
+
+### **BR-DZIEN-005: Wielowymiarowa analityka i trendy parzeń (Brew Analytics)**
+* **Opis:** Segmentowany widok Dziennika z przełącznikiem `[ 📋 Sesje ]` oraz `[ 📊 Statystyki & Trendy ]`, prezentujący podsumowanie nawyków parzenia i ewolucji sensorycznej użytkownika w 100% lokalnie.
+* **Persona:** Michał (P1), Karolina (P2), Agnieszka (P5).
+* **Kryteria akceptacji:**
+  1. Karty wolumenu sumarycznego: łączna gramatura zużytej kawy i herbaty (g), całkowita objętość przelanej wody (L), łączna przyjęta dawka kofeiny (mg) oraz średnia ocen gwiazdkowych naparów (★).
+  2. Rozkład najpopularniejszych metod parzenia (np. V60, Chemex, Aeropress, Gongfu) z paskami postępu i udziałem procentowym.
+  3. Uśredniony radar sensoryczny SCA (`SensoryRadarChart`) syntetyzujący 6 wymiarów profilu sensorycznego ze wszystkich ocenionych sesji w dzienniku.
+  4. Chmura najczęstszych nut smakowych z hierarchicznego koła smaków SCA.
+  5. Rozkład balansu w filiżance: zbalansowana, za kwaśna (niedoparzenie), za gorzka (przeparzenie), wodnista (kanałowanie/niski TDS).
+* **Priorytet:** SHOULD | **Etap:** MVP

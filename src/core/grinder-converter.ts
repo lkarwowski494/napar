@@ -229,3 +229,50 @@ export function convertBetweenGrinders(
     microns: Math.round(microns),
   };
 }
+
+/**
+ * Zwraca szacowany rozmiar cząstek w mikronach dla danej metody lub opisu przemiału receptury
+ */
+export function getRecipeMicrons(recipe: {
+  method?: string;
+  grindSettingDescriptionPl?: string;
+  grind_size_description?: string;
+}): number {
+  const method = (recipe.method || '').toUpperCase();
+  const desc = (recipe.grindSettingDescriptionPl || recipe.grind_size_description || '').toLowerCase();
+
+  if (desc.includes('bardzo drobno') || method === 'ESPRESSO') {
+    return 350;
+  }
+  if (desc.includes('drobno') || method === 'AEROPRESS') {
+    if (desc.includes('16') || desc.includes('18')) return 520;
+    return 560;
+  }
+  if (method === 'V60' || method === 'ORIGAMI' || method === 'KALITA' || method === 'SWITCH') {
+    if (desc.includes('28') || desc.includes('30') || desc.includes('grubo')) return 850;
+    if (desc.includes('18') || desc.includes('20')) return 600;
+    return 720;
+  }
+  if (method === 'CHEMEX' || method === 'CLEVER_DRIPPER' || method === 'CUPPING') {
+    return 880;
+  }
+  if (method === 'FRENCH_PRESS' || method === 'COLD_BREW') {
+    return 1150;
+  }
+  return 720;
+}
+
+/**
+ * Zwraca rekomendację nastawy dla konkretnego młynka i receptury
+ */
+export function getRecommendedGrindForRecipe(
+  recipe: { method?: string; grindSettingDescriptionPl?: string; grind_size_description?: string },
+  grinderId: string
+): { formatted: string; rawValue: number; grinderName: string; microns: number } {
+  const microns = getRecipeMicrons(recipe);
+  const result = convertMicronsToGrinder(microns, grinderId);
+  return {
+    ...result,
+    microns,
+  };
+}

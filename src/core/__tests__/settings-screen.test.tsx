@@ -392,5 +392,28 @@ describe('SettingsScreen Component', () => {
       cancelBtn.props.onPress();
     });
   });
+
+  test('Wybiera domyślny młynek i zapisuje preferencję w bazie', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <SettingsScreen />
+        </LanguageProvider>
+      );
+    });
+
+    const odeOption = findPressableWithText(tree.root, 'Fellow Ode Gen 2');
+    expect(odeOption).toBeTruthy();
+
+    renderer.act(() => {
+      odeOption?.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['default_grinder', 'fellow_ode_gen2']
+    );
+  });
 });
 

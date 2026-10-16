@@ -26,6 +26,8 @@ import {
   exportSessionsCsv,
   exportInventoryCsv,
   escapeCsvValue,
+  getAppSetting,
+  setAppSetting,
 } from '../database';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../database-schema';
 
@@ -35,6 +37,7 @@ const mockDb: any = {
   recipes: new Map<string, any>(),
   sessions: new Map<string, any>(),
   caffeine: new Map<string, any>(),
+  settings: new Map<string, string>(),
 
   execSync: jest.fn(),
   getFirstSync: jest.fn((query: string, params?: any[]) => {
@@ -46,6 +49,10 @@ const mockDb: any = {
     }
     if (query.includes('FROM recipes WHERE id = ?')) {
       return mockDb.recipes.get(params?.[0]) || null;
+    }
+    if (query.includes('FROM app_settings WHERE key = ?')) {
+      const val = mockDb.settings.get(params?.[0]);
+      return val ? { value: val } : null;
     }
     if (query.includes('FROM brew_sessions WHERE id = ?')) {
       return mockDb.sessions.get(params?.[0]) || null;
@@ -118,6 +125,9 @@ const mockDb: any = {
       });
     } else if (query.includes('DELETE FROM caffeine_logs WHERE id = ?')) {
       mockDb.caffeine.delete(params![0]);
+    } else if (query.includes('INSERT OR REPLACE INTO app_settings')) {
+      const [key, value] = params!;
+      mockDb.settings.set(key, value);
     }
   }),
   prepareSync: jest.fn(() => ({
@@ -154,6 +164,7 @@ describe('Napar SQLite Database & Repositories', () => {
     mockDb.recipes.clear();
     mockDb.sessions.clear();
     mockDb.caffeine.clear();
+    mockDb.settings.clear();
   });
 
   test('Inicjalizacja bazy i seeding domyślnych przepisów', () => {
@@ -566,5 +577,14 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(session).not.toBeNull();
     expect(session?.flavorTags).toEqual([]);
     expect(session?.sensory).toBeUndefined();
+  });
+
+  test('Pobiera i zapisuje ustawienia aplikacji (getAppSetting, setAppSetting)', () => {
+    // Domyślna wartość gdy brak klucza
+    expect(getAppSetting('default_grinder', 'comandante_c40')).toBe('comandante_c40');
+
+    // Zapisz nowe ustawienie
+    setAppSetting('default_grinder', 'fellow_ode_gen2');
+    expect(getAppSetting('default_grinder', 'comandante_c40')).toBe('fellow_ode_gen2');
   });
 });
