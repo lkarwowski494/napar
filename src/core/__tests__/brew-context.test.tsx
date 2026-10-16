@@ -9,11 +9,26 @@ import { MASTER_RECIPES } from '../recipes-data';
 import * as databaseModule from '../database';
 import { SavedRecipe } from '../database-schema';
 
+const settingsStore = new Map<string, string>();
+
 const mockDb: any = {
   execSync: jest.fn(),
-  getFirstSync: jest.fn(),
+  getFirstSync: jest.fn((sql: string, params: any[] = []) => {
+    if (sql.includes('FROM app_settings WHERE key = ?')) {
+      const key = params[0];
+      if (settingsStore.has(key)) {
+        return { value: settingsStore.get(key) };
+      }
+      return null;
+    }
+    return null;
+  }),
   getAllSync: jest.fn(() => []),
-  runSync: jest.fn(),
+  runSync: jest.fn((sql: string, params: any[] = []) => {
+    if (sql.includes('INSERT OR REPLACE INTO app_settings')) {
+      settingsStore.set(params[0], params[1]);
+    }
+  }),
 };
 
 jest.mock('expo-sqlite', () => ({
@@ -23,6 +38,7 @@ jest.mock('expo-sqlite', () => ({
 describe('BrewContext & BrewProvider', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    settingsStore.clear();
   });
 
   test('useBrew rzuca błąd, gdy jest wywołany poza BrewProvider', () => {
@@ -302,5 +318,101 @@ describe('BrewContext & BrewProvider', () => {
     expect(savedSession.extractionYieldPercentage).toBeUndefined();
     expect(saveSessionSpy).toHaveBeenCalled();
     expect(logCaffeineSpy).not.toHaveBeenCalled();
+  });
+
+  test('VoiceOver / Audio Announcements są wywoływane podczas przebiegu timera', () => {
+    jest.useFakeTimers();
+    const announceSpy = jest
+      .spyOn(require('react-native').AccessibilityInfo, 'announceForAccessibility')
+      .mockImplementation(() => {});
+
+    databaseModule.setVoiceAnnounceEnabled(true);
+    databaseModule.setAppSetting('app_language', 'pl');
+
+    let brewData: any;
+    const Consumer = () => {
+      brewData = useBrew();
+      return null;
+    };
+
+    renderer.act(() => {
+      renderer.create(
+        <BrewProvider>
+          <Consumer />
+        </BrewProvider>
+      );
+    });
+
+    // Start timera uruchamia krok 1 i zapowiada go przez VoiceOver
+    renderer.act(() => {
+      brewData.startTimer();
+    });
+    expect(announceSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Krok 1')
+    );
+
+    // Przejście do kroku 2 zapowiada krok 2
+    renderer.act(() => {
+      brewData.nextStep();
+    });
+    expect(announceSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Krok 2')
+    );
+
+    // Odliczanie do ostatnich 3 sekund kroku wywołuje onWarning
+    const currentStepDuration = brewData.snapshot.currentStep.durationSeconds;
+    renderer.act(() => {
+      jest.advanceTimersByTime((currentStepDuration - 3) * 1000);
+    });
+    expect(announceSpy).toHaveBeenCalledWith('3 sekundy do końca etapu.');
+
+    // Zakończenie sesji wywołuje zapowiedź finiszu
+    renderer.act(() => {
+      brewData.finishAndSaveSession({ rating: 5 });
+    });
+    expect(announceSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Parzenie')
+    );
+
+    // Reset timera
+    renderer.act(() => {
+      brewData.resetTimer();
+    });
+
+    jest.useRealTimers();
+  });
+
+  test('VoiceOver nie anonsuje, gdy funkcja jest wyłączona w ustawieniach', () => {
+    const announceSpy = jest
+      .spyOn(require('react-native').AccessibilityInfo, 'announceForAccessibility')
+      .mockImplementation(() => {});
+
+    databaseModule.setVoiceAnnounceEnabled(false);
+
+    let brewData: any;
+    const Consumer = () => {
+      brewData = useBrew();
+      return null;
+    };
+
+    renderer.act(() => {
+      renderer.create(
+        <BrewProvider>
+          <Consumer />
+        </BrewProvider>
+      );
+    });
+
+    announceSpy.mockClear();
+
+    renderer.act(() => {
+      brewData.startTimer();
+    });
+    expect(announceSpy).not.toHaveBeenCalled();
+
+    renderer.act(() => {
+      brewData.resetTimer();
+    });
+    databaseModule.setVoiceAnnounceEnabled(true);
   });
 });

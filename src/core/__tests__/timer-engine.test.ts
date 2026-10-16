@@ -172,10 +172,11 @@ describe('BrewTimerEngine', () => {
     engine.destroy();
   });
 
-  test('onStepChange oraz ostrzeżenie haptyczne warning na 3 sekundy przed końcem', () => {
+  test('onStepChange, onWarning oraz ostrzeżenie haptyczne warning na 3 sekundy przed końcem', () => {
     const onStepChange = jest.fn();
+    const onWarning = jest.fn();
     const Haptics = require('expo-haptics');
-    const engine = new BrewTimerEngine(testSteps, { onStepChange });
+    const engine = new BrewTimerEngine(testSteps, { onStepChange, onWarning });
 
     engine.start();
     expect(onStepChange).toHaveBeenCalledWith(0, expect.objectContaining({ namePl: 'Preinfuzja' }));
@@ -183,6 +184,7 @@ describe('BrewTimerEngine', () => {
     // Przeskocz do 27s (3s przed końcem kroku trwającego 30s)
     jest.advanceTimersByTime(27000);
     expect(Haptics.impactAsync).toHaveBeenCalledWith('light');
+    expect(onWarning).toHaveBeenCalledWith(3);
 
     // Kolejny krok
     jest.advanceTimersByTime(3000);

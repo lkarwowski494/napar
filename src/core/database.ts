@@ -615,3 +615,22 @@ export function setUnitSystem(unit: 'metric' | 'imperial'): void {
   setAppSetting('unit_system', unit);
 }
 
+export function getVoiceAnnounceEnabled(): boolean {
+  const val = getAppSetting('voice_announce_enabled', 'true');
+  return val !== 'false';
+}
+
+export function setVoiceAnnounceEnabled(enabled: boolean): void {
+  setAppSetting('voice_announce_enabled', enabled ? 'true' : 'false');
+}
+
+export function getHapticsEnabled(): boolean {
+  const val = getAppSetting('haptics_enabled', 'true');
+  return val !== 'false';
+}
+
+export function setHapticsEnabled(enabled: boolean): void {
+  setAppSetting('haptics_enabled', enabled ? 'true' : 'false');
+}
+
+

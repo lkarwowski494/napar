@@ -448,5 +448,41 @@ describe('SettingsScreen Component', () => {
       ['unit_system', 'metric']
     );
   });
+
+  test('Przełącza komunikaty głosowe VoiceOver i haptykę oraz zapisuje w bazie', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <SettingsScreen />
+        </LanguageProvider>
+      );
+    });
+
+    const voiceBtn = tree.root.findByProps({ testID: 'toggle-voice-btn' });
+    expect(voiceBtn).toBeTruthy();
+
+    renderer.act(() => {
+      voiceBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['voice_announce_enabled', 'false']
+    );
+
+    const hapticsBtn = tree.root.findByProps({ testID: 'toggle-haptics-btn' });
+    expect(hapticsBtn).toBeTruthy();
+
+    renderer.act(() => {
+      hapticsBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['haptics_enabled', 'false']
+    );
+  });
 });
+
 

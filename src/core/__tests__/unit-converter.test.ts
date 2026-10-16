@@ -54,4 +54,10 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
     expect(formatWaterWeight(300, 'metric')).toBe('300g');
     expect(formatWaterWeight(300, 'imperial')).toBe('10.14 fl oz');
   });
+
+  test('Formatters używają metrycznych jednostek jako domyślnych parametrów', () => {
+    expect(formatTemperature(93)).toBe('93°C');
+    expect(formatDoseWeight(18)).toBe('18g');
+    expect(formatWaterWeight(300)).toBe('300g');
+  });
 });

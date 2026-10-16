@@ -9,6 +9,8 @@ export interface RecipeStep {
   targetWaterGrams: number;
   durationSeconds: number;
   instructionPl: string;
+  nameEn?: string;
+  instructionEn?: string;
 }
 
 export interface MasterRecipe {

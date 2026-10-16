@@ -23,6 +23,10 @@ import {
   setAppSetting,
   getUnitSystem,
   setUnitSystem,
+  getVoiceAnnounceEnabled,
+  setVoiceAnnounceEnabled,
+  getHapticsEnabled,
+  setHapticsEnabled,
 } from '../src/core/database';
 import { SUPPORTED_GRINDERS } from '../src/core/grinder-converter';
 import { theme } from '../src/core/theme';
@@ -36,6 +40,12 @@ export default function SettingsScreen() {
   const [unitSystem, setUnitSystemState] = useState<'metric' | 'imperial'>(() => {
     return getUnitSystem();
   });
+  const [voiceAnnounce, setVoiceAnnounce] = useState<boolean>(() => {
+    return getVoiceAnnounceEnabled();
+  });
+  const [haptics, setHaptics] = useState<boolean>(() => {
+    return getHapticsEnabled();
+  });
   const [isPro, setIsPro] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -48,6 +58,18 @@ export default function SettingsScreen() {
   const handleSelectUnitSystem = (unit: 'metric' | 'imperial') => {
     setUnitSystemState(unit);
     setUnitSystem(unit);
+  };
+
+  const handleToggleVoiceAnnounce = () => {
+    const next = !voiceAnnounce;
+    setVoiceAnnounce(next);
+    setVoiceAnnounceEnabled(next);
+  };
+
+  const handleToggleHaptics = () => {
+    const next = !haptics;
+    setHaptics(next);
+    setHapticsEnabled(next);
   };
   const [showCsvModal, setShowCsvModal] = useState(false);
   const [csvModalTitle, setCsvModalTitle] = useState('');
@@ -170,6 +192,66 @@ export default function SettingsScreen() {
             {t.settings.unitImperial}
           </Text>
         </Pressable>
+      </View>
+
+      {/* Dostępność i Sygnały (VoiceOver / Audio & Haptyka - BR-DOST-001, DEC-13) */}
+      <Text style={styles.sectionTitle}>{t.settings.accessibilitySection}</Text>
+      <View style={styles.cardGroup}>
+        <View style={styles.actionRow}>
+          <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
+            <Text style={styles.actionTitle}>📢 {t.settings.voiceAnnounceTitle}</Text>
+            <Text style={styles.actionSubtitle}>{t.settings.voiceAnnounceDesc}</Text>
+          </View>
+          <Pressable
+            testID="toggle-voice-btn"
+            style={[
+              styles.toggleBtn,
+              voiceAnnounce && styles.toggleBtnActive,
+            ]}
+            onPress={handleToggleVoiceAnnounce}
+            accessibilityRole="switch"
+            accessibilityLabel={t.settings.voiceAnnounceTitle}
+            accessibilityState={{ checked: voiceAnnounce }}
+          >
+            <Text
+              style={[
+                styles.toggleBtnText,
+                voiceAnnounce && styles.toggleBtnTextActive,
+              ]}
+            >
+              {voiceAnnounce ? t.settings.enabled : t.settings.disabled}
+            </Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.actionRow}>
+          <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
+            <Text style={styles.actionTitle}>📳 {t.settings.hapticsTitle}</Text>
+            <Text style={styles.actionSubtitle}>{t.settings.hapticsDesc}</Text>
+          </View>
+          <Pressable
+            testID="toggle-haptics-btn"
+            style={[
+              styles.toggleBtn,
+              haptics && styles.toggleBtnActive,
+            ]}
+            onPress={handleToggleHaptics}
+            accessibilityRole="switch"
+            accessibilityLabel={t.settings.hapticsTitle}
+            accessibilityState={{ checked: haptics }}
+          >
+            <Text
+              style={[
+                styles.toggleBtnText,
+                haptics && styles.toggleBtnTextActive,
+              ]}
+            >
+              {haptics ? t.settings.enabled : t.settings.disabled}
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       {/* Karta Filozofii Apps4Brew */}
@@ -706,6 +788,27 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   langTabTextActive: {
+    color: theme.colors.copper,
+    fontWeight: '700',
+  },
+  toggleBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: theme.borderRadius.sm,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  toggleBtnActive: {
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    borderColor: theme.colors.copper,
+  },
+  toggleBtnText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+  },
+  toggleBtnTextActive: {
     color: theme.colors.copper,
     fontWeight: '700',
   },

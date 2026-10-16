@@ -389,7 +389,12 @@ export default function BrewScreen() {
       </View>
 
       {/* Główny stoper parzenia */}
-      <View style={styles.timerCard}>
+      <View
+        style={styles.timerCard}
+        accessible={true}
+        accessibilityRole="timer"
+        accessibilityLabel={`Całkowity czas: ${formatTime(snapshot.totalElapsedSeconds)}`}
+      >
         <Text style={styles.timerTotalLabel}>CAŁKOWITY CZAS</Text>
         <Text style={styles.timerDisplay}>
           {formatTime(snapshot.totalElapsedSeconds)}
@@ -407,7 +412,12 @@ export default function BrewScreen() {
 
         {/* Informacja o bieżącym etapie */}
         {snapshot.currentStep && (
-          <View style={styles.activeStepBox}>
+          <View
+            style={styles.activeStepBox}
+            accessible={true}
+            accessibilityLiveRegion="assertive"
+            accessibilityLabel={`Krok ${snapshot.currentStepIndex + 1} z ${snapshot.totalSteps}: ${snapshot.currentStep.namePl}. Cel wody: ${snapshot.targetWaterGrams} gramów, pozostało ${snapshot.stepRemainingSeconds} sekund.`}
+          >
             <View style={styles.stepHeaderRow}>
               <Text style={styles.stepBadge}>
                 Krok {snapshot.currentStepIndex + 1} z {snapshot.totalSteps}
@@ -443,7 +453,13 @@ export default function BrewScreen() {
       {/* Przyciski kontroli parzenia */}
       <View style={styles.controlsRow}>
         {isIdle && (
-          <Pressable style={styles.mainStartButton} onPress={startTimer}>
+          <Pressable
+            style={styles.mainStartButton}
+            onPress={startTimer}
+            accessibilityRole="button"
+            accessibilityLabel="Rozpocznij parzenie"
+            accessibilityHint="Uruchamia stoper i pierwszy etap parzenia"
+          >
             <Text style={styles.mainStartButtonText}>ROZPOCZNIJ PARZENIE</Text>
           </Pressable>
         )}
@@ -454,15 +470,30 @@ export default function BrewScreen() {
               style={styles.secondaryButton}
               onPress={previousStep}
               disabled={snapshot.currentStepIndex === 0}
+              accessibilityRole="button"
+              accessibilityLabel="Poprzedni krok"
+              accessibilityHint="Cofa do poprzedniego etapu parzenia"
             >
               <Text style={styles.secondaryButtonText}>◀ Wstecz</Text>
             </Pressable>
 
-            <Pressable style={styles.pauseButton} onPress={pauseTimer}>
+            <Pressable
+              style={styles.pauseButton}
+              onPress={pauseTimer}
+              accessibilityRole="button"
+              accessibilityLabel="Wstrzymaj parzenie"
+              accessibilityHint="Zatrzymuje odliczanie czasu"
+            >
               <Text style={styles.pauseButtonText}>PAUZA</Text>
             </Pressable>
 
-            <Pressable style={styles.secondaryButton} onPress={nextStep}>
+            <Pressable
+              style={styles.secondaryButton}
+              onPress={nextStep}
+              accessibilityRole="button"
+              accessibilityLabel={snapshot.isLastStep ? 'Zakończ parzenie' : 'Następny krok'}
+              accessibilityHint={snapshot.isLastStep ? 'Kończy parzenie i otwiera arkusz oceny' : 'Przechodzi do kolejnego etapu zalewania'}
+            >
               <Text style={styles.secondaryButtonText}>
                 {snapshot.isLastStep ? 'Zakończ ▶' : 'Dalej ▶'}
               </Text>
@@ -472,17 +503,32 @@ export default function BrewScreen() {
 
         {isPaused && (
           <>
-            <Pressable style={styles.resetButton} onPress={resetTimer}>
+            <Pressable
+              style={styles.resetButton}
+              onPress={resetTimer}
+              accessibilityRole="button"
+              accessibilityLabel="Zresetuj stoper"
+              accessibilityHint="Zeruje czas i wraca do stanu początkowego"
+            >
               <Text style={styles.resetButtonText}>Reset</Text>
             </Pressable>
 
-            <Pressable style={styles.mainStartButton} onPress={resumeTimer}>
+            <Pressable
+              style={styles.mainStartButton}
+              onPress={resumeTimer}
+              accessibilityRole="button"
+              accessibilityLabel="Wznów parzenie"
+              accessibilityHint="Wznawia odliczanie czasu parzenia"
+            >
               <Text style={styles.mainStartButtonText}>WZNÓW</Text>
             </Pressable>
 
             <Pressable
               style={styles.secondaryButton}
               onPress={() => setShowFinishModal(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Zapisz sesję"
+              accessibilityHint="Otwiera arkusz degustacyjny do zapisu notatek"
             >
               <Text style={styles.secondaryButtonText}>Zapisz</Text>
             </Pressable>

@@ -7,6 +7,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useMemo 
 import { MasterRecipe, RecipeStep, MASTER_RECIPES } from './recipes-data';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog, SensoryProfile } from './database-schema';
 import { BrewTimerEngine, TimerSnapshot } from './timer-engine';
+import { announceStep, announceCountdown, announceFinish } from './announce';
 import {
   saveBrewSession,
   logCaffeine,
@@ -15,6 +16,8 @@ import {
   getRecipes,
   getAppSetting,
   setAppSetting,
+  getVoiceAnnounceEnabled,
+  getHapticsEnabled,
 } from './database';
 import {
   calculateExtractionYield,
@@ -143,15 +146,47 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const engineRef = useRef<BrewTimerEngine | null>(null);
 
   useEffect(() => {
-    engineRef.current = new BrewTimerEngine(scaledSteps, {
+    const engine = new BrewTimerEngine(scaledSteps, {
       onTick: (snap) => setSnapshot(snap),
+      onStepChange: (stepIndex, step) => {
+        if (getVoiceAnnounceEnabled()) {
+          const lang = (getAppSetting('app_language', 'pl') as 'pl' | 'en') || 'pl';
+          const stepName = lang === 'en' ? (step.nameEn || step.namePl) : step.namePl;
+          const stepInstr = lang === 'en' ? (step.instructionEn || step.instructionPl) : step.instructionPl;
+          announceStep(
+            stepIndex + 1,
+            scaledSteps.length,
+            stepName,
+            step.targetWaterGrams,
+            step.durationSeconds,
+            stepInstr,
+            lang
+          );
+        }
+      },
+      onWarning: (remaining) => {
+        if (getVoiceAnnounceEnabled()) {
+          const lang = (getAppSetting('app_language', 'pl') as 'pl' | 'en') || 'pl';
+          announceCountdown(remaining, lang);
+        }
+      },
+      onFinish: () => {
+        if (getVoiceAnnounceEnabled()) {
+          const lang = (getAppSetting('app_language', 'pl') as 'pl' | 'en') || 'pl';
+          const totalSecs = engineRef.current?.getSnapshot().totalElapsedSeconds || 0;
+          announceFinish(recipe.name, totalSecs, lang);
+        }
+      },
     });
-    setSnapshot(engineRef.current.getSnapshot());
+
+    engine.setHapticsEnabled(getHapticsEnabled());
+    engineRef.current = engine;
+    setSnapshot(engine.getSnapshot());
 
     return () => {
-      engineRef.current?.destroy();
+      engine.destroy();
     };
-  }, [scaledSteps]);
+  }, [scaledSteps, recipe]);
 
   const selectRecipe = (newRecipe: SavedRecipe | MasterRecipe) => {
     setRecipe(newRecipe);
@@ -171,9 +206,15 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setWaterGrams(Number((d * ratio).toFixed(1)));
   };
 
-  const startTimer = () => engineRef.current?.start();
+  const startTimer = () => {
+    engineRef.current?.setHapticsEnabled(getHapticsEnabled());
+    engineRef.current?.start();
+  };
   const pauseTimer = () => engineRef.current?.pause();
-  const resumeTimer = () => engineRef.current?.resume();
+  const resumeTimer = () => {
+    engineRef.current?.setHapticsEnabled(getHapticsEnabled());
+    engineRef.current?.resume();
+  };
   const resetTimer = () => engineRef.current?.reset();
   const nextStep = () => engineRef.current?.nextStep();
   const previousStep = () => engineRef.current?.previousStep();

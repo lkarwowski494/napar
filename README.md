@@ -23,6 +23,7 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Wskaźnik tempa nalewania (g/s) i dynamiczny pasek postępu wody dla każdego etapu.
    - Płynne skalowanie gramatur przy zmianie dozy z zachowaniem właściwych proporcji (Batch Scaling 1–4 osób z korektą grubości przemiału).
    - **⚙️ Młynek Domowy (Grinder Dial-in):** Precyzyjny selektor młynka specialty (Comandante C40 MK3/MK4, Timemore Chestnut C2/C3, 1Zpresso K-Ultra/K-Max, Fellow Ode Gen 2, Baratza Encore, Kingrinder K6) z automatycznym przeliczaniem mikronów ($\mu\text{m}$) na kliki/nastawę tarczy dla wybranej metody i trwałym zapamiętywaniem w SQLite.
+   - **📢 Dostępność VoiceOver & Haptyka (BR-DOST-001, DEC-13):** Automatyczne mówione anonsowanie zmian etapów (`AccessibilityInfo.announceForAccessibility`), wagi docelowej wody, 3-sekundowych ostrzeżeń przed końcem zalania, sygnałów haptycznych (`expo-haptics`) i podsumowania po zakończeniu sesji (stworzone z myślą o osobach niewidomych i słabowidzących, Persona Ewa P4).
    - **📱 Wymiana Receptur Offline (Kody QR SVG & Universal Links — DEC-20):** Błyskawiczne udostępnianie i importowanie receptur w 100% offline (zero konta, zero chmury, zero telemetry). Wektorowy generator kodów QR SVG, protokół deep link `napar://recipe?v=1&d=...` oraz `https://napar.app/recipe?v=1&d=...`, natywne udostępnianie systemowe (`Share.share`) oraz modal importu z podglądem kroków.
    - Karta degustacyjna po zakończeniu: ocena w gwiazdkach, profil balansu smaku, nuty smakowe, wybór profilu użytej wody, odczyt refractometru TDS.
 2. **🫘 Spiżarnia Ziaren & Liści (Stash) & Kompendium Wiedzy:**
@@ -60,6 +61,7 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - **Bedtime Sleep Curfew:** Prognoza stężenia kofeiny o wybranej godzinie snu (próg bezpieczny dla fazy głębokiej NREM $\le 25\,\text{mg}$) oraz wyznaczenie godziny ostatniej dopuszczalnej filiżanki.
 7. **⚙️ Ustawienia, Kopia Zapasowa i Jednostki:**
    - **⚖️ Globalny Przełącznik Jednostek (Metric / Imperial — DEC-21 & BR-JEDN-001):** Płynne przełączanie między systemem metrycznym (°C, g, ml) i imperialnym (°F, oz, fl oz) z zachowaniem wewnętrznej precyzji obliczeniowej i trwałą persystencją w SQLite.
+   - **📢 Dostępność i Sygnały (VoiceOver & Haptyka — BR-DOST-001, DEC-13):** Konfiguracja komunikatów głosowych czytnika ekranu oraz sygnałów wibracyjnych z natychmiastowym zapisem w SQLite.
    - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite.
    - Eksport i import bazy w formacie JSON.
    - Model uczciwej monetyzacji (Darmowy rdzeń + Pro: 3,99 zł/mies., 19,99 zł/rok z 14-dniowym okresem próbnym, 59,99 zł Lifetime + Chmura rodzinna).
@@ -148,11 +150,12 @@ napar/
 │       ├── grinder-converter.ts# Baza modeli młynków i konwersja mikronów
 │       ├── recipe-share.ts     # Kodowanie receptur QR SVG i Deep Links
 │       ├── unit-converter.ts   # Dwukierunkowa konwersja jednostek Metric/Imperial
+│       ├── announce.ts         # Asystujące komunikaty głosowe VoiceOver i dostępność
 │       ├── i18n.tsx            # Pełne wsparcie dwujęzyczne PL/EN
 │       ├── timer-engine.ts     # Maszyna stanów stopera i haptyka
 │       ├── brew-context.tsx    # Główny React Context aktywnej sesji
 │       ├── theme.ts            # Tokeny stylistyczne (Apps4Brew artisanal)
-│       └── __tests__/          # 30 zestawów testowych (259 testów, mutacje i PBT)
+│       └── __tests__/          # 30 zestawów testowych (269 testów, mutacje i PBT)
 └── napar_brd/                  # Pełna dokumentacja wymagań biznesowych BRD 0.1
 ```
 

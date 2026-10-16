@@ -33,12 +33,13 @@
   3. Obsługa Chmury rodzinnej (Family Sharing) włączona dla wszystkich produktów.
 * **Priorytet:** MUST | **Etap:** MVP
 
-### **BR-DOST-001: Pełna dostępność VoiceOver i Dynamic Type**
-* **Opis:** Interfejs jest w 100% użyteczny dla osób niewidomych i słabowidzących.
+### **BR-DOST-001: Pełna dostępność VoiceOver, anonsowanie faz i haptyka (DEC-13)**
+* **Opis:** Interfejs jest w 100% użyteczny dla osób niewidomych i słabowidzących (Persona Ewa P4).
 * **Kryteria akceptacji:**
-  1. Każdy przycisk, pole edycyjne i faza timera posiada precyzyjne `accessibilityLabel` i `accessibilityHint`.
-  2. Timer w trybie VoiceOver anonsuje zmiany fazy głosem syntetycznym.
-  3. Skalowanie czcionek do największych rozmiarów Dynamic Type bez ucinania tekstu.
+  1. Każdy przycisk, pole edycyjne i faza timera posiada precyzyjne `accessibilityRole`, `accessibilityLabel` i `accessibilityHint`.
+  2. Timer parzenia w trybie VoiceOver anonsuje zmiany fazy głosem syntetycznym (`AccessibilityInfo.announceForAccessibility`), w tym cel wody, czas kroku, 3-sekundowe odliczanie ostrzegawcze i podsumowanie po zakończeniu.
+  3. Dedykowane przełączniki anonsowania głosowego oraz wyrazistej haptyki (`expo-haptics`) w Ustawieniach z persystencją w SQLite.
+  4. Skalowanie czcionek do największych rozmiarów Dynamic Type bez ucinania tekstu.
 * **Priorytet:** MUST | **Etap:** MVP
 
 ### **BR-JEDN-001: Globalny przełącznik jednostek miar (Metric / Imperial — DEC-21)**

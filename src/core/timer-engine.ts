@@ -28,6 +28,7 @@ export interface TimerSnapshot {
 export interface TimerCallbacks {
   onTick?: (snapshot: TimerSnapshot) => void;
   onStepChange?: (stepIndex: number, step: RecipeStep) => void;
+  onWarning?: (secondsRemaining: number) => void;
   onFinish?: () => void;
 }
 
@@ -187,6 +188,9 @@ export class BrewTimerEngine {
     // Odliczanie ostatnich 3 sekund etapu
     if (remaining > 0 && remaining <= 3) {
       this.triggerHaptic('warning');
+      if (this.callbacks.onWarning) {
+        this.callbacks.onWarning(remaining);
+      }
     }
 
     if (this.stepElapsedSeconds >= currentStep.durationSeconds) {

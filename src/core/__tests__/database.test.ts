@@ -30,6 +30,10 @@ import {
   setAppSetting,
   getUnitSystem,
   setUnitSystem,
+  getVoiceAnnounceEnabled,
+  setVoiceAnnounceEnabled,
+  getHapticsEnabled,
+  setHapticsEnabled,
 } from '../database';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../database-schema';
 
@@ -596,5 +600,25 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(getUnitSystem()).toBe('imperial');
     setUnitSystem('metric');
     expect(getUnitSystem()).toBe('metric');
+  });
+
+  test('Pobiera i zapisuje ustawienia dostępności i haptyki (getVoiceAnnounceEnabled, getHapticsEnabled)', () => {
+    // Domyślnie włączone
+    expect(getVoiceAnnounceEnabled()).toBe(true);
+    expect(getHapticsEnabled()).toBe(true);
+
+    // Wyłączenie
+    setVoiceAnnounceEnabled(false);
+    expect(getVoiceAnnounceEnabled()).toBe(false);
+
+    setHapticsEnabled(false);
+    expect(getHapticsEnabled()).toBe(false);
+
+    // Ponowne włączenie
+    setVoiceAnnounceEnabled(true);
+    expect(getVoiceAnnounceEnabled()).toBe(true);
+
+    setHapticsEnabled(true);
+    expect(getHapticsEnabled()).toBe(true);
   });
 });
