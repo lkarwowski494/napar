@@ -1,9 +1,13 @@
-// ============================================================================
-// Napar (Steepwise) — Unit Tests: DialInScreen UI with Water Chemistry
-// ============================================================================
-
 import React from 'react';
 import renderer from 'react-test-renderer';
+
+const mockPush = jest.fn();
+jest.mock('expo-router', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
+
 import DialInScreen from '../../../app/(tabs)/dialin';
 
 describe('DialInScreen UI with Water Chemistry', () => {
@@ -498,6 +502,48 @@ describe('DialInScreen UI with Water Chemistry', () => {
 
     str = JSON.stringify(tree.toJSON());
     expect(str).toContain('WODA DO ZALANIA');
+  });
+
+  test('Brak kalkulatora kosztu PLN oraz obecność skrótu do kalkulatora kofeiny z poprawną nawigacją', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<DialInScreen />);
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    // Weryfikacja usunięcia kalkulatora kosztu PLN (decyzja użytkownika)
+    expect(str).not.toContain('Kalkulator Kosztu');
+    expect(str).not.toContain('Ekonomia Rzemiosła');
+
+    // Weryfikacja kafelka kofeiny
+    const caffeineCard = tree.root.findByProps({ testID: 'open-caffeine-from-workshop' });
+    expect(caffeineCard).toBeTruthy();
+
+    renderer.act(() => {
+      caffeineCard.props.onPress();
+    });
+
+    expect(mockPush).toHaveBeenCalledWith('/caffeine');
+  });
+
+  test('Tabela młynków w Ratio zawiera skalę uniwersalną µm oraz popularne młynki (Wilfa, Kinu, Eureka)', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<DialInScreen />);
+    });
+
+    // Przełącz na zakładkę Ratio
+    const ratioTab = findPressableWithText(tree.root, 'Ratio & Uzysk');
+    expect(ratioTab).toBeTruthy();
+    renderer.act(() => {
+      ratioTab.props.onPress();
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Inny młynek (Skala uniwersalna µm)');
+    expect(str).toContain('Wilfa Svart Aroma / Classic');
+    expect(str).toContain('Kinu M47');
+    expect(str).toContain('Eureka Mignon');
   });
 });
 

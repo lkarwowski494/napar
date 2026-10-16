@@ -367,4 +367,53 @@ describe('Modal Safety & Beverage Toggle Tests', () => {
       closeBtns[0].props.onPress();
     });
   });
+
+  test('Kreator nowych procedur: przycisk "+ Nowa receptura" (add-custom-recipe-btn) w modalu nawiguje do /recipe-builder', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const root = tree.root;
+    const changeRecipeBtn = root.findByProps({ testID: 'change-recipe-btn' });
+    act(() => {
+      changeRecipeBtn.props.onPress();
+    });
+
+    const addRecipeBtn = root.findByProps({ testID: 'add-custom-recipe-btn' });
+    expect(addRecipeBtn).toBeTruthy();
+
+    act(() => {
+      addRecipeBtn.props.onPress();
+    });
+
+    expect(mockPush).toHaveBeenCalledWith('/recipe-builder');
+  });
+
+  test('Modal wyboru młynka zawiera opcję "Inny młynek (Skala uniwersalna µm)" dla niewymienionych modeli', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const root = tree.root;
+    const grinderBtn = root.findByProps({ testID: 'grinder-pill-btn' });
+    act(() => {
+      grinderBtn.props.onPress();
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Inny młynek (Skala uniwersalna µm)');
+    expect(str).toContain('Wilfa Svart');
+    expect(str).toContain('Kinu M47');
+    expect(str).toContain('Eureka Mignon');
+  });
 });

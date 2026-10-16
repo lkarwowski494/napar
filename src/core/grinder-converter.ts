@@ -179,6 +179,80 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
       return num * 16.0;
     },
   },
+  {
+    id: 'wilfa_svart',
+    name: 'Wilfa Svart Aroma / Classic',
+    burrType: 'Stożkowe stalowe (40mm)',
+    stepMicrons: 45.0,
+    minSetting: 1,
+    maxSetting: 20,
+    micronsPerSettingOffset: 250,
+    formatSetting: (clicks: number) => {
+      if (clicks <= 3) return 'Moka / Aeropress (Drobno)';
+      if (clicks <= 8) return `Filter #${Math.round(clicks)} (V60 / Drip)`;
+      if (clicks <= 14) return `Filter #${Math.round(clicks)} (Chemex)`;
+      return `French Press #${Math.round(clicks)}`;
+    },
+    parseSetting: (text: string) => {
+      const num = parseFloat(text.replace(/[^0-9.]/g, '')) || 7;
+      return 250 + num * 45.0;
+    },
+  },
+  {
+    id: 'kinu_m47',
+    name: 'Kinu M47 (Classic/Simplicity/Phoenix)',
+    burrType: 'Black Fusion (47mm stożkowe)',
+    stepMicrons: 10.0,
+    minSetting: 10,
+    maxSetting: 50,
+    micronsPerSettingOffset: 0,
+    formatSetting: (clicks: number) => {
+      const major = Math.floor(clicks / 10);
+      const minor = Math.round(clicks % 10);
+      return `${major}.${minor} obrotu (${clicks} klików)`;
+    },
+    parseSetting: (text: string) => {
+      const num = parseFloat(text) || 3.5;
+      return num < 10 ? num * 10 * 10.0 : num * 10.0;
+    },
+  },
+  {
+    id: 'eureka_mignon',
+    name: 'Eureka Mignon (Filtro / Crono / Specialita)',
+    burrType: 'Płaskie żarna 50mm / 55mm',
+    stepMicrons: 25.0,
+    minSetting: 1,
+    maxSetting: 30,
+    micronsPerSettingOffset: 200,
+    formatSetting: (clicks: number) => `Pozycja #${Math.round(clicks * 10) / 10}`,
+    parseSetting: (text: string) => {
+      const num = parseFloat(text.replace(/[^0-9.]/g, '')) || 5;
+      return 200 + num * 25.0;
+    },
+  },
+  {
+    id: 'generic_grinder',
+    name: 'Inny młynek (Skala uniwersalna µm)',
+    burrType: 'Uniwersalna skala mikronowa',
+    stepMicrons: 10.0,
+    minSetting: 20,
+    maxSetting: 140,
+    micronsPerSettingOffset: 0,
+    formatSetting: (clicks: number) => {
+      const microns = clicks * 10.0;
+      let desc = 'Średnio';
+      if (microns < 450) desc = 'Bardzo drobno (Espresso)';
+      else if (microns < 610) desc = 'Drobno (AeroPress)';
+      else if (microns < 810) desc = 'Średnio (V60 / Drip)';
+      else if (microns < 1010) desc = 'Średnio-grubo (Chemex)';
+      else desc = 'Grubo (French Press / Cold Brew)';
+      return `${Math.round(microns)} µm · ${desc}`;
+    },
+    parseSetting: (text: string) => {
+      const num = parseFloat(text.replace(/[^0-9.]/g, '')) || 720;
+      return num;
+    },
+  },
 ];
 
 /**

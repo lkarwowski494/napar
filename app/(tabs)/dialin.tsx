@@ -12,6 +12,7 @@ import {
   Pressable,
   TextInput,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import {
   diagnoseExtractionTaste,
   calculateBrewWater,
@@ -31,41 +32,20 @@ import {
   GRIND_CATEGORIES,
   convertMicronsToGrinder,
 } from '../../src/core/grinder-converter';
-import { calculateBrewCost } from '../../src/core/cost-calculator';
+import { CaffeineIcon } from '../../src/components/icons/CraftIcons';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
 import { getUnitSystem } from '../../src/core/database';
 import { formatDoseWeight, formatWaterWeight } from '../../src/core/unit-converter';
 
 export default function DialInScreen() {
+  const router = useRouter();
   const { t, language } = useTranslation();
   const unitSystem = getUnitSystem();
-  const [activeTab, setActiveTab] = useState<'doctor' | 'ratio' | 'ey' | 'water' | 'cost'>('doctor');
+  const [activeTab, setActiveTab] = useState<'doctor' | 'ratio' | 'ey' | 'water'>('doctor');
 
   // Stan: Dial-in Doctor
   const [selectedIssue, setSelectedIssue] = useState<string>('sour');
-
-  // Stan: Kalkulator Kosztu Filiżanki (Craft Economics)
-  const [costDoseInput, setCostDoseInput] = useState<string>('15');
-  const [costBeanPriceInput, setCostBeanPriceInput] = useState<string>('260');
-  const [costWaterVolInput, setCostWaterVolInput] = useState<string>('250');
-  const [costFilterPriceInput, setCostFilterPriceInput] = useState<string>('0.25');
-  const [costCafePriceInput, setCostCafePriceInput] = useState<string>('18.0');
-
-  const brewCostMetrics = React.useMemo(() => {
-    const dose = parseFloat(costDoseInput) || 15;
-    const beanPrice = parseFloat(costBeanPriceInput) || 260;
-    const waterGrams = parseFloat(costWaterVolInput) || 250;
-    const filter = parseFloat(costFilterPriceInput) || 0.25;
-    const cafe = parseFloat(costCafePriceInput) || 18.0;
-    return calculateBrewCost({
-      doseGrams: dose,
-      beanPricePerKg: beanPrice,
-      waterWeightGrams: waterGrams,
-      filterPaperCost: filter,
-      cafeReferencePrice: cafe,
-    });
-  }, [costDoseInput, costBeanPriceInput, costWaterVolInput, costFilterPriceInput, costCafePriceInput]);
 
   // Stan: Kalkulator Mineralizacji Wody
   const [selectedWaterRecipeId, setSelectedWaterRecipeId] = useState<string>('barista_hustle_80_40');
@@ -280,23 +260,6 @@ export default function DialInScreen() {
             ]}
           >
             {t.water.tabTitle}
-          </Text>
-        </Pressable>
-
-        <Pressable
-          style={[styles.segmentBtn, activeTab === 'cost' && styles.segmentBtnActive]}
-          onPress={() => setActiveTab('cost')}
-          testID="tab-cost-btn"
-          accessibilityRole="button"
-          accessibilityLabel="Kalkulator kosztu filiżanki"
-        >
-          <Text
-            style={[
-              styles.segmentBtnText,
-              activeTab === 'cost' && styles.segmentBtnTextActive,
-            ]}
-          >
-            {t.dialin.costTabTitle}
           </Text>
         </Pressable>
       </View>
@@ -845,134 +808,29 @@ export default function DialInScreen() {
         </View>
       )}
 
-      {/* 5. KALKULATOR KOSZTU FILIŻANKI (CRAFT ECONOMICS - Zadanie N2) */}
-      {activeTab === 'cost' && (
-        <View style={styles.costTabContainer} testID="cost-calculator-view">
-          <Text style={styles.sectionHeader}>{t.dialin.costTitle}</Text>
-          <Text style={styles.sectionSub}>{t.dialin.costSubtitle}</Text>
-
-          {/* Formularz wejściowy parametrów */}
-          <View style={styles.costFormCard}>
-            <View style={styles.costInputGroup}>
-              <Text style={styles.costInputLabel}>{t.dialin.costBeanPriceLabel}</Text>
-              <TextInput
-                testID="cost-bean-price-input"
-                style={styles.costTextInput}
-                value={costBeanPriceInput}
-                onChangeText={setCostBeanPriceInput}
-                keyboardType="numeric"
-                placeholder="260"
-                placeholderTextColor={theme.colors.textMuted}
-              />
-            </View>
-
-            <View style={styles.costInputRow}>
-              <View style={[styles.costInputGroup, { flex: 1, marginRight: 8 }]}>
-                <Text style={styles.costInputLabel}>{t.dialin.costDoseLabel}</Text>
-                <TextInput
-                  testID="cost-dose-input"
-                  style={styles.costTextInput}
-                  value={costDoseInput}
-                  onChangeText={setCostDoseInput}
-                  keyboardType="numeric"
-                  placeholder="15"
-                  placeholderTextColor={theme.colors.textMuted}
-                />
-              </View>
-
-              <View style={[styles.costInputGroup, { flex: 1, marginLeft: 8 }]}>
-                <Text style={styles.costInputLabel}>{t.dialin.costWaterVolLabel}</Text>
-                <TextInput
-                  testID="cost-water-input"
-                  style={styles.costTextInput}
-                  value={costWaterVolInput}
-                  onChangeText={setCostWaterVolInput}
-                  keyboardType="numeric"
-                  placeholder="250"
-                  placeholderTextColor={theme.colors.textMuted}
-                />
-              </View>
-            </View>
-
-            <View style={styles.costInputRow}>
-              <View style={[styles.costInputGroup, { flex: 1, marginRight: 8 }]}>
-                <Text style={styles.costInputLabel}>{t.dialin.costFilterLabel}</Text>
-                <TextInput
-                  testID="cost-filter-input"
-                  style={styles.costTextInput}
-                  value={costFilterPriceInput}
-                  onChangeText={setCostFilterPriceInput}
-                  keyboardType="numeric"
-                  placeholder="0.25"
-                  placeholderTextColor={theme.colors.textMuted}
-                />
-              </View>
-
-              <View style={[styles.costInputGroup, { flex: 1, marginLeft: 8 }]}>
-                <Text style={styles.costInputLabel}>{t.dialin.costCafePriceLabel}</Text>
-                <TextInput
-                  testID="cost-cafe-price-input"
-                  style={styles.costTextInput}
-                  value={costCafePriceInput}
-                  onChangeText={setCostCafePriceInput}
-                  keyboardType="numeric"
-                  placeholder="18.0"
-                  placeholderTextColor={theme.colors.textMuted}
-                />
-              </View>
-            </View>
-          </View>
-
-          {/* Podsumowanie rozbicia kosztów */}
-          <View style={styles.costBreakdownCard}>
-            <Text style={styles.costBreakdownTitle}>{t.dialin.costBreakdownTitle}</Text>
-
-            <View style={styles.costRow}>
-              <Text style={styles.costRowLabel}>
-                {t.dialin.costCoffeeBeans} ({formatDoseWeight(parseFloat(costDoseInput) || 0, unitSystem)})
-              </Text>
-              <Text style={styles.costRowVal}>{brewCostMetrics.coffeeCost.toFixed(2)} zł</Text>
-            </View>
-
-            <View style={styles.costRow}>
-              <Text style={styles.costRowLabel}>
-                {t.dialin.costWaterSalts} ({formatWaterWeight(parseFloat(costWaterVolInput) || 0, unitSystem)})
-              </Text>
-              <Text style={styles.costRowVal}>{brewCostMetrics.waterCost.toFixed(2)} zł</Text>
-            </View>
-
-            <View style={styles.costRow}>
-              <Text style={styles.costRowLabel}>{t.dialin.costElectricity}</Text>
-              <Text style={styles.costRowVal}>{brewCostMetrics.energyCost.toFixed(2)} zł</Text>
-            </View>
-
-            <View style={styles.costRow}>
-              <Text style={styles.costRowLabel}>{t.dialin.costPaperFilter}</Text>
-              <Text style={styles.costRowVal}>{brewCostMetrics.filterCost.toFixed(2)} zł</Text>
-            </View>
-
-            <View style={styles.costSummaryRow}>
-              <View style={styles.costSummaryCol}>
-                <Text style={styles.costSummaryHeader}>{t.dialin.costTotalHome}</Text>
-                <Text style={styles.costSummaryBig}>{brewCostMetrics.totalHomeCost.toFixed(2)} zł</Text>
-              </View>
-
-              <View style={styles.costSummaryCol}>
-                <Text style={styles.costSummaryHeader}>{t.dialin.costCafeBenchmark}</Text>
-                <Text style={styles.costSummaryBig}>{brewCostMetrics.cafePrice.toFixed(2)} zł</Text>
-              </View>
-
-              <View style={styles.costSummaryCol}>
-                <Text style={styles.costSummaryHeader}>{t.dialin.costSavingsCup}</Text>
-                <Text style={[styles.costSummaryBig, { color: theme.colors.sage }]}>
-                  +{brewCostMetrics.savingsPerCup.toFixed(2)} zł
-                </Text>
-                <Text style={styles.costPercentBadge}>-{brewCostMetrics.savingsPercent}%</Text>
-              </View>
-            </View>
-          </View>
+      {/* Skrót do Kalkulatora Kofeiny (zintegrowany w Warsztacie po uproszczeniu dolnego paska nawigacji) */}
+      <Pressable
+        testID="open-caffeine-from-workshop"
+        style={styles.caffeineWorkshopCard}
+        onPress={() => router.push('/caffeine')}
+        accessibilityRole="button"
+        accessibilityLabel={t.caffeine?.title || 'Kalkulator Kofeiny'}
+      >
+        <View style={styles.caffeineWorkshopIconBox}>
+          <CaffeineIcon size={24} color={theme.colors.copper} />
         </View>
-      )}
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Text style={styles.caffeineWorkshopTitle}>
+            {t.caffeine?.title || 'Kalkulator Kofeiny i Wchłaniania'}
+          </Text>
+          <Text style={styles.caffeineWorkshopSubtitle}>
+            {language === 'pl'
+              ? 'Sprawdź dawkę kofeiny, czas półtrwania i optymalne okno snu.'
+              : 'Calculate caffeine intake, half-life metabolic decay, and sleep window.'}
+          </Text>
+        </View>
+        <Text style={styles.caffeineWorkshopArrow}>→</Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -1619,100 +1477,42 @@ const styles = StyleSheet.create({
     color: theme.colors.copper,
     fontVariant: ['tabular-nums'],
   },
-  costTabContainer: {
-    marginTop: 8,
-  },
-  costFormCard: {
-    backgroundColor: theme.colors.bgCard,
-    borderRadius: theme.borderRadius.md,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginBottom: 16,
-  },
-  costInputGroup: {
-    marginBottom: 12,
-  },
-  costInputLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-    marginBottom: 6,
-  },
-  costTextInput: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: theme.borderRadius.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-    color: theme.colors.textPrimary,
-    minHeight: 44,
-  },
-  costInputRow: {
+  caffeineWorkshopCard: {
     flexDirection: 'row',
-  },
-  costBreakdownCard: {
-    backgroundColor: theme.colors.bgCard,
-    borderRadius: theme.borderRadius.md,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  costBreakdownTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    marginBottom: 12,
-  },
-  costRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.borderLight,
-  },
-  costRowLabel: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-  },
-  costRowVal: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: theme.colors.textPrimary,
-    fontVariant: ['tabular-nums'],
-  },
-  costSummaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-  },
-  costSummaryCol: {
-    flex: 1,
     alignItems: 'center',
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    padding: 16,
+    marginTop: 20,
+    marginBottom: 24,
   },
-  costSummaryHeader: {
-    fontSize: 10,
+  caffeineWorkshopIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  caffeineWorkshopTitle: {
+    fontSize: 15,
     fontWeight: '700',
-    color: theme.colors.textMuted,
-    textTransform: 'uppercase',
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  costSummaryBig: {
-    fontSize: 16,
-    fontWeight: '800',
     color: theme.colors.textPrimary,
-    fontVariant: ['tabular-nums'],
   },
-  costPercentBadge: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: theme.colors.sage,
+  caffeineWorkshopSubtitle: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
     marginTop: 2,
+    lineHeight: 16,
+  },
+  caffeineWorkshopArrow: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    marginLeft: 8,
   },
 });

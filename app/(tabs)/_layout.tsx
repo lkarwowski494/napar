@@ -123,6 +123,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="caffeine"
         options={{
+          href: null,
           title: 'Kofeina',
           headerTitle: 'Monitor Kofeiny',
           tabBarIcon: ({ focused }) => (

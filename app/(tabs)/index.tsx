@@ -476,12 +476,6 @@ export default function BrewScreen() {
           onSelectWaterProfile={setWaterProfile}
           tdsInput={tdsInput}
           onChangeTds={setTdsInput}
-          sensoryProfile={sensoryProfile}
-          onChangeSensory={setSensoryProfile}
-          selectedTags={selectedTags}
-          onToggleTag={toggleTag}
-          costTotalPln={brewCost.totalHomeCost}
-          costSavingsPln={brewCost.savingsPerCup}
         />
       )}
 
@@ -567,6 +561,7 @@ export default function BrewScreen() {
 
             <View style={styles.modalActionButtonsRow}>
               <Pressable
+                testID="add-custom-recipe-btn"
                 style={styles.addCustomRecipeBtn}
                 onPress={() => {
                   if (!canCreate) {

@@ -1,6 +1,6 @@
 // ============================================================================
 // Napar (Steepwise) — BrewProAccordion Component (Progressive Disclosure)
-// Hides Barista Hustle water chemistry, TDS & SCA sensory behind a clean fold.
+// Hides Barista Hustle water chemistry and TDS behind a clean fold.
 // Apps4Brew Studio — 100% Offline-First.
 // ============================================================================
 
@@ -8,8 +8,6 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
 import { theme } from '../../core/theme';
 import { WATER_RECIPES } from '../../core/water-chemistry';
-import { SensoryProfile, SensoryRadarChart, SensoryScoreEditor } from '../../core/radar-chart';
-import { FlavorWheelPicker } from '../../core/flavor-wheel-picker';
 import { LabIcon } from '../icons/CraftIcons';
 
 interface BrewProAccordionProps {
@@ -17,12 +15,6 @@ interface BrewProAccordionProps {
   onSelectWaterProfile: (id: string) => void;
   tdsInput: string;
   onChangeTds: (val: string) => void;
-  sensoryProfile: SensoryProfile;
-  onChangeSensory: (profile: SensoryProfile) => void;
-  selectedTags: string[];
-  onToggleTag: (tag: string) => void;
-  costTotalPln: number;
-  costSavingsPln: number;
 }
 
 export function BrewProAccordion({
@@ -30,12 +22,6 @@ export function BrewProAccordion({
   onSelectWaterProfile,
   tdsInput,
   onChangeTds,
-  sensoryProfile,
-  onChangeSensory,
-  selectedTags,
-  onToggleTag,
-  costTotalPln,
-  costSavingsPln,
 }: BrewProAccordionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -46,25 +32,17 @@ export function BrewProAccordion({
         style={styles.header}
         onPress={() => setIsExpanded(!isExpanded)}
         accessibilityRole="button"
-        accessibilityLabel="Rozwiń parametry rzemieślnicze i chemię wody"
+        accessibilityLabel="Rozwiń parametry wody i mineralizację"
       >
         <View style={styles.headerTitleRow}>
           <LabIcon size={18} color={theme.colors.copper} />
-          <Text style={styles.headerTitle}>Parametry Rzemieślnicze & Chemia Wody</Text>
+          <Text style={styles.headerTitle}>Zaawansowane: Woda & TDS</Text>
         </View>
         <Text style={styles.headerArrow}>{isExpanded ? '▴' : '▾'}</Text>
       </Pressable>
 
       {isExpanded && (
         <View style={styles.body} testID="pro-accordion-body">
-          {/* Ekonomia w pigułce */}
-          <View style={styles.costBox}>
-            <Text style={styles.costTitle}>💰 Ekonomia Naparu:</Text>
-            <Text style={styles.costValue}>
-              Koszt domowy: <Text style={styles.costHighlight}>{`${costTotalPln.toFixed(2)} zł`}</Text> · Oszczędność vs kawiarnia: <Text style={styles.costHighlight}>{`+${costSavingsPln.toFixed(2)} zł`}</Text>
-            </Text>
-          </View>
-
           {/* Chemia wody Barista Hustle / SCA */}
           <Text style={styles.sectionLabel}>Profil Wody (Barista Hustle / SCA)</Text>
           <View style={styles.chipsRow}>
@@ -100,18 +78,6 @@ export function BrewProAccordion({
               onChangeText={onChangeTds}
             />
           </View>
-
-          {/* Radar Sensoryczny SCA (Spider Graph) */}
-          <Text style={[styles.sectionLabel, { marginTop: 14 }]}>Wykres Sensoryki SCA (Radar)</Text>
-          <SensoryRadarChart profile={sensoryProfile} size={180} />
-          <SensoryScoreEditor profile={sensoryProfile} onChange={onChangeSensory} />
-
-          {/* Hierarchiczne Koło Smaków SCA */}
-          <Text style={[styles.sectionLabel, { marginTop: 14 }]}>Koło Smaków SCA</Text>
-          <FlavorWheelPicker
-            selectedDescriptors={selectedTags}
-            onToggleDescriptor={onToggleTag}
-          />
         </View>
       )}
     </View>
@@ -139,9 +105,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  headerIcon: {
-    fontSize: 16,
-  },
   headerTitle: {
     fontSize: 13,
     fontWeight: '700',
@@ -157,28 +120,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
-  },
-  costBox: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: theme.borderRadius.sm,
-    padding: 10,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  costTitle: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: theme.colors.copper,
-    marginBottom: 2,
-  },
-  costValue: {
-    fontSize: 12,
-    color: theme.colors.textPrimary,
-  },
-  costHighlight: {
-    color: theme.colors.statusPeak,
-    fontWeight: '700',
   },
   sectionLabel: {
     fontSize: 11,

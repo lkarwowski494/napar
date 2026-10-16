@@ -50,12 +50,21 @@ describe('TabLayout', () => {
       }
     }
 
-    // Weryfikacja obecności 5 ekranów
+    // Weryfikacja obecności 5 zarejestrowanych ekranów (w tym ukryta kofeina z href: null)
     const screens = root.findAllByType('Screen' as any);
     expect(screens.length).toBe(5);
 
     const screenNames = screens.map((s) => s.props.name);
     expect(screenNames).toEqual(['index', 'beans', 'journal', 'dialin', 'caffeine']);
+
+    // Kofeina ukryta z dolnego paska nawigacji (dostępna przez Warsztat)
+    const caffeineScreen = screens.find((s) => s.props.name === 'caffeine');
+    expect(caffeineScreen?.props.options?.href).toBeNull();
+
+    // Dokładnie 4 widoczne zakładki na dolnym pasku
+    const visibleScreens = screens.filter((s) => s.props.options?.href !== null);
+    expect(visibleScreens.length).toBe(4);
+    expect(visibleScreens.map((s) => s.props.name)).toEqual(['index', 'beans', 'journal', 'dialin']);
 
     // Test wywołania komponentu TabIcon dla każdego ekranu (active + inactive)
     screens.forEach((s) => {

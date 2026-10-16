@@ -13,22 +13,16 @@ describe('BrewProAccordion Component', () => {
     onSelectWaterProfile: jest.fn(),
     tdsInput: '1.35',
     onChangeTds: jest.fn(),
-    sensoryProfile: DEFAULT_SENSORY_PROFILE,
-    onChangeSensory: jest.fn(),
-    selectedTags: ['jaśmin', 'brzoskwinia'],
-    onToggleTag: jest.fn(),
-    costTotalPln: 3.4,
-    costSavingsPln: 14.6,
   };
 
-  test('Domyślnie jest zwinięty, a po kliknięciu rozwija chemię wody, TDS i sensorykę', () => {
+  test('Domyślnie jest zwinięty, a po kliknięciu rozwija chemię wody i TDS (bez rozpraszaczy)', () => {
     let tree: any;
     act(() => {
       tree = renderer.create(<BrewProAccordion {...defaultProps} />);
     });
 
     let str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('Parametry Rzemieślnicze & Chemia Wody');
+    expect(str).toContain('Zaawansowane: Woda & TDS');
     // Ciało akordeonu nie jest widoczne przed kliknięciem
     expect(tree.root.findAllByProps({ testID: 'pro-accordion-body' }).length).toBe(0);
 
@@ -40,11 +34,11 @@ describe('BrewProAccordion Component', () => {
 
     str = JSON.stringify(tree.toJSON());
     expect(tree.root.findByProps({ testID: 'pro-accordion-body' })).toBeTruthy();
-    expect(str).toContain('Ekonomia Naparu');
-    expect(str).toContain('3.40 zł');
-    expect(str).toContain('+14.60 zł');
     expect(str).toContain('Profil Wody (Barista Hustle / SCA)');
-    expect(str).toContain('Wykres Sensoryki SCA (Radar)');
+    expect(str).toContain('Odczyt refractometru TDS (%)');
+    // Upewnij się, że kalkulator kosztu PLN i radar sensoryczny zostały skasowane z ekranu parzenia
+    expect(str).not.toContain('Ekonomia Naparu');
+    expect(str).not.toContain('Wykres Sensoryki SCA (Radar)');
   });
 
   test('Zmiana profilu wody i TDS wywołuje odpowiednie akcje', () => {
