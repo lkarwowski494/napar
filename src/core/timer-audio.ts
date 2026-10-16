@@ -5,11 +5,11 @@
 // Apps4Brew Studio — 100% Offline-First.
 // ============================================================================
 
-import { Audio } from 'expo-av';
+import { createAudioPlayer, AudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 import { announce } from './announce';
 
-let soundInstance: Audio.Sound | null = null;
+let soundInstance: AudioPlayer | null = null;
 
 // Gentle short acoustic chime tone encoded as valid RIFF WAV with PCM samples (880Hz kitchen chime)
 export const CHIME_AUDIO_DATA_URI =
@@ -22,18 +22,16 @@ export async function playTimerChime(): Promise<boolean> {
   try {
     if (soundInstance) {
       try {
-        await soundInstance.unloadAsync();
+        soundInstance.remove();
       } catch {
         // Ignoruj błąd rozładowania
       }
       soundInstance = null;
     }
 
-    const { sound } = await Audio.Sound.createAsync(
-      { uri: CHIME_AUDIO_DATA_URI },
-      { shouldPlay: true, volume: 1.0 }
-    );
-    soundInstance = sound;
+    const player = createAudioPlayer(CHIME_AUDIO_DATA_URI);
+    player.play();
+    soundInstance = player;
     return true;
   } catch {
     return false;

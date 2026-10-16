@@ -2,7 +2,7 @@
 // Napar (Steepwise) — Unit Tests: Timer Audio & Chime
 // ============================================================================
 
-import { Audio } from 'expo-av';
+import { createAudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 import * as announceModule from '../announce';
 import {
@@ -12,18 +12,15 @@ import {
   CHIME_AUDIO_DATA_URI,
 } from '../timer-audio';
 
-jest.mock('expo-av', () => {
-  const mockSound = {
-    unloadAsync: jest.fn().mockResolvedValue(undefined),
-  };
-  return {
-    Audio: {
-      Sound: {
-        createAsync: jest.fn().mockResolvedValue({ sound: mockSound }),
-      },
-    },
-  };
-});
+const mockPlay = jest.fn();
+const mockRemove = jest.fn();
+
+jest.mock('expo-audio', () => ({
+  createAudioPlayer: jest.fn(() => ({
+    play: mockPlay,
+    remove: mockRemove,
+  })),
+}));
 
 jest.mock('expo-haptics', () => ({
   notificationAsync: jest.fn().mockResolvedValue(undefined),
@@ -45,17 +42,17 @@ describe('Timer Audio & Chime Engine', () => {
     announceSpy.mockRestore();
   });
 
-  test('playTimerChime tworzy instancję dźwięku z właściwym URI', async () => {
+  test('playTimerChime tworzy odtwarzacz audio z właściwym URI i wywołuje play', async () => {
     const success = await playTimerChime();
     expect(success).toBe(true);
-    expect(Audio.Sound.createAsync).toHaveBeenCalledWith(
-      { uri: CHIME_AUDIO_DATA_URI },
-      { shouldPlay: true, volume: 1.0 }
-    );
+    expect(createAudioPlayer).toHaveBeenCalledWith(CHIME_AUDIO_DATA_URI);
+    expect(mockPlay).toHaveBeenCalled();
   });
 
   test('playTimerChime obsługuje błąd odtwarzania i zwraca false', async () => {
-    (Audio.Sound.createAsync as jest.Mock).mockRejectedValueOnce(new Error('Audio device error'));
+    (createAudioPlayer as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('Audio device error');
+    });
     const success = await playTimerChime();
     expect(success).toBe(false);
   });
@@ -65,7 +62,8 @@ describe('Timer Audio & Chime Engine', () => {
     expect(success).toBe(true);
     expect(announceSpy).toHaveBeenCalledWith('Pozostały 3 sekundy do końca zalania');
     expect(Haptics.notificationAsync).toHaveBeenCalledWith(Haptics.NotificationFeedbackType.Warning);
-    expect(Audio.Sound.createAsync).toHaveBeenCalled();
+    expect(createAudioPlayer).toHaveBeenCalled();
+    expect(mockPlay).toHaveBeenCalled();
   });
 
   test('notifyTimerFinished anonsuje sukces, wywołuje haptykę success i odtwarza dźwięk', async () => {
@@ -73,7 +71,8 @@ describe('Timer Audio & Chime Engine', () => {
     expect(success).toBe(true);
     expect(announceSpy).toHaveBeenCalledWith('Krok ukończony: Preinfuzja');
     expect(Haptics.notificationAsync).toHaveBeenCalledWith(Haptics.NotificationFeedbackType.Success);
-    expect(Audio.Sound.createAsync).toHaveBeenCalled();
+    expect(createAudioPlayer).toHaveBeenCalled();
+    expect(mockPlay).toHaveBeenCalled();
   });
 
   test('notifyTimerFinished bez nazwy kroku anonsuje domyślny koniec', async () => {
