@@ -294,4 +294,36 @@ describe('CaffeineScreen Component', () => {
     const cancelBtn = findPressableWithText(tree.root, 'Anuluj');
     // W React Native Modal po visible=false może nie renderować zawartości lub tree nie zawiera modala
   });
+
+  test('D-02 & BR-KOF-003: Regulacja godziny snu i czasu półtrwania kofeiny (t1/2) ze stepperami', () => {
+    const setBedtimeSpy = jest.spyOn(databaseModule, 'setBedtimeHour');
+    const setHalfLifeSpy = jest.spyOn(databaseModule, 'setCaffeineHalfLife');
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<CaffeineScreen />);
+    });
+
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Predykcja Jakości Snu');
+    expect(str).toContain('23:00');
+    expect(str).toContain('Metabolizm kofeiny (t₁/₂)');
+    expect(str).toContain('5.0h');
+
+    const allPlus = tree.root.findAll((n: any) => n.props?.children === '+');
+    renderer.act(() => {
+      for (let i = 0; i < allPlus.length; i++) {
+        let p = allPlus[i];
+        while (p && !p.props?.onPress) {
+          p = p.parent;
+        }
+        if (p?.props?.onPress) {
+          p.props.onPress();
+        }
+      }
+    });
+
+    expect(setBedtimeSpy).toHaveBeenCalledWith(24);
+    expect(setHalfLifeSpy).toHaveBeenCalledWith(5.5);
+  });
 });

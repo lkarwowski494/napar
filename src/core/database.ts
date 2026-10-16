@@ -697,4 +697,31 @@ export function setIsProUser(enabled: boolean): void {
   setAppSetting('is_pro_active', enabled ? 'true' : 'false');
 }
 
+export function getCaffeineHalfLife(): number {
+  const val = parseFloat(getAppSetting('caffeine_half_life_hours', '5.0'));
+  if (isNaN(val) || val < 3.0 || val > 8.0) {
+    return 5.0;
+  }
+  return Number(val.toFixed(1));
+}
+
+export function setCaffeineHalfLife(hours: number): void {
+  const clamped = Math.max(3.0, Math.min(8.0, hours));
+  setAppSetting('caffeine_half_life_hours', clamped.toFixed(1));
+}
+
+export function getBedtimeHour(): number {
+  const val = parseInt(getAppSetting('bedtime_hour', '23'), 10);
+  if (isNaN(val) || val < 18 || val > 28) {
+    return 23;
+  }
+  return val;
+}
+
+export function setBedtimeHour(hour: number): void {
+  const clamped = Math.max(18, Math.min(28, hour));
+  setAppSetting('bedtime_hour', clamped.toString());
+}
+
+
 

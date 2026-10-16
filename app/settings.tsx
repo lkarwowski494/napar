@@ -29,6 +29,10 @@ import {
   setHapticsEnabled,
   getIsProUser,
   setIsProUser,
+  getCaffeineHalfLife,
+  setCaffeineHalfLife,
+  getBedtimeHour,
+  setBedtimeHour,
 } from '../src/core/database';
 import { SUPPORTED_GRINDERS } from '../src/core/grinder-converter';
 import { theme } from '../src/core/theme';
@@ -51,8 +55,26 @@ export default function SettingsScreen() {
   const [isPro, setIsPro] = useState(() => {
     return getIsProUser();
   });
+  const [halfLifeHours, setHalfLifeHoursState] = useState(() => {
+    return getCaffeineHalfLife();
+  });
+  const [bedtimeHour, setBedtimeHourState] = useState(() => {
+    return getBedtimeHour();
+  });
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+
+  const handleHalfLifeChange = (newHours: number) => {
+    const clamped = Number(Math.max(3.0, Math.min(8.0, newHours)).toFixed(1));
+    setHalfLifeHoursState(clamped);
+    setCaffeineHalfLife(clamped);
+  };
+
+  const handleBedtimeChange = (newHour: number) => {
+    const clamped = Math.max(18, Math.min(28, newHour));
+    setBedtimeHourState(clamped);
+    setBedtimeHour(clamped);
+  };
 
   const handleSelectGrinder = (id: string) => {
     setSelectedGrinder(id);
@@ -268,6 +290,70 @@ export default function SettingsScreen() {
             ? 'Napar nie wymaga logowania, nie łączy się z żadnym zewnętrznym serwerem i nie zbiera Twoich danych (etykieta „Data Not Collected”). Cała spiżarnia, dziennik i kalkulatory działają w 100% lokalnie na Twoim urządzeniu.'
             : 'Steepwise requires no login, connects to no external servers, and collects zero data (Apple "Data Not Collected" badge). Your stash, journal, and calculators run 100% locally on your device.'}
         </Text>
+      </View>
+
+      {/* Metabolizm Kofeiny & Sen (D-02 & BR-KOF-003) */}
+      <Text style={styles.sectionTitle}>
+        {t.settings.caffeineSettingsSection || 'Metabolizm Kofeiny & Sen (D-02)'}
+      </Text>
+      <View style={styles.cardGroup}>
+        <View style={styles.actionRow}>
+          <View style={{ flex: 1, paddingRight: 10 }}>
+            <Text style={styles.actionTitle}>
+              {t.settings.caffeineHalfLifeTitle || 'Czas Półtrwania Kofeiny (t₁/₂)'}
+            </Text>
+            <Text style={styles.actionSubtitle}>
+              {t.settings.caffeineHalfLifeDesc || 'Wskaźnik klirensu wątrobowego (3.0h–8.0h, domyślnie 5.0h wg EFSA).'}
+            </Text>
+          </View>
+          <View style={styles.stepperContainer}>
+            <Pressable
+              style={styles.stepperBtn}
+              onPress={() => handleHalfLifeChange(halfLifeHours - 0.5)}
+              accessibilityLabel="Zmniejsz czas półtrwania"
+            >
+              <Text style={styles.stepperBtnText}>−</Text>
+            </Pressable>
+            <Text style={styles.stepperValueText}>{halfLifeHours.toFixed(1)}h</Text>
+            <Pressable
+              style={styles.stepperBtn}
+              onPress={() => handleHalfLifeChange(halfLifeHours + 0.5)}
+              accessibilityLabel="Zwiększ czas półtrwania"
+            >
+              <Text style={styles.stepperBtnText}>+</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.actionRow}>
+          <View style={{ flex: 1, paddingRight: 10 }}>
+            <Text style={styles.actionTitle}>
+              {t.settings.bedtimeHourTitle || 'Docelowa Godzina Snu'}
+            </Text>
+            <Text style={styles.actionSubtitle}>
+              {t.settings.bedtimeHourDesc || 'Używana do kalkulacji nocnego curfew i progu 25 mg dla fazy NREM.'}
+            </Text>
+          </View>
+          <View style={styles.stepperContainer}>
+            <Pressable
+              style={styles.stepperBtn}
+              onPress={() => handleBedtimeChange(bedtimeHour - 1)}
+              accessibilityLabel="Wcześniejsza godzina snu"
+            >
+              <Text style={styles.stepperBtnText}>−</Text>
+            </Pressable>
+            <Text style={styles.stepperValueText}>{`${bedtimeHour}:00`}</Text>
+            <Pressable
+              style={styles.stepperBtn}
+              onPress={() => handleBedtimeChange(bedtimeHour + 1)}
+              accessibilityLabel="Późniejsza godzina snu"
+            >
+              <Text style={styles.stepperBtnText}>+</Text>
+            </Pressable>
+          </View>
+        </View>
       </View>
 
       {/* Młynek Domowy (Domyślny młynek) */}
@@ -828,5 +914,32 @@ const styles = StyleSheet.create({
   toggleBtnTextActive: {
     color: theme.colors.copper,
     fontWeight: '700',
+  },
+  stepperContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    gap: 8,
+  },
+  stepperBtn: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepperBtnText: {
+    color: theme.colors.textPrimary,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  stepperValueText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.copperLight,
+    minWidth: 44,
+    textAlign: 'center',
   },
 });

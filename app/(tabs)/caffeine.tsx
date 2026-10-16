@@ -13,7 +13,15 @@ import {
   Modal,
   Alert,
 } from 'react-native';
-import { getCaffeineLogs, logCaffeine, deleteCaffeineLog } from '../../src/core/database';
+import {
+  getCaffeineLogs,
+  logCaffeine,
+  deleteCaffeineLog,
+  getBedtimeHour,
+  setBedtimeHour,
+  getCaffeineHalfLife,
+  setCaffeineHalfLife,
+} from '../../src/core/database';
 import { CaffeineLog } from '../../src/core/database-schema';
 import {
   calculateRemainingCaffeineMg,
@@ -25,8 +33,37 @@ import { theme } from '../../src/core/theme';
 
 export default function CaffeineScreen() {
   const [logs, setLogs] = useState<CaffeineLog[]>([]);
-  const [bedtimeHour, setBedtimeHour] = useState(23); // 23:00
+  const [bedtimeHour, setBedtimeHourState] = useState(() => {
+    try {
+      return getBedtimeHour();
+    } catch {
+      return 23;
+    }
+  });
+  const [halfLifeHours, setHalfLifeHoursState] = useState(() => {
+    try {
+      return getCaffeineHalfLife();
+    } catch {
+      return 5.0;
+    }
+  });
   const [showQuickAddModal, setShowQuickAddModal] = useState(false);
+
+  const handleBedtimeChange = (newHour: number) => {
+    const clamped = Math.max(18, Math.min(28, newHour));
+    setBedtimeHourState(clamped);
+    try {
+      setBedtimeHour(clamped);
+    } catch {}
+  };
+
+  const handleHalfLifeChange = (newHours: number) => {
+    const clamped = Number(Math.max(3.0, Math.min(8.0, newHours)).toFixed(1));
+    setHalfLifeHoursState(clamped);
+    try {
+      setCaffeineHalfLife(clamped);
+    } catch {}
+  };
 
   const loadLogs = () => {
     try {
@@ -49,7 +86,7 @@ export default function CaffeineScreen() {
   const currentTotalMg = logs.reduce((sum, item) => {
     const intakeTime = new Date(item.consumedAt).getTime();
     const hoursPassed = Math.max(0, (now.getTime() - intakeTime) / (1000 * 3600));
-    return sum + calculateRemainingCaffeineMg(item.caffeineMg, hoursPassed, 5.0);
+    return sum + calculateRemainingCaffeineMg(item.caffeineMg, hoursPassed, halfLifeHours);
   }, 0);
 
   // Całkowita spożyta dzisiaj kofeina
@@ -71,10 +108,10 @@ export default function CaffeineScreen() {
     };
   });
 
-  const bedtimeEval = evaluateBedtimeCaffeine(intakesForEvaluation, 25.0, 5.0);
+  const bedtimeEval = evaluateBedtimeCaffeine(intakesForEvaluation, 25.0, halfLifeHours);
 
   // Curfew (godzina graniczna dla nowej filiżanki 140mg)
-  const hoursUntilSafe = calculateHoursUntilSafeCaffeine(140, 25.0, 5.0);
+  const hoursUntilSafe = calculateHoursUntilSafeCaffeine(140, 25.0, halfLifeHours);
   const curfewDate = new Date(targetBedtime.getTime() - hoursUntilSafe * 3600 * 1000);
   const curfewTimeString = `${curfewDate.getHours().toString().padStart(2, '0')}:${curfewDate
     .getMinutes()
@@ -131,6 +168,7 @@ export default function CaffeineScreen() {
         logs={logs}
         bedtimeHour={bedtimeHour}
         thresholdMg={25.0}
+        halfLifeHours={halfLifeHours}
       />
 
       {/* Kalkulator Godziny Snu (Bedtime Curfew) */}
@@ -140,14 +178,43 @@ export default function CaffeineScreen() {
           <View style={styles.bedtimeStepper}>
             <Pressable
               style={styles.hourBtn}
-              onPress={() => setBedtimeHour(Math.max(20, bedtimeHour - 1))}
+              onPress={() => handleBedtimeChange(bedtimeHour - 1)}
             >
               <Text style={styles.hourBtnText}>−</Text>
             </Pressable>
-            <Text style={styles.bedtimeHourText}>{bedtimeHour}:00</Text>
+            <Text style={styles.bedtimeHourText}>{`${bedtimeHour}:00`}</Text>
             <Pressable
               style={styles.hourBtn}
-              onPress={() => setBedtimeHour(Math.min(26, bedtimeHour + 1))}
+              onPress={() => handleBedtimeChange(bedtimeHour + 1)}
+            >
+              <Text style={styles.hourBtnText}>+</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* Metabolizm Kofeiny (t1/2) D-02 */}
+        <View style={styles.metabolismRow}>
+          <View style={{ flex: 1, paddingRight: 8 }}>
+            <Text style={styles.metabolismTitle}>Metabolizm kofeiny (t₁/₂)</Text>
+            <Text style={styles.metabolismSubtitle}>
+              {halfLifeHours <= 3.5
+                ? 'Szybki klirens (CYP1A2 *1A)'
+                : halfLifeHours >= 6.5
+                ? 'Wolny klirens wątrobowy'
+                : 'Standardowy klirens (EFSA)'}
+            </Text>
+          </View>
+          <View style={styles.bedtimeStepper}>
+            <Pressable
+              style={styles.hourBtn}
+              onPress={() => handleHalfLifeChange(halfLifeHours - 0.5)}
+            >
+              <Text style={styles.hourBtnText}>−</Text>
+            </Pressable>
+            <Text style={styles.bedtimeHourText}>{halfLifeHours.toFixed(1)}h</Text>
+            <Pressable
+              style={styles.hourBtn}
+              onPress={() => handleHalfLifeChange(halfLifeHours + 0.5)}
             >
               <Text style={styles.hourBtnText}>+</Text>
             </Pressable>
@@ -370,6 +437,25 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: theme.colors.copperLight,
+  },
+  metabolismRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    marginBottom: 10,
+  },
+  metabolismTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  metabolismSubtitle: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    marginTop: 2,
   },
   curfewVerdictBadge: {
     paddingHorizontal: 12,

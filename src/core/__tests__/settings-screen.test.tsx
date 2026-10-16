@@ -483,6 +483,46 @@ describe('SettingsScreen Component', () => {
       ['haptics_enabled', 'false']
     );
   });
+
+  test('D-02 & BR-KOF-003: Renderuje i modyfikuje metabolizm kofeiny oraz godzinę snu w Ustawieniach', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <SettingsScreen />
+        </LanguageProvider>
+      );
+    });
+
+    let str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Metabolizm Kofeiny & Sen (D-02)');
+    expect(str).toContain('Czas Półtrwania Kofeiny (t₁/₂)');
+    expect(str).toContain('5.0h');
+    expect(str).toContain('Docelowa Godzina Snu');
+    expect(str).toContain('23:00');
+
+    // Kliknij '+' dla czasu półtrwania
+    const incHalfLifeBtn = tree.root.findByProps({ accessibilityLabel: 'Zwiększ czas półtrwania' });
+    renderer.act(() => {
+      incHalfLifeBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['caffeine_half_life_hours', '5.5']
+    );
+
+    // Kliknij '+' dla godziny snu
+    const incBedtimeBtn = tree.root.findByProps({ accessibilityLabel: 'Późniejsza godzina snu' });
+    renderer.act(() => {
+      incBedtimeBtn.props.onPress();
+    });
+
+    expect(mockDb.runSync).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      ['bedtime_hour', '24']
+    );
+  });
 });
 
 

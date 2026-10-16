@@ -37,6 +37,10 @@ import {
   setHapticsEnabled,
   getIsProUser,
   setIsProUser,
+  getCaffeineHalfLife,
+  setCaffeineHalfLife,
+  getBedtimeHour,
+  setBedtimeHour,
 } from '../database';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../database-schema';
 
@@ -765,5 +769,39 @@ describe('Napar SQLite Database & Repositories', () => {
     // Dezaktywacja Pro
     setIsProUser(false);
     expect(getIsProUser()).toBe(false);
+  });
+
+  test('D-02 & BR-KOF-003: Pobiera i zapisuje metabolizm kofeiny oraz godzinę snu', () => {
+    // Domyślne wartości
+    expect(getCaffeineHalfLife()).toBe(5.0);
+    expect(getBedtimeHour()).toBe(23);
+
+    // Zmiana czasu półtrwania (np. 6.5h)
+    setCaffeineHalfLife(6.5);
+    expect(getCaffeineHalfLife()).toBe(6.5);
+
+    // Ograniczenia klamrowe (clamping: 3.0h - 8.0h)
+    setCaffeineHalfLife(1.5);
+    expect(getCaffeineHalfLife()).toBe(3.0);
+    setCaffeineHalfLife(10.0);
+    expect(getCaffeineHalfLife()).toBe(8.0);
+
+    // Przywrócenie 5.0h
+    setCaffeineHalfLife(5.0);
+    expect(getCaffeineHalfLife()).toBe(5.0);
+
+    // Zmiana godziny snu (np. 22:00)
+    setBedtimeHour(22);
+    expect(getBedtimeHour()).toBe(22);
+
+    // Ograniczenia klamrowe (clamping: 18 - 28)
+    setBedtimeHour(10);
+    expect(getBedtimeHour()).toBe(18);
+    setBedtimeHour(35);
+    expect(getBedtimeHour()).toBe(28);
+
+    // Przywrócenie 23:00
+    setBedtimeHour(23);
+    expect(getBedtimeHour()).toBe(23);
   });
 });
