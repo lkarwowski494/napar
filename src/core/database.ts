@@ -723,5 +723,15 @@ export function setBedtimeHour(hour: number): void {
   setAppSetting('bedtime_hour', clamped.toString());
 }
 
+export function getHealthKitSyncEnabled(): boolean {
+  const val = getAppSetting('healthkit_sync_enabled', 'false');
+  return val === 'true';
+}
+
+export function setHealthKitSyncEnabled(enabled: boolean): void {
+  setAppSetting('healthkit_sync_enabled', enabled ? 'true' : 'false');
+}
+
+
 
 

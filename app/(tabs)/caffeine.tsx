@@ -30,6 +30,7 @@ import {
 } from '../../src/core/domain-rules';
 import { CaffeineCurveChart } from '../../src/core/caffeine-chart';
 import { theme } from '../../src/core/theme';
+import { getHealthKitSyncEnabled, saveDietaryCaffeineSample } from '../../src/core/healthkit';
 
 export default function CaffeineScreen() {
   const [logs, setLogs] = useState<CaffeineLog[]>([]);
@@ -119,15 +120,26 @@ export default function CaffeineScreen() {
     .padStart(2, '0')}`;
 
   const handleQuickAdd = (name: string, type: 'coffee' | 'tea', doseG: number, mg: number) => {
+    const consumedAt = new Date().toISOString();
     const log: CaffeineLog = {
       id: `caff-${Date.now()}`,
       beverageName: name,
       beverageType: type,
-      consumedAt: new Date().toISOString(),
+      consumedAt,
       doseGrams: doseG,
       caffeineMg: mg,
     };
     logCaffeine(log);
+
+    // BR-KOF-002: Apple HealthKit sync
+    if (getHealthKitSyncEnabled()) {
+      saveDietaryCaffeineSample({
+        caffeineMg: mg,
+        consumedAt,
+        beverageName: name,
+      }).catch(() => {});
+    }
+
     loadLogs();
     setShowQuickAddModal(false);
   };

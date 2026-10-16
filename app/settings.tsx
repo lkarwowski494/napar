@@ -34,6 +34,12 @@ import {
   getBedtimeHour,
   setBedtimeHour,
 } from '../src/core/database';
+import {
+  getHealthKitSyncEnabled,
+  setHealthKitSyncEnabled,
+  requestHealthKitPermissions,
+  revokeHealthKitPermissions,
+} from '../src/core/healthkit';
 import { SUPPORTED_GRINDERS } from '../src/core/grinder-converter';
 import { theme } from '../src/core/theme';
 import { useTranslation, SupportedLanguage } from '../src/core/i18n';
@@ -61,8 +67,21 @@ export default function SettingsScreen() {
   const [bedtimeHour, setBedtimeHourState] = useState(() => {
     return getBedtimeHour();
   });
+  const [healthKitSync, setHealthKitSync] = useState(() => {
+    return getHealthKitSyncEnabled();
+  });
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+
+  const handleToggleHealthKit = async () => {
+    const next = !healthKitSync;
+    setHealthKitSync(next);
+    if (next) {
+      await requestHealthKitPermissions();
+    } else {
+      revokeHealthKitPermissions();
+    }
+  };
 
   const handleHalfLifeChange = (newHours: number) => {
     const clamped = Number(Math.max(3.0, Math.min(8.0, newHours)).toFixed(1));
@@ -353,6 +372,39 @@ export default function SettingsScreen() {
               <Text style={styles.stepperBtnText}>+</Text>
             </Pressable>
           </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* BR-KOF-002: Apple HealthKit Integration */}
+        <View style={styles.actionRow}>
+          <View style={{ flex: 1, paddingRight: 10 }}>
+            <Text style={styles.actionTitle}>
+              {t.settings.healthKitTitle || 'Synchronizuj Kofeinę z Apple Health'}
+            </Text>
+            <Text style={styles.actionSubtitle}>
+              {t.settings.healthKitSubtitle || 'Automatycznie zapisuj spożytą kofeinę (Dietary Caffeine) w aplikacji Zdrowie bez wysyłania danych na zewnątrz.'}
+            </Text>
+          </View>
+          <Pressable
+            testID="toggle-healthkit-btn"
+            style={[
+              styles.toggleBtn,
+              healthKitSync && styles.toggleBtnActive,
+            ]}
+            onPress={handleToggleHealthKit}
+            accessibilityRole="switch"
+            accessibilityLabel={`${t.settings.healthKitTitle}: ${healthKitSync ? t.settings.enabled : t.settings.disabled}`}
+          >
+            <Text
+              style={[
+                styles.toggleBtnText,
+                healthKitSync && styles.toggleBtnTextActive,
+              ]}
+            >
+              {healthKitSync ? t.settings.enabled : t.settings.disabled}
+            </Text>
+          </Pressable>
         </View>
       </View>
 

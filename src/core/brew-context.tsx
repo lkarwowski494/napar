@@ -25,6 +25,7 @@ import {
   estimateTeaInfusionCaffeineMg,
 } from './domain-rules';
 import { getRecommendedGrindForRecipe } from './grinder-converter';
+import { getHealthKitSyncEnabled, saveDietaryCaffeineSample } from './healthkit';
 
 export interface BrewContextType {
   recipe: SavedRecipe | MasterRecipe;
@@ -301,6 +302,15 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
         caffeineMg,
       };
       logCaffeine(caffeineLog);
+
+      // BR-KOF-002: Apple HealthKit sync
+      if (getHealthKitSyncEnabled()) {
+        saveDietaryCaffeineSample({
+          caffeineMg,
+          consumedAt: nowIso,
+          beverageName: selectedInventoryItem?.name || recipe.name,
+        }).catch(() => {});
+      }
     }
 
     return session;
