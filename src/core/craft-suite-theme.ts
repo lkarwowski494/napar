@@ -98,5 +98,50 @@ export const sharedCraftTokens = {
     lg: 18,
     full: 999,
   },
-  touchTargetMin: 52,
+  touchTargetMin: 44,
+  buttonHeightMin: 52,
+  hitSlopStandard: { top: 12, bottom: 12, left: 12, right: 12 },
+  typography: {
+    displayHero: {
+      fontSize: 48,
+      fontWeight: '700' as const,
+      letterSpacing: -1,
+      color: '#F4EFEA',
+    },
+    displayLarge: {
+      fontSize: 32,
+      fontWeight: '700' as const,
+      letterSpacing: -0.5,
+      color: '#F4EFEA',
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '700' as const,
+      color: '#F4EFEA',
+    },
+    subtitle: {
+      fontSize: 16,
+      fontWeight: '600' as const,
+      color: '#A09C96',
+    },
+    body: {
+      fontSize: 14,
+      fontWeight: '400' as const,
+      color: '#F4EFEA',
+      lineHeight: 20,
+    },
+    caption: {
+      fontSize: 12,
+      fontWeight: '500' as const,
+      color: '#686561',
+    },
+    monoNumber: {
+      fontVariant: ['tabular-nums' as const],
+      fontWeight: '700' as const,
+    },
+  },
 };
+
+export function getCraftTheme(appId: CraftAppId = 'napar'): CraftAppTheme {
+  return CRAFT_APPS[appId] ?? CRAFT_APPS.napar;
+}

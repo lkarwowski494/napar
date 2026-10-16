@@ -25,6 +25,8 @@ import {
   MasazAppIcon,
   FermentAppIcon,
   CraftFamilyEmblem,
+  ChevronBackIcon,
+  CloseIcon,
 } from '../CraftIcons';
 
 describe('CraftIcons Component Suite', () => {
@@ -50,6 +52,8 @@ describe('CraftIcons Component Suite', () => {
       <MasazAppIcon key="masaz-app" />,
       <FermentAppIcon key="ferment-app" />,
       <CraftFamilyEmblem key="family-emblem" />,
+      <ChevronBackIcon key="chevron-back" />,
+      <CloseIcon key="close" />,
     ];
 
     iconsWithDefaults.forEach((icon) => {

@@ -443,3 +443,33 @@ export function CraftFamilyEmblem({ size = 32, color = '#F4EFEA', strokeWidth = 
   );
 }
 
+/** 7. Nawigacja Wstecz (Chevron Back) */
+export function ChevronBackIcon({ size = 24, color = '#F4EFEA', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M15 18l-6-6 6-6"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+/** 8. Zamknięcie (Close X) */
+export function CloseIcon({ size = 24, color = '#F4EFEA', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M18 6L6 18M6 6l12 12"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
