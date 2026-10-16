@@ -2,30 +2,49 @@
   "expo": {
     "name": "Napar",
     "slug": "napar",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "scheme": "napar",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "ios": {
       "bundleIdentifier": "pl.lukasz.napar",
       "appleTeamId": "8NQ9GHY8GF",
+      "buildNumber": "1",
       "supportsTablet": false,
       "infoPlist": {
         "UIFileSharingEnabled": true,
         "LSSupportsOpeningDocumentsInPlace": true,
         "ITSAppUsesNonExemptEncryption": false,
-        "CFBundleAllowMixedLocalizations": true
+        "CFBundleAllowMixedLocalizations": true,
+        "UIBackgroundModes": [
+          "audio"
+        ],
+        "NSCameraUsageDescription": "Napar potrzebuje dostępu do aparatu, aby skanować kody QR receptur parzenia kawy i herbaty.",
+        "NSHealthShareUsageDescription": "Napar odczytuje spożycie kofeiny z aplikacji Apple Health, aby analizować Twój sen i okres półtrwania.",
+        "NSHealthUpdateUsageDescription": "Napar automatycznie rejestruje zawartość kofeiny z każdej zaparzonej filiżanki w Apple Health."
       }
     },
     "android": {
       "package": "pl.lukasz.napar",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#121214"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.VIBRATE",
+        "android.permission.WAKE_LOCK"
+      ]
     },
     "plugins": [
       "expo-router",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Napar potrzebuje dostępu do aparatu, aby skanować kody QR receptur parzenia kawy i herbaty."
+        }
+      ]
     ]
   }
 }

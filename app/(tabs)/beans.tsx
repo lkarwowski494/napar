@@ -30,14 +30,18 @@ import {
   searchCoffeeOrigins,
   searchTeaCategories,
 } from '../../src/core/knowledge-data';
+import { useAppAccess } from '../../src/core/app-access';
+import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 
 export default function BeansScreen() {
   const router = useRouter();
   const { selectInventoryItem } = useBrew();
+  const { canCreate, isHistoryReadOnly } = useAppAccess();
 
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [filter, setFilter] = useState<'all' | 'coffee' | 'tea' | 'archived'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   const [showCompendium, setShowCompendium] = useState(false);
   const [compendiumTab, setCompendiumTab] = useState<'varieties' | 'processes' | 'origins' | 'tea'>('varieties');
   const [compendiumSearch, setCompendiumSearch] = useState('');
@@ -84,6 +88,11 @@ export default function BeansScreen() {
     process?: string;
     notes: string[];
   }) => {
+    if (!canCreate) {
+      setShowCompendium(false);
+      setShowPaywall(true);
+      return;
+    }
     setName(template.name);
     setType(template.type);
     if (template.origin) setOrigin(template.origin);
@@ -91,6 +100,14 @@ export default function BeansScreen() {
     if (template.process) setProcess(template.process);
     setNotesStr(template.notes.join(', '));
     setShowCompendium(false);
+    setShowAddModal(true);
+  };
+
+  const handleOpenAdd = () => {
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
     setShowAddModal(true);
   };
 
@@ -108,6 +125,11 @@ export default function BeansScreen() {
   }, []);
 
   const handleAddItem = () => {
+    if (!canCreate) {
+      setShowAddModal(false);
+      setShowPaywall(true);
+      return;
+    }
     if (!name.trim()) {
       Alert.alert('Błąd', 'Podaj nazwę kawy lub herbaty.');
       return;
@@ -334,10 +356,18 @@ export default function BeansScreen() {
         >
           <Text style={styles.compendiumButtonText}>📚 Baza wiedzy</Text>
         </Pressable>
-        <Pressable style={styles.addButton} onPress={() => setShowAddModal(true)}>
+        <Pressable testID="beans-add-button" style={styles.addButton} onPress={handleOpenAdd}>
           <Text style={styles.addButtonText}>+ Dodaj</Text>
         </Pressable>
       </View>
+
+      {isHistoryReadOnly && (
+        <View style={styles.readOnlyBanner}>
+          <Text style={styles.readOnlyText}>
+            🛡️ Spiżarnia w trybie Read-Only · Twoje paczki są bezpieczne. Odblokuj Apps4Brew Pass, aby dodawać nowe.
+          </Text>
+        </View>
+      )}
 
       {/* Lista paczek */}
       <ScrollView contentContainerStyle={styles.listContent}>
@@ -348,7 +378,7 @@ export default function BeansScreen() {
             <Text style={styles.emptySub}>
               Dodaj świeżo wypaloną kawę lub ulubioną herbatę liściastą, aby śledzić okno świeżości i gramaturę.
             </Text>
-            <Pressable style={styles.emptyBtn} onPress={() => setShowAddModal(true)}>
+            <Pressable testID="beans-empty-add-button" style={styles.emptyBtn} onPress={handleOpenAdd}>
               <Text style={styles.emptyBtnText}>+ Dodaj pierwszą paczkę</Text>
             </Pressable>
           </View>
@@ -1002,6 +1032,12 @@ export default function BeansScreen() {
           </ScrollView>
         </View>
       </Modal>
+
+      {/* Apps4Brew Pass Paywall Modal */}
+      <Apps4BrewPassModal
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+      />
     </View>
   );
 }
@@ -1010,6 +1046,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,
+  },
+  readOnlyBanner: {
+    backgroundColor: 'rgba(78, 159, 61, 0.12)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  readOnlyText: {
+    color: theme.colors.textSecondary,
+    fontSize: 12,
+    textAlign: 'center',
+    fontWeight: '600',
   },
   topBar: {
     flexDirection: 'row',

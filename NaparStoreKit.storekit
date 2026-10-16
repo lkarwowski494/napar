@@ -1,0 +1,111 @@
+{
+  "identifier" : "NaparStoreKit",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "14.99",
+      "familyShareable" : true,
+      "internalID" : "A1B2C3D4",
+      "localizations" : [
+        {
+          "description" : "Jednorazowy dostęp dożywotni do wszystkich funkcji Napar",
+          "displayName" : "Apps4Brew Pass Lifetime",
+          "locale" : "pl"
+        },
+        {
+          "description" : "One-time lifetime access to all Napar features",
+          "displayName" : "Apps4Brew Pass Lifetime",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "pl.lukasz.napar.lifetime",
+      "referenceName" : "Napar Lifetime Access",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "pl",
+    "_storefront" : "POL",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21400001",
+      "localizations" : [
+
+      ],
+      "name" : "Apps4Brew Pass Subscriptions",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "0.99",
+          "familyShareable" : true,
+          "groupNumber" : 2,
+          "internalID" : "A1B2C3D5",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Miesięczna subskrypcja Napar Apps4Brew Pass",
+              "displayName" : "Napar Miesięczny",
+              "locale" : "pl"
+            },
+            {
+              "description" : "Monthly Napar Apps4Brew Pass subscription",
+              "displayName" : "Napar Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "pl.lukasz.napar.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Napar Monthly Subscription",
+          "subscriptionGroupID" : "21400001",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "A1B2C3D6",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Roczna subskrypcja Napar Apps4Brew Pass (najlepsza wartość)",
+              "displayName" : "Napar Roczny",
+              "locale" : "pl"
+            },
+            {
+              "description" : "Annual Napar Apps4Brew Pass subscription (best value)",
+              "displayName" : "Napar Annual",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "pl.lukasz.napar.annual",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Napar Annual Subscription",
+          "subscriptionGroupID" : "21400001",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

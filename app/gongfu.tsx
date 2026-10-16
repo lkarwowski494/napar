@@ -31,10 +31,14 @@ import { theme } from '../src/core/theme';
 import { confirmAction } from '../src/core/confirm';
 import { announce } from '../src/core/announce';
 import { useTranslation } from '../src/core/i18n';
+import { useAppAccess } from '../src/core/app-access';
+import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
 
 export default function GongfuScreen() {
   const router = useRouter();
   const { t, language } = useTranslation();
+  const { canCreate, recordBrew } = useAppAccess();
+  const [showPaywall, setShowPaywall] = useState(false);
 
   // Stan sesji
   const [teaType, setTeaType] = useState<GongfuTeaType>('wulong_rock');
@@ -132,6 +136,10 @@ export default function GongfuScreen() {
   }, [isSteeping]);
 
   const handleStartSteep = () => {
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
     setIsSteeping(true);
     setSteepFinished(false);
     try {
@@ -225,6 +233,7 @@ export default function GongfuScreen() {
           deductInventoryWeight(selectedInventoryId, doseNum);
         }
 
+        recordBrew();
         announce(t.gongfu.finishSession);
         router.back();
       },
@@ -351,7 +360,7 @@ export default function GongfuScreen() {
 
           {/* Główny Przycisk Parzenia */}
           {!isSteeping && !steepFinished && (
-            <Pressable style={styles.startBtn} onPress={handleStartSteep}>
+            <Pressable testID="gongfu-start-btn" style={styles.startBtn} onPress={handleStartSteep}>
               <Text style={styles.startBtnText}>{t.gongfu.startSteep}</Text>
             </Pressable>
           )}
@@ -426,6 +435,10 @@ export default function GongfuScreen() {
           </View>
         )}
       </ScrollView>
+      <Apps4BrewPassModal
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+      />
     </SafeAreaView>
   );
 }

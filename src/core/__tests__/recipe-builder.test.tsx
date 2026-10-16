@@ -12,8 +12,13 @@ const mockBack = jest.fn();
 // Mock in-memory DB for SQLite
 const mockDb: any = {
   recipes: new Map<string, any>(),
+  settings: new Map<string, string>(),
   execSync: jest.fn(),
   getFirstSync: jest.fn((query: string, params?: any[]) => {
+    if (query.includes('FROM app_settings WHERE key = ?')) {
+      const val = mockDb.settings.get(params?.[0]);
+      return val !== undefined ? { value: val } : null;
+    }
     if (query.includes('FROM recipes WHERE id = ?')) {
       return mockDb.recipes.get(params?.[0]) || null;
     }
@@ -528,5 +533,47 @@ describe('Custom Recipe Builder & Persistence', () => {
     expect(alertSpy).toHaveBeenCalledWith('Zduplikowano', expect.stringContaining('V60 Original Hoffmann (Kopia)'));
     expect(mockBack).toHaveBeenCalled();
     mockSearchParams = {};
+  });
+
+  test('W trybie wygasłego trialu próba zapisu nowej receptury wyświetla Paywall zamiast zapisu', () => {
+    mockDb.settings.set('trial_brews_count', '3');
+    mockDb.settings.set('is_pro_active', 'false');
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    const saveBtn = tree.root.findByProps({ testID: 'recipe-builder-save-btn' });
+    expect(saveBtn).toBeDefined();
+
+    renderer.act(() => {
+      saveBtn.props.onPress();
+    });
+
+    // Paywall modal powinien się otworzyć
+    const planAnnualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
+    expect(planAnnualBtn).toBeDefined();
+
+    // Zamknij paywall
+    const closeBtn = tree.root.findByProps({ testID: 'close-paywall-btn' });
+    renderer.act(() => {
+      closeBtn.props.onPress();
+    });
+
+    // Próba duplikowania w trybie wygasłego trialu
+    mockSearchParams = { id: 'recipe-to-clone' };
+    let treeEdit: any;
+    renderer.act(() => {
+      treeEdit = renderer.create(<RecipeBuilderScreen />);
+    });
+    const dupBtn = findPressableWithText(treeEdit.root, 'Duplikuj jako nową');
+    renderer.act(() => {
+      dupBtn?.props.onPress();
+    });
+    expect(treeEdit.root.findByProps({ testID: 'plan-annual-btn' })).toBeDefined();
+
+    mockSearchParams = {};
+    mockDb.settings.clear();
   });
 });

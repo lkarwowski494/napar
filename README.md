@@ -73,7 +73,7 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
      - **Gwarancja Historii Read-Only (Ochrona 4.9★):** Po wygaśnięciu trialu blokowane jest jedynie tworzenie nowych sesji i parzeń, a cała historia, Dziennik i notatki pozostają ZAWSZE bezpłatne i czytelne w 100% offline. [Wdrożone]
 8. **⌚ Ekosystem Apple: Apple Watch, Live Activity & Widżety (BR-ZEG-001 do BR-ZEG-005):**
    - **Live Activity & Dynamic Island (BR-ZEG-003, BR-ZEG-004):** Natywny mostek ActivityKit (`ActivityAttributes` i `ContentState`) dla ekranu blokady i Dynamic Island (kompaktowy i rozszerzony podgląd z wagą wody, czasem etapu i stanem timera). [Wdrożone]
-   - **Apple Watch & Widżety WidgetKit (BR-ZEG-001, BR-ZEG-002, BR-ZEG-005):** Mostek synchronizacji sesji i wzorców haptycznych na nadgarstku oraz kontener danych dla widżetów kofeiny. [W trakcie wdrażania]
+   - **Apple Watch & Widżety WidgetKit (BR-ZEG-001, BR-ZEG-002, BR-ZEG-005):** Mostek synchronizacji sesji i wzorców haptycznych na nadgarstku oraz kontener danych dla widżetów kofeiny. [Wdrożone]
 
 ---
 
@@ -122,10 +122,13 @@ npm install
 # Uruchomienie weryfikacji typów TypeScript
 npm run typecheck
 
+# Sprawdzenie symetrii językowej i18n (360 kluczy PL i EN)
+npm run check:i18n
+
 # Uruchomienie testów jednostkowych i integracyjnych Jest
 npm test
 
-# Pełna weryfikacja projektu (CI)
+# Pełna weryfikacja projektu (i18n + typecheck + 100% testów z pokryciem)
 npm run verify
 
 # Uruchomienie aplikacji w środowisku Expo
@@ -140,18 +143,27 @@ npm run start
 napar/
 ├── app/                        # Ekrany Expo Router (file-based routing)
 │   ├── _layout.tsx             # Root layout z BrewProvider i SafeAreaProvider
-│   ├── settings.tsx            # Ustawienia, Kopia JSON/CSV, Model Pro Apps4Brew
+│   ├── settings.tsx            # Ustawienia, Kopia JSON/CSV, Wersja 1.0.0
 │   ├── gongfu.tsx              # Dedykowany wielonaparowy tracker Gongfu Cha
 │   ├── recipe-builder.tsx      # Kreator i edytor receptur autorskich z klonowaniem
 │   └── (tabs)/
 │       ├── _layout.tsx         # Dolny pasek 5 zakładek
-│       ├── index.tsx           # Asystent Parzenia (Active Brew Assistant, QR, Młynek)
+│       ├── index.tsx           # Zdekomponowany Asystent Parzenia Kitchen-Proof
 │       ├── beans.tsx           # Spiżarnia Ziaren i Liści (Resting Window, Edycja)
 │       ├── journal.tsx         # Dziennik Degustacji, Oceny, Analityka i Parz Ponownie
 │       ├── dialin.tsx          # Dial-in Doctor, Kalkulatory Ratio, TDS/EY i Chemia Wody
 │       └── caffeine.tsx        # Monitor Kofeiny, Wykres Kinetyki i Kalkulator Snu
 ├── src/
+│   ├── components/
+│   │   ├── Apps4BrewPassModal.tsx # Paywall "Cheaper than Espresso" ($0.99 / $4.99 / $14.99)
+│   │   └── brew/               # Zdekomponowane moduły Kitchen-Proof:
+│   │       ├── BrewHeader.tsx           # Kliki młynka na samej górze, wybór receptury i ziarna
+│   │       ├── BrewQuickPrepCard.tsx    # Karta 1-Tap "Do drippera na wagę", steppery 44-52pt
+│   │       ├── BrewActiveFocusTimer.tsx # Stoper Focus Mode, cyfry 64pt, kontrolki brudnego kciuka
+│   │       ├── BrewProAccordion.tsx     # Akordeon rzemieślniczy: woda, TDS, radar sensoryczny
+│   │       └── BrewFinishModal.tsx      # Arkusz degustacyjny, Dial-in Doctor i ekonomia
 │   └── core/                   # Czysta logika biznesowa i persystencja
+│       ├── app-access.ts       # Silnik dostępu Apps4Brew Pass, trial 100% i Read-Only history
 │       ├── domain-rules.ts     # Deterministyczne reguły RD-01…RD-30
 │       ├── recipes-data.ts     # 24 wzorcowe receptury specialty i herbaty
 │       ├── knowledge-data.ts   # Kompendium wiedzy o odmianach, obróbkach, terroir i herbatach
@@ -167,20 +179,22 @@ napar/
 │       ├── recipe-share.ts     # Kodowanie receptur QR SVG i Deep Links
 │       ├── unit-converter.ts   # Dwukierunkowa konwersja jednostek Metric/Imperial
 │       ├── announce.ts         # Asystujące komunikaty głosowe VoiceOver i dostępność
-│       ├── i18n.tsx            # Pełne wsparcie dwujęzyczne PL/EN (338 symetrycznych kluczy)
+│       ├── i18n.tsx            # Pełne wsparcie dwujęzyczne PL/EN (360 symetrycznych kluczy)
 │       ├── timer-engine.ts     # Maszyna stanów stopera i haptyka
 │       ├── brew-context.tsx    # Główny React Context aktywnej sesji
 │       ├── gongfu-session.ts   # Matematyka i model kofeiny naparów Gongfu Cha
-│       ├── flavor-wheel-data.ts# Taksonomia koła smaków SCA (8 kategorii, 40 deskryptorów)
+│       ├── flavor-wheel-data.ts# Taksonomia koła smaków SCA (6 kategorii, 40+ deskryptorów)
 │       ├── flavor-wheel-picker.tsx # Interaktywny selektor koła smaków
 │       ├── radar-chart.tsx     # Wektorowy radar sensoryczny SCA (SVG)
 │       ├── caffeine-chart.tsx  # Wektorowy wykres kinetyki kofeiny ze strefą snu
 │       ├── qr-code.tsx         # Generator kodów QR SVG
 │       ├── confirm.ts          # Zabezpieczenia sesji parzenia przed przerwaniem
 │       ├── theme.ts            # Tokeny stylistyczne (Apps4Brew artisanal)
-│       └── __tests__/          # 37 zestawów testowych (339 testów, mutacje i PBT)
+│       └── __tests__/          # 44 zestawy testowe (372 testy, 100% pass, 97.76% pokrycia)
+├── NaparStoreKit.storekit      # Konfiguracja Xcode StoreKit Testing ($0.99 / $4.99 / $14.99)
 ├── scripts/
-│   └── check-i18n.mjs          # Bramka CI weryfikująca 100% symetrii PL/EN
+│   ├── check-i18n.mjs          # Bramka CI weryfikująca 100% symetrii PL/EN
+│   └── ci/                     # Skrypty automatyzacji budowania i wysyłki TestFlight
 └── napar_brd/                  # Pełna dokumentacja wymagań biznesowych BRD 0.1
 ```
 

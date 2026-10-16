@@ -23,6 +23,8 @@ import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
 import { SensoryRadarChart, SensoryProfile } from '../../src/core/radar-chart';
 import { getWaterProfileName } from '../../src/core/water-chemistry';
+import { useAppAccess } from '../../src/core/app-access';
+import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 
 export default function JournalScreen() {
   const router = useRouter();
@@ -36,10 +38,12 @@ export default function JournalScreen() {
     setWaterProfile,
   } = useBrew();
   const { t, language } = useTranslation();
+  const { canCreate, isHistoryReadOnly } = useAppAccess();
   const [sessions, setSessions] = useState<BrewSession[]>([]);
   const [viewMode, setViewMode] = useState<'sessions' | 'analytics'>('sessions');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterType, setFilterType] = useState<'all' | 'coffee' | 'tea' | 'high_rated'>('all');
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const analyticsData = useMemo(() => {
     const totalBrews = sessions.length;
@@ -169,6 +173,10 @@ export default function JournalScreen() {
   };
 
   const handleBrewAgain = (session: BrewSession) => {
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
     try {
       const userRecipes = getRecipes();
       const allRecipes = [...userRecipes, ...MASTER_RECIPES];
@@ -277,6 +285,14 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
           {filteredSessions.length !== sessions.length ? ` (widoczne: ${filteredSessions.length})` : ''}
         </Text>
       </View>
+
+      {isHistoryReadOnly && (
+        <View style={styles.readOnlyBanner} testID="journal-readonly-banner">
+          <Text style={styles.readOnlyText}>
+            {`🛡️ ${t.paywall.historyNotice}`}
+          </Text>
+        </View>
+      )}
 
       {/* Przełącznik Widoku: Sesje vs Analityka */}
       <View style={styles.viewModeRow}>
@@ -638,6 +654,12 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
           </View>
         </View>
       )}
+
+      {/* Apps4Brew Pass Paywall Modal */}
+      <Apps4BrewPassModal
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+      />
     </ScrollView>
   );
 }
@@ -646,6 +668,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,
+  },
+  readOnlyBanner: {
+    backgroundColor: 'rgba(78, 159, 61, 0.12)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.statusPeak,
+    marginBottom: 16,
+  },
+  readOnlyText: {
+    color: theme.colors.textPrimary,
+    fontSize: 12,
+    textAlign: 'center',
+    fontWeight: '600',
+    lineHeight: 16,
   },
   content: {
     padding: theme.spacing.md,

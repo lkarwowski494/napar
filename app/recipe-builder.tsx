@@ -23,11 +23,15 @@ import { theme } from '../src/core/theme';
 import { confirmAction } from '../src/core/confirm';
 import { announce } from '../src/core/announce';
 import { useTranslation } from '../src/core/i18n';
+import { useAppAccess } from '../src/core/app-access';
+import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
 
 export default function RecipeBuilderScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { t, language } = useTranslation();
+  const { canCreate } = useAppAccess();
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const isEditing = Boolean(id);
 
@@ -143,6 +147,11 @@ export default function RecipeBuilderScreen() {
   };
 
   const handleSave = () => {
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
+
     const trimmedName = name.trim();
     if (!trimmedName) {
       Alert.alert(t.recipeBuilder.titleNew, t.recipeBuilder.fillRequired);
@@ -194,6 +203,10 @@ export default function RecipeBuilderScreen() {
 
   const handleDuplicate = () => {
     if (!id) return;
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
     const existing = getRecipeById(id);
     if (!existing) return;
     const cloned = duplicateRecipe(existing);
@@ -426,7 +439,7 @@ export default function RecipeBuilderScreen() {
         </View>
 
         {/* Przycisk zapisu */}
-        <Pressable style={styles.mainSaveBtn} onPress={handleSave}>
+        <Pressable testID="recipe-builder-save-btn" style={styles.mainSaveBtn} onPress={handleSave}>
           <Text style={styles.mainSaveBtnText}>{t.recipeBuilder.saveRecipeBtn}</Text>
         </Pressable>
 
@@ -442,6 +455,10 @@ export default function RecipeBuilderScreen() {
           </>
         )}
       </ScrollView>
+      <Apps4BrewPassModal
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+      />
     </SafeAreaView>
   );
 }

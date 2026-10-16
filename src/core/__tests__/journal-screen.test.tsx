@@ -320,6 +320,46 @@ describe('JournalScreen Integration', () => {
       message: expect.stringContaining('15g | Woda: 250g'),
     });
   });
+
+  test('W trybie Read-Only (po trialu) wyświetla się baner ochrony historii, a Powtórz Parzenie otwiera paywall', () => {
+    const { getAppSetting } = require('../database');
+    getAppSetting.mockImplementation((key: string, def: string) => {
+      if (key === 'trial_brews_count') return '3';
+      if (key === 'is_pro_active') return 'false';
+      return def;
+    });
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Weryfikacja obecności banera informującego o Read-Only
+    const readOnlyBanner = tree.root.findByProps({ testID: 'journal-readonly-banner' });
+    expect(readOnlyBanner).toBeDefined();
+
+    // Kliknięcie Powtórz Parzenie przy wygasłym trialu
+    const brewAgainBtn = tree.root.findByProps({ testID: 'brew-again-btn-sess-1' });
+    act(() => {
+      brewAgainBtn.props.onPress();
+    });
+
+    // Paywall modal powinien się pojawić z planami
+    const annualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
+    expect(annualBtn).toBeDefined();
+
+    // Zamknij paywall
+    const closeBtn = tree.root.findByProps({ testID: 'close-paywall-btn' });
+    act(() => {
+      closeBtn.props.onPress();
+    });
+
+    getAppSetting.mockImplementation(() => null);
+  });
 });
 
 function findPressableWithText(root: any, text: string) {

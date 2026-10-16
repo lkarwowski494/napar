@@ -14,6 +14,7 @@ import {
   useAppAccess,
   TRIAL_MAX_BREWS,
   TRIAL_DURATION_DAYS,
+  STORE_PRODUCT_IDS,
 } from '../app-access';
 import { initDatabase, setAppSetting } from '../database';
 
@@ -156,5 +157,11 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
       hookData.refresh();
     });
     expect(hookData.status).toBe('subscribed');
+  });
+
+  test('Identyfikatory produktów App Store / Google Play są poprawnie zdefiniowane', () => {
+    expect(STORE_PRODUCT_IDS.monthly).toBe('pl.lukasz.napar.monthly');
+    expect(STORE_PRODUCT_IDS.annual).toBe('pl.lukasz.napar.annual');
+    expect(STORE_PRODUCT_IDS.lifetime).toBe('pl.lukasz.napar.lifetime');
   });
 });

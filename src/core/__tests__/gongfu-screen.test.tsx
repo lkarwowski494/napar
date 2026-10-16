@@ -10,8 +10,15 @@ const mockDb: any = {
   inventory: new Map<string, any>(),
   sessions: new Map<string, any>(),
   caffeine: new Map<string, any>(),
+  settings: new Map<string, string>(),
   execSync: jest.fn(),
-  getFirstSync: jest.fn(),
+  getFirstSync: jest.fn((query: string, params?: any[]) => {
+    if (query.includes('FROM app_settings WHERE key = ?')) {
+      const val = mockDb.settings.get(params?.[0]);
+      return val !== undefined ? { value: val } : null;
+    }
+    return null;
+  }),
   getAllSync: jest.fn((query: string) => {
     if (query.includes('FROM inventory_items')) {
       return [
@@ -284,5 +291,34 @@ describe('GongfuScreen Component', () => {
     expect(alertSpy).toHaveBeenCalled();
     expect(saveSessionSpy).toHaveBeenCalled();
     expect(logCaffeineSpy).toHaveBeenCalled();
+  });
+
+  test('W trybie wygasłego trialu próba rozpoczęcia parzenia Gongfu Cha otwiera Paywall', () => {
+    mockDb.settings.set('trial_brews_count', '3');
+    mockDb.settings.set('is_pro_active', 'false');
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<GongfuScreen />);
+    });
+
+    const startBtn = tree.root.findByProps({ testID: 'gongfu-start-btn' });
+    expect(startBtn).toBeDefined();
+
+    renderer.act(() => {
+      startBtn.props.onPress();
+    });
+
+    // Paywall modal powinien się otworzyć
+    const planAnnualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
+    expect(planAnnualBtn).toBeDefined();
+
+    // Zamknij paywall
+    const closeBtn = tree.root.findByProps({ testID: 'close-paywall-btn' });
+    renderer.act(() => {
+      closeBtn.props.onPress();
+    });
+
+    mockDb.settings.clear();
   });
 });

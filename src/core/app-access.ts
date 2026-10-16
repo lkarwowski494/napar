@@ -11,6 +11,12 @@ import { getAppSetting, setAppSetting } from './database';
 export const TRIAL_MAX_BREWS = 3;
 export const TRIAL_DURATION_DAYS = 7;
 
+export const STORE_PRODUCT_IDS = {
+  monthly: 'pl.lukasz.napar.monthly',
+  annual: 'pl.lukasz.napar.annual',
+  lifetime: 'pl.lukasz.napar.lifetime',
+} as const;
+
 export type AppAccessStatus = 'trial_active' | 'trial_expired' | 'subscribed';
 
 export interface AppAccessState {

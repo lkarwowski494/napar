@@ -30,6 +30,9 @@ jobs:
       - name: Instalacja zależności
         run: npm ci
 
+      - name: Sprawdzenie symetrii i18n (PL/EN)
+        run: npm run check:i18n
+
       - name: Kontrola typów TypeScript
         run: npm run typecheck
 

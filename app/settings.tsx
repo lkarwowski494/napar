@@ -589,7 +589,7 @@ export default function SettingsScreen() {
       <View style={styles.cardGroup}>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Wersja</Text>
-          <Text style={styles.infoValue}>0.1.0 (Build 1)</Text>
+          <Text style={styles.infoValue}>1.0.0 (Build 1)</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.infoRow}>
