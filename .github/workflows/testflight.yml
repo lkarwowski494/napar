@@ -114,12 +114,14 @@ jobs:
           path: |
             ios/Pods
             ~/Library/Caches/CocoaPods
-          key: pods-${{ runner.os }}-xcode16-${{ hashFiles('ios/Podfile.lock', 'package-lock.json') }}
+          key: pods-v2-${{ runner.os }}-xcode16-${{ hashFiles('ios/Podfile.lock', 'package-lock.json') }}
           restore-keys: |
-            pods-${{ runner.os }}-xcode16-
+            pods-v2-${{ runner.os }}-xcode16-
 
       - name: Install CocoaPods
         working-directory: ios
+        env:
+          EXPO_USE_PRECOMPILED_MODULES: '0'
         run: |
           if [ "${{ steps.pods-cache.outputs.cache-hit }}" != "true" ]; then
             pod install --repo-update

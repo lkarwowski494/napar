@@ -116,7 +116,7 @@ if (existsSync(precompiledModulesRb)) {
   const original = readFileSync(precompiledModulesRb, 'utf8');
   let content = original;
   if (!content.includes('def enabled?\n        false\n      end')) {
-    content = content.replace(/def enabled\?[\s\S]+?end\b/, 'def enabled?\n        false\n      end');
+    content = content.replace(/def enabled\?[\s\S]+?(?=\s+def configure)/, 'def enabled?\n        false\n      end\n');
   }
   if (content !== original) {
     writeFileSync(precompiledModulesRb, content, 'utf8');
