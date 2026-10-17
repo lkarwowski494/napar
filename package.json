@@ -16,7 +16,8 @@
     "check:native": "node scripts/verify-native.mjs",
     "check": "npm run check:i18n && npm run check:licenses && npm run check:corpus && npm run check:matrix && npm run check:native && npm run typecheck && npm run test:coverage",
     "verify": "npm run check:i18n && npm run check:licenses && npm run check:corpus && npm run check:matrix && npm run check:native && npm run typecheck && npm test",
-    "test:mutation": "stryker run"
+    "test:mutation": "stryker run",
+    "postinstall": "node scripts/patch-swift-tools.mjs"
   },
   "dependencies": {
     "@types/qrcode": "^1.5.6",

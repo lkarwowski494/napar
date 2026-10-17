@@ -62,6 +62,9 @@ jobs:
       - name: Install JS dependencies
         run: npm ci
 
+      - name: Patch Swift tools version for Xcode 16.x compatibility
+        run: node scripts/patch-swift-tools.mjs
+
       - name: Guard against test/mock flags in release build
         run: |
           for var in EXPO_PUBLIC_STORE_FAKE EXPO_PUBLIC_E2E EXPO_PUBLIC_MOCK_AUTH EXPO_PUBLIC_DEMO_MODE; do
