@@ -24,14 +24,13 @@ env:
   APP_SCHEME: 'Napar'
   APP_DIR: 'Napar'
   BUNDLE_ID: 'pl.lukasz.napar'
-  BUILD_BASE: '10'
-  EXPO_USE_PRECOMPILED_MODULES: '0'
+  BUILD_BASE: '1000'
 
 jobs:
   build:
     name: Archive & Upload (.ipa -> TestFlight)
-    runs-on: macos-14
-    timeout-minutes: 60
+    runs-on: macos-26
+    timeout-minutes: 90
     outputs:
       version: ${{ steps.ver.outputs.version }}
       build_number: ${{ steps.ver.outputs.build_number }}
@@ -57,14 +56,11 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Select Xcode 16 (iOS 18 SDK)
-        run: bash .github/scripts/select-xcode.sh 16
+      - name: Select Xcode 26 (iOS 26 SDK)
+        run: bash .github/scripts/select-xcode.sh 26
 
       - name: Install JS dependencies
         run: npm ci
-
-      - name: Patch Swift tools version for Xcode 16.x compatibility
-        run: node scripts/patch-swift-tools.mjs
 
       - name: Guard against test/mock flags in release build
         run: |
@@ -114,20 +110,21 @@ jobs:
           path: |
             ios/Pods
             ~/Library/Caches/CocoaPods
-          key: pods-v2-${{ runner.os }}-xcode16-${{ hashFiles('ios/Podfile.lock', 'package-lock.json') }}
+          key: pods-v3-${{ runner.os }}-xcode26-${{ hashFiles('ios/Podfile.lock', 'package-lock.json') }}
           restore-keys: |
-            pods-v2-${{ runner.os }}-xcode16-
+            pods-v3-${{ runner.os }}-xcode26-
 
       - name: Install CocoaPods
         working-directory: ios
-        env:
-          EXPO_USE_PRECOMPILED_MODULES: '0'
         run: |
           if [ "${{ steps.pods-cache.outputs.cache-hit }}" != "true" ]; then
             pod install --repo-update
           else
             pod install
           fi
+
+      - name: Ensure iOS Platform SDK matches selected Xcode
+        run: bash scripts/ci/ensure-ios-platform.sh
 
       - name: Verify PrivacyInfo.xcprivacy after pod install
         run: |

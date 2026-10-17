@@ -104,15 +104,15 @@ export function parseStepDurationSeconds(
 }
 
 function toDateKey(d: Date): string {
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 
 function addDays(base: Date, days: number): Date {
   const copy = new Date(base.getTime());
-  copy.setDate(copy.getDate() + days);
+  copy.setUTCDate(copy.getUTCDate() + days);
   return copy;
 }
 
@@ -127,9 +127,11 @@ export function buildProactiveActionSchedule(
 ): ProactiveActionItem[] {
   const baseDate = new Date(referenceDateIso);
   const refDayStart = new Date(
-    baseDate.getFullYear(),
-    baseDate.getMonth(),
-    baseDate.getDate()
+    Date.UTC(
+      baseDate.getUTCFullYear(),
+      baseDate.getUTCMonth(),
+      baseDate.getUTCDate()
+    )
   );
 
   const actions: ProactiveActionItem[] = [];
@@ -142,9 +144,11 @@ export function buildProactiveActionSchedule(
       const roastDate = new Date(item.roastOrHarvestDate);
       if (!Number.isNaN(roastDate.getTime())) {
         const roastDayStart = new Date(
-          roastDate.getFullYear(),
-          roastDate.getMonth(),
-          roastDate.getDate()
+          Date.UTC(
+            roastDate.getUTCFullYear(),
+            roastDate.getUTCMonth(),
+            roastDate.getUTCDate()
+          )
         );
         const daysSinceRoast = Math.floor(
           (refDayStart.getTime() - roastDayStart.getTime()) / (1000 * 3600 * 24)
@@ -292,9 +296,11 @@ export function buildFourteenDayCalendar(
 ): CalendarDayItem[] {
   const baseDate = new Date(referenceDateIso);
   const todayStart = new Date(
-    baseDate.getFullYear(),
-    baseDate.getMonth(),
-    baseDate.getDate()
+    Date.UTC(
+      baseDate.getUTCFullYear(),
+      baseDate.getUTCMonth(),
+      baseDate.getUTCDate()
+    )
   );
 
   const schedule = buildProactiveActionSchedule(
@@ -323,7 +329,7 @@ export function buildFourteenDayCalendar(
   for (let offset = 0; offset < 14; offset++) {
     const current = addDays(todayStart, offset);
     const key = toDateKey(current);
-    const dow = current.getDay();
+    const dow = current.getUTCDay();
     const sCount = sessionCountsByDate[key] || 0;
     const aCount = actionCountsByDate[key] || 0;
 
@@ -338,7 +344,7 @@ export function buildFourteenDayCalendar(
 
     days.push({
       dateIso: key,
-      dayNumber: current.getDate(),
+      dayNumber: current.getUTCDate(),
       weekdayPl: WEEKDAYS_PL[dow],
       weekdayEn: WEEKDAYS_EN[dow],
       isToday: offset === 0,

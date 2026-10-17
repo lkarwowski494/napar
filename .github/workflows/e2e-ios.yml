@@ -36,7 +36,7 @@ env:
 jobs:
   e2e-ios:
     name: Maestro E2E on iOS Simulator
-    runs-on: macos-14
+    runs-on: macos-26
     timeout-minutes: 60
 
     steps:
@@ -51,14 +51,11 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Select Xcode 16
-        run: bash .github/scripts/select-xcode.sh 16
+      - name: Select Xcode 26
+        run: bash .github/scripts/select-xcode.sh 26
 
       - name: Install JS dependencies
         run: npm ci
-
-      - name: Patch Swift tools version for Xcode 16.x compatibility
-        run: node scripts/patch-swift-tools.mjs
 
       - name: Install Maestro CLI
         run: |
