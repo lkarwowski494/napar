@@ -43,6 +43,7 @@
       "infoPlist": {
         "UIFileSharingEnabled": true,
         "LSSupportsOpeningDocumentsInPlace": true,
+        "UIRequiresFullScreen": true,
         "ITSAppUsesNonExemptEncryption": false,
         "CFBundleAllowMixedLocalizations": true,
         "NSCameraUsageDescription": "Napar potrzebuje dostępu do aparatu, aby skanować kody QR receptur parzenia kawy i herbaty."
@@ -67,7 +68,8 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Napar potrzebuje dostępu do aparatu, aby skanować kody QR receptur parzenia kawy i herbaty."
+          "cameraPermission": "Napar potrzebuje dostępu do aparatu, aby skanować kody QR receptur parzenia kawy i herbaty.",
+          "microphonePermission": false
         }
       ]
     ]

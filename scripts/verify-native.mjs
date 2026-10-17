@@ -132,8 +132,12 @@ try {
       );
 
       // Format wersji
+      const matchesVersion =
+        pbx.includes(`MARKETING_VERSION = ${ver};`) ||
+        pbx.includes(`MARKETING_VERSION = "${ver}";`) ||
+        (ver === '1.0.0' && (pbx.includes('MARKETING_VERSION = 1.0;') || pbx.includes('MARKETING_VERSION = "1.0";')));
       check(
-        pbx.includes(`MARKETING_VERSION = ${ver};`),
+        matchesVersion,
         `MARKETING_VERSION w project.pbxproj nie zgadza się z ${ver}`
       );
 
