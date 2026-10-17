@@ -107,12 +107,44 @@ if (existsSync(hostObjectCallbacksHeader)) {
   }
 }
 
-// 5. Patch Swift sources in expo-modules-jsi for Swift 6.0 compatibility
-const jsiSourcesDir = join(process.cwd(), 'node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI');
-if (existsSync(jsiSourcesDir)) {
-  function patchDir(dir) {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = join(dir, entry.name);
+// 5. Disable precompiled XCFrameworks in expo-modules-autolinking (so Expo modules build from source on Xcode 16.x)
+const precompiledModulesRb = join(
+  process.cwd(),
+  'node_modules/expo-modules-autolinking/scripts/ios/precompiled_modules.rb'
+);
+if (existsSync(precompiledModulesRb)) {
+  const original = readFileSync(precompiledModulesRb, 'utf8');
+  let content = original;
+  if (!content.includes('def enabled?\n        false\n      end')) {
+    content = content.replace(/def enabled\?[\s\S]+?end\b/, 'def enabled?\n        false\n      end');
+  }
+  if (content !== original) {
+    writeFileSync(precompiledModulesRb, content, 'utf8');
+    console.log('[patch-swift-tools] Disabled precompiled modules in precompiled_modules.rb for Xcode 16.x compatibility.');
+  }
+}
+
+// 6. Patch Swift sources in expo-modules-jsi and other expo modules for Swift 6.0 compatibility
+const dirsToPatch = [
+  join(process.cwd(), 'node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI'),
+  join(process.cwd(), 'node_modules/expo-modules-core/ios'),
+];
+const nodeModulesDir = join(process.cwd(), 'node_modules');
+if (existsSync(nodeModulesDir)) {
+  for (const pkg of readdirSync(nodeModulesDir)) {
+    if (pkg.startsWith('expo-') || pkg === 'expo') {
+      const iosSubdir = join(nodeModulesDir, pkg, 'ios');
+      if (existsSync(iosSubdir) && !dirsToPatch.includes(iosSubdir)) {
+        dirsToPatch.push(iosSubdir);
+      }
+    }
+  }
+}
+
+function patchDir(dir) {
+  if (!existsSync(dir)) return;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
       if (entry.isDirectory()) {
         patchDir(full);
       } else if (entry.name.endsWith('.swift')) {
@@ -236,10 +268,11 @@ if (existsSync(jsiSourcesDir)) {
 
         if (content !== original) {
           writeFileSync(full, content, 'utf8');
-          console.log(`[patch-swift-tools] Patched ${entry.name} for Swift 6.0 compatibility.`);
         }
       }
     }
   }
-  patchDir(jsiSourcesDir);
+
+for (const dir of dirsToPatch) {
+  patchDir(dir);
 }

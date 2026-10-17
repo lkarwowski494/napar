@@ -25,6 +25,7 @@ env:
   APP_DIR: 'Napar'
   BUNDLE_ID: 'pl.lukasz.napar'
   BUILD_BASE: '10'
+  EXPO_USE_PRECOMPILED_MODULES: '0'
 
 jobs:
   build:
