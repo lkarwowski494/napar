@@ -148,7 +148,7 @@ jobs:
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/$APP_SCHEME.xcarchive" \
-            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
+            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID || '8NQ9GHY8GF' }}" \
             CODE_SIGN_STYLE=Automatic \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
@@ -165,8 +165,8 @@ jobs:
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 || secrets.ASC_KEY_P8 }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID || '8NQ9GHY8GF' }}
         run: |
           set +x
           for req in APPLE_TEAM_ID ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8_BASE64; do
@@ -183,7 +183,11 @@ jobs:
           KEY_DIR="$RUNNER_TEMP/asc_private_keys"
           mkdir -p "$KEY_DIR"
           KEY_PATH="$KEY_DIR/AuthKey_${ASC_KEY_ID}.p8"
-          printf '%s' "$ASC_KEY_P8_BASE64" | base64 --decode > "$KEY_PATH"
+          if [[ "$ASC_KEY_P8_BASE64" =~ "BEGIN PRIVATE KEY" ]]; then
+            printf '%s\n' "$ASC_KEY_P8_BASE64" > "$KEY_PATH"
+          else
+            printf '%s' "$ASC_KEY_P8_BASE64" | base64 --decode > "$KEY_PATH"
+          fi
           chmod 600 "$KEY_PATH"
           if ! grep -q "BEGIN PRIVATE KEY" "$KEY_PATH"; then
             echo "::error::Zdekodowany klucz .p8 nie zawiera nagłówka BEGIN PRIVATE KEY"
@@ -196,7 +200,7 @@ jobs:
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID || '8NQ9GHY8GF' }}
         run: |
           cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
