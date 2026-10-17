@@ -187,6 +187,15 @@ if (existsSync(jsiSourcesDir)) {
             /expo\.HostFunctionClosure\(context, call, deallocate\)/g,
             'expo.HostFunctionClosure.create(context, call, deallocate)'
           );
+          // Fix createClass constructor passing (avoids 'arguments is borrowed and cannot be consumed' in Swift 6.0)
+          content = content.replace(
+            /public func createClass\(\s*name: String,\s*inheriting baseClass: consuming JavaScriptFunction\? = nil,\s*_ constructor: @escaping SyncFunctionClosure\s*\)/,
+            'public func createClass(\n    name: String, inheriting baseClass: consuming JavaScriptFunction? = nil,\n    _ constructor: sending @escaping SyncFunctionClosure\n  )'
+          );
+          content = content.replace(
+            /let nativeConstructor = createFunction\(name\) \{ this, arguments in\s*return try constructor\(this, arguments\)\s*\}/,
+            'let nativeConstructor = createFunction(name, constructor)'
+          );
         }
 
         // h) Fix JavaScriptObject.swift (~Copyable delegating initializer triggers Swift 6.0 compiler bug)
