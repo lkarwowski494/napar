@@ -189,6 +189,42 @@ if (existsSync(jsiSourcesDir)) {
           );
         }
 
+        // h) Fix JavaScriptObject.swift (~Copyable delegating initializer triggers Swift 6.0 compiler bug)
+        if (entry.name === 'JavaScriptObject.swift') {
+          content = content.replace(
+            /public\s+init\(_\s+runtime:\s+JavaScriptRuntime\)\s*\{\s*self\.init\(runtime,\s*facebook\.jsi\.Object\(runtime\.pointee\)\)\s*\}/,
+            `public init(_ runtime: JavaScriptRuntime) {\n    self.runtime = runtime\n    self.pointee = facebook.jsi.Object(runtime.pointee)\n  }`
+          );
+        }
+
+        // i) Fix JavaScriptArray.swift (~Copyable delegating initializers trigger Swift 6.0 compiler bug)
+        if (entry.name === 'JavaScriptArray.swift') {
+          content = content.replace(
+            /public\s+init\(_\s+runtime:\s+JavaScriptRuntime,\s*length:\s*Int\s*=\s*0\)\s*\{\s*self\.init\(runtime,\s*facebook\.jsi\.Array\(runtime\.pointee,\s*length\)\)\s*\}/,
+            `public init(_ runtime: JavaScriptRuntime, length: Int = 0) {\n    self.runtime = runtime\n    self.pointee = facebook.jsi.Array(runtime.pointee, length)\n  }`
+          );
+          content = content.replace(
+            /public\s+init\(_\s+runtime:\s+JavaScriptRuntime,\s*items:\s*\[JavaScriptValue\]\)\s*\{\s*self\.init\(runtime,\s*length:\s*items\.count\)/,
+            `public init(_ runtime: JavaScriptRuntime, items: [JavaScriptValue]) {\n    self.runtime = runtime\n    self.pointee = facebook.jsi.Array(runtime.pointee, items.count)`
+          );
+          content = content.replace(
+            /public\s+init\(_\s+runtime:\s+JavaScriptRuntime,\s*items:\s*JavaScriptValue\.\.\.\)\s*\{\s*self\.init\(runtime,\s*items:\s*items\)\s*\}/,
+            `public init(_ runtime: JavaScriptRuntime, items: JavaScriptValue...) {\n    self.runtime = runtime\n    self.pointee = facebook.jsi.Array(runtime.pointee, items.count)\n\n    for (i, item) in items.enumerated() {\n      self[i] = item\n    }\n  }`
+          );
+          content = content.replace(
+            /self\.init\(runtime,\s*length:\s*length\)/,
+            `self.runtime = runtime\n    self.pointee = facebook.jsi.Array(runtime.pointee, length)`
+          );
+        }
+
+        // j) Fix JavaScriptPromise.swift (~Copyable delegating initializer triggers Swift 6.0 compiler bug)
+        if (entry.name === 'JavaScriptPromise.swift') {
+          content = content.replace(
+            /@JavaScriptActor\s*internal\s+init\(_\s+runtime:\s+JavaScriptRuntime,\s*_\s+object:\s+consuming\s+facebook\.jsi\.Object\)\s*throws\s*\{\s*try\s+self\.init\(runtime,\s*JavaScriptObject\(runtime,\s*object\)\)\s*\}/,
+            `@JavaScriptActor\n  internal init(_ runtime: JavaScriptRuntime, _ object: consuming facebook.jsi.Object) throws {\n    self.runtime = runtime\n    longLivedState.object.reset(JavaScriptValue(runtime, facebook.jsi.Value(runtime.pointee, object)))\n    try setUpCallbacks()\n    runtime.longLivedObjects.add(longLivedState)\n  }`
+          );
+        }
+
         if (content !== original) {
           writeFileSync(full, content, 'utf8');
           console.log(`[patch-swift-tools] Patched ${entry.name} for Swift 6.0 compatibility.`);
