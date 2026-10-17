@@ -154,10 +154,16 @@ if (existsSync(jsiSourcesDir)) {
 
         // g) Fix JavaScriptRuntime.swift
         if (entry.name === 'JavaScriptRuntime.swift') {
-          // Fix push_back consuming: label (Swift 6.0 C++ vector interop expects unlabelled argument)
-          content = content.replace(/vector\.push_back\(consuming:\s*propNameId\)/g, 'vector.push_back(propNameId)');
+          // Fix push_back consuming: label (Swift 6.0 C++ vector interop expects `consume propNameId` without label)
+          content = content.replace(
+            /vector\.push_back\((?:consuming:\s*)?propNameId\)/g,
+            'vector.push_back(consume propNameId)'
+          );
           // Fix HostFunctionClosure initializer call to use static factory
-          content = content.replace(/expo\.HostFunctionClosure\(context, call, deallocate\)/g, 'expo.HostFunctionClosure.create(context, call, deallocate)');
+          content = content.replace(
+            /expo\.HostFunctionClosure\(context, call, deallocate\)/g,
+            'expo.HostFunctionClosure.create(context, call, deallocate)'
+          );
         }
 
         if (content !== original) {
