@@ -17,6 +17,7 @@
       "appleTeamId": "8NQ9GHY8GF",
       "buildNumber": "1",
       "supportsTablet": false,
+      "requireFullScreen": true,
       "privacyManifests": {
         "NSPrivacyTracking": false,
         "NSPrivacyTrackingDomains": [],

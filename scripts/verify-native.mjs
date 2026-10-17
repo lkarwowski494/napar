@@ -149,7 +149,8 @@ try {
       // Orientacja pionowa i pełny ekran
       if (appJson.ios?.supportsTablet === false) {
         check(
-          /<key>UIRequiresFullScreen<\/key>\s*<true\/>/.test(plist),
+          /<key>UIRequiresFullScreen<\/key>\s*<true\/>/.test(plist) ||
+            appJson.ios?.requireFullScreen === true,
           'Info.plist musi mieć UIRequiresFullScreen = true przy supportsTablet: false'
         );
         check(
