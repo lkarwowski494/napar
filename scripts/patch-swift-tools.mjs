@@ -73,7 +73,11 @@ if (existsSync(jsiSourcesDir)) {
         const original = readFileSync(full, 'utf8');
         let content = original;
 
-        // a) Convert "weak let" -> "weak var" (weak let requires Swift 6.2+)
+        // a) Convert "weak let" -> "nonisolated(unsafe) weak var" for Sendable compatibility in Swift 6.0
+        content = content.replace(
+          /(?<!nonisolated\(unsafe\)\s+)(private|internal)\s+(?:weak\s+let|weak\s+var)\s+runtime/g,
+          'nonisolated(unsafe) $1 weak var runtime'
+        );
         content = content.replace(/\bweak\s+let\b/g, 'weak var');
 
         // b) Remove trailing commas before closing paren / bracket
@@ -89,9 +93,35 @@ if (existsSync(jsiSourcesDir)) {
 
         // e) Fix JavaScriptActor.assumeIsolated in JavaScriptActor.swift
         if (entry.name === 'JavaScriptActor.swift') {
+          // Replace nonthrowing assumeIsolated
           content = content.replace(
-            /let runner = unsafeBitCast\(runIsolated as IsolatedRunner, to: NonisolatedRunner\.self\)\s+return runner\(operation\)/g,
-            'typealias NonisolatedOp = () -> T\n    let runner = unsafeBitCast(operation, to: NonisolatedOp.self)\n    return runner()'
+            /public static func assumeIsolated<T(?:: ~Copyable)?\>[\s\S]+?return runner\(\)/g,
+            `public static func assumeIsolated<T>(_ operation: @JavaScriptActor () -> T) -> T {
+    checkIsolated()
+    return withoutActuallyEscaping(operation) { fn in
+      let nonisolatedFn = unsafeBitCast(fn, to: (() -> T).self)
+      return nonisolatedFn()
+    }`
+          );
+          // Also handle original unpatched body if present
+          content = content.replace(
+            /public static func assumeIsolated<T(?:: ~Copyable)?\>[\s\S]+?return runner\(operation\)/g,
+            `public static func assumeIsolated<T>(_ operation: @JavaScriptActor () -> T) -> T {
+    checkIsolated()
+    return withoutActuallyEscaping(operation) { fn in
+      let nonisolatedFn = unsafeBitCast(fn, to: (() -> T).self)
+      return nonisolatedFn()
+    }`
+          );
+          // Fix generic constraint in throwing overload
+          content = content.replace(
+            /public static func assumeIsolated<T: ~Copyable,\s*E: Error>/g,
+            'public static func assumeIsolated<T, E: Error>'
+          );
+          // Fix generic constraint in runIsolated
+          content = content.replace(
+            /internal static func runIsolated<T: ~Copyable>/g,
+            'internal static func runIsolated<T>'
           );
         }
 
