@@ -2,7 +2,8 @@
 /**
  * Patch SwiftPM Package.swift manifests and Swift/C++ sources in node_modules to match Xcode 16.x (Swift tools version 6.0).
  * Aligns swift-tools-version to 6.0, removes trailing commas in argument lists (SE-0437, requires Swift 6.2),
- * patches Swift 6.2-only constructs (weak let, Escapable, CppError library evolution, actor isolation)
+ * patches Swift 6.2-only constructs (weak let, Escapable, CppError library evolution, actor isolation, Task.immediate)
+ * and provides C++ static factories for foreign reference types (RuntimeScheduler, HostFunctionClosure)
  * so that ExpoModulesJSI builds cleanly on Xcode 16.2 / Swift 6.0.
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -61,7 +62,29 @@ if (existsSync(runtimeSchedulerHeader)) {
   }
 }
 
-// 3. Patch Swift sources in expo-modules-jsi for Swift 6.0 compatibility
+// 3. Patch HostFunctionClosure.h for Xcode 16.x (Swift 6.0 immortal reference static factory)
+const hostFunctionClosureHeader = join(
+  process.cwd(),
+  'node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI-Cxx/include/HostFunctionClosure.h'
+);
+if (existsSync(hostFunctionClosureHeader)) {
+  const original = readFileSync(hostFunctionClosureHeader, 'utf8');
+  let content = original;
+
+  if (!content.includes('static HostFunctionClosure *create')) {
+    content = content.replace(
+      /explicit HostFunctionClosure\(Context context, Closure closure, Deallocator deallocator\)[\s\S]+?\};/,
+      `explicit HostFunctionClosure(Context context, Closure closure, Deallocator deallocator) : RetainedSwiftPointer(context, deallocator), _closure(closure) {}\n\n  static HostFunctionClosure *create(Context context, Closure closure, Deallocator deallocator) {\n    return new HostFunctionClosure(context, closure, deallocator);\n  }`
+    );
+  }
+
+  if (content !== original) {
+    writeFileSync(hostFunctionClosureHeader, content, 'utf8');
+    console.log('[patch-swift-tools] Successfully patched HostFunctionClosure.h for Xcode 16.x C++/Swift compatibility.');
+  }
+}
+
+// 4. Patch Swift sources in expo-modules-jsi for Swift 6.0 compatibility
 const jsiSourcesDir = join(process.cwd(), 'node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI');
 if (existsSync(jsiSourcesDir)) {
   function patchDir(dir) {
@@ -93,7 +116,6 @@ if (existsSync(jsiSourcesDir)) {
 
         // e) Fix JavaScriptActor.assumeIsolated in JavaScriptActor.swift
         if (entry.name === 'JavaScriptActor.swift') {
-          // Replace nonthrowing assumeIsolated
           content = content.replace(
             /public static func assumeIsolated<T(?:: ~Copyable)?\>[\s\S]+?return runner\(\)/g,
             `public static func assumeIsolated<T>(_ operation: @JavaScriptActor () -> T) -> T {
@@ -103,7 +125,6 @@ if (existsSync(jsiSourcesDir)) {
       return nonisolatedFn()
     }`
           );
-          // Also handle original unpatched body if present
           content = content.replace(
             /public static func assumeIsolated<T(?:: ~Copyable)?\>[\s\S]+?return runner\(operation\)/g,
             `public static func assumeIsolated<T>(_ operation: @JavaScriptActor () -> T) -> T {
@@ -113,16 +134,30 @@ if (existsSync(jsiSourcesDir)) {
       return nonisolatedFn()
     }`
           );
-          // Fix generic constraint in throwing overload
           content = content.replace(
             /public static func assumeIsolated<T: ~Copyable,\s*E: Error>/g,
             'public static func assumeIsolated<T, E: Error>'
           );
-          // Fix generic constraint in runIsolated
           content = content.replace(
             /internal static func runIsolated<T: ~Copyable>/g,
             'internal static func runIsolated<T>'
           );
+        }
+
+        // f) Fix Task+immediate.swift (Task.immediate and name: parameter require Swift 6.2)
+        if (entry.name === 'Task+immediate.swift') {
+          content = content.replace(
+            /if #available\(macOS 26[\s\S]+?return Task\(name: name, priority: \.high, operation: operation\)\s*\}/,
+            'return Task(priority: .high, operation: operation)'
+          );
+        }
+
+        // g) Fix JavaScriptRuntime.swift
+        if (entry.name === 'JavaScriptRuntime.swift') {
+          // Fix push_back consuming: label (Swift 6.0 C++ vector interop expects unlabelled argument)
+          content = content.replace(/vector\.push_back\(consuming:\s*propNameId\)/g, 'vector.push_back(propNameId)');
+          // Fix HostFunctionClosure initializer call to use static factory
+          content = content.replace(/expo\.HostFunctionClosure\(context, call, deallocate\)/g, 'expo.HostFunctionClosure.create(context, call, deallocate)');
         }
 
         if (content !== original) {
