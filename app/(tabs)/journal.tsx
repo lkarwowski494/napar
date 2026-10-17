@@ -26,7 +26,7 @@ import { getWaterProfileName } from '../../src/core/water-chemistry';
 import { useAppAccess } from '../../src/core/app-access';
 import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../src/core/unit-converter';
-import { StarIcon, JournalIcon } from '../../src/components/icons/CraftIcons';
+import { StarIcon, JournalIcon, BrewIcon, DropletIcon, LightningIcon, ShieldIcon } from '../../src/components/icons/CraftIcons';
 
 export default function JournalScreen() {
   const router = useRouter();
@@ -258,17 +258,17 @@ export default function JournalScreen() {
   const handleShareSession = (session: BrewSession) => {
     const formattedDate = formatDateTime(session.brewedAt);
     const title = session.recipeName || session.method;
-    const bean = session.inventoryItemName ? `\n🫘 Ziarno: ${session.inventoryItemName}` : '';
-    const ratingStr = session.rating ? `\n⭐ Ocena: ★ ${session.rating.toFixed(1)}/5` : '';
-    const balanceStr = session.tasteBalance ? `\n🎯 Balans: ${session.tasteBalance}` : '';
+    const bean = session.inventoryItemName ? `\nZiarno: ${session.inventoryItemName}` : '';
+    const ratingStr = session.rating ? `\nOcena: ${session.rating.toFixed(1)}/5` : '';
+    const balanceStr = session.tasteBalance ? `\nBalans: ${session.tasteBalance}` : '';
     const eyStr = session.extractionYieldPercentage ? ` (EY: ${session.extractionYieldPercentage.toFixed(1)}%)` : '';
-    const tagsStr = session.flavorTags && session.flavorTags.length > 0 ? `\n🌸 Nuty: ${session.flavorTags.join(', ')}` : '';
-    const notesStr = session.notes ? `\n📝 Notatki: "${session.notes}"` : '';
+    const tagsStr = session.flavorTags && session.flavorTags.length > 0 ? `\nNuty: ${session.flavorTags.join(', ')}` : '';
+    const notesStr = session.notes ? `\nNotatki: "${session.notes}"` : '';
 
-    const shareMessage = `☕ ${title} — Napar (Steepwise)
-📅 ${formattedDate}${bean}
-⚖️ Doza: ${session.doseGrams}g | Woda: ${session.waterGrams}g | Temp: ${session.waterTempCelsius}°C
-⏱️ Czas parzenia: ${formatSeconds(session.totalTimeSeconds)}${ratingStr}${balanceStr}${eyStr}${tagsStr}${notesStr}
+    const shareMessage = `${title} — Napar (Steepwise)
+Data: ${formattedDate}${bean}
+Doza: ${session.doseGrams}g | Woda: ${session.waterGrams}g | Temp: ${session.waterTempCelsius}°C
+Czas parzenia: ${formatSeconds(session.totalTimeSeconds)}${ratingStr}${balanceStr}${eyStr}${tagsStr}${notesStr}
 
 Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
 
@@ -322,8 +322,9 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
 
       {isHistoryReadOnly && (
         <View style={styles.readOnlyBanner} testID="journal-readonly-banner">
-          <Text style={styles.readOnlyText}>
-            {`🛡️ ${t.paywall.historyNotice}`}
+          <ShieldIcon size={14} color="#D49B42" />
+          <Text style={[styles.readOnlyText, { marginLeft: 8 }]}>
+            {t.paywall.historyNotice}
           </Text>
         </View>
       )}
@@ -400,7 +401,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
         </View>
       ) : filteredSessions.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>🔍</Text>
+          <JournalIcon size={36} color={theme.colors.textMuted} />
           <Text style={styles.emptyTitle}>{t.journal.noResults}</Text>
           <Pressable
             style={styles.clearSearchBtn}
@@ -480,11 +481,11 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
                 >
                   <Text style={styles.balanceText}>
                     {session.tasteBalance === 'balanced'
-                      ? '✓ Zbalansowana'
+                      ? 'Zbalansowana'
                       : session.tasteBalance === 'sour'
-                      ? '⚠ Za kwaśna'
+                      ? 'Za kwaśna'
                       : session.tasteBalance === 'bitter'
-                      ? '⚠ Za gorzka'
+                      ? 'Za gorzka'
                       : session.tasteBalance}
                   </Text>
                 </View>
@@ -574,25 +575,25 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
           {/* Karty podsumowania wolumenu */}
           <View style={styles.statsGrid}>
             <View style={styles.statCard}>
-              <Text style={styles.statIcon}>☕</Text>
+              <View style={styles.statIconBox}><BrewIcon size={22} color={theme.colors.copper} /></View>
               <Text style={styles.statValue}>{`${analyticsData.totalDoseGrams}g`}</Text>
               <Text style={styles.statLabel}>{t.journal.statTotalDose}</Text>
             </View>
 
             <View style={styles.statCard}>
-              <Text style={styles.statIcon}>💧</Text>
+              <View style={styles.statIconBox}><DropletIcon size={20} color="#3D84A8" /></View>
               <Text style={styles.statValue}>{`${analyticsData.totalWaterLiters} L`}</Text>
               <Text style={styles.statLabel}>{t.journal.statTotalWater}</Text>
             </View>
 
             <View style={styles.statCard}>
-              <Text style={styles.statIcon}>⚡</Text>
+              <View style={styles.statIconBox}><LightningIcon size={20} color="#E5A96A" /></View>
               <Text style={styles.statValue}>{`${analyticsData.totalCaffeineMg} mg`}</Text>
               <Text style={styles.statLabel}>{t.journal.statTotalCaffeine}</Text>
             </View>
 
             <View style={styles.statCard}>
-              <Text style={styles.statIcon}>★</Text>
+              <View style={styles.statIconBox}><StarIcon size={20} color="#E5A96A" filled /></View>
               <Text style={styles.statValue}>{`${analyticsData.avgRating}`}</Text>
               <Text style={styles.statLabel}>{t.journal.statAvgRating}</Text>
             </View>
@@ -714,13 +715,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.statusPeak,
     marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   readOnlyText: {
     color: theme.colors.textPrimary,
     fontSize: 12,
-    textAlign: 'center',
     fontWeight: '600',
     lineHeight: 16,
+    flex: 1,
   },
   content: {
     padding: theme.spacing.md,
@@ -1043,6 +1046,12 @@ const styles = StyleSheet.create({
   },
   statIcon: {
     fontSize: 22,
+    marginBottom: 4,
+  },
+  statIconBox: {
+    height: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 4,
   },
   statValue: {

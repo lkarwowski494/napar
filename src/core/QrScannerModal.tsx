@@ -15,6 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { theme } from './theme';
+import { CameraIcon } from '../components/icons/CraftIcons';
 
 interface QrScannerModalProps {
   visible: boolean;
@@ -71,7 +72,10 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
 
         {!permission?.granted ? (
           <View style={styles.permissionBox}>
-            <Text style={styles.permissionTitle}>📷 Dostęp do Aparatu</Text>
+            <View style={{ marginBottom: 16 }}>
+              <CameraIcon size={44} color={theme.colors.copper} />
+            </View>
+            <Text style={styles.permissionTitle}>Dostęp do Aparatu</Text>
             <Text style={styles.permissionDesc}>
               Aparat jest potrzebny, aby natychmiast zeskanować kod QR z telefonu innego baristy i zaimportować recepturę w 100% offline.
             </Text>

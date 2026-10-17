@@ -19,6 +19,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../core/theme';
 import { useTranslation } from '../core/i18n';
 import { useAppAccess } from '../core/app-access';
+import { ShieldIcon } from './icons/CraftIcons';
 
 interface Apps4BrewPassModalProps {
   visible: boolean;
@@ -105,20 +106,22 @@ export function Apps4BrewPassModal({
           {status === 'trial_active' ? (
             <View style={styles.trialStatusCard}>
               <Text style={styles.trialStatusText}>
-                ☕ Pozostało Ci {brewsRemaining} {brewsRemaining === 1 ? 'parzenie' : 'parzenia'} w bezpłatnym okresie próbnym ({daysRemaining} dni).
+                Pozostało Ci {brewsRemaining} {brewsRemaining === 1 ? 'parzenie' : 'parzenia'} w bezpłatnym okresie próbnym ({daysRemaining} dni).
               </Text>
             </View>
           ) : (
             <View style={[styles.trialStatusCard, styles.trialExpiredCard]}>
               <Text style={styles.trialExpiredText}>
-                ⏱️ Twój bezpłatny okres próbny dobiegł końca. Wybierz plan poniżej, aby parzyć kolejne filiżanki.
+                Twój bezpłatny okres próbny dobiegł końca. Wybierz plan poniżej, aby parzyć kolejne filiżanki.
               </Text>
             </View>
           )}
 
           {/* Gwarancja historii Read-Only */}
           <View style={styles.guaranteeCard}>
-            <Text style={styles.guaranteeIcon}>🛡️</Text>
+            <View style={styles.guaranteeIcon}>
+              <ShieldIcon size={20} color={theme.colors.statusPeak} />
+            </View>
             <Text style={styles.guaranteeText}>
               {t.paywall.historyNotice}
             </Text>
@@ -307,7 +310,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   guaranteeIcon: {
-    fontSize: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   guaranteeText: {
     flex: 1,

@@ -16,7 +16,7 @@ export interface FlavorCategory {
 export const SCA_FLAVOR_WHEEL: FlavorCategory[] = [
   {
     id: 'fruity',
-    namePl: 'Owoce 🍓',
+    namePl: 'Owoce',
     color: '#D9534F',
     subcategories: [
       {
@@ -43,7 +43,7 @@ export const SCA_FLAVOR_WHEEL: FlavorCategory[] = [
   },
   {
     id: 'sweet',
-    namePl: 'Słodycz & Czekolada 🍫',
+    namePl: 'Słodycz & Czekolada',
     color: '#D97736',
     subcategories: [
       {
@@ -62,7 +62,7 @@ export const SCA_FLAVOR_WHEEL: FlavorCategory[] = [
   },
   {
     id: 'floral',
-    namePl: 'Kwiatowe 🌸',
+    namePl: 'Kwiatowe',
     color: '#C060A8',
     subcategories: [
       {
@@ -77,7 +77,7 @@ export const SCA_FLAVOR_WHEEL: FlavorCategory[] = [
   },
   {
     id: 'nutty',
-    namePl: 'Orzechy & Prażone 🌰',
+    namePl: 'Orzechy & Prażone',
     color: '#8C6239',
     subcategories: [
       {
@@ -92,7 +92,7 @@ export const SCA_FLAVOR_WHEEL: FlavorCategory[] = [
   },
   {
     id: 'spices',
-    namePl: 'Przyprawy 🌿',
+    namePl: 'Przyprawy',
     color: '#A85A32',
     subcategories: [
       {
@@ -107,7 +107,7 @@ export const SCA_FLAVOR_WHEEL: FlavorCategory[] = [
   },
   {
     id: 'tea_green',
-    namePl: 'Herbaciane & Ziołowe 🍵',
+    namePl: 'Herbaciane & Ziołowe',
     color: '#2A7B62',
     subcategories: [
       {

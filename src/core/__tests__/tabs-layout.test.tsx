@@ -24,6 +24,11 @@ jest.mock('expo-router', () => {
   };
 });
 
+// Mock react-native-safe-area-context
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 47, bottom: 34, left: 0, right: 0 }),
+}));
+
 import TabLayout from '../../../app/(tabs)/_layout';
 
 describe('TabLayout', () => {

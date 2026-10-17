@@ -67,6 +67,10 @@ import {
   MasazAppIcon,
   FermentAppIcon,
   CraftFamilyEmblem,
+  CheckIcon,
+  BrewIcon,
+  TeaLeafIcon,
+  StarIcon,
 } from '../src/components/icons/CraftIcons';
 import { CRAFT_APPS } from '../src/core/craft-suite-theme';
 
@@ -250,7 +254,7 @@ export default function SettingsScreen() {
           onPress={() => setLanguage('pl')}
         >
           <Text style={[styles.langTabText, language === 'pl' && styles.langTabTextActive]}>
-            🇵🇱 Polski (Napar)
+            Polski (Napar)
           </Text>
         </Pressable>
         <Pressable
@@ -261,7 +265,7 @@ export default function SettingsScreen() {
           onPress={() => setLanguage('en')}
         >
           <Text style={[styles.langTabText, language === 'en' && styles.langTabTextActive]}>
-            🇬🇧 English (Steepwise)
+            English (Steepwise)
           </Text>
         </Pressable>
       </View>
@@ -278,12 +282,12 @@ export default function SettingsScreen() {
         >
           <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
             <Text style={[styles.actionTitle, beveragePreference === 'both' && styles.actionTitleActive]}>
-              ☕ + 🍵 {t.settings.beverageBoth}
+              {t.settings.beverageBoth}
             </Text>
             <Text style={styles.actionSubtitle}>{t.settings.beverageBothDesc}</Text>
           </View>
           {beveragePreference === 'both' && (
-            <Text style={styles.checkIcon}>✓</Text>
+            <CheckIcon size={18} color={theme.colors.copper} />
           )}
         </Pressable>
 
@@ -298,12 +302,12 @@ export default function SettingsScreen() {
         >
           <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
             <Text style={[styles.actionTitle, beveragePreference === 'coffee' && styles.actionTitleActive]}>
-              ☕ {t.settings.beverageCoffeeOnly}
+              {t.settings.beverageCoffeeOnly}
             </Text>
             <Text style={styles.actionSubtitle}>{t.settings.beverageCoffeeOnlyDesc}</Text>
           </View>
           {beveragePreference === 'coffee' && (
-            <Text style={styles.checkIcon}>✓</Text>
+            <CheckIcon size={18} color={theme.colors.copper} />
           )}
         </Pressable>
 
@@ -318,12 +322,12 @@ export default function SettingsScreen() {
         >
           <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
             <Text style={[styles.actionTitle, beveragePreference === 'tea' && styles.actionTitleActive]}>
-              🍵 {t.settings.beverageTeaOnly}
+              {t.settings.beverageTeaOnly}
             </Text>
             <Text style={styles.actionSubtitle}>{t.settings.beverageTeaOnlyDesc}</Text>
           </View>
           {beveragePreference === 'tea' && (
-            <Text style={styles.checkIcon}>✓</Text>
+            <CheckIcon size={18} color={theme.colors.emerald} />
           )}
         </Pressable>
       </View>
@@ -382,7 +386,7 @@ export default function SettingsScreen() {
       <View style={styles.cardGroup}>
         <View style={styles.actionRow}>
           <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
-            <Text style={styles.actionTitle}>📢 {t.settings.voiceAnnounceTitle}</Text>
+            <Text style={styles.actionTitle}>{t.settings.voiceAnnounceTitle}</Text>
             <Text style={styles.actionSubtitle}>{t.settings.voiceAnnounceDesc}</Text>
           </View>
           <Pressable
@@ -411,7 +415,7 @@ export default function SettingsScreen() {
 
         <View style={styles.actionRow}>
           <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
-            <Text style={styles.actionTitle}>📳 {t.settings.hapticsTitle}</Text>
+            <Text style={styles.actionTitle}>{t.settings.hapticsTitle}</Text>
             <Text style={styles.actionSubtitle}>{t.settings.hapticsDesc}</Text>
           </View>
           <Pressable
@@ -575,15 +579,19 @@ export default function SettingsScreen() {
                     {grinder.stepMicrons} µm/klik · Zakres: {grinder.minSetting}–{grinder.maxSetting}
                   </Text>
                 </View>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: '700',
-                    color: isSelected ? theme.colors.copper : theme.colors.textMuted,
-                  }}
-                >
-                  {isSelected ? '✓' : '○'}
-                </Text>
+                {isSelected ? (
+                  <CheckIcon size={18} color={theme.colors.copper} />
+                ) : (
+                  <View
+                    style={{
+                      width: 18,
+                      height: 18,
+                      borderRadius: 9,
+                      borderWidth: 1.5,
+                      borderColor: theme.colors.border,
+                    }}
+                  />
+                )}
               </Pressable>
             </React.Fragment>
           );
@@ -636,7 +644,7 @@ export default function SettingsScreen() {
               Arkusz kalkulacyjny (Excel, Google Sheets) z historią zaparzeń i sensoryką
             </Text>
           </View>
-          <Text style={styles.actionArrow}>📊</Text>
+          <Text style={styles.actionArrow}>CSV</Text>
         </Pressable>
 
         <View style={styles.divider} />
@@ -648,7 +656,7 @@ export default function SettingsScreen() {
               Zestawienie paczek ziaren, herbat, palarni, dat palenia i zapasów
             </Text>
           </View>
-          <Text style={styles.actionArrow}>🫙</Text>
+          <Text style={styles.actionArrow}>CSV</Text>
         </Pressable>
       </View>
 
@@ -696,8 +704,8 @@ export default function SettingsScreen() {
         >
           <Text style={styles.passCtaBtnText}>
             {isSubscribed
-              ? '★ Licencja Aktywna — Zarządzaj Planem'
-              : '☕ Przejdź do planów ($0.99 / $4.99 / $14.99)'}
+              ? 'Licencja Aktywna — Zarządzaj Planem'
+              : 'Przejdź do planów ($0.99 / $4.99 / $14.99)'}
           </Text>
         </Pressable>
       </View>

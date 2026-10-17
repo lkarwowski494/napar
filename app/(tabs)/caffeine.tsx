@@ -171,7 +171,7 @@ export default function CaffeineScreen() {
       {isHistoryReadOnly && (
         <View style={styles.readOnlyBanner}>
           <Text style={styles.readOnlyBannerText}>
-            🛡️ Tryb Tylko do Odczytu — Twoja historia kofeiny jest bezpieczna. Nowe wpisy wymagają Apps4Brew Pass.
+            Tryb Tylko do Odczytu — Twoja historia kofeiny jest bezpieczna. Nowe wpisy wymagają Apps4Brew Pass.
           </Text>
         </View>
       )}
@@ -267,7 +267,6 @@ export default function CaffeineScreen() {
           ]}
         >
           <Text style={styles.curfewVerdictText}>
-            {bedtimeEval.isSafeForSleep ? '✓ ' : '⚠ '}
             Poziom kofeiny o {bedtimeHour}:00: {bedtimeEval.totalRemainingMg} mg
           </Text>
         </View>
@@ -342,7 +341,7 @@ export default function CaffeineScreen() {
               style={styles.quickOption}
               onPress={() => handleQuickAdd('Kawa przelewowa (V60 / Drip)', 'coffee', 18, 140)}
             >
-              <Text style={styles.quickOptionName}>☕ Przelew / Drip (V60, Chemex)</Text>
+              <Text style={styles.quickOptionName}>Przelew / Drip (V60, Chemex)</Text>
               <Text style={styles.quickOptionMg}>~140 mg ({formatDoseWeight(18, unitSystem)})</Text>
             </Pressable>
 
@@ -350,7 +349,7 @@ export default function CaffeineScreen() {
               style={styles.quickOption}
               onPress={() => handleQuickAdd('Podwójne Espresso', 'coffee', 18, 130)}
             >
-              <Text style={styles.quickOptionName}>☕ Podwójne Espresso (Doppio)</Text>
+              <Text style={styles.quickOptionName}>Podwójne Espresso (Doppio)</Text>
               <Text style={styles.quickOptionMg}>~130 mg ({formatDoseWeight(18, unitSystem)})</Text>
             </Pressable>
 
@@ -358,7 +357,7 @@ export default function CaffeineScreen() {
               style={styles.quickOption}
               onPress={() => handleQuickAdd('Pojedyncze Espresso', 'coffee', 9, 65)}
             >
-              <Text style={styles.quickOptionName}>☕ Pojedyncze Espresso</Text>
+              <Text style={styles.quickOptionName}>Pojedyncze Espresso</Text>
               <Text style={styles.quickOptionMg}>~65 mg ({formatDoseWeight(9, unitSystem)})</Text>
             </Pressable>
 
@@ -366,7 +365,7 @@ export default function CaffeineScreen() {
               style={styles.quickOption}
               onPress={() => handleQuickAdd('AeroPress', 'coffee', 15, 110)}
             >
-              <Text style={styles.quickOptionName}>☕ AeroPress</Text>
+              <Text style={styles.quickOptionName}>AeroPress</Text>
               <Text style={styles.quickOptionMg}>~110 mg ({formatDoseWeight(15, unitSystem)})</Text>
             </Pressable>
 
@@ -374,7 +373,7 @@ export default function CaffeineScreen() {
               style={styles.quickOption}
               onPress={() => handleQuickAdd('Herbata Gongfu / Liściasta', 'tea', 5, 45)}
             >
-              <Text style={styles.quickOptionName}>🍵 Herbata liściasta (infuzja)</Text>
+              <Text style={styles.quickOptionName}>Herbata liściasta (infuzja)</Text>
               <Text style={styles.quickOptionMg}>~45 mg ({formatDoseWeight(5, unitSystem)})</Text>
             </Pressable>
 

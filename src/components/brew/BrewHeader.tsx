@@ -93,7 +93,7 @@ export function BrewHeader({
                 currentBeverageType === 'COFFEE' && styles.beverageToggleTextActiveCoffee,
               ]}
             >
-              ☕ Kawa Specialty
+              Kawa Specialty
             </Text>
           </Pressable>
 
@@ -115,7 +115,7 @@ export function BrewHeader({
                 currentBeverageType === 'TEA' && styles.beverageToggleTextActiveTea,
               ]}
             >
-              🍵 Herbata Rzemieślnicza
+              Herbata Rzemieślnicza
             </Text>
           </Pressable>
         </View>

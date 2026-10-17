@@ -6,6 +6,7 @@
 import React from 'react';
 import { Tabs, Link } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../src/core/theme';
 import {
   BrewIcon,
@@ -32,6 +33,15 @@ function SettingsHeaderButton() {
 }
 
 export default function TabLayout() {
+  let insets = { bottom: 0, top: 0, left: 0, right: 0 };
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    insets = useSafeAreaInsets();
+  } catch {
+    insets = { bottom: 0, top: 0, left: 0, right: 0 };
+  }
+  const bottomInset = Math.max(insets?.bottom || 0, 8);
+
   return (
     <Tabs
       screenOptions={{
@@ -54,9 +64,9 @@ export default function TabLayout() {
           backgroundColor: theme.colors.bgCard,
           borderTopColor: theme.colors.border,
           borderTopWidth: 1,
-          height: 64,
-          paddingBottom: 8,
-          paddingTop: 8,
+          height: 52 + bottomInset,
+          paddingBottom: bottomInset,
+          paddingTop: 6,
           elevation: 0,
         },
         tabBarActiveTintColor: theme.colors.copper,

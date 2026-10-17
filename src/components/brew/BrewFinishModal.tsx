@@ -24,6 +24,7 @@ import {
 } from '../../core/radar-chart';
 import { FlavorWheelPicker } from '../../core/flavor-wheel-picker';
 import { WATER_RECIPES } from '../../core/water-chemistry';
+import { CompassIcon, StarIcon } from '../icons/CraftIcons';
 
 interface BrewFinishModalProps {
   visible: boolean;
@@ -144,7 +145,10 @@ export function BrewFinishModal({
             {/* Dial-in Doctor: 1-Tap Diagnoza i Recepta Ratunkowa */}
             {tasteBalance === 'sour' && (
               <View style={styles.doctorAdviceCard} testID="doctor-advice-sour">
-                <Text style={styles.doctorTitle}>🧭 Recepta Dial-in Doctor:</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <CompassIcon size={14} color={theme.colors.copper} />
+                  <Text style={styles.doctorTitle}>Recepta Dial-in Doctor:</Text>
+                </View>
                 <Text style={styles.doctorText}>
                   Za kwaśna (niedoparzenie)? Następnym razem:{' '}
                   <Text style={styles.doctorBold}>zmiel drobniej o 2 kliki</Text> lub podnieś temperaturę wody o{' '}
@@ -155,7 +159,10 @@ export function BrewFinishModal({
 
             {tasteBalance === 'bitter' && (
               <View style={styles.doctorAdviceCard} testID="doctor-advice-bitter">
-                <Text style={styles.doctorTitle}>🧭 Recepta Dial-in Doctor:</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <CompassIcon size={14} color={theme.colors.copper} />
+                  <Text style={styles.doctorTitle}>Recepta Dial-in Doctor:</Text>
+                </View>
                 <Text style={styles.doctorText}>
                   Za gorzka / ściągająca (przeparzenie)? Następnym razem:{' '}
                   <Text style={styles.doctorBold}>zmiel grubiej o 2 kliki</Text> lub obniż temperaturę wody o{' '}
@@ -166,7 +173,10 @@ export function BrewFinishModal({
 
             {tasteBalance === 'weak' && (
               <View style={styles.doctorAdviceCard} testID="doctor-advice-weak">
-                <Text style={styles.doctorTitle}>🧭 Recepta Dial-in Doctor:</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <CompassIcon size={14} color={theme.colors.copper} />
+                  <Text style={styles.doctorTitle}>Recepta Dial-in Doctor:</Text>
+                </View>
                 <Text style={styles.doctorText}>
                   Zbyt wodnista (niska ekstrakcja)? Zwiększ dozę o{' '}
                   <Text style={styles.doctorBold}>+1.5g</Text> lub wydłuż czas kontaktu z wodą.
@@ -176,7 +186,10 @@ export function BrewFinishModal({
 
             {tasteBalance === 'balanced' && (
               <View style={[styles.doctorAdviceCard, styles.doctorAdviceSuccess]} testID="doctor-advice-balanced">
-                <Text style={styles.doctorTitleSuccess}>✨ Idealny Balans:</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <StarIcon size={14} color="#4CAF50" filled />
+                  <Text style={styles.doctorTitleSuccess}>Idealny Balans:</Text>
+                </View>
                 <Text style={styles.doctorText}>
                   Wzorcowa ekstrakcja specialty. Zapisz tę sesję w Dzienniku, aby powtórzyć parametry!
                 </Text>
@@ -253,7 +266,7 @@ export function BrewFinishModal({
 
             {/* Ekonomia Rzemiosła (Koszt vs Kawiarnia) */}
             <View style={styles.finishCostCard} testID="finish-cost-card">
-              <Text style={styles.finishCostTitle}>💰 Ekonomia Rzemiosła</Text>
+              <Text style={styles.finishCostTitle}>Ekonomia Rzemiosła</Text>
               <Text style={styles.finishCostSubtitle}>
                 {`Koszt tego naparu: ${brewCost.totalHomeCost.toFixed(2)} PLN (ziarna: ${brewCost.coffeeCost.toFixed(2)} zł, woda: ${brewCost.waterCost.toFixed(2)} zł)`}
               </Text>

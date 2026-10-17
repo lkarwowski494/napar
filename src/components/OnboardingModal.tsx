@@ -21,6 +21,9 @@ import {
   BrewIcon,
   BeansIcon,
   StarIcon,
+  TeaLeafIcon,
+  CraftFamilyEmblem,
+  CheckIcon,
 } from './icons/CraftIcons';
 
 interface OnboardingModalProps {
@@ -82,7 +85,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
                   </Text>
                   {selectedPref === 'coffee' && (
                     <View style={styles.checkIndicator}>
-                      <Text style={styles.checkIndicatorText}>✓</Text>
+                      <CheckIcon size={12} color="#FFFFFF" strokeWidth={2.5} />
                     </View>
                   )}
                 </View>
@@ -102,7 +105,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
               onPress={() => setSelectedPref('tea')}
             >
               <View style={[styles.cardIconBox, selectedPref === 'tea' && styles.cardIconBoxActiveTea]}>
-                <Text style={{ fontSize: 20 }}>🍃</Text>
+                <TeaLeafIcon size={22} color={selectedPref === 'tea' ? theme.colors.emerald : theme.colors.textMuted} />
               </View>
               <View style={styles.cardContent}>
                 <View style={styles.cardHeaderRow}>
@@ -111,7 +114,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
                   </Text>
                   {selectedPref === 'tea' && (
                     <View style={[styles.checkIndicator, { backgroundColor: theme.colors.emerald }]}>
-                      <Text style={styles.checkIndicatorText}>✓</Text>
+                      <CheckIcon size={12} color="#FFFFFF" strokeWidth={2.5} />
                     </View>
                   )}
                 </View>
@@ -131,7 +134,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
               onPress={() => setSelectedPref('both')}
             >
               <View style={[styles.cardIconBox, selectedPref === 'both' && styles.cardIconBoxActiveBoth]}>
-                <Text style={{ fontSize: 20 }}>☕🍵</Text>
+                <CraftFamilyEmblem size={22} color={selectedPref === 'both' ? theme.colors.copper : theme.colors.textMuted} />
               </View>
               <View style={styles.cardContent}>
                 <View style={styles.cardHeaderRow}>
@@ -140,7 +143,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
                   </Text>
                   {selectedPref === 'both' && (
                     <View style={styles.checkIndicator}>
-                      <Text style={styles.checkIndicatorText}>✓</Text>
+                      <CheckIcon size={12} color="#FFFFFF" strokeWidth={2.5} />
                     </View>
                   )}
                 </View>

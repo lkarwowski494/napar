@@ -296,24 +296,24 @@ export default function DialInScreen() {
             {[
               {
                 id: 'sour',
-                title: '🍋 Zbyt kwaśna / ostra / trawiasta',
+                title: 'Zbyt kwaśna / ostra / trawiasta',
                 desc: 'Brak słodyczy, cierpki finisz, cytrynowa kwasowość.',
               },
               {
                 id: 'bitter',
-                title: '🍫 Za gorzka / ściągająca / sucha',
+                title: 'Za gorzka / ściągająca / sucha',
                 desc: 'Wrażenie suchości na języku (ashy), popiołowość, ciemna gorycz.',
               },
               {
                 id: 'weak',
-                title: '💧 Płaska / mdła / wodnista',
+                title: 'Płaska / mdła / wodnista',
                 desc: 'Brak ciała, herbaciana konsystencja bez wyrazistej słodyczy.',
               },
               ...(beveragePreference !== 'coffee'
                 ? [
                     {
                       id: 'astringent_tea',
-                      title: '🍵 Herbata ściągająca gardło',
+                      title: 'Herbata ściągająca gardło',
                       desc: 'Zbyt wysoka temperatura zniszczyła subtelne katechiny i l-teaninę.',
                     },
                   ]
@@ -361,8 +361,8 @@ export default function DialInScreen() {
                   <Text style={styles.diagActionLabel}>TEMPERATURA WODY</Text>
                   <Text style={styles.diagActionVal}>
                     {diagnosis.tempAdjustment === 'higher'
-                      ? '🔥 Podnieś o +2°C do 95°C'
-                      : '❄️ Obniż o 2–4°C'}
+                      ? 'Podnieś o +2°C do 95°C'
+                      : 'Obniż o 2–4°C'}
                   </Text>
                 </View>
               )}
@@ -528,7 +528,7 @@ export default function DialInScreen() {
 
             <View style={styles.grinderCategoryDetailsCard}>
               <Text style={styles.grinderMethodsText}>
-                📌 Metody: {language === 'pl' ? activeGrindCategory.methodsPl : activeGrindCategory.methodsEn}
+                Metody: {language === 'pl' ? activeGrindCategory.methodsPl : activeGrindCategory.methodsEn}
               </Text>
               <Text style={styles.grinderMicronsRange}>
                 Średnia cząstek: {activeGrindCategory.micronMin} – {activeGrindCategory.micronMax} µm (punkt odniesienia: {activeGrindCategory.defaultMicrons} µm)
@@ -611,10 +611,10 @@ export default function DialInScreen() {
                 >
                   <Text style={styles.eyRatingText}>
                     {eyResult.rating === 'ideal'
-                      ? '✓ Złote Okno SCA (Idealna ekstrakcja)'
+                      ? 'Złote Okno SCA (Idealna ekstrakcja)'
                       : eyResult.rating === 'under'
-                      ? '⚠ Niedoparzenie (< 18%)'
-                      : '⚠ Przeparzenie (> 22%)'}
+                      ? 'Niedoparzenie (< 18%)'
+                      : 'Przeparzenie (> 22%)'}
                   </Text>
                 </View>
 
@@ -698,7 +698,7 @@ export default function DialInScreen() {
                     {language === 'pl' ? recipe.descriptionPl : recipe.descriptionEn}
                   </Text>
                   <Text style={styles.waterRecipeBestFor}>
-                    🎯 {language === 'pl' ? recipe.bestForPl : recipe.bestForEn}
+                    {language === 'pl' ? recipe.bestForPl : recipe.bestForEn}
                   </Text>
                 </Pressable>
               );
@@ -765,7 +765,7 @@ export default function DialInScreen() {
             </View>
 
             <Text style={styles.concentrateHelpText}>
-              💡 {t.water.concentrateHelp}
+              {t.water.concentrateHelp}
             </Text>
           </View>
 

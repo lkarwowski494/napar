@@ -257,7 +257,7 @@ export default function RecipeBuilderScreen() {
                 beverageType === 'COFFEE' && styles.typeTabTextActive,
               ]}
             >
-              ☕ {t.recipeBuilder.coffee}
+              {t.recipeBuilder.coffee}
             </Text>
           </Pressable>
           <Pressable
@@ -273,7 +273,7 @@ export default function RecipeBuilderScreen() {
                 beverageType === 'TEA' && styles.typeTabTextActive,
               ]}
             >
-              🍵 {t.recipeBuilder.tea}
+              {t.recipeBuilder.tea}
             </Text>
           </Pressable>
         </View>
@@ -466,7 +466,7 @@ export default function RecipeBuilderScreen() {
         {isEditing && (
           <>
             <Pressable style={styles.duplicateBtn} onPress={handleDuplicate}>
-              <Text style={styles.duplicateBtnText}>📋 {t.recipeBuilder.duplicateBtn}</Text>
+              <Text style={styles.duplicateBtnText}>{t.recipeBuilder.duplicateBtn}</Text>
             </Pressable>
             <Pressable style={styles.deleteBtn} onPress={handleDelete}>
               <Text style={styles.deleteBtnText}>{t.common.delete}</Text>

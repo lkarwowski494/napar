@@ -228,7 +228,7 @@ describe('GongfuScreen Component', () => {
     });
 
     expect(alertSpy).toHaveBeenCalledWith(
-      'Gongfu Cha 🍵',
+      'Gongfu Cha',
       'Przeprowadź przynajmniej jedno zalanie przed zapisem sesji.'
     );
   });

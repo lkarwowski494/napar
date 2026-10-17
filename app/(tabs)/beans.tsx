@@ -35,7 +35,7 @@ import {
 import { useAppAccess } from '../../src/core/app-access';
 import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { formatDoseWeight } from '../../src/core/unit-converter';
-import { BeansIcon } from '../../src/components/icons/CraftIcons';
+import { BeansIcon, BookIcon, ShieldIcon } from '../../src/components/icons/CraftIcons';
 
 export default function BeansScreen() {
   const router = useRouter();
@@ -392,7 +392,7 @@ export default function BeansScreen() {
               onPress={() => setFilter('coffee')}
             >
               <Text style={[styles.filterChipText, filter === 'coffee' && styles.filterChipTextActive]}>
-                Kawa ☕
+                Kawa
               </Text>
             </Pressable>
           )}
@@ -402,7 +402,7 @@ export default function BeansScreen() {
               onPress={() => setFilter('tea')}
             >
               <Text style={[styles.filterChipText, filter === 'tea' && styles.filterChipTextActive]}>
-                Herbata 🍵
+                Herbata
               </Text>
             </Pressable>
           )}
@@ -411,7 +411,7 @@ export default function BeansScreen() {
             onPress={() => setFilter('archived')}
           >
             <Text style={[styles.filterChipText, filter === 'archived' && styles.filterChipTextActive]}>
-              Archiwum 📦
+              Archiwum
             </Text>
           </Pressable>
         </ScrollView>
@@ -421,7 +421,10 @@ export default function BeansScreen() {
           style={styles.compendiumButton}
           onPress={() => setShowCompendium(true)}
         >
-          <Text style={styles.compendiumButtonText}>📚 Baza wiedzy</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <BookIcon size={14} color={theme.colors.copper} />
+            <Text style={styles.compendiumButtonText}>Baza wiedzy</Text>
+          </View>
         </Pressable>
         <Pressable testID="beans-add-button" style={styles.addButton} onPress={handleOpenAdd}>
           <Text style={styles.addButtonText}>+ Dodaj</Text>
@@ -430,8 +433,9 @@ export default function BeansScreen() {
 
       {isHistoryReadOnly && (
         <View style={styles.readOnlyBanner}>
-          <Text style={styles.readOnlyText}>
-            🛡️ Spiżarnia w trybie Read-Only · Twoje paczki są bezpieczne. Odblokuj Apps4Brew Pass, aby dodawać nowe.
+          <ShieldIcon size={14} color="#D49B42" />
+          <Text style={[styles.readOnlyText, { marginLeft: 8 }]}>
+            Spiżarnia w trybie Read-Only · Twoje paczki są bezpieczne. Odblokuj Apps4Brew Pass, aby dodawać nowe.
           </Text>
         </View>
       )}
@@ -488,10 +492,24 @@ export default function BeansScreen() {
                       resting.stage === 'degassing' && styles.restingDegas,
                       resting.stage === 'stable' && styles.restingStable,
                       resting.stage === 'aging' && styles.restingAging,
+                      { flexDirection: 'row', alignItems: 'center' },
                     ]}
                   >
+                    <View
+                      style={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: 3.5,
+                        backgroundColor:
+                          resting.stage === 'peak'
+                            ? theme.colors.statusPeak
+                            : resting.stage === 'degassing'
+                            ? theme.colors.copper
+                            : theme.colors.textSecondary,
+                        marginRight: 6,
+                      }}
+                    />
                     <Text style={styles.restingBadgeText}>
-                      {resting.stage === 'peak' ? '🟢 ' : resting.stage === 'degassing' ? '🟠 ' : '🔵 '}
                       {resting.messagePl} ({resting.daysSinceRoast} dni od palenia)
                     </Text>
                   </View>
@@ -523,7 +541,7 @@ export default function BeansScreen() {
                 {item.remainingWeightGrams === 0 && !item.isArchived && (
                   <View style={styles.emptyAlertBanner}>
                     <Text style={styles.emptyAlertText}>
-                      ⚠️ Paczka skończona (0 g). Przenieść do archiwum?
+                      Paczka skończona (0 g). Przenieść do archiwum?
                     </Text>
                     <Pressable
                       style={styles.emptyAlertBtn}
@@ -539,12 +557,12 @@ export default function BeansScreen() {
                   <View style={styles.varietyProcessRow}>
                     {item.variety ? (
                       <View style={styles.varietyChip}>
-                        <Text style={styles.varietyChipText}>🌱 {item.variety}</Text>
+                        <Text style={styles.varietyChipText}>{item.variety}</Text>
                       </View>
                     ) : null}
                     {item.process ? (
                       <View style={styles.processChip}>
-                        <Text style={styles.processChipText}>⚗️ {item.process}</Text>
+                        <Text style={styles.processChipText}>{item.process}</Text>
                       </View>
                     ) : null}
                   </View>
@@ -576,13 +594,13 @@ export default function BeansScreen() {
                     style={styles.actionBrewBtn}
                     onPress={() => handleSelectForBrew(item)}
                   >
-                    <Text style={styles.actionBrewText}>☕ Parz z tych ziaren</Text>
+                    <Text style={styles.actionBrewText}>Parz z tych ziaren</Text>
                   </Pressable>
                   <Pressable
                     style={styles.actionEditBtn}
                     onPress={() => handleOpenEdit(item)}
                   >
-                    <Text style={styles.actionEditText}>✏️ Edytuj</Text>
+                    <Text style={styles.actionEditText}>Edytuj</Text>
                   </Pressable>
                   <Pressable
                     style={styles.actionArchiveBtn}
@@ -624,7 +642,7 @@ export default function BeansScreen() {
                   onPress={() => setType('coffee')}
                 >
                   <Text style={[styles.typeBtnText, type === 'coffee' && styles.typeBtnTextActive]}>
-                    ☕ Kawa ziarnista
+                    Kawa ziarnista
                   </Text>
                 </Pressable>
                 <Pressable
@@ -632,7 +650,7 @@ export default function BeansScreen() {
                   onPress={() => setType('tea')}
                 >
                   <Text style={[styles.typeBtnText, type === 'tea' && styles.typeBtnTextActive]}>
-                    🍵 Herbata liściasta
+                    Herbata liściasta
                   </Text>
                 </Pressable>
               </View>
@@ -646,7 +664,7 @@ export default function BeansScreen() {
               }}
             >
               <Text style={styles.compendiumPromptText}>
-                💡 Szukasz inspiracji? Otwórz 📚 Bazę Wiedzy (odmiany, terroir, herbata)
+                Szukasz inspiracji? Otwórz Bazę Wiedzy (odmiany, terroir, herbata)
               </Text>
             </Pressable>
 
@@ -769,7 +787,7 @@ export default function BeansScreen() {
                   onPress={() => setEditType('coffee')}
                 >
                   <Text style={[styles.typeBtnText, editType === 'coffee' && styles.typeBtnTextActive]}>
-                    ☕ Kawa ziarnista
+                    Kawa ziarnista
                   </Text>
                 </Pressable>
                 <Pressable
@@ -777,7 +795,7 @@ export default function BeansScreen() {
                   onPress={() => setEditType('tea')}
                 >
                   <Text style={[styles.typeBtnText, editType === 'tea' && styles.typeBtnTextActive]}>
-                    🍵 Herbata liściasta
+                    Herbata liściasta
                   </Text>
                 </Pressable>
               </View>
@@ -906,7 +924,7 @@ export default function BeansScreen() {
             />
 
             {/* Ocena paczki */}
-            <Text style={styles.inputLabel}>Ocena paczki (1-5★)</Text>
+            <Text style={styles.inputLabel}>Ocena paczki (1-5)</Text>
             <View style={styles.starRow}>
               {[1, 2, 3, 4, 5].map((star) => (
                 <Pressable
@@ -927,11 +945,11 @@ export default function BeansScreen() {
             </Pressable>
 
             <Pressable style={styles.markFinishedBtn} onPress={handleMarkAsFinished}>
-              <Text style={styles.markFinishedText}>📦 Oznacz jako zużytą i zarchiwizuj</Text>
+              <Text style={styles.markFinishedText}>Oznacz jako zużytą i zarchiwizuj</Text>
             </Pressable>
 
             <Pressable style={styles.deletePackBtn} onPress={handleDeleteItem}>
-              <Text style={styles.deletePackText}>🗑️ Usuń paczkę ze spiżarni</Text>
+              <Text style={styles.deletePackText}>Usuń paczkę ze spiżarni</Text>
             </Pressable>
           </ScrollView>
         </SafeAreaView>
@@ -942,7 +960,7 @@ export default function BeansScreen() {
         <SafeAreaView style={styles.compendiumModalContainer} edges={['top', 'bottom', 'left', 'right']}>
           <View style={styles.modalHeader}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.modalTitle}>📚 Kompendium Wiedzy</Text>
+              <Text style={styles.modalTitle}>Kompendium Wiedzy</Text>
               <Text style={styles.compendiumHeaderSub}>Odmiany botaniczne, obróbki, terroir i herbaty</Text>
             </View>
             <Pressable
@@ -977,7 +995,7 @@ export default function BeansScreen() {
                   onPress={() => setCompendiumTab('varieties')}
                 >
                   <Text style={[styles.compTabText, compendiumTab === 'varieties' && styles.compTabTextActive]}>
-                    ☕ Odmiany ({filteredVarieties.length})
+                    Odmiany ({filteredVarieties.length})
                   </Text>
                 </Pressable>
                 <Pressable
@@ -985,7 +1003,7 @@ export default function BeansScreen() {
                   onPress={() => setCompendiumTab('processes')}
                 >
                   <Text style={[styles.compTabText, compendiumTab === 'processes' && styles.compTabTextActive]}>
-                    ⚗️ Obróbki ({filteredProcesses.length})
+                    Obróbki ({filteredProcesses.length})
                   </Text>
                 </Pressable>
                 <Pressable
@@ -993,7 +1011,7 @@ export default function BeansScreen() {
                   onPress={() => setCompendiumTab('origins')}
                 >
                   <Text style={[styles.compTabText, compendiumTab === 'origins' && styles.compTabTextActive]}>
-                    🌍 Terroir ({filteredOrigins.length})
+                    Terroir ({filteredOrigins.length})
                   </Text>
                 </Pressable>
               </>
@@ -1004,7 +1022,7 @@ export default function BeansScreen() {
                 onPress={() => setCompendiumTab('tea')}
               >
                 <Text style={[styles.compTabText, compendiumTab === 'tea' && styles.compTabTextActive]}>
-                  🍃 Herbaty ({filteredTeas.length})
+                  Herbaty ({filteredTeas.length})
                 </Text>
               </Pressable>
             )}
@@ -1110,7 +1128,7 @@ export default function BeansScreen() {
                   <Text style={styles.compCardLineage}>Metoda Sha Qing: {t.killGreenMethod}</Text>
                   <Text style={styles.compCardSensory}>{t.sensoryProfilePl}</Text>
                   <Text style={styles.compCardDesc}>Słynne odmiany: {t.famousVarietiesPl.join(', ')}</Text>
-                  <Text style={styles.compCardHealth}>✨ {t.healthAttributesPl}</Text>
+                  <Text style={styles.compCardHealth}>{t.healthAttributesPl}</Text>
 
                   <Pressable
                     style={styles.compUseBtn}
@@ -1153,12 +1171,15 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   readOnlyText: {
     color: theme.colors.textSecondary,
     fontSize: 12,
-    textAlign: 'center',
     fontWeight: '600',
+    flex: 1,
   },
   topBar: {
     flexDirection: 'row',

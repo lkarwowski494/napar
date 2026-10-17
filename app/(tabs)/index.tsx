@@ -31,7 +31,14 @@ import {
   setHasCompletedOnboarding,
   BeveragePreference,
 } from '../../src/core/database';
-import { StarIcon } from '../../src/components/icons/CraftIcons';
+import {
+  StarIcon,
+  CopyIcon,
+  EditIcon,
+  CameraIcon,
+  CheckIcon,
+  ShieldIcon,
+} from '../../src/components/icons/CraftIcons';
 import {
   formatDoseWeight,
   formatWaterWeight,
@@ -444,8 +451,9 @@ export default function BrewScreen() {
       {/* Read-Only Status Banner when trial expired */}
       {isHistoryReadOnly && (
         <View style={styles.readOnlyBanner}>
+          <ShieldIcon size={16} color={theme.colors.copper} />
           <Text style={styles.readOnlyBannerText}>
-            🛡️ Tryb Tylko do Odczytu — Twoje receptury i historia są bezpieczne. Parzenie i edycja wymagają Apps4Brew Pass.
+            Tryb Tylko do Odczytu — Twoje receptury i historia są bezpieczne. Parzenie i edycja wymagają Apps4Brew Pass.
           </Text>
         </View>
       )}
@@ -591,7 +599,7 @@ export default function BrewScreen() {
                     recipeCategoryFilter === 'COFFEE' && styles.recipeFilterTabTextActive,
                   ]}
                 >
-                  ☕ Kawa ({allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'COFFEE' : r.type === 'COFFEE')).length})
+                  Kawa ({allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'COFFEE' : r.type === 'COFFEE')).length})
                 </Text>
               </Pressable>
               <Pressable
@@ -611,7 +619,7 @@ export default function BrewScreen() {
                     recipeCategoryFilter === 'TEA' && styles.recipeFilterTabTextActive,
                   ]}
                 >
-                  🍵 Herbata ({allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'TEA' : r.type === 'TEA')).length})
+                  Herbata ({allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'TEA' : r.type === 'TEA')).length})
                 </Text>
               </Pressable>
             </View>
@@ -644,7 +652,7 @@ export default function BrewScreen() {
                     router.push('/gongfu');
                   }}
                 >
-                  <Text style={styles.gongfuModalBtnText}>🍵 Gongfu Cha</Text>
+                  <Text style={styles.gongfuModalBtnText}>Gongfu Cha</Text>
                 </Pressable>
               )}
 
@@ -661,7 +669,7 @@ export default function BrewScreen() {
                 testID="import-recipe-btn"
               >
                 <Text style={styles.importRecipeModalBtnText}>
-                  📥 {t.brew.importRecipe}
+                  {t.brew.importRecipe}
                 </Text>
               </Pressable>
 
@@ -679,7 +687,7 @@ export default function BrewScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Skanuj kod QR receptury aparatem"
               >
-                <Text style={styles.scanQrModalBtnText}>📷 QR</Text>
+                <Text style={styles.scanQrModalBtnText}>QR</Text>
               </Pressable>
             </View>
 
@@ -732,12 +740,15 @@ export default function BrewScreen() {
                     accessibilityRole="button"
                     accessibilityLabel={`${t.brew.duplicateRecipe}: ${r.name}`}
                   >
-                    <Text style={styles.duplicateRecipeBtnText}>📋</Text>
+                    <CopyIcon size={16} color={theme.colors.textSecondary} />
                   </Pressable>
                   {r.isCustom && (
                     <Pressable
                       style={styles.editRecipeBtn}
                       hitSlop={8}
+                      accessibilityRole="button"
+                      accessibilityLabel="Edytuj recepturę"
+                      testID={`edit-recipe-${r.id}`}
                       onPress={(e) => {
                         e.stopPropagation();
                         if (!canCreate) {
@@ -752,7 +763,7 @@ export default function BrewScreen() {
                         });
                       }}
                     >
-                      <Text style={styles.editRecipeBtnText}>✏️</Text>
+                      <EditIcon size={16} color={theme.colors.textSecondary} />
                     </Pressable>
                   )}
                 </View>
@@ -913,15 +924,19 @@ export default function BrewScreen() {
                       Rekomendacja: {rec.formatted} ({rec.microns} µm)
                     </Text>
                   </View>
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: '700',
-                      color: isSelected ? theme.colors.copper : theme.colors.textMuted,
-                    }}
-                  >
-                    {isSelected ? '✓' : '○'}
-                  </Text>
+                  {isSelected ? (
+                    <CheckIcon size={18} color={theme.colors.copper} />
+                  ) : (
+                    <View
+                      style={{
+                        width: 18,
+                        height: 18,
+                        borderRadius: 9,
+                        borderWidth: 1.5,
+                        borderColor: theme.colors.border,
+                      }}
+                    />
+                  )}
                 </Pressable>
               );
             })}
@@ -982,7 +997,7 @@ export default function BrewScreen() {
                 }}
               >
                 <Text style={styles.shareActionBtnText}>
-                  📤 {t.brew.qrShareLink}
+                  {t.brew.qrShareLink}
                 </Text>
               </Pressable>
 
@@ -994,7 +1009,7 @@ export default function BrewScreen() {
                 }}
               >
                 <Text style={styles.shareActionBtnTextSecondary}>
-                  📋 {t.brew.qrCopyLink}
+                  {t.brew.qrCopyLink}
                 </Text>
               </Pressable>
             </View>
@@ -1128,13 +1143,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: theme.colors.copper,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   readOnlyBannerText: {
     color: theme.colors.copper,
     fontSize: 12,
     lineHeight: 18,
     fontWeight: '600',
-    textAlign: 'center',
+    flex: 1,
   },
   modalContainer: {
     flex: 1,

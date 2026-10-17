@@ -613,8 +613,8 @@ describe('BrewScreen UI Integration', () => {
       recipeCard.props.onPress();
     });
 
-    // 2. Kliknij "🍵 Gongfu Cha"
-    const gongfuBtn = findPressableWithText(tree.root, '🍵 Gongfu Cha');
+    // 2. Kliknij "Gongfu Cha"
+    const gongfuBtn = findPressableWithText(tree.root, 'Gongfu Cha');
     expect(gongfuBtn).toBeDefined();
     act(() => {
       gongfuBtn.props.onPress();
@@ -626,8 +626,8 @@ describe('BrewScreen UI Integration', () => {
       recipeCard.props.onPress();
     });
 
-    // 3. Kliknij ołówek ✏️ przy autorskiej recepturze "Autorskie V60"
-    const editBtn = findPressableWithText(tree.root, '✏️');
+    // 3. Kliknij edycję przy autorskiej recepturze "Autorskie V60"
+    const editBtn = tree.root.findByProps({ accessibilityLabel: 'Edytuj recepturę' });
     expect(editBtn).toBeDefined();
     act(() => {
       editBtn.props.onPress({ stopPropagation: jest.fn() });

@@ -138,7 +138,7 @@ describe('BeansScreen (Stash & Inventory)', () => {
     });
 
     // Filtruj do samej kawy
-    const coffeeBtn = findPressableWithText(tree.root, 'Kawa ☕');
+    const coffeeBtn = findPressableWithText(tree.root, 'Kawa');
     expect(coffeeBtn).toBeTruthy();
 
     renderer.act(() => {
@@ -150,7 +150,7 @@ describe('BeansScreen (Stash & Inventory)', () => {
     expect(str).not.toContain('Da Hong Pao Rock Tea');
 
     // Filtruj do herbaty
-    const teaBtn = findPressableWithText(tree.root, 'Herbata 🍵');
+    const teaBtn = findPressableWithText(tree.root, 'Herbata');
     expect(teaBtn).toBeTruthy();
 
     renderer.act(() => {
@@ -162,7 +162,7 @@ describe('BeansScreen (Stash & Inventory)', () => {
     expect(str).not.toContain('Etiopia Yirgacheffe Washed');
 
     // Filtruj do archiwum
-    const archiveBtn = findPressableWithText(tree.root, 'Archiwum 📦');
+    const archiveBtn = findPressableWithText(tree.root, 'Archiwum');
     expect(archiveBtn).toBeTruthy();
 
     renderer.act(() => {
