@@ -5,18 +5,13 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Platform,
   View,
   Text,
   StyleSheet,
   ScrollView,
   Pressable,
-  Modal,
-  TextInput,
   Alert,
-  Share,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
 import {
@@ -33,17 +28,8 @@ import {
 } from '../../src/core/database';
 import {
   StarIcon,
-  CopyIcon,
-  EditIcon,
-  CameraIcon,
-  CheckIcon,
   ShieldIcon,
 } from '../../src/components/icons/CraftIcons';
-import {
-  formatDoseWeight,
-  formatWaterWeight,
-  formatTemperature,
-} from '../../src/core/unit-converter';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
 import { InventoryItem, SavedRecipe } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
@@ -54,14 +40,9 @@ import {
 } from '../../src/core/radar-chart';
 import { calculateBatchScaling } from '../../src/core/domain-rules';
 import {
-  SUPPORTED_GRINDERS,
-  getRecommendedGrindForRecipe,
-} from '../../src/core/grinder-converter';
-import {
   encodeRecipeToShareUrl,
   decodeRecipeFromShareUrl,
 } from '../../src/core/recipe-share';
-import { QrCodeSvg } from '../../src/core/qr-code';
 import { confirmAction } from '../../src/core/confirm';
 import { calculateBrewCost } from '../../src/core/cost-calculator';
 import { QrScannerModal } from '../../src/core/QrScannerModal';
@@ -73,6 +54,11 @@ import { BrewQuickPrepCard } from '../../src/components/brew/BrewQuickPrepCard';
 import { BrewActiveFocusTimer } from '../../src/components/brew/BrewActiveFocusTimer';
 import { BrewProAccordion } from '../../src/components/brew/BrewProAccordion';
 import { BrewFinishModal } from '../../src/components/brew/BrewFinishModal';
+import { RecipeSelectModal } from '../../src/components/brew/RecipeSelectModal';
+import { InventorySelectModal } from '../../src/components/brew/InventorySelectModal';
+import { GrinderSelectModal } from '../../src/components/brew/GrinderSelectModal';
+import { ShareRecipeModal } from '../../src/components/brew/ShareRecipeModal';
+import { ImportRecipeModal } from '../../src/components/brew/ImportRecipeModal';
 
 export default function BrewScreen() {
   const router = useRouter();
@@ -138,11 +124,6 @@ export default function BrewScreen() {
     }
     setShowOnboarding(false);
   };
-  const [importUrlInput, setImportUrlInput] = useState('');
-  const [importParsedRecipe, setImportParsedRecipe] = useState<{
-    recipe: SavedRecipe;
-    originalSteps: any[];
-  } | null>(null);
 
   const isCurrentRecipeTea =
     'beverageType' in recipe
@@ -193,20 +174,6 @@ export default function BrewScreen() {
       }
     }
   };
-
-  const displayedRecipes = useMemo(() => {
-    if (beveragePreference === 'coffee') {
-      return allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'COFFEE' : r.type === 'COFFEE'));
-    }
-    if (beveragePreference === 'tea') {
-      return allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'TEA' : r.type === 'TEA'));
-    }
-    if (recipeCategoryFilter === 'ALL') return allRecipes;
-    return allRecipes.filter((r) => {
-      const type = 'beverageType' in r ? r.beverageType : r.type;
-      return type === recipeCategoryFilter;
-    });
-  }, [allRecipes, recipeCategoryFilter, beveragePreference]);
 
   const recentFiveStarSession = useMemo(() => {
     try {
@@ -281,16 +248,23 @@ export default function BrewScreen() {
       setShowPaywallModal(true);
       return;
     }
-    const decoded = decodeRecipeFromShareUrl(data);
-    if (!decoded) {
-      Alert.alert(t.common.confirm, t.brew.importError);
-      return;
+    try {
+      const decoded = decodeRecipeFromShareUrl(data);
+      if (decoded && decoded.recipe) {
+        saveRecipe(decoded.recipe);
+        refreshData();
+        selectRecipe(decoded.recipe);
+        Alert.alert(
+          'Zeskanowano recepturę!',
+          `Receptura "${decoded.recipe.name}" została zapisana w Twojej bazie.`,
+          [{ text: 'OK' }]
+        );
+      } else {
+        Alert.alert('Błąd skanowania', 'Kod QR nie zawiera prawidłowej receptury Napar.');
+      }
+    } catch {
+      Alert.alert('Błąd skanowania', 'Nie udało się przetworzyć danych z kodu QR.');
     }
-    saveRecipe(decoded.recipe);
-    setAllRecipes(getRecipes());
-    selectRecipe(decoded.recipe);
-    setShowRecipeModal(false);
-    Alert.alert(t.common.save, t.brew.importSuccess);
   };
 
   const shareUrl = useMemo(() => {
@@ -544,306 +518,73 @@ export default function BrewScreen() {
       )}
 
       {/* Modal wyboru receptury */}
-      <Modal visible={showRecipeModal} animationType="slide" transparent={false}>
-        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{t.brew.chooseRecipe}</Text>
-            <Pressable
-              style={styles.modalCloseBtn}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              onPress={() => setShowRecipeModal(false)}
-              accessibilityRole="button"
-              accessibilityLabel={t.common.close}
-            >
-              <Text style={styles.modalCloseText}>{t.common.close}</Text>
-            </Pressable>
-          </View>
-          <ScrollView>
-            {/* Filtr Kawa vs Herbata — widoczny wyłącznie gdy preferencja to 'Kawa i Herbata' (both) */}
-            {(!beveragePreference || beveragePreference === 'both') && (
-              <View style={styles.recipeFilterTabsRow} accessibilityRole="tablist">
-              <Pressable
-                testID="recipe-filter-all"
-                style={[
-                  styles.recipeFilterTab,
-                  recipeCategoryFilter === 'ALL' && styles.recipeFilterTabActive,
-                ]}
-                onPress={() => setRecipeCategoryFilter('ALL')}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: recipeCategoryFilter === 'ALL' }}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <Text
-                  style={[
-                    styles.recipeFilterTabText,
-                    recipeCategoryFilter === 'ALL' && styles.recipeFilterTabTextActive,
-                  ]}
-                >
-                  Wszystkie ({allRecipes.length})
-                </Text>
-              </Pressable>
-              <Pressable
-                testID="recipe-filter-coffee"
-                style={[
-                  styles.recipeFilterTab,
-                  recipeCategoryFilter === 'COFFEE' && styles.recipeFilterTabActive,
-                ]}
-                onPress={() => setRecipeCategoryFilter('COFFEE')}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: recipeCategoryFilter === 'COFFEE' }}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <Text
-                  style={[
-                    styles.recipeFilterTabText,
-                    recipeCategoryFilter === 'COFFEE' && styles.recipeFilterTabTextActive,
-                  ]}
-                >
-                  Kawa ({allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'COFFEE' : r.type === 'COFFEE')).length})
-                </Text>
-              </Pressable>
-              <Pressable
-                testID="recipe-filter-tea"
-                style={[
-                  styles.recipeFilterTab,
-                  recipeCategoryFilter === 'TEA' && styles.recipeFilterTabActive,
-                ]}
-                onPress={() => setRecipeCategoryFilter('TEA')}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: recipeCategoryFilter === 'TEA' }}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <Text
-                  style={[
-                    styles.recipeFilterTabText,
-                    recipeCategoryFilter === 'TEA' && styles.recipeFilterTabTextActive,
-                  ]}
-                >
-                  Herbata ({allRecipes.filter((r) => ('beverageType' in r ? r.beverageType === 'TEA' : r.type === 'TEA')).length})
-                </Text>
-              </Pressable>
-            </View>
-            )}
-
-            <View style={styles.modalActionButtonsRow}>
-              <Pressable
-                testID="add-custom-recipe-btn"
-                style={styles.addCustomRecipeBtn}
-                onPress={() => {
-                  if (!canCreate) {
-                    setShowRecipeModal(false);
-                    setShowPaywallModal(true);
-                    return;
-                  }
-                  setShowRecipeModal(false);
-                  router.push('/recipe-builder');
-                }}
-              >
-                <Text style={styles.addCustomRecipeBtnText}>
-                  {t.brew.customRecipe}
-                </Text>
-              </Pressable>
-
-              {beveragePreference !== 'coffee' && (
-                <Pressable
-                  style={styles.gongfuModalBtn}
-                  onPress={() => {
-                    setShowRecipeModal(false);
-                    router.push('/gongfu');
-                  }}
-                >
-                  <Text style={styles.gongfuModalBtnText}>Gongfu Cha</Text>
-                </Pressable>
-              )}
-
-              <Pressable
-                style={styles.importRecipeModalBtn}
-                onPress={() => {
-                  if (!canCreate) {
-                    setShowRecipeModal(false);
-                    setShowPaywallModal(true);
-                    return;
-                  }
-                  setShowImportModal(true);
-                }}
-                testID="import-recipe-btn"
-              >
-                <Text style={styles.importRecipeModalBtnText}>
-                  {t.brew.importRecipe}
-                </Text>
-              </Pressable>
-
-              <Pressable
-                style={styles.scanQrModalBtn}
-                onPress={() => {
-                  if (!canCreate) {
-                    setShowRecipeModal(false);
-                    setShowPaywallModal(true);
-                    return;
-                  }
-                  setShowQrScanner(true);
-                }}
-                testID="scan-qr-btn"
-                accessibilityRole="button"
-                accessibilityLabel="Skanuj kod QR receptury aparatem"
-              >
-                <Text style={styles.scanQrModalBtnText}>QR</Text>
-              </Pressable>
-            </View>
-
-            {displayedRecipes.map((r) => (
-              <Pressable
-                key={r.id}
-                style={[
-                  styles.recipeOptionItem,
-                  recipe.id === r.id && styles.recipeOptionActive,
-                ]}
-                onPress={() => {
-                  selectRecipe(r);
-                  setShowRecipeModal(false);
-                }}
-              >
-                <View style={styles.recipeOptionHeader}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.recipeOptionName}>{r.name}</Text>
-                    <Text style={styles.recipeOptionMethod}>
-                      {'beverageType' in r ? r.beverageType : r.type} · {r.method}
-                      {r.isCustom ? ' · Autorska' : ''}
-                    </Text>
-                  </View>
-                  <Pressable
-                    style={styles.favToggleBtn}
-                    hitSlop={10}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      toggleRecipeFavorite(r.id);
-                      refreshData();
-                    }}
-                    accessibilityLabel={`Ulubione: ${r.name}`}
-                  >
-                    <Text
-                      style={[
-                        styles.favToggleIcon,
-                        r.isFavorite && styles.favToggleIconActive,
-                      ]}
-                    >
-                      {r.isFavorite ? '★' : '☆'}
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    style={styles.duplicateRecipeBtn}
-                    hitSlop={8}
-                    onPress={(e) => {
-                      e?.stopPropagation?.();
-                      handleDuplicateRecipe(r);
-                    }}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${t.brew.duplicateRecipe}: ${r.name}`}
-                  >
-                    <CopyIcon size={16} color={theme.colors.textSecondary} />
-                  </Pressable>
-                  {r.isCustom && (
-                    <Pressable
-                      style={styles.editRecipeBtn}
-                      hitSlop={8}
-                      accessibilityRole="button"
-                      accessibilityLabel="Edytuj recepturę"
-                      testID={`edit-recipe-${r.id}`}
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        if (!canCreate) {
-                          setShowRecipeModal(false);
-                          setShowPaywallModal(true);
-                          return;
-                        }
-                        setShowRecipeModal(false);
-                        router.push({
-                          pathname: '/recipe-builder',
-                          params: { id: r.id },
-                        });
-                      }}
-                    >
-                      <EditIcon size={16} color={theme.colors.textSecondary} />
-                    </Pressable>
-                  )}
-                </View>
-                <Text style={styles.recipeOptionAuthor}>
-                  {r.author || 'Receptura własna'}
-                </Text>
-                <Text style={styles.recipeOptionDetails}>
-                  {formatDoseWeight(
-                    'doseGrams' in r ? r.doseGrams : r.coffeeOrTeaDoseGrams,
-                    unitSystem
-                  )}{' '}
-                  kawy/herbaty ·{' '}
-                  {formatWaterWeight(
-                    'waterGrams' in r ? r.waterGrams : r.waterWeightGrams,
-                    unitSystem
-                  )}{' '}
-                  wody ·{' '}
-                  {formatTemperature(
-                    'waterTempCelsius' in r ? r.waterTempCelsius : r.waterTemperatureCelsius,
-                    unitSystem
-                  )}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
+      <RecipeSelectModal
+        visible={showRecipeModal}
+        onClose={() => setShowRecipeModal(false)}
+        recipes={allRecipes}
+        activeRecipeId={recipe.id}
+        beveragePreference={beveragePreference}
+        categoryFilter={recipeCategoryFilter}
+        onCategoryFilterChange={setRecipeCategoryFilter}
+        onSelectRecipe={handleSelectRecipe}
+        onToggleFavorite={(id) => {
+          toggleRecipeFavorite(id);
+          refreshData();
+        }}
+        onDuplicateRecipe={handleDuplicateRecipe}
+        onEditRecipe={(id) => {
+          if (!canCreate) {
+            setShowRecipeModal(false);
+            setShowPaywallModal(true);
+            return;
+          }
+          setShowRecipeModal(false);
+          router.push({
+            pathname: '/recipe-builder',
+            params: { id },
+          });
+        }}
+        onAddCustomRecipe={() => {
+          if (!canCreate) {
+            setShowRecipeModal(false);
+            setShowPaywallModal(true);
+            return;
+          }
+          setShowRecipeModal(false);
+          router.push('/recipe-builder');
+        }}
+        onOpenGongfu={() => {
+          setShowRecipeModal(false);
+          router.push('/gongfu');
+        }}
+        onOpenImport={() => {
+          if (!canCreate) {
+            setShowRecipeModal(false);
+            setShowPaywallModal(true);
+            return;
+          }
+          setShowImportModal(true);
+        }}
+        onOpenQrScanner={() => {
+          if (!canCreate) {
+            setShowRecipeModal(false);
+            setShowPaywallModal(true);
+            return;
+          }
+          setShowQrScanner(true);
+        }}
+        unitSystem={unitSystem}
+        t={t}
+      />
 
       {/* Modal wyboru ziaren ze spiżarni */}
-      <Modal visible={showInventoryModal} animationType="slide" transparent={false}>
-        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Wybierz ze Spiżarni</Text>
-            <Pressable
-              style={styles.modalCloseBtn}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              onPress={() => setShowInventoryModal(false)}
-              accessibilityRole="button"
-              accessibilityLabel="Zamknij"
-            >
-              <Text style={styles.modalCloseText}>Zamknij</Text>
-            </Pressable>
-          </View>
-          <ScrollView>
-            <Pressable
-              style={styles.recipeOptionItem}
-              onPress={() => {
-                selectInventoryItem(null);
-                setShowInventoryModal(false);
-              }}
-            >
-              <Text style={styles.recipeOptionName}>Brak przypisania (ogólne)</Text>
-              <Text style={styles.recipeOptionAuthor}>
-                Nie odliczaj gramatury ze spiżarni
-              </Text>
-            </Pressable>
-            {allInventory.map((item) => (
-              <Pressable
-                key={item.id}
-                style={[
-                  styles.recipeOptionItem,
-                  selectedInventoryItem?.id === item.id && styles.recipeOptionActive,
-                ]}
-                onPress={() => {
-                  selectInventoryItem(item);
-                  setShowInventoryModal(false);
-                }}
-              >
-                <Text style={styles.recipeOptionName}>{item.name}</Text>
-                <Text style={styles.recipeOptionAuthor}>
-                  {item.roasterOrProducer || 'Palarnia'} · {item.origin || ''}
-                </Text>
-                <Text style={styles.recipeOptionDetails}>
-                  Pozostało: {item.remainingWeightGrams}g z {item.initialWeightGrams}g
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
+      <InventorySelectModal
+        visible={showInventoryModal}
+        onClose={() => setShowInventoryModal(false)}
+        inventory={allInventory}
+        selectedItem={selectedInventoryItem}
+        onSelectItem={selectInventoryItem}
+      />
 
       {/* Modal Podsumowania Parzenia (Karta Degustacyjna & Dial-in Doctor) */}
       <BrewFinishModal
@@ -873,229 +614,43 @@ export default function BrewScreen() {
       />
 
       {/* Modal Wyboru Młynka */}
-      <Modal visible={showGrinderModal} animationType="slide">
-        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{t.brew.grinderModalTitle}</Text>
-            <Pressable
-              testID="close-grinder-modal-btn"
-              style={styles.modalCloseBtn}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              onPress={() => setShowGrinderModal(false)}
-              accessibilityRole="button"
-              accessibilityLabel={t.common.close}
-            >
-              <Text style={styles.modalCloseText}>{t.common.close}</Text>
-            </Pressable>
-          </View>
-          <ScrollView contentContainerStyle={{ padding: 16 }}>
-            <Text style={styles.modalSub}>{t.brew.grinderModalDesc}</Text>
-            {SUPPORTED_GRINDERS.map((grinder) => {
-              const isSelected = grinderId === grinder.id;
-              const rec = getRecommendedGrindForRecipe(recipe, grinder.id);
-              return (
-                <Pressable
-                  key={grinder.id}
-                  testID={`grinder-item-${grinder.id}`}
-                  style={[
-                    styles.grinderItemCard,
-                    isSelected && styles.grinderItemCardActive,
-                  ]}
-                  onPress={() => {
-                    setGrinderId(grinder.id);
-                    setShowGrinderModal(false);
-                  }}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${grinder.name}, ${rec.formatted}`}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={[
-                        styles.grinderItemName,
-                        isSelected && {
-                          color: theme.colors.copper,
-                          fontWeight: '700',
-                        },
-                      ]}
-                    >
-                      {grinder.name}
-                    </Text>
-                    <Text style={styles.grinderItemRecommendation}>
-                      Rekomendacja: {rec.formatted} ({rec.microns} µm)
-                    </Text>
-                  </View>
-                  {isSelected ? (
-                    <CheckIcon size={18} color={theme.colors.copper} />
-                  ) : (
-                    <View
-                      style={{
-                        width: 18,
-                        height: 18,
-                        borderRadius: 9,
-                        borderWidth: 1.5,
-                        borderColor: theme.colors.border,
-                      }}
-                    />
-                  )}
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
+      <GrinderSelectModal
+        visible={showGrinderModal}
+        onClose={() => setShowGrinderModal(false)}
+        grinderId={grinderId}
+        onSelectGrinder={setGrinderId}
+        recipe={recipe}
+        t={t}
+      />
 
       {/* Modal Udostępniania Receptury (Offline QR) */}
-      <Modal visible={showShareModal} animationType="slide">
-        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{t.brew.qrModalTitle}</Text>
-            <Pressable
-              testID="close-share-modal-btn"
-              style={styles.modalCloseBtn}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              onPress={() => setShowShareModal(false)}
-              accessibilityRole="button"
-              accessibilityLabel={t.common.close}
-            >
-              <Text style={styles.modalCloseText}>{t.common.close}</Text>
-            </Pressable>
-          </View>
-          <ScrollView contentContainerStyle={{ padding: 20, alignItems: 'center' }}>
-            <Text style={[styles.modalSub, { textAlign: 'center', marginBottom: 16 }]}>
-              {t.brew.qrModalDesc}
-            </Text>
-
-            <View style={styles.qrCard}>
-              <QrCodeSvg value={shareUrl} size={220} testID="recipe-qr-code-svg" />
-            </View>
-
-            <Text style={styles.shareRecipeName}>{recipe.name}</Text>
-            <Text style={styles.shareRecipeDetails}>
-              {recipe.method} ·{' '}
-              {formatDoseWeight(
-                'doseGrams' in recipe ? recipe.doseGrams : recipe.coffeeOrTeaDoseGrams,
-                unitSystem
-              )}{' '}
-              /{' '}
-              {formatWaterWeight(
-                'waterGrams' in recipe ? recipe.waterGrams : recipe.waterWeightGrams,
-                unitSystem
-              )}{' '}
-              · {formatTemperature(waterTempCelsius, unitSystem)}
-            </Text>
-
-            <View style={styles.shareButtonsRow}>
-              <Pressable
-                testID="share-link-btn"
-                style={styles.shareActionBtn}
-                onPress={() => {
-                  Share.share({
-                    title: recipe.name,
-                    message: `${recipe.name} — receptura parzenia w Napar:\n${shareUrl}`,
-                    url: shareUrl,
-                  });
-                }}
-              >
-                <Text style={styles.shareActionBtnText}>
-                  {t.brew.qrShareLink}
-                </Text>
-              </Pressable>
-
-              <Pressable
-                testID="copy-link-btn"
-                style={[styles.shareActionBtn, styles.shareActionBtnSecondary]}
-                onPress={() => {
-                  Alert.alert('Link receptury', shareUrl);
-                }}
-              >
-                <Text style={styles.shareActionBtnTextSecondary}>
-                  {t.brew.qrCopyLink}
-                </Text>
-              </Pressable>
-            </View>
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
+      <ShareRecipeModal
+        visible={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        recipe={recipe}
+        shareUrl={shareUrl}
+        waterTempCelsius={waterTempCelsius}
+        unitSystem={unitSystem}
+        t={t}
+      />
 
       {/* Modal Importu Receptury z Linku / QR */}
-      <Modal visible={showImportModal} animationType="slide">
-        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{t.brew.importModalTitle}</Text>
-            <Pressable
-              testID="close-import-modal-btn"
-              style={styles.modalCloseBtn}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              onPress={() => setShowImportModal(false)}
-              accessibilityRole="button"
-              accessibilityLabel={t.common.close}
-            >
-              <Text style={styles.modalCloseText}>{t.common.close}</Text>
-            </Pressable>
-          </View>
-          <ScrollView contentContainerStyle={{ padding: 16 }}>
-            <Text style={styles.modalSub}>{t.brew.importModalDesc}</Text>
-            <TextInput
-              style={[styles.importTextInput, { minHeight: 80 }]}
-              multiline
-              placeholder={t.brew.importInputPlaceholder}
-              placeholderTextColor={theme.colors.textMuted}
-              value={importUrlInput}
-              onChangeText={(txt) => {
-                setImportUrlInput(txt);
-                const dec = decodeRecipeFromShareUrl(txt);
-                setImportParsedRecipe(dec);
-              }}
-              testID="import-recipe-input"
-            />
-
-            {importParsedRecipe && (
-              <View style={styles.importPreviewCard} testID="import-recipe-preview">
-                <Text style={styles.importPreviewTitle}>
-                  {importParsedRecipe.recipe.name}
-                </Text>
-                <Text style={styles.importPreviewSubtitle}>
-                  {importParsedRecipe.recipe.method} ·{' '}
-                  {formatDoseWeight(importParsedRecipe.recipe.doseGrams, unitSystem)} /{' '}
-                  {formatWaterWeight(importParsedRecipe.recipe.waterGrams, unitSystem)} ·{' '}
-                  {formatTemperature(importParsedRecipe.recipe.waterTempCelsius, unitSystem)}
-                </Text>
-                <Text style={styles.importPreviewStepsCount}>
-                  Liczba kroków parzenia: {importParsedRecipe.originalSteps.length}
-                </Text>
-                <Pressable
-                  style={styles.confirmImportBtn}
-                  onPress={() => {
-                    if (!canCreate) {
-                      setShowImportModal(false);
-                      setShowRecipeModal(false);
-                      setShowPaywallModal(true);
-                      return;
-                    }
-                    try {
-                      saveRecipe(importParsedRecipe.recipe);
-                      refreshData();
-                      selectRecipe(importParsedRecipe.recipe);
-                      setShowImportModal(false);
-                      setShowRecipeModal(false);
-                      setImportUrlInput('');
-                      setImportParsedRecipe(null);
-                      Alert.alert('Sukces!', t.brew.importSuccess);
-                    } catch {
-                      Alert.alert('Błąd', t.brew.importError);
-                    }
-                  }}
-                  testID="confirm-import-btn"
-                >
-                  <Text style={styles.confirmImportBtnText}>
-                    {t.brew.importActionBtn}
-                  </Text>
-                </Pressable>
-              </View>
-            )}
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
+      <ImportRecipeModal
+        visible={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        canCreate={canCreate}
+        onRequirePaywall={() => {
+          setShowRecipeModal(false);
+          setShowPaywallModal(true);
+        }}
+        onImportSuccess={(importedRecipe) => {
+          refreshData();
+          selectRecipe(importedRecipe);
+          setShowRecipeModal(false);
+        }}
+        unitSystem={unitSystem}
+        t={t}
+      />
 
       {/* Skaner Aparatem Kodów QR */}
       <QrScannerModal
@@ -1154,344 +709,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     flex: 1,
   },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: theme.colors.bg,
-    padding: theme.spacing.md,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-    marginBottom: 12,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-  },
-  modalCloseBtn: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseText: {
-    fontSize: 14,
-    color: theme.colors.copper,
-    fontWeight: '700',
-  },
-  recipeFilterTabsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-  },
-  recipeFilterTab: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 44,
-  },
-  recipeFilterTabActive: {
-    backgroundColor: 'rgba(200, 106, 40, 0.16)',
-    borderColor: theme.colors.copper,
-  },
-  recipeFilterTabText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-  },
-  recipeFilterTabTextActive: {
-    color: theme.colors.copperLight,
-    fontWeight: '700',
-  },
-  recipeOptionItem: {
-    backgroundColor: theme.colors.bgCard,
-    borderRadius: theme.borderRadius.md,
-    padding: 16,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  recipeOptionActive: {
-    borderColor: theme.colors.copper,
-    backgroundColor: theme.colors.bgCardSecondary,
-  },
-  recipeOptionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  recipeOptionName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    flex: 1,
-  },
-  recipeOptionMethod: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: theme.colors.copper,
-  },
-  recipeOptionAuthor: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    marginBottom: 4,
-  },
-  recipeOptionDetails: {
-    fontSize: 12,
-    color: theme.colors.textMuted,
-  },
-  addCustomRecipeBtn: {
-    flex: 1,
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
-    borderWidth: 1,
-    borderColor: theme.colors.copper,
-    borderRadius: theme.borderRadius.md,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  addCustomRecipeBtnText: {
-    color: theme.colors.copper,
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  editRecipeBtn: {
-    padding: 6,
-    borderRadius: 6,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginLeft: 8,
-  },
-  editRecipeBtnText: {
-    fontSize: 14,
-  },
-  duplicateRecipeBtn: {
-    padding: 6,
-    borderRadius: 6,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginLeft: 8,
-  },
-  duplicateRecipeBtnText: {
-    fontSize: 14,
-  },
-  modalActionButtonsRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 14,
-  },
-  gongfuModalBtn: {
-    flex: 1,
-    backgroundColor: 'rgba(42, 123, 98, 0.15)',
-    borderWidth: 1,
-    borderColor: theme.colors.emerald,
-    borderRadius: theme.borderRadius.md,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  gongfuModalBtnText: {
-    color: theme.colors.emeraldLight,
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  favToggleBtn: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  favToggleIcon: {
-    fontSize: 20,
-    color: theme.colors.textMuted,
-  },
-  favToggleIconActive: {
-    color: theme.colors.copper,
-  },
-  modalSub: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    marginBottom: 14,
-    lineHeight: 18,
-  },
-  importRecipeModalBtn: {
-    flex: 1,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: theme.borderRadius.md,
-    padding: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  importRecipeModalBtnText: {
-    color: theme.colors.copper,
-    fontWeight: '600',
-    fontSize: 13,
-  },
-  scanQrModalBtn: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: theme.borderRadius.md,
-    padding: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.copper,
-  },
-  scanQrModalBtnText: {
-    color: theme.colors.copper,
-    fontWeight: '700',
-    fontSize: 13,
-  },
-  qrCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: theme.borderRadius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 16,
-  },
-  shareRecipeName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  shareRecipeDetails: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  shareButtonsRow: {
-    flexDirection: 'row',
-    gap: 10,
-    width: '100%',
-    marginTop: 8,
-  },
-  shareActionBtn: {
-    flex: 1,
-    backgroundColor: theme.colors.copper,
-    borderRadius: theme.borderRadius.md,
-    padding: 14,
-    alignItems: 'center',
-  },
-  shareActionBtnSecondary: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  shareActionBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  shareActionBtnTextSecondary: {
-    color: theme.colors.textPrimary,
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  grinderItemCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.bgCard,
-    borderRadius: theme.borderRadius.md,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginBottom: 10,
-  },
-  grinderItemCardActive: {
-    borderColor: theme.colors.copper,
-    backgroundColor: theme.colors.bgCardSecondary,
-  },
-  grinderItemName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.colors.textPrimary,
-    marginBottom: 2,
-  },
-  grinderItemRecommendation: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-  },
-  importTextInput: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: theme.borderRadius.md,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    color: theme.colors.textPrimary,
-    fontSize: 13,
-    marginBottom: 16,
-  },
-  importPreviewCard: {
-    backgroundColor: theme.colors.bgCard,
-    borderRadius: theme.borderRadius.md,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.copper,
-    marginBottom: 16,
-  },
-  importPreviewTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    marginBottom: 4,
-  },
-  importPreviewSubtitle: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    marginBottom: 6,
-  },
-  importPreviewStepsCount: {
-    fontSize: 12,
-    color: theme.colors.copper,
-    marginBottom: 14,
-  },
-  confirmImportBtn: {
-    backgroundColor: theme.colors.copper,
-    borderRadius: theme.borderRadius.md,
-    padding: 14,
-    alignItems: 'center',
-  },
-  confirmImportBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 14,
-  },
   reBrewBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(217, 119, 54, 0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(217, 119, 54, 0.35)',
+    backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.md,
     padding: 12,
-    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
   },
   reBrewIconBox: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    width: 32,
+    height: 32,
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.copperMuted,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -1500,21 +732,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   reBrewEyebrow: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: '700',
     color: theme.colors.copper,
-    letterSpacing: 0.6,
-    marginBottom: 2,
+    letterSpacing: 0.5,
   },
   reBrewTitle: {
     fontSize: 13,
     fontWeight: '600',
     color: theme.colors.textPrimary,
+    marginTop: 2,
   },
   reBrewArrow: {
     fontSize: 16,
-    fontWeight: '600',
     color: theme.colors.copper,
-    marginLeft: 8,
+    fontWeight: '700',
+    marginLeft: 6,
   },
 });

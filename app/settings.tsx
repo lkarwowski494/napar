@@ -11,10 +11,7 @@ import {
   ScrollView,
   Pressable,
   Alert,
-  Modal,
-  TextInput,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   exportAllDataJson,
   importDataJson,
@@ -28,8 +25,6 @@ import {
   setVoiceAnnounceEnabled,
   getHapticsEnabled,
   setHapticsEnabled,
-  getIsProUser,
-  setIsProUser,
   getCaffeineHalfLife,
   setCaffeineHalfLife,
   getBedtimeHour,
@@ -49,9 +44,8 @@ import {
   requestHealthKitPermissions,
   revokeHealthKitPermissions,
 } from '../src/core/healthkit';
-import { SUPPORTED_GRINDERS } from '../src/core/grinder-converter';
 import { theme } from '../src/core/theme';
-import { useTranslation, SupportedLanguage } from '../src/core/i18n';
+import { useTranslation } from '../src/core/i18n';
 import { safetyBackup, NaparBackupData } from '../src/core/backup';
 import { useAppAccess } from '../src/core/app-access';
 import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
@@ -60,19 +54,14 @@ import {
   formatDoseWeight,
   formatWaterWeight,
 } from '../src/core/unit-converter';
-import {
-  NaparAppIcon,
-  PiekarzAppIcon,
-  SloikAppIcon,
-  MasazAppIcon,
-  FermentAppIcon,
-  CraftFamilyEmblem,
-  CheckIcon,
-  BrewIcon,
-  TeaLeafIcon,
-  StarIcon,
-} from '../src/components/icons/CraftIcons';
-import { CRAFT_APPS } from '../src/core/craft-suite-theme';
+import { CheckIcon } from '../src/components/icons/CraftIcons';
+import { JsonExportModal, JsonImportModal } from '../src/components/settings/JsonBackupModals';
+import { CsvExportModal } from '../src/components/settings/CsvExportModal';
+import { CraftFamilyShowcase } from '../src/components/settings/CraftFamilyShowcase';
+import { CaffeineSettingsCard } from '../src/components/settings/CaffeineSettingsCard';
+import { DataBackupCard } from '../src/components/settings/DataBackupCard';
+import { GrinderSelectionCard } from '../src/components/settings/GrinderSelectionCard';
+import { PassSettingsCard } from '../src/components/settings/PassSettingsCard';
 
 export default function SettingsScreen() {
   const { t, language, setLanguage } = useTranslation();
@@ -108,9 +97,6 @@ export default function SettingsScreen() {
   const [haptics, setHaptics] = useState<boolean>(() => {
     return getHapticsEnabled();
   });
-  const [isPro, setIsPro] = useState(() => {
-    return getIsProUser();
-  });
   const [halfLifeHours, setHalfLifeHoursState] = useState(() => {
     return getCaffeineHalfLife();
   });
@@ -125,7 +111,6 @@ export default function SettingsScreen() {
     isSubscribed,
     subscriptionTier,
     brewsRemaining,
-    daysRemaining,
     refresh: refreshAccess,
   } = useAppAccess();
   const [showPassModal, setShowPassModal] = useState(false);
@@ -453,366 +438,43 @@ export default function SettingsScreen() {
       </View>
 
       {/* Metabolizm Kofeiny & Sen (D-02 & BR-KOF-003) */}
-      <Text style={styles.sectionTitle}>
-        {t.settings.caffeineSettingsSection || 'Metabolizm Kofeiny & Sen (D-02)'}
-      </Text>
-      <View style={styles.cardGroup}>
-        <View style={styles.actionRow}>
-          <View style={{ flex: 1, paddingRight: 10 }}>
-            <Text style={styles.actionTitle}>
-              {t.settings.caffeineHalfLifeTitle || 'Czas Półtrwania Kofeiny (t₁/₂)'}
-            </Text>
-            <Text style={styles.actionSubtitle}>
-              {t.settings.caffeineHalfLifeDesc || 'Wskaźnik klirensu wątrobowego (3.0h–8.0h, domyślnie 5.0h wg EFSA).'}
-            </Text>
-          </View>
-          <View style={styles.stepperContainer}>
-            <Pressable
-              style={styles.stepperBtn}
-              onPress={() => handleHalfLifeChange(halfLifeHours - 0.5)}
-              accessibilityLabel="Zmniejsz czas półtrwania"
-            >
-              <Text style={styles.stepperBtnText}>−</Text>
-            </Pressable>
-            <Text style={styles.stepperValueText}>{halfLifeHours.toFixed(1)}h</Text>
-            <Pressable
-              style={styles.stepperBtn}
-              onPress={() => handleHalfLifeChange(halfLifeHours + 0.5)}
-              accessibilityLabel="Zwiększ czas półtrwania"
-            >
-              <Text style={styles.stepperBtnText}>+</Text>
-            </Pressable>
-          </View>
-        </View>
-
-        <View style={styles.divider} />
-
-        <View style={styles.actionRow}>
-          <View style={{ flex: 1, paddingRight: 10 }}>
-            <Text style={styles.actionTitle}>
-              {t.settings.bedtimeHourTitle || 'Docelowa Godzina Snu'}
-            </Text>
-            <Text style={styles.actionSubtitle}>
-              {t.settings.bedtimeHourDesc || 'Używana do kalkulacji nocnego curfew i progu 25 mg dla fazy NREM.'}
-            </Text>
-          </View>
-          <View style={styles.stepperContainer}>
-            <Pressable
-              style={styles.stepperBtn}
-              onPress={() => handleBedtimeChange(bedtimeHour - 1)}
-              accessibilityLabel="Wcześniejsza godzina snu"
-            >
-              <Text style={styles.stepperBtnText}>−</Text>
-            </Pressable>
-            <Text style={styles.stepperValueText}>{`${bedtimeHour}:00`}</Text>
-            <Pressable
-              style={styles.stepperBtn}
-              onPress={() => handleBedtimeChange(bedtimeHour + 1)}
-              accessibilityLabel="Późniejsza godzina snu"
-            >
-              <Text style={styles.stepperBtnText}>+</Text>
-            </Pressable>
-          </View>
-        </View>
-
-        <View style={styles.divider} />
-
-        {/* BR-KOF-002: Apple HealthKit Integration */}
-        <View style={styles.actionRow}>
-          <View style={{ flex: 1, paddingRight: 10 }}>
-            <Text style={styles.actionTitle}>
-              {t.settings.healthKitTitle || 'Synchronizuj Kofeinę z Apple Health'}
-            </Text>
-            <Text style={styles.actionSubtitle}>
-              {t.settings.healthKitSubtitle || 'Automatycznie zapisuj spożytą kofeinę (Dietary Caffeine) w aplikacji Zdrowie bez wysyłania danych na zewnątrz.'}
-            </Text>
-          </View>
-          <Pressable
-            testID="toggle-healthkit-btn"
-            style={[
-              styles.toggleBtn,
-              healthKitSync && styles.toggleBtnActive,
-            ]}
-            onPress={handleToggleHealthKit}
-            accessibilityRole="switch"
-            accessibilityLabel={`${t.settings.healthKitTitle}: ${healthKitSync ? t.settings.enabled : t.settings.disabled}`}
-          >
-            <Text
-              style={[
-                styles.toggleBtnText,
-                healthKitSync && styles.toggleBtnTextActive,
-              ]}
-            >
-              {healthKitSync ? t.settings.enabled : t.settings.disabled}
-            </Text>
-          </Pressable>
-        </View>
-      </View>
+      <CaffeineSettingsCard
+        halfLifeHours={halfLifeHours}
+        onHalfLifeChange={handleHalfLifeChange}
+        bedtimeHour={bedtimeHour}
+        onBedtimeChange={handleBedtimeChange}
+        healthKitSync={healthKitSync}
+        onToggleHealthKit={handleToggleHealthKit}
+        t={t}
+      />
 
       {/* Młynek Domowy (Domyślny młynek) */}
-      <Text style={styles.sectionTitle}>{t.settings.grinderSection}</Text>
-      <View style={styles.cardGroup}>
-        {SUPPORTED_GRINDERS.map((grinder, idx) => {
-          const isSelected = selectedGrinder === grinder.id;
-          return (
-            <React.Fragment key={grinder.id}>
-              {idx > 0 && <View style={styles.divider} />}
-              <Pressable
-                style={[
-                  styles.actionRow,
-                  isSelected && { backgroundColor: theme.colors.bgCardSecondary },
-                ]}
-                onPress={() => handleSelectGrinder(grinder.id)}
-                accessibilityRole="button"
-                accessibilityLabel={`${grinder.name}, ${isSelected ? 'wybrany' : 'wybierz'}`}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={[
-                      styles.actionTitle,
-                      isSelected && { color: theme.colors.copper, fontWeight: '700' },
-                    ]}
-                  >
-                    {grinder.name}
-                  </Text>
-                  <Text style={styles.actionSubtitle}>
-                    {grinder.stepMicrons} µm/klik · Zakres: {grinder.minSetting}–{grinder.maxSetting}
-                  </Text>
-                </View>
-                {isSelected ? (
-                  <CheckIcon size={18} color={theme.colors.copper} />
-                ) : (
-                  <View
-                    style={{
-                      width: 18,
-                      height: 18,
-                      borderRadius: 9,
-                      borderWidth: 1.5,
-                      borderColor: theme.colors.border,
-                    }}
-                  />
-                )}
-              </Pressable>
-            </React.Fragment>
-          );
-        })}
-      </View>
+      <GrinderSelectionCard
+        selectedGrinder={selectedGrinder}
+        onSelectGrinder={handleSelectGrinder}
+        title={t.settings.grinderSection}
+      />
 
       {/* Kopia Zapasowa i Własność Danych */}
-      <Text style={styles.sectionTitle}>Twoje Dane (ZP-06 & ZP-07)</Text>
-      <View style={styles.cardGroup}>
-        <Pressable
-          testID="export-json-btn"
-          style={styles.actionRow}
-          onPress={handleExport}
-        >
-          <View style={{ flex: 1 }}>
-            <Text style={styles.actionTitle}>Eksportuj Kopię Zapasową (JSON)</Text>
-            <Text style={styles.actionSubtitle}>
-              Pobierz pełną historię parzeń, spiżarnię i notatki w otwartym formacie
-            </Text>
-          </View>
-          <Text style={styles.actionArrow}>↗</Text>
-        </Pressable>
-
-        <View style={styles.divider} />
-
-        <Pressable
-          testID="import-json-btn"
-          style={styles.actionRow}
-          onPress={() => setShowImportModal(true)}
-        >
-          <View style={{ flex: 1 }}>
-            <Text style={styles.actionTitle}>Importuj Kopię z Pliku JSON</Text>
-            <Text style={styles.actionSubtitle}>
-              Przywróć stan spiżarni i sesji z wcześniejszej kopii zapasowej
-            </Text>
-          </View>
-          <Text style={styles.actionArrow}>↙</Text>
-        </Pressable>
-
-        <View style={styles.divider} />
-
-        <Pressable
-          testID="export-csv-sessions-btn"
-          style={styles.actionRow}
-          onPress={handleExportSessionsCsv}
-        >
-          <View style={{ flex: 1 }}>
-            <Text style={styles.actionTitle}>Eksportuj Dziennik (CSV)</Text>
-            <Text style={styles.actionSubtitle}>
-              Arkusz kalkulacyjny (Excel, Google Sheets) z historią zaparzeń i sensoryką
-            </Text>
-          </View>
-          <Text style={styles.actionArrow}>CSV</Text>
-        </Pressable>
-
-        <View style={styles.divider} />
-
-        <Pressable style={styles.actionRow} onPress={handleExportInventoryCsv}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.actionTitle}>Eksportuj Spiżarnię (CSV)</Text>
-            <Text style={styles.actionSubtitle}>
-              Zestawienie paczek ziaren, herbat, palarni, dat palenia i zapasów
-            </Text>
-          </View>
-          <Text style={styles.actionArrow}>CSV</Text>
-        </Pressable>
-      </View>
+      <DataBackupCard
+        onExportJson={handleExport}
+        onOpenImportJson={() => setShowImportModal(true)}
+        onExportSessionsCsv={handleExportSessionsCsv}
+        onExportInventoryCsv={handleExportInventoryCsv}
+      />
 
       {/* Oferta Apps4Brew Pass ("Cheaper than Espresso") */}
-      <Text style={styles.sectionTitle}>{t.settings.proTitle} — Apps4Brew Pass</Text>
-      <View style={styles.proCard}>
-        <View style={styles.proHeader}>
-          <Text style={styles.proTitle}>{t.paywall.title}</Text>
-          {isSubscribed ? (
-            <View style={styles.proActiveBadge}>
-              <Text style={styles.proActiveText}>
-                {subscriptionTier.toUpperCase()} PRO
-              </Text>
-            </View>
-          ) : accessStatus === 'trial_active' ? (
-            <View style={[styles.proActiveBadge, { backgroundColor: theme.colors.copperMuted }]}>
-              <Text style={[styles.proActiveText, { color: theme.colors.copper }]}>
-                TRIAL ({brewsRemaining} {brewsRemaining === 1 ? 'parzenie' : 'parzenia'})
-              </Text>
-            </View>
-          ) : (
-            <View style={[styles.proActiveBadge, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
-              <Text style={[styles.proActiveText, { color: '#ef4444' }]}>
-                TRIAL WYGASŁ
-              </Text>
-            </View>
-          )}
-        </View>
-
-        <Text style={styles.proDesc}>{t.paywall.tagline}</Text>
-
-        <View style={styles.proPerks}>
-          <Text style={styles.proPerkItem}>{t.paywall.perk1}</Text>
-          <Text style={styles.proPerkItem}>{t.paywall.perk2}</Text>
-          <Text style={styles.proPerkItem}>{t.paywall.perk3}</Text>
-          <Text style={styles.proPerkItem}>{t.paywall.perk4}</Text>
-        </View>
-
-        <Pressable
-          testID="open-apps4brew-pass-btn"
-          style={styles.passCtaBtn}
-          onPress={() => setShowPassModal(true)}
-          accessibilityRole="button"
-          accessibilityLabel={isSubscribed ? 'Apps4Brew Pass: Aktywny' : 'Odblokuj Apps4Brew Pass ($0.99 / $4.99 / $14.99)'}
-        >
-          <Text style={styles.passCtaBtnText}>
-            {isSubscribed
-              ? 'Licencja Aktywna — Zarządzaj Planem'
-              : 'Przejdź do planów ($0.99 / $4.99 / $14.99)'}
-          </Text>
-        </Pressable>
-      </View>
+      <PassSettingsCard
+        isSubscribed={isSubscribed}
+        subscriptionTier={subscriptionTier}
+        accessStatus={accessStatus}
+        brewsRemaining={brewsRemaining}
+        onOpenPassModal={() => setShowPassModal(true)}
+        t={t}
+      />
 
       {/* Rodzina Apps4Craft Studio (Kuchenne Rzemiosło) */}
-      <Text style={styles.sectionTitle}>
-        {language === 'pl' ? 'Rodzina Apps4Craft Studio' : 'Apps4Craft Studio Family'}
-      </Text>
-      <View style={styles.cardGroup}>
-        {/* Napar */}
-        <View style={styles.craftAppRow}>
-          <View style={[styles.craftAppIconBox, { backgroundColor: 'rgba(200, 106, 40, 0.15)' }]}>
-            <NaparAppIcon size={24} color={CRAFT_APPS.napar.accent} />
-          </View>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={styles.actionTitle}>Napar</Text>
-              <View style={styles.currentAppPill}>
-                <Text style={styles.currentAppPillText}>{language === 'pl' ? 'Zainstalowano' : 'Installed'}</Text>
-              </View>
-            </View>
-            <Text style={styles.actionSubtitle}>
-              {language === 'pl' ? 'Kawa Specialty & Herbata Rzemieślnicza' : 'Specialty Coffee & Artisan Tea'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.divider} />
-
-        {/* Piekarz */}
-        <View style={styles.craftAppRow}>
-          <View style={[styles.craftAppIconBox, { backgroundColor: 'rgba(212, 155, 66, 0.15)' }]}>
-            <PiekarzAppIcon size={24} color={CRAFT_APPS.piekarz.accent} />
-          </View>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={styles.actionTitle}>Piekarz</Text>
-              <View style={styles.upcomingAppPill}>
-                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
-              </View>
-            </View>
-            <Text style={styles.actionSubtitle}>
-              {language === 'pl' ? 'Chleb na Zakwasie, Hydratacja & Fermentacja' : 'Sourdough Bread, Hydration & Schedule'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.divider} />
-
-        {/* Słoik */}
-        <View style={styles.craftAppRow}>
-          <View style={[styles.craftAppIconBox, { backgroundColor: 'rgba(91, 138, 97, 0.15)' }]}>
-            <SloikAppIcon size={24} color={CRAFT_APPS.sloik.accent} />
-          </View>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={styles.actionTitle}>Słoik</Text>
-              <View style={styles.upcomingAppPill}>
-                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
-              </View>
-            </View>
-            <Text style={styles.actionSubtitle}>
-              {language === 'pl' ? 'Kiszonki, Solanki & Wekowanie Warzyw' : 'Fermented Pickles, Brine % & Canning'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.divider} />
-
-        {/* Masaż */}
-        <View style={styles.craftAppRow}>
-          <View style={[styles.craftAppIconBox, { backgroundColor: 'rgba(164, 62, 56, 0.15)' }]}>
-            <MasazAppIcon size={24} color={CRAFT_APPS.masaz.accent} />
-          </View>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={styles.actionTitle}>Masaż</Text>
-              <View style={styles.upcomingAppPill}>
-                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
-              </View>
-            </View>
-            <Text style={styles.actionSubtitle}>
-              {language === 'pl' ? 'Wędliny, Peklosól, Sezonowanie & Ubytek Masy' : 'Charcuterie, Curing Salt & Weight Loss'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.divider} />
-
-        {/* Ferment */}
-        <View style={styles.craftAppRow}>
-          <View style={[styles.craftAppIconBox, { backgroundColor: 'rgba(224, 168, 56, 0.15)' }]}>
-            <FermentAppIcon size={24} color={CRAFT_APPS.ferment.accent} />
-          </View>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={styles.actionTitle}>Ferment</Text>
-              <View style={styles.upcomingAppPill}>
-                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
-              </View>
-            </View>
-            <Text style={styles.actionSubtitle}>
-              {language === 'pl' ? 'Sery Rzemieślnicze, Podpuszczka & Dojrzewalnia' : 'Artisan Cheeses, Rennet & Aging Cellar'}
-            </Text>
-          </View>
-        </View>
-      </View>
+      <CraftFamilyShowcase language={language} />
 
       {/* O aplikacji */}
       <Text style={styles.sectionTitle}>O Aplikacji</Text>
@@ -834,97 +496,41 @@ export default function SettingsScreen() {
       </View>
 
       {/* Modal Eksportu JSON */}
-      <Modal visible={showExportModal} animationType="slide">
-        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Kopia Zapasowa (JSON)</Text>
-            <Pressable
-              style={styles.modalCloseBtn}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              onPress={() => setShowExportModal(false)}
-              accessibilityRole="button"
-              accessibilityLabel="Zamknij"
-            >
-              <Text style={styles.modalCloseText}>Zamknij</Text>
-            </Pressable>
-          </View>
-          <Text style={styles.modalSub}>
-            Poniższy kod JSON zawiera wszystkie Twoje wpisy ze spiżarni, historię parzeń oraz logi kofeiny. Możesz go skopiować i bezpiecznie zapisać:
-          </Text>
-          <TextInput
-            style={styles.jsonTextInput}
-            multiline
-            editable={false}
-            value={exportedJsonText}
-          />
-        </SafeAreaView>
-      </Modal>
+      <JsonExportModal
+        visible={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        exportedJsonText={exportedJsonText}
+      />
 
       {/* Modal Importu JSON */}
-      <Modal visible={showImportModal} animationType="slide">
-        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Importuj Dane JSON</Text>
-            <Pressable
-              style={styles.modalCloseBtn}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              onPress={() => setShowImportModal(false)}
-              accessibilityRole="button"
-              accessibilityLabel="Anuluj"
-            >
-              <Text style={styles.modalCloseText}>Anuluj</Text>
-            </Pressable>
-          </View>
-          <Text style={styles.modalSub}>
-            Wklej poniżej treść pliku JSON z kopią zapasową aplikacji Napar:
-          </Text>
-          <TextInput
-            style={styles.jsonTextInput}
-            multiline
-            placeholder='{"version": 1, ...}'
-            placeholderTextColor={theme.colors.textMuted}
-            value={importJsonText}
-            onChangeText={setImportJsonText}
-          />
-          <Pressable style={styles.submitImportBtn} onPress={handleImport}>
-            <Text style={styles.submitImportBtnText}>Zaimportuj i Zastąp Dane</Text>
-          </Pressable>
-        </SafeAreaView>
-      </Modal>
+      <JsonImportModal
+        visible={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        importJsonText={importJsonText}
+        onChangeImportJsonText={setImportJsonText}
+        onImport={handleImport}
+      />
 
-      {/* Modal Eksportu CSV (Z-152, ZP-07) */}
-      <Modal visible={showCsvModal} animationType="slide">
-        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{csvModalTitle}</Text>
-            <Pressable
-              style={styles.modalCloseBtn}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              onPress={() => setShowCsvModal(false)}
-              accessibilityRole="button"
-              accessibilityLabel="Zamknij"
-            >
-              <Text style={styles.modalCloseText}>Zamknij</Text>
-            </Pressable>
-          </View>
-          <Text style={styles.modalSub}>
-            Poniższy tekst w formacie CSV możesz skopiować do schowka i otworzyć w Excelu, Numbers lub Arkuszach Google:
-          </Text>
-          <TextInput
-            style={styles.jsonTextInput}
-            multiline
-            editable={false}
-            value={exportedCsvText}
-          />
-        </SafeAreaView>
-      </Modal>
+      {/* Modal Eksportu CSV */}
+      <CsvExportModal
+        visible={showCsvModal}
+        onClose={() => setShowCsvModal(false)}
+        title={csvModalTitle}
+        csvText={exportedCsvText}
+      />
 
-      {/* Modal Apps4Brew Pass ("Cheaper than Espresso") */}
+      {/* Apps4Brew Pass Paywall Modal ($0.99 / $4.99 / $14.99) */}
       <Apps4BrewPassModal
         visible={showPassModal}
         onClose={() => setShowPassModal(false)}
-        onPurchaseSuccess={refreshAccess}
-        onSubscribed={refreshAccess}
+        onPurchaseSuccess={() => {
+          setShowPassModal(false);
+          refreshAccess();
+        }}
+        onSubscribed={() => {
+          setShowPassModal(false);
+          refreshAccess();
+        }}
       />
     </ScrollView>
   );
@@ -939,13 +545,113 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
     paddingBottom: 40,
   },
-  manifestoCard: {
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    marginBottom: 8,
+    marginTop: 16,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  langSelectorRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  langTab: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: theme.borderRadius.md,
+    backgroundColor: theme.colors.bgCard,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+  },
+  langTabActive: {
+    borderColor: theme.colors.copper,
+    backgroundColor: theme.colors.copperMuted,
+  },
+  langTabText: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    fontWeight: '600',
+  },
+  langTabTextActive: {
+    color: theme.colors.copperLight,
+    fontWeight: '700',
+  },
+  cardGroup: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
-    borderLeftWidth: 3,
-    borderLeftColor: theme.colors.copper,
-    marginBottom: 24,
+  },
+  actionTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+    marginBottom: 2,
+  },
+  actionTitleActive: {
+    color: theme.colors.copper,
+    fontWeight: '700',
+  },
+  actionSubtitle: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    lineHeight: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: theme.colors.border,
+    marginLeft: 16,
+  },
+  toggleBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  toggleBtnActive: {
+    backgroundColor: theme.colors.copperMuted,
+    borderColor: theme.colors.copper,
+  },
+  toggleBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  toggleBtnTextActive: {
+    color: theme.colors.copperLight,
+    fontWeight: '700',
+  },
+  unitPreviewRow: {
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    marginBottom: 8,
+  },
+  unitPreviewText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  manifestoCard: {
+    backgroundColor: 'rgba(200, 106, 40, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(200, 106, 40, 0.3)',
+    borderRadius: theme.borderRadius.md,
+    padding: 16,
+    marginBottom: 16,
+    marginTop: 8,
   },
   manifestoBadge: {
     fontSize: 10,
@@ -965,57 +671,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     lineHeight: 18,
   },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: theme.colors.textMuted,
-    letterSpacing: 0.5,
-    marginBottom: 8,
-    marginLeft: 4,
-    textTransform: 'uppercase',
-  },
-  cardGroup: {
-    backgroundColor: theme.colors.bgCard,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginBottom: 24,
-    overflow: 'hidden',
-  },
-  actionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  actionTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.colors.textPrimary,
-    marginBottom: 2,
-  },
-  actionSubtitle: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-  },
-  actionArrow: {
-    fontSize: 18,
-    color: theme.colors.copper,
-    marginLeft: 12,
-  },
-  actionTitleActive: {
-    color: theme.colors.copper,
-    fontWeight: '700',
-  },
-  checkIcon: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.copper,
-    marginLeft: 12,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: theme.colors.border,
-  },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1027,319 +682,7 @@ const styles = StyleSheet.create({
   },
   infoValue: {
     fontSize: 14,
+    color: theme.colors.textPrimary,
     fontWeight: '600',
-    color: theme.colors.textPrimary,
-  },
-  proCard: {
-    backgroundColor: theme.colors.bgCard,
-    borderRadius: theme.borderRadius.lg,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: theme.colors.copper,
-    marginBottom: 24,
-  },
-  proHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  proTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-  },
-  proActiveBadge: {
-    backgroundColor: theme.colors.statusPeakMuted,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: theme.borderRadius.sm,
-  },
-  proActiveText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: theme.colors.statusPeak,
-  },
-  proDesc: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    lineHeight: 18,
-    marginBottom: 12,
-  },
-  proPerks: {
-    gap: 6,
-    marginBottom: 18,
-  },
-  proPerkItem: {
-    fontSize: 12,
-    color: theme.colors.copperLight,
-    fontWeight: '500',
-  },
-  pricingGrid: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 14,
-  },
-  priceOption: {
-    flex: 1,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: theme.borderRadius.md,
-    padding: 10,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  priceOptionBest: {
-    borderColor: theme.colors.copper,
-    backgroundColor: theme.colors.copperMuted,
-  },
-  bestBadge: {
-    backgroundColor: theme.colors.copper,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginBottom: 4,
-  },
-  bestBadgeText: {
-    fontSize: 8,
-    fontWeight: '800',
-    color: '#FFFFFF',
-  },
-  priceTerm: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: theme.colors.textMuted,
-    marginBottom: 2,
-  },
-  priceValue: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    marginBottom: 2,
-  },
-  priceSub: {
-    fontSize: 9,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-  },
-  restoreBtn: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  restoreBtnText: {
-    fontSize: 12,
-    color: theme.colors.textMuted,
-    textDecorationLine: 'underline',
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: theme.colors.bg,
-    padding: theme.spacing.md,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-    marginBottom: 12,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-  },
-  modalCloseBtn: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseText: {
-    fontSize: 14,
-    color: theme.colors.copper,
-    fontWeight: '700',
-  },
-  modalSub: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    marginBottom: 12,
-    lineHeight: 18,
-  },
-  jsonTextInput: {
-    flex: 1,
-    backgroundColor: theme.colors.bgCard,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.md,
-    padding: 14,
-    color: theme.colors.textPrimary,
-    fontFamily: 'monospace',
-    fontSize: 12,
-    marginBottom: 16,
-  },
-  submitImportBtn: {
-    backgroundColor: theme.colors.copper,
-    paddingVertical: 14,
-    borderRadius: theme.borderRadius.md,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  submitImportBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 15,
-  },
-  langSelectorRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 16,
-  },
-  langTab: {
-    flex: 1,
-    paddingVertical: 12,
-    backgroundColor: theme.colors.bgCard,
-    borderRadius: theme.borderRadius.md,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  langTabActive: {
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
-    borderColor: theme.colors.copper,
-  },
-  langTabText: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    fontWeight: '600',
-  },
-  langTabTextActive: {
-    color: theme.colors.copper,
-    fontWeight: '700',
-  },
-  toggleBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: theme.borderRadius.sm,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  toggleBtnActive: {
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
-    borderColor: theme.colors.copper,
-  },
-  toggleBtnText: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-    fontWeight: '600',
-  },
-  toggleBtnTextActive: {
-    color: theme.colors.copper,
-    fontWeight: '700',
-  },
-  stepperContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: theme.borderRadius.sm,
-    paddingHorizontal: 6,
-    paddingVertical: 4,
-    gap: 8,
-  },
-  stepperBtn: {
-    width: 28,
-    height: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepperBtnText: {
-    color: theme.colors.textPrimary,
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  stepperValueText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: theme.colors.copperLight,
-    minWidth: 44,
-    textAlign: 'center',
-  },
-  unitPreviewRow: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: theme.borderRadius.sm,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  unitPreviewText: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-  },
-  passCtaBtn: {
-    backgroundColor: theme.colors.copper,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: theme.borderRadius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
-  },
-  passCtaBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  craftAppRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-  },
-  craftAppIconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  currentAppPill: {
-    backgroundColor: 'rgba(42, 123, 98, 0.18)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(42, 123, 98, 0.4)',
-  },
-  currentAppPillText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#4E9F3D',
-    textTransform: 'uppercase',
-  },
-  upcomingAppPill: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  upcomingAppPillText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: theme.colors.textMuted,
-    textTransform: 'uppercase',
   },
 });
