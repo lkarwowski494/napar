@@ -3,7 +3,8 @@
  * Patch SwiftPM Package.swift manifests and Swift/C++ sources in node_modules to match Xcode 16.x (Swift tools version 6.0).
  * Aligns swift-tools-version to 6.0, removes trailing commas in argument lists (SE-0437, requires Swift 6.2),
  * patches Swift 6.2-only constructs (weak let, Escapable, CppError library evolution, actor isolation, Task.immediate)
- * and provides C++ static factories for foreign reference types (RuntimeScheduler, HostFunctionClosure)
+ * and provides C++ static factories / move helpers for foreign reference and move-only types
+ * (RuntimeScheduler, HostFunctionClosure, HostObjectCallbacks::addPropNameId)
  * so that ExpoModulesJSI builds cleanly on Xcode 16.2 / Swift 6.0.
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -84,7 +85,29 @@ if (existsSync(hostFunctionClosureHeader)) {
   }
 }
 
-// 4. Patch Swift sources in expo-modules-jsi for Swift 6.0 compatibility
+// 4. Patch HostObjectCallbacks.h for Xcode 16.x (C++ move helper for vector push_back)
+const hostObjectCallbacksHeader = join(
+  process.cwd(),
+  'node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI-Cxx/include/HostObjectCallbacks.h'
+);
+if (existsSync(hostObjectCallbacksHeader)) {
+  const original = readFileSync(hostObjectCallbacksHeader, 'utf8');
+  let content = original;
+
+  if (!content.includes('static inline void addPropNameId')) {
+    content = content.replace(
+      'using PropNameIds = std::vector<facebook::jsi::PropNameID>;',
+      `using PropNameIds = std::vector<facebook::jsi::PropNameID>;\n\n  static inline void addPropNameId(PropNameIds &vector, facebook::jsi::PropNameID propNameId) {\n    vector.push_back(std::move(propNameId));\n  }\n\n  static inline void addPropNameId(PropNameIds &vector, facebook::jsi::IRuntime &runtime, const std::string &name) {\n    vector.push_back(facebook::jsi::PropNameID::forUtf8(runtime, name));\n  }`
+    );
+  }
+
+  if (content !== original) {
+    writeFileSync(hostObjectCallbacksHeader, content, 'utf8');
+    console.log('[patch-swift-tools] Successfully patched HostObjectCallbacks.h for Xcode 16.x C++/Swift compatibility.');
+  }
+}
+
+// 5. Patch Swift sources in expo-modules-jsi for Swift 6.0 compatibility
 const jsiSourcesDir = join(process.cwd(), 'node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI');
 if (existsSync(jsiSourcesDir)) {
   function patchDir(dir) {
@@ -154,10 +177,10 @@ if (existsSync(jsiSourcesDir)) {
 
         // g) Fix JavaScriptRuntime.swift
         if (entry.name === 'JavaScriptRuntime.swift') {
-          // Fix push_back consuming: label (Swift 6.0 C++ vector interop expects `consume propNameId` without label)
+          // Fix push_back of move-only PropNameID by delegating to C++ addPropNameId helper
           content = content.replace(
-            /vector\.push_back\((?:consuming:\s*)?propNameId\)/g,
-            'vector.push_back(consume propNameId)'
+            /for propertyName in propertyNames \{[\s\S]+?vector\.push_back\([^\)]+\)\s*\}/,
+            `for propertyName in propertyNames {\n        expo.HostObjectCallbacks.addPropNameId(&vector, iRuntime, std.string(propertyName))\n      }`
           );
           // Fix HostFunctionClosure initializer call to use static factory
           content = content.replace(
