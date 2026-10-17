@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Polityka Prywatności — Napar (Steepwise) | Apps4Brew Studio</title>
+  <meta name="description" content="Polityka Prywatności aplikacji Napar (Steepwise). 100% offline, brak kont, brak trackerów reklamowych, zero danych przesyłanych do serwerów zewnętrznych.">
+  <style>
+    :root {
+      --bg: #121214;
+      --card-bg: #1c1c1f;
+      --accent: #c86a28;
+      --accent-gold: #e5a96a;
+      --text: #f4efea;
+      --text-muted: #a09c96;
+      --border: #2e2e34;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f9f8f6;
+        --card-bg: #ffffff;
+        --accent: #b05a1e;
+        --accent-gold: #c2884a;
+        --text: #1a1a1c;
+        --text-muted: #6b6864;
+        --border: #e2dfda;
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      padding: 40px 24px 24px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2.2rem;
+      letter-spacing: -0.03em;
+    }
+    .date {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+    h2 {
+      color: var(--accent-gold);
+      margin-top: 32px;
+      font-size: 1.35rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    p, li {
+      color: var(--text-muted);
+    }
+    strong {
+      color: var(--text);
+    }
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    footer a {
+      color: var(--accent-gold);
+      text-decoration: none;
+      margin: 0 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Polityka Prywatności aplikacji Napar (Steepwise)</h1>
+    <div class="date">Wersja obowiązująca od: 17 października 2026 r.</div>
+  </header>
+
+  <main class="container">
+    <h2>1. Filozofia 100% Prywatności i Działania Offline</h2>
+    <p>Aplikacja <strong>Napar (Steepwise)</strong>, stworzona przez Apps4Brew Studio, została zaprojektowana w oparciu o fundamentalną zasadę pełnej suwerenności danych użytkownika. Aplikacja nie wymaga zakładania konta, podawania adresu e-mail ani logowania przez usługi społecznościowe.</p>
+    <p>Wszystkie Twoje receptury, wpisy w dzienniku degustacyjnym, zawartość spiżarni ziaren, historia parzeń oraz notatki są zapisywane <strong>wyłącznie w lokalnej bazie danych SQLite na Twoim urządzeniu</strong>.</p>
+
+    <h2>2. Brak Zewnętrznych Serwerów i Trackerów</h2>
+    <p>Aplikacja nie posiada własnego serwera zbierającego dane i nie przesyła żadnych informacji telemetrycznych, diagnostycznych ani analitycznych. W kodzie aplikacji nie znajdują się biblioteki analityczne ani reklamowe stron trzecich (takie jak Google Analytics, Firebase Analytics, Meta SDK czy Sentry).</p>
+    <p>Zgodnie z wymogami firmy Apple, plik konfiguracyjny <code>PrivacyInfo.xcprivacy</code> deklaruje: <code>NSPrivacyTracking = false</code> oraz zerowe zbieranie danych osobowych (<em>Data Not Collected</em>).</p>
+
+    <h2>3. Opcjonalna Integracja z Apple Health (HealthKit)</h2>
+    <p>Jeżeli wyrazisz na to zgodę w Ustawieniach, Napar może zapisywać szacowaną ilość spożytej kofeiny (mg) bezpośrednio do systemowej bazy Apple Health na Twoim iPhone. Dane te pozostają pod pełną kontrolą systemu iOS i nigdy nie są wysyłane poza Twoje urządzenie przez naszą aplikację.</p>
+
+    <h2>4. Dostęp do Aparatu (Kody QR)</h2>
+    <p>Aparat fotograficzny jest wykorzystywany wyłącznie w celach lokalnego skanowania kodów QR receptur udostępnionych przez innych baristów. Obraz z kamery jest przetwarzany w czasie rzeczywistym w pamięci urządzenia i nie jest nigdzie zapisywany ani przesyłany.</p>
+
+    <h2>5. Eksport i Kopie Zapasowe</h2>
+    <p>W każdej chwili masz prawo wyeksportować całą historię swoich danych do otwartego formatu JSON lub plików arkusza CSV. Wszystkie operacje eksportu i importu odbywają się całkowicie lokalnie w piaskownicy aplikacji.</p>
+
+    <h2>6. Kontakt</h2>
+    <p>W razie jakichkolwiek pytań dotyczących polityki prywatności lub działania aplikacji, prosimy o kontakt za pośrednictwem strony <a href="support.html">Wsparcia Technicznego</a>.</p>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Apps4Brew Studio. Wszystkie prawa zastrzeżone.</p>
+    <p>
+      <a href="index.html">Strona Główna</a> |
+      <a href="privacy.html">Polityka Prywatności</a> |
+      <a href="support.html">Wsparcie Techniczne</a>
+    </p>
+  </footer>
+</body>
+</html>

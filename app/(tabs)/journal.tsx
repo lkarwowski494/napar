@@ -11,7 +11,6 @@ import {
   ScrollView,
   Pressable,
   Alert,
-  TextInput,
   Share,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -23,6 +22,8 @@ import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
 import { SensoryProfile } from '../../src/core/radar-chart';
 import { useAppAccess } from '../../src/core/app-access';
+import { confirmAction } from '../../src/core/confirm';
+import { SearchField } from '../../src/components/ui';
 import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { JournalIcon, ShieldIcon } from '../../src/components/icons/CraftIcons';
 import { JournalSessionCard } from '../../src/components/journal/JournalSessionCard';
@@ -189,21 +190,16 @@ export default function JournalScreen() {
       setShowPaywall(true);
       return;
     }
-    Alert.alert(
-      'Usuń wpis',
-      `Czy na pewno chcesz usunąć sesję "${session.recipeName || session.method}"?`,
-      [
-        { text: 'Anuluj', style: 'cancel' },
-        {
-          text: 'Usuń',
-          style: 'destructive',
-          onPress: () => {
-            deleteBrewSession(session.id);
-            loadSessions();
-          },
-        },
-      ]
-    );
+    confirmAction({
+      title: 'Usuń wpis',
+      message: `Czy na pewno chcesz usunąć sesję "${session.recipeName || session.method}"?`,
+      actionText: 'Usuń',
+      destructive: true,
+      onConfirm: () => {
+        deleteBrewSession(session.id);
+        loadSessions();
+      },
+    });
   };
 
   const handleBrewAgain = (session: BrewSession) => {
@@ -355,13 +351,10 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
         <>
           {/* Wyszukiwarka sesji (search bar) */}
           <View style={styles.searchBarContainer}>
-            <TextInput
-              style={styles.searchInput}
+            <SearchField
               placeholder={t.journal.searchPlaceholder}
-              placeholderTextColor={theme.colors.textMuted}
               value={searchQuery}
               onChangeText={setSearchQuery}
-              clearButtonMode="while-editing"
             />
           </View>
 

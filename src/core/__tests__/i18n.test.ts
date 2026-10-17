@@ -10,12 +10,16 @@ import {
   SupportedLanguage,
   LanguageProvider,
   useTranslation,
+  getCurrentTranslations,
 } from '../i18n';
 
 describe('i18n System', () => {
   test('Wykrywa język systemowy lub domyślny fallback', () => {
     const lang = detectSystemLanguage();
     expect(['pl', 'en']).toContain(lang);
+    const currTr = getCurrentTranslations();
+    expect(currTr).toBeDefined();
+    expect(currTr.common.cancel).toBeDefined();
   });
 
   test('Słownik PL i EN posiadają kompletne klucze', () => {
@@ -57,6 +61,15 @@ describe('i18n System', () => {
     expect(Object.keys(translations.pl.settings).sort()).toEqual(
       Object.keys(translations.en.settings).sort()
     );
+    expect(Object.keys(translations.pl.favorites).sort()).toEqual(
+      Object.keys(translations.en.favorites).sort()
+    );
+  });
+
+  test('Klucze ulubionych i akcji szybkiego parzenia', () => {
+    expect(translations.pl.favorites.addToFav).toBe('Dodaj do ulubionych');
+    expect(translations.pl.favorites.removeFromFav).toBe('Usuń z ulubionych');
+    expect(translations.pl.favorites.quickBrew).toBe('Szybkie parzenie');
   });
 
   test('Nazwa aplikacji to Napar po polsku i Steepwise po angielsku', () => {

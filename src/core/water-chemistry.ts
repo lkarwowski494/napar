@@ -288,3 +288,11 @@ export function diagnoseWaterSensoryImpact(
     recommendationEn: 'Water is dialed in perfectly. Focus on grind setting calibration and pouring dynamics.',
   };
 }
+
+/**
+ * Konwertuje twardość z ppm CaCO3 na stopnie niemieckie dH (1 dH = 17.848 ppm CaCO3)
+ */
+export function ppmCaCO3ToDegreesDH(ppm: number): number {
+  return Number((ppm / 17.848).toFixed(4));
+}
+

@@ -97,7 +97,7 @@ describe('SettingsScreen Component', () => {
     });
 
     let str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('Language / Język');
+    expect(str).toContain('Language');
     expect(str).toContain('Steepwise requires no login');
 
     // 2. Przełącz z powrotem na polski
@@ -148,7 +148,7 @@ describe('SettingsScreen Component', () => {
     });
   });
 
-  test('Import kopii zapasowej JSON: waliduje puste wejście i importuje poprawny JSON', () => {
+  test('Import kopii zapasowej JSON: waliduje puste wejście i importuje poprawny JSON', async () => {
     const alertSpy = jest.spyOn(Alert, 'alert');
     const importSpy = jest.spyOn(databaseModule, 'importDataJson').mockImplementation(jest.fn());
 
@@ -176,11 +176,11 @@ describe('SettingsScreen Component', () => {
     const submitBtn = findPressableWithText(tree.root, 'Zaimportuj i Zastąp Dane');
     expect(submitBtn).toBeTruthy();
 
-    renderer.act(() => {
-      submitBtn.props.onPress();
+    await renderer.act(async () => {
+      await submitBtn.props.onPress();
     });
 
-    expect(alertSpy).toHaveBeenCalledWith('Błąd', 'Wklej prawidłowy tekst JSON kopii zapasowej.');
+    expect(alertSpy).toHaveBeenCalledWith('Nie udało się zaimportować', 'Wklej prawidłowy tekst JSON kopii zapasowej.');
 
     // 3. Wpisz treść JSON i zaimportuj
     const jsonInput = tree.root.findByProps({ placeholder: '{"version": 1, ...}' });
@@ -190,8 +190,8 @@ describe('SettingsScreen Component', () => {
       jsonInput.props.onChangeText('{"version": 1, "test": true}');
     });
 
-    renderer.act(() => {
-      submitBtn.props.onPress();
+    await renderer.act(async () => {
+      await submitBtn.props.onPress();
     });
 
     expect(importSpy).toHaveBeenCalledWith('{"version": 1, "test": true}');
@@ -341,7 +341,7 @@ describe('SettingsScreen Component', () => {
     );
   });
 
-  test('Obsługa błędu podczas importu uszkodzonego pliku JSON', () => {
+  test('Obsługa błędu podczas importu uszkodzonego pliku JSON', async () => {
     const alertSpy = jest.spyOn(Alert, 'alert');
     jest.spyOn(databaseModule, 'importDataJson').mockImplementation(() => {
       throw new Error('Niepoprawny format danych JSON.');
@@ -368,11 +368,11 @@ describe('SettingsScreen Component', () => {
     });
 
     // Kliknij import
-    renderer.act(() => {
-      findPressableWithText(tree.root, 'Zaimportuj i Zastąp Dane')?.props.onPress();
+    await renderer.act(async () => {
+      await findPressableWithText(tree.root, 'Zaimportuj i Zastąp Dane')?.props.onPress();
     });
 
-    expect(alertSpy).toHaveBeenCalledWith('Błąd importu', 'Niepoprawny format danych JSON.');
+    expect(alertSpy).toHaveBeenCalledWith('Nie udało się zaimportować', 'Niepoprawny format danych JSON.');
   });
 
   test('Obsługa błędów eksportu JSON i CSV oraz zamykanie modalu importu', () => {
@@ -395,7 +395,7 @@ describe('SettingsScreen Component', () => {
     renderer.act(() => {
       findPressableWithText(tree.root, 'Eksportuj Kopię Zapasową (JSON)')?.props.onPress();
     });
-    expect(alertSpy).toHaveBeenCalledWith('Błąd eksportu', 'Dysk pełny');
+    expect(alertSpy).toHaveBeenCalledWith('Nie udało się wyeksportować', 'Dysk pełny');
 
     // 2. Błąd eksportu CSV sesji
     jest.spyOn(databaseModule, 'exportSessionsCsv').mockImplementation(() => {
@@ -404,7 +404,7 @@ describe('SettingsScreen Component', () => {
     renderer.act(() => {
       findPressableWithText(tree.root, 'Eksportuj Dziennik (CSV)')?.props.onPress();
     });
-    expect(alertSpy).toHaveBeenCalledWith('Błąd eksportu', 'Błąd odczytu sesji');
+    expect(alertSpy).toHaveBeenCalledWith('Nie udało się wyeksportować', 'Błąd odczytu sesji');
 
     // 3. Błąd eksportu CSV spiżarni
     jest.spyOn(databaseModule, 'exportInventoryCsv').mockImplementation(() => {
@@ -413,7 +413,7 @@ describe('SettingsScreen Component', () => {
     renderer.act(() => {
       findPressableWithText(tree.root, 'Eksportuj Spiżarnię (CSV)')?.props.onPress();
     });
-    expect(alertSpy).toHaveBeenCalledWith('Błąd eksportu', 'Błąd odczytu spiżarni');
+    expect(alertSpy).toHaveBeenCalledWith('Nie udało się wyeksportować', 'Błąd odczytu spiżarni');
 
     // 4. Zamknięcie modalu importu przyciskiem "Anuluj"
     renderer.act(() => {

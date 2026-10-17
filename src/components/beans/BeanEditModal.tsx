@@ -344,15 +344,30 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             ))}
           </View>
 
-          <Pressable style={styles.saveSubmitBtn} onPress={handleSaveEdit}>
+          <Pressable
+            style={styles.saveSubmitBtn}
+            onPress={handleSaveEdit}
+            accessibilityRole="button"
+            accessibilityLabel="Zapisz zmiany"
+          >
             <Text style={styles.saveSubmitText}>Zapisz zmiany</Text>
           </Pressable>
 
-          <Pressable style={styles.markFinishedBtn} onPress={handleMarkAsFinished}>
+          <Pressable
+            style={styles.markFinishedBtn}
+            onPress={handleMarkAsFinished}
+            accessibilityRole="button"
+            accessibilityLabel="Oznacz jako zużytą i zarchiwizuj"
+          >
             <Text style={styles.markFinishedText}>Oznacz jako zużytą i zarchiwizuj</Text>
           </Pressable>
 
-          <Pressable style={styles.deletePackBtn} onPress={handleDeleteItem}>
+          <Pressable
+            style={styles.deletePackBtn}
+            onPress={handleDeleteItem}
+            accessibilityRole="button"
+            accessibilityLabel="Usuń paczkę ze spiżarni"
+          >
             <Text style={styles.deletePackText}>Usuń paczkę ze spiżarni</Text>
           </Pressable>
         </ScrollView>

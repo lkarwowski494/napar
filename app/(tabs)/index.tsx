@@ -59,6 +59,11 @@ import { InventorySelectModal } from '../../src/components/brew/InventorySelectM
 import { GrinderSelectModal } from '../../src/components/brew/GrinderSelectModal';
 import { ShareRecipeModal } from '../../src/components/brew/ShareRecipeModal';
 import { ImportRecipeModal } from '../../src/components/brew/ImportRecipeModal';
+import {
+  checkCorruptState,
+  dismissCorruptState,
+  CorruptStateRecovery,
+} from '../../src/core/backup';
 
 export default function BrewScreen() {
   const router = useRouter();
@@ -107,6 +112,21 @@ export default function BrewScreen() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showQrScanner, setShowQrScanner] = useState(false);
   const [showPaywallModal, setShowPaywallModal] = useState(false);
+  const [corruptState, setCorruptState] = useState<CorruptStateRecovery | null>(null);
+
+  useEffect(() => {
+    void checkCorruptState().then((res) => {
+      if (res) setCorruptState(res);
+    });
+  }, []);
+
+  const handleDismissCorrupt = () => {
+    if (corruptState) {
+      void dismissCorruptState(corruptState.corruptFile);
+      setCorruptState(null);
+    }
+  };
+
   const [showOnboarding, setShowOnboarding] = useState<boolean>(() => {
     try {
       return !getHasCompletedOnboarding();
@@ -229,14 +249,12 @@ export default function BrewScreen() {
       selectedInventoryItem &&
       selectedInventoryItem.remainingWeightGrams < doseGrams
     ) {
-      Alert.alert(
-        'Mało ziaren w paczce!',
-        `W paczce "${selectedInventoryItem.name}" pozostało tylko ${selectedInventoryItem.remainingWeightGrams}g, a doza wymaga ${doseGrams}g. Czy chcesz zaparzyć blend z innymi ziarnami?`,
-        [
-          { text: 'Anuluj', style: 'cancel' },
-          { text: 'Parz Blend', onPress: () => startTimer() },
-        ]
-      );
+      confirmAction({
+        title: 'Mało ziaren w paczce!',
+        message: `W paczce "${selectedInventoryItem.name}" pozostało tylko ${selectedInventoryItem.remainingWeightGrams}g, a doza wymaga ${doseGrams}g. Czy chcesz zaparzyć blend z innymi ziarnami?`,
+        actionText: 'Parz Blend',
+        onConfirm: () => startTimer(),
+      });
       return;
     }
     startTimer();
@@ -256,14 +274,13 @@ export default function BrewScreen() {
         selectRecipe(decoded.recipe);
         Alert.alert(
           'Zeskanowano recepturę!',
-          `Receptura "${decoded.recipe.name}" została zapisana w Twojej bazie.`,
-          [{ text: 'OK' }]
+          `Receptura "${decoded.recipe.name}" została zapisana w Twojej bazie.`
         );
       } else {
-        Alert.alert('Błąd skanowania', 'Kod QR nie zawiera prawidłowej receptury Napar.');
+        Alert.alert('Nie udało się zeskanować', 'Kod QR nie zawiera prawidłowej receptury Napar.');
       }
     } catch {
-      Alert.alert('Błąd skanowania', 'Nie udało się przetworzyć danych z kodu QR.');
+      Alert.alert('Nie udało się zeskanować', 'Nie udało się przetworzyć danych z kodu QR.');
     }
   };
 
@@ -422,6 +439,34 @@ export default function BrewScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      {/* Baner odzyskiwania uszkodzonego stanu (BR-TEST-023) */}
+      {corruptState && (
+        <View style={styles.corruptBanner} testID="corrupt-state-banner">
+          <View style={{ flex: 1 }}>
+            <Text style={styles.corruptBannerTitle}>
+              {language === 'pl'
+                ? 'Wykryto uszkodzony stan po awarii'
+                : 'Corrupt state detected after crash'}
+            </Text>
+            <Text style={styles.corruptBannerDesc}>
+              {language === 'pl'
+                ? `Plik ${corruptState.corruptFile} został zabezpieczony w Backup/. Twoje dane bazowe są nienaruszone.`
+                : `File ${corruptState.corruptFile} was secured in Backup/. Your base data is intact.`}
+            </Text>
+          </View>
+          <Pressable
+            style={styles.corruptDismissBtn}
+            onPress={handleDismissCorrupt}
+            accessibilityRole="button"
+            accessibilityLabel="Odrzuć komunikat awarii"
+          >
+            <Text style={styles.corruptDismissText}>
+              {language === 'pl' ? 'Odrzuć' : 'Dismiss'}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+
       {/* Read-Only Status Banner when trial expired */}
       {isHistoryReadOnly && (
         <View style={styles.readOnlyBanner}>
@@ -748,5 +793,42 @@ const styles = StyleSheet.create({
     color: theme.colors.copper,
     fontWeight: '700',
     marginLeft: 6,
+  },
+  corruptBanner: {
+    backgroundColor: '#7F1D1D',
+    borderRadius: theme.borderRadius.md,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#DC2626',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  corruptBannerTitle: {
+    color: '#FEE2E2',
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  corruptBannerDesc: {
+    color: '#FECACA',
+    fontSize: 11,
+    lineHeight: 15,
+  },
+  corruptDismissBtn: {
+    backgroundColor: '#991B1B',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: theme.borderRadius.sm,
+    minHeight: 44,
+    minWidth: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  corruptDismissText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
   },
 });

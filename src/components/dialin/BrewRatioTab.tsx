@@ -105,6 +105,9 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
         {/* Przełącznik kierunku przeliczania */}
         <View style={styles.directionToggleRow}>
           <Pressable
+            testID="calc-dir-doseToWater"
+            accessibilityRole="button"
+            accessibilityLabel={t.dialin.directionDoseToWater || 'Doza → Woda'}
             style={[
               styles.directionBtn,
               calcDirection === 'doseToWater' && styles.directionBtnActive,
@@ -121,6 +124,9 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
             </Text>
           </Pressable>
           <Pressable
+            testID="calc-dir-waterToDose"
+            accessibilityRole="button"
+            accessibilityLabel={t.dialin.directionWaterToDose || 'Woda → Doza'}
             style={[
               styles.directionBtn,
               calcDirection === 'waterToDose' && styles.directionBtnActive,
@@ -142,6 +148,8 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
           <>
             <Text style={styles.inputTitle}>{t.dialin.doseInputLabel || 'Doza suchej kawy / herbaty (g)'}</Text>
             <TextInput
+              testID="dose-input"
+              accessibilityLabel={t.dialin.doseInputLabel || 'Doza suchej kawy / herbaty'}
               style={styles.calcInput}
               keyboardType="numeric"
               value={doseInput}
@@ -154,6 +162,8 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
           <>
             <Text style={styles.inputTitle}>{t.dialin.waterInputLabel || 'Docelowa objętość wody (g)'}</Text>
             <TextInput
+              testID="water-input"
+              accessibilityLabel={t.dialin.waterInputLabel || 'Docelowa objętość wody'}
               style={styles.calcInput}
               keyboardType="numeric"
               value={waterInput}
@@ -176,6 +186,9 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
           ].map((item) => (
             <Pressable
               key={item.r}
+              testID={`ratio-chip-${item.r}`}
+              accessibilityRole="button"
+              accessibilityLabel={`Proporcja ${item.label}`}
               style={[
                 styles.ratioChip,
                 ratioVal === item.r && styles.ratioChipActive,
@@ -201,7 +214,10 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
                 ? (t.dialin.calculatedWater || 'WODA DO ZALANIA')
                 : (t.dialin.calculatedDose || 'WYMAGANA DOZA ZIAREN')}
             </Text>
-            <Text style={styles.resultVal}>
+            <Text
+              style={styles.resultVal}
+              testID={calcDirection === 'doseToWater' ? 'calculated-water-output' : 'calculated-dose-output'}
+            >
               {calcDirection === 'doseToWater'
                 ? formatWaterWeight(waterCalcResult, unitSystem)
                 : formatDoseWeight(doseCalcResult, unitSystem)}
@@ -209,7 +225,9 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
           </View>
           <View style={styles.resultItem}>
             <Text style={styles.resultLabel}>{t.dialin.calculatedYield || 'UZYSK W FILIŻANCE'}</Text>
-            <Text style={styles.resultValSecondary}>{formatWaterWeight(yieldResult, unitSystem)}</Text>
+            <Text style={styles.resultValSecondary} testID="calculated-yield-output">
+              {formatWaterWeight(yieldResult, unitSystem)}
+            </Text>
             <Text style={styles.resultNote}>
               {t.dialin.absorptionNote || 'Po absorpcji 2.0g/g przez ciastko'}
             </Text>

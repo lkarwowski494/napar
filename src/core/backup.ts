@@ -1,7 +1,8 @@
 // ============================================================================
-// Napar (Steepwise) — Backup Engine (Zadanie N5 / Apps4Brew SEC-09)
+// Napar (Steepwise) — Backup Engine (BR-TEST-022, BR-TEST-023, RD-ENG-12)
 // Rotating 10 auto-backups in Documents/Backup/, safety backups before destructive
-// operations, and standardized BackupEnvelope<T> format.
+// operations, separated safety pool, and standardized BackupEnvelope<T> format.
+// Apps4Brew Studio — 100% Offline-First, Zero Telemetry.
 // ============================================================================
 
 import * as FileSystem from 'expo-file-system/legacy';
@@ -13,9 +14,9 @@ export const AUTO_DIR = 'Backup/';
 export const AUTO_KEEP = 10;
 
 /**
- * Wzorzec nazw kopii automatycznych: napar-RRRR-MM-DD-GGMMSS[-N].json
+ * Wzorzec nazw kopii automatycznych: napar-[kopia-]RRRR-MM-DD-GGMMSS[-N].json (RD-ENG-12)
  */
-export const AUTO_RE = /^napar-(\d{4}-\d{2}-\d{2}-\d{6})(?:-(\d{1,3}))?\.json$/;
+export const AUTO_RE = /^napar-(?:kopia-)?(\d{4}-\d{2}-\d{2}-\d{6})(?:-(\d{1,3}))?\.json$/;
 
 /**
  * Wzorzec nazw kopii bezpieczeństwa: napar-przed-(importem|czyszczeniem)-RRRR-MM-DD-GGMMSS[-N].json
@@ -36,6 +37,12 @@ export interface NaparBackupEnvelope {
   schemaVersion: number;
   exportedAt: string;
   state: NaparBackupData;
+}
+
+export interface CorruptStateRecovery {
+  corruptFile: string;
+  timestamp: string;
+  rawSnippet: string;
 }
 
 export function buildBackup(state: NaparBackupData): NaparBackupEnvelope {
@@ -62,7 +69,34 @@ export function stampOf(d: Date = new Date()): string {
   return `${iso}-${hours}${minutes}${seconds}`;
 }
 
-const poolKey = (m: RegExpExecArray) => `${m[1]}-${(m[2] ?? '1').padStart(3, '0')}`;
+export const poolKey = (m: RegExpExecArray): string => `${m[1]}-${(m[2] ?? '1').padStart(3, '0')}`;
+
+/**
+ * RD-ENG-12: Algorytm rotacji dwóch rozdzielnych pul kopii zapasowych.
+ * Zwraca listę nazw plików do usunięcia z dysku.
+ */
+export function rotateBackupFiles(
+  fileList: string[],
+  poolRegex: RegExp,
+  keepCount = AUTO_KEEP
+): string[] {
+  const pool = fileList
+    .map((f) => [f, poolRegex.exec(f)] as const)
+    .filter((x): x is readonly [string, RegExpExecArray] => !!x[1]);
+
+  if (pool.length <= keepCount) {
+    return [];
+  }
+
+  // Sortuj malejąco po dacie/czasie + przyrostku kolizji
+  const sorted = pool.sort((a, b) => {
+    const keyA = poolKey(a[1]);
+    const keyB = poolKey(b[1]);
+    return keyA < keyB ? 1 : keyA > keyB ? -1 : 0;
+  });
+
+  return sorted.slice(keepCount).map(([f]) => f);
+}
 
 /**
  * Udostępnienie pliku tymczasowego w Caches z gwarantowanym usunięciem w bloku finally.
@@ -85,7 +119,7 @@ async function shareTemp(
     try {
       await FileSystem.deleteAsync(path, { idempotent: true });
     } catch {
-      // Ignoruj błąd
+      // Ignoruj błąd usuwania pliku tymczasowego
     }
   }
 }
@@ -104,6 +138,7 @@ export async function exportBackup(state: NaparBackupData): Promise<boolean> {
 
 /**
  * Zapis kopii zapasowej w katalogu Dokumentów (Backup/...) z rotacją do AUTO_KEEP.
+ * Przyrostek kolizji -2, -3 w tej samej sekundzie (RD-ENG-12, RYZ-03).
  */
 async function writeBackupFile(
   prefix: string,
@@ -142,19 +177,11 @@ async function writeBackupFile(
     throw e;
   }
 
-  // Rotacja puli
+  // Rotacja rozdzielnej puli (RD-ENG-12)
   try {
     const files = await FileSystem.readDirectoryAsync(dir);
-    const pool = files
-      .map((f) => [f, re.exec(f)] as const)
-      .filter((x): x is readonly [string, RegExpExecArray] => !!x[1]);
-
-    const oldFiles = pool
-      .map(([f, m]) => [f, poolKey(m)] as const)
-      .sort((a, b) => (a[1] < b[1] ? 1 : a[1] > b[1] ? -1 : 0))
-      .slice(AUTO_KEEP);
-
-    for (const [f] of oldFiles) {
+    const toDelete = rotateBackupFiles(files, re, AUTO_KEEP);
+    for (const f of toDelete) {
       await FileSystem.deleteAsync(`${dir}${f}`, { idempotent: true });
     }
   } catch {
@@ -176,7 +203,8 @@ export async function autoBackup(state: NaparBackupData): Promise<string | null>
 }
 
 /**
- * Kopia bezpieczeństwa przed operacjami niszczącymi (import, reset bazy).
+ * Kopia bezpieczeństwa przed operacjami niszczącymi (import, reset bazy) (BR-TEST-022).
+ * Rzuca błąd w razie niepowodzenia zapisu — caller MUSI przerwać operację niszczącą!
  */
 export async function safetyBackup(
   kind: 'import' | 'reset',
@@ -184,6 +212,74 @@ export async function safetyBackup(
 ): Promise<string> {
   const prefix = kind === 'import' ? 'napar-przed-importem-' : 'napar-przed-czyszczeniem-';
   return await writeBackupFile(prefix, SAFETY_RE, state);
+}
+
+/**
+ * BR-TEST-023: Zapis uszkodzonego stanu do pliku ratunkowego state_corrupt_<timestamp>.json
+ */
+export async function saveCorruptState(rawPayload: string, reason: string): Promise<string> {
+  const docDir = (FileSystem as any).documentDirectory;
+  if (!docDir) throw new Error('Brak katalogu dokumentów aplikacji');
+  const dir = `${docDir}${AUTO_DIR}`;
+  const dirInfo = await FileSystem.getInfoAsync(dir);
+  if (!dirInfo.exists) {
+    await FileSystem.makeDirectoryAsync(dir, { intermediates: true });
+  }
+
+  const stamp = stampOf(new Date());
+  const name = `state_corrupt_${stamp}.json`;
+  const filePath = `${dir}${name}`;
+  const envelope = {
+    format: 'napar-corrupt-state',
+    timestamp: new Date().toISOString(),
+    reason,
+    recovery: {
+      rawPayload,
+    },
+  };
+  await FileSystem.writeAsStringAsync(filePath, JSON.stringify(envelope, null, 2));
+  return filePath;
+}
+
+/**
+ * BR-TEST-023: Sprawdzenie czy istnieje zapisany uszkodzony stan po awarii
+ */
+export async function checkCorruptState(): Promise<CorruptStateRecovery | null> {
+  try {
+    const docDir = (FileSystem as any).documentDirectory;
+    if (!docDir) return null;
+    const dir = `${docDir}${AUTO_DIR}`;
+    const dirInfo = await FileSystem.getInfoAsync(dir);
+    if (!dirInfo.exists) return null;
+    const files = await FileSystem.readDirectoryAsync(dir);
+    const corruptFiles = files.filter((f) => f.startsWith('state_corrupt_')).sort().reverse();
+    if (corruptFiles.length === 0) return null;
+
+    const latest = corruptFiles[0];
+    const content = await FileSystem.readAsStringAsync(`${dir}${latest}`);
+    const parsed = JSON.parse(content);
+    return {
+      corruptFile: latest,
+      timestamp: parsed.timestamp || '',
+      rawSnippet: (parsed.recovery?.rawPayload || '').slice(0, 100),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * BR-TEST-023: Odrzucenie / wyczyszczenie banera uszkodzonego stanu
+ */
+export async function dismissCorruptState(fileName: string): Promise<void> {
+  try {
+    const docDir = (FileSystem as any).documentDirectory;
+    if (!docDir) return;
+    const path = `${docDir}${AUTO_DIR}${fileName}`;
+    await FileSystem.deleteAsync(path, { idempotent: true });
+  } catch {
+    // Ignoruj błąd
+  }
 }
 
 /**

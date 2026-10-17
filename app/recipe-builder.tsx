@@ -8,13 +8,13 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   ScrollView,
   Pressable,
   Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Field, NumInput } from '../src/components/ui';
 import { getRecipeById, saveRecipe, deleteRecipe, duplicateRecipe, getUnitSystem } from '../src/core/database';
 import { SavedRecipe } from '../src/core/database-schema';
 import { RecipeStep } from '../src/core/recipes-data';
@@ -230,7 +230,13 @@ export default function RecipeBuilderScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerBtn}>
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={8}
+          style={styles.headerBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t.common.close}
+        >
           <Text style={styles.headerBtnText}>✕ {t.common.close}</Text>
         </Pressable>
         <Text style={styles.headerTitle}>
@@ -241,7 +247,10 @@ export default function RecipeBuilderScreen() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Typ naparu: Kawa / Herbata */}
         <View style={styles.typeSelectorRow}>
           <Pressable
@@ -281,44 +290,36 @@ export default function RecipeBuilderScreen() {
         {/* Podstawowe dane */}
         <View style={styles.card}>
           <Text style={styles.fieldLabel}>{t.recipeBuilder.nameLabel} *</Text>
-          <TextInput
-            style={styles.input}
+          <Field
             value={name}
             onChangeText={setName}
             placeholder={t.recipeBuilder.namePlaceholder}
-            placeholderTextColor={theme.colors.textMuted}
           />
 
           <View style={styles.row}>
             <View style={styles.flex1}>
               <Text style={styles.fieldLabel}>{t.recipeBuilder.methodLabel}</Text>
-              <TextInput
-                style={styles.input}
+              <Field
                 value={method}
                 onChangeText={setMethod}
                 placeholder={t.recipeBuilder.methodPlaceholder}
-                placeholderTextColor={theme.colors.textMuted}
               />
             </View>
             <View style={[styles.flex1, { marginLeft: 10 }]}>
               <Text style={styles.fieldLabel}>{t.recipeBuilder.authorLabel}</Text>
-              <TextInput
-                style={styles.input}
+              <Field
                 value={author}
                 onChangeText={setAuthor}
                 placeholder={t.recipeBuilder.authorPlaceholder}
-                placeholderTextColor={theme.colors.textMuted}
               />
             </View>
           </View>
 
           <Text style={styles.fieldLabel}>{t.recipeBuilder.descriptionLabel}</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
+          <Field
             value={description}
             onChangeText={setDescription}
             placeholder={t.recipeBuilder.descriptionPlaceholder}
-            placeholderTextColor={theme.colors.textMuted}
             multiline
             numberOfLines={2}
           />
@@ -331,29 +332,26 @@ export default function RecipeBuilderScreen() {
           <View style={styles.row}>
             <View style={styles.flex1}>
               <Text style={styles.fieldLabel}>{t.recipeBuilder.doseLabel}</Text>
-              <TextInput
-                style={styles.input}
-                value={doseGrams}
-                onChangeText={setDoseGrams}
-                keyboardType="decimal-pad"
+              <NumInput
+                value={parseFloat(doseGrams) || 0}
+                onChangeNumber={(n) => setDoseGrams(n.toString())}
+                unit="g"
               />
             </View>
             <View style={[styles.flex1, { marginHorizontal: 10 }]}>
               <Text style={styles.fieldLabel}>{t.recipeBuilder.waterLabel}</Text>
-              <TextInput
-                style={styles.input}
-                value={waterGrams}
-                onChangeText={setWaterGrams}
-                keyboardType="decimal-pad"
+              <NumInput
+                value={parseFloat(waterGrams) || 0}
+                onChangeNumber={(n) => setWaterGrams(n.toString())}
+                unit="g"
               />
             </View>
             <View style={styles.flex1}>
               <Text style={styles.fieldLabel}>{t.recipeBuilder.tempLabel}</Text>
-              <TextInput
-                style={styles.input}
-                value={waterTempCelsius}
-                onChangeText={setWaterTempCelsius}
-                keyboardType="number-pad"
+              <NumInput
+                value={parseFloat(waterTempCelsius) || 0}
+                onChangeNumber={(n) => setWaterTempCelsius(n.toString())}
+                unit="°C"
               />
             </View>
           </View>
@@ -373,12 +371,10 @@ export default function RecipeBuilderScreen() {
           </View>
 
           <Text style={styles.fieldLabel}>{t.recipeBuilder.grindLabel}</Text>
-          <TextInput
-            style={styles.input}
+          <Field
             value={grindSize}
             onChangeText={setGrindSize}
             placeholder={t.recipeBuilder.grindPlaceholder}
-            placeholderTextColor={theme.colors.textMuted}
           />
         </View>
 
@@ -413,32 +409,29 @@ export default function RecipeBuilderScreen() {
               <View style={styles.row}>
                 <View style={styles.flex1}>
                   <Text style={styles.subFieldLabel}>Nazwa kroku</Text>
-                  <TextInput
-                    style={styles.smallInput}
+                  <Field
                     value={step.namePl}
                     onChangeText={(val) => handleUpdateStep(index, 'namePl', val)}
                   />
                 </View>
                 <View style={[styles.flex1, { marginHorizontal: 8 }]}>
                   <Text style={styles.subFieldLabel}>Waga docelowa (g)</Text>
-                  <TextInput
-                    style={styles.smallInput}
-                    value={step.targetWaterGrams.toString()}
-                    onChangeText={(val) =>
-                      handleUpdateStep(index, 'targetWaterGrams', parseFloat(val) || 0)
+                  <NumInput
+                    value={step.targetWaterGrams}
+                    onChangeNumber={(val) =>
+                      handleUpdateStep(index, 'targetWaterGrams', val)
                     }
-                    keyboardType="decimal-pad"
+                    unit="g"
                   />
                 </View>
                 <View style={styles.flex1}>
                   <Text style={styles.subFieldLabel}>Czas (sekundy)</Text>
-                  <TextInput
-                    style={styles.smallInput}
-                    value={step.durationSeconds.toString()}
-                    onChangeText={(val) =>
-                      handleUpdateStep(index, 'durationSeconds', parseInt(val, 10) || 0)
+                  <NumInput
+                    value={step.durationSeconds}
+                    onChangeNumber={(val) =>
+                      handleUpdateStep(index, 'durationSeconds', Math.round(val))
                     }
-                    keyboardType="number-pad"
+                    unit="s"
                   />
                 </View>
               </View>
@@ -446,12 +439,10 @@ export default function RecipeBuilderScreen() {
               <Text style={[styles.subFieldLabel, { marginTop: 6 }]}>
                 {t.recipeBuilder.stepInstruction}
               </Text>
-              <TextInput
-                style={styles.smallInput}
+              <Field
                 value={step.instructionPl}
                 onChangeText={(val) => handleUpdateStep(index, 'instructionPl', val)}
                 placeholder={t.recipeBuilder.stepInstructionPlaceholder}
-                placeholderTextColor={theme.colors.textMuted}
               />
             </View>
           ))}

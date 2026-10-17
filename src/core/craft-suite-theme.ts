@@ -80,7 +80,7 @@ export const sharedCraftTokens = {
     borderLight: '#3E3E46',
     textPrimary: '#F4EFEA',
     textSecondary: '#A09C96',
-    textMuted: '#686561',
+    textMuted: '#8C8884',
     danger: '#D9534F',
     dangerMuted: 'rgba(217, 83, 79, 0.15)',
     statusSuccess: '#4E9F3D',
@@ -133,7 +133,7 @@ export const sharedCraftTokens = {
     caption: {
       fontSize: 12,
       fontWeight: '500' as const,
-      color: '#686561',
+      color: '#8C8884',
     },
     monoNumber: {
       fontVariant: ['tabular-nums' as const],

@@ -5,6 +5,7 @@
 
 import * as Haptics from 'expo-haptics';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import { AppState, AppStateStatus, NativeEventSubscription } from 'react-native';
 import { RecipeStep } from './recipes-data';
 import { playTimerChime } from './timer-audio';
 
@@ -33,6 +34,14 @@ export interface TimerCallbacks {
   onFinish?: () => void;
 }
 
+/**
+ * RD-ENG-06 & NFR-PERF-004: Wyliczanie czasu timera odporne na uśpienie w tle
+ * r = max(0, ceil((endAtMs - nowMs) / 1000))
+ */
+export function remainingTimerSec(endAtMs: number, nowMs: number = Date.now()): number {
+  return Math.max(0, Math.ceil((endAtMs - nowMs) / 1000));
+}
+
 export class BrewTimerEngine {
   private steps: RecipeStep[] = [];
   private status: TimerStatus = 'idle';
@@ -43,6 +52,13 @@ export class BrewTimerEngine {
   private callbacks: TimerCallbacks = {};
   private soundEnabled = true;
   private hapticsEnabled = true;
+
+  // Znaczniki czasu odporne na uśpienie w tle (RD-ENG-06, NFR-PERF-004)
+  private stepEndAtMs: number | null = null;
+  private pausedRemainingMs: number | null = null;
+  private totalStartAtMs: number | null = null;
+  private pausedTotalElapsedMs = 0;
+  private appStateSubscription: NativeEventSubscription | null = null;
 
   constructor(steps: RecipeStep[], callbacks: TimerCallbacks = {}) {
     this.steps = steps;
@@ -70,18 +86,35 @@ export class BrewTimerEngine {
     if (this.status === 'running') return;
     if (this.steps.length === 0) return;
 
+    const now = Date.now();
     if (this.status === 'idle') {
       this.currentStepIndex = 0;
       this.stepElapsedSeconds = 0;
       this.totalElapsedSeconds = 0;
+      this.pausedRemainingMs = null;
+      this.pausedTotalElapsedMs = 0;
+      this.totalStartAtMs = now;
       this.triggerHaptic('start');
       const step = this.getCurrentStep();
       if (step && this.callbacks.onStepChange) {
         this.callbacks.onStepChange(this.currentStepIndex, step);
       }
+    } else if (this.status === 'paused') {
+      this.totalStartAtMs = now;
     }
 
+    const currentStep = this.getCurrentStep();
+    const durationMs = currentStep ? currentStep.durationSeconds * 1000 : 0;
+    const msLeft =
+      this.pausedRemainingMs !== null
+        ? this.pausedRemainingMs
+        : Math.max(0, durationMs - this.stepElapsedSeconds * 1000);
+
+    this.stepEndAtMs = now + msLeft;
+    this.pausedRemainingMs = null;
+
     this.status = 'running';
+    this.setupAppStateListener();
     try {
       activateKeepAwakeAsync();
     } catch {
@@ -96,6 +129,16 @@ export class BrewTimerEngine {
   public pause(): void {
     if (this.status !== 'running') return;
     this.status = 'paused';
+    const now = Date.now();
+    if (this.stepEndAtMs !== null) {
+      this.pausedRemainingMs = Math.max(0, this.stepEndAtMs - now);
+      this.stepEndAtMs = null;
+    }
+    if (this.totalStartAtMs !== null) {
+      this.pausedTotalElapsedMs += Math.max(0, now - this.totalStartAtMs);
+      this.totalStartAtMs = null;
+    }
+    this.removeAppStateListener();
     this.clearInterval();
     try {
       deactivateKeepAwake();
@@ -111,11 +154,16 @@ export class BrewTimerEngine {
   }
 
   public reset(): void {
+    this.removeAppStateListener();
     this.clearInterval();
     this.status = 'idle';
     this.currentStepIndex = 0;
     this.stepElapsedSeconds = 0;
     this.totalElapsedSeconds = 0;
+    this.stepEndAtMs = null;
+    this.pausedRemainingMs = null;
+    this.totalStartAtMs = null;
+    this.pausedTotalElapsedMs = 0;
     try {
       deactivateKeepAwake();
     } catch {
@@ -128,10 +176,14 @@ export class BrewTimerEngine {
     if (this.currentStepIndex < this.steps.length - 1) {
       this.currentStepIndex++;
       this.stepElapsedSeconds = 0;
+      const currentStep = this.getCurrentStep();
+      if (currentStep && this.status === 'running') {
+        this.stepEndAtMs = Date.now() + currentStep.durationSeconds * 1000;
+        this.pausedRemainingMs = null;
+      }
       this.triggerHaptic('step');
-      const step = this.getCurrentStep();
-      if (step && this.callbacks.onStepChange) {
-        this.callbacks.onStepChange(this.currentStepIndex, step);
+      if (currentStep && this.callbacks.onStepChange) {
+        this.callbacks.onStepChange(this.currentStepIndex, currentStep);
       }
       this.notifyTick();
     } else {
@@ -143,9 +195,13 @@ export class BrewTimerEngine {
     if (this.currentStepIndex > 0) {
       this.currentStepIndex--;
       this.stepElapsedSeconds = 0;
-      const step = this.getCurrentStep();
-      if (step && this.callbacks.onStepChange) {
-        this.callbacks.onStepChange(this.currentStepIndex, step);
+      const currentStep = this.getCurrentStep();
+      if (currentStep && this.status === 'running') {
+        this.stepEndAtMs = Date.now() + currentStep.durationSeconds * 1000;
+        this.pausedRemainingMs = null;
+      }
+      if (currentStep && this.callbacks.onStepChange) {
+        this.callbacks.onStepChange(this.currentStepIndex, currentStep);
       }
       this.notifyTick();
     }
@@ -156,12 +212,21 @@ export class BrewTimerEngine {
     if (!currentStep) return;
     const newDuration = Math.max(this.stepElapsedSeconds + 1, currentStep.durationSeconds + deltaSeconds);
     currentStep.durationSeconds = newDuration;
+    if (this.status === 'running') {
+      const remSec = Math.max(1, currentStep.durationSeconds - this.stepElapsedSeconds);
+      this.stepEndAtMs = Date.now() + remSec * 1000;
+      this.pausedRemainingMs = null;
+    }
     this.notifyTick();
   }
 
   public finish(): void {
+    this.removeAppStateListener();
     this.clearInterval();
     this.status = 'finished';
+    this.stepEndAtMs = null;
+    this.pausedRemainingMs = null;
+    this.totalStartAtMs = null;
     try {
       deactivateKeepAwake();
     } catch {
@@ -178,6 +243,7 @@ export class BrewTimerEngine {
   }
 
   public destroy(): void {
+    this.removeAppStateListener();
     this.clearInterval();
     try {
       deactivateKeepAwake();
@@ -186,16 +252,57 @@ export class BrewTimerEngine {
     }
   }
 
+  private setupAppStateListener(): void {
+    if (this.appStateSubscription) return;
+    try {
+      if (typeof AppState?.addEventListener === 'function') {
+        this.appStateSubscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
+          if (nextState === 'active' && this.status === 'running') {
+            this.syncWithRealTime();
+          }
+        });
+      }
+    } catch {
+      // safe fallback for non-react-native environments
+    }
+  }
+
+  private removeAppStateListener(): void {
+    if (this.appStateSubscription) {
+      try {
+        if (typeof this.appStateSubscription.remove === 'function') {
+          this.appStateSubscription.remove();
+        }
+      } catch {
+        // safe fallback
+      }
+      this.appStateSubscription = null;
+    }
+  }
+
+  public syncWithRealTime(): void {
+    if (this.status === 'running') {
+      this.tick();
+    }
+  }
+
   private tick(): void {
     if (this.status !== 'running') return;
-
-    this.stepElapsedSeconds++;
-    this.totalElapsedSeconds++;
 
     const currentStep = this.getCurrentStep();
     if (!currentStep) return;
 
-    const remaining = currentStep.durationSeconds - this.stepElapsedSeconds;
+    const now = Date.now();
+    const remaining = this.stepEndAtMs !== null
+      ? remainingTimerSec(this.stepEndAtMs, now)
+      : Math.max(0, currentStep.durationSeconds - this.stepElapsedSeconds);
+    this.stepElapsedSeconds = Math.max(0, currentStep.durationSeconds - remaining);
+
+    if (this.totalStartAtMs !== null) {
+      this.totalElapsedSeconds = Math.floor(
+        (this.pausedTotalElapsedMs + (now - this.totalStartAtMs)) / 1000
+      );
+    }
 
     // Odliczanie ostatnich 3 sekund etapu
     if (remaining > 0 && remaining <= 3) {
@@ -208,7 +315,7 @@ export class BrewTimerEngine {
       }
     }
 
-    if (this.stepElapsedSeconds >= currentStep.durationSeconds) {
+    if (remaining <= 0 || this.stepElapsedSeconds >= currentStep.durationSeconds) {
       if (this.currentStepIndex < this.steps.length - 1) {
         this.nextStep();
         return;

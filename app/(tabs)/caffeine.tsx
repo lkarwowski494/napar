@@ -214,14 +214,22 @@ export default function CaffeineScreen() {
           <Text style={styles.curfewTitle}>Predykcja Jakości Snu</Text>
           <View style={styles.bedtimeStepper}>
             <Pressable
+              testID="bedtime-dec-btn"
               style={styles.hourBtn}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Wcześniejsza godzina snu"
               onPress={() => handleBedtimeChange(bedtimeHour - 1)}
             >
               <Text style={styles.hourBtnText}>−</Text>
             </Pressable>
             <Text style={styles.bedtimeHourText}>{`${bedtimeHour}:00`}</Text>
             <Pressable
+              testID="bedtime-inc-btn"
               style={styles.hourBtn}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Późniejsza godzina snu"
               onPress={() => handleBedtimeChange(bedtimeHour + 1)}
             >
               <Text style={styles.hourBtnText}>+</Text>
@@ -243,14 +251,22 @@ export default function CaffeineScreen() {
           </View>
           <View style={styles.bedtimeStepper}>
             <Pressable
+              testID="halflife-dec-btn"
               style={styles.hourBtn}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Krótszy czas półtrwania kofeiny"
               onPress={() => handleHalfLifeChange(halfLifeHours - 0.5)}
             >
               <Text style={styles.hourBtnText}>−</Text>
             </Pressable>
             <Text style={styles.bedtimeHourText}>{halfLifeHours.toFixed(1)}h</Text>
             <Pressable
+              testID="halflife-inc-btn"
               style={styles.hourBtn}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Dłuższy czas półtrwania kofeiny"
               onPress={() => handleHalfLifeChange(halfLifeHours + 0.5)}
             >
               <Text style={styles.hourBtnText}>+</Text>
@@ -287,7 +303,10 @@ export default function CaffeineScreen() {
       <View style={styles.listHeaderRow}>
         <Text style={styles.listTitle}>Dzisiejsze Porcje Kofeiny</Text>
         <Pressable
+          testID="quick-add-caffeine-btn"
           style={styles.quickAddBtn}
+          accessibilityRole="button"
+          accessibilityLabel="+ Dodaj porcję kofeiny"
           onPress={() => {
             if (!canCreate) {
               setShowPaywall(true);
@@ -320,9 +339,12 @@ export default function CaffeineScreen() {
               </View>
               <Text style={styles.logMg}>{Math.round(item.caffeineMg)} mg</Text>
               <Pressable
+                testID={`delete-caffeine-log-${item.id}`}
                 onPress={() => handleDeleteLog(item)}
                 style={styles.logDeleteBtn}
                 hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={`Usuń wpis kofeiny: ${item.beverageName}`}
               >
                 <Text style={styles.logDeleteText}>✕</Text>
               </Pressable>

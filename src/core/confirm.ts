@@ -4,19 +4,20 @@
 // ============================================================================
 
 import { Alert } from 'react-native';
+import { getCurrentTranslations } from './i18n';
 
 export type CancelBtn = { text: string; style: 'cancel'; onPress?: () => void };
 
-/** Przycisk rezygnacji „Anuluj” */
+/** Przycisk rezygnacji „Anuluj” / „Cancel” */
 export const cancelButton = (onPress?: () => void): CancelBtn => ({
-  text: 'Anuluj',
+  text: getCurrentTranslations().common.cancel,
   style: 'cancel',
   ...(onPress ? { onPress } : {}),
 });
 
 /** Przycisk „OK” dla okien informacyjnych */
 export const okButton = (): CancelBtn => ({
-  text: 'OK',
+  text: getCurrentTranslations().common.ok,
   style: 'cancel',
 });
 
@@ -45,3 +46,30 @@ export function confirmAction({
     },
   ]);
 }
+
+/** Standardowy helper S5 confirm({ title, message, confirmText, destructive, onConfirm, onCancel }) */
+export function confirm({
+  title,
+  message,
+  confirmText,
+  destructive = false,
+  onConfirm,
+  onCancel,
+}: {
+  title: string;
+  message?: string;
+  confirmText: string;
+  destructive?: boolean;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+}) {
+  confirmAction({
+    title,
+    message,
+    actionText: confirmText,
+    destructive,
+    onConfirm: onConfirm || (() => {}),
+    onCancel,
+  });
+}
+

@@ -1,0 +1,7 @@
+appId: pl.lukasz.napar
+name: 05 Asystent Gongfu Cha Wielokrotne Parzenia
+---
+- launchApp
+- tapOn: "Gongfu"
+- assertVisible: "Asystent Gongfu Cha"
+- takeScreenshot: 05-gongfu-cha

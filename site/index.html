@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Napar (Steepwise) — Kawa Specialty & Herbata Rzemieślnicza | Apps4Brew Studio</title>
+  <meta name="description" content="Napar (Steepwise) — rzemieślniczy asystent parzenia kawy specialty i herbaty gongfu. 100% offline, zero śledzenia, precyzyjne wagi, stopery zalewań i analiza kofeiny.">
+  <style>
+    :root {
+      --bg: #121214;
+      --card-bg: #1c1c1f;
+      --accent: #c86a28;
+      --accent-gold: #e5a96a;
+      --text: #f4efea;
+      --text-muted: #a09c96;
+      --border: #2e2e34;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f9f8f6;
+        --card-bg: #ffffff;
+        --accent: #b05a1e;
+        --accent-gold: #c2884a;
+        --text: #1a1a1c;
+        --text-muted: #6b6864;
+        --border: #e2dfda;
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      padding: 48px 24px 32px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--card-bg) 0%, var(--bg) 100%);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background-color: rgba(200, 106, 40, 0.15);
+      color: var(--accent-gold);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 2.75rem;
+      letter-spacing: -0.04em;
+    }
+    .tagline {
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .container {
+      max-width: 860px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 36px 0;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .card h3 {
+      margin-top: 0;
+      color: var(--accent-gold);
+      font-size: 1.2rem;
+    }
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .btn-row {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .btn-primary {
+      background-color: var(--accent);
+      color: #ffffff;
+    }
+    .btn-secondary {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    footer {
+      text-align: center;
+      padding: 48px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    footer a {
+      color: var(--accent-gold);
+      text-decoration: none;
+      margin: 0 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="badge">Apps4Brew Studio</div>
+    <h1>Napar (Steepwise)</h1>
+    <p class="tagline">Rzemieślniczy asystent parzenia kawy specialty, herbaty gongfu, spiżarni ziaren i metabolizmu kofeiny.</p>
+    <div class="btn-row">
+      <a href="privacy.html" class="btn btn-secondary">Polityka Prywatności</a>
+      <a href="support.html" class="btn btn-secondary">Wsparcie i FAQ</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <h2>Dlaczego Napar?</h2>
+    <p>Napar (dla użytkowników anglojęzycznych: <strong>Steepwise</strong>) powstał z myślą o domowych baristach i pasjonatach herbaty, którzy cenią powtarzalność, estetykę i pełną kontrolę nad recepturą bez rozpraszaczy reklamowych i wymuszonego logowania.</p>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Święte Liczby Parzenia</h3>
+        <p>Dynamiczny kalkulator proporcji (ratio), automatyczne przeliczanie gramatury wody i dozy oraz podpowiedzi klików dla młynków ręcznych i elektrycznych.</p>
+      </div>
+      <div class="card">
+        <h3>Aktywny Stoper i Kroki</h3>
+        <p>Precyzyjny stoper z tempem zalewania w czasie rzeczywistym (g/s), odporny na wygaszenie ekranu telefonu dzięki synchronizacji znaczników czasu.</p>
+      </div>
+      <div class="card">
+        <h3>Gongfu Cha & Wielokrotne Napary</h3>
+        <p>Dedykowany moduł dla herbaty tradycyjnej z rejestracją kolejnych parzeń, zmianą czasów ekstrakcji i profili smakowych.</p>
+      </div>
+      <div class="card">
+        <h3>100% Offline & Twoje Dane</h3>
+        <p>Wszystkie dane zapisywane w lokalnej bazie SQLite. Darmowy eksport do czytelnego JSON i CSV. Brak analityki, brak kont w chmurze.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Apps4Brew Studio. Wszystkie prawa zastrzeżone.</p>
+    <p>
+      <a href="index.html">Strona Główna</a> |
+      <a href="privacy.html">Polityka Prywatności</a> |
+      <a href="support.html">Wsparcie Techniczne</a>
+    </p>
+  </footer>
+</body>
+</html>

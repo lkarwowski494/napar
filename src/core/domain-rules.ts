@@ -347,3 +347,61 @@ export function calculateBatchScaling(
     recommendationEn: recEn,
   };
 }
+
+/**
+ * Farmakokinetyka eliminacji kofeiny: C(t) = C0 * 0.5^(t / t_half)
+ */
+export function calculateCaffeineDecay(
+  initialMg: number,
+  elapsedHours: number,
+  halfLifeHours = 5.0
+): number {
+  return Number((initialMg * Math.pow(0.5, elapsedHours / halfLifeHours)).toFixed(4));
+}
+
+export interface ScaledRecipeResult {
+  multiplier: number;
+  newDoseGrams: number;
+  targetWaterGrams: number;
+  steps: Array<{
+    id: string;
+    name: string;
+    waterGrams: number;
+    durationSeconds: number;
+    instruction?: string;
+  }>;
+}
+
+/**
+ * Skaluje kroki zalewania receptury zachowując addytywność (suma kroków == targetWaterGrams)
+ */
+export function scaleRecipeDose<
+  T extends { id: string; name: string; waterGrams: number; durationSeconds: number; instruction?: string }
+>(steps: T[], originalDose: number, newDose: number): ScaledRecipeResult {
+  if (originalDose <= 0 || newDose <= 0) {
+    throw new Error('Doza musi być większa od zera');
+  }
+  const factor = newDose / originalDose;
+  const originalWater = steps.reduce((sum, s) => sum + s.waterGrams, 0);
+  const targetWater = Number((originalWater * factor).toFixed(1));
+
+  let allocated = 0;
+  const scaledSteps = steps.map((s, idx) => {
+    if (idx === steps.length - 1) {
+      const remaining = Number((targetWater - allocated).toFixed(1));
+      return { ...s, waterGrams: remaining };
+    }
+    const scaledWater = Number((s.waterGrams * factor).toFixed(1));
+    allocated += scaledWater;
+    return { ...s, waterGrams: scaledWater };
+  });
+
+  return {
+    multiplier: factor,
+    newDoseGrams: newDose,
+    targetWaterGrams: targetWater,
+    steps: scaledSteps,
+  };
+}
+
+

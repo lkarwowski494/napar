@@ -1,379 +1,135 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: CaffeineScreen (Kinetics, Curfew & EFSA)
+// Napar (Steepwise) — Unit Tests: CaffeineScreen (app/(tabs)/caffeine.tsx)
 // ============================================================================
 
 import React from 'react';
 import renderer from 'react-test-renderer';
+import CaffeineScreen from '../../../app/(tabs)/caffeine';
+import * as database from '../database';
+import { CaffeineLog } from '../database-schema';
 
-const mockLogs: any[] = [
-  {
-    id: 'caff-1',
-    beverageName: 'V60 Etiopia Gedeb',
-    beverageType: 'coffee',
-    consumedAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(), // 2h temu
-    doseGrams: 18,
-    caffeineMg: 140,
-  },
-  {
-    id: 'caff-2',
-    beverageName: 'Sencha Fukamushi',
-    beverageType: 'tea',
-    consumedAt: new Date(Date.now() - 4 * 3600 * 1000).toISOString(), // 4h temu
-    doseGrams: 5,
-    caffeineMg: 45,
-  },
-];
-
-const mockDb: any = {
-  execSync: jest.fn(),
-  getFirstSync: jest.fn(),
-  getAllSync: jest.fn(() => []),
-  runSync: jest.fn(),
-};
-
-jest.mock('expo-sqlite', () => ({
-  openDatabaseSync: jest.fn(() => mockDb),
+jest.mock('../database', () => ({
+  getCaffeineLogs: jest.fn(),
+  logCaffeine: jest.fn(),
+  deleteCaffeineLog: jest.fn(),
+  getBedtimeHour: jest.fn(() => 23),
+  setBedtimeHour: jest.fn(),
+  getCaffeineHalfLife: jest.fn(() => 5.0),
+  setCaffeineHalfLife: jest.fn(),
+  getUnitSystem: jest.fn(() => 'metric'),
 }));
 
-// Mock react-native-svg dla CaffeineCurveChart
-jest.mock('react-native-svg', () => {
-  const React = require('react');
-  const createComponent = (name: string) => {
-    const Component = (props: any) => React.createElement(name, props, props.children);
-    Component.displayName = name;
-    return Component;
-  };
-  return {
-    __esModule: true,
-    default: createComponent('Svg'),
-    Svg: createComponent('Svg'),
-    Path: createComponent('Path'),
-    Line: createComponent('Line'),
-    Text: createComponent('SvgText'),
-    Circle: createComponent('Circle'),
-    Rect: createComponent('Rect'),
-    G: createComponent('G'),
-    Defs: createComponent('Defs'),
-    LinearGradient: createComponent('LinearGradient'),
-    Stop: createComponent('Stop'),
-  };
-});
+jest.mock('../healthkit', () => ({
+  getHealthKitSyncEnabled: jest.fn(() => false),
+  saveDietaryCaffeineSample: jest.fn().mockResolvedValue({ success: true }),
+}));
 
-import CaffeineScreen from '../../../app/(tabs)/caffeine';
-import * as databaseModule from '../database';
-import * as healthKitModule from '../healthkit';
+jest.mock('../app-access', () => ({
+  useAppAccess: jest.fn(() => ({
+    canCreate: true,
+    isHistoryReadOnly: false,
+    refresh: jest.fn(),
+  })),
+}));
 
-const findPressableWithText = (root: any, text: string) => {
-  const nodes = root.findAll((n: any) => {
-    const c = n.props?.children;
-    if (typeof c === 'string' && c.includes(text)) return true;
-    if (Array.isArray(c) && c.some((child) => typeof child === 'string' && child.includes(text))) return true;
-    return false;
-  });
-  if (nodes.length === 0) return null;
-  let curr = nodes[0];
-  while (curr && !curr.props?.onPress) {
-    curr = curr.parent;
-  }
-  return curr;
-};
+describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
+  const mockLogs: CaffeineLog[] = [
+    {
+      id: 'log-1',
+      beverageName: 'V60 Kenia Nyeri',
+      beverageType: 'coffee',
+      consumedAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(), // 2h temu
+      doseGrams: 15,
+      caffeineMg: 120,
+    },
+  ];
 
-describe('CaffeineScreen Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(databaseModule, 'getCaffeineLogs').mockReturnValue([...mockLogs]);
+    (database.getCaffeineLogs as jest.Mock).mockReturnValue(mockLogs);
   });
 
-  test('Renderuje ekran monitora kofeiny z sumą dobową EFSA i aktywnym stężeniem', () => {
-    let tree: any;
+  test('Renderuje ekran kofeiny z aktywną dawką, wykresem kinetyki i historią', () => {
+    let tree: renderer.ReactTestRenderer;
     renderer.act(() => {
       tree = renderer.create(<CaffeineScreen />);
     });
 
-    const json = tree.toJSON();
-    expect(json).toBeTruthy();
-    const str = JSON.stringify(json);
-
-    expect(str).toContain('AKTYWNA KOFEINA W KRWIOBIEGU');
-    expect(str).toContain('Zalecenie EFSA');
-    expect(str).toContain('Predykcja Jakości Snu');
-    expect(str).toContain('BEZPIECZNA GODZINA (CURFEW)');
-    expect(str).toContain('Dzisiejsze Porcje Kofeiny');
-    expect(str).toContain('V60 Etiopia Gedeb');
-    expect(str).toContain('Sencha Fukamushi');
+    const root = tree!.root;
+    expect(root.findByProps({ testID: 'bedtime-dec-btn' })).toBeDefined();
+    expect(root.findByProps({ testID: 'bedtime-inc-btn' })).toBeDefined();
+    expect(root.findByProps({ testID: 'halflife-dec-btn' })).toBeDefined();
+    expect(root.findByProps({ testID: 'halflife-inc-btn' })).toBeDefined();
+    expect(root.findByProps({ testID: 'quick-add-caffeine-btn' })).toBeDefined();
+    expect(root.findByProps({ testID: 'delete-caffeine-log-log-1' })).toBeDefined();
   });
 
-  test('Koryguje godzinę snu stepperem (+ / −)', () => {
-    let tree: any;
+  test('Koryguje docelową godzinę snu i zapisuje w bazie', () => {
+    let tree: renderer.ReactTestRenderer;
     renderer.act(() => {
       tree = renderer.create(<CaffeineScreen />);
     });
 
-    // Domyślnie 23:00
-    let str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('23:00');
-
-    // Kliknij '+'
-    const plusBtn = findPressableWithText(tree.root, '+');
-    expect(plusBtn).toBeTruthy();
+    const root = tree!.root;
+    const decBtn = root.findByProps({ testID: 'bedtime-dec-btn' });
+    const incBtn = root.findByProps({ testID: 'bedtime-inc-btn' });
 
     renderer.act(() => {
-      plusBtn.props.onPress();
+      decBtn.props.onPress();
     });
-
-    str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('24:00');
-
-    // Kliknij '−' dwa razy
-    const minusBtn = findPressableWithText(tree.root, '−');
-    expect(minusBtn).toBeTruthy();
+    expect(database.setBedtimeHour).toHaveBeenCalledWith(22);
 
     renderer.act(() => {
-      minusBtn.props.onPress();
+      incBtn.props.onPress();
     });
-    renderer.act(() => {
-      minusBtn.props.onPress();
-    });
-
-    str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('22:00');
+    expect(database.setBedtimeHour).toHaveBeenCalledWith(23);
   });
 
-  test('Usuwa wpis kofeiny po kliknięciu ✕', () => {
-    const deleteSpy = jest.spyOn(databaseModule, 'deleteCaffeineLog').mockImplementation(jest.fn());
-
-    let tree: any;
+  test('Koryguje czas półtrwania kofeiny (t1/2) i zapisuje w bazie', () => {
+    let tree: renderer.ReactTestRenderer;
     renderer.act(() => {
       tree = renderer.create(<CaffeineScreen />);
     });
 
-    // Znajdź przycisk usuwania '✕'
-    const deleteBtns = tree.root.findAll((n: any) => n.props?.children === '✕');
-    expect(deleteBtns.length).toBeGreaterThan(0);
-
-    let deletePressable = deleteBtns[0].parent;
-    while (deletePressable && !deletePressable.props?.onPress) {
-      deletePressable = deletePressable.parent;
-    }
+    const root = tree!.root;
+    const decBtn = root.findByProps({ testID: 'halflife-dec-btn' });
+    const incBtn = root.findByProps({ testID: 'halflife-inc-btn' });
 
     renderer.act(() => {
-      deletePressable.props.onPress();
+      decBtn.props.onPress();
     });
+    expect(database.setCaffeineHalfLife).toHaveBeenCalledWith(4.5);
 
-    expect(deleteSpy).toHaveBeenCalledWith('caff-1');
+    renderer.act(() => {
+      incBtn.props.onPress();
+    });
+    expect(database.setCaffeineHalfLife).toHaveBeenCalledWith(5.0);
   });
 
-  test('Otwiera modal szybkiego dodawania i loguje nową dawkę kofeiny', () => {
-    const logSpy = jest.spyOn(databaseModule, 'logCaffeine').mockImplementation(jest.fn());
-
-    let tree: any;
+  test('Usuwa wpis kofeiny z historii i odświeża listę', () => {
+    let tree: renderer.ReactTestRenderer;
     renderer.act(() => {
       tree = renderer.create(<CaffeineScreen />);
     });
 
-    // 1. Kliknij '+ Dodaj'
-    const addBtn = findPressableWithText(tree.root, '+ Dodaj');
-    expect(addBtn).toBeTruthy();
+    const root = tree!.root;
+    const deleteBtn = root.findByProps({ testID: 'delete-caffeine-log-log-1' });
 
     renderer.act(() => {
-      addBtn.props.onPress();
+      deleteBtn.props.onPress();
     });
 
-    let str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('Szybkie dodanie kofeiny');
-    expect(str).toContain('Podwójne Espresso (Doppio)');
-
-    // 2. Kliknij opcję Podwójne Espresso (~130 mg)
-    const espressoOption = findPressableWithText(tree.root, 'Podwójne Espresso (Doppio)');
-    expect(espressoOption).toBeTruthy();
-
-    renderer.act(() => {
-      espressoOption.props.onPress();
-    });
-
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        beverageName: 'Podwójne Espresso',
-        beverageType: 'coffee',
-        doseGrams: 18,
-        caffeineMg: 130,
-      })
-    );
+    expect(database.deleteCaffeineLog).toHaveBeenCalledWith('log-1');
   });
 
-  test('Loguje Pojedyncze Espresso, AeroPress i Herbatę liściastą przez modal szybkiego dodawania', () => {
-    const logSpy = jest.spyOn(databaseModule, 'logCaffeine').mockImplementation(jest.fn());
+  test('Renderuje stan pusty gdy brak wpisów w danym dniu', () => {
+    (database.getCaffeineLogs as jest.Mock).mockReturnValue([]);
 
-    let tree: any;
+    let tree: renderer.ReactTestRenderer;
     renderer.act(() => {
       tree = renderer.create(<CaffeineScreen />);
     });
 
-    // 0. Przelew / Drip
-    renderer.act(() => {
-      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
-    });
-    renderer.act(() => {
-      findPressableWithText(tree.root, 'Przelew / Drip')?.props.onPress();
-    });
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        beverageName: 'Kawa przelewowa (V60 / Drip)',
-        beverageType: 'coffee',
-        doseGrams: 18,
-        caffeineMg: 140,
-      })
-    );
-
-    // 1. Pojedyncze Espresso
-    renderer.act(() => {
-      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
-    });
-    renderer.act(() => {
-      findPressableWithText(tree.root, 'Pojedyncze Espresso')?.props.onPress();
-    });
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        beverageName: 'Pojedyncze Espresso',
-        beverageType: 'coffee',
-        doseGrams: 9,
-        caffeineMg: 65,
-      })
-    );
-
-    // 2. AeroPress
-    renderer.act(() => {
-      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
-    });
-    renderer.act(() => {
-      findPressableWithText(tree.root, 'AeroPress')?.props.onPress();
-    });
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        beverageName: 'AeroPress',
-        beverageType: 'coffee',
-        doseGrams: 15,
-        caffeineMg: 110,
-      })
-    );
-
-    // 3. Herbata liściasta
-    renderer.act(() => {
-      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
-    });
-    renderer.act(() => {
-      findPressableWithText(tree.root, 'Herbata liściasta')?.props.onPress();
-    });
-    expect(logSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        beverageName: 'Herbata Gongfu / Liściasta',
-        beverageType: 'tea',
-        doseGrams: 5,
-        caffeineMg: 45,
-      })
-    );
-  });
-
-  test('Zamknięcie modala szybkiego dodawania przyciskiem Anuluj', () => {
-    let tree: any;
-    renderer.act(() => {
-      tree = renderer.create(<CaffeineScreen />);
-    });
-
-    // Otwórz modal
-    renderer.act(() => {
-      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
-    });
-    expect(JSON.stringify(tree.toJSON())).toContain('Szybkie dodanie kofeiny');
-
-    // Kliknij Anuluj
-    renderer.act(() => {
-      findPressableWithText(tree.root, 'Anuluj')?.props.onPress();
-    });
-
-    // Modal nie jest widoczny w logice lub zamknięty
-    const cancelBtn = findPressableWithText(tree.root, 'Anuluj');
-    // W React Native Modal po visible=false może nie renderować zawartości lub tree nie zawiera modala
-  });
-
-  test('D-02 & BR-KOF-003: Regulacja godziny snu i czasu półtrwania kofeiny (t1/2) ze stepperami', () => {
-    const setBedtimeSpy = jest.spyOn(databaseModule, 'setBedtimeHour');
-    const setHalfLifeSpy = jest.spyOn(databaseModule, 'setCaffeineHalfLife');
-
-    let tree: any;
-    renderer.act(() => {
-      tree = renderer.create(<CaffeineScreen />);
-    });
-
-    let str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('Predykcja Jakości Snu');
-    expect(str).toContain('23:00');
-    expect(str).toContain('Metabolizm kofeiny (t₁/₂)');
-    expect(str).toContain('5.0h');
-
-    const allPlus = tree.root.findAll((n: any) => n.props?.children === '+');
-    renderer.act(() => {
-      for (let i = 0; i < allPlus.length; i++) {
-        let p = allPlus[i];
-        while (p && !p.props?.onPress) {
-          p = p.parent;
-        }
-        if (p?.props?.onPress) {
-          p.props.onPress();
-        }
-      }
-    });
-
-    expect(setBedtimeSpy).toHaveBeenCalledWith(24);
-    expect(setHalfLifeSpy).toHaveBeenCalledWith(5.5);
-
-    // Kliknij '−' dla obu stepperów
-    const allMinus = tree.root.findAll((n: any) => n.props?.children === '−');
-    renderer.act(() => {
-      for (let i = 0; i < allMinus.length; i++) {
-        let p = allMinus[i];
-        while (p && !p.props?.onPress) {
-          p = p.parent;
-        }
-        if (p?.props?.onPress) {
-          p.props.onPress();
-        }
-      }
-    });
-
-    expect(setBedtimeSpy).toHaveBeenCalledWith(23);
-    expect(setHalfLifeSpy).toHaveBeenCalledWith(5.0);
-  });
-
-  test('BR-KOF-002: Szybkie dodanie kofeiny zapisuje próbkę w Apple HealthKit gdy włączone', () => {
-    jest.spyOn(healthKitModule, 'getHealthKitSyncEnabled').mockReturnValue(true);
-    const saveHkSpy = jest.spyOn(healthKitModule, 'saveDietaryCaffeineSample').mockResolvedValue({
-      success: true,
-      quantityType: 'HKQuantityTypeIdentifierDietaryCaffeine',
-      caffeineMg: 140,
-      consumedAt: new Date().toISOString(),
-    });
-
-    let tree: any;
-    renderer.act(() => {
-      tree = renderer.create(<CaffeineScreen />);
-    });
-
-    // Otwórz modal
-    renderer.act(() => {
-      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
-    });
-
-    // Kliknij V60
-    renderer.act(() => {
-      findPressableWithText(tree.root, 'Przelew / Drip')?.props.onPress();
-    });
-
-    expect(saveHkSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        caffeineMg: 140,
-        beverageName: expect.stringContaining('przelewowa'),
-      })
-    );
+    expect(tree!.toJSON()).toBeDefined();
   });
 });

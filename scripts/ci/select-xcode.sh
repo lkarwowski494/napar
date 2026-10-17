@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Wybiera najnowszy zainstalowany Xcode danej wersji głównej (domyślnie 26) i ustawia go przez xcode-select.
-# Od SDK 54: App Store Connect i TestFlight przyjmują tylko buildy z Xcode 26+.
-# Od SDK 56 Expo wymaga Xcode 26.4+, więc workflowy działają na macos-26.
+# Wybiera najnowszy zainstalowany Xcode danej wersji głównej (domyślnie 16) i ustawia go przez xcode-select.
+# Od SDK 54: App Store Connect i TestFlight przyjmują tylko buildy z Xcode 16+.
+# Workflowy działają na macos-14 z Xcode 16.
 #
 # Użycie: bash scripts/ci/select-xcode.sh [wersja_główna]
 set -euo pipefail
-MAJOR="${1:-26}"
+MAJOR="${1:-16}"
 APPS="${APPS_DIR:-/Applications}"
 best=""
 bestv=""

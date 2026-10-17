@@ -1,0 +1,307 @@
+{
+  "metadata": {
+    "generator": "scripts/gen-coffee-corpus.py",
+    "version": "1.0",
+    "description": "Domain calculation oracle corpus for Napar (Steepwise)"
+  },
+  "extraction_yield": [
+    {
+      "waterGrams": 250.0,
+      "tdsPercent": 1.35,
+      "coffeeDoseGrams": 15.0,
+      "expectedExtractionYieldPercent": 22.5,
+      "expectedRating": "over"
+    },
+    {
+      "waterGrams": 200.0,
+      "tdsPercent": 1.2,
+      "coffeeDoseGrams": 12.0,
+      "expectedExtractionYieldPercent": 20.0,
+      "expectedRating": "ideal"
+    },
+    {
+      "waterGrams": 300.0,
+      "tdsPercent": 1.45,
+      "coffeeDoseGrams": 18.0,
+      "expectedExtractionYieldPercent": 24.1667,
+      "expectedRating": "over"
+    },
+    {
+      "waterGrams": 500.0,
+      "tdsPercent": 1.1,
+      "coffeeDoseGrams": 30.0,
+      "expectedExtractionYieldPercent": 18.3333,
+      "expectedRating": "ideal"
+    },
+    {
+      "waterGrams": 150.0,
+      "tdsPercent": 1.8,
+      "coffeeDoseGrams": 10.0,
+      "expectedExtractionYieldPercent": 27.0,
+      "expectedRating": "over"
+    },
+    {
+      "waterGrams": 250.0,
+      "tdsPercent": 0.9,
+      "coffeeDoseGrams": 15.0,
+      "expectedExtractionYieldPercent": 15.0,
+      "expectedRating": "under"
+    },
+    {
+      "waterGrams": 250.0,
+      "tdsPercent": 1.6,
+      "coffeeDoseGrams": 15.0,
+      "expectedExtractionYieldPercent": 26.6667,
+      "expectedRating": "over"
+    },
+    {
+      "waterGrams": 350.0,
+      "tdsPercent": 1.25,
+      "coffeeDoseGrams": 20.0,
+      "expectedExtractionYieldPercent": 21.875,
+      "expectedRating": "ideal"
+    },
+    {
+      "waterGrams": 240.0,
+      "tdsPercent": 1.5,
+      "coffeeDoseGrams": 15.0,
+      "expectedExtractionYieldPercent": 24.0,
+      "expectedRating": "over"
+    },
+    {
+      "waterGrams": 400.0,
+      "tdsPercent": 1.38,
+      "coffeeDoseGrams": 25.0,
+      "expectedExtractionYieldPercent": 22.08,
+      "expectedRating": "over"
+    }
+  ],
+  "water_hardness": [
+    {
+      "ppmCaCO3": 0.0,
+      "expectedDegreesDH": 0.0
+    },
+    {
+      "ppmCaCO3": 17.848,
+      "expectedDegreesDH": 1.0
+    },
+    {
+      "ppmCaCO3": 50.0,
+      "expectedDegreesDH": 2.8014
+    },
+    {
+      "ppmCaCO3": 80.0,
+      "expectedDegreesDH": 4.4823
+    },
+    {
+      "ppmCaCO3": 120.0,
+      "expectedDegreesDH": 6.7234
+    },
+    {
+      "ppmCaCO3": 150.0,
+      "expectedDegreesDH": 8.4043
+    },
+    {
+      "ppmCaCO3": 200.0,
+      "expectedDegreesDH": 11.2057
+    },
+    {
+      "ppmCaCO3": 300.0,
+      "expectedDegreesDH": 16.8086
+    }
+  ],
+  "caffeine_decay": [
+    {
+      "initialMg": 80.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 80.0
+    },
+    {
+      "initialMg": 80.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 69.644
+    },
+    {
+      "initialMg": 80.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 56.5685
+    },
+    {
+      "initialMg": 80.0,
+      "elapsedHours": 5.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 40.0
+    },
+    {
+      "initialMg": 80.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 28.2843
+    },
+    {
+      "initialMg": 80.0,
+      "elapsedHours": 10.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 20.0
+    },
+    {
+      "initialMg": 80.0,
+      "elapsedHours": 15.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 10.0
+    },
+    {
+      "initialMg": 80.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 2.8717
+    },
+    {
+      "initialMg": 120.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 120.0
+    },
+    {
+      "initialMg": 120.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 104.4661
+    },
+    {
+      "initialMg": 120.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 84.8528
+    },
+    {
+      "initialMg": 120.0,
+      "elapsedHours": 5.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 60.0
+    },
+    {
+      "initialMg": 120.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 42.4264
+    },
+    {
+      "initialMg": 120.0,
+      "elapsedHours": 10.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 30.0
+    },
+    {
+      "initialMg": 120.0,
+      "elapsedHours": 15.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 15.0
+    },
+    {
+      "initialMg": 120.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 4.3076
+    },
+    {
+      "initialMg": 160.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 160.0
+    },
+    {
+      "initialMg": 160.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 139.2881
+    },
+    {
+      "initialMg": 160.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 113.1371
+    },
+    {
+      "initialMg": 160.0,
+      "elapsedHours": 5.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 80.0
+    },
+    {
+      "initialMg": 160.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 56.5685
+    },
+    {
+      "initialMg": 160.0,
+      "elapsedHours": 10.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 40.0
+    },
+    {
+      "initialMg": 160.0,
+      "elapsedHours": 15.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 20.0
+    },
+    {
+      "initialMg": 160.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 5.7435
+    },
+    {
+      "initialMg": 200.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 200.0
+    },
+    {
+      "initialMg": 200.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 174.1101
+    },
+    {
+      "initialMg": 200.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 141.4214
+    },
+    {
+      "initialMg": 200.0,
+      "elapsedHours": 5.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 100.0
+    },
+    {
+      "initialMg": 200.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 70.7107
+    },
+    {
+      "initialMg": 200.0,
+      "elapsedHours": 10.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 50.0
+    },
+    {
+      "initialMg": 200.0,
+      "elapsedHours": 15.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 25.0
+    },
+    {
+      "initialMg": 200.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 7.1794
+    }
+  ]
+}

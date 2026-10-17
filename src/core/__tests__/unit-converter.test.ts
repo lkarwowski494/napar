@@ -12,6 +12,8 @@ import {
   formatTemperature,
   formatDoseWeight,
   formatWaterWeight,
+  wInKeep,
+  roundTo,
 } from '../unit-converter';
 
 describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
@@ -59,5 +61,69 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
     expect(formatTemperature(93)).toBe('93°C');
     expect(formatDoseWeight(18)).toBe('18g');
     expect(formatWaterWeight(300)).toBe('300g');
+  });
+
+  describe('RD-ENG-01 & BR-TEST-005: wInKeep (Konwersja bez dryfu zaokrągleń)', () => {
+    test('Wektory testowe z dokumentu BRD (RD-ENG-01)', () => {
+      // • wInKeep("135", "lb", 61.23) -> 61.23 (brak dryfu na 61.25)
+      expect(wInKeep('135', 'lb', 61.23)).toBe(61.23);
+
+      // • wInKeep("135,0", "lb", 61.23) -> 61.23
+      expect(wInKeep('135,0', 'lb', 61.23)).toBe(61.23);
+
+      // • wInKeep("140", "lb", 61.23) -> 63.5
+      expect(wInKeep('140', 'lb', 61.23)).toBe(63.5);
+
+      // • wInKeep("80,5", "kg", 80) -> 80.5
+      expect(wInKeep('80,5', 'kg', 80)).toBe(80.5);
+    });
+
+    test('Jednostki kawowe: gramy <-> uncje (oz)', () => {
+      // 15.0 g = 0.53 oz. Użytkownik widzi 0.5 oz po zaokrągleniu i zatwierdza bez zmian
+      expect(wInKeep('0.5', 'oz', 15.0)).toBe(15.0);
+      expect(wInKeep('0,5', 'oz', 15.0)).toBe(15.0);
+
+      // Nowa wartość wpisana: 1.0 oz
+      expect(wInKeep('1.0', 'oz', 15.0)).toBe(28.35);
+      expect(wInKeep('135', 'lbs', 61.23)).toBe(61.23);
+    });
+
+    test('Jednostki wody: ml/g <-> fl oz', () => {
+      // 250 g wody = 8.5 fl oz. Użytkownik zatwierdza 8.5
+      expect(wInKeep('8.5', 'fl oz', 250)).toBe(250);
+      expect(wInKeep('8,5', 'fl oz', 250)).toBe(250);
+      expect(wInKeep('8.5', 'floz', 250)).toBe(250);
+
+      // Nowa wartość: 10 fl oz
+      expect(wInKeep('10', 'fl oz', 250)).toBe(295.74);
+    });
+
+    test('Temperatura: °C <-> °F', () => {
+      // 93°C = 199.4°F -> 199.4°F. Wpisane 199.4
+      expect(wInKeep('199.4', '°F', 93)).toBe(93);
+      expect(wInKeep('199,4', '°F', 93)).toBe(93);
+
+      // Nowa temperatura: 205°F
+      expect(wInKeep('205', '°F', 93)).toBe(96.11);
+      // Bez prevBase
+      expect(wInKeep('212', '°F')).toBe(100);
+    });
+
+    test('Obsługa wartości brzegowych: pusty ciąg, NaN, brak prevBase', () => {
+      expect(wInKeep('', 'g', 15)).toBe(15);
+      expect(wInKeep('   ', 'g', 15)).toBe(15);
+      expect(wInKeep('abc', 'g', 15)).toBe(15);
+      expect(wInKeep('15', 'g')).toBe(15);
+      expect(wInKeep('20,5', 'g')).toBe(20.5);
+    });
+
+    test('Inwariant 100 cykli otwarcia i zapisu formularza bez dryfu', () => {
+      let baseVal = 15.0; // 15g kawy
+      for (let i = 0; i < 100; i++) {
+        const displayedOz = String(roundTo(baseVal * 0.03527396195, 1));
+        baseVal = wInKeep(displayedOz, 'oz', baseVal);
+      }
+      expect(baseVal).toBe(15.0);
+    });
   });
 });

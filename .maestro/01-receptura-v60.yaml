@@ -1,0 +1,9 @@
+appId: pl.lukasz.napar
+name: 01 Wybór Receptury V60 i Przelicznik
+---
+- launchApp
+- assertVisible: "Napar"
+- tapOn: "Kenia Nyeri V60"
+- assertVisible: "15.0 g"
+- assertVisible: "250 g"
+- takeScreenshot: 01-receptura-v60

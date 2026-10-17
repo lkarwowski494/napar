@@ -1,127 +1,305 @@
-# TestFlight — automatyczny build i wysyłka do App Store Connect narzędziami Apple
-# Uruchamianie: Zakładka Actions → „TestFlight (Napar)” → Run workflow
-#
-# Wymagane sekrety repozytorium (Settings → Secrets and variables → Actions):
-#   ASC_KEY_ID     — identyfikator klucza API App Store Connect (10 znaków)
-#   ASC_ISSUER_ID  — Issuer ID (UUID z App Store Connect → Users and Access → Integrations)
-#   ASC_KEY_P8     — pełna treść klucza AuthKey_XXXX.p8 (wraz z liniami BEGIN i END)
-name: TestFlight (Napar)
+name: Build & Upload to TestFlight (iOS)
+
 on:
   workflow_dispatch:
-permissions:
-  contents: write
+    inputs:
+      notes:
+        description: 'Notatka do wydania (opcjonalnie)'
+        required: false
+        default: ''
+  push:
+    tags:
+      - 'v*'
+
 concurrency:
   group: testflight
   cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_OPTIONS: --max-old-space-size=3072
+  FORCE_COLOR: '1'
+  APP_SCHEME: 'Napar'
+  APP_DIR: 'Napar'
+  BUNDLE_ID: 'pl.lukasz.napar'
+  BUILD_BASE: '10'
+
 jobs:
   build:
-    runs-on: macos-26
-    timeout-minutes: 90
+    name: Archive & Upload (.ipa -> TestFlight)
+    runs-on: macos-14
+    timeout-minutes: 60
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+      build_number: ${{ steps.ver.outputs.build_number }}
+
     steps:
-      - uses: actions/checkout@v5
-      - name: Select Xcode 26.x
-        run: bash scripts/ci/select-xcode.sh 26
-      - uses: actions/setup-node@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify commit is on origin/main
+        run: |
+          git fetch origin main --depth=50
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Commit $GITHUB_SHA nie jest przodkiem gałęzi origin/main!"
+            exit 1
+          fi
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - name: Sprawdzenie obecności sekretów
-        env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+
+      - name: Select Xcode 16 (iOS 18 SDK)
+        run: bash .github/scripts/select-xcode.sh 16
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Guard against test/mock flags in release build
         run: |
-          for v in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8; do
-            [ -n "${!v}" ] || { echo "::error::Brak wymaganego sekretu $v w Settings -> Secrets and variables -> Actions"; exit 1; };
+          for var in EXPO_PUBLIC_STORE_FAKE EXPO_PUBLIC_E2E EXPO_PUBLIC_MOCK_AUTH EXPO_PUBLIC_DEMO_MODE; do
+            val="${!var:-}"
+            if [ -n "$val" ] && [ "$val" != "0" ]; then
+              echo "::error::Flaga testowa $var=$val nie może być ustawiona w wydaniu produkcyjnym!"
+              exit 1
+            fi
           done
-      - run: npm ci
-      - name: Weryfikacja jakości (TypeScript + testy jednostkowe)
+
+      - name: Run quality gates (Verify)
         run: npm run verify
-      - name: Generowanie natywnego projektu iOS (expo prebuild)
+
+      - name: Prebuild native iOS project
         run: npx expo prebuild --platform ios --no-install --clean
-      - name: Ustalenie numeru buildu (BUILD_BASE + GITHUB_RUN_NUMBER)
-        env:
-          BUILD_BASE: ${{ vars.BUILD_BASE || '1000' }}
+
+      - name: Verify native iOS project invariants
+        run: node scripts/verify-native.mjs
+
+      - name: Compute & set monotonic build number
+        id: ver
         run: |
-          BUILD_NUM=$((BUILD_BASE + GITHUB_RUN_NUMBER))
-          echo "BUILD_NUMBER=$BUILD_NUM" >> "$GITHUB_ENV"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUM" ios/Napar/Info.plist
-      - name: Instalacja CocoaPods
-        run: cd ios && pod install
-      - name: Platforma iOS zgodna z SDK wybranego Xcode
-        run: bash scripts/ci/ensure-ios-platform.sh
-      - name: Zapisanie klucza API do bezpiecznego pliku tymczasowego
+          VERSION=$(node -p "require('./app.json').expo.version")
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+            echo "::error::Nieprawidłowy format wersji w app.json: '$VERSION' (wymagane X.Y lub X.Y.Z)"
+            exit 1
+          fi
+          BUILD_NUMBER=$((BUILD_BASE + GITHUB_RUN_NUMBER))
+          if ! [[ "$BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "::error::Nieprawidłowy numer buildu: '$BUILD_NUMBER'"
+            exit 1
+          fi
+          echo "Ustawianie wersji $VERSION ($BUILD_NUMBER)"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "ios/$APP_DIR/Info.plist"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "ios/$APP_DIR/Info.plist"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
+          echo "EXPO_PUBLIC_BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Cache CocoaPods
+        id: pods-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-xcode16-${{ hashFiles('ios/Podfile.lock', 'package-lock.json') }}
+          restore-keys: |
+            pods-${{ runner.os }}-xcode16-
+
+      - name: Install CocoaPods
+        working-directory: ios
+        run: |
+          if [ "${{ steps.pods-cache.outputs.cache-hit }}" != "true" ]; then
+            pod install --repo-update
+          else
+            pod install
+          fi
+
+      - name: Verify PrivacyInfo.xcprivacy after pod install
+        run: |
+          PRIV="ios/$APP_DIR/PrivacyInfo.xcprivacy"
+          test -f "$PRIV" || { echo "::error::Brak $PRIV"; exit 1; }
+          plutil -lint "$PRIV"
+          for cat in NSPrivacyAccessedAPICategoryUserDefaults NSPrivacyAccessedAPICategoryFileTimestamp NSPrivacyAccessedAPICategorySystemBootTime NSPrivacyAccessedAPICategoryDiskSpace; do
+            grep -q "$cat" "$PRIV" || { echo "::error::Brak kategorii $cat w $PRIV"; exit 1; }
+          done
+          grep -q "PrivacyInfo.xcprivacy" "ios/$APP_SCHEME.xcodeproj/project.pbxproj" || {
+            echo "::error::PrivacyInfo.xcprivacy nie jest podpięty w project.pbxproj"
+            exit 1
+          }
+
+      - name: Archive (Release, unsigned build step)
         env:
-          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
-        run: umask 077; printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/AuthKey.p8"
-      - name: Archiwizacja (xcodebuild archive)
+          CI: '1'
+          NODE_ENV: production
         run: |
           set -o pipefail
-          TEAM=$(node -p "require('./app.json').expo.ios.appleTeamId")
-          cd ios
-          xcodebuild -workspace Napar.xcworkspace -scheme Napar -configuration Release -destination 'generic/platform=iOS' \
-            -archivePath "$RUNNER_TEMP/Napar.xcarchive" archive \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM="$TEAM" CURRENT_PROJECT_VERSION=$BUILD_NUMBER \
-            2>&1 | tee xcodebuild.log
-      - name: Eksport i wysyłka do App Store Connect
+          xcodebuild archive \
+            -workspace "ios/$APP_SCHEME.xcworkspace" \
+            -scheme "$APP_SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/$APP_SCHEME.xcarchive" \
+            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
+            CODE_SIGN_STYLE=Automatic \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            2>&1 | tee /tmp/xcodebuild-archive.log | grep -E "^(===|CompileC|Ld |Touch |RegisterExecutionPolicyException|*\* ARCHIVE|error:|warning:.*\berror\b)" || true
+
+          if [ ! -d "$RUNNER_TEMP/$APP_SCHEME.xcarchive/Products/Applications/$APP_SCHEME.app" ]; then
+            echo "::error::Archiwum .xcarchive nie powstało — ostatnie 80 linii logu:"
+            tail -80 /tmp/xcodebuild-archive.log
+            exit 1
+          fi
+
+      - name: Prepare App Store Connect API Key (.p8) after pod install & archive
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          set -o pipefail
-          KID="$ASC_KEY_ID"; ISS="$ASC_ISSUER_ID"; unset ASC_KEY_ID ASC_ISSUER_ID
-          TEAM=$(node -p "require('./app.json').expo.ios.appleTeamId")
+          set +x
+          for req in APPLE_TEAM_ID ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8_BASE64; do
+            if [ -z "${!req:-}" ]; then
+              echo "::error::Brak wymaganego sekretu GitHub: $req (zobacz docs/15-app-store.md)"
+              exit 1
+            fi
+          done
+          if ! [[ "$ASC_KEY_ID" =~ ^[A-Z0-9]{6,16}$ ]]; then
+            echo "::error::Nieprawidłowy format ASC_KEY_ID"
+            exit 1
+          fi
+          umask 077
+          KEY_DIR="$RUNNER_TEMP/asc_private_keys"
+          mkdir -p "$KEY_DIR"
+          KEY_PATH="$KEY_DIR/AuthKey_${ASC_KEY_ID}.p8"
+          printf '%s' "$ASC_KEY_P8_BASE64" | base64 --decode > "$KEY_PATH"
+          chmod 600 "$KEY_PATH"
+          if ! grep -q "BEGIN PRIVATE KEY" "$KEY_PATH"; then
+            echo "::error::Zdekodowany klucz .p8 nie zawiera nagłówka BEGIN PRIVATE KEY"
+            rm -f "$KEY_PATH"
+            exit 1
+          fi
+          echo "KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
+
+      - name: Generate ExportOptions.plist & Upload to TestFlight
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
           cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0"><dict>
-            <key>method</key><string>app-store-connect</string>
-            <key>destination</key><string>upload</string>
-            <key>teamID</key><string>$TEAM</string>
-            <key>signingStyle</key><string>automatic</string>
-            <key>manageAppVersionAndBuildNumber</key><false/>
-          </dict></plist>
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>signingStyle</key>
+            <string>automatic</string>
+            <key>teamID</key>
+            <string>${APPLE_TEAM_ID}</string>
+            <key>destination</key>
+            <string>upload</string>
+            <key>manageAppVersionAndBuildNumber</key>
+            <string>NO</string>
+            <key>uploadSymbols</key>
+            <true/>
+            <key>testFlightInternalTestingOnly</key>
+            <false/>
+          </dict>
+          </plist>
           EOF
-          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Napar.xcarchive" -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
-            -exportPath "$RUNNER_TEMP/export" -allowProvisioningUpdates -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
-            -authenticationKeyID "$KID" -authenticationKeyIssuerID "$ISS" 2>&1 | tee export.log
-          echo "## TestFlight: build $BUILD_NUMBER został wysłany do App Store Connect" >> "$GITHUB_STEP_SUMMARY"
-          echo "Po przetworzeniu przez Apple (zwykle 10–25 minut) pojawi się w Twojej aplikacji TestFlight." >> "$GITHUB_STEP_SUMMARY"
-      - name: Bezpieczne usunięcie klucza prywatnego z maszyny
+
+          set +e
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/$APP_SCHEME.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            2>&1 | sed \
+              -e "s/${ASC_KEY_ID}/<KEY_ID>/g" \
+              -e "s/${ASC_ISSUER_ID}/<ISSUER_ID>/g" \
+              -e "s/${APPLE_TEAM_ID}/<TEAM_ID>/g" \
+              > /tmp/xcodebuild-export.log
+          RC=${PIPESTATUS[0]}
+          set -e
+
+          if [ "$RC" -ne 0 ]; then
+            echo "::error::Eksport i wysyłka do TestFlight nie powiodły się (kod $RC). Ostatnie 80 linii:"
+            tail -80 /tmp/xcodebuild-export.log
+            exit "$RC"
+          fi
+          tail -30 /tmp/xcodebuild-export.log
+
+      - name: Clean up credentials
         if: always()
-        run: rm -f "$RUNNER_TEMP/AuthKey.p8"
-      - name: Maskowanie identyfikatorów klucza przed uploadem logów
-        if: failure()
-        env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
-          [ -n "$ASC_KEY_ID" ] && [ -n "$ASC_ISSUER_ID" ] || exit 0
-          for f in ios/xcodebuild.log export.log; do
-            [ -f "$f" ] || continue
-            sed -i '' -e "s/${ASC_KEY_ID}/<KEY_ID>/g" -e "s/${ASC_ISSUER_ID}/<ISSUER_ID>/g" "$f"
-            if grep -qF -e "$ASC_KEY_ID" -e "$ASC_ISSUER_ID" "$f"; then rm -f "$f"; echo "::warning::$f usunięty — maskowanie nie zadziałało"; fi
-          done
-      - uses: actions/upload-artifact@v4
+          rm -rf "$RUNNER_TEMP/asc_private_keys" "$RUNNER_TEMP/ExportOptions.plist"
+
+      - name: Write release summary
+        if: always()
+        env:
+          RELEASE_NOTES: ${{ inputs.notes }}
+        run: |
+          {
+            echo "## Wydanie TestFlight — $APP_SCHEME"
+            echo ""
+            echo "| Parametr | Wartość |"
+            echo "| :--- | :--- |"
+            echo "| **Bundle ID** | \`$BUNDLE_ID\` |"
+            echo "| **Wersja** | \`${VERSION:-?}\` |"
+            echo "| **Numer buildu** | \`${BUILD_NUMBER:-?}\` |"
+            echo "| **Commit** | \`${GITHUB_SHA}\` |"
+            echo "| **Notatka** | ${RELEASE_NOTES:-*(brak)*} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload scrubbed logs on failure only (retention 1 day)
         if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          name: testflight-logi
+          name: testflight-xcodebuild-logs-${{ github.run_number }}
+          path: /tmp/xcodebuild-*.log
           retention-days: 1
-          path: |
-            ios/xcodebuild.log
-            export.log
+
   tag:
+    name: Create Git Tag
     needs: build
+    if: success()
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
-      - name: Tagowanie wydania
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Create and push tag vX.Y.Z-bNNNN
         env:
-          BUILD_BASE: ${{ vars.BUILD_BASE || '1000' }}
+          VERSION: ${{ needs.build.outputs.version }}
+          BUILD: ${{ needs.build.outputs.build_number }}
         run: |
-          V=$(node -p "require('./app.json').expo.version")
-          T="v$V-b$((BUILD_BASE + GITHUB_RUN_NUMBER))"
-          git tag "$T" && git push origin "$T"
-          echo "## Utworzono tag wydania: $T" >> "$GITHUB_STEP_SUMMARY"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || ! [[ "$BUILD" =~ ^[0-9]+$ ]]; then
+            echo "::error::Nieprawidłowe dane wyjściowe wersji lub buildu: VERSION='$VERSION' BUILD='$BUILD'"
+            exit 1
+          fi
+          TAG="v${VERSION}-b${BUILD}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "$TAG" "$GITHUB_SHA"
+          git push origin "$TAG" --force

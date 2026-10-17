@@ -1,0 +1,7 @@
+appId: pl.lukasz.napar
+name: 07 Aktualizacja Sprawdź (Weryfikacja integralności danych po aktualizacji)
+---
+- launchApp
+- tapOn: "Spiżarnia"
+- assertVisible: "Spiżarnia Ziaren"
+- takeScreenshot: 07-aktualizacja-sprawdz

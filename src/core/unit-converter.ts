@@ -76,3 +76,62 @@ export function formatWaterWeight(grams: number, unitSystem: UnitSystem = 'metri
   }
   return `${grams}g`;
 }
+
+/**
+ * Pomocnicze zaokrąglanie do określonej liczby miejsc po przecinku
+ */
+export function roundTo(val: number, decimals: number): number {
+  const factor = Math.pow(10, decimals);
+  return Math.round(val * factor) / factor;
+}
+
+/**
+ * RD-ENG-01 & BR-TEST-005: Konwersja wejściowa bez dryfu zaokrągleń (wInKeep)
+ * Zachowuje dokładną wartość bazową v_prev, jeżeli sformatowana liczba w jednostce wyświetlania
+ * zgadza się po zaokrągleniu do 0.1 z liczbą wpisaną przez użytkownika.
+ */
+export function wInKeep(txt: string, unit: string, prevBase?: number): number {
+  if (typeof txt !== 'string') return prevBase ?? 0;
+  const normalized = txt.replace(',', '.').trim();
+  const xIn = parseFloat(normalized);
+  if (isNaN(xIn) || !isFinite(xIn)) {
+    return prevBase ?? 0;
+  }
+
+  // Współczynniki konwersji jednostek
+  const u = unit.toLowerCase();
+  let cu = 1;
+  const isFahrenheit = u === '°f' || u === 'f';
+
+  if (u === 'lb' || u === 'lbs') {
+    cu = 2.20462262185;
+  } else if (u === 'oz') {
+    cu = 0.03527396195;
+  } else if (u === 'fl oz' || u === 'floz') {
+    cu = 0.0338140227;
+  } else {
+    cu = 1;
+  }
+
+  if (prevBase !== undefined && prevBase > 0) {
+    if (isFahrenheit) {
+      const fPrev = roundTo((prevBase * 9) / 5 + 32, 1);
+      if (roundTo(xIn, 1) === fPrev) {
+        return prevBase;
+      }
+      return roundTo(((xIn - 32) * 5) / 9, 2);
+    } else {
+      const fPrev = roundTo(prevBase * cu, 1);
+      if (roundTo(xIn, 1) === fPrev) {
+        return prevBase;
+      }
+      return roundTo(xIn / cu, 2);
+    }
+  }
+
+  // Brak prevBase
+  if (isFahrenheit) {
+    return roundTo(((xIn - 32) * 5) / 9, 2);
+  }
+  return roundTo(xIn / cu, 2);
+}

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wsparcie Techniczne & FAQ — Napar (Steepwise) | Apps4Brew Studio</title>
+  <meta name="description" content="Oficjalna strona wsparcia technicznego aplikacji Napar (Steepwise). Odpowiedzi na często zadawane pytania (FAQ), kopie zapasowe, odzyskiwanie danych i kontakt.">
+  <style>
+    :root {
+      --bg: #121214;
+      --card-bg: #1c1c1f;
+      --accent: #c86a28;
+      --accent-gold: #e5a96a;
+      --text: #f4efea;
+      --text-muted: #a09c96;
+      --border: #2e2e34;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f9f8f6;
+        --card-bg: #ffffff;
+        --accent: #b05a1e;
+        --accent-gold: #c2884a;
+        --text: #1a1a1c;
+        --text-muted: #6b6864;
+        --border: #e2dfda;
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      padding: 40px 24px 24px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2.2rem;
+      letter-spacing: -0.03em;
+    }
+    .tagline {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+    .faq-item {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .faq-item h3 {
+      margin-top: 0;
+      color: var(--accent-gold);
+      font-size: 1.15rem;
+    }
+    .faq-item p {
+      margin: 0;
+      color: var(--text-muted);
+    }
+    .contact-box {
+      margin-top: 40px;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px dashed var(--accent);
+      background-color: rgba(200, 106, 40, 0.08);
+      text-align: center;
+    }
+    .contact-box h3 {
+      margin-top: 0;
+      color: var(--accent-gold);
+    }
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    footer a {
+      color: var(--accent-gold);
+      text-decoration: none;
+      margin: 0 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Wsparcie Techniczne — Napar (Steepwise)</h1>
+    <div class="tagline">Centrum pomocy dla użytkowników i często zadawane pytania (FAQ)</div>
+  </header>
+
+  <main class="container">
+    <h2>Najczęściej Zadawane Pytania (FAQ)</h2>
+
+    <div class="faq-item">
+      <h3>Jak utworzyć kopię zapasową moich danych?</h3>
+      <p>Przejdź do zakładki <strong>Ustawienia</strong> i wybierz <em>Eksportuj Kopię Zapasową (JSON)</em>. Otrzymasz kompletny, czytelny plik JSON ze wszystkimi Twoimi recepturami, spiżarnią ziaren i historią parzeń, który możesz zapisać w aplikacji Pliki, wysłać mailem lub zarchiwizować w chmurze iCloud Drive.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Co się stanie, jeśli zmienię telefon?</h3>
+      <p>Przed zmianą telefonu wykonaj eksport kopii zapasowej JSON na starym urządzeniu. Na nowym telefonie zainstaluj aplikację Napar, wejdź w <strong>Ustawienia</strong> &rarr; <em>Importuj Kopię z Pliku JSON</em>, wklej zawartość pliku lub wczytaj plik, a Twoje dane zostaną natychmiast odtworzone.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Czy aplikacja zużywa transfer danych komórkowych?</h3>
+      <p>Nie. Napar jest w 100% aplikacją offline i nie wykonuje żadnych połączeń sieciowych w tle. Cała baza danych oraz algorytmy kalkulatora działają lokalnie na procesorze Twojego telefonu.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Jak działa automatyczna ochrona przed utratą danych?</h3>
+      <p>Przed każdą operacją importu lub czyszczenia bazy aplikacja bezwarunkowo tworzy kopię bezpieczeństwa w wewnętrznym katalogu <code>Backup/</code>. Jeśli importowany plik byłby uszkodzony, dotychczasowe dane nigdy nie zostaną utracone.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Jak odzyskać dostęp do zakupionej subskrypcji Napar Pro?</h3>
+      <p>W ekranie <strong>Ustawienia</strong> dotknij przycisku <em>Przywróć Zakupy</em>. Twoja subskrypcja zostanie zweryfikowana bezpośrednio w sklepie Apple App Store bez konieczności ponownej opłaty.</p>
+    </div>
+
+    <div class="contact-box">
+      <h3>Potrzebujesz dodatkowej pomocy?</h3>
+      <p>Jeśli zauważyłeś błąd w aplikacji lub masz pomysł na nową funkcję, napisz do nas bezpośrednio na adres zespołu rzemieślniczego Apps4Brew Studio: <strong>kontakt@apps4brew.pl</strong>. Odpowiadamy zazwyczaj w ciągu 24–48 godzin.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Apps4Brew Studio. Wszystkie prawa zastrzeżone.</p>
+    <p>
+      <a href="index.html">Strona Główna</a> |
+      <a href="privacy.html">Polityka Prywatności</a> |
+      <a href="support.html">Wsparcie Techniczne</a>
+    </p>
+  </footer>
+</body>
+</html>

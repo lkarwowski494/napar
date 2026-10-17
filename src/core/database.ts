@@ -27,6 +27,28 @@ export function getDatabase(): SQLite.SQLiteDatabase {
 }
 
 export function initDatabase(db: SQLite.SQLiteDatabase): void {
+  try {
+    db.execSync('PRAGMA foreign_keys = ON;');
+  } catch {
+    // Ignoruj błąd PRAGMA w środowiskach zastępczych
+  }
+
+  try {
+    db.execSync('PRAGMA journal_mode = WAL;');
+  } catch {
+    // Ignoruj błąd PRAGMA w środowiskach zastępczych
+  }
+
+  let currentVersion = 0;
+  try {
+    const versionRow = db.getFirstSync<{ user_version: number }>('PRAGMA user_version');
+    if (versionRow && typeof versionRow.user_version === 'number') {
+      currentVersion = versionRow.user_version;
+    }
+  } catch {
+    currentVersion = 0;
+  }
+
   db.execSync(SCHEMA_SQL);
 
   try {
@@ -47,6 +69,15 @@ export function initDatabase(db: SQLite.SQLiteDatabase): void {
     );
   } catch {
     // Table already exists
+  }
+
+  const TARGET_SCHEMA_VERSION = 3;
+  if (currentVersion < TARGET_SCHEMA_VERSION) {
+    try {
+      db.execSync(`PRAGMA user_version = ${TARGET_SCHEMA_VERSION};`);
+    } catch {
+      // Ignoruj błąd w mockach
+    }
   }
 
   // Sprawdź czy tabela recipes ma dane początkowe z master recipes lub wymaga uzupełnienia
@@ -544,17 +575,37 @@ export function importDataJson(jsonStr: string): void {
 }
 
 // ----------------------------------------------------------------------------
-// Eksport danych do otwartego formatu CSV (Z-152, ZP-07)
+// Eksport danych do otwartego formatu CSV (Z-152, ZP-07, RD-ENG-10, NFR-SEC-015)
 // ----------------------------------------------------------------------------
 
-export function escapeCsvValue(val: any): string {
+/**
+ * RD-ENG-10 & NFR-SEC-015: Zabezpieczenie komórek CSV przed Formula Injection (CSV Injection)
+ */
+export function escapeCsvCell(val: any): string {
   if (val === null || val === undefined) return '';
-  const str = String(val);
-  if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+  let str = String(val);
+
+  // Jeśli nie jest to czysta liczba ujemna i zaczyna się od znaku niebezpiecznego
+  const isPureNegativeNumber = /^-\d+(\.\d+)?$/.test(str);
+  const dangerousFirstChars = ['=', '+', '-', '@', '\t', '\r'];
+  if (!isPureNegativeNumber && str.length > 0 && dangerousFirstChars.includes(str[0])) {
+    str = `'${str}`;
+  }
+
+  // Jeśli zawiera znaki specjalne CSV lub apostrof, zawiń w cudzysłów i podwój cudzysłowy
+  if (
+    str.includes(',') ||
+    str.includes('"') ||
+    str.includes('\n') ||
+    str.includes('\r') ||
+    str.includes("'")
+  ) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;
 }
+
+export const escapeCsvValue = escapeCsvCell;
 
 export function exportSessionsCsv(): string {
   const sessions = getBrewSessions(10000);

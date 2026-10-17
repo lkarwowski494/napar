@@ -1,0 +1,108 @@
+{
+  "metadata": {
+    "generator": "scripts/gen-theme-contrast-corpus.py",
+    "standard": "WCAG 2.1 relative luminance & contrast ratio (RD-ENG-02)"
+  },
+  "canonical_rd_vectors": [
+    {
+      "color1": "#FFFFFF",
+      "color2": "#000000",
+      "contrastRatio": 21.0,
+      "passAA": true,
+      "passAAA": true
+    },
+    {
+      "color1": "#767676",
+      "color2": "#FFFFFF",
+      "contrastRatio": 4.5422,
+      "passAA": true,
+      "passAAA": false
+    },
+    {
+      "color1": "#777777",
+      "color2": "#FFFFFF",
+      "contrastRatio": 4.4781,
+      "passAA": false,
+      "passAAA": false
+    },
+    {
+      "color1": "#9CA3AF",
+      "color2": "#F3F4F6",
+      "contrastRatio": 2.307,
+      "passAA": false,
+      "passAAA": false
+    }
+  ],
+  "theme_pairs": [
+    {
+      "foregroundName": "textPrimary",
+      "foregroundHex": "#F4EFEA",
+      "backgroundName": "bg",
+      "backgroundHex": "#121214",
+      "contrastRatio": 16.3776,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": true
+    },
+    {
+      "foregroundName": "textPrimary",
+      "foregroundHex": "#F4EFEA",
+      "backgroundName": "bgCard",
+      "backgroundHex": "#1C1C1F",
+      "contrastRatio": 14.8805,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": true
+    },
+    {
+      "foregroundName": "textSecondary",
+      "foregroundHex": "#A09C96",
+      "backgroundName": "bgCard",
+      "backgroundHex": "#1C1C1F",
+      "contrastRatio": 6.2258,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": false
+    },
+    {
+      "foregroundName": "copperLight",
+      "foregroundHex": "#E88B4D",
+      "backgroundName": "bg",
+      "backgroundHex": "#121214",
+      "contrastRatio": 7.3341,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": true
+    },
+    {
+      "foregroundName": "emeraldLight",
+      "foregroundHex": "#3AA584",
+      "backgroundName": "bg",
+      "backgroundHex": "#121214",
+      "contrastRatio": 6.1435,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": false
+    },
+    {
+      "foregroundName": "danger",
+      "foregroundHex": "#D9534F",
+      "backgroundName": "bg",
+      "backgroundHex": "#121214",
+      "contrastRatio": 4.7228,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": false
+    },
+    {
+      "foregroundName": "textPrimary",
+      "foregroundHex": "#F4EFEA",
+      "backgroundName": "copper",
+      "backgroundHex": "#D97736",
+      "contrastRatio": 2.7673,
+      "passAA_NormalText": false,
+      "passAA_LargeTextOrUI": false,
+      "passAAA_NormalText": false
+    }
+  ]
+}

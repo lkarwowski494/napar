@@ -24,7 +24,7 @@ export const theme = {
     // Teksty
     textPrimary: '#F4EFEA',
     textSecondary: '#A09C96',
-    textMuted: '#686561',
+    textMuted: '#8C8884',
     
     // Statusy i świeżość (Resting window)
     statusPeak: '#4E9F3D',
@@ -68,7 +68,7 @@ export const theme = {
     caption: {
       fontSize: 13,
       fontWeight: '400' as const,
-      color: '#686561',
+      color: '#8C8884',
     },
     timerDisplay: {
       fontSize: 64,

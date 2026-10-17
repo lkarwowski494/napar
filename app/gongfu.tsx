@@ -10,13 +10,13 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
-  TextInput,
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import { Field, NumInput } from '../src/components/ui';
 import {
   GongfuSession,
   GongfuTeaType,
@@ -273,7 +273,13 @@ export default function GongfuScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.closeBtn}>
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={8}
+          style={styles.closeBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t.common.close}
+        >
           <Text style={styles.closeBtnText}>✕ {t.common.close}</Text>
         </Pressable>
         <Text style={styles.headerTitle}>{t.gongfu.modeTitle}</Text>
@@ -282,7 +288,10 @@ export default function GongfuScreen() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Wybór rodzaju herbaty */}
         <View style={styles.teaTypeRow}>
           {(
@@ -314,42 +323,37 @@ export default function GongfuScreen() {
         {/* Karta Parametrów Liścia */}
         <View style={styles.card}>
           <Text style={styles.cardLabel}>{t.gongfu.modeDesc}</Text>
-          <TextInput
-            style={styles.teaNameInput}
+          <Field
             value={teaName}
             onChangeText={setTeaName}
             placeholder="Nazwa herbaty..."
-            placeholderTextColor={theme.colors.textMuted}
           />
 
           <View style={styles.paramsRow}>
             <View style={styles.paramBox}>
               <Text style={styles.paramSub}>{t.gongfu.leafDose}</Text>
-              <TextInput
-                style={styles.paramInput}
-                value={leafDoseGrams}
-                onChangeText={setLeafDoseGrams}
-                keyboardType="decimal-pad"
+              <NumInput
+                value={parseFloat(leafDoseGrams) || 0}
+                onChangeNumber={(n) => setLeafDoseGrams(n.toString())}
+                unit={unitSystem === 'imperial' ? 'oz' : 'g'}
               />
               <Text style={styles.unitText}>{unitSystem === 'imperial' ? 'oz' : 'g'}</Text>
             </View>
             <View style={styles.paramBox}>
               <Text style={styles.paramSub}>{t.gongfu.vesselCapacity}</Text>
-              <TextInput
-                style={styles.paramInput}
-                value={vesselCapacityMl}
-                onChangeText={setVesselCapacityMl}
-                keyboardType="number-pad"
+              <NumInput
+                value={parseFloat(vesselCapacityMl) || 0}
+                onChangeNumber={(n) => setVesselCapacityMl(n.toString())}
+                unit={unitSystem === 'imperial' ? 'fl oz' : 'ml'}
               />
               <Text style={styles.unitText}>{unitSystem === 'imperial' ? 'fl oz' : 'ml'}</Text>
             </View>
             <View style={styles.paramBox}>
               <Text style={styles.paramSub}>{t.gongfu.waterTemp}</Text>
-              <TextInput
-                style={styles.paramInput}
-                value={waterTempCelsius}
-                onChangeText={setWaterTempCelsius}
-                keyboardType="number-pad"
+              <NumInput
+                value={parseFloat(waterTempCelsius) || 0}
+                onChangeNumber={(n) => setWaterTempCelsius(n.toString())}
+                unit={unitSystem === 'imperial' ? '°F' : '°C'}
               />
               <Text style={styles.unitText}>{unitSystem === 'imperial' ? '°F' : '°C'}</Text>
             </View>
@@ -405,12 +409,10 @@ export default function GongfuScreen() {
           {steepFinished && (
             <View style={styles.finishedInfusionPanel}>
               <Text style={styles.pourAlertText}>{t.gongfu.pourNow}</Text>
-              <TextInput
-                style={styles.notesInput}
+              <Field
                 value={currentNotes}
                 onChangeText={setCurrentNotes}
                 placeholder={t.gongfu.infusionNotesPlaceholder}
-                placeholderTextColor={theme.colors.textMuted}
               />
               <Pressable
                 style={styles.recordNextBtn}

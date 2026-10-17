@@ -1,0 +1,8 @@
+appId: pl.lukasz.napar
+name: 06 Aktualizacja Przygotuj (Zapis stanu bazy przed aktualizacją)
+---
+- launchApp
+- assertVisible: "Napar"
+- tapOn: "Spiżarnia"
+- assertVisible: "Spiżarnia Ziaren"
+- takeScreenshot: 06-aktualizacja-przygotuj

@@ -34,6 +34,10 @@ export const translations = {
       back: 'Wstecz',
       next: 'Dalej',
       finish: 'Zakończ',
+      ok: 'OK',
+      timerStepWarning: 'Pozostały {seconds} sekundy do końca zalania',
+      stepFinished: 'Krok ukończony: {step}',
+      brewingFinished: 'Parzenie zakończone!',
       grams: 'g',
       seconds: 's',
       celsius: '°C',
@@ -451,6 +455,10 @@ export const translations = {
       back: 'Back',
       next: 'Next',
       finish: 'Finish',
+      ok: 'OK',
+      timerStepWarning: '{seconds} seconds remaining for this pour',
+      stepFinished: 'Step completed: {step}',
+      brewingFinished: 'Brewing finished!',
       grams: 'g',
       seconds: 's',
       celsius: '°C',
@@ -744,7 +752,7 @@ export const translations = {
     },
     settings: {
       title: 'Settings & Privacy',
-      languageSection: 'Language / Język',
+      languageSection: 'Language',
       languageAuto: 'Automatic (System Default)',
       beverageSection: 'Beverage Preference',
       beverageDesc: 'Tailor the app to your rituals: hide unneeded options, recipes, and settings.',
@@ -885,4 +893,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
 export function useTranslation(): LanguageContextType {
   return useContext(LanguageContext);
+}
+
+export function getCurrentTranslations(): Translations {
+  const lang = detectSystemLanguage();
+  return translations[lang] || translations.en;
 }

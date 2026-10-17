@@ -2,7 +2,7 @@
 // Napar (Steepwise) — Unit Tests: BrewTimerEngine
 // ============================================================================
 
-import { BrewTimerEngine, TimerSnapshot } from '../timer-engine';
+import { BrewTimerEngine, TimerSnapshot, remainingTimerSec } from '../timer-engine';
 import { RecipeStep } from '../recipes-data';
 
 // Mock expo modules
@@ -19,30 +19,31 @@ jest.mock('expo-keep-awake', () => ({
 }));
 
 describe('BrewTimerEngine', () => {
+  let testSteps: RecipeStep[];
+
   beforeEach(() => {
     jest.useFakeTimers();
+    testSteps = [
+      {
+        stepNumber: 1,
+        namePl: 'Preinfuzja',
+        targetWaterGrams: 50.0,
+        durationSeconds: 30,
+        instructionPl: 'Zalej 50g wody',
+      },
+      {
+        stepNumber: 2,
+        namePl: 'Główne zalanie',
+        targetWaterGrams: 250.0,
+        durationSeconds: 60,
+        instructionPl: 'Zalej do 250g wody',
+      },
+    ];
   });
 
   afterEach(() => {
     jest.useRealTimers();
   });
-
-  const testSteps: RecipeStep[] = [
-    {
-      stepNumber: 1,
-      namePl: 'Preinfuzja',
-      targetWaterGrams: 50.0,
-      durationSeconds: 30,
-      instructionPl: 'Zalej 50g wody',
-    },
-    {
-      stepNumber: 2,
-      namePl: 'Główne zalanie',
-      targetWaterGrams: 250.0,
-      durationSeconds: 60,
-      instructionPl: 'Zalej do 250g wody',
-    },
-  ];
 
   test('Inicjalizacja z poprawnym stanem początkowym', () => {
     const engine = new BrewTimerEngine(testSteps);
@@ -223,5 +224,55 @@ describe('BrewTimerEngine', () => {
     // Wywołanie na pustym silniku bez kroków nie rzuca błędu
     const emptyEngine = new BrewTimerEngine([]);
     expect(() => emptyEngine.adjustStepDuration(10)).not.toThrow();
+  });
+
+  describe('RD-ENG-06 & NFR-PERF-004: Odliczanie odporne na uśpienie w tle', () => {
+    test('Wektory testowe z dokumentu BRD (RD-ENG-06)', () => {
+      // • Start 180s o 10:00:00, uśpienie, wybudzenie o 10:02:15 -> 45s
+      const t0 = new Date('2026-10-17T10:00:00.000Z').getTime();
+      const tEnd180 = t0 + 180 * 1000;
+      const tWake135 = t0 + 135 * 1000; // 10:02:15
+      expect(remainingTimerSec(tEnd180, tWake135)).toBe(45);
+
+      // • Start 60s o 10:00:00, wybudzenie o 10:05:00 -> 0s (zakończony)
+      const tEnd60 = t0 + 60 * 1000;
+      const tWake300 = t0 + 300 * 1000; // 10:05:00
+      expect(remainingTimerSec(tEnd60, tWake300)).toBe(0);
+    });
+
+    test('syncWithRealTime synchronizuje upływ czasu po uśpieniu aplikacji', () => {
+      const engine = new BrewTimerEngine(testSteps);
+      engine.start();
+
+      expect(engine.getSnapshot().status).toBe('running');
+      expect(engine.getSnapshot().stepElapsedSeconds).toBe(0);
+
+      // Symulacja skoku czasu o 15 sekund
+      jest.advanceTimersByTime(15000);
+      engine.syncWithRealTime();
+
+      expect(engine.getSnapshot().stepElapsedSeconds).toBe(15);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(15);
+
+      engine.destroy();
+    });
+
+    test('Pauza i wznowienie zachowują prawidłowy pozostały czas', () => {
+      const engine = new BrewTimerEngine(testSteps);
+      engine.start();
+
+      jest.advanceTimersByTime(10000); // 10 sekund upłynęło
+      engine.pause();
+      expect(engine.getSnapshot().status).toBe('paused');
+
+      jest.advanceTimersByTime(30000); // W tle na pauzie 30s
+      engine.resume();
+      expect(engine.getSnapshot().status).toBe('running');
+
+      // Po wznowieniu pozostały czas to nadal 20s dla kroku 30s
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(20);
+
+      engine.destroy();
+    });
   });
 });

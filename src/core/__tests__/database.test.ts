@@ -28,6 +28,7 @@ import {
   exportSessionsCsv,
   exportInventoryCsv,
   escapeCsvValue,
+  escapeCsvCell,
   getAppSetting,
   setAppSetting,
   getUnitSystem,
@@ -44,6 +45,11 @@ import {
   setBedtimeHour,
   getHealthKitSyncEnabled,
   setHealthKitSyncEnabled,
+  getDatabase,
+  getHasCompletedOnboarding,
+  setHasCompletedOnboarding,
+  getBeveragePreference,
+  setBeveragePreference,
 } from '../database';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../database-schema';
 
@@ -821,5 +827,59 @@ describe('Napar SQLite Database & Repositories', () => {
 
     setHealthKitSyncEnabled(false);
     expect(getHealthKitSyncEnabled()).toBe(false);
+  });
+
+  test('getDatabase zwraca instancję bazy danych', () => {
+    const db = getDatabase();
+    expect(db).toBeDefined();
+  });
+
+  test('Pobiera i zapisuje stan ukończenia onboardingu', () => {
+    expect(getHasCompletedOnboarding()).toBe(false);
+    setHasCompletedOnboarding(true);
+    expect(getHasCompletedOnboarding()).toBe(true);
+    setHasCompletedOnboarding(false);
+    expect(getHasCompletedOnboarding()).toBe(false);
+  });
+
+  test('Pobiera i zapisuje preferencje naparów (both, coffee, tea)', () => {
+    expect(getBeveragePreference()).toBe('both');
+    setBeveragePreference('coffee');
+    expect(getBeveragePreference()).toBe('coffee');
+    setBeveragePreference('tea');
+    expect(getBeveragePreference()).toBe('tea');
+    setBeveragePreference('both');
+    expect(getBeveragePreference()).toBe('both');
+  });
+
+  describe('RD-ENG-10 & NFR-SEC-015: escapeCsvCell (Formula Injection Escape)', () => {
+    test('Wektory testowe z dokumentu BRD (RD-ENG-10)', () => {
+      // • "=SUM(A1:A5)" -> "'=SUM(A1:A5)"
+      expect(escapeCsvCell('=SUM(A1:A5)')).toBe("\"'=SUM(A1:A5)\"");
+
+      // • "+cmd|' /C calc'!A0" -> "'+cmd|' /C calc'!A0"
+      expect(escapeCsvCell("+cmd|' /C calc'!A0")).toBe("\"'+cmd|' /C calc'!A0\"");
+
+      // • "-12.5" -> "-12.5" (zwykła liczba ujemna)
+      expect(escapeCsvCell('-12.5')).toBe('-12.5');
+
+      // • 'Notatka z "cudzysłowem", przecinkiem' -> '"Notatka z ""cudzysłowem"", przecinkiem"'
+      expect(escapeCsvCell('Notatka z "cudzysłowem", przecinkiem')).toBe(
+        '"Notatka z ""cudzysłowem"", przecinkiem"'
+      );
+    });
+
+    test('Ucieczka znaków niebezpiecznych (@, tab, enter)', () => {
+      expect(escapeCsvCell('@danger')).toBe("\"'@danger\"");
+      expect(escapeCsvCell('\ttext')).toBe("\"'\ttext\"");
+      expect(escapeCsvCell('\rtext')).toBe("\"'\rtext\"");
+    });
+
+    test('Wartości puste i null/undefined', () => {
+      expect(escapeCsvCell(null)).toBe('');
+      expect(escapeCsvCell(undefined)).toBe('');
+      expect(escapeCsvCell('')).toBe('');
+      expect(escapeCsvCell(123)).toBe('123');
+    });
   });
 });

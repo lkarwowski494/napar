@@ -1,0 +1,9 @@
+appId: pl.lukasz.napar
+name: 02 Aktywny Stoper i Kroki Zalewania
+---
+- launchApp
+- assertVisible: "Napar"
+- tapOn: "Zacznij Parzyć"
+- assertVisible: "00:00"
+- tapOn: "Start"
+- takeScreenshot: 02-stoper-zalewania

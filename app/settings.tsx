@@ -172,7 +172,7 @@ export default function SettingsScreen() {
       setExportedJsonText(json);
       setShowExportModal(true);
     } catch (e: any) {
-      Alert.alert('Błąd eksportu', e?.message || 'Nie udało się wyeksportować danych.');
+      Alert.alert('Nie udało się wyeksportować', e?.message || 'Nie udało się wyeksportować danych.');
     }
   };
 
@@ -183,7 +183,7 @@ export default function SettingsScreen() {
       setCsvModalTitle('Eksport Dziennika (CSV)');
       setShowCsvModal(true);
     } catch (e: any) {
-      Alert.alert('Błąd eksportu', e?.message || 'Nie udało się wyeksportować danych.');
+      Alert.alert('Nie udało się wyeksportować', e?.message || 'Nie udało się wyeksportować danych.');
     }
   };
 
@@ -194,35 +194,33 @@ export default function SettingsScreen() {
       setCsvModalTitle('Eksport Spiżarni (CSV)');
       setShowCsvModal(true);
     } catch (e: any) {
-      Alert.alert('Błąd eksportu', e?.message || 'Nie udało się wyeksportować danych.');
+      Alert.alert('Nie udało się wyeksportować', e?.message || 'Nie udało się wyeksportować danych.');
     }
   };
 
-  const handleImport = () => {
+  const handleImport = async () => {
     try {
       if (!importJsonText.trim()) {
-        Alert.alert('Błąd', 'Wklej prawidłowy tekst JSON kopii zapasowej.');
+        Alert.alert('Nie udało się zaimportować', 'Wklej prawidłowy tekst JSON kopii zapasowej.');
         return;
       }
-      // Apps4Brew SEC-09: Tworzenie kopii bezpieczeństwa przed niszczącym importem
-      try {
-        const currentData: NaparBackupData = {
-          inventory: getInventoryItems(true),
-          customRecipes: getRecipes(),
-          sessions: getBrewSessions(),
-          caffeineLogs: getCaffeineLogs(),
-        };
-        safetyBackup('import', currentData).catch(() => {});
-      } catch {
-        // Kontynuuj import nawet jeśli system plików napotkał problem
-      }
+      // Apps4Brew SEC-09 & BR-TEST-022: Tworzenie kopii bezpieczeństwa przed niszczącym importem
+      // Natychmiastowe przerwanie importu w razie błędu zapisu kopii (RD-ENG-12)
+      const currentData: NaparBackupData = {
+        inventory: getInventoryItems(true),
+        customRecipes: getRecipes(),
+        sessions: getBrewSessions(),
+        caffeineLogs: getCaffeineLogs(),
+      };
+      await safetyBackup('import', currentData);
+
       importDataJson(importJsonText.trim());
       setShowImportModal(false);
       setImportJsonText('');
       refreshAccess();
       Alert.alert('Sukces!', 'Dane zostały pomyślnie zaimportowane do Twojej lokalnej bazy.');
     } catch (e: any) {
-      Alert.alert('Błąd importu', e?.message || 'Niepoprawny format danych JSON.');
+      Alert.alert('Nie udało się zaimportować', e?.message || 'Niepoprawny format danych JSON.');
     }
   };
 

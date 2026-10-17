@@ -14,6 +14,12 @@ import {
   safetyBackup,
   NaparBackupData,
   SCHEMA_VERSION,
+  saveCorruptState,
+  checkCorruptState,
+  dismissCorruptState,
+  rotateBackupFiles,
+  AUTO_RE,
+  SAFETY_RE,
 } from '../backup';
 
 jest.mock('expo-sharing', () => ({
@@ -32,6 +38,7 @@ jest.mock('expo-file-system/legacy', () => {
       isDirectory: path.endsWith('/'),
     })),
     makeDirectoryAsync: jest.fn().mockResolvedValue(undefined),
+    readAsStringAsync: jest.fn(async (path: string) => files[path] || ''),
     writeAsStringAsync: jest.fn(async (path: string, content: string) => {
       files[path] = content;
     }),
@@ -166,5 +173,60 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
 
     const resetPath = await safetyBackup('reset', dummyState);
     expect(resetPath).toContain('Backup/napar-przed-czyszczeniem-');
+  });
+
+  describe('RD-ENG-12: Rotacja dwóch rozdzielnych pul kopii zapasowych', () => {
+    test('Wektory testowe: 10 kopii przed-importem + 15 kopii bieżących', () => {
+      // 10 kopii bezpiecznych
+      const safeFiles: string[] = [];
+      for (let i = 1; i <= 10; i++) {
+        safeFiles.push(`napar-przed-importem-2026-10-17-0800${i.toString().padStart(2, '0')}.json`);
+      }
+      // 15 kopii bieżących
+      const autoFiles: string[] = [];
+      for (let i = 1; i <= 15; i++) {
+        autoFiles.push(`napar-kopia-2026-10-17-0900${i.toString().padStart(2, '0')}.json`);
+      }
+
+      const allFiles = [...safeFiles, ...autoFiles];
+
+      // Rotacja puli auto: powinno usunąć 5 najstarszych kopii z puli auto i 0 z safe
+      const toDeleteAuto = rotateBackupFiles(allFiles, AUTO_RE, 10);
+      expect(toDeleteAuto).toHaveLength(5);
+      expect(toDeleteAuto.every((f) => f.includes('kopia'))).toBe(true);
+
+      // Rotacja puli safe: ma dokładnie 10 plików, więc 0 do usunięcia
+      const toDeleteSafe = rotateBackupFiles(allFiles, SAFETY_RE, 10);
+      expect(toDeleteSafe).toHaveLength(0);
+    });
+
+    test('Wektory testowe: kolizja w tej samej sekundzie dodaje przyrostek -2, -3', () => {
+      const files = [
+        'napar-kopia-2026-10-17-080000.json',
+        'napar-kopia-2026-10-17-080000-2.json',
+        'napar-kopia-2026-10-17-080000-3.json',
+      ];
+      const toDelete = rotateBackupFiles(files, AUTO_RE, 2);
+      // Najstarszy to ten bez przyrostka (-3 jest najnowszy, potem -2, potem bazowy)
+      expect(toDelete).toEqual(['napar-kopia-2026-10-17-080000.json']);
+    });
+  });
+
+  describe('BR-TEST-023: Ochrona uszkodzonego stanu (state_corrupt_*)', () => {
+    test('Zapisuje, sprawdza i odrzuca uszkodzony stan po awarii', async () => {
+      const corruptJson = '{"broken": [1, 2, 3';
+      const path = await saveCorruptState(corruptJson, 'SyntaxError w JSON');
+      expect(path).toContain('state_corrupt_');
+
+      const recovery = await checkCorruptState();
+      expect(recovery).not.toBeNull();
+      expect(recovery?.corruptFile).toContain('state_corrupt_');
+      expect(recovery?.rawSnippet).toContain('{"broken":');
+
+      // Odrzucenie banera
+      await dismissCorruptState(recovery!.corruptFile);
+      const afterDismiss = await checkCorruptState();
+      expect(afterDismiss).toBeNull();
+    });
   });
 });

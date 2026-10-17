@@ -1,0 +1,12 @@
+# Scenariusze E2E Maestro dla aplikacji NAPAR (Steepwise)
+# Apps4Brew Studio — Warstwa 8 Jakości (Symulator iOS)
+appId: pl.lukasz.napar
+executionOrder:
+  flows:
+    - 01-receptura-v60.yaml
+    - 02-stoper-zalewania.yaml
+    - 03-spizarnia-ziarna.yaml
+    - 04-dziennik-parzen.yaml
+    - 05-gongfu-cha.yaml
+    - 06-aktualizacja-przygotuj.yaml
+    - 07-aktualizacja-sprawdz.yaml

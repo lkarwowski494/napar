@@ -1,0 +1,13 @@
+title = "gitleaks config for NAPAR (Apps4Brew Studio)"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Global allowlist"
+paths = [
+  '''node_modules''',
+  '''\.expo''',
+  '''dist''',
+  '''tests/fixtures''',
+]

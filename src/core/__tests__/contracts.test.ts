@@ -46,13 +46,13 @@ describe('System Contracts: Metadata, Versioning & Security', () => {
     expect(appJson.expo.android.package).toBe('pl.lukasz.napar');
     expect(appJson.expo.android.versionCode).toBe(1);
 
-    // Uprawnienia iOS Info.plist
+    // Uprawnienia iOS Info.plist (brak naruszeń App Store Guideline 2.5.4 i 5.1.1)
     const infoPlist = appJson.expo.ios.infoPlist;
     expect(infoPlist.NSCameraUsageDescription).toBeDefined();
     expect(infoPlist.NSCameraUsageDescription.length).toBeGreaterThan(10);
-    expect(infoPlist.UIBackgroundModes).toContain('audio');
-    expect(infoPlist.NSHealthShareUsageDescription).toBeDefined();
-    expect(infoPlist.NSHealthUpdateUsageDescription).toBeDefined();
+    expect(infoPlist.UIBackgroundModes).toBeUndefined();
+    expect(infoPlist.NSHealthShareUsageDescription).toBeUndefined();
+    expect(infoPlist.NSHealthUpdateUsageDescription).toBeUndefined();
 
     // Uprawnienia Android
     expect(appJson.expo.android.permissions).toContain('android.permission.CAMERA');

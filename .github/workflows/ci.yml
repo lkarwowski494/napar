@@ -33,6 +33,15 @@ jobs:
       - name: Sprawdzenie symetrii i18n (PL/EN)
         run: npm run check:i18n
 
+      - name: Sprawdzenie spójności wyroczni Python (Corpus)
+        run: npm run check:corpus
+
+      - name: Kontrola licencji bibliotek (zakaz GPL)
+        run: npm run check:licenses
+
+      - name: Kontrola macierzy testów (100% w 5 kategoriach)
+        run: npm run check:matrix
+
       - name: Kontrola typów TypeScript
         run: npm run typecheck
 
