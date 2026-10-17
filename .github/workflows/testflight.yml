@@ -219,7 +219,7 @@ jobs:
             <key>destination</key>
             <string>upload</string>
             <key>manageAppVersionAndBuildNumber</key>
-            <string>NO</string>
+            <false/>
             <key>uploadSymbols</key>
             <true/>
             <key>testFlightInternalTestingOnly</key>
