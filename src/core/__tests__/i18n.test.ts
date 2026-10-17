@@ -11,6 +11,8 @@ import {
   LanguageProvider,
   useTranslation,
   getCurrentTranslations,
+  pluralPl,
+  plural,
 } from '../i18n';
 
 describe('i18n System', () => {
@@ -133,5 +135,54 @@ describe('i18n System', () => {
     });
     expect(contextValue.language).toBe('pl');
     expect(contextValue.t.appName).toBe('Napar');
+  });
+
+  describe('Polska i angielska odmiana liczebników (RD-ENG-09, NFR-I18N-007)', () => {
+    test('pluralPl prawidłowo odmienia formy one, few, many zgodnie z regułą modulo 10/100', () => {
+      const one = 'seria';
+      const few = 'serie';
+      const many = 'serii';
+
+      // 1 -> one
+      expect(pluralPl(1, one, few, many)).toBe(one);
+      expect(pluralPl(-1, one, few, many)).toBe(one);
+
+      // few: 2, 3, 4, 22, 104, 102
+      expect(pluralPl(2, one, few, many)).toBe(few);
+      expect(pluralPl(3, one, few, many)).toBe(few);
+      expect(pluralPl(4, one, few, many)).toBe(few);
+      expect(pluralPl(22, one, few, many)).toBe(few);
+      expect(pluralPl(23, one, few, many)).toBe(few);
+      expect(pluralPl(24, one, few, many)).toBe(few);
+      expect(pluralPl(102, one, few, many)).toBe(few);
+      expect(pluralPl(104, one, few, many)).toBe(few);
+
+      // many: 0, 5, 11, 12, 14, 21, 25, 100, 101, 112
+      expect(pluralPl(0, one, few, many)).toBe(many);
+      expect(pluralPl(5, one, few, many)).toBe(many);
+      expect(pluralPl(11, one, few, many)).toBe(many);
+      expect(pluralPl(12, one, few, many)).toBe(many);
+      expect(pluralPl(13, one, few, many)).toBe(many);
+      expect(pluralPl(14, one, few, many)).toBe(many);
+      expect(pluralPl(21, one, few, many)).toBe(many);
+      expect(pluralPl(25, one, few, many)).toBe(many);
+      expect(pluralPl(100, one, few, many)).toBe(many);
+      expect(pluralPl(101, one, few, many)).toBe(many);
+      expect(pluralPl(112, one, few, many)).toBe(many);
+    });
+
+    test('plural() obsługuje poprawnie zarówno język PL jak i EN', () => {
+      // PL
+      expect(plural('pl', 1, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekunda');
+      expect(plural('pl', 3, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekundy');
+      expect(plural('pl', 12, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekund');
+      expect(plural('pl', 22, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekundy');
+
+      // EN
+      expect(plural('en', 1, { one: 'second', other: 'seconds' })).toBe('second');
+      expect(plural('en', 0, { one: 'second', other: 'seconds' })).toBe('seconds');
+      expect(plural('en', 2, { one: 'second', other: 'seconds' })).toBe('seconds');
+      expect(plural('en', 25, { one: 'second', other: 'seconds' })).toBe('seconds');
+    });
   });
 });

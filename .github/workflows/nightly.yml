@@ -1,0 +1,82 @@
+name: "Nightly: Pełna Weryfikacja, Testy Losowe i Mutacyjne (DEC-05, BR-TEST-009, BR-TEST-032)"
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  nightly-verification:
+    name: Nocna Weryfikacja (Random Seed & Stryker)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    env:
+      PROP_SEED: random
+      MATRIX_SEED: random
+      MATRIX_RUNS: '1000'
+      NODE_OPTIONS: --max-old-space-size=2048
+      FORCE_COLOR: '1'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalacja zależności
+        run: npm ci
+
+      - name: Sprawdzenie symetrii i18n (PL/EN)
+        run: npm run check:i18n
+
+      - name: Sprawdzenie spójności wyroczni Python (Corpus)
+        run: npm run check:corpus
+
+      - name: Kontrola licencji bibliotek (zakaz GPL)
+        run: npm run check:licenses
+
+      - name: Kontrola macierzy testów (100% w 5 kategoriach)
+        run: npm run check:matrix
+
+      - name: Kontrola niezmienników natywnych iOS
+        run: npm run check:native
+
+      - name: Kontrola typów TypeScript
+        run: npm run typecheck
+
+      - name: Nocny zestaw testów z losowym ziarnem (PROP_SEED=random, MATRIX_RUNS=1000)
+        run: npx jest --coverage --runInBand
+
+      - name: Ochrona OOM i testy mutacyjne Stryker dla logiki domenowej (BR-TEST-032, BR-TEST-034)
+        run: |
+          if [ -w /proc/self/oom_score_adj ]; then
+            echo 1000 > /proc/self/oom_score_adj || true
+          fi
+          npx stryker run
+
+      - name: Zapis raportu mutacyjnego jako artefakt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stryker-mutation-report
+          path: reports/mutation/
+          retention-days: 14

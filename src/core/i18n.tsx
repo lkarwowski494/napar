@@ -899,3 +899,35 @@ export function getCurrentTranslations(): Translations {
   const lang = detectSystemLanguage();
   return translations[lang] || translations.en;
 }
+
+/**
+ * Polska odmiana gramatyczna liczebników (RD-ENG-09, NFR-I18N-007).
+ * Dla n = |x| mod 100, n10 = n mod 10:
+ * - jeśli |x| === 1 -> one (np. 1 seria, 1 sekunda, 1 klik)
+ * - jeśli n10 in {2, 3, 4} i n not in {12, 13, 14} -> few (np. 2 serie, 22 serie, 104 serie)
+ * - inaczej -> many (np. 0 serii, 5 serii, 12 serii, 21 serii, 112 serii)
+ */
+export function pluralPl(count: number, one: string, few: string, many: string): string {
+  const abs = Math.abs(Math.floor(count));
+  const n = abs % 100;
+  const n10 = n % 10;
+  if (abs === 1) return one;
+  if (n10 >= 2 && n10 <= 4 && (n < 12 || n > 14)) return few;
+  return many;
+}
+
+/**
+ * Uniwersalny helper pluralizacji dla języków aplikacji ('pl' | 'en')
+ */
+export function plural(
+  lang: SupportedLanguage,
+  count: number,
+  forms: { one: string; few?: string; many?: string; other?: string }
+): string {
+  if (lang === 'pl') {
+    return pluralPl(count, forms.one, forms.few ?? forms.one, forms.many ?? forms.few ?? forms.one);
+  }
+  const abs = Math.abs(Math.floor(count));
+  if (abs === 1) return forms.one;
+  return forms.other ?? forms.many ?? forms.few ?? forms.one;
+}

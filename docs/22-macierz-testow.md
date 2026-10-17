@@ -10,10 +10,10 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | **EKRAN** | 8 | 8 | **100.0%** | ✅ POKRYTE |
 | **UI** | 61 | 61 | **100.0%** | ✅ POKRYTE |
 | **TEKST** | 324 | 324 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 174 | 174 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 176 | 176 | **100.0%** | ✅ POKRYTE |
 | **WYMIAR** | 35 | 35 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **602** | Pokrytych: **602** | Brakujących: **0**
+Łącznie elementów: **604** | Pokrytych: **604** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -320,4 +320,4 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `settings.caffeineSettingsSection` | `src/core/i18n.tsx` | ✅ | src/components/icons/__tests__/CraftIcons.test.tsx, src/components/__tests__/Apps4BrewPassModal.test.tsx |
 | `TEKST` | `settings.caffeineHalfLifeTitle` | `src/core/i18n.tsx` | ✅ | src/components/icons/__tests__/CraftIcons.test.tsx, src/components/__tests__/Apps4BrewPassModal.test.tsx |
 
-*(... i 302 kolejnych elementów w pełnym wykazie)*
+*(... i 304 kolejnych elementów w pełnym wykazie)*
