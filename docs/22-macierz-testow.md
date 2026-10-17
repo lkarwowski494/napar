@@ -7,13 +7,13 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 
 | Kategoria | Łącznie | Pokryte | Pokrycie % | Status |
 | :--- | :---: | :---: | :---: | :---: |
-| **EKRAN** | 8 | 8 | **100.0%** | ✅ POKRYTE |
+| **EKRAN** | 9 | 9 | **100.0%** | ✅ POKRYTE |
 | **UI** | 61 | 61 | **100.0%** | ✅ POKRYTE |
 | **TEKST** | 324 | 324 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 176 | 176 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 180 | 180 | **100.0%** | ✅ POKRYTE |
 | **WYMIAR** | 35 | 35 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **604** | Pokrytych: **604** | Brakujących: **0**
+Łącznie elementów: **609** | Pokrytych: **609** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -24,21 +24,22 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `EKRAN` | `/(tabs)/dialin` | `app/(tabs)/dialin.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
 | `EKRAN` | `/(tabs)/index` | `app/(tabs)/index.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/public-repo.test.ts |
 | `EKRAN` | `/(tabs)/journal` | `app/(tabs)/journal.tsx` | ✅ | tests/interaction-guards.test.ts, src/components/icons/__tests__/CraftIcons.test.tsx |
+| `EKRAN` | `/(tabs)/settings` | `app/(tabs)/settings.tsx` | ✅ | src/components/icons/__tests__/CraftIcons.test.tsx, src/components/__tests__/Apps4BrewPassModal.test.tsx |
 | `EKRAN` | `/gongfu` | `app/gongfu.tsx` | ✅ | tests/audit-fixes.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `EKRAN` | `/recipe-builder` | `app/recipe-builder.tsx` | ✅ | src/core/__tests__/brew-screen.test.tsx, src/core/__tests__/modal-safety-and-beverage-toggle.test.tsx |
 | `EKRAN` | `/settings` | `app/settings.tsx` | ✅ | src/components/icons/__tests__/CraftIcons.test.tsx, src/components/__tests__/Apps4BrewPassModal.test.tsx |
-| `TEKST` | `appName` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/brands.contract.test.ts |
-| `TEKST` | `appTagline` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/brands.contract.test.ts |
+| `TEKST` | `appName` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/bpr-components.test.tsx |
+| `TEKST` | `appTagline` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/bpr-components.test.tsx |
 | `UI` | `common.cancel` | `src/core/i18n.tsx` | ✅ | tests/close-button-guard.test.tsx, src/core/__tests__/confirm-announce.test.ts |
-| `UI` | `common.save` | `src/core/i18n.tsx` | ✅ | src/components/beans/__tests__/BeanEditModal.test.tsx, src/components/brew/__tests__/BrewFinishModal.test.tsx |
+| `UI` | `common.save` | `src/core/i18n.tsx` | ✅ | tests/bpr-components.test.tsx, src/components/beans/__tests__/BeanEditModal.test.tsx |
 | `UI` | `common.delete` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/interaction-guards.test.ts |
 | `UI` | `common.edit` | `src/core/i18n.tsx` | ✅ | tests/state-sequences.test.ts, src/components/beans/__tests__/BeanEditModal.test.tsx |
-| `UI` | `common.close` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/close-button-guard.test.tsx |
+| `UI` | `common.close` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/bpr-components.test.tsx |
 | `UI` | `common.confirm` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/interaction-guards.test.ts |
 | `UI` | `common.back` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/maestro-runner.ts |
-| `UI` | `common.next` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx |
-| `UI` | `common.finish` | `src/core/i18n.tsx` | ✅ | src/components/beans/__tests__/BeanEditModal.test.tsx, src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx |
-| `UI` | `common.ok` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/matrix-dimensions.test.tsx |
+| `UI` | `common.next` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/bpr-components.test.tsx |
+| `UI` | `common.finish` | `src/core/i18n.tsx` | ✅ | tests/bpr-components.test.tsx, src/components/beans/__tests__/BeanEditModal.test.tsx |
+| `UI` | `common.ok` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/bpr-components.test.tsx |
 | `UI` | `common.timerStepWarning` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/domain-coverage-edge-cases.test.tsx, src/core/__tests__/i18n.test.ts |
 | `UI` | `common.stepFinished` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/domain-coverage-edge-cases.test.tsx, src/core/__tests__/i18n.test.ts |
 | `UI` | `common.brewingFinished` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/domain-coverage-edge-cases.test.tsx, src/core/__tests__/i18n.test.ts |
@@ -51,17 +52,17 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `tabs.dialin` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/stash-screen.test.tsx |
 | `TEKST` | `tabs.caffeine` | `src/core/i18n.tsx` | ✅ | tests/oracle-coffee.test.ts, src/components/icons/__tests__/CraftIcons.test.tsx |
 | `TEKST` | `tabs.settings` | `src/core/i18n.tsx` | ✅ | src/components/icons/__tests__/CraftIcons.test.tsx, src/components/__tests__/Apps4BrewPassModal.test.tsx |
-| `TEKST` | `brew.recipe` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/matrix-coverage-gap.test.tsx |
+| `TEKST` | `brew.recipe` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/bpr-components.test.tsx |
 | `TEKST` | `brew.chooseRecipe` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx, src/components/brew/__tests__/BrewFinishModal.test.tsx |
 | `TEKST` | `brew.customRecipe` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx, src/components/brew/__tests__/BrewFinishModal.test.tsx |
 | `TEKST` | `brew.stashItem` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx, src/components/brew/__tests__/BrewFinishModal.test.tsx |
 | `TEKST` | `brew.chooseStash` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx, src/components/brew/__tests__/BrewFinishModal.test.tsx |
 | `TEKST` | `brew.noStashItem` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx, src/components/brew/__tests__/BrewFinishModal.test.tsx |
 | `TEKST` | `brew.noStashDesc` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx, src/components/brew/__tests__/BrewFinishModal.test.tsx |
-| `TEKST` | `brew.remaining` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, src/components/beans/__tests__/BeanEditModal.test.tsx |
+| `TEKST` | `brew.remaining` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/bpr-components.test.tsx |
 | `TEKST` | `brew.dose` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/domain-properties.test.ts |
 | `TEKST` | `brew.water` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/domain-properties.test.ts |
-| `TEKST` | `brew.ratio` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/domain-properties.test.ts |
+| `TEKST` | `brew.ratio` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/bpr-components.test.tsx |
 | `TEKST` | `brew.temp` | `src/core/i18n.tsx` | ✅ | tests/state-sequences.test.ts, src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx |
 | `TEKST` | `brew.grind` | `src/core/i18n.tsx` | ✅ | tests/state-sequences.test.ts, src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx |
 | `TEKST` | `brew.timerReady` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx, src/components/brew/__tests__/BrewFinishModal.test.tsx |
@@ -125,7 +126,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `recipeBuilder.nameLabel` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
 | `TEKST` | `recipeBuilder.namePlaceholder` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
 | `TEKST` | `recipeBuilder.typeLabel` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.coffee` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/matrix-coverage-gap.test.tsx |
+| `TEKST` | `recipeBuilder.coffee` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/bpr-components.test.tsx |
 | `TEKST` | `recipeBuilder.tea` | `src/core/i18n.tsx` | ✅ | tests/matrix-coverage-gap.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `TEKST` | `recipeBuilder.methodLabel` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
 | `TEKST` | `recipeBuilder.methodPlaceholder` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
@@ -294,7 +295,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `sensory.sweetness` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewFinishModal.test.tsx, src/components/journal/__tests__/JournalSessionCard.test.tsx |
 | `TEKST` | `sensory.body` | `src/core/i18n.tsx` | ✅ | tests/public-repo.test.ts, src/components/brew/__tests__/BrewFinishModal.test.tsx |
 | `TEKST` | `sensory.clarity` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewFinishModal.test.tsx, src/components/journal/__tests__/JournalSessionCard.test.tsx |
-| `UI` | `sensory.finish` | `src/core/i18n.tsx` | ✅ | src/components/beans/__tests__/BeanEditModal.test.tsx, src/components/brew/__tests__/BrewActiveFocusTimer.test.tsx |
+| `UI` | `sensory.finish` | `src/core/i18n.tsx` | ✅ | tests/bpr-components.test.tsx, src/components/beans/__tests__/BeanEditModal.test.tsx |
 | `TEKST` | `batch.label` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/close-button-guard.test.tsx |
 | `TEKST` | `batch.cups` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
 | `TEKST` | `batch.cup1` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
@@ -303,9 +304,9 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `batch.cup4` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
 | `TEKST` | `batch.grindAdjustmentNotice` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
 | `TEKST` | `favorites.title` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/interaction-guards.test.ts |
-| `TEKST` | `favorites.addToFav` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
-| `TEKST` | `favorites.removeFromFav` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
-| `TEKST` | `favorites.quickBrew` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
+| `TEKST` | `favorites.addToFav` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/brew-screen.test.tsx, src/core/__tests__/i18n.test.ts |
+| `TEKST` | `favorites.removeFromFav` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/brew-screen.test.tsx, src/core/__tests__/i18n.test.ts |
+| `TEKST` | `favorites.quickBrew` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/brew-screen.test.tsx, src/core/__tests__/i18n.test.ts |
 | `TEKST` | `settings.title` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/interaction-guards.test.ts |
 | `TEKST` | `settings.languageSection` | `src/core/i18n.tsx` | ✅ | src/components/icons/__tests__/CraftIcons.test.tsx, src/components/__tests__/Apps4BrewPassModal.test.tsx |
 | `TEKST` | `settings.languageAuto` | `src/core/i18n.tsx` | ✅ | src/components/icons/__tests__/CraftIcons.test.tsx, src/components/__tests__/Apps4BrewPassModal.test.tsx |
@@ -318,6 +319,5 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `settings.beverageTeaOnly` | `src/core/i18n.tsx` | ✅ | src/components/icons/__tests__/CraftIcons.test.tsx, src/components/__tests__/Apps4BrewPassModal.test.tsx |
 | `TEKST` | `settings.beverageTeaOnlyDesc` | `src/core/i18n.tsx` | ✅ | src/components/icons/__tests__/CraftIcons.test.tsx, src/components/__tests__/Apps4BrewPassModal.test.tsx |
 | `TEKST` | `settings.caffeineSettingsSection` | `src/core/i18n.tsx` | ✅ | src/components/icons/__tests__/CraftIcons.test.tsx, src/components/__tests__/Apps4BrewPassModal.test.tsx |
-| `TEKST` | `settings.caffeineHalfLifeTitle` | `src/core/i18n.tsx` | ✅ | src/components/icons/__tests__/CraftIcons.test.tsx, src/components/__tests__/Apps4BrewPassModal.test.tsx |
 
-*(... i 304 kolejnych elementów w pełnym wykazie)*
+*(... i 309 kolejnych elementów w pełnym wykazie)*

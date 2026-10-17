@@ -362,6 +362,69 @@ describe('JournalScreen Integration', () => {
 
     getAppSetting.mockImplementation(() => null);
   });
+
+  test('BPR Pillar 5: 1-Tap Execute z Harmonogramu Akcji w JournalScreen ładuje parametry i nawiguje do Parzenia', () => {
+    const { getInventoryItems, getAppSetting } = require('../database');
+    getInventoryItems.mockImplementation(() => [
+      {
+        id: 'inv-peak-1',
+        name: 'Kenya AA Peak',
+        type: 'coffee',
+        roastOrHarvestDate: new Date(Date.now() - 10 * 86400000).toISOString().slice(0, 10),
+        recommendedMethod: 'V60',
+        initialWeightGrams: 250,
+        remainingWeightGrams: 200,
+        flavorNotes: [],
+        isFavorite: true,
+        isArchived: false,
+        createdAt: '2026-10-01',
+        updatedAt: '2026-10-01',
+      },
+    ]);
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
+    });
+
+    const peakBtn = tree.root.findByProps({
+      testID: 'execute-action-btn-action-peak-now-inv-peak-1',
+    });
+    act(() => {
+      peakBtn.props.onPress();
+    });
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+
+    // Test wygasłego triala przy kliknięciu 1-Tap Execute
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+    getAppSetting.mockImplementation((key: string) => {
+      if (key === 'apps4brew_trial_started_at') return thirtyDaysAgo;
+      return null;
+    });
+
+    let expiredTree: any;
+    act(() => {
+      expiredTree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
+    });
+
+    const expiredExecBtn = expiredTree.root.findByProps({
+      testID: 'execute-action-btn-action-peak-now-inv-peak-1',
+    });
+    act(() => {
+      expiredExecBtn.props.onPress();
+    });
+
+    getAppSetting.mockImplementation(() => null);
+    getInventoryItems.mockImplementation(() => []);
+  });
 });
 
 function findPressableWithText(root: any, text: string) {

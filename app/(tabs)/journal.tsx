@@ -17,7 +17,7 @@ import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
 import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems, getUnitSystem } from '../../src/core/database';
-import { BrewSession } from '../../src/core/database-schema';
+import { BrewSession, InventoryItem } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
 import { SensoryProfile } from '../../src/core/radar-chart';
@@ -28,6 +28,8 @@ import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { JournalIcon, ShieldIcon } from '../../src/components/icons/CraftIcons';
 import { JournalSessionCard } from '../../src/components/journal/JournalSessionCard';
 import { JournalAnalyticsView } from '../../src/components/journal/JournalAnalyticsView';
+import { ProactiveCalendarCard } from '../../src/components/journal/ProactiveCalendarCard';
+import { ProactiveActionItem } from '../../src/core/bpr-engine';
 
 export default function JournalScreen() {
   const router = useRouter();
@@ -55,6 +57,7 @@ export default function JournalScreen() {
     }
   });
   const [sessions, setSessions] = useState<BrewSession[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [viewMode, setViewMode] = useState<'sessions' | 'analytics'>('sessions');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterType, setFilterType] = useState<'all' | 'coffee' | 'tea' | 'high_rated'>('all');
@@ -176,6 +179,8 @@ export default function JournalScreen() {
     try {
       const data = getBrewSessions(200);
       setSessions(data);
+      const inv = getInventoryItems(true);
+      setInventoryItems(inv);
     } catch {
       // fallback
     }
@@ -184,6 +189,41 @@ export default function JournalScreen() {
   useEffect(() => {
     loadSessions();
   }, []);
+
+  const handleExecuteProactiveAction = (action: ProactiveActionItem) => {
+    if (!canCreate) {
+      setShowPaywall(true);
+      return;
+    }
+    try {
+      const userRecipes = getRecipes();
+      const allRecipes = [...userRecipes, ...MASTER_RECIPES];
+      let targetRecipe = action.recipeId
+        ? allRecipes.find((r) => r.id === action.recipeId)
+        : undefined;
+      if (!targetRecipe && action.recommendedMethod) {
+        targetRecipe = allRecipes.find(
+          (r) => r.method.toLowerCase() === action.recommendedMethod!.toLowerCase()
+        );
+      }
+      if (targetRecipe) {
+        selectRecipe(targetRecipe);
+      }
+      if (action.inventoryItemId) {
+        const inv = getInventoryItems(true);
+        const foundItem = inv.find((i) => i.id === action.inventoryItemId);
+        if (foundItem) {
+          selectInventoryItem(foundItem);
+        }
+      }
+      if (action.doseGrams) setDoseGrams(action.doseGrams);
+      if (action.waterGrams) setWaterGrams(action.waterGrams);
+      if (action.waterTempCelsius) setWaterTempCelsius(action.waterTempCelsius);
+      router.navigate('/');
+    } catch {
+      router.navigate('/');
+    }
+  };
 
   const handleDelete = (session: BrewSession) => {
     if (!canCreate) {
@@ -324,6 +364,14 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
           </Text>
         </View>
       )}
+
+      {/* 14-dniowy Proaktywny Kalendarz i Harmonogram Akcji 1-Tap (BPR Pillar 5) */}
+      <ProactiveCalendarCard
+        inventory={inventoryItems}
+        sessions={relevantSessions}
+        language={language}
+        onExecuteAction={handleExecuteProactiveAction}
+      />
 
       {/* Przełącznik Widoku: Sesje vs Analityka */}
       <View style={styles.viewModeRow}>

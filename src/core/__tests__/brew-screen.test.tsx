@@ -1557,6 +1557,126 @@ describe('BrewScreen UI Integration', () => {
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('POWTÓRZ OSTATNI NAPAR');
   });
+
+  test('BPR Krok 4: Otwarcie ProcedureModal, sterowanie krokami, pauza/wznów, korekta czasu i Zakończ i zapisz', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const openProcBtn = tree.root.findByProps({ testID: 'open-procedure-modal-btn' });
+    act(() => {
+      openProcBtn.props.onPress();
+    });
+
+    expect(JSON.stringify(tree.toJSON())).toContain('ASYSTENT PROCEDURY');
+
+    act(() => {
+      tree.root.findByProps({ testID: 'procedure-pause-resume-btn' }).props.onPress();
+    });
+    act(() => {
+      tree.root.findByProps({ testID: 'procedure-pause-resume-btn' }).props.onPress();
+      tree.root.findByProps({ testID: 'procedure-add-10-btn' }).props.onPress();
+      tree.root.findByProps({ testID: 'procedure-reset-step-btn' }).props.onPress();
+      tree.root.findByProps({ testID: 'procedure-next-step-btn' }).props.onPress();
+    });
+    act(() => {
+      tree.root.findByProps({ testID: 'procedure-prev-step-btn' }).props.onPress();
+      tree.root.findByProps({ testID: 'procedure-close-btn' }).props.onPress();
+    });
+
+    // Otwórz ponownie i przejdź do końca, aby kliknąć Zakończ i zapisz
+    act(() => {
+      openProcBtn.props.onPress();
+    });
+    for (let i = 0; i < 6; i++) {
+      const nextBtns = tree.root.findAllByProps({ testID: 'procedure-next-step-btn' });
+      if (nextBtns.length > 0) {
+        act(() => {
+          nextBtns[0].props.onPress();
+        });
+      }
+    }
+    const finishBtns = tree.root.findAllByProps({ testID: 'procedure-finish-save-btn' });
+    expect(finishBtns.length).toBeGreaterThan(0);
+    act(() => {
+      finishBtns[0].props.onPress();
+    });
+  });
+
+  test('BPR Krok 1: Wyszukiwarka receptur, filtr podzbiorów oraz zwijanie kategorii w RecipeSelectModal', () => {
+    mockDb.recipes.set('rec-tea-test', {
+      id: 'rec-tea-test',
+      name: 'Sencha Uji',
+      beverage_type: 'TEA',
+      method: 'Kyusu',
+      author: 'Master',
+      dose_g: 5,
+      water_g: 150,
+      water_temp_c: 75,
+      recommended_ratio: 30,
+      steps_json: '[]',
+      is_custom: 0,
+      is_favorite: 1,
+      created_at: '2026-10-10',
+    });
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    const recipeCard = findPressableWithText(tree.root, 'RECEPTURA');
+    act(() => {
+      recipeCard.props.onPress();
+    });
+
+    const searchInput = tree.root.findByProps({ testID: 'recipe-search-input' });
+    act(() => {
+      searchInput.props.onChangeText('4:6');
+    });
+    expect(JSON.stringify(tree.toJSON())).toContain('4:6');
+
+    act(() => {
+      searchInput.props.onChangeText('');
+      tree.root.findByProps({ testID: 'subset-filter-favorites' }).props.onPress();
+    });
+    act(() => {
+      tree.root.findByProps({ testID: 'subset-filter-custom' }).props.onPress();
+    });
+    act(() => {
+      tree.root.findByProps({ testID: 'subset-filter-all' }).props.onPress();
+      tree.root.findByProps({ testID: 'recipe-cat-toggle-COFFEE' }).props.onPress();
+    });
+    act(() => {
+      tree.root.findByProps({ testID: 'recipe-cat-toggle-COFFEE' }).props.onPress();
+    });
+
+    mockDb.recipes.delete('rec-tea-test');
+
+    // Sprawdź blokadę paywalla na przycisku Krok 4 przy wygasłym trialu
+    setTrialExpiredForTesting();
+    let expiredTree: any;
+    act(() => {
+      expiredTree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+    act(() => {
+      expiredTree.root.findByProps({ testID: 'open-procedure-modal-btn' }).props.onPress();
+    });
+    resetTrialForTesting();
+  });
 });
 
 function findPressableWithText(root: any, text: string) {

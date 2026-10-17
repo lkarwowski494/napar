@@ -59,6 +59,7 @@ import { InventorySelectModal } from '../../src/components/brew/InventorySelectM
 import { GrinderSelectModal } from '../../src/components/brew/GrinderSelectModal';
 import { ShareRecipeModal } from '../../src/components/brew/ShareRecipeModal';
 import { ImportRecipeModal } from '../../src/components/brew/ImportRecipeModal';
+import { ProcedureModal } from '../../src/components/brew/ProcedureModal';
 import {
   checkCorruptState,
   dismissCorruptState,
@@ -107,6 +108,7 @@ export default function BrewScreen() {
   const [showRecipeModal, setShowRecipeModal] = useState(false);
   const [showInventoryModal, setShowInventoryModal] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
+  const [showProcedureModal, setShowProcedureModal] = useState(false);
   const [showGrinderModal, setShowGrinderModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -477,7 +479,26 @@ export default function BrewScreen() {
         </View>
       )}
 
-      {/* Nagłówek: Młynek z klikami, Ulubione, Receptura, Spiżarnia i Udostępnianie */}
+      {/* Stały, nierozpychający ekranu baner "Złote Zasady" domeny (BPR Pillar 2) */}
+      <View style={styles.goldenRulesBanner} testID="golden-rules-banner">
+        <Text style={styles.goldenRulesBannerText} numberOfLines={2}>
+          {language === 'en'
+            ? '⚖️ Golden Rules: Sour/thin → grind finer (2 clicks) or raise temp 2°C · Bitter/dry → grind coarser (2 clicks) · Peak: 7–35d.'
+            : '⚖️ Złote Zasady: Kwaśna/płaska → drobniej o 2 kliki lub wyższa temp. o 2°C · Gorzka/sucha → grubiej o 2 kliki · Peak: 7–35 dni.'}
+        </Text>
+      </View>
+
+      {/* KROK 1: Co robimy? (Wybór obiektu / surowca / szablonu) */}
+      <View style={styles.bprStepLabelRow}>
+        <View style={styles.bprStepBadge}>
+          <Text style={styles.bprStepBadgeText}>1</Text>
+        </View>
+        <Text style={styles.bprStepTitle}>
+          {language === 'en'
+            ? 'STEP 1: WHAT ARE WE BREWING? (RECIPE & STASH)'
+            : 'KROK 1: CO ROBIMY? (WYBÓR RECEPTURY I SUROWCA)'}
+        </Text>
+      </View>
       <BrewHeader
         recipe={recipe}
         selectedInventoryItem={selectedInventoryItem}
@@ -522,22 +543,78 @@ export default function BrewScreen() {
         </Pressable>
       )}
 
-      {/* Stan Przygotowawczy (Przed parzeniem): Karta 1-Tap ze stepperami */}
+      {/* KROK 2 & KROK 3: Parametry wejściowe oraz Przeliczone wyniki i proporcje na żywo */}
       {!isRunning && !isPaused && (
-        <BrewQuickPrepCard
-          doseGrams={doseGrams}
-          waterGrams={waterGrams}
-          waterTempCelsius={waterTempCelsius}
-          grindSetting={grindSetting}
-          servings={servings}
-          onServingsChange={handleServingsChange}
-          onDoseChange={setDoseGrams}
-          onWaterChange={setWaterGrams}
-          disabled={isRunning}
-          batchScaling={batchScaling}
-          unitSystem={unitSystem}
-        />
+        <>
+          <View style={styles.bprStepLabelRow}>
+            <View style={styles.bprStepBadge}>
+              <Text style={styles.bprStepBadgeText}>2</Text>
+            </View>
+            <Text style={styles.bprStepTitle}>
+              {language === 'en'
+                ? 'STEP 2 & 3: INPUT PARAMETERS & LIVE PROPORTIONS'
+                : 'KROK 2 & 3: PARAMETRY WEJŚCIOWE I PROPORCJE NA ŻYWO'}
+            </Text>
+          </View>
+          <BrewQuickPrepCard
+            doseGrams={doseGrams}
+            waterGrams={waterGrams}
+            waterTempCelsius={waterTempCelsius}
+            grindSetting={grindSetting}
+            servings={servings}
+            onServingsChange={handleServingsChange}
+            onDoseChange={setDoseGrams}
+            onWaterChange={setWaterGrams}
+            disabled={isRunning}
+            batchScaling={batchScaling}
+            unitSystem={unitSystem}
+          />
+        </>
       )}
+
+      {/* KROK 4: Przycisk otwierający pełnoekranowy Asystent Procedury Krok po Kroku */}
+      <View style={styles.bprStepLabelRow}>
+        <View style={styles.bprStepBadge}>
+          <Text style={styles.bprStepBadgeText}>4</Text>
+        </View>
+        <Text style={styles.bprStepTitle}>
+          {language === 'en'
+            ? 'STEP 4: STEP-BY-STEP PROCEDURE EXECUTION'
+            : 'KROK 4: ASYSTENT PROCEDURY KROK PO KROKU'}
+        </Text>
+      </View>
+
+      <Pressable
+        testID="open-procedure-modal-btn"
+        style={styles.openProcedureCta}
+        onPress={() => {
+          if (!canCreate) {
+            setShowPaywallModal(true);
+            return;
+          }
+          if (!isRunning && !isPaused) {
+            startTimer();
+          }
+          setShowProcedureModal(true);
+        }}
+        accessibilityRole="button"
+        accessibilityLabel={
+          language === 'en'
+            ? 'Open Step-by-Step Procedure Assistant'
+            : 'Otwórz Asystenta Procedury Krok po Kroku'
+        }
+      >
+        <Text style={styles.openProcedureCtaTitle}>
+          {language === 'en'
+            ? '▶ OPEN STEP-BY-STEP PROCEDURE ASSISTANT'
+            : '▶ OTWÓRZ ASYSTENTA PROCEDURY KROK PO KROKU'}
+        </Text>
+        <Text style={styles.openProcedureCtaSub}>
+          {language === 'en'
+            ? 'Auto-parsed step timer · Full screen · 1-Tap Finish & Save'
+            : 'Auto-stoper z opisu kroku · Pełny ekran · Zakończ i zapisz'}
+        </Text>
+      </Pressable>
 
       {/* Główny Stoper Focus Mode: Zoptymalizowany pod 1 metr */}
       <BrewActiveFocusTimer
@@ -561,6 +638,51 @@ export default function BrewScreen() {
           onChangeTds={setTdsInput}
         />
       )}
+
+      {/* Pełnoekranowy Asystent Procedury Krok po Kroku (ProcedureModal — BPR Pillar 3 & 4) */}
+      <ProcedureModal
+        visible={showProcedureModal}
+        recipeName={recipe.name}
+        steps={
+          'steps' in recipe && Array.isArray((recipe as any).steps)
+            ? (recipe as any).steps
+            : [snapshot.currentStep]
+        }
+        currentStepIndex={snapshot.currentStepIndex}
+        isRunning={isRunning}
+        stepRemainingSeconds={snapshot.stepRemainingSeconds}
+        totalElapsedSeconds={snapshot.totalElapsedSeconds}
+        unitSystem={unitSystem}
+        language={language}
+        onPauseResume={() => {
+          if (isRunning) {
+            pauseTimer();
+          } else {
+            resumeTimer();
+          }
+        }}
+        onAdjustTimeSeconds={(deltaSec) => adjustStepDuration(deltaSec)}
+        onResetCurrentStep={(parsedSec) => {
+          const delta = parsedSec - snapshot.stepRemainingSeconds;
+          if (delta !== 0) {
+            adjustStepDuration(delta);
+          }
+        }}
+        onPrevStep={() => {
+          previousStep();
+          if (!isRunning) resumeTimer();
+        }}
+        onNextStep={() => {
+          nextStep();
+          if (!isRunning) resumeTimer();
+        }}
+        onFinishAndSave={() => {
+          setShowProcedureModal(false);
+          pauseTimer();
+          setShowFinishModal(true);
+        }}
+        onClose={() => setShowProcedureModal(false)}
+      />
 
       {/* Modal wyboru receptury */}
       <RecipeSelectModal
@@ -735,6 +857,68 @@ const styles = StyleSheet.create({
   content: {
     padding: theme.spacing.md,
     paddingBottom: 40,
+  },
+  goldenRulesBanner: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 12,
+  },
+  goldenRulesBannerText: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    lineHeight: 16,
+    fontWeight: '600',
+  },
+  bprStepLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+    marginTop: 4,
+  },
+  bprStepBadge: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: theme.colors.copper,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bprStepBadgeText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+  bprStepTitle: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: theme.colors.copper,
+    letterSpacing: 0.7,
+  },
+  openProcedureCta: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1.5,
+    borderColor: theme.colors.copper,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  openProcedureCtaTitle: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: theme.colors.copper,
+    letterSpacing: 0.5,
+  },
+  openProcedureCtaSub: {
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    marginTop: 3,
   },
   readOnlyBanner: {
     backgroundColor: 'rgba(217, 119, 54, 0.12)',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
   Modal,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
@@ -51,11 +52,129 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
   unitSystem,
   t,
 }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [subsetFilter, setSubsetFilter] = useState<'ALL' | 'FAVORITES' | 'CUSTOM'>('ALL');
+  const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
+
+  const toggleCategoryCollapse = (catKey: string) => {
+    setCollapsedCategories((prev) => ({
+      ...prev,
+      [catKey]: !prev[catKey],
+    }));
+  };
+
   const displayedRecipes = recipes.filter((r) => {
-    if (categoryFilter === 'ALL') return true;
     const itemType = 'beverageType' in r ? r.beverageType : r.type;
-    return itemType === categoryFilter;
+    if (categoryFilter !== 'ALL' && itemType !== categoryFilter) {
+      return false;
+    }
+    if (subsetFilter === 'FAVORITES' && !r.isFavorite && r.isCustom) {
+      return false;
+    }
+    if (subsetFilter === 'CUSTOM' && !r.isCustom) {
+      return false;
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      const matchName = (r.name || '').toLowerCase().includes(q);
+      const matchMethod = (r.method || '').toLowerCase().includes(q);
+      const matchAuthor = (r.author || '').toLowerCase().includes(q);
+      if (!matchName && !matchMethod && !matchAuthor) return false;
+    }
+    return true;
   });
+
+  const coffeeGroup = displayedRecipes.filter(
+    (r) => ('beverageType' in r ? r.beverageType : r.type) === 'COFFEE'
+  );
+  const teaGroup = displayedRecipes.filter(
+    (r) => ('beverageType' in r ? r.beverageType : r.type) === 'TEA'
+  );
+
+  const renderRecipeCard = (r: any) => (
+    <Pressable
+      key={r.id}
+      style={[
+        styles.recipeOptionItem,
+        activeRecipeId === r.id && styles.recipeOptionActive,
+      ]}
+      onPress={() => onSelectRecipe(r)}
+    >
+      <View style={styles.recipeOptionHeader}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.recipeOptionName}>{r.name}</Text>
+          <Text style={styles.recipeOptionMethod}>
+            {'beverageType' in r ? r.beverageType : r.type} · {r.method}
+            {r.isCustom ? ' · Autorska' : ''}
+          </Text>
+        </View>
+        <Pressable
+          style={styles.favToggleBtn}
+          hitSlop={10}
+          onPress={(e) => {
+            e.stopPropagation();
+            onToggleFavorite(r.id);
+          }}
+          accessibilityLabel={`Ulubione: ${r.name}`}
+        >
+          <Text
+            style={[
+              styles.favToggleIcon,
+              r.isFavorite && styles.favToggleIconActive,
+            ]}
+          >
+            {r.isFavorite ? '★' : '☆'}
+          </Text>
+        </Pressable>
+        <Pressable
+          style={styles.duplicateRecipeBtn}
+          hitSlop={8}
+          onPress={(e) => {
+            e?.stopPropagation?.();
+            onDuplicateRecipe(r);
+          }}
+          accessibilityRole="button"
+          accessibilityLabel={`${t.brew.duplicateRecipe}: ${r.name}`}
+        >
+          <CopyIcon size={16} color={theme.colors.textSecondary} />
+        </Pressable>
+        {r.isCustom && (
+          <Pressable
+            style={styles.editRecipeBtn}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Edytuj recepturę"
+            testID={`edit-recipe-${r.id}`}
+            onPress={(e) => {
+              e.stopPropagation();
+              onEditRecipe(r.id);
+            }}
+          >
+            <EditIcon size={16} color={theme.colors.textSecondary} />
+          </Pressable>
+        )}
+      </View>
+      <Text style={styles.recipeOptionAuthor}>
+        {r.author || 'Receptura własna'}
+      </Text>
+      <Text style={styles.recipeOptionDetails}>
+        {formatDoseWeight(
+          'doseGrams' in r ? r.doseGrams : r.coffeeOrTeaDoseGrams,
+          unitSystem
+        )}{' '}
+        kawy/herbaty ·{' '}
+        {formatWaterWeight(
+          'waterGrams' in r ? r.waterGrams : r.waterWeightGrams,
+          unitSystem
+        )}{' '}
+        wody ·{' '}
+        {formatTemperature(
+          'waterTempCelsius' in r ? r.waterTempCelsius : r.waterTemperatureCelsius,
+          unitSystem
+        )}
+      </Text>
+    </Pressable>
+  );
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
@@ -73,6 +192,79 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
           </Pressable>
         </View>
         <ScrollView>
+          {/* Wyszukiwarka receptur (BPR Pillar 3) */}
+          <View style={styles.searchBox}>
+            <TextInput
+              testID="recipe-search-input"
+              style={styles.searchInput}
+              placeholder="Szukaj receptury, metody (V60, AeroPress, Gaiwan)..."
+              placeholderTextColor={theme.colors.textMuted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+
+          {/* Filtr pierwszego rzędu: Klasyki i Ulubione / Wszystkie / Własne Presety (BPR Pillar 1) */}
+          <View style={styles.subsetFilterRow}>
+            <Pressable
+              testID="subset-filter-all"
+              style={[
+                styles.subsetChip,
+                subsetFilter === 'ALL' && styles.subsetChipActive,
+              ]}
+              onPress={() => setSubsetFilter('ALL')}
+              accessibilityRole="button"
+              accessibilityLabel="Wszystkie presety i klasyki"
+            >
+              <Text
+                style={[
+                  styles.subsetChipText,
+                  subsetFilter === 'ALL' && styles.subsetChipTextActive,
+                ]}
+              >
+                📚 Wszystkie
+              </Text>
+            </Pressable>
+            <Pressable
+              testID="subset-filter-favorites"
+              style={[
+                styles.subsetChip,
+                subsetFilter === 'FAVORITES' && styles.subsetChipActive,
+              ]}
+              onPress={() => setSubsetFilter('FAVORITES')}
+              accessibilityRole="button"
+              accessibilityLabel="Klasyki i Ulubione"
+            >
+              <Text
+                style={[
+                  styles.subsetChipText,
+                  subsetFilter === 'FAVORITES' && styles.subsetChipTextActive,
+                ]}
+              >
+                ⭐ Klasyki / Ulubione
+              </Text>
+            </Pressable>
+            <Pressable
+              testID="subset-filter-custom"
+              style={[
+                styles.subsetChip,
+                subsetFilter === 'CUSTOM' && styles.subsetChipActive,
+              ]}
+              onPress={() => setSubsetFilter('CUSTOM')}
+              accessibilityRole="button"
+              accessibilityLabel="Własne receptury"
+            >
+              <Text
+                style={[
+                  styles.subsetChipText,
+                  subsetFilter === 'CUSTOM' && styles.subsetChipTextActive,
+                ]}
+              >
+                ✍️ Własne Presety
+              </Text>
+            </Pressable>
+          </View>
+
           {/* Filtr Kawa vs Herbata — widoczny wyłącznie gdy preferencja to 'Kawa i Herbata' (both) */}
           {(!beveragePreference || beveragePreference === 'both') && (
             <View style={styles.recipeFilterTabsRow} accessibilityRole="tablist">
@@ -180,90 +372,47 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
             </Pressable>
           </View>
 
-          {displayedRecipes.map((r) => (
-            <Pressable
-              key={r.id}
-              style={[
-                styles.recipeOptionItem,
-                activeRecipeId === r.id && styles.recipeOptionActive,
-              ]}
-              onPress={() => onSelectRecipe(r)}
-            >
-              <View style={styles.recipeOptionHeader}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.recipeOptionName}>{r.name}</Text>
-                  <Text style={styles.recipeOptionMethod}>
-                    {'beverageType' in r ? r.beverageType : r.type} · {r.method}
-                    {r.isCustom ? ' · Autorska' : ''}
-                  </Text>
-                </View>
-                <Pressable
-                  style={styles.favToggleBtn}
-                  hitSlop={10}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    onToggleFavorite(r.id);
-                  }}
-                  accessibilityLabel={`Ulubione: ${r.name}`}
-                >
-                  <Text
-                    style={[
-                      styles.favToggleIcon,
-                      r.isFavorite && styles.favToggleIconActive,
-                    ]}
-                  >
-                    {r.isFavorite ? '★' : '☆'}
-                  </Text>
-                </Pressable>
-                <Pressable
-                  style={styles.duplicateRecipeBtn}
-                  hitSlop={8}
-                  onPress={(e) => {
-                    e?.stopPropagation?.();
-                    onDuplicateRecipe(r);
-                  }}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${t.brew.duplicateRecipe}: ${r.name}`}
-                >
-                  <CopyIcon size={16} color={theme.colors.textSecondary} />
-                </Pressable>
-                {r.isCustom && (
-                  <Pressable
-                    style={styles.editRecipeBtn}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel="Edytuj recepturę"
-                    testID={`edit-recipe-${r.id}`}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      onEditRecipe(r.id);
-                    }}
-                  >
-                    <EditIcon size={16} color={theme.colors.textSecondary} />
-                  </Pressable>
-                )}
-              </View>
-              <Text style={styles.recipeOptionAuthor}>
-                {r.author || 'Receptura własna'}
-              </Text>
-              <Text style={styles.recipeOptionDetails}>
-                {formatDoseWeight(
-                  'doseGrams' in r ? r.doseGrams : r.coffeeOrTeaDoseGrams,
-                  unitSystem
-                )}{' '}
-                kawy/herbaty ·{' '}
-                {formatWaterWeight(
-                  'waterGrams' in r ? r.waterGrams : r.waterWeightGrams,
-                  unitSystem
-                )}{' '}
-                wody ·{' '}
-                {formatTemperature(
-                  'waterTempCelsius' in r ? r.waterTempCelsius : r.waterTemperatureCelsius,
-                  unitSystem
-                )}
-              </Text>
-            </Pressable>
-          ))}
+          {/* Zwijana kategoria 1: Kawa Specialty */}
+          {coffeeGroup.length > 0 && (
+            <View style={styles.categoryGroupSection}>
+              <Pressable
+                testID="recipe-cat-toggle-COFFEE"
+                style={styles.categoryAccordionHeader}
+                onPress={() => toggleCategoryCollapse('COFFEE')}
+                accessibilityRole="button"
+                accessibilityLabel="Zwiń lub rozwiń kategorię Kawa Specialty"
+              >
+                <Text style={styles.categoryAccordionTitle}>
+                  ☕ Kawa Specialty — Przelew i Immersion ({coffeeGroup.length})
+                </Text>
+                <Text style={styles.categoryAccordionArrow}>
+                  {collapsedCategories['COFFEE'] ? '▸' : '▾'}
+                </Text>
+              </Pressable>
+              {!collapsedCategories['COFFEE'] && coffeeGroup.map(renderRecipeCard)}
+            </View>
+          )}
+
+          {/* Zwijana kategoria 2: Herbata Rzemieślnicza */}
+          {teaGroup.length > 0 && (
+            <View style={styles.categoryGroupSection}>
+              <Pressable
+                testID="recipe-cat-toggle-TEA"
+                style={styles.categoryAccordionHeader}
+                onPress={() => toggleCategoryCollapse('TEA')}
+                accessibilityRole="button"
+                accessibilityLabel="Zwiń lub rozwiń kategorię Herbata Rzemieślnicza"
+              >
+                <Text style={styles.categoryAccordionTitle}>
+                  🍃 Herbata Rzemieślnicza & Gongfu ({teaGroup.length})
+                </Text>
+                <Text style={styles.categoryAccordionArrow}>
+                  {collapsedCategories['TEA'] ? '▸' : '▾'}
+                </Text>
+              </Pressable>
+              {!collapsedCategories['TEA'] && teaGroup.map(renderRecipeCard)}
+            </View>
+          )}
         </ScrollView>
       </SafeAreaView>
     </Modal>
@@ -452,5 +601,72 @@ const styles = StyleSheet.create({
   recipeOptionDetails: {
     fontSize: 12,
     color: theme.colors.textMuted,
+  },
+  searchBox: {
+    marginBottom: 10,
+  },
+  searchInput: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 13,
+    color: theme.colors.textPrimary,
+  },
+  subsetFilterRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 10,
+  },
+  subsetChip: {
+    flex: 1,
+    paddingVertical: 7,
+    paddingHorizontal: 8,
+    borderRadius: theme.borderRadius.sm,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+  },
+  subsetChipActive: {
+    borderColor: theme.colors.copper,
+    backgroundColor: theme.colors.copperMuted,
+  },
+  subsetChipText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+  },
+  subsetChipTextActive: {
+    color: theme.colors.copper,
+    fontWeight: '800',
+  },
+  categoryGroupSection: {
+    marginBottom: 14,
+  },
+  categoryAccordionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 8,
+  },
+  categoryAccordionTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: theme.colors.copper,
+    letterSpacing: 0.4,
+  },
+  categoryAccordionArrow: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: theme.colors.copper,
   },
 });
