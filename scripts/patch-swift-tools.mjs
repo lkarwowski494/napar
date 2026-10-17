@@ -35,3 +35,29 @@ for (const rel of filesToPatch) {
     }
   }
 }
+
+// 3. Patch RuntimeScheduler.h for Xcode 16.x (Swift 6.0 / Clang C++ interop)
+const runtimeSchedulerHeader = join(
+  process.cwd(),
+  'node_modules/expo-modules-jsi/apple/Sources/ExpoModulesJSI-Cxx/include/RuntimeScheduler.h'
+);
+if (existsSync(runtimeSchedulerHeader)) {
+  const original = readFileSync(runtimeSchedulerHeader, 'utf8');
+  let content = original;
+
+  // Ensure fallback definition exists after <swift/bridging>
+  if (!content.includes('#ifndef SWIFT_RETURNS_RETAINED')) {
+    content = content.replace(
+      '#include <swift/bridging>',
+      '#include <swift/bridging>\n\n#ifndef SWIFT_RETURNS_RETAINED\n#define SWIFT_RETURNS_RETAINED\n#endif'
+    );
+  }
+
+  // Remove the keyword from create method signatures where Clang in Xcode 16 fails to parse it
+  content = content.replace(/(static RuntimeScheduler \*create[^{]+?)\s*\bSWIFT_RETURNS_RETAINED\s*/g, '$1 ');
+
+  if (content !== original) {
+    writeFileSync(runtimeSchedulerHeader, content, 'utf8');
+    console.log('[patch-swift-tools] Successfully patched RuntimeScheduler.h for Xcode 16.x C++/Swift compatibility.');
+  }
+}
