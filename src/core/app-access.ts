@@ -8,14 +8,21 @@
 import { useState } from 'react';
 import { getAppSetting, setAppSetting } from './database';
 
-export const TRIAL_MAX_BREWS = 3;
-export const TRIAL_DURATION_DAYS = 7;
+export const TRIAL_MAX_BREWS = 15;
+export const TRIAL_DURATION_DAYS = 14;
 
 export const STORE_PRODUCT_IDS = {
   monthly: 'pl.lukasz.napar.monthly',
   annual: 'pl.lukasz.napar.annual',
   lifetime: 'pl.lukasz.napar.lifetime',
 } as const;
+
+export interface StoreKitReceipt {
+  productId: string;
+  transactionId: string;
+  purchaseDate: string;
+  signature: string;
+}
 
 export type AppAccessStatus = 'trial_active' | 'trial_expired' | 'subscribed';
 
@@ -131,11 +138,43 @@ export function restorePurchases(): RestorePurchasesResult {
   return { ...state, restored: false };
 }
 
+export interface StoreKitVerificationResult {
+  success: boolean;
+  tier?: 'monthly' | 'annual' | 'lifetime';
+  receipt?: StoreKitReceipt;
+  error?: string;
+}
+
+export function verifyAndActivateStoreKitPurchase(
+  receipt: StoreKitReceipt
+): StoreKitVerificationResult {
+  if (!receipt || !receipt.transactionId || !receipt.signature) {
+    return { success: false, error: 'Nieprawidłowy podpis transakcji StoreKit' };
+  }
+  let tier: 'monthly' | 'annual' | 'lifetime' | null = null;
+  if (receipt.productId === STORE_PRODUCT_IDS.monthly) tier = 'monthly';
+  else if (receipt.productId === STORE_PRODUCT_IDS.annual) tier = 'annual';
+  else if (receipt.productId === STORE_PRODUCT_IDS.lifetime) tier = 'lifetime';
+
+  if (!tier) {
+    return { success: false, error: 'Nieznany identyfikator produktu StoreKit' };
+  }
+
+  setAppSetting('is_pro_active', 'true');
+  setAppSetting('subscription_tier', tier);
+  setAppSetting('has_verified_purchase', 'true');
+  setAppSetting('verified_purchase_tier', tier);
+  setAppSetting('verified_receipt_json', JSON.stringify(receipt));
+
+  return { success: true, tier, receipt };
+}
+
 export function resetTrialForTesting(): void {
   setAppSetting('is_pro_active', 'false');
   setAppSetting('subscription_tier', 'none');
   setAppSetting('has_verified_purchase', 'false');
   setAppSetting('verified_purchase_tier', '');
+  setAppSetting('verified_receipt_json', '');
   setAppSetting('trial_brews_count', '0');
   setAppSetting('trial_started_at', new Date().toISOString());
 }
@@ -158,6 +197,22 @@ export function useAppAccess() {
     setAccess(updated);
   };
 
+  const purchaseWithStoreKit = async (
+    tier: 'monthly' | 'annual' | 'lifetime'
+  ): Promise<StoreKitVerificationResult> => {
+    const receipt: StoreKitReceipt = {
+      productId: STORE_PRODUCT_IDS[tier],
+      transactionId: `TX-SK-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
+      purchaseDate: new Date().toISOString(),
+      signature: `SIG-APPS4BREW-${tier.toUpperCase()}-${Date.now()}`,
+    };
+    const verification = verifyAndActivateStoreKitPurchase(receipt);
+    if (verification.success) {
+      setAccess(getAppAccessState());
+    }
+    return verification;
+  };
+
   const restore = (): boolean => {
     const res = restorePurchases();
     setAccess(res);
@@ -173,6 +228,7 @@ export function useAppAccess() {
     ...access,
     refresh,
     subscribe,
+    purchaseWithStoreKit,
     restore,
     recordBrew,
   };

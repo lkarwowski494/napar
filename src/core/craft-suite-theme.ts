@@ -98,7 +98,7 @@ export const sharedCraftTokens = {
     lg: 18,
     full: 999,
   },
-  touchTargetMin: 44,
+  touchTargetMin: 48,
   buttonHeightMin: 52,
   hitSlopStandard: { top: 12, bottom: 12, left: 12, right: 12 },
   typography: {

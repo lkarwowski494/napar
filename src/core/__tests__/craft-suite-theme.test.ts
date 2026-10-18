@@ -21,7 +21,7 @@ describe('Apps4Craft Suite Theme Tokens', () => {
 
   test('Udostępnia wspólne tokeny ceramiczne i minimalny rozmiar celu dotykowego 44pt / 52pt', () => {
     expect(sharedCraftTokens.colors.bgBasalt).toBe('#121214');
-    expect(sharedCraftTokens.touchTargetMin).toBe(44);
+    expect(sharedCraftTokens.touchTargetMin).toBe(48);
     expect(sharedCraftTokens.buttonHeightMin).toBe(52);
     expect(sharedCraftTokens.hitSlopStandard).toEqual({ top: 12, bottom: 12, left: 12, right: 12 });
     expect(sharedCraftTokens.borderRadius.lg).toBe(18);

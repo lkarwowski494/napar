@@ -35,25 +35,38 @@ export function Apps4BrewPassModal({
   onSubscribed,
 }: Apps4BrewPassModalProps) {
   const { t } = useTranslation();
-  const { subscribe, restore, status, brewsRemaining, daysRemaining } = useAppAccess();
+  const { purchaseWithStoreKit, restore, status, brewsRemaining, daysRemaining } = useAppAccess();
+  const [isProcessing, setIsProcessing] = React.useState(false);
 
-  const handleSelectPlan = (tier: 'monthly' | 'annual' | 'lifetime') => {
-    subscribe(tier);
-    Alert.alert(
-      t.settings.purchaseSuccessTitle,
-      tier === 'annual'
-        ? t.settings.purchaseAnnualSuccessMsg
-        : tier === 'lifetime'
-        ? t.settings.purchaseLifetimeSuccessMsg
-        : t.settings.purchaseSuccessMsg
-    );
-    if (onPurchaseSuccess) {
-      onPurchaseSuccess();
+  const handleSelectPlan = async (tier: 'monthly' | 'annual' | 'lifetime') => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    try {
+      const result = await purchaseWithStoreKit(tier);
+      if (result.success) {
+        Alert.alert(
+          t.settings.purchaseSuccessTitle,
+          tier === 'annual'
+            ? t.settings.purchaseAnnualSuccessMsg
+            : tier === 'lifetime'
+            ? t.settings.purchaseLifetimeSuccessMsg
+            : t.settings.purchaseSuccessMsg
+        );
+        if (onPurchaseSuccess) {
+          onPurchaseSuccess();
+        }
+        if (onSubscribed) {
+          onSubscribed();
+        }
+        onClose();
+      } else {
+        Alert.alert(t.settings.restoreNotFoundTitle, result.error || 'Błąd autoryzacji transakcji StoreKit');
+      }
+    } catch {
+      Alert.alert(t.settings.restoreNotFoundTitle, 'Nie udało się zrealizować transakcji StoreKit');
+    } finally {
+      setIsProcessing(false);
     }
-    if (onSubscribed) {
-      onSubscribed();
-    }
-    onClose();
   };
 
   const handleRestore = () => {

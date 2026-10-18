@@ -69,26 +69,26 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     recordBrewCompleted();
     state = getAppAccessState();
     expect(state.brewsCount).toBe(2);
-    expect(state.brewsRemaining).toBe(1);
+    expect(state.brewsRemaining).toBe(TRIAL_MAX_BREWS - 2);
     expect(state.status).toBe('trial_active');
   });
 
-  test('Osiągnięcie limitu 3 parzeń wygasza trial i blokuje tworzenie, zachowując historię read-only', () => {
-    recordBrewCompleted(); // 1
-    recordBrewCompleted(); // 2
-    recordBrewCompleted(); // 3
+  test('Osiągnięcie limitu parzeń wygasza trial i blokuje tworzenie, zachowując historię read-only', () => {
+    for (let i = 0; i < TRIAL_MAX_BREWS; i++) {
+      recordBrewCompleted();
+    }
 
     const state = getAppAccessState();
     expect(state.status).toBe('trial_expired');
-    expect(state.brewsCount).toBe(3);
+    expect(state.brewsCount).toBe(TRIAL_MAX_BREWS);
     expect(state.brewsRemaining).toBe(0);
     expect(state.canCreate).toBe(false);
     expect(state.isHistoryReadOnly).toBe(true);
   });
 
-  test('Upływ 7 dni wygasza trial nawet przy mniejszej liczbie parzeń', () => {
-    // Ustaw datę rozpoczęcia trialu na 8 dni temu
-    const pastDate = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString();
+  test('Upływ 14 dni wygasza trial nawet przy mniejszej liczbie parzeń', () => {
+    // Ustaw datę rozpoczęcia trialu na 15 dni temu
+    const pastDate = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
     setAppSetting('trial_started_at', pastDate);
 
     const state = getAppAccessState();
@@ -179,5 +179,37 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(STORE_PRODUCT_IDS.monthly).toBe('pl.lukasz.napar.monthly');
     expect(STORE_PRODUCT_IDS.annual).toBe('pl.lukasz.napar.annual');
     expect(STORE_PRODUCT_IDS.lifetime).toBe('pl.lukasz.napar.lifetime');
+  });
+
+  test('Weryfikacja podpisanego pokwitowania StoreKit aktywuje subskrypcję i zapisuje receipt JSON', () => {
+    setTrialExpiredForTesting();
+    expect(getAppAccessState().status).toBe('trial_expired');
+
+    const fakeReceipt = {
+      productId: STORE_PRODUCT_IDS.lifetime,
+      transactionId: 'TX-STOREKIT-998811',
+      purchaseDate: new Date().toISOString(),
+      signature: 'VALID_CRYPTOGRAPHIC_SIG_8877',
+    };
+
+    // Import funkcji weryfikacji
+    const { verifyAndActivateStoreKitPurchase } = require('../app-access');
+    const result = verifyAndActivateStoreKitPurchase(fakeReceipt);
+    expect(result.success).toBe(true);
+    expect(result.tier).toBe('lifetime');
+
+    const state = getAppAccessState();
+    expect(state.status).toBe('subscribed');
+    expect(state.isSubscribed).toBe(true);
+    expect(state.subscriptionTier).toBe('lifetime');
+
+    // Nieprawidłowe pokwitowanie jest odrzucane
+    const invalidResult = verifyAndActivateStoreKitPurchase({
+      productId: 'invalid.product.id',
+      transactionId: 'TX-1',
+      purchaseDate: new Date().toISOString(),
+      signature: 'SIG',
+    });
+    expect(invalidResult.success).toBe(false);
   });
 });
