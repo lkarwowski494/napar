@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  View,
   Text,
   StyleSheet,
   ScrollView,
@@ -16,6 +17,7 @@ export interface InventorySelectModalProps {
   inventory: InventoryItem[];
   selectedItem: InventoryItem | null;
   onSelectItem: (item: InventoryItem | null) => void;
+  inline?: boolean;
 }
 
 export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
@@ -24,63 +26,94 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
   inventory,
   selectedItem,
   onSelectItem,
+  inline = false,
 }) => {
+  const innerContent = (
+    <ScrollView style={inline ? styles.inlineScrollView : undefined} nestedScrollEnabled={inline}>
+      <Text style={styles.modalTitle}>Wybierz ze Spiżarni</Text>
+      <Pressable
+        testID="close-inventory-modal-btn"
+        style={styles.modalCloseBtn}
+        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="Zamknij"
+      >
+        <Text style={styles.modalCloseText}>Zamknij</Text>
+      </Pressable>
+
+      <Pressable
+        style={styles.recipeOptionItem}
+        onPress={() => {
+          onSelectItem(null);
+          onClose();
+        }}
+      >
+        <Text style={styles.recipeOptionName}>Brak przypisania (ogólne)</Text>
+        <Text style={styles.recipeOptionAuthor}>
+          Nie odliczaj gramatury ze spiżarni
+        </Text>
+      </Pressable>
+
+      {inventory.map((item) => (
+        <Pressable
+          key={item.id}
+          testID={`inventory-option-${item.id}`}
+          style={[
+            styles.recipeOptionItem,
+            selectedItem?.id === item.id && styles.recipeOptionActive,
+          ]}
+          onPress={() => {
+            onSelectItem(item);
+            onClose();
+          }}
+        >
+          <Text style={styles.recipeOptionName}>{item.name}</Text>
+          <Text style={styles.recipeOptionAuthor}>
+            {item.roasterOrProducer || 'Palarnia'} · {item.origin || ''}
+          </Text>
+          <Text style={styles.recipeOptionDetails}>
+            Pozostało: {item.remainingWeightGrams}g z {item.initialWeightGrams}g
+          </Text>
+        </Pressable>
+      ))}
+    </ScrollView>
+  );
+
+  if (inline) {
+    if (!visible) return null;
+    return (
+      <View style={styles.inlineContainer} testID="inventory-select-inline-panel">
+        {innerContent}
+      </View>
+    );
+  }
+
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-        <ScrollView>
-          <Text style={styles.modalTitle}>Wybierz ze Spiżarni</Text>
-          <Pressable
-            style={styles.modalCloseBtn}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel="Zamknij"
-          >
-            <Text style={styles.modalCloseText}>Zamknij</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.recipeOptionItem}
-            onPress={() => {
-              onSelectItem(null);
-              onClose();
-            }}
-          >
-            <Text style={styles.recipeOptionName}>Brak przypisania (ogólne)</Text>
-            <Text style={styles.recipeOptionAuthor}>
-              Nie odliczaj gramatury ze spiżarni
-            </Text>
-          </Pressable>
-
-          {inventory.map((item) => (
-            <Pressable
-              key={item.id}
-              style={[
-                styles.recipeOptionItem,
-                selectedItem?.id === item.id && styles.recipeOptionActive,
-              ]}
-              onPress={() => {
-                onSelectItem(item);
-                onClose();
-              }}
-            >
-              <Text style={styles.recipeOptionName}>{item.name}</Text>
-              <Text style={styles.recipeOptionAuthor}>
-                {item.roasterOrProducer || 'Palarnia'} · {item.origin || ''}
-              </Text>
-              <Text style={styles.recipeOptionDetails}>
-                Pozostało: {item.remainingWeightGrams}g z {item.initialWeightGrams}g
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
+        {innerContent}
       </SafeAreaView>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  inlineContainer: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.lg,
+    borderWidth: 1.5,
+    borderColor: theme.colors.copper,
+    padding: theme.spacing.md,
+    marginVertical: theme.spacing.sm,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  inlineScrollView: {
+    maxHeight: 350,
+  },
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.bg,
@@ -140,3 +173,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+

@@ -850,7 +850,7 @@ describe('BeansScreen (Stash & Inventory)', () => {
   test('W trybie wygasłego trialu kliknięcie + Dodaj paczkę otwiera Paywall zamiast formularza', () => {
     mockDb.getFirstSync.mockImplementation((query: string, params?: any[]) => {
       if (query && query.includes('FROM app_settings WHERE key = ?')) {
-        if (params?.[0] === 'trial_brews_count') return { value: '3' };
+        if (params?.[0] === 'trial_brews_count') return { value: '15' };
         if (params?.[0] === 'is_pro_active') return { value: 'false' };
       }
       return null;

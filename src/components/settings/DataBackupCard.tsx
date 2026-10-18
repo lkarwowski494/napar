@@ -4,17 +4,22 @@ import { theme } from '../../core/theme';
 
 export interface DataBackupCardProps {
   onExportJson: () => void;
-  onOpenImportJson: () => void;
+  onOpenImportJson?: () => void;
+  onImportJson?: () => void;
   onExportSessionsCsv: () => void;
   onExportInventoryCsv: () => void;
+  t?: any;
 }
 
 export const DataBackupCard: React.FC<DataBackupCardProps> = ({
   onExportJson,
   onOpenImportJson,
+  onImportJson,
   onExportSessionsCsv,
   onExportInventoryCsv,
+  t,
 }) => {
+  const handleOpenImport = onOpenImportJson || onImportJson || (() => {});
   return (
     <View>
       <Text style={styles.sectionTitle}>Twoje Dane (ZP-06 & ZP-07)</Text>
@@ -38,7 +43,7 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
         <Pressable
           testID="import-json-btn"
           style={styles.actionRow}
-          onPress={onOpenImportJson}
+          onPress={handleOpenImport}
         >
           <View style={{ flex: 1 }}>
             <Text style={styles.actionTitle}>Importuj Kopię z Pliku JSON</Text>

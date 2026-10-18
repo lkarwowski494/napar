@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Field, NumInput } from '../src/components/ui';
+import { Field } from '../src/components/ui';
 import { getRecipeById, saveRecipe, deleteRecipe, duplicateRecipe, getUnitSystem } from '../src/core/database';
 import { SavedRecipe } from '../src/core/database-schema';
 import { RecipeStep } from '../src/core/recipes-data';
@@ -25,12 +25,15 @@ import { announce } from '../src/core/announce';
 import { useTranslation } from '../src/core/i18n';
 import { useAppAccess } from '../src/core/app-access';
 import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
-import { formatTemperature, formatDoseWeight, formatWaterWeight } from '../src/core/unit-converter';
+import { RecipeBasicInfoCard } from '../src/components/recipe-builder/RecipeBasicInfoCard';
+import { RecipeParamsCard } from '../src/components/recipe-builder/RecipeParamsCard';
+import { RecipeStepEditor } from '../src/components/recipe-builder/RecipeStepEditor';
+import { RecipeTypeSelector } from '../src/components/recipe-builder/RecipeTypeSelector';
 
 export default function RecipeBuilderScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
   const { canCreate, refresh } = useAppAccess();
   const [unitSystem] = useState<'metric' | 'imperial'>(() => {
     try {
@@ -93,7 +96,7 @@ export default function RecipeBuilderScreen() {
                 setSteps(parsed);
               }
             } catch {
-              // fallback do domyślnych
+              // fallback
             }
           }
         }
@@ -103,7 +106,6 @@ export default function RecipeBuilderScreen() {
     }
   }, [id]);
 
-  // Kalkulacja Ratio (RD-01)
   const doseNum = parseFloat(doseGrams) || 15;
   const waterNum = parseFloat(waterGrams) || 250;
   const currentRatio = calculateBrewRatio(doseNum, waterNum);
@@ -242,7 +244,13 @@ export default function RecipeBuilderScreen() {
         <Text style={styles.headerTitle}>
           {isEditing ? t.recipeBuilder.titleEdit : t.recipeBuilder.titleNew}
         </Text>
-        <Pressable onPress={handleSave} hitSlop={8} style={styles.saveBtn}>
+        <Pressable
+          onPress={handleSave}
+          hitSlop={8}
+          style={styles.saveBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t.common.save}
+        >
           <Text style={styles.saveBtnText}>{t.common.save}</Text>
         </Pressable>
       </View>
@@ -252,214 +260,79 @@ export default function RecipeBuilderScreen() {
         keyboardShouldPersistTaps="handled"
       >
         {/* Typ naparu: Kawa / Herbata */}
-        <View style={styles.typeSelectorRow}>
-          <Pressable
-            style={[
-              styles.typeTab,
-              beverageType === 'COFFEE' && styles.typeTabActiveCoffee,
-            ]}
-            onPress={() => setBeverageType('COFFEE')}
-          >
-            <Text
-              style={[
-                styles.typeTabText,
-                beverageType === 'COFFEE' && styles.typeTabTextActive,
-              ]}
-            >
-              {t.recipeBuilder.coffee}
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[
-              styles.typeTab,
-              beverageType === 'TEA' && styles.typeTabActiveTea,
-            ]}
-            onPress={() => setBeverageType('TEA')}
-          >
-            <Text
-              style={[
-                styles.typeTabText,
-                beverageType === 'TEA' && styles.typeTabTextActive,
-              ]}
-            >
-              {t.recipeBuilder.tea}
-            </Text>
-          </Pressable>
-        </View>
+        <RecipeTypeSelector
+          beverageType={beverageType}
+          onSelectType={setBeverageType}
+          coffeeLabel={t.recipeBuilder.coffee}
+          teaLabel={t.recipeBuilder.tea}
+        />
 
         {/* Podstawowe dane */}
-        <View style={styles.card}>
-          <Text style={styles.fieldLabel}>{t.recipeBuilder.nameLabel} *</Text>
-          <Field
-            value={name}
-            onChangeText={setName}
-            placeholder={t.recipeBuilder.namePlaceholder}
-          />
-
-          <View style={styles.row}>
-            <View style={styles.flex1}>
-              <Text style={styles.fieldLabel}>{t.recipeBuilder.methodLabel}</Text>
-              <Field
-                value={method}
-                onChangeText={setMethod}
-                placeholder={t.recipeBuilder.methodPlaceholder}
-              />
-            </View>
-            <View style={[styles.flex1, { marginLeft: 10 }]}>
-              <Text style={styles.fieldLabel}>{t.recipeBuilder.authorLabel}</Text>
-              <Field
-                value={author}
-                onChangeText={setAuthor}
-                placeholder={t.recipeBuilder.authorPlaceholder}
-              />
-            </View>
-          </View>
-
-          <Text style={styles.fieldLabel}>{t.recipeBuilder.descriptionLabel}</Text>
-          <Field
-            value={description}
-            onChangeText={setDescription}
-            placeholder={t.recipeBuilder.descriptionPlaceholder}
-            multiline
-            numberOfLines={2}
-          />
-        </View>
+        <RecipeBasicInfoCard
+          name={name}
+          onChangeName={setName}
+          method={method}
+          onChangeMethod={setMethod}
+          author={author}
+          onChangeAuthor={setAuthor}
+          description={description}
+          onChangeDescription={setDescription}
+          t={t}
+        />
 
         {/* Parametry parzenia i Ratio (RD-01) */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Parametry & Proporcja</Text>
-
-          <View style={styles.row}>
-            <View style={styles.flex1}>
-              <Text style={styles.fieldLabel}>{t.recipeBuilder.doseLabel}</Text>
-              <NumInput
-                value={parseFloat(doseGrams) || 0}
-                onChangeNumber={(n) => setDoseGrams(n.toString())}
-                unit="g"
-              />
-            </View>
-            <View style={[styles.flex1, { marginHorizontal: 10 }]}>
-              <Text style={styles.fieldLabel}>{t.recipeBuilder.waterLabel}</Text>
-              <NumInput
-                value={parseFloat(waterGrams) || 0}
-                onChangeNumber={(n) => setWaterGrams(n.toString())}
-                unit="g"
-              />
-            </View>
-            <View style={styles.flex1}>
-              <Text style={styles.fieldLabel}>{t.recipeBuilder.tempLabel}</Text>
-              <NumInput
-                value={parseFloat(waterTempCelsius) || 0}
-                onChangeNumber={(n) => setWaterTempCelsius(n.toString())}
-                unit="°C"
-              />
-            </View>
-          </View>
-
-          {/* Badge wyliczonego ratio */}
-          <View style={styles.ratioBadge}>
-            <Text style={styles.ratioBadgeText}>
-              Wyliczona proporcja: <Text style={styles.ratioValue}>1 : {currentRatio}</Text>
-            </Text>
-          </View>
-
-          {/* Podgląd w wybranym układzie jednostek */}
-          <View style={styles.unitPreviewBadge}>
-            <Text style={styles.unitPreviewBadgeText}>
-              {formatDoseWeight(doseNum, unitSystem)} / {formatWaterWeight(waterNum, unitSystem)} · {formatTemperature(parseFloat(waterTempCelsius) || 93, unitSystem)}
-            </Text>
-          </View>
-
-          <Text style={styles.fieldLabel}>{t.recipeBuilder.grindLabel}</Text>
-          <Field
-            value={grindSize}
-            onChangeText={setGrindSize}
-            placeholder={t.recipeBuilder.grindPlaceholder}
-          />
-        </View>
+        <RecipeParamsCard
+          doseGrams={doseGrams}
+          onChangeDose={setDoseGrams}
+          waterGrams={waterGrams}
+          onChangeWater={setWaterGrams}
+          waterTempCelsius={waterTempCelsius}
+          onChangeWaterTemp={setWaterTempCelsius}
+          grindSize={grindSize}
+          onChangeGrindSize={setGrindSize}
+          currentRatio={currentRatio}
+          unitSystem={unitSystem}
+          t={t}
+        />
 
         {/* Kroki parzenia (Steps) */}
-        <View style={styles.card}>
-          <View style={styles.stepsHeader}>
-            <Text style={styles.cardTitle}>{t.recipeBuilder.stepsTitle}</Text>
-            <Pressable
-              style={styles.addStepBtn}
-              onPress={handleAddStep}
-              hitSlop={8}
-            >
-              <Text style={styles.addStepBtnText}>{t.recipeBuilder.addStep}</Text>
-            </Pressable>
-          </View>
-
-          {steps.map((step, index) => (
-            <View key={index} style={styles.stepItem}>
-              <View style={styles.stepItemHeader}>
-                <Text style={styles.stepNumberBadge}>Krok {step.stepNumber}</Text>
-                {steps.length > 1 && (
-                  <Pressable
-                    onPress={() => handleRemoveStep(index)}
-                    hitSlop={6}
-                    style={styles.removeStepBtn}
-                  >
-                    <Text style={styles.removeStepBtnText}>✕</Text>
-                  </Pressable>
-                )}
-              </View>
-
-              <View style={styles.row}>
-                <View style={styles.flex1}>
-                  <Text style={styles.subFieldLabel}>Nazwa kroku</Text>
-                  <Field
-                    value={step.namePl}
-                    onChangeText={(val) => handleUpdateStep(index, 'namePl', val)}
-                  />
-                </View>
-                <View style={[styles.flex1, { marginHorizontal: 8 }]}>
-                  <Text style={styles.subFieldLabel}>Waga docelowa (g)</Text>
-                  <NumInput
-                    value={step.targetWaterGrams}
-                    onChangeNumber={(val) =>
-                      handleUpdateStep(index, 'targetWaterGrams', val)
-                    }
-                    unit="g"
-                  />
-                </View>
-                <View style={styles.flex1}>
-                  <Text style={styles.subFieldLabel}>Czas (sekundy)</Text>
-                  <NumInput
-                    value={step.durationSeconds}
-                    onChangeNumber={(val) =>
-                      handleUpdateStep(index, 'durationSeconds', Math.round(val))
-                    }
-                    unit="s"
-                  />
-                </View>
-              </View>
-
-              <Text style={[styles.subFieldLabel, { marginTop: 6 }]}>
-                {t.recipeBuilder.stepInstruction}
-              </Text>
-              <Field
-                value={step.instructionPl}
-                onChangeText={(val) => handleUpdateStep(index, 'instructionPl', val)}
-                placeholder={t.recipeBuilder.stepInstructionPlaceholder}
-              />
-            </View>
-          ))}
-        </View>
+        <RecipeStepEditor
+          steps={steps}
+          onAddStep={handleAddStep}
+          onRemoveStep={handleRemoveStep}
+          onUpdateStep={handleUpdateStep}
+          t={t}
+        />
 
         {/* Przycisk zapisu */}
-        <Pressable testID="recipe-builder-save-btn" style={styles.mainSaveBtn} onPress={handleSave}>
+        <Pressable
+          testID="recipe-builder-save-btn"
+          style={styles.mainSaveBtn}
+          onPress={handleSave}
+          accessibilityRole="button"
+          accessibilityLabel={t.recipeBuilder.saveRecipeBtn}
+        >
           <Text style={styles.mainSaveBtnText}>{t.recipeBuilder.saveRecipeBtn}</Text>
         </Pressable>
 
-        {/* Przycisk usuwania i duplikowania (w trybie edycji) */}
+        {/* Akcje dodatkowe: Duplikuj / Usuń w trybie edycji */}
         {isEditing && (
           <>
-            <Pressable style={styles.duplicateBtn} onPress={handleDuplicate}>
+            <Pressable
+              style={styles.duplicateBtn}
+              onPress={handleDuplicate}
+              accessibilityRole="button"
+              accessibilityLabel={t.recipeBuilder.duplicateBtn}
+            >
               <Text style={styles.duplicateBtnText}>{t.recipeBuilder.duplicateBtn}</Text>
             </Pressable>
-            <Pressable style={styles.deleteBtn} onPress={handleDelete}>
+
+            <Pressable
+              style={styles.deleteBtn}
+              onPress={handleDelete}
+              accessibilityRole="button"
+              accessibilityLabel={t.common.delete}
+            >
               <Text style={styles.deleteBtnText}>{t.common.delete}</Text>
             </Pressable>
           </>
@@ -482,8 +355,8 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
@@ -491,7 +364,11 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCard,
   },
   headerBtn: {
-    padding: 4,
+    padding: 6,
+    minHeight: 48,
+    minWidth: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerBtnText: {
     color: theme.colors.textSecondary,
@@ -499,15 +376,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   headerTitle: {
-    color: theme.colors.textPrimary,
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '700',
+    color: theme.colors.textPrimary,
   },
   saveBtn: {
     backgroundColor: theme.colors.copper,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 8,
+    minHeight: 48,
+    minWidth: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   saveBtnText: {
     color: '#FFFFFF',
@@ -518,181 +399,14 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 40,
   },
-  typeSelectorRow: {
-    flexDirection: 'row',
-    marginBottom: 16,
-    gap: 12,
-  },
-  typeTab: {
-    flex: 1,
-    paddingVertical: 10,
-    backgroundColor: theme.colors.bgCard,
-    borderRadius: 10,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  typeTabActiveCoffee: {
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
-    borderColor: theme.colors.copper,
-  },
-  typeTabActiveTea: {
-    backgroundColor: 'rgba(42, 123, 98, 0.15)',
-    borderColor: theme.colors.emerald,
-  },
-  typeTabText: {
-    color: theme.colors.textSecondary,
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  typeTabTextActive: {
-    color: theme.colors.textPrimary,
-    fontWeight: '700',
-  },
-  card: {
-    backgroundColor: theme.colors.bgCard,
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginBottom: 16,
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    marginBottom: 12,
-  },
-  fieldLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-    marginBottom: 6,
-  },
-  subFieldLabel: {
-    fontSize: 11,
-    color: theme.colors.textMuted,
-    marginBottom: 4,
-  },
-  input: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    color: theme.colors.textPrimary,
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  textArea: {
-    height: 60,
-    textAlignVertical: 'top',
-  },
-  smallInput: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    color: theme.colors.textPrimary,
-    fontSize: 13,
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  flex1: {
-    flex: 1,
-  },
-  ratioBadge: {
-    backgroundColor: 'rgba(217, 119, 54, 0.1)',
-    borderRadius: 8,
-    padding: 10,
-    alignItems: 'center',
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(217, 119, 54, 0.3)',
-  },
-  ratioBadgeText: {
-    color: theme.colors.textSecondary,
-    fontSize: 13,
-  },
-  ratioValue: {
-    color: theme.colors.copper,
-    fontWeight: '700',
-    fontSize: 15,
-  },
-  unitPreviewBadge: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  unitPreviewBadgeText: {
-    color: theme.colors.textSecondary,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  stepsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  addStepBtn: {
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 6,
-  },
-  addStepBtnText: {
-    color: theme.colors.copper,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  stepItem: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  stepItemHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  stepNumberBadge: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: theme.colors.copper,
-  },
-  removeStepBtn: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: 'rgba(217, 83, 79, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  removeStepBtnText: {
-    color: theme.colors.danger,
-    fontSize: 12,
-    fontWeight: '700',
-  },
   mainSaveBtn: {
     backgroundColor: theme.colors.copper,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
     marginBottom: 12,
+    minHeight: 48,
+    justifyContent: 'center',
   },
   mainSaveBtnText: {
     color: '#FFFFFF',
@@ -707,6 +421,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
     marginBottom: 10,
+    minHeight: 48,
+    justifyContent: 'center',
   },
   duplicateBtnText: {
     color: theme.colors.copperLight,
@@ -720,6 +436,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: 'center',
+    minHeight: 48,
+    justifyContent: 'center',
   },
   deleteBtnText: {
     color: theme.colors.danger,

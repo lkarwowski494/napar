@@ -294,7 +294,7 @@ describe('GongfuScreen Component', () => {
   });
 
   test('W trybie wygasłego trialu próba rozpoczęcia parzenia Gongfu Cha otwiera Paywall', () => {
-    mockDb.settings.set('trial_brews_count', '3');
+    mockDb.settings.set('trial_brews_count', '15');
     mockDb.settings.set('is_pro_active', 'false');
 
     let tree: any;

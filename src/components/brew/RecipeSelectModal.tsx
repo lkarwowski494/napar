@@ -31,6 +31,7 @@ export interface RecipeSelectModalProps {
   onOpenQrScanner: () => void;
   unitSystem: 'metric' | 'imperial';
   t: any;
+  inline?: boolean;
 }
 
 export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
@@ -51,6 +52,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
   onOpenQrScanner,
   unitSystem,
   t,
+  inline = false,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [subsetFilter, setSubsetFilter] = useState<'ALL' | 'FAVORITES' | 'CUSTOM'>('ALL');
@@ -94,6 +96,9 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
   const renderRecipeCard = (r: any) => (
     <Pressable
       key={r.id}
+      testID={`recipe-option-${r.id}`}
+      accessibilityRole="button"
+      accessibilityLabel={`Wybierz przepis: ${r.name}`}
       style={[
         styles.recipeOptionItem,
         activeRecipeId === r.id && styles.recipeOptionActive,
@@ -176,23 +181,23 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
     </Pressable>
   );
 
-  return (
-    <Modal visible={visible} animationType="slide" transparent={false}>
-      <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-        <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>{t.brew.chooseRecipe}</Text>
-          <Pressable
-            style={styles.modalCloseBtn}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel={t.common.close}
-          >
-            <Text style={styles.modalCloseText}>{t.common.close}</Text>
-          </Pressable>
-        </View>
-        <ScrollView>
-          {/* Wyszukiwarka receptur (BPR Pillar 3) */}
+  const innerContent = (
+    <>
+      <View style={styles.modalHeader}>
+        <Text style={styles.modalTitle}>{t.brew.chooseRecipe}</Text>
+        <Pressable
+          testID="close-recipe-modal-btn"
+          style={styles.modalCloseBtn}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel={t.common.close}
+        >
+          <Text style={styles.modalCloseText}>{t.common.close}</Text>
+        </Pressable>
+      </View>
+      <ScrollView style={inline ? styles.inlineScrollView : undefined} nestedScrollEnabled={inline}>
+        {/* Wyszukiwarka receptur (BPR Pillar 3) */}
           <View style={styles.searchBox}>
             <TextInput
               testID="recipe-search-input"
@@ -414,12 +419,43 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
             </View>
           )}
         </ScrollView>
+    </>
+  );
+
+  if (inline) {
+    if (!visible) return null;
+    return (
+      <View style={styles.inlineContainer} testID="recipe-select-inline-panel">
+        {innerContent}
+      </View>
+    );
+  }
+
+  return (
+    <Modal visible={visible} animationType="slide" transparent={false}>
+      <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
+        {innerContent}
       </SafeAreaView>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  inlineContainer: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.lg,
+    borderWidth: 1.5,
+    borderColor: theme.colors.copper,
+    padding: theme.spacing.md,
+    marginVertical: theme.spacing.sm,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  inlineScrollView: {
+    maxHeight: 450,
+  },
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.bg,

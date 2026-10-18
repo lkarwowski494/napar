@@ -326,7 +326,7 @@ describe('JournalScreen Integration', () => {
   test('W trybie Read-Only (po trialu) wyświetla się baner ochrony historii, a Powtórz Parzenie otwiera paywall', () => {
     const { getAppSetting } = require('../database');
     getAppSetting.mockImplementation((key: string, def: string) => {
-      if (key === 'trial_brews_count') return '3';
+      if (key === 'trial_brews_count') return '15';
       if (key === 'is_pro_active') return 'false';
       return def;
     });

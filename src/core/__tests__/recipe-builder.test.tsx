@@ -536,7 +536,7 @@ describe('Custom Recipe Builder & Persistence', () => {
   });
 
   test('W trybie wygasłego trialu próba zapisu nowej receptury wyświetla Paywall zamiast zapisu', () => {
-    mockDb.settings.set('trial_brews_count', '3');
+    mockDb.settings.set('trial_brews_count', '15');
     mockDb.settings.set('is_pro_active', 'false');
 
     let tree: any;

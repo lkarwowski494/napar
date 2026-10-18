@@ -9,9 +9,84 @@ import {
   SavedRecipe,
   BrewSession,
   CaffeineLog,
+  SensoryProfile,
   SCHEMA_SQL,
 } from './database-schema';
 import { MASTER_RECIPES } from './recipes-data';
+
+export interface InventoryRow {
+  id: string;
+  name: string;
+  type: 'coffee' | 'tea';
+  roaster_or_producer: string | null;
+  origin: string | null;
+  roast_or_harvest_date: string | null;
+  roast_profile: string | null;
+  process: string | null;
+  variety: string | null;
+  initial_weight_g: number;
+  remaining_weight_g: number;
+  flavor_notes_json: string | null;
+  rating: number | null;
+  is_favorite: number;
+  is_archived: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RecipeRow {
+  id: string;
+  name: string;
+  beverage_type: 'COFFEE' | 'TEA';
+  method: string;
+  author: string | null;
+  description: string | null;
+  dose_g: number;
+  water_g: number;
+  water_temp_c: number;
+  grind_size_description: string | null;
+  recommended_ratio: number;
+  steps_json: string;
+  is_custom: number;
+  is_favorite: number;
+  created_at: string;
+}
+
+export interface BrewSessionRow {
+  id: string;
+  recipe_id: string | null;
+  recipe_name: string | null;
+  beverage_type: 'COFFEE' | 'TEA';
+  method: string;
+  inventory_item_id: string | null;
+  inventory_item_name: string | null;
+  dose_g: number;
+  water_g: number;
+  water_temp_c: number;
+  grind_setting: string | null;
+  total_time_seconds: number;
+  rating: number | null;
+  flavor_tags_json: string | null;
+  taste_balance: string | null;
+  tds_percentage: number | null;
+  extraction_yield_percentage: number | null;
+  caffeine_content_mg: number | null;
+  notes: string | null;
+  infusion_number: number | null;
+  sensory_scores_json: string | null;
+  water_profile: string | null;
+  brewed_at: string;
+}
+
+export interface CaffeineLogRow {
+  id: string;
+  brew_session_id: string | null;
+  beverage_name: string;
+  beverage_type: 'coffee' | 'tea';
+  consumed_at: string;
+  dose_g: number;
+  caffeine_mg: number;
+}
 
 let dbInstance: SQLite.SQLiteDatabase | null = null;
 
@@ -165,13 +240,13 @@ export function getInventoryItems(includeArchived = false): InventoryItem[] {
     ? 'SELECT * FROM inventory_items ORDER BY is_favorite DESC, updated_at DESC'
     : 'SELECT * FROM inventory_items WHERE is_archived = 0 ORDER BY is_favorite DESC, updated_at DESC';
 
-  const rows = db.getAllSync<any>(query);
+  const rows = db.getAllSync<InventoryRow>(query);
   return rows.map(mapRowToInventoryItem);
 }
 
 export function getInventoryItemById(id: string): InventoryItem | null {
   const db = getDatabase();
-  const row = db.getFirstSync<any>(
+  const row = db.getFirstSync<InventoryRow>(
     'SELECT * FROM inventory_items WHERE id = ?',
     [id]
   );
@@ -230,7 +305,7 @@ export function deductBeansForBrew(itemId: string, grams: number): void {
   deductInventoryWeight(itemId, grams);
 }
 
-function mapRowToInventoryItem(row: any): InventoryItem {
+function mapRowToInventoryItem(row: InventoryRow): InventoryItem {
   let flavorNotes: string[] = [];
   try {
     flavorNotes = row.flavor_notes_json ? JSON.parse(row.flavor_notes_json) : [];
@@ -240,7 +315,7 @@ function mapRowToInventoryItem(row: any): InventoryItem {
   return {
     id: row.id,
     name: row.name,
-    type: row.type,
+    type: row.type === 'tea' ? 'tea' : 'coffee',
     roasterOrProducer: row.roaster_or_producer || undefined,
     origin: row.origin || undefined,
     roastOrHarvestDate: row.roast_or_harvest_date || undefined,
@@ -268,13 +343,13 @@ export function getRecipes(beverageType?: 'COFFEE' | 'TEA'): SavedRecipe[] {
     ? 'SELECT * FROM recipes WHERE beverage_type = ? ORDER BY is_favorite DESC, name ASC'
     : 'SELECT * FROM recipes ORDER BY is_favorite DESC, beverage_type ASC, name ASC';
   const params = beverageType ? [beverageType] : [];
-  const rows = db.getAllSync<any>(query, params);
+  const rows = db.getAllSync<RecipeRow>(query, params);
   return rows.map(mapRowToRecipe);
 }
 
 export function getRecipeById(id: string): SavedRecipe | null {
   const db = getDatabase();
-  const row = db.getFirstSync<any>('SELECT * FROM recipes WHERE id = ?', [id]);
+  const row = db.getFirstSync<RecipeRow>('SELECT * FROM recipes WHERE id = ?', [id]);
   return row ? mapRowToRecipe(row) : null;
 }
 
@@ -343,7 +418,7 @@ export function duplicateRecipe(
     grindSettingDescriptionPl?: string;
     grindSizeDescription?: string;
     recommendedRatio: number;
-    steps?: any[];
+    steps?: unknown[];
     stepsJson?: string;
   },
   copySuffix = ' (Kopia)'
@@ -380,7 +455,7 @@ export function duplicateRecipe(
   return cloned;
 }
 
-function mapRowToRecipe(row: any): SavedRecipe {
+function mapRowToRecipe(row: RecipeRow): SavedRecipe {
   return {
     id: row.id,
     name: row.name,
@@ -406,7 +481,7 @@ function mapRowToRecipe(row: any): SavedRecipe {
 
 export function getBrewSessions(limit = 100): BrewSession[] {
   const db = getDatabase();
-  const rows = db.getAllSync<any>(
+  const rows = db.getAllSync<BrewSessionRow>(
     'SELECT * FROM brew_sessions ORDER BY brewed_at DESC LIMIT ?',
     [limit]
   );
@@ -415,7 +490,7 @@ export function getBrewSessions(limit = 100): BrewSession[] {
 
 export function getBrewSessionById(id: string): BrewSession | null {
   const db = getDatabase();
-  const row = db.getFirstSync<any>('SELECT * FROM brew_sessions WHERE id = ?', [id]);
+  const row = db.getFirstSync<BrewSessionRow>('SELECT * FROM brew_sessions WHERE id = ?', [id]);
   return row ? mapRowToBrewSession(row) : null;
 }
 
@@ -457,12 +532,42 @@ export function saveBrewSession(session: BrewSession): void {
   );
 }
 
+/**
+ * Atomic transaction recording a brew session and deducting corresponding inventory (TASK-R08-04)
+ */
+export function recordBrewSessionTransaction(
+  session: BrewSession,
+  inventoryDeduction?: { itemId: string; doseGrams: number }
+): void {
+  const db = getDatabase();
+  const executeOperation = () => {
+    saveBrewSession(session);
+    if (inventoryDeduction && inventoryDeduction.itemId && inventoryDeduction.doseGrams > 0) {
+      deductInventoryWeight(inventoryDeduction.itemId, inventoryDeduction.doseGrams);
+    }
+  };
+
+  const txDb = db as unknown as { withTransactionSync?: (fn: () => void) => void };
+  if (typeof txDb.withTransactionSync === 'function') {
+    txDb.withTransactionSync(executeOperation);
+  } else {
+    db.execSync('BEGIN TRANSACTION;');
+    try {
+      executeOperation();
+      db.execSync('COMMIT;');
+    } catch (err) {
+      db.execSync('ROLLBACK;');
+      throw err;
+    }
+  }
+}
+
 export function deleteBrewSession(id: string): void {
   const db = getDatabase();
   db.runSync('DELETE FROM brew_sessions WHERE id = ?', [id]);
 }
 
-function mapRowToBrewSession(row: any): BrewSession {
+function mapRowToBrewSession(row: BrewSessionRow): BrewSession {
   let flavorTags: string[] = [];
   try {
     flavorTags = row.flavor_tags_json ? JSON.parse(row.flavor_tags_json) : [];
@@ -470,10 +575,10 @@ function mapRowToBrewSession(row: any): BrewSession {
     flavorTags = [];
   }
 
-  let sensory: any = undefined;
+  let sensory: SensoryProfile | undefined = undefined;
   if (row.sensory_scores_json) {
     try {
-      sensory = JSON.parse(row.sensory_scores_json);
+      sensory = JSON.parse(row.sensory_scores_json) as SensoryProfile;
     } catch {
       sensory = undefined;
     }
@@ -518,7 +623,7 @@ export function getCaffeineLogs(sinceIso?: string): CaffeineLog[] {
     ? 'SELECT * FROM caffeine_logs WHERE consumed_at >= ? ORDER BY consumed_at ASC'
     : 'SELECT * FROM caffeine_logs ORDER BY consumed_at DESC LIMIT 200';
   const params = sinceIso ? [sinceIso] : [];
-  const rows = db.getAllSync<any>(query, params);
+  const rows = db.getAllSync<CaffeineLogRow>(query, params);
   return rows.map((r) => ({
     id: r.id,
     brewSessionId: r.brew_session_id || undefined,
@@ -611,7 +716,7 @@ export function importDataJson(jsonStr: string): void {
 /**
  * RD-ENG-10 & NFR-SEC-015: Zabezpieczenie komórek CSV przed Formula Injection (CSV Injection)
  */
-export function escapeCsvCell(val: any): string {
+export function escapeCsvCell(val: unknown): string {
   if (val === null || val === undefined) return '';
   let str = String(val);
 

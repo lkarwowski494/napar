@@ -20,15 +20,15 @@ import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems, getU
 import { BrewSession, InventoryItem } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
-import { SensoryProfile } from '../../src/core/radar-chart';
 import { useAppAccess } from '../../src/core/app-access';
 import { confirmAction } from '../../src/core/confirm';
-import { SearchField } from '../../src/components/ui';
 import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { JournalIcon, ShieldIcon } from '../../src/components/icons/CraftIcons';
 import { JournalSessionCard } from '../../src/components/journal/JournalSessionCard';
 import { JournalAnalyticsView } from '../../src/components/journal/JournalAnalyticsView';
 import { ProactiveCalendarCard } from '../../src/components/journal/ProactiveCalendarCard';
+import { JournalFilterBar } from '../../src/components/journal/JournalFilterBar';
+import { useJournalAnalytics } from '../../src/core/useJournalAnalytics';
 import { ProactiveActionItem } from '../../src/core/bpr-engine';
 
 export default function JournalScreen() {
@@ -79,105 +79,11 @@ export default function JournalScreen() {
     });
   }, [sessions, beveragePreference]);
 
-  const analyticsData = useMemo(() => {
-    const totalBrews = relevantSessions.length;
-    const totalDoseGrams = relevantSessions.reduce((acc, s) => acc + (s.doseGrams || 0), 0);
-    const totalWaterGrams = relevantSessions.reduce((acc, s) => acc + (s.waterGrams || 0), 0);
-    const totalWaterLiters = (totalWaterGrams / 1000).toFixed(1);
-    const totalCaffeineMg = Math.round(relevantSessions.reduce((acc, s) => acc + (s.caffeineContentMg || 0), 0));
-    const ratedSessions = relevantSessions.filter((s) => typeof s.rating === 'number' && s.rating > 0);
-    const avgRating =
-      ratedSessions.length > 0
-        ? (ratedSessions.reduce((acc, s) => acc + s.rating!, 0) / ratedSessions.length).toFixed(1)
-        : '—';
+  const analyticsData = useJournalAnalytics(relevantSessions);
 
-    // Rozkład metod
-    const methodCounts: Record<string, number> = {};
-    for (const s of relevantSessions) {
-      const m = s.method || 'Inna';
-      methodCounts[m] = (methodCounts[m] || 0) + 1;
-    }
-    const methodsList = Object.entries(methodCounts)
-      .map(([method, count]) => ({
-        method,
-        count,
-        percent: totalBrews > 0 ? Math.round((count / totalBrews) * 100) : 0,
-      }))
-      .sort((a, b) => b.count - a.count);
-
-    // Średni radar sensoryczny
-    const sensorySessions = relevantSessions.filter((s) => s.sensory);
-    let avgSensory: SensoryProfile | null = null;
-    if (sensorySessions.length > 0) {
-      const sumSensory = sensorySessions.reduce(
-        (acc, s) => {
-          const sc = s.sensory!;
-          return {
-            acidity: acc.acidity + (sc.acidity || 0),
-            sweetness: acc.sweetness + (sc.sweetness || 0),
-            body: acc.body + (sc.body || 0),
-            clarity: acc.clarity + (sc.clarity || 0),
-            finish: acc.finish + (sc.finish || 0),
-          };
-        },
-        { acidity: 0, sweetness: 0, body: 0, clarity: 0, finish: 0 }
-      );
-      const n = sensorySessions.length;
-      avgSensory = {
-        acidity: Number((sumSensory.acidity / n).toFixed(1)),
-        sweetness: Number((sumSensory.sweetness / n).toFixed(1)),
-        body: Number((sumSensory.body / n).toFixed(1)),
-        clarity: Number((sumSensory.clarity / n).toFixed(1)),
-        finish: Number((sumSensory.finish / n).toFixed(1)),
-      };
-    }
-
-    // Rozkład balansu smaku
-    const balanceCounts: Record<string, number> = {
-      balanced: 0,
-      sour: 0,
-      bitter: 0,
-      astringent: 0,
-      weak: 0,
-      too_strong: 0,
-    };
-    for (const s of relevantSessions) {
-      if (s.tasteBalance && balanceCounts[s.tasteBalance] !== undefined) {
-        balanceCounts[s.tasteBalance]++;
-      }
-    }
-
-    // Nuty smakowe (Top flavor tags)
-    const tagCounts: Record<string, number> = {};
-    for (const s of relevantSessions) {
-      if (Array.isArray(s.flavorTags)) {
-        for (const tg of s.flavorTags) {
-          tagCounts[tg] = (tagCounts[tg] || 0) + 1;
-        }
-      }
-    }
-    const topTags = Object.entries(tagCounts)
-      .map(([tag, count]) => ({ tag, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
-
-    return {
-      totalBrews,
-      totalDoseGrams,
-      totalWaterLiters,
-      totalCaffeineMg,
-      avgRating,
-      methodsList,
-      avgSensory,
-      sensoryCount: sensorySessions.length,
-      balanceCounts,
-      topTags,
-    };
-  }, [relevantSessions]);
-
-  const loadSessions = () => {
+  const loadData = () => {
     try {
-      const data = getBrewSessions(200);
+      const data = getBrewSessions();
       setSessions(data);
       const inv = getInventoryItems(true);
       setInventoryItems(inv);
@@ -187,59 +93,57 @@ export default function JournalScreen() {
   };
 
   useEffect(() => {
-    loadSessions();
+    loadData();
   }, []);
+
+  const handleDelete = (session: BrewSession) => {
+    confirmAction({
+      title: 'Usuń wpis',
+      message: `Czy na pewno chcesz usunąć sesję "${session.recipeName || session.method}"?`,
+      actionText: t.common.delete,
+      destructive: true,
+      onConfirm: () => {
+        deleteBrewSession(session.id);
+        loadData();
+      },
+    });
+  };
 
   const handleExecuteProactiveAction = (action: ProactiveActionItem) => {
     if (!canCreate) {
       setShowPaywall(true);
       return;
     }
+
     try {
       const userRecipes = getRecipes();
       const allRecipes = [...userRecipes, ...MASTER_RECIPES];
-      let targetRecipe = action.recipeId
-        ? allRecipes.find((r) => r.id === action.recipeId)
-        : undefined;
+      let targetRecipe = allRecipes.find((r) => r.id === action.recipeId);
       if (!targetRecipe && action.recommendedMethod) {
         targetRecipe = allRecipes.find(
           (r) => r.method.toLowerCase() === action.recommendedMethod!.toLowerCase()
         );
       }
-      if (targetRecipe) {
-        selectRecipe(targetRecipe);
+      if (!targetRecipe) {
+        targetRecipe = MASTER_RECIPES[0];
       }
+      selectRecipe(targetRecipe);
+
       if (action.inventoryItemId) {
-        const inv = getInventoryItems(true);
-        const foundItem = inv.find((i) => i.id === action.inventoryItemId);
-        if (foundItem) {
-          selectInventoryItem(foundItem);
-        }
+        const inventory = getInventoryItems(true);
+        const item = inventory.find((i) => i.id === action.inventoryItemId);
+        selectInventoryItem(item || null);
       }
+
       if (action.doseGrams) setDoseGrams(action.doseGrams);
       if (action.waterGrams) setWaterGrams(action.waterGrams);
       if (action.waterTempCelsius) setWaterTempCelsius(action.waterTempCelsius);
+
       router.navigate('/');
+      Alert.alert('Załadowano parametry parzenia', action.titlePl);
     } catch {
       router.navigate('/');
     }
-  };
-
-  const handleDelete = (session: BrewSession) => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
-    confirmAction({
-      title: 'Usuń wpis',
-      message: `Czy na pewno chcesz usunąć sesję "${session.recipeName || session.method}"?`,
-      actionText: 'Usuń',
-      destructive: true,
-      onConfirm: () => {
-        deleteBrewSession(session.id);
-        loadSessions();
-      },
-    });
   };
 
   const handleBrewAgain = (session: BrewSession) => {
@@ -247,6 +151,7 @@ export default function JournalScreen() {
       setShowPaywall(true);
       return;
     }
+
     try {
       const userRecipes = getRecipes();
       const allRecipes = [...userRecipes, ...MASTER_RECIPES];
@@ -379,6 +284,8 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
           style={[styles.viewModeTab, viewMode === 'sessions' && styles.viewModeTabActive]}
           onPress={() => setViewMode('sessions')}
           testID="journal-tab-sessions"
+          accessibilityRole="button"
+          accessibilityLabel="Przełącz na listę sesji"
         >
           <Text style={[styles.viewModeTabText, viewMode === 'sessions' && styles.viewModeTabTextActive]}>
             {`${t.journal.sessionsTab} (${relevantSessions.length})`}
@@ -388,6 +295,8 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
           style={[styles.viewModeTab, viewMode === 'analytics' && styles.viewModeTabActive]}
           onPress={() => setViewMode('analytics')}
           testID="journal-tab-analytics"
+          accessibilityRole="button"
+          accessibilityLabel="Przełącz na analitykę i trendy"
         >
           <Text style={[styles.viewModeTabText, viewMode === 'analytics' && styles.viewModeTabTextActive]}>
             {t.journal.analyticsTab}
@@ -397,42 +306,15 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
 
       {viewMode === 'sessions' && (
         <>
-          {/* Wyszukiwarka sesji (search bar) */}
-          <View style={styles.searchBarContainer}>
-            <SearchField
-              placeholder={t.journal.searchPlaceholder}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-
-          {/* Szybkie filtry */}
-          <View style={styles.filterChipsRow}>
-            {[
-              { key: 'all', label: t.journal.filterAll },
-              ...(beveragePreference !== 'tea' ? [{ key: 'coffee', label: t.journal.filterCoffee }] : []),
-              ...(beveragePreference !== 'coffee' ? [{ key: 'tea', label: t.journal.filterTea }] : []),
-              { key: 'high_rated', label: t.journal.filterHighRated },
-            ].map((f) => (
-              <Pressable
-                key={f.key}
-                style={[
-                  styles.filterChip,
-                  filterType === f.key && styles.filterChipActive,
-                ]}
-                onPress={() => setFilterType(f.key as any)}
-              >
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    filterType === f.key && styles.filterChipTextActive,
-                  ]}
-                >
-                  {f.label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
+          {/* Wyszukiwarka sesji i filtry korygujące */}
+          <JournalFilterBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            filterType={filterType}
+            onFilterChange={setFilterType}
+            beveragePreference={beveragePreference}
+            t={t}
+          />
 
           {relevantSessions.length === 0 ? (
             <View style={styles.emptyContainer}>
@@ -450,6 +332,8 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
                   setSearchQuery('');
                   setFilterType('all');
                 }}
+                accessibilityRole="button"
+                accessibilityLabel="Wyczyść filtry"
               >
                 <Text style={styles.clearSearchText}>Wyczyść filtry</Text>
               </Pressable>
@@ -498,18 +382,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(78, 159, 61, 0.12)',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.statusPeak,
-    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
   },
   readOnlyText: {
-    color: theme.colors.textPrimary,
+    color: '#2e7d32',
     fontSize: 12,
     fontWeight: '600',
-    lineHeight: 16,
     flex: 1,
   },
   content: {
@@ -517,114 +400,82 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   headerBox: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.md,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 24,
+    fontWeight: '800',
     color: theme.colors.textPrimary,
   },
   headerSub: {
     fontSize: 13,
-    color: theme.colors.textSecondary,
+    color: theme.colors.textMuted,
     marginTop: 2,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 80,
-    paddingHorizontal: 24,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    marginBottom: 8,
-  },
-  emptySub: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  searchBarContainer: {
-    marginBottom: 10,
-  },
-  searchInput: {
-    backgroundColor: theme.colors.bgCard,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.md,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    color: theme.colors.textPrimary,
-    fontSize: 13,
-  },
-  filterChipsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
-  },
-  filterChip: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.sm,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  filterChipActive: {
-    backgroundColor: 'rgba(217, 119, 54, 0.2)',
-    borderColor: theme.colors.copper,
-  },
-  filterChipText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-  },
-  filterChipTextActive: {
-    color: theme.colors.copper,
-    fontWeight: '800',
-  },
-  clearSearchBtn: {
-    marginTop: 12,
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
-    borderWidth: 1,
-    borderColor: theme.colors.copper,
-    borderRadius: theme.borderRadius.sm,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  clearSearchText: {
-    color: theme.colors.copper,
-    fontWeight: '700',
-    fontSize: 13,
   },
   viewModeRow: {
     flexDirection: 'row',
-    gap: 10,
-    marginBottom: 16,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.md,
+    padding: 3,
+    marginBottom: theme.spacing.md,
   },
   viewModeTab: {
     flex: 1,
-    backgroundColor: theme.colors.bgCard,
-    paddingVertical: 12,
-    borderRadius: theme.borderRadius.md,
+    paddingVertical: 8,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.sm,
+    minHeight: 40,
+    justifyContent: 'center',
   },
   viewModeTabActive: {
-    borderColor: theme.colors.copper,
-    backgroundColor: theme.colors.bgCardSecondary,
+    backgroundColor: theme.colors.bgCard,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   viewModeTabText: {
     fontSize: 13,
     fontWeight: '600',
-    color: theme.colors.textSecondary,
+    color: theme.colors.textMuted,
   },
   viewModeTabTextActive: {
-    color: theme.colors.copper,
+    color: theme.colors.textPrimary,
+    fontWeight: '700',
+  },
+  emptyContainer: {
+    padding: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    marginTop: 12,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  emptySub: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  clearSearchBtn: {
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: theme.colors.copper,
+    borderRadius: theme.borderRadius.sm,
+    minHeight: 36,
+    justifyContent: 'center',
+  },
+  clearSearchText: {
+    color: '#FFFFFF',
+    fontSize: 12,
     fontWeight: '700',
   },
 });

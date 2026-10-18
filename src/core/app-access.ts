@@ -197,9 +197,9 @@ export function useAppAccess() {
     setAccess(updated);
   };
 
-  const purchaseWithStoreKit = async (
+  const purchaseWithStoreKit = (
     tier: 'monthly' | 'annual' | 'lifetime'
-  ): Promise<StoreKitVerificationResult> => {
+  ): StoreKitVerificationResult => {
     const receipt: StoreKitReceipt = {
       productId: STORE_PRODUCT_IDS[tier],
       transactionId: `TX-SK-${Date.now()}-${Math.floor(Math.random() * 100000)}`,

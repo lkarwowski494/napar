@@ -19,6 +19,7 @@ import {
   getBrewSessions,
   getBrewSessionById,
   saveBrewSession,
+  recordBrewSessionTransaction,
   deleteBrewSession,
   getCaffeineLogs,
   logCaffeine,
@@ -404,6 +405,57 @@ describe('Napar SQLite Database & Repositories', () => {
     const logs = getCaffeineLogs();
     expect(logs.length).toBe(1);
     expect(logs[0].caffeineMg).toBe(140);
+  });
+
+  test('TASK-R08-04: recordBrewSessionTransaction atomowo zapisuje sesję i odejmuje ziarna z inwentarza', () => {
+    const bean: InventoryItem = {
+      id: 'bean-tx-1',
+      name: 'Kenya Nyeri AA',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 250,
+      flavorNotes: ['czarna porzeczka'],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-10-10T10:00:00Z',
+      updatedAt: '2026-10-10T10:00:00Z',
+    };
+    saveInventoryItem(bean);
+
+    const session: BrewSession = {
+      id: 'sess-tx-1',
+      beverageType: 'COFFEE',
+      method: 'Kalita Wave',
+      recipeName: 'Kalita Standard',
+      inventoryItemId: 'bean-tx-1',
+      inventoryItemName: 'Kenya Nyeri AA',
+      doseGrams: 18.5,
+      waterGrams: 300,
+      waterTempCelsius: 94,
+      totalTimeSeconds: 180,
+      flavorTags: ['czarna porzeczka'],
+      brewedAt: new Date().toISOString(),
+    };
+
+    recordBrewSessionTransaction(session, { itemId: 'bean-tx-1', doseGrams: 18.5 });
+
+    const savedSess = getBrewSessionById('sess-tx-1');
+    expect(savedSess).not.toBeNull();
+    expect(savedSess?.doseGrams).toBe(18.5);
+
+    const updatedBean = getInventoryItemById('bean-tx-1');
+    expect(updatedBean?.remainingWeightGrams).toBe(231.5);
+
+    // Fallback transaction executes BEGIN and COMMIT
+    expect(mockDb.execSync).toHaveBeenCalledWith('BEGIN TRANSACTION;');
+    expect(mockDb.execSync).toHaveBeenCalledWith('COMMIT;');
+
+    // Test with withTransactionSync mock
+    const originalWithTx = mockDb.withTransactionSync;
+    mockDb.withTransactionSync = jest.fn((cb: () => void) => cb());
+    recordBrewSessionTransaction(session, { itemId: 'bean-tx-1', doseGrams: 10 });
+    expect(mockDb.withTransactionSync).toHaveBeenCalled();
+    mockDb.withTransactionSync = originalWithTx;
   });
 
   test('Eksport i import kopii zapasowej w formacie JSON (inventory, recipes, sessions, caffeine)', () => {

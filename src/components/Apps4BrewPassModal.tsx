@@ -38,11 +38,11 @@ export function Apps4BrewPassModal({
   const { purchaseWithStoreKit, restore, status, brewsRemaining, daysRemaining } = useAppAccess();
   const [isProcessing, setIsProcessing] = React.useState(false);
 
-  const handleSelectPlan = async (tier: 'monthly' | 'annual' | 'lifetime') => {
+  const handleSelectPlan = (tier: 'monthly' | 'annual' | 'lifetime') => {
     if (isProcessing) return;
     setIsProcessing(true);
     try {
-      const result = await purchaseWithStoreKit(tier);
+      const result = purchaseWithStoreKit(tier);
       if (result.success) {
         Alert.alert(
           t.settings.purchaseSuccessTitle,

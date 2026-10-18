@@ -53,18 +53,28 @@ export const JsonExportModal: React.FC<JsonExportModalProps> = ({
 export interface JsonImportModalProps {
   visible: boolean;
   onClose: () => void;
-  importJsonText: string;
-  onChangeImportJsonText: (text: string) => void;
-  onImport: () => void;
+  importJsonText?: string;
+  jsonText?: string;
+  onChangeImportJsonText?: (text: string) => void;
+  onChangeJsonText?: (text: string) => void;
+  onImport?: () => void;
+  onConfirmImport?: () => void;
+  t?: any;
 }
 
 export const JsonImportModal: React.FC<JsonImportModalProps> = ({
   visible,
   onClose,
   importJsonText,
+  jsonText,
   onChangeImportJsonText,
+  onChangeJsonText,
   onImport,
+  onConfirmImport,
 }) => {
+  const textValue = jsonText !== undefined ? jsonText : (importJsonText || '');
+  const handleChangeText = onChangeJsonText || onChangeImportJsonText || (() => {});
+  const handleConfirm = onConfirmImport || onImport || (() => {});
   return (
     <Modal visible={visible} animationType="slide">
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
@@ -88,10 +98,10 @@ export const JsonImportModal: React.FC<JsonImportModalProps> = ({
           multiline
           placeholder='{"version": 1, ...}'
           placeholderTextColor={theme.colors.textMuted}
-          value={importJsonText}
-          onChangeText={onChangeImportJsonText}
+          value={textValue}
+          onChangeText={handleChangeText}
         />
-        <Pressable style={styles.submitImportBtn} onPress={onImport}>
+        <Pressable style={styles.submitImportBtn} onPress={handleConfirm}>
           <Text style={styles.submitImportBtnText}>Zaimportuj i Zastąp Dane</Text>
         </Pressable>
       </SafeAreaView>
