@@ -26,6 +26,25 @@ export function getDatabase(): SQLite.SQLiteDatabase {
   return dbInstance;
 }
 
+export function createPreMigrationBackup(db: SQLite.SQLiteDatabase, fromVersion: number): string {
+  try {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupKey = `backup_pre_migration_v${fromVersion}_${timestamp}`;
+    const count = db.getFirstSync<{ c: number }>('SELECT COUNT(*) as c FROM brew_sessions');
+    db.runSync(
+      'CREATE TABLE IF NOT EXISTS migration_backups (id TEXT PRIMARY KEY, created_at TEXT, sessions_count INTEGER)',
+      []
+    );
+    db.runSync(
+      'INSERT OR REPLACE INTO migration_backups (id, created_at, sessions_count) VALUES (?, ?, ?)',
+      [backupKey, new Date().toISOString(), count?.c || 0]
+    );
+    return backupKey;
+  } catch {
+    return 'backup_failed_fallback';
+  }
+}
+
 export function initDatabase(db: SQLite.SQLiteDatabase): void {
   try {
     db.execSync('PRAGMA foreign_keys = ON;');
@@ -35,6 +54,12 @@ export function initDatabase(db: SQLite.SQLiteDatabase): void {
 
   try {
     db.execSync('PRAGMA journal_mode = WAL;');
+  } catch {
+    // Ignoruj błąd PRAGMA w środowiskach zastępczych
+  }
+
+  try {
+    db.execSync('PRAGMA busy_timeout = 5000;');
   } catch {
     // Ignoruj błąd PRAGMA w środowiskach zastępczych
   }
@@ -51,32 +76,37 @@ export function initDatabase(db: SQLite.SQLiteDatabase): void {
 
   db.execSync(SCHEMA_SQL);
 
-  try {
-    db.runSync('ALTER TABLE brew_sessions ADD COLUMN sensory_scores_json TEXT');
-  } catch {
-    // Column already exists
-  }
-
-  try {
-    db.runSync('ALTER TABLE brew_sessions ADD COLUMN water_profile TEXT');
-  } catch {
-    // Column already exists
-  }
-
-  try {
-    db.runSync(
-      'CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL)'
-    );
-  } catch {
-    // Table already exists
-  }
-
   const TARGET_SCHEMA_VERSION = 3;
   if (currentVersion < TARGET_SCHEMA_VERSION) {
+    createPreMigrationBackup(db, currentVersion);
     try {
-      db.execSync(`PRAGMA user_version = ${TARGET_SCHEMA_VERSION};`);
-    } catch {
-      // Ignoruj błąd w mockach
+      db.execSync('BEGIN TRANSACTION;');
+      try {
+        db.runSync('ALTER TABLE brew_sessions ADD COLUMN sensory_scores_json TEXT');
+      } catch {
+        // Kolumna już istnieje
+      }
+      try {
+        db.runSync('ALTER TABLE brew_sessions ADD COLUMN water_profile TEXT');
+      } catch {
+        // Kolumna już istnieje
+      }
+      db.runSync(
+        'CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL)'
+      );
+      try {
+        db.execSync(`PRAGMA user_version = ${TARGET_SCHEMA_VERSION};`);
+      } catch {
+        // Ignoruj błąd w mockach
+      }
+      db.execSync('COMMIT;');
+    } catch (migError) {
+      try {
+        db.execSync('ROLLBACK;');
+      } catch {
+        // ignore
+      }
+      throw migError;
     }
   }
 

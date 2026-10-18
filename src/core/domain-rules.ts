@@ -253,8 +253,16 @@ export function calculateHoursUntilSafeCaffeine(doseMg: number, safeThresholdMg 
   return Number(hours.toFixed(1));
 }
 
+export interface TasteDiagnosis {
+  issue: string;
+  recommendationPl: string;
+  grindAdjustment?: 'finer' | 'coarser';
+  tempAdjustment?: 'higher' | 'lower';
+  steepTimeAdjustmentSeconds?: number;
+}
+
 /**
- * RD-05: Deterministyczny kompas ekstrakcji (Dial-in Doctor)
+ * RD-05: Deterministyczny kompas ekstrakcji (Dial-in Doctor dla Kawy)
  */
 export function diagnoseExtractionTaste(params: {
   isSour?: boolean;
@@ -262,7 +270,17 @@ export function diagnoseExtractionTaste(params: {
   isAstringent?: boolean;
   isWatery?: boolean;
   isTooIntense?: boolean;
+  beverageType?: 'COFFEE' | 'TEA';
+  isScalded?: boolean;
 }): TasteDiagnosis[] {
+  if (params.beverageType === 'TEA') {
+    return diagnoseTeaTaste({
+      isBitterOrAstringent: params.isBitter || params.isAstringent,
+      isWeakOrWatery: params.isWatery,
+      isScaldedOrCooked: params.isScalded,
+    });
+  }
+
   const diagnoses: TasteDiagnosis[] = [];
 
   if (params.isSour) {
@@ -299,6 +317,49 @@ export function diagnoseExtractionTaste(params: {
 
   return diagnoses;
 }
+
+/**
+ * RD-05b: Deterministyczny kompas parzenia herbaty rzemieślniczej i Gongfu Cha
+ */
+export function diagnoseTeaTaste(params: {
+  isBitterOrAstringent?: boolean;
+  isWeakOrWatery?: boolean;
+  isScaldedOrCooked?: boolean;
+  teaType?: 'GREEN' | 'OOLONG' | 'BLACK' | 'PUERH' | 'WHITE';
+}): TasteDiagnosis[] {
+  const diagnoses: TasteDiagnosis[] = [];
+
+  if (params.isScaldedOrCooked) {
+    diagnoses.push({
+      issue: 'Poparzone liście / ugotowany posmak (Za gorąca woda)',
+      recommendationPl: 'Obniż temperaturę wody do 70–80°C dla zielonej/białej herbaty, aby chronić aminokwasy L-teaniny i zapobiec gorzkiemu wyciekowi katechin.',
+      tempAdjustment: 'lower',
+      steepTimeAdjustmentSeconds: -5,
+    });
+  }
+
+  if (params.isBitterOrAstringent) {
+    diagnoses.push({
+      issue: 'Nadmierna ściągająca cierpkość (Zbyt długa infuzja lub za duża doza)',
+      recommendationPl: 'Skróć czas parzenia o 5–10 sekund w metodzie Gongfu Cha lub obniż temperaturę wody o 3–5°C.',
+      tempAdjustment: 'lower',
+      steepTimeAdjustmentSeconds: -10,
+    });
+  }
+
+  if (params.isWeakOrWatery) {
+    diagnoses.push({
+      issue: 'Zbyt wodnisty / brak głębi aromatu (Niedostateczna infuzja)',
+      recommendationPl: 'Wydłuż czas parzenia o 10–15 sekund lub podnieś temperaturę wody o 3–5°C (szczególnie dla dojrzałych puerhów i oolongów skalnych).',
+      tempAdjustment: 'higher',
+      steepTimeAdjustmentSeconds: 15,
+    });
+  }
+
+  return diagnoses;
+}
+
+export const diagnoseTaste = diagnoseExtractionTaste;
 
 export interface BatchScalingResult {
   multiplier: number;

@@ -264,5 +264,31 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       const empty = diagnoseExtractionTaste({});
       expect(empty.length).toBe(0);
     });
+
+    it('diagnoseTeaTaste oraz diagnoseExtractionTaste z beverageType=TEA poprawnie diagnozują błędy parzenia herbaty', () => {
+      const { diagnoseTeaTaste } = require('../domain-rules');
+      const scalded = diagnoseTeaTaste({ isScaldedOrCooked: true });
+      expect(scalded.length).toBe(1);
+      expect(scalded[0].issue).toContain('Poparzone liście');
+      expect(scalded[0].tempAdjustment).toBe('lower');
+
+      const bitter = diagnoseTeaTaste({ isBitterOrAstringent: true });
+      expect(bitter.length).toBe(1);
+      expect(bitter[0].issue).toContain('Nadmierna ściągająca cierpkość');
+      expect(bitter[0].steepTimeAdjustmentSeconds).toBe(-10);
+
+      const weak = diagnoseTeaTaste({ isWeakOrWatery: true });
+      expect(weak.length).toBe(1);
+      expect(weak[0].issue).toContain('Zbyt wodnisty');
+      expect(weak[0].tempAdjustment).toBe('higher');
+
+      // Wywołanie przez uniwersalny interfejs diagnoseExtractionTaste
+      const viaExtraction = diagnoseExtractionTaste({
+        beverageType: 'TEA',
+        isScalded: true,
+      });
+      expect(viaExtraction.length).toBe(1);
+      expect(viaExtraction[0].issue).toContain('Poparzone liście');
+    });
   });
 });

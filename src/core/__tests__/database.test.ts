@@ -195,7 +195,9 @@ describe('Napar SQLite Database & Repositories', () => {
 
   test('Inicjalizacja bazy i seeding domyślnych przepisów', () => {
     initDatabase(mockDb as any);
-    expect(mockDb.execSync).toHaveBeenCalled();
+    expect(mockDb.execSync).toHaveBeenCalledWith('PRAGMA foreign_keys = ON;');
+    expect(mockDb.execSync).toHaveBeenCalledWith('PRAGMA journal_mode = WAL;');
+    expect(mockDb.execSync).toHaveBeenCalledWith('PRAGMA busy_timeout = 5000;');
     // Powinno zainicjalizować przepisy wzorcowe
     expect(mockDb.recipes.size).toBeGreaterThanOrEqual(10);
   });
