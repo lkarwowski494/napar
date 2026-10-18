@@ -17,6 +17,8 @@ import {
   findCoffeeProcessById,
   findCoffeeOriginById,
   findTeaCategoryById,
+  getKnowledgeDescription,
+  getKnowledgeSensoryProfile,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -180,5 +182,59 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
 
     expect(findTeaCategoryById('tea-white')).toBeDefined();
     expect(findTeaCategoryById('non-existent-tea')).toBeUndefined();
+  });
+
+  test('Wyszukiwanie wielojęzyczne i filtry zaawansowane', () => {
+    // Odmiany - wyszukiwanie po regionie i angielskich nutach
+    const byRegion = searchCoffeeVarieties('Scott Agricultural');
+    expect(byRegion.length).toBeGreaterThanOrEqual(1);
+
+    const byEnNote = searchCoffeeVarieties('blackcurrant');
+    expect(byEnNote.length).toBeGreaterThanOrEqual(1);
+
+    const bySensory = searchCoffeeVarieties('krystaliczna czystość');
+    expect(bySensory.length).toBeGreaterThanOrEqual(1);
+
+    // Obróbki - wyszukiwanie po sensoryce i typie obróbki
+    const byProcType = searchCoffeeProcesses('WET_HULLED');
+    expect(byProcType.length).toBeGreaterThanOrEqual(1);
+
+    const byProcSensory = searchCoffeeProcesses('wilgotności');
+    expect(byProcSensory.length).toBeGreaterThanOrEqual(1);
+
+    // Terroir - wyszukiwanie po odmianach i profilu sensorycznym
+    const byVarietyInOrigin = searchCoffeeOrigins('Bourbon');
+    expect(byVarietyInOrigin.length).toBeGreaterThanOrEqual(1);
+
+    const bySensoryOrigin = searchCoffeeOrigins('jaśmin');
+    expect(bySensoryOrigin.length).toBeGreaterThanOrEqual(1);
+
+    // Herbata - wyszukiwanie po nazwie angielskiej i regionie
+    const byEnTea = searchTeaCategories('White Tea');
+    expect(byEnTea.length).toBeGreaterThanOrEqual(1);
+
+    const byTeaRegion = searchTeaCategories('Fujian');
+    expect(byTeaRegion.length).toBeGreaterThanOrEqual(1);
+
+    const byTeaSensory = searchTeaCategories('kwiatowy');
+    expect(byTeaSensory.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test('Pobieranie opisów i profili sensorycznych przez getKnowledgeDescription i getKnowledgeSensoryProfile', () => {
+    // Opisy
+    expect(getKnowledgeDescription('variety-geisha', 'pl')).toContain('Najbardziej ceniona');
+    expect(getKnowledgeDescription('variety-geisha', 'en')).toContain('The most prestigious');
+
+    // Profile sensoryczne odmian
+    expect(getKnowledgeSensoryProfile('variety-geisha', 'pl')).toContain('Krystaliczna czystość');
+    expect(getKnowledgeSensoryProfile('variety-geisha', 'en')).toContain('Crystal clarity');
+
+    // Profile sensoryczne obróbek
+    expect(getKnowledgeSensoryProfile('process-washed', 'pl')).toContain('przejrzystość');
+    expect(getKnowledgeSensoryProfile('process-washed', 'en')).toContain('clarity');
+
+    // Profile sensoryczne terroir
+    expect(getKnowledgeSensoryProfile('origin-ethiopia', 'pl')).toContain('jaśmin');
+    expect(getKnowledgeSensoryProfile('origin-ethiopia', 'en')).toContain('jasmine');
   });
 });

@@ -1,10 +1,11 @@
 // ============================================================================
 // Apps4Brew Studio — i18n Verification Gate (check-i18n.mjs)
-// Verifies 100% key symmetry, non-empty values, and param integrity between PL & EN
+// Verifies 100% key symmetry, non-empty values, and param integrity across 35 languages
+// TASK-R09-01: Full verification of _source.json and all 35 locale files
 // ============================================================================
 
 import { fileURLToPath } from 'node:url';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { createRequire } from 'node:module';
 import vm from 'node:vm';
@@ -14,6 +15,9 @@ const require = createRequire(import.meta.url);
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const i18nPath = join(root, 'src/core/i18n.tsx');
+const localesDir = join(root, 'locales');
+const sourceJsonPath = join(localesDir, '_source.json');
+
 const code = readFileSync(i18nPath, 'utf8');
 
 const transformed = babel.transformSync(code, {
@@ -92,9 +96,72 @@ function checkSymmetry(plObj, enObj, prefix = '') {
   }
 }
 
+// 1. Weryfikacja symetrii PL/EN w kodzie i18n.tsx
 checkSymmetry(tr.pl, tr.en);
-
 console.log(`[i18n] Zweryfikowano ${totalKeys} kluczy w słownikach PL i EN.`);
+
+// 2. Weryfikacja bazy _source.json
+if (!existsSync(sourceJsonPath)) {
+  console.error('[i18n] Błąd: Brak pliku bazowego locales/_source.json');
+  process.exit(1);
+}
+
+const sourceData = JSON.parse(readFileSync(sourceJsonPath, 'utf8'));
+
+// 3. Weryfikacja 35 słowników językowych w locales/
+const EXPECTED_LOCALES = [
+  'en', 'pl', 'de', 'fr', 'es', 'it', 'pt-BR', 'pt-PT', 'nl', 'sv',
+  'da', 'no', 'fi', 'cs', 'sk', 'hu', 'ro', 'bg', 'el', 'tr',
+  'ru', 'uk', 'ja', 'ko', 'zh-Hans', 'zh-Hant', 'id', 'ms', 'th', 'vi',
+  'ar', 'he', 'hi', 'hr', 'ca',
+];
+
+const localeErrors = [];
+let verifiedLocalesCount = 0;
+
+function validateLocaleRecursive(sourceObj, targetObj, localeCode, prefix = '') {
+  for (const [key, sourceVal] of Object.entries(sourceObj)) {
+    if (key === '_meta') continue;
+    const path = prefix ? `${prefix}.${key}` : key;
+
+    if (!(key in targetObj)) {
+      localeErrors.push(`[${localeCode}] Brak klucza: ${path}`);
+      continue;
+    }
+
+    const targetVal = targetObj[key];
+    if (typeof sourceVal === 'object' && sourceVal !== null && !Array.isArray(sourceVal)) {
+      if (typeof targetVal !== 'object' || targetVal === null) {
+        localeErrors.push(`[${localeCode}] Niezgodność typu dla ${path}: oczekiwano obiektu`);
+      } else {
+        validateLocaleRecursive(sourceVal, targetVal, localeCode, path);
+      }
+    } else {
+      if (typeof targetVal === 'string' && targetVal.trim() === '') {
+        localeErrors.push(`[${localeCode}] Pusta wartość dla ${path}`);
+      }
+      const sParams = extractParams(sourceVal);
+      const tParams = extractParams(targetVal);
+      if (sParams !== tParams) {
+        localeErrors.push(`[${localeCode}] Niezgodne parametry dla ${path}: źródło {${sParams}} vs {${tParams}}`);
+      }
+    }
+  }
+}
+
+for (const loc of EXPECTED_LOCALES) {
+  const locPath = join(localesDir, `${loc}.json`);
+  if (!existsSync(locPath)) {
+    localeErrors.push(`Brak pliku słownika: locales/${loc}.json`);
+    continue;
+  }
+
+  const locData = JSON.parse(readFileSync(locPath, 'utf8'));
+  validateLocaleRecursive(sourceData, locData, loc);
+  verifiedLocalesCount++;
+}
+
+console.log(`[i18n] Zweryfikowano ${verifiedLocalesCount} słowników językowych z zachowaniem 100% symetrii parametrów.`);
 
 if (missingInEn.length > 0) {
   console.error(`[i18n] Brakujące klucze w słowniku EN (${missingInEn.length}):`);
@@ -116,16 +183,25 @@ if (badParams.length > 0) {
   badParams.forEach((k) => console.error(`  - ${k}`));
 }
 
+if (localeErrors.length > 0) {
+  console.error(`[i18n] Błędy w macierzy 35 języków (${localeErrors.length}):`);
+  localeErrors.slice(0, 20).forEach((err) => console.error(`  - ${err}`));
+  if (localeErrors.length > 20) {
+    console.error(`  ...oraz ${localeErrors.length - 20} dalszych błędów.`);
+  }
+}
+
 const hasErrors =
   missingInEn.length > 0 ||
   missingInPl.length > 0 ||
   emptyValues.length > 0 ||
-  badParams.length > 0;
+  badParams.length > 0 ||
+  localeErrors.length > 0;
 
 if (hasErrors) {
   console.error('[i18n] Weryfikacja symetrii nie powiodła się.');
   process.exit(1);
 } else {
-  console.log('[i18n] 100% symetrii językowej PL/EN zachowane bez błędów.');
+  console.log('[i18n] 100% symetrii językowej (35 języków) zachowane bez błędów.');
   process.exit(0);
 }

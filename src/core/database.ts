@@ -120,28 +120,34 @@ export function createPreMigrationBackup(db: SQLite.SQLiteDatabase, fromVersion:
   }
 }
 
-export function initDatabase(db: SQLite.SQLiteDatabase): void {
+export function initDatabase(db?: SQLite.SQLiteDatabase): void {
+  const targetDb = db || dbInstance;
+  if (!targetDb) {
+    getDatabase();
+    return;
+  }
+
   try {
-    db.execSync('PRAGMA foreign_keys = ON;');
+    targetDb.execSync('PRAGMA foreign_keys = ON;');
   } catch {
     // Ignoruj błąd PRAGMA w środowiskach zastępczych
   }
 
   try {
-    db.execSync('PRAGMA journal_mode = WAL;');
+    targetDb.execSync('PRAGMA journal_mode = WAL;');
   } catch {
     // Ignoruj błąd PRAGMA w środowiskach zastępczych
   }
 
   try {
-    db.execSync('PRAGMA busy_timeout = 5000;');
+    targetDb.execSync('PRAGMA busy_timeout = 5000;');
   } catch {
     // Ignoruj błąd PRAGMA w środowiskach zastępczych
   }
 
   let currentVersion = 0;
   try {
-    const versionRow = db.getFirstSync<{ user_version: number }>('PRAGMA user_version');
+    const versionRow = targetDb.getFirstSync<{ user_version: number }>('PRAGMA user_version');
     if (versionRow && typeof versionRow.user_version === 'number') {
       currentVersion = versionRow.user_version;
     }
@@ -149,35 +155,35 @@ export function initDatabase(db: SQLite.SQLiteDatabase): void {
     currentVersion = 0;
   }
 
-  db.execSync(SCHEMA_SQL);
+  targetDb.execSync(SCHEMA_SQL);
 
   const TARGET_SCHEMA_VERSION = 3;
   if (currentVersion < TARGET_SCHEMA_VERSION) {
-    createPreMigrationBackup(db, currentVersion);
+    createPreMigrationBackup(targetDb, currentVersion);
     try {
-      db.execSync('BEGIN TRANSACTION;');
+      targetDb.execSync('BEGIN TRANSACTION;');
       try {
-        db.runSync('ALTER TABLE brew_sessions ADD COLUMN sensory_scores_json TEXT');
+        targetDb.runSync('ALTER TABLE brew_sessions ADD COLUMN sensory_scores_json TEXT');
       } catch {
         // Kolumna już istnieje
       }
       try {
-        db.runSync('ALTER TABLE brew_sessions ADD COLUMN water_profile TEXT');
+        targetDb.runSync('ALTER TABLE brew_sessions ADD COLUMN water_profile TEXT');
       } catch {
         // Kolumna już istnieje
       }
-      db.runSync(
+      targetDb.runSync(
         'CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL)'
       );
       try {
-        db.execSync(`PRAGMA user_version = ${TARGET_SCHEMA_VERSION};`);
+        targetDb.execSync(`PRAGMA user_version = ${TARGET_SCHEMA_VERSION};`);
       } catch {
         // Ignoruj błąd w mockach
       }
-      db.execSync('COMMIT;');
+      targetDb.execSync('COMMIT;');
     } catch (migError) {
       try {
-        db.execSync('ROLLBACK;');
+        targetDb.execSync('ROLLBACK;');
       } catch {
         // ignore
       }
@@ -186,11 +192,11 @@ export function initDatabase(db: SQLite.SQLiteDatabase): void {
   }
 
   // Sprawdź czy tabela recipes ma dane początkowe z master recipes lub wymaga uzupełnienia
-  const countRow = db.getFirstSync<{ count: number }>(
+  const countRow = targetDb.getFirstSync<{ count: number }>(
     'SELECT COUNT(*) as count FROM recipes WHERE is_custom = 0'
   );
   if (!countRow || countRow.count < MASTER_RECIPES.length) {
-    seedMasterRecipes(db);
+    seedMasterRecipes(targetDb);
   }
 }
 
