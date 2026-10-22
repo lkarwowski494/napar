@@ -93,12 +93,11 @@ describe('Apps4BrewPassModal Component', () => {
     jest.restoreAllMocks();
   });
 
-  test('Renderuje plany cenowe ($0.99, $4.99, $14.99) i gwarancję historii', () => {
+  test('Renderuje plany bez wpisanych cen (tekst zastępczy) i gwarancję historii', () => {
     const tree = renderModal();
     const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('$0.99');
-    expect(str).toContain('$4.99');
-    expect(str).toContain('$14.99');
+    expect(str).toContain('cena w App Store');
+    expect(str).not.toMatch(/\$\d/);
     expect(str).toContain('APPS4BREW PASS');
     expect(str).toContain('Historia parzeń, edycja, eksport i kopia są ZAWSZE bezpłatne.');
   });
@@ -186,13 +185,14 @@ describe('Apps4BrewPassModal ze sklepem (etap 4b)', () => {
   test('ceny pochodzą z App Store (displayPrice), a bez produktów zostaje tekst zastępczy', async () => {
     useStore({
       listProducts: async () => [
-        { productId: STORE_PRODUCT_IDS.yearly, plan: 'yearly', displayPrice: '22,99 zł' },
+        { productId: STORE_PRODUCT_IDS.yearly, plan: 'yearly', displayPrice: '19,99 zł' },
       ],
     });
     const str = JSON.stringify((await renderModalAsync()).toJSON());
-    expect(str).toContain('22,99 zł');
-    expect(str).not.toContain('$4.99 / rok');
-    expect(str).toContain('$0.99 / msc');
+    expect(str).toContain('19,99 zł');
+    expect(str).not.toContain('$4.99');
+    // Plany bez produktu w sklepie nadal pokazują tekst zastępczy, nie stałą cenę
+    expect(str).toContain('cena w App Store');
   });
 
   test('zakup w sklepie: plan roczny aktywuje Pro przez onSubscribed (bez zamykania przez onPurchaseSuccess)', async () => {

@@ -58,12 +58,12 @@ export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
           style={[styles.passCtaBtn, styles.touchTarget]}
           onPress={onOpenPassModal}
           accessibilityRole="button"
-          accessibilityLabel={isPro ? 'Apps4Brew Pass: Aktywny' : 'Odblokuj Apps4Brew Pass ($0.99 / $4.99 / $14.99)'}
+          accessibilityLabel={isPro ? 'Apps4Brew Pass: Aktywny' : 'Odblokuj Apps4Brew Pass'}
         >
           <Text style={styles.passCtaBtnText}>
             {isPro
               ? 'Licencja Aktywna — Zarządzaj Planem'
-              : 'Przejdź do planów ($0.99 / $4.99 / $14.99)'}
+              : 'Przejdź do planów'}
           </Text>
         </Pressable>
       </View>

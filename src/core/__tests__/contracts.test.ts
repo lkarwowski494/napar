@@ -278,7 +278,8 @@ describe('Kontrakt Monetyzacji & StoreKit (Cheaper than Espresso)', () => {
 
     const annualSub = subGroup.subscriptions.find((s: any) => s.productID === 'pl.lukasz.napar.annual');
     expect(annualSub).toBeDefined();
-    expect(annualSub.displayPrice).toBe('4.99');
+    // Zatwierdzony cennik (docs/lista-funkcji-mvp.md, 22.10.2026): roczna subskrypcja USD 6,99
+    expect(annualSub.displayPrice).toBe('6.99');
     expect(annualSub.recurringSubscriptionPeriod).toBe('P1Y');
   });
 });

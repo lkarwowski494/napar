@@ -1431,7 +1431,7 @@ describe('BrewScreen UI Integration', () => {
     // Paywall Modal: plany i komunikat o wyczerpanym limicie (bez fałszywego triala)
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('APPS4BREW PASS');
-    expect(str).toContain('$4.99 / rok');
+    expect(str).toContain('cena w App Store');
     expect(str).toContain('Limit darmowego poziomu wykorzystany');
 
     mockDb.app_settings.delete('free_brew_days');

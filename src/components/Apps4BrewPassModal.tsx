@@ -1,6 +1,6 @@
 // ============================================================================
 // Napar (Steepwise) — Apps4Brew Pass Paywall Modal ("Cheaper than Espresso")
-// Pricing: $0.99/mo, $4.99/yr, $14.99 Lifetime.
+// Ceny nie są w kodzie: wyświetla się displayPrice ze sklepu (patrz priceOf).
 // Model M5 S1: darmowy poziom = 7 dni parzenia w miesiącu; historia i dane zawsze dostępne.
 // Zakup i przywracanie przez StoreAdapter (etap 4b). Bez produktów w sklepie: „zakup niedostępny”.
 // Ceny: displayPrice ze sklepu, a gdy sklep nie zna produktów, tekst zastępczy z tłumaczeń.
