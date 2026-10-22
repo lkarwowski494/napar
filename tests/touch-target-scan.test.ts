@@ -1,8 +1,11 @@
 // ============================================================================
 // Napar (Steepwise) — Skaner minimalnego pola dotyku (CLAUDE.md §2.4, NFR-A11Y)
-// Każda interaktywna kontrolka (Pressable / TouchableOpacity / ...) ma efektywny
-// obszar dotyku co najmniej 44 × 44 pt: przez width/height/minWidth/minHeight
-// albo przez hitSlop, który dopełnia obszar. Skaner działa statycznie na AST.
+// KAŻDA interaktywna kontrolka (Pressable / TouchableOpacity / ... / Switch)
+// ma efektywny obszar dotyku co najmniej 44 × 44 pt na każdej osi:
+//   obszar = rozmiar jawny (width/minWidth, height/minHeight; brak = 0) + 2 × hitSlop.
+// Kontrolka bez jawnego rozmiaru musi mieć minimum albo hitSlop, który sam daje 44 pt.
+// Wyjątki tylko z listy TOUCH_TARGET_EXCEPTIONS, z uzasadnieniem. Skaner działa
+// statycznie na AST.
 // ============================================================================
 
 import fs from 'fs';
@@ -17,7 +20,19 @@ const TOUCH_COMPONENTS = new Set([
   'TouchableHighlight',
   'TouchableWithoutFeedback',
   'TouchableNativeFeedback',
+  'Switch',
 ]);
+
+/**
+ * Wyjątki od reguły 44 pt. Każdy wpis wskazuje plik, linię kontrolki i uzasadnienie,
+ * dlaczego nie wolno jej powiększyć. Wpis, który przestaje pasować do naruszenia, failuje test.
+ */
+export const TOUCH_TARGET_EXCEPTIONS: ReadonlyArray<{
+  file: string; // ścieżka względem katalogu głównego repo
+  line: number;
+  component: string;
+  reason: string;
+}> = [];
 
 interface Violation {
   file: string;
@@ -107,6 +122,10 @@ function collectStyleSources(
     case 'LogicalExpression':
       collectStyleSources(expr.right, styleSheet, out);
       return;
+    case 'ArrowFunctionExpression':
+      // style={({ pressed }) => [...]}: źródła z wyrażenia zwracanego (bez bloku)
+      if (expr.body.type !== 'BlockStatement') collectStyleSources(expr.body, styleSheet, out);
+      return;
     default:
       return;
   }
@@ -135,10 +154,7 @@ function hitSlopExtent(attr: AnyNode): { horizontal: number; vertical: number } 
   return undefined;
 }
 
-export function scanFileForTouchTargetViolations(
-  filePath: string,
-  onUnsized?: (line: number, component: string) => void
-): Violation[] {
+export function scanFileForTouchTargetViolations(filePath: string): Violation[] {
   const code = fs.readFileSync(filePath, 'utf8');
   const ast = babel.parseSync(code, {
     filename: filePath,
@@ -179,47 +195,40 @@ export function scanFileForTouchTargetViolations(
       collectStyleSources(styleAttr.value.expression, styleSheet, sources);
     }
 
-    // Efektywny rozmiar: największa z wartości width/minWidth (osobno dla osi)
-    const sizes = { width: undefined as number | undefined, height: undefined as number | undefined };
+    // Jawny rozmiar: największa z wartości width/minWidth (osobno dla osi); brak = undefined
+    const explicit = { width: undefined as number | undefined, height: undefined as number | undefined };
     for (const src of sources) {
       const s = sizeFromObject(src);
       const w = [s.width, s.minWidth].filter((v): v is number => v !== undefined);
       const h = [s.height, s.minHeight].filter((v): v is number => v !== undefined);
-      if (w.length) sizes.width = Math.max(sizes.width ?? -Infinity, ...w);
-      if (h.length) sizes.height = Math.max(sizes.height ?? -Infinity, ...h);
+      if (w.length) explicit.width = Math.max(explicit.width ?? -Infinity, ...w);
+      if (h.length) explicit.height = Math.max(explicit.height ?? -Infinity, ...h);
     }
 
-    const slop = hitSlopExtent(hitSlopAttr);
     const line = node.loc ? node.loc.start.line : 0;
     const component = node.name.name;
-
-    if (sizes.width === undefined && sizes.height === undefined) {
-      // Rozmiar wynika z zawartości; nie da się go sprawdzić statycznie
-      onUnsized?.(line, component);
-      return;
-    }
-    if (slop === undefined) {
-      violations.push({
-        file: filePath,
-        line,
-        component,
-        detail: 'hitSlop nie jest liczbą literalną, nie da się sprawdzić obszaru dotyku',
-      });
-      return;
-    }
+    // hitSlop niebędący literałem liczy się jako 0 (konserwatywnie: nie zawyża obszaru)
+    const slopLiteral = hitSlopExtent(hitSlopAttr);
+    const slop = slopLiteral ?? { horizontal: 0, vertical: 0 };
     const failingAxes: string[] = [];
-    if (sizes.width !== undefined && sizes.width + 2 * slop.horizontal < MIN_TOUCH_PT) {
-      failingAxes.push(`szerokość ${sizes.width}`);
+    const effectiveWidth = (explicit.width ?? 0) + 2 * slop.horizontal;
+    const effectiveHeight = (explicit.height ?? 0) + 2 * slop.vertical;
+    if (effectiveWidth < MIN_TOUCH_PT) {
+      failingAxes.push(
+        `szerokość ${explicit.width === undefined ? 'bez jawnego rozmiaru' : explicit.width} pt`
+      );
     }
-    if (sizes.height !== undefined && sizes.height + 2 * slop.vertical < MIN_TOUCH_PT) {
-      failingAxes.push(`wysokość ${sizes.height}`);
+    if (effectiveHeight < MIN_TOUCH_PT) {
+      failingAxes.push(
+        `wysokość ${explicit.height === undefined ? 'bez jawnego rozmiaru' : explicit.height} pt`
+      );
     }
     if (failingAxes.length) {
       violations.push({
         file: filePath,
         line,
         component,
-        detail: `${failingAxes.join(', ')} pt (hitSlop ${slop.horizontal}/${slop.vertical}), wymagane ${MIN_TOUCH_PT}`,
+        detail: `${failingAxes.join(', ')} (hitSlop ${slopLiteral ? `${slop.horizontal}/${slop.vertical}` : 'niebędący literałem, liczony jako 0'}), wymagane ${MIN_TOUCH_PT} pt na każdej osi`,
       });
     }
   });
@@ -227,13 +236,15 @@ export function scanFileForTouchTargetViolations(
   return violations;
 }
 
-describe('Skaner pola dotyku: interaktywne kontrolki mają co najmniej 44 pt (§2.4)', () => {
-  const files = [
+function allSourceFiles(): string[] {
+  return [
     ...listSourceFiles(path.join(ROOT, 'app')),
     ...listSourceFiles(path.join(ROOT, 'src')),
   ];
+}
 
-  test('skaner znajduje naruszenie w zbudowanym przykładzie (test samego skanera)', () => {
+describe('Skaner pola dotyku: każda interaktywna kontrolka ma co najmniej 44 pt (§2.4)', () => {
+  test('skaner znajduje naruszenia w zbudowanym przykładzie (test samego skanera)', () => {
     const tmpDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'touch-scan-'));
     const sample = path.join(tmpDir, 'Sample.tsx');
     fs.writeFileSync(
@@ -244,6 +255,7 @@ const styles = StyleSheet.create({
   big: { width: 44, height: 44 },
   padded: { width: 28, height: 28 },
   minimum: { minWidth: 44, minHeight: 44 },
+  tall: { height: 44 },
 });
 export const A = () => <Pressable style={styles.small} onPress={() => {}} />;
 export const B = () => <Pressable style={styles.big} onPress={() => {}} />;
@@ -251,20 +263,39 @@ export const C = () => <Pressable style={styles.padded} hitSlop={8} onPress={() 
 export const D = () => <Pressable style={[styles.minimum]} onPress={() => {}} />;
 export const E = () => <Pressable style={{ width: 30, height: 50 }} onPress={() => {}} />;
 export const F = () => <Pressable hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={styles.small} onPress={() => {}} />;
+export const G = () => <Pressable onPress={() => {}} />;
+export const H = () => <Pressable style={styles.tall} onPress={() => {}} />;
+export const I = () => <Pressable style={styles.tall} hitSlop={11} onPress={() => {}} />;
 `
     );
     const violations = scanFileForTouchTargetViolations(sample);
     fs.rmSync(tmpDir, { recursive: true, force: true });
 
-    expect(violations.map((v) => v.line)).toEqual([8, 12]);
+    expect(violations.map((v) => v.line)).toEqual([9, 13, 15, 16, 17]);
   });
 
-  test('żadna interaktywna kontrolka w app/ i src/ nie jest mniejsza niż 44 × 44 pt', () => {
-    const all: Violation[] = [];
-    for (const file of files) {
-      all.push(...scanFileForTouchTargetViolations(file));
+  test('wyjątki wskazują rzeczywiste naruszenia i mają uzasadnienie', () => {
+    const all = new Map<string, Violation>();
+    for (const file of allSourceFiles()) {
+      for (const v of scanFileForTouchTargetViolations(file)) {
+        all.set(`${path.relative(ROOT, v.file)}:${v.line}`, v);
+      }
     }
-    const report = all
+    for (const ex of TOUCH_TARGET_EXCEPTIONS) {
+      expect(ex.reason.trim().length).toBeGreaterThan(20);
+      expect(all.has(`${ex.file}:${ex.line}`)).toBe(true);
+    }
+  });
+
+  test('żadna interaktywna kontrolka w app/ i src/ nie jest mniejsza niż 44 × 44 pt (bez wyjątku)', () => {
+    const excepted = new Set(TOUCH_TARGET_EXCEPTIONS.map((e) => `${e.file}:${e.line}`));
+    const failing: Violation[] = [];
+    for (const file of allSourceFiles()) {
+      for (const v of scanFileForTouchTargetViolations(file)) {
+        if (!excepted.has(`${path.relative(ROOT, v.file)}:${v.line}`)) failing.push(v);
+      }
+    }
+    const report = failing
       .map((v) => `${path.relative(ROOT, v.file)}:${v.line} <${v.component}> ${v.detail}`)
       .join('\n');
     expect(report).toBe('');
