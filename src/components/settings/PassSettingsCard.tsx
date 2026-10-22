@@ -1,46 +1,44 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
+import { fillTemplate } from '../../core/access-policy';
 
 export interface PassSettingsCardProps {
-  isSubscribed: boolean;
-  subscriptionTier: string;
-  accessStatus: string;
-  brewsRemaining: number;
+  isPro: boolean;
+  monthDaysUsed: number;
+  freeDaysPerMonth: number;
   onOpenPassModal: () => void;
   t: any;
 }
 
 export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
-  isSubscribed,
-  subscriptionTier,
-  accessStatus,
-  brewsRemaining,
+  isPro,
+  monthDaysUsed,
+  freeDaysPerMonth,
   onOpenPassModal,
   t,
 }) => {
+  const limitReached = monthDaysUsed >= freeDaysPerMonth;
   return (
     <View>
       <Text style={styles.sectionTitle}>{t.settings.proTitle} — Apps4Brew Pass</Text>
       <View style={styles.proCard}>
         <View style={styles.proHeader}>
           <Text style={styles.proTitle}>{t.paywall.title}</Text>
-          {isSubscribed ? (
+          {isPro ? (
             <View style={styles.proActiveBadge}>
-              <Text style={styles.proActiveText}>
-                {subscriptionTier.toUpperCase()} PRO
-              </Text>
+              <Text style={styles.proActiveText}>PRO</Text>
             </View>
-          ) : accessStatus === 'trial_active' ? (
-            <View style={[styles.proActiveBadge, { backgroundColor: theme.colors.copperMuted }]}>
-              <Text style={[styles.proActiveText, { color: theme.colors.copper }]}>
-                TRIAL ({brewsRemaining} {brewsRemaining === 1 ? 'parzenie' : 'parzenia'})
+          ) : limitReached ? (
+            <View style={[styles.proActiveBadge, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
+              <Text style={[styles.proActiveText, { color: '#ef4444' }]}>
+                {t.paywall.limitBadge}
               </Text>
             </View>
           ) : (
-            <View style={[styles.proActiveBadge, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
-              <Text style={[styles.proActiveText, { color: '#ef4444' }]}>
-                TRIAL WYGASŁ
+            <View style={[styles.proActiveBadge, { backgroundColor: theme.colors.copperMuted }]}>
+              <Text style={[styles.proActiveText, { color: theme.colors.copper }]}>
+                {fillTemplate(t.paywall.freeBadge, { used: monthDaysUsed, limit: freeDaysPerMonth })}
               </Text>
             </View>
           )}
@@ -60,10 +58,10 @@ export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
           style={styles.passCtaBtn}
           onPress={onOpenPassModal}
           accessibilityRole="button"
-          accessibilityLabel={isSubscribed ? 'Apps4Brew Pass: Aktywny' : 'Odblokuj Apps4Brew Pass ($0.99 / $4.99 / $14.99)'}
+          accessibilityLabel={isPro ? 'Apps4Brew Pass: Aktywny' : 'Odblokuj Apps4Brew Pass ($0.99 / $4.99 / $14.99)'}
         >
           <Text style={styles.passCtaBtnText}>
-            {isSubscribed
+            {isPro
               ? 'Licencja Aktywna — Zarządzaj Planem'
               : 'Przejdź do planów ($0.99 / $4.99 / $14.99)'}
           </Text>

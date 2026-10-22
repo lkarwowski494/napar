@@ -57,7 +57,14 @@ export function getRecipeName(recipe: AnyRecipe): string {
 export function useBrewWorkflow() {
   const router = useRouter();
   const { t, language } = useTranslation();
-  const { canCreate, isHistoryReadOnly, recordBrew, refresh } = useAppAccess();
+  const brewAccessHook = useAppAccess();
+  const { checkBrewStart, recordTimerBrew, refresh } = brewAccessHook;
+  const brewAccess = {
+    isPro: brewAccessHook.isPro,
+    monthDaysUsed: brewAccessHook.monthDaysUsed,
+    freeDaysPerMonth: brewAccessHook.freeDaysPerMonth,
+    remainingDays: brewAccessHook.remainingDays,
+  };
   const unitSystem = getUnitSystem();
 
   const brew = useBrew();
@@ -282,7 +289,9 @@ export function useBrewWorkflow() {
   }, [doseGrams, waterGrams]);
 
   const handleStartTimer = () => {
-    if (!canCreate) {
+    // Limit dotyczy tylko rozpoczęcia parzenia; trwające parzenie nigdy nie jest blokowane.
+    const sessionInProgress = snapshot.status === 'running' || snapshot.status === 'paused';
+    if (!checkBrewStart(sessionInProgress).allowed) {
       setShowPaywallModal(true);
       return;
     }
@@ -303,10 +312,6 @@ export function useBrewWorkflow() {
 
   const handleScanQrRecipe = (data: string) => {
     setShowQrScanner(false);
-    if (!canCreate) {
-      setShowPaywallModal(true);
-      return;
-    }
     try {
       const decoded = decodeRecipeFromShareUrl(data);
       if (decoded && decoded.recipe) {
@@ -364,11 +369,6 @@ export function useBrewWorkflow() {
   };
 
   const handleDuplicateRecipe = (r: AnyRecipe) => {
-    if (!canCreate) {
-      setShowRecipeModal(false);
-      setShowPaywallModal(true);
-      return;
-    }
     const cloned = duplicateRecipe(r);
     refreshData();
     Alert.alert(
@@ -404,7 +404,7 @@ export function useBrewWorkflow() {
       notes: notes.trim() || undefined,
       logToCaffeineTracker: true,
     });
-    recordBrew();
+    recordTimerBrew();
     setShowFinishModal(false);
     resetTimer();
     Alert.alert('Zapisano!', 'Sesja parzenia została utrwalona w Twoim Dzienniku.');
@@ -440,8 +440,8 @@ export function useBrewWorkflow() {
     t,
     language,
     unitSystem,
-    canCreate,
-    isHistoryReadOnly,
+    brewAccess,
+    checkBrewStart,
     refresh,
     recipe,
     selectedInventoryItem,

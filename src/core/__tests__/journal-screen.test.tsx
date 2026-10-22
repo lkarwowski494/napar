@@ -6,6 +6,7 @@
 import React from 'react';
 import { Alert, Share } from 'react-native';
 import renderer, { act } from 'react-test-renderer';
+import { exhaustedFreeBrewDaysValue } from '../../../tests/helpers/free-brew-days';
 import JournalScreen from '../../../app/(tabs)/journal';
 import { BrewProvider } from '../brew-context';
 import { getBrewSessions, deleteBrewSession } from '../database';
@@ -323,10 +324,10 @@ describe('JournalScreen Integration', () => {
     });
   });
 
-  test('W trybie Read-Only (po trialu) wyświetla się baner ochrony historii, a Powtórz Parzenie otwiera paywall', () => {
+  test('Wyczerpany limit: dziennik bez banera tylko do odczytu, Powtórz Parzenie ładuje parametry bez Paywalla', () => {
     const { getAppSetting } = require('../database');
     getAppSetting.mockImplementation((key: string, def: string) => {
-      if (key === 'trial_brews_count') return '15';
+      if (key === 'free_brew_days') return exhaustedFreeBrewDaysValue();
       if (key === 'is_pro_active') return 'false';
       return def;
     });
@@ -340,25 +341,15 @@ describe('JournalScreen Integration', () => {
       );
     });
 
-    // Weryfikacja obecności banera informującego o Read-Only
-    const readOnlyBanner = tree.root.findByProps({ testID: 'journal-readonly-banner' });
-    expect(readOnlyBanner).toBeDefined();
+    // Historia jest zawsze dostępna: brak banera ochrony i brak Paywalla
+    expect(tree.root.findAllByProps({ testID: 'journal-readonly-banner' })).toHaveLength(0);
 
-    // Kliknięcie Powtórz Parzenie przy wygasłym trialu
     const brewAgainBtn = tree.root.findByProps({ testID: 'brew-again-btn-sess-1' });
     act(() => {
       brewAgainBtn.props.onPress();
     });
-
-    // Paywall modal powinien się pojawić z planami
-    const annualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
-    expect(annualBtn).toBeDefined();
-
-    // Zamknij paywall
-    const closeBtn = tree.root.findByProps({ testID: 'close-paywall-btn' });
-    act(() => {
-      closeBtn.props.onPress();
-    });
+    expect(tree.root.findAllByProps({ testID: 'plan-annual-btn' })).toHaveLength(0);
+    expect(mockNavigate).toHaveBeenCalledWith('/');
 
     getAppSetting.mockImplementation(() => null);
   });
@@ -399,10 +390,9 @@ describe('JournalScreen Integration', () => {
     });
     expect(mockNavigate).toHaveBeenCalledWith('/');
 
-    // Test wygasłego triala przy kliknięciu 1-Tap Execute
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+    // Wyczerpany limit nie blokuje 1-Tap Execute (ładowanie parametrów, bez startu timera)
     getAppSetting.mockImplementation((key: string) => {
-      if (key === 'apps4brew_trial_started_at') return thirtyDaysAgo;
+      if (key === 'free_brew_days') return exhaustedFreeBrewDaysValue();
       return null;
     });
 
@@ -421,6 +411,7 @@ describe('JournalScreen Integration', () => {
     act(() => {
       expiredExecBtn.props.onPress();
     });
+    expect(expiredTree.root.findAllByProps({ testID: 'plan-annual-btn' })).toHaveLength(0);
 
     getAppSetting.mockImplementation(() => null);
     getInventoryItems.mockImplementation(() => []);

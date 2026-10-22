@@ -22,6 +22,7 @@ import * as recipes from './repositories/recipes';
 import * as sessions from './repositories/brew-sessions';
 import * as caffeine from './repositories/caffeine';
 import * as settings from './repositories/app-settings';
+import * as brewAccess from './repositories/brew-access';
 
 export { createPreMigrationBackup, TARGET_SCHEMA_VERSION } from './repositories/schema';
 export type { BeveragePreference } from './repositories/app-settings';
@@ -167,6 +168,10 @@ export const getBeveragePreference = bindSetting(settings.getBeveragePreference)
 export const setBeveragePreference = bindSetting(settings.setBeveragePreference);
 export const getHasCompletedOnboarding = bindSetting(settings.getHasCompletedOnboarding);
 export const setHasCompletedOnboarding = bindSetting(settings.setHasCompletedOnboarding);
+
+// Dostęp do parzenia: dni wliczone do darmowego limitu (stan poza kopią)
+export const getCountedBrewDays = bindSetting(brewAccess.getCountedBrewDays);
+export const recordCountedBrewDay = bindSetting(brewAccess.recordCountedBrewDay);
 
 // Kopia zapasowa
 /** Pełny stan bieżącej bazy do kopii (bez limitów). */

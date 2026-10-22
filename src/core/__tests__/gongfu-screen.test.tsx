@@ -4,6 +4,7 @@
 
 import React from 'react';
 import renderer from 'react-test-renderer';
+import { exhaustedFreeBrewDaysValue } from '../../../tests/helpers/free-brew-days';
 
 // Mock in-memory DB for SQLite
 const mockDb: any = {
@@ -298,8 +299,8 @@ describe('GongfuScreen Component', () => {
     expect(saved.tasteBalance).toBeUndefined();
   });
 
-  test('W trybie wygasłego trialu próba rozpoczęcia parzenia Gongfu Cha otwiera Paywall', () => {
-    mockDb.settings.set('trial_brews_count', '15');
+  test('Wyczerpany limit dni parzenia: próba rozpoczęcia zalania Gongfu Cha otwiera Paywall', () => {
+    mockDb.settings.set('free_brew_days', exhaustedFreeBrewDaysValue());
     mockDb.settings.set('is_pro_active', 'false');
 
     let tree: any;

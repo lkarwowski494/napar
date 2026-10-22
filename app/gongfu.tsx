@@ -48,7 +48,7 @@ import { GongfuInfusionHistory } from '../src/components/gongfu/GongfuInfusionHi
 export default function GongfuScreen() {
   const router = useRouter();
   const { t, language } = useTranslation();
-  const { canCreate, recordBrew, refresh } = useAppAccess();
+  const { checkBrewStart, recordTimerBrew, refresh } = useAppAccess();
   const [showPaywall, setShowPaywall] = useState(false);
   const unitSystem = getUnitSystem();
 
@@ -142,7 +142,8 @@ export default function GongfuScreen() {
   }, [isSteeping, t.gongfu.pourNow]);
 
   const handleStartSteep = () => {
-    if (!canCreate) {
+    // Start zalania to rozpoczęcie parzenia: podlega limitowi darmowego poziomu.
+    if (!checkBrewStart(isSteeping).allowed) {
       setShowPaywall(true);
       return;
     }
@@ -177,10 +178,6 @@ export default function GongfuScreen() {
   };
 
   const handleFinishAndSaveSession = () => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
     if (session.infusions.length === 0) {
       Alert.alert(t.gongfu.modeTitle, 'Przeprowadź przynajmniej jedno zalanie przed zapisem sesji.');
       return;
@@ -232,7 +229,8 @@ export default function GongfuScreen() {
           deductInventoryWeight(selectedInventoryId, doseNum);
         }
 
-        recordBrew();
+        // Zalania są zmierzone timerem (zapis zalania dostępny po zakończeniu odliczania).
+        recordTimerBrew();
         try {
           void autoBackup(getBackupState());
         } catch {

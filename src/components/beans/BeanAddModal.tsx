@@ -19,8 +19,6 @@ export interface BeanAddModalProps {
   visible: boolean;
   onClose: () => void;
   beveragePreference?: 'coffee' | 'tea' | 'both';
-  canCreate: boolean;
-  onRequirePaywall: () => void;
   onOpenCompendium: () => void;
   presetTemplate?: KnowledgeTemplate | null;
   onSaved: () => void;
@@ -30,8 +28,6 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
   visible,
   onClose,
   beveragePreference,
-  canCreate,
-  onRequirePaywall,
   onOpenCompendium,
   presetTemplate,
   onSaved,
@@ -86,11 +82,6 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
   };
 
   const handleAddItem = () => {
-    if (!canCreate) {
-      onClose();
-      onRequirePaywall();
-      return;
-    }
     if (!name.trim()) {
       Alert.alert('Błąd', 'Podaj nazwę kawy lub herbaty.');
       return;

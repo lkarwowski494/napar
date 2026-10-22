@@ -10,7 +10,7 @@ import { BrewProvider } from '../brew-context';
 import { QrScannerModal } from '../QrScannerModal';
 import { encodeRecipeToShareUrl } from '../recipe-share';
 import { MASTER_RECIPES } from '../recipes-data';
-import { resetTrialForTesting, setTrialExpiredForTesting } from '../app-access';
+import { exhaustedFreeBrewDaysValue } from '../../../tests/helpers/free-brew-days';
 
 jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
 jest.spyOn(Alert, 'alert').mockImplementation(() => {});
@@ -1397,8 +1397,8 @@ describe('BrewScreen UI Integration', () => {
     expect(str).toContain('Oszczędność vs kawiarnia');
   });
 
-  test('Wygasły trial (trial_expired): Próba rozpoczęcia parzenia blokuje start i otwiera Apps4BrewPassModal', () => {
-    setTrialExpiredForTesting();
+  test('Wyczerpany limit dni parzenia: próba rozpoczęcia parzenia w nowym dniu blokuje start i otwiera Apps4BrewPassModal', () => {
+    mockDb.app_settings.set('free_brew_days', exhaustedFreeBrewDaysValue());
 
     let tree: any;
     act(() => {
@@ -1409,7 +1409,6 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
-    // Próba kliknięcia ROZPOCZNIJ PARZENIE
     const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
     expect(startBtn).toBeTruthy();
 
@@ -1417,18 +1416,17 @@ describe('BrewScreen UI Integration', () => {
       startBtn?.props.onPress();
     });
 
-    // Paywall Modal powinien się pojawić z planami $0.99 / $4.99 / $14.99
+    // Paywall Modal: plany i komunikat o wyczerpanym limicie (bez fałszywego triala)
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('APPS4BREW PASS');
     expect(str).toContain('$4.99 / rok');
-    expect(str).toContain('Twoja historia parzeń');
+    expect(str).toContain('Limit darmowego poziomu wykorzystany');
 
-    // Reset dla kolejnych testów
-    resetTrialForTesting();
+    mockDb.app_settings.delete('free_brew_days');
   });
 
-  test('Aktywny trial: Pozwala rozpocząć parzenie i uruchamia stoper', () => {
-    resetTrialForTesting();
+  test('Dostępny limit: pozwala rozpocząć parzenie i uruchamia stoper', () => {
+    mockDb.app_settings.delete('free_brew_days');
 
     let tree: any;
     act(() => {
@@ -1449,10 +1447,11 @@ describe('BrewScreen UI Integration', () => {
     // Po starcie stoper przechodzi w tryb running z przyciskiem PAUZA
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('PAUZA');
+    expect(str).not.toContain('APPS4BREW PASS');
   });
 
-  test('Wygasły trial: Ekran główny wyświetla baner Tryb Tylko do Odczytu', () => {
-    setTrialExpiredForTesting();
+  test('Wyczerpany limit: ekran główny pokazuje stan limitu zamiast banera tylko do odczytu', () => {
+    mockDb.app_settings.set('free_brew_days', exhaustedFreeBrewDaysValue());
 
     let tree: any;
     act(() => {
@@ -1464,14 +1463,14 @@ describe('BrewScreen UI Integration', () => {
     });
 
     const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('Tryb Tylko do Odczytu');
-    expect(str).toContain('Twoje receptury i historia są bezpieczne');
+    expect(str).toContain('Limit darmowego poziomu wykorzystany');
+    expect(str).not.toContain('Tryb Tylko do Odczytu');
 
-    resetTrialForTesting();
+    mockDb.app_settings.delete('free_brew_days');
   });
 
-  test('Wygasły trial: Próba duplikowania receptury w modalu blokuje akcję i otwiera Apps4BrewPassModal', () => {
-    setTrialExpiredForTesting();
+  test('Wyczerpany limit: duplikowanie receptury działa bez Paywalla (edycja receptur zawsze dostępna)', () => {
+    mockDb.app_settings.set('free_brew_days', exhaustedFreeBrewDaysValue());
 
     let tree: any;
     act(() => {
@@ -1482,14 +1481,12 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
-    // Otwórz modal wyboru receptury
     const recipeCard = findPressableWithText(tree.root, 'RECEPTURA');
     expect(recipeCard).toBeTruthy();
     act(() => {
       recipeCard.props.onPress();
     });
 
-    // Kliknij duplikowanie pierwszej receptury
     const dupBtns = tree.root.findAll((n: any) => n.props?.accessibilityLabel?.includes('Duplikuj recepturę'));
     expect(dupBtns.length).toBeGreaterThan(0);
 
@@ -1497,15 +1494,13 @@ describe('BrewScreen UI Integration', () => {
       dupBtns[0].props.onPress();
     });
 
-    const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('APPS4BREW PASS');
-    expect(str).toContain('$4.99 / rok');
+    expect(JSON.stringify(tree.toJSON())).not.toContain('APPS4BREW PASS');
 
-    resetTrialForTesting();
+    mockDb.app_settings.delete('free_brew_days');
   });
 
-  test('Wygasły trial: Próba kliknięcia Import w modalu receptur otwiera Apps4BrewPassModal', () => {
-    setTrialExpiredForTesting();
+  test('Wyczerpany limit: import receptury działa bez Paywalla', () => {
+    mockDb.app_settings.set('free_brew_days', exhaustedFreeBrewDaysValue());
 
     let tree: any;
     act(() => {
@@ -1516,14 +1511,12 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
-    // Otwórz modal wyboru receptury
     const recipeCard = findPressableWithText(tree.root, 'RECEPTURA');
     expect(recipeCard).toBeTruthy();
     act(() => {
       recipeCard.props.onPress();
     });
 
-    // Kliknij Import
     const importBtn = tree.root.findByProps({
       testID: 'import-recipe-btn',
     });
@@ -1531,10 +1524,9 @@ describe('BrewScreen UI Integration', () => {
       importBtn.props.onPress();
     });
 
-    const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('APPS4BREW PASS');
+    expect(JSON.stringify(tree.toJSON())).not.toContain('APPS4BREW PASS');
 
-    resetTrialForTesting();
+    mockDb.app_settings.delete('free_brew_days');
   });
 
   test('Szybki Re-Brew 1-Tap: Kliknięcie baneru ostatniego udanego naparu ładuje parametry', () => {
@@ -1662,8 +1654,8 @@ describe('BrewScreen UI Integration', () => {
 
     mockDb.recipes.delete('rec-tea-test');
 
-    // Sprawdź blokadę paywalla na przycisku Krok 4 przy wygasłym trialu
-    setTrialExpiredForTesting();
+    // Wyczerpany limit: przycisk procedury (uruchamia timer) otwiera Paywall zamiast procedury
+    mockDb.app_settings.set('free_brew_days', exhaustedFreeBrewDaysValue());
     let expiredTree: any;
     act(() => {
       expiredTree = renderer.create(
@@ -1675,7 +1667,8 @@ describe('BrewScreen UI Integration', () => {
     act(() => {
       expiredTree.root.findByProps({ testID: 'open-procedure-modal-btn' }).props.onPress();
     });
-    resetTrialForTesting();
+    expect(JSON.stringify(expiredTree.toJSON())).toContain('APPS4BREW PASS');
+    mockDb.app_settings.delete('free_brew_days');
   });
 });
 

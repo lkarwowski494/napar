@@ -169,12 +169,8 @@ import {
 import { calculateBrewCost } from '../src/core/cost-calculator';
 import { calculateWaterMinerals } from '../src/core/water-chemistry';
 import { diagnoseTaste } from '../src/core/domain-rules';
-import {
-  getAppAccessState,
-  recordBrewCompleted,
-  activateSubscription,
-  TRIAL_MAX_BREWS,
-} from '../src/core/app-access';
+import { getBrewAccessState, recordTimerBrewCompleted } from '../src/core/app-access';
+import { FREE_BREW_DAYS_PER_MONTH } from '../src/core/access-policy';
 import { buildBackup, parseAndValidateBackup } from '../src/core/backup';
 
 describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
@@ -358,16 +354,15 @@ describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
     expect(reloadedInventory.some((i) => i.id === 'offline-ethiopia-02')).toBe(true);
   });
 
-  test('Zarządzanie licencją i okresem próbnym (Trial & Offline Access) bez serwera zewnętrznego', () => {
-    const access = getAppAccessState();
-    expect(access).toBeDefined();
-    expect(TRIAL_MAX_BREWS).toBe(15);
+  test('Limit darmowego poziomu (7 dni parzenia) i Pro działają lokalnie, bez serwera i bez okresu próbnego', () => {
+    const access = getBrewAccessState();
+    expect(access.freeDaysPerMonth).toBe(FREE_BREW_DAYS_PER_MONTH);
+    expect(access.remainingDays).toBe(FREE_BREW_DAYS_PER_MONTH);
 
-    const updated = recordBrewCompleted();
-    expect(updated.brewsRemaining).toBeLessThan(15);
+    recordTimerBrewCompleted();
+    expect(getBrewAccessState().monthDaysUsed).toBe(1);
 
-    const subscribed = activateSubscription('lifetime');
-    expect(subscribed.isSubscribed).toBe(true);
-    expect(subscribed.subscriptionTier).toBe('lifetime');
+    setAppSetting('is_pro_active', 'true');
+    expect(getBrewAccessState().isPro).toBe(true);
   });
 });

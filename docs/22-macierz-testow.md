@@ -9,11 +9,11 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | :--- | :---: | :---: | :---: | :---: |
 | **EKRAN** | 9 | 9 | **100.0%** | ✅ POKRYTE |
 | **UI** | 61 | 61 | **100.0%** | ✅ POKRYTE |
-| **TEKST** | 324 | 324 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 214 | 214 | **100.0%** | ✅ POKRYTE |
-| **WYMIAR** | 44 | 44 | **100.0%** | ✅ POKRYTE |
+| **TEKST** | 319 | 319 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 219 | 219 | **100.0%** | ✅ POKRYTE |
+| **WYMIAR** | 43 | 43 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **652** | Pokrytych: **652** | Brakujących: **0**
+Łącznie elementów: **651** | Pokrytych: **651** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -320,4 +320,4 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `settings.beverageTeaOnlyDesc` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `TEKST` | `settings.caffeineSettingsSection` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 
-*(... i 352 kolejnych elementów w pełnym wykazie)*
+*(... i 351 kolejnych elementów w pełnym wykazie)*

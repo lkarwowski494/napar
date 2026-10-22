@@ -18,8 +18,6 @@ import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../co
 export interface ImportRecipeModalProps {
   visible: boolean;
   onClose: () => void;
-  canCreate: boolean;
-  onRequirePaywall: () => void;
   onImportSuccess: (importedRecipe: any) => void;
   unitSystem: 'metric' | 'imperial';
   t: any;
@@ -28,8 +26,6 @@ export interface ImportRecipeModalProps {
 export const ImportRecipeModal: React.FC<ImportRecipeModalProps> = ({
   visible,
   onClose,
-  canCreate,
-  onRequirePaywall,
   onImportSuccess,
   unitSystem,
   t,
@@ -38,11 +34,6 @@ export const ImportRecipeModal: React.FC<ImportRecipeModalProps> = ({
   const [importParsedRecipe, setImportParsedRecipe] = useState<any>(null);
 
   const handleConfirmImport = () => {
-    if (!canCreate) {
-      onClose();
-      onRequirePaywall();
-      return;
-    }
     if (!importParsedRecipe) return;
     try {
       saveRecipe(importParsedRecipe.recipe);

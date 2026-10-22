@@ -1,7 +1,8 @@
 // ============================================================================
 // Napar (Steepwise) — Apps4Brew Pass Paywall Modal ("Cheaper than Espresso")
 // Pricing: $0.99/mo, $4.99/yr, $14.99 Lifetime.
-// Zero feature gating during trial, 100% read-only history guaranteed.
+// Model M5 S1: darmowy poziom = 7 dni parzenia w miesiącu; historia i dane zawsze dostępne.
+// Zakup nie jest jeszcze podpięty (etap 4b): plany i przywracanie pokazują „zakup niedostępny”.
 // Apps4Brew Studio — 100% Offline-First, Zero Telemetry.
 // ============================================================================
 
@@ -19,6 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../core/theme';
 import { useTranslation } from '../core/i18n';
 import { useAppAccess } from '../core/app-access';
+import { describeFreeDays } from '../core/access-policy';
 import { ShieldIcon } from './icons/CraftIcons';
 
 interface Apps4BrewPassModalProps {
@@ -35,55 +37,19 @@ export function Apps4BrewPassModal({
   onSubscribed,
 }: Apps4BrewPassModalProps) {
   const { t } = useTranslation();
-  const { purchaseWithStoreKit, restore, status, brewsRemaining, daysRemaining } = useAppAccess();
-  const [isProcessing, setIsProcessing] = React.useState(false);
+  const { isPro, monthDaysUsed, freeDaysPerMonth, remainingDays } = useAppAccess();
 
-  const handleSelectPlan = (tier: 'monthly' | 'annual' | 'lifetime') => {
-    if (isProcessing) return;
-    setIsProcessing(true);
-    try {
-      const result = purchaseWithStoreKit(tier);
-      if (result.success) {
-        Alert.alert(
-          t.settings.purchaseSuccessTitle,
-          tier === 'annual'
-            ? t.settings.purchaseAnnualSuccessMsg
-            : tier === 'lifetime'
-            ? t.settings.purchaseLifetimeSuccessMsg
-            : t.settings.purchaseSuccessMsg
-        );
-        if (onPurchaseSuccess) {
-          onPurchaseSuccess();
-        }
-        if (onSubscribed) {
-          onSubscribed();
-        }
-        onClose();
-      } else {
-        Alert.alert(t.settings.restoreNotFoundTitle, result.error || 'Błąd autoryzacji transakcji StoreKit');
-      }
-    } catch {
-      Alert.alert(t.settings.restoreNotFoundTitle, 'Nie udało się zrealizować transakcji StoreKit');
-    } finally {
-      setIsProcessing(false);
-    }
+  // Zakup w aplikacji nie istnieje w tej wersji (etap 4a). Nie udajemy sukcesu:
+  // onPurchaseSuccess i onSubscribed zostają jako punkt podpięcia dla StoreAdapter (etap 4b).
+  const handlePurchaseUnavailable = () => {
+    Alert.alert(t.paywall.purchaseUnavailableTitle, t.paywall.purchaseUnavailableMsg);
   };
 
-  const handleRestore = () => {
-    const success = restore();
-    if (success) {
-      Alert.alert(t.settings.restoreSuccessTitle, t.settings.restoreSuccessMsg);
-      if (onPurchaseSuccess) {
-        onPurchaseSuccess();
-      }
-      if (onSubscribed) {
-        onSubscribed();
-      }
-      onClose();
-    } else {
-      Alert.alert(t.settings.restoreNotFoundTitle, t.settings.restoreNotFoundMsg);
-    }
-  };
+  const freeDaysText = describeFreeDays(
+    { isPro, monthDaysUsed, remainingDays, freeDaysPerMonth },
+    t.paywall
+  );
+  const limitReached = !isPro && remainingDays === 0;
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
@@ -115,22 +81,18 @@ export function Apps4BrewPassModal({
           <Text style={styles.subtitle}>{t.paywall.subtitle}</Text>
           <Text style={styles.tagline}>{t.paywall.tagline}</Text>
 
-          {/* Status Trialu */}
-          {status === 'trial_active' ? (
-            <View style={styles.trialStatusCard}>
-              <Text style={styles.trialStatusText}>
-                Pozostało Ci {brewsRemaining} {brewsRemaining === 1 ? 'parzenie' : 'parzenia'} w bezpłatnym okresie próbnym ({daysRemaining} dni).
-              </Text>
-            </View>
-          ) : (
-            <View style={[styles.trialStatusCard, styles.trialExpiredCard]}>
-              <Text style={styles.trialExpiredText}>
-                Twój bezpłatny okres próbny dobiegł końca. Wybierz plan poniżej, aby parzyć kolejne filiżanki.
-              </Text>
+          {/* Status darmowego limitu dni parzenia (Pro: bez karty) */}
+          {freeDaysText !== null && (
+            <View style={[styles.statusCard, limitReached && styles.limitCard]}>
+              <Text style={limitReached ? styles.limitText : styles.statusText}>{freeDaysText}</Text>
             </View>
           )}
 
-          {/* Gwarancja historii Read-Only */}
+          {freeDaysText !== null && (
+            <Text style={styles.scopeText}>{t.paywall.blockedScope}</Text>
+          )}
+
+          {/* Gwarancja: historia i dane zawsze dostępne */}
           <View style={styles.guaranteeCard}>
             <View style={styles.guaranteeIcon}>
               <ShieldIcon size={20} color={theme.colors.statusPeak} />
@@ -152,7 +114,7 @@ export function Apps4BrewPassModal({
           <Pressable
             testID="plan-annual-btn"
             style={[styles.planCard, styles.planCardFeatured]}
-            onPress={() => handleSelectPlan('annual')}
+            onPress={handlePurchaseUnavailable}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planAnnualTitle} ${t.paywall.planAnnualPrice}`}
           >
@@ -170,7 +132,7 @@ export function Apps4BrewPassModal({
           <Pressable
             testID="plan-lifetime-btn"
             style={styles.planCard}
-            onPress={() => handleSelectPlan('lifetime')}
+            onPress={handlePurchaseUnavailable}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planLifetimeTitle} ${t.paywall.planLifetimePrice}`}
           >
@@ -185,7 +147,7 @@ export function Apps4BrewPassModal({
           <Pressable
             testID="plan-monthly-btn"
             style={styles.planCard}
-            onPress={() => handleSelectPlan('monthly')}
+            onPress={handlePurchaseUnavailable}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planMonthlyTitle} ${t.paywall.planMonthlyPrice}`}
           >
@@ -200,7 +162,7 @@ export function Apps4BrewPassModal({
           <Pressable
             testID="restore-purchases-btn"
             style={styles.restoreBtn}
-            onPress={handleRestore}
+            onPress={handlePurchaseUnavailable}
             accessibilityRole="button"
             accessibilityLabel={t.paywall.restore}
           >
@@ -285,7 +247,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: 16,
   },
-  trialStatusCard: {
+  statusCard: {
     width: '100%',
     backgroundColor: theme.colors.bgCardSecondary,
     borderRadius: theme.borderRadius.md,
@@ -294,21 +256,28 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     marginBottom: 14,
   },
-  trialExpiredCard: {
+  limitCard: {
     borderColor: theme.colors.danger,
     backgroundColor: theme.colors.dangerMuted,
   },
-  trialStatusText: {
+  statusText: {
     fontSize: 13,
     color: theme.colors.textPrimary,
     textAlign: 'center',
     fontWeight: '600',
   },
-  trialExpiredText: {
+  limitText: {
     fontSize: 13,
     color: '#FF6B6B',
     textAlign: 'center',
     fontWeight: '700',
+  },
+  scopeText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 17,
+    marginBottom: 16,
   },
   guaranteeCard: {
     width: '100%',

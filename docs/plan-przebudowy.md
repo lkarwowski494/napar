@@ -194,3 +194,22 @@ Otwarte (nie blokują etapu 3, wymagają weryfikacji):
 - **D8 na symulatorze/urządzeniu:** utworzenie `/Library/SQLite` przez `Directory.create`, fallback przy nieudanym otwarciu, oraz co dzieje się z danymi, które dawniej leżały w `Documents/SQLite` (tej migracji plik nie wykonuje; zachowanie wyboru ścieżki jest takie samo jak w `db-path.ts`).
 - **Decyzja właściciela:** czy stan Pro i klucze lokalne są poza kopią (obecnie tak).
 - Testy na sql.js sprawdzają SQL i logikę kopii, a nie sterownik expo-sqlite na urządzeniu.
+
+## Status etapu 4a — polityka dostępu, bez sklepu (22.10.2026)
+
+Zrobione na gałęzi `claude/wykonaj-sl7vii`:
+- **Model M5 S1:** darmowy poziom = 7 dni parzenia w miesiącu (`FREE_BREW_DAYS_PER_MONTH`, wpis D-001 w `docs/research/rejestr-twierdzen.json`). Dzień parzenia = dzień ukończenia parzenia zmierzonego timerem. Wpisy ręczne, import i edycja wstecz nie liczą się. Blokada dotyczy tylko rozpoczęcia parzenia w nowym dniu ponad limit; trwające parzenie nigdy nie jest przerywane. Pro (`is_pro_active`) znosi limit. Brak okresu próbnego i ofert wprowadzających.
+- **Czysta logika:** `src/core/access-policy.ts` (`canStartBrew`, `addCountedBrewDay`, teksty stanu). Zegar i stan wchodzą jako argumenty.
+- **Stan dni:** `src/core/repositories/brew-access.ts`, klucz `free_brew_days` w `app_settings` (JSON per miesiąc). Dni są tylko dopisywane. Klucz jest na liście niepenetrowalnych: poza kopią, a import pliku go nie zeruje.
+- **Fasada i hook:** `src/core/app-access.ts` (bez logiki zakupu). Usunięto atrapę zakupu (`verifyAndActivateStoreKitPurchase`, paragon z `Date.now`/`Math.random`), przywracanie z flagi i stare pola triala (`trial_*`, `subscription_tier`).
+- **Ekrany:** plany i przywracanie w `Apps4BrewPassModal` pokazują „zakup niedostępny”. Bramki `canCreate` i banery „tylko do odczytu” usunięto z przepisów, spiżarni, dziennika, kofeiny i importu. Jedyną bramką jest start parzenia (ekran główny, procedura, gongfu). Baner ekranu głównego pokazuje stan limitu dla darmowego poziomu.
+- **Stan Pro poza kopią:** przyjęto rekomendację (decyzja właściciela nie była wymagana). Komentarze w `repositories/app-settings.ts` i `app-access.ts`.
+
+Bramka: `check:i18n` zielone (PL/EN), `typecheck` zielone, `test:coverage` zielone. `access-policy.ts`, `app-access.ts` i `repositories/brew-access.ts` mają 100% (progi w `jest.config.js`).
+
+Otwarte (nie blokują etapu 4b):
+- **Zakup (4b):** `StoreAdapter` i `expo-iap` podpinane w `Apps4BrewPassModal` przez `onPurchaseSuccess`/`onSubscribed` (nadal wiszą jako punkt podpięcia). Wymaga produktów w App Store Connect i pliku `.storekit`.
+- **Zegar urządzenia:** licznik jest lokalny i offline. Zmiana daty w systemie może obejść limit. Akceptowane dla aplikacji bez serwera.
+- **Częstotliwość kawowa:** model 7 dni policzony na częstotliwości treningowej (patrz wyżej). Liczba płacących wymaga ponownego przeliczenia.
+- **Pokrycie tłumaczeń:** nowe klucze dodane tylko do PL i EN. Pozostałe 33 języki w `locales/` nie mają ich jeszcze (decyzja właściciela: 35 języków, do zrobienia w zakresie tłumaczeń).
+- **Brak repo `trening` w sandboxie:** `docs/monetyzacja.md` nie został odczytany. Zachowanie licznika wzięto z opisu zadania, bez kopiowania kodu.

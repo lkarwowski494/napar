@@ -5,6 +5,7 @@
 
 import React from 'react';
 import renderer from 'react-test-renderer';
+import { exhaustedFreeBrewDaysValue } from '../../../tests/helpers/free-brew-days';
 import { Alert } from 'react-native';
 
 const mockDb: any = {
@@ -847,10 +848,10 @@ describe('BeansScreen (Stash & Inventory)', () => {
     expect(JSON.stringify(tree.toJSON())).toContain('Dodaj do Spiżarni');
   });
 
-  test('W trybie wygasłego trialu kliknięcie + Dodaj paczkę otwiera Paywall zamiast formularza', () => {
+  test('Wyczerpany limit darmowego poziomu nie blokuje dodawania paczki ani szablonu z kompendium', () => {
     mockDb.getFirstSync.mockImplementation((query: string, params?: any[]) => {
       if (query && query.includes('FROM app_settings WHERE key = ?')) {
-        if (params?.[0] === 'trial_brews_count') return { value: '15' };
+        if (params?.[0] === 'free_brew_days') return { value: exhaustedFreeBrewDaysValue() };
         if (params?.[0] === 'is_pro_active') return { value: 'false' };
       }
       return null;
@@ -865,24 +866,11 @@ describe('BeansScreen (Stash & Inventory)', () => {
       );
     });
 
-    const addBtn = tree.root.findByProps({ testID: 'beans-add-button' });
-    expect(addBtn).toBeDefined();
-
     renderer.act(() => {
-      addBtn.props.onPress();
+      tree.root.findByProps({ testID: 'beans-add-button' }).props.onPress();
     });
+    expect(tree.root.findAllByProps({ testID: 'plan-annual-btn' })).toHaveLength(0);
 
-    // Paywall modal powinien się otworzyć
-    const planAnnualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
-    expect(planAnnualBtn).toBeDefined();
-
-    // Zamknij paywall
-    const closeBtn = tree.root.findByProps({ testID: 'close-paywall-btn' });
-    renderer.act(() => {
-      closeBtn.props.onPress();
-    });
-
-    // Próba użycia szablonu z kompendium wiedzy przy wygasłym trialu
     renderer.act(() => {
       tree.root.findByProps({ testID: 'compendium-open-button' }).props.onPress();
     });
@@ -890,7 +878,7 @@ describe('BeansScreen (Stash & Inventory)', () => {
     renderer.act(() => {
       useVarietyBtn.props.onPress();
     });
-    expect(tree.root.findByProps({ testID: 'plan-annual-btn' })).toBeDefined();
+    expect(tree.root.findAllByProps({ testID: 'plan-annual-btn' })).toHaveLength(0);
 
     mockDb.getFirstSync.mockReset();
   });

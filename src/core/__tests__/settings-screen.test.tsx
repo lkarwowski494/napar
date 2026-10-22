@@ -201,55 +201,6 @@ describe('SettingsScreen Component', () => {
     );
   });
 
-  test('Aktywuje Napar Pro i przywraca zakupy StoreKit', () => {
-    const alertSpy = jest.spyOn(Alert, 'alert');
-
-    let tree: any;
-    renderer.act(() => {
-      tree = renderer.create(
-        <LanguageProvider>
-          <SettingsScreen />
-        </LanguageProvider>
-      );
-    });
-
-    // Otwórz modal Apps4Brew Pass
-    const openPassBtn = tree.root.findByProps({ testID: 'open-apps4brew-pass-btn' });
-    expect(openPassBtn).toBeTruthy();
-    renderer.act(() => {
-      openPassBtn.props.onPress();
-    });
-
-    // Kliknij opcję zakupu Lifetime
-    const lifetimeBtn = tree.root.findByProps({ testID: 'plan-lifetime-btn' });
-    expect(lifetimeBtn).toBeTruthy();
-
-    renderer.act(() => {
-      lifetimeBtn.props.onPress();
-    });
-
-    expect(alertSpy).toHaveBeenCalledWith('Dziękujemy!', 'Dożywotnia licencja Lifetime została aktywowana!');
-
-    let str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('PRO');
-
-    // Kliknij przywrócenie zakupów (po wcześniejszym zakupie)
-    renderer.act(() => {
-      openPassBtn.props.onPress();
-    });
-    const restoreBtn = tree.root.findByProps({ testID: 'restore-purchases-btn' });
-    expect(restoreBtn).toBeTruthy();
-
-    renderer.act(() => {
-      restoreBtn.props.onPress();
-    });
-
-    expect(alertSpy).toHaveBeenCalledWith(
-      'Przywracanie zakupów',
-      expect.stringContaining('Sprawdzanie lokalnych uprawnień StoreKit...')
-    );
-  });
-
   test('Eksport dziennika i spiżarni do CSV: wywołuje exportSessionsCsv / exportInventoryCsv i otwiera modal', () => {
     const exportSessionsSpy = jest
       .spyOn(databaseModule, 'exportSessionsCsv')
@@ -300,8 +251,8 @@ describe('SettingsScreen Component', () => {
     expect(str).toContain('inv-1,Etiopia,coffee');
   });
 
-  test('Aktywacja planów subskrypcji Pro: Miesięczny oraz Roczny (Trial)', () => {
-    const alertSpy = jest.spyOn(Alert, 'alert');
+  test('Zakupy niedostępne w tym etapie: plan i przywracanie pokazują komunikat, bez aktywacji Pro', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 
     let tree: any;
     renderer.act(() => {
@@ -313,32 +264,22 @@ describe('SettingsScreen Component', () => {
     });
 
     const openPassBtn = tree.root.findByProps({ testID: 'open-apps4brew-pass-btn' });
-    expect(openPassBtn).toBeTruthy();
-
-    // 1. Otwórz modal i kliknij plan MIESIĘCZNY
     renderer.act(() => {
       openPassBtn.props.onPress();
     });
-    const monthlyBtn = tree.root.findByProps({ testID: 'plan-monthly-btn' });
-    expect(monthlyBtn).toBeTruthy();
     renderer.act(() => {
-      monthlyBtn.props.onPress();
+      tree.root.findByProps({ testID: 'plan-lifetime-btn' }).props.onPress();
     });
-    expect(alertSpy).toHaveBeenCalledWith('Dziękujemy!', 'Napar Pro został pomyślnie aktywowany.');
+    renderer.act(() => {
+      tree.root.findByProps({ testID: 'restore-purchases-btn' }).props.onPress();
+    });
 
-    // 2. Otwórz ponownie i kliknij plan ROCZNY
-    renderer.act(() => {
-      openPassBtn.props.onPress();
-    });
-    const annualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
-    expect(annualBtn).toBeTruthy();
-    renderer.act(() => {
-      annualBtn.props.onPress();
-    });
+    expect(alertSpy).toHaveBeenCalledTimes(2);
     expect(alertSpy).toHaveBeenCalledWith(
-      'Dziękujemy!',
-      'Roczna subskrypcja Napar Pro (14 dni za darmo) została aktywowana.'
+      'Zakup niedostępny',
+      'Zakupy w aplikacji nie są jeszcze dostępne w tej wersji. Darmowy poziom działa bez zmian.'
     );
+    expect(JSON.stringify(tree.toJSON())).not.toContain('Napar Pro został');
   });
 
   test('Obsługa błędu podczas importu uszkodzonego pliku JSON', async () => {

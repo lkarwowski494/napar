@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { theme } from '../../src/core/theme';
 import { StarIcon } from '../../src/components/icons/CraftIcons';
 import { useBrewWorkflow } from '../../src/core/useBrewWorkflow';
+import { describeFreeDays } from '../../src/core/access-policy';
 import { BrewBanners } from '../../src/components/brew/BrewBanners';
 import { BrewHeader } from '../../src/components/brew/BrewHeader';
 import { BrewQuickPrepCard } from '../../src/components/brew/BrewQuickPrepCard';
@@ -33,8 +34,8 @@ export default function BrewScreen() {
     t,
     language,
     unitSystem,
-    canCreate,
-    isHistoryReadOnly,
+    brewAccess,
+    checkBrewStart,
     recipe,
     selectedInventoryItem,
     doseGrams,
@@ -97,7 +98,7 @@ export default function BrewScreen() {
       {/* Banery systemowe i Złote Zasady domeny */}
       <BrewBanners
         corruptState={corruptState}
-        isHistoryReadOnly={isHistoryReadOnly}
+        freeDaysText={describeFreeDays(brewAccess, t.paywall)}
         language={language}
         onDismissCorrupt={handleDismissCorrupt}
       />
@@ -148,11 +149,6 @@ export default function BrewScreen() {
         }}
         onDuplicateRecipe={handleDuplicateRecipe}
         onEditRecipe={(id) => {
-          if (!canCreate) {
-            setShowRecipeModal(false);
-            setShowPaywallModal(true);
-            return;
-          }
           setShowRecipeModal(false);
           router.push({
             pathname: '/recipe-builder',
@@ -160,11 +156,6 @@ export default function BrewScreen() {
           });
         }}
         onAddCustomRecipe={() => {
-          if (!canCreate) {
-            setShowRecipeModal(false);
-            setShowPaywallModal(true);
-            return;
-          }
           setShowRecipeModal(false);
           router.push('/recipe-builder');
         }}
@@ -173,19 +164,9 @@ export default function BrewScreen() {
           router.push('/gongfu');
         }}
         onOpenImport={() => {
-          if (!canCreate) {
-            setShowRecipeModal(false);
-            setShowPaywallModal(true);
-            return;
-          }
           setShowImportModal(true);
         }}
         onOpenQrScanner={() => {
-          if (!canCreate) {
-            setShowRecipeModal(false);
-            setShowPaywallModal(true);
-            return;
-          }
           setShowQrScanner(true);
         }}
         unitSystem={unitSystem}
@@ -269,11 +250,12 @@ export default function BrewScreen() {
         testID="open-procedure-modal-btn"
         style={styles.openProcedureCta}
         onPress={() => {
-          if (!canCreate) {
-            setShowPaywallModal(true);
-            return;
-          }
           if (!isRunning && !isPaused) {
+            // Otwarcie procedury uruchamia timer: to rozpoczęcie parzenia podlega limitowi.
+            if (!checkBrewStart(false).allowed) {
+              setShowPaywallModal(true);
+              return;
+            }
             startTimer();
           }
           setShowProcedureModal(true);

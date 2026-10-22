@@ -34,7 +34,6 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     selectRecipe,
     refreshData,
     refresh,
-    canCreate,
     showProcedureModal,
     setShowProcedureModal,
     showFinishModal,
@@ -178,11 +177,6 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
       <ImportRecipeModal
         visible={showImportModal}
         onClose={() => setShowImportModal(false)}
-        canCreate={canCreate}
-        onRequirePaywall={() => {
-          setShowImportModal(false);
-          setShowPaywallModal(true);
-        }}
         onImportSuccess={(importedRecipe) => {
           refreshData();
           selectRecipe(importedRecipe as any);

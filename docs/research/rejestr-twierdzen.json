@@ -1148,6 +1148,20 @@
       "status": "do sprawdzenia",
       "zrodla": [],
       "przeglad": null
+    },
+    {
+      "id": "D-001",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/access-policy.ts:12",
+      "cytat": "export const FREE_BREW_DAYS_PER_MONTH = 7;",
+      "kategoria": "PRIORYTET: monetyzacja",
+      "typ": "decyzja właściciela",
+      "uwaga": "Darmowy poziom: 7 dni parzenia w miesiącu kalendarzowym (model M5 S1). Dzień parzenia = dzień ukończenia parzenia zmierzonego timerem; wpisy ręczne, import i edycja wstecz się nie liczą. Pro znosi limit; brak okresu próbnego i ofert wprowadzających. Zastępuje decyzje 15, 5 i 10 dni z tej samej listy. Model z repo trening (częstotliwość treningowa) daje 1,63 płacących na 100 pobrań w 24 mies. (scenariusz normalny, [OCENA]); częstotliwość kawowa nie jest jeszcze policzona.",
+      "status": "zatwierdzona",
+      "zrodla": [
+        "docs/lista-funkcji-mvp.md, sekcja „Decyzja właściciela: limit darmowego poziomu = 7 dni parzenia/mies.” (22.10.2026)"
+      ],
+      "przeglad": null
     }
   ]
 }

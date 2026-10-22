@@ -1,235 +1,105 @@
 // ============================================================================
-// Napar (Steepwise) — App Access & Monetization Engine ("Cheaper than Espresso")
-// Zero feature-gating during trial (100% features available).
-// After trial expiration: Creation blocked + Read-Only History guaranteed.
+// Napar (Steepwise) — Dostęp do parzenia (most: polityka <-> baza <-> UI)
+// Model M5 S1: darmowy poziom to 7 dni parzenia w miesiącu, Pro znosi limit.
+// Historia, edycja, dopisywanie wstecz, eksport, kopia i import są zawsze dostępne.
+// Brak okresu próbnego i brak ofert wprowadzających.
+// Zakup w aplikacji NIE jest tu zaimplementowany (etap 4b, StoreAdapter).
+// Stan Pro (is_pro_active) pochodzi wyłącznie z zakupu i jest poza kopią zapasową.
 // Apps4Brew Studio — 100% Offline-First, Zero Telemetry.
 // ============================================================================
 
-import { useState } from 'react';
-import { getAppSetting, setAppSetting } from './database';
+import { useEffect, useState } from 'react';
+import { getCountedBrewDays, getIsProUser, recordCountedBrewDay } from './database';
+import {
+  FREE_BREW_DAYS_PER_MONTH,
+  canStartBrew,
+  getDayKey,
+  getMonthKey,
+  type BrewStartDecision,
+  type BrewStartInput,
+} from './access-policy';
 
-export const TRIAL_MAX_BREWS = 15;
-export const TRIAL_DURATION_DAYS = 14;
-
-export const STORE_PRODUCT_IDS = {
-  monthly: 'pl.lukasz.napar.monthly',
-  annual: 'pl.lukasz.napar.annual',
-  lifetime: 'pl.lukasz.napar.lifetime',
-} as const;
-
-export interface StoreKitReceipt {
-  productId: string;
-  transactionId: string;
-  purchaseDate: string;
-  signature: string;
+export interface BrewAccessState {
+  isPro: boolean;
+  monthDaysUsed: number;
+  todayCounted: boolean;
+  /** Dni parzenia, które zostały w tym miesiącu (Infinity dla Pro). */
+  remainingDays: number;
+  freeDaysPerMonth: number;
 }
 
-export type AppAccessStatus = 'trial_active' | 'trial_expired' | 'subscribed';
-
-export interface AppAccessState {
-  status: AppAccessStatus;
-  brewsCount: number;
-  brewsRemaining: number;
-  daysRemaining: number;
-  isSubscribed: boolean;
-  canCreate: boolean;
-  isHistoryReadOnly: boolean;
-  subscriptionTier: 'none' | 'monthly' | 'annual' | 'lifetime';
-}
-
-export function getAppAccessState(): AppAccessState {
-  const isPro = getAppSetting('is_pro_active', 'false') === 'true';
-  const tier = (getAppSetting('subscription_tier', isPro ? 'lifetime' : 'none') as any) || 'none';
-
-  if (isPro) {
-    return {
-      status: 'subscribed',
-      brewsCount: 0,
-      brewsRemaining: Infinity,
-      daysRemaining: Infinity,
-      isSubscribed: true,
-      canCreate: true,
-      isHistoryReadOnly: false,
-      subscriptionTier: tier === 'none' ? 'lifetime' : tier,
-    };
-  }
-
-  // Sprawdź datę pierwszej instalacji
-  let trialStartedAt = getAppSetting('trial_started_at', '');
-  if (!trialStartedAt) {
-    trialStartedAt = new Date().toISOString();
-    setAppSetting('trial_started_at', trialStartedAt);
-  }
-
-  const startDate = new Date(trialStartedAt);
-  const now = new Date();
-  const elapsedMs = Math.max(0, now.getTime() - startDate.getTime());
-  const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
-  const daysRemaining = Math.max(0, TRIAL_DURATION_DAYS - elapsedDays);
-
-  const brewsCount = parseInt(getAppSetting('trial_brews_count', '0'), 10) || 0;
-  const brewsRemaining = Math.max(0, TRIAL_MAX_BREWS - brewsCount);
-
-  const isExpired = brewsCount >= TRIAL_MAX_BREWS || elapsedDays >= TRIAL_DURATION_DAYS;
-
-  if (isExpired) {
-    return {
-      status: 'trial_expired',
-      brewsCount,
-      brewsRemaining: 0,
-      daysRemaining,
-      isSubscribed: false,
-      canCreate: false,
-      isHistoryReadOnly: true,
-      subscriptionTier: 'none',
-    };
-  }
-
+function readBrewStartInput(now: Date, sessionInProgress: boolean): BrewStartInput {
+  const today = getDayKey(now);
+  const counted = getCountedBrewDays(getMonthKey(today));
   return {
-    status: 'trial_active',
-    brewsCount,
-    brewsRemaining,
-    daysRemaining,
-    isSubscribed: false,
-    canCreate: true,
-    isHistoryReadOnly: false,
-    subscriptionTier: 'none',
+    monthDaysUsed: counted.length,
+    todayCounted: counted.includes(today),
+    isPro: getIsProUser(),
+    sessionInProgress,
   };
 }
 
-export function recordBrewCompleted(): AppAccessState {
-  const current = getAppAccessState();
-  if (current.isSubscribed) {
-    return current;
-  }
-  const newCount = current.brewsCount + 1;
-  setAppSetting('trial_brews_count', String(newCount));
-  return getAppAccessState();
+/** Decyzja o rozpoczęciu parzenia w tej chwili (czyta stan z bazy). */
+export function getBrewStartDecision(sessionInProgress: boolean, now: Date = new Date()): BrewStartDecision {
+  return canStartBrew(readBrewStartInput(now, sessionInProgress));
 }
 
-export function activateSubscription(tier: 'monthly' | 'annual' | 'lifetime'): AppAccessState {
-  setAppSetting('is_pro_active', 'true');
-  setAppSetting('subscription_tier', tier);
-  setAppSetting('has_verified_purchase', 'true');
-  setAppSetting('verified_purchase_tier', tier);
-  return getAppAccessState();
+export function getBrewAccessState(now: Date = new Date()): BrewAccessState {
+  const input = readBrewStartInput(now, false);
+  const decision = canStartBrew(input);
+  return {
+    isPro: input.isPro,
+    monthDaysUsed: input.monthDaysUsed,
+    todayCounted: input.todayCounted,
+    remainingDays: decision.remainingDays,
+    freeDaysPerMonth: FREE_BREW_DAYS_PER_MONTH,
+  };
 }
 
-export type RestorePurchasesResult = AppAccessState & { restored: boolean };
+// Każda zamontowana instancja useAppAccess trzyma własną kopię stanu.
+// Zmiana licznika powiadamia wszystkie, żeby banery i karty nie pokazywały starych dni.
+type AccessListener = () => void;
+const accessListeners = new Set<AccessListener>();
 
-export function restorePurchases(): RestorePurchasesResult {
-  const verifiedVal = getAppSetting('has_verified_purchase', 'false');
-  const hasVerifiedPurchase = verifiedVal === 'true' || verifiedVal === '1';
-  const verifiedTier = getAppSetting('verified_purchase_tier', '') as
-    | 'monthly'
-    | 'annual'
-    | 'lifetime'
-    | '';
-
-  if (hasVerifiedPurchase && verifiedTier) {
-    setAppSetting('is_pro_active', 'true');
-    setAppSetting('subscription_tier', verifiedTier);
-    const state = getAppAccessState();
-    return { ...state, restored: true };
-  }
-
-  // Brak legalnego dowodu zakupu — nie rozdajemy darmowego Lifetime
-  const state = getAppAccessState();
-  return { ...state, restored: false };
+function notifyAccessChanged(): void {
+  accessListeners.forEach((listener) => listener());
 }
 
-export interface StoreKitVerificationResult {
-  success: boolean;
-  tier?: 'monthly' | 'annual' | 'lifetime';
-  receipt?: StoreKitReceipt;
-  error?: string;
-}
-
-export function verifyAndActivateStoreKitPurchase(
-  receipt: StoreKitReceipt
-): StoreKitVerificationResult {
-  if (!receipt || !receipt.transactionId || !receipt.signature) {
-    return { success: false, error: 'Nieprawidłowy podpis transakcji StoreKit' };
-  }
-  let tier: 'monthly' | 'annual' | 'lifetime' | null = null;
-  if (receipt.productId === STORE_PRODUCT_IDS.monthly) tier = 'monthly';
-  else if (receipt.productId === STORE_PRODUCT_IDS.annual) tier = 'annual';
-  else if (receipt.productId === STORE_PRODUCT_IDS.lifetime) tier = 'lifetime';
-
-  if (!tier) {
-    return { success: false, error: 'Nieznany identyfikator produktu StoreKit' };
-  }
-
-  setAppSetting('is_pro_active', 'true');
-  setAppSetting('subscription_tier', tier);
-  setAppSetting('has_verified_purchase', 'true');
-  setAppSetting('verified_purchase_tier', tier);
-  setAppSetting('verified_receipt_json', JSON.stringify(receipt));
-
-  return { success: true, tier, receipt };
-}
-
-export function resetTrialForTesting(): void {
-  setAppSetting('is_pro_active', 'false');
-  setAppSetting('subscription_tier', 'none');
-  setAppSetting('has_verified_purchase', 'false');
-  setAppSetting('verified_purchase_tier', '');
-  setAppSetting('verified_receipt_json', '');
-  setAppSetting('trial_brews_count', '0');
-  setAppSetting('trial_started_at', new Date().toISOString());
-}
-
-export function setTrialExpiredForTesting(): void {
-  setAppSetting('is_pro_active', 'false');
-  setAppSetting('subscription_tier', 'none');
-  setAppSetting('trial_brews_count', String(TRIAL_MAX_BREWS));
+/**
+ * Wlicza dzień po ukończeniu parzenia zmierzonego timerem.
+ * Wpisy ręczne, import i edycja wstecz NIE wywołują tej funkcji.
+ */
+export function recordTimerBrewCompleted(now: Date = new Date()): void {
+  recordCountedBrewDay(getDayKey(now));
+  notifyAccessChanged();
 }
 
 export function useAppAccess() {
-  const [access, setAccess] = useState<AppAccessState>(() => getAppAccessState());
+  const [access, setAccess] = useState<BrewAccessState>(() => getBrewAccessState());
+
+  useEffect(() => {
+    const listener: AccessListener = () => setAccess(getBrewAccessState());
+    accessListeners.add(listener);
+    return () => {
+      accessListeners.delete(listener);
+    };
+  }, []);
 
   const refresh = () => {
-    setAccess(getAppAccessState());
+    setAccess(getBrewAccessState());
   };
 
-  const subscribe = (tier: 'monthly' | 'annual' | 'lifetime') => {
-    const updated = activateSubscription(tier);
-    setAccess(updated);
-  };
+  const checkBrewStart = (sessionInProgress: boolean): BrewStartDecision =>
+    getBrewStartDecision(sessionInProgress);
 
-  const purchaseWithStoreKit = (
-    tier: 'monthly' | 'annual' | 'lifetime'
-  ): StoreKitVerificationResult => {
-    const receipt: StoreKitReceipt = {
-      productId: STORE_PRODUCT_IDS[tier],
-      transactionId: `TX-SK-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
-      purchaseDate: new Date().toISOString(),
-      signature: `SIG-APPS4BREW-${tier.toUpperCase()}-${Date.now()}`,
-    };
-    const verification = verifyAndActivateStoreKitPurchase(receipt);
-    if (verification.success) {
-      setAccess(getAppAccessState());
-    }
-    return verification;
-  };
-
-  const restore = (): boolean => {
-    const res = restorePurchases();
-    setAccess(res);
-    return res.restored;
-  };
-
-  const recordBrew = () => {
-    const updated = recordBrewCompleted();
-    setAccess(updated);
+  const recordTimerBrew = () => {
+    recordTimerBrewCompleted();
   };
 
   return {
     ...access,
     refresh,
-    subscribe,
-    purchaseWithStoreKit,
-    restore,
-    recordBrew,
+    checkBrewStart,
+    recordTimerBrew,
   };
 }

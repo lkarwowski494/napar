@@ -69,8 +69,8 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Eksport i import bazy w formacie JSON oraz eksport do arkuszy CSV (Dziennik i Spiżarnia). [Wdrożone]
    - **💎 Model Monetyzacji „Taniej niż espresso” (Apps4Brew Pass):**
      - **Cennik:** $0.99 USD / mies. (~4,49 zł), $4.99 USD / rok (~22,99 zł, oferta główna!), $14.99 USD Lifetime (~69,99 zł na zawsze z Chmurą rodzinną Family Sharing).
-     - **Zero podziału Free/Pro:** W okresie próbnym (Free Trial: 7 dni lub 3 parzenia) użytkownik ma dostęp do 100% możliwości (brak sztucznie blokowanych funkcji).
-     - **Gwarancja Historii Read-Only (Ochrona 4.9★):** Po wygaśnięciu trialu blokowane jest jedynie tworzenie nowych sesji i parzeń, a cała historia, Dziennik i notatki pozostają ZAWSZE bezpłatne i czytelne w 100% offline. [Wdrożone]
+     - **Darmowy poziom (model M5 S1):** 7 dni parzenia w miesiącu kalendarzowym (dzień liczy się po ukończeniu parzenia zmierzonego timerem). Pro znosi limit. Bez okresu próbnego i ofert wprowadzających. Zakup w aplikacji jeszcze niedostępny (etap 4b).
+     - **Gwarancja danych:** Po wyczerpaniu limitu blokowane jest tylko rozpoczęcie nowego parzenia timerem w nowym dniu. Historia, edycja, dopisywanie wstecz, eksport, kopia i import pozostają ZAWSZE dostępne w 100% offline.
 8. **⌚ Ekosystem Apple: Apple Watch, Live Activity & Widżety (BR-ZEG-001 do BR-ZEG-005):**
    - **Live Activity & Dynamic Island (BR-ZEG-003, BR-ZEG-004):** Natywny mostek ActivityKit (`ActivityAttributes` i `ContentState`) dla ekranu blokady i Dynamic Island (kompaktowy i rozszerzony podgląd z wagą wody, czasem etapu i stanem timera). [Wdrożone]
    - **Apple Watch & Widżety WidgetKit (BR-ZEG-001, BR-ZEG-002, BR-ZEG-005):** Mostek synchronizacji sesji i wzorców haptycznych na nadgarstku oraz kontener danych dla widżetów kofeiny. [Wdrożone]
@@ -163,7 +163,8 @@ napar/
 │   │       ├── BrewProAccordion.tsx     # Akordeon rzemieślniczy: woda, TDS, radar sensoryczny
 │   │       └── BrewFinishModal.tsx      # Arkusz degustacyjny, Dial-in Doctor i ekonomia
 │   └── core/                   # Czysta logika biznesowa i persystencja
-│       ├── app-access.ts       # Silnik dostępu Apps4Brew Pass, trial 100% i Read-Only history
+│       ├── access-policy.ts    # Polityka dostępu (M5 S1): limit 7 dni parzenia w miesiącu, czysta logika
+│       ├── app-access.ts       # Most dostępu: stan dni, decyzja startu parzenia, hook dla UI
 │       ├── domain-rules.ts     # Deterministyczne reguły RD-01…RD-30
 │       ├── recipes-data.ts     # 24 wzorcowe receptury specialty i herbaty
 │       ├── knowledge-data.ts   # Kompendium wiedzy o odmianach, obróbkach, terroir i herbatach

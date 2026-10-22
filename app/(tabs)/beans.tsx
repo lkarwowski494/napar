@@ -20,9 +20,7 @@ import {
 } from '../../src/core/database';
 import { InventoryItem } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
-import { useAppAccess } from '../../src/core/app-access';
-import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
-import { BeansIcon, ShieldIcon } from '../../src/components/icons/CraftIcons';
+import { BeansIcon } from '../../src/components/icons/CraftIcons';
 import { BeanCompendiumModal, KnowledgeTemplate } from '../../src/components/beans/BeanCompendiumModal';
 import { BeanAddModal } from '../../src/components/beans/BeanAddModal';
 import { BeanEditModal } from '../../src/components/beans/BeanEditModal';
@@ -32,7 +30,6 @@ import { BeanItemCard } from '../../src/components/beans/BeanItemCard';
 export default function BeansScreen() {
   const router = useRouter();
   const { selectInventoryItem, beveragePreference } = useBrew();
-  const { canCreate, isHistoryReadOnly, refresh } = useAppAccess();
   const [unitSystem] = useState<'metric' | 'imperial'>(() => {
     try {
       return getUnitSystem();
@@ -44,7 +41,6 @@ export default function BeansScreen() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [filter, setFilter] = useState<'all' | 'coffee' | 'tea' | 'archived'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showPaywall, setShowPaywall] = useState(false);
   const [showCompendium, setShowCompendium] = useState(false);
   const [presetTemplate, setPresetTemplate] = useState<KnowledgeTemplate | null>(null);
 
@@ -74,30 +70,17 @@ export default function BeansScreen() {
   }, []);
 
   const handleOpenAdd = () => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
     setPresetTemplate(null);
     setShowAddModal(true);
   };
 
   const handleUseKnowledgeTemplate = (template: KnowledgeTemplate) => {
-    if (!canCreate) {
-      setShowCompendium(false);
-      setShowPaywall(true);
-      return;
-    }
     setPresetTemplate({ ...template });
     setShowCompendium(false);
     setShowAddModal(true);
   };
 
   const handleOpenEdit = (item: InventoryItem) => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
     setEditingItem(item);
     setShowEditModal(true);
   };
@@ -138,15 +121,6 @@ export default function BeansScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Baner informacyjny w trybie tylko do odczytu */}
-      {isHistoryReadOnly && (
-        <View style={styles.readOnlyBanner}>
-          <ShieldIcon size={14} color={theme.colors.copper} />
-          <Text style={styles.readOnlyText}>
-            Tryb tylko do odczytu (wygasła subskrypcja)
-          </Text>
-        </View>
-      )}
 
       {/* Pasek filtrowania i akcji */}
       <BeanTopBar
@@ -198,8 +172,6 @@ export default function BeansScreen() {
         visible={showAddModal}
         onClose={() => setShowAddModal(false)}
         beveragePreference={beveragePreference}
-        canCreate={canCreate}
-        onRequirePaywall={() => setShowPaywall(true)}
         onOpenCompendium={() => {
           setShowAddModal(false);
           setShowCompendium(true);
@@ -217,8 +189,6 @@ export default function BeansScreen() {
           setEditingItem(null);
         }}
         beveragePreference={beveragePreference}
-        canCreate={canCreate}
-        onRequirePaywall={() => setShowPaywall(true)}
         onSaved={loadData}
         onDeleted={loadData}
       />
@@ -231,13 +201,6 @@ export default function BeansScreen() {
         onUseTemplate={handleUseKnowledgeTemplate}
       />
 
-      {/* Apps4Brew Pass Paywall Modal */}
-      <Apps4BrewPassModal
-        visible={showPaywall}
-        onClose={() => setShowPaywall(false)}
-        onPurchaseSuccess={refresh}
-        onSubscribed={refresh}
-      />
     </View>
   );
 }
@@ -246,22 +209,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,
-  },
-  readOnlyBanner: {
-    backgroundColor: 'rgba(78, 159, 61, 0.12)',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  readOnlyText: {
-    color: theme.colors.textSecondary,
-    fontSize: 12,
-    fontWeight: '600',
-    flex: 1,
   },
   listContent: {
     padding: theme.spacing.md,

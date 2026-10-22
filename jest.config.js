@@ -44,7 +44,8 @@ module.exports = {
     './src/core/search-utils.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/healthkit.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/announce.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
-    './src/core/app-access.ts': { statements: 98, branches: 94, functions: 100, lines: 98 },
+    './src/core/app-access.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './src/core/access-policy.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/live-activity.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/craft-suite-theme.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     // Przebudowa etapu 2 (persystencja i kopie): 100% bez wyjątków

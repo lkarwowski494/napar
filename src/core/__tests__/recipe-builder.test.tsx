@@ -4,6 +4,7 @@
 
 import React from 'react';
 import renderer from 'react-test-renderer';
+import { exhaustedFreeBrewDaysValue } from '../../../tests/helpers/free-brew-days';
 import { Alert } from 'react-native';
 
 const mockPush = jest.fn();
@@ -535,8 +536,8 @@ describe('Custom Recipe Builder & Persistence', () => {
     mockSearchParams = {};
   });
 
-  test('W trybie wygasłego trialu próba zapisu nowej receptury wyświetla Paywall zamiast zapisu', () => {
-    mockDb.settings.set('trial_brews_count', '15');
+  test('Wyczerpany limit darmowego poziomu nie blokuje zapisu receptury (historia i edycja zawsze dostępne)', () => {
+    mockDb.settings.set('free_brew_days', exhaustedFreeBrewDaysValue());
     mockDb.settings.set('is_pro_active', 'false');
 
     let tree: any;
@@ -545,35 +546,13 @@ describe('Custom Recipe Builder & Persistence', () => {
     });
 
     const saveBtn = tree.root.findByProps({ testID: 'recipe-builder-save-btn' });
-    expect(saveBtn).toBeDefined();
-
     renderer.act(() => {
       saveBtn.props.onPress();
     });
 
-    // Paywall modal powinien się otworzyć
-    const planAnnualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
-    expect(planAnnualBtn).toBeDefined();
+    // Brak Paywalla: zapis nie jest bramkowany limitem dni parzenia
+    expect(tree.root.findAllByProps({ testID: 'plan-annual-btn' })).toHaveLength(0);
 
-    // Zamknij paywall
-    const closeBtn = tree.root.findByProps({ testID: 'close-paywall-btn' });
-    renderer.act(() => {
-      closeBtn.props.onPress();
-    });
-
-    // Próba duplikowania w trybie wygasłego trialu
-    mockSearchParams = { id: 'recipe-to-clone' };
-    let treeEdit: any;
-    renderer.act(() => {
-      treeEdit = renderer.create(<RecipeBuilderScreen />);
-    });
-    const dupBtn = findPressableWithText(treeEdit.root, 'Duplikuj jako nową');
-    renderer.act(() => {
-      dupBtn?.props.onPress();
-    });
-    expect(treeEdit.root.findByProps({ testID: 'plan-annual-btn' })).toBeDefined();
-
-    mockSearchParams = {};
     mockDb.settings.clear();
   });
 });

@@ -77,7 +77,7 @@ import {
   announceStart,
   announceFinish,
 } from '../announce';
-import { getAppAccessState } from '../app-access';
+import { getBrewAccessState } from '../app-access';
 import { getCraftTheme, CRAFT_APPS } from '../craft-suite-theme';
 import {
   buildDynamicIslandPayload,
@@ -284,15 +284,12 @@ describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
   });
 
   describe('app-access and craft-suite-theme', () => {
-    test('subscription tier fallback and pro tier reading', () => {
+    test('stan Pro czytany z ustawienia (bez okresu próbnego)', () => {
       setIsProUser(true);
-      setAppSetting('subscription_tier', 'none');
-      const st1 = getAppAccessState();
-      expect(st1.subscriptionTier).toBe('lifetime');
-
-      setAppSetting('subscription_tier', 'annual');
-      const st2 = getAppAccessState();
-      expect(st2.subscriptionTier).toBe('annual');
+      expect(getBrewAccessState().isPro).toBe(true);
+      setIsProUser(false);
+      expect(getBrewAccessState().isPro).toBe(false);
+      expect(getBrewAccessState().remainingDays).toBe(7);
     });
 
     test('getCraftTheme handles fallback to napar', () => {

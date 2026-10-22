@@ -97,10 +97,9 @@ export default function SettingsScreen() {
     return getHealthKitSyncEnabled();
   });
   const {
-    status: accessStatus,
-    isSubscribed,
-    subscriptionTier,
-    brewsRemaining,
+    isPro,
+    monthDaysUsed,
+    freeDaysPerMonth,
     refresh: refreshAccess,
   } = useAppAccess();
   const [showPassModal, setShowPassModal] = useState(false);
@@ -258,10 +257,9 @@ export default function SettingsScreen() {
 
       {/* Status Apps4Brew Pass (Pro) */}
       <PassSettingsCard
-        isSubscribed={isSubscribed}
-        subscriptionTier={subscriptionTier}
-        accessStatus={accessStatus}
-        brewsRemaining={brewsRemaining}
+        isPro={isPro}
+        monthDaysUsed={monthDaysUsed}
+        freeDaysPerMonth={freeDaysPerMonth}
         onOpenPassModal={() => setShowPassModal(true)}
         t={t}
       />

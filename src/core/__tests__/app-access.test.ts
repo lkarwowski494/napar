@@ -1,22 +1,20 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: App Access & Monetization (Cheaper than Espresso)
+// Napar (Steepwise) — Unit Tests: dostęp do parzenia (most polityka <-> baza <-> UI)
+// Model M5 S1: 7 dni parzenia w miesiącu, Pro znosi limit, brak okresu próbnego.
+// Zakup w aplikacji nie istnieje w tym etapie: test pilnuje, że nie ma atrapy sukcesu.
 // ============================================================================
 
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import {
-  getAppAccessState,
-  recordBrewCompleted,
-  activateSubscription,
-  restorePurchases,
-  resetTrialForTesting,
-  setTrialExpiredForTesting,
+  getBrewAccessState,
+  getBrewStartDecision,
+  recordTimerBrewCompleted,
   useAppAccess,
-  TRIAL_MAX_BREWS,
-  TRIAL_DURATION_DAYS,
-  STORE_PRODUCT_IDS,
 } from '../app-access';
-import { initDatabase, setAppSetting } from '../database';
+import { setAppSetting } from '../database';
+import { FREE_BREW_DAYS_SETTING_KEY } from '../repositories/brew-access';
+import { exhaustedFreeBrewDaysValue, freeBrewDaysValue } from '../../../tests/helpers/free-brew-days';
 
 const mockSettings = new Map<string, string>();
 
@@ -42,174 +40,170 @@ jest.mock('expo-sqlite', () => ({
   defaultDatabaseDirectory: '/test/SQLite',
 }));
 
-describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
+const MONDAY_7TH = new Date(2026, 9, 7, 10, 0);
+const THURSDAY_22ND = new Date(2026, 9, 22, 10, 0);
+
+describe('dostęp do parzenia: stan i decyzje (czysty zegar)', () => {
   beforeEach(() => {
     mockSettings.clear();
-    resetTrialForTesting();
   });
 
-  test('Początkowy stan aplikacji: aktywny trial z pełnym dostępem (100% funkcji)', () => {
-    const state = getAppAccessState();
-    expect(state.status).toBe('trial_active');
-    expect(state.brewsCount).toBe(0);
-    expect(state.brewsRemaining).toBe(TRIAL_MAX_BREWS);
-    expect(state.daysRemaining).toBeLessThanOrEqual(TRIAL_DURATION_DAYS);
-    expect(state.canCreate).toBe(true);
-    expect(state.isHistoryReadOnly).toBe(false);
-    expect(state.isSubscribed).toBe(false);
+  test('stan początkowy: darmowy poziom, pełne 7 dni, brak wliczonego dzisiaj', () => {
+    expect(getBrewAccessState(THURSDAY_22ND)).toEqual({
+      isPro: false,
+      monthDaysUsed: 0,
+      todayCounted: false,
+      remainingDays: 7,
+      freeDaysPerMonth: 7,
+    });
   });
 
-  test('Ukończenie parzenia inkrementuje licznik sesji trialowych', () => {
-    recordBrewCompleted();
-    let state = getAppAccessState();
-    expect(state.brewsCount).toBe(1);
-    expect(state.brewsRemaining).toBe(TRIAL_MAX_BREWS - 1);
-    expect(state.canCreate).toBe(true);
-
-    recordBrewCompleted();
-    state = getAppAccessState();
-    expect(state.brewsCount).toBe(2);
-    expect(state.brewsRemaining).toBe(TRIAL_MAX_BREWS - 2);
-    expect(state.status).toBe('trial_active');
+  test('bez okresu próbnego: żadne ustawienie triala nie wpływa na dostęp', () => {
+    setAppSetting('trial_started_at', '2000-01-01T00:00:00.000Z');
+    setAppSetting('trial_brews_count', '0');
+    expect(getBrewAccessState(THURSDAY_22ND).remainingDays).toBe(7);
   });
 
-  test('Osiągnięcie limitu parzeń wygasza trial i blokuje tworzenie, zachowując historię read-only', () => {
-    for (let i = 0; i < TRIAL_MAX_BREWS; i++) {
-      recordBrewCompleted();
+  test('ukończenie parzenia wlicza dzisiejszy dzień i zmniejsza pozostałe dni', () => {
+    recordTimerBrewCompleted(THURSDAY_22ND);
+    expect(getBrewAccessState(THURSDAY_22ND)).toMatchObject({
+      monthDaysUsed: 1,
+      todayCounted: true,
+      remainingDays: 6,
+    });
+  });
+
+  test('drugie parzenie tego samego dnia nie zużywa limitu', () => {
+    recordTimerBrewCompleted(THURSDAY_22ND);
+    recordTimerBrewCompleted(THURSDAY_22ND);
+    expect(getBrewAccessState(THURSDAY_22ND).monthDaysUsed).toBe(1);
+  });
+
+  test('7. dzień dozwolony, 8. dzień blokowany (start nowego dnia)', () => {
+    mockSettings.set(FREE_BREW_DAYS_SETTING_KEY, freeBrewDaysValue(6, THURSDAY_22ND));
+    expect(getBrewStartDecision(false, THURSDAY_22ND).allowed).toBe(true);
+
+    recordTimerBrewCompleted(THURSDAY_22ND);
+    const nextDay = new Date(2026, 9, 23, 10, 0);
+    expect(getBrewStartDecision(false, nextDay)).toEqual({
+      allowed: false,
+      reason: 'limit_reached',
+      remainingDays: 0,
+    });
+  });
+
+  test('blokada nie przerywa trwającego parzenia (sessionInProgress)', () => {
+    mockSettings.set(FREE_BREW_DAYS_SETTING_KEY, exhaustedFreeBrewDaysValue(MONDAY_7TH));
+    expect(getBrewStartDecision(true, MONDAY_7TH).allowed).toBe(true);
+    expect(getBrewStartDecision(false, MONDAY_7TH).allowed).toBe(false);
+  });
+
+  test('Pro omija limit i nie pokazuje pozostałych dni', () => {
+    mockSettings.set(FREE_BREW_DAYS_SETTING_KEY, exhaustedFreeBrewDaysValue(MONDAY_7TH));
+    setAppSetting('is_pro_active', 'true');
+    expect(getBrewAccessState(MONDAY_7TH)).toMatchObject({
+      isPro: true,
+      remainingDays: Infinity,
+    });
+    expect(getBrewStartDecision(false, MONDAY_7TH)).toEqual({
+      allowed: true,
+      reason: 'pro',
+      remainingDays: Infinity,
+    });
+  });
+
+  test('zapis dnia bez podanej daty używa bieżącego zegara', () => {
+    recordTimerBrewCompleted();
+    expect(getBrewAccessState().monthDaysUsed).toBe(1);
+    expect(getBrewStartDecision(false).remainingDays).toBe(6);
+  });
+
+  test('pusty stan bez podanej daty działa na bieżącym zegarze', () => {
+    expect(getBrewAccessState().freeDaysPerMonth).toBe(7);
+  });
+});
+
+describe('hook useAppAccess (widok)', () => {
+  beforeEach(() => {
+    mockSettings.clear();
+  });
+
+  test('odświeża stan po ukończeniu parzenia i udostępnia decyzję startu', () => {
+    let latest: ReturnType<typeof useAppAccess> | null = null;
+    function Probe() {
+      latest = useAppAccess();
+      return null;
     }
 
-    const state = getAppAccessState();
-    expect(state.status).toBe('trial_expired');
-    expect(state.brewsCount).toBe(TRIAL_MAX_BREWS);
-    expect(state.brewsRemaining).toBe(0);
-    expect(state.canCreate).toBe(false);
-    expect(state.isHistoryReadOnly).toBe(true);
+    act(() => {
+      renderer.create(React.createElement(Probe));
+    });
+    expect(latest!.monthDaysUsed).toBe(0);
+    expect(latest!.checkBrewStart(false).allowed).toBe(true);
+
+    act(() => {
+      latest!.recordTimerBrew();
+    });
+    expect(latest!.monthDaysUsed).toBe(1);
+    expect(latest!.todayCounted).toBe(true);
+
+    act(() => {
+      latest!.refresh();
+    });
+    expect(latest!.remainingDays).toBe(6);
   });
 
-  test('Upływ 14 dni wygasza trial nawet przy mniejszej liczbie parzeń', () => {
-    // Ustaw datę rozpoczęcia trialu na 15 dni temu
-    const pastDate = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
-    setAppSetting('trial_started_at', pastDate);
-
-    const state = getAppAccessState();
-    expect(state.status).toBe('trial_expired');
-    expect(state.canCreate).toBe(false);
-    expect(state.isHistoryReadOnly).toBe(true);
-  });
-
-  test('Aktywacja subskrypcji odblokowuje pełny dostęp bez limitów', () => {
-    setTrialExpiredForTesting();
-    expect(getAppAccessState().status).toBe('trial_expired');
-
-    const state = activateSubscription('annual');
-    expect(state.status).toBe('subscribed');
-    expect(state.isSubscribed).toBe(true);
-    expect(state.canCreate).toBe(true);
-    expect(state.subscriptionTier).toBe('annual');
-    expect(state.brewsRemaining).toBe(Infinity);
-
-    // Dalsze parzenia nie zmieniają statusu subskrypcji
-    recordBrewCompleted();
-    expect(getAppAccessState().status).toBe('subscribed');
-  });
-
-  test('Przywrócenie zakupów (Restore Purchases) bez wcześniejszego zakupu nie aktywuje licencji', () => {
-    setTrialExpiredForTesting();
-    const result = restorePurchases();
-    expect(result.restored).toBe(false);
-    expect(result.status).toBe('trial_expired');
-    expect(result.isSubscribed).toBe(false);
-    expect(result.canCreate).toBe(false);
-  });
-
-  test('Przywrócenie zakupów (Restore Purchases) po wcześniejszym zakupie poprawnie przywraca licencję', () => {
-    activateSubscription('annual');
-    // Symulacja utraty flagi sesyjnej przy zachowanym dowodzie zakupu
-    setAppSetting('is_pro_active', 'false');
-    setAppSetting('subscription_tier', 'none');
-
-    const result = restorePurchases();
-    expect(result.restored).toBe(true);
-    expect(result.status).toBe('subscribed');
-    expect(result.isSubscribed).toBe(true);
-    expect(result.subscriptionTier).toBe('annual');
-    expect(result.canCreate).toBe(true);
-  });
-
-  test('Hook useAppAccess reaguje na subskrypcję, odświeżenie i rejestrację parzeń', () => {
-    let hookData: any;
-    const TestConsumer = () => {
-      hookData = useAppAccess();
+  test('zapis parzenia odświeża wszystkie zamontowane instancje; odmontowana przestaje nasłuchiwać', () => {
+    let first: ReturnType<typeof useAppAccess> | null = null;
+    let second: ReturnType<typeof useAppAccess> | null = null;
+    function ProbeA() {
+      first = useAppAccess();
       return null;
-    };
-
+    }
+    function ProbeB() {
+      second = useAppAccess();
+      return null;
+    }
+    let treeA: any;
+    let treeB: any;
     act(() => {
-      renderer.create(React.createElement(TestConsumer));
+      treeA = renderer.create(React.createElement(ProbeA));
+      treeB = renderer.create(React.createElement(ProbeB));
     });
 
-    expect(hookData.status).toBe('trial_active');
-    expect(hookData.canCreate).toBe(true);
-
     act(() => {
-      hookData.recordBrew();
+      recordTimerBrewCompleted();
     });
-    expect(hookData.brewsCount).toBe(1);
+    expect(first!.monthDaysUsed).toBe(1);
+    expect(second!.monthDaysUsed).toBe(1);
 
+    // Inny dzień tego samego miesiąca (ten sam dzień nie zwiększa licznika)
+    const now = new Date();
+    const otherDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() === 1 ? 2 : 1, 12);
     act(() => {
-      hookData.subscribe('monthly');
+      treeB.unmount();
     });
-    expect(hookData.status).toBe('subscribed');
-    expect(hookData.isSubscribed).toBe(true);
-    expect(hookData.subscriptionTier).toBe('monthly');
-
-    let restoredResult: boolean = false;
     act(() => {
-      restoredResult = hookData.restore();
+      recordTimerBrewCompleted(otherDay);
     });
-    expect(restoredResult).toBe(true);
-    expect(hookData.subscriptionTier).toBe('monthly');
-
+    expect(first!.monthDaysUsed).toBe(2);
+    expect(second!.monthDaysUsed).toBe(1);
     act(() => {
-      hookData.refresh();
+      treeA.unmount();
     });
-    expect(hookData.status).toBe('subscribed');
   });
 
-  test('Identyfikatory produktów App Store / Google Play są poprawnie zdefiniowane', () => {
-    expect(STORE_PRODUCT_IDS.monthly).toBe('pl.lukasz.napar.monthly');
-    expect(STORE_PRODUCT_IDS.annual).toBe('pl.lukasz.napar.annual');
-    expect(STORE_PRODUCT_IDS.lifetime).toBe('pl.lukasz.napar.lifetime');
-  });
-
-  test('Weryfikacja podpisanego pokwitowania StoreKit aktywuje subskrypcję i zapisuje receipt JSON', () => {
-    setTrialExpiredForTesting();
-    expect(getAppAccessState().status).toBe('trial_expired');
-
-    const fakeReceipt = {
-      productId: STORE_PRODUCT_IDS.lifetime,
-      transactionId: 'TX-STOREKIT-998811',
-      purchaseDate: new Date().toISOString(),
-      signature: 'VALID_CRYPTOGRAPHIC_SIG_8877',
-    };
-
-    // Import funkcji weryfikacji
-    const { verifyAndActivateStoreKitPurchase } = require('../app-access');
-    const result = verifyAndActivateStoreKitPurchase(fakeReceipt);
-    expect(result.success).toBe(true);
-    expect(result.tier).toBe('lifetime');
-
-    const state = getAppAccessState();
-    expect(state.status).toBe('subscribed');
-    expect(state.isSubscribed).toBe(true);
-    expect(state.subscriptionTier).toBe('lifetime');
-
-    // Nieprawidłowe pokwitowanie jest odrzucane
-    const invalidResult = verifyAndActivateStoreKitPurchase({
-      productId: 'invalid.product.id',
-      transactionId: 'TX-1',
-      purchaseDate: new Date().toISOString(),
-      signature: 'SIG',
+  test('zwraca decyzję odmowną po wyczerpaniu limitu', () => {
+    mockSettings.set(FREE_BREW_DAYS_SETTING_KEY, exhaustedFreeBrewDaysValue());
+    let latest: ReturnType<typeof useAppAccess> | null = null;
+    function Probe() {
+      latest = useAppAccess();
+      return null;
+    }
+    act(() => {
+      renderer.create(React.createElement(Probe));
     });
-    expect(invalidResult.success).toBe(false);
+    expect(latest!.checkBrewStart(false).allowed).toBe(false);
+    expect(latest!.checkBrewStart(true).allowed).toBe(true);
   });
 });

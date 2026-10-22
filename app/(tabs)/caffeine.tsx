@@ -29,15 +29,11 @@ import {
 import { CaffeineCurveChart } from '../../src/core/caffeine-chart';
 import { theme } from '../../src/core/theme';
 import { getHealthKitSyncEnabled, saveDietaryCaffeineSample } from '../../src/core/healthkit';
-import { useAppAccess } from '../../src/core/app-access';
-import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { BedtimeCurfewCard } from '../../src/components/caffeine/BedtimeCurfewCard';
 import { CaffeineLogList } from '../../src/components/caffeine/CaffeineLogList';
 import { CaffeineQuickAddModal } from '../../src/components/caffeine/CaffeineQuickAddModal';
 
 export default function CaffeineScreen() {
-  const { canCreate, isHistoryReadOnly, refresh } = useAppAccess();
-  const [showPaywall, setShowPaywall] = useState(false);
   const unitSystem = getUnitSystem();
   const [logs, setLogs] = useState<CaffeineLog[]>([]);
   const [bedtimeHour, setBedtimeHourState] = useState(() => {
@@ -126,11 +122,6 @@ export default function CaffeineScreen() {
     .padStart(2, '0')}`;
 
   const handleQuickAdd = (name: string, type: 'coffee' | 'tea', doseG: number, mg: number) => {
-    if (!canCreate) {
-      setShowQuickAddModal(false);
-      setShowPaywall(true);
-      return;
-    }
     const consumedAt = new Date().toISOString();
     const log: CaffeineLog = {
       id: `caff-${Date.now()}`,
@@ -156,25 +147,12 @@ export default function CaffeineScreen() {
   };
 
   const handleDeleteLog = (log: CaffeineLog) => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
     deleteCaffeineLog(log.id);
     loadLogs();
   };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Read-Only Status Banner when trial expired */}
-      {isHistoryReadOnly && (
-        <View style={styles.readOnlyBanner}>
-          <Text style={styles.readOnlyBannerText}>
-            Tryb Tylko do Odczytu — Twoja historia kofeiny jest bezpieczna. Nowe wpisy wymagają Apps4Brew Pass.
-          </Text>
-        </View>
-      )}
-
       {/* Karta Stężenia Kofeiny Teraz */}
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>AKTYWNA KOFEINA W KRWIOBIEGU</Text>
@@ -221,13 +199,7 @@ export default function CaffeineScreen() {
       <CaffeineLogList
         logs={logs}
         unitSystem={unitSystem}
-        onQuickAddPress={() => {
-          if (!canCreate) {
-            setShowPaywall(true);
-            return;
-          }
-          setShowQuickAddModal(true);
-        }}
+        onQuickAddPress={() => setShowQuickAddModal(true)}
         onDeleteLog={handleDeleteLog}
       />
 
@@ -239,13 +211,6 @@ export default function CaffeineScreen() {
         onSelectOption={handleQuickAdd}
       />
 
-      {/* Apps4Brew Pass Paywall Modal */}
-      <Apps4BrewPassModal
-        visible={showPaywall}
-        onClose={() => setShowPaywall(false)}
-        onPurchaseSuccess={refresh}
-        onSubscribed={refresh}
-      />
     </ScrollView>
   );
 }
@@ -295,21 +260,5 @@ const styles = StyleSheet.create({
   },
   efsaProgressFill: {
     height: '100%',
-  },
-  readOnlyBanner: {
-    backgroundColor: 'rgba(78, 159, 61, 0.12)',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: theme.borderRadius.md,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(78, 159, 61, 0.3)',
-  },
-  readOnlyBannerText: {
-    fontSize: 12,
-    color: '#2e7d32',
-    fontWeight: '600',
-    lineHeight: 16,
-    textAlign: 'center',
   },
 });

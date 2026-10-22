@@ -9,8 +9,14 @@ export type BeveragePreference = 'both' | 'coffee' | 'tea';
 /**
  * Klucze lokalne dla urządzenia lub uprawnień: nie trafiają do kopii zapasowej
  * i nie są przywracane z pliku (np. stan Pro pochodzi wyłącznie z zakupu, nie z pliku).
+ * `is_pro_active`: decyzja właściciela (22.10.2026) — stan Pro zostaje poza kopią.
+ * `free_brew_days`: licznik dni darmowego limitu (repositories/brew-access.ts) — import pliku nie może go wyzerować.
  */
-export const NON_PORTABLE_SETTING_KEYS: readonly string[] = ['is_pro_active', 'db_location_fallback'];
+export const NON_PORTABLE_SETTING_KEYS: readonly string[] = [
+  'is_pro_active',
+  'db_location_fallback',
+  'free_brew_days',
+];
 
 export function getAppSetting(db: DbPort, key: string, defaultValue = ''): string {
   try {

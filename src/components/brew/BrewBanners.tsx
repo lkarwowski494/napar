@@ -11,14 +11,15 @@ import { CorruptStateRecovery } from '../../core/backup';
 
 interface BrewBannersProps {
   corruptState: CorruptStateRecovery | null;
-  isHistoryReadOnly: boolean;
+  /** Tekst stanu darmowego limitu dni parzenia; null dla Pro (brak banera). */
+  freeDaysText: string | null;
   language: 'pl' | 'en';
   onDismissCorrupt: () => void;
 }
 
 export const BrewBanners: React.FC<BrewBannersProps> = ({
   corruptState,
-  isHistoryReadOnly,
+  freeDaysText,
   language,
   onDismissCorrupt,
 }) => {
@@ -52,13 +53,11 @@ export const BrewBanners: React.FC<BrewBannersProps> = ({
         </View>
       )}
 
-      {/* Read-Only Status Banner when trial expired */}
-      {isHistoryReadOnly && (
-        <View style={styles.readOnlyBanner}>
+      {/* Stan darmowego limitu dni parzenia (model M5 S1) */}
+      {freeDaysText !== null && (
+        <View style={styles.freeDaysBanner} testID="free-days-banner">
           <ShieldIcon size={16} color={theme.colors.copper} />
-          <Text style={styles.readOnlyBannerText}>
-            Tryb Tylko do Odczytu — Twoje receptury i historia są bezpieczne. Parzenie i edycja wymagają Apps4Brew Pass.
-          </Text>
+          <Text style={styles.freeDaysBannerText}>{freeDaysText}</Text>
         </View>
       )}
 
@@ -90,7 +89,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     fontWeight: '600',
   },
-  readOnlyBanner: {
+  freeDaysBanner: {
     backgroundColor: 'rgba(217, 119, 54, 0.12)',
     borderRadius: theme.borderRadius.md,
     padding: 12,
@@ -101,7 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  readOnlyBannerText: {
+  freeDaysBannerText: {
     color: theme.colors.copper,
     fontSize: 12,
     lineHeight: 18,
