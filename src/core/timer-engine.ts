@@ -212,12 +212,17 @@ export class BrewTimerEngine {
   public adjustStepDuration(deltaSeconds: number): void {
     const currentStep = this.getCurrentStep();
     if (!currentStep) return;
-    const newDuration = Math.max(this.stepElapsedSeconds + 1, currentStep.durationSeconds + deltaSeconds);
+    const oldDurationSec = currentStep.durationSeconds;
+    const newDuration = Math.max(this.stepElapsedSeconds + 1, oldDurationSec + deltaSeconds);
     currentStep.durationSeconds = newDuration;
     if (this.status === 'running') {
       const remSec = Math.max(1, currentStep.durationSeconds - this.stepElapsedSeconds);
       this.stepEndAtMs = Date.now() + remSec * 1000;
       this.pausedRemainingMs = null;
+    } else if (this.status === 'paused' && this.pausedRemainingMs !== null) {
+      // Pauza: korekta trafia do zapisanego czasu pozostałego, inaczej znika przy WZNÓW
+      const elapsedMs = oldDurationSec * 1000 - this.pausedRemainingMs;
+      this.pausedRemainingMs = Math.max(1000, newDuration * 1000 - elapsedMs);
     }
     this.notifyTick();
   }

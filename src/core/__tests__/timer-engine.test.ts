@@ -226,6 +226,77 @@ describe('BrewTimerEngine', () => {
     expect(() => emptyEngine.adjustStepDuration(10)).not.toThrow();
   });
 
+  test('Korekta ±10 s w pauzie zostaje po WZNÓW (pauza → korekta → wznowienie)', () => {
+    let latestSnap: any = null;
+    const engine = new BrewTimerEngine(testSteps, {
+      onTick: (snap) => {
+        latestSnap = snap;
+      },
+    });
+
+    engine.start();
+    jest.advanceTimersByTime(10000); // etap 1 (30 s): zostało 20 s
+    engine.pause();
+
+    // Korekta +10 s w pauzie: krok ma 40 s, zostało 30 s
+    engine.adjustStepDuration(10);
+    expect(engine.getSnapshot().currentStep?.durationSeconds).toBe(40);
+    expect(engine.getSnapshot().stepRemainingSeconds).toBe(30);
+
+    // Czas płynie w pauzie bez skutków
+    jest.advanceTimersByTime(60000);
+    expect(engine.getSnapshot().status).toBe('paused');
+
+    engine.resume();
+    // Po WZNÓW zostaje 30 s, a nie 20 s sprzed korekty
+    expect(engine.getSnapshot().stepRemainingSeconds).toBe(30);
+
+    jest.advanceTimersByTime(29000);
+    expect(latestSnap.currentStepIndex).toBe(0);
+    expect(latestSnap.stepRemainingSeconds).toBe(1);
+    jest.advanceTimersByTime(1000);
+    expect(latestSnap.currentStepIndex).toBe(1);
+
+    engine.destroy();
+  });
+
+  test('Skrócenie o 10 s w pauzie zostaje po WZNÓW i nie schodzi poniżej 1 s', () => {
+    let latestSnap: any = null;
+    const engine = new BrewTimerEngine(testSteps, {
+      onTick: (snap) => {
+        latestSnap = snap;
+      },
+    });
+
+    engine.start();
+    jest.advanceTimersByTime(10000); // zostało 20 s
+    engine.pause();
+
+    engine.adjustStepDuration(-10); // krok 20 s, zostało 10 s
+    engine.resume();
+    jest.advanceTimersByTime(9000);
+    expect(latestSnap.currentStepIndex).toBe(0);
+    jest.advanceTimersByTime(1000);
+    expect(latestSnap.currentStepIndex).toBe(1);
+
+    // Zbyt mocne skrócenie w pauzie: minimum 1 s do końca etapu
+    const engine2 = new BrewTimerEngine(testSteps, {
+      onTick: (snap) => {
+        latestSnap = snap;
+      },
+    });
+    engine2.start();
+    jest.advanceTimersByTime(10000);
+    engine2.pause();
+    engine2.adjustStepDuration(-30);
+    engine2.resume();
+    jest.advanceTimersByTime(1000);
+    expect(latestSnap.currentStepIndex).toBe(1);
+
+    engine.destroy();
+    engine2.destroy();
+  });
+
   describe('RD-ENG-06 & NFR-PERF-004: Odliczanie odporne na uśpienie w tle', () => {
     test('Wektory testowe z dokumentu BRD (RD-ENG-06)', () => {
       // • Start 180s o 10:00:00, uśpienie, wybudzenie o 10:02:15 -> 45s
