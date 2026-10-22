@@ -143,3 +143,13 @@ Suma agenta dla MVP: około **7–11 dni**. Realny kalendarz: **3–5 tygodni**,
 - **Przebudowa rozmyta:** przy przebudowie w miejscu stary i nowy kod mogą się mieszać. Mitigacja: nowy kod w nowych katalogach, przełączenie jednym commitem, stary kod usuwany osobnym commitem.
 - **Stare długi wracają:** bez rejestru twierdzeń i bramki pokrycia znowu pojawią się atrapy. Mitigacja: bramki z etapu 0 są nienegocjowalne.
 - **Różnice wersji:** `trening` i Napar mają te same wersje dziś; po aktualizacji jednego trzeba sprawdzić drugi.
+
+## Aktualizacja 22.10.2026 — decyzje, które zmieniają plan
+
+- **Zakres MVP:** 31 pozycji z `docs/lista-funkcji-mvp.md` (łącznie z Live Activity, Apple Watch i napojami mlecznymi, na decyzję właściciela).
+- **Języki:** 35, jak w `trening`. Tłumaczenia i weryfikacja to najdroższa pozycja; harmonogram wymaga przeliczenia.
+- **Zakupy:** model M5 S1 z `trening`: darmowy poziom z limitem **7 dni parzenia miesięcznie**, Pro (subskrypcja miesięczna, roczna albo dożywotnia) bez limitu, bez okresu próbnego. Ceny jak w `trening`. Zastępuje D3/D4 w zakresie zakupów.
+- **Family Sharing:** zatwierdzone dla subskrypcji i dożywotniego. Nieodwracalne po włączeniu w App Store Connect (źródło Apple, sekcja w `lista-funkcji-mvp.md`).
+- **Zastrzeżenie:** liczby płacących w modelu zakładają częstotliwość treningową. Przed liczeniem przychodu trzeba je ponownie policzyć z częstotliwością kawową.
+
+**Nadal otwarte (blokują konkretne etapy):** D7 licencja (blokuje wydanie), D8 ścieżka bazy (test na symulatorze przed etapem 2), D9 progi pokrycia (etap 0), zgoda na kopiowanie kodu z `trening` (etap 4 i 6, jeśli kopiujemy zamiast przepisywać).

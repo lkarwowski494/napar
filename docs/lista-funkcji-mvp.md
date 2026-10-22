@@ -136,3 +136,7 @@ Wynik modelu `trening` (ta sama metoda, częstotliwość treningowa, [OCENA]; p�
 **Nadal otwarte:** model wymaga ponownego uruchomienia z rozkładem częstotliwości dla parzenia kawy (kawa jest pijana częściej niż trenuje się). Przy wyższej częstotliwości udział trafiających na blokadę przy 7 dniach będzie większy niż 77%.
 
 Warunki bez zmian: blokada nie przerywa trwającego parzenia, historia i eksport zawsze dostępne, ekran pokazuje pozostałe dni przed blokadą, pomiar po premierze (blokady i recenzje 1–2★). Jeśli ocen spadnie za bardzo, podnosimy limit.
+
+## Family Sharing — zatwierdzone (22.10.2026)
+
+Zatwierdzone przez właściciela dla subskrypcji i zakupu dożywotniego. **Nieodwracalne:** Apple (strona „Turn on Family Sharing for in-app purchases”, App Store Connect Help, odczyt 22.10.2026) pisze: „once you turn on Family Sharing for an In-App Purchases in App Store Connect, you can't turn it off”. Włączenie wykonuje właściciel w App Store Connect, po sprawdzeniu, że wybrany produkt jest właściwy.
