@@ -242,3 +242,22 @@ Otwarte (zadania właściciela, nie blokują kodu):
 **Otwarte, nie blokują kodu:** utworzenie produktów i grupy subskrypcji w App Store Connect (zadanie właściciela); test sandbox na urządzeniu; nieodwracalne Family Sharing sprawdzić przed wysyłką; przywracanie bez `AppStore.sync` — zweryfikować w sandboxie.
 
 Bramka po 4b: `verify` kod 0 (101 zestawów, 1024 testy); `test:coverage` kod 0.
+
+## Status etapu 3a — usunięcie atrap i naprawy z audytu (22.10.2026)
+
+Zrobione na gałęzi `claude/wykonaj-sl7vii` (commity od `d4a1469` do `baf5678`):
+1. **HealthKit:** usunięty `src/core/healthkit.ts` i wszystkie wywołania (asystent, kofeina, ustawienia), klucze i18n, wpis w README i w progach `jest.config.js`. Testy `NSHealth*` w kontraktach zostają jako strażnik.
+2. **Ulubione (★):** `handleToggleRecipeFavorite` w `useBrewWorkflow` wywołuje `toggleRecipeFavorite`. Test w `brew-screen.test.tsx`.
+3. **Edycja receptury:** zachowuje `isFavorite` i `createdAt`. Test w `recipe-builder.test.tsx`.
+4. **Kopiowanie i link (pozycja 30 MVP):** `expo-clipboard@~57.0.2` (wersja z `bundledNativeModules` Expo 57). Trasa `app/recipe.tsx` dla `napar://recipe?v=1&d=...` pokazuje podgląd przed zapisem. Zapis tylko w nagłówku. Routing realizuje expo-router na schemacie `napar`, bez osobnego listenera expo-linking. Test w `recipe-link-route.test.tsx`.
+5. **Stoper:** korekta ±10 s w pauzie aktualizuje `pausedRemainingMs`. Testy pauza → korekta → wznowienie w `timer-engine.test.ts`.
+6. **Dzwonek:** decyzja: poprawiono dane, nie opis. Osadzony WAV ma teraz dominantę 440 Hz (poprzednio ok. 875 Hz). Test DFT w `timer-audio.test.ts`.
+7. **Arkusz po parzeniu:** diagnoza smaku z `diagnoseExtractionTaste` (ten sam silnik co dial-in). Testy scenariuszy „za kwaśna” i „za gorzka” w `BrewFinishModal.test.tsx`.
+8. **Dostępność (§2.4):** skaner `tests/touch-target-scan.test.ts` sprawdza kontrolki z jawnym rozmiarem w stylu. Naprawiono 13 kontrolek (steppery hitSlop 8, pozostałe minHeight 44 lub 44 × 44). **Otwarte:** 121 kontrolek bez jawnego rozmiaru (rozmiar z zawartości) nie jest sprawdzanych statycznie. Wymaga pomiaru na urządzeniu lub jawnych rozmiarów.
+9. **Przecinek:** `parseFloat` w polach formularzy zamieniony na `parseDecimal`. W `grinder-converter.ts` przecinek był usuwany (1,5 → 15), teraz jest normalizowany.
+
+Otwarte po etapie 3a:
+- Tłumaczenia nowych kluczy (`recipeLink`, `qrCopyFailed`) tylko PL i EN, jak w 4a i 4b. Pozostałe 33 pliki w `locales/` (nieładowane w runtime) nadal zawierają starą frazę „Apple Health” w `proPerk2` i `perk4`.
+- Kody QR w `handleScanQrRecipe` (`useBrewWorkflow.ts`) nadal zapisują recepturę bez podglądu. Podgląd dotyczy tylko linku.
+- `healthAttributesPl` (właściwości zdrowotne herbat) to decyzja D5, nie HealthKit. Nie zmieniano.
+- Weryfikacja na urządzeniu i Maestro: dotyk, otwieranie `napar://` z systemu, dzwonek, schowek.
