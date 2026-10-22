@@ -29,6 +29,8 @@ import { CompassIcon, StarIcon } from '../icons/CraftIcons';
 
 interface BrewFinishModalProps {
   visible: boolean;
+  /** Typ napoju parzenia: kawa (RD-05) lub herbata (RD-05b, poz. 24 MVP). */
+  beverageType: 'COFFEE' | 'TEA';
   totalElapsedSeconds: number;
   waterGrams: number;
   rating: number;
@@ -52,6 +54,7 @@ interface BrewFinishModalProps {
 
 export function BrewFinishModal({
   visible,
+  beverageType,
   totalElapsedSeconds,
   waterGrams,
   rating,
@@ -74,13 +77,14 @@ export function BrewFinishModal({
 }: BrewFinishModalProps) {
   const { t } = useTranslation();
 
-  // Dial-in Doctor: ta sama diagnoza co w zakładce dial-in (RD-05, domain-rules.ts)
+  // Dial-in Doctor: ta sama diagnoza co w zakładce dial-in (RD-05 dla kawy, RD-05b dla herbaty, domain-rules.ts).
+  // Herbata nie ma reguły dla „za kwaśnej” (tylko cierpkość i wodnistość), więc takie wpisy nie dają diagnozy.
   const doctorDiagnosis = useMemo(() => {
-    if (tasteBalance === 'sour') return diagnoseExtractionTaste({ isSour: true })[0];
-    if (tasteBalance === 'bitter') return diagnoseExtractionTaste({ isBitter: true })[0];
-    if (tasteBalance === 'weak') return diagnoseExtractionTaste({ isWatery: true })[0];
+    if (tasteBalance === 'sour') return diagnoseExtractionTaste({ beverageType, isSour: true })[0];
+    if (tasteBalance === 'bitter') return diagnoseExtractionTaste({ beverageType, isBitter: true })[0];
+    if (tasteBalance === 'weak') return diagnoseExtractionTaste({ beverageType, isWatery: true })[0];
     return undefined;
-  }, [tasteBalance]);
+  }, [tasteBalance, beverageType]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
