@@ -90,4 +90,52 @@ describe('Timer Audio & Chime Engine', () => {
     // Dane PCM muszą zawierać rzeczywiste próbki audio (> 1000 bajtów)
     expect(buffer.length).toBeGreaterThan(1000);
   });
+
+  test('dzwonek ma dominującą częstotliwość A4 = 440 Hz (dekodowanie próbek WAV i DFT)', () => {
+    const buffer = Buffer.from(CHIME_AUDIO_DATA_URI.replace('data:audio/wav;base64,', ''), 'base64');
+    const sampleRate = buffer.readUInt32LE(24);
+    const channels = buffer.readUInt16LE(22);
+    const bitsPerSample = buffer.readUInt16LE(34);
+    expect(channels).toBe(1);
+    expect(bitsPerSample).toBe(16);
+
+    // Próbki PCM 16-bit po chunku 'data' (nagłówek 44 bajty)
+    const dataOffset = buffer.indexOf('data') + 8;
+    const sampleCount = Math.floor((buffer.length - dataOffset) / 2);
+    const samples = new Float64Array(sampleCount);
+    for (let i = 0; i < sampleCount; i++) {
+      samples[i] = buffer.readInt16LE(dataOffset + i * 2) / 32768;
+    }
+
+    // Moc widma (DFT): grubo co 5 Hz w zakresie 100–2000 Hz, potem dokładnie co 1 Hz wokół maksimum
+    const powerAt = (freq: number): number => {
+      let re = 0;
+      let im = 0;
+      for (let i = 0; i < sampleCount; i++) {
+        const angle = (2 * Math.PI * freq * i) / sampleRate;
+        re += samples[i] * Math.cos(angle);
+        im -= samples[i] * Math.sin(angle);
+      }
+      return re * re + im * im;
+    };
+    let coarseFreq = 100;
+    let coarsePower = -1;
+    for (let f = 100; f <= 2000; f += 5) {
+      const p = powerAt(f);
+      if (p > coarsePower) {
+        coarsePower = p;
+        coarseFreq = f;
+      }
+    }
+    let bestFreq = coarseFreq;
+    let bestPower = -1;
+    for (let f = coarseFreq - 5; f <= coarseFreq + 5; f += 1) {
+      const p = powerAt(f);
+      if (p > bestPower) {
+        bestPower = p;
+        bestFreq = f;
+      }
+    }
+    expect(bestFreq).toBe(440);
+  });
 });
