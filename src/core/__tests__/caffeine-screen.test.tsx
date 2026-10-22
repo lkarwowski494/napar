@@ -19,11 +19,6 @@ jest.mock('../database', () => ({
   getUnitSystem: jest.fn(() => 'metric'),
 }));
 
-jest.mock('../healthkit', () => ({
-  getHealthKitSyncEnabled: jest.fn(() => false),
-  saveDietaryCaffeineSample: jest.fn().mockResolvedValue({ success: true }),
-}));
-
 describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
   const mockLogs: CaffeineLog[] = [
     {

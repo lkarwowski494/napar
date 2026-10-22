@@ -26,7 +26,6 @@ import {
   getDatabaseFallback,
   getHapticsEnabled,
   getHasCompletedOnboarding,
-  getHealthKitSyncEnabled,
   getInventoryItemById,
   getInventoryItems,
   getIsProUser,
@@ -46,7 +45,6 @@ import {
   setCaffeineHalfLife,
   setHapticsEnabled,
   setHasCompletedOnboarding,
-  setHealthKitSyncEnabled,
   setIsProUser,
   setUnitSystem,
   setVoiceAnnounceEnabled,
@@ -354,13 +352,11 @@ describe('ustawienia aplikacji', () => {
     expect(getAppSetting('klucz')).toBe('wartość');
   });
 
-  test('przełączniki działają w obu kierunkach (HealthKit, Pro, onboarding, haptyka)', () => {
+  test('przełączniki działają w obu kierunkach (Pro, onboarding, haptyka)', () => {
     setHapticsEnabled(true);
     expect(getHapticsEnabled()).toBe(true);
     setIsProUser(false);
     expect(getIsProUser()).toBe(false);
-    setHealthKitSyncEnabled(false);
-    expect(getHealthKitSyncEnabled()).toBe(false);
     setHasCompletedOnboarding(false);
     expect(getHasCompletedOnboarding()).toBe(false);
   });
@@ -398,11 +394,7 @@ describe('ustawienia aplikacji', () => {
     expect(getBedtimeHour()).toBe(23);
   });
 
-  test('HealthKit, onboarding i preferencje naparów', () => {
-    expect(getHealthKitSyncEnabled()).toBe(false);
-    setHealthKitSyncEnabled(true);
-    expect(getHealthKitSyncEnabled()).toBe(true);
-
+  test('onboarding i preferencje naparów', () => {
     expect(getHasCompletedOnboarding()).toBe(false);
     setHasCompletedOnboarding(true);
     expect(getHasCompletedOnboarding()).toBe(true);

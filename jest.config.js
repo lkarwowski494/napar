@@ -42,7 +42,6 @@ module.exports = {
     './src/core/contrast.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/theme.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/search-utils.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
-    './src/core/healthkit.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/announce.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/app-access.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/access-policy.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },

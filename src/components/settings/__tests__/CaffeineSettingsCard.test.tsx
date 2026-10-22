@@ -11,13 +11,12 @@ describe('CaffeineSettingsCard Component', () => {
   const t = translations.pl;
   const mockOnHalfLifeChange = jest.fn();
   const mockOnBedtimeChange = jest.fn();
-  const mockOnToggleHealthKit = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('Renderuje nastawy metabolizmu kofeiny, czas półtrwania, porę snu i przełącznik HealthKit', () => {
+  test('Renderuje nastawy metabolizmu kofeiny, czas półtrwania i porę snu', () => {
     let tree: renderer.ReactTestRenderer;
     renderer.act(() => {
       tree = renderer.create(
@@ -26,15 +25,12 @@ describe('CaffeineSettingsCard Component', () => {
           onHalfLifeChange={mockOnHalfLifeChange}
           bedtimeHour={23}
           onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={true}
-          onToggleHealthKit={mockOnToggleHealthKit}
           t={t}
         />
       );
     });
 
     const root = tree!.root;
-    expect(root.findByProps({ testID: 'toggle-healthkit-btn' })).toBeDefined();
     expect(root.findByProps({ accessibilityLabel: 'Zmniejsz czas półtrwania' })).toBeDefined();
     expect(root.findByProps({ accessibilityLabel: 'Zwiększ czas półtrwania' })).toBeDefined();
     expect(root.findByProps({ accessibilityLabel: 'Wcześniejsza godzina snu' })).toBeDefined();
@@ -50,8 +46,6 @@ describe('CaffeineSettingsCard Component', () => {
           onHalfLifeChange={mockOnHalfLifeChange}
           bedtimeHour={23}
           onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={false}
-          onToggleHealthKit={mockOnToggleHealthKit}
           t={t}
         />
       );
@@ -81,8 +75,6 @@ describe('CaffeineSettingsCard Component', () => {
           onHalfLifeChange={mockOnHalfLifeChange}
           bedtimeHour={23}
           onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={false}
-          onToggleHealthKit={mockOnToggleHealthKit}
           t={t}
         />
       );
@@ -101,30 +93,5 @@ describe('CaffeineSettingsCard Component', () => {
       incBtn.props.onPress();
     });
     expect(mockOnBedtimeChange).toHaveBeenCalledWith(24);
-  });
-
-  test('Przełącza synchronizację Apple HealthKit', () => {
-    let tree: renderer.ReactTestRenderer;
-    renderer.act(() => {
-      tree = renderer.create(
-        <CaffeineSettingsCard
-          halfLifeHours={5.0}
-          onHalfLifeChange={mockOnHalfLifeChange}
-          bedtimeHour={23}
-          onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={false}
-          onToggleHealthKit={mockOnToggleHealthKit}
-          t={t}
-        />
-      );
-    });
-
-    const root = tree!.root;
-    const hkBtn = root.findByProps({ testID: 'toggle-healthkit-btn' });
-
-    renderer.act(() => {
-      hkBtn.props.onPress();
-    });
-    expect(mockOnToggleHealthKit).toHaveBeenCalled();
   });
 });

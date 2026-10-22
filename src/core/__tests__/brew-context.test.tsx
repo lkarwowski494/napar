@@ -7,7 +7,6 @@ import renderer from 'react-test-renderer';
 import { BrewProvider, useBrew } from '../brew-context';
 import { MASTER_RECIPES } from '../recipes-data';
 import * as databaseModule from '../database';
-import * as healthKitModule from '../healthkit';
 import { SavedRecipe } from '../database-schema';
 
 const settingsStore = new Map<string, string>();
@@ -483,43 +482,6 @@ describe('BrewContext & BrewProvider', () => {
 
     jest.useRealTimers();
     databaseModule.setAppSetting('app_language', 'pl');
-  });
-
-  test('BR-KOF-002: finishAndSaveSession zapisuje próbkę w Apple HealthKit gdy synchronizacja jest włączona', async () => {
-    jest.spyOn(healthKitModule, 'getHealthKitSyncEnabled').mockReturnValue(true);
-    const saveHkSpy = jest.spyOn(healthKitModule, 'saveDietaryCaffeineSample').mockResolvedValue({
-      success: true,
-      quantityType: 'HKQuantityTypeIdentifierDietaryCaffeine',
-      caffeineMg: 140,
-      consumedAt: new Date().toISOString(),
-    });
-
-    let brewData: any;
-    const Consumer = () => {
-      brewData = useBrew();
-      return null;
-    };
-
-    renderer.act(() => {
-      renderer.create(
-        <BrewProvider>
-          <Consumer />
-        </BrewProvider>
-      );
-    });
-
-    renderer.act(() => {
-      brewData.finishAndSaveSession({
-        logToCaffeineTracker: true,
-      });
-    });
-
-    expect(saveHkSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        caffeineMg: expect.any(Number),
-        beverageName: expect.any(String),
-      })
-    );
   });
 
   test('Zarządza preferencjami naparów (beveragePreference) i automatycznie dostosowuje aktywny przepis', () => {

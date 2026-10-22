@@ -34,11 +34,6 @@ import {
   setBeveragePreference,
 } from '../src/core/database';
 import { useBrew } from '../src/core/brew-context';
-import {
-  getHealthKitSyncEnabled,
-  requestHealthKitPermissions,
-  revokeHealthKitPermissions,
-} from '../src/core/healthkit';
 import { theme } from '../src/core/theme';
 import { useTranslation } from '../src/core/i18n';
 import { parseAndValidateBackup, safetyBackup } from '../src/core/backup';
@@ -93,9 +88,6 @@ export default function SettingsScreen() {
   const [bedtimeHour, setBedtimeHourState] = useState(() => {
     return getBedtimeHour();
   });
-  const [healthKitSync, setHealthKitSync] = useState(() => {
-    return getHealthKitSyncEnabled();
-  });
   const {
     isPro,
     monthDaysUsed,
@@ -110,16 +102,6 @@ export default function SettingsScreen() {
   const [exportedJsonText, setExportedJsonText] = useState('');
   const [importJsonText, setImportJsonText] = useState('');
   const [exportedCsvText, setExportedCsvText] = useState('');
-
-  const handleToggleHealthKit = async () => {
-    const next = !healthKitSync;
-    setHealthKitSync(next);
-    if (next) {
-      await requestHealthKitPermissions();
-    } else {
-      revokeHealthKitPermissions();
-    }
-  };
 
   const handleHalfLifeChange = (newHours: number) => {
     const clamped = Number(Math.max(3.0, Math.min(8.0, newHours)).toFixed(1));
@@ -231,8 +213,6 @@ export default function SettingsScreen() {
         onHalfLifeChange={handleHalfLifeChange}
         bedtimeHour={bedtimeHour}
         onBedtimeChange={handleBedtimeChange}
-        healthKitSync={healthKitSync}
-        onToggleHealthKit={handleToggleHealthKit}
         t={t}
       />
 

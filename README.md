@@ -56,11 +56,10 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Dwutorowy kalkulator: roztwory koncentratów płynnych (1g/L = 2 ppm) oraz bezpośrednie odważanie soli suchych ($\text{NaHCO}_3, \text{MgSO}_4, \text{CaCl}_2$). [Wdrożone]
    - Diagnoza chemiczna wody: wykrywanie wad smaku wynikających ze zbyt twardej lub niebuforowanej wody. [Wdrożone]
    - Poradnik i benchmark powszechnie dostępnych wód butelkowanych (Volvic, Żywiecki Kryształ itp.). [Wdrożone]
-6. **⚡ Monitor Kofeiny, Kalkulator Snu & Apple HealthKit (BR-KOF-001 do BR-KOF-004):**
+6. **⚡ Monitor Kofeiny & Kalkulator Snu (BR-KOF-001, BR-KOF-003, BR-KOF-004):**
    - Model jedno-kompartmentowej eliminacji kofeiny w organizmie. [Wdrożone]
    - **Personalizacja Metabolizmu Kofeiny (D-02):** Regulacja indywidualnego czasu półtrwania kofeiny $t_{1/2}$ w zakresie 3.0h – 8.0h (domyślnie 5.0h) z zapisem w SQLite. [Wdrożone]
    - **Kalkulator Snu i Godzina Odcięcia (Bedtime Curfew — BR-KOF-003):** Prognoza stężenia kofeiny o wybranej godzinie snu (próg bezpieczny dla fazy głębokiej NREM $\le 25\,\text{mg}$) z persystencją godziny snu. [Wdrożone]
-   - **Integracja z Apple HealthKit (BR-KOF-002, Z-096):** Bezpośredni eksport spożytej kofeiny do systemowej bazy Zdrowie (`HKQuantityTypeIdentifierDietaryCaffeine`) z oknem zgody i trybem offline. [Wdrożone]
    - Dobowy bilans kofeiny w relacji do normy EFSA (400 mg). [Wdrożone]
 7. **⚙️ Ustawienia, Kopia Zapasowa i Jednostki:**
    - **⚖️ Globalny Przełącznik Jednostek (Metric / Imperial — DEC-21 & BR-JEDN-001):** Płynne przełączanie między systemem metrycznym (°C, g, ml) i imperialnym (°F, oz, fl oz) z zachowaniem wewnętrznej precyzji obliczeniowej i trwałą persystencją w SQLite. [Wdrożone]

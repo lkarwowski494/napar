@@ -106,14 +106,6 @@ export function setBedtimeHour(db: DbPort, hour: number): void {
   setAppSetting(db, 'bedtime_hour', clamped.toString());
 }
 
-export function getHealthKitSyncEnabled(db: DbPort): boolean {
-  return getAppSetting(db, 'healthkit_sync_enabled', 'false') === 'true';
-}
-
-export function setHealthKitSyncEnabled(db: DbPort, enabled: boolean): void {
-  setAppSetting(db, 'healthkit_sync_enabled', enabled ? 'true' : 'false');
-}
-
 export function getBeveragePreference(db: DbPort): BeveragePreference {
   const val = getAppSetting(db, 'beverage_preference', 'both');
   if (val === 'coffee' || val === 'tea') {

@@ -32,9 +32,6 @@ import {
   GongfuTeaType,
 } from '../src/core/gongfu';
 import {
-  HealthKitAuthStatus,
-} from '../src/core/healthkit';
-import {
   SupportedLanguage,
 } from '../src/core/i18n';
 import {
@@ -125,13 +122,6 @@ describe('AST Test Matrix: Logika and Wymiar 100% Coverage (BR-TEST-028..031)', 
       const types: GongfuTeaType[] = ['green', 'black', 'oolong', 'white', 'puerh', 'herbal'];
       for (const t of types) {
         expect(['green', 'black', 'oolong', 'white', 'puerh', 'herbal']).toContain(t);
-      }
-    });
-
-    test('HealthKitAuthStatus union literals are valid', () => {
-      const statuses: HealthKitAuthStatus[] = ['not_determined', 'authorized', 'denied'];
-      for (const s of statuses) {
-        expect(['not_determined', 'authorized', 'denied']).toContain(s);
       }
     });
 
