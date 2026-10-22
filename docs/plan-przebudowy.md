@@ -90,6 +90,28 @@ Każdy etap kończy się zieloną bramką (`npm run verify` + testy etapu). Bez 
 - Oczekiwanie: CI i E2E na macOS (kilkanaście minut na przebieg), upload do App Store Connect.
 - Czas użytkownika: zatwierdzenie założeń, decyzja D7, zgoda na wzorce z `trening`, testy na urządzeniu (D8, zakup, HealthKit), przegląd rejestru twierdzeń (badacz lub Ty).
 
+## 5a. BRD i harmonogram
+
+Zakres jest jeszcze nieustalony (BRD 0.1 ma 180 pozycji zakresu i 40 decyzji otwartych), więc BRD v2 jest pierwszym etapem, nie dodatkiem.
+
+**Opcje BRD v2:**
+- **A. Krótki BRD ze zakresem (rekomendacja):** 8–10 stron. Zakres MVP, lista funkcji wyciętych i dlaczego, decyzje D1–D9 z wynikiem, KPI, warunki wydania. Pozostałe części BRD 0.1 zostają jako archiwum i wracają tylko tam, gdzie są potrzebne. Szacunek: kilka godzin agenta plus 1–2 h Twojego przeglądu.
+- B. Pełny BRD od zera (22 pliki, jak obecny). Dużo więcej pracy i ryzyko powtórzenia niesprawdzonych twierdzeń z 0.1. Szacunek: 1–2 dni agenta plus dłuższy przegląd.
+- C. Zostawić BRD 0.1 i dopisać errata. Najtaniej, ale zakres dalej nieuporządkowany. Nie polecam.
+
+**Harmonogram (szacunek; niepewność duża):**
+
+| Krok | Czas agenta | Czas oczekiwania | Czas Twój |
+|---|---|---|---|
+| Zatwierdzenie D1–D9 i zakresu | — | — | ok. 1 h |
+| BRD v2 (opcja A) | kilka h | 1 cykl przeglądu | 2–3 h |
+| Etap 0–1 (fundament, domena) | 1,5–3 dni | rejestr badacza równolegle | przegląd rejestru |
+| Etap 2–3 (persystencja, UI MVP) | 3–5 dni | CI na macOS | testy na urządzeniu |
+| Etap 4 (zakup, po D3) | 1 dzień | App Store Connect | konto i produkty |
+| Etap 5 (CI, TestFlight) | 1 dzień | przebiegi E2E | — |
+
+Suma agenta dla MVP: około **7–11 dni**. Realny kalendarz: **3–5 tygodni**, bo czeka się na macOS, App Store Connect i Twoje decyzje. Rejestr twierdzeń u badacza może trwać dłużej niż kod; etap 1 nie wchodzi bez zielonego wpisu dla każdej stałej.
+
 ## 6. Otwarte pytania (blokują konkretne etapy)
 
 1. **Zatwierdzenie założeń z sekcji 2** — blokuje etap 0.
