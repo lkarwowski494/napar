@@ -90,6 +90,24 @@ Każdy etap kończy się zieloną bramką (`npm run verify` + testy etapu). Bez 
 - Oczekiwanie: CI i E2E na macOS (kilkanaście minut na przebieg), upload do App Store Connect.
 - Czas użytkownika: zatwierdzenie założeń, decyzja D7, zgoda na wzorce z `trening`, testy na urządzeniu (D8, zakup, HealthKit), przegląd rejestru twierdzeń (badacz lub Ty).
 
+## 5-0. Bramka 0: walidacja popytu przed budową
+
+Dziś nie wiadomo, co się sprzeda. Obecne liczby w BRD 0.1 to założenia: „42% entuzjastów” z ankiety na r/Coffee (źródło nie sprawdzone), konwersja 4,5% i 12% trial→paid jako cele, nie pomiary. Dlatego przed etapem 0 wchodzi bramka walidacji. Zakres i cena wynikają z jej wyniku, nie odwrotnie.
+
+**Kroki (czas agenta kilka h na przygotowanie, reszta to czekanie na ludzi):**
+1. **Badanie rynku kawy i herbaty** w stylu `trening/docs/monetyzacja-badanie-2026-10.md`: konkurenci, ceny, model (odnawiany/jednorazowy), recenzje. Dane tylko z odczytanych źródeł.
+2. **Wywiady:** 15–20 osób z grupy docelowej (persony P1–P6 z BRD) — co parzą, czym mierzą, za co już płacą.
+3. **Test zapisów:** prosta strona z obietnicą i zapisem do listy, kierowana przez kanały, które regulamin dopuszcza (`trening/docs/wzrost.md` ma już listę z tym zastrzeżeniem).
+4. **Test ceny:** pytanie o gotowość zapłaty przy 2–3 wariantach (jednorazowo vs roczna vs dożywotnia).
+
+**Progi decyzji (propozycja agenta [OCENA], decyzja Twoja):**
+- Zapisy w 3 tygodnie: co najmniej **200** z kanałów, które dopuszczają link.
+- Wywiady: **co najmniej 10** osób deklaruje, że płaciłoby za konkretną funkcję (nie „fajnie byłoby”).
+- Cena: wariant z najwyższą deklarowaną gotowością zapłaty daje przychód powyżej progu z BRD (decyzja D4).
+- Poniżej progów: nie budujemy pełnego MVP, wracamy do zakresu albo zmieniamy model (np. tylko narzędzie bez subskrypcji).
+
+**Uwaga:** do testów nie używamy obecnej wersji z atrapami (zakup, HealthKit, Live Activity). Testerzy dostają tylko to, co działa.
+
 ## 5a. BRD i harmonogram
 
 Zakres jest jeszcze nieustalony (BRD 0.1 ma 180 pozycji zakresu i 40 decyzji otwartych), więc BRD v2 jest pierwszym etapem, nie dodatkiem.
