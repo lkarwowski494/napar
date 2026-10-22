@@ -232,3 +232,13 @@ Otwarte (zadania właściciela, nie blokują kodu):
 - **Przywracanie** nie wywołuje `AppStore.sync` (`restorePurchases`), zgodnie z zasadą dostępu wyłącznie z `getAvailablePurchases`. Jeśli sandbox pokaże, że nowe urządzenie nie widzi zakupów bez synchronizacji, trzeba to zmienić.
 - **E2E Maestro** nie ma scenariusza zakupu (fałszywy sklep nie ma produktów, więc zakup kończy się „zakup niedostępny”).
 - **Tłumaczenia:** nowe klucze tylko PL i EN (jak w 4a); 33 pozostałe języki do zrobienia w zakresie 35 języków.
+
+## Status etapów 4a i 4b (22.10.2026)
+
+- **4a (e684223):** polityka M5 S1 — 7 dni parzenia w miesiącu, bramka tylko przy starcie parzenia, historia i kopia zawsze dostępne, licznik dni poza kopią. Atrapa zakupu usunięta.
+- **4b (7214adc):** adapter sklepu `StoreAdapter` (port w `src/core/store-port.ts`), produkcyjny adapter na `expo-iap` 5.8.3 (opublikowana 07.10.2026), fałszywy sklep tylko przy `EXPO_PUBLIC_STORE_FAKE=1`. Identyfikatory produktów z `NaparStoreKit.storekit` (`pl.lukasz.napar.monthly` / `annual` / `lifetime`).
+- Bez produktów w App Store Connect zakup pokazuje „Zakup niedostępny”. Nie ma fałszywego sukcesu.
+
+**Otwarte, nie blokują kodu:** utworzenie produktów i grupy subskrypcji w App Store Connect (zadanie właściciela); test sandbox na urządzeniu; nieodwracalne Family Sharing sprawdzić przed wysyłką; przywracanie bez `AppStore.sync` — zweryfikować w sandboxie.
+
+Bramka po 4b: `verify` kod 0 (101 zestawów, 1024 testy); `test:coverage` kod 0.
