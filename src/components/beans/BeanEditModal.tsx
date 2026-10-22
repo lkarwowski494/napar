@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
+import { parseDecimal } from '../../core/parse-decimal';
 import { saveInventoryItem, deleteInventoryItem } from '../../core/database';
 import { InventoryItem } from '../../core/database-schema';
 
@@ -64,7 +65,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
   }, [item]);
 
   const handleAdjustRemainingWeight = (delta: number) => {
-    const cur = parseFloat(editRemainingWeight) || 0;
+    const cur = parseDecimal(editRemainingWeight) || 0;
     const next = Math.max(0, cur + delta);
     setEditRemainingWeight(next.toString());
   };
@@ -75,8 +76,8 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
       Alert.alert('Błąd', 'Podaj nazwę kawy lub herbaty.');
       return;
     }
-    const initW = parseFloat(editInitialWeight) || 250;
-    let remW = parseFloat(editRemainingWeight);
+    const initW = parseDecimal(editInitialWeight) || 250;
+    let remW = parseDecimal(editRemainingWeight);
     if (isNaN(remW) || remW < 0) remW = 0;
 
     const notesArray = editNotesStr

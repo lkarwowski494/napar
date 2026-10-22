@@ -34,6 +34,7 @@ import {
 } from '../src/core/database';
 import { InventoryItem } from '../src/core/database-schema';
 import { theme } from '../src/core/theme';
+import { parseDecimal } from '../src/core/parse-decimal';
 import { confirmAction } from '../src/core/confirm';
 import { announce } from '../src/core/announce';
 import { useTranslation } from '../src/core/i18n';
@@ -164,7 +165,7 @@ export default function GongfuScreen() {
     const actualSteep = targetSeconds - remainingSeconds > 0 ? targetSeconds - remainingSeconds : targetSeconds;
     const updated = recordGongfuInfusion(session, {
       durationSeconds: actualSteep,
-      waterTempCelsius: parseFloat(waterTempCelsius) || 96,
+      waterTempCelsius: parseDecimal(waterTempCelsius) || 96,
       notes: currentNotes.trim() || undefined,
     });
     setSession(updated);
@@ -188,7 +189,7 @@ export default function GongfuScreen() {
       message: `Zapisujesz sesję ${teaName} z ${session.infusions.length} zalaniami (łącznie ~${session.totalCaffeineMg} mg kofeiny).`,
       actionText: t.common.save,
       onConfirm: () => {
-        const doseNum = parseFloat(leafDoseGrams) || 7;
+        const doseNum = parseDecimal(leafDoseGrams) || 7;
         const totalDuration = session.infusions.reduce((sum, inf) => sum + inf.durationSeconds, 0);
 
         // Zapis do brew_sessions
@@ -200,7 +201,7 @@ export default function GongfuScreen() {
           method: 'GONGFU',
           doseGrams: doseNum,
           waterGrams: session.vesselCapacityMl,
-          waterTempCelsius: parseFloat(waterTempCelsius) || 96,
+          waterTempCelsius: parseDecimal(waterTempCelsius) || 96,
           totalTimeSeconds: totalDuration,
           rating: getGongfuSessionRating(session) ?? undefined,
           flavorTags: ['Gongfu Cha', `${session.infusions.length} infuzji`],

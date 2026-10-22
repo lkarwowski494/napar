@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { GongfuSession, estimateTotalLeafCaffeineMg } from '../../core/gongfu-session';
 import { theme } from '../../core/theme';
+import { parseDecimal } from '../../core/parse-decimal';
 
 interface GongfuInfusionHistoryProps {
   session: GongfuSession;
@@ -21,7 +22,7 @@ export const GongfuInfusionHistory: React.FC<GongfuInfusionHistoryProps> = ({
   leafDoseGrams,
   t,
 }) => {
-  const leafDose = parseFloat(leafDoseGrams) || 7;
+  const leafDose = parseDecimal(leafDoseGrams) || 7;
   const totalLeafCaffeine = estimateTotalLeafCaffeineMg(leafDose);
 
   return (

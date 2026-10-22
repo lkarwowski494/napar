@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Field, NumInput } from '../ui';
 import { theme } from '../../core/theme';
+import { parseDecimal } from '../../core/parse-decimal';
 import { formatTemperature, formatDoseWeight, formatWaterWeight } from '../../core/unit-converter';
 
 interface RecipeParamsCardProps {
@@ -36,8 +37,8 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
   unitSystem,
   t,
 }) => {
-  const doseNum = parseFloat(doseGrams) || 0;
-  const waterNum = parseFloat(waterGrams) || 0;
+  const doseNum = parseDecimal(doseGrams) || 0;
+  const waterNum = parseDecimal(waterGrams) || 0;
 
   return (
     <View style={styles.card}>
@@ -63,7 +64,7 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
         <View style={styles.flex1}>
           <Text style={styles.fieldLabel}>{t.recipeBuilder.tempLabel}</Text>
           <NumInput
-            value={parseFloat(waterTempCelsius) || 0}
+            value={parseDecimal(waterTempCelsius) || 0}
             onChangeNumber={(n) => onChangeWaterTemp(n.toString())}
             unit="°C"
           />
@@ -80,7 +81,7 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
       {/* Podgląd w wybranym układzie jednostek */}
       <View style={styles.unitPreviewBadge}>
         <Text style={styles.unitPreviewBadgeText}>
-          {formatDoseWeight(doseNum, unitSystem)} / {formatWaterWeight(waterNum, unitSystem)} · {formatTemperature(parseFloat(waterTempCelsius) || 93, unitSystem)}
+          {formatDoseWeight(doseNum, unitSystem)} / {formatWaterWeight(waterNum, unitSystem)} · {formatTemperature(parseDecimal(waterTempCelsius) || 93, unitSystem)}
         </Text>
       </View>
 

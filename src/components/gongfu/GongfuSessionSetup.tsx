@@ -9,6 +9,7 @@ import { Field, NumInput } from '../ui';
 import { GongfuTeaType } from '../../core/gongfu-session';
 import { baseToDisplay } from '../../core/unit-converter';
 import { theme } from '../../core/theme';
+import { parseDecimal } from '../../core/parse-decimal';
 
 interface GongfuSessionSetupProps {
   teaType: GongfuTeaType;
@@ -41,9 +42,9 @@ export const GongfuSessionSetup: React.FC<GongfuSessionSetupProps> = ({
 }) => {
   // Wartości w stanie są zawsze w jednostkach bazowych (g, ml, °C); pole wyświetla je w wybranym układzie
   const imperial = unitSystem === 'imperial';
-  const leafBase = parseFloat(leafDoseGrams) || 0;
-  const vesselBase = parseFloat(vesselCapacityMl) || 0;
-  const tempBase = parseFloat(waterTempCelsius) || 0;
+  const leafBase = parseDecimal(leafDoseGrams) || 0;
+  const vesselBase = parseDecimal(vesselCapacityMl) || 0;
+  const tempBase = parseDecimal(waterTempCelsius) || 0;
   const leafUnit = imperial ? 'oz' : 'g';
   const vesselUnit = imperial ? 'fl oz' : 'ml';
   const tempUnit = imperial ? '°F' : '°C';

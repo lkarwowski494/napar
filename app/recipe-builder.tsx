@@ -20,6 +20,7 @@ import { SavedRecipe } from '../src/core/database-schema';
 import { RecipeStep } from '../src/core/recipes-data';
 import { calculateBrewRatio } from '../src/core/domain-rules';
 import { theme } from '../src/core/theme';
+import { parseDecimal } from '../src/core/parse-decimal';
 import { confirmAction } from '../src/core/confirm';
 import { announce } from '../src/core/announce';
 import { useTranslation } from '../src/core/i18n';
@@ -102,8 +103,8 @@ export default function RecipeBuilderScreen() {
     }
   }, [id]);
 
-  const doseNum = parseFloat(doseGrams) || 15;
-  const waterNum = parseFloat(waterGrams) || 250;
+  const doseNum = parseDecimal(doseGrams) || 15;
+  const waterNum = parseDecimal(waterGrams) || 250;
   const currentRatio = calculateBrewRatio(doseNum, waterNum);
 
   const handleAddStep = () => {
@@ -175,7 +176,7 @@ export default function RecipeBuilderScreen() {
       description: description.trim() || undefined,
       doseGrams: doseNum,
       waterGrams: waterNum,
-      waterTempCelsius: parseFloat(waterTempCelsius) || 93,
+      waterTempCelsius: parseDecimal(waterTempCelsius) || 93,
       grindSizeDescription: grindSize.trim() || undefined,
       recommendedRatio: currentRatio,
       stepsJson: JSON.stringify(steps),

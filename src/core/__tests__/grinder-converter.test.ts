@@ -107,6 +107,16 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(ode.formatSetting(4)).toBe('2');
   });
 
+  test('Przecinek jako separator dziesiętny w nastawie młynka daje ten sam wynik co kropka', () => {
+    const kUltra = SUPPORTED_GRINDERS.find((g) => g.id === '1zpresso_k_ultra')!;
+    expect(kUltra.parseSetting('3,5')).toBe(kUltra.parseSetting('3.5'));
+    expect(kUltra.parseSetting('3,5')).toBe(700);
+
+    const c40 = SUPPORTED_GRINDERS.find((g) => g.id === 'comandante_c40')!;
+    expect(c40.parseSetting('22,0')).toBe(c40.parseSetting('22.0'));
+    expect(c40.parseSetting('22,0')).toBe(22 * 30.0);
+  });
+
   test('Obsługuje domyślne fallbacki parseSetting dla nienumerycznych ciągów', () => {
     const c40 = SUPPORTED_GRINDERS.find((g) => g.id === 'comandante_c40')!;
     expect(c40.parseSetting('nieznana')).toBe(24 * 30.0);

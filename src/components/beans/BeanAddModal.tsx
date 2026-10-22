@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
+import { parseDecimal } from '../../core/parse-decimal';
 import { saveInventoryItem } from '../../core/database';
 import { InventoryItem } from '../../core/database-schema';
 import { KnowledgeTemplate } from './BeanCompendiumModal';
@@ -86,7 +87,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
       Alert.alert('Błąd', 'Podaj nazwę kawy lub herbaty.');
       return;
     }
-    const weightNum = parseFloat(initialWeight) || 250;
+    const weightNum = parseDecimal(initialWeight) || 250;
     const notesArray = notesStr
       .split(',')
       .map((s) => s.trim())
