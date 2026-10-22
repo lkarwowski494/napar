@@ -94,17 +94,18 @@ Każdy etap kończy się zieloną bramką (`npm run verify` + testy etapu). Bez 
 
 Dziś nie wiadomo, co się sprzeda. Obecne liczby w BRD 0.1 to założenia: „42% entuzjastów” z ankiety na r/Coffee (źródło nie sprawdzone), konwersja 4,5% i 12% trial→paid jako cele, nie pomiary. Dlatego przed etapem 0 wchodzi bramka walidacji. Zakres i cena wynikają z jej wyniku, nie odwrotnie.
 
-**Kroki (czas agenta kilka h na przygotowanie, reszta to czekanie na ludzi):**
-1. **Badanie rynku kawy i herbaty** w stylu `trening/docs/monetyzacja-badanie-2026-10.md`: konkurenci, ceny, model (odnawiany/jednorazowy), recenzje. Dane tylko z odczytanych źródeł.
-2. **Wywiady:** 15–20 osób z grupy docelowej (persony P1–P6 z BRD) — co parzą, czym mierzą, za co już płacą.
-3. **Test zapisów:** prosta strona z obietnicą i zapisem do listy, kierowana przez kanały, które regulamin dopuszcza (`trening/docs/wzrost.md` ma już listę z tym zastrzeżeniem).
-4. **Test ceny:** pytanie o gotowość zapłaty przy 2–3 wariantach (jednorazowo vs roczna vs dożywotnia).
+**Wariant bez kontaktu z ludźmi (przyjęty 22.10.2026, właściciel: „zadnych wywiadow, robimy self development z AI”):**
+1. **Badanie biurkowe** (bez kontaktu z ludźmi): konkurenci, ceny, model, recenzje z App Store. Dane tylko z odczytanych źródeł. Wstępny przegląd: `docs/research/rynek-wstepny-2026-10-22.md`.
+2. **Analiza recenzji konkurencji** (publiczne recenzje, bez rozmów): co ludzie chwalą i za co narzekają w timerach kawy i herbaty.
+3. **Decyzja o cenie i zakresie** na podstawie 1–2, przed budową. Model z BRD (D4) traktowany jako hipoteza.
+4. **Pierwszy prawdziwy test popytu: premiera w App Store** po zbudowaniu MVP, z progami ustalonymi przed premierą.
 
-**Progi decyzji (propozycja agenta [OCENA], decyzja Twoja):**
-- Zapisy w 3 tygodnie: co najmniej **200** z kanałów, które dopuszczają link.
-- Wywiady: **co najmniej 10** osób deklaruje, że płaciłoby za konkretną funkcję (nie „fajnie byłoby”).
-- Cena: wariant z najwyższą deklarowaną gotowością zapłaty daje przychód powyżej progu z BRD (decyzja D4).
-- Poniżej progów: nie budujemy pełnego MVP, wracamy do zakresu albo zmieniamy model (np. tylko narzędzie bez subskrypcji).
+**Ryzyko tego wariantu:** brak wywiadów oznacza, że pierwszy dowód popytu pojawi się dopiero po zbudowaniu. Zbudowanie MVP to kilka do kilkunastu dni agenta plus czas oczekiwania, więc koszt błędu jest realny. Złagodzenie: zakres MVP wybieramy najmniejszy, który da się sprzedać (sekcja 5a).
+
+**Progi premiery (propozycja agenta [OCENA], decyzja Twoja):**
+- Po 60 dniach od premiery: co najmniej **100 pobrań miesięcznie** (poziom z `trening/docs/wzrost.md`, cel właściciela).
+- Konwersja w płatne plany: co najmniej **2%** pobrań (założenie z rachunku w `trening/docs/monetyzacja-badanie-2026-10.md`, do sprawdzenia w App Store Connect).
+- Poniżej progów: zmiana modelu (np. narzędzie bez subskrypcji) albo zatrzymanie, zanim wejdzie kolejny etap z kosztem.
 
 **Uwaga:** do testów nie używamy obecnej wersji z atrapami (zakup, HealthKit, Live Activity). Testerzy dostają tylko to, co działa.
 
