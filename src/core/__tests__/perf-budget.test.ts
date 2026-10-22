@@ -44,7 +44,7 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       for (let i = 0; i < 10000; i++) {
         const ratio = calculateBrewRatio(15.0 + (i % 5), 250.0 + (i % 20));
         const yieldGrams = calculateLiquidYield(250.0, 15.0);
-        const ey = calculateExtractionYield(250.0, 1.35, 15.0);
+        const ey = calculateExtractionYield({ beverageWeightGrams: 250.0, tdsPercent: 1.35, doseGrams: 15.0 });
       }
     });
 

@@ -50,7 +50,7 @@ describe('Property-Based & Invariant Tests: Brewing Science & Mathematics (fast-
         (water, dose) => {
           let previousEy = -1;
           for (let tds = 0.8; tds <= 2.5; tds += 0.05) {
-            const result = calculateExtractionYield(water, tds, dose);
+            const result = calculateExtractionYield({ beverageWeightGrams: water, tdsPercent: tds, doseGrams: dose });
             if (result.extractionYieldPercent <= previousEy) return false;
             previousEy = result.extractionYieldPercent;
           }
@@ -66,7 +66,7 @@ describe('Property-Based & Invariant Tests: Brewing Science & Mathematics (fast-
       fc.property(
         fc.float({ min: 0.5, max: 3.0, noNaN: true }),
         (tds) => {
-          const res = calculateExtractionYield(250, tds, 15);
+          const res = calculateExtractionYield({ beverageWeightGrams: 250, tdsPercent: tds, doseGrams: 15 });
           if (res.extractionYieldPercent < 18.0) {
             return res.rating === 'under';
           } else if (res.extractionYieldPercent > 22.0) {

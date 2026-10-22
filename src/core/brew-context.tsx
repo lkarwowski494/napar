@@ -292,7 +292,11 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let eyPercent: number | undefined;
     if (data.tdsPercentage && data.tdsPercentage > 0) {
       try {
-        const ey = calculateExtractionYield(waterGrams, doseGrams, data.tdsPercentage);
+        const ey = calculateExtractionYield({
+          beverageWeightGrams: waterGrams,
+          tdsPercent: data.tdsPercentage,
+          doseGrams,
+        });
         eyPercent = ey.extractionYieldPercent;
       } catch {
         // Pomijamy jeśli błędne dane wejściowe

@@ -70,8 +70,8 @@ describe('Domain Properties with fast-check (BR-TEST-006)', () => {
         fc.double({ min: 0.1, max: 1.0, noNaN: true }), // delta
         (water, dose, tds1, delta) => {
           const tds2 = tds1 + delta;
-          const ey1 = calculateExtractionYield(water, tds1, dose).extractionYieldPercent;
-          const ey2 = calculateExtractionYield(water, tds2, dose).extractionYieldPercent;
+          const ey1 = calculateExtractionYield({ beverageWeightGrams: water, tdsPercent: tds1, doseGrams: dose }).extractionYieldPercent;
+          const ey2 = calculateExtractionYield({ beverageWeightGrams: water, tdsPercent: tds2, doseGrams: dose }).extractionYieldPercent;
 
           expect(ey2).toBeGreaterThan(ey1);
         }

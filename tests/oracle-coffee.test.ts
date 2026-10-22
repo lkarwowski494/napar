@@ -12,11 +12,11 @@ describe('Python 3 Domain Calculation Oracle (BR-TEST-011, BR-TEST-012)', () => 
     expect(corpus.extraction_yield.length).toBeGreaterThanOrEqual(10);
 
     for (const vector of corpus.extraction_yield) {
-      const result = calculateExtractionYield(
-        vector.waterGrams,
-        vector.tdsPercent,
-        vector.coffeeDoseGrams
-      );
+      const result = calculateExtractionYield({
+        beverageWeightGrams: vector.waterGrams,
+        tdsPercent: vector.tdsPercent,
+        doseGrams: vector.coffeeDoseGrams,
+      });
 
       // TS rounds to 2 decimal places, compare with delta <= 0.01
       expect(Math.abs(result.extractionYieldPercent - vector.expectedExtractionYieldPercent)).toBeLessThanOrEqual(0.01);

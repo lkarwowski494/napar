@@ -273,7 +273,8 @@ describe('BrewContext & BrewProvider', () => {
     expect(savedSession.rating).toBe(5);
     expect(savedSession.inventoryItemId).toBe('inv-item-1');
     expect(savedSession.tdsPercentage).toBe(1.4);
-    expect(savedSession.extractionYieldPercentage).toBeGreaterThan(0);
+    // Ręcznie: EY = 300 g napoju * 1,4 % TDS / 20 g kawy = 21,0 %
+    expect(savedSession.extractionYieldPercentage).toBeCloseTo(21.0, 2);
     expect(savedSession.caffeineContentMg).toBeGreaterThan(0);
 
     expect(saveSessionSpy).toHaveBeenCalled();

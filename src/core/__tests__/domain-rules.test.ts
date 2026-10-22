@@ -48,21 +48,21 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
   describe('RD-03: Extraction Yield (EY %)', () => {
     it('evaluates optimal Golden Cup extraction (18.0% - 22.0%)', () => {
       // 15g dose, 220g beverage, 1.35% TDS -> EY = (220 * 1.35) / 15 = 19.8%
-      const result = calculateExtractionYield(220.0, 1.35, 15.0);
+      const result = calculateExtractionYield({ beverageWeightGrams: 220.0, tdsPercent: 1.35, doseGrams: 15.0 });
       expect(result.extractionYieldPercent).toBe(19.8);
       expect(result.rating).toBe('ideal');
     });
 
     it('identifies under-extraction (<18.0%)', () => {
       // 20g dose, 300g beverage, 1.00% TDS -> EY = (300 * 1.0) / 20 = 15.0%
-      const result = calculateExtractionYield(300.0, 1.0, 20.0);
+      const result = calculateExtractionYield({ beverageWeightGrams: 300.0, tdsPercent: 1.0, doseGrams: 20.0 });
       expect(result.extractionYieldPercent).toBe(15.0);
       expect(result.rating).toBe('under');
     });
 
     it('identifies over-extraction (>22.0%)', () => {
       // 15g dose, 250g beverage, 1.50% TDS -> EY = (250 * 1.5) / 15 = 25.0%
-      const result = calculateExtractionYield(250.0, 1.5, 15.0);
+      const result = calculateExtractionYield({ beverageWeightGrams: 250.0, tdsPercent: 1.5, doseGrams: 15.0 });
       expect(result.extractionYieldPercent).toBe(25.0);
       expect(result.rating).toBe('over');
     });
@@ -216,9 +216,9 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(() => calculateLiquidYield(250, 15, -1)).toThrow();
     });
     it('calculateExtractionYield throws on zero or negative dose/beverage', () => {
-      expect(() => calculateExtractionYield(0, 1.35, 15)).toThrow();
-      expect(() => calculateExtractionYield(250, 1.35, 0)).toThrow();
-      expect(() => calculateExtractionYield(-100, 1.35, 15)).toThrow();
+      expect(() => calculateExtractionYield({ beverageWeightGrams: 0, tdsPercent: 1.35, doseGrams: 15 })).toThrow();
+      expect(() => calculateExtractionYield({ beverageWeightGrams: 250, tdsPercent: 1.35, doseGrams: 0 })).toThrow();
+      expect(() => calculateExtractionYield({ beverageWeightGrams: -100, tdsPercent: 1.35, doseGrams: 15 })).toThrow();
     });
 
     it('estimateCoffeeCaffeineMg returns 0 on non-positive dose, and handles immersion/cold_brew', () => {

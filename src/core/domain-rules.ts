@@ -79,11 +79,17 @@ export function calculateLiquidYield(waterGrams: number, doseGrams: number, rete
  * EY = (Masa naparu * TDS%) / Doza sucha
  * Standard SCA Golden Cup: 18.0% - 22.0%
  */
-export function calculateExtractionYield(
-  beverageWeightGrams: number,
-  tdsPercent: number,
-  doseGrams: number
-): ExtractionYieldResult {
+export interface ExtractionYieldInput {
+  beverageWeightGrams: number;
+  tdsPercent: number;
+  doseGrams: number;
+}
+
+export function calculateExtractionYield({
+  beverageWeightGrams,
+  tdsPercent,
+  doseGrams,
+}: ExtractionYieldInput): ExtractionYieldResult {
   if (beverageWeightGrams <= 0 || tdsPercent <= 0 || doseGrams <= 0) {
     throw new Error('Parametry ekstrakcji muszą być większe od zera');
   }

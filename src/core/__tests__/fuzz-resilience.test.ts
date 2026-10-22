@@ -67,9 +67,9 @@ describe('Chaos & Fuzzing: Extraction Mathematics & Physical Limits', () => {
       const dose = (Math.random() - 0.5) * 100;
 
       if (water <= 0 || tds <= 0 || dose <= 0) {
-        expect(() => calculateExtractionYield(water, tds, dose)).toThrow();
+        expect(() => calculateExtractionYield({ beverageWeightGrams: water, tdsPercent: tds, doseGrams: dose })).toThrow();
       } else {
-        const res = calculateExtractionYield(water, tds, dose);
+        const res = calculateExtractionYield({ beverageWeightGrams: water, tdsPercent: tds, doseGrams: dose });
         expect(res.extractionYieldPercent).toBeGreaterThanOrEqual(0);
         expect(isNaN(res.extractionYieldPercent)).toBe(false);
         expect(['under', 'ideal', 'over']).toContain(res.rating);
