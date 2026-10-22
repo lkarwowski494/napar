@@ -35,3 +35,27 @@ Data: 22.10.2026. Źródło: publiczny kanał RSS recenzji App Store (`itunes.ap
 - Pobrać więcej recenzji (kraje: GB, DE, FR, CA, AU) — większa próba, żeby zarzuty się potwierdziły albo odpadły.
 - Dla każdego zarzutu sprawdzić, czy Napar mógłby go rozwiązać, i z jakim kosztem (np. dane młynków wymagają weryfikacji źródłami).
 - Zdecydować o wejściu (wybór kierunku) przed budową. Sam „MVP z całym BRD” nie jest kierunkiem.
+
+## 5. Aktualizacja — poszerzona próba (ta sama data)
+
+**Próba:** ok. 120 unikalnych recenzji z 9 aplikacji (kraje US, GB, DE, FR, CA, AU, PL). Większość recenzji siedzi w 2–3 aplikacjach (FourSix, Single Origin); pozostałe mają 1–16 recenzji lub brak danych w kanale. Wiele zarzutów się powtarza między krajami, więc to ta sama próba, nie niezależne potwierdzenie.
+
+**Nowi konkurenci (z wyszukiwania, bez pełnych recenzji):**
+- **Brew Timer – Coffee Recipes** — płatna; ustawienia pod młynek, korekty wody, automatyczny dziennik. [App Store/SimilarWeb](https://similarweb.com/app/apple/1519905670). **To pokrywa się z naszą hipotezą „młynek + dziennik”.**
+- **Barista – Coffee Timer** — płatna; V60 i AeroPress, wagi wody na każdym kroku. [SimilarWeb](https://similarweb.com/app/apple/1286975088).
+- **Simple Coffee Timer** — premiera kwiecień 2026; V60 i AeroPress, przeliczanie proporcji, Live Activity. [mwm.ai](https://mwm.ai/apps/simple-coffee-timer/6761335857). Ma recenzje 3★: edycja receptur w małych polach, brak zmiany wagi kawy, brak zapisu odmiany mielenia.
+- **Brewly: Coffee Timer & Journal**, **Coffee DTR Timer** — dziennik i timer w jednej aplikacji. [AppsHunter](https://appshunter.io/ios/app/brewly-coffee-timer-and-journal/id6738063344/similar).
+- **Tea Brew Timer & Journal** — zapis notatek degustacyjnych, od oolong po pu-erh; strona oznaczona „Designed for iPad”. [App Store](https://apps.apple.com/us/app/-/id6745836038). **Nisza herbaty z dziennikiem już jest zajęta.**
+- **Enthusiast Tea Timer** — gongfu i notatki z gwiazdkami, ale dostępna na Androida i przez F-Droid, nie na iOS. [F-Droid](https://f-droid.org/packages/com.sesu8642.infusion_timer/).
+
+**Nowe zarzuty z 1–3★:**
+- edycja receptur w małych polach, trudne przestawianie kroków (Simple Coffee Timer, 3★);
+- nie da się zmienić wagi kawy poniżej progu (Simple Coffee Timer, 3★; Single Origin, 3★);
+- brak zapisu odmiany mielenia (Simple Coffee Timer, 3★);
+- błędne ilości w metodzie 4:6 (FourSix, 1★, po niemiecku).
+
+**Korekta wniosków z sekcji 3:**
+- Hipoteza „młynek + dziennik” **nie jest unikalna**: płatna aplikacja już to oferuje. Wzięcie jej jako przewagi wymaga czegoś głębszego.
+- Dziennik herbaty z notatkami też już istnieje.
+- Zarzuty z recenzji dotyczą głównie UX i błędów danych, nie braku funkcji. To sugeruje, że przewaga może być w **wiarygodności danych i prostocie edycji**, a nie w liście funkcji. To wymaga potwierdzenia.
+- Potencjalnie unikalne dla Napar, do zweryfikowania: diagnoza smaku z recepturą naprawczą (Dial-in Doctor), model kofeiny i wody, pełna praca offline bez konta i z eksportem. Żadnej z tych funkcji nie widziałem u konkurentów w wynikach wyszukiwania, ale brak wyniku nie dowodzi braku konkurenta.
