@@ -21,6 +21,7 @@ import {
   GongfuTeaType,
   createGongfuSession,
   recordGongfuInfusion,
+  getGongfuSessionRating,
   getRecommendedGongfuSteepSeconds,
 } from '../src/core/gongfu-session';
 import {
@@ -80,7 +81,6 @@ export default function GongfuScreen() {
   const [isSteeping, setIsSteeping] = useState<boolean>(false);
   const [steepFinished, setSteepFinished] = useState<boolean>(false);
   const [currentNotes, setCurrentNotes] = useState<string>('');
-  const [currentRating, setCurrentRating] = useState<number>(5);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -166,7 +166,6 @@ export default function GongfuScreen() {
     const updated = recordGongfuInfusion(session, {
       durationSeconds: actualSteep,
       waterTempCelsius: parseFloat(waterTempCelsius) || 96,
-      tasteRating: currentRating,
       notes: currentNotes.trim() || undefined,
     });
     setSession(updated);
@@ -208,9 +207,9 @@ export default function GongfuScreen() {
           waterGrams: session.vesselCapacityMl,
           waterTempCelsius: parseFloat(waterTempCelsius) || 96,
           totalTimeSeconds: totalDuration,
-          rating: 5,
+          rating: getGongfuSessionRating(session) ?? undefined,
           flavorTags: ['Gongfu Cha', `${session.infusions.length} infuzji`],
-          tasteBalance: 'balanced',
+          // Brak pola balansu smaku w sesji Gongfu — nie zapisujemy domyślnej wartości
           caffeineContentMg: session.totalCaffeineMg,
           notes: `Sesja Gongfu Cha: ${session.infusions.length} zalań. ${session.infusions
             .map((inf) => `#${inf.infusionNumber}: ${inf.durationSeconds}s${inf.notes ? ` (${inf.notes})` : ''}`)

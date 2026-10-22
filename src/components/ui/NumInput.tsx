@@ -8,7 +8,7 @@ import {
   NativeSyntheticEvent,
   TextInputFocusEventData,
 } from 'react-native';
-import { wInKeep, roundTo } from '../../core/unit-converter';
+import { wInKeep, baseToDisplay } from '../../core/unit-converter';
 import { theme } from '../../core/theme';
 
 export interface NumInputProps extends Omit<TextInputProps, 'value' | 'onChangeText'> {
@@ -89,7 +89,8 @@ export const NumInput: React.FC<NumInputProps> = ({
       parsed = max;
     }
 
-    setRawText(String(parsed));
+    // Pole pokazuje wartość w jednostce `unit`; wartość zwrotna i `stored` są w jednostce bazowej
+    setRawText(String(baseToDisplay(parsed, unit)));
     if (onChangeNumber) {
       onChangeNumber(parsed);
     }

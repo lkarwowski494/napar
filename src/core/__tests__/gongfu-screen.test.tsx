@@ -291,6 +291,11 @@ describe('GongfuScreen Component', () => {
     expect(alertSpy).toHaveBeenCalled();
     expect(saveSessionSpy).toHaveBeenCalled();
     expect(logCaffeineSpy).toHaveBeenCalled();
+
+    // Sesja bez ocen zalań nie dostaje wpisanej na sztywno oceny 5 ani balansu 'balanced'
+    const saved = saveSessionSpy.mock.calls[0][0] as { rating?: number; tasteBalance?: string };
+    expect(saved.rating).toBeUndefined();
+    expect(saved.tasteBalance).toBeUndefined();
   });
 
   test('W trybie wygasłego trialu próba rozpoczęcia parzenia Gongfu Cha otwiera Paywall', () => {

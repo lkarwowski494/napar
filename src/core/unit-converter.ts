@@ -86,9 +86,37 @@ export function roundTo(val: number, decimals: number): number {
 }
 
 /**
+ * Współczynnik przeliczenia z jednostki bazowej (g, ml, kg) na jednostkę wyświetlania.
+ * Dla °F zwraca 1 — konwersja temperatury jest liniowa z przesunięciem i obsługiwana osobno.
+ */
+export function unitFactor(unit: string): number {
+  const u = unit.toLowerCase();
+  if (u === 'lb' || u === 'lbs') return 2.20462262185;
+  if (u === 'oz') return 0.03527396195;
+  if (u === 'fl oz' || u === 'floz') return 0.0338140227;
+  return 1;
+}
+
+/**
+ * Zamienia wartość w jednostce bazowej (°C, g, ml, kg) na wartość wyświetlaną w `unit`.
+ * Wynik jest zaokrąglony do 0,1 — tej samej precyzji, którą porównuje wInKeep, dzięki czemu
+ * wartość zapisana w jednostce bazowej przechodzi przez pole bez dryfu.
+ */
+export function baseToDisplay(baseValue: number, unit: string): number {
+  const u = unit.toLowerCase();
+  if (u === '°f' || u === 'f') {
+    return roundTo((baseValue * 9) / 5 + 32, 1);
+  }
+  const cu = unitFactor(u);
+  if (cu === 1) return baseValue;
+  return roundTo(baseValue * cu, 1);
+}
+
+/**
  * RD-ENG-01 & BR-TEST-005: Konwersja wejściowa bez dryfu zaokrągleń (wInKeep)
  * Zachowuje dokładną wartość bazową v_prev, jeżeli sformatowana liczba w jednostce wyświetlania
  * zgadza się po zaokrągleniu do 0.1 z liczbą wpisaną przez użytkownika.
+ * Wynik zawsze w jednostce bazowej (g, ml, °C, kg).
  */
 export function wInKeep(txt: string, unit: string, prevBase?: number): number {
   if (typeof txt !== 'string') return prevBase ?? 0;
@@ -98,20 +126,9 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
     return prevBase ?? 0;
   }
 
-  // Współczynniki konwersji jednostek
   const u = unit.toLowerCase();
-  let cu = 1;
   const isFahrenheit = u === '°f' || u === 'f';
-
-  if (u === 'lb' || u === 'lbs') {
-    cu = 2.20462262185;
-  } else if (u === 'oz') {
-    cu = 0.03527396195;
-  } else if (u === 'fl oz' || u === 'floz') {
-    cu = 0.0338140227;
-  } else {
-    cu = 1;
-  }
+  const cu = unitFactor(u);
 
   if (prevBase !== undefined && prevBase > 0) {
     if (isFahrenheit) {

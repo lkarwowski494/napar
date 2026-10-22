@@ -151,6 +151,17 @@ export function createGongfuSession(params: {
 }
 
 /**
+ * Ocena całej sesji: średnia ocen zalań (1-5) zaokrąglona do pełnej gwiazdki.
+ * Zwraca null, gdy żadne zalanie nie ma oceny — nie podstawiamy domyślnej wartości.
+ */
+export function getGongfuSessionRating(session: GongfuSession): number | null {
+  const rated = session.infusions.filter((inf) => typeof inf.tasteRating === 'number');
+  if (rated.length === 0) return null;
+  const sum = rated.reduce((acc, inf) => acc + (inf.tasteRating as number), 0);
+  return Math.round(sum / rated.length);
+}
+
+/**
  * Rejestruje ukończone zalanie i aktualizuje ładunek kofeiny sesji
  */
 export function recordGongfuInfusion(
