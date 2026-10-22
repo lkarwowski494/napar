@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
 import { parseDecimal } from '../../core/parse-decimal';
+import { confirm } from '../../core/confirm';
 import { saveInventoryItem, deleteInventoryItem } from '../../core/database';
 import { InventoryItem } from '../../core/database-schema';
 
@@ -125,24 +126,20 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
     Alert.alert('Zarchiwizowano', 'Paczka została oznaczona jako zużyta (0 g) i przeniesiona do archiwum.');
   };
 
+  // Trwałe usunięcie wyłącznie po potwierdzeniu (lib/confirm, CLAUDE.md §2.2 / S5)
   const handleDeleteItem = () => {
     if (!item) return;
-    Alert.alert(
-      'Usunąć paczkę?',
-      `Czy na pewno chcesz bezpowrotnie usunąć "${item.name}" ze spiżarni?`,
-      [
-        { text: 'Anuluj', style: 'cancel' },
-        {
-          text: 'Usuń',
-          style: 'destructive',
-          onPress: () => {
-            deleteInventoryItem(item.id);
-            onDeleted();
-            onClose();
-          },
-        },
-      ]
-    );
+    confirm({
+      title: 'Usunąć paczkę?',
+      message: `Czy na pewno chcesz bezpowrotnie usunąć "${item.name}" ze spiżarni?`,
+      confirmText: 'Usuń',
+      destructive: true,
+      onConfirm: () => {
+        deleteInventoryItem(item.id);
+        onDeleted();
+        onClose();
+      },
+    });
   };
 
   return (
