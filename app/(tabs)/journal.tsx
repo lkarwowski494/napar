@@ -266,7 +266,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
       {/* Przełącznik Widoku: Sesje vs Analityka */}
       <View style={styles.viewModeRow}>
         <Pressable
-          style={[styles.viewModeTab, viewMode === 'sessions' && styles.viewModeTabActive]}
+          style={[styles.viewModeTab, viewMode === 'sessions' && styles.viewModeTabActive, styles.touchTarget]}
           onPress={() => setViewMode('sessions')}
           testID="journal-tab-sessions"
           accessibilityRole="button"
@@ -277,7 +277,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
           </Text>
         </Pressable>
         <Pressable
-          style={[styles.viewModeTab, viewMode === 'analytics' && styles.viewModeTabActive]}
+          style={[styles.viewModeTab, viewMode === 'analytics' && styles.viewModeTabActive, styles.touchTarget]}
           onPress={() => setViewMode('analytics')}
           testID="journal-tab-analytics"
           accessibilityRole="button"
@@ -312,7 +312,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
               <JournalIcon size={36} color={theme.colors.textMuted} />
               <Text style={styles.emptyTitle}>{t.journal.noResults}</Text>
               <Pressable
-                style={styles.clearSearchBtn}
+                style={[styles.clearSearchBtn, styles.touchTarget]}
                 onPress={() => {
                   setSearchQuery('');
                   setFilterType('all');
@@ -365,6 +365,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,

@@ -158,7 +158,7 @@ export function Apps4BrewPassModal({
           {/* Plany subskrypcyjne: Roczny (Polecany) na samej górze */}
           <Pressable
             testID="plan-annual-btn"
-            style={[styles.planCard, styles.planCardFeatured]}
+            style={[styles.planCard, styles.planCardFeatured, styles.touchTarget]}
             onPress={() => void handlePurchase('yearly')}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planAnnualTitle} ${priceOf('yearly', t.paywall.planAnnualPrice)}`}
@@ -176,7 +176,7 @@ export function Apps4BrewPassModal({
           {/* Plan Lifetime */}
           <Pressable
             testID="plan-lifetime-btn"
-            style={styles.planCard}
+            style={[styles.planCard, styles.touchTarget]}
             onPress={() => void handlePurchase('lifetime')}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planLifetimeTitle} ${priceOf('lifetime', t.paywall.planLifetimePrice)}`}
@@ -191,7 +191,7 @@ export function Apps4BrewPassModal({
           {/* Plan Miesięczny */}
           <Pressable
             testID="plan-monthly-btn"
-            style={styles.planCard}
+            style={[styles.planCard, styles.touchTarget]}
             onPress={() => void handlePurchase('monthly')}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planMonthlyTitle} ${priceOf('monthly', t.paywall.planMonthlyPrice)}`}
@@ -206,7 +206,7 @@ export function Apps4BrewPassModal({
           {/* Przywróć zakupy i polityka */}
           <Pressable
             testID="restore-purchases-btn"
-            style={styles.restoreBtn}
+            style={[styles.restoreBtn, styles.touchTarget]}
             onPress={() => void handleRestore()}
             accessibilityRole="button"
             accessibilityLabel={t.paywall.restore}
@@ -224,6 +224,7 @@ export function Apps4BrewPassModal({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,

@@ -86,7 +86,7 @@ export function BrewActiveFocusTimer({
               <View style={styles.countdownAdjustRow}>
                 {(isRunning || isPaused) && (
                   <Pressable
-                    style={styles.timeAdjustPill}
+                    style={[styles.timeAdjustPill, styles.touchTarget]}
                     onPress={() => onAdjustStepDuration(-10)}
                     hitSlop={8}
                     accessibilityRole="button"
@@ -100,7 +100,7 @@ export function BrewActiveFocusTimer({
                 </Text>
                 {(isRunning || isPaused) && (
                   <Pressable
-                    style={styles.timeAdjustPill}
+                    style={[styles.timeAdjustPill, styles.touchTarget]}
                     onPress={() => onAdjustStepDuration(10)}
                     hitSlop={8}
                     accessibilityRole="button"
@@ -139,7 +139,7 @@ export function BrewActiveFocusTimer({
       <View style={styles.controlsRow}>
         {isIdle && (
           <Pressable
-            style={styles.mainStartButton}
+            style={[styles.mainStartButton, styles.touchTarget]}
             onPress={onStart}
             accessibilityRole="button"
             accessibilityLabel="Rozpocznij parzenie"
@@ -153,7 +153,7 @@ export function BrewActiveFocusTimer({
         {isRunning && (
           <>
             <Pressable
-              style={styles.secondaryButton}
+              style={[styles.secondaryButton, styles.touchTarget]}
               onPress={onPreviousStep}
               disabled={snapshot.currentStepIndex === 0}
               accessibilityRole="button"
@@ -164,7 +164,7 @@ export function BrewActiveFocusTimer({
             </Pressable>
 
             <Pressable
-              style={styles.pauseButton}
+              style={[styles.pauseButton, styles.touchTarget]}
               onPress={onPause}
               accessibilityRole="button"
               accessibilityLabel="Wstrzymaj parzenie"
@@ -174,7 +174,7 @@ export function BrewActiveFocusTimer({
             </Pressable>
 
             <Pressable
-              style={styles.nextButton}
+              style={[styles.nextButton, styles.touchTarget]}
               onPress={onNextStep}
               accessibilityRole="button"
               accessibilityLabel={
@@ -196,7 +196,7 @@ export function BrewActiveFocusTimer({
         {isPaused && (
           <>
             <Pressable
-              style={styles.resetButton}
+              style={[styles.resetButton, styles.touchTarget]}
               onPress={onReset}
               accessibilityRole="button"
               accessibilityLabel="Zresetuj stoper"
@@ -206,7 +206,7 @@ export function BrewActiveFocusTimer({
             </Pressable>
 
             <Pressable
-              style={styles.mainStartButton}
+              style={[styles.mainStartButton, styles.touchTarget]}
               onPress={onResume}
               accessibilityRole="button"
               accessibilityLabel="Wznów parzenie"
@@ -216,7 +216,7 @@ export function BrewActiveFocusTimer({
             </Pressable>
 
             <Pressable
-              style={styles.secondaryButton}
+              style={[styles.secondaryButton, styles.touchTarget]}
               onPress={onFinish}
               accessibilityRole="button"
               accessibilityLabel="Zapisz sesję"
@@ -232,6 +232,7 @@ export function BrewActiveFocusTimer({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     marginBottom: 16,
   },

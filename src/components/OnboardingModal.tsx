@@ -71,7 +71,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
               accessibilityState={{ selected: selectedPref === 'coffee' }}
               style={[
                 styles.prefCard,
-                selectedPref === 'coffee' && styles.prefCardActiveCoffee,
+                selectedPref === 'coffee' && styles.prefCardActiveCoffee, styles.touchTarget,
               ]}
               onPress={() => setSelectedPref('coffee')}
             >
@@ -100,7 +100,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
               accessibilityState={{ selected: selectedPref === 'tea' }}
               style={[
                 styles.prefCard,
-                selectedPref === 'tea' && styles.prefCardActiveTea,
+                selectedPref === 'tea' && styles.prefCardActiveTea, styles.touchTarget,
               ]}
               onPress={() => setSelectedPref('tea')}
             >
@@ -129,7 +129,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
               accessibilityState={{ selected: selectedPref === 'both' }}
               style={[
                 styles.prefCard,
-                selectedPref === 'both' && styles.prefCardActiveBoth,
+                selectedPref === 'both' && styles.prefCardActiveBoth, styles.touchTarget,
               ]}
               onPress={() => setSelectedPref('both')}
             >
@@ -156,7 +156,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
           <View style={styles.footer}>
             <Pressable
               testID="onboarding-submit-btn"
-              style={styles.submitBtn}
+              style={[styles.submitBtn, styles.touchTarget]}
               onPress={handleStart}
               accessibilityRole="button"
               accessibilityLabel={t.onboarding.startBtn}
@@ -176,6 +176,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.bg,

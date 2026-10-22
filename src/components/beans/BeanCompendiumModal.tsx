@@ -93,7 +93,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
           {beveragePreference !== 'tea' && (
             <>
               <Pressable
-                style={[styles.compTabBtn, compendiumTab === 'varieties' && styles.compTabBtnActive]}
+                style={[styles.compTabBtn, compendiumTab === 'varieties' && styles.compTabBtnActive, styles.touchTarget]}
                 onPress={() => setCompendiumTab('varieties')}
               >
                 <Text style={[styles.compTabText, compendiumTab === 'varieties' && styles.compTabTextActive]}>
@@ -101,7 +101,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 </Text>
               </Pressable>
               <Pressable
-                style={[styles.compTabBtn, compendiumTab === 'processes' && styles.compTabBtnActive]}
+                style={[styles.compTabBtn, compendiumTab === 'processes' && styles.compTabBtnActive, styles.touchTarget]}
                 onPress={() => setCompendiumTab('processes')}
               >
                 <Text style={[styles.compTabText, compendiumTab === 'processes' && styles.compTabTextActive]}>
@@ -109,7 +109,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 </Text>
               </Pressable>
               <Pressable
-                style={[styles.compTabBtn, compendiumTab === 'origins' && styles.compTabBtnActive]}
+                style={[styles.compTabBtn, compendiumTab === 'origins' && styles.compTabBtnActive, styles.touchTarget]}
                 onPress={() => setCompendiumTab('origins')}
               >
                 <Text style={[styles.compTabText, compendiumTab === 'origins' && styles.compTabTextActive]}>
@@ -120,7 +120,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
           )}
           {beveragePreference !== 'coffee' && (
             <Pressable
-              style={[styles.compTabBtn, compendiumTab === 'tea' && styles.compTabBtnActive]}
+              style={[styles.compTabBtn, compendiumTab === 'tea' && styles.compTabBtnActive, styles.touchTarget]}
               onPress={() => setCompendiumTab('tea')}
             >
               <Text style={[styles.compTabText, compendiumTab === 'tea' && styles.compTabTextActive]}>
@@ -157,7 +157,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 </View>
 
                 <Pressable
-                  style={styles.compUseBtn}
+                  style={[styles.compUseBtn, styles.touchTarget]}
                   onPress={() =>
                     onUseTemplate({
                       name: `${v.name} Specialty`,
@@ -204,7 +204,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 <Text style={styles.compCardDesc}>{o.descriptionPl}</Text>
 
                 <Pressable
-                  style={styles.compUseBtn}
+                  style={[styles.compUseBtn, styles.touchTarget]}
                   onPress={() =>
                     onUseTemplate({
                       name: `${o.country} ${o.primaryRegions[0]} Washed`,
@@ -233,7 +233,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 <Text style={styles.compCardHealth}>{t.healthAttributesPl}</Text>
 
                 <Pressable
-                  style={styles.compUseBtn}
+                  style={[styles.compUseBtn, styles.touchTarget]}
                   onPress={() =>
                     onUseTemplate({
                       name: t.famousVarietiesPl[0].split('(')[0].trim(),
@@ -254,6 +254,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   compendiumModalContainer: {
     flex: 1,
     backgroundColor: theme.colors.bg,

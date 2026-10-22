@@ -28,7 +28,7 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
     <View style={styles.topBar}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
         <Pressable
-          style={[styles.filterChip, filter === 'all' && styles.filterChipActive]}
+          style={[styles.filterChip, filter === 'all' && styles.filterChipActive, styles.touchTarget]}
           onPress={() => onFilterChange('all')}
           accessibilityRole="button"
           accessibilityLabel="Filtr: Wszystkie pozycje"
@@ -38,7 +38,7 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
           </Text>
         </Pressable>
         <Pressable
-          style={[styles.filterChip, filter === 'coffee' && styles.filterChipActive]}
+          style={[styles.filterChip, filter === 'coffee' && styles.filterChipActive, styles.touchTarget]}
           onPress={() => onFilterChange('coffee')}
           accessibilityRole="button"
           accessibilityLabel="Filtr: Kawa"
@@ -48,7 +48,7 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
           </Text>
         </Pressable>
         <Pressable
-          style={[styles.filterChip, filter === 'tea' && styles.filterChipActive]}
+          style={[styles.filterChip, filter === 'tea' && styles.filterChipActive, styles.touchTarget]}
           onPress={() => onFilterChange('tea')}
           accessibilityRole="button"
           accessibilityLabel="Filtr: Herbata"
@@ -58,7 +58,7 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
           </Text>
         </Pressable>
         <Pressable
-          style={[styles.filterChip, filter === 'archived' && styles.filterChipActive]}
+          style={[styles.filterChip, filter === 'archived' && styles.filterChipActive, styles.touchTarget]}
           onPress={() => onFilterChange('archived')}
           accessibilityRole="button"
           accessibilityLabel="Filtr: Archiwum"
@@ -72,7 +72,7 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
       {/* Przycisk Bazy Wiedzy */}
       <Pressable
         testID="compendium-open-button"
-        style={styles.compendiumButton}
+        style={[styles.compendiumButton, styles.touchTarget]}
         onPress={onOpenCompendium}
         accessibilityRole="button"
         accessibilityLabel="Otwórz kompendium wiedzy"
@@ -84,7 +84,7 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
       {/* Przycisk dodawania nowej paczki */}
       <Pressable
         testID="beans-add-button"
-        style={styles.addButton}
+        style={[styles.addButton, styles.touchTarget]}
         onPress={onOpenAdd}
         accessibilityRole="button"
         accessibilityLabel="+ Dodaj"
@@ -96,6 +96,7 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',

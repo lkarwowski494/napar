@@ -81,7 +81,7 @@ export default function DialInScreen() {
       {/* Przełącznik zakładek */}
       <View style={styles.segmentBar}>
         <Pressable
-          style={[styles.segmentBtn, activeTab === 'doctor' && styles.segmentBtnActive]}
+          style={[styles.segmentBtn, activeTab === 'doctor' && styles.segmentBtnActive, styles.touchTarget]}
           onPress={() => setActiveTab('doctor')}
         >
           <Text
@@ -95,7 +95,7 @@ export default function DialInScreen() {
         </Pressable>
 
         <Pressable
-          style={[styles.segmentBtn, activeTab === 'ratio' && styles.segmentBtnActive]}
+          style={[styles.segmentBtn, activeTab === 'ratio' && styles.segmentBtnActive, styles.touchTarget]}
           onPress={() => setActiveTab('ratio')}
         >
           <Text
@@ -109,7 +109,7 @@ export default function DialInScreen() {
         </Pressable>
 
         <Pressable
-          style={[styles.segmentBtn, activeTab === 'ey' && styles.segmentBtnActive]}
+          style={[styles.segmentBtn, activeTab === 'ey' && styles.segmentBtnActive, styles.touchTarget]}
           onPress={() => setActiveTab('ey')}
         >
           <Text
@@ -123,7 +123,7 @@ export default function DialInScreen() {
         </Pressable>
 
         <Pressable
-          style={[styles.segmentBtn, activeTab === 'water' && styles.segmentBtnActive]}
+          style={[styles.segmentBtn, activeTab === 'water' && styles.segmentBtnActive, styles.touchTarget]}
           onPress={() => setActiveTab('water')}
         >
           <Text
@@ -176,7 +176,7 @@ export default function DialInScreen() {
                 key={issue.id}
                 style={[
                   styles.issueCard,
-                  selectedIssue === issue.id && styles.issueCardActive,
+                  selectedIssue === issue.id && styles.issueCardActive, styles.touchTarget,
                 ]}
                 onPress={() => setSelectedIssue(issue.id)}
               >
@@ -253,7 +253,7 @@ export default function DialInScreen() {
       {/* Skrót do Kalkulatora Kofeiny */}
       <Pressable
         testID="open-caffeine-from-workshop"
-        style={styles.caffeineWorkshopCard}
+        style={[styles.caffeineWorkshopCard, styles.touchTarget]}
         onPress={() => router.push('/caffeine')}
         accessibilityRole="button"
         accessibilityLabel={t.caffeine?.title || 'Kalkulator Kofeiny'}
@@ -278,6 +278,7 @@ export default function DialInScreen() {
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,

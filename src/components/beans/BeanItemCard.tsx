@@ -44,7 +44,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
         <Pressable
           onPress={() => onToggleFavorite(item)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={{ padding: 4 }}
+          style={{ minWidth: 44, minHeight: 44, padding: 4 }}
           accessibilityRole="button"
           accessibilityLabel={item.isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
         >
@@ -102,7 +102,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             Paczka skończona (0 g). Przenieść do archiwum?
           </Text>
           <Pressable
-            style={styles.archiveEmptyBtn}
+            style={[styles.archiveEmptyBtn, styles.touchTarget]}
             onPress={() => onToggleArchive(item)}
             accessibilityRole="button"
             accessibilityLabel="Archiwizuj teraz"
@@ -125,7 +125,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
         <View style={styles.actionsRow}>
           {!item.isArchived && item.remainingWeightGrams > 0 && (
             <Pressable
-              style={styles.brewActionBtn}
+              style={[styles.brewActionBtn, styles.touchTarget]}
               onPress={() => onSelectForBrew(item)}
               accessibilityRole="button"
               accessibilityLabel="Parz z tych ziaren"
@@ -134,7 +134,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             </Pressable>
           )}
           <Pressable
-            style={styles.editActionBtn}
+            style={[styles.editActionBtn, styles.touchTarget]}
             onPress={() => onOpenEdit(item)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessibilityRole="button"
@@ -143,7 +143,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             <Text style={styles.editActionText}>Edytuj</Text>
           </Pressable>
           <Pressable
-            style={styles.archiveActionBtn}
+            style={[styles.archiveActionBtn, styles.touchTarget]}
             onPress={() => onToggleArchive(item)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessibilityRole="button"
@@ -160,6 +160,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   itemCard: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.lg,

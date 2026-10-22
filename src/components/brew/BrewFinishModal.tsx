@@ -105,7 +105,7 @@ export function BrewFinishModal({
             <Text style={styles.sectionLabel}>Twoja Ocena</Text>
             <View style={styles.starRow}>
               {[1, 2, 3, 4, 5].map((s) => (
-                <Pressable
+                <Pressable style={styles.touchTarget}
                   key={s}
                   testID={`star-rating-${s}`}
                   onPress={() => onChangeRating(s)}
@@ -133,7 +133,7 @@ export function BrewFinishModal({
                   testID={`taste-chip-${b.key}`}
                   style={[
                     styles.balanceChip,
-                    tasteBalance === b.key && styles.balanceChipActive,
+                    tasteBalance === b.key && styles.balanceChipActive, styles.touchTarget,
                   ]}
                   onPress={() => onChangeTasteBalance(b.key)}
                   accessibilityRole="button"
@@ -207,7 +207,7 @@ export function BrewFinishModal({
                     accessibilityRole="button"
                     accessibilityState={{ selected: active }}
                     accessibilityLabel={`Woda ${w.namePl}, GH ${w.targetGhPpm}, KH ${w.targetKhPpm}`}
-                    style={[styles.waterChip, active && styles.waterChipActive]}
+                    style={[styles.waterChip, active && styles.waterChipActive, styles.touchTarget]}
                     onPress={() => onChangeWaterProfile(w.id)}
                   >
                     <Text style={[styles.waterChipText, active && styles.waterChipTextActive]}>
@@ -261,7 +261,7 @@ export function BrewFinishModal({
             <View style={styles.finishButtonsRow}>
               <Pressable
                 testID="finish-skip-btn"
-                style={styles.finishCancelBtn}
+                style={[styles.finishCancelBtn, styles.touchTarget]}
                 onPress={onSkip}
                 accessibilityRole="button"
                 accessibilityLabel="Pomiń zapis"
@@ -270,7 +270,7 @@ export function BrewFinishModal({
               </Pressable>
               <Pressable
                 testID="finish-save-btn"
-                style={styles.finishSaveBtn}
+                style={[styles.finishSaveBtn, styles.touchTarget]}
                 onPress={onSave}
                 accessibilityRole="button"
                 accessibilityLabel="Zapisz w Dzienniku"
@@ -286,6 +286,7 @@ export function BrewFinishModal({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.7)',

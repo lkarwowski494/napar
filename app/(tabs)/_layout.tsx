@@ -23,7 +23,7 @@ function AppGuideHeaderButton({ onOpen }: { onOpen: () => void }) {
     <Pressable
       testID="header-guide-btn"
       hitSlop={10}
-      style={styles.headerGuideButton}
+      style={[styles.headerGuideButton, styles.touchTarget]}
       onPress={onOpen}
       accessibilityRole="button"
       accessibilityLabel="Jak działa aplikacja?"
@@ -173,6 +173,7 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   headerGuideButton: {
     marginRight: 12,
     paddingHorizontal: 10,

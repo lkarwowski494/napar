@@ -144,7 +144,7 @@ export default function BeansScreen() {
               odmiany botaniczne i wagę.
             </Text>
             <Pressable
-              style={styles.emptyBtn}
+              style={[styles.emptyBtn, styles.touchTarget]}
               onPress={handleOpenAdd}
               accessibilityRole="button"
               accessibilityLabel="+ Dodaj pierwszą paczkę"
@@ -206,6 +206,7 @@ export default function BeansScreen() {
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,

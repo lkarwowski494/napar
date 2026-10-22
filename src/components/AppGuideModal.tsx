@@ -109,7 +109,7 @@ export function AppGuideModal({
             </View>
             <Pressable
               testID="app-guide-close-btn"
-              style={styles.closeBtn}
+              style={[styles.closeBtn, styles.touchTarget]}
               onPress={onClose}
               hitSlop={10}
               accessibilityRole="button"
@@ -167,7 +167,7 @@ export function AppGuideModal({
 
           <Pressable
             testID="app-guide-got-it-btn"
-            style={styles.primaryBtn}
+            style={[styles.primaryBtn, styles.touchTarget]}
             onPress={onClose}
             accessibilityRole="button"
             accessibilityLabel={isEn ? 'Got it' : 'Rozumiem, zaczynamy'}
@@ -183,6 +183,7 @@ export function AppGuideModal({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.82)',

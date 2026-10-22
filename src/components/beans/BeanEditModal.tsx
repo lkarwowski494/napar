@@ -169,7 +169,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           {(!beveragePreference || beveragePreference === 'both') && (
             <View style={styles.typeSelectorRow}>
               <Pressable
-                style={[styles.typeBtn, editType === 'coffee' && styles.typeBtnActive]}
+                style={[styles.typeBtn, editType === 'coffee' && styles.typeBtnActive, styles.touchTarget]}
                 onPress={() => setEditType('coffee')}
               >
                 <Text style={[styles.typeBtnText, editType === 'coffee' && styles.typeBtnTextActive]}>
@@ -177,7 +177,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 </Text>
               </Pressable>
               <Pressable
-                style={[styles.typeBtn, editType === 'tea' && styles.typeBtnActive]}
+                style={[styles.typeBtn, editType === 'tea' && styles.typeBtnActive, styles.touchTarget]}
                 onPress={() => setEditType('tea')}
               >
                 <Text style={[styles.typeBtnText, editType === 'tea' && styles.typeBtnTextActive]}>
@@ -274,25 +274,25 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             />
             <View style={styles.weightQuickButtonsRow}>
               <Pressable
-                style={styles.quickWeightBtn}
+                style={[styles.quickWeightBtn, styles.touchTarget]}
                 onPress={() => handleAdjustRemainingWeight(-15)}
               >
                 <Text style={styles.quickWeightBtnText}>-15 g</Text>
               </Pressable>
               <Pressable
-                style={styles.quickWeightBtn}
+                style={[styles.quickWeightBtn, styles.touchTarget]}
                 onPress={() => handleAdjustRemainingWeight(-18)}
               >
                 <Text style={styles.quickWeightBtnText}>-18 g</Text>
               </Pressable>
               <Pressable
-                style={styles.quickWeightBtn}
+                style={[styles.quickWeightBtn, styles.touchTarget]}
                 onPress={() => handleAdjustRemainingWeight(15)}
               >
                 <Text style={styles.quickWeightBtnText}>+15 g</Text>
               </Pressable>
               <Pressable
-                style={[styles.quickWeightBtn, styles.quickWeightZeroBtn]}
+                style={[styles.quickWeightBtn, styles.quickWeightZeroBtn, styles.touchTarget]}
                 onPress={() => setEditRemainingWeight('0')}
               >
                 <Text style={styles.quickWeightZeroText}>0 g (pusta)</Text>
@@ -317,7 +317,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 key={star}
                 onPress={() => setEditRating(editRating === star ? undefined : star)}
                 hitSlop={8}
-                style={styles.starBtn}
+                style={[styles.starBtn, styles.touchTarget]}
               >
                 <Text style={[styles.starIcon, (editRating || 0) >= star && styles.starIconActive]}>
                   ★
@@ -327,7 +327,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           </View>
 
           <Pressable
-            style={styles.saveSubmitBtn}
+            style={[styles.saveSubmitBtn, styles.touchTarget]}
             onPress={handleSaveEdit}
             accessibilityRole="button"
             accessibilityLabel="Zapisz zmiany"
@@ -336,7 +336,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           </Pressable>
 
           <Pressable
-            style={styles.markFinishedBtn}
+            style={[styles.markFinishedBtn, styles.touchTarget]}
             onPress={handleMarkAsFinished}
             accessibilityRole="button"
             accessibilityLabel="Oznacz jako zużytą i zarchiwizuj"
@@ -345,7 +345,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           </Pressable>
 
           <Pressable
-            style={styles.deletePackBtn}
+            style={[styles.deletePackBtn, styles.touchTarget]}
             onPress={handleDeleteItem}
             accessibilityRole="button"
             accessibilityLabel="Usuń paczkę ze spiżarni"
@@ -359,6 +359,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.bg,

@@ -185,7 +185,7 @@ export default function BrewScreen() {
       {/* 1-Tap Quick Re-Brew (Bleary-Eyed Barista Shortcut) */}
       {recentFiveStarSession && !isRunning && !isPaused && (
         <Pressable
-          style={styles.reBrewBanner}
+          style={[styles.reBrewBanner, styles.touchTarget]}
           onPress={() => handleQuickReBrew(recentFiveStarSession)}
           accessibilityRole="button"
           accessibilityLabel={`Powtórz ostatni udany napar: ${recentFiveStarSession.recipeName || recentFiveStarSession.method}`}
@@ -247,7 +247,7 @@ export default function BrewScreen() {
 
       <Pressable
         testID="open-procedure-modal-btn"
-        style={styles.openProcedureCta}
+        style={[styles.openProcedureCta, styles.touchTarget]}
         onPress={() => {
           if (!isRunning && !isPaused) {
             // Otwarcie procedury uruchamia timer: to rozpoczęcie parzenia podlega limitowi.
@@ -308,6 +308,7 @@ export default function BrewScreen() {
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,

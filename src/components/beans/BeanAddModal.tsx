@@ -140,7 +140,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           {(!beveragePreference || beveragePreference === 'both') && (
             <View style={styles.typeSelectorRow}>
               <Pressable
-                style={[styles.typeBtn, type === 'coffee' && styles.typeBtnActive]}
+                style={[styles.typeBtn, type === 'coffee' && styles.typeBtnActive, styles.touchTarget]}
                 onPress={() => setType('coffee')}
               >
                 <Text style={[styles.typeBtnText, type === 'coffee' && styles.typeBtnTextActive]}>
@@ -148,7 +148,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
                 </Text>
               </Pressable>
               <Pressable
-                style={[styles.typeBtn, type === 'tea' && styles.typeBtnActive]}
+                style={[styles.typeBtn, type === 'tea' && styles.typeBtnActive, styles.touchTarget]}
                 onPress={() => setType('tea')}
               >
                 <Text style={[styles.typeBtnText, type === 'tea' && styles.typeBtnTextActive]}>
@@ -159,7 +159,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           )}
 
           <Pressable
-            style={styles.compendiumPromptBtn}
+            style={[styles.compendiumPromptBtn, styles.touchTarget]}
             onPress={onOpenCompendium}
           >
             <Text style={styles.compendiumPromptText}>
@@ -251,7 +251,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             onChangeText={setNotesStr}
           />
 
-          <Pressable style={styles.saveSubmitBtn} onPress={handleAddItem}>
+          <Pressable style={[styles.saveSubmitBtn, styles.touchTarget]} onPress={handleAddItem}>
             <Text style={styles.saveSubmitText}>Zapisz w Spiżarni</Text>
           </Pressable>
         </ScrollView>
@@ -261,6 +261,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.bg,

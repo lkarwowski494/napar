@@ -293,7 +293,7 @@ export default function RecipeBuilderScreen() {
         {/* Przycisk zapisu */}
         <Pressable
           testID="recipe-builder-save-btn"
-          style={styles.mainSaveBtn}
+          style={[styles.mainSaveBtn, styles.touchTarget]}
           onPress={handleSave}
           accessibilityRole="button"
           accessibilityLabel={t.recipeBuilder.saveRecipeBtn}
@@ -305,7 +305,7 @@ export default function RecipeBuilderScreen() {
         {isEditing && (
           <>
             <Pressable
-              style={styles.duplicateBtn}
+              style={[styles.duplicateBtn, styles.touchTarget]}
               onPress={handleDuplicate}
               accessibilityRole="button"
               accessibilityLabel={t.recipeBuilder.duplicateBtn}
@@ -314,7 +314,7 @@ export default function RecipeBuilderScreen() {
             </Pressable>
 
             <Pressable
-              style={styles.deleteBtn}
+              style={[styles.deleteBtn, styles.touchTarget]}
               onPress={handleDelete}
               accessibilityRole="button"
               accessibilityLabel={t.common.delete}
@@ -329,6 +329,7 @@ export default function RecipeBuilderScreen() {
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.bg,
