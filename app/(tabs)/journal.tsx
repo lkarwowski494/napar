@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: 'center',
     borderRadius: theme.borderRadius.sm,
-    minHeight: 40,
+    minHeight: 44,
     justifyContent: 'center',
   },
   viewModeTabActive: {
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: theme.colors.copper,
     borderRadius: theme.borderRadius.sm,
-    minHeight: 36,
+    minHeight: 44,
     justifyContent: 'center',
   },
   clearSearchText: {

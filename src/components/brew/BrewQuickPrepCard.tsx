@@ -108,6 +108,7 @@ export function BrewQuickPrepCard({
           <View style={styles.stepperRow}>
             <Pressable
               style={styles.stepBtn}
+              hitSlop={8}
               onPress={() => onDoseChange(Math.max(1, doseGrams - 1))}
               disabled={disabled}
               accessibilityRole="button"
@@ -118,6 +119,7 @@ export function BrewQuickPrepCard({
             <Text style={styles.paramValue}>{formatDoseWeight(doseGrams, unitSystem)}</Text>
             <Pressable
               style={styles.stepBtn}
+              hitSlop={8}
               onPress={() => onDoseChange(doseGrams + 1)}
               disabled={disabled}
               accessibilityRole="button"
@@ -138,6 +140,7 @@ export function BrewQuickPrepCard({
             {onWaterChange && (
               <Pressable
                 style={styles.stepBtn}
+                hitSlop={8}
                 onPress={() => onWaterChange(Math.max(10, waterGrams - 10))}
                 disabled={disabled}
                 accessibilityRole="button"
@@ -152,6 +155,7 @@ export function BrewQuickPrepCard({
             {onWaterChange && (
               <Pressable
                 style={styles.stepBtn}
+                hitSlop={8}
                 onPress={() => onWaterChange(waterGrams + 10)}
                 disabled={disabled}
                 accessibilityRole="button"
