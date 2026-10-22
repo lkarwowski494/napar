@@ -91,3 +91,30 @@ Numery zachowane z poprzedniej listy. Status: **MVP** (pierwsza wersja), **1.1**
 5. **Języki jak w treningu: 35.** Konsekwencje: tłumaczenie wszystkich tekstów interfejsu, sklepu i ekranów zakupu na 35 języków, weryfikacja przez rolę tłumacza, a `check:i18n` musi przechodzić dla wszystkich 35. To najdroższa pozycja w zakresie.
 
 **Liczba MVP:** 31. **Zakres po decyzjach:** dodaje się koszt 35 języków, Live Activity i Apple Watch oraz treści napojów mlecznych. Harmonogram z planu przebudowy (7–11 dni agenta bez tych pozycji) wymaga aktualizacji po zebraniu zakresu.
+
+## Korekta limitu darmowego poziomu (22.10.2026)
+
+**Poprzednia decyzja „zwiększamy limit do 15” była błędna w kierunku.** Model z repo `trening` (`docs/monetyzacja/limit-dni.mjs`, uruchomiony bez zmian w repo; wariant 5–20 na kopii danych w scratchpadzie) pokazuje płacących na 100 pobrań w 24 miesiące:
+
+| Limit (dni parzenia/mies.) | pesymistyczny | normalny | optymistyczny | aktywni trafiający na blokadę w 1. pełnym miesiącu |
+|---|---|---|---|---|
+| 4 | 1,40 | 2,00 | 2,89 | 90% |
+| 5 | 1,31 | 1,88 | 2,72 | 86% |
+| 6 | 1,22 | 1,76 | 2,56 | 82% |
+| 10 | 0,83 | 1,23 | 1,81 | 59% |
+| 15 | 0,39 | 0,59 | 0,88 | 30% |
+| 20 | 0,11 | 0,17 | 0,26 | 9% |
+
+**Zastrzeżenia:** wszystkie dane wejściowe są oznaczone w modelu jako [OCENA], a kluczowe (1,37% zakupów przy każdej blokadzie, retencja, częstotliwość) nie są zmierzone. Wynik pokazuje kierunek i proporcje, nie prognozę. Model nie uwzględnia wpływu blokady na oceny w sklepie. Badanie `trening` zanotowało, że „twarda blokada” ma 2,10★ w recenzjach.
+
+**Wniosek:** dla celu „ludzie kupują” niższy limit daje więcej płacących w modelu. Koszt to ryzyko ocen i odinstalowań, którego model nie mierzy.
+
+**Rekomendacja robocza: 5 dni parzenia/mies.** (tak jak w `trening`). Warunki, bez których nie wchodzimy na ten poziom:
+- blokada nigdy nie przerywa trwającego parzenia; pojawia się przed startem nowego dnia,
+- historia, edycja, eksport i kopia zawsze dostępne (jak w `trening` i `piekarz`),
+- przed blokadą ekran pokazuje, ile dni zostało i co dokładnie się zablokuje,
+- po premierze mierzymy: odsetek aktywnych trafiających na limit i udział recenzji 1–2★ z powodu blokady. Jeśli ocen spadnie za bardzo, podnosimy limit do 10.
+
+**Alternatywa:** 10 dni (59% trafia na blokadę, ok. 65% płacących z wariantu 5). Mniej ryzyka ocen, mniej płacących w modelu.
+
+Limit 15 z poprzedniej decyzji nie obowiązuje.
