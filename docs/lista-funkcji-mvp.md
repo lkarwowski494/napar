@@ -126,3 +126,13 @@ Zastępuje rekomendację 5 dni z korekty powyżej. Uzasadnienie właściciela: k
 **Otwarte, do zrobienia przed wyliczeniem przychodu:** model z `trening` używa częstotliwości treningowej (1–5 razy w tygodniu, z maksimum 5). Dla kawy częstotliwość jest wyższa, więc udział trafiających na limit przy 10 dniach jest prawdopodobnie większy niż 59%. Trzeba ponownie uruchomić model z rozkładem częstotliwości dla parzenia kawy (dziś nieznanym, do oszacowania) i dopiero wtedy traktować liczbę płacących jako punkt odniesienia.
 
 Warunki z korekty obowiązują bez zmian: blokada nie przerywa trwającego parzenia, historia i eksport zawsze dostępne, ekran pokazuje pozostałe dni przed blokadą, pomiar po premierze (blokady i recenzje 1–2★).
+
+## Decyzja właściciela: limit darmowego poziomu = 7 dni parzenia/mies. (22.10.2026)
+
+Zastępuje decyzję 10 dni. Uzasadnienie właściciela: niższy limit daje więcej płacących; podniesienie limitu po premierze jest łatwe, obniżenie byłoby trudne dla użytkowników.
+
+Wynik modelu `trening` (ta sama metoda, częstotliwość treningowa, [OCENA]; płacący na 100 pobrań w 24 mies., scenariusz normalny): **7 dni — 1,63** (77% aktywnych trafia na blokadę w pierwszym pełnym miesiącu); 10 dni — 1,23 (59%); 5 dni — 1,88 (86%).
+
+**Nadal otwarte:** model wymaga ponownego uruchomienia z rozkładem częstotliwości dla parzenia kawy (kawa jest pijana częściej niż trenuje się). Przy wyższej częstotliwości udział trafiających na blokadę przy 7 dniach będzie większy niż 77%.
+
+Warunki bez zmian: blokada nie przerywa trwającego parzenia, historia i eksport zawsze dostępne, ekran pokazuje pozostałe dni przed blokadą, pomiar po premierze (blokady i recenzje 1–2★). Jeśli ocen spadnie za bardzo, podnosimy limit.
