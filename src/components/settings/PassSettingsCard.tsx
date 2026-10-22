@@ -55,7 +55,7 @@ export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
 
         <Pressable
           testID="open-apps4brew-pass-btn"
-          style={styles.passCtaBtn}
+          style={[styles.passCtaBtn, styles.touchTarget]}
           onPress={onOpenPassModal}
           accessibilityRole="button"
           accessibilityLabel={isPro ? 'Apps4Brew Pass: Aktywny' : 'Odblokuj Apps4Brew Pass ($0.99 / $4.99 / $14.99)'}
@@ -72,6 +72,7 @@ export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',

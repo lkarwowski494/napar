@@ -64,7 +64,7 @@ export const GongfuSessionSetup: React.FC<GongfuSessionSetupProps> = ({
         ).map((item) => (
           <Pressable
             key={item.id}
-            style={[styles.teaTypeChip, teaType === item.id && styles.teaTypeChipActive]}
+            style={[styles.teaTypeChip, teaType === item.id && styles.teaTypeChipActive, styles.touchTarget]}
             onPress={() => onSelectTeaType(item.id)}
           >
             <Text
@@ -126,6 +126,7 @@ export const GongfuSessionSetup: React.FC<GongfuSessionSetupProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   teaTypeRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',

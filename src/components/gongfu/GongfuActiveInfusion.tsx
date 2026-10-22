@@ -90,7 +90,7 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
             placeholder={t.gongfu.infusionNotesPlaceholder}
           />
           <Pressable
-            style={styles.recordNextBtn}
+            style={[styles.recordNextBtn, styles.touchTarget]}
             onPress={onRecordCurrentInfusion}
           >
             <Text style={styles.recordNextBtnText}>{t.gongfu.nextInfusion}</Text>
@@ -102,6 +102,7 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   timerCard: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: 16,

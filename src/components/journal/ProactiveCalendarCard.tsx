@@ -94,7 +94,7 @@ export function ProactiveCalendarCard({
         {selectedDateIso && (
           <Pressable
             testID="calendar-clear-date-btn"
-            style={styles.clearDateChip}
+            style={[styles.clearDateChip, styles.touchTarget]}
             onPress={() => setSelectedDateIso(null)}
             accessibilityRole="button"
             accessibilityLabel={isEn ? 'Show all days' : 'Pokaż wszystkie dni'}
@@ -121,7 +121,7 @@ export function ProactiveCalendarCard({
               style={[
                 styles.dayCell,
                 day.isToday && styles.dayCellToday,
-                isSelected && styles.dayCellSelected,
+                isSelected && styles.dayCellSelected, styles.touchTarget,
               ]}
               onPress={() =>
                 setSelectedDateIso(isSelected ? null : day.dateIso)
@@ -169,7 +169,7 @@ export function ProactiveCalendarCard({
             testID="schedule-filter-upcoming"
             style={[
               styles.modeBtn,
-              scheduleFilter === 'upcoming' && styles.modeBtnActive,
+              scheduleFilter === 'upcoming' && styles.modeBtnActive, styles.touchTarget,
             ]}
             onPress={() => {
               setSelectedDateIso(null);
@@ -191,7 +191,7 @@ export function ProactiveCalendarCard({
             testID="schedule-filter-all"
             style={[
               styles.modeBtn,
-              scheduleFilter === 'all' && styles.modeBtnActive,
+              scheduleFilter === 'all' && styles.modeBtnActive, styles.touchTarget,
             ]}
             onPress={() => {
               setSelectedDateIso(null);
@@ -249,7 +249,7 @@ export function ProactiveCalendarCard({
             <View style={styles.actionButtonsRow}>
               <Pressable
                 testID={`execute-action-btn-${act.id}`}
-                style={styles.executeOneTapBtn}
+                style={[styles.executeOneTapBtn, styles.touchTarget]}
                 onPress={() => onExecuteAction(act)}
                 accessibilityRole="button"
                 accessibilityLabel={
@@ -265,7 +265,7 @@ export function ProactiveCalendarCard({
 
               <Pressable
                 testID={`ics-export-btn-${act.id}`}
-                style={styles.icsExportBtn}
+                style={[styles.icsExportBtn, styles.touchTarget]}
                 onPress={() => handleExportIcs(act)}
                 accessibilityRole="button"
                 accessibilityLabel={
@@ -283,6 +283,7 @@ export function ProactiveCalendarCard({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.lg,

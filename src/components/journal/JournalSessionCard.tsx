@@ -150,7 +150,7 @@ export function JournalSessionCard({
         <View style={styles.cardActionsRow}>
           <Pressable
             testID={`brew-again-btn-${session.id}`}
-            style={styles.cardActionBtn}
+            style={[styles.cardActionBtn, styles.touchTarget]}
             onPress={() => onBrewAgain(session)}
             accessibilityRole="button"
             accessibilityLabel={`${t.journal.brewAgain}: ${session.recipeName || session.method}`}
@@ -160,7 +160,7 @@ export function JournalSessionCard({
 
           <Pressable
             testID={`share-session-btn-${session.id}`}
-            style={[styles.cardActionBtn, styles.cardActionBtnSecondary]}
+            style={[styles.cardActionBtn, styles.cardActionBtnSecondary, styles.touchTarget]}
             onPress={() => onShareSession(session)}
             accessibilityRole="button"
             accessibilityLabel={`${t.journal.shareSession}: ${session.recipeName || session.method}`}
@@ -168,7 +168,7 @@ export function JournalSessionCard({
             <Text style={styles.cardActionBtnSecondaryText}>{t.journal.shareSession}</Text>
           </Pressable>
 
-          <Pressable
+          <Pressable style={styles.touchTarget}
             testID={`delete-session-btn-${session.id}`}
             onPress={() => onDelete(session)}
             hitSlop={10}
@@ -184,6 +184,7 @@ export function JournalSessionCard({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   sessionCard: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.md,

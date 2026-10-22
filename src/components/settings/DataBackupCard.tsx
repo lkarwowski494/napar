@@ -26,7 +26,7 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
       <View style={styles.cardGroup}>
         <Pressable
           testID="export-json-btn"
-          style={styles.actionRow}
+          style={[styles.actionRow, styles.touchTarget]}
           onPress={onExportJson}
         >
           <View style={{ flex: 1 }}>
@@ -42,7 +42,7 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
 
         <Pressable
           testID="import-json-btn"
-          style={styles.actionRow}
+          style={[styles.actionRow, styles.touchTarget]}
           onPress={handleOpenImport}
         >
           <View style={{ flex: 1 }}>
@@ -58,7 +58,7 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
 
         <Pressable
           testID="export-csv-sessions-btn"
-          style={styles.actionRow}
+          style={[styles.actionRow, styles.touchTarget]}
           onPress={onExportSessionsCsv}
         >
           <View style={{ flex: 1 }}>
@@ -72,7 +72,7 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
 
         <View style={styles.divider} />
 
-        <Pressable style={styles.actionRow} onPress={onExportInventoryCsv}>
+        <Pressable style={[styles.actionRow, styles.touchTarget]} onPress={onExportInventoryCsv}>
           <View style={{ flex: 1 }}>
             <Text style={styles.actionTitle}>Eksportuj Spiżarnię (CSV)</Text>
             <Text style={styles.actionSubtitle}>
@@ -87,6 +87,7 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',

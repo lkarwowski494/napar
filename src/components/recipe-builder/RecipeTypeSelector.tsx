@@ -25,7 +25,7 @@ export const RecipeTypeSelector: React.FC<RecipeTypeSelectorProps> = ({
       <Pressable
         style={[
           styles.typeTab,
-          beverageType === 'COFFEE' && styles.typeTabActiveCoffee,
+          beverageType === 'COFFEE' && styles.typeTabActiveCoffee, styles.touchTarget,
         ]}
         onPress={() => onSelectType('COFFEE')}
         accessibilityRole="button"
@@ -43,7 +43,7 @@ export const RecipeTypeSelector: React.FC<RecipeTypeSelectorProps> = ({
       <Pressable
         style={[
           styles.typeTab,
-          beverageType === 'TEA' && styles.typeTabActiveTea,
+          beverageType === 'TEA' && styles.typeTabActiveTea, styles.touchTarget,
         ]}
         onPress={() => onSelectType('TEA')}
         accessibilityRole="button"
@@ -63,6 +63,7 @@ export const RecipeTypeSelector: React.FC<RecipeTypeSelectorProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   typeSelectorRow: {
     flexDirection: 'row',
     marginBottom: 16,

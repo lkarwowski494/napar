@@ -32,7 +32,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
             {selectedDescriptors.map((desc) => (
               <Pressable
                 key={desc}
-                style={styles.activeChip}
+                style={[styles.activeChip, styles.touchTarget]}
                 onPress={() => onToggleDescriptor(desc)}
                 hitSlop={6}
               >
@@ -60,6 +60,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                   borderColor: cat.color,
                   backgroundColor: 'rgba(255,255,255,0.08)',
                 },
+                styles.touchTarget,
               ]}
               onPress={() => setActiveCategoryId(cat.id)}
             >
@@ -95,6 +96,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                         backgroundColor: activeCategory.color,
                         borderColor: activeCategory.color,
                       },
+                      styles.touchTarget,
                     ]}
                     onPress={() => onToggleDescriptor(desc)}
                   >
@@ -118,6 +120,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     marginVertical: 6,
   },

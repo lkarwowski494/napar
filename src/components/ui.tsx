@@ -196,6 +196,7 @@ export const Btn: React.FC<BtnProps> = ({
       disabled={disabled}
       style={({ pressed }) => [
         styles.btnBase,
+        styles.touchTarget,
         getVariantStyle(),
         pressed && styles.btnPressed,
         disabled && styles.btnDisabled,
@@ -335,6 +336,7 @@ export const CloseButton: React.FC<CloseButtonProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   fieldContainer: {
     marginBottom: 16,
   },

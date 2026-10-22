@@ -28,6 +28,7 @@ export const GrinderSelectionCard: React.FC<GrinderSelectionCardProps> = ({
                 style={[
                   styles.actionRow,
                   isSelected && { backgroundColor: theme.colors.bgCardSecondary },
+                  styles.touchTarget,
                 ]}
                 onPress={() => onSelectGrinder(grinder.id)}
                 accessibilityRole="button"
@@ -69,6 +70,7 @@ export const GrinderSelectionCard: React.FC<GrinderSelectionCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',

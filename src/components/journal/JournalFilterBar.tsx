@@ -51,7 +51,7 @@ export const JournalFilterBar: React.FC<JournalFilterBarProps> = ({
             key={f.key}
             style={[
               styles.filterChip,
-              filterType === f.key && styles.filterChipActive,
+              filterType === f.key && styles.filterChipActive, styles.touchTarget,
             ]}
             onPress={() => onFilterChange(f.key as any)}
             accessibilityRole="button"
@@ -73,6 +73,7 @@ export const JournalFilterBar: React.FC<JournalFilterBarProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   searchBarContainer: {
     marginBottom: theme.spacing.md,
   },

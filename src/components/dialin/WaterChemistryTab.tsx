@@ -61,7 +61,7 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
               key={vol}
               style={[
                 styles.volumeChip,
-                waterVolumeInput === vol && styles.volumeChipActive,
+                waterVolumeInput === vol && styles.volumeChipActive, styles.touchTarget,
               ]}
               onPress={() => setWaterVolumeInput(vol)}
             >
@@ -97,7 +97,7 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
               key={recipe.id}
               style={[
                 styles.waterRecipeCard,
-                isSelected && styles.waterRecipeCardActive,
+                isSelected && styles.waterRecipeCardActive, styles.touchTarget,
               ]}
               onPress={() => {
                 setIsCustomWater(false);
@@ -127,7 +127,7 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
         <Pressable
           style={[
             styles.waterRecipeCard,
-            isCustomWater && styles.waterRecipeCardActive,
+            isCustomWater && styles.waterRecipeCardActive, styles.touchTarget,
           ]}
           onPress={() => setIsCustomWater(true)}
         >
@@ -261,6 +261,7 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   sectionHeader: {
     fontSize: 18,
     fontWeight: '700',

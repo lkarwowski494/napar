@@ -174,7 +174,7 @@ export const OwnWaterCard: React.FC<OwnWaterCardProps> = ({ t, target, volumeLit
           <View style={styles.buttonRow}>
             <Pressable
               testID="own-water-cancel-btn"
-              style={styles.secondaryButton}
+              style={[styles.secondaryButton, styles.touchTarget]}
               onPress={cancelEditing}
               accessibilityRole="button"
               accessibilityLabel={t.common.cancel}
@@ -183,7 +183,7 @@ export const OwnWaterCard: React.FC<OwnWaterCardProps> = ({ t, target, volumeLit
             </Pressable>
             <Pressable
               testID="own-water-save-btn"
-              style={styles.primaryButton}
+              style={[styles.primaryButton, styles.touchTarget]}
               onPress={save}
               accessibilityRole="button"
               accessibilityLabel={t.common.save}
@@ -201,7 +201,7 @@ export const OwnWaterCard: React.FC<OwnWaterCardProps> = ({ t, target, volumeLit
           <View style={styles.buttonRow}>
             <Pressable
               testID="own-water-edit-btn"
-              style={styles.secondaryButton}
+              style={[styles.secondaryButton, styles.touchTarget]}
               onPress={startEditing}
               accessibilityRole="button"
               accessibilityLabel={t.common.edit}
@@ -210,7 +210,7 @@ export const OwnWaterCard: React.FC<OwnWaterCardProps> = ({ t, target, volumeLit
             </Pressable>
             <Pressable
               testID="own-water-delete-btn"
-              style={styles.secondaryButton}
+              style={[styles.secondaryButton, styles.touchTarget]}
               onPress={removeProfile}
               accessibilityRole="button"
               accessibilityLabel={t.common.delete}
@@ -242,7 +242,7 @@ export const OwnWaterCard: React.FC<OwnWaterCardProps> = ({ t, target, volumeLit
       ) : (
         <Pressable
           testID="own-water-add-btn"
-          style={styles.primaryButton}
+          style={[styles.primaryButton, styles.touchTarget]}
           onPress={startEditing}
           accessibilityRole="button"
           accessibilityLabel={t.water.ownAdd}
@@ -255,6 +255,7 @@ export const OwnWaterCard: React.FC<OwnWaterCardProps> = ({ t, target, volumeLit
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   card: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.md,

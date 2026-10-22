@@ -101,7 +101,7 @@ export const JsonImportModal: React.FC<JsonImportModalProps> = ({
           value={textValue}
           onChangeText={handleChangeText}
         />
-        <Pressable style={styles.submitImportBtn} onPress={handleConfirm}>
+        <Pressable style={[styles.submitImportBtn, styles.touchTarget]} onPress={handleConfirm}>
           <Text style={styles.submitImportBtnText}>Zaimportuj i Zastąp Dane</Text>
         </Pressable>
       </SafeAreaView>
@@ -110,6 +110,7 @@ export const JsonImportModal: React.FC<JsonImportModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.bg,

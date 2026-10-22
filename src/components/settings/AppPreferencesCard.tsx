@@ -47,7 +47,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
       <Text style={styles.sectionTitle}>{t.settings.languageSection}</Text>
       <View style={styles.langSelectorRow}>
         <Pressable
-          style={[styles.langTab, language === 'pl' && styles.langTabActive]}
+          style={[styles.langTab, language === 'pl' && styles.langTabActive, styles.touchTarget]}
           onPress={() => onSetLanguage('pl')}
           accessibilityRole="button"
           accessibilityLabel="Polski (Napar)"
@@ -57,7 +57,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
           </Text>
         </Pressable>
         <Pressable
-          style={[styles.langTab, language === 'en' && styles.langTabActive]}
+          style={[styles.langTab, language === 'en' && styles.langTabActive, styles.touchTarget]}
           onPress={() => onSetLanguage('en')}
           accessibilityRole="button"
           accessibilityLabel="English (Steepwise)"
@@ -73,7 +73,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
       <View style={styles.cardGroup}>
         <Pressable
           testID="beverage-pref-both"
-          style={styles.actionRow}
+          style={[styles.actionRow, styles.touchTarget]}
           onPress={() => onSelectBeveragePreference('both')}
           accessibilityRole="button"
           accessibilityLabel={t.settings.beverageBoth}
@@ -93,7 +93,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
 
         <Pressable
           testID="beverage-pref-coffee"
-          style={styles.actionRow}
+          style={[styles.actionRow, styles.touchTarget]}
           onPress={() => onSelectBeveragePreference('coffee')}
           accessibilityRole="button"
           accessibilityLabel={t.settings.beverageCoffeeOnly}
@@ -113,7 +113,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
 
         <Pressable
           testID="beverage-pref-tea"
-          style={styles.actionRow}
+          style={[styles.actionRow, styles.touchTarget]}
           onPress={() => onSelectBeveragePreference('tea')}
           accessibilityRole="button"
           accessibilityLabel={t.settings.beverageTeaOnly}
@@ -135,7 +135,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
       <View style={styles.langSelectorRow}>
         <Pressable
           testID="unit-metric-btn"
-          style={[styles.langTab, unitSystem === 'metric' && styles.langTabActive]}
+          style={[styles.langTab, unitSystem === 'metric' && styles.langTabActive, styles.touchTarget]}
           onPress={() => onSelectUnitSystem('metric')}
           accessibilityRole="button"
           accessibilityLabel={t.settings.unitMetric}
@@ -146,7 +146,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
         </Pressable>
         <Pressable
           testID="unit-imperial-btn"
-          style={[styles.langTab, unitSystem === 'imperial' && styles.langTabActive]}
+          style={[styles.langTab, unitSystem === 'imperial' && styles.langTabActive, styles.touchTarget]}
           onPress={() => onSelectUnitSystem('imperial')}
           accessibilityRole="button"
           accessibilityLabel={t.settings.unitImperial}
@@ -232,6 +232,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',

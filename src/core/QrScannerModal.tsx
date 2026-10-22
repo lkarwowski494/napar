@@ -81,7 +81,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
             </Text>
             <Pressable
               testID="qr-scanner-permission-btn"
-              style={styles.permissionBtn}
+              style={[styles.permissionBtn, styles.touchTarget]}
               onPress={requestPermission}
               accessibilityRole="button"
               accessibilityLabel="Zezwól na aparat"
@@ -121,6 +121,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     flex: 1,
     backgroundColor: '#000000',
