@@ -4,7 +4,7 @@
 // Apps4Brew Studio — 100% Offline-First.
 // ============================================================================
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Modal,
   View,
@@ -24,6 +24,7 @@ import {
 } from '../../core/radar-chart';
 import { FlavorWheelPicker } from '../../core/flavor-wheel-picker';
 import { WATER_RECIPES } from '../../core/water-chemistry';
+import { diagnoseExtractionTaste } from '../../core/domain-rules';
 import { CompassIcon, StarIcon } from '../icons/CraftIcons';
 
 interface BrewFinishModalProps {
@@ -72,6 +73,14 @@ export function BrewFinishModal({
   onSave,
 }: BrewFinishModalProps) {
   const { t } = useTranslation();
+
+  // Dial-in Doctor: ta sama diagnoza co w zakładce dial-in (RD-05, domain-rules.ts)
+  const doctorDiagnosis = useMemo(() => {
+    if (tasteBalance === 'sour') return diagnoseExtractionTaste({ isSour: true })[0];
+    if (tasteBalance === 'bitter') return diagnoseExtractionTaste({ isBitter: true })[0];
+    if (tasteBalance === 'weak') return diagnoseExtractionTaste({ isWatery: true })[0];
+    return undefined;
+  }, [tasteBalance]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -143,44 +152,14 @@ export function BrewFinishModal({
             </View>
 
             {/* Dial-in Doctor: 1-Tap Diagnoza i Recepta Ratunkowa */}
-            {tasteBalance === 'sour' && (
-              <View style={styles.doctorAdviceCard} testID="doctor-advice-sour">
+            {doctorDiagnosis && (
+              <View style={styles.doctorAdviceCard} testID={`doctor-advice-${tasteBalance}`}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                   <CompassIcon size={14} color={theme.colors.copper} />
                   <Text style={styles.doctorTitle}>Recepta Dial-in Doctor:</Text>
                 </View>
-                <Text style={styles.doctorText}>
-                  Za kwaśna (niedoparzenie)? Następnym razem:{' '}
-                  <Text style={styles.doctorBold}>zmiel drobniej o 2 kliki</Text> lub podnieś temperaturę wody o{' '}
-                  <Text style={styles.doctorBold}>+2°C</Text>.
-                </Text>
-              </View>
-            )}
-
-            {tasteBalance === 'bitter' && (
-              <View style={styles.doctorAdviceCard} testID="doctor-advice-bitter">
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                  <CompassIcon size={14} color={theme.colors.copper} />
-                  <Text style={styles.doctorTitle}>Recepta Dial-in Doctor:</Text>
-                </View>
-                <Text style={styles.doctorText}>
-                  Za gorzka / ściągająca (przeparzenie)? Następnym razem:{' '}
-                  <Text style={styles.doctorBold}>zmiel grubiej o 2 kliki</Text> lub obniż temperaturę wody o{' '}
-                  <Text style={styles.doctorBold}>-2°C</Text>.
-                </Text>
-              </View>
-            )}
-
-            {tasteBalance === 'weak' && (
-              <View style={styles.doctorAdviceCard} testID="doctor-advice-weak">
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                  <CompassIcon size={14} color={theme.colors.copper} />
-                  <Text style={styles.doctorTitle}>Recepta Dial-in Doctor:</Text>
-                </View>
-                <Text style={styles.doctorText}>
-                  Zbyt wodnista (niska ekstrakcja)? Zwiększ dozę o{' '}
-                  <Text style={styles.doctorBold}>+1.5g</Text> lub wydłuż czas kontaktu z wodą.
-                </Text>
+                <Text style={styles.doctorBold}>{doctorDiagnosis.issue}</Text>
+                <Text style={styles.doctorText}>{doctorDiagnosis.recommendationPl}</Text>
               </View>
             )}
 

@@ -6,6 +6,7 @@ import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { BrewFinishModal } from '../BrewFinishModal';
 import { DEFAULT_SENSORY_PROFILE } from '../../../core/radar-chart';
+import { diagnoseExtractionTaste } from '../../../core/domain-rules';
 
 describe('BrewFinishModal Component', () => {
   const defaultProps = {
@@ -52,8 +53,39 @@ describe('BrewFinishModal Component', () => {
     expect(str).toContain('03:15');
     expect(str).toContain('300g');
     expect(str).toContain('Recepta Dial-in Doctor');
-    expect(str).toContain('zmiel drobniej o 2 kliki');
     expect(str).toContain('+14.70 PLN');
+  });
+
+  test('Scenariusz "Za kwaśna": diagnoza z silnika dial-in (niedoparzenie, mielenie drobniej i wyższa temperatura)', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<BrewFinishModal {...defaultProps} tasteBalance="sour" />);
+    });
+    const expected = diagnoseExtractionTaste({ isSour: true })[0];
+    expect(tree.root.findByProps({ testID: 'doctor-advice-sour' })).toBeDefined();
+    const str = JSON.stringify(tree.toJSON());
+
+    expect(str).toContain(expected.issue);
+    expect(str).toContain(expected.recommendationPl);
+    expect(expected.grindAdjustment).toBe('finer');
+    expect(expected.tempAdjustment).toBe('higher');
+    // Dawna, ręcznie wpisana wersja nie wraca
+    expect(JSON.stringify(tree.toJSON())).not.toContain('zmiel drobniej o 2 kliki');
+  });
+
+  test('Scenariusz "Za gorzka": diagnoza z silnika dial-in (przeparzenie, mielenie grubiej i niższa temperatura)', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<BrewFinishModal {...defaultProps} tasteBalance="bitter" />);
+    });
+    const expected = diagnoseExtractionTaste({ isBitter: true })[0];
+    const str = JSON.stringify(tree.toJSON());
+
+    expect(str).toContain(expected.issue);
+    expect(str).toContain(expected.recommendationPl);
+    expect(expected.grindAdjustment).toBe('coarser');
+    expect(expected.tempAdjustment).toBe('lower');
+    expect(str).not.toContain('zmiel grubiej o 2 kliki');
   });
 
   test('Dial-in Doctor dostosowuje receptę w zależności od balansu (bitter, weak, balanced)', () => {
@@ -63,7 +95,7 @@ describe('BrewFinishModal Component', () => {
         <BrewFinishModal {...defaultProps} tasteBalance="bitter" />
       );
     });
-    expect(JSON.stringify(treeBitter.toJSON())).toContain('zmiel grubiej o 2 kliki');
+    expect(JSON.stringify(treeBitter.toJSON())).toContain('Gorzka / sucha w ustach (Przeparzenie)');
 
     let treeWeak: any;
     act(() => {
@@ -71,7 +103,7 @@ describe('BrewFinishModal Component', () => {
         <BrewFinishModal {...defaultProps} tasteBalance="weak" />
       );
     });
-    expect(JSON.stringify(treeWeak.toJSON())).toContain('Zwiększ dozę o');
+    expect(JSON.stringify(treeWeak.toJSON())).toContain('Zwiększ dozę kawy o +1g');
 
     let treeBalanced: any;
     act(() => {
