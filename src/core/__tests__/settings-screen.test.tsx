@@ -251,7 +251,7 @@ describe('SettingsScreen Component', () => {
     expect(str).toContain('inv-1,Etiopia,coffee');
   });
 
-  test('Zakupy niedostępne w tym etapie: plan i przywracanie pokazują komunikat, bez aktywacji Pro', () => {
+  test('Bez sklepu: plan i przywracanie pokazują „zakup niedostępny”, bez aktywacji Pro', async () => {
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 
     let tree: any;
@@ -267,11 +267,13 @@ describe('SettingsScreen Component', () => {
     renderer.act(() => {
       openPassBtn.props.onPress();
     });
-    renderer.act(() => {
+    await renderer.act(async () => {
       tree.root.findByProps({ testID: 'plan-lifetime-btn' }).props.onPress();
+      await new Promise((resolve) => setImmediate(resolve));
     });
-    renderer.act(() => {
+    await renderer.act(async () => {
       tree.root.findByProps({ testID: 'restore-purchases-btn' }).props.onPress();
+      await new Promise((resolve) => setImmediate(resolve));
     });
 
     expect(alertSpy).toHaveBeenCalledTimes(2);

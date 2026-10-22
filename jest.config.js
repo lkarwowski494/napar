@@ -46,6 +46,14 @@ module.exports = {
     './src/core/announce.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/app-access.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/access-policy.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    // Etap 4b (sklep): port, produkty i mapowanie StoreKit w czystym core bez wyjątków
+    './src/core/store-port.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './src/core/store-products.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './src/core/store-mapping.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    // Adaptery platformy: expo-iap działa tu na atrapie API (wstrzykiwane), więc progi są pełne
+    './src/platform/store-expo.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './src/platform/store-fake.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './src/platform/store.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/live-activity.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/craft-suite-theme.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     // Przebudowa etapu 2 (persystencja i kopie): 100% bez wyjątków

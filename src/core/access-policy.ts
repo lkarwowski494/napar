@@ -11,6 +11,22 @@
 /** Limit dni parzenia w miesiącu na darmowym poziomie (D-001). */
 export const FREE_BREW_DAYS_PER_MONTH = 7;
 
+/** Plan Pro: dwa plany subskrypcyjne w jednej grupie i jeden zakup dożywotni (produkty w store-products.ts). */
+export type ProPlan = 'monthly' | 'yearly' | 'lifetime';
+
+/**
+ * Aktywne uprawnienie zwrócone przez sklep (StoreKit, getAvailablePurchases).
+ * Stan Pro = co najmniej jedno uprawnienie; ceny i daty nie wchodzą do polityki.
+ */
+export interface Entitlement {
+  productId: string;
+  plan: ProPlan;
+}
+
+export function hasProEntitlement(entitlements: readonly Entitlement[]): boolean {
+  return entitlements.length > 0;
+}
+
 /** Dzień lokalny w formacie YYYY-MM-DD. */
 export type DayKey = string;
 

@@ -213,3 +213,22 @@ Otwarte (nie blokują etapu 4b):
 - **Częstotliwość kawowa:** model 7 dni policzony na częstotliwości treningowej (patrz wyżej). Liczba płacących wymaga ponownego przeliczenia.
 - **Pokrycie tłumaczeń:** nowe klucze dodane tylko do PL i EN. Pozostałe 33 języki w `locales/` nie mają ich jeszcze (decyzja właściciela: 35 języków, do zrobienia w zakresie tłumaczeń).
 - **Brak repo `trening` w sandboxie:** `docs/monetyzacja.md` nie został odczytany. Zachowanie licznika wzięto z opisu zadania, bez kopiowania kodu.
+
+## Status etapu 4b — sklep StoreKit przez expo-iap (22.10.2026)
+
+Zrobione na gałęzi `claude/wykonaj-sl7vii`:
+- **Zależność:** `expo-iap@~5.8.3` (opublikowana 07.10.2026, czyli co najmniej 2 tygodnie przed wydaniem; wersje 6.x są młodsze niż 14 dni). Pakiet jest w wersji zgodnej z Expo 57 według jego dokumentacji. Licencja MIT.
+- **Port i produkty:** `src/core/store-port.ts` (interfejs `StoreAdapter`, rejestr adaptera), `src/core/store-products.ts` (identyfikatory zgodne z `NaparStoreKit.storekit`: `pl.lukasz.napar.monthly`, `.annual` dla rocznego, `.lifetime`). Typ `Entitlement` jest w `access-policy.ts`.
+- **Czyste mapowanie:** `src/core/store-mapping.ts` (produkty, uprawnienia z pominięciem odwołanych transakcji, kody błędów StoreKit na statusy, brak sukcesu bez transakcji).
+- **Adapter produkcyjny:** `src/platform/store-expo.ts`. Działa tylko na iOS. Uprawnienia wyłącznie z `getAvailablePurchases({ onlyIncludeActiveItemsIOS: true })`. Brak weryfikacji JWS i brak usług zewnętrznych (pilnuje tego `tests/store-adapter.test.ts`).
+- **Fałszywy sklep:** `src/platform/store-fake.ts`, wybierany tylko przy `EXPO_PUBLIC_STORE_FAKE=1` (`src/platform/store.ts`). Ustawiony w buildzie E2E (`e2e-ios.yml`, Debug), a w `testflight.yml` strażnik go blokuje.
+- **Most z dostępem:** `src/core/app-access.ts` (`purchaseProduct`, `restoreProPurchases`, `syncProEntitlement`, `ensureStoreSync`, `useStoreProducts`). Stan Pro (`is_pro_active`) pochodzi z uprawnień sklepu i pozostaje poza kopią.
+- **Ekran:** `Apps4BrewPassModal` kupuje przez sklep. Ceny to `displayPrice` ze sklepu, a bez produktów zostaje tekst zastępczy. Komunikaty: zakup niedostępny, oczekujący, błąd, przywrócono, brak zakupów, błąd przywracania. Nowe klucze tylko w PL i EN.
+- **Bramka:** `check:i18n`, `check:licenses`, `check:matrix`, `check:native`, `check:core-imports`, `typecheck` i `test:coverage` zielone. Progi 100% dla nowych modułów w `jest.config.js`. Adapter expo-iap jest testowany na wstrzykniętej atrapie API, więc nie wymaga progów wyłączonych.
+
+Otwarte (zadania właściciela, nie blokują kodu):
+- **K-CENA:** utworzenie w App Store Connect trzech produktów o identyfikatorach z `store-products.ts` i grupy subskrypcji. Ceny ustawia Apple. Przed wysyłką sprawdzić nieodwracalne Family Sharing.
+- **Test sandbox na urządzeniu** (bramka etapu 4): wymaga produktów w App Store Connect. Lokalnie można testować przez `NaparStoreKit.storekit`.
+- **Przywracanie** nie wywołuje `AppStore.sync` (`restorePurchases`), zgodnie z zasadą dostępu wyłącznie z `getAvailablePurchases`. Jeśli sandbox pokaże, że nowe urządzenie nie widzi zakupów bez synchronizacji, trzeba to zmienić.
+- **E2E Maestro** nie ma scenariusza zakupu (fałszywy sklep nie ma produktów, więc zakup kończy się „zakup niedostępny”).
+- **Tłumaczenia:** nowe klucze tylko PL i EN (jak w 4a); 33 pozostałe języki do zrobienia w zakresie 35 języków.

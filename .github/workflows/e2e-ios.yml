@@ -66,6 +66,9 @@ jobs:
         run: npx expo prebuild --platform ios --no-install --clean
 
       - name: Build iOS Simulator App (.app)
+        env:
+          # Konfiguracja testowa: fałszywy sklep w E2E (bez StoreKit i bez produktów w App Store Connect).
+          EXPO_PUBLIC_STORE_FAKE: '1'
         run: |
           set -o pipefail
           cd ios

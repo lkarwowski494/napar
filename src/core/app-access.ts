@@ -3,21 +3,24 @@
 // Model M5 S1: darmowy poziom to 7 dni parzenia w miesiącu, Pro znosi limit.
 // Historia, edycja, dopisywanie wstecz, eksport, kopia i import są zawsze dostępne.
 // Brak okresu próbnego i brak ofert wprowadzających.
-// Zakup w aplikacji NIE jest tu zaimplementowany (etap 4b, StoreAdapter).
-// Stan Pro (is_pro_active) pochodzi wyłącznie z zakupu i jest poza kopią zapasową.
+// Zakup przez StoreAdapter (etap 4b): stan Pro (is_pro_active) wynika wyłącznie z uprawnień
+// sklepu (getAvailablePurchases) i jest poza kopią zapasową. Bez sklepu zakup jest „unavailable”.
 // Apps4Brew Studio — 100% Offline-First, Zero Telemetry.
 // ============================================================================
 
 import { useEffect, useState } from 'react';
-import { getCountedBrewDays, getIsProUser, recordCountedBrewDay } from './database';
+import { getCountedBrewDays, getIsProUser, recordCountedBrewDay, setIsProUser } from './database';
 import {
   FREE_BREW_DAYS_PER_MONTH,
   canStartBrew,
   getDayKey,
   getMonthKey,
+  hasProEntitlement,
   type BrewStartDecision,
   type BrewStartInput,
+  type Entitlement,
 } from './access-policy';
+import { getStoreAdapter, type PurchaseStatus, type StoreAdapter, type StoreProduct } from './store-port';
 
 export interface BrewAccessState {
   isPro: boolean;
@@ -74,6 +77,124 @@ export function recordTimerBrewCompleted(now: Date = new Date()): void {
   notifyAccessChanged();
 }
 
+export type SyncOutcome = 'pro' | 'free' | 'error' | 'unavailable';
+export type RestoreOutcome = 'restored' | 'none' | 'error' | 'unavailable';
+
+let storeSync: { adapter: StoreAdapter; stop: () => void } | null = null;
+
+/**
+ * Odczytuje uprawnienia ze sklepu i zapisuje stan Pro (is_pro_active).
+ * Błąd odczytu nie zmienia stanu: lepiej zostawić poprzedni wynik niż zgubić Pro przez awarię.
+ */
+export async function syncProEntitlement(): Promise<SyncOutcome> {
+  const adapter = getStoreAdapter();
+  if (adapter === null) {
+    return 'unavailable';
+  }
+  let entitlements: Entitlement[];
+  try {
+    entitlements = await adapter.restore();
+  } catch {
+    return 'error';
+  }
+  const isPro = hasProEntitlement(entitlements);
+  setIsProUser(isPro);
+  notifyAccessChanged();
+  return isPro ? 'pro' : 'free';
+}
+
+/** Nasłuch zmian transakcji i pierwsze uzgodnienie stanu; powtórne wywołanie dla tego samego adaptera nic nie robi. */
+export function ensureStoreSync(): void {
+  const adapter = getStoreAdapter();
+  if (adapter === null) {
+    return;
+  }
+  if (storeSync !== null && storeSync.adapter === adapter) {
+    return;
+  }
+  storeSync?.stop();
+  storeSync = {
+    adapter,
+    stop: adapter.observe(() => {
+      void syncProEntitlement();
+    }),
+  };
+  void syncProEntitlement();
+}
+
+/**
+ * Zakup produktu. Sukces wyłącznie przy potwierdzonej transakcji sklepu.
+ * Po sukcesie uprawnienia są uzgadniane z getAvailablePurchases; gdy odczyt się nie uda,
+ * Pro wynika z samej transakcji (sklep ją potwierdził).
+ */
+export async function purchaseProduct(productId: string): Promise<PurchaseStatus> {
+  const adapter = getStoreAdapter();
+  if (adapter === null) {
+    return 'unavailable';
+  }
+  let status: PurchaseStatus;
+  try {
+    status = (await adapter.purchase(productId)).status;
+  } catch {
+    return 'error';
+  }
+  if (status !== 'success') {
+    return status;
+  }
+  if ((await syncProEntitlement()) === 'error') {
+    setIsProUser(true);
+    notifyAccessChanged();
+  }
+  return 'success';
+}
+
+/** Przywracanie zakupów: odtwarza Pro z getAvailablePurchases (bez zapisu w kopii). */
+export async function restoreProPurchases(): Promise<RestoreOutcome> {
+  const outcome = await syncProEntitlement();
+  switch (outcome) {
+    case 'pro':
+      return 'restored';
+    case 'free':
+      return 'none';
+    case 'error':
+      return 'error';
+    case 'unavailable':
+      return 'unavailable';
+  }
+}
+
+/** Produkty ze sklepu; pusta lista, gdy sklep nie zna żadnego (stan startowy) lub nie odpowiada. */
+export async function listStoreProducts(): Promise<StoreProduct[]> {
+  const adapter = getStoreAdapter();
+  if (adapter === null) {
+    return [];
+  }
+  try {
+    return await adapter.listProducts();
+  } catch {
+    return [];
+  }
+}
+
+/** Ceny z App Store (displayPrice); w stanie startowym lista pusta i widok pokazuje tekst zastępczy. */
+export function useStoreProducts(): StoreProduct[] {
+  const [products, setProducts] = useState<StoreProduct[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    void listStoreProducts().then((list) => {
+      if (active && list.length > 0) {
+        setProducts(list);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return products;
+}
+
 export function useAppAccess() {
   const [access, setAccess] = useState<BrewAccessState>(() => getBrewAccessState());
 
@@ -83,6 +204,10 @@ export function useAppAccess() {
     return () => {
       accessListeners.delete(listener);
     };
+  }, []);
+
+  useEffect(() => {
+    ensureStoreSync();
   }, []);
 
   const refresh = () => {

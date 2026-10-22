@@ -2,7 +2,8 @@
 // Napar (Steepwise) — Apps4Brew Pass Paywall Modal ("Cheaper than Espresso")
 // Pricing: $0.99/mo, $4.99/yr, $14.99 Lifetime.
 // Model M5 S1: darmowy poziom = 7 dni parzenia w miesiącu; historia i dane zawsze dostępne.
-// Zakup nie jest jeszcze podpięty (etap 4b): plany i przywracanie pokazują „zakup niedostępny”.
+// Zakup i przywracanie przez StoreAdapter (etap 4b). Bez produktów w sklepie: „zakup niedostępny”.
+// Ceny: displayPrice ze sklepu, a gdy sklep nie zna produktów, tekst zastępczy z tłumaczeń.
 // Apps4Brew Studio — 100% Offline-First, Zero Telemetry.
 // ============================================================================
 
@@ -19,8 +20,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../core/theme';
 import { useTranslation } from '../core/i18n';
-import { useAppAccess } from '../core/app-access';
-import { describeFreeDays } from '../core/access-policy';
+import { purchaseProduct, restoreProPurchases, useAppAccess, useStoreProducts } from '../core/app-access';
+import { describeFreeDays, type ProPlan } from '../core/access-policy';
+import { STORE_PRODUCT_IDS, isSubscriptionPlan } from '../core/store-products';
+import type { PurchaseStatus } from '../core/store-port';
 import { ShieldIcon } from './icons/CraftIcons';
 
 interface Apps4BrewPassModalProps {
@@ -38,11 +41,53 @@ export function Apps4BrewPassModal({
 }: Apps4BrewPassModalProps) {
   const { t } = useTranslation();
   const { isPro, monthDaysUsed, freeDaysPerMonth, remainingDays } = useAppAccess();
+  const products = useStoreProducts();
 
-  // Zakup w aplikacji nie istnieje w tej wersji (etap 4a). Nie udajemy sukcesu:
-  // onPurchaseSuccess i onSubscribed zostają jako punkt podpięcia dla StoreAdapter (etap 4b).
-  const handlePurchaseUnavailable = () => {
-    Alert.alert(t.paywall.purchaseUnavailableTitle, t.paywall.purchaseUnavailableMsg);
+  const priceOf = (plan: ProPlan, fallback: string): string =>
+    products.find((product) => product.plan === plan)?.displayPrice ?? fallback;
+
+  // Sukces wyłącznie przy potwierdzonej transakcji (purchaseProduct); pozostałe statusy nie aktywują Pro.
+  const handlePurchase = async (plan: ProPlan) => {
+    const status: PurchaseStatus = await purchaseProduct(STORE_PRODUCT_IDS[plan]);
+    switch (status) {
+      case 'success':
+        if (isSubscriptionPlan(plan)) {
+          onSubscribed?.();
+        } else {
+          onPurchaseSuccess?.();
+        }
+        return;
+      case 'cancelled':
+        return;
+      case 'pending':
+        Alert.alert(t.paywall.purchasePendingTitle, t.paywall.purchasePendingMsg);
+        return;
+      case 'error':
+        Alert.alert(t.paywall.purchaseErrorTitle, t.paywall.purchaseErrorMsg);
+        return;
+      case 'unavailable':
+        Alert.alert(t.paywall.purchaseUnavailableTitle, t.paywall.purchaseUnavailableMsg);
+        return;
+    }
+  };
+
+  const handleRestore = async () => {
+    const outcome = await restoreProPurchases();
+    switch (outcome) {
+      case 'restored':
+        Alert.alert(t.paywall.restoredTitle, t.paywall.restoredMsg);
+        onPurchaseSuccess?.();
+        return;
+      case 'none':
+        Alert.alert(t.paywall.restoreNoneTitle, t.paywall.restoreNoneMsg);
+        return;
+      case 'error':
+        Alert.alert(t.paywall.restoreErrorTitle, t.paywall.restoreErrorMsg);
+        return;
+      case 'unavailable':
+        Alert.alert(t.paywall.purchaseUnavailableTitle, t.paywall.purchaseUnavailableMsg);
+        return;
+    }
   };
 
   const freeDaysText = describeFreeDays(
@@ -114,16 +159,16 @@ export function Apps4BrewPassModal({
           <Pressable
             testID="plan-annual-btn"
             style={[styles.planCard, styles.planCardFeatured]}
-            onPress={handlePurchaseUnavailable}
+            onPress={() => void handlePurchase('yearly')}
             accessibilityRole="button"
-            accessibilityLabel={`${t.paywall.planAnnualTitle} ${t.paywall.planAnnualPrice}`}
+            accessibilityLabel={`${t.paywall.planAnnualTitle} ${priceOf('yearly', t.paywall.planAnnualPrice)}`}
           >
             <View style={styles.featuredBadge}>
               <Text style={styles.featuredBadgeText}>{t.paywall.planAnnualBadge}</Text>
             </View>
             <View style={styles.planCardHeader}>
               <Text style={styles.planTitleFeatured}>{t.paywall.planAnnualTitle}</Text>
-              <Text style={styles.planPriceFeatured}>{t.paywall.planAnnualPrice}</Text>
+              <Text style={styles.planPriceFeatured}>{priceOf('yearly', t.paywall.planAnnualPrice)}</Text>
             </View>
             <Text style={styles.planDescFeatured}>{t.paywall.planAnnualDesc}</Text>
           </Pressable>
@@ -132,13 +177,13 @@ export function Apps4BrewPassModal({
           <Pressable
             testID="plan-lifetime-btn"
             style={styles.planCard}
-            onPress={handlePurchaseUnavailable}
+            onPress={() => void handlePurchase('lifetime')}
             accessibilityRole="button"
-            accessibilityLabel={`${t.paywall.planLifetimeTitle} ${t.paywall.planLifetimePrice}`}
+            accessibilityLabel={`${t.paywall.planLifetimeTitle} ${priceOf('lifetime', t.paywall.planLifetimePrice)}`}
           >
             <View style={styles.planCardHeader}>
               <Text style={styles.planTitle}>{t.paywall.planLifetimeTitle}</Text>
-              <Text style={styles.planPrice}>{t.paywall.planLifetimePrice}</Text>
+              <Text style={styles.planPrice}>{priceOf('lifetime', t.paywall.planLifetimePrice)}</Text>
             </View>
             <Text style={styles.planDesc}>{t.paywall.planLifetimeDesc}</Text>
           </Pressable>
@@ -147,13 +192,13 @@ export function Apps4BrewPassModal({
           <Pressable
             testID="plan-monthly-btn"
             style={styles.planCard}
-            onPress={handlePurchaseUnavailable}
+            onPress={() => void handlePurchase('monthly')}
             accessibilityRole="button"
-            accessibilityLabel={`${t.paywall.planMonthlyTitle} ${t.paywall.planMonthlyPrice}`}
+            accessibilityLabel={`${t.paywall.planMonthlyTitle} ${priceOf('monthly', t.paywall.planMonthlyPrice)}`}
           >
             <View style={styles.planCardHeader}>
               <Text style={styles.planTitle}>{t.paywall.planMonthlyTitle}</Text>
-              <Text style={styles.planPrice}>{t.paywall.planMonthlyPrice}</Text>
+              <Text style={styles.planPrice}>{priceOf('monthly', t.paywall.planMonthlyPrice)}</Text>
             </View>
             <Text style={styles.planDesc}>{t.paywall.planMonthlyDesc}</Text>
           </Pressable>
@@ -162,7 +207,7 @@ export function Apps4BrewPassModal({
           <Pressable
             testID="restore-purchases-btn"
             style={styles.restoreBtn}
-            onPress={handlePurchaseUnavailable}
+            onPress={() => void handleRestore()}
             accessibilityRole="button"
             accessibilityLabel={t.paywall.restore}
           >

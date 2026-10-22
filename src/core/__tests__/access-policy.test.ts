@@ -13,6 +13,7 @@ import {
   fillTemplate,
   getDayKey,
   getMonthKey,
+  hasProEntitlement,
   remainingFreeBrewDays,
 } from '../access-policy';
 
@@ -176,5 +177,13 @@ describe('fillTemplate i describeFreeDays (teksty banera i modala)', () => {
         templates
       )
     ).toBe('LIMIT 7/7');
+  });
+});
+
+describe('uprawnienia sklepu (Entitlement)', () => {
+  test('Pro = co najmniej jedno aktywne uprawnienie', () => {
+    expect(hasProEntitlement([])).toBe(false);
+    expect(hasProEntitlement([{ productId: 'p', plan: 'monthly' }])).toBe(true);
+    expect(hasProEntitlement([{ productId: 'a', plan: 'yearly' }, { productId: 'b', plan: 'lifetime' }])).toBe(true);
   });
 });
