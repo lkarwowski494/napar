@@ -90,7 +90,7 @@ export default function BrewScreen() {
     handleResetWithConfirm,
     isRunning,
     isPaused,
-    refreshData,
+    handleToggleRecipeFavorite,
   } = workflow;
 
   return (
@@ -144,9 +144,7 @@ export default function BrewScreen() {
         categoryFilter={recipeCategoryFilter}
         onCategoryFilterChange={setRecipeCategoryFilter}
         onSelectRecipe={handleSelectRecipe}
-        onToggleFavorite={(id) => {
-          refreshData();
-        }}
+        onToggleFavorite={handleToggleRecipeFavorite}
         onDuplicateRecipe={handleDuplicateRecipe}
         onEditRecipe={(id) => {
           setShowRecipeModal(false);

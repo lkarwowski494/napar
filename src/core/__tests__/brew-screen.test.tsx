@@ -3,7 +3,7 @@
 // ============================================================================
 
 import React from 'react';
-import { Share, Alert } from 'react-native';
+import { Share, Alert, Text } from 'react-native';
 import renderer, { act } from 'react-test-renderer';
 import BrewScreen from '../../../app/(tabs)/index';
 import { BrewProvider } from '../brew-context';
@@ -142,6 +142,10 @@ const mockDb: any = {
   runSync: jest.fn((q, p) => {
     if (q.includes('INSERT OR REPLACE INTO app_settings')) {
       mockDb.app_settings.set(p?.[0], p?.[1]);
+    }
+    if (q.includes('UPDATE recipes SET is_favorite = ?')) {
+      const recipe = mockDb.recipes.get(p?.[1]);
+      if (recipe) recipe.is_favorite = p?.[0];
     }
   }),
   prepareSync: jest.fn(() => ({
@@ -1598,6 +1602,59 @@ describe('BrewScreen UI Integration', () => {
     act(() => {
       finishBtns[0].props.onPress();
     });
+  });
+
+  test('Ulubione (★) receptury przełączają stan w bazie i w liście wyboru', () => {
+    mockDb.recipes.set('rec-fav-toggle', {
+      id: 'rec-fav-toggle',
+      name: 'Ulubiona Kawa Test',
+      beverage_type: 'COFFEE',
+      method: 'V60',
+      author: 'Test',
+      dose_g: 15,
+      water_g: 250,
+      water_temp_c: 93,
+      recommended_ratio: 16.7,
+      steps_json: '[]',
+      is_custom: 1,
+      is_favorite: 0,
+      created_at: '2026-10-10',
+    });
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+    act(() => {
+      findPressableWithText(tree.root, 'RECEPTURA').props.onPress();
+    });
+
+    const starOf = () =>
+      tree.root
+        .findByProps({ accessibilityLabel: 'Ulubione: Ulubiona Kawa Test' })
+        .findAllByType(Text)
+        .map((node: any) => node.props.children)
+        .join('');
+    const press = () =>
+      act(() => {
+        tree.root
+          .findByProps({ accessibilityLabel: 'Ulubione: Ulubiona Kawa Test' })
+          .props.onPress({ stopPropagation: () => {} });
+      });
+
+    expect(starOf()).toBe('☆');
+    press();
+    expect(mockDb.recipes.get('rec-fav-toggle').is_favorite).toBe(1);
+    expect(starOf()).toBe('★');
+    press();
+    expect(mockDb.recipes.get('rec-fav-toggle').is_favorite).toBe(0);
+    expect(starOf()).toBe('☆');
+
+    mockDb.recipes.delete('rec-fav-toggle');
   });
 
   test('BPR Krok 1: Wyszukiwarka receptur, filtr podzbiorów oraz zwijanie kategorii w RecipeSelectModal', () => {

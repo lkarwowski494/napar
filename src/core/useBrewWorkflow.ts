@@ -430,6 +430,15 @@ export function useBrewWorkflow() {
     setShowRecipeModal(true);
   };
 
+  // Ulubione (★) przełączane w bazie; odświeżenie listy receptur i ulubionych w UI
+  const handleToggleRecipeFavorite = useCallback(
+    (recipeId: string) => {
+      toggleRecipeFavorite(recipeId);
+      refreshData();
+    },
+    [refreshData]
+  );
+
   const handleOpenInventoryInline = () => {
     setShowRecipeModal(false);
     setShowInventoryModal(true);
@@ -526,5 +535,6 @@ export function useBrewWorkflow() {
     isRunning,
     isPaused,
     refreshData,
+    handleToggleRecipeFavorite,
   };
 }
