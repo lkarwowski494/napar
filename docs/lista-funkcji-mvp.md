@@ -118,3 +118,11 @@ Numery zachowane z poprzedniej listy. Status: **MVP** (pierwsza wersja), **1.1**
 **Alternatywa:** 10 dni (59% trafia na blokadę, ok. 65% płacących z wariantu 5). Mniej ryzyka ocen, mniej płacących w modelu.
 
 Limit 15 z poprzedniej decyzji nie obowiązuje.
+
+## Decyzja właściciela: limit darmowego poziomu = 10 dni parzenia/mies. (22.10.2026)
+
+Zastępuje rekomendację 5 dni z korekty powyżej. Uzasadnienie właściciela: kawę pija się częściej niż trenuje.
+
+**Otwarte, do zrobienia przed wyliczeniem przychodu:** model z `trening` używa częstotliwości treningowej (1–5 razy w tygodniu, z maksimum 5). Dla kawy częstotliwość jest wyższa, więc udział trafiających na limit przy 10 dniach jest prawdopodobnie większy niż 59%. Trzeba ponownie uruchomić model z rozkładem częstotliwości dla parzenia kawy (dziś nieznanym, do oszacowania) i dopiero wtedy traktować liczbę płacących jako punkt odniesienia.
+
+Warunki z korekty obowiązują bez zmian: blokada nie przerywa trwającego parzenia, historia i eksport zawsze dostępne, ekran pokazuje pozostałe dni przed blokadą, pomiar po premierze (blokady i recenzje 1–2★).
