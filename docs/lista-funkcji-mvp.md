@@ -72,3 +72,12 @@ Numery zachowane z poprzedniej listy. Status: **MVP** (pierwsza wersja), **1.1**
 - **Rekomendacja: B**, chyba że 35 języków jest warunkiem sprzedaży, czego nie wiem.
 
 **Liczba:** 31 pozycji MVP, 2 w wersji 1.1 (6, 18), 1 później (21). Po uwagach A i B (bez 22 i 32): 29 MVP.
+
+## Decyzje właściciela (22.10.2026)
+
+- **A — pozycja 22 (Live Activity i Apple Watch) w MVP.** Zaakceptowane z kosztem czasu. Odstępstwo od rekomendacji 1.1.
+- **B — pozycja 32 (napoje mleczne i latte art) w MVP.** Zaakceptowane. Odstępstwo od rekomendacji „później”.
+- **C — pozycja 34 (zakupy) według modelu z repo `trening` (M5 S1), zamiast modelu „piekarza”.** Struktura: darmowy poziom z limitem, Pro bez limitu (subskrypcja miesięczna, roczna albo dożywotnia), bez okresu próbnego i bez ofert wprowadzających, dane (historia, edycja, eksport, kopia) zawsze dostępne. Otwarte: jednostka i wielkość limitu, ceny, Family Sharing, kody ofertowe. Zastępuje decyzje D3/D4 z planu przebudowy w tym zakresie.
+- **D — pozycja 35 (języki): bez decyzji.** Pozostaje otwarta.
+
+**Liczba MVP:** 31 (bez zmian po akceptacji A i B).
