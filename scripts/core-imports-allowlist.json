@@ -1,0 +1,23 @@
+{
+  "opis": "Dług techniczny CLAUDE.md §2.1 (src/core bez react/react-native/expo-*). Stan na 22.10.2026, commit f07796f. Każdy wpis znika, gdy plik zostanie przeniesiony poza src/core albo oczyszczony z importów. Nowych wpisów nie dodajemy.",
+  "files": [
+    "src/core/QrScannerModal.tsx",
+    "src/core/announce.ts",
+    "src/core/app-access.ts",
+    "src/core/backup.ts",
+    "src/core/brew-context.tsx",
+    "src/core/caffeine-chart.tsx",
+    "src/core/confirm.ts",
+    "src/core/database.ts",
+    "src/core/flavor-wheel-picker.tsx",
+    "src/core/healthkit.ts",
+    "src/core/i18n.tsx",
+    "src/core/live-activity.ts",
+    "src/core/qr-code.tsx",
+    "src/core/radar-chart.tsx",
+    "src/core/timer-audio.ts",
+    "src/core/timer-engine.ts",
+    "src/core/useBrewWorkflow.ts",
+    "src/core/useJournalAnalytics.ts"
+  ]
+}

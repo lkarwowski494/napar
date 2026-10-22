@@ -1,0 +1,159 @@
+{
+  "opis": "Rejestr twierdzeń do weryfikacji źródłami (etap 0 planu przebudowy, 22.10.2026). Wpisy z raportu G6 (docs/audyt-etap1/etap1-G6-rejestr-twierdzen.md). Status 'do sprawdzenia' do czasu wpisania źródła pierwotnego i daty przeglądu. Nie wolno wprowadzać stałej ani tekstu dziedzinowego bez wpisu.",
+  "wpisy": [
+    {
+      "id": "T-019",
+      "plik_linia": "src/core/domain-rules.ts:172",
+      "cytat": "const baseRatePerGram = beanType === 'robusta' ? 22.0 : 12.0;",
+      "kategoria": "PRIORYTET: kofeina-zdrowie",
+      "typ": "liczba",
+      "uwaga": "Stałe mg/g: Robusta 22,0 / Arabica 12,0; sprzeczne z komentarzem l.162-163 (T-017/T-018)",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-036",
+      "plik_linia": "src/core/domain-rules.ts:231",
+      "cytat": "Poziom kofeiny o porze snu (${totalRemaining} mg) jest bezpieczny dla fazy głębokiej NREM.",
+      "kategoria": "PRIORYTET: sen",
+      "typ": "twierdzenie-zdrowotne",
+      "uwaga": "Twierdzenie: poziom ≤25 mg „bezpieczny dla fazy głębokiej NREM” (brak źródła)",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-073",
+      "plik_linia": "src/core/water-chemistry.ts:119",
+      "cytat": "Światowy punkt odniesienia do cuppingu i dripa V60. Zrównoważona i powtarzalna.",
+      "kategoria": "PRIORYTET: woda-chemia",
+      "typ": "cytat-autorytet",
+      "uwaga": "Ocena „światowy punkt odniesienia” dla Volvic (marka)",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-079",
+      "plik_linia": "src/core/water-chemistry.ts:152",
+      "cytat": "Zbyt twarda do ekstrakcji specialty. Zabija kwasowość, powoduje kredowy posmak i niszczy czajnik.",
+      "kategoria": "PRIORYTET: woda-chemia",
+      "typ": "twierdzenie-faktograficzne",
+      "uwaga": "Twierdzenie o szkodliwości wody Muszynianka (brak źródła)",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-139",
+      "plik_linia": "src/components/caffeine/BedtimeCurfewCard.tsx:65-69",
+      "cytat": "halfLifeHours <= 3.5 ? 'Szybki klirens (CYP1A2 *1A)'` / `: halfLifeHours >= 6.5 ? 'Wolny klirens wątrobowy'` / `: 'Standardowy klirens (EFSA)'",
+      "kategoria": "PRIORYTET: kofeina-zdrowie",
+      "typ": "twierdzenie-zdrowotne",
+      "uwaga": "Klasyfikacja metabolizmu kofeiny wg t½ (3,5 h / 6,5 h) z odniesieniem do genotypu CYP1A2 *1A i EFSA",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-141",
+      "plik_linia": "src/components/caffeine/BedtimeCurfewCard.tsx:117",
+      "cytat": "Ostatni przelew (140 mg) wypij do {curfewTimeString}",
+      "kategoria": "PRIORYTET: sen",
+      "typ": "liczba",
+      "uwaga": "Zalecenie „ostatni przelew 140 mg” do godziny curfew; 140 mg ≠ wzór (T-024 daje ~190 mg dla 18 g filtra)",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-142",
+      "plik_linia": "src/components/settings/CaffeineSettingsCard.tsx:36",
+      "cytat": "Wskaźnik klirensu wątrobowego (3.0h–8.0h, domyślnie 5.0h wg EFSA).",
+      "kategoria": "PRIORYTET: kofeina-zdrowie",
+      "typ": "nazwa-marki-osoby",
+      "uwaga": "Atrybucja „domyślnie 5.0h wg EFSA”; zakres t½ 3,0–8,0 h (do weryfikacji źródłem EFSA)",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-149",
+      "plik_linia": "app/(tabs)/caffeine.tsx:185",
+      "cytat": "Dobowy bilans: {Math.round(totalConsumedTodayMg)} mg / 400 mg (Zalecenie EFSA)",
+      "kategoria": "PRIORYTET: EFSA",
+      "typ": "nazwa-marki-osoby",
+      "uwaga": "Norma dobowa 400 mg „Zalecenie EFSA” (do weryfikacji źródłem EFSA)",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-152",
+      "plik_linia": "src/components/caffeine/CaffeineQuickAddModal.tsx:32",
+      "cytat": "onSelectOption('Kawa przelewowa (V60 / Drip)', 'coffee', 18, 140)",
+      "kategoria": "PRIORYTET: kofeina-zdrowie",
+      "typ": "liczba",
+      "uwaga": "Szybki wpis: przelew 18 g = 140 mg. NIESPÓJNE z wzorem RD-17 (domyślnie 18×12×0,88 ≈ 190 mg) – T-019/T-020/T-024",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-343",
+      "plik_linia": "app-access.ts:11 / :12",
+      "cytat": "export const TRIAL_MAX_BREWS = 15;` / `export const TRIAL_DURATION_DAYS = 14;",
+      "kategoria": "PRIORYTET: ekonomia",
+      "typ": "liczba",
+      "uwaga": "Okres próbny: 14 dni lub 15 parzeń. NIESPÓJNE z README.md:72 („7 dni lub 3 parzenia”)",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-345",
+      "plik_linia": "src/core/app-access.ts:205-207",
+      "cytat": "transactionId: \\`TX-SK-${Date.now()}-...\\`,` / `signature: \\`SIG-APPS4BREW-${tier.toUpperCase()}-${Date.now()}\\`,",
+      "kategoria": "ekonomia",
+      "typ": "twierdzenie-faktograficzne",
+      "uwaga": "Lokalnie generowane identyfikatory transakcji/podpisu (symulacja zakupu) – do weryfikacji zgodności z zasadami płatności",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-355",
+      "plik_linia": "src/core/i18n.tsx:76 / :497",
+      "cytat": "flavorWheelLabel: 'Koło Smaków SCA',` / `flavorWheelLabel: 'SCA Flavor Wheel',",
+      "kategoria": "PRIORYTET: odmiany-procesy-kraje",
+      "typ": "nazwa-marki-osoby",
+      "uwaga": "Użycie nazwy „SCA” i „SCA Flavor Wheel” (znak towarowy/nazwa organizacji)",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-363",
+      "plik_linia": "README.md:72",
+      "cytat": "Free Trial: 7 dni lub 3 parzenia",
+      "kategoria": "PRIORYTET: ekonomia",
+      "typ": "liczba",
+      "uwaga": "README: okres próbny 7 dni lub 3 parzenia – NIESPÓJNE z kodem (14 dni / 15 parzeń, T-343)",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "T-364",
+      "plik_linia": "README.md:71",
+      "cytat": "**Cennik:** $0.99 USD / mies. (~4,49 zł), $4.99 USD / rok (~22,99 zł, oferta główna!), $14.99 USD Lifetime (~69,99 zł na zawsze z Chmurą rodzinną F…",
+      "kategoria": "PRIORYTET: ekonomia",
+      "typ": "liczba",
+      "uwaga": "Cennik w README (USD + przeliczenia zł) – NIESPÓJNE z pl.json (3,99 / 19,99 / 59,99 zł) i kodem (USD/EUR)",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    }
+  ]
+}

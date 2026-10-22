@@ -153,3 +153,14 @@ Suma agenta dla MVP: około **7–11 dni**. Realny kalendarz: **3–5 tygodni**,
 - **Zastrzeżenie:** liczby płacących w modelu zakładają częstotliwość treningową. Przed liczeniem przychodu trzeba je ponownie policzyć z częstotliwością kawową.
 
 **Nadal otwarte (blokują konkretne etapy):** D7 licencja (blokuje wydanie), D8 ścieżka bazy (test na symulatorze przed etapem 2), D9 progi pokrycia (etap 0), zgoda na kopiowanie kodu z `trening` (etap 4 i 6, jeśli kopiujemy zamiast przepisywać).
+
+## Status etapu 0 (22.10.2026)
+
+Zrobione na gałęzi `claude/wykonaj-sl7vii`:
+- **Progi pokrycia (D9, wariant A):** ustawione na wartości zmierzone, zaokrąglone w dół (`jest.config.js`). Globalnie: instrukcje 92, funkcje 91, linie 93; `src/core/`: instrukcje 97, gałęzie 88, linie 97; `knowledge-data.ts` i `app-access.ts`: progi obniżone do stanu. Cel 100% zostaje w planie do etapu 1–2.
+- **Reguła CLAUDE.md §2.1:** `scripts/check-core-imports.mjs`, dodana do `npm run verify`. Istniejące naruszenia (18 plików) są w `scripts/core-imports-allowlist.json` jako dług techniczny. Nowe naruszenie kończy się błędem, a plik usunięty z naruszeń wymaga usunięcia wpisu.
+- **Rejestr twierdzeń:** `docs/research/rejestr-twierdzen.json`, 14 wpisów z priorytetów G6. Wszystkie w statusie „do sprawdzenia”.
+
+Wynik bramki: `npm run verify` kod 0 (77 zestawów, 649 testów); `npm run test:coverage` kod 0 z nowymi progami.
+
+Dług do spłaty w etapach 1–2: 18 plików w allowliście (zlikwidowany wraz z przepisaniem domeny i warstwy UI), progi 100% w `src/core/` (wracamy do nich w miarę przepisywania).

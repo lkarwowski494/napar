@@ -15,8 +15,9 @@
     "check:matrix": "node scripts/test-matrix.mjs --check",
     "check:native": "node scripts/verify-native.mjs",
     "check": "npm run check:i18n && npm run check:licenses && npm run check:corpus && npm run check:matrix && npm run check:native && npm run typecheck && npm run test:coverage",
-    "verify": "npm run check:i18n && npm run check:licenses && npm run check:corpus && npm run check:matrix && npm run check:native && npm run typecheck && npm test",
-    "test:mutation": "stryker run"
+    "verify": "npm run check:i18n && npm run check:licenses && npm run check:corpus && npm run check:matrix && npm run check:native && npm run check:core-imports && npm run typecheck && npm test",
+    "test:mutation": "stryker run",
+    "check:core-imports": "node scripts/check-core-imports.mjs"
   },
   "dependencies": {
     "@types/qrcode": "^1.5.6",
