@@ -41,8 +41,8 @@ Data: 22.10.2026. Źródło: publiczny kanał RSS recenzji App Store (`itunes.ap
 **Próba:** ok. 120 unikalnych recenzji z 9 aplikacji (kraje US, GB, DE, FR, CA, AU, PL). Większość recenzji siedzi w 2–3 aplikacjach (FourSix, Single Origin); pozostałe mają 1–16 recenzji lub brak danych w kanale. Wiele zarzutów się powtarza między krajami, więc to ta sama próba, nie niezależne potwierdzenie.
 
 **Nowi konkurenci (z wyszukiwania, bez pełnych recenzji):**
-- **Brew Timer – Coffee Recipes** — płatna; ustawienia pod młynek, korekty wody, automatyczny dziennik. [App Store/SimilarWeb](https://similarweb.com/app/apple/1519905670). **To pokrywa się z naszą hipotezą „młynek + dziennik”.**
-- **Barista – Coffee Timer** — płatna; V60 i AeroPress, wagi wody na każdym kroku. [SimilarWeb](https://similarweb.com/app/apple/1286975088).
+- **Brew Timer – Coffee Recipes** — płatna; ustawienia pod młynek, korekty wody, automatyczny dziennik. Źródło: wynik wyszukiwania (SimilarWeb), adres strony nie został przypisany do aplikacji — **do weryfikacji w App Store**. **To pokrywa się z naszą hipotezą „młynek + dziennik”.**
+- **Barista – Coffee Timer** — płatna; V60 i AeroPress, wagi wody na każdym kroku. Źródło: wynik wyszukiwania (SimilarWeb), adres do weryfikacji w App Store.
 - **Simple Coffee Timer** — premiera kwiecień 2026; V60 i AeroPress, przeliczanie proporcji, Live Activity. [mwm.ai](https://mwm.ai/apps/simple-coffee-timer/6761335857). Ma recenzje 3★: edycja receptur w małych polach, brak zmiany wagi kawy, brak zapisu odmiany mielenia.
 - **Brewly: Coffee Timer & Journal**, **Coffee DTR Timer** — dziennik i timer w jednej aplikacji. [AppsHunter](https://appshunter.io/ios/app/brewly-coffee-timer-and-journal/id6738063344/similar).
 - **Tea Brew Timer & Journal** — zapis notatek degustacyjnych, od oolong po pu-erh; strona oznaczona „Designed for iPad”. [App Store](https://apps.apple.com/us/app/-/id6745836038). **Nisza herbaty z dziennikiem już jest zajęta.**
