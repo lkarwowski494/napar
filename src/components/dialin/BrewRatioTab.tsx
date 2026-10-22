@@ -8,6 +8,7 @@ import {
 import { formatDoseWeight, formatWaterWeight } from '../../core/unit-converter';
 import { theme } from '../../core/theme';
 import { GrinderConverterCard } from './GrinderConverterCard';
+import { parseDecimal } from '../../core/parse-decimal';
 
 export interface BrewRatioTabProps {
   language: string;
@@ -38,7 +39,7 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
 
   const handleDoseChange = (text: string) => {
     setDoseInput(text);
-    const d = parseFloat(text);
+    const d = parseDecimal(text);
     if (!isNaN(d) && d > 0) {
       const w = calculateBrewWater(d, ratioVal);
       setWaterCalcResult(w);
@@ -48,7 +49,7 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
 
   const handleWaterChange = (text: string) => {
     setWaterInput(text);
-    const w = parseFloat(text);
+    const w = parseDecimal(text);
     if (!isNaN(w) && w > 0) {
       const d = calculateBrewDose(w, ratioVal);
       setDoseCalcResult(d);
@@ -59,14 +60,14 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
   const handleRatioSelect = (newRatio: number) => {
     setRatioVal(newRatio);
     if (calcDirection === 'doseToWater') {
-      const d = parseFloat(doseInput);
+      const d = parseDecimal(doseInput);
       if (!isNaN(d) && d > 0) {
         const w = calculateBrewWater(d, newRatio);
         setWaterCalcResult(w);
         setYieldResult(calculateLiquidYield(w, d));
       }
     } else {
-      const w = parseFloat(waterInput);
+      const w = parseDecimal(waterInput);
       if (!isNaN(w) && w > 0) {
         const d = calculateBrewDose(w, newRatio);
         setDoseCalcResult(d);
@@ -78,14 +79,14 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
   const handleDirectionChange = (dir: 'doseToWater' | 'waterToDose') => {
     setCalcDirection(dir);
     if (dir === 'doseToWater') {
-      const d = parseFloat(doseInput);
+      const d = parseDecimal(doseInput);
       if (!isNaN(d) && d > 0) {
         const w = calculateBrewWater(d, ratioVal);
         setWaterCalcResult(w);
         setYieldResult(calculateLiquidYield(w, d));
       }
     } else {
-      const w = parseFloat(waterInput);
+      const w = parseDecimal(waterInput);
       if (!isNaN(w) && w > 0) {
         const d = calculateBrewDose(w, ratioVal);
         setDoseCalcResult(d);
