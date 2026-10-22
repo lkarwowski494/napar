@@ -179,3 +179,18 @@ Otwarte (nie blokują etapu 2):
 - Tabele czasów Gongfu: komentarz i kod różnią się dla pięciu typów herbaty.
 - RD-19: suma procentów przy kolejnych zalaniach przekracza 100 % od 7. zalania.
 - Ocena zalania Gongfu: UI nie ma kontrolki, więc ocena sesji to `null`. To decyzja produktowa (dodać kontrolkę czy zostawić `null`); na razie wybrana opcja `null`.
+
+## Status etapu 2 (22.10.2026)
+
+Zrobione na gałęzi `claude/wykonaj-sl7vii`:
+- **Port bazy:** `src/core/db-port.ts` (`DbPort`, API synchroniczne jak w expo-sqlite). Repozytoria w `src/core/repositories/` (schemat i migracje, przepisy, spiżarnia, dziennik, kofeina, ustawienia) nie importują expo. Adapter expo-sqlite i katalog bazy są w `src/platform/sqlite-adapter.ts`, podpinane w `src/platform/bootstrap.ts`. `src/core/database.ts` i `src/core/backup.ts` nie importują już expo/react, więc zniknęły z `scripts/core-imports-allowlist.json` (dług: 16 plików).
+- **Lokalizacja bazy (D8, wariant B):** czysta funkcja `openDatabaseLocation` w `src/core/db-location.ts` (exists/makeDirectory/open wstrzyknięte). Przy błędzie otwarcia `/Library/SQLite` baza otwiera się w domyślnej ścieżce, a powód zapisuje się w ustawieniu `db_location_fallback` (`getDatabaseFallback()`).
+- **Kopia zapasowa, format v2:** `{ format: 'napar-backup', version: 2, exportedAt, state }`. Eksport i kopia przed importem bez limitów (sesje, kofeina). Import akceptuje v2 oraz v1 w obu wariantach (zapis automatyczny z `schemaVersion: 1` i dawny eksport `version: 1`), odrzuca nieznane i nowsze. Ścieżka importu w `app/settings.tsx` używa `parseAndValidateBackup`, a zapis jest atomowy (jedna transakcja). Ustawienia wracają z kopii; `is_pro_active` i `db_location_fallback` są pomijane (stan Pro pochodzi z zakupu, nie z pliku).
+- **CSV:** każda komórka i nagłówek przechodzą przez `escapeCsvCell` (`src/core/csv-export.ts`). Prefiks `'` dla `= + - @ TAB CR`, także dla ujemnych liczb (wcześniej wyjątek).
+- **Test okrągły na prawdziwym SQL:** `tests/backup-roundtrip.test.ts` na sql.js 1.14.2 (devDependency; opublikowany 14.08.2026, czyli ponad 2 tygodnie temu). Test obejmuje sesje, paczki, receptury, ustawienia i kofeinę, w liczności powyżej dawnych limitów. Receptury startowe porównywane są po identyfikatorach, bo `created_at` zapisuje aplikacja przy instalacji.
+- **Bramka:** progi 100% (instrukcje, gałęzie, funkcje, linie) w `jest.config.js` dla `src/core/repositories/`, `backup.ts`, `csv-export.ts` i `db-location.ts`. Progi globalne i per-moduł z etapów 0–1 bez zmian.
+
+Otwarte (nie blokują etapu 3, wymagają weryfikacji):
+- **D8 na symulatorze/urządzeniu:** utworzenie `/Library/SQLite` przez `Directory.create`, fallback przy nieudanym otwarciu, oraz co dzieje się z danymi, które dawniej leżały w `Documents/SQLite` (tej migracji plik nie wykonuje; zachowanie wyboru ścieżki jest takie samo jak w `db-path.ts`).
+- **Decyzja właściciela:** czy stan Pro i klucze lokalne są poza kopią (obecnie tak).
+- Testy na sql.js sprawdzają SQL i logikę kopii, a nie sterownik expo-sqlite na urządzeniu.
