@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,11 @@ import {
   Pressable,
   Modal,
   Share,
-  Alert,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
+import { announce } from '../../core/announce';
 import { QrCodeSvg } from '../../core/qr-code';
 import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../core/unit-converter';
 import { MasterRecipe } from '../../core/recipes-data';
@@ -35,6 +36,23 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
   unitSystem,
   t,
 }) => {
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
+
+  useEffect(() => {
+    if (!visible) setCopyStatus('idle');
+  }, [visible]);
+
+  const handleCopyLink = async () => {
+    try {
+      await Clipboard.setStringAsync(shareUrl);
+      setCopyStatus('copied');
+      announce(t.brew.qrCopied);
+    } catch {
+      setCopyStatus('failed');
+      announce(t.brew.qrCopyFailed);
+    }
+  };
+
   return (
     <Modal visible={visible} animationType="slide">
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
@@ -95,15 +113,24 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
             <Pressable
               testID="copy-link-btn"
               style={[styles.shareActionBtn, styles.shareActionBtnSecondary]}
-              onPress={() => {
-                Alert.alert('Link receptury', shareUrl);
-              }}
+              onPress={handleCopyLink}
+              accessibilityRole="button"
             >
               <Text style={styles.shareActionBtnTextSecondary}>
                 {t.brew.qrCopyLink}
               </Text>
             </Pressable>
           </View>
+
+          {copyStatus !== 'idle' && (
+            <Text
+              testID="copy-link-status"
+              accessibilityLiveRegion="polite"
+              style={styles.copyStatusText}
+            >
+              {copyStatus === 'copied' ? t.brew.qrCopied : t.brew.qrCopyFailed}
+            </Text>
+          )}
         </ScrollView>
       </SafeAreaView>
     </Modal>
@@ -111,6 +138,12 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  copyStatusText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+  },
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.bg,

@@ -5,12 +5,17 @@
 import React from 'react';
 import { Share, Alert, Text } from 'react-native';
 import renderer, { act } from 'react-test-renderer';
+import * as Clipboard from 'expo-clipboard';
 import BrewScreen from '../../../app/(tabs)/index';
 import { BrewProvider } from '../brew-context';
 import { QrScannerModal } from '../QrScannerModal';
 import { encodeRecipeToShareUrl } from '../recipe-share';
 import { MASTER_RECIPES } from '../recipes-data';
 import { exhaustedFreeBrewDaysValue } from '../../../tests/helpers/free-brew-days';
+
+jest.mock('expo-clipboard', () => ({
+  setStringAsync: jest.fn(() => Promise.resolve(true)),
+}));
 
 jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
 jest.spyOn(Alert, 'alert').mockImplementation(() => {});
@@ -939,7 +944,7 @@ describe('BrewScreen UI Integration', () => {
     expect(JSON.stringify(tree.toJSON())).toContain('Kolumbia Geisha Special');
   });
 
-  test('Modal udostępniania QR i Linku pozwala udostępnić, skopiować link i zamknąć modal', () => {
+  test('Modal udostępniania QR i Linku pozwala udostępnić, skopiować link i zamknąć modal', async () => {
     let tree: any;
     act(() => {
       tree = renderer.create(
@@ -965,12 +970,15 @@ describe('BrewScreen UI Integration', () => {
       shareBtn.props.onPress();
     });
 
-    // Kliknij kopiuj
+    // Kliknij kopiuj: link trafia do schowka
     const copyBtn = tree.root.findByProps({ testID: 'copy-link-btn' });
     expect(copyBtn).toBeDefined();
-    act(() => {
-      copyBtn.props.onPress();
+    await act(async () => {
+      await copyBtn.props.onPress();
     });
+    expect(Clipboard.setStringAsync).toHaveBeenCalledWith(
+      expect.stringContaining('napar://recipe?v=1&d=')
+    );
 
     // Zamknij modal
     const closeBtn = tree.root.findByProps({ testID: 'close-share-modal-btn' });

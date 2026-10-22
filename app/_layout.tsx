@@ -51,6 +51,13 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
+              name="recipe"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
               name="gongfu"
               options={{
                 presentation: 'modal',
