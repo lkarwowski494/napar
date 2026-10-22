@@ -1,6 +1,6 @@
 # Napar (Steepwise)
 
-Stan na **22.10.2026** (commit bazowy `3cfdf1a`, gałąź `claude/wykonaj-sl7vii`). Ten plik opisuje to, co kod faktycznie robi, i zakres MVP. Poprzednia wersja README (z twierdzeniami bez pokrycia) jest w `docs/archiwum/README-do-2026-10-22.md`.
+Stan na **22.10.2026** (commit z pomiarów `984f628`, gałąź `claude/wykonaj-sl7vii`). Ten plik opisuje to, co kod faktycznie robi, i zakres MVP. Poprzednia wersja README (z twierdzeniami bez pokrycia) jest w `docs/archiwum/README-do-2026-10-22.md`.
 
 ## Czym jest Napar
 
@@ -39,24 +39,24 @@ Legenda statusów:
 | # | Funkcja MVP | Status | Dowód i czego brakuje |
 |---|---|---|---|
 | 1 | Kompendium odmian, procesów i regionów, bez nazw marek | DZIAŁA | `src/core/knowledge-data.ts`, `knowledge.test.ts`. |
-| 2 | Zapas paczek: palarnia, data palenia, waga, cena, ubytek, ostrzeżenie przy pustej paczce | CZĘŚCIOWO | `app/(tabs)/beans.tsx`, `BeanEditModal.tsx` (archiwizacja przy 0 g). Brak potwierdzenia ostrzeżenia na karcie paczki. |
+| 2 | Zapas paczek: palarnia, data palenia, waga, cena, ubytek, ostrzeżenie przy pustej paczce | DZIAŁA | Baner „Paczka skończona (0 g)” z jedną akcją „Archiwizuj teraz”: `src/components/beans/BeanItemCard.tsx` (ok. l. 95–112), test `src/core/__tests__/stash-screen.test.tsx` („Paczka ze stanem 0g…”). Trwałe usunięcie tylko przez `lib/confirm` w `BeanEditModal.tsx`. |
 | 4 | Okna świeżości (odpoczynek, szczyt, starzenie) | CZĘŚCIOWO | `bpr-engine.ts` i `domain-rules.ts` podają różne progi (odgazowanie 7 dni w jednym, 5 dni w drugim; szczyt 7–35 dni w jednym, 6–30 w drugim). Do ujednolicenia. |
 | 7 | Profile wody predefiniowane, bez nazw marek wód butelkowanych | CZĘŚCIOWO | `src/core/water-chemistry.ts` nadal zawiera nazwy marek wód (Volvic, Żywiecki Kryształ, Żywiec Zdrój, Muszynianka). |
 | 8 | Kalkulator mineralizacji z koncentratów i soli | DZIAŁA | `water-chemistry.ts`, `water-chemistry.test.ts`. |
 | 9 | Własna woda: twardość i zasadowość z raportu wodociągów | DZIAŁA | `src/components/dialin/OwnWaterCard.tsx`, `own-water.ts`, `own-water.test.ts`. Zasady przeliczeń: rejestr D-002. |
 | 10 | Młynki z przelicznikiem kliknięć, dane zweryfikowane | CZĘŚCIOWO | `grinder-converter.ts`, `grinder-converter.test.ts`. Dane młynków nie są zweryfikowane (wpisy rejestru w statusie „do sprawdzenia”). Przykłady kliknięć w README z poprzedniej wersji nie wynikają z kodu. |
-| 11 | Własny młynek i własna metoda | CZĘŚCIOWO | Własna metoda: kreator receptur (`app/recipe-builder.tsx`), DZIAŁA. Własnego młynka nie znaleziono w kodzie. |
+| 11 | Własny młynek i własna metoda | DZIAŁA | Własny młynek: `src/core/custom-grinder.ts`, `src/core/repositories/custom-grinders.ts` (zapis w `app_settings`, kopia zapasowa), `src/components/dialin/CustomGrinderCard.tsx`; testy `custom-grinder.test.ts`, `repositories-custom-grinders.test.ts`, `CustomGrinderCard.test.tsx`. Własna metoda: wolne pole metody w kreatorze (`app/recipe-builder.tsx`, `RecipeBasicInfoCard.tsx`). |
 | 12 | Kalibracja przelicznika kliknięć z własnych parzeń | DZIAŁA | `GrinderCalibrationCard.tsx`, `grinder-calibration.ts`, `grinder-calibration.test.ts`. Limity: ±5 kliknięć, min. 3 pary (rejestr S-093, S-095). |
 | 13 | Kalkulator proporcji w obie strony | DZIAŁA | `src/components/dialin/BrewRatioTab.tsx`, `calculateBrewDose` w `domain-rules.ts`. |
-| 14 | Zakres wagi bez sztywnego minimum | NIE USTALONO | Komponent `NumInput` ma opcjonalne `min`. Nie ustalono z kodu, czy pola wagi go nie ustawiają. |
+| 14 | Zakres wagi bez sztywnego minimum | DZIAŁA | Steper dozy i wody zatrzymuje się na 0 g (wcześniej 1 g i 10 g): `src/core/weight-range.ts`, `BrewQuickPrepCard.tsx`. Pole `NumInput` nie ma min/max. Testy granic: `weight-range.test.ts`, `weight-input.test.tsx` (5 g, 270 g, 320 g, 500 g). Brak górnego limitu wagi w kodzie. |
 | 15 | Skalowanie na porcje | DZIAŁA | `calculateBatchScaling` (RD-06, 1–4 osoby) w `domain-rules.ts`, `BrewQuickPrepCard.tsx`. |
 | 16 | Kroki metod: V60, Chemex, French press, AeroPress (obie metody), espresso, Kalita | DZIAŁA | `src/core/recipes-data.ts`: V60, CHEMEX, FRENCH_PRESS, AEROPRESS (odwrócona i klasyczna), ESPRESSO, KALITA. |
 | 17 | Sesja Gongfu: rundy, czasy, kofeina na rundę | CZĘŚCIOWO | `app/gongfu.tsx`, `gongfu.test.ts`, `gongfu-screen.test.tsx`. Brak kontrolki oceny zalania w UI (ocena sesji może być pusta). |
 | 19 | Sygnał dźwiękowy i haptyczny przy końcu kroku | DO ZWERYFIKOWANIA NA URZĄDZENIU | `src/core/timer-audio.ts` (dzwonek WAV 440 Hz, test DFT w `timer-audio.test.ts`), haptyka w `timer-engine.ts`. Nie słyszano na urządzeniu. |
-| 20 | Zapamiętany tryb bez przełączania | NIE USTALONO | Nie znaleziono w kodzie mechanizmu zapisu ostatnio użytego trybu. |
+| 20 | Zapamiętany tryb bez przełączania | DZIAŁA | Ostatnia receptura (`last_recipe_id`) i liczba porcji (`last_servings`) w `app_settings`: `src/core/repositories/app-settings.ts`, odczyt przy starcie w `src/core/brew-context.tsx` (`rememberedRecipeFor`), porcje w `src/core/useBrewWorkflow.ts`. Tryb napoju (`beverage_preference`) był już zapisany. Testy: `repositories-brew-memory.test.ts`, `brew-memory-workflow.test.tsx`. |
 | 22 | Live Activity i Apple Watch | DO ZWERYFIKOWANIA NA URZĄDZENIU (Live Activity); ZAPLANOWANE (Apple Watch) | Live Activity: `modules/napar-live-activity` (ActivityKit), `targets/napar-widget`, `src/platform/live-activity-sync.tsx`, kontrakt TS–Swift w `napar-live-activity.test.ts`. Swift nie jest kompilowany na Linuksie ani sprawdzony na urządzeniu. Apple Watch: brak kodu. |
 | 23 | Ocena w skali koła smaków SCA | DZIAŁA | `src/core/flavor-wheel-data.ts`, `flavor-wheel-picker.tsx`, używane w `BrewFinishModal.tsx`. |
-| 24 | Diagnoza smaku z korektą (kawa, herbata) | CZĘŚCIOWO | Kawa: `diagnoseExtractionTaste` w arkuszu po parzeniu, `BrewFinishModal.test.tsx`. Herbata: nie ustalono z kodu; reguły są w rejestrze jako „do sprawdzenia”. |
+| 24 | Diagnoza smaku z korektą (kawa, herbata) | DZIAŁA | Arkusz po parzeniu przekazuje typ napoju: `src/components/brew/BrewFinishModal.tsx` (`beverageType`), herbata używa `diagnoseTeaTaste` (RD-05b, `src/core/domain-rules.ts`). Testy dwóch scenariuszy herbaty w `BrewFinishModal.test.tsx`. Reguły herbaty w rejestrze: „do sprawdzenia”. |
 | 26 | Dziennik sesji z pełnymi parametrami i notatkami | DZIAŁA | `app/(tabs)/journal.tsx`, `journal-screen.test.tsx`. |
 | 27 | Statystyki i trendy | DZIAŁA | `JournalAnalyticsView.tsx`, `useJournalAnalytics.ts`, `journal-screen.test.tsx`. |
 | 28 | Kopia zapasowa: eksport JSON, CSV, import z testem odtworzenia | DZIAŁA | `src/core/backup.ts`, `csv-export.ts` (`escapeCsvCell`), `backup.test.ts`, `backup-roundtrip.test.ts`. Test odtworzenia działa na sql.js, nie na sterowniku expo-sqlite w telefonie. |
@@ -98,25 +98,26 @@ Poza MVP (bez zmian w liście):
 | EUR | 0,99 | 7,99 | 17,99 |
 | GBP | 0,99 | 6,99 | 14,99 |
 
-- **Rozbieżność do usunięcia:** plik testowy `NaparStoreKit.storekit` podaje roczną subskrypcję w USD jako 4,99 (decyzja: 6,99). Przed utworzeniem produktów w App Store Connect trzeba to uzgodnić.
+- **Ceny testowe:** `NaparStoreKit.storekit` ma roczną subskrypcję w USD 6,99 (zgodnie z decyzją). Test kontraktu: `src/core/__tests__/contracts.test.ts`.
+- **Ceny w tekstach:** słowniki PL i EN nie zawierają cen. Ceny w aplikacji to `displayPrice` ze sklepu; przed załadowaniem sklepu widać „cena w App Store”. Test: `src/core/__tests__/price-texts.test.ts`.
 - **Family Sharing:** zatwierdzone dla subskrypcji i zakupu dożywotniego. Apple podaje, że po włączeniu w App Store Connect nie można go wyłączyć. Przed wysyłką właściciel sprawdza wybrany produkt.
 - **Zakup działa dopiero po utworzeniu produktów w App Store Connect:** `pl.lukasz.napar.monthly`, `pl.lukasz.napar.annual`, `pl.lukasz.napar.lifetime` i grupa subskrypcji. Bez nich zakup pokazuje „zakup niedostępny”. Sandbox na urządzeniu jeszcze nie przeszedł. Przywracanie nie wywołuje `AppStore.sync` i wymaga sprawdzenia w sandboxie.
 - **Liczba 7 dni** jest decyzją właściciela. Model liczby płacących zakładał częstotliwość treningową i nie został przeliczony na kawę (otwarte w `docs/lista-funkcji-mvp.md`).
 
-## Liczby z pomiaru (22.10.2026, commit `3cfdf1a`)
+## Liczby z pomiaru (22.10.2026, commit `984f628`)
 
 | Pomiar | Wynik |
 |---|---|
 | `npm run verify` | kod 0 |
-| Zestawy testów Jest | 115 (wszystkie przeszły) |
-| Testy Jest | 1198 (wszystkie przeszły) |
-| Klucze i18n w PL i EN (`check:i18n`) | 494 |
+| Zestawy testów Jest | 125 (wszystkie przeszły) |
+| Testy Jest | 1270 (wszystkie przeszły) |
+| Klucze i18n w PL i EN (`check:i18n`) | 504 |
 | Słowniki w `locales/` (`check:i18n`) | 35 (ładowane w aplikacji: 2) |
-| Elementy macierzy testów (`check:matrix`) | 824 z 824 (to wynik macierzy, nie pokrycie kodu) |
+| Elementy macierzy testów (`check:matrix`) | 860 z 860 (to wynik macierzy, nie pokrycie kodu) |
 | Zależności produkcyjne sprawdzone pod licencje | 24, 0 naruszeń GPL/LGPL |
 | Pliki z długiem w `check:core-imports` | 14 (`scripts/core-imports-allowlist.json`) |
-| Pokrycie, wszystkie pliki (`npm run test:coverage`, kod 0) | instrukcje 96,73%, gałęzie 86,57%, funkcje 95,46%, linie 97,31% |
-| Pokrycie, `src/core/` | instrukcje 98,36%, gałęzie 89,85%, funkcje 98,89%, linie 98,71% |
+| Pokrycie, wszystkie pliki (`npm run test:coverage`, kod 0) | instrukcje 96,78%, gałęzie 86,86%, funkcje 95,43%, linie 97,35% |
+| Pokrycie, `src/core/` | instrukcje 98,37%, gałęzie 90,10%, funkcje 98,92%, linie 98,70% |
 | Progi w `jest.config.js` | globalnie: instrukcje 92, gałęzie 80, funkcje 91, linie 93; `src/core/`: 97 / 88 / 98 / 97; wybrane moduły: 100 |
 | Rejestr twierdzeń (`docs/research/rejestr-twierdzen.json`) | 121 wpisów: 109 „do sprawdzenia”, 6 „[OCENA]”, 5 „decyzja techniczna”, 1 „zatwierdzona”, 0 „potwierdzone” |
 
@@ -149,7 +150,7 @@ Stos: Expo ~57.0.26, React Native 0.86.3, React 19.2.3, expo-sqlite ~57.0.3, exp
 - **Licencja (D7):** decyzja licencyjna otwarta (D7 w `docs/plan-przebudowy.md`). Plik `LICENSE` w repo nie istnieje. Blokuje wydanie.
 - **Testy E2E:** w historii CI z 15–20.10.2026 wszystkie przebiegi Maestro kończyły się błędem (`docs/audyt-etap1-2026-10-22.md`). Stan po tej dacie nie jest sprawdzony.
 - **Plan a lista:** `docs/plan-przebudowy.md` zakładał Live Activity i Watch poza MVP (etap 6), a `docs/lista-funkcji-mvp.md` (decyzja A) włącza je do MVP. Plan wymaga aktualizacji.
-- **Etapy:** statusy 0, 1, 2, 3a, 4a i 4b są w planie. Etapy 3b i 3c nie mają statusu. Etapy 5 (CI, TestFlight) i 7 (wydanie) nie są zrobione.
+- **Etapy:** statusy 0, 1, 2, 3a, 3b, 3c, 4a i 4b są w `docs/plan-przebudowy.md`. Etapy 5 (CI, TestFlight) i 7 (wydanie) nie są zrobione.
 
 ## Dokumentacja
 

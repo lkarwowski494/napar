@@ -261,3 +261,37 @@ Otwarte po etapie 3a:
 - Kody QR w `handleScanQrRecipe` (`useBrewWorkflow.ts`) nadal zapisują recepturę bez podglądu. Podgląd dotyczy tylko linku.
 - `healthAttributesPl` (właściwości zdrowotne herbat) to decyzja D5, nie HealthKit. Nie zmieniano.
 - Weryfikacja na urządzeniu i Maestro: dotyk, otwieranie `napar://` z systemu, dzwonek, schowek.
+
+## Status etapu 3b — własna woda i kalibracja młynka (22.10.2026)
+
+Zrobione na gałęzi `claude/wykonaj-sl7vii` (commit `e013e2c`):
+- **Poz. 9 MVP, własna woda:** wpis twardości i zasadowości z raportu wodociągów (`src/core/own-water.ts`, `src/components/dialin/OwnWaterCard.tsx`). Zapis w `app_settings` jako JSON (`src/core/repositories/water-profile.ts`), więc kopia zapasowa go obejmuje. Przelicznik °dH na mg CaCO₃/L: S-091 („do sprawdzenia”). Metoda: D-002 („decyzja techniczna”).
+- **Poz. 12 MVP, kalibracja przelicznika kliknięć:** średnia ważona z własnych parzeń kawy z TDS (`src/core/grinder-calibration.ts`), limit ±5 kliknięć i minimum 3 pary (S-093, D-003 — „decyzja techniczna”). Czułość 0,5 % EY na klik: S-092 („do sprawdzenia”). Wyzerowanie nie kasuje parzeń (`src/core/repositories/grinder-calibration.ts`).
+
+Otwarte: wpisy S-091 i S-092 nie mają źródła pierwotnego. Przed wydaniem trzeba je potwierdzić albo oznaczyć jako decyzję techniczną z uzasadnieniem.
+
+## Status etapu 3c — napoje mleczne, karta obrazowa, dostępność (22.10.2026)
+
+Zrobione na gałęzi `claude/wykonaj-sl7vii`:
+- **Poz. 32 MVP, napoje mleczne i latte art** (commit `96bd572`, testy ekranu i kompletności tekstów w `65c51bf`): `src/core/milk-drinks.ts`, `app/milk-drinks.tsx`, `src/components/milk/MilkDrinkCard.tsx`. Objętości i proporcje są wartościami roboczymi z oznaczeniem „[OCENA]” (rejestr NM-01…NM-07). Ich źródła nie są sprawdzone. Decyzja właściciela (B): pozycja jest w MVP.
+- **Poz. 31 MVP, karta degustacyjna jako obraz** (commit `2f78021`): `src/components/journal/TastingCardExport.tsx`, `src/platform/tasting-card-share.ts` (PNG przez `react-native-view-shot`). Arkusz udostępniania nie był sprawdzony na urządzeniu.
+- **Poz. 36 MVP, dostępność — przyciski 44 pt** (commity `07cebdc`, `6d11a29`, `73309f8`, `3cfdf1a`): kontrolki z jawnym rozmiarem mają co najmniej 44 pt, a skaner `tests/touch-target-scan.test.ts` sprawdza wszystkie. Kontrolki bez jawnego rozmiaru (w README: 121) nie są sprawdzane statycznie. VoiceOver i Dynamic Type do 2.0× wymagają sprawdzenia na urządzeniu.
+
+Otwarte: pomiar na urządzeniu (dotyk, VoiceOver, Dynamic Type), tłumaczenia nowych kluczy na 33 pozostałe języki.
+
+## Ostatnie zmiany dokumentacji i cen
+
+- `8e9058a`: README i zasady pracy doprowadzone do stanu z 22.10.2026.
+- `b20f836`: roczna subskrypcja testowa w `NaparStoreKit.storekit` ustawiona na 6,99 USD zgodnie z zatwierdzonym cennikiem (`docs/lista-funkcji-mvp.md`).
+
+## Domknięcie pozycji MVP 2, 11, 14, 20, 24 i cen (22.10.2026)
+
+Zrobione na gałęzi `claude/wykonaj-sl7vii` (każda pozycja ma test w repo, status w README):
+- **Ceny w tekstach** (`77cb33b`): słowniki PL i EN bez cen; tekst zastępczy „cena w App Store”. Test: `src/core/__tests__/price-texts.test.ts`. Naprawiono też test kontraktu StoreKit, który oczekiwał nieaktualnej ceny rocznej 4,99 USD.
+- **Poz. 14, zakres wagi bez sztywnego minimum** (`8a69674`): steper dozy schodził do 1 g, a wody do 10 g. Teraz do 0 g (`src/core/weight-range.ts`).
+- **Poz. 24, diagnoza smaku dla herbaty** (`bd8e4a4`): arkusz po parzeniu używa reguł herbaty (RD-05b) dla herbaty.
+- **Poz. 20, zapamiętany tryb** (`1295a18`): ostatnia receptura i liczba porcji w `app_settings`. Tryb napoju był już zapisany.
+- **Poz. 11, własny młynek** (`dcc4a8f`): nazwa i przelicznik µm/klik, zapis w `app_settings`, lista w dial-in, ustawieniach i modalu parzenia. Własna metoda działała wcześniej jako receptura z wolnym polem metody.
+- **Poz. 2, baner pustej paczki** (`984f628`): baner z archiwizacją już był. Usunięcie paczki przeniesiono na `lib/confirm`.
+
+Bramka po tych zmianach: patrz `README.md`, sekcja „Liczby z pomiaru”.
