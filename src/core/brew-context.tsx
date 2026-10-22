@@ -22,6 +22,9 @@ import {
   getBeveragePreference,
   setBeveragePreference as setBeveragePreferenceDb,
   getGrinderCalibrationStatus,
+  getLastRecipeId,
+  setLastRecipeId,
+  getRecipeById,
 } from './database';
 import { autoBackup } from './backup';
 import {
@@ -81,6 +84,29 @@ const defaultCoffeeRecipe = MASTER_RECIPES.find((r) => r.type === 'COFFEE') || M
 const defaultTeaRecipe = MASTER_RECIPES.find((r) => r.type === 'TEA') || MASTER_RECIPES[3];
 const defaultRecipe = defaultCoffeeRecipe;
 
+/** Typ napoju przepisu (wzorcowego: `type`, własnego: `beverageType`). */
+function beverageOf(recipe: SavedRecipe | MasterRecipe): 'COFFEE' | 'TEA' {
+  return 'beverageType' in recipe ? recipe.beverageType : recipe.type;
+}
+
+/**
+ * Ostatnio używana receptura z ustawień (poz. 20 MVP). Zwraca null, gdy nic nie zapamiętano,
+ * przepis zniknął albo nie pasuje do wybranego trybu (kawa / herbata / oba).
+ */
+function rememberedRecipeFor(pref: BeveragePreference): SavedRecipe | MasterRecipe | null {
+  try {
+    const id = getLastRecipeId();
+    if (!id) return null;
+    const found: SavedRecipe | MasterRecipe | null =
+      MASTER_RECIPES.find((r) => r.id === id) ?? getRecipeById(id);
+    if (!found) return null;
+    if (pref === 'both') return found;
+    return beverageOf(found) === (pref === 'tea' ? 'TEA' : 'COFFEE') ? found : null;
+  } catch {
+    return null;
+  }
+}
+
 const defaultInitialSnapshot: TimerSnapshot = {
   status: 'idle',
   currentStepIndex: 0,
@@ -117,7 +143,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [recipe, setRecipe] = useState<SavedRecipe | MasterRecipe>(() => {
     try {
       const pref = typeof getBeveragePreference === 'function' ? getBeveragePreference() : 'both';
-      return pref === 'tea' ? defaultTeaRecipe : defaultCoffeeRecipe;
+      return rememberedRecipeFor(pref) ?? (pref === 'tea' ? defaultTeaRecipe : defaultCoffeeRecipe);
     } catch {
       return defaultCoffeeRecipe;
     }
@@ -252,6 +278,12 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const selectRecipe = (newRecipe: SavedRecipe | MasterRecipe) => {
     setRecipe(newRecipe);
+    // Zapamiętany tryb (poz. 20): ta receptura otworzy się przy następnym starcie
+    try {
+      setLastRecipeId(newRecipe.id);
+    } catch {
+      // zapis ustawienia jest opcjonalny; wybór receptury działa bez niego
+    }
     const d = 'doseGrams' in newRecipe ? newRecipe.doseGrams : newRecipe.coffeeOrTeaDoseGrams;
     const w = 'waterGrams' in newRecipe ? newRecipe.waterGrams : newRecipe.waterWeightGrams;
     const t = 'waterTempCelsius' in newRecipe ? newRecipe.waterTempCelsius : newRecipe.waterTemperatureCelsius;

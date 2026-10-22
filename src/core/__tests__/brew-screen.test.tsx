@@ -166,6 +166,9 @@ jest.mock('expo-sqlite', () => ({
 describe('BrewScreen UI Integration', () => {
   beforeEach(() => {
     jest.useFakeTimers();
+    // Zapamiętany tryb (poz. 20) nie może przenosić receptury ani porcji między testami
+    mockDb.app_settings.delete('last_recipe_id');
+    mockDb.app_settings.delete('last_servings');
   });
 
   afterEach(() => {

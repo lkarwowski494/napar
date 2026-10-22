@@ -167,6 +167,10 @@ export const setBedtimeHour = bindSetting(settings.setBedtimeHour);
 export const getBeveragePreference = bindSetting(settings.getBeveragePreference);
 export const setBeveragePreference = bindSetting(settings.setBeveragePreference);
 export const getHasCompletedOnboarding = bindSetting(settings.getHasCompletedOnboarding);
+export const getLastRecipeId = bindSetting(settings.getLastRecipeId);
+export const setLastRecipeId = bindSetting(settings.setLastRecipeId);
+export const getLastServings = bindSetting(settings.getLastServings);
+export const setLastServings = bindSetting(settings.setLastServings);
 export const setHasCompletedOnboarding = bindSetting(settings.setHasCompletedOnboarding);
 
 // Dostęp do parzenia: dni wliczone do darmowego limitu (stan poza kopią)

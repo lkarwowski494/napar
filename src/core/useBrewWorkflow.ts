@@ -18,6 +18,8 @@ import {
   getUnitSystem,
   getHasCompletedOnboarding,
   setHasCompletedOnboarding,
+  getLastServings,
+  setLastServings,
   BeveragePreference,
 } from './database';
 import { MASTER_RECIPES, MasterRecipe } from './recipes-data';
@@ -121,7 +123,22 @@ export function useBrewWorkflow() {
   const [notes, setNotes] = useState<string>('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sensoryProfile, setSensoryProfile] = useState<SensoryProfile>(DEFAULT_SENSORY_PROFILE);
-  const [servings, setServings] = useState<number>(1);
+  // Liczba porcji jest zapamiętana w ustawieniach (poz. 20 MVP): nie resetuje się przy każdym otwarciu
+  const [servings, setServingsState] = useState<number>(() => {
+    try {
+      return getLastServings();
+    } catch {
+      return 1;
+    }
+  });
+  const setServings = (count: number) => {
+    setServingsState(count);
+    try {
+      setLastServings(count);
+    } catch {
+      // zapis opcjonalny: stan w pamięci wystarcza do bieżącej sesji
+    }
+  };
 
   useEffect(() => {
     void checkCorruptState().then((res) => {

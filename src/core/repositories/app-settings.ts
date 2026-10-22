@@ -118,6 +118,42 @@ export function setBeveragePreference(db: DbPort, pref: BeveragePreference): voi
   setAppSetting(db, 'beverage_preference', pref);
 }
 
+// ----------------------------------------------------------------------------
+// Zapamiętany tryb parzenia (poz. 20 MVP): ostatnio wybrana receptura (metoda) i liczba porcji.
+// Zapis w app_settings; przy starcie aplikacji nie trzeba przełączać ich ponownie.
+// ----------------------------------------------------------------------------
+
+export const LAST_RECIPE_SETTING_KEY = 'last_recipe_id';
+export const LAST_SERVINGS_SETTING_KEY = 'last_servings';
+/** Zakres porcji zgodny z calculateBatchScaling (RD-06: 1–4 osoby). */
+export const MIN_REMEMBERED_SERVINGS = 1;
+export const MAX_REMEMBERED_SERVINGS = 4;
+
+/** Identyfikator ostatnio wybranej receptury (wzorcowej lub własnej); pusty tekst, gdy brak. */
+export function getLastRecipeId(db: DbPort): string {
+  return getAppSetting(db, LAST_RECIPE_SETTING_KEY, '');
+}
+
+export function setLastRecipeId(db: DbPort, recipeId: string): void {
+  setAppSetting(db, LAST_RECIPE_SETTING_KEY, recipeId);
+}
+
+/** Zapamiętana liczba porcji; wartość spoza zakresu 1–4 lub uszkodzona daje 1. */
+export function getLastServings(db: DbPort): number {
+  const value = Number(getAppSetting(db, LAST_SERVINGS_SETTING_KEY, '1'));
+  if (!Number.isInteger(value) || value < MIN_REMEMBERED_SERVINGS || value > MAX_REMEMBERED_SERVINGS) {
+    return MIN_REMEMBERED_SERVINGS;
+  }
+  return value;
+}
+
+/** Zapis liczby porcji przycięty do 1–4; wartość nieliczbowa zapisuje 1. */
+export function setLastServings(db: DbPort, servings: number): void {
+  const rounded = Number.isFinite(servings) ? Math.round(servings) : MIN_REMEMBERED_SERVINGS;
+  const clamped = Math.max(MIN_REMEMBERED_SERVINGS, Math.min(MAX_REMEMBERED_SERVINGS, rounded));
+  setAppSetting(db, LAST_SERVINGS_SETTING_KEY, String(clamped));
+}
+
 export function getHasCompletedOnboarding(db: DbPort): boolean {
   return getAppSetting(db, 'onboarding_completed') === 'true';
 }
