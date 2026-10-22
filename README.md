@@ -1,205 +1,168 @@
-# Napar (Steepwise) ☕🍵
+# Napar (Steepwise)
 
-> **„Parz uważnie, smakuj głęboko — Twoja codzienna chwila rzemiosła.”**
+Stan na **22.10.2026** (commit bazowy `3cfdf1a`, gałąź `claude/wykonaj-sl7vii`). Ten plik opisuje to, co kod faktycznie robi, i zakres MVP. Poprzednia wersja README (z twierdzeniami bez pokrycia) jest w `docs/archiwum/README-do-2026-10-22.md`.
 
-Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty liściastej, stworzona zgodnie z bezkompromisowymi zasadami ekosystemu **Apps4Brew**.
+## Czym jest Napar
 
----
+Aplikacja mobilna (Expo / React Native, cel: iOS) dla osób, które parzą kawę specialty i herbatę liściastą w domu. Pomaga:
 
-## 🌟 Główne Zasady Produktowe (Apps4Brew)
+- prowadzić parzenie krok po kroku z timerem (metody: V60, Chemex, French press, AeroPress, Kalita, espresso, Gongfu, kyusu, herbata w czarce, dekokt);
+- dobierać proporcje, dozę, wodę i nastawę młynka oraz diagnozować smak (dial-in);
+- prowadzić spiżarnię paczek kawy i herbaty, dziennik parzeń i statystyki;
+- liczyć szacunkową kofeinę.
 
-- **100% Offline-First:** Pełna funkcjonalność bez połączenia z internetem. Działa w podróży, schronisku górskim i kawiarni bez Wi-Fi.
-- **Zero Login & Bez Kont:** Brak ekranów rejestracji, formularzy logowania czy onboardingowych ankiet. Po uruchomieniu od razu gotowa do parzenia.
-- **Prywatność „Data Not Collected”:** Zero trackerów, zero zewnętrznych bibliotek telemetrycznych (brak Firebase, Meta, Google Analytics). Twoje notatki degustacyjne i magazyn ziaren należą wyłącznie do Ciebie.
-- **Własność Danych:** Bezpłatny i nielimitowany eksport/import całej bazy do formatu JSON w dowolnym momencie.
-- **Deterministyczna Fizyka i Chemia Wody:** Wszystkie formuły (Brew Ratio, retencja wody $2.0\,\text{g/g}$, Extraction Yield $EY\%$, kinetyka eliminacji kofeiny $t_{1/2}=5.0\,\text{h}$, remineralizacja wody Barista Hustle/SCA, Dial-in Doctor) bazują na zweryfikowanej literaturze naukowej SCA (Specialty Coffee Association), Hendona (*Water for Coffee*) i EFSA.
+Nazwa w języku polskim to Napar, w angielskim Steepwise. Interfejs działa w dwóch językach: polskim i angielskim (patrz „Języki”).
 
----
+## Zasady — co kod faktycznie robi
 
-## 📱 Moduły i Ekrany
+- **Bez konta.** Aplikacja nie ma ekranów logowania ani rejestracji.
+- **Dane w telefonie.** Dane są w lokalnej bazie SQLite (`expo-sqlite`). Nie ma synchronizacji ani chmury Napar.
+- **Offline.** Funkcje nie wymagają sieci. Test `tests/public-repo.test.ts` sprawdza, że pliki `src/` i `app/` (poza testami) nie wywołują `fetch`, `XMLHttpRequest`, `WebSocket` ani `axios`.
+- **Zero telemetrii.** W `package.json` nie ma zależności analitycznych ani śledzących. Kopie zapasowe (JSON, CSV) eksportuje użytkownik przez arkusz udostępniania systemu.
+- **Zakup przez Apple.** Zakup i odczyt uprawnień idą przez StoreKit (`expo-iap`). Napar nie ma własnego serwera ani weryfikacji zakupu poza sklepem (test `tests/store-adapter.test.ts`).
+- **Kofeina jako szacunek.** Model kinetyki (t½ domyślnie 5 h) jest szacunkiem, nie wynikiem pomiaru. Treści o śnie i zdrowiu są w trakcie usuwania (patrz „Znane ograniczenia”).
+- **Brak HealthKit.** Integracja z Apple Health została usunięta z kodu (commit `d4a1469`).
 
-1. **☕ Asystent Parzenia Kitchen-Proof (Active Brew Assistant):**
-   - **Wyeksponowana Nastawa Młynka (`BrewHeader`):** Prominentna pigułka z dokładną liczbą klików (np. `Comandante C40: 22 kliki`, `Timemore: 18 klików`) widoczna na samej górze ekranu przed każdym zalaniem.
-   - **1-Tap Szybki Start (`BrewQuickPrepCard`):** Karta „Do drippera na wagę” z dużymi stepperami dozy (wysokość 44–52pt), wskaźnikiem wody, temperatury i natychmiastowym rozpoczęciem sesji poniżej 15 sekund.
-   - **Batch Scaling (👥 Porcje 1–4 osób):** Automatyczne przeliczanie dozy i wody wraz z dynamiczną rekomendacją przemiału (`+2 kliki grubiej`).
-   - **Focus Mode Stoper (`BrewActiveFocusTimer`):** Cyfrowy zegar z gigantycznymi cyframi (64pt) czytelnymi z odległości 1 metra, wskaźnikiem przepływu `~g/s`, pigułkami korekty w locie (`-10s` / `+10s`) oraz kontrolkami brudnego kciuka (`PAUZA`, `DALEJ ▶`, `WSTECZ`, `RESET`, `WZNÓW`, `ZAPISZ` $\ge 52\,\text{pt}$).
-   - **Progressive Disclosure (`BrewProAccordion`):** Schowany pod eleganckim, zwijanym panelem zaawansowany zestaw rzemieślniczy: chemia wody Barista Hustle / SCA, odczyt refractometru TDS (%) oraz radar sensoryczny SCA.
-   - **Karta Degustacyjna & Dial-in Doctor (`BrewFinishModal`):** 1-klikowa autodiagnoza smaku (kwasowość, gorycz, wodnistość) z natychmiastową receptą ratunkową oraz podsumowaniem **Ekonomii Rzemiosła** (koszt domowy vs 18 zł w kawiarni specialty).
-   - **Wymiana Receptur Offline (Kody QR SVG & Deep Linki `napar://`):** Szybkie skanowanie aparatem i udostępnianie receptur w 100% offline.
-2. **🫘 Spiżarnia Ziaren & Liści (Stash) & Kompendium Wiedzy:**
-   - Śledzenie świeżości ziaren kawy (okno *Resting Window*: odgazowywanie CO₂, szczyt smaku *Peak*, stabilne okno, dojrzałe ziarna).
-   - **✏️ Edycja Paczki & Szybkie Steppery Wagowe (BR-MAG-001):** Pełny modal edycji metadanych paczki (odmiana botaniczna, proces obróbki, data palenia, waga) oraz przyciski szybkiej korekty (`-15 g`, `-18 g`, `+15 g`, `0 g`).
-   - **⚠️ Archiwizacja Pustych Paczek (BR-MAG-004):** Automatyczny baner na karcie paczki po osiągnięciu 0 g z 1-tap archiwizacją oraz trwałym usuwaniem z potwierdzeniem.
-   - Dynamiczny ubytek wagi w paczce po każdym parzeniu.
-   - Filtrowanie: Wszystkie, Kawa ziarnista, Herbata liściasta, Archiwum.
-   - **📚 Kompendium Wiedzy (Encyklopedia Specialty & Herbaty):**
-     - *Odmiany botaniczne kawy (10 odmian):* Geisha, SL28 & SL34, Pink Bourbon, Ethiopian Heirloom, Bourbon, Typica, Caturra/Catuai, Pacamara, Castillo, Eugenioides.
-     - *Metody obróbki ziaren (6 procesów):* Washed, Natural, Honey (Yellow/Red/Black), Anaerobic, Carbonic Maceration, Wet-Hulled.
-     - *Terroir & Kraje (7 eksporterów):* Etiopia, Kenia, Kolumbia, Gwatemala, Kostaryka, Brazylia, Panama (wysokości, zbiory, profile sensoryczne).
-     - *Klasyfikacja herbaty (6 wielkich tradycji):* Biała (Bai Cha), Zielona (Lü Cha / Ryokucha), Żółta (Huang Cha), Wulong (Oolong), Czarna/Czerwona (Hong Cha), Ciemna (Heicha / Puerh).
-     - Funkcja *„+ Użyj jako szablon w spiżarni”* natychmiast predefiniująca kartotekę surowca.
-   - Natychmiastowe przejście do parzenia z wybranej paczki.
-3. **📖 Dziennik Degustacji & Analityka (Brew Journal & Analytics):**
-   - Pełna historia zaparzonych filiżanek z datą, recepturą, parametrami (czas, doza, woda, temperatura, nastawa młynka, użyty profil wody).
-   - Obliczone wskaźniki ekstrakcji ($EY\%$) i szacowana zawartość kofeiny (mg).
-   - Balans smaku, notatki degustacyjne, plakietka profilu wody i oceny.
-   - **🔁 Parz Ponownie (Brew Again — BR-DZIEN-004):** Błyskawiczne odtworzenie historycznej sesji jednym dotknięciem – załadowanie proporcji, dozy, temperatury, profilu wody i nastawy młynka bezpośrednio do aktywnego Asystenta Parzenia.
-   - **📤 Udostępnianie Notatek Degustacyjnych:** Generowanie sformatowanej, estetycznej karty parzenia z parametrami, balansem, nutami sensorycznymi i uzyskiem $EY\%$ do natywnego udostępnienia (`Share.share`) w 100% offline.
-   - **📊 Statystyki & Trendy (Brew Analytics):** Przełącznik widoków `[ 📋 Sesje ]` / `[ 📊 Statystyki & Trendy ]`. Karty sumarycznego wolumenu (gramatura ziaren/liści, litry przelanej wody, przyjęta kofeina, średnia ocen ★), wykres rozkładu metod parzenia, uśredniony radar sensoryczny SCA (`SensoryRadarChart`), chmura najczęstszych nut smakowych oraz rozkład balansu w filiżance.
-4. **🧭 Dial-in Doctor & Kalkulatory Ekstrakcji:**
-   - **Kompas Ekstrakcji (Dial-in Doctor):** Diagnozuje błędy smaku (za kwaśna, za gorzka, wodnista, cierpka herbata) i podaje fizyczną receptę na korektę mielenia młynka i temperatury wody. [Wdrożone]
-   - **Kalkulator Brew Ratio (BR-KALK-001):** Pełny dwukierunkowy przelicznik proporcji (Doza → Woda oraz Woda → Doza `calculateBrewDose`) z presetami baristycznymi (1:15 intensywna, 1:16.6 SCA standard, 1:17.5 lekka, 1:20 Gongfu, 1:2 espresso, 1:50 herbata) oraz kalkulacją uzysku po absorpcji ciastka ($2.0\,\text{g/g}$). [Wdrożone]
-   - **Kalkulator TDS & Extraction Yield (BR-KALK-002):** Weryfikacja czy napar trafia w Złote Okno SCA ($18.0\% - 22.0\%$). [Wdrożone]
-5. **💧 Chemia Wody i Mineralizacja (SCA & Barista Hustle — BR-WODA-001 do BR-WODA-005):**
-   - 98.5% kawy i 99.5% herbaty to woda. Twardość ogólna (GH) i alkaliczność/bufor (KH) kształtują profil sensoryczny. [Wdrożone]
-   - Baza 7 zweryfikowanych profili (Barista Hustle 80/40, SCA Standard, Melbourne Sweet & Soft, Scott Rao Wonder Water, Hendon Hard Water, Herbata Szlachetna, Gongfu Wulong/Puerh). [Wdrożone]
-   - Dwutorowy kalkulator: roztwory koncentratów płynnych (1g/L = 2 ppm) oraz bezpośrednie odważanie soli suchych ($\text{NaHCO}_3, \text{MgSO}_4, \text{CaCl}_2$). [Wdrożone]
-   - Diagnoza chemiczna wody: wykrywanie wad smaku wynikających ze zbyt twardej lub niebuforowanej wody. [Wdrożone]
-   - Poradnik i benchmark powszechnie dostępnych wód butelkowanych (Volvic, Żywiecki Kryształ itp.). [Wdrożone]
-6. **⚡ Monitor Kofeiny & Kalkulator Snu (BR-KOF-001, BR-KOF-003, BR-KOF-004):**
-   - Model jedno-kompartmentowej eliminacji kofeiny w organizmie. [Wdrożone]
-   - **Personalizacja Metabolizmu Kofeiny (D-02):** Regulacja indywidualnego czasu półtrwania kofeiny $t_{1/2}$ w zakresie 3.0h – 8.0h (domyślnie 5.0h) z zapisem w SQLite. [Wdrożone]
-   - **Kalkulator Snu i Godzina Odcięcia (Bedtime Curfew — BR-KOF-003):** Prognoza stężenia kofeiny o wybranej godzinie snu (próg bezpieczny dla fazy głębokiej NREM $\le 25\,\text{mg}$) z persystencją godziny snu. [Wdrożone]
-   - Dobowy bilans kofeiny w relacji do normy EFSA (400 mg). [Wdrożone]
-7. **⚙️ Ustawienia, Kopia Zapasowa i Jednostki:**
-   - **⚖️ Globalny Przełącznik Jednostek (Metric / Imperial — DEC-21 & BR-JEDN-001):** Płynne przełączanie między systemem metrycznym (°C, g, ml) i imperialnym (°F, oz, fl oz) z zachowaniem wewnętrznej precyzji obliczeniowej i trwałą persystencją w SQLite. [Wdrożone]
-   - **📢 Dostępność i Sygnały (VoiceOver & Haptyka — BR-DOST-001, DEC-13):** Konfiguracja komunikatów głosowych czytnika ekranu oraz sygnałów wibracyjnych z natychmiastowym zapisem w SQLite. [Wdrożone]
-   - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite. [Wdrożone]
-   - Eksport i import bazy w formacie JSON oraz eksport do arkuszy CSV (Dziennik i Spiżarnia). [Wdrożone]
-   - **💎 Model Monetyzacji „Taniej niż espresso” (Apps4Brew Pass):**
-     - **Cennik:** $0.99 USD / mies. (~4,49 zł), $4.99 USD / rok (~22,99 zł, oferta główna!), $14.99 USD Lifetime (~69,99 zł na zawsze z Chmurą rodzinną Family Sharing).
-     - **Darmowy poziom (model M5 S1):** 7 dni parzenia w miesiącu kalendarzowym (dzień liczy się po ukończeniu parzenia zmierzonego timerem). Pro znosi limit. Bez okresu próbnego i ofert wprowadzających. Zakup w aplikacji jeszcze niedostępny (etap 4b).
-     - **Gwarancja danych:** Po wyczerpaniu limitu blokowane jest tylko rozpoczęcie nowego parzenia timerem w nowym dniu. Historia, edycja, dopisywanie wstecz, eksport, kopia i import pozostają ZAWSZE dostępne w 100% offline.
-8. **⌚ Ekosystem Apple: Apple Watch, Live Activity & Widżety (BR-ZEG-001 do BR-ZEG-005):**
-   - **Live Activity & Dynamic Island (BR-ZEG-003, BR-ZEG-004):** Natywny mostek ActivityKit (`ActivityAttributes` i `ContentState`) dla ekranu blokady i Dynamic Island (kompaktowy i rozszerzony podgląd z wagą wody, czasem etapu i stanem timera). [Wdrożone]
-   - **Apple Watch & Widżety WidgetKit (BR-ZEG-001, BR-ZEG-002, BR-ZEG-005):** Mostek synchronizacji sesji i wzorców haptycznych na nadgarstku oraz kontener danych dla widżetów kofeiny. [Wdrożone]
+## Stan funkcji MVP
 
----
+Zakres MVP: 31 pozycji z `docs/lista-funkcji-mvp.md` (z decyzjami właściciela z 22.10.2026).
 
-## 🧪 Wzorcowe Receptury w Bazie (Master Recipes)
+Legenda statusów:
 
-Aplikacja zawiera **24 fabryczne, zweryfikowane receptury specialty** dla kawy i herbaty rzemieślniczej:
+- **DZIAŁA** — jest realna logika, dostępna z interfejsu i pokryta testem w repo. Nie oznacza sprawdzenia na urządzeniu, chyba że napisano inaczej.
+- **CZĘŚCIOWO** — działa, ale brakuje wskazanego elementu.
+- **DO ZWERYFIKOWANIA NA URZĄDZENIU** — kod istnieje, lecz nie sprawdzono go na iPhonie ani w symulatorze.
+- **ZAPLANOWANE** — nie zbudowane.
+- **USUNIĘTE** — usunięte z kodu.
+- **NIE USTALONO** — nie dało się ustalić stanu z kodu i testów.
 
-### ☕ Kawa Specialty (14 receptur)
-- **V60 — Metoda 4:6** (Tetsu Kasuya, Mistrz Świata Brewers Cup 2016)
-- **V60 — Single Cup Technique** (James Hoffmann)
-- **AeroPress — Inverted Champion** (World AeroPress Championship)
-- **AeroPress — Klasyk Tima Wendelboe** (Tim Wendelboe, World Barista Champion)
-- **AeroPress — Koncentrat Espresso-Style** (Fellow Prismo)
-- **Hario Switch — Hybryda Kasuya (God/Devil)** (Imersja + Perkolacja)
-- **Origami Dripper — Maksymalna Słodycz** (Du Jianing, World Brewers Cup 2019)
-- **Clever Dripper — Czysta Imersja** (Water-First Technique)
-- **Chemex — Czysty i Soczysty** (Klasyczny przelew 30g / 500g)
-- **Kalita Wave 185 — Trzy Zalania** (George Howell Coffee)
-- **French Press — Czysty Napar** (James Hoffmann Technique)
-- **Espresso — Specialty Double Shot (1:2)** (WBC Standard Protocol)
-- **Espresso — Turbo Shot 1:3** (Prof. Christopher Hendon & Barista Hustle)
-- **Cupping — Standard SCA Protocol** (Specialty Coffee Association)
+| # | Funkcja MVP | Status | Dowód i czego brakuje |
+|---|---|---|---|
+| 1 | Kompendium odmian, procesów i regionów, bez nazw marek | DZIAŁA | `src/core/knowledge-data.ts`, `knowledge.test.ts`. |
+| 2 | Zapas paczek: palarnia, data palenia, waga, cena, ubytek, ostrzeżenie przy pustej paczce | CZĘŚCIOWO | `app/(tabs)/beans.tsx`, `BeanEditModal.tsx` (archiwizacja przy 0 g). Brak potwierdzenia ostrzeżenia na karcie paczki. |
+| 4 | Okna świeżości (odpoczynek, szczyt, starzenie) | CZĘŚCIOWO | `bpr-engine.ts` i `domain-rules.ts` podają różne progi (odgazowanie 7 dni w jednym, 5 dni w drugim; szczyt 7–35 dni w jednym, 6–30 w drugim). Do ujednolicenia. |
+| 7 | Profile wody predefiniowane, bez nazw marek wód butelkowanych | CZĘŚCIOWO | `src/core/water-chemistry.ts` nadal zawiera nazwy marek wód (Volvic, Żywiecki Kryształ, Żywiec Zdrój, Muszynianka). |
+| 8 | Kalkulator mineralizacji z koncentratów i soli | DZIAŁA | `water-chemistry.ts`, `water-chemistry.test.ts`. |
+| 9 | Własna woda: twardość i zasadowość z raportu wodociągów | DZIAŁA | `src/components/dialin/OwnWaterCard.tsx`, `own-water.ts`, `own-water.test.ts`. Zasady przeliczeń: rejestr D-002. |
+| 10 | Młynki z przelicznikiem kliknięć, dane zweryfikowane | CZĘŚCIOWO | `grinder-converter.ts`, `grinder-converter.test.ts`. Dane młynków nie są zweryfikowane (wpisy rejestru w statusie „do sprawdzenia”). Przykłady kliknięć w README z poprzedniej wersji nie wynikają z kodu. |
+| 11 | Własny młynek i własna metoda | CZĘŚCIOWO | Własna metoda: kreator receptur (`app/recipe-builder.tsx`), DZIAŁA. Własnego młynka nie znaleziono w kodzie. |
+| 12 | Kalibracja przelicznika kliknięć z własnych parzeń | DZIAŁA | `GrinderCalibrationCard.tsx`, `grinder-calibration.ts`, `grinder-calibration.test.ts`. Limity: ±5 kliknięć, min. 3 pary (rejestr S-093, S-095). |
+| 13 | Kalkulator proporcji w obie strony | DZIAŁA | `src/components/dialin/BrewRatioTab.tsx`, `calculateBrewDose` w `domain-rules.ts`. |
+| 14 | Zakres wagi bez sztywnego minimum | NIE USTALONO | Komponent `NumInput` ma opcjonalne `min`. Nie ustalono z kodu, czy pola wagi go nie ustawiają. |
+| 15 | Skalowanie na porcje | DZIAŁA | `calculateBatchScaling` (RD-06, 1–4 osoby) w `domain-rules.ts`, `BrewQuickPrepCard.tsx`. |
+| 16 | Kroki metod: V60, Chemex, French press, AeroPress (obie metody), espresso, Kalita | DZIAŁA | `src/core/recipes-data.ts`: V60, CHEMEX, FRENCH_PRESS, AEROPRESS (odwrócona i klasyczna), ESPRESSO, KALITA. |
+| 17 | Sesja Gongfu: rundy, czasy, kofeina na rundę | CZĘŚCIOWO | `app/gongfu.tsx`, `gongfu.test.ts`, `gongfu-screen.test.tsx`. Brak kontrolki oceny zalania w UI (ocena sesji może być pusta). |
+| 19 | Sygnał dźwiękowy i haptyczny przy końcu kroku | DO ZWERYFIKOWANIA NA URZĄDZENIU | `src/core/timer-audio.ts` (dzwonek WAV 440 Hz, test DFT w `timer-audio.test.ts`), haptyka w `timer-engine.ts`. Nie słyszano na urządzeniu. |
+| 20 | Zapamiętany tryb bez przełączania | NIE USTALONO | Nie znaleziono w kodzie mechanizmu zapisu ostatnio użytego trybu. |
+| 22 | Live Activity i Apple Watch | DO ZWERYFIKOWANIA NA URZĄDZENIU (Live Activity); ZAPLANOWANE (Apple Watch) | Live Activity: `modules/napar-live-activity` (ActivityKit), `targets/napar-widget`, `src/platform/live-activity-sync.tsx`, kontrakt TS–Swift w `napar-live-activity.test.ts`. Swift nie jest kompilowany na Linuksie ani sprawdzony na urządzeniu. Apple Watch: brak kodu. |
+| 23 | Ocena w skali koła smaków SCA | DZIAŁA | `src/core/flavor-wheel-data.ts`, `flavor-wheel-picker.tsx`, używane w `BrewFinishModal.tsx`. |
+| 24 | Diagnoza smaku z korektą (kawa, herbata) | CZĘŚCIOWO | Kawa: `diagnoseExtractionTaste` w arkuszu po parzeniu, `BrewFinishModal.test.tsx`. Herbata: nie ustalono z kodu; reguły są w rejestrze jako „do sprawdzenia”. |
+| 26 | Dziennik sesji z pełnymi parametrami i notatkami | DZIAŁA | `app/(tabs)/journal.tsx`, `journal-screen.test.tsx`. |
+| 27 | Statystyki i trendy | DZIAŁA | `JournalAnalyticsView.tsx`, `useJournalAnalytics.ts`, `journal-screen.test.tsx`. |
+| 28 | Kopia zapasowa: eksport JSON, CSV, import z testem odtworzenia | DZIAŁA | `src/core/backup.ts`, `csv-export.ts` (`escapeCsvCell`), `backup.test.ts`, `backup-roundtrip.test.ts`. Test odtworzenia działa na sql.js, nie na sterowniku expo-sqlite w telefonie. |
+| 29 | Spójność danych po aktualizacji | CZĘŚCIOWO | Testy migracji: `migration-v1-to-v2.test.ts`. Ścieżka bazy (`db-location.ts`, fallback) nie sprawdzona na symulatorze ani urządzeniu. |
+| 30 | Receptura jako link lub QR, offline, z obsługą otwierania linku | CZĘŚCIOWO | Link `napar://` z podglądem przed zapisem: `app/recipe.tsx`, `recipe-link-route.test.tsx`. Generowanie QR: `qr-code.tsx`. Skan QR zapisuje recepturę bez podglądu (`useBrewWorkflow.ts`). Otwieranie `napar://` z systemu, skan aparatem i kopiowanie do schowka do sprawdzenia na urządzeniu. |
+| 31 | Karta degustacyjna jako obraz do udostępnienia | DZIAŁA | `TastingCardExport.tsx`, `src/platform/tasting-card-share.ts` (PNG przez `react-native-view-shot`), `tasting-card-share.test.ts`. Arkusz udostępniania do sprawdzenia na urządzeniu. |
+| 32 | Przepisy na napoje mleczne i latte art | DZIAŁA | `app/milk-drinks.tsx`, `MilkDrinkCard.tsx`, `milk-drinks.ts`, `milk-drinks-screen.test.tsx`. Objętości i proporcje są wartościami roboczymi bez źródła (rejestr NM-01…NM-07, status „[OCENA]”). |
+| 33 | Bez konta, dane tylko w telefonie | DZIAŁA | Brak logowania; baza lokalna (`src/core/database-schema.ts`). |
+| 34 | Zakupy: model M5 S1 | CZĘŚCIOWO | Polityka dostępu (`src/core/access-policy.ts`, `src/core/app-access.ts`) i adapter `expo-iap` (`src/platform/store-expo.ts`) są w repo i pokryte testami. Brak produktów w App Store Connect: zakup pokazuje „zakup niedostępny”. Brak testu sandbox na urządzeniu. Szczegóły w „Model cenowy”. |
+| 35 | Języki: jak w „treningu” (35) | ZAPLANOWANE | Działają tylko PL i EN (patrz „Języki”). |
+| 36 | Dostępność: VoiceOver, Dynamic Type do 2.0×, przyciski 44 pt | CZĘŚCIOWO | Skaner `tests/touch-target-scan.test.ts` sprawdza kontrolki z jawnym rozmiarem. 121 kontrolek bez jawnego rozmiaru nie jest sprawdzanych statycznie. Kontrast testowany przez `oracle-contrast.test.ts`. VoiceOver i Dynamic Type do 2.0× do sprawdzenia na urządzeniu. |
+| 37 | Kofeina jako szacunek, bez obietnic dotyczących snu i zdrowia | CZĘŚCIOWO | Model i wykres kinetyki są w repo. Progi snu („bezpieczny dla fazy głębokiej NREM”, `domain-rules.ts`), karta odcięcia (`BedtimeCurfewCard.tsx`) i odwołanie do EFSA (`caffeine.tsx`) nadal są w kodzie. Wpisy rejestru T-036, T-139, T-149 są „do sprawdzenia”. |
 
-### 🍃 Herbata Rzemieślnicza (10 receptur)
-- **Gongfu Cha — Wulong Skalny Da Hong Pao** (Tradycja Wuyi Shan)
-- **Gongfu Cha — Sheng Puerh (Młody)** (Tradycja Yunnan)
-- **Dong Ding Oolong — Mroźny Szczyt** (Tradycja Nantou, Taiwan Gongfu)
-- **Tie Guan Yin — Żelazna Bogini Miłosierdzia** (Anxi Gongfu)
-- **Gyokuro Uji — Kropla Rosy (Shizuku-cha)** (Rytuał Kyusu, 60°C)
-- **Matcha Ceremonialna — Ubijanie Usucha** (Tradycja Urasenke, Chasen)
-- **Sencha Japońska — Rytuał Kyusu** (Tradycyjne igły parowane)
-- **Hojicha — Prażone Liście i Łodyżki** (Kyoto Roast)
-- **Biała Herbata — Pai Mu Tan (Biała Piwonia)** (Fujian Artisan)
-- **Masala Chai — Autentyczny Dekokt Korzenny** (Tradycja Dhaba Punjab)
+Poza MVP (bez zmian w liście):
 
----
+- **Wersja 1.1:** 6 (zapas herbaty: rok zbioru, cena za gram), 18 (krzywa rund i porównanie sesji).
+- **Później:** 21 (waga Bluetooth).
+- **Skreślone:** 3, 5, 25.
+- **Usunięte z kodu:** HealthKit (poza MVP, commit `d4a1469`); fałszywy paragon zakupu (etap 4a).
 
-## 🛠️ Uruchomienie i Testy
+## Języki
 
-Wymagane środowisko: Node.js 20+ oraz npm.
+- W aplikacji działają **dwa języki**: polski i angielski (`src/core/i18n.tsx`, typ `SupportedLanguage = 'pl' | 'en'`).
+- Katalog `locales/` zawiera **35 plików** słowników (w tym `_source.json`, `pl`, `en`). Aplikacja z nich nie korzysta. Słowniki nie są zsynchronizowane z `i18n.tsx`.
+- Cel MVP to 35 języków (decyzja właściciela). Tłumaczenia pozostałych 33 są zaplanowane, nie zrobione.
+
+## Model cenowy (M5 S1)
+
+- **Darmowy poziom:** 7 dni parzenia w miesiącu kalendarzowym. Dzień parzenia to dzień, w którym ukończono parzenie zmierzone timerem w aplikacji. Wpisy ręczne, import i edycja wstecz się nie liczą.
+- **Blokada:** dotyczy tylko rozpoczęcia nowego parzenia timerem w dniu, w którym limit został wyczerpany. Trwającego parzenia blokada nie przerywa. Historia, edycja, eksport, kopia i import są zawsze dostępne.
+- **Pro:** bez limitu. Plany: miesięczny, roczny, dożywotni.
+- **Bez okresu próbnego i bez ofert wprowadzających.**
+- **Ceny** (decyzja 2 w `docs/lista-funkcji-mvp.md`, do potwierdzenia przy premierze):
+
+| Waluta | Miesięczna | Roczna | Dożywotnia |
+|---|---|---|---|
+| USD | 0,99 | 6,99 | 14,99 |
+| PLN | 4,99 | 19,99 | 59,99 |
+| EUR | 0,99 | 7,99 | 17,99 |
+| GBP | 0,99 | 6,99 | 14,99 |
+
+- **Rozbieżność do usunięcia:** plik testowy `NaparStoreKit.storekit` podaje roczną subskrypcję w USD jako 4,99 (decyzja: 6,99). Przed utworzeniem produktów w App Store Connect trzeba to uzgodnić.
+- **Family Sharing:** zatwierdzone dla subskrypcji i zakupu dożywotniego. Apple podaje, że po włączeniu w App Store Connect nie można go wyłączyć. Przed wysyłką właściciel sprawdza wybrany produkt.
+- **Zakup działa dopiero po utworzeniu produktów w App Store Connect:** `pl.lukasz.napar.monthly`, `pl.lukasz.napar.annual`, `pl.lukasz.napar.lifetime` i grupa subskrypcji. Bez nich zakup pokazuje „zakup niedostępny”. Sandbox na urządzeniu jeszcze nie przeszedł. Przywracanie nie wywołuje `AppStore.sync` i wymaga sprawdzenia w sandboxie.
+- **Liczba 7 dni** jest decyzją właściciela. Model liczby płacących zakładał częstotliwość treningową i nie został przeliczony na kawę (otwarte w `docs/lista-funkcji-mvp.md`).
+
+## Liczby z pomiaru (22.10.2026, commit `3cfdf1a`)
+
+| Pomiar | Wynik |
+|---|---|
+| `npm run verify` | kod 0 |
+| Zestawy testów Jest | 115 (wszystkie przeszły) |
+| Testy Jest | 1198 (wszystkie przeszły) |
+| Klucze i18n w PL i EN (`check:i18n`) | 494 |
+| Słowniki w `locales/` (`check:i18n`) | 35 (ładowane w aplikacji: 2) |
+| Elementy macierzy testów (`check:matrix`) | 824 z 824 (to wynik macierzy, nie pokrycie kodu) |
+| Zależności produkcyjne sprawdzone pod licencje | 24, 0 naruszeń GPL/LGPL |
+| Pliki z długiem w `check:core-imports` | 14 (`scripts/core-imports-allowlist.json`) |
+| Pokrycie, wszystkie pliki (`npm run test:coverage`, kod 0) | instrukcje 96,73%, gałęzie 86,57%, funkcje 95,46%, linie 97,31% |
+| Pokrycie, `src/core/` | instrukcje 98,36%, gałęzie 89,85%, funkcje 98,89%, linie 98,71% |
+| Progi w `jest.config.js` | globalnie: instrukcje 92, gałęzie 80, funkcje 91, linie 93; `src/core/`: 97 / 88 / 98 / 97; wybrane moduły: 100 |
+| Rejestr twierdzeń (`docs/research/rejestr-twierdzen.json`) | 121 wpisów: 109 „do sprawdzenia”, 6 „[OCENA]”, 5 „decyzja techniczna”, 1 „zatwierdzona”, 0 „potwierdzone” |
+
+Progi pokrycia to dolne granice, a nie cel 100%. Cel 100% dla `src/core/` jest w planie na późniejsze etapy.
+
+## Uruchomienie i sprawdzenie
+
+Wymagane: Node.js 20 lub nowszy, npm, Python 3 (dla `check:corpus`). Do uruchomienia w symulatorze: macOS z Xcode.
 
 ```bash
-# Instalacja zależności
-npm install
-
-# Uruchomienie weryfikacji typów TypeScript
-npm run typecheck
-
-# Sprawdzenie symetrii językowej i18n (360 kluczy PL i EN)
-npm run check:i18n
-
-# Uruchomienie testów jednostkowych i integracyjnych Jest
-npm test
-
-# Pełna weryfikacja projektu (i18n + typecheck + 100% testów z pokryciem)
-npm run verify
-
-# Uruchomienie aplikacji w środowisku Expo
-npm run start
+npm install                  # zależności
+npm run verify               # pełna bramka: i18n, licencje, korpus Python, macierz, natywny, importy core, typy, testy
+npm test                     # same testy Jest
+npm run test:coverage        # testy z progami pokrycia z jest.config.js
+npm run typecheck            # tsc --noEmit
+npm run check:i18n           # symetria kluczy PL i EN
+PROP_SEED=12345 npm test -- tests/domain-properties.test.ts   # powtórzenie testów losowych z tym samym ziarnem
+npm run start                # Expo (uruchomienie w symulatorze iOS)
 ```
 
----
+`npm run verify` nie zmienia plików w repo; wyniki macierzy są porównywane z `docs/22-macierz-testow.md`.
 
-## 📂 Architektura Kodu
+Stos: Expo ~57.0.26, React Native 0.86.3, React 19.2.3, expo-sqlite ~57.0.3, expo-iap ~5.8.3, TypeScript ^5.5.4.
 
-```text
-napar/
-├── app/                        # Ekrany Expo Router (file-based routing)
-│   ├── _layout.tsx             # Root layout z BrewProvider i SafeAreaProvider
-│   ├── settings.tsx            # Ustawienia, Kopia JSON/CSV, Wersja 1.0.0
-│   ├── gongfu.tsx              # Dedykowany wielonaparowy tracker Gongfu Cha
-│   ├── recipe-builder.tsx      # Kreator i edytor receptur autorskich z klonowaniem
-│   └── (tabs)/
-│       ├── _layout.tsx         # Dolny pasek 5 zakładek
-│       ├── index.tsx           # Zdekomponowany Asystent Parzenia Kitchen-Proof
-│       ├── beans.tsx           # Spiżarnia Ziaren i Liści (Resting Window, Edycja)
-│       ├── journal.tsx         # Dziennik Degustacji, Oceny, Analityka i Parz Ponownie
-│       ├── dialin.tsx          # Dial-in Doctor, Kalkulatory Ratio, TDS/EY i Chemia Wody
-│       └── caffeine.tsx        # Monitor Kofeiny, Wykres Kinetyki i Kalkulator Snu
-├── src/
-│   ├── components/
-│   │   ├── Apps4BrewPassModal.tsx # Paywall "Cheaper than Espresso" ($0.99 / $4.99 / $14.99)
-│   │   └── brew/               # Zdekomponowane moduły Kitchen-Proof:
-│   │       ├── BrewHeader.tsx           # Kliki młynka na samej górze, wybór receptury i ziarna
-│   │       ├── BrewQuickPrepCard.tsx    # Karta 1-Tap "Do drippera na wagę", steppery 44-52pt
-│   │       ├── BrewActiveFocusTimer.tsx # Stoper Focus Mode, cyfry 64pt, kontrolki brudnego kciuka
-│   │       ├── BrewProAccordion.tsx     # Akordeon rzemieślniczy: woda, TDS, radar sensoryczny
-│   │       └── BrewFinishModal.tsx      # Arkusz degustacyjny, Dial-in Doctor i ekonomia
-│   └── core/                   # Czysta logika biznesowa i persystencja
-│       ├── access-policy.ts    # Polityka dostępu (M5 S1): limit 7 dni parzenia w miesiącu, czysta logika
-│       ├── app-access.ts       # Most dostępu: stan dni, decyzja startu parzenia, hook dla UI
-│       ├── domain-rules.ts     # Deterministyczne reguły RD-01…RD-30
-│       ├── recipes-data.ts     # 24 wzorcowe receptury specialty i herbaty
-│       ├── knowledge-data.ts   # Kompendium wiedzy o odmianach, obróbkach, terroir i herbatach
-│       ├── water-chemistry.ts  # Profile wody Barista Hustle / SCA, kalkulator mineralizacji
-│       ├── cost-calculator.ts  # Ekonomia rzemiosła: kalkulator kosztów parzenia vs kawiarnia
-│       ├── timer-audio.ts      # Dźwięki minutnika: dzwonek akustyczny A4 440Hz i haptyka
-│       ├── backup.ts           # Apps4Brew SEC-09: 10 rotacyjnych kopii JSON i safetyBackup
-│       ├── db-path.ts          # Zabezpieczenie ścieżki bazy SQLite (/Library/SQLite)
-│       ├── QrScannerModal.tsx  # Natywny skaner kodów QR receptur aparatem (expo-camera)
-│       ├── database-schema.ts  # DDL i schemat SQLite
-│       ├── database.ts         # Klient expo-sqlite, repozytoria i licencja Pro
-│       ├── grinder-converter.ts# Baza modeli młynków i konwersja mikronów
-│       ├── recipe-share.ts     # Kodowanie receptur QR SVG i Deep Links
-│       ├── unit-converter.ts   # Dwukierunkowa konwersja jednostek Metric/Imperial
-│       ├── announce.ts         # Asystujące komunikaty głosowe VoiceOver i dostępność
-│       ├── i18n.tsx            # Pełne wsparcie dwujęzyczne PL/EN (360 symetrycznych kluczy)
-│       ├── timer-engine.ts     # Maszyna stanów stopera i haptyka
-│       ├── brew-context.tsx    # Główny React Context aktywnej sesji
-│       ├── gongfu-session.ts   # Matematyka i model kofeiny naparów Gongfu Cha
-│       ├── flavor-wheel-data.ts# Taksonomia koła smaków SCA (6 kategorii, 40+ deskryptorów)
-│       ├── flavor-wheel-picker.tsx # Interaktywny selektor koła smaków
-│       ├── radar-chart.tsx     # Wektorowy radar sensoryczny SCA (SVG)
-│       ├── caffeine-chart.tsx  # Wektorowy wykres kinetyki kofeiny ze strefą snu
-│       ├── qr-code.tsx         # Generator kodów QR SVG
-│       ├── confirm.ts          # Zabezpieczenia sesji parzenia przed przerwaniem
-│       ├── theme.ts            # Tokeny stylistyczne (Apps4Brew artisanal)
-│       └── __tests__/          # 44 zestawy testowe (379 testów, 100% pass, >97% pokrycia)
-├── NaparStoreKit.storekit      # Konfiguracja Xcode StoreKit Testing ($0.99 / $4.99 / $14.99)
-├── scripts/
-│   ├── check-i18n.mjs          # Bramka CI weryfikująca 100% symetrii PL/EN
-│   └── ci/                     # Skrypty automatyzacji budowania i wysyłki TestFlight
-└── napar_brd/                  # Pełna dokumentacja wymagań biznesowych BRD 0.1
-```
+## Znane ograniczenia i otwarte decyzje
 
----
+- **Nie sprawdzono na urządzeniu:** dźwięk i haptyka, Live Activity, otwieranie `napar://` z systemu, kopiowanie do schowka, skan QR aparatem, VoiceOver, Dynamic Type do 2.0×, ścieżka bazy SQLite (`/Library/SQLite` i fallback).
+- **Kofeina i zdrowie (D5):** progi snu i odwołania do EFSA nadal są w kodzie. Do usunięcia albo do zweryfikowania źródłami (rejestr T-036, T-139, T-149).
+- **Marki i osoby (D6):** nazwy autorów receptur (np. Tetsu Kasuya, James Hoffmann) i marek młynków (np. Comandante, Timemore) oraz marki wód nadal są w `recipes-data.ts`, `grinder-converter.ts` i `water-chemistry.ts`.
+- **Licencja (D7):** decyzja licencyjna otwarta (D7 w `docs/plan-przebudowy.md`). Plik `LICENSE` w repo nie istnieje. Blokuje wydanie.
+- **Testy E2E:** w historii CI z 15–20.10.2026 wszystkie przebiegi Maestro kończyły się błędem (`docs/audyt-etap1-2026-10-22.md`). Stan po tej dacie nie jest sprawdzony.
+- **Plan a lista:** `docs/plan-przebudowy.md` zakładał Live Activity i Watch poza MVP (etap 6), a `docs/lista-funkcji-mvp.md` (decyzja A) włącza je do MVP. Plan wymaga aktualizacji.
+- **Etapy:** statusy 0, 1, 2, 3a, 4a i 4b są w planie. Etapy 3b i 3c nie mają statusu. Etapy 5 (CI, TestFlight) i 7 (wydanie) nie są zrobione.
 
-## 📄 Licencja
+## Dokumentacja
 
-GPLv3 / Open Core — tworzone z pasją w duchu rzemiosła specialty.
+- `CLAUDE.md` — reguły dla agentów AI i nienaruszalne zasady architektury.
+- `docs/lista-funkcji-mvp.md` — zakres MVP i decyzje właściciela (źródło prawdy o zakresie).
+- `docs/plan-przebudowy.md` — etapy, statusy i otwarte decyzje D1–D9.
+- `docs/audyt-etap1-2026-10-22.md` — audyt stanu wyjściowego.
+- `docs/research/rejestr-twierdzen.json` — rejestr twierdzeń i stałych merytorycznych.
+- `docs/project-rules.md` — obowiązujące zasady pracy nad repo.
+- `docs/22-macierz-testow.md` — macierz testów sprawdzana przez `check:matrix`.
+- `site/` — strony `index.html`, `privacy.html`, `support.html`.
+- `docs/archiwum/` — archiwum poprzedniego README i zasad projektu.
+
+## Licencja
+
+Decyzja licencyjna otwarta (D7 w `docs/plan-przebudowy.md`). Plik `LICENSE` nie istnieje.
