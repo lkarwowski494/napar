@@ -164,6 +164,8 @@ export default function RecipeBuilderScreen() {
       return;
     }
 
+    // Edycja zachowuje ulubione i datę utworzenia; nowa receptura zaczyna od zera
+    const existing = id ? getRecipeById(id) : null;
     const recipe: SavedRecipe = {
       id: id || `custom-${Date.now()}`,
       name: trimmedName,
@@ -178,8 +180,8 @@ export default function RecipeBuilderScreen() {
       recommendedRatio: currentRatio,
       stepsJson: JSON.stringify(steps),
       isCustom: true,
-      isFavorite: false,
-      createdAt: new Date().toISOString(),
+      isFavorite: existing?.isFavorite ?? false,
+      createdAt: existing?.createdAt ?? new Date().toISOString(),
     };
 
     saveRecipe(recipe);

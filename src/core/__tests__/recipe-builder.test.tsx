@@ -388,6 +388,52 @@ describe('Custom Recipe Builder & Persistence', () => {
     mockSearchParams = {};
   });
 
+  test('Edycja receptury zachowuje ulubione i datę utworzenia', () => {
+    const createdAt = '2025-03-14T10:00:00.000Z';
+    mockDb.recipes.set('rec-keep-fav', {
+      id: 'rec-keep-fav',
+      name: 'Ulubiona Edycja',
+      beverage_type: 'COFFEE',
+      method: 'V60',
+      author: null,
+      description: null,
+      dose_g: 15,
+      water_g: 250,
+      water_temp_c: 93,
+      grind_size_description: null,
+      recommended_ratio: 16.67,
+      steps_json: JSON.stringify([
+        { stepNumber: 1, namePl: 'Bloom', targetWaterGrams: 50, durationSeconds: 30, instructionPl: 'Zalej 50g' },
+      ]),
+      is_custom: 1,
+      is_favorite: 1,
+      created_at: createdAt,
+    });
+
+    mockSearchParams = { id: 'rec-keep-fav' };
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    const saveText = tree.root.findAll((node: any) => {
+      return node.props && node.props.children === 'Zapisz';
+    })[0];
+    let saveBtn = saveText.parent;
+    while (saveBtn && !saveBtn.props.onPress) {
+      saveBtn = saveBtn.parent;
+    }
+    renderer.act(() => {
+      saveBtn.props.onPress();
+    });
+
+    const saved = mockDb.recipes.get('rec-keep-fav');
+    expect(saved.is_favorite).toBe(1);
+    expect(saved.created_at).toBe(createdAt);
+
+    mockSearchParams = {};
+  });
+
   test('Edycja pól pojedynczego kroku: nazwa, woda, czas, instrukcja', () => {
     let tree: any;
     renderer.act(() => {
