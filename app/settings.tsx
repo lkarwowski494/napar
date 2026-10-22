@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import {
   exportAllDataJson,
-  importDataJson,
+  importBackup,
+  getBackupState,
   exportSessionsCsv,
   exportInventoryCsv,
   getAppSetting,
@@ -28,10 +29,6 @@ import {
   setCaffeineHalfLife,
   getBedtimeHour,
   setBedtimeHour,
-  getInventoryItems,
-  getRecipes,
-  getBrewSessions,
-  getCaffeineLogs,
   BeveragePreference,
   getBeveragePreference,
   setBeveragePreference,
@@ -44,7 +41,7 @@ import {
 } from '../src/core/healthkit';
 import { theme } from '../src/core/theme';
 import { useTranslation } from '../src/core/i18n';
-import { safetyBackup, NaparBackupData } from '../src/core/backup';
+import { parseAndValidateBackup, safetyBackup } from '../src/core/backup';
 import { useAppAccess } from '../src/core/app-access';
 import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
 import { JsonExportModal, JsonImportModal } from '../src/components/settings/JsonBackupModals';
@@ -197,16 +194,12 @@ export default function SettingsScreen() {
         Alert.alert('Nie udało się zaimportować', 'Wklej prawidłowy tekst JSON kopii zapasowej.');
         return;
       }
+      // Walidacja przed jakąkolwiek zmianą danych: zły plik nie tworzy kopii i nie dotyka bazy
+      const envelope = parseAndValidateBackup(importJsonText.trim());
       // Apps4Brew SEC-09 & BR-TEST-022: Tworzenie kopii bezpieczeństwa przed niszczącym importem
-      const currentData: NaparBackupData = {
-        inventory: getInventoryItems(true),
-        customRecipes: getRecipes(),
-        sessions: getBrewSessions(),
-        caffeineLogs: getCaffeineLogs(),
-      };
-      await safetyBackup('import', currentData);
+      await safetyBackup('import', getBackupState());
 
-      importDataJson(importJsonText.trim());
+      importBackup(envelope);
       setShowImportModal(false);
       setImportJsonText('');
       refreshAccess();

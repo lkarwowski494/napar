@@ -150,7 +150,7 @@ describe('SettingsScreen Component', () => {
 
   test('Import kopii zapasowej JSON: waliduje puste wejście i importuje poprawny JSON', async () => {
     const alertSpy = jest.spyOn(Alert, 'alert');
-    const importSpy = jest.spyOn(databaseModule, 'importDataJson').mockImplementation(jest.fn());
+    const importSpy = jest.spyOn(databaseModule, 'importBackup').mockImplementation(jest.fn());
 
     let tree: any;
     renderer.act(() => {
@@ -187,14 +187,14 @@ describe('SettingsScreen Component', () => {
     expect(jsonInput).toBeTruthy();
 
     renderer.act(() => {
-      jsonInput.props.onChangeText('{"version": 1, "test": true}');
+      jsonInput.props.onChangeText('{"format":"napar-backup","version":2,"exportedAt":"2026-10-22T08:00:00.000Z","state":{"inventory":[],"customRecipes":[],"sessions":[],"caffeineLogs":[],"settings":{}}}');
     });
 
     await renderer.act(async () => {
       await submitBtn.props.onPress();
     });
 
-    expect(importSpy).toHaveBeenCalledWith('{"version": 1, "test": true}');
+    expect(importSpy).toHaveBeenCalledWith(expect.objectContaining({ version: 2 }));
     expect(alertSpy).toHaveBeenCalledWith(
       'Sukces!',
       'Dane zostały pomyślnie zaimportowane do Twojej lokalnej bazy.'
@@ -343,9 +343,6 @@ describe('SettingsScreen Component', () => {
 
   test('Obsługa błędu podczas importu uszkodzonego pliku JSON', async () => {
     const alertSpy = jest.spyOn(Alert, 'alert');
-    jest.spyOn(databaseModule, 'importDataJson').mockImplementation(() => {
-      throw new Error('Niepoprawny format danych JSON.');
-    });
 
     let tree: any;
     renderer.act(() => {
@@ -372,7 +369,7 @@ describe('SettingsScreen Component', () => {
       await findPressableWithText(tree.root, 'Zaimportuj i Zastąp Dane')?.props.onPress();
     });
 
-    expect(alertSpy).toHaveBeenCalledWith('Nie udało się zaimportować', 'Niepoprawny format danych JSON.');
+    expect(alertSpy).toHaveBeenCalledWith('Nie udało się zaimportować', 'Nieprawidłowy format JSON');
   });
 
   test('Obsługa błędów eksportu JSON i CSV oraz zamykanie modalu importu', () => {

@@ -20,7 +20,7 @@ export interface InventoryItem {
   isFavorite: boolean;
   isArchived: boolean;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string; // ustawiany przez repozytorium; zachowany przy przywracaniu z kopii
 }
 
 export interface SavedRecipe {

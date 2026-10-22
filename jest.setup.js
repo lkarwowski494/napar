@@ -103,3 +103,26 @@ console.warn = function (...args) {
 };
 
 
+
+// Adaptery platformy w testach: baza (expo-sqlite, ładowany leniwie, więc mocki z testów działają)
+// oraz magazyn kopii zapasowych (expo-file-system/legacy z mockiem powyżej).
+const { configureDatabase } = require('./src/core/database');
+const { configureBackupStorage } = require('./src/core/backup');
+configureDatabase(() => require('./src/platform/sqlite-adapter').openNaparDatabase());
+// Magazyn leniwy: moduł adaptera ładujemy dopiero przy użyciu, żeby mocki z testów (np. expo-sharing) działały.
+const platformBackupStorage = () => require('./src/platform/backup-storage').expoBackupStorage;
+configureBackupStorage({
+  get documentDirectory() {
+    return platformBackupStorage().documentDirectory;
+  },
+  get cacheDirectory() {
+    return platformBackupStorage().cacheDirectory;
+  },
+  exists: (path) => platformBackupStorage().exists(path),
+  makeDirectory: (path) => platformBackupStorage().makeDirectory(path),
+  writeText: (path, text) => platformBackupStorage().writeText(path, text),
+  readText: (path) => platformBackupStorage().readText(path),
+  listDirectory: (path) => platformBackupStorage().listDirectory(path),
+  remove: (path) => platformBackupStorage().remove(path),
+  share: (path, options) => platformBackupStorage().share(path, options),
+});

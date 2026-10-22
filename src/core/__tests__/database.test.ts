@@ -1,939 +1,472 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Database & Repositories
+// Napar (Steepwise) — Unit Tests: Fasada bazy i repozytoria (prawdziwy SQL, sql.js)
 // ============================================================================
 
 import {
-  initDatabase,
-  getInventoryItems,
-  getInventoryItemById,
-  saveInventoryItem,
-  deductInventoryWeight,
+  configureDatabase,
   deductBeansForBrew,
+  deductInventoryWeight,
+  deleteBrewSession,
+  deleteCaffeineLog,
   deleteInventoryItem,
-  getRecipes,
+  deleteRecipe,
+  duplicateRecipe,
+  exportAllDataJson,
+  exportInventoryCsv,
+  exportSessionsCsv,
+  getAppSetting,
+  getBedtimeHour,
+  getBeveragePreference,
+  getBrewSessionById,
+  getBackupState,
+  getBrewSessions,
+  getCaffeineHalfLife,
+  getCaffeineLogs,
+  getDatabase,
+  getDatabaseFallback,
+  getHapticsEnabled,
+  getHasCompletedOnboarding,
+  getHealthKitSyncEnabled,
+  getInventoryItemById,
+  getInventoryItems,
+  getIsProUser,
   getRecipeById,
+  getRecipes,
+  getUnitSystem,
+  getVoiceAnnounceEnabled,
+  initDatabase,
+  logCaffeine,
+  recordBrewSessionTransaction,
+  saveBrewSession,
+  saveInventoryItem,
   saveRecipe,
+  setAppSetting,
+  setBedtimeHour,
+  setBeveragePreference,
+  setCaffeineHalfLife,
+  setHapticsEnabled,
+  setHasCompletedOnboarding,
+  setHealthKitSyncEnabled,
+  setIsProUser,
+  setUnitSystem,
+  setVoiceAnnounceEnabled,
   toggleRecipeFavorite,
   updateRecipeFavorite,
-  duplicateRecipe,
-  getBrewSessions,
-  getBrewSessionById,
-  saveBrewSession,
-  recordBrewSessionTransaction,
-  deleteBrewSession,
-  getCaffeineLogs,
-  logCaffeine,
-  deleteCaffeineLog,
-  exportAllDataJson,
-  importDataJson,
-  exportSessionsCsv,
-  exportInventoryCsv,
-  escapeCsvValue,
-  escapeCsvCell,
-  getAppSetting,
-  setAppSetting,
-  getUnitSystem,
-  setUnitSystem,
-  getVoiceAnnounceEnabled,
-  setVoiceAnnounceEnabled,
-  getHapticsEnabled,
-  setHapticsEnabled,
-  getIsProUser,
-  setIsProUser,
-  getCaffeineHalfLife,
-  setCaffeineHalfLife,
-  getBedtimeHour,
-  setBedtimeHour,
-  getHealthKitSyncEnabled,
-  setHealthKitSyncEnabled,
-  getDatabase,
-  getHasCompletedOnboarding,
-  setHasCompletedOnboarding,
-  getBeveragePreference,
-  setBeveragePreference,
 } from '../database';
-import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../database-schema';
+import type { BrewSession, CaffeineLog, InventoryItem, SavedRecipe } from '../database-schema';
+import { MASTER_RECIPES } from '../recipes-data';
+import { createMemoryDb, dumpTable, loadSqlJs, type MemoryDb, type SqlJsModule } from '../../../tests/helpers/sqljs-port';
 
-// Mock expo-sqlite with in-memory SQLite emulation
-const mockDb: any = {
-  inventory: new Map<string, any>(),
-  recipes: new Map<string, any>(),
-  sessions: new Map<string, any>(),
-  caffeine: new Map<string, any>(),
-  settings: new Map<string, string>(),
+let SQL: SqlJsModule;
+let db: MemoryDb;
 
-  execSync: jest.fn(),
-  getFirstSync: jest.fn((query: string, params?: any[]) => {
-    if (query.includes('COUNT(*) as count FROM recipes')) {
-      return { count: mockDb.recipes.size };
-    }
-    if (query.includes('FROM inventory_items WHERE id = ?')) {
-      return mockDb.inventory.get(params?.[0]) || null;
-    }
-    if (query.includes('FROM recipes WHERE id = ?')) {
-      return mockDb.recipes.get(params?.[0]) || null;
-    }
-    if (query.includes('FROM app_settings WHERE key = ?')) {
-      const val = mockDb.settings.get(params?.[0]);
-      return val ? { value: val } : null;
-    }
-    if (query.includes('FROM brew_sessions WHERE id = ?')) {
-      return mockDb.sessions.get(params?.[0]) || null;
-    }
-    return null;
-  }),
-  getAllSync: jest.fn((query: string, params?: any[]) => {
-    if (query.includes('FROM inventory_items')) {
-      return Array.from(mockDb.inventory.values());
-    }
-    if (query.includes('FROM recipes')) {
-      return Array.from(mockDb.recipes.values());
-    }
-    if (query.includes('FROM brew_sessions')) {
-      return Array.from(mockDb.sessions.values());
-    }
-    if (query.includes('FROM caffeine_logs')) {
-      let rows = Array.from(mockDb.caffeine.values());
-      if (query.includes('WHERE consumed_at >= ?') && params && params[0]) {
-        rows = rows.filter((r: any) => r.consumed_at >= params[0]);
-      }
-      return rows;
-    }
-    return [];
-  }),
-  runSync: jest.fn((query: string, params?: any[]) => {
-    if (query.includes('INSERT OR REPLACE INTO inventory_items')) {
-      const [id, name, type, roaster, origin, roastDate, profile, process, variety, initW, remW, notes, rating, isFav, isArch, created, updated] = params!;
-      mockDb.inventory.set(id, {
-        id, name, type, roaster_or_producer: roaster, origin, roast_or_harvest_date: roastDate,
-        roast_profile: profile, process, variety, initial_weight_g: initW, remaining_weight_g: remW,
-        flavor_notes_json: notes, rating, is_favorite: isFav, is_archived: isArch, created_at: created, updated_at: updated
-      });
-    } else if (query.includes('UPDATE inventory_items SET remaining_weight_g = ?')) {
-      const [newW, updated, id] = params!;
-      const existing = mockDb.inventory.get(id);
-      if (existing) {
-        existing.remaining_weight_g = newW;
-        existing.updated_at = updated;
-      }
-    } else if (query.includes('DELETE FROM inventory_items WHERE id = ?')) {
-      mockDb.inventory.delete(params![0]);
-    } else if (query.includes('INSERT OR REPLACE INTO recipes')) {
-      const [id, name, type, method, author, desc, dose, water, temp, grind, ratio, steps, custom, fav, created] = params!;
-      mockDb.recipes.set(id, {
-        id, name, beverage_type: type, method, author, description: desc,
-        dose_g: dose, water_g: water, water_temp_c: temp, grind_size_description: grind,
-        recommended_ratio: ratio, steps_json: steps, is_custom: custom, is_favorite: fav, created_at: created
-      });
-    } else if (query.includes('UPDATE recipes SET is_favorite = ?')) {
-      const [fav, id] = params!;
-      const existing = mockDb.recipes.get(id);
-      if (existing) {
-        existing.is_favorite = fav;
-      }
-    } else if (query.includes('DELETE FROM recipes WHERE id = ?')) {
-      mockDb.recipes.delete(params![0]);
-    } else if (query.includes('INSERT OR REPLACE INTO brew_sessions')) {
-      const [id, rId, rName, iId, iName, type, method, dose, water, temp, waterProfile, grind, time, rating, tags, balance, tds, ey, caff, notes, inf, sensory, brewed] = params!;
-      mockDb.sessions.set(id, {
-        id, recipe_id: rId, recipe_name: rName, inventory_item_id: iId, inventory_item_name: iName,
-        beverage_type: type, method, dose_g: dose, water_g: water, water_temp_c: temp, water_profile: waterProfile, grind_setting: grind,
-        total_time_seconds: time, rating, flavor_tags_json: tags, taste_balance: balance, tds_percentage: tds,
-        extraction_yield_percentage: ey, caffeine_content_mg: caff, notes, infusion_number: inf,
-        sensory_scores_json: sensory, brewed_at: brewed
-      });
-    } else if (query.includes('DELETE FROM brew_sessions WHERE id = ?')) {
-      mockDb.sessions.delete(params![0]);
-    } else if (query.includes('INSERT OR REPLACE INTO caffeine_logs')) {
-      const [id, bId, name, type, consumed, dose, caff] = params!;
-      mockDb.caffeine.set(id, {
-        id, brew_session_id: bId, beverage_name: name, beverage_type: type,
-        consumed_at: consumed, dose_g: dose, caffeine_mg: caff
-      });
-    } else if (query.includes('DELETE FROM caffeine_logs WHERE id = ?')) {
-      mockDb.caffeine.delete(params![0]);
-    } else if (query.includes('INSERT OR REPLACE INTO app_settings')) {
-      const [key, value] = params!;
-      mockDb.settings.set(key, value);
-    }
-  }),
-  prepareSync: jest.fn(() => ({
-    executeSync: jest.fn((params: any) => {
-      mockDb.recipes.set(params.$id, {
-        id: params.$id,
-        name: params.$name,
-        beverage_type: params.$beverageType,
-        method: params.$method,
-        author: params.$author,
-        description: params.$description,
-        dose_g: params.$doseG,
-        water_g: params.$waterG,
-        water_temp_c: params.$waterTempC,
-        grind_size_description: params.$grindSize,
-        recommended_ratio: params.$ratio,
-        steps_json: params.$stepsJson,
-        is_custom: 0,
-        is_favorite: 0,
-        created_at: params.$createdAt,
-      });
-    }),
-    finalizeSync: jest.fn(),
-  })),
-};
+beforeAll(async () => {
+  SQL = await loadSqlJs();
+});
 
-jest.mock('expo-sqlite', () => ({
-  openDatabaseSync: jest.fn(() => mockDb),
-}));
+beforeEach(() => {
+  db = createMemoryDb(SQL);
+  configureDatabase(() => ({ port: db.port, fallback: null }));
+});
 
-describe('Napar SQLite Database & Repositories', () => {
-  beforeEach(() => {
-    mockDb.inventory.clear();
-    mockDb.recipes.clear();
-    mockDb.sessions.clear();
-    mockDb.caffeine.clear();
-    mockDb.settings.clear();
-  });
+afterAll(() => {
+  configureDatabase(null);
+});
 
-  test('Inicjalizacja bazy i seeding domyślnych przepisów', () => {
-    initDatabase(mockDb as any);
-    expect(mockDb.execSync).toHaveBeenCalledWith('PRAGMA foreign_keys = ON;');
-    expect(mockDb.execSync).toHaveBeenCalledWith('PRAGMA journal_mode = WAL;');
-    expect(mockDb.execSync).toHaveBeenCalledWith('PRAGMA busy_timeout = 5000;');
-    // Powinno zainicjalizować przepisy wzorcowe
-    expect(mockDb.recipes.size).toBeGreaterThanOrEqual(10);
-  });
+function item(overrides: Partial<InventoryItem> = {}): InventoryItem {
+  return {
+    id: 'inv-1',
+    name: 'Kenia AA',
+    type: 'coffee',
+    roasterOrProducer: 'Palarnia',
+    origin: 'Kenia',
+    roastOrHarvestDate: '2026-10-01',
+    roastProfile: 'light',
+    process: 'washed',
+    variety: 'SL28',
+    initialWeightGrams: 250,
+    remainingWeightGrams: 100,
+    flavorNotes: ['cytrus'],
+    rating: 4,
+    isFavorite: true,
+    isArchived: false,
+    createdAt: '2026-10-01T00:00:00.000Z',
+    ...overrides,
+  };
+}
 
-  test('Operacje na spiżarni (Inventory): dodanie, odjęcie gramatury, pobranie, usunięcie', () => {
-    const item: InventoryItem = {
-      id: 'bean-1',
-      name: 'Etiopia Yirgacheffe Washed',
-      type: 'coffee',
-      roasterOrProducer: 'Hard Beans',
-      origin: 'Yirgacheffe, Etiopia',
-      roastOrHarvestDate: '2026-10-01',
-      roastProfile: 'light',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 250,
-      flavorNotes: ['jaśmin', 'brzoskwinia', 'bergamotka'],
-      rating: 5,
-      isFavorite: true,
-      isArchived: false,
-      createdAt: '2026-10-10T10:00:00Z',
-      updatedAt: '2026-10-10T10:00:00Z',
-    };
+function recipe(overrides: Partial<SavedRecipe> = {}): SavedRecipe {
+  return {
+    id: 'rec-1',
+    name: 'Moje V60',
+    beverageType: 'COFFEE',
+    method: 'V60',
+    author: 'Ja',
+    description: 'opis',
+    doseGrams: 15,
+    waterGrams: 250,
+    waterTempCelsius: 94,
+    grindSizeDescription: 'średni',
+    recommendedRatio: 16.7,
+    stepsJson: '[]',
+    isCustom: true,
+    isFavorite: false,
+    createdAt: '2026-10-02T00:00:00.000Z',
+    ...overrides,
+  };
+}
 
-    saveInventoryItem(item);
-    let items = getInventoryItems();
-    expect(items.length).toBe(1);
-    expect(items[0].name).toBe('Etiopia Yirgacheffe Washed');
-    expect(items[0].flavorNotes).toContain('jaśmin');
+function session(overrides: Partial<BrewSession> = {}): BrewSession {
+  return {
+    id: 'ses-1',
+    beverageType: 'COFFEE',
+    method: 'V60',
+    doseGrams: 15,
+    waterGrams: 250,
+    waterTempCelsius: 94,
+    totalTimeSeconds: 180,
+    flavorTags: ['owoce'],
+    brewedAt: '2026-10-22T07:00:00.000Z',
+    ...overrides,
+  };
+}
 
-    // Odjęcie gramatury po parzeniu (np. 18g)
-    deductInventoryWeight('bean-1', 18);
-    items = getInventoryItems();
-    expect(items[0].remainingWeightGrams).toBe(232);
+function caffeine(overrides: Partial<CaffeineLog> = {}): CaffeineLog {
+  return {
+    id: 'caf-1',
+    beverageName: 'Espresso',
+    beverageType: 'coffee',
+    consumedAt: '2026-10-22T08:00:00.000Z',
+    doseGrams: 18,
+    caffeineMg: 120,
+    ...overrides,
+  };
+}
 
-    // Zadanie N3: deductBeansForBrew alias
-    deductBeansForBrew('bean-1', 12);
-    items = getInventoryItems();
-    expect(items[0].remainingWeightGrams).toBe(220);
-
-    deleteInventoryItem('bean-1');
-    expect(getInventoryItems().length).toBe(0);
-  });
-
-  test('Zarządzanie ulubionymi recepturami (toggleRecipeFavorite)', () => {
-    const recipe: SavedRecipe = {
-      id: 'rec-fav-1',
-      name: 'Aeropress Inverted',
-      beverageType: 'COFFEE',
-      method: 'Aeropress',
-      doseGrams: 15,
-      waterGrams: 200,
-      waterTempCelsius: 85,
-      recommendedRatio: 13.3,
-      stepsJson: '[]',
-      isCustom: true,
-      isFavorite: false,
-      createdAt: '2026-10-10T10:00:00Z',
-    };
-    saveRecipe(recipe);
-    expect(getRecipes().length).toBe(1);
-    const toggled = toggleRecipeFavorite('rec-fav-1');
-    expect(toggled).toBe(true);
-    expect(getRecipes()[0].isFavorite).toBe(true);
-  });
-
-  test('Duplikowanie receptury tworzy nową recepturę autorską ze statusem isCustom=true', () => {
-    const original: SavedRecipe = {
-      id: 'rec-orig-1',
-      name: 'V60 Sweet Bloom',
-      beverageType: 'COFFEE',
-      method: 'V60',
-      author: 'James H',
-      doseGrams: 15,
-      waterGrams: 250,
-      waterTempCelsius: 93,
-      recommendedRatio: 16.67,
-      stepsJson: '[]',
-      isCustom: false,
-      isFavorite: false,
-      createdAt: '2026-10-10T10:00:00Z',
-    };
-    saveRecipe(original);
-
-    const cloned = duplicateRecipe(original);
-    expect(cloned.id).not.toBe(original.id);
-    expect(cloned.name).toBe('V60 Sweet Bloom (Kopia)');
-    expect(cloned.isCustom).toBe(true);
-    expect(cloned.isFavorite).toBe(false);
-    expect(cloned.author).toBe('James H (Modyfikacja)');
-
-    const recipes = getRecipes();
-    expect(recipes.find((r) => r.id === cloned.id)).toBeTruthy();
-
-    // Pokrycie gałęzi z MasterRecipe (pola alternatywne: type, coffeeOrTeaDoseGrams, steps, brak autora)
-    const masterLike = {
-      id: 'master-tea-1',
-      name: 'Gyokuro Shizuku',
-      type: 'TEA' as const,
-      method: 'Kyusu',
-      coffeeOrTeaDoseGrams: 6,
-      waterWeightGrams: 60,
-      waterTemperatureCelsius: 50,
-      grindSettingDescriptionPl: 'Liście całe',
-      recommendedRatio: 10,
-      steps: [{ stepNamePl: 'Infuzja 1', durationSeconds: 90, waterGrams: 60 }],
-    };
-    const clonedTea = duplicateRecipe(masterLike, ' [Klon]');
-    expect(clonedTea.name).toBe('Gyokuro Shizuku [Klon]');
-    expect(clonedTea.beverageType).toBe('TEA');
-    expect(clonedTea.doseGrams).toBe(6);
-    expect(clonedTea.waterGrams).toBe(60);
-    expect(clonedTea.waterTempCelsius).toBe(50);
-    expect(clonedTea.author).toBe('Własna');
-    expect(clonedTea.stepsJson).toContain('Infuzja 1');
-
-    // Minimalny obiekt z wartościami domyślnymi
-    const minimal = {
-      id: 'minimal-1',
-      name: 'Minimal',
-      method: 'Drip',
-      recommendedRatio: 15,
-    };
-    const clonedMin = duplicateRecipe(minimal);
-    expect(clonedMin.beverageType).toBe('COFFEE');
-    expect(clonedMin.doseGrams).toBe(15);
-    expect(clonedMin.waterGrams).toBe(250);
-    expect(clonedMin.waterTempCelsius).toBe(93);
-  });
-
-  test('toggleRecipeFavorite zwraca false gdy receptura nie istnieje', () => {
-    expect(toggleRecipeFavorite('non-existent-rec-id')).toBe(false);
-  });
-
-  test('getCaffeineLogs filtruje według sinceIso', () => {
-    const log1: CaffeineLog = {
-      id: 'caff-iso-1',
-      beverageName: 'Kawa 1',
-      beverageType: 'coffee',
-      consumedAt: '2026-10-01T10:00:00Z',
-      doseGrams: 15,
-      caffeineMg: 100,
-    };
-    const log2: CaffeineLog = {
-      id: 'caff-iso-2',
-      beverageName: 'Kawa 2',
-      beverageType: 'coffee',
-      consumedAt: '2026-10-15T10:00:00Z',
-      doseGrams: 18,
-      caffeineMg: 130,
-    };
-    logCaffeine(log1);
-    logCaffeine(log2);
-
-    const filtered = getCaffeineLogs('2026-10-10T00:00:00Z');
-    expect(filtered.length).toBe(1);
-    expect(filtered[0].id).toBe('caff-iso-2');
-  });
-
-  test('Zapis sesji parzenia i rejestru kofeiny z profilem sensorycznym', () => {
-    const session: BrewSession = {
-      id: 'sess-100',
-      beverageType: 'COFFEE',
-      method: 'V60',
-      recipeName: 'V60 Kasuya 4:6',
-      doseGrams: 20,
-      waterGrams: 300,
-      waterTempCelsius: 92,
-      totalTimeSeconds: 210,
-      rating: 4.8,
-      flavorTags: ['brzoskwinia', 'miód'],
-      tasteBalance: 'balanced',
-      tdsPercentage: 1.35,
-      extractionYieldPercentage: 19.8,
-      caffeineContentMg: 140,
-      sensory: {
-        acidity: 4,
-        sweetness: 5,
-        body: 3,
-        clarity: 4,
-        finish: 4,
-      },
-      brewedAt: new Date().toISOString(),
-    };
-
-    saveBrewSession(session);
-    const sessions = getBrewSessions();
-    expect(sessions.length).toBe(1);
-    expect(sessions[0].method).toBe('V60');
-    expect(sessions[0].caffeineContentMg).toBe(140);
-    expect(sessions[0].sensory?.acidity).toBe(4);
-    expect(sessions[0].sensory?.sweetness).toBe(5);
-
-    const caffLog: CaffeineLog = {
-      id: 'caff-1',
-      brewSessionId: session.id,
-      beverageName: 'V60 Kasuya',
-      beverageType: 'coffee',
-      consumedAt: new Date().toISOString(),
-      doseGrams: 20,
-      caffeineMg: 140,
-    };
-
-    logCaffeine(caffLog);
-    const logs = getCaffeineLogs();
-    expect(logs.length).toBe(1);
-    expect(logs[0].caffeineMg).toBe(140);
-  });
-
-  test('TASK-R08-04: recordBrewSessionTransaction atomowo zapisuje sesję i odejmuje ziarna z inwentarza', () => {
-    const bean: InventoryItem = {
-      id: 'bean-tx-1',
-      name: 'Kenya Nyeri AA',
-      type: 'coffee',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 250,
-      flavorNotes: ['czarna porzeczka'],
-      isFavorite: false,
-      isArchived: false,
-      createdAt: '2026-10-10T10:00:00Z',
-      updatedAt: '2026-10-10T10:00:00Z',
-    };
-    saveInventoryItem(bean);
-
-    const session: BrewSession = {
-      id: 'sess-tx-1',
-      beverageType: 'COFFEE',
-      method: 'Kalita Wave',
-      recipeName: 'Kalita Standard',
-      inventoryItemId: 'bean-tx-1',
-      inventoryItemName: 'Kenya Nyeri AA',
-      doseGrams: 18.5,
-      waterGrams: 300,
-      waterTempCelsius: 94,
-      totalTimeSeconds: 180,
-      flavorTags: ['czarna porzeczka'],
-      brewedAt: new Date().toISOString(),
-    };
-
-    recordBrewSessionTransaction(session, { itemId: 'bean-tx-1', doseGrams: 18.5 });
-
-    const savedSess = getBrewSessionById('sess-tx-1');
-    expect(savedSess).not.toBeNull();
-    expect(savedSess?.doseGrams).toBe(18.5);
-
-    const updatedBean = getInventoryItemById('bean-tx-1');
-    expect(updatedBean?.remainingWeightGrams).toBe(231.5);
-
-    // Fallback transaction executes BEGIN and COMMIT
-    expect(mockDb.execSync).toHaveBeenCalledWith('BEGIN TRANSACTION;');
-    expect(mockDb.execSync).toHaveBeenCalledWith('COMMIT;');
-
-    // Test with withTransactionSync mock
-    const originalWithTx = mockDb.withTransactionSync;
-    mockDb.withTransactionSync = jest.fn((cb: () => void) => cb());
-    recordBrewSessionTransaction(session, { itemId: 'bean-tx-1', doseGrams: 10 });
-    expect(mockDb.withTransactionSync).toHaveBeenCalled();
-    mockDb.withTransactionSync = originalWithTx;
-  });
-
-  test('Eksport i import kopii zapasowej w formacie JSON (inventory, recipes, sessions, caffeine)', () => {
-    const item: InventoryItem = {
-      id: 'tea-1',
-      name: 'Da Hong Pao Oolong',
-      type: 'tea',
-      initialWeightGrams: 50,
-      remainingWeightGrams: 42,
-      flavorNotes: ['dym', 'prażony orzech'],
-      isFavorite: false,
-      isArchived: false,
-      createdAt: '2026-10-12T10:00:00Z',
-      updatedAt: '2026-10-12T10:00:00Z',
-    };
-    saveInventoryItem(item);
-
-    const recipe: SavedRecipe = {
-      id: 'rec-custom-backup',
-      name: 'Backup Recipe',
-      beverageType: 'COFFEE',
-      method: 'Kalita',
-      doseGrams: 16,
-      waterGrams: 260,
-      waterTempCelsius: 92,
-      recommendedRatio: 16.25,
-      stepsJson: '[]',
-      isCustom: true,
-      isFavorite: false,
-      createdAt: new Date().toISOString(),
-    };
-    saveRecipe(recipe);
-
-    const session: BrewSession = {
-      id: 'sess-backup-1',
-      beverageType: 'COFFEE',
-      method: 'Kalita',
-      recipeName: 'Backup Recipe',
-      doseGrams: 16,
-      waterGrams: 260,
-      waterTempCelsius: 92,
-      totalTimeSeconds: 180,
-      flavorTags: [],
-      brewedAt: new Date().toISOString(),
-    };
-    saveBrewSession(session);
-
-    const caffLog: CaffeineLog = {
-      id: 'caff-backup-1',
-      beverageName: 'Backup Recipe',
-      beverageType: 'coffee',
-      consumedAt: new Date().toISOString(),
-      doseGrams: 16,
-      caffeineMg: 110,
-    };
-    logCaffeine(caffLog);
-
-    const exportedJson = exportAllDataJson();
-    expect(exportedJson).toContain('Da Hong Pao Oolong');
-    expect(exportedJson).toContain('Backup Recipe');
-    expect(exportedJson).toContain('"version": 1');
-
-    // Wyczyść i zaimportuj
-    mockDb.inventory.clear();
-    mockDb.recipes.clear();
-    mockDb.sessions.clear();
-    mockDb.caffeine.clear();
-    expect(getInventoryItems().length).toBe(0);
-    expect(getRecipes().length).toBe(0);
-    expect(getBrewSessions().length).toBe(0);
-    expect(getCaffeineLogs().length).toBe(0);
-
-    importDataJson(exportedJson);
-    expect(getInventoryItems().length).toBe(1);
-    expect(getInventoryItems()[0].name).toBe('Da Hong Pao Oolong');
-    expect(getRecipes().length).toBe(1);
-    expect(getRecipes()[0].name).toBe('Backup Recipe');
-    expect(getBrewSessions().length).toBe(1);
-    expect(getCaffeineLogs().length).toBe(1);
-  });
-
-  test('escapeCsvValue prawidłowo zabezpiecza znaki specjalne (przecinki, cudzysłowy, entery)', () => {
-    expect(escapeCsvValue(null)).toBe('');
-    expect(escapeCsvValue(undefined)).toBe('');
-    expect(escapeCsvValue('normal_text')).toBe('normal_text');
-    expect(escapeCsvValue('text,with,comma')).toBe('"text,with,comma"');
-    expect(escapeCsvValue('text"with"quotes')).toBe('"text""with""quotes"');
-    expect(escapeCsvValue("text\nwith\nnewline")).toBe("\"text\nwith\nnewline\"");
-  });
-
-  test('exportSessionsCsv generuje poprawny plik CSV z nagłówkami i wierszami sesji', () => {
-    const session: BrewSession = {
-      id: 'sess-csv-1',
-      recipeName: 'V60 Sweet Bloom',
-      inventoryItemName: 'Etiopia Guji, Natural',
-      beverageType: 'COFFEE',
-      method: 'V60',
-      doseGrams: 15,
-      waterGrams: 250,
-      waterTempCelsius: 93,
-      totalTimeSeconds: 165,
-      rating: 4.8,
-      tasteBalance: 'balanced',
-      tdsPercentage: 1.38,
-      extractionYieldPercentage: 23.0,
-      caffeineContentMg: 135,
-      flavorTags: ['brzoskwinia', 'jaśmin'],
-      notes: 'Bardzo czysty napar, słodki finisz',
-      brewedAt: '2026-10-15T10:00:00Z',
-    };
-    saveBrewSession(session);
-
-    // Minimalna sesja bez opcjonalnych pól
-    const sessionMinimal: BrewSession = {
-      id: 'sess-csv-min',
-      beverageType: 'TEA',
-      method: 'Gongfu',
-      doseGrams: 5,
-      waterGrams: 100,
-      waterTempCelsius: 95,
-      totalTimeSeconds: 20,
-      flavorTags: [],
-      brewedAt: '2026-10-15T11:00:00Z',
-    };
-    saveBrewSession(sessionMinimal);
-
-    const csv = exportSessionsCsv();
-    expect(csv).toContain('id,brewed_at,beverage_type,method');
-    expect(csv).toContain('sess-csv-1');
-    expect(csv).toContain('sess-csv-min');
-    expect(csv).toContain('V60 Sweet Bloom');
-    expect(csv).toContain('"Etiopia Guji, Natural"');
-    expect(csv).toContain('15,250,93,165,4.8,balanced,1.38,23,135');
-    expect(csv).toContain('brzoskwinia; jaśmin');
-  });
-
-  test('exportInventoryCsv generuje poprawny plik CSV z pozycjami spiżarni', () => {
-    const item: InventoryItem = {
-      id: 'inv-csv-1',
-      name: 'Kenya Nyeri Peaberry',
-      type: 'coffee',
-      roasterOrProducer: 'Specialty Roastery, Warsaw',
-      origin: 'Kenia',
-      roastOrHarvestDate: '2026-10-01',
-      roastProfile: 'light',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 210,
-      flavorNotes: ['czarna porzeczka', 'rabarbar'],
-      isFavorite: true,
-      isArchived: false,
-      createdAt: '2026-10-01T10:00:00Z',
-      updatedAt: '2026-10-01T10:00:00Z',
-    };
-    saveInventoryItem(item);
-
-    // Pozycja bez opcjonalnych właściwości
-    const itemMinimal: InventoryItem = {
-      id: 'inv-csv-min',
-      name: 'Simple Tea',
-      type: 'tea',
-      initialWeightGrams: 100,
-      remainingWeightGrams: 100,
-      flavorNotes: [],
-      isFavorite: false,
-      isArchived: false,
-      createdAt: '2026-10-01T10:00:00Z',
-      updatedAt: '2026-10-01T10:00:00Z',
-    };
-    saveInventoryItem(itemMinimal);
-
-    const csv = exportInventoryCsv();
-    expect(csv).toContain('id,name,type,roaster_or_producer');
-    expect(csv).toContain('inv-csv-1');
-    expect(csv).toContain('inv-csv-min');
-    expect(csv).toContain('Kenya Nyeri Peaberry');
-    expect(csv).toContain('"Specialty Roastery, Warsaw"');
-    expect(csv).toContain('250,210');
-    expect(csv).toContain('czarna porzeczka; rabarbar');
-    expect(csv).toContain(',1,0'); // isFavorite: 1, isArchived: 0
-    expect(csv).toContain(',0,0'); // isFavorite: 0, isArchived: 0
-  });
-
-  test('getInventoryItemById pobiera paczkę lub zwraca null gdy brak', () => {
-    const itemToSave: InventoryItem = {
-      id: 'inv-get-test',
-      name: 'Kenya Nyeri Peaberry',
-      type: 'coffee',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 210,
-      flavorNotes: ['porzeczka'],
-      isFavorite: false,
-      isArchived: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    saveInventoryItem(itemToSave);
-
-    const item = getInventoryItemById('inv-get-test');
-    expect(item).not.toBeNull();
-    expect(item?.name).toBe('Kenya Nyeri Peaberry');
-
-    const notFound = getInventoryItemById('non-existent-id-999');
-    expect(notFound).toBeNull();
-  });
-
-  test('getBrewSessionById pobiera sesję lub zwraca null gdy brak', () => {
-    const sessionToSave: BrewSession = {
-      id: 'sess-get-test',
-      recipeName: 'V60 Sweet Bloom',
-      beverageType: 'COFFEE',
-      method: 'V60',
-      doseGrams: 15,
-      waterGrams: 250,
-      waterTempCelsius: 93,
-      totalTimeSeconds: 165,
-      flavorTags: [],
-      brewedAt: new Date().toISOString(),
-    };
-    saveBrewSession(sessionToSave);
-
-    const session = getBrewSessionById('sess-get-test');
-    expect(session).not.toBeNull();
-    expect(session?.recipeName).toBe('V60 Sweet Bloom');
-
-    const notFound = getBrewSessionById('non-existent-sess-999');
-    expect(notFound).toBeNull();
-  });
-
-  test('updateRecipeFavorite jawnie aktualizuje flagę isFavorite', () => {
-    const recipe: SavedRecipe = {
-      id: 'rec-fav-test',
-      name: 'Test Fav Recipe',
-      beverageType: 'COFFEE',
-      method: 'V60',
-      doseGrams: 15,
-      waterGrams: 250,
-      waterTempCelsius: 93,
-      recommendedRatio: 16.6,
-      stepsJson: '[]',
-      isCustom: true,
-      isFavorite: false,
-      createdAt: new Date().toISOString(),
-    };
-    saveRecipe(recipe);
-
-    updateRecipeFavorite('rec-fav-test', true);
-    expect(getRecipeById('rec-fav-test')?.isFavorite).toBe(true);
-
-    updateRecipeFavorite('rec-fav-test', false);
-    expect(getRecipeById('rec-fav-test')?.isFavorite).toBe(false);
-  });
-
-  test('deleteBrewSession usuwa sesję z bazy', () => {
-    const sessionToSave: BrewSession = {
-      id: 'sess-del-test',
-      recipeName: 'V60 Delete Test',
-      beverageType: 'COFFEE',
-      method: 'V60',
-      doseGrams: 15,
-      waterGrams: 250,
-      waterTempCelsius: 93,
-      totalTimeSeconds: 165,
-      flavorTags: [],
-      brewedAt: new Date().toISOString(),
-    };
-    saveBrewSession(sessionToSave);
-    expect(mockDb.sessions.has('sess-del-test')).toBe(true);
-
-    deleteBrewSession('sess-del-test');
-    expect(mockDb.sessions.has('sess-del-test')).toBe(false);
-  });
-
-  test('deleteCaffeineLog usuwa wpis kofeiny z bazy', () => {
-    const log: CaffeineLog = {
-      id: 'caff-del-test',
-      beverageName: 'Espresso',
-      beverageType: 'coffee',
-      consumedAt: new Date().toISOString(),
-      doseGrams: 18,
-      caffeineMg: 130,
-    };
-    logCaffeine(log);
-    expect(mockDb.caffeine.has('caff-del-test')).toBe(true);
-
-    deleteCaffeineLog('caff-del-test');
-    expect(mockDb.caffeine.has('caff-del-test')).toBe(false);
-  });
-
-  test('importDataJson walidacja błędów: niepoprawny JSON oraz version !== 1', () => {
-    expect(() => importDataJson('invalid json string :::')).toThrow();
-    expect(() => importDataJson(JSON.stringify({ version: 2 }))).toThrow(
-      'Nieprawidłowy format pliku kopii zapasowej'
+describe('inicjalizacja i dane startowe', () => {
+  test('schemat w wersji 3 z wszystkimi receptami startowymi', () => {
+    initDatabase(db.port);
+    expect(db.port.getFirstSync<{ user_version: number }>('PRAGMA user_version')?.user_version).toBe(3);
+    expect(db.port.getFirstSync<{ c: number }>('SELECT COUNT(*) AS c FROM recipes WHERE is_custom = 0')?.c).toBe(
+      MASTER_RECIPES.length
     );
   });
 
-  test('mapowanie uszkodzonego JSON w flavor_notes_json oraz sensory_scores_json zwraca wartości domyślne', () => {
-    mockDb.inventory.set('corrupted-bean', {
-      id: 'corrupted-bean',
-      name: 'Corrupted Bean',
-      type: 'coffee',
-      initial_weight_g: 250,
-      remaining_weight_g: 200,
-      flavor_notes_json: '{ bad json',
-      is_favorite: 0,
-      is_archived: 0,
-      created_at: '2026-10-15',
-      updated_at: '2026-10-15',
+  test('ponowna inicjalizacja nie dubluje receptur startowych', () => {
+    initDatabase(db.port);
+    const before = dumpTable(db.port, 'recipes');
+    initDatabase(db.port);
+    expect(dumpTable(db.port, 'recipes')).toEqual(before);
+  });
+
+  test('brakująca receptura startowa jest odtwarzana przy inicjalizacji', () => {
+    initDatabase(db.port);
+    const first = MASTER_RECIPES[0];
+    db.port.runSync('DELETE FROM recipes WHERE id = ?', [first.id]);
+    initDatabase(db.port);
+    expect(getRecipeById(first.id)?.name).toBe(first.name);
+  });
+
+  test('getDatabase otwiera bazę z konfiguracji i zwraca ten sam port', () => {
+    expect(getDatabase()).toBe(getDatabase());
+    expect(getDatabase()).toBe(db.port);
+  });
+
+  test('initDatabase bez argumentu otwiera bazę z konfiguracji', () => {
+    initDatabase();
+    expect(getRecipes().length).toBeGreaterThanOrEqual(MASTER_RECIPES.length);
+  });
+
+  test('bez konfiguracji bazy dostęp zgłasza błąd', () => {
+    configureDatabase(null);
+    expect(() => getDatabase()).toThrow('Baza danych nie jest skonfigurowana');
+  });
+
+  test('fallback lokalizacji jest zapisany w ustawieniach aplikacji', () => {
+    configureDatabase(() => ({
+      port: db.port,
+      fallback: { preferredDirectory: 'file:///Library/SQLite', reason: 'brak katalogu' },
+    }));
+    expect(getDatabaseFallback()).toEqual({ preferredDirectory: 'file:///Library/SQLite', reason: 'brak katalogu' });
+    expect(getAppSetting('db_location_fallback')).toBe('file:///Library/SQLite: brak katalogu');
+  });
+
+  test('bez fallbacku nic nie jest zapisywane i brak informacji o fallbacku', () => {
+    expect(getDatabaseFallback()).toBeNull();
+    expect(getAppSetting('db_location_fallback', 'brak')).toBe('brak');
+  });
+});
+
+describe('spiżarnia', () => {
+  test('zapis, odczyt, lista i archiwum', () => {
+    saveInventoryItem(item());
+    saveInventoryItem(item({ id: 'inv-2', name: 'Archiwum', isArchived: true }));
+    expect(getInventoryItemById('inv-1')).toMatchObject({ name: 'Kenia AA', flavorNotes: ['cytrus'], isFavorite: true });
+    expect(getInventoryItemById('brak')).toBeNull();
+    expect(getInventoryItems().map((i) => i.id)).toEqual(['inv-1']);
+    expect(getInventoryItems(true)).toHaveLength(2);
+  });
+
+  test('zapis z UI ustawia updatedAt na moment zapisu', () => {
+    saveInventoryItem(item({ updatedAt: '2000-01-01T00:00:00.000Z' }));
+    expect(getInventoryItemById('inv-1')?.updatedAt).not.toBe('2000-01-01T00:00:00.000Z');
+  });
+
+  test('odjęcie gramatury zaokrągla do 0,1 g i nie schodzi poniżej zera', () => {
+    saveInventoryItem(item({ remainingWeightGrams: 20 }));
+    deductInventoryWeight('inv-1', 15.25);
+    expect(getInventoryItemById('inv-1')?.remainingWeightGrams).toBe(4.8);
+    deductBeansForBrew('inv-1', 100);
+    expect(getInventoryItemById('inv-1')?.remainingWeightGrams).toBe(0);
+  });
+
+  test('odjęcie dla nieistniejącej paczki nic nie zmienia', () => {
+    expect(() => deductInventoryWeight('brak', 5)).not.toThrow();
+    expect(getInventoryItems(true)).toEqual([]);
+  });
+
+  test('usunięcie paczki', () => {
+    saveInventoryItem(item());
+    deleteInventoryItem('inv-1');
+    expect(getInventoryItemById('inv-1')).toBeNull();
+  });
+});
+
+describe('przepisy', () => {
+  test('filtrowanie po rodzaju napoju i sortowanie ulubionych', () => {
+    saveRecipe(recipe({ id: 'r-tea', name: 'Herbata', beverageType: 'TEA' }));
+    saveRecipe(recipe({ id: 'r-fav', name: 'Ulubiona', isFavorite: true }));
+    expect(getRecipes('TEA').map((r) => r.id)).toContain('r-tea');
+    expect(getRecipes('TEA').every((r) => r.beverageType === 'TEA')).toBe(true);
+    expect(getRecipes('COFFEE')[0].id).toBe('r-fav');
+  });
+
+  test('ulubione: przełączanie, jawne ustawienie i brak receptury', () => {
+    saveRecipe(recipe());
+    expect(toggleRecipeFavorite('rec-1')).toBe(true);
+    expect(getRecipeById('rec-1')?.isFavorite).toBe(true);
+    updateRecipeFavorite('rec-1', false);
+    expect(getRecipeById('rec-1')?.isFavorite).toBe(false);
+    expect(toggleRecipeFavorite('brak')).toBe(false);
+  });
+
+  test('duplikat tworzy recepturę własną z sufiksem', () => {
+    const copy = duplicateRecipe(
+      {
+        id: 'src',
+        name: 'Wzorzec',
+        type: 'TEA',
+        method: 'Gong Fu',
+        author: 'Źródło',
+        coffeeOrTeaDoseGrams: 5,
+        waterWeightGrams: 100,
+        waterTemperatureCelsius: 90,
+        grindSettingDescriptionPl: 'liście',
+        recommendedRatio: 20,
+        steps: [{ t: 1 }],
+      },
+      ' (Test)'
+    );
+    expect(copy).toMatchObject({
+      name: 'Wzorzec (Test)',
+      beverageType: 'TEA',
+      author: 'Źródło (Modyfikacja)',
+      doseGrams: 5,
+      waterGrams: 100,
+      waterTempCelsius: 90,
+      grindSizeDescription: 'liście',
+      stepsJson: '[{"t":1}]',
+      isCustom: true,
     });
+    expect(getRecipeById(copy.id)?.name).toBe('Wzorzec (Test)');
+  });
 
-    const item = getInventoryItemById('corrupted-bean');
-    expect(item).not.toBeNull();
-    expect(item?.flavorNotes).toEqual([]);
+  test('usunięcie receptury', () => {
+    saveRecipe(recipe());
+    deleteRecipe('rec-1');
+    expect(getRecipeById('rec-1')).toBeNull();
+  });
+});
 
-    mockDb.sessions.set('corrupted-sess', {
-      id: 'corrupted-sess',
-      recipe_name: 'Corrupted Session',
-      beverage_type: 'COFFEE',
-      method: 'V60',
-      dose_g: 15,
-      water_g: 250,
-      water_temp_c: 93,
-      total_time_seconds: 180,
-      flavor_tags_json: '{ bad tags',
-      sensory_scores_json: '{ bad sensory',
-      brewed_at: '2026-10-15T12:00:00Z',
+describe('dziennik parzeń', () => {
+  test('zapis i odczyt sesji z profilem sensorycznym', () => {
+    saveBrewSession(
+      session({ sensory: { acidity: 3, sweetness: 4, body: 2, clarity: 5, finish: 3 }, tdsPercentage: 1.4, rating: 5, infusionNumber: 2 })
+    );
+    expect(getBrewSessionById('ses-1')).toMatchObject({
+      flavorTags: ['owoce'],
+      sensory: { acidity: 3, sweetness: 4, body: 2, clarity: 5, finish: 3 },
+      tdsPercentage: 1.4,
+      rating: 5,
+      infusionNumber: 2,
     });
-
-    const session = getBrewSessionById('corrupted-sess');
-    expect(session).not.toBeNull();
-    expect(session?.flavorTags).toEqual([]);
-    expect(session?.sensory).toBeUndefined();
+    expect(getBrewSessionById('brak')).toBeNull();
   });
 
-  test('Pobiera i zapisuje ustawienia aplikacji (getAppSetting, setAppSetting)', () => {
-    // Domyślna wartość gdy brak klucza
-    expect(getAppSetting('default_grinder', 'comandante_c40')).toBe('comandante_c40');
-
-    // Zapisz nowe ustawienie
-    setAppSetting('default_grinder', 'fellow_ode_gen2');
-    expect(getAppSetting('default_grinder', 'comandante_c40')).toBe('fellow_ode_gen2');
+  test('lista dziennika domyślnie zwraca 100 najnowszych sesji', () => {
+    for (let i = 0; i < 105; i++) {
+      saveBrewSession(session({ id: `s-${i}`, brewedAt: `2026-10-22T07:${String(i % 60).padStart(2, '0')}:00.000Z` }));
+    }
+    expect(getBrewSessions()).toHaveLength(100);
+    expect(getBrewSessions(3)).toHaveLength(3);
   });
 
-  test('Pobiera i zapisuje jednostki miar (getUnitSystem, setUnitSystem)', () => {
-    expect(getUnitSystem()).toBe('metric');
-    setUnitSystem('imperial');
-    expect(getUnitSystem()).toBe('imperial');
-    setUnitSystem('metric');
-    expect(getUnitSystem()).toBe('metric');
+  test('transakcja: sesja i zdjęcie z zapasu razem, a bez odjęcia tylko sesja', () => {
+    saveInventoryItem(item({ remainingWeightGrams: 30 }));
+    recordBrewSessionTransaction(session({ id: 'tx-1' }), { itemId: 'inv-1', doseGrams: 15 });
+    expect(getInventoryItemById('inv-1')?.remainingWeightGrams).toBe(15);
+
+    recordBrewSessionTransaction(session({ id: 'tx-2' }), { itemId: '', doseGrams: 15 });
+    recordBrewSessionTransaction(session({ id: 'tx-3' }), { itemId: 'inv-1', doseGrams: 0 });
+    recordBrewSessionTransaction(session({ id: 'tx-4' }));
+    expect(getInventoryItemById('inv-1')?.remainingWeightGrams).toBe(15);
+    expect(getBrewSessionById('tx-4')).not.toBeNull();
   });
 
-  test('Pobiera i zapisuje ustawienia dostępności i haptyki (getVoiceAnnounceEnabled, getHapticsEnabled)', () => {
-    // Domyślnie włączone
-    expect(getVoiceAnnounceEnabled()).toBe(true);
-    expect(getHapticsEnabled()).toBe(true);
+  test('usunięcie sesji', () => {
+    saveBrewSession(session());
+    deleteBrewSession('ses-1');
+    expect(getBrewSessionById('ses-1')).toBeNull();
+  });
+});
 
-    // Wyłączenie
-    setVoiceAnnounceEnabled(false);
-    expect(getVoiceAnnounceEnabled()).toBe(false);
+describe('kofeina', () => {
+  test('filtr od podanej chwili i pełna lista bez argumentu', () => {
+    logCaffeine(caffeine({ id: 'old', consumedAt: '2026-10-20T08:00:00.000Z' }));
+    logCaffeine(caffeine({ id: 'new', consumedAt: '2026-10-22T08:00:00.000Z', brewSessionId: 'ses-9' }));
+    expect(getCaffeineLogs('2026-10-21T00:00:00.000Z').map((l) => l.id)).toEqual(['new']);
+    expect(getCaffeineLogs().map((l) => l.id)).toEqual(['new', 'old']);
+    expect(getCaffeineLogs()[0].brewSessionId).toBe('ses-9');
+    expect(getCaffeineLogs()[1].brewSessionId).toBeUndefined();
+  });
 
-    setHapticsEnabled(false);
-    expect(getHapticsEnabled()).toBe(false);
+  test('usunięcie wpisu', () => {
+    logCaffeine(caffeine());
+    deleteCaffeineLog('caf-1');
+    expect(getCaffeineLogs()).toEqual([]);
+  });
+});
 
-    // Ponowne włączenie
-    setVoiceAnnounceEnabled(true);
-    expect(getVoiceAnnounceEnabled()).toBe(true);
+describe('ustawienia aplikacji', () => {
+  test('ogólne odczyty i zapisy', () => {
+    expect(getAppSetting('brak', 'domyślna')).toBe('domyślna');
+    setAppSetting('klucz', 'wartość');
+    expect(getAppSetting('klucz')).toBe('wartość');
+  });
 
+  test('przełączniki działają w obu kierunkach (HealthKit, Pro, onboarding, haptyka)', () => {
     setHapticsEnabled(true);
     expect(getHapticsEnabled()).toBe(true);
-  });
-
-  test('Pobiera i zapisuje status licencji Pro (getIsProUser, setIsProUser)', () => {
-    // Domyślnie false
-    expect(getIsProUser()).toBe(false);
-
-    // Aktywacja Pro
-    setIsProUser(true);
-    expect(getIsProUser()).toBe(true);
-
-    // Dezaktywacja Pro
     setIsProUser(false);
     expect(getIsProUser()).toBe(false);
-  });
-
-  test('D-02 & BR-KOF-003: Pobiera i zapisuje metabolizm kofeiny oraz godzinę snu', () => {
-    // Domyślne wartości
-    expect(getCaffeineHalfLife()).toBe(5.0);
-    expect(getBedtimeHour()).toBe(23);
-
-    // Zmiana czasu półtrwania (np. 6.5h)
-    setCaffeineHalfLife(6.5);
-    expect(getCaffeineHalfLife()).toBe(6.5);
-
-    // Ograniczenia klamrowe (clamping: 3.0h - 8.0h)
-    setCaffeineHalfLife(1.5);
-    expect(getCaffeineHalfLife()).toBe(3.0);
-    setCaffeineHalfLife(10.0);
-    expect(getCaffeineHalfLife()).toBe(8.0);
-
-    // Przywrócenie 5.0h
-    setCaffeineHalfLife(5.0);
-    expect(getCaffeineHalfLife()).toBe(5.0);
-
-    // Zmiana godziny snu (np. 22:00)
-    setBedtimeHour(22);
-    expect(getBedtimeHour()).toBe(22);
-
-    // Ograniczenia klamrowe (clamping: 18 - 28)
-    setBedtimeHour(10);
-    expect(getBedtimeHour()).toBe(18);
-    setBedtimeHour(35);
-    expect(getBedtimeHour()).toBe(28);
-
-    // Przywrócenie 23:00
-    setBedtimeHour(23);
-    expect(getBedtimeHour()).toBe(23);
-  });
-
-  test('BR-KOF-002: Pobiera i zapisuje flagę synchronizacji HealthKit w bazie', () => {
-    expect(getHealthKitSyncEnabled()).toBe(false);
-
-    setHealthKitSyncEnabled(true);
-    expect(getHealthKitSyncEnabled()).toBe(true);
-
     setHealthKitSyncEnabled(false);
     expect(getHealthKitSyncEnabled()).toBe(false);
-  });
-
-  test('getDatabase zwraca instancję bazy danych', () => {
-    const db = getDatabase();
-    expect(db).toBeDefined();
-  });
-
-  test('Pobiera i zapisuje stan ukończenia onboardingu', () => {
-    expect(getHasCompletedOnboarding()).toBe(false);
-    setHasCompletedOnboarding(true);
-    expect(getHasCompletedOnboarding()).toBe(true);
     setHasCompletedOnboarding(false);
     expect(getHasCompletedOnboarding()).toBe(false);
   });
 
-  test('Pobiera i zapisuje preferencje naparów (both, coffee, tea)', () => {
-    expect(getBeveragePreference()).toBe('both');
-    setBeveragePreference('coffee');
-    expect(getBeveragePreference()).toBe('coffee');
-    setBeveragePreference('tea');
-    expect(getBeveragePreference()).toBe('tea');
-    setBeveragePreference('both');
-    expect(getBeveragePreference()).toBe('both');
+  test('jednostki, powiadomienia, haptyka i Pro', () => {
+    expect(getUnitSystem()).toBe('metric');
+    setUnitSystem('imperial');
+    expect(getUnitSystem()).toBe('imperial');
+    expect(getVoiceAnnounceEnabled()).toBe(true);
+    setVoiceAnnounceEnabled(false);
+    expect(getVoiceAnnounceEnabled()).toBe(false);
+    expect(getHapticsEnabled()).toBe(true);
+    setHapticsEnabled(false);
+    expect(getHapticsEnabled()).toBe(false);
+    expect(getIsProUser()).toBe(false);
+    setIsProUser(true);
+    expect(getIsProUser()).toBe(true);
   });
 
-  describe('RD-ENG-10 & NFR-SEC-015: escapeCsvCell (Formula Injection Escape)', () => {
-    test('Wektory testowe z dokumentu BRD (RD-ENG-10)', () => {
-      // • "=SUM(A1:A5)" -> "'=SUM(A1:A5)"
-      expect(escapeCsvCell('=SUM(A1:A5)')).toBe("\"'=SUM(A1:A5)\"");
+  test('metabolizm kofeiny i godzina snu są ograniczane do dozwolonych zakresów', () => {
+    expect(getCaffeineHalfLife()).toBe(5);
+    setCaffeineHalfLife(9);
+    expect(getCaffeineHalfLife()).toBe(8);
+    setCaffeineHalfLife(1);
+    expect(getCaffeineHalfLife()).toBe(3);
+    setAppSetting('caffeine_half_life_hours', 'abc');
+    expect(getCaffeineHalfLife()).toBe(5);
 
-      // • "+cmd|' /C calc'!A0" -> "'+cmd|' /C calc'!A0"
-      expect(escapeCsvCell("+cmd|' /C calc'!A0")).toBe("\"'+cmd|' /C calc'!A0\"");
+    expect(getBedtimeHour()).toBe(23);
+    setBedtimeHour(30);
+    expect(getBedtimeHour()).toBe(28);
+    setBedtimeHour(10);
+    expect(getBedtimeHour()).toBe(18);
+    setAppSetting('bedtime_hour', 'x');
+    expect(getBedtimeHour()).toBe(23);
+  });
 
-      // • "-12.5" -> "-12.5" (zwykła liczba ujemna)
-      expect(escapeCsvCell('-12.5')).toBe('-12.5');
+  test('HealthKit, onboarding i preferencje naparów', () => {
+    expect(getHealthKitSyncEnabled()).toBe(false);
+    setHealthKitSyncEnabled(true);
+    expect(getHealthKitSyncEnabled()).toBe(true);
 
-      // • 'Notatka z "cudzysłowem", przecinkiem' -> '"Notatka z ""cudzysłowem"", przecinkiem"'
-      expect(escapeCsvCell('Notatka z "cudzysłowem", przecinkiem')).toBe(
-        '"Notatka z ""cudzysłowem"", przecinkiem"'
-      );
+    expect(getHasCompletedOnboarding()).toBe(false);
+    setHasCompletedOnboarding(true);
+    expect(getHasCompletedOnboarding()).toBe(true);
+
+    expect(getBeveragePreference()).toBe('both');
+    setBeveragePreference('tea');
+    expect(getBeveragePreference()).toBe('tea');
+    setAppSetting('beverage_preference', 'inne');
+    expect(getBeveragePreference()).toBe('both');
+  });
+});
+
+describe('eksport danych', () => {
+  test('stan do kopii zawiera wszystkie dane bez kluczy niepenetrowalnych', () => {
+    saveInventoryItem(item());
+    setAppSetting('unit_system', 'imperial');
+    setIsProUser(true);
+    const state = getBackupState();
+    expect(state.inventory.map((i) => i.id)).toEqual(['inv-1']);
+    expect(state.settings).toEqual({ unit_system: 'imperial' });
+  });
+
+  test('kopia JSON w formacie v2 zawiera dane i pomija klucze niepenetrowalne', () => {
+    saveInventoryItem(item());
+    saveRecipe(recipe());
+    saveBrewSession(session());
+    logCaffeine(caffeine());
+    setIsProUser(true);
+    setUnitSystem('imperial');
+
+    const parsed = JSON.parse(exportAllDataJson());
+    expect(parsed).toMatchObject({ format: 'napar-backup', version: 2 });
+    expect(parsed.state.inventory).toHaveLength(1);
+    expect(parsed.state.customRecipes.map((r: SavedRecipe) => r.id)).toEqual(['rec-1']);
+    expect(parsed.state.sessions).toHaveLength(1);
+    expect(parsed.state.caffeineLogs).toHaveLength(1);
+    expect(parsed.state.settings).toEqual({ unit_system: 'imperial' });
+  });
+
+  test('eksport CSV sesji i spiżarni zawiera nagłówki i wiersze', () => {
+    saveInventoryItem(item());
+    saveBrewSession(session({ notes: '=HYPERLINK("x")' }));
+    expect(exportSessionsCsv().split('\n')[0]).toMatch(/^id,brewed_at,/);
+    expect(exportSessionsCsv()).toContain(`"'=HYPERLINK(""x"")"`);
+    expect(exportInventoryCsv().split('\n')[1]).toMatch(/^inv-1,Kenia AA,coffee,/);
+  });
+
+  test('eksport CSV nie obcina wyników do 100 wierszy', () => {
+    for (let i = 0; i < 120; i++) {
+      saveBrewSession(session({ id: `e-${i}`, brewedAt: `2026-10-22T06:00:${String(i % 60).padStart(2, '0')}.000Z` }));
+    }
+    expect(exportSessionsCsv().split('\n')).toHaveLength(121);
+  });
+});
+
+describe('ustawienia przy niedostępnej bazie', () => {
+  test('odczyty dają wartości domyślne, a zapisy są pomijane bez błędu', () => {
+    configureDatabase(() => {
+      throw new Error('brak pliku');
     });
-
-    test('Ucieczka znaków niebezpiecznych (@, tab, enter)', () => {
-      expect(escapeCsvCell('@danger')).toBe("\"'@danger\"");
-      expect(escapeCsvCell('\ttext')).toBe("\"'\ttext\"");
-      expect(escapeCsvCell('\rtext')).toBe("\"'\rtext\"");
-    });
-
-    test('Wartości puste i null/undefined', () => {
-      expect(escapeCsvCell(null)).toBe('');
-      expect(escapeCsvCell(undefined)).toBe('');
-      expect(escapeCsvCell('')).toBe('');
-      expect(escapeCsvCell(123)).toBe('123');
-    });
+    expect(getUnitSystem()).toBe('metric');
+    expect(getAppSetting('brak', 'dom')).toBe('dom');
+    expect(() => setUnitSystem('imperial')).not.toThrow();
+    expect(() => setAppSetting('x', 'y')).not.toThrow();
+    expect(() => getDatabase()).toThrow('brak pliku');
   });
 });

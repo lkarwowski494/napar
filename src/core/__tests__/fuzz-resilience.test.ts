@@ -30,7 +30,8 @@ jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => mockDb),
 }));
 
-import { importDataJson } from '../database';
+import { importBackup } from '../database';
+import { parseAndValidateBackup } from '../backup';
 
 describe('Chaos & Fuzzing: Extraction Mathematics & Physical Limits', () => {
   test('Chaos 1: Ekstremalne, ujemne i zmutowane liczby w kalkulatorze proporcji i uzysku', () => {
@@ -185,7 +186,7 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
 
     for (const payload of malformedPayloads) {
       try {
-        importDataJson(payload);
+        importBackup(parseAndValidateBackup(payload));
       } catch (err: any) {
         // Import musi bezpiecznie odrzucić błędem z komunikatem, bez niekontrolowanego unhandled crasha
         expect(err).toBeInstanceOf(Error);

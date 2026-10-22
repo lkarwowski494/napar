@@ -13,10 +13,7 @@ import {
   logCaffeine,
   deductInventoryWeight,
   deductBeansForBrew,
-  getInventoryItems,
-  getRecipes,
-  getBrewSessions,
-  getCaffeineLogs,
+  getBackupState,
   getAppSetting,
   setAppSetting,
   getVoiceAnnounceEnabled,
@@ -344,12 +341,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Apps4Brew SEC-09: Automatyczna rotacja 10 kopii JSON w tle (Zadanie N5)
     try {
-      void autoBackup({
-        inventory: getInventoryItems(true),
-        customRecipes: getRecipes().filter((r) => r.isCustom),
-        sessions: getBrewSessions(5000),
-        caffeineLogs: getCaffeineLogs(),
-      });
+      void autoBackup(getBackupState());
     } catch {
       // Ignoruj błędy kopii zapasowej w tle
     }

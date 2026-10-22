@@ -29,9 +29,7 @@ import {
   logCaffeine,
   deductInventoryWeight,
   getInventoryItems,
-  getBrewSessions,
-  getCaffeineLogs,
-  getRecipes,
+  getBackupState,
   getUnitSystem,
 } from '../src/core/database';
 import { InventoryItem } from '../src/core/database-schema';
@@ -236,12 +234,7 @@ export default function GongfuScreen() {
 
         recordBrew();
         try {
-          void autoBackup({
-            inventory: getInventoryItems(true),
-            customRecipes: getRecipes().filter((r) => r.isCustom),
-            sessions: getBrewSessions(5000),
-            caffeineLogs: getCaffeineLogs(),
-          });
+          void autoBackup(getBackupState());
         } catch {
           // fallback
         }

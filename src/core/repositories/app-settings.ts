@@ -1,0 +1,129 @@
+// ============================================================================
+// Napar (Steepwise) — Repozytorium: Ustawienia aplikacji (key-value)
+// ============================================================================
+
+import type { DbPort } from '../db-port';
+
+export type BeveragePreference = 'both' | 'coffee' | 'tea';
+
+/**
+ * Klucze lokalne dla urządzenia lub uprawnień: nie trafiają do kopii zapasowej
+ * i nie są przywracane z pliku (np. stan Pro pochodzi wyłącznie z zakupu, nie z pliku).
+ */
+export const NON_PORTABLE_SETTING_KEYS: readonly string[] = ['is_pro_active', 'db_location_fallback'];
+
+export function getAppSetting(db: DbPort, key: string, defaultValue = ''): string {
+  try {
+    const row = db.getFirstSync<{ value: string }>('SELECT value FROM app_settings WHERE key = ?', [key]);
+    return row ? row.value : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+}
+
+/** Zapis wprost; błąd propaguje się do wywołującego (używa go import kopii w transakcji). */
+export function upsertAppSetting(db: DbPort, key: string, value: string): void {
+  db.runSync('INSERT OR REPLACE INTO app_settings (key, value) VALUES (?, ?)', [key, value]);
+}
+
+export function setAppSetting(db: DbPort, key: string, value: string): void {
+  try {
+    upsertAppSetting(db, key, value);
+  } catch {
+    // ignoruj błąd zapisu ustawienia (środowisko bez tabeli)
+  }
+}
+
+/** Wszystkie ustawienia bez kluczy niepenetrowalnych — do kopii zapasowej. */
+export function listPortableAppSettings(db: DbPort): { key: string; value: string }[] {
+  const rows = db.getAllSync<{ key: string; value: string }>(
+    'SELECT key, value FROM app_settings ORDER BY key ASC'
+  );
+  return rows.filter((row) => !NON_PORTABLE_SETTING_KEYS.includes(row.key));
+}
+
+export function getUnitSystem(db: DbPort): 'metric' | 'imperial' {
+  return getAppSetting(db, 'unit_system', 'metric') === 'imperial' ? 'imperial' : 'metric';
+}
+
+export function setUnitSystem(db: DbPort, unit: 'metric' | 'imperial'): void {
+  setAppSetting(db, 'unit_system', unit);
+}
+
+export function getVoiceAnnounceEnabled(db: DbPort): boolean {
+  return getAppSetting(db, 'voice_announce_enabled', 'true') !== 'false';
+}
+
+export function setVoiceAnnounceEnabled(db: DbPort, enabled: boolean): void {
+  setAppSetting(db, 'voice_announce_enabled', enabled ? 'true' : 'false');
+}
+
+export function getHapticsEnabled(db: DbPort): boolean {
+  return getAppSetting(db, 'haptics_enabled', 'true') !== 'false';
+}
+
+export function setHapticsEnabled(db: DbPort, enabled: boolean): void {
+  setAppSetting(db, 'haptics_enabled', enabled ? 'true' : 'false');
+}
+
+export function getIsProUser(db: DbPort): boolean {
+  return getAppSetting(db, 'is_pro_active', 'false') === 'true';
+}
+
+export function setIsProUser(db: DbPort, enabled: boolean): void {
+  setAppSetting(db, 'is_pro_active', enabled ? 'true' : 'false');
+}
+
+export function getCaffeineHalfLife(db: DbPort): number {
+  const val = parseFloat(getAppSetting(db, 'caffeine_half_life_hours', '5.0'));
+  if (isNaN(val) || val < 3.0 || val > 8.0) {
+    return 5.0;
+  }
+  return Number(val.toFixed(1));
+}
+
+export function setCaffeineHalfLife(db: DbPort, hours: number): void {
+  const clamped = Math.max(3.0, Math.min(8.0, hours));
+  setAppSetting(db, 'caffeine_half_life_hours', clamped.toFixed(1));
+}
+
+export function getBedtimeHour(db: DbPort): number {
+  const val = parseInt(getAppSetting(db, 'bedtime_hour', '23'), 10);
+  if (isNaN(val) || val < 18 || val > 28) {
+    return 23;
+  }
+  return val;
+}
+
+export function setBedtimeHour(db: DbPort, hour: number): void {
+  const clamped = Math.max(18, Math.min(28, hour));
+  setAppSetting(db, 'bedtime_hour', clamped.toString());
+}
+
+export function getHealthKitSyncEnabled(db: DbPort): boolean {
+  return getAppSetting(db, 'healthkit_sync_enabled', 'false') === 'true';
+}
+
+export function setHealthKitSyncEnabled(db: DbPort, enabled: boolean): void {
+  setAppSetting(db, 'healthkit_sync_enabled', enabled ? 'true' : 'false');
+}
+
+export function getBeveragePreference(db: DbPort): BeveragePreference {
+  const val = getAppSetting(db, 'beverage_preference', 'both');
+  if (val === 'coffee' || val === 'tea') {
+    return val;
+  }
+  return 'both';
+}
+
+export function setBeveragePreference(db: DbPort, pref: BeveragePreference): void {
+  setAppSetting(db, 'beverage_preference', pref);
+}
+
+export function getHasCompletedOnboarding(db: DbPort): boolean {
+  return getAppSetting(db, 'onboarding_completed') === 'true';
+}
+
+export function setHasCompletedOnboarding(db: DbPort, completed: boolean): void {
+  setAppSetting(db, 'onboarding_completed', completed ? 'true' : 'false');
+}

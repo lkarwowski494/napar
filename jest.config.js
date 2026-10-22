@@ -47,6 +47,11 @@ module.exports = {
     './src/core/app-access.ts': { statements: 98, branches: 94, functions: 100, lines: 98 },
     './src/core/live-activity.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/craft-suite-theme.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    // Przebudowa etapu 2 (persystencja i kopie): 100% bez wyjątków
+    './src/core/repositories/': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './src/core/backup.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './src/core/csv-export.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './src/core/db-location.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './app/': {
       statements: 88,
       branches: 70,

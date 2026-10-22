@@ -12,7 +12,7 @@ import { join } from 'node:path';
 // Importy logiki i komponentów
 import { wInKeep, roundTo } from '../src/core/unit-converter';
 import { remainingTimerSec } from '../src/core/timer-engine';
-import { escapeCsvCell } from '../src/core/database';
+import { escapeCsvCell } from '../src/core/csv-export';
 import {
   saveBackupSafely,
   rotateBackupFiles,

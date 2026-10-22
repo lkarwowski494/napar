@@ -23,7 +23,7 @@ jest.mock('expo-sqlite', () => ({
   })),
 }));
 
-import { escapeCsvValue } from '../database';
+import { escapeCsvCell } from '../csv-export';
 
 function measureCpuMs(fn: () => unknown, runs = 5): number {
   fn(); // Rozgrzewka JIT
@@ -119,7 +119,7 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     const ms = measureCpuMs(() => {
       for (let i = 0; i < 5000; i++) {
         const val = sampleStrings[i % sampleStrings.length];
-        escapeCsvValue(val as any);
+        escapeCsvCell(val);
       }
     });
 

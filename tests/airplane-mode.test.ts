@@ -158,7 +158,7 @@ import {
   getCaffeineLogs,
   logCaffeine,
   exportAllDataJson,
-  importDataJson,
+  importBackup,
   exportSessionsCsv,
   exportInventoryCsv,
   getAppSetting,
@@ -175,7 +175,7 @@ import {
   activateSubscription,
   TRIAL_MAX_BREWS,
 } from '../src/core/app-access';
-import { buildBackup } from '../src/core/backup';
+import { buildBackup, parseAndValidateBackup } from '../src/core/backup';
 
 describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
   const originalFetch = global.fetch;
@@ -337,7 +337,7 @@ describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
     });
 
     const backupJson = exportAllDataJson();
-    expect(backupJson).toContain('"version": 1');
+    expect(backupJson).toContain('"version": 2');
     expect(backupJson).toContain('offline-ethiopia-02');
 
     const inventoryCsv = exportInventoryCsv();
@@ -349,10 +349,11 @@ describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
       customRecipes: getRecipes().filter((r) => r.isCustom),
       sessions: getBrewSessions(),
       caffeineLogs: getCaffeineLogs(),
+      settings: {},
     });
-    expect(backupObj.schemaVersion).toBeGreaterThanOrEqual(1);
+    expect(backupObj.version).toBe(2);
 
-    importDataJson(backupJson);
+    importBackup(parseAndValidateBackup(backupJson));
     const reloadedInventory = getInventoryItems(true);
     expect(reloadedInventory.some((i) => i.id === 'offline-ethiopia-02')).toBe(true);
   });
