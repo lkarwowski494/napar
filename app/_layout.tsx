@@ -64,6 +64,13 @@ export default function RootLayout() {
                 headerShown: false,
               }}
             />
+            <Stack.Screen
+              name="milk-drinks"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
           </Stack>
         </BrewProvider>
       </LanguageProvider>

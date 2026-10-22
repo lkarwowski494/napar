@@ -1276,6 +1276,102 @@
         "src/core/brew-context.tsx (zapis parzenia, pola grinder*)"
       ],
       "przeglad": null
+    },
+    {
+      "id": "NM-01",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/milk-drinks.ts:48 (MILK_DRINKS: espresso)",
+      "cytat": "Espresso (dwie porcje, 60 ml), składnik jedyny, bez mleka",
+      "kategoria": "PRIORYTET: napoje mleczne (poz. 32 MVP)",
+      "typ": "liczba",
+      "uwaga": "Domyślna objętość espresso w filiżance: 60 ml (podwójna porcja). Wartość robocza, nie wynika z żadnego źródła. Espresso nie jest skalowalne (brak zmiany objętości w aplikacji). Brak zakresu temperatury (napój bez mleka).",
+      "status": "[OCENA]",
+      "zrodla": [
+        "docs/research/napoje-mleczne-2026-10-22.md (M-04, M-06: wartość wybrana przez autora, bez standardu)"
+      ],
+      "przeglad": null
+    },
+    {
+      "id": "NM-02",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/milk-drinks.ts:57 (MILK_DRINKS: cappuccino)",
+      "cytat": "Cappuccino: espresso 60 ml + mleko 60 ml + pianka 60 ml = 180 ml filiżanki",
+      "kategoria": "PRIORYTET: napoje mleczne (poz. 32 MVP)",
+      "typ": "liczba",
+      "uwaga": "Trzy równe części zgodnie z M-04 (łącznie 150–180 ml, zgodne w blogach, bez standardu). Wartość 180 ml i podział 60/60/60 wybrane przez autora aplikacji. Nie wpisywać jako definicji SCA (M-05 niepotwierdzone).",
+      "status": "[OCENA]",
+      "zrodla": [
+        "docs/research/napoje-mleczne-2026-10-22.md (M-04, M-06: wartość wybrana przez autora, bez standardu)"
+      ],
+      "przeglad": null
+    },
+    {
+      "id": "NM-03",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/milk-drinks.ts:70 (MILK_DRINKS: latte)",
+      "cytat": "Latte: espresso 60 ml + mleko 180 ml = 240 ml filiżanki (proporcja 1:3)",
+      "kategoria": "PRIORYTET: napoje mleczne (poz. 32 MVP)",
+      "typ": "liczba",
+      "uwaga": "Proporcja 1:3 wybrana spośród rozbieżnych źródeł (M-06: 1:2 lub 1:3). Objętość filiżanki 240 ml to dolna granica zakresu M-06 (240–350 ml). Wartości robocze.",
+      "status": "[OCENA]",
+      "zrodla": [
+        "docs/research/napoje-mleczne-2026-10-22.md (M-04, M-06: wartość wybrana przez autora, bez standardu)"
+      ],
+      "przeglad": null
+    },
+    {
+      "id": "NM-04",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/milk-drinks.ts:82 (MILK_DRINKS: flatWhite)",
+      "cytat": "Flat white: espresso 60 ml + mleko (mikropianka) 120 ml = 180 ml filiżanki (proporcja 1:2)",
+      "kategoria": "PRIORYTET: napoje mleczne (poz. 32 MVP)",
+      "typ": "liczba",
+      "uwaga": "Wartości robocze autora aplikacji; brak źródła w pliku badań dla tej pozycji (M-04 i M-06 dotyczą cappuccino i latte). Do przeglądu przy kolejnym przeglądzie treści.",
+      "status": "[OCENA]",
+      "zrodla": [
+        "docs/research/napoje-mleczne-2026-10-22.md (M-04, M-06: wartość wybrana przez autora, bez standardu)"
+      ],
+      "przeglad": null
+    },
+    {
+      "id": "NM-05",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/milk-drinks.ts:94 (MILK_DRINKS: mocha)",
+      "cytat": "Mocha: espresso 60 ml + syrop czekoladowy 20 ml + mleko 160 ml = 240 ml filiżanki",
+      "kategoria": "PRIORYTET: napoje mleczne (poz. 32 MVP)",
+      "typ": "liczba",
+      "uwaga": "Wartości robocze autora aplikacji; brak źródła w pliku badań dla tej pozycji. Ilość syropu to przybliżenie domowe.",
+      "status": "[OCENA]",
+      "zrodla": [
+        "docs/research/napoje-mleczne-2026-10-22.md (M-04, M-06: wartość wybrana przez autora, bez standardu)"
+      ],
+      "przeglad": null
+    },
+    {
+      "id": "NM-06",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/milk-drinks.ts:39 (MILK_TEMPERATURE_RANGE_C)",
+      "cytat": "Temperatura spienionego mleka dla cappuccino, latte, flat white i mocha: 60–68 °C",
+      "kategoria": "PRIORYTET: napoje mleczne (poz. 32 MVP)",
+      "typ": "liczba",
+      "uwaga": "Zakres z M-01 (Clive Coffee, Corner Coffee: zgodne ze sobą, bez źródła pierwotnego). Status do sprawdzenia źródłem pierwotnym (materiały SCA lub przegląd recenzowany). Nie wolno podawać jako wymogu SCA (M-02 i M-05 niepotwierdzone). Górna granica łączy się z M-03 (powyżej ok. 75 °C pianka traci strukturę; źródło handlowe, [OCENA]).",
+      "status": "do sprawdzenia",
+      "zrodla": [
+        "docs/research/napoje-mleczne-2026-10-22.md (M-01)"
+      ],
+      "przeglad": null
+    },
+    {
+      "id": "NM-07",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/milk-drinks.ts:42 (MILK_CUP_STEP_ML, MILK_CUP_MIN_ML, MILK_CUP_MAX_ML)",
+      "cytat": "Zmiana objętości filiżanki o 30 ml, granice 120–360 ml",
+      "kategoria": "PRIORYTET: napoje mleczne (poz. 32 MVP)",
+      "typ": "decyzja techniczna",
+      "uwaga": "Ustawienia interfejsu, nie twierdzenie o napoju. Granice obejmują przedział, w którym przepisy zachowują proporcje. Zmiana wymaga jedynie aktualizacji stałych.",
+      "status": "[OCENA]",
+      "zrodla": [],
+      "przeglad": null
     }
   ]
 }

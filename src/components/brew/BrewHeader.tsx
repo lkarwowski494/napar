@@ -35,6 +35,7 @@ interface BrewHeaderProps {
   onOpenGrinderModal: () => void;
   onOpenShareModal: () => void;
   onNavigateToGongfu: () => void;
+  onNavigateToMilkDrinks?: () => void;
 }
 
 export function BrewHeader({
@@ -53,6 +54,7 @@ export function BrewHeader({
   onOpenGrinderModal,
   onOpenShareModal,
   onNavigateToGongfu,
+  onNavigateToMilkDrinks,
 }: BrewHeaderProps) {
   const { t } = useTranslation();
 
@@ -263,6 +265,18 @@ export function BrewHeader({
           </Text>
         </Pressable>
       )}
+
+      {/* Poz. 32 MVP: przepisy na napoje mleczne i latte art (kawa) */}
+      {!isTea && beveragePreference !== 'tea' && onNavigateToMilkDrinks && (
+        <Pressable
+          testID="milk-drinks-btn"
+          style={styles.milkBanner}
+          onPress={onNavigateToMilkDrinks}
+          accessibilityRole="button"
+        >
+          <Text style={styles.milkBannerText}>{t.milkDrinks.entry}</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -457,6 +471,24 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     minHeight: 48,
     justifyContent: 'center',
+  },
+  milkBanner: {
+    backgroundColor: theme.colors.copperMuted,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    borderRadius: theme.borderRadius.md,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    marginBottom: 12,
+    minHeight: 48,
+    justifyContent: 'center',
+  },
+  milkBannerText: {
+    color: theme.colors.copperLight,
+    fontWeight: '700',
+    fontSize: 12,
+    letterSpacing: 0.2,
   },
   gongfuBannerText: {
     color: theme.colors.emeraldLight,

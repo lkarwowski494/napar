@@ -131,6 +131,7 @@ export default function BrewScreen() {
         onOpenGrinderModal={() => setShowGrinderModal(true)}
         onOpenShareModal={() => setShowShareModal(true)}
         onNavigateToGongfu={() => router.push('/gongfu')}
+        onNavigateToMilkDrinks={() => router.push('/milk-drinks')}
       />
 
       {/* Wzorzec P16: Zwijana karta inline wyboru receptury */}
