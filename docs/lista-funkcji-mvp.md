@@ -71,4 +71,4 @@ Numery zachowane z poprzedniej listy. Status: **MVP** (pierwsza wersja), **1.1**
 - **B. PL i EN w MVP, reszta w 1.1:** tańsze, szybciej do premiery.
 - **Rekomendacja: B**, chyba że 35 języków jest warunkiem sprzedaży, czego nie wiem.
 
-**Liczba:** 31 pozycji MVP, 2 w wersji 1.1 (6, 18), 1 później (21). Po uwagach A i B: 28 MVP (bez 22 i 32).
+**Liczba:** 31 pozycji MVP, 2 w wersji 1.1 (6, 18), 1 później (21). Po uwagach A i B (bez 22 i 32): 29 MVP.
