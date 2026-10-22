@@ -164,3 +164,18 @@ Zrobione na gałęzi `claude/wykonaj-sl7vii`:
 Wynik bramki: `npm run verify` kod 0 (77 zestawów, 649 testów); `npm run test:coverage` kod 0 z nowymi progami.
 
 Dług do spłaty w etapach 1–2: 18 plików w allowliście (zlikwidowany wraz z przepisaniem domeny i warstwy UI), progi 100% w `src/core/` (wracamy do nich w miarę przepisywania).
+
+## Status etapu 1 (22.10.2026)
+
+Zrobione (commity `f7ac0dd`, `c61ba5a`, `55cbef8`, `4376d9d`):
+- EY przyjmuje obiekt z nazwanymi polami; wszystkie wywołania poprawione; test wektorowy 300 g / TDS 1,4 % / 20 g → 21,0 %.
+- Gongfu: ocena z danych sesji (bez stałej 5), balans bez stałej wartości, jednostki imperialne spójne (test okrągły g/oz, ml/fl oz, °C/°F).
+- Przecinek jako separator: `parseDecimal` w trzech ekranach dial-in.
+- Rejestr: 90 wpisów S-001…S-090 (status „do sprawdzenia”).
+- Bramka 100% instrukcji, gałęzi, funkcji i linii w sześciu modułach domenowych i `parse-decimal.ts`. `verify`: kod 0 (83 zestawy, 783 testy); `test:coverage`: kod 0.
+
+Otwarte (nie blokują etapu 2):
+- T-019: kofeina 12,0/22,0 mg/g vs komentarz 10,5/18,7 — nierozstrzygnięte źródłem pierwotnym.
+- Tabele czasów Gongfu: komentarz i kod różnią się dla pięciu typów herbaty.
+- RD-19: suma procentów przy kolejnych zalaniach przekracza 100 % od 7. zalania.
+- Ocena zalania Gongfu: UI nie ma kontrolki, więc ocena sesji to `null`. To decyzja produktowa (dodać kontrolkę czy zostawić `null`); na razie wybrana opcja `null`.
