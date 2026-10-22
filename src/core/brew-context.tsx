@@ -21,6 +21,7 @@ import {
   BeveragePreference,
   getBeveragePreference,
   setBeveragePreference as setBeveragePreferenceDb,
+  getGrinderCalibrationStatus,
 } from './database';
 import { autoBackup } from './backup';
 import {
@@ -29,6 +30,10 @@ import {
   estimateTeaInfusionCaffeineMg,
 } from './domain-rules';
 import { getRecommendedGrindForRecipe } from './grinder-converter';
+import {
+  notifyGrinderCalibrationChanged,
+  onGrinderCalibrationChanged,
+} from './grinder-calibration';
 
 export interface BrewContextType {
   recipe: SavedRecipe | MasterRecipe;
@@ -48,7 +53,7 @@ export interface BrewContextType {
   setWaterProfile: (profile: string) => void;
   grinderId: string;
   setGrinderId: (grinderId: string) => void;
-  grinderRecommendation: { formatted: string; rawValue: number; grinderName: string; microns: number };
+  grinderRecommendation: { formatted: string; rawValue: number; grinderName: string; microns: number; baseValue: number };
   setDoseGrams: (grams: number) => void;
   setWaterGrams: (grams: number) => void;
   setWaterTempCelsius: (temp: number) => void;
@@ -160,9 +165,19 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAppSetting('default_grinder', id);
   };
 
+  // Kalibracja z własnych parzeń (poz. 12): przelicza się po zapisie parzenia i po wyzerowaniu
+  const [calibrationRevision, setCalibrationRevision] = useState<number>(0);
+  useEffect(
+    () => onGrinderCalibrationChanged(() => setCalibrationRevision((rev) => rev + 1)),
+    []
+  );
+  const grinderShift = useMemo(
+    () => getGrinderCalibrationStatus(grinderId).shiftClicks,
+    [grinderId, calibrationRevision]
+  );
   const grinderRecommendation = useMemo(() => {
-    return getRecommendedGrindForRecipe(recipe, grinderId);
-  }, [recipe, grinderId]);
+    return getRecommendedGrindForRecipe(recipe, grinderId, grinderShift);
+  }, [recipe, grinderId, grinderShift]);
 
   // Parsuj kroki przepisu
   const originalSteps = useMemo<RecipeStep[]>(() => {
@@ -329,10 +344,15 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       caffeineContentMg: caffeineMg,
       notes: data.notes,
       sensory: data.sensory,
+      // Kalibracja młynka dotyczy kawy: zapisujemy młynek, nastawę pokazaną i nastawę bazową
+      grinderId: bevType === 'COFFEE' ? grinderId : undefined,
+      grinderClicks: bevType === 'COFFEE' ? grinderRecommendation.rawValue : undefined,
+      grinderBaseClicks: bevType === 'COFFEE' ? grinderRecommendation.baseValue : undefined,
       brewedAt: nowIso,
     };
 
     saveBrewSession(session);
+    notifyGrinderCalibrationChanged();
 
     // Automatyczne odjęcie zużytej porcji ze spiżarni (Zadanie N3)
     if (selectedInventoryItem?.id) {

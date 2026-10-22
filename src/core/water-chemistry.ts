@@ -177,6 +177,13 @@ export interface WaterCalculationResult {
 }
 
 /**
+ * W systemie koncentratów Barista Hustle:
+ * 1g Buffer Concentrate dodany do 1L wody = 2 ppm KH, 1g Hardness Concentrate = 2 ppm GH.
+ * Wpis w rejestrze: S-047 (wartość nieźródłowa, do sprawdzenia).
+ */
+export const CONCENTRATE_PPM_PER_GRAM_PER_LITER = 2.0;
+
+/**
  * Wylicza zapotrzebowanie na koncentraty i sole mineralne dla zadanej objętości wody
  * @param waterVolumeLiters Objętość wody bazowej (np. 1.0, 5.0)
  * @param targetGh Twardość ogólna w ppm CaCO3 (magnez/wapń)
@@ -191,11 +198,8 @@ export function calculateWaterMinerals(
   const gh = Math.max(0, targetGh);
   const kh = Math.max(0, targetKh);
 
-  // W systemie koncentratów Barista Hustle:
-  // 1g Buffer Concentrate dodany do 1L wody = 2 ppm KH
-  // 1g Hardness Concentrate dodany do 1L wody = 2 ppm GH
-  const concentrateBuffer = Number(((kh / 2.0) * vol).toFixed(1));
-  const concentrateHardness = Number(((gh / 2.0) * vol).toFixed(1));
+  const concentrateBuffer = Number(((kh / CONCENTRATE_PPM_PER_GRAM_PER_LITER) * vol).toFixed(1));
+  const concentrateHardness = Number(((gh / CONCENTRATE_PPM_PER_GRAM_PER_LITER) * vol).toFixed(1));
 
   // Waga suchych soli do bezpośredniego rozpuszczenia:
   // NaHCO3: 1 ppm KH = 0.00168 g NaHCO3 na 1L
@@ -216,6 +220,34 @@ export function calculateWaterMinerals(
     dryBakingSodaNaHCO3Grams: dryNaHCO3,
     dryEpsomSaltMgSO4Grams: dryMgSO4,
     dryCalciumChlorideCaCl2Grams: dryCaCl2,
+  };
+}
+
+export interface SourceTopUpResult {
+  bufferGrams: number; // koncentrat bufora (KH) do dolania do wody źródłowej
+  hardnessGrams: number; // koncentrat magnezu (GH) do dolania do wody źródłowej
+  khAtOrAboveTarget: boolean; // KH wody źródłowej już osiąga cel (dolewka 0 g)
+  ghAtOrAboveTarget: boolean; // GH wody źródłowej już osiąga cel (dolewka 0 g)
+}
+
+/**
+ * Ile koncentratów dolać do wody z raportu (profil „Moja woda”), by osiągnąć profil docelowy.
+ * Liczy tylko brakującą część: max(0, cel − źródło). Nadmiar nie jest usuwany tutaj
+ * (wymagałby rozcieńczenia wodą RO), a flagi *AtOrAboveTarget pozwalają to pokazać.
+ */
+export function calculateTopUpFromSource(
+  waterVolumeLiters: number,
+  source: { ghPpm: number; khPpm: number },
+  target: { ghPpm: number; khPpm: number }
+): SourceTopUpResult {
+  const vol = Math.max(0.1, waterVolumeLiters);
+  const khDeficit = Math.max(0, target.khPpm - source.khPpm);
+  const ghDeficit = Math.max(0, target.ghPpm - source.ghPpm);
+  return {
+    bufferGrams: Number(((khDeficit / CONCENTRATE_PPM_PER_GRAM_PER_LITER) * vol).toFixed(1)),
+    hardnessGrams: Number(((ghDeficit / CONCENTRATE_PPM_PER_GRAM_PER_LITER) * vol).toFixed(1)),
+    khAtOrAboveTarget: khDeficit === 0,
+    ghAtOrAboveTarget: ghDeficit === 0,
   };
 }
 

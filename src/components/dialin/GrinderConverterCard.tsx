@@ -6,6 +6,7 @@ import {
   convertMicronsToGrinder,
 } from '../../core/grinder-converter';
 import { theme } from '../../core/theme';
+import { GrinderCalibrationCard } from './GrinderCalibrationCard';
 
 export interface GrinderConverterCardProps {
   language: string;
@@ -73,6 +74,9 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
           );
         })}
       </View>
+
+      {/* KALIBRACJA Z WŁASNYCH PARZEŃ (poz. 12) */}
+      <GrinderCalibrationCard t={t} />
     </View>
   );
 };

@@ -256,18 +256,21 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
 ];
 
 /**
- * Konwertuje rozmiar cząstek w mikronach na czytelną nastawę dla zadanego modelu młynka
+ * Konwertuje rozmiar cząstek w mikronach na nastawę zaokrągloną do pełnego kliknięcia,
+ * po dodaniu przesunięcia kalibracji (w klikach, np. z grinder-calibration.ts).
+ * Tabela modeli (SUPPORTED_GRINDERS) nie jest zmieniana; przesunięcie 0 daje wynik bazowy.
  */
-export function convertMicronsToGrinder(
+export function convertMicronsWithShift(
   microns: number,
-  grinderId: string
+  grinderId: string,
+  shiftClicks: number
 ): { formatted: string; rawValue: number; grinderName: string } {
   const grinder =
     SUPPORTED_GRINDERS.find((g) => g.id === grinderId) || SUPPORTED_GRINDERS[0];
 
   const targetMicrons = Math.max(150, Math.min(1500, microns));
   const effectiveMicrons = Math.max(0, targetMicrons - grinder.micronsPerSettingOffset);
-  const rawClicks = Math.round(effectiveMicrons / grinder.stepMicrons);
+  const rawClicks = Math.round(effectiveMicrons / grinder.stepMicrons + shiftClicks);
   const clampedClicks = Math.max(grinder.minSetting, Math.min(grinder.maxSetting, rawClicks));
 
   return {
@@ -275,6 +278,16 @@ export function convertMicronsToGrinder(
     rawValue: clampedClicks,
     grinderName: grinder.name,
   };
+}
+
+/**
+ * Konwertuje rozmiar cząstek w mikronach na czytelną nastawę dla zadanego modelu młynka
+ */
+export function convertMicronsToGrinder(
+  microns: number,
+  grinderId: string
+): { formatted: string; rawValue: number; grinderName: string } {
+  return convertMicronsWithShift(microns, grinderId, 0);
 }
 
 /**
@@ -337,16 +350,21 @@ export function getRecipeMicrons(recipe: {
 }
 
 /**
- * Zwraca rekomendację nastawy dla konkretnego młynka i receptury
+ * Zwraca rekomendację nastawy dla konkretnego młynka i receptury.
+ * `baseValue` to nastawa z tabeli modelu bez kalibracji; zapisuje się ją z parzeniem,
+ * by kalibracja mogła porównać użyte kliki z bazą (grinder-calibration.ts).
  */
 export function getRecommendedGrindForRecipe(
   recipe: { method?: string; grindSettingDescriptionPl?: string; grind_size_description?: string },
-  grinderId: string
-): { formatted: string; rawValue: number; grinderName: string; microns: number } {
+  grinderId: string,
+  shiftClicks = 0
+): { formatted: string; rawValue: number; grinderName: string; microns: number; baseValue: number } {
   const microns = getRecipeMicrons(recipe);
-  const result = convertMicronsToGrinder(microns, grinderId);
+  const result = convertMicronsWithShift(microns, grinderId, shiftClicks);
+  const baseValue = convertMicronsToGrinder(microns, grinderId).rawValue;
   return {
     ...result,
     microns,
+    baseValue,
   };
 }

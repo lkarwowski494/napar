@@ -142,9 +142,9 @@ function caffeine(overrides: Partial<CaffeineLog> = {}): CaffeineLog {
 }
 
 describe('inicjalizacja i dane startowe', () => {
-  test('schemat w wersji 3 z wszystkimi receptami startowymi', () => {
+  test('schemat w wersji 4 z wszystkimi receptami startowymi', () => {
     initDatabase(db.port);
-    expect(db.port.getFirstSync<{ user_version: number }>('PRAGMA user_version')?.user_version).toBe(3);
+    expect(db.port.getFirstSync<{ user_version: number }>('PRAGMA user_version')?.user_version).toBe(4);
     expect(db.port.getFirstSync<{ c: number }>('SELECT COUNT(*) AS c FROM recipes WHERE is_custom = 0')?.c).toBe(
       MASTER_RECIPES.length
     );

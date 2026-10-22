@@ -1162,6 +1162,120 @@
         "docs/lista-funkcji-mvp.md, sekcja „Decyzja właściciela: limit darmowego poziomu = 7 dni parzenia/mies.” (22.10.2026)"
       ],
       "przeglad": null
+    },
+    {
+      "id": "S-091",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/own-water.ts:11",
+      "cytat": "export const MG_CACO3_PER_DEGREE_DH = 17.848;",
+      "kategoria": "STAŁA poz. 9 (własna woda)",
+      "typ": "liczba",
+      "uwaga": "Przelicznik twardości: 1 °dH = 17,848 mg CaCO₃/L. Wzór: 10 · M(CaCO₃) / M(CaO), z M(CaCO₃) = 100,086 g/mol i M(CaO) = 56,077 g/mol (masy atomowe Ca 40,078, C 12,011, O 15,999), wynik 17,848. Wzór ppm = dH × 17,848, wynik zaokrąglony do 0,1 mg/L. Definicja stopnia niemieckiego, bez źródła pierwotnego w repo: do sprawdzenia przed wydaniem.",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "S-092",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/grinder-calibration.ts:25",
+      "cytat": "export const GRINDER_EY_PER_CLICK = 0.5;",
+      "kategoria": "STAŁA poz. 12 (kalibracja młynka)",
+      "typ": "liczba",
+      "uwaga": "Czułość ekstrakcji: 0,5 punktu EY na 1 klik młynka. Używana do zamiany odchylenia EY na przesunięcie kliknięć: offset = (EY − 20,0) / 0,5. Wartość nieźródłowa, przyjęta do startu kalibracji, bez pomiaru na młynkach. Błędna czułość skaluje estymację proporcjonalnie; sprawdzić na parzeniach testowych przed wydaniem.",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "S-093",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/grinder-calibration.ts:28",
+      "cytat": "export const GRINDER_MAX_SHIFT_CLICKS = 5;",
+      "kategoria": "STAŁA poz. 12 (kalibracja młynka)",
+      "typ": "liczba",
+      "uwaga": "Ograniczenie przesunięcia kalibracji do ±5 klików. Ochrona przed pojedynczym błędnym wpisem (np. EY 40 % zamiast 4,0 %). Parametr techniczny metody (D-003), nie wynik pomiaru.",
+      "status": "decyzja techniczna",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "S-094",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/grinder-calibration.ts:22",
+      "cytat": "export const GRINDER_TARGET_EY_PERCENT = 20.0;",
+      "kategoria": "STAŁA poz. 12 (kalibracja młynka)",
+      "typ": "liczba",
+      "uwaga": "Cel EY 20,0 % = środek zakresu Golden Cup 18–22 % (S-001, S-002). Zakres nie ma źródła pierwotnego SCA w repo, więc środek też jest do sprawdzenia.",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "S-095",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/grinder-calibration.ts:19",
+      "cytat": "export const GRINDER_CALIBRATION_MIN_PAIRS = 3;",
+      "kategoria": "STAŁA poz. 12 (kalibracja młynka)",
+      "typ": "liczba",
+      "uwaga": "Minimum 3 pary z wynikiem EY, przy którym przesunięcie jest stosowane. Poniżej progu nastawy zostają bez zmian (wymaganie właściciela w zadaniu poz. 12). Wartość z zadania, nie z pomiaru.",
+      "status": "decyzja techniczna",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "S-096",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/water-chemistry.ts:184",
+      "cytat": "export const CONCENTRATE_PPM_PER_GRAM_PER_LITER = 2.0;",
+      "kategoria": "STAŁA poz. 9 (własna woda)",
+      "typ": "liczba",
+      "uwaga": "Nazwana stała dla 1 g koncentratu w 1 L = 2 ppm (KH i GH). Ta sama wartość co dawniej wpisana jako dzielnik 2.0 w calculateWaterMinerals (S-047, S-049, S-050). Wartość nieźródłowa, bez zmiany; używana też przez dolewkę z własnej wody.",
+      "status": "do sprawdzenia",
+      "zrodla": [],
+      "przeglad": null
+    },
+    {
+      "id": "D-002",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/own-water.ts; src/core/water-chemistry.ts:238 (calculateTopUpFromSource); src/core/repositories/water-profile.ts:18",
+      "cytat": "validateOwnWaterForm / calculateTopUpFromSource (dolewka = max(0; cel − źródło) / 2 ppm na g na L)",
+      "kategoria": "PRIORYTET: woda (poz. 9 MVP)",
+      "typ": "decyzja techniczna",
+      "uwaga": "Metoda własnej wody z raportu wodociągów: wewnętrznie mg CaCO₃/L; wejście w mg CaCO₃/L albo °dH (S-091); zaokrąglenie do 0,1 ppm; puste i ujemne wartości odrzucane, przecinek jako separator (parseDecimal); profil GH/KH z nazwą źródła zapisany jako jedno ustawienie (JSON), więc eksport i import kopii obejmują go bez zmiany formatu. Dolewka: osobno dla KH i GH, max(0; cel − źródło) / 2 ppm na g na L (S-096), z flagą, gdy woda źródłowa już osiąga cel (wtedy potrzebne rozcieńczenie RO, którego aplikacja nie liczy). Poza zakresem: OCR i import PDF. Wymaga zatwierdzenia właściciela produktu.",
+      "status": "decyzja techniczna",
+      "zrodla": [
+        "docs/lista-funkcji-mvp.md, pozycja 9 (korekta właściciela 22.10.2026)"
+      ],
+      "przeglad": null
+    },
+    {
+      "id": "D-003",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/grinder-calibration.ts:54 (estimateGrinderCalibration)",
+      "cytat": "offset_j = (kliki_użyte − kliki_bazowe) + (EY_j − 20,0) / 0,5 ; przesunięcie = Σ w_j·offset_j / Σ w_j, w_j = 1 / (1 + |EY_j − 20,0|)",
+      "kategoria": "PRIORYTET: młynek (poz. 12 MVP)",
+      "typ": "decyzja techniczna",
+      "uwaga": "Metoda kalibracji przelicznika kliknięć z własnych parzeń. Para: parzenie kawy z zapisanymi klikami, klikami bazowymi modelu i EY > 0 (wymagany TDS). Dane z dziennika, osobno dla każdego młynka, bez względu na metodę (przesunięcie dotyczy mechaniki młynka). Ocena smakowa nie jest używana jako cel liczbowy, bo nie wskazuje kierunku zmiany mielenia. Waga 1/(1+|odchylenie|) zmniejsza wpływ skrajnych EY, gdzie liniowe przybliżenie (S-092) jest najmniej wiarygodne. Przy mniej niż 3 parach brak zmiany (S-095). Ograniczenie ±5 klików (S-093). Wynik zaokrąglony do 0,01 klika; zaokrąglenie nastawy do pełnego kliknięcia po dodaniu przesunięcia. Tabela modeli bez zmian. Wyzerowanie zapisuje znacznik czasu i liczy tylko późniejsze parzenia (dane się nie kasują). Ograniczenie: zapisywane kliki to nastawa pokazana w aplikacji, nie faktycznie nakręcona; aplikacja nie ma pola na rzeczywiste kliki (zob. D-004). Wymaga weryfikacji na parzeniach i zatwierdzenia właściciela.",
+      "status": "decyzja techniczna",
+      "zrodla": [
+        "docs/research/proces-parzenia-luki-2026-10-22.md, G1 (kalibracja młynka)"
+      ],
+      "przeglad": null
+    },
+    {
+      "id": "D-004",
+      "data": "2026-10-22",
+      "plik_linia": "src/core/repositories/schema.ts:migrateToV4; src/core/database-schema.ts:brew_sessions",
+      "cytat": "ALTER TABLE brew_sessions ADD COLUMN grinder_id TEXT / grinder_clicks REAL / grinder_base_clicks REAL; PRAGMA user_version = 4",
+      "kategoria": "PRIORYTET: dane (poz. 12 MVP)",
+      "typ": "decyzja techniczna",
+      "uwaga": "Schemat v4. Dziennik dotąd nie zapisywał kliknięć ani młynka (pole grind_setting to tekst receptury). Dodano trzy pola zapisywane automatycznie przy zapisie parzenia kawy: młynek, nastawa pokazana w chwili zapisu i nastawa bazowa modelu. Stare wiersze dostają NULL i nie tworzą par. Bez pola w UI na rzeczywiste kliki. Wymaga decyzji właściciela, czy dodać pole „faktyczne kliki” po parzeniu (poza zakresem zadania).",
+      "status": "decyzja techniczna",
+      "zrodla": [
+        "src/core/brew-context.tsx (zapis parzenia, pola grinder*)"
+      ],
+      "przeglad": null
     }
   ]
 }

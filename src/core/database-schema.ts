@@ -72,6 +72,9 @@ export interface BrewSession {
   notes?: string;
   infusionNumber?: number; // for Gongfu Cha
   sensory?: SensoryProfile;
+  grinderId?: string; // młynek użyty przy zapisie (tylko kawa; kalibracja, poz. 12)
+  grinderClicks?: number; // nastawa pokazana w chwili zapisu (po kalibracji)
+  grinderBaseClicks?: number; // nastawa bazowa modelu bez kalibracji
   brewedAt: string; // ISO 8601
 }
 
@@ -147,6 +150,9 @@ CREATE TABLE IF NOT EXISTS brew_sessions (
   notes TEXT,
   infusion_number INTEGER DEFAULT 1,
   sensory_scores_json TEXT,
+  grinder_id TEXT,
+  grinder_clicks REAL,
+  grinder_base_clicks REAL,
   brewed_at TEXT NOT NULL
 );
 

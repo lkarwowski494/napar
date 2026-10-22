@@ -37,6 +37,7 @@ jest.mock('../database', () => ({
   setVoiceAnnounceEnabled: jest.fn(),
   getBeveragePreference: jest.fn(() => 'both'),
   setBeveragePreference: jest.fn(),
+  getGrinderCalibrationStatus: jest.fn(() => ({ shiftClicks: 0, pairCount: 0, isActive: false })),
 }));
 
 const mockSessions = [

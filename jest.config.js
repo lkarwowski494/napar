@@ -57,6 +57,9 @@ module.exports = {
     // Live Activity (ekran blokady, Dynamic Island): most stopera w platformie, decyzje w core/live-activity.ts
     './src/platform/live-activity-sync.tsx': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/craft-suite-theme.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    // Poz. 9 (własna woda z raportu wodociągów) i poz. 12 (kalibracja przelicznika kliknięć): 100% bez wyjątków
+    './src/core/own-water.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './src/core/grinder-calibration.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     // Przebudowa etapu 2 (persystencja i kopie): 100% bez wyjątków
     './src/core/repositories/': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/backup.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },

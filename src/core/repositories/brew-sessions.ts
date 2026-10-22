@@ -29,6 +29,9 @@ export interface BrewSessionRow {
   infusion_number: number | null;
   sensory_scores_json: string | null;
   water_profile: string | null;
+  grinder_id: string | null;
+  grinder_clicks: number | null;
+  grinder_base_clicks: number | null;
   brewed_at: string;
 }
 
@@ -73,6 +76,9 @@ function mapRowToBrewSession(row: BrewSessionRow): BrewSession {
     notes: row.notes ?? undefined,
     infusionNumber: row.infusion_number ?? 1,
     sensory,
+    grinderId: row.grinder_id ?? undefined,
+    grinderClicks: row.grinder_clicks !== null ? row.grinder_clicks : undefined,
+    grinderBaseClicks: row.grinder_base_clicks !== null ? row.grinder_base_clicks : undefined,
     brewedAt: row.brewed_at,
   };
 }
@@ -104,8 +110,9 @@ export function saveBrewSession(db: DbPort, session: BrewSession): void {
       beverage_type, method, dose_g, water_g, water_temp_c, water_profile,
       grind_setting, total_time_seconds, rating, flavor_tags_json,
       taste_balance, tds_percentage, extraction_yield_percentage,
-      caffeine_content_mg, notes, infusion_number, sensory_scores_json, brewed_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      caffeine_content_mg, notes, infusion_number, sensory_scores_json,
+      grinder_id, grinder_clicks, grinder_base_clicks, brewed_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       session.id,
       session.recipeId ?? null,
@@ -129,6 +136,9 @@ export function saveBrewSession(db: DbPort, session: BrewSession): void {
       session.notes ?? null,
       session.infusionNumber ?? 1,
       session.sensory ? JSON.stringify(session.sensory) : null,
+      session.grinderId ?? null,
+      session.grinderClicks ?? null,
+      session.grinderBaseClicks ?? null,
       session.brewedAt || new Date().toISOString(),
     ]
   );

@@ -23,6 +23,8 @@ import * as sessions from './repositories/brew-sessions';
 import * as caffeine from './repositories/caffeine';
 import * as settings from './repositories/app-settings';
 import * as brewAccess from './repositories/brew-access';
+import * as waterProfile from './repositories/water-profile';
+import * as grinderCalibration from './repositories/grinder-calibration';
 
 export { createPreMigrationBackup, TARGET_SCHEMA_VERSION } from './repositories/schema';
 export type { BeveragePreference } from './repositories/app-settings';
@@ -170,6 +172,15 @@ export const setHasCompletedOnboarding = bindSetting(settings.setHasCompletedOnb
 // Dostęp do parzenia: dni wliczone do darmowego limitu (stan poza kopią)
 export const getCountedBrewDays = bindSetting(brewAccess.getCountedBrewDays);
 export const recordCountedBrewDay = bindSetting(brewAccess.recordCountedBrewDay);
+
+// Własna woda z raportu wodociągów (poz. 9) — odczyt bezpieczny: brak bazy = brak profilu
+export const getOwnWaterProfile = bindSetting(waterProfile.getOwnWaterProfile);
+export const saveOwnWaterProfile = bind(waterProfile.saveOwnWaterProfile);
+export const deleteOwnWaterProfile = bind(waterProfile.deleteOwnWaterProfile);
+
+// Kalibracja przelicznika kliknięć (poz. 12) — odczyt bezpieczny: brak bazy = brak kalibracji
+export const getGrinderCalibrationStatus = bindSetting(grinderCalibration.getGrinderCalibration);
+export const resetGrinderCalibration = bind(grinderCalibration.resetGrinderCalibration);
 
 // Kopia zapasowa
 /** Pełny stan bieżącej bazy do kopii (bez limitów). */

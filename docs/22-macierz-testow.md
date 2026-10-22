@@ -8,12 +8,12 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | Kategoria | Łącznie | Pokryte | Pokrycie % | Status |
 | :--- | :---: | :---: | :---: | :---: |
 | **EKRAN** | 10 | 10 | **100.0%** | ✅ POKRYTE |
-| **UI** | 61 | 61 | **100.0%** | ✅ POKRYTE |
-| **TEKST** | 334 | 334 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 221 | 221 | **100.0%** | ✅ POKRYTE |
-| **WYMIAR** | 51 | 51 | **100.0%** | ✅ POKRYTE |
+| **UI** | 65 | 65 | **100.0%** | ✅ POKRYTE |
+| **TEKST** | 355 | 355 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 238 | 238 | **100.0%** | ✅ POKRYTE |
+| **WYMIAR** | 63 | 63 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **677** | Pokrytych: **677** | Brakujących: **0**
+Łącznie elementów: **731** | Pokrytych: **731** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -132,7 +132,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `recipeLink.temperature` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/recipe-link-route.test.tsx |
 | `TEKST` | `recipeLink.steps` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `TEKST` | `recipeLink.noSteps` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/recipe-link-route.test.tsx |
-| `UI` | `recipeLink.saved` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/backup.test.ts, src/core/__tests__/brew-context.test.tsx |
+| `UI` | `recipeLink.saved` | `src/core/i18n.tsx` | ✅ | src/components/dialin/__tests__/OwnWaterCard.test.tsx, src/core/__tests__/backup.test.ts |
 | `UI` | `recipeLink.saveFailed` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/recipe-link-route.test.tsx |
 | `TEKST` | `recipeBuilder.titleNew` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
 | `UI` | `recipeBuilder.titleEdit` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
@@ -287,37 +287,37 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `UI` | `water.suitabilityACCEPTABLE` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `UI` | `water.suitabilityNOT_RECOMMENDED` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `water.sessionWaterLabel` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownTitle` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownIntro` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownAdd` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownSourceLabel` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownUnitMg` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownUnitDh` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownErrEmpty` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownErrInvalid` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownErrNegative` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `UI` | `water.ownSaveFailed` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownGhKhLine` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `UI` | `water.ownDeleteTitle` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `UI` | `water.ownDeleteMessage` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownTopUpTitle` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownTopUpFor` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `water.ownTopUpAboveTarget` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `grinder.title` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/backup-roundtrip.test.ts |
 | `TEKST` | `grinder.subtitle` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/craft/__tests__/CraftComponents.test.tsx |
-| `UI` | `grinder.categorySelect` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/icons/__tests__/CraftIcons.test.tsx |
-| `TEKST` | `grinder.allGrindersHeader` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/icons/__tests__/CraftIcons.test.tsx |
-| `TEKST` | `grinder.micronsLabel` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/icons/__tests__/CraftIcons.test.tsx |
+| `UI` | `grinder.categorySelect` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
+| `TEKST` | `grinder.allGrindersHeader` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
+| `TEKST` | `grinder.micronsLabel` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
+| `TEKST` | `grinder.calibTitle` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
+| `TEKST` | `grinder.calibHelp` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
+| `TEKST` | `grinder.calibCount` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
+| `TEKST` | `grinder.calibActive` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
+| `TEKST` | `grinder.calibInactive` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
+| `TEKST` | `grinder.calibReset` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
+| `TEKST` | `grinder.calibResetTitle` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
+| `TEKST` | `grinder.calibResetMessage` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
+| `UI` | `grinder.calibResetAction` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewHeader.test.tsx, src/components/dialin/__tests__/GrinderCalibrationCard.test.tsx |
 | `TEKST` | `caffeine.title` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `caffeine.currentLevel` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `caffeine.halfLifeNote` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `caffeine.halfLifeTitle` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `caffeine.halfLifeDesc` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `caffeine.bedtimeTitle` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `caffeine.bedtimeCurfew` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `caffeine.safeAtBedtime` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `caffeine.riskAtBedtime` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `UI` | `caffeine.logDoseBtn` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `sensory.title` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
-| `TEKST` | `sensory.subtitle` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `sensory.acidity` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `sensory.sweetness` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `sensory.body` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `sensory.clarity` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `UI` | `sensory.finish` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `batch.label` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/close-button-guard.test.tsx |
-| `TEKST` | `batch.cups` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `batch.cup1` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `batch.cup2` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `batch.cup3` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `batch.cup4` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `batch.grindAdjustmentNotice` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `favorites.title` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/backup-roundtrip.test.ts |
-| `TEKST` | `favorites.addToFav` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/brew-screen.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `favorites.removeFromFav` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/brew-screen.test.tsx, src/core/__tests__/i18n.test.ts |
 
-*(... i 377 kolejnych elementów w pełnym wykazie)*
+*(... i 431 kolejnych elementów w pełnym wykazie)*

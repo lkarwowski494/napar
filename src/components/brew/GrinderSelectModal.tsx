@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
+import { getGrinderCalibrationStatus } from '../../core/database';
 import { CheckIcon } from '../icons/CraftIcons';
 import {
   SUPPORTED_GRINDERS,
@@ -54,7 +55,9 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
           <Text style={styles.modalSub}>{t.brew.grinderModalDesc}</Text>
           {SUPPORTED_GRINDERS.map((grinder) => {
             const isSelected = grinderId === grinder.id;
-            const rec = getRecommendedGrindForRecipe(recipe, grinder.id);
+            // Ta sama kalibracja co na ekranie parzenia, żeby podgląd i wybrana nastawa się zgadzały (poz. 12)
+            const shift = getGrinderCalibrationStatus(grinder.id).shiftClicks;
+            const rec = getRecommendedGrindForRecipe(recipe, grinder.id, shift);
             return (
               <Pressable
                 key={grinder.id}

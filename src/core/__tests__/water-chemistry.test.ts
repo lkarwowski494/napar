@@ -8,6 +8,8 @@ import {
   calculateWaterMinerals,
   diagnoseWaterSensoryImpact,
   getWaterProfileName,
+  calculateTopUpFromSource,
+  CONCENTRATE_PPM_PER_GRAM_PER_LITER,
 } from '../water-chemistry';
 
 describe('Water Chemistry & Mineralization Module', () => {
@@ -96,5 +98,53 @@ describe('Water Chemistry & Mineralization Module', () => {
     // 5. Złote okno (optymalna woda)
     const optimal = diagnoseWaterSensoryImpact(80, 40);
     expect(optimal.problemPl).toContain('Optymalny profil wody');
+  });
+});
+
+describe('Dolewka koncentratów z własnej wody (poz. 9)', () => {
+  test('Stała koncentratu: 1 g w 1 L = 2 ppm (rejestr S-096, dawny dzielnik 2.0)', () => {
+    expect(CONCENTRATE_PPM_PER_GRAM_PER_LITER).toBe(2.0);
+  });
+
+  test('Brakująca część: źródło GH 60 / KH 30 do celu 80 / 40 w 1 L', () => {
+    // KH: (40 − 30) / 2 · 1 = 5,0 g ; GH: (80 − 60) / 2 · 1 = 10,0 g
+    const res = calculateTopUpFromSource(1.0, { ghPpm: 60, khPpm: 30 }, { ghPpm: 80, khPpm: 40 });
+    expect(res.bufferGrams).toBe(5.0);
+    expect(res.hardnessGrams).toBe(10.0);
+    expect(res.khAtOrAboveTarget).toBe(false);
+    expect(res.ghAtOrAboveTarget).toBe(false);
+  });
+
+  test('Skalowanie na objętość: ten sam przypadek w 2 L daje 10,0 g i 20,0 g', () => {
+    const res = calculateTopUpFromSource(2.0, { ghPpm: 60, khPpm: 30 }, { ghPpm: 80, khPpm: 40 });
+    expect(res.bufferGrams).toBe(10.0);
+    expect(res.hardnessGrams).toBe(20.0);
+  });
+
+  test('Zaokrąglenie do 0,1 g: KH 29 → 11 / 2 = 5,5 g/L · 1,2 L = 6,6 g; GH 62,4 → 17,6 / 2 = 8,8 g/L · 1,2 L = 10,56 → 10,6 g', () => {
+    const res = calculateTopUpFromSource(1.2, { ghPpm: 62.4, khPpm: 29 }, { ghPpm: 80, khPpm: 40 });
+    expect(res.bufferGrams).toBe(6.6);
+    expect(res.hardnessGrams).toBe(10.6);
+  });
+
+  test('Źródło KH powyżej celu: dolewka KH 0 g i flaga; GH nadal liczone', () => {
+    const res = calculateTopUpFromSource(1.0, { ghPpm: 60, khPpm: 45 }, { ghPpm: 80, khPpm: 40 });
+    expect(res.bufferGrams).toBe(0);
+    expect(res.khAtOrAboveTarget).toBe(true);
+    expect(res.hardnessGrams).toBe(10.0);
+    expect(res.ghAtOrAboveTarget).toBe(false);
+  });
+
+  test('Źródło GH równe celowi: dolewka GH 0 g i flaga (granica liczy się jako osiągnięta)', () => {
+    const res = calculateTopUpFromSource(1.0, { ghPpm: 80, khPpm: 30 }, { ghPpm: 80, khPpm: 40 });
+    expect(res.hardnessGrams).toBe(0);
+    expect(res.ghAtOrAboveTarget).toBe(true);
+    expect(res.bufferGrams).toBe(5.0);
+  });
+
+  test('Objętość poniżej 0,1 L jest podnoszona do 0,1 L: 10 / 2 · 0,1 = 0,5 g', () => {
+    const res = calculateTopUpFromSource(0, { ghPpm: 60, khPpm: 30 }, { ghPpm: 80, khPpm: 40 });
+    expect(res.bufferGrams).toBe(0.5);
+    expect(res.hardnessGrams).toBe(1.0);
   });
 });

@@ -8,7 +8,7 @@ import { SCHEMA_SQL } from '../database-schema';
 import { MASTER_RECIPES } from '../recipes-data';
 import { countMasterRecipes, seedMasterRecipes } from './recipes';
 
-export const TARGET_SCHEMA_VERSION = 3;
+export const TARGET_SCHEMA_VERSION = 4;
 
 function tryExec(db: DbPort, source: string): void {
   try {
@@ -54,6 +54,26 @@ function migrateToV3(db: DbPort, fromVersion: number): void {
     db.runSync(
       'CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL)'
     );
+    tryExec(db, 'PRAGMA user_version = 3;');
+    db.execSync('COMMIT;');
+  } catch (migError) {
+    tryExec(db, 'ROLLBACK;');
+    throw migError;
+  }
+}
+
+/** v4: kolumny kalibracji młynka w dzienniku (poz. 12). Istniejące wiersze dostają NULL. */
+function migrateToV4(db: DbPort, fromVersion: number): void {
+  // Kopię tworzymy tylko dla istniejących danych (wersja >= 3); świeża baza nie ma czego chronić,
+  // a krok v3 w tym samym uruchomieniu już ją zapisał.
+  if (fromVersion >= 3) {
+    createPreMigrationBackup(db, fromVersion);
+  }
+  try {
+    db.execSync('BEGIN TRANSACTION;');
+    tryExec(db, 'ALTER TABLE brew_sessions ADD COLUMN grinder_id TEXT');
+    tryExec(db, 'ALTER TABLE brew_sessions ADD COLUMN grinder_clicks REAL');
+    tryExec(db, 'ALTER TABLE brew_sessions ADD COLUMN grinder_base_clicks REAL');
     tryExec(db, `PRAGMA user_version = ${TARGET_SCHEMA_VERSION};`);
     db.execSync('COMMIT;');
   } catch (migError) {
@@ -73,8 +93,11 @@ export function initDatabaseSchema(db: DbPort): void {
   const currentVersion = readUserVersion(db);
   db.execSync(SCHEMA_SQL);
 
-  if (currentVersion < TARGET_SCHEMA_VERSION) {
+  if (currentVersion < 3) {
     migrateToV3(db, currentVersion);
+  }
+  if (currentVersion < 4) {
+    migrateToV4(db, currentVersion);
   }
 
   if (countMasterRecipes(db) < MASTER_RECIPES.length) {

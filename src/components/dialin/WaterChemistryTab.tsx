@@ -8,6 +8,7 @@ import {
 } from '../../core/water-chemistry';
 import { theme } from '../../core/theme';
 import { parseDecimal } from '../../core/parse-decimal';
+import { OwnWaterCard } from './OwnWaterCard';
 
 export interface WaterChemistryTabProps {
   language: string;
@@ -209,6 +210,14 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
           <Text style={styles.drySaltAmount}>{waterCalc.dryCalciumChlorideCaCl2Grams} g</Text>
         </View>
       </View>
+
+      {/* WŁASNA WODA Z RAPORTU WODOCIĄGÓW (poz. 9) — dolewka do wybranego celu */}
+      <OwnWaterCard
+        language={language}
+        t={t}
+        target={{ ghPpm: waterCalc.targetGhPpm, khPpm: waterCalc.targetKhPpm }}
+        volumeLiters={waterCalc.waterVolumeLiters}
+      />
 
       {/* DIAGNOZA SENSORYCZNA WODY */}
       <View style={styles.waterInfoCard} testID="water-diagnosis-card">

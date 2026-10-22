@@ -105,8 +105,9 @@ describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
     const mockDb: any = {
       execSync: jest.fn((sql: string) => {
         executedQueries.push(sql);
-        if (sql.includes('PRAGMA user_version = 3')) {
-          userVersion = 3;
+        const versionWrite = /PRAGMA user_version = (\d+)/.exec(sql);
+        if (versionWrite) {
+          userVersion = Number(versionWrite[1]);
         }
       }),
       getFirstSync: jest.fn((query: string) => {
@@ -152,8 +153,8 @@ describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
     );
     expect(createdSettings).toBe(true);
 
-    // 4. Weryfikacja podniesienia wersji schematu do v3
-    expect(userVersion).toBe(3);
+    // 4. Weryfikacja podniesienia wersji schematu do v4 (v3 i v4 dodają kolumny)
+    expect(userVersion).toBe(4);
 
     // 5. Gwarancja nienaruszalności danych pierwotnych v1
     expect(v1Inventory[0].name).toBe('Panama Geisha Hacienda La Esmeralda');

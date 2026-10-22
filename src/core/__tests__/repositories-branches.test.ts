@@ -74,7 +74,7 @@ const BASE_RECIPE: SavedRecipe = {
 describe('schemat i migracje', () => {
   test('wersja użytkownika: wartość, brak wiersza, brak liczby i błąd zapytania', () => {
     const { port } = fresh();
-    expect(readUserVersion(port)).toBe(3);
+    expect(readUserVersion(port)).toBe(4);
     expect(readUserVersion(portWith(port, { getFirstSync: () => null }))).toBe(0);
     expect(readUserVersion(portWith(port, { getFirstSync: <T>() => ({ user_version: 'x' } as T) }))).toBe(0);
     expect(
@@ -100,7 +100,7 @@ describe('schemat i migracje', () => {
     expect(countMasterRecipes(port)).toBe(MASTER_RECIPES.length);
   });
 
-  test('pełna migracja z wersji 0 tworzy kopię przed migracją i zapisuje wersję 3', () => {
+  test('pełna migracja z wersji 0 tworzy kopię przed migracją v3 i zapisuje wersję 4', () => {
     const db = createMemoryDb(SQL);
     initDatabaseSchema(db.port);
     expect(db.port.getAllSync('SELECT id FROM migration_backups').length).toBe(1);
@@ -160,7 +160,7 @@ describe('receptury', () => {
     expect(listCustomRecipes(port)).toEqual([]);
     saveRecipe(port, { ...BASE_RECIPE, id: 'wlasna' });
     expect(listCustomRecipes(port).map((r) => r.id)).toEqual(['wlasna']);
-    expect(TARGET_SCHEMA_VERSION).toBe(3);
+    expect(TARGET_SCHEMA_VERSION).toBe(4);
   });
 
   test('filtrowanie po rodzaju napoju', () => {

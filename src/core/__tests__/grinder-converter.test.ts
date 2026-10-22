@@ -9,6 +9,7 @@ import {
   convertBetweenGrinders,
   getRecipeMicrons,
   getRecommendedGrindForRecipe,
+  convertMicronsWithShift,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -192,3 +193,39 @@ describe('Grinder Dial-in Converter Module', () => {
   });
 });
 
+describe('Przesunięcie kalibracji w klikach (poz. 12)', () => {
+  test('Przesunięcie 0 daje ten sam wynik co konwerter bazowy', () => {
+    expect(convertMicronsWithShift(720, 'comandante_c40', 0)).toEqual(
+      convertMicronsToGrinder(720, 'comandante_c40')
+    );
+  });
+
+  test('Przesunięcie −1 klik na Comandante: 720 µm / 30 µm = 24, po kalibracji 23 kliki', () => {
+    const res = convertMicronsWithShift(720, 'comandante_c40', -1);
+    expect(res.rawValue).toBe(23);
+    expect(res.formatted).toBe('23 klików');
+  });
+
+  test('Ułamkowe przesunięcie zaokrąglane po dodaniu: 24 + 0,6 → 25 kliknięć', () => {
+    expect(convertMicronsWithShift(720, 'comandante_c40', 0.6).rawValue).toBe(25);
+  });
+
+  test('Przesunięcie nie wychodzi poza zakres młynka (min 5 klików Comandante)', () => {
+    expect(convertMicronsWithShift(720, 'comandante_c40', -50).rawValue).toBe(5);
+  });
+
+  test('Rekomendacja z przesunięciem zwraca nastawę skorygowaną i bazową', () => {
+    const v60Recipe = { method: 'V60', grindSettingDescriptionPl: 'Średnio (24 kliki C40)' };
+    const rec = getRecommendedGrindForRecipe(v60Recipe, 'comandante_c40', -1);
+    expect(rec.rawValue).toBe(23);
+    expect(rec.baseValue).toBe(24);
+    expect(rec.microns).toBe(720);
+  });
+
+  test('Rekomendacja bez przesunięcia: wartość skorygowana równa bazowej', () => {
+    const v60Recipe = { method: 'V60', grindSettingDescriptionPl: 'Średnio (24 kliki C40)' };
+    const rec = getRecommendedGrindForRecipe(v60Recipe, 'comandante_c40');
+    expect(rec.rawValue).toBe(24);
+    expect(rec.baseValue).toBe(24);
+  });
+});

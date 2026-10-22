@@ -110,6 +110,7 @@ describe('getRecipeMicrons i rekomendacja nastawy dla receptury', () => {
       rawValue: 24,
       grinderName: 'Comandante C40 MK3/MK4',
       microns: 720,
+      baseValue: 24,
     });
   });
 });
