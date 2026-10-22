@@ -81,3 +81,13 @@ Numery zachowane z poprzedniej listy. Status: **MVP** (pierwsza wersja), **1.1**
 - **D — pozycja 35 (języki): bez decyzji.** Pozostaje otwarta.
 
 **Liczba MVP:** 31 (bez zmian po akceptacji A i B).
+
+## Decyzje właściciela — model zakupów i języki (22.10.2026)
+
+1. **Limit darmowego poziomu zwiększony.** Przyjęta wartość robocza: **15 dni parzenia w miesiącu** (propozycja z tej listy; do potwierdzenia przy premierze). Dzień parzenia liczy się tylko dla parzeń wykonanych w aplikacji (timer), nie dla wpisów ręcznych.
+2. **Ceny z treningu** (przyjęte jako odpowiedź „Ok”; do potwierdzenia): USD 0,99 / 6,99 / 14,99; PLN 4,99 / 19,99 / 59,99; EUR 0,99 / 7,99 / 17,99; GBP 0,99 / 6,99 / 14,99.
+3. **Family Sharing dla subskrypcji i dożywotniego: zaakceptowane.** Warunek przed wysyłką: sprawdzić w App Store Connect, czy włączenie jest nieodwracalne (w treningu to pytanie jest otwarte).
+4. **Bez okresu próbnego i bez ofert wprowadzających** (jak w treningu).
+5. **Języki jak w treningu: 35.** Konsekwencje: tłumaczenie wszystkich tekstów interfejsu, sklepu i ekranów zakupu na 35 języków, weryfikacja przez rolę tłumacza, a `check:i18n` musi przechodzić dla wszystkich 35. To najdroższa pozycja w zakresie.
+
+**Liczba MVP:** 31. **Zakres po decyzjach:** dodaje się koszt 35 języków, Live Activity i Apple Watch oraz treści napojów mlecznych. Harmonogram z planu przebudowy (7–11 dni agenta bez tych pozycji) wymaga aktualizacji po zebraniu zakresu.
