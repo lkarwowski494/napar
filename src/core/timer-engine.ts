@@ -25,6 +25,8 @@ export interface TimerSnapshot {
   targetWaterGrams: number;
   recommendedPourRate: number; // g/s
   isLastStep: boolean;
+  /** Moment końca bieżącego etapu (epoch ms) podczas biegu; null poza biegiem. Dla Live Activity. */
+  stepEndAtMs: number | null;
 }
 
 export interface TimerCallbacks {
@@ -364,6 +366,7 @@ export class BrewTimerEngine {
       targetWaterGrams: targetWater,
       recommendedPourRate,
       isLastStep: this.currentStepIndex >= this.steps.length - 1,
+      stepEndAtMs: this.status === 'running' ? this.stepEndAtMs : null,
     };
   }
 

@@ -11,12 +11,14 @@ import '../src/platform/bootstrap';
 import { LanguageProvider } from '../src/core/i18n';
 import { BrewProvider } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
+import { LiveActivitySync } from '../src/platform/live-activity-sync';
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <LanguageProvider>
         <BrewProvider>
+          <LiveActivitySync />
           <StatusBar barStyle="light-content" />
           <Stack
             screenOptions={{

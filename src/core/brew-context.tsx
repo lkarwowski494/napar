@@ -96,6 +96,7 @@ const defaultInitialSnapshot: TimerSnapshot = {
     ).toFixed(1)
   ),
   isLastStep: false,
+  stepEndAtMs: null,
 };
 
 const BrewContext = createContext<BrewContextType | undefined>(undefined);

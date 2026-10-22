@@ -275,4 +275,36 @@ describe('BrewTimerEngine', () => {
       engine.destroy();
     });
   });
+
+  describe('stepEndAtMs: moment końca etapu dla Live Activity', () => {
+    test('podczas biegu wskazuje koniec etapu w ms, na pauzie i bezczynnie jest null', () => {
+      const engine = new BrewTimerEngine(testSteps);
+      expect(engine.getSnapshot().stepEndAtMs).toBeNull();
+
+      const startedAt = Date.now();
+      engine.start();
+      expect(engine.getSnapshot().stepEndAtMs).toBe(startedAt + 30_000);
+
+      jest.advanceTimersByTime(10_000);
+      expect(engine.getSnapshot().stepEndAtMs).toBe(startedAt + 30_000);
+
+      engine.pause();
+      expect(engine.getSnapshot().stepEndAtMs).toBeNull();
+
+      engine.resume();
+      expect(engine.getSnapshot().stepEndAtMs).toBe(Date.now() + 20_000);
+
+      engine.destroy();
+    });
+
+    test('po przejściu do kolejnego etapu koniec przesuwa się o czas nowego etapu', () => {
+      const engine = new BrewTimerEngine(testSteps);
+      engine.start();
+      const first = engine.getSnapshot().stepEndAtMs;
+      engine.nextStep();
+      expect(engine.getSnapshot().stepEndAtMs).toBe(Date.now() + 60_000);
+      expect(engine.getSnapshot().stepEndAtMs).not.toBe(first);
+      engine.destroy();
+    });
+  });
 });

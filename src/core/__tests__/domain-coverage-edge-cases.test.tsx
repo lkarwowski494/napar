@@ -79,11 +79,6 @@ import {
 } from '../announce';
 import { getBrewAccessState } from '../app-access';
 import { getCraftTheme, CRAFT_APPS } from '../craft-suite-theme';
-import {
-  buildDynamicIslandPayload,
-  buildLiveActivityPayload,
-  endLiveActivity,
-} from '../live-activity';
 import { getCurrentTranslations, LanguageProvider, useTranslation } from '../i18n';
 import { CaffeineCurveChart } from '../caffeine-chart';
 import { SensoryRadarChart, SensoryScoreEditor } from '../radar-chart';
@@ -296,41 +291,6 @@ describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
       expect(getCraftTheme()).toBe(CRAFT_APPS.napar);
       expect(getCraftTheme('invalid' as any)).toBe(CRAFT_APPS.napar);
       expect(getCraftTheme('piekarz')).toBe(CRAFT_APPS.piekarz);
-    });
-  });
-
-  describe('live-activity', () => {
-    test('builds live activity payloads with default parameters', async () => {
-      const attrs = {
-        sessionId: 'session_1',
-        recipeName: 'V60',
-        method: 'V60',
-        beverageType: 'COFFEE' as const,
-        totalWaterGrams: 250,
-        doseGrams: 15,
-      };
-      const state = {
-        stepIndex: 0,
-        totalSteps: 3,
-        stepNamePl: 'Preinfuzja',
-        stepNameEn: 'Bloom',
-        targetWaterGrams: 50,
-        stepRemainingSeconds: 30,
-        stepDurationSeconds: 45,
-        totalElapsedSeconds: 15,
-        totalRemainingSeconds: 150,
-        isPaused: false,
-        isFinished: false,
-      };
-
-      const island = buildDynamicIslandPayload(attrs, state);
-      expect(island.compactLeading).toBe('☕');
-
-      const full = buildLiveActivityPayload(attrs, state);
-      expect(full.attributes.recipeName).toBe('V60');
-
-      const endRes = await endLiveActivity('unknown_activity_id');
-      expect(endRes.success).toBe(true);
     });
   });
 

@@ -10,7 +10,6 @@
     "src/core/flavor-wheel-picker.tsx",
     "src/core/healthkit.ts",
     "src/core/i18n.tsx",
-    "src/core/live-activity.ts",
     "src/core/qr-code.tsx",
     "src/core/radar-chart.tsx",
     "src/core/timer-audio.ts",

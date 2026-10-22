@@ -10,10 +10,10 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | **EKRAN** | 9 | 9 | **100.0%** | ✅ POKRYTE |
 | **UI** | 61 | 61 | **100.0%** | ✅ POKRYTE |
 | **TEKST** | 329 | 329 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 235 | 235 | **100.0%** | ✅ POKRYTE |
-| **WYMIAR** | 50 | 50 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 230 | 230 | **100.0%** | ✅ POKRYTE |
+| **WYMIAR** | 53 | 53 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **684** | Pokrytych: **684** | Brakujących: **0**
+Łącznie elementów: **682** | Pokrytych: **682** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -143,7 +143,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `recipeBuilder.addStep` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/recipe-builder.test.tsx |
 | `TEKST` | `recipeBuilder.removeStep` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
 | `TEKST` | `recipeBuilder.stepTimeSec` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.stepDurationSec` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/domain-coverage-edge-cases.test.tsx, src/core/__tests__/i18n.test.ts |
+| `TEKST` | `recipeBuilder.stepDurationSec` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
 | `TEKST` | `recipeBuilder.stepWaterGrams` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
 | `TEKST` | `recipeBuilder.stepInstruction` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
 | `TEKST` | `recipeBuilder.stepInstructionPlaceholder` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
@@ -320,4 +320,4 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `settings.beverageTeaOnlyDesc` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `TEKST` | `settings.caffeineSettingsSection` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 
-*(... i 384 kolejnych elementów w pełnym wykazie)*
+*(... i 382 kolejnych elementów w pełnym wykazie)*

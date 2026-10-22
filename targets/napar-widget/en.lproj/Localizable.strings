@@ -1,0 +1,3 @@
+/* Live Activity: napisy widżetu (język angielski). Klucze zgodne z pl.lproj. */
+"live.pourOf" = "Pour %1$ld of %2$ld";
+"live.paused" = "Paused";

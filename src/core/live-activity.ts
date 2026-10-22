@@ -1,200 +1,172 @@
 // ============================================================================
-// Napar (Steepwise) — ActivityKit Live Activity & Dynamic Island Bridge
-// BR-ZEG-003 & BR-ZEG-004: Lock Screen Widget & Dynamic Island (iPhone 14 Pro+)
-// 100% Offline-first, Zero-login, Local payload builder & native bridge
+// Napar (Steepwise) — Live Activity: czysty model stanu i sterowanie wywołaniami
+// Ekran blokady i Dynamic Island pokazują stan stoptera parzenia (BR-ZEG-003, BR-ZEG-004).
+// Ten moduł nie importuje React ani expo: wyłącznie dane i decyzje. Most ActivityKit
+// jest w modules/napar-live-activity i podawany tu jako LiveActivityBridge.
 // ============================================================================
 
-import { Platform } from 'react-native';
-import { getAppSetting, setAppSetting } from './database';
+import type { RecipeStep } from './recipes-data';
+import type { TimerSnapshot } from './timer-engine';
 
-export interface BrewActivityAttributes {
-  sessionId: string;
+export type LiveActivityLanguage = 'pl' | 'en';
+export type LiveBeverageType = 'COFFEE' | 'TEA';
+
+/** Stałe dla jednej aktywności, ustawiane przy starcie. */
+export interface LiveActivityAttributes {
   recipeName: string;
-  method: string;
-  beverageType: 'COFFEE' | 'TEA';
-  totalWaterGrams: number;
+  beverageType: LiveBeverageType;
+  language: LiveActivityLanguage;
 }
 
-export interface BrewActivityContentState {
-  stepIndex: number;
-  totalSteps: number;
-  stepNamePl: string;
-  stepNameEn: string;
-  stepRemainingSeconds: number;
-  stepDurationSeconds: number;
-  totalElapsedSeconds: number;
-  targetWaterGrams: number;
+/** Zmienny stan wyświetlany na ekranie blokady i w Dynamic Island. */
+export interface LiveActivityContentState {
+  stepName: string;
+  /** Koniec bieżącego etapu (epoch ms). 0 podczas pauzy: wtedy liczy się pausedRemainingMs. */
+  endAtMs: number;
+  /** Numer zalania (etapu), od 1. */
+  pourIndex: number;
+  pourTotal: number;
   isPaused: boolean;
-  isFinished: boolean;
+  /** Pozostały czas etapu przy pauzie (ms). 0, gdy timer biegnie. */
+  pausedRemainingMs: number;
 }
 
-export interface DynamicIslandPayload {
-  compactLeading: string; // e.g. "☕" / "🍵"
-  compactTrailing: string; // e.g. "0:45"
-  expandedLeadingIcon: string;
-  expandedTrailingTime: string;
-  expandedCenterTitle: string;
-  expandedCenterSubtitle: string;
-  expandedBottomTarget: string;
-  isPaused: boolean;
-  isFinished: boolean;
+/** Wycinek stanu silnika stopera potrzebny do zbudowania ContentState (z TimerSnapshot). */
+export interface LiveTimerInput
+  extends Pick<
+    TimerSnapshot,
+    'status' | 'currentStepIndex' | 'totalSteps' | 'stepRemainingSeconds' | 'stepEndAtMs'
+  > {
+  currentStep: Pick<RecipeStep, 'namePl' | 'nameEn'> | null;
 }
 
-export interface LiveActivityPayload {
-  attributes: BrewActivityAttributes;
-  contentState: BrewActivityContentState;
-  dynamicIsland: DynamicIslandPayload;
-}
-
-let currentActiveActivityId: string | null = null;
-
-/**
- * Sprawdza czy urządzenie wspiera ActivityKit (iOS 16.1+).
- */
-export function isLiveActivitySupported(): boolean {
-  return Platform.OS === 'ios';
+/** Język aplikacji zawężony do obsługiwanych przez widżet (PL / EN). */
+export function liveActivityLanguage(language: string): LiveActivityLanguage {
+  return language === 'en' ? 'en' : 'pl';
 }
 
 /**
- * Zwraca czy Live Activity jest włączone w ustawieniach.
+ * Mapuje stan stopera na ContentState. Zwraca null, gdy nie ma czego pokazywać
+ * (bezczynny timer, zakończone parzenie lub brak etapu): wtedy aktywność się kończy.
+ * Podczas pauzy endAtMs jest stałe (0), więc kolejne ticki nie generują zmian.
  */
-export function getLiveActivityEnabled(): boolean {
-  return getAppSetting('live_activity_enabled', 'true') !== 'false';
+export function buildLiveActivityContentState(
+  timer: LiveTimerInput,
+  nowMs: number,
+  language: LiveActivityLanguage
+): LiveActivityContentState | null {
+  if (timer.status !== 'running' && timer.status !== 'paused') return null;
+  const step = timer.currentStep;
+  if (!step) return null;
+
+  const remainingMs = Math.max(0, Math.round(timer.stepRemainingSeconds * 1000));
+  const shared = {
+    stepName: language === 'en' ? step.nameEn || step.namePl : step.namePl,
+    pourIndex: timer.currentStepIndex + 1,
+    pourTotal: timer.totalSteps,
+  };
+
+  if (timer.status === 'paused') {
+    return { ...shared, endAtMs: 0, isPaused: true, pausedRemainingMs: remainingMs };
+  }
+
+  const endAtMs = timer.stepEndAtMs ?? nowMs + remainingMs;
+  return { ...shared, endAtMs: Math.round(endAtMs), isPaused: false, pausedRemainingMs: 0 };
 }
 
 /**
- * Ustawia preferencję Live Activity w bazie SQLite.
+ * Serializacja stanu do postaci porównywalnej. Klucze w stałej kolejności,
+ * więc dwa identyczne stany dają identyczny ciąg.
  */
-export function setLiveActivityEnabled(enabled: boolean): void {
-  setAppSetting('live_activity_enabled', enabled ? 'true' : 'false');
-}
-
-/**
- * Formatuje sekundy do formatu M:SS
- */
-export function formatActivityTimer(seconds: number): string {
-  const s = Math.max(0, Math.floor(seconds));
-  const m = Math.floor(s / 60);
-  const rem = s % 60;
-  return `${m}:${rem.toString().padStart(2, '0')}`;
-}
-
-/**
- * Buduje payload dla Dynamic Island (kompaktowy i rozszerzony)
- */
-export function buildDynamicIslandPayload(
-  attributes: BrewActivityAttributes,
-  state: BrewActivityContentState,
-  language: 'pl' | 'en' = 'pl'
-): DynamicIslandPayload {
-  const icon = attributes.beverageType === 'TEA' ? '🍵' : '☕';
-  const remainingFormatted = formatActivityTimer(state.stepRemainingSeconds);
-
-  const stepName = language === 'pl' ? state.stepNamePl : state.stepNameEn;
-  const stepProgress = language === 'pl'
-    ? `Krok ${state.stepIndex + 1} z ${state.totalSteps}`
-    : `Step ${state.stepIndex + 1} of ${state.totalSteps}`;
-
-  const targetText = language === 'pl'
-    ? `Docelowo: ${state.targetWaterGrams} g (z ${attributes.totalWaterGrams} g)`
-    : `Target: ${state.targetWaterGrams} g (of ${attributes.totalWaterGrams} g)`;
-
-  return {
-    compactLeading: icon,
-    compactTrailing: remainingFormatted,
-    expandedLeadingIcon: icon,
-    expandedTrailingTime: remainingFormatted,
-    expandedCenterTitle: attributes.recipeName,
-    expandedCenterSubtitle: `${stepName} · ${stepProgress}`,
-    expandedBottomTarget: targetText,
+export function serializeLiveActivityState(state: LiveActivityContentState): string {
+  return JSON.stringify({
+    stepName: state.stepName,
+    endAtMs: state.endAtMs,
+    pourIndex: state.pourIndex,
+    pourTotal: state.pourTotal,
     isPaused: state.isPaused,
-    isFinished: state.isFinished,
-  };
+    pausedRemainingMs: state.pausedRemainingMs,
+  });
+}
+
+export type LiveActivityCommand =
+  | { kind: 'none' }
+  | { kind: 'start'; key: string; content: LiveActivityContentState }
+  | { kind: 'update'; key: string; content: LiveActivityContentState }
+  | { kind: 'end' };
+
+/**
+ * Decyzja przejścia. lastKey to klucz ostatnio zleconego stanu (null = brak aktywności).
+ * Start, aktualizacja i koniec wykonują się tylko przy zmianie stanu, nie w każdym ticku.
+ */
+export function decideLiveActivityCommand(
+  lastKey: string | null,
+  next: LiveActivityContentState | null
+): LiveActivityCommand {
+  if (next === null) {
+    return lastKey === null ? { kind: 'none' } : { kind: 'end' };
+  }
+  const key = serializeLiveActivityState(next);
+  if (key === lastKey) return { kind: 'none' };
+  return lastKey === null
+    ? { kind: 'start', key, content: next }
+    : { kind: 'update', key, content: next };
+}
+
+/** Most natywny: identyfikatorem aktywności jest wartość zwracana przez start. */
+export interface LiveActivityBridge {
+  start(attributes: LiveActivityAttributes, content: LiveActivityContentState): Promise<string | null>;
+  update(activityId: string, content: LiveActivityContentState): Promise<boolean>;
+  end(activityId: string): Promise<boolean>;
+}
+
+export interface LiveActivityController {
+  /** Zleca zmianę stanu. Wywołania idą kolejką, więc start zawsze poprzedza update i end. */
+  sync(next: LiveActivityContentState | null, attributes: LiveActivityAttributes): Promise<void>;
 }
 
 /**
- * Buduje pełny payload dla Live Activity na zablokowanym ekranie i Dynamic Island
+ * Kontroler: pamięta ostatni zlecony stan i kolejkuje wywołania mostu.
+ * Błąd mostu (np. wyłączone Live Activity) nie przerywa parzenia: aktywność po prostu nie powstaje.
  */
-export function buildLiveActivityPayload(
-  attributes: BrewActivityAttributes,
-  state: BrewActivityContentState,
-  language: 'pl' | 'en' = 'pl'
-): LiveActivityPayload {
-  return {
-    attributes,
-    contentState: state,
-    dynamicIsland: buildDynamicIslandPayload(attributes, state, language),
+export function createLiveActivityController(bridge: LiveActivityBridge): LiveActivityController {
+  let lastKey: string | null = null;
+  let activityId: string | null = null;
+  let queue: Promise<void> = Promise.resolve();
+
+  const enqueue = (job: () => Promise<void>): Promise<void> => {
+    queue = queue.then(job).catch(() => undefined);
+    return queue;
   };
-}
-
-/**
- * Rozpoczyna sesję Live Activity
- */
-export async function startLiveActivity(
-  attributes: BrewActivityAttributes,
-  initialState: BrewActivityContentState,
-  language: 'pl' | 'en' = 'pl'
-): Promise<{ activityId?: string; success: boolean; error?: string }> {
-  if (!isLiveActivitySupported()) {
-    return { success: false, error: 'Live Activity wymaga systemu iOS 16.1+.' };
-  }
-
-  if (!getLiveActivityEnabled()) {
-    return { success: false, error: 'Live Activity jest wyłączone w ustawieniach aplikacji.' };
-  }
-
-  const activityId = `act-${attributes.sessionId}-${Date.now()}`;
-  currentActiveActivityId = activityId;
-
-  return {
-    activityId,
-    success: true,
-  };
-}
-
-/**
- * Aktualizuje stan aktywnego widgetu Live Activity
- */
-export async function updateLiveActivity(
-  activityId: string,
-  state: BrewActivityContentState
-): Promise<{ success: boolean; error?: string }> {
-  if (!isLiveActivitySupported()) {
-    return { success: false, error: 'Live Activity wymaga systemu iOS 16.1+.' };
-  }
-
-  if (!activityId || activityId !== currentActiveActivityId) {
-    return { success: false, error: 'Nie znaleziono aktywnej sesji Live Activity o podanym ID.' };
-  }
 
   return {
-    success: true,
+    sync(next, attributes) {
+      const command = decideLiveActivityCommand(lastKey, next);
+      switch (command.kind) {
+        case 'none':
+          return queue;
+        case 'start': {
+          lastKey = command.key;
+          const content = command.content;
+          return enqueue(async () => {
+            activityId = await bridge.start(attributes, content);
+          });
+        }
+        case 'update': {
+          lastKey = command.key;
+          const content = command.content;
+          return enqueue(async () => {
+            if (activityId !== null) await bridge.update(activityId, content);
+          });
+        }
+        case 'end':
+          lastKey = null;
+          return enqueue(async () => {
+            const id = activityId;
+            activityId = null;
+            if (id !== null) await bridge.end(id);
+          });
+      }
+    },
   };
-}
-
-/**
- * Kończy sesję Live Activity na zablokowanym ekranie i Dynamic Island
- */
-export async function endLiveActivity(
-  activityId: string,
-  dismissalPolicy: 'immediate' | 'after_delay' = 'immediate'
-): Promise<{ success: boolean; error?: string }> {
-  if (!isLiveActivitySupported()) {
-    return { success: false, error: 'Live Activity wymaga systemu iOS 16.1+.' };
-  }
-
-  if (activityId === currentActiveActivityId) {
-    currentActiveActivityId = null;
-  }
-
-  return {
-    success: true,
-  };
-}
-
-/**
- * Zwraca identyfikator aktualnej sesji Live Activity lub null
- */
-export function getActiveLiveActivityId(): string | null {
-  return currentActiveActivityId;
 }

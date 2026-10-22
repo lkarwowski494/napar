@@ -55,6 +55,8 @@ module.exports = {
     './src/platform/store-fake.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/platform/store.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/live-activity.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    // Live Activity (ekran blokady, Dynamic Island): most stopera w platformie, decyzje w core/live-activity.ts
+    './src/platform/live-activity-sync.tsx': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/craft-suite-theme.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     // Przebudowa etapu 2 (persystencja i kopie): 100% bez wyjątków
     './src/core/repositories/': { statements: 100, branches: 100, functions: 100, lines: 100 },
