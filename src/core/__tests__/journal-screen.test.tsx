@@ -22,6 +22,10 @@ jest.mock('expo-router', () => ({
   Link: ({ children }: any) => children,
 }));
 
+jest.mock('../../platform/tasting-card-share', () => ({
+  shareTastingCardImage: jest.fn(() => Promise.resolve()),
+}));
+
 jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
 
 jest.mock('../database', () => ({
@@ -302,7 +306,12 @@ describe('JournalScreen Integration', () => {
     alertSpy.mockRestore();
   });
 
-  test('Przycisk Udostępnij wywołuje Share.share z estetyczną notatką degustacyjną', () => {
+  test('Przycisk Udostępnij otwiera kartę degustacyjną i udostępnia ją jako PNG (poz. 31)', async () => {
+    const { shareTastingCardImage } = require('../../platform/tasting-card-share');
+    shareTastingCardImage.mockClear();
+    shareTastingCardImage.mockImplementation(() => Promise.resolve());
+    (Share.share as jest.Mock).mockClear();
+
     let tree: any;
     act(() => {
       tree = renderer.create(
@@ -313,10 +322,41 @@ describe('JournalScreen Integration', () => {
     });
 
     const shareBtn = tree.root.findByProps({ testID: 'share-session-btn-sess-1' });
-    expect(shareBtn).toBeDefined();
-
     act(() => {
       shareBtn.props.onPress();
+    });
+
+    const capture = tree.root.findByProps({ testID: 'tasting-card-capture' });
+    await act(async () => {
+      capture.props.onLayout();
+    });
+
+    expect(shareTastingCardImage).toHaveBeenCalledWith(expect.anything(), expect.any(String));
+    expect(Share.share).not.toHaveBeenCalled();
+    expect(tree.root.findAllByProps({ testID: 'tasting-card-export' })).toHaveLength(0);
+  });
+
+  test('Gdy zapis karty się nie udaje, Udostępnij wraca do notatki tekstowej (Share.share)', async () => {
+    const { shareTastingCardImage } = require('../../platform/tasting-card-share');
+    shareTastingCardImage.mockClear();
+    shareTastingCardImage.mockImplementation(() => Promise.reject(new Error('brak widoku')));
+    (Share.share as jest.Mock).mockClear();
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
+    });
+
+    act(() => {
+      tree.root.findByProps({ testID: 'share-session-btn-sess-1' }).props.onPress();
+    });
+    const capture = tree.root.findByProps({ testID: 'tasting-card-capture' });
+    await act(async () => {
+      capture.props.onLayout();
     });
 
     expect(Share.share).toHaveBeenCalledWith({

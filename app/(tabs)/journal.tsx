@@ -26,6 +26,7 @@ import { JournalSessionCard } from '../../src/components/journal/JournalSessionC
 import { JournalAnalyticsView } from '../../src/components/journal/JournalAnalyticsView';
 import { ProactiveCalendarCard } from '../../src/components/journal/ProactiveCalendarCard';
 import { JournalFilterBar } from '../../src/components/journal/JournalFilterBar';
+import { TastingCardExport } from '../../src/components/journal/TastingCardExport';
 import { useJournalAnalytics } from '../../src/core/useJournalAnalytics';
 import { ProactiveActionItem } from '../../src/core/bpr-engine';
 
@@ -58,6 +59,8 @@ export default function JournalScreen() {
   const [viewMode, setViewMode] = useState<'sessions' | 'analytics'>('sessions');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterType, setFilterType] = useState<'all' | 'coffee' | 'tea' | 'high_rated'>('all');
+  // Karta degustacyjna (poz. 31 MVP): sesja, dla której renderujemy obraz do udostępnienia
+  const [cardSession, setCardSession] = useState<BrewSession | null>(null);
 
   useEffect(() => {
     if (beveragePreference === 'coffee' && filterType === 'tea') {
@@ -183,6 +186,11 @@ export default function JournalScreen() {
   };
 
   const handleShareSession = (session: BrewSession) => {
+    setCardSession(session);
+  };
+
+  // Zapasowa notatka tekstowa, gdy zapis karty do PNG się nie udaje
+  const shareSessionAsText = (session: BrewSession) => {
     const formattedDate = formatDateTime(session.brewedAt);
     const title = session.recipeName || session.method;
     const bean = session.inventoryItemName ? `\nZiarno: ${session.inventoryItemName}` : '';
@@ -337,6 +345,19 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
       {/* Widok Analityki i Trendów (Brew Analytics) */}
       {viewMode === 'analytics' && (
         <JournalAnalyticsView analyticsData={analyticsData} t={t} />
+      )}
+
+      {cardSession && (
+        <TastingCardExport
+          session={cardSession}
+          unitSystem={unitSystem}
+          dialogTitle={t.tastingCard.title}
+          onFinished={() => setCardSession(null)}
+          onFailed={(failed) => {
+            setCardSession(null);
+            shareSessionAsText(failed);
+          }}
+        />
       )}
 
     </ScrollView>
