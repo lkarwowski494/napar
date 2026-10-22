@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { getAppSetting, getGrinderCalibrationStatus, resetGrinderCalibration } from '../../core/database';
-import { SUPPORTED_GRINDERS } from '../../core/grinder-converter';
+import {
+  getAllGrinders,
+  getAppSetting,
+  getGrinderCalibrationStatus,
+  resetGrinderCalibration,
+} from '../../core/database';
 import {
   GRINDER_CALIBRATION_MIN_PAIRS,
   notifyGrinderCalibrationChanged,
@@ -31,7 +35,7 @@ export const GrinderCalibrationCard: React.FC<GrinderCalibrationCardProps> = ({ 
   useEffect(() => onGrinderCalibrationChanged(() => setRevision((rev) => rev + 1)), []);
 
   const grinderId = getAppSetting('default_grinder', DEFAULT_GRINDER_ID);
-  const grinderName = SUPPORTED_GRINDERS.find((g) => g.id === grinderId)?.name ?? grinderId;
+  const grinderName = getAllGrinders().find((g) => g.id === grinderId)?.name ?? grinderId;
   const calibration: GrinderCalibration = useMemo(
     () => getGrinderCalibrationStatus(grinderId),
     // revision odświeża odczyt po zapisie parzenia lub wyzerowaniu kalibracji

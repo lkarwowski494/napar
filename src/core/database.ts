@@ -25,6 +25,9 @@ import * as settings from './repositories/app-settings';
 import * as brewAccess from './repositories/brew-access';
 import * as waterProfile from './repositories/water-profile';
 import * as grinderCalibration from './repositories/grinder-calibration';
+import * as customGrinders from './repositories/custom-grinders';
+import { allGrinderModels, customGrinderModel } from './custom-grinder';
+import type { GrinderModel } from './grinder-converter';
 
 export { createPreMigrationBackup, TARGET_SCHEMA_VERSION } from './repositories/schema';
 export type { BeveragePreference } from './repositories/app-settings';
@@ -178,6 +181,18 @@ export const getCountedBrewDays = bindSetting(brewAccess.getCountedBrewDays);
 export const recordCountedBrewDay = bindSetting(brewAccess.recordCountedBrewDay);
 
 // Własna woda z raportu wodociągów (poz. 9) — odczyt bezpieczny: brak bazy = brak profilu
+// Własne młynki (poz. 11): odczyt degraduje się do pustej listy, zapis i usunięcie zgłaszają błąd
+export const listCustomGrinders = bindSetting(customGrinders.listCustomGrinders);
+export const saveCustomGrinder = bind(customGrinders.saveCustomGrinder);
+export const deleteCustomGrinder = bind(customGrinders.deleteCustomGrinder);
+
+/** Tylko własne młynki, jako modele dla konwertera (findGrinderModel, convertMicronsWithShift). */
+export const getCustomGrinderModels = (): GrinderModel[] =>
+  listCustomGrinders().map(customGrinderModel);
+
+/** Wszystkie młynki do wyboru: tabela modeli, potem własne. */
+export const getAllGrinders = (): GrinderModel[] => allGrinderModels(listCustomGrinders());
+
 export const getOwnWaterProfile = bindSetting(waterProfile.getOwnWaterProfile);
 export const saveOwnWaterProfile = bind(waterProfile.saveOwnWaterProfile);
 export const deleteOwnWaterProfile = bind(waterProfile.deleteOwnWaterProfile);

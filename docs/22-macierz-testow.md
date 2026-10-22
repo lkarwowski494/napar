@@ -8,12 +8,12 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | Kategoria | Łącznie | Pokryte | Pokrycie % | Status |
 | :--- | :---: | :---: | :---: | :---: |
 | **EKRAN** | 11 | 11 | **100.0%** | ✅ POKRYTE |
-| **UI** | 65 | 65 | **100.0%** | ✅ POKRYTE |
-| **TEKST** | 429 | 429 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 247 | 247 | **100.0%** | ✅ POKRYTE |
-| **WYMIAR** | 72 | 72 | **100.0%** | ✅ POKRYTE |
+| **UI** | 69 | 69 | **100.0%** | ✅ POKRYTE |
+| **TEKST** | 435 | 435 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 262 | 262 | **100.0%** | ✅ POKRYTE |
+| **WYMIAR** | 83 | 83 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **824** | Pokrytych: **824** | Brakujących: **0**
+Łącznie elementów: **860** | Pokrytych: **860** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -207,7 +207,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `recipeLink.temperature` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/recipe-link-route.test.tsx |
 | `TEKST` | `recipeLink.steps` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `TEKST` | `recipeLink.noSteps` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/recipe-link-route.test.tsx |
-| `UI` | `recipeLink.saved` | `src/core/i18n.tsx` | ✅ | src/components/dialin/__tests__/OwnWaterCard.test.tsx, src/core/__tests__/backup.test.ts |
+| `UI` | `recipeLink.saved` | `src/core/i18n.tsx` | ✅ | src/components/dialin/__tests__/CustomGrinderCard.test.tsx, src/components/dialin/__tests__/OwnWaterCard.test.tsx |
 | `UI` | `recipeLink.saveFailed` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/recipe-link-route.test.tsx |
 | `TEKST` | `recipeBuilder.titleNew` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
 | `UI` | `recipeBuilder.titleEdit` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts |
@@ -296,7 +296,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `journal.sessionLoadedTitle` | `src/core/i18n.tsx` | ✅ | tests/interaction-guards.test.ts, src/components/icons/__tests__/CraftIcons.test.tsx |
 | `TEKST` | `journal.sessionLoadedMsg` | `src/core/i18n.tsx` | ✅ | tests/interaction-guards.test.ts, src/components/icons/__tests__/CraftIcons.test.tsx |
 | `TEKST` | `dialin.title` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/backup-roundtrip.test.ts |
-| `TEKST` | `dialin.subtitle` | `src/core/i18n.tsx` | ✅ | src/components/craft/__tests__/CraftComponents.test.tsx, src/core/__tests__/i18n.test.ts |
+| `TEKST` | `dialin.subtitle` | `src/core/i18n.tsx` | ✅ | src/components/craft/__tests__/CraftComponents.test.tsx, src/components/settings/__tests__/GrinderSelectionCard.test.tsx |
 | `TEKST` | `dialin.diagnosisTitle` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
 | `TEKST` | `dialin.sourTitle` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
 | `TEKST` | `dialin.sourDesc` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
@@ -320,4 +320,4 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `UI` | `dialin.costTabTitle` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
 | `TEKST` | `dialin.costTitle` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
 
-*(... i 524 kolejnych elementów w pełnym wykazie)*
+*(... i 560 kolejnych elementów w pełnym wykazie)*

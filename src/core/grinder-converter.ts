@@ -256,6 +256,14 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
 ];
 
 /**
+ * Młynek o zadanym identyfikatorze: najpierw tabela modeli, potem dodatkowe (własne, poz. 11).
+ * Nieznany identyfikator daje pierwszy model z tabeli (dawne zachowanie).
+ */
+export function findGrinderModel(grinderId: string, extra: readonly GrinderModel[] = []): GrinderModel {
+  return [...SUPPORTED_GRINDERS, ...extra].find((g) => g.id === grinderId) || SUPPORTED_GRINDERS[0];
+}
+
+/**
  * Konwertuje rozmiar cząstek w mikronach na nastawę zaokrągloną do pełnego kliknięcia,
  * po dodaniu przesunięcia kalibracji (w klikach, np. z grinder-calibration.ts).
  * Tabela modeli (SUPPORTED_GRINDERS) nie jest zmieniana; przesunięcie 0 daje wynik bazowy.
@@ -263,10 +271,10 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
 export function convertMicronsWithShift(
   microns: number,
   grinderId: string,
-  shiftClicks: number
+  shiftClicks: number,
+  extra: readonly GrinderModel[] = []
 ): { formatted: string; rawValue: number; grinderName: string } {
-  const grinder =
-    SUPPORTED_GRINDERS.find((g) => g.id === grinderId) || SUPPORTED_GRINDERS[0];
+  const grinder = findGrinderModel(grinderId, extra);
 
   const targetMicrons = Math.max(150, Math.min(1500, microns));
   const effectiveMicrons = Math.max(0, targetMicrons - grinder.micronsPerSettingOffset);
@@ -285,9 +293,10 @@ export function convertMicronsWithShift(
  */
 export function convertMicronsToGrinder(
   microns: number,
-  grinderId: string
+  grinderId: string,
+  extra: readonly GrinderModel[] = []
 ): { formatted: string; rawValue: number; grinderName: string } {
-  return convertMicronsWithShift(microns, grinderId, 0);
+  return convertMicronsWithShift(microns, grinderId, 0, extra);
 }
 
 /**
@@ -357,11 +366,12 @@ export function getRecipeMicrons(recipe: {
 export function getRecommendedGrindForRecipe(
   recipe: { method?: string; grindSettingDescriptionPl?: string; grind_size_description?: string },
   grinderId: string,
-  shiftClicks = 0
+  shiftClicks = 0,
+  extra: readonly GrinderModel[] = []
 ): { formatted: string; rawValue: number; grinderName: string; microns: number; baseValue: number } {
   const microns = getRecipeMicrons(recipe);
-  const result = convertMicronsWithShift(microns, grinderId, shiftClicks);
-  const baseValue = convertMicronsToGrinder(microns, grinderId).rawValue;
+  const result = convertMicronsWithShift(microns, grinderId, shiftClicks, extra);
+  const baseValue = convertMicronsToGrinder(microns, grinderId, extra).rawValue;
   return {
     ...result,
     microns,

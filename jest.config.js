@@ -35,6 +35,8 @@ module.exports = {
     './src/core/grinder-converter.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     // Poz. 14 MVP: zakres wagi bez sztywnego minimum (krok steperów, bez przycinania do 1 g ani 10 g)
     './src/core/weight-range.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    // Poz. 11 MVP: własny młynek (walidacja, model dla konwertera, lista do wyboru) bez wyjątków
+    './src/core/custom-grinder.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/parse-decimal.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/recipes-data.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/knowledge-data.ts': { statements: 96, branches: 87, functions: 100, lines: 97 },

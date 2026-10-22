@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 import { CheckIcon } from '../icons/CraftIcons';
-import { SUPPORTED_GRINDERS } from '../../core/grinder-converter';
+import { getAllGrinders } from '../../core/database';
 
 export interface GrinderSelectionCardProps {
   selectedGrinder: string;
@@ -15,11 +15,13 @@ export const GrinderSelectionCard: React.FC<GrinderSelectionCardProps> = ({
   onSelectGrinder,
   title,
 }) => {
+  // Tabela modeli i własne młynki (poz. 11)
+  const grinders = getAllGrinders();
   return (
     <View>
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.cardGroup}>
-        {SUPPORTED_GRINDERS.map((grinder, idx) => {
+        {grinders.map((grinder, idx) => {
           const isSelected = selectedGrinder === grinder.id;
           return (
             <React.Fragment key={grinder.id}>

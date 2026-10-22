@@ -32,6 +32,7 @@ jest.mock('../database', () => ({
   getBrewSessions: jest.fn(),
   deleteBrewSession: jest.fn(),
   getRecipes: jest.fn(() => []),
+  getCustomGrinderModels: jest.fn(() => []),
   getInventoryItems: jest.fn(() => []),
   getAppSetting: jest.fn(() => null),
   setAppSetting: jest.fn(),

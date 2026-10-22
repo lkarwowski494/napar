@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import {
   SUPPORTED_GRINDERS,
   GRIND_CATEGORIES,
   convertMicronsToGrinder,
 } from '../../core/grinder-converter';
+import { getCustomGrinderModels } from '../../core/database';
 import { theme } from '../../core/theme';
 import { GrinderCalibrationCard } from './GrinderCalibrationCard';
+import { CustomGrinderCard } from './CustomGrinderCard';
 
 export interface GrinderConverterCardProps {
   language: string;
@@ -17,6 +19,11 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
   const [selectedGrindCategoryId, setSelectedGrindCategoryId] = useState<string>('pourover_v60');
   const activeGrindCategory =
     GRIND_CATEGORIES.find((c) => c.id === selectedGrindCategoryId) || GRIND_CATEGORIES[2];
+
+  // Własne młynki (poz. 11) są w przeliczniku obok tabeli; zmiana listy odświeża odczyt
+  const [customRevision, setCustomRevision] = useState<number>(0);
+  const customModels = useMemo(() => getCustomGrinderModels(), [customRevision]);
+  const grinders = useMemo(() => [...SUPPORTED_GRINDERS, ...customModels], [customModels]);
 
   return (
     <View style={[styles.calcCard, { marginTop: 16 }]}>
@@ -63,8 +70,12 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
       </Text>
 
       <View style={styles.grindersGrid}>
-        {SUPPORTED_GRINDERS.map((grinder) => {
-          const setting = convertMicronsToGrinder(activeGrindCategory.defaultMicrons, grinder.id);
+        {grinders.map((grinder) => {
+          const setting = convertMicronsToGrinder(
+            activeGrindCategory.defaultMicrons,
+            grinder.id,
+            customModels
+          );
           return (
             <View key={grinder.id} style={styles.grinderSettingCard}>
               <Text style={styles.grinderNameText}>{grinder.name}</Text>
@@ -74,6 +85,9 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
           );
         })}
       </View>
+
+      {/* WŁASNY MŁYNEK (poz. 11) */}
+      <CustomGrinderCard t={t} onChanged={() => setCustomRevision((rev) => rev + 1)} />
 
       {/* KALIBRACJA Z WŁASNYCH PARZEŃ (poz. 12) */}
       <GrinderCalibrationCard t={t} />

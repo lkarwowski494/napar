@@ -9,12 +9,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
-import { getGrinderCalibrationStatus } from '../../core/database';
-import { CheckIcon } from '../icons/CraftIcons';
 import {
-  SUPPORTED_GRINDERS,
-  getRecommendedGrindForRecipe,
-} from '../../core/grinder-converter';
+  getAllGrinders,
+  getCustomGrinderModels,
+  getGrinderCalibrationStatus,
+} from '../../core/database';
+import { CheckIcon } from '../icons/CraftIcons';
+import { getRecommendedGrindForRecipe } from '../../core/grinder-converter';
 import { MasterRecipe } from '../../core/recipes-data';
 import { SavedRecipe } from '../../core/database-schema';
 
@@ -53,11 +54,11 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
         </View>
         <ScrollView contentContainerStyle={{ padding: 16 }}>
           <Text style={styles.modalSub}>{t.brew.grinderModalDesc}</Text>
-          {SUPPORTED_GRINDERS.map((grinder) => {
+          {getAllGrinders().map((grinder) => {
             const isSelected = grinderId === grinder.id;
             // Ta sama kalibracja co na ekranie parzenia, żeby podgląd i wybrana nastawa się zgadzały (poz. 12)
             const shift = getGrinderCalibrationStatus(grinder.id).shiftClicks;
-            const rec = getRecommendedGrindForRecipe(recipe, grinder.id, shift);
+            const rec = getRecommendedGrindForRecipe(recipe, grinder.id, shift, getCustomGrinderModels());
             return (
               <Pressable
                 key={grinder.id}

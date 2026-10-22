@@ -14,6 +14,7 @@ jest.mock('../../../core/database', () => ({
   getAppSetting: jest.fn(),
   getGrinderCalibrationStatus: jest.fn(),
   resetGrinderCalibration: jest.fn(),
+  getAllGrinders: () => require('../../../core/grinder-converter').SUPPORTED_GRINDERS,
 }));
 
 jest.mock('../../../core/confirm', () => ({

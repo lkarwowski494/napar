@@ -8,6 +8,8 @@ import { initDatabaseSchema } from '../repositories/schema';
 import {
   LAST_RECIPE_SETTING_KEY,
   LAST_SERVINGS_SETTING_KEY,
+  MAX_REMEMBERED_SERVINGS,
+  MIN_REMEMBERED_SERVINGS,
   getAppSetting,
   getBeveragePreference,
   getLastRecipeId,
@@ -59,9 +61,11 @@ describe('Zapamiętana receptura (poz. 20 MVP)', () => {
 });
 
 describe('Zapamiętana liczba porcji (poz. 20 MVP)', () => {
-  test('bez zapisu domyślnie 1 porcja', () => {
+  test('bez zapisu domyślnie 1 porcja; zakres to 1–4 (zgodny z RD-06)', () => {
     const { port } = fresh();
     expect(getLastServings(port)).toBe(1);
+    expect(MIN_REMEMBERED_SERVINGS).toBe(1);
+    expect(MAX_REMEMBERED_SERVINGS).toBe(4);
   });
 
   test('zapis i odczyt 2 i 4 porcji', () => {

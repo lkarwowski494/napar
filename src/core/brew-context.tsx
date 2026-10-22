@@ -25,6 +25,7 @@ import {
   getLastRecipeId,
   setLastRecipeId,
   getRecipeById,
+  getCustomGrinderModels,
 } from './database';
 import { autoBackup } from './backup';
 import {
@@ -202,7 +203,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [grinderId, calibrationRevision]
   );
   const grinderRecommendation = useMemo(() => {
-    return getRecommendedGrindForRecipe(recipe, grinderId, grinderShift);
+    return getRecommendedGrindForRecipe(recipe, grinderId, grinderShift, getCustomGrinderModels());
   }, [recipe, grinderId, grinderShift]);
 
   // Parsuj kroki przepisu
