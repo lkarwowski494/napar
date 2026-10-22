@@ -114,4 +114,27 @@ describe('BrewQuickPrepCard Component', () => {
     // 20g * 16.7 = 334g
     expect(onWaterChangeMock).toHaveBeenCalledWith(334);
   });
+
+  test('Steppery bez sztywnego minimum: dozy 5 g → 4 g, woda 5 g → 0 g (poz. 14 MVP)', () => {
+    const onWaterChangeMock = jest.fn();
+    const onDoseChangeMock = jest.fn();
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewQuickPrepCard
+          {...defaultProps}
+          doseGrams={5}
+          waterGrams={5}
+          onDoseChange={onDoseChangeMock}
+          onWaterChange={onWaterChangeMock}
+        />
+      );
+    });
+
+    act(() => tree.root.findByProps({ accessibilityLabel: 'Zmniejsz dozę kawy' }).props.onPress());
+    expect(onDoseChangeMock).toHaveBeenLastCalledWith(4);
+
+    act(() => tree.root.findByProps({ accessibilityLabel: 'Zmniejsz ilość wody' }).props.onPress());
+    expect(onWaterChangeMock).toHaveBeenLastCalledWith(0);
+  });
 });

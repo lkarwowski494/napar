@@ -14,6 +14,7 @@ import {
   formatTemperature,
   UnitSystem,
 } from '../../core/unit-converter';
+import { stepWeightGrams } from '../../core/weight-range';
 
 interface BrewQuickPrepCardProps {
   doseGrams: number;
@@ -109,7 +110,7 @@ export function BrewQuickPrepCard({
             <Pressable
               style={styles.stepBtn}
               hitSlop={8}
-              onPress={() => onDoseChange(Math.max(1, doseGrams - 1))}
+              onPress={() => onDoseChange(stepWeightGrams(doseGrams, -1))}
               disabled={disabled}
               accessibilityRole="button"
               accessibilityLabel="Zmniejsz dozę kawy"
@@ -120,7 +121,7 @@ export function BrewQuickPrepCard({
             <Pressable
               style={styles.stepBtn}
               hitSlop={8}
-              onPress={() => onDoseChange(doseGrams + 1)}
+              onPress={() => onDoseChange(stepWeightGrams(doseGrams, 1))}
               disabled={disabled}
               accessibilityRole="button"
               accessibilityLabel="Zwiększ dozę kawy"
@@ -141,7 +142,7 @@ export function BrewQuickPrepCard({
               <Pressable
                 style={styles.stepBtn}
                 hitSlop={8}
-                onPress={() => onWaterChange(Math.max(10, waterGrams - 10))}
+                onPress={() => onWaterChange(stepWeightGrams(waterGrams, -10))}
                 disabled={disabled}
                 accessibilityRole="button"
                 accessibilityLabel="Zmniejsz ilość wody"
@@ -156,7 +157,7 @@ export function BrewQuickPrepCard({
               <Pressable
                 style={styles.stepBtn}
                 hitSlop={8}
-                onPress={() => onWaterChange(waterGrams + 10)}
+                onPress={() => onWaterChange(stepWeightGrams(waterGrams, 10))}
                 disabled={disabled}
                 accessibilityRole="button"
                 accessibilityLabel="Zwiększ ilość wody"
