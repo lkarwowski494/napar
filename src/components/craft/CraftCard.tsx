@@ -58,7 +58,7 @@ export function CraftCard({
         testID={testID}
         activeOpacity={0.85}
         onPress={handlePress}
-        style={[styles.container, cardStyle, style]}
+        style={[styles.container, cardStyle, style, styles.touchTarget]}
       >
         {hasHeader ? (
           <View style={styles.headerRow}>
@@ -91,6 +91,7 @@ export function CraftCard({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     backgroundColor: sharedCraftTokens.colors.bgCard,
     borderRadius: sharedCraftTokens.borderRadius.lg,

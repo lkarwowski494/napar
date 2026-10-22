@@ -96,7 +96,7 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
           <View style={styles.shareButtonsRow}>
             <Pressable
               testID="share-link-btn"
-              style={styles.shareActionBtn}
+              style={[styles.shareActionBtn, styles.touchTarget]}
               onPress={() => {
                 Share.share({
                   title: recipe.name,
@@ -112,7 +112,7 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
 
             <Pressable
               testID="copy-link-btn"
-              style={[styles.shareActionBtn, styles.shareActionBtnSecondary]}
+              style={[styles.shareActionBtn, styles.shareActionBtnSecondary, styles.touchTarget]}
               onPress={handleCopyLink}
               accessibilityRole="button"
             >
@@ -138,6 +138,7 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   copyStatusText: {
     marginTop: 12,
     fontSize: 14,

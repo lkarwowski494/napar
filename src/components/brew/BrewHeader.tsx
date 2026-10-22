@@ -81,7 +81,7 @@ export function BrewHeader({
             testID="beverage-toggle-coffee"
             style={[
               styles.beverageToggleBtn,
-              currentBeverageType === 'COFFEE' && styles.beverageToggleBtnActiveCoffee,
+              currentBeverageType === 'COFFEE' && styles.beverageToggleBtnActiveCoffee, styles.touchTarget,
             ]}
             onPress={() => onBeverageTypeChange('COFFEE')}
             accessibilityRole="tab"
@@ -103,7 +103,7 @@ export function BrewHeader({
             testID="beverage-toggle-tea"
             style={[
               styles.beverageToggleBtn,
-              currentBeverageType === 'TEA' && styles.beverageToggleBtnActiveTea,
+              currentBeverageType === 'TEA' && styles.beverageToggleBtnActiveTea, styles.touchTarget,
             ]}
             onPress={() => onBeverageTypeChange('TEA')}
             accessibilityRole="tab"
@@ -143,7 +143,7 @@ export function BrewHeader({
                   key={fav.id}
                   style={[
                     styles.favoriteChip,
-                    isSelected && styles.favoriteChipActive,
+                    isSelected && styles.favoriteChipActive, styles.touchTarget,
                   ]}
                   onPress={() => onSelectRecipe(fav)}
                 >
@@ -170,7 +170,7 @@ export function BrewHeader({
       {!isTea && beveragePreference !== 'tea' && (
         <Pressable
           testID="grinder-pill-btn"
-          style={styles.grinderPillCard}
+          style={[styles.grinderPillCard, styles.touchTarget]}
           onPress={onOpenGrinderModal}
           accessibilityRole="button"
           accessibilityLabel={`Młynek: ${grinderRecommendation.grinderName}, nastawa ${grinderRecommendation.formatted}`}
@@ -195,7 +195,7 @@ export function BrewHeader({
       <View style={styles.selectorRow}>
         <Pressable
           testID="change-recipe-btn"
-          style={styles.selectorCard}
+          style={[styles.selectorCard, styles.touchTarget]}
           onPress={onOpenRecipeModal}
           accessibilityRole="button"
           accessibilityLabel={`Wybrany przepis: ${recipe.name}`}
@@ -213,7 +213,7 @@ export function BrewHeader({
           testID="open-inventory-modal-btn"
           style={[
             styles.selectorCard,
-            selectedInventoryItem && styles.selectorCardActive,
+            selectedInventoryItem && styles.selectorCardActive, styles.touchTarget,
           ]}
           onPress={onOpenInventoryModal}
           accessibilityRole="button"
@@ -234,7 +234,7 @@ export function BrewHeader({
       {/* Pasek Udostępniania Receptury (Offline QR) */}
       <View style={styles.actionPillsRow}>
         <Pressable
-          style={styles.actionPillCard}
+          style={[styles.actionPillCard, styles.touchTarget]}
           onPress={onOpenShareModal}
           accessibilityRole="button"
           accessibilityLabel="Udostępnij recepturę przez kod QR"
@@ -257,7 +257,7 @@ export function BrewHeader({
       {isTea && beveragePreference !== 'coffee' && (
         <Pressable
           testID="gongfu-mode-btn"
-          style={styles.gongfuBanner}
+          style={[styles.gongfuBanner, styles.touchTarget]}
           onPress={onNavigateToGongfu}
         >
           <Text style={styles.gongfuBannerText}>
@@ -270,7 +270,7 @@ export function BrewHeader({
       {!isTea && beveragePreference !== 'tea' && onNavigateToMilkDrinks && (
         <Pressable
           testID="milk-drinks-btn"
-          style={styles.milkBanner}
+          style={[styles.milkBanner, styles.touchTarget]}
           onPress={onNavigateToMilkDrinks}
           accessibilityRole="button"
         >
@@ -282,6 +282,7 @@ export function BrewHeader({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     marginBottom: 8,
   },

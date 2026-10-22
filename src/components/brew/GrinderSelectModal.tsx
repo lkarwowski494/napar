@@ -64,7 +64,7 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
                 testID={`grinder-item-${grinder.id}`}
                 style={[
                   styles.grinderItemCard,
-                  isSelected && styles.grinderItemCardActive,
+                  isSelected && styles.grinderItemCardActive, styles.touchTarget,
                 ]}
                 onPress={() => {
                   onSelectGrinder(grinder.id);
@@ -112,6 +112,7 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.bg,

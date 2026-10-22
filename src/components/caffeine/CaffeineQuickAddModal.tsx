@@ -28,7 +28,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
           <Text style={styles.modalCardTitle}>Szybkie dodanie kofeiny</Text>
 
           <Pressable
-            style={styles.quickOption}
+            style={[styles.quickOption, styles.touchTarget]}
             onPress={() => onSelectOption('Kawa przelewowa (V60 / Drip)', 'coffee', 18, 140)}
           >
             <Text style={styles.quickOptionName}>Przelew / Drip (V60, Chemex)</Text>
@@ -36,7 +36,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
           </Pressable>
 
           <Pressable
-            style={styles.quickOption}
+            style={[styles.quickOption, styles.touchTarget]}
             onPress={() => onSelectOption('Podwójne Espresso', 'coffee', 18, 130)}
           >
             <Text style={styles.quickOptionName}>Podwójne Espresso (Doppio)</Text>
@@ -44,7 +44,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
           </Pressable>
 
           <Pressable
-            style={styles.quickOption}
+            style={[styles.quickOption, styles.touchTarget]}
             onPress={() => onSelectOption('Pojedyncze Espresso', 'coffee', 9, 65)}
           >
             <Text style={styles.quickOptionName}>Pojedyncze Espresso</Text>
@@ -52,7 +52,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
           </Pressable>
 
           <Pressable
-            style={styles.quickOption}
+            style={[styles.quickOption, styles.touchTarget]}
             onPress={() => onSelectOption('AeroPress', 'coffee', 15, 110)}
           >
             <Text style={styles.quickOptionName}>AeroPress</Text>
@@ -60,7 +60,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
           </Pressable>
 
           <Pressable
-            style={styles.quickOption}
+            style={[styles.quickOption, styles.touchTarget]}
             onPress={() => onSelectOption('Herbata Gongfu / Liściasta', 'tea', 5, 45)}
           >
             <Text style={styles.quickOptionName}>Herbata liściasta (infuzja)</Text>
@@ -68,7 +68,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
           </Pressable>
 
           <Pressable
-            style={styles.modalCancelBtn}
+            style={[styles.modalCancelBtn, styles.touchTarget]}
             onPress={onClose}
           >
             <Text style={styles.modalCancelText}>Anuluj</Text>
@@ -80,6 +80,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',

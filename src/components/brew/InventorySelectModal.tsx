@@ -43,7 +43,7 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
       </Pressable>
 
       <Pressable
-        style={styles.recipeOptionItem}
+        style={[styles.recipeOptionItem, styles.touchTarget]}
         onPress={() => {
           onSelectItem(null);
           onClose();
@@ -61,7 +61,7 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
           testID={`inventory-option-${item.id}`}
           style={[
             styles.recipeOptionItem,
-            selectedItem?.id === item.id && styles.recipeOptionActive,
+            selectedItem?.id === item.id && styles.recipeOptionActive, styles.touchTarget,
           ]}
           onPress={() => {
             onSelectItem(item);
@@ -99,6 +99,7 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   inlineContainer: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.lg,

@@ -124,7 +124,7 @@ export function ProcedureModal({
           </View>
           <Pressable
             testID="procedure-close-btn"
-            style={styles.abortBtn}
+            style={[styles.abortBtn, styles.touchTarget]}
             onPress={onClose}
             hitSlop={10}
             accessibilityRole="button"
@@ -213,7 +213,7 @@ export function ProcedureModal({
             <View style={styles.quickAdjustRow}>
               <Pressable
                 testID="procedure-sub-60-btn"
-                style={styles.adjustChip}
+                style={[styles.adjustChip, styles.touchTarget]}
                 onPress={() => onAdjustTimeSeconds(-60)}
                 accessibilityRole="button"
                 accessibilityLabel="-1 min"
@@ -223,7 +223,7 @@ export function ProcedureModal({
 
               <Pressable
                 testID="procedure-sub-10-btn"
-                style={styles.adjustChip}
+                style={[styles.adjustChip, styles.touchTarget]}
                 onPress={() => onAdjustTimeSeconds(-10)}
                 accessibilityRole="button"
                 accessibilityLabel="-10 s"
@@ -235,7 +235,7 @@ export function ProcedureModal({
                 testID="procedure-pause-resume-btn"
                 style={[
                   styles.pauseResumeBtn,
-                  !isRunning && styles.pauseResumeBtnPaused,
+                  !isRunning && styles.pauseResumeBtnPaused, styles.touchTarget,
                 ]}
                 onPress={onPauseResume}
                 accessibilityRole="button"
@@ -254,7 +254,7 @@ export function ProcedureModal({
 
               <Pressable
                 testID="procedure-add-10-btn"
-                style={styles.adjustChip}
+                style={[styles.adjustChip, styles.touchTarget]}
                 onPress={() => onAdjustTimeSeconds(10)}
                 accessibilityRole="button"
                 accessibilityLabel="+10 s"
@@ -264,7 +264,7 @@ export function ProcedureModal({
 
               <Pressable
                 testID="procedure-add-60-btn"
-                style={styles.adjustChip}
+                style={[styles.adjustChip, styles.touchTarget]}
                 onPress={() => onAdjustTimeSeconds(60)}
                 accessibilityRole="button"
                 accessibilityLabel="+1 min"
@@ -275,7 +275,7 @@ export function ProcedureModal({
 
             <Pressable
               testID="procedure-reset-step-btn"
-              style={styles.resetStepBtn}
+              style={[styles.resetStepBtn, styles.touchTarget]}
               onPress={() => onResetCurrentStep(parsedDurationSec)}
               accessibilityRole="button"
               accessibilityLabel={isEn ? 'Reset step timer' : 'Resetuj czas kroku'}
@@ -295,7 +295,7 @@ export function ProcedureModal({
             testID="procedure-prev-step-btn"
             style={[
               styles.secondaryNavBtn,
-              boundedIdx === 0 && styles.secondaryNavBtnDisabled,
+              boundedIdx === 0 && styles.secondaryNavBtnDisabled, styles.touchTarget,
             ]}
             disabled={boundedIdx === 0}
             onPress={onPrevStep}
@@ -310,7 +310,7 @@ export function ProcedureModal({
           {!isLastStep ? (
             <Pressable
               testID="procedure-next-step-btn"
-              style={styles.primaryNextBtn}
+              style={[styles.primaryNextBtn, styles.touchTarget]}
               onPress={onNextStep}
               accessibilityRole="button"
               accessibilityLabel={isEn ? 'Next step' : 'Następny krok'}
@@ -322,7 +322,7 @@ export function ProcedureModal({
           ) : (
             <Pressable
               testID="procedure-finish-save-btn"
-              style={styles.finishSaveBtn}
+              style={[styles.finishSaveBtn, styles.touchTarget]}
               onPress={onFinishAndSave}
               accessibilityRole="button"
               accessibilityLabel={isEn ? 'Finish and save' : 'Zakończ i zapisz'}
@@ -339,6 +339,7 @@ export function ProcedureModal({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,

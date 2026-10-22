@@ -94,7 +94,7 @@ export const ImportRecipeModal: React.FC<ImportRecipeModalProps> = ({
                 Liczba kroków parzenia: {importParsedRecipe.originalSteps.length}
               </Text>
               <Pressable
-                style={styles.confirmImportBtn}
+                style={[styles.confirmImportBtn, styles.touchTarget]}
                 onPress={handleConfirmImport}
                 testID="confirm-import-btn"
               >
@@ -111,6 +111,7 @@ export const ImportRecipeModal: React.FC<ImportRecipeModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.bg,

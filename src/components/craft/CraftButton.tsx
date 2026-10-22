@@ -106,7 +106,7 @@ export function CraftButton({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || label}
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
-      style={[styles.baseButton, containerDynamicStyle, style]}
+      style={[styles.baseButton, containerDynamicStyle, style, styles.touchTarget]}
     >
       {loading ? (
         <ActivityIndicator
@@ -125,6 +125,7 @@ export function CraftButton({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   baseButton: {
     borderRadius: sharedCraftTokens.borderRadius.md,
     paddingHorizontal: sharedCraftTokens.spacing.md,

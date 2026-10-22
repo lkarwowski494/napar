@@ -30,7 +30,7 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
             key={cat.id}
             style={[
               styles.grindCategoryChip,
-              selectedGrindCategoryId === cat.id && styles.grindCategoryChipActive,
+              selectedGrindCategoryId === cat.id && styles.grindCategoryChipActive, styles.touchTarget,
             ]}
             onPress={() => setSelectedGrindCategoryId(cat.id)}
           >
@@ -82,6 +82,7 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   calcCard: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.md,

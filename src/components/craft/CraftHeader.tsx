@@ -61,7 +61,7 @@ export function CraftHeader({
         {hasLeftAction ? (
           <TouchableOpacity
             testID={onBack ? 'craft-header-back' : 'craft-header-close'}
-            style={styles.actionButton}
+            style={[styles.actionButton, styles.touchTarget]}
             hitSlop={sharedCraftTokens.hitSlopStandard}
             onPress={() => handlePress(onBack || onClose)}
             accessibilityRole="button"
@@ -99,6 +99,7 @@ export function CraftHeader({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     backgroundColor: sharedCraftTokens.colors.bgBasalt,
     borderBottomWidth: 1,

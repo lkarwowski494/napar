@@ -101,7 +101,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
       accessibilityLabel={`Wybierz przepis: ${r.name}`}
       style={[
         styles.recipeOptionItem,
-        activeRecipeId === r.id && styles.recipeOptionActive,
+        activeRecipeId === r.id && styles.recipeOptionActive, styles.touchTarget,
       ]}
       onPress={() => onSelectRecipe(r)}
     >
@@ -114,7 +114,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
           </Text>
         </View>
         <Pressable
-          style={styles.favToggleBtn}
+          style={[styles.favToggleBtn, styles.touchTarget]}
           hitSlop={10}
           onPress={(e) => {
             e.stopPropagation();
@@ -132,7 +132,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
           </Text>
         </Pressable>
         <Pressable
-          style={styles.duplicateRecipeBtn}
+          style={[styles.duplicateRecipeBtn, styles.touchTarget]}
           hitSlop={8}
           onPress={(e) => {
             e?.stopPropagation?.();
@@ -145,7 +145,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
         </Pressable>
         {r.isCustom && (
           <Pressable
-            style={styles.editRecipeBtn}
+            style={[styles.editRecipeBtn, styles.touchTarget]}
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel="Edytuj recepturę"
@@ -215,7 +215,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               testID="subset-filter-all"
               style={[
                 styles.subsetChip,
-                subsetFilter === 'ALL' && styles.subsetChipActive,
+                subsetFilter === 'ALL' && styles.subsetChipActive, styles.touchTarget,
               ]}
               onPress={() => setSubsetFilter('ALL')}
               accessibilityRole="button"
@@ -234,7 +234,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               testID="subset-filter-favorites"
               style={[
                 styles.subsetChip,
-                subsetFilter === 'FAVORITES' && styles.subsetChipActive,
+                subsetFilter === 'FAVORITES' && styles.subsetChipActive, styles.touchTarget,
               ]}
               onPress={() => setSubsetFilter('FAVORITES')}
               accessibilityRole="button"
@@ -253,7 +253,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               testID="subset-filter-custom"
               style={[
                 styles.subsetChip,
-                subsetFilter === 'CUSTOM' && styles.subsetChipActive,
+                subsetFilter === 'CUSTOM' && styles.subsetChipActive, styles.touchTarget,
               ]}
               onPress={() => setSubsetFilter('CUSTOM')}
               accessibilityRole="button"
@@ -277,7 +277,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 testID="recipe-filter-all"
                 style={[
                   styles.recipeFilterTab,
-                  categoryFilter === 'ALL' && styles.recipeFilterTabActive,
+                  categoryFilter === 'ALL' && styles.recipeFilterTabActive, styles.touchTarget,
                 ]}
                 onPress={() => onCategoryFilterChange('ALL')}
                 accessibilityRole="tab"
@@ -297,7 +297,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 testID="recipe-filter-coffee"
                 style={[
                   styles.recipeFilterTab,
-                  categoryFilter === 'COFFEE' && styles.recipeFilterTabActive,
+                  categoryFilter === 'COFFEE' && styles.recipeFilterTabActive, styles.touchTarget,
                 ]}
                 onPress={() => onCategoryFilterChange('COFFEE')}
                 accessibilityRole="tab"
@@ -317,7 +317,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 testID="recipe-filter-tea"
                 style={[
                   styles.recipeFilterTab,
-                  categoryFilter === 'TEA' && styles.recipeFilterTabActive,
+                  categoryFilter === 'TEA' && styles.recipeFilterTabActive, styles.touchTarget,
                 ]}
                 onPress={() => onCategoryFilterChange('TEA')}
                 accessibilityRole="tab"
@@ -339,7 +339,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
           <View style={styles.modalActionButtonsRow}>
             <Pressable
               testID="add-custom-recipe-btn"
-              style={styles.addCustomRecipeBtn}
+              style={[styles.addCustomRecipeBtn, styles.touchTarget]}
               onPress={onAddCustomRecipe}
             >
               <Text style={styles.addCustomRecipeBtnText}>
@@ -349,7 +349,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
 
             {beveragePreference !== 'coffee' && (
               <Pressable
-                style={styles.gongfuModalBtn}
+                style={[styles.gongfuModalBtn, styles.touchTarget]}
                 onPress={onOpenGongfu}
               >
                 <Text style={styles.gongfuModalBtnText}>Gongfu Cha</Text>
@@ -357,7 +357,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
             )}
 
             <Pressable
-              style={styles.importRecipeModalBtn}
+              style={[styles.importRecipeModalBtn, styles.touchTarget]}
               onPress={onOpenImport}
               testID="import-recipe-btn"
             >
@@ -367,7 +367,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
             </Pressable>
 
             <Pressable
-              style={styles.scanQrModalBtn}
+              style={[styles.scanQrModalBtn, styles.touchTarget]}
               onPress={onOpenQrScanner}
               testID="scan-qr-btn"
               accessibilityRole="button"
@@ -382,7 +382,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
             <View style={styles.categoryGroupSection}>
               <Pressable
                 testID="recipe-cat-toggle-COFFEE"
-                style={styles.categoryAccordionHeader}
+                style={[styles.categoryAccordionHeader, styles.touchTarget]}
                 onPress={() => toggleCategoryCollapse('COFFEE')}
                 accessibilityRole="button"
                 accessibilityLabel="Zwiń lub rozwiń kategorię Kawa Specialty"
@@ -403,7 +403,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
             <View style={styles.categoryGroupSection}>
               <Pressable
                 testID="recipe-cat-toggle-TEA"
-                style={styles.categoryAccordionHeader}
+                style={[styles.categoryAccordionHeader, styles.touchTarget]}
                 onPress={() => toggleCategoryCollapse('TEA')}
                 accessibilityRole="button"
                 accessibilityLabel="Zwiń lub rozwiń kategorię Herbata Rzemieślnicza"
@@ -441,6 +441,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   inlineContainer: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.lg,

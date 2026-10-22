@@ -111,7 +111,7 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
             accessibilityLabel={t.dialin.directionDoseToWater || 'Doza → Woda'}
             style={[
               styles.directionBtn,
-              calcDirection === 'doseToWater' && styles.directionBtnActive,
+              calcDirection === 'doseToWater' && styles.directionBtnActive, styles.touchTarget,
             ]}
             onPress={() => handleDirectionChange('doseToWater')}
           >
@@ -130,7 +130,7 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
             accessibilityLabel={t.dialin.directionWaterToDose || 'Woda → Doza'}
             style={[
               styles.directionBtn,
-              calcDirection === 'waterToDose' && styles.directionBtnActive,
+              calcDirection === 'waterToDose' && styles.directionBtnActive, styles.touchTarget,
             ]}
             onPress={() => handleDirectionChange('waterToDose')}
           >
@@ -192,7 +192,7 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
               accessibilityLabel={`Proporcja ${item.label}`}
               style={[
                 styles.ratioChip,
-                ratioVal === item.r && styles.ratioChipActive,
+                ratioVal === item.r && styles.ratioChipActive, styles.touchTarget,
               ]}
               onPress={() => handleRatioSelect(item.r)}
             >
@@ -243,6 +243,7 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   sectionHeader: {
     fontSize: 18,
     fontWeight: '700',

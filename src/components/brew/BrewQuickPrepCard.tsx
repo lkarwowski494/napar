@@ -70,7 +70,7 @@ export function BrewQuickPrepCard({
               key={n}
               style={[
                 styles.batchChip,
-                servings === n && styles.batchChipActive,
+                servings === n && styles.batchChipActive, styles.touchTarget,
               ]}
               onPress={() => onServingsChange(n)}
               disabled={disabled}
@@ -196,7 +196,7 @@ export function BrewQuickPrepCard({
               return (
                 <Pressable
                   key={r.label}
-                  style={[styles.ratioChip, isActive && styles.ratioChipActive]}
+                  style={[styles.ratioChip, isActive && styles.ratioChipActive, styles.touchTarget]}
                   onPress={() => onWaterChange(Math.round(doseGrams * r.ratio))}
                   disabled={disabled}
                 >
@@ -217,6 +217,7 @@ export function BrewQuickPrepCard({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   card: {
     marginBottom: 4,
   },

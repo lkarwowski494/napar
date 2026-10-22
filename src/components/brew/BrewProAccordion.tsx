@@ -29,7 +29,7 @@ export function BrewProAccordion({
     <View style={styles.container} testID="pro-accordion">
       <Pressable
         testID="pro-accordion-toggle-btn"
-        style={styles.header}
+        style={[styles.header, styles.touchTarget]}
         onPress={() => setIsExpanded(!isExpanded)}
         accessibilityRole="button"
         accessibilityLabel="Rozwiń parametry wody i mineralizację"
@@ -52,7 +52,7 @@ export function BrewProAccordion({
                 <Pressable
                   key={w.id}
                   testID={`pro-water-chip-${w.id}`}
-                  style={[styles.chip, active && styles.chipActive]}
+                  style={[styles.chip, active && styles.chipActive, styles.touchTarget]}
                   onPress={() => onSelectWaterProfile(w.id)}
                   accessibilityRole="button"
                   accessibilityLabel={`Profil wody ${w.namePl}`}
@@ -85,6 +85,7 @@ export function BrewProAccordion({
 }
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   container: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.lg,

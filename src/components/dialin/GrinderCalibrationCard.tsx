@@ -67,7 +67,7 @@ export const GrinderCalibrationCard: React.FC<GrinderCalibrationCardProps> = ({ 
       </Text>
       <Pressable
         testID="grinder-calibration-reset-btn"
-        style={styles.resetButton}
+        style={[styles.resetButton, styles.touchTarget]}
         onPress={resetCalibration}
         accessibilityRole="button"
         accessibilityLabel={t.grinder.calibReset}
@@ -79,6 +79,7 @@ export const GrinderCalibrationCard: React.FC<GrinderCalibrationCardProps> = ({ 
 };
 
 const styles = StyleSheet.create({
+  touchTarget: { minWidth: 44, minHeight: 44 },
   card: {
     backgroundColor: theme.colors.bgCardSecondary,
     borderRadius: theme.borderRadius.sm,
