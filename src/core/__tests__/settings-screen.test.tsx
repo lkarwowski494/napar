@@ -70,8 +70,8 @@ describe('SettingsScreen Component', () => {
     expect(json).toBeTruthy();
     const str = JSON.stringify(json);
 
-    expect(str).toContain('Polski (Napar)');
-    expect(str).toContain('English (Steepwise)');
+    expect(str).toContain('Polski');
+    expect(str).toContain('English');
     expect(str).toContain('FILOZOFIA APPS4BREW');
     expect(str).toContain('Eksportuj Kopię Zapasową (JSON)');
     expect(str).toContain('Importuj Kopię z Pliku JSON');
@@ -89,7 +89,7 @@ describe('SettingsScreen Component', () => {
     });
 
     // 1. Przełącz na język angielski
-    const enBtn = findPressableWithText(tree.root, 'English (Steepwise)');
+    const enBtn = findPressableWithText(tree.root, 'English');
     expect(enBtn).toBeTruthy();
 
     renderer.act(() => {
@@ -101,7 +101,7 @@ describe('SettingsScreen Component', () => {
     expect(str).toContain('Steepwise requires no login');
 
     // 2. Przełącz z powrotem na polski
-    const plBtn = findPressableWithText(tree.root, 'Polski (Napar)');
+    const plBtn = findPressableWithText(tree.root, 'Polski');
     expect(plBtn).toBeTruthy();
 
     renderer.act(() => {
@@ -111,6 +111,43 @@ describe('SettingsScreen Component', () => {
     str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Język / Language');
     expect(str).toContain('Napar nie wymaga logowania');
+  });
+
+  test('Wybór języka z listy zapisuje się w app_settings i przetrwa ponowne otwarcie ekranu', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <SettingsScreen />
+        </LanguageProvider>
+      );
+    });
+
+    const jaHost = tree.root.find((n: any) => typeof n.type === 'string' && n.props.testID === 'language-option-ja');
+    let jaBtn: any = jaHost;
+    while (jaBtn && !jaBtn.props.onPress) jaBtn = jaBtn.parent;
+    renderer.act(() => {
+      jaBtn.props.onPress();
+    });
+    expect(mockSettings.get('app_language')).toBe('ja');
+    expect(JSON.stringify(tree.toJSON())).toContain('日本語');
+
+    renderer.act(() => {
+      tree.unmount();
+    });
+
+    let restarted: any;
+    renderer.act(() => {
+      restarted = renderer.create(
+        <LanguageProvider>
+          <SettingsScreen />
+        </LanguageProvider>
+      );
+    });
+    const checked = restarted.root.find(
+      (n: any) => typeof n.type === 'string' && n.props.testID === 'language-option-ja'
+    );
+    expect(checked.props.accessibilityState).toEqual({ checked: true, selected: true });
   });
 
   test('Eksport kopii zapasowej JSON: wywołuje exportAllDataJson i otwiera modal', () => {

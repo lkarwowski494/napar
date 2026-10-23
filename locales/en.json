@@ -458,6 +458,7 @@
     "title": "Settings & Privacy",
     "languageSection": "Language",
     "languageAuto": "Automatic (System Default)",
+    "languageSystem": "System language",
     "beverageSection": "Beverage Preference",
     "beverageDesc": "Tailor the app to your rituals: hide unneeded options, recipes, and settings.",
     "beverageBoth": "Coffee & Tea",

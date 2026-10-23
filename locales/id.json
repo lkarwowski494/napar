@@ -458,6 +458,7 @@
     "title": "Pengaturan & Privasi",
     "languageSection": "Bahasa",
     "languageAuto": "Otomatis (Default Sistem)",
+    "languageSystem": "System language",
     "beverageSection": "Preferensi Minuman",
     "beverageDesc": "Sesuaikan aplikasi dengan ritual Anda: sembunyikan opsi, resep, dan pengaturan yang tidak diperlukan.",
     "beverageBoth": "Kopi & Teh",

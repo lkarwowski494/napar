@@ -7,7 +7,9 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 import { BeveragePreference } from '../../core/database';
+import type { LanguageSetting } from '../../core/i18n';
 import { CheckIcon } from '../icons/CraftIcons';
+import { LanguagePicker } from './LanguagePicker';
 import {
   formatTemperature,
   formatDoseWeight,
@@ -17,7 +19,8 @@ import {
 interface AppPreferencesCardProps {
   t: any;
   language: string;
-  onSetLanguage: (lang: 'pl' | 'en') => void;
+  languageSetting: LanguageSetting;
+  onSetLanguage: (setting: LanguageSetting) => void;
   beveragePreference: BeveragePreference;
   onSelectBeveragePreference: (pref: BeveragePreference) => void;
   unitSystem: 'metric' | 'imperial';
@@ -31,6 +34,7 @@ interface AppPreferencesCardProps {
 export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
   t,
   language,
+  languageSetting,
   onSetLanguage,
   beveragePreference,
   onSelectBeveragePreference,
@@ -43,30 +47,9 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
 }) => {
   return (
     <>
-      {/* Przełącznik Języka (PL / EN) */}
+      {/* Wybór języka: język systemu + 35 języków (LANGS) pod nazwami własnymi */}
       <Text style={styles.sectionTitle}>{t.settings.languageSection}</Text>
-      <View style={styles.langSelectorRow}>
-        <Pressable
-          style={[styles.langTab, language === 'pl' && styles.langTabActive, styles.touchTarget]}
-          onPress={() => onSetLanguage('pl')}
-          accessibilityRole="button"
-          accessibilityLabel="Polski (Napar)"
-        >
-          <Text style={[styles.langTabText, language === 'pl' && styles.langTabTextActive]}>
-            Polski (Napar)
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[styles.langTab, language === 'en' && styles.langTabActive, styles.touchTarget]}
-          onPress={() => onSetLanguage('en')}
-          accessibilityRole="button"
-          accessibilityLabel="English (Steepwise)"
-        >
-          <Text style={[styles.langTabText, language === 'en' && styles.langTabTextActive]}>
-            English (Steepwise)
-          </Text>
-        </Pressable>
-      </View>
+      <LanguagePicker t={t} setting={languageSetting} onSelect={onSetLanguage} />
 
       {/* Preferencje Naparów (Kawa / Herbata / Kawa i herbata) */}
       <Text style={styles.sectionTitle}>{t.settings.beverageSection}</Text>

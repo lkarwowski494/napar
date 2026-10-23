@@ -458,6 +458,7 @@
     "title": "Innstillinger og personvern",
     "languageSection": "Språk",
     "languageAuto": "Automatisk (systemstandard)",
+    "languageSystem": "System language",
     "beverageSection": "Drikkepreferanse",
     "beverageDesc": "Tilpass appen til rutinene dine: skjul unødvendige alternativer, oppskrifter og innstillinger.",
     "beverageBoth": "Kaffe og te",

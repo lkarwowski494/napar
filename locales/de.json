@@ -458,6 +458,7 @@
     "title": "Einstellungen & Datenschutz",
     "languageSection": "Sprache",
     "languageAuto": "Automatisch (Systemstandard)",
+    "languageSystem": "System language",
     "beverageSection": "Getränkepräferenz",
     "beverageDesc": "Passen Sie die App Ihrem Ritual an: Blenden Sie nicht benötigte Optionen, Rezepte und Einstellungen aus.",
     "beverageBoth": "Kaffee & Tee",

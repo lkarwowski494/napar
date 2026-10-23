@@ -22,6 +22,8 @@ jest.mock('expo-router', () => ({
 }));
 
 jest.mock('../database', () => ({
+  getLanguageSetting: jest.fn(() => 'system'),
+  setLanguageSetting: jest.fn(),
   getUnitSystem: jest.fn(() => 'metric'),
 }));
 

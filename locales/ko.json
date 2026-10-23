@@ -458,6 +458,7 @@
     "title": "설정 및 개인정보",
     "languageSection": "언어",
     "languageAuto": "자동 (시스템 기본값)",
+    "languageSystem": "System language",
     "beverageSection": "음료 선호",
     "beverageDesc": "나의 루틴에 맞게 앱을 조정하세요. 필요 없는 옵션, 레시피, 설정을 숨길 수 있어요.",
     "beverageBoth": "커피 & 차",

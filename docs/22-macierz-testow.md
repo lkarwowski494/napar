@@ -9,11 +9,11 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | :--- | :---: | :---: | :---: | :---: |
 | **EKRAN** | 11 | 11 | **100.0%** | ✅ POKRYTE |
 | **UI** | 69 | 69 | **100.0%** | ✅ POKRYTE |
-| **TEKST** | 435 | 435 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 278 | 278 | **100.0%** | ✅ POKRYTE |
-| **WYMIAR** | 90 | 90 | **100.0%** | ✅ POKRYTE |
+| **TEKST** | 436 | 436 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 284 | 284 | **100.0%** | ✅ POKRYTE |
+| **WYMIAR** | 94 | 94 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **883** | Pokrytych: **883** | Brakujących: **0**
+Łącznie elementów: **894** | Pokrytych: **894** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -320,4 +320,4 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `UI` | `dialin.costTabTitle` | `locales/pl.json` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
 | `TEKST` | `dialin.costTitle` | `locales/pl.json` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
 
-*(... i 583 kolejnych elementów w pełnym wykazie)*
+*(... i 594 kolejnych elementów w pełnym wykazie)*

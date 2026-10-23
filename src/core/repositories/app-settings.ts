@@ -3,6 +3,7 @@
 // ============================================================================
 
 import type { DbPort } from '../db-port';
+import { parseLanguageSetting, SYSTEM_LANGUAGE, type LanguageSetting } from '../i18n-loader';
 
 export type BeveragePreference = 'both' | 'coffee' | 'tea';
 
@@ -46,6 +47,19 @@ export function listPortableAppSettings(db: DbPort): { key: string; value: strin
     'SELECT key, value FROM app_settings ORDER BY key ASC'
   );
   return rows.filter((row) => !NON_PORTABLE_SETTING_KEYS.includes(row.key));
+}
+
+/** Klucz trwałego wyboru języka interfejsu (wartość: kod z LANGS albo „system”). */
+export const APP_LANGUAGE_SETTING_KEY = 'app_language';
+
+/** Odczyt wyboru języka; brak wpisu, nieznana lub uszkodzona wartość -> „system”. */
+export function getLanguageSetting(db: DbPort): LanguageSetting {
+  return parseLanguageSetting(getAppSetting(db, APP_LANGUAGE_SETTING_KEY, SYSTEM_LANGUAGE));
+}
+
+/** Zapis wyboru języka; wartość spoza listy zapisywana jest jako „system”. */
+export function setLanguageSetting(db: DbPort, value: LanguageSetting): void {
+  setAppSetting(db, APP_LANGUAGE_SETTING_KEY, parseLanguageSetting(value));
 }
 
 export function getUnitSystem(db: DbPort): 'metric' | 'imperial' {

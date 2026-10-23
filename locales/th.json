@@ -458,6 +458,7 @@
     "title": "การตั้งค่าและความเป็นส่วนตัว",
     "languageSection": "ภาษา",
     "languageAuto": "อัตโนมัติ (ตามระบบ)",
+    "languageSystem": "System language",
     "beverageSection": "ความชอบด้านเครื่องดื่ม",
     "beverageDesc": "ปรับแอปให้เข้ากับกิจวัตรของคุณ: ซ่อนตัวเลือก สูตร และการตั้งค่าที่ไม่จำเป็น",
     "beverageBoth": "กาแฟและชา",

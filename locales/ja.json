@@ -458,6 +458,7 @@
     "title": "設定とプライバシー",
     "languageSection": "言語",
     "languageAuto": "自動（システムの設定）",
+    "languageSystem": "System language",
     "beverageSection": "飲み物の設定",
     "beverageDesc": "アプリをあなたの習慣に合わせます。不要なオプション、レシピ、設定を非表示にできます。",
     "beverageBoth": "コーヒーと茶",

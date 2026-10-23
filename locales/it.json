@@ -458,6 +458,7 @@
     "title": "Impostazioni e privacy",
     "languageSection": "Lingua",
     "languageAuto": "Automatica (predefinita di sistema)",
+    "languageSystem": "System language",
     "beverageSection": "Preferenza bevanda",
     "beverageDesc": "Adatti l'app ai Suoi rituali: nasconda opzioni, ricette e impostazioni non necessarie.",
     "beverageBoth": "Caffè e tè",

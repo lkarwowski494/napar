@@ -458,6 +458,7 @@
     "title": "Definições e privacidade",
     "languageSection": "Idioma",
     "languageAuto": "Automático (predefinição do sistema)",
+    "languageSystem": "System language",
     "beverageSection": "Preferência de bebida",
     "beverageDesc": "Adapte a aplicação aos seus rituais: oculte opções, receitas e definições que não usa.",
     "beverageBoth": "Café e chá",

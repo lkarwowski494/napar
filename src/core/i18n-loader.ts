@@ -120,6 +120,21 @@ export function isLangCode(value: unknown): value is LangCode {
   return typeof value === 'string' && (LANGS as readonly string[]).includes(value);
 }
 
+/** Wartość ustawienia „Język systemu” (brak wyboru użytkownika). */
+export const SYSTEM_LANGUAGE = 'system' as const;
+
+/** Ustawienie języka: kod z LANGS albo „system” (język urządzenia). */
+export type LanguageSetting = LangCode | typeof SYSTEM_LANGUAGE;
+
+export function isLanguageSetting(value: unknown): value is LanguageSetting {
+  return value === SYSTEM_LANGUAGE || isLangCode(value);
+}
+
+/** Każda wartość spoza listy (także uszkodzona lub pusta) oznacza język systemu. */
+export function parseLanguageSetting(value: unknown): LanguageSetting {
+  return isLanguageSetting(value) ? value : SYSTEM_LANGUAGE;
+}
+
 /**
  * Dopasowuje tag języka systemu (np. `pt_BR`, `de-AT`, `zh-TW`) do obsługiwanego kodu.
  * Zwraca null, gdy nie ma dopasowania (wtedy decyduje język zapasowy).

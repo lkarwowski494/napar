@@ -458,6 +458,7 @@
     "title": "Ustawienia & Prywatność",
     "languageSection": "Język / Language",
     "languageAuto": "Automatyczny (systemowy)",
+    "languageSystem": "Język systemu",
     "beverageSection": "Preferencje Naparów",
     "beverageDesc": "Dostosuj aplikację do swoich rytuałów: ukrywaj zbędne opcje, receptury i ustawienia.",
     "beverageBoth": "Kawa i Herbata",

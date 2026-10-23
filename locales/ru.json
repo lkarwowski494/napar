@@ -458,6 +458,7 @@
     "title": "Настройки и конфиденциальность",
     "languageSection": "Язык",
     "languageAuto": "Автоматически (как в системе)",
+    "languageSystem": "System language",
     "beverageSection": "Тип напитков",
     "beverageDesc": "Настройте приложение под свои ритуалы: скройте ненужные опции, рецепты и настройки.",
     "beverageBoth": "Кофе и чай",

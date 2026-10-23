@@ -458,6 +458,7 @@
     "title": "הגדרות ופרטיות",
     "languageSection": "שפה",
     "languageAuto": "אוטומטי (ברירת מחדל של המערכת)",
+    "languageSystem": "System language",
     "beverageSection": "העדפת משקה",
     "beverageDesc": "התאם את האפליקציה לטקסים שלך: הסתר אפשרויות, מתכונים והגדרות מיותרים.",
     "beverageBoth": "קפה ותה",

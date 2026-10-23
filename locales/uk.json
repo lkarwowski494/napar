@@ -458,6 +458,7 @@
     "title": "Налаштування та конфіденційність",
     "languageSection": "Мова",
     "languageAuto": "Автоматично (як у системі)",
+    "languageSystem": "System language",
     "beverageSection": "Вподобання напоїв",
     "beverageDesc": "Налаштуйте застосунок під свої ритуали: приховайте непотрібні опції, рецепти та налаштування.",
     "beverageBoth": "Кава і чай",

@@ -458,6 +458,7 @@
     "title": "设置与隐私",
     "languageSection": "语言",
     "languageAuto": "自动（跟随系统）",
+    "languageSystem": "System language",
     "beverageSection": "饮品偏好",
     "beverageDesc": "按你的习惯定制应用：隐藏不需要的选项、配方和设置。",
     "beverageBoth": "咖啡与茶",

@@ -28,6 +28,7 @@ import {
   getCustomGrinderModels,
 } from './database';
 import { autoBackup } from './backup';
+import { getCurrentLanguage } from './i18n';
 import {
   calculateExtractionYield,
   estimateCoffeeCaffeineMg,
@@ -84,6 +85,11 @@ export interface BrewContextType {
 const defaultCoffeeRecipe = MASTER_RECIPES.find((r) => r.type === 'COFFEE') || MASTER_RECIPES[0];
 const defaultTeaRecipe = MASTER_RECIPES.find((r) => r.type === 'TEA') || MASTER_RECIPES[3];
 const defaultRecipe = defaultCoffeeRecipe;
+
+/** Komunikaty głosowe mają wersje tylko PL i EN; pozostałe języki z listy dostają EN. */
+function announceLanguage(): 'pl' | 'en' {
+  return getCurrentLanguage() === 'pl' ? 'pl' : 'en';
+}
 
 /** Typ napoju przepisu (wzorcowego: `type`, własnego: `beverageType`). */
 function beverageOf(recipe: SavedRecipe | MasterRecipe): 'COFFEE' | 'TEA' {
@@ -239,7 +245,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       onTick: (snap) => setSnapshot(snap),
       onStepChange: (stepIndex, step) => {
         if (getVoiceAnnounceEnabled()) {
-          const lang = (getAppSetting('app_language', 'pl') as 'pl' | 'en') || 'pl';
+          const lang = announceLanguage();
           const stepName = lang === 'en' ? (step.nameEn || step.namePl) : step.namePl;
           const stepInstr = lang === 'en' ? (step.instructionEn || step.instructionPl) : step.instructionPl;
           announceStep(
@@ -255,13 +261,13 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       },
       onWarning: (remaining) => {
         if (getVoiceAnnounceEnabled()) {
-          const lang = (getAppSetting('app_language', 'pl') as 'pl' | 'en') || 'pl';
+          const lang = announceLanguage();
           announceCountdown(remaining, lang);
         }
       },
       onFinish: () => {
         if (getVoiceAnnounceEnabled()) {
-          const lang = (getAppSetting('app_language', 'pl') as 'pl' | 'en') || 'pl';
+          const lang = announceLanguage();
           const totalSecs = engineRef.current?.getSnapshot().totalElapsedSeconds || 0;
           announceFinish(recipe.name, totalSecs, lang);
         }

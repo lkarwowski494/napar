@@ -29,6 +29,8 @@ jest.mock('../../platform/tasting-card-share', () => ({
 jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
 
 jest.mock('../database', () => ({
+  getLanguageSetting: jest.fn(() => 'system'),
+  setLanguageSetting: jest.fn(),
   getBrewSessions: jest.fn(),
   deleteBrewSession: jest.fn(),
   getRecipes: jest.fn(() => []),

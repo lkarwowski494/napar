@@ -458,6 +458,7 @@
     "title": "Cài đặt và quyền riêng tư",
     "languageSection": "Ngôn ngữ",
     "languageAuto": "Tự động (theo hệ thống)",
+    "languageSystem": "System language",
     "beverageSection": "Tùy chọn đồ uống",
     "beverageDesc": "Điều chỉnh ứng dụng theo thói quen của bạn: ẩn các tùy chọn, công thức và cài đặt không cần thiết.",
     "beverageBoth": "Cà phê và trà",

@@ -73,6 +73,9 @@ module.exports = {
     // Przebudowa etapu 2 (persystencja i kopie): 100% bez wyjątków
     // Etap 3f (i18n): loader słowników i wybór języka w czystym core; adapter języka systemu
     './src/core/i18n-loader.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    // Trwały wybór języka (app_settings): provider i nazwy natywne w pickerze bez wyjątków
+    './src/core/i18n.tsx': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './src/core/language-names.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/platform/system-locale.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/repositories/': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/backup.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },

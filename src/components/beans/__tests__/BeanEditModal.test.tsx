@@ -10,6 +10,8 @@ import { InventoryItem } from '../../../core/database-schema';
 import * as database from '../../../core/database';
 
 jest.mock('../../../core/database', () => ({
+  getLanguageSetting: jest.fn(() => 'system'),
+  setLanguageSetting: jest.fn(),
   saveInventoryItem: jest.fn(),
   deleteInventoryItem: jest.fn(),
 }));

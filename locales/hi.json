@@ -458,6 +458,7 @@
     "title": "सेटिंग्स और गोपनीयता",
     "languageSection": "भाषा",
     "languageAuto": "स्वचालित (सिस्टम डिफ़ॉल्ट)",
+    "languageSystem": "System language",
     "beverageSection": "पेय वरीयता",
     "beverageDesc": "ऐप को अपनी दिनचर्या के अनुसार ढालें: अनावश्यक विकल्प, रेसिपी और सेटिंग छिपाएँ।",
     "beverageBoth": "कॉफ़ी और चाय",

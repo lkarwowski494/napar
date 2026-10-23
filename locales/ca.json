@@ -458,6 +458,7 @@
     "title": "Configuració i privadesa",
     "languageSection": "Idioma",
     "languageAuto": "Automàtic (predeterminat del sistema)",
+    "languageSystem": "System language",
     "beverageSection": "Preferència de beguda",
     "beverageDesc": "Adapta l'app als teus rituals: amaga les opcions, receptes i configuracions que no necessites.",
     "beverageBoth": "Cafè i te",

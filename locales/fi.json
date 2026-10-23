@@ -458,6 +458,7 @@
     "title": "Asetukset ja yksityisyys",
     "languageSection": "Kieli",
     "languageAuto": "Automaattinen (järjestelmän oletus)",
+    "languageSystem": "System language",
     "beverageSection": "Juomamieltymys",
     "beverageDesc": "Mukauta sovellus omiin rituaaleihisi: piilota tarpeettomat vaihtoehdot, reseptit ja asetukset.",
     "beverageBoth": "Kahvi ja tee",

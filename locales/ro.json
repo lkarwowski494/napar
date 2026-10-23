@@ -458,6 +458,7 @@
     "title": "Setări și confidențialitate",
     "languageSection": "Limbă",
     "languageAuto": "Automat (setarea sistemului)",
+    "languageSystem": "System language",
     "beverageSection": "Preferința pentru băuturi",
     "beverageDesc": "Adaptați aplicația la ritualurile dvs.: ascundeți opțiunile, rețetele și setările inutile.",
     "beverageBoth": "Cafea și ceai",

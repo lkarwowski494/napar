@@ -458,6 +458,7 @@
     "title": "Nastavení a soukromí",
     "languageSection": "Jazyk",
     "languageAuto": "Automaticky (výchozí systémový)",
+    "languageSystem": "System language",
     "beverageSection": "Preference nápoje",
     "beverageDesc": "Přizpůsobte aplikaci svým rituálům: skryjte nepotřebné možnosti, recepty a nastavení.",
     "beverageBoth": "Káva a čaj",

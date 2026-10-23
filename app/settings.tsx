@@ -49,7 +49,7 @@ import { PassSettingsCard } from '../src/components/settings/PassSettingsCard';
 import { AppPreferencesCard } from '../src/components/settings/AppPreferencesCard';
 
 export default function SettingsScreen() {
-  const { t, language, setLanguage } = useTranslation();
+  const { t, language, setting: languageSetting, setLanguage } = useTranslation();
 
   let brewCtx: any = null;
   try {
@@ -196,6 +196,7 @@ export default function SettingsScreen() {
       <AppPreferencesCard
         t={t}
         language={language}
+        languageSetting={languageSetting}
         onSetLanguage={setLanguage}
         beveragePreference={beveragePreference}
         onSelectBeveragePreference={handleSelectBeveragePreference}

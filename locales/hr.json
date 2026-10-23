@@ -458,6 +458,7 @@
     "title": "Postavke i privatnost",
     "languageSection": "Jezik",
     "languageAuto": "Automatski (zadano na sustavu)",
+    "languageSystem": "System language",
     "beverageSection": "Vrsta napitka",
     "beverageDesc": "Prilagodite aplikaciju svojim navikama: sakrijte nepotrebne opcije, recepte i postavke.",
     "beverageBoth": "Kava i čaj",

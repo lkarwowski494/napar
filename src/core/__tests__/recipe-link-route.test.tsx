@@ -32,6 +32,8 @@ jest.mock('expo-clipboard', () => ({
 }));
 
 jest.mock('../database', () => ({
+  getLanguageSetting: jest.fn(() => 'system'),
+  setLanguageSetting: jest.fn(),
   saveRecipe: jest.fn(),
   getUnitSystem: jest.fn(() => 'metric'),
 }));

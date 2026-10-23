@@ -155,6 +155,8 @@ export const deleteCaffeineLog = bind(caffeine.deleteCaffeineLog);
 // Ustawienia
 export const getAppSetting = bindSetting(settings.getAppSetting);
 export const setAppSetting = bindSetting(settings.setAppSetting);
+export const getLanguageSetting = bindSetting(settings.getLanguageSetting);
+export const setLanguageSetting = bindSetting(settings.setLanguageSetting);
 export const getUnitSystem = bindSetting(settings.getUnitSystem);
 export const setUnitSystem = bindSetting(settings.setUnitSystem);
 export const getVoiceAnnounceEnabled = bindSetting(settings.getVoiceAnnounceEnabled);

@@ -5,22 +5,31 @@
 // 100% offline, zero telemetrii.
 // ============================================================================
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { readSystemLocale } from '../platform/system-locale';
+import { getLanguageSetting, setLanguageSetting } from './database';
 import {
   buildMessages,
   LANGS,
   LangCode,
+  LanguageSetting,
+  parseLanguageSetting,
   resolveLanguage,
+  SYSTEM_LANGUAGE,
   Translations,
 } from './i18n-loader';
 
-export { LANGS };
-export type { LangCode, Translations } from './i18n-loader';
+export { LANGS, SYSTEM_LANGUAGE };
+export type { LangCode, LanguageSetting, Translations } from './i18n-loader';
 export type SupportedLanguage = LangCode;
 
 export function detectSystemLanguage(): SupportedLanguage {
   return resolveLanguage(null, readSystemLocale());
+}
+
+/** Język używany w UI: wybór użytkownika zapisany w app_settings, a gdy go brak — język systemu. */
+export function getCurrentLanguage(): SupportedLanguage {
+  return resolveLanguage(getLanguageSetting(), readSystemLocale());
 }
 
 const warnMissingKey = (path: string, lang: LangCode) => {
@@ -46,27 +55,38 @@ export const translations: { pl: Translations; en: Translations } = {
 };
 
 interface LanguageContextType {
+  /** Język faktycznie używany (po rozwiązaniu wyboru i języka systemu). */
   language: SupportedLanguage;
-  setLanguage: (lang: SupportedLanguage) => void;
+  /** Wybór użytkownika: kod języka albo „system”. */
+  setting: LanguageSetting;
+  /** Zapisuje wybór w app_settings i od razu przelicza słownik. */
+  setLanguage: (setting: LanguageSetting) => void;
   t: Translations;
 }
 
 const LanguageContext = createContext<LanguageContextType>({
   language: 'pl',
+  setting: SYSTEM_LANGUAGE,
   setLanguage: () => {},
   t: translations.pl,
 });
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userLanguage, setUserLanguage] = useState<SupportedLanguage | null>(null);
+  const [setting, setSetting] = useState<LanguageSetting>(() => getLanguageSetting());
   const [systemLocale] = useState<string | null>(() => readSystemLocale());
 
-  const language = resolveLanguage(userLanguage, systemLocale);
-  const value = {
-    language,
-    setLanguage: setUserLanguage,
-    t: getTranslations(language),
-  };
+  const language = resolveLanguage(setting, systemLocale);
+
+  const setLanguage = useCallback((next: LanguageSetting) => {
+    const value = parseLanguageSetting(next);
+    setLanguageSetting(value);
+    setSetting(value);
+  }, []);
+
+  const value = useMemo<LanguageContextType>(
+    () => ({ language, setting, setLanguage, t: getTranslations(language) }),
+    [language, setting, setLanguage]
+  );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 };
@@ -76,7 +96,7 @@ export function useTranslation(): LanguageContextType {
 }
 
 export function getCurrentTranslations(): Translations {
-  return getTranslations(detectSystemLanguage());
+  return getTranslations(getCurrentLanguage());
 }
 
 /**

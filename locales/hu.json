@@ -458,6 +458,7 @@
     "title": "Beállítások és adatvédelem",
     "languageSection": "Nyelv",
     "languageAuto": "Automatikus (rendszer alapértelmezett)",
+    "languageSystem": "System language",
     "beverageSection": "Italpreferencia",
     "beverageDesc": "Igazítsa az alkalmazást a szokásaihoz: rejtse el a felesleges opciókat, recepteket és beállításokat.",
     "beverageBoth": "Kávé és tea",
