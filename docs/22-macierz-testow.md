@@ -8,12 +8,12 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | Kategoria | Łącznie | Pokryte | Pokrycie % | Status |
 | :--- | :---: | :---: | :---: | :---: |
 | **EKRAN** | 11 | 11 | **100.0%** | ✅ POKRYTE |
-| **UI** | 69 | 69 | **100.0%** | ✅ POKRYTE |
-| **TEKST** | 436 | 436 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 284 | 284 | **100.0%** | ✅ POKRYTE |
+| **UI** | 95 | 95 | **100.0%** | ✅ POKRYTE |
+| **TEKST** | 506 | 506 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 286 | 286 | **100.0%** | ✅ POKRYTE |
 | **WYMIAR** | 94 | 94 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **894** | Pokrytych: **894** | Brakujących: **0**
+Łącznie elementów: **992** | Pokrytych: **992** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -22,7 +22,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `EKRAN` | `/(tabs)/beans` | `app/(tabs)/beans.tsx` | ✅ | tests/interaction-guards.test.ts, tests/state-sequences.test.ts |
 | `EKRAN` | `/(tabs)/caffeine` | `app/(tabs)/caffeine.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `EKRAN` | `/(tabs)/dialin` | `app/(tabs)/dialin.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
-| `EKRAN` | `/(tabs)/index` | `app/(tabs)/index.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/napar-watch-link.test.ts |
+| `EKRAN` | `/(tabs)/index` | `app/(tabs)/index.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/i18n-no-language-literals.test.ts |
 | `EKRAN` | `/(tabs)/journal` | `app/(tabs)/journal.tsx` | ✅ | tests/interaction-guards.test.ts, src/components/icons/__tests__/CraftIcons.test.tsx |
 | `EKRAN` | `/(tabs)/settings` | `app/(tabs)/settings.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `EKRAN` | `/gongfu` | `app/gongfu.tsx` | ✅ | tests/audit-fixes.test.tsx, src/components/__tests__/gongfu-setup-units.test.tsx |
@@ -49,9 +49,9 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `UI` | `common.seconds` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `UI` | `common.celsius` | `locales/pl.json` | ✅ | tests/recipe-select-inline.test.tsx, src/core/__tests__/domain-coverage-edge-cases.test.tsx |
 | `TEKST` | `tabs.brew` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
-| `TEKST` | `tabs.beans` | `locales/pl.json` | ✅ | tests/interaction-guards.test.ts, tests/state-sequences.test.ts |
-| `TEKST` | `tabs.journal` | `locales/pl.json` | ✅ | tests/interaction-guards.test.ts, src/components/icons/__tests__/CraftIcons.test.tsx |
-| `TEKST` | `tabs.dialin` | `locales/pl.json` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `tabs.beans` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, tests/interaction-guards.test.ts |
+| `TEKST` | `tabs.journal` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, tests/interaction-guards.test.ts |
+| `TEKST` | `tabs.dialin` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/i18n.test.ts |
 | `TEKST` | `tabs.caffeine` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `TEKST` | `tabs.settings` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `TEKST` | `brew.recipe` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
@@ -144,7 +144,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `tastingCard.balanceLabel.weak` | `locales/pl.json` | ✅ | src/components/__tests__/TastingCardView.test.tsx, src/components/brew/__tests__/BrewFinishModal.test.tsx |
 | `TEKST` | `tastingCard.balanceLabel.too_strong` | `locales/pl.json` | ✅ | src/components/__tests__/TastingCardView.test.tsx, src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.title` | `locales/pl.json` | ✅ | tests/audit-fixes.test.tsx, tests/backup-roundtrip.test.ts |
-| `TEKST` | `milkDrinks.entry` | `locales/pl.json` | ✅ | tests/touch-target-scan.test.ts, src/core/__tests__/contracts.test.ts |
+| `TEKST` | `milkDrinks.entry` | `locales/pl.json` | ✅ | tests/i18n-no-language-literals.test.ts, tests/touch-target-scan.test.ts |
 | `TEKST` | `milkDrinks.intro` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/milk-drinks.test.ts |
 | `TEKST` | `milkDrinks.cupLabel` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/milk-drinks.test.ts |
 | `TEKST` | `milkDrinks.cupValue` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/milk-drinks.test.ts |
@@ -163,39 +163,39 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `milkDrinks.ingredient.syrup` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.espresso.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.espresso.description` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
-| `TEKST` | `milkDrinks.drinks.espresso.step1` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
-| `TEKST` | `milkDrinks.drinks.espresso.step2` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
+| `TEKST` | `milkDrinks.drinks.espresso.step1` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.espresso.step2` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.espresso.tip` | `locales/pl.json` | ✅ | src/core/__tests__/domain-rules.test.ts, src/core/__tests__/hand-vectors-domain.test.ts |
 | `TEKST` | `milkDrinks.drinks.cappuccino.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.cappuccino.description` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
-| `TEKST` | `milkDrinks.drinks.cappuccino.step1` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
-| `TEKST` | `milkDrinks.drinks.cappuccino.step2` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
-| `TEKST` | `milkDrinks.drinks.cappuccino.step3` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
-| `TEKST` | `milkDrinks.drinks.cappuccino.step4` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.cappuccino.step1` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.cappuccino.step2` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.cappuccino.step3` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.cappuccino.step4` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.cappuccino.step5` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.cappuccino.tip` | `locales/pl.json` | ✅ | src/core/__tests__/domain-rules.test.ts, src/core/__tests__/hand-vectors-domain.test.ts |
 | `TEKST` | `milkDrinks.drinks.latte.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.latte.description` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
-| `TEKST` | `milkDrinks.drinks.latte.step1` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
-| `TEKST` | `milkDrinks.drinks.latte.step2` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
-| `TEKST` | `milkDrinks.drinks.latte.step3` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
-| `TEKST` | `milkDrinks.drinks.latte.step4` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.latte.step1` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.latte.step2` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.latte.step3` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.latte.step4` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.latte.step5` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.latte.tip` | `locales/pl.json` | ✅ | src/core/__tests__/domain-rules.test.ts, src/core/__tests__/hand-vectors-domain.test.ts |
 | `TEKST` | `milkDrinks.drinks.flatWhite.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.flatWhite.description` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
-| `TEKST` | `milkDrinks.drinks.flatWhite.step1` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
-| `TEKST` | `milkDrinks.drinks.flatWhite.step2` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
-| `TEKST` | `milkDrinks.drinks.flatWhite.step3` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
-| `TEKST` | `milkDrinks.drinks.flatWhite.step4` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.flatWhite.step1` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.flatWhite.step2` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.flatWhite.step3` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.flatWhite.step4` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.flatWhite.step5` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.flatWhite.tip` | `locales/pl.json` | ✅ | src/core/__tests__/domain-rules.test.ts, src/core/__tests__/hand-vectors-domain.test.ts |
 | `TEKST` | `milkDrinks.drinks.mocha.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.mocha.description` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
-| `TEKST` | `milkDrinks.drinks.mocha.step1` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
-| `TEKST` | `milkDrinks.drinks.mocha.step2` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
-| `TEKST` | `milkDrinks.drinks.mocha.step3` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
-| `TEKST` | `milkDrinks.drinks.mocha.step4` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.mocha.step1` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.mocha.step2` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.mocha.step3` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
+| `TEKST` | `milkDrinks.drinks.mocha.step4` | `locales/pl.json` | ✅ | tests/i18n-screen-texts.test.ts, src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.mocha.step5` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.mocha.tip` | `locales/pl.json` | ✅ | src/core/__tests__/domain-rules.test.ts, src/core/__tests__/hand-vectors-domain.test.ts |
 | `TEKST` | `recipeLink.title` | `locales/pl.json` | ✅ | tests/audit-fixes.test.tsx, tests/backup-roundtrip.test.ts |
@@ -320,4 +320,4 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `UI` | `dialin.costTabTitle` | `locales/pl.json` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
 | `TEKST` | `dialin.costTitle` | `locales/pl.json` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
 
-*(... i 594 kolejnych elementów w pełnym wykazie)*
+*(... i 692 kolejnych elementów w pełnym wykazie)*
