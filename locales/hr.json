@@ -416,7 +416,9 @@
     "customErrStepEmpty": "Unesite omjer u mikronima po kliku.",
     "customErrStepInvalid": "Unesite broj, npr. 22 ili 22.5.",
     "customErrStepRange": "Omjer mora biti između 1 i 200 µm po kliku.",
-    "customSaveFailed": "Mlinac nije bilo moguće spremiti. Pokušajte ponovno."
+    "customSaveFailed": "Mlinac nije bilo moguće spremiti. Pokušajte ponovno.",
+    "methodsPrefix": "Methods:",
+    "micronsRangeText": "Average particle size: {min} – {max} µm (reference point: {reference} µm)"
   },
   "caffeine": {
     "title": "Kinetika kofeina",
@@ -428,7 +430,8 @@
     "bedtimeCurfew": "Granica kofeina prije spavanja",
     "safeAtBedtime": "Sigurna razina za obnavljajući NREM san (< 25 mg)",
     "riskAtBedtime": "Oprez: povišen kofein može poremetiti strukturu dubokog NREM sna",
-    "logDoseBtn": "+ Zabilježi dozu kofeina"
+    "logDoseBtn": "+ Zabilježi dozu kofeina",
+    "workshopSubtitle": "Calculate caffeine intake, half-life metabolic decay, and sleep window."
   },
   "sensory": {
     "title": "SCA senzorni pauk-dijagram",
@@ -506,7 +509,11 @@
     "privacyBullet4": "Potpuna sloboda: besplatna cjelovita sigurnosna kopija i vraćanje u otvorenom JSON formatu.",
     "exportBtn": "Izvezi JSON sigurnosnu kopiju",
     "importBtn": "Vrati iz JSON sigurnosne kopije",
-    "backupSuccess": "Sigurnosna kopija uspješno izvezena."
+    "backupSuccess": "Sigurnosna kopija uspješno izvezena.",
+    "unitPreviewLabel": "Standard recipe preview:",
+    "philosophyBadge": "APPS4BREW PHILOSOPHY",
+    "philosophyTitle": "Privacy & Craft",
+    "philosophyBody": "Steepwise requires no login, connects to no external servers, and collects zero data (Apple \"Data Not Collected\" badge). Your stash, journal, and calculators run 100% locally on your device."
   },
   "paywall": {
     "title": "Jeftinije od espressa",
@@ -558,6 +565,109 @@
     "teaOnlyDesc": "Gongfu čaj, više ulijevanja, Kyusu, Gaiwan, zdjelice i listovi. Bez kave.",
     "bothTitle": "Kava i čaj",
     "bothDesc": "Puni zanatski ekosustav: od lagano prženih etiopskih kava do japanskog Gyokuroa.",
-    "startBtn": "Započni ritual"
+    "startBtn": "Započni ritual",
+    "changeAnytime": "You can change this anytime in Settings."
+  },
+  "brewScreen": {
+    "stepOneTitle": "STEP 1: WHAT ARE WE BREWING? (RECIPE & STASH)",
+    "stepTwoThreeTitle": "STEP 2 & 3: INPUT PARAMETERS & LIVE PROPORTIONS",
+    "stepFourTitle": "STEP 4: STEP-BY-STEP PROCEDURE EXECUTION",
+    "procedureCtaTitle": "▶ OPEN STEP-BY-STEP PROCEDURE ASSISTANT",
+    "procedureCtaSub": "Auto-parsed step timer · Full screen · 1-Tap Finish & Save",
+    "procedureCtaA11y": "Open Step-by-Step Procedure Assistant",
+    "corruptTitle": "Corrupt state detected after crash",
+    "corruptDesc": "File {file} was secured in Backup/. Your base data is intact.",
+    "corruptDismiss": "Dismiss",
+    "corruptDismissA11y": "Dismiss crash message",
+    "goldenRules": "⚖️ Golden Rules: Sour/thin → grind finer (2 clicks) or raise temp 2°C · Bitter/dry → grind coarser (2 clicks) · Peak: 7–35d."
+  },
+  "brewWorkflow": {
+    "changeRecipeTitle": "Change recipe?",
+    "changeRecipeMessage": "An active brew session is in progress. Changing recipe will reset timer progress.",
+    "changeRecipeAction": "Change",
+    "resetSessionTitle": "Reset brew session?",
+    "resetSessionMessage": "Current brew progress will be cleared.",
+    "resetSessionAction": "Reset"
+  },
+  "procedure": {
+    "eyebrow": "STEP-BY-STEP PROCEDURE ASSISTANT",
+    "exitA11y": "Exit procedure",
+    "stepCounter": "STEP {current} OF {total}",
+    "autoTimerTag": "⏱ Auto-parsed: {seconds}s",
+    "pourToWeight": "POUR TO WEIGHT ON SCALE:",
+    "timerRunning": "● AUTO-TIMER RUNNING",
+    "timerPaused": "⏸ TIMER PAUSED",
+    "totalBrewTime": "Total brew time: {time}",
+    "pauseBtn": "⏸ Pause",
+    "resumeBtn": "▶ Resume",
+    "pauseA11y": "Pause",
+    "resumeA11y": "Resume",
+    "resetStepA11y": "Reset step timer",
+    "resetStepBtn": "↺ Reset step ({seconds}s)",
+    "prevA11y": "Previous step",
+    "prevBtn": "◀ Prev",
+    "nextA11y": "Next step",
+    "nextBtn": "Next Step ▶",
+    "finishA11y": "Finish and save",
+    "finishBtn": "✓ Finish & Save"
+  },
+  "proactiveCalendar": {
+    "title": "14-DAY FRESHNESS & BREW CALENDAR",
+    "scheduleTitle": "Proactive Action Schedule",
+    "showAllA11y": "Show all days",
+    "allDays": "All days",
+    "feedTitle": "1-TAP ACTION FEED",
+    "upcomingA11y": "Upcoming actions",
+    "upcoming": "⚡ Upcoming",
+    "allActionsA11y": "All scheduled actions",
+    "allActions": "📅 All",
+    "executeA11y": "1-Tap Execute: {title}",
+    "executeBtn": "▶ 1-Tap Brew Now",
+    "icsA11y": "Export .ics reminder"
+  },
+  "appGuide": {
+    "title": "How Steepwise Works",
+    "closeA11y": "Close guide",
+    "gotIt": "Got it",
+    "goldenRulesEyebrow": "GOLDEN RULES OF EXTRACTION",
+    "goldenRulesText": "• Sour / thin cup → Grind finer (-2 clicks) or raise water temp (+2°C).\n• Bitter / dry cup → Grind coarser (+2 clicks) or lower water temp (-2°C).\n• Always use freshly roasted beans in their Peak Window (7–35 days post-roast).",
+    "mainProcess": "MAIN PROCESS (1 → 2 → 3 → 4)",
+    "tabsTitle": "BOTTOM NAVIGATION TABS",
+    "step1Title": "Step 1: What are we brewing?",
+    "step1Desc": "Pick a master or custom recipe (with Classics/Favorites filter and search) and link beans or tea leaves from your Stash.",
+    "step2Title": "Step 2: Input Parameters",
+    "step2Desc": "Set servings (1x–3x), dry dose weight (g), water volume (g/ml), and water temperature (°C/°F).",
+    "step3Title": "Step 3: Live Ratio & Proportions",
+    "step3Desc": "Review real-time Brew Ratio, exact grinder clicks for your model, and scaled pour schedule.",
+    "step4Title": "Step 4: Step-by-Step Procedure Assistant",
+    "step4Desc": "Open ProcedureModal — the timer automatically parses step time and starts counting down upon entering each step.",
+    "tabBrew": "Brew",
+    "tabBrewDesc": "Causal 1 → 2 → 3 → 4 brewing flow & Procedure Assistant.",
+    "tabStash": "Stash",
+    "tabStashDesc": "Coffee & tea freshness tracker (Resting & Peak Window).",
+    "tabJournal": "Journal",
+    "tabJournalDesc": "14-day Proactive Calendar, 1-Tap Action Feed & tasting history.",
+    "tabDialin": "Dial-in",
+    "tabDialinDesc": "Taste defect compass, Ratio, TDS/EY% & SCA Water Chemistry.",
+    "tabSettings": "Settings",
+    "tabSettingsDesc": "Units, grinder model, language, and 100% offline JSON/CSV backup."
+  },
+  "voice": {
+    "stepAnnouncement": "Step {stepNumber} of {totalSteps}: {stepName}. Target water: {water} g. Step duration: {seconds} seconds.{instruction}",
+    "countdownAnnouncement": "{seconds} seconds remaining in this step.",
+    "startAnnouncement": "Started brewing {recipe}. Dose: {dose} g, water: {water} g.",
+    "finishAnnouncement": "Brewing of {recipe} finished. Total time: {time}. Enjoy your cup!",
+    "minutesSeconds": "{minutes} min {seconds} s",
+    "secondsOnly": "{seconds} seconds"
+  },
+  "craftFamily": {
+    "title": "Apps4Craft Studio Family",
+    "installed": "Installed",
+    "upcoming": "Upcoming",
+    "napar": "Specialty Coffee & Artisan Tea",
+    "piekarz": "Sourdough Bread, Hydration & Schedule",
+    "sloik": "Fermented Pickles, Brine % & Canning",
+    "masaz": "Charcuterie, Curing Salt & Weight Loss",
+    "ferment": "Artisan Cheeses, Rennet & Aging Cellar"
   }
 }

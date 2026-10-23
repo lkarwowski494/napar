@@ -416,7 +416,9 @@
     "customErrStepEmpty": "Podaj przelicznik w mikronach na klik.",
     "customErrStepInvalid": "Wpisz liczbę, np. 22 albo 22,5.",
     "customErrStepRange": "Przelicznik musi mieścić się w zakresie 1–200 µm na klik.",
-    "customSaveFailed": "Nie udało się zapisać młynka. Spróbuj ponownie."
+    "customSaveFailed": "Nie udało się zapisać młynka. Spróbuj ponownie.",
+    "methodsPrefix": "Metody:",
+    "micronsRangeText": "Średnia cząstek: {min} – {max} µm (punkt odniesienia: {reference} µm)"
   },
   "caffeine": {
     "title": "Kinetyka Kofeiny",
@@ -428,7 +430,8 @@
     "bedtimeCurfew": "Limit Spożycia Przed Snem",
     "safeAtBedtime": "Bezpieczny poziom do snu głębokiego NREM (< 25 mg)",
     "riskAtBedtime": "Uwaga: wysoki poziom kofeiny może zaburzać fazę snu głębokiego NREM",
-    "logDoseBtn": "+ Zarejestruj Dawkę"
+    "logDoseBtn": "+ Zarejestruj Dawkę",
+    "workshopSubtitle": "Sprawdź dawkę kofeiny, czas półtrwania i optymalne okno snu."
   },
   "sensory": {
     "title": "Wykres Sensoryki SCA (Spider Graph)",
@@ -506,7 +509,11 @@
     "privacyBullet4": "Pełna wolność: darmowy eksport i import bazy w formacie JSON.",
     "exportBtn": "Eksportuj Kopię JSON",
     "importBtn": "Przywróć z Kopii JSON",
-    "backupSuccess": "Kopia zapasowa wyeksportowana pomyślnie."
+    "backupSuccess": "Kopia zapasowa wyeksportowana pomyślnie.",
+    "unitPreviewLabel": "Podgląd jednostek w przepisach:",
+    "philosophyBadge": "FILOZOFIA APPS4BREW",
+    "philosophyTitle": "Prywatność i Rzemiosło",
+    "philosophyBody": "Napar nie wymaga logowania, nie łączy się z żadnym zewnętrznym serwerem i nie zbiera Twoich danych (etykieta „Data Not Collected”). Cała spiżarnia, dziennik i kalkulatory działają w 100% lokalnie na Twoim urządzeniu."
   },
   "paywall": {
     "title": "Taniej niż jedno espresso",
@@ -558,6 +565,109 @@
     "teaOnlyDesc": "Gongfu Cha, wielokrotne parzenia, Kyusu, Gaiwan, czarki i liście. Zero kawy.",
     "bothTitle": "Kawa i Herbata",
     "bothDesc": "Pełny ekosystem: od jasno palonych ziaren z Etiopii po japońskie Gyokuro.",
-    "startBtn": "Rozpocznij Rytuał"
+    "startBtn": "Rozpocznij Rytuał",
+    "changeAnytime": "Wybór możesz zmienić w każdej chwili w Ustawieniach."
+  },
+  "brewScreen": {
+    "stepOneTitle": "KROK 1: CO ROBIMY? (WYBÓR RECEPTURY I SUROWCA)",
+    "stepTwoThreeTitle": "KROK 2 & 3: PARAMETRY WEJŚCIOWE I PROPORCJE NA ŻYWO",
+    "stepFourTitle": "KROK 4: ASYSTENT PROCEDURY KROK PO KROKU",
+    "procedureCtaTitle": "▶ OTWÓRZ ASYSTENTA PROCEDURY KROK PO KROKU",
+    "procedureCtaSub": "Auto-stoper z opisu kroku · Pełny ekran · Zakończ i zapisz",
+    "procedureCtaA11y": "Otwórz Asystenta Procedury Krok po Kroku",
+    "corruptTitle": "Wykryto uszkodzony stan po awarii",
+    "corruptDesc": "Plik {file} został zabezpieczony w Backup/. Twoje dane bazowe są nienaruszone.",
+    "corruptDismiss": "Odrzuć",
+    "corruptDismissA11y": "Odrzuć komunikat awarii",
+    "goldenRules": "⚖️ Złote Zasady: Kwaśna/płaska → drobniej o 2 kliki lub wyższa temp. o 2°C · Gorzka/sucha → grubiej o 2 kliki · Peak: 7–35 dni."
+  },
+  "brewWorkflow": {
+    "changeRecipeTitle": "Zmienić recepturę?",
+    "changeRecipeMessage": "Trwa aktywna sesja parzenia. Zmiana receptury zresetuje postęp stopera.",
+    "changeRecipeAction": "Zmień",
+    "resetSessionTitle": "Zresetować sesję parzenia?",
+    "resetSessionMessage": "Bieżący postęp parzenia zostanie wyzerowany.",
+    "resetSessionAction": "Zresetuj"
+  },
+  "procedure": {
+    "eyebrow": "ASYSTENT PROCEDURY KROK PO KROKU",
+    "exitA11y": "Zamknij asystenta procedury",
+    "stepCounter": "KROK {current} Z {total}",
+    "autoTimerTag": "⏱ Auto-czas z kroku: {seconds}s",
+    "pourToWeight": "ZALEJ DO WAGI NA WADZE:",
+    "timerRunning": "● STOPER KROKU AKTYWNY (AUTO-START)",
+    "timerPaused": "⏸ STOPER WSTRZYMANY",
+    "totalBrewTime": "Całkowity czas parzenia: {time}",
+    "pauseBtn": "⏸ Pauza",
+    "resumeBtn": "▶ Wznów",
+    "pauseA11y": "Pauza",
+    "resumeA11y": "Wznów",
+    "resetStepA11y": "Resetuj czas kroku",
+    "resetStepBtn": "↺ Resetuj krok ({seconds}s)",
+    "prevA11y": "Poprzedni krok",
+    "prevBtn": "◀ Wstecz",
+    "nextA11y": "Następny krok",
+    "nextBtn": "Następny krok ▶",
+    "finishA11y": "Zakończ i zapisz",
+    "finishBtn": "✓ Zakończ i zapisz"
+  },
+  "proactiveCalendar": {
+    "title": "KALENDARZ 14-DNIOWY I HARMONOGRAM",
+    "scheduleTitle": "Proaktywny Harmonogram Akcji",
+    "showAllA11y": "Pokaż wszystkie dni",
+    "allDays": "Wszystkie dni",
+    "feedTitle": "HARMONOGRAM AKCJI (1-TAP)",
+    "upcomingA11y": "Najbliższe akcje",
+    "upcoming": "⚡ Najbliższe",
+    "allActionsA11y": "Wszystkie akcje",
+    "allActions": "📅 Wszystkie",
+    "executeA11y": "Wykonaj 1-Tap: {title}",
+    "executeBtn": "▶ Wykonaj 1-Tap",
+    "icsA11y": "Eksportuj przypomnienie .ics"
+  },
+  "appGuide": {
+    "title": "Jak działa aplikacja?",
+    "closeA11y": "Zamknij przewodnik",
+    "gotIt": "Rozumiem, zaczynamy",
+    "goldenRulesEyebrow": "ZŁOTE ZASADY EKSTRAKCJI",
+    "goldenRulesText": "• Napar za kwaśny / wodnisty → Zmiel drobniej (-2 kliki) lub podnieś temp. (+2°C).\n• Napar za gorzki / ściągający → Zmiel grubiej (+2 kliki) lub obniż temp. (-2°C).\n• Parz ziarna w oknie szczytu świeżości Peak (7–35 dni po wypale).",
+    "mainProcess": "PROCES GŁÓWNY (1 → 2 → 3 → 4)",
+    "tabsTitle": "EKRANY DOLNEGO PASKA NAWIGACJI",
+    "step1Title": "Krok 1: Co parzymy?",
+    "step1Desc": "Wybierz recepturę z katalogu (z filtrem Klasyki/Ulubione, wyszukiwarką i zwijanymi kategoriami) oraz przypisz paczkę ze Spiżarni.",
+    "step2Title": "Krok 2: Parametry wejściowe",
+    "step2Desc": "Ustaw liczbę porcji (1x–3x), dozę suchego surowca (g), ilość wody (g/ml) oraz temperaturę parzenia.",
+    "step3Title": "Krok 3: Przeliczone wyniki na żywo",
+    "step3Desc": "Sprawdź wyliczone na żywo Ratio (np. 1:16.7), dokładne kliki Twojego młynka oraz harmonogram zalań.",
+    "step4Title": "Krok 4: Asystent Procedury Krok po Kroku",
+    "step4Desc": "Otwórz pełnoekranowy ProcedureModal — stoper sam parsuje czas z opisu kroku i automatycznie rusza po wejściu w krok.",
+    "tabBrew": "Parzenie",
+    "tabBrewDesc": "Główny proces przyczynowo-skutkowy 1 → 2 → 3 → 4 i Asystent Procedury.",
+    "tabStash": "Spiżarnia",
+    "tabStashDesc": "Śledzenie świeżości ziaren po wypale (Resting & Peak Window) oraz herbat.",
+    "tabJournal": "Dziennik",
+    "tabJournalDesc": "14-dniowy Kalendarz, Harmonogram Akcji 1-Tap oraz historia i analityka.",
+    "tabDialin": "Warsztat",
+    "tabDialinDesc": "Kompas korekty smaku Dial-in Doctor, Ratio, TDS/EY% i Woda SCA.",
+    "tabSettings": "Ustawienia",
+    "tabSettingsDesc": "Jednostki, młynek domowy, język oraz lokalna kopia zapasowa JSON/CSV."
+  },
+  "voice": {
+    "stepAnnouncement": "Krok {stepNumber} z {totalSteps}: {stepName}. Cel wody: {water} g. Czas trwania: {seconds} sekund.{instruction}",
+    "countdownAnnouncement": "{seconds} sekundy do końca etapu.",
+    "startAnnouncement": "Rozpoczęto parzenie {recipe}. Doza: {dose} g, woda: {water} g.",
+    "finishAnnouncement": "Parzenie {recipe} zakończone. Całkowity czas: {time}. Smacznego!",
+    "minutesSeconds": "{minutes} min {seconds} s",
+    "secondsOnly": "{seconds} sekund"
+  },
+  "craftFamily": {
+    "title": "Rodzina Apps4Craft Studio",
+    "installed": "Zainstalowano",
+    "upcoming": "Wkrótce",
+    "napar": "Kawa Specialty & Herbata Rzemieślnicza",
+    "piekarz": "Chleb na Zakwasie, Hydratacja & Fermentacja",
+    "sloik": "Kiszonki, Solanki & Wekowanie Warzyw",
+    "masaz": "Wędliny, Peklosól, Sezonowanie & Ubytek Masy",
+    "ferment": "Sery Rzemieślnicze, Podpuszczka & Dojrzewalnia"
   }
 }
