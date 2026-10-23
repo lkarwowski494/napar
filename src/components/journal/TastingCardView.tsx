@@ -32,10 +32,10 @@ export function TastingCardView({ model, unitSystem }: TastingCardViewProps) {
   const { t, language } = useTranslation();
   const texts = t.tastingCard;
   const date = new Date(model.brewedAtIso);
-  const dateLabel = `${date.toLocaleDateString(language === 'pl' ? 'pl-PL' : 'en-US')} · ${date.toLocaleTimeString(
-    language === 'pl' ? 'pl-PL' : 'en-US',
-    { hour: '2-digit', minute: '2-digit' }
-  )}`;
+  const dateLabel = `${date.toLocaleDateString(language)} · ${date.toLocaleTimeString(language, {
+    hour: '2-digit',
+    minute: '2-digit',
+  })}`;
 
   return (
     <View style={styles.card} testID="tasting-card-view">

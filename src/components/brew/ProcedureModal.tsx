@@ -22,6 +22,9 @@ import { theme } from '../../core/theme';
 import { RecipeStep } from '../../core/recipes-data';
 import { parseStepDurationSeconds } from '../../core/bpr-engine';
 import { formatWaterWeight } from '../../core/unit-converter';
+import { getTranslations } from '../../core/i18n';
+import { pickBilingual } from '../../core/i18n-loader';
+import { fillTemplate } from '../../core/access-policy';
 
 export interface ProcedureModalProps {
   visible: boolean;
@@ -60,7 +63,7 @@ export function ProcedureModal({
   onFinishAndSave,
   onClose,
 }: ProcedureModalProps) {
-  const isEn = language === 'en';
+  const t = getTranslations(language);
   const filteredSteps = Array.isArray(steps) ? steps.filter(Boolean) : [];
   const safeSteps: RecipeStep[] =
     filteredSteps.length > 0
@@ -117,7 +120,7 @@ export function ProcedureModal({
         <View style={styles.topHeader}>
           <View style={{ flex: 1 }}>
             <Text style={styles.eyebrow}>
-              {isEn ? 'STEP-BY-STEP PROCEDURE ASSISTANT' : 'ASYSTENT PROCEDURY KROK PO KROKU'}
+              {t.procedure.eyebrow}
             </Text>
             <Text style={styles.recipeTitle} numberOfLines={1}>
               {recipeName}
@@ -129,10 +132,10 @@ export function ProcedureModal({
             onPress={onClose}
             hitSlop={10}
             accessibilityRole="button"
-            accessibilityLabel={isEn ? 'Exit procedure' : 'Zamknij asystenta procedury'}
+            accessibilityLabel={t.procedure.exitA11y}
           >
             <Text style={styles.abortBtnText}>
-              {isEn ? 'Close' : 'Zamknij'}
+              {t.common.close}
             </Text>
           </Pressable>
         </View>
@@ -159,24 +162,20 @@ export function ProcedureModal({
           <View style={styles.stepCard}>
             <View style={styles.stepHeaderRow}>
               <Text style={styles.stepCounterBadge} testID="procedure-step-counter">
-                {isEn
-                  ? `STEP ${boundedIdx + 1} OF ${safeSteps.length}`
-                  : `KROK ${boundedIdx + 1} Z ${safeSteps.length}`}
+                {fillTemplate(t.procedure.stepCounter, { current: boundedIdx + 1, total: safeSteps.length })}
               </Text>
               <Text style={styles.autoTimerTag}>
-                {isEn
-                  ? `⏱ Auto-parsed: ${parsedDurationSec}s`
-                  : `⏱ Auto-czas z kroku: ${parsedDurationSec}s`}
+                {fillTemplate(t.procedure.autoTimerTag, { seconds: parsedDurationSec })}
               </Text>
             </View>
 
             <Text style={styles.stepName} testID="procedure-step-name">
-              {currentStep.namePl}
+              {pickBilingual(language, currentStep.namePl, currentStep.nameEn || currentStep.namePl)}
             </Text>
 
             <View style={styles.targetWaterBanner}>
               <Text style={styles.targetWaterLabel}>
-                {isEn ? 'POUR TO WEIGHT ON SCALE:' : 'ZALEJ DO WAGI NA WADZE:'}
+                {t.procedure.pourToWeight}
               </Text>
               <Text style={styles.targetWaterValue} testID="procedure-target-water">
                 {formatWaterWeight(currentStep.targetWaterGrams, unitSystem)}
@@ -184,20 +183,14 @@ export function ProcedureModal({
             </View>
 
             <Text style={styles.stepInstruction} testID="procedure-step-instruction">
-              {currentStep.instructionPl}
+              {pickBilingual(language, currentStep.instructionPl, currentStep.instructionEn || currentStep.instructionPl)}
             </Text>
           </View>
 
           {/* Zero-Click Context Timer — uruchamiany automatycznie po wejściu w krok */}
           <View style={styles.timerCard}>
             <Text style={styles.timerStatusLabel}>
-              {isRunning
-                ? isEn
-                  ? '● AUTO-TIMER RUNNING'
-                  : '● STOPER KROKU AKTYWNY (AUTO-START)'
-                : isEn
-                ? '⏸ TIMER PAUSED'
-                : '⏸ STOPER WSTRZYMANY'}
+              {isRunning ? t.procedure.timerRunning : t.procedure.timerPaused}
             </Text>
 
             <Text style={styles.giantClock} testID="procedure-countdown-display">
@@ -205,9 +198,7 @@ export function ProcedureModal({
             </Text>
 
             <Text style={styles.totalElapsedSub}>
-              {isEn
-                ? `Total brew time: ${formatClock(totalElapsedSeconds)}`
-                : `Całkowity czas parzenia: ${formatClock(totalElapsedSeconds)}`}
+              {fillTemplate(t.procedure.totalBrewTime, { time: formatClock(totalElapsedSeconds) })}
             </Text>
 
             {/* Przyciski szybkiej korekty czasu (-1 min, -10 s, Pauza/Wznów, +10 s, +1 min, Reset) */}
@@ -240,16 +231,10 @@ export function ProcedureModal({
                 ]}
                 onPress={onPauseResume}
                 accessibilityRole="button"
-                accessibilityLabel={isRunning ? 'Pauza' : 'Wznów'}
+                accessibilityLabel={isRunning ? t.procedure.pauseA11y : t.procedure.resumeA11y}
               >
                 <Text style={styles.pauseResumeBtnText}>
-                  {isRunning
-                    ? isEn
-                      ? '⏸ Pause'
-                      : '⏸ Pauza'
-                    : isEn
-                    ? '▶ Resume'
-                    : '▶ Wznów'}
+                  {isRunning ? t.procedure.pauseBtn : t.procedure.resumeBtn}
                 </Text>
               </Pressable>
 
@@ -279,12 +264,10 @@ export function ProcedureModal({
               style={[styles.resetStepBtn, styles.touchTarget]}
               onPress={() => onResetCurrentStep(parsedDurationSec)}
               accessibilityRole="button"
-              accessibilityLabel={isEn ? 'Reset step timer' : 'Resetuj czas kroku'}
+              accessibilityLabel={t.procedure.resetStepA11y}
             >
               <Text style={styles.resetStepBtnText}>
-                {isEn
-                  ? `↺ Reset step (${parsedDurationSec}s)`
-                  : `↺ Resetuj krok (${parsedDurationSec}s)`}
+                {fillTemplate(t.procedure.resetStepBtn, { seconds: parsedDurationSec })}
               </Text>
             </Pressable>
           </View>
@@ -301,10 +284,10 @@ export function ProcedureModal({
             disabled={boundedIdx === 0}
             onPress={onPrevStep}
             accessibilityRole="button"
-            accessibilityLabel={isEn ? 'Previous step' : 'Poprzedni krok'}
+            accessibilityLabel={t.procedure.prevA11y}
           >
             <Text style={styles.secondaryNavBtnText}>
-              {isEn ? '◀ Prev' : '◀ Wstecz'}
+              {t.procedure.prevBtn}
             </Text>
           </Pressable>
 
@@ -314,10 +297,10 @@ export function ProcedureModal({
               style={[styles.primaryNextBtn, styles.touchTarget]}
               onPress={onNextStep}
               accessibilityRole="button"
-              accessibilityLabel={isEn ? 'Next step' : 'Następny krok'}
+              accessibilityLabel={t.procedure.nextA11y}
             >
               <Text style={styles.primaryNextBtnText}>
-                {isEn ? 'Next Step ▶' : 'Następny krok ▶'}
+                {t.procedure.nextBtn}
               </Text>
             </Pressable>
           ) : (
@@ -326,10 +309,10 @@ export function ProcedureModal({
               style={[styles.finishSaveBtn, styles.touchTarget]}
               onPress={onFinishAndSave}
               accessibilityRole="button"
-              accessibilityLabel={isEn ? 'Finish and save' : 'Zakończ i zapisz'}
+              accessibilityLabel={t.procedure.finishA11y}
             >
               <Text style={styles.finishSaveBtnText}>
-                {isEn ? '✓ Finish & Save' : '✓ Zakończ i zapisz'}
+                {t.procedure.finishBtn}
               </Text>
             </Pressable>
           )}

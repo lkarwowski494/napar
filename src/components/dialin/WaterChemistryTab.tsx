@@ -9,6 +9,7 @@ import {
 import { theme } from '../../core/theme';
 import { parseDecimal } from '../../core/parse-decimal';
 import { OwnWaterCard } from './OwnWaterCard';
+import { pickBilingual } from '../../core/i18n-loader';
 
 export interface WaterChemistryTabProps {
   language: string;
@@ -106,7 +107,7 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
             >
               <View style={styles.waterRecipeHeader}>
                 <Text style={styles.waterRecipeName}>
-                  {language === 'pl' ? recipe.namePl : recipe.nameEn}
+                  {pickBilingual(language, recipe.namePl, recipe.nameEn)}
                 </Text>
                 <View style={styles.waterGhKhBadges}>
                   <Text style={styles.waterGhBadge}>GH {recipe.targetGhPpm}</Text>
@@ -114,10 +115,10 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
                 </View>
               </View>
               <Text style={styles.waterRecipeDesc}>
-                {language === 'pl' ? recipe.descriptionPl : recipe.descriptionEn}
+                {pickBilingual(language, recipe.descriptionPl, recipe.descriptionEn)}
               </Text>
               <Text style={styles.waterRecipeBestFor}>
-                {language === 'pl' ? recipe.bestForPl : recipe.bestForEn}
+                {pickBilingual(language, recipe.bestForPl, recipe.bestForEn)}
               </Text>
             </Pressable>
           );
@@ -224,15 +225,15 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
         <Text style={styles.waterInfoHeader}>{t.water.diagnosisHeader}</Text>
         <Text style={styles.waterInfoLabel}>{t.water.diagnosisProblem}</Text>
         <Text style={styles.waterInfoText}>
-          {language === 'pl' ? waterDiagnosis.problemPl : waterDiagnosis.problemEn}
+          {pickBilingual(language, waterDiagnosis.problemPl, waterDiagnosis.problemEn)}
         </Text>
         <Text style={styles.waterInfoLabel}>{t.water.diagnosisCause}</Text>
         <Text style={styles.waterInfoText}>
-          {language === 'pl' ? waterDiagnosis.causePl : waterDiagnosis.causeEn}
+          {pickBilingual(language, waterDiagnosis.causePl, waterDiagnosis.causeEn)}
         </Text>
         <Text style={styles.waterInfoLabel}>{t.water.diagnosisRemedy}</Text>
         <Text style={styles.waterInfoText}>
-          {language === 'pl' ? waterDiagnosis.recommendationPl : waterDiagnosis.recommendationEn}
+          {pickBilingual(language, waterDiagnosis.recommendationPl, waterDiagnosis.recommendationEn)}
         </Text>
       </View>
 
@@ -247,7 +248,7 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
                 {b.brandName} · TDS {b.tdsPpm} · GH {b.estimatedGhPpm} · KH {b.estimatedKhPpm}
               </Text>
               <Text style={styles.waterInfoText}>
-                {language === 'pl' ? b.verdictPl : b.verdictEn}
+                {pickBilingual(language, b.verdictPl, b.verdictEn)}
               </Text>
             </View>
             <Text style={styles.bottledBadge}>

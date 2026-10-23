@@ -109,9 +109,7 @@ export default function BrewScreen() {
           <Text style={styles.bprStepBadgeText}>1</Text>
         </View>
         <Text style={styles.bprStepTitle}>
-          {language === 'en'
-            ? 'STEP 1: WHAT ARE WE BREWING? (RECIPE & STASH)'
-            : 'KROK 1: CO ROBIMY? (WYBÓR RECEPTURY I SUROWCA)'}
+          {t.brewScreen.stepOneTitle}
         </Text>
       </View>
 
@@ -212,9 +210,7 @@ export default function BrewScreen() {
               <Text style={styles.bprStepBadgeText}>2</Text>
             </View>
             <Text style={styles.bprStepTitle}>
-              {language === 'en'
-                ? 'STEP 2 & 3: INPUT PARAMETERS & LIVE PROPORTIONS'
-                : 'KROK 2 & 3: PARAMETRY WEJŚCIOWE I PROPORCJE NA ŻYWO'}
+              {t.brewScreen.stepTwoThreeTitle}
             </Text>
           </View>
           <BrewQuickPrepCard
@@ -239,9 +235,7 @@ export default function BrewScreen() {
           <Text style={styles.bprStepBadgeText}>4</Text>
         </View>
         <Text style={styles.bprStepTitle}>
-          {language === 'en'
-            ? 'STEP 4: STEP-BY-STEP PROCEDURE EXECUTION'
-            : 'KROK 4: ASYSTENT PROCEDURY KROK PO KROKU'}
+          {t.brewScreen.stepFourTitle}
         </Text>
       </View>
 
@@ -260,22 +254,10 @@ export default function BrewScreen() {
           setShowProcedureModal(true);
         }}
         accessibilityRole="button"
-        accessibilityLabel={
-          language === 'en'
-            ? 'Open Step-by-Step Procedure Assistant'
-            : 'Otwórz Asystenta Procedury Krok po Kroku'
-        }
+        accessibilityLabel={t.brewScreen.procedureCtaA11y}
       >
-        <Text style={styles.openProcedureCtaTitle}>
-          {language === 'en'
-            ? '▶ OPEN STEP-BY-STEP PROCEDURE ASSISTANT'
-            : '▶ OTWÓRZ ASYSTENTA PROCEDURY KROK PO KROKU'}
-        </Text>
-        <Text style={styles.openProcedureCtaSub}>
-          {language === 'en'
-            ? 'Auto-parsed step timer · Full screen · 1-Tap Finish & Save'
-            : 'Auto-stoper z opisu kroku · Pełny ekran · Zakończ i zapisz'}
-        </Text>
+        <Text style={styles.openProcedureCtaTitle}>{t.brewScreen.procedureCtaTitle}</Text>
+        <Text style={styles.openProcedureCtaSub}>{t.brewScreen.procedureCtaSub}</Text>
       </Pressable>
 
       {/* Główny Stoper Focus Mode: Zoptymalizowany pod 1 metr */}

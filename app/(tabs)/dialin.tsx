@@ -263,13 +263,9 @@ export default function DialInScreen() {
         </View>
         <View style={{ flex: 1, marginLeft: 12 }}>
           <Text style={styles.caffeineWorkshopTitle}>
-            {t.caffeine?.title || 'Kalkulator Kofeiny i Wchłaniania'}
+            {t.caffeine.title}
           </Text>
-          <Text style={styles.caffeineWorkshopSubtitle}>
-            {language === 'pl'
-              ? 'Sprawdź dawkę kofeiny, czas półtrwania i optymalne okno snu.'
-              : 'Calculate caffeine intake, half-life metabolic decay, and sleep window.'}
-          </Text>
+          <Text style={styles.caffeineWorkshopSubtitle}>{t.caffeine.workshopSubtitle}</Text>
         </View>
         <Text style={styles.caffeineWorkshopArrow}>→</Text>
       </Pressable>

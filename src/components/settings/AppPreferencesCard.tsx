@@ -141,7 +141,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
       </View>
       <View style={styles.unitPreviewRow}>
         <Text style={styles.unitPreviewText}>
-          {language === 'en' ? 'Standard recipe preview:' : 'Podgląd jednostek w przepisach:'}{' '}
+          {t.settings.unitPreviewLabel}{' '}
           <Text style={{ color: theme.colors.copper, fontWeight: '700' }}>
             {formatDoseWeight(15, unitSystem)}
           </Text>{' '}
@@ -202,13 +202,9 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
 
       {/* Karta Filozofii Apps4Brew */}
       <View style={styles.manifestoCard}>
-        <Text style={styles.manifestoBadge}>FILOZOFIA APPS4BREW</Text>
-        <Text style={styles.manifestoTitle}>Prywatność i Rzemiosło</Text>
-        <Text style={styles.manifestoBody}>
-          {language === 'pl'
-            ? 'Napar nie wymaga logowania, nie łączy się z żadnym zewnętrznym serwerem i nie zbiera Twoich danych (etykieta „Data Not Collected”). Cała spiżarnia, dziennik i kalkulatory działają w 100% lokalnie na Twoim urządzeniu.'
-            : 'Steepwise requires no login, connects to no external servers, and collects zero data (Apple "Data Not Collected" badge). Your stash, journal, and calculators run 100% locally on your device.'}
-        </Text>
+        <Text style={styles.manifestoBadge}>{t.settings.philosophyBadge}</Text>
+        <Text style={styles.manifestoTitle}>{t.settings.philosophyTitle}</Text>
+        <Text style={styles.manifestoBody}>{t.settings.philosophyBody}</Text>
       </View>
     </>
   );

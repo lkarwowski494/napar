@@ -9,6 +9,8 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 import { ShieldIcon } from '../icons/CraftIcons';
 import { CorruptStateRecovery } from '../../core/backup';
+import { getTranslations } from '../../core/i18n';
+import { fillTemplate } from '../../core/access-policy';
 
 interface BrewBannersProps {
   corruptState: CorruptStateRecovery | null;
@@ -24,32 +26,25 @@ export const BrewBanners: React.FC<BrewBannersProps> = ({
   language,
   onDismissCorrupt,
 }) => {
+  const t = getTranslations(language);
   return (
     <>
       {/* Baner odzyskiwania uszkodzonego stanu (BR-TEST-023) */}
       {corruptState && (
         <View style={styles.corruptBanner} testID="corrupt-state-banner">
           <View style={{ flex: 1 }}>
-            <Text style={styles.corruptBannerTitle}>
-              {language === 'pl'
-                ? 'Wykryto uszkodzony stan po awarii'
-                : 'Corrupt state detected after crash'}
-            </Text>
+            <Text style={styles.corruptBannerTitle}>{t.brewScreen.corruptTitle}</Text>
             <Text style={styles.corruptBannerDesc}>
-              {language === 'pl'
-                ? `Plik ${corruptState.corruptFile} został zabezpieczony w Backup/. Twoje dane bazowe są nienaruszone.`
-                : `File ${corruptState.corruptFile} was secured in Backup/. Your base data is intact.`}
+              {fillTemplate(t.brewScreen.corruptDesc, { file: corruptState.corruptFile })}
             </Text>
           </View>
           <Pressable
             style={styles.corruptDismissBtn}
             onPress={onDismissCorrupt}
             accessibilityRole="button"
-            accessibilityLabel="Odrzuć komunikat awarii"
+            accessibilityLabel={t.brewScreen.corruptDismissA11y}
           >
-            <Text style={styles.corruptDismissText}>
-              {language === 'pl' ? 'Odrzuć' : 'Dismiss'}
-            </Text>
+            <Text style={styles.corruptDismissText}>{t.brewScreen.corruptDismiss}</Text>
           </Pressable>
         </View>
       )}
@@ -65,9 +60,7 @@ export const BrewBanners: React.FC<BrewBannersProps> = ({
       {/* Stały baner "Złote Zasady" domeny (BPR Pillar 2) */}
       <View style={styles.goldenRulesBanner} testID="golden-rules-banner">
         <Text style={styles.goldenRulesBannerText} numberOfLines={2}>
-          {language === 'en'
-            ? '⚖️ Golden Rules: Sour/thin → grind finer (2 clicks) or raise temp 2°C · Bitter/dry → grind coarser (2 clicks) · Peak: 7–35d.'
-            : '⚖️ Złote Zasady: Kwaśna/płaska → drobniej o 2 kliki lub wyższa temp. o 2°C · Gorzka/sucha → grubiej o 2 kliki · Peak: 7–35 dni.'}
+          {t.brewScreen.goldenRules}
         </Text>
       </View>
     </>

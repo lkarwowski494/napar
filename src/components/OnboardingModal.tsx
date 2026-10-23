@@ -164,9 +164,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
               <Text style={styles.submitBtnText}>{t.onboarding.startBtn} →</Text>
             </Pressable>
             <Text style={styles.footnote}>
-              {language === 'pl'
-                ? 'Wybór możesz zmienić w każdej chwili w Ustawieniach.'
-                : 'You can change this anytime in Settings.'}
+              {t.onboarding.changeAnytime}
             </Text>
           </View>
         </ScrollView>

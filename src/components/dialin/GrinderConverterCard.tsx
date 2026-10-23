@@ -9,6 +9,8 @@ import { getCustomGrinderModels } from '../../core/database';
 import { theme } from '../../core/theme';
 import { GrinderCalibrationCard } from './GrinderCalibrationCard';
 import { CustomGrinderCard } from './CustomGrinderCard';
+import { pickBilingual } from '../../core/i18n-loader';
+import { fillTemplate } from '../../core/access-policy';
 
 export interface GrinderConverterCardProps {
   language: string;
@@ -47,7 +49,7 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
                 selectedGrindCategoryId === cat.id && styles.grindCategoryChipTextActive,
               ]}
             >
-              {language === 'pl' ? cat.namePl : cat.nameEn}
+              {pickBilingual(language, cat.namePl, cat.nameEn)}
             </Text>
             <Text style={styles.grindCategoryChipSub}>
               ~{cat.defaultMicrons} µm
@@ -58,10 +60,15 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
 
       <View style={styles.grinderCategoryDetailsCard}>
         <Text style={styles.grinderMethodsText}>
-          Metody: {language === 'pl' ? activeGrindCategory.methodsPl : activeGrindCategory.methodsEn}
+          {t.grinder.methodsPrefix}{' '}
+          {pickBilingual(language, activeGrindCategory.methodsPl, activeGrindCategory.methodsEn)}
         </Text>
         <Text style={styles.grinderMicronsRange}>
-          Średnia cząstek: {activeGrindCategory.micronMin} – {activeGrindCategory.micronMax} µm (punkt odniesienia: {activeGrindCategory.defaultMicrons} µm)
+          {fillTemplate(t.grinder.micronsRangeText, {
+            min: activeGrindCategory.micronMin,
+            max: activeGrindCategory.micronMax,
+            reference: activeGrindCategory.defaultMicrons,
+          })}
         </Text>
       </View>
 

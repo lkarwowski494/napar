@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../core/theme';
 import { CompassIcon } from './icons/CraftIcons';
+import { getTranslations } from '../core/i18n';
 
 export interface AppGuideModalProps {
   visible: boolean;
@@ -29,69 +30,22 @@ export function AppGuideModal({
   onClose,
   language = 'pl',
 }: AppGuideModalProps) {
-  const isEn = language === 'en';
+  const t = getTranslations(language);
 
-  const steps = isEn
-    ? [
-        {
-          num: '1',
-          title: 'Step 1: What are we brewing?',
-          desc: 'Pick a master or custom recipe (with Classics/Favorites filter and search) and link beans or tea leaves from your Stash.',
-        },
-        {
-          num: '2',
-          title: 'Step 2: Input Parameters',
-          desc: 'Set servings (1x–3x), dry dose weight (g), water volume (g/ml), and water temperature (°C/°F).',
-        },
-        {
-          num: '3',
-          title: 'Step 3: Live Ratio & Proportions',
-          desc: 'Review real-time Brew Ratio, exact grinder clicks for your model, and scaled pour schedule.',
-        },
-        {
-          num: '4',
-          title: 'Step 4: Step-by-Step Procedure Assistant',
-          desc: 'Open ProcedureModal — the timer automatically parses step time and starts counting down upon entering each step.',
-        },
-      ]
-    : [
-        {
-          num: '1',
-          title: 'Krok 1: Co parzymy?',
-          desc: 'Wybierz recepturę z katalogu (z filtrem Klasyki/Ulubione, wyszukiwarką i zwijanymi kategoriami) oraz przypisz paczkę ze Spiżarni.',
-        },
-        {
-          num: '2',
-          title: 'Krok 2: Parametry wejściowe',
-          desc: 'Ustaw liczbę porcji (1x–3x), dozę suchego surowca (g), ilość wody (g/ml) oraz temperaturę parzenia.',
-        },
-        {
-          num: '3',
-          title: 'Krok 3: Przeliczone wyniki na żywo',
-          desc: 'Sprawdź wyliczone na żywo Ratio (np. 1:16.7), dokładne kliki Twojego młynka oraz harmonogram zalań.',
-        },
-        {
-          num: '4',
-          title: 'Krok 4: Asystent Procedury Krok po Kroku',
-          desc: 'Otwórz pełnoekranowy ProcedureModal — stoper sam parsuje czas z opisu kroku i automatycznie rusza po wejściu w krok.',
-        },
-      ];
+  const steps = [
+    { num: '1', title: t.appGuide.step1Title, desc: t.appGuide.step1Desc },
+    { num: '2', title: t.appGuide.step2Title, desc: t.appGuide.step2Desc },
+    { num: '3', title: t.appGuide.step3Title, desc: t.appGuide.step3Desc },
+    { num: '4', title: t.appGuide.step4Title, desc: t.appGuide.step4Desc },
+  ];
 
-  const tabsInfo = isEn
-    ? [
-        { icon: '☕', name: 'Brew', desc: 'Causal 1 → 2 → 3 → 4 brewing flow & Procedure Assistant.' },
-        { icon: '🫘', name: 'Stash', desc: 'Coffee & tea freshness tracker (Resting & Peak Window).' },
-        { icon: '📅', name: 'Journal', desc: '14-day Proactive Calendar, 1-Tap Action Feed & tasting history.' },
-        { icon: '🧭', name: 'Dial-in', desc: 'Taste defect compass, Ratio, TDS/EY% & SCA Water Chemistry.' },
-        { icon: '⚙️', name: 'Settings', desc: 'Units, grinder model, language, and 100% offline JSON/CSV backup.' },
-      ]
-    : [
-        { icon: '☕', name: 'Parzenie', desc: 'Główny proces przyczynowo-skutkowy 1 → 2 → 3 → 4 i Asystent Procedury.' },
-        { icon: '🫘', name: 'Spiżarnia', desc: 'Śledzenie świeżości ziaren po wypale (Resting & Peak Window) oraz herbat.' },
-        { icon: '📅', name: 'Dziennik', desc: '14-dniowy Kalendarz, Harmonogram Akcji 1-Tap oraz historia i analityka.' },
-        { icon: '🧭', name: 'Warsztat', desc: 'Kompas korekty smaku Dial-in Doctor, Ratio, TDS/EY% i Woda SCA.' },
-        { icon: '⚙️', name: 'Ustawienia', desc: 'Jednostki, młynek domowy, język oraz lokalna kopia zapasowa JSON/CSV.' },
-      ];
+  const tabsInfo = [
+    { icon: '☕', name: t.appGuide.tabBrew, desc: t.appGuide.tabBrewDesc },
+    { icon: '🫘', name: t.appGuide.tabStash, desc: t.appGuide.tabStashDesc },
+    { icon: '📅', name: t.appGuide.tabJournal, desc: t.appGuide.tabJournalDesc },
+    { icon: '🧭', name: t.appGuide.tabDialin, desc: t.appGuide.tabDialinDesc },
+    { icon: '⚙️', name: t.appGuide.tabSettings, desc: t.appGuide.tabSettingsDesc },
+  ];
 
   if (!visible) {
     return null;
@@ -105,7 +59,7 @@ export function AppGuideModal({
             <View style={styles.headerTitleRow}>
               <CompassIcon size={18} color={theme.colors.copper} />
               <Text style={styles.title}>
-                {isEn ? 'How Steepwise Works' : 'Jak działa aplikacja?'}
+                {t.appGuide.title}
               </Text>
             </View>
             <Pressable
@@ -114,10 +68,10 @@ export function AppGuideModal({
               onPress={onClose}
               hitSlop={10}
               accessibilityRole="button"
-              accessibilityLabel={isEn ? 'Close guide' : 'Zamknij przewodnik'}
+              accessibilityLabel={t.appGuide.closeA11y}
             >
               <Text style={styles.closeBtnText}>
-                {isEn ? 'Close' : 'Zamknij'}
+                {t.common.close}
               </Text>
             </Pressable>
           </View>
@@ -128,17 +82,15 @@ export function AppGuideModal({
           >
             <View style={styles.goldenRulesBox}>
               <Text style={styles.goldenRulesEyebrow}>
-                {isEn ? 'GOLDEN RULES OF EXTRACTION' : 'ZŁOTE ZASADY EKSTRAKCJI'}
+                {t.appGuide.goldenRulesEyebrow}
               </Text>
               <Text style={styles.goldenRulesText}>
-                {isEn
-                  ? '• Sour / thin cup → Grind finer (-2 clicks) or raise water temp (+2°C).\n• Bitter / dry cup → Grind coarser (+2 clicks) or lower water temp (-2°C).\n• Always use freshly roasted beans in their Peak Window (7–35 days post-roast).'
-                  : '• Napar za kwaśny / wodnisty → Zmiel drobniej (-2 kliki) lub podnieś temp. (+2°C).\n• Napar za gorzki / ściągający → Zmiel grubiej (+2 kliki) lub obniż temp. (-2°C).\n• Parz ziarna w oknie szczytu świeżości Peak (7–35 dni po wypale).'}
+                {t.appGuide.goldenRulesText}
               </Text>
             </View>
 
             <Text style={styles.sectionTitle}>
-              {isEn ? 'MAIN PROCESS (1 → 2 → 3 → 4)' : 'PROCES GŁÓWNY (1 → 2 → 3 → 4)'}
+              {t.appGuide.mainProcess}
             </Text>
             {steps.map((s) => (
               <View key={s.num} style={styles.stepCard}>
@@ -153,7 +105,7 @@ export function AppGuideModal({
             ))}
 
             <Text style={[styles.sectionTitle, { marginTop: 18 }]}>
-              {isEn ? 'BOTTOM NAVIGATION TABS' : 'EKRANY DOLNEGO PASKA NAWIGACJI'}
+              {t.appGuide.tabsTitle}
             </Text>
             {tabsInfo.map((tab) => (
               <View key={tab.name} style={styles.tabRow}>
@@ -171,10 +123,10 @@ export function AppGuideModal({
             style={[styles.primaryBtn, styles.touchTarget]}
             onPress={onClose}
             accessibilityRole="button"
-            accessibilityLabel={isEn ? 'Got it' : 'Rozumiem, zaczynamy'}
+            accessibilityLabel={t.appGuide.gotIt}
           >
             <Text style={styles.primaryBtnText}>
-              {isEn ? 'Got it' : 'Rozumiem, zaczynamy'}
+              {t.appGuide.gotIt}
             </Text>
           </Pressable>
         </SafeAreaView>

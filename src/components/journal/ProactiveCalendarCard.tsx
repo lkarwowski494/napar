@@ -22,6 +22,9 @@ import {
   generateActionIcsContent,
 } from '../../core/bpr-engine';
 import { InventoryItem, BrewSession } from '../../core/database-schema';
+import { getTranslations } from '../../core/i18n';
+import { pickBilingual } from '../../core/i18n-loader';
+import { fillTemplate } from '../../core/access-policy';
 
 export interface ProactiveCalendarCardProps {
   inventory: InventoryItem[];
@@ -38,7 +41,7 @@ export function ProactiveCalendarCard({
   referenceDateIso,
   onExecuteAction,
 }: ProactiveCalendarCardProps) {
-  const isEn = language === 'en';
+  const t = getTranslations(language);
   const refIso = useMemo(
     () => referenceDateIso || new Date().toISOString(),
     [referenceDateIso]
@@ -86,10 +89,10 @@ export function ProactiveCalendarCard({
       <View style={styles.headerRow}>
         <View>
           <Text style={styles.eyebrow}>
-            {isEn ? '14-DAY FRESHNESS & BREW CALENDAR' : 'KALENDARZ 14-DNIOWY I HARMONOGRAM'}
+            {t.proactiveCalendar.title}
           </Text>
           <Text style={styles.title}>
-            {isEn ? 'Proactive Action Schedule' : 'Proaktywny Harmonogram Akcji'}
+            {t.proactiveCalendar.scheduleTitle}
           </Text>
         </View>
         {selectedDateIso && (
@@ -98,10 +101,10 @@ export function ProactiveCalendarCard({
             style={[styles.clearDateChip, styles.touchTarget]}
             onPress={() => setSelectedDateIso(null)}
             accessibilityRole="button"
-            accessibilityLabel={isEn ? 'Show all days' : 'Pokaż wszystkie dni'}
+            accessibilityLabel={t.proactiveCalendar.showAllA11y}
           >
             <Text style={styles.clearDateText}>
-              {isEn ? 'All days' : 'Wszystkie dni'}
+              {t.proactiveCalendar.allDays}
             </Text>
           </Pressable>
         )}
@@ -136,7 +139,7 @@ export function ProactiveCalendarCard({
                   (day.isToday || isSelected) && styles.dayTextActive,
                 ]}
               >
-                {isEn ? day.weekdayEn : day.weekdayPl}
+                {pickBilingual(language, day.weekdayPl, day.weekdayEn)}
               </Text>
               <Text
                 style={[
@@ -163,7 +166,7 @@ export function ProactiveCalendarCard({
       {/* Przełącznik Harmonogramu Akcji: [⚡ Najbliższe] / [📅 Wszystkie] */}
       <View style={styles.scheduleHeaderRow}>
         <Text style={styles.scheduleSectionTitle}>
-          {isEn ? '1-TAP ACTION FEED' : 'HARMONOGRAM AKCJI (1-TAP)'}
+          {t.proactiveCalendar.feedTitle}
         </Text>
         <View style={styles.modeSwitchRow}>
           <Pressable
@@ -177,7 +180,7 @@ export function ProactiveCalendarCard({
               setScheduleFilter('upcoming');
             }}
             accessibilityRole="button"
-            accessibilityLabel={isEn ? 'Upcoming actions' : 'Najbliższe akcje'}
+            accessibilityLabel={t.proactiveCalendar.upcomingA11y}
           >
             <Text
               style={[
@@ -185,7 +188,7 @@ export function ProactiveCalendarCard({
                 scheduleFilter === 'upcoming' && styles.modeBtnTextActive,
               ]}
             >
-              {isEn ? '⚡ Upcoming' : '⚡ Najbliższe'}
+              {t.proactiveCalendar.upcoming}
             </Text>
           </Pressable>
           <Pressable
@@ -199,7 +202,7 @@ export function ProactiveCalendarCard({
               setScheduleFilter('all');
             }}
             accessibilityRole="button"
-            accessibilityLabel={isEn ? 'All scheduled actions' : 'Wszystkie akcje'}
+            accessibilityLabel={t.proactiveCalendar.allActionsA11y}
           >
             <Text
               style={[
@@ -207,7 +210,7 @@ export function ProactiveCalendarCard({
                 scheduleFilter === 'all' && styles.modeBtnTextActive,
               ]}
             >
-              {isEn ? '📅 All' : '📅 Wszystkie'}
+              {t.proactiveCalendar.allActions}
             </Text>
           </Pressable>
         </View>
@@ -234,17 +237,17 @@ export function ProactiveCalendarCard({
                     act.daysOffset === 0 && styles.bucketBadgeTextToday,
                   ]}
                 >
-                  {isEn ? act.bucketLabelEn : act.bucketLabelPl}
+                  {pickBilingual(language, act.bucketLabelPl, act.bucketLabelEn)}
                 </Text>
               </View>
               <Text style={styles.actionDateLabel}>{act.dateIso}</Text>
             </View>
 
             <Text style={styles.actionTitle}>
-              {isEn ? act.titleEn : act.titlePl}
+              {pickBilingual(language, act.titlePl, act.titleEn)}
             </Text>
             <Text style={styles.actionSubtitle}>
-              {isEn ? act.subtitleEn : act.subtitlePl}
+              {pickBilingual(language, act.subtitlePl, act.subtitleEn)}
             </Text>
 
             <View style={styles.actionButtonsRow}>
@@ -253,14 +256,12 @@ export function ProactiveCalendarCard({
                 style={[styles.executeOneTapBtn, styles.touchTarget]}
                 onPress={() => onExecuteAction(act)}
                 accessibilityRole="button"
-                accessibilityLabel={
-                  isEn
-                    ? `1-Tap Execute: ${act.titleEn}`
-                    : `Wykonaj 1-Tap: ${act.titlePl}`
-                }
+                accessibilityLabel={fillTemplate(t.proactiveCalendar.executeA11y, {
+                  title: pickBilingual(language, act.titlePl, act.titleEn),
+                })}
               >
                 <Text style={styles.executeOneTapText}>
-                  {isEn ? '▶ 1-Tap Brew Now' : '▶ Wykonaj 1-Tap'}
+                  {t.proactiveCalendar.executeBtn}
                 </Text>
               </Pressable>
 
@@ -269,9 +270,7 @@ export function ProactiveCalendarCard({
                 style={[styles.icsExportBtn, styles.touchTarget]}
                 onPress={() => handleExportIcs(act)}
                 accessibilityRole="button"
-                accessibilityLabel={
-                  isEn ? 'Export .ics reminder' : 'Eksportuj przypomnienie .ics'
-                }
+                accessibilityLabel={t.proactiveCalendar.icsA11y}
               >
                 <Text style={styles.icsExportBtnText}>📅 .ics</Text>
               </Pressable>

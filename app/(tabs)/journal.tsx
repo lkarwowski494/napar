@@ -215,7 +215,7 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
 
   const formatDateTime = (iso: string) => {
     const d = new Date(iso);
-    return `${d.toLocaleDateString(language === 'pl' ? 'pl-PL' : 'en-US')} o ${d.toLocaleTimeString(language === 'pl' ? 'pl-PL' : 'en-US', {
+    return `${d.toLocaleDateString(language)} o ${d.toLocaleTimeString(language, {
       hour: '2-digit',
       minute: '2-digit',
     })}`;

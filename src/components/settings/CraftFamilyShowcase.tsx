@@ -9,16 +9,19 @@ import {
   FermentAppIcon,
 } from '../icons/CraftIcons';
 import { CRAFT_APPS } from '../../core/craft-suite-theme';
+import { getTranslations } from '../../core/i18n';
+import type { SupportedLanguage } from '../../core/i18n';
 
 export interface CraftFamilyShowcaseProps {
-  language: string;
+  language: SupportedLanguage;
 }
 
 export const CraftFamilyShowcase: React.FC<CraftFamilyShowcaseProps> = ({ language }) => {
+  const t = getTranslations(language);
   return (
     <View>
       <Text style={styles.sectionTitle}>
-        {language === 'pl' ? 'Rodzina Apps4Craft Studio' : 'Apps4Craft Studio Family'}
+        {t.craftFamily.title}
       </Text>
       <View style={styles.cardGroup}>
         {/* Napar */}
@@ -30,11 +33,11 @@ export const CraftFamilyShowcase: React.FC<CraftFamilyShowcaseProps> = ({ langua
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={styles.actionTitle}>Napar</Text>
               <View style={styles.currentAppPill}>
-                <Text style={styles.currentAppPillText}>{language === 'pl' ? 'Zainstalowano' : 'Installed'}</Text>
+                <Text style={styles.currentAppPillText}>{t.craftFamily.installed}</Text>
               </View>
             </View>
             <Text style={styles.actionSubtitle}>
-              {language === 'pl' ? 'Kawa Specialty & Herbata Rzemieślnicza' : 'Specialty Coffee & Artisan Tea'}
+              {t.craftFamily.napar}
             </Text>
           </View>
         </View>
@@ -50,11 +53,11 @@ export const CraftFamilyShowcase: React.FC<CraftFamilyShowcaseProps> = ({ langua
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={styles.actionTitle}>Piekarz</Text>
               <View style={styles.upcomingAppPill}>
-                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
+                <Text style={styles.upcomingAppPillText}>{t.craftFamily.upcoming}</Text>
               </View>
             </View>
             <Text style={styles.actionSubtitle}>
-              {language === 'pl' ? 'Chleb na Zakwasie, Hydratacja & Fermentacja' : 'Sourdough Bread, Hydration & Schedule'}
+              {t.craftFamily.piekarz}
             </Text>
           </View>
         </View>
@@ -70,11 +73,11 @@ export const CraftFamilyShowcase: React.FC<CraftFamilyShowcaseProps> = ({ langua
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={styles.actionTitle}>Słoik</Text>
               <View style={styles.upcomingAppPill}>
-                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
+                <Text style={styles.upcomingAppPillText}>{t.craftFamily.upcoming}</Text>
               </View>
             </View>
             <Text style={styles.actionSubtitle}>
-              {language === 'pl' ? 'Kiszonki, Solanki & Wekowanie Warzyw' : 'Fermented Pickles, Brine % & Canning'}
+              {t.craftFamily.sloik}
             </Text>
           </View>
         </View>
@@ -90,11 +93,11 @@ export const CraftFamilyShowcase: React.FC<CraftFamilyShowcaseProps> = ({ langua
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={styles.actionTitle}>Masaż</Text>
               <View style={styles.upcomingAppPill}>
-                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
+                <Text style={styles.upcomingAppPillText}>{t.craftFamily.upcoming}</Text>
               </View>
             </View>
             <Text style={styles.actionSubtitle}>
-              {language === 'pl' ? 'Wędliny, Peklosól, Sezonowanie & Ubytek Masy' : 'Charcuterie, Curing Salt & Weight Loss'}
+              {t.craftFamily.masaz}
             </Text>
           </View>
         </View>
@@ -110,11 +113,11 @@ export const CraftFamilyShowcase: React.FC<CraftFamilyShowcaseProps> = ({ langua
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={styles.actionTitle}>Ferment</Text>
               <View style={styles.upcomingAppPill}>
-                <Text style={styles.upcomingAppPillText}>{language === 'pl' ? 'Wkrótce' : 'Upcoming'}</Text>
+                <Text style={styles.upcomingAppPillText}>{t.craftFamily.upcoming}</Text>
               </View>
             </View>
             <Text style={styles.actionSubtitle}>
-              {language === 'pl' ? 'Sery Rzemieślnicze, Podpuszczka & Dojrzewalnia' : 'Artisan Cheeses, Rennet & Aging Cellar'}
+              {t.craftFamily.ferment}
             </Text>
           </View>
         </View>
