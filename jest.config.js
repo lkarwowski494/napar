@@ -60,6 +60,8 @@ module.exports = {
     './src/core/live-activity.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     // Live Activity (ekran blokady, Dynamic Island): most stopera w platformie, decyzje w core/live-activity.ts
     './src/platform/live-activity-sync.tsx': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    // Apple Watch (poz. 22 MVP): model stanu i polecenia w core, bez wyjątków
+    './src/core/watch-state.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/craft-suite-theme.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     // Poz. 9 (własna woda z raportu wodociągów) i poz. 12 (kalibracja przelicznika kliknięć): 100% bez wyjątków
     './src/core/own-water.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
