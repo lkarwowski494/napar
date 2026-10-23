@@ -180,6 +180,6 @@ Licznik dni parzenia na urządzeniu jest potrzebny do samego limitu i pojawi si�
 ## Decyzje właściciela — potwierdzenia przed premierą (23.10.2026)
 
 - **Family Sharing (dożywotnie i subskrypcje): zamknięte.** Właściciel zna nieodwracalność i ją akceptuje.
-- **Ceny USD: 0,99 / 6,99 / 14,99.** Potwierdzone. Ceny w PLN, EUR i GBP z listy wyżej pozostają do potwierdzenia.
+- **Ceny USD: 0,99 / 6,99 / 14,99.** Potwierdzone. Ceny w PLN, EUR i GBP nie są ustalane osobno: przeliczają się z waluty bazowej USD. Wartości PLN, EUR i GBP z listy wyżej są nieaktualne jako cele. Ostateczne kwoty wynikają z przeliczenia w App Store Connect; nie sprawdzono w tej sesji, jakie kwoty ono daje.
 - **Limit darmowego poziomu: 7 dni parzenia/mies.** Potwierdzone (wariant (a) z pomiarem po premierze).
 - **Języki: jak w `trening`, czyli 35.** Potwierdzone. Zakres: tłumaczenie interfejsu, sklepu i ekranów zakupu na 35 języków, weryfikacja przez rolę tłumacza, `check:i18n` przechodzi dla wszystkich 35.
