@@ -12,6 +12,7 @@ import { LanguageProvider } from '../src/core/i18n';
 import { BrewProvider } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
 import { LiveActivitySync } from '../src/platform/live-activity-sync';
+import { WatchSync } from '../src/platform/watch-sync';
 
 export default function RootLayout() {
   return (
@@ -19,6 +20,7 @@ export default function RootLayout() {
       <LanguageProvider>
         <BrewProvider>
           <LiveActivitySync />
+          <WatchSync />
           <StatusBar barStyle="light-content" />
           <Stack
             screenOptions={{
