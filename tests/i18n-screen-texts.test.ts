@@ -133,7 +133,7 @@ describe('Teksty przeniesione do słowników (NFR-I18N-001)', () => {
       'Step 1 of 3: Brew. Target water: 50 g. Step duration: 30 seconds. Pour'
     );
     expect(formatStepAnnouncement(1, 3, 'Brew', 50, 30, undefined, 'de')).toBe(
-      'Step 1 of 3: Brew. Target water: 50 g. Step duration: 30 seconds.'
+      'Schritt 1 von 3: Brew. Zielwasser: 50 g. Schrittdauer: 30 Sekunden.'
     );
   });
 
