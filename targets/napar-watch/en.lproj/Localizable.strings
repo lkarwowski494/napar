@@ -1,0 +1,10 @@
+/* Napar watch: English strings. Keys match pl.lproj (tests/napar-watch-link.test.ts). */
+"watch.idle.title" = "No brew";
+"watch.idle.hint" = "Start the timer in Napar on iPhone.";
+"watch.pourOf" = "Pour %1$ld of %2$ld";
+"watch.pause" = "Pause";
+"watch.resume" = "Resume";
+"watch.next" = "Next";
+"watch.paused" = "Paused";
+"watch.finished" = "Brew finished";
+"watch.phoneUnavailable" = "iPhone unavailable";

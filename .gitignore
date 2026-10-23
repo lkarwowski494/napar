@@ -2,6 +2,8 @@ node_modules/
 .expo/
 dist/
 /ios/
+# Katalog ikon zegarka generuje wtyczka @bacons/apple-targets przy expo prebuild (z assets/icon.png)
+/targets/napar-watch/Assets.xcassets/
 /android/
 *.log
 .DS_Store

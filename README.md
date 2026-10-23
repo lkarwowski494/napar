@@ -1,6 +1,6 @@
 # Napar (Steepwise)
 
-Stan na **22.10.2026** (commit z pomiarów `984f628`, gałąź `claude/wykonaj-sl7vii`). Ten plik opisuje to, co kod faktycznie robi, i zakres MVP. Poprzednia wersja README (z twierdzeniami bez pokrycia) jest w `docs/archiwum/README-do-2026-10-22.md`.
+Stan na **23.10.2026** (gałąź `claude/wykonaj-sl7vii`; pomiary w sekcji „Liczby z pomiaru”). Ten plik opisuje to, co kod faktycznie robi, i zakres MVP. Poprzednia wersja README (z twierdzeniami bez pokrycia) jest w `docs/archiwum/README-do-2026-10-22.md`.
 
 ## Czym jest Napar
 
@@ -54,7 +54,7 @@ Legenda statusów:
 | 17 | Sesja Gongfu: rundy, czasy, kofeina na rundę | CZĘŚCIOWO | `app/gongfu.tsx`, `gongfu.test.ts`, `gongfu-screen.test.tsx`. Brak kontrolki oceny zalania w UI (ocena sesji może być pusta). |
 | 19 | Sygnał dźwiękowy i haptyczny przy końcu kroku | DO ZWERYFIKOWANIA NA URZĄDZENIU | `src/core/timer-audio.ts` (dzwonek WAV 440 Hz, test DFT w `timer-audio.test.ts`), haptyka w `timer-engine.ts`. Nie słyszano na urządzeniu. |
 | 20 | Zapamiętany tryb bez przełączania | DZIAŁA | Ostatnia receptura (`last_recipe_id`) i liczba porcji (`last_servings`) w `app_settings`: `src/core/repositories/app-settings.ts`, odczyt przy starcie w `src/core/brew-context.tsx` (`rememberedRecipeFor`), porcje w `src/core/useBrewWorkflow.ts`. Tryb napoju (`beverage_preference`) był już zapisany. Testy: `repositories-brew-memory.test.ts`, `brew-memory-workflow.test.tsx`. |
-| 22 | Live Activity i Apple Watch | DO ZWERYFIKOWANIA NA URZĄDZENIU (Live Activity); ZAPLANOWANE (Apple Watch) | Live Activity: `modules/napar-live-activity` (ActivityKit), `targets/napar-widget`, `src/platform/live-activity-sync.tsx`, kontrakt TS–Swift w `napar-live-activity.test.ts`. Swift nie jest kompilowany na Linuksie ani sprawdzony na urządzeniu. Apple Watch: brak kodu. |
+| 22 | Live Activity i Apple Watch | DO ZWERYFIKOWANIA NA URZĄDZENIU (Live Activity i Apple Watch) | Live Activity: `modules/napar-live-activity` (ActivityKit), `targets/napar-widget`, `src/platform/live-activity-sync.tsx`, kontrakt TS–Swift w `napar-live-activity.test.ts`. Apple Watch: model i polecenia w `src/core/watch-state.ts`, most iPhone `modules/napar-watch-link` (WatchConnectivity), sync `src/platform/watch-sync.tsx`, aplikacja `targets/napar-watch` (watchOS 10+, haptyka, PL/EN). Kontrakt w `tests/napar-watch-link.test.ts`. Swift i watchOS nie są kompilowane na Linuksie; parowanie i działanie na zegarku nie są sprawdzone. |
 | 23 | Ocena w skali koła smaków SCA | DZIAŁA | `src/core/flavor-wheel-data.ts`, `flavor-wheel-picker.tsx`, używane w `BrewFinishModal.tsx`. |
 | 24 | Diagnoza smaku z korektą (kawa, herbata) | DZIAŁA | Arkusz po parzeniu przekazuje typ napoju: `src/components/brew/BrewFinishModal.tsx` (`beverageType`), herbata używa `diagnoseTeaTaste` (RD-05b, `src/core/domain-rules.ts`). Testy dwóch scenariuszy herbaty w `BrewFinishModal.test.tsx`. Reguły herbaty w rejestrze: „do sprawdzenia”. |
 | 26 | Dziennik sesji z pełnymi parametrami i notatkami | DZIAŁA | `app/(tabs)/journal.tsx`, `journal-screen.test.tsx`. |
@@ -104,20 +104,20 @@ Poza MVP (bez zmian w liście):
 - **Zakup działa dopiero po utworzeniu produktów w App Store Connect:** `pl.lukasz.napar.monthly`, `pl.lukasz.napar.annual`, `pl.lukasz.napar.lifetime` i grupa subskrypcji. Bez nich zakup pokazuje „zakup niedostępny”. Sandbox na urządzeniu jeszcze nie przeszedł. Przywracanie nie wywołuje `AppStore.sync` i wymaga sprawdzenia w sandboxie.
 - **Liczba 7 dni** jest decyzją właściciela. Model liczby płacących zakładał częstotliwość treningową i nie został przeliczony na kawę (otwarte w `docs/lista-funkcji-mvp.md`).
 
-## Liczby z pomiaru (22.10.2026, commit `984f628`)
+## Liczby z pomiaru (23.10.2026, po wdrożeniu zegarka; poprzedni pomiar 22.10.2026, commit `984f628`)
 
 | Pomiar | Wynik |
 |---|---|
 | `npm run verify` | kod 0 |
-| Zestawy testów Jest | 125 (wszystkie przeszły) |
-| Testy Jest | 1270 (wszystkie przeszły) |
+| Zestawy testów Jest | 128 (wszystkie przeszły) |
+| Testy Jest | 1329 (wszystkie przeszły) |
 | Klucze i18n w PL i EN (`check:i18n`) | 504 |
 | Słowniki w `locales/` (`check:i18n`) | 35 (ładowane w aplikacji: 2) |
-| Elementy macierzy testów (`check:matrix`) | 860 z 860 (to wynik macierzy, nie pokrycie kodu) |
+| Elementy macierzy testów (`check:matrix`) | 873 z 873 (to wynik macierzy, nie pokrycie kodu) |
 | Zależności produkcyjne sprawdzone pod licencje | 24, 0 naruszeń GPL/LGPL |
 | Pliki z długiem w `check:core-imports` | 14 (`scripts/core-imports-allowlist.json`) |
-| Pokrycie, wszystkie pliki (`npm run test:coverage`, kod 0) | instrukcje 96,78%, gałęzie 86,86%, funkcje 95,43%, linie 97,35% |
-| Pokrycie, `src/core/` | instrukcje 98,37%, gałęzie 90,10%, funkcje 98,92%, linie 98,70% |
+| Pokrycie, wszystkie pliki (`npm run test:coverage`, kod 0) | instrukcje 96,83%, gałęzie 87,04%, funkcje 95,51%, linie 97,36% |
+| Pokrycie, `src/core/` (wyliczone z `coverage/coverage-final.json`) | instrukcje 98,6%, gałęzie 91,8%, funkcje 99,1% (linie: nie liczono w tym pomiarze) |
 | Progi w `jest.config.js` | globalnie: instrukcje 92, gałęzie 80, funkcje 91, linie 93; `src/core/`: 97 / 88 / 98 / 97; wybrane moduły: 100 |
 | Rejestr twierdzeń (`docs/research/rejestr-twierdzen.json`) | 121 wpisów: 109 „do sprawdzenia”, 6 „[OCENA]”, 5 „decyzja techniczna”, 1 „zatwierdzona”, 0 „potwierdzone” |
 
@@ -144,12 +144,13 @@ Stos: Expo ~57.0.26, React Native 0.86.3, React 19.2.3, expo-sqlite ~57.0.3, exp
 
 ## Znane ograniczenia i otwarte decyzje
 
-- **Nie sprawdzono na urządzeniu:** dźwięk i haptyka, Live Activity, otwieranie `napar://` z systemu, kopiowanie do schowka, skan QR aparatem, VoiceOver, Dynamic Type do 2.0×, ścieżka bazy SQLite (`/Library/SQLite` i fallback).
+- **Nie sprawdzono na urządzeniu:** dźwięk i haptyka, Live Activity, Apple Watch (parowanie, polecenia, wibracja, napisy), otwieranie `napar://` z systemu, kopiowanie do schowka, skan QR aparatem, VoiceOver, Dynamic Type do 2.0×, ścieżka bazy SQLite (`/Library/SQLite` i fallback).
 - **Kofeina i zdrowie (D5):** progi snu i odwołania do EFSA nadal są w kodzie. Do usunięcia albo do zweryfikowania źródłami (rejestr T-036, T-139, T-149).
 - **Marki i osoby (D6):** nazwy autorów receptur (np. Tetsu Kasuya, James Hoffmann) i marek młynków (np. Comandante, Timemore) oraz marki wód nadal są w `recipes-data.ts`, `grinder-converter.ts` i `water-chemistry.ts`.
 - **Licencja (D7):** decyzja licencyjna otwarta (D7 w `docs/plan-przebudowy.md`). Plik `LICENSE` w repo nie istnieje. Blokuje wydanie.
 - **Testy E2E:** w historii CI z 15–20.10.2026 wszystkie przebiegi Maestro kończyły się błędem (`docs/audyt-etap1-2026-10-22.md`). Stan po tej dacie nie jest sprawdzony.
 - **Plan a lista:** `docs/plan-przebudowy.md` zakładał Live Activity i Watch poza MVP (etap 6), a `docs/lista-funkcji-mvp.md` (decyzja A) włącza je do MVP. Plan wymaga aktualizacji.
+- **Apple Watch, silnik:** `nextStep()` w pauzie zostawia w `pausedRemainingMs` czas poprzedniego etapu, więc po wznowieniu nowy etap odlicza czas starego (potwierdzone testem tymczasowym przy przygotowaniu wdrożenia zegarka). Zegarek nie wysyła „Dalej” w pauzie. Błąd dotyczy też przycisku w aplikacji i wymaga osobnej poprawki w `src/core/timer-engine.ts`.
 - **Etapy:** statusy 0, 1, 2, 3a, 3b, 3c, 4a i 4b są w `docs/plan-przebudowy.md`. Etapy 5 (CI, TestFlight) i 7 (wydanie) nie są zrobione.
 
 ## Dokumentacja

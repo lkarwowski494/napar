@@ -10,10 +10,10 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | **EKRAN** | 11 | 11 | **100.0%** | ✅ POKRYTE |
 | **UI** | 69 | 69 | **100.0%** | ✅ POKRYTE |
 | **TEKST** | 435 | 435 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 262 | 262 | **100.0%** | ✅ POKRYTE |
-| **WYMIAR** | 83 | 83 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 270 | 270 | **100.0%** | ✅ POKRYTE |
+| **WYMIAR** | 88 | 88 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **860** | Pokrytych: **860** | Brakujących: **0**
+Łącznie elementów: **873** | Pokrytych: **873** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -22,7 +22,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `EKRAN` | `/(tabs)/beans` | `app/(tabs)/beans.tsx` | ✅ | tests/interaction-guards.test.ts, tests/state-sequences.test.ts |
 | `EKRAN` | `/(tabs)/caffeine` | `app/(tabs)/caffeine.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `EKRAN` | `/(tabs)/dialin` | `app/(tabs)/dialin.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
-| `EKRAN` | `/(tabs)/index` | `app/(tabs)/index.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/public-repo.test.ts |
+| `EKRAN` | `/(tabs)/index` | `app/(tabs)/index.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/napar-watch-link.test.ts |
 | `EKRAN` | `/(tabs)/journal` | `app/(tabs)/journal.tsx` | ✅ | tests/interaction-guards.test.ts, src/components/icons/__tests__/CraftIcons.test.tsx |
 | `EKRAN` | `/(tabs)/settings` | `app/(tabs)/settings.tsx` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `EKRAN` | `/gongfu` | `app/gongfu.tsx` | ✅ | tests/audit-fixes.test.tsx, src/components/__tests__/gongfu-setup-units.test.tsx |
@@ -320,4 +320,4 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `UI` | `dialin.costTabTitle` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
 | `TEKST` | `dialin.costTitle` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/i18n.test.ts, src/core/__tests__/tabs-layout.test.tsx |
 
-*(... i 560 kolejnych elementów w pełnym wykazie)*
+*(... i 573 kolejnych elementów w pełnym wykazie)*

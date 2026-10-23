@@ -1,0 +1,10 @@
+/* Zegarek Napar: napisy języka polskiego. Klucze zgodne z en.lproj (tests/napar-watch-link.test.ts). */
+"watch.idle.title" = "Brak parzenia";
+"watch.idle.hint" = "Uruchom stoper w Napar na iPhonie.";
+"watch.pourOf" = "Zalanie %1$ld z %2$ld";
+"watch.pause" = "Pauza";
+"watch.resume" = "Wznów";
+"watch.next" = "Dalej";
+"watch.paused" = "Pauza";
+"watch.finished" = "Koniec parzenia";
+"watch.phoneUnavailable" = "iPhone niedostępny";
