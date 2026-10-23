@@ -174,3 +174,5 @@ Otwarte dla właściciela: (a) przyjąć 7 dni jako wartość roboczą i mierzy�
 - **(ii) Zmiana zasady:** opt-in, anonimowe zdarzenia blokady. Wymaga zmiany CLAUDE.md, BRD, etykiety prywatności w App Store i testu `public-repo`. Ryzyko: zaufanie do „zero telemetrii”, które jest częścią produktu.
 
 Licznik dni parzenia na urządzeniu jest potrzebny do samego limitu i pojawi się przy wdrażaniu paywalla, nie jako narzędzie pomiaru. Do decyzji właściciela: (i) lub (ii).
+
+**Decyzja właściciela (23.10.2026): (i) — bez telemetrii.** Zero telemetrii zostaje. Pomiar po premierze: agregaty z App Store Connect (zakupy, konwersja) i ręczny przegląd recenzji 1–2★ pod kątem blokady. Zmian w kodzie pod pomiar nie robimy. Do sprawdzenia przed premierą: jakie dane App Store Connect udostępnia dla darmowej aplikacji z zakupami (nie zweryfikowano w tej sesji).
