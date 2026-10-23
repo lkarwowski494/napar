@@ -168,3 +168,9 @@ Wnioski:
 Otwarte dla właściciela: (a) przyjąć 7 dni jako wartość roboczą i mierzyć blokady oraz recenzje po premierze; (b) przed premierą zmienić model darmowego poziomu, bo limit dni nie rozdziela użytkowników kawy. Rekomendacja: (a) z pomiarem, bo nie ma danych, które uzasadniałyby (b). Zmiana modelu to decyzja cenowa i wymaga Twojej akceptacji.
 
 **Decyzja właściciela (23.10.2026): (a).** Limit darmowego poziomu zostaje 7 dni parzenia/mies. jako wartość robocza. Po premierze mierzymy blokady i recenzje 1–2★ z powodu blokady. Wariant (b) nie jest przyjęty. Otwarte: licznik parzeń i blokad w kodzie, zakres i termin ustalimy osobno.
+
+**Korekta (23.10.2026): licznik nie daje pomiaru po premierze.** Zero telemetrii jest zasadą nienaruszalną (CLAUDE.md §2.5, README, `tests/public-repo.test.ts`). Licznik w aplikacji zostaje na urządzeniu i nie może wysłać blokad do właściciela. Opcje:
+- **(i) Bez telemetrii (rekomendacja):** pomiar z App Store Connect (agregaty zakupów i konwersji, bez kodu w aplikacji) oraz ręczny przegląd recenzji 1–2★. Zmian w kodzie pod pomiar nie ma.
+- **(ii) Zmiana zasady:** opt-in, anonimowe zdarzenia blokady. Wymaga zmiany CLAUDE.md, BRD, etykiety prywatności w App Store i testu `public-repo`. Ryzyko: zaufanie do „zero telemetrii”, które jest częścią produktu.
+
+Licznik dni parzenia na urządzeniu jest potrzebny do samego limitu i pojawi się przy wdrażaniu paywalla, nie jako narzędzie pomiaru. Do decyzji właściciela: (i) lub (ii).
