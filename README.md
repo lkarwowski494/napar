@@ -110,7 +110,7 @@ Poza MVP (bez zmian w liście):
 |---|---|
 | `npm run verify` | kod 0 |
 | Zestawy testów Jest | 128 (wszystkie przeszły) |
-| Testy Jest | 1378 (wszystkie przeszły) |
+| Testy Jest | 1381 (wszystkie przeszły) |
 | Klucze i18n w PL i EN (`check:i18n`) | 504 |
 | Słowniki w `locales/` (`check:i18n`) | 35 (ładowane w aplikacji: 35) |
 | Elementy macierzy testów (`check:matrix`) | 883 z 883 (to wynik macierzy, nie pokrycie kodu) |

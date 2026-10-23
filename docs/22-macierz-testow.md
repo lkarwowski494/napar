@@ -138,7 +138,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `tastingCard.notes` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
 | `TEKST` | `tastingCard.footer` | `locales/pl.json` | ✅ | src/components/craft/__tests__/CraftComponents.test.tsx, src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `tastingCard.balanceLabel.balanced` | `locales/pl.json` | ✅ | tests/backup-roundtrip.test.ts, src/components/__tests__/TastingCardView.test.tsx |
-| `TEKST` | `tastingCard.balanceLabel.sour` | `locales/pl.json` | ✅ | tests/backup-roundtrip.test.ts, tests/helpers/sqljs-port.ts |
+| `TEKST` | `tastingCard.balanceLabel.sour` | `locales/pl.json` | ✅ | tests/audit-fixes.test.tsx, tests/backup-roundtrip.test.ts |
 | `TEKST` | `tastingCard.balanceLabel.bitter` | `locales/pl.json` | ✅ | src/components/__tests__/TastingCardView.test.tsx, src/components/brew/__tests__/BrewFinishModal.test.tsx |
 | `TEKST` | `tastingCard.balanceLabel.astringent` | `locales/pl.json` | ✅ | src/components/__tests__/TastingCardView.test.tsx, src/core/__tests__/dialin-screen.test.tsx |
 | `TEKST` | `tastingCard.balanceLabel.weak` | `locales/pl.json` | ✅ | src/components/__tests__/TastingCardView.test.tsx, src/components/brew/__tests__/BrewFinishModal.test.tsx |
@@ -161,12 +161,12 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `milkDrinks.ingredient.milk` | `locales/pl.json` | ✅ | src/components/__tests__/MilkDrinkCard.test.tsx, src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.ingredient.foam` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.ingredient.syrup` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
-| `TEKST` | `milkDrinks.drinks.espresso.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
+| `TEKST` | `milkDrinks.drinks.espresso.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.espresso.description` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.espresso.step1` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
 | `TEKST` | `milkDrinks.drinks.espresso.step2` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
 | `TEKST` | `milkDrinks.drinks.espresso.tip` | `locales/pl.json` | ✅ | src/core/__tests__/domain-rules.test.ts, src/core/__tests__/hand-vectors-domain.test.ts |
-| `TEKST` | `milkDrinks.drinks.cappuccino.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
+| `TEKST` | `milkDrinks.drinks.cappuccino.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.cappuccino.description` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.cappuccino.step1` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
 | `TEKST` | `milkDrinks.drinks.cappuccino.step2` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
@@ -174,7 +174,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `milkDrinks.drinks.cappuccino.step4` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.cappuccino.step5` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.cappuccino.tip` | `locales/pl.json` | ✅ | src/core/__tests__/domain-rules.test.ts, src/core/__tests__/hand-vectors-domain.test.ts |
-| `TEKST` | `milkDrinks.drinks.latte.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
+| `TEKST` | `milkDrinks.drinks.latte.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.latte.description` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.latte.step1` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
 | `TEKST` | `milkDrinks.drinks.latte.step2` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
@@ -182,7 +182,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `milkDrinks.drinks.latte.step4` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.latte.step5` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.latte.tip` | `locales/pl.json` | ✅ | src/core/__tests__/domain-rules.test.ts, src/core/__tests__/hand-vectors-domain.test.ts |
-| `TEKST` | `milkDrinks.drinks.flatWhite.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
+| `TEKST` | `milkDrinks.drinks.flatWhite.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.flatWhite.description` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.flatWhite.step1` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
 | `TEKST` | `milkDrinks.drinks.flatWhite.step2` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
@@ -190,7 +190,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `milkDrinks.drinks.flatWhite.step4` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.flatWhite.step5` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx |
 | `TEKST` | `milkDrinks.drinks.flatWhite.tip` | `locales/pl.json` | ✅ | src/core/__tests__/domain-rules.test.ts, src/core/__tests__/hand-vectors-domain.test.ts |
-| `TEKST` | `milkDrinks.drinks.mocha.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/backup-roundtrip.test.ts |
+| `TEKST` | `milkDrinks.drinks.mocha.name` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.mocha.description` | `locales/pl.json` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `milkDrinks.drinks.mocha.step1` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |
 | `TEKST` | `milkDrinks.drinks.mocha.step2` | `locales/pl.json` | ✅ | src/core/__tests__/milk-drinks-screen.test.tsx, src/core/__tests__/property-based.test.ts |

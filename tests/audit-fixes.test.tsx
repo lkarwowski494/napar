@@ -8,6 +8,7 @@ import renderer, { act } from 'react-test-renderer';
 import { StyleSheet } from 'react-native';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { LANGS as LOADER_LANGS } from '../src/core/i18n-loader';
 
 // Importy logiki i komponentów
 import { wInKeep, roundTo } from '../src/core/unit-converter';
@@ -477,5 +478,44 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
       expect(existsSync(join(wfDir, 'tests-tz.yml'))).toBe(true);
       expect(existsSync(join(wfDir, 'e2e-ios.yml'))).toBe(true);
     });
+  });
+});
+
+describe('Regresja U18/U19: 35 słowników zgodnych z pl.json (docs/supreme-audit-1-11.md)', () => {
+  const localesDir = join(__dirname, '..', 'locales');
+  const leafPaths = (node: Record<string, unknown>, prefix = ''): string[] =>
+    Object.entries(node).flatMap(([key, value]) => {
+      const path = prefix ? `${prefix}.${key}` : key;
+      return value !== null && typeof value === 'object' && !Array.isArray(value)
+        ? leafPaths(value as Record<string, unknown>, path)
+        : [path];
+    });
+  const load = (code: string) => JSON.parse(readFileSync(join(localesDir, `${code}.json`), 'utf8'));
+
+  test('U18: locales/ ma dokładnie 35 słowników zgodnych z LANGS i bez _source.json', () => {
+    const files = readdirSync(localesDir)
+      .filter((f) => f.endsWith('.json'))
+      .map((f) => f.slice(0, -'.json'.length))
+      .sort();
+    expect(files).toEqual([...LOADER_LANGS].sort());
+    expect(existsSync(join(localesDir, '_source.json'))).toBe(false);
+  });
+
+  test('U19: każdy z 35 słowników ma te same klucze co pl.json', () => {
+    const plKeys = leafPaths(load('pl')).sort();
+    expect(plKeys.length).toBeGreaterThan(0);
+    for (const code of LOADER_LANGS) {
+      expect(leafPaths(load(code)).sort()).toEqual(plKeys);
+    }
+  });
+
+  test('U19: w żadnym ze słowników nie ma fraz o HealthKit ani twardych cen w walucie', () => {
+    const forbidden = [/apple health|healthkit/i, /(?:[$€£]|USD|EUR|GBP)\s?\d/];
+    for (const code of LOADER_LANGS) {
+      const text = readFileSync(join(localesDir, `${code}.json`), 'utf8');
+      for (const pattern of forbidden) {
+        expect({ code, hit: pattern.test(text) }).toEqual({ code, hit: false });
+      }
+    }
   });
 });
