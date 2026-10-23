@@ -127,7 +127,7 @@
   "milkDrinks": {
     "title": "Milk drinks and latte art",
     "entry": "Milk drinks and latte art →",
-    "intro": "Proportions are default settings marked [OCENA] (an estimate, not an SCA standard). Adjust them to your taste.",
+    "intro": "Proportions are default estimates, not an SCA standard. Adjust them to your taste.",
     "cupLabel": "Cup volume",
     "cupValue": "Cup: {volume}",
     "cupSmaller": "Smaller cup",

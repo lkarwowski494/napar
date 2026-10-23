@@ -6,6 +6,7 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { readSystemLocale } from '../../platform/system-locale';
+import { DICTIONARIES } from '../i18n-loader';
 import {
   detectSystemLanguage,
   getCurrentTranslations,
@@ -52,7 +53,7 @@ describe('LanguageProvider: wybór języka', () => {
     const sink: Sink = {};
     renderProvider(sink);
     expect(sink.current?.language).toBe('fr');
-    expect(sink.current?.t.common.cancel).toBe(translations.en.common.cancel);
+    expect(sink.current?.t.common.cancel).toBe(DICTIONARIES.fr.common?.cancel);
   });
 
   test('ustawienie użytkownika ma pierwszeństwo przed językiem systemu', () => {

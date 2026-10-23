@@ -127,7 +127,7 @@
   "milkDrinks": {
     "title": "Napoje mleczne i latte art",
     "entry": "Napoje mleczne i latte art →",
-    "intro": "Proporcje to domyślne ustawienia oznaczone [OCENA] (ocena, nie standard SCA). Zmień je według własnego smaku.",
+    "intro": "Proporcje to domyślne ustawienia — szacunek, nie standard SCA. Zmień je według własnego smaku.",
     "cupLabel": "Objętość filiżanki",
     "cupValue": "Filiżanka: {volume}",
     "cupSmaller": "Mniejsza filiżanka",
