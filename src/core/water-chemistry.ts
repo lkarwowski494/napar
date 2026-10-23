@@ -3,6 +3,8 @@
 // Matematyka remineralizacji wody dla kawy specialty i herbaty (SCA & Barista Hustle)
 // ============================================================================
 
+import { pickBilingual } from './i18n-loader';
+
 export interface WaterRecipe {
   id: string;
   namePl: string;
@@ -160,7 +162,7 @@ export const BOTTLED_WATER_BENCHMARKS: BottledWaterProfile[] = [
 export function getWaterProfileName(id: string, language: 'pl' | 'en' | string): string {
   const recipe = WATER_RECIPES.find((r) => r.id === id);
   if (!recipe) return id;
-  return language === 'pl' ? recipe.namePl : recipe.nameEn;
+  return pickBilingual(language, recipe.namePl, recipe.nameEn);
 }
 
 export interface WaterCalculationResult {

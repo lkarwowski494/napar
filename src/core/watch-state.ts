@@ -8,6 +8,7 @@
 
 import type { RecipeStep } from './recipes-data';
 import type { TimerSnapshot, TimerStatus } from './timer-engine';
+import { pickBilingual } from './i18n-loader';
 
 /** Wersja formatu wiadomości. Zegarek odrzuca inne wartości. */
 export const WATCH_PAYLOAD_VERSION = 1;
@@ -43,7 +44,7 @@ export interface WatchTimerInput
 
 /** Język aplikacji zawężony do obsługiwanych przez zegarek (PL / EN). */
 export function watchLanguage(language: string): WatchLanguage {
-  return language === 'en' ? 'en' : 'pl';
+  return language === 'pl' ? 'pl' : 'en';
 }
 
 /**
@@ -61,7 +62,7 @@ export function buildWatchState(
 
   const remainingMs = Math.max(0, Math.round(timer.stepRemainingSeconds * 1000));
   const shared = {
-    stepName: language === 'en' ? step.nameEn || step.namePl : step.namePl,
+    stepName: pickBilingual(language, step.namePl, step.nameEn || step.namePl),
     pourIndex: timer.currentStepIndex + 1,
     pourTotal: timer.totalSteps,
     language,

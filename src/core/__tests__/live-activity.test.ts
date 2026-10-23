@@ -59,7 +59,7 @@ describe('liveActivityLanguage', () => {
     const english: LiveActivityLanguage = liveActivityLanguage('en');
     expect(english).toBe('en');
     expect(liveActivityLanguage('pl')).toBe('pl');
-    expect(liveActivityLanguage('de')).toBe('pl');
+    expect(liveActivityLanguage('de')).toBe('en');
   });
 });
 

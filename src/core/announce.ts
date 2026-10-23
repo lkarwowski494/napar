@@ -5,6 +5,8 @@
 
 import { useEffect } from 'react';
 import { AccessibilityInfo } from 'react-native';
+import { messagesFor, LangCode } from './i18n-loader';
+import { fillTemplate } from './access-policy';
 
 export const announce = (text: string): void => {
   try {
@@ -22,6 +24,7 @@ export function useAnnounce(text: string | null | undefined): void {
 
 /**
  * Formatuje komunikat zapowiedzi etapu parzenia dla czytnika ekranu (VoiceOver / TalkBack).
+ * Teksty z sekcji `voice` słownika języka (te same słowniki co UI).
  */
 export function formatStepAnnouncement(
   stepNumber: number,
@@ -30,27 +33,23 @@ export function formatStepAnnouncement(
   targetWaterGrams: number,
   durationSeconds: number,
   instruction?: string,
-  language: 'pl' | 'en' = 'pl'
+  language: LangCode = 'pl'
 ): string {
-  if (language === 'en') {
-    const instr = instruction ? ` ${instruction}` : '';
-    return `Step ${stepNumber} of ${totalSteps}: ${stepName}. Target water: ${targetWaterGrams} g. Step duration: ${durationSeconds} seconds.${instr}`;
-  }
-  const instr = instruction ? ` ${instruction}` : '';
-  return `Krok ${stepNumber} z ${totalSteps}: ${stepName}. Cel wody: ${targetWaterGrams} g. Czas trwania: ${durationSeconds} sekund.${instr}`;
+  return fillTemplate(messagesFor(language).voice.stepAnnouncement, {
+    stepNumber,
+    totalSteps,
+    stepName,
+    water: targetWaterGrams,
+    seconds: durationSeconds,
+    instruction: instruction ? ` ${instruction}` : '',
+  });
 }
 
 /**
  * Formatuje ostrzeżenie przed końcem etapu (np. 3 sekundy).
  */
-export function formatCountdownAnnouncement(
-  secondsRemaining: number,
-  language: 'pl' | 'en' = 'pl'
-): string {
-  if (language === 'en') {
-    return `${secondsRemaining} seconds remaining in this step.`;
-  }
-  return `${secondsRemaining} sekundy do końca etapu.`;
+export function formatCountdownAnnouncement(secondsRemaining: number, language: LangCode = 'pl'): string {
+  return fillTemplate(messagesFor(language).voice.countdownAnnouncement, { seconds: secondsRemaining });
 }
 
 /**
@@ -60,30 +59,27 @@ export function formatStartAnnouncement(
   recipeName: string,
   doseGrams: number,
   waterGrams: number,
-  language: 'pl' | 'en' = 'pl'
+  language: LangCode = 'pl'
 ): string {
-  if (language === 'en') {
-    return `Started brewing ${recipeName}. Dose: ${doseGrams} g, water: ${waterGrams} g.`;
-  }
-  return `Rozpoczęto parzenie ${recipeName}. Doza: ${doseGrams} g, woda: ${waterGrams} g.`;
+  return fillTemplate(messagesFor(language).voice.startAnnouncement, {
+    recipe: recipeName,
+    dose: doseGrams,
+    water: waterGrams,
+  });
 }
 
 /**
  * Formatuje komunikat zakończenia parzenia.
  */
-export function formatFinishAnnouncement(
-  recipeName: string,
-  totalSeconds: number,
-  language: 'pl' | 'en' = 'pl'
-): string {
+export function formatFinishAnnouncement(recipeName: string, totalSeconds: number, language: LangCode = 'pl'): string {
+  const voice = messagesFor(language).voice;
   const mins = Math.floor(totalSeconds / 60);
   const secs = totalSeconds % 60;
-  if (language === 'en') {
-    const timeStr = mins > 0 ? `${mins} min ${secs} s` : `${secs} seconds`;
-    return `Brewing of ${recipeName} finished. Total time: ${timeStr}. Enjoy your cup!`;
-  }
-  const timeStr = mins > 0 ? `${mins} min ${secs} s` : `${secs} sekund`;
-  return `Parzenie ${recipeName} zakończone. Całkowity czas: ${timeStr}. Smacznego!`;
+  const timeStr =
+    mins > 0
+      ? fillTemplate(voice.minutesSeconds, { minutes: mins, seconds: secs })
+      : fillTemplate(voice.secondsOnly, { seconds: secs });
+  return fillTemplate(voice.finishAnnouncement, { recipe: recipeName, time: timeStr });
 }
 
 /**
@@ -96,7 +92,7 @@ export function announceStep(
   targetWaterGrams: number,
   durationSeconds: number,
   instruction?: string,
-  language: 'pl' | 'en' = 'pl'
+  language: LangCode = 'pl'
 ): void {
   const msg = formatStepAnnouncement(
     stepNumber,
@@ -115,7 +111,7 @@ export function announceStep(
  */
 export function announceCountdown(
   secondsRemaining: number,
-  language: 'pl' | 'en' = 'pl'
+  language: LangCode = 'pl'
 ): void {
   const msg = formatCountdownAnnouncement(secondsRemaining, language);
   announce(msg);
@@ -127,7 +123,7 @@ export function announceCountdown(
 export function announceFinish(
   recipeName: string,
   totalSeconds: number,
-  language: 'pl' | 'en' = 'pl'
+  language: LangCode = 'pl'
 ): void {
   const msg = formatFinishAnnouncement(recipeName, totalSeconds, language);
   announce(msg);
@@ -140,7 +136,7 @@ export function announceStart(
   recipeName: string,
   doseGrams: number,
   waterGrams: number,
-  language: 'pl' | 'en' = 'pl'
+  language: LangCode = 'pl'
 ): void {
   const msg = formatStartAnnouncement(recipeName, doseGrams, waterGrams, language);
   announce(msg);

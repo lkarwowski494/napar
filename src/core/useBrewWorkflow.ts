@@ -224,12 +224,10 @@ export function useBrewWorkflow() {
     (r: AnyRecipe) => {
       if (snapshot.totalElapsedSeconds > 0 && snapshot.status !== 'finished') {
         confirmAction({
-          title: language === 'en' ? 'Change recipe?' : 'Zmienić recepturę?',
+          title: t.brewWorkflow.changeRecipeTitle,
           message:
-            language === 'en'
-              ? 'An active brew session is in progress. Changing recipe will reset timer progress.'
-              : 'Trwa aktywna sesja parzenia. Zmiana receptury zresetuje postęp stopera.',
-          actionText: language === 'en' ? 'Change' : 'Zmień',
+            t.brewWorkflow.changeRecipeMessage,
+          actionText: t.brewWorkflow.changeRecipeAction,
           destructive: true,
           onConfirm: () => {
             resetTimer();
@@ -244,7 +242,7 @@ export function useBrewWorkflow() {
         setShowRecipeModal(false);
       }
     },
-    [language, resetTimer, selectRecipe, snapshot.status, snapshot.totalElapsedSeconds]
+    [t, resetTimer, selectRecipe, snapshot.status, snapshot.totalElapsedSeconds]
   );
 
   const handleBeverageTypeChange = (type: 'COFFEE' | 'TEA') => {
@@ -371,12 +369,10 @@ export function useBrewWorkflow() {
     if (snapshot.totalElapsedSeconds > 0) {
       confirmAction({
         title:
-          language === 'en' ? 'Reset brew session?' : 'Zresetować sesję parzenia?',
+          t.brewWorkflow.resetSessionTitle,
         message:
-          language === 'en'
-            ? 'Current brew progress will be cleared.'
-            : 'Bieżący postęp parzenia zostanie wyzerowany.',
-        actionText: language === 'en' ? 'Reset' : 'Zresetuj',
+          t.brewWorkflow.resetSessionMessage,
+        actionText: t.brewWorkflow.resetSessionAction,
         destructive: true,
         onConfirm: resetTimer,
       });

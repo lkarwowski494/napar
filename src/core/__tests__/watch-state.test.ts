@@ -62,7 +62,7 @@ describe('język zegarka', () => {
     const english: WatchLanguage = watchLanguage('en');
     expect(english).toBe('en');
     expect(watchLanguage('pl')).toBe('pl');
-    expect(watchLanguage('de')).toBe('pl');
+    expect(watchLanguage('de')).toBe('en');
   });
 });
 

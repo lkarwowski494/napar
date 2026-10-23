@@ -6,6 +6,8 @@
 // ============================================================================
 
 import { KNOWLEDGE_LOCALES, KnowledgeLocaleEntry } from './knowledge-locales';
+import { pickBilingual } from './i18n-loader';
+import type { LangCode } from './i18n-loader';
 
 function getLocale(id: string): KnowledgeLocaleEntry {
   const loc = KNOWLEDGE_LOCALES[id];
@@ -605,21 +607,21 @@ export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
   return TEA_CATEGORIES.find((t) => t.id === id);
 }
 
-export function getKnowledgeDescription(id: string, lang: 'pl' | 'en' = 'pl'): string {
+export function getKnowledgeDescription(id: string, lang: LangCode = 'pl'): string {
   const loc = getLocale(id);
-  return lang === 'en' ? loc.descriptionEn : loc.descriptionPl;
+  return pickBilingual(lang, loc.descriptionPl, loc.descriptionEn);
 }
 
-export function getKnowledgeSensoryProfile(id: string, lang: 'pl' | 'en' = 'pl'): string {
+export function getKnowledgeSensoryProfile(id: string, lang: LangCode = 'pl'): string {
   const loc = getLocale(id);
   if (loc.sensoryProfilePl || loc.sensoryProfileEn) {
-    return (lang === 'en' ? loc.sensoryProfileEn : loc.sensoryProfilePl) || '';
+    return pickBilingual(lang, loc.sensoryProfilePl, loc.sensoryProfileEn) || '';
   }
   if (loc.sensoryImpactPl || loc.sensoryImpactEn) {
-    return (lang === 'en' ? loc.sensoryImpactEn : loc.sensoryImpactPl) || '';
+    return pickBilingual(lang, loc.sensoryImpactPl, loc.sensoryImpactEn) || '';
   }
   if (loc.flavorProfilePl || loc.flavorProfileEn) {
-    return (lang === 'en' ? loc.flavorProfileEn : loc.flavorProfilePl) || '';
+    return pickBilingual(lang, loc.flavorProfilePl, loc.flavorProfileEn) || '';
   }
   return '';
 }

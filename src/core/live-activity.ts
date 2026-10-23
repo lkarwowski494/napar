@@ -7,6 +7,7 @@
 
 import type { RecipeStep } from './recipes-data';
 import type { TimerSnapshot } from './timer-engine';
+import { pickBilingual } from './i18n-loader';
 
 export type LiveActivityLanguage = 'pl' | 'en';
 export type LiveBeverageType = 'COFFEE' | 'TEA';
@@ -42,7 +43,7 @@ export interface LiveTimerInput
 
 /** Język aplikacji zawężony do obsługiwanych przez widżet (PL / EN). */
 export function liveActivityLanguage(language: string): LiveActivityLanguage {
-  return language === 'en' ? 'en' : 'pl';
+  return language === 'pl' ? 'pl' : 'en';
 }
 
 /**
@@ -61,7 +62,7 @@ export function buildLiveActivityContentState(
 
   const remainingMs = Math.max(0, Math.round(timer.stepRemainingSeconds * 1000));
   const shared = {
-    stepName: language === 'en' ? step.nameEn || step.namePl : step.namePl,
+    stepName: pickBilingual(language, step.namePl, step.nameEn || step.namePl),
     pourIndex: timer.currentStepIndex + 1,
     pourTotal: timer.totalSteps,
   };

@@ -237,3 +237,22 @@ export function buildMessages(
     onMissing?.(path, lang)
   );
 }
+
+const messagesCache: Partial<Record<LangCode, Translations>> = {};
+
+/** Słownik języka liczony raz na język (dla komponentów i modułów core, które dostają język jako argument). */
+export function messagesFor(lang: LangCode): Translations {
+  const cached = messagesCache[lang];
+  if (cached) return cached;
+  const built = buildMessages(lang);
+  messagesCache[lang] = built;
+  return built;
+}
+
+/**
+ * Dane dwujęzyczne (np. namePl / nameEn w przepisach, sensoryce, komunikatach):
+ * wartość PL tylko dla języka polskiego, dla wszystkich pozostałych 34 języków wartość EN (fallback).
+ */
+export function pickBilingual<T>(lang: string, pl: T, en: T): T {
+  return lang === 'pl' ? pl : en;
+}

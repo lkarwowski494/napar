@@ -12,6 +12,8 @@ import {
   lookupMessage,
   matchSystemLocale,
   mergeWithFallback,
+  messagesFor,
+  pickBilingual,
   resolveLanguage,
   resolveMessage,
   Translations,
@@ -279,5 +281,25 @@ describe('resolveLanguage z wartością typu LangCode', () => {
   test('zwraca typ LangCode dla każdego obsługiwanego języka', () => {
     const lang: LangCode = resolveLanguage('ja', null);
     expect(lang).toBe('ja');
+  });
+});
+
+describe('messagesFor i pickBilingual (słowniki dla komponentów i dane dwujęzyczne)', () => {
+  test('messagesFor zwraca pełny słownik języka i cache\'uje go na kolejne wywołania', () => {
+    const first = messagesFor('de');
+    expect(messagesFor('de')).toBe(first);
+    expect(first.voice.stepAnnouncement).toContain('{stepNumber}');
+  });
+
+  test('messagesFor zwraca własne teksty języka (PL i EN)', () => {
+    expect(messagesFor('pl').brewScreen.stepOneTitle).toBe('KROK 1: CO ROBIMY? (WYBÓR RECEPTURY I SUROWCA)');
+    expect(messagesFor('en').brewScreen.stepOneTitle).toBe('STEP 1: WHAT ARE WE BREWING? (RECIPE & STASH)');
+  });
+
+  test('pickBilingual: wartość PL tylko dla pl, pozostałe 34 języki dostają wartość EN', () => {
+    expect(pickBilingual('pl', 'PL', 'EN')).toBe('PL');
+    expect(pickBilingual('en', 'PL', 'EN')).toBe('EN');
+    expect(pickBilingual('de', 'PL', 'EN')).toBe('EN');
+    expect(pickBilingual('zh-Hans', 'PL', 'EN')).toBe('EN');
   });
 });

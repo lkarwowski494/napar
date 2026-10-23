@@ -39,6 +39,7 @@ import {
   notifyGrinderCalibrationChanged,
   onGrinderCalibrationChanged,
 } from './grinder-calibration';
+import { pickBilingual } from './i18n-loader';
 
 export interface BrewContextType {
   recipe: SavedRecipe | MasterRecipe;
@@ -86,9 +87,9 @@ const defaultCoffeeRecipe = MASTER_RECIPES.find((r) => r.type === 'COFFEE') || M
 const defaultTeaRecipe = MASTER_RECIPES.find((r) => r.type === 'TEA') || MASTER_RECIPES[3];
 const defaultRecipe = defaultCoffeeRecipe;
 
-/** Komunikaty głosowe mają wersje tylko PL i EN; pozostałe języki z listy dostają EN. */
-function announceLanguage(): 'pl' | 'en' {
-  return getCurrentLanguage() === 'pl' ? 'pl' : 'en';
+/** Komunikaty głosowe: język aplikacji (sekcja `voice` słownika; brakujące klucze z EN). */
+function announceLanguage() {
+  return getCurrentLanguage();
 }
 
 /** Typ napoju przepisu (wzorcowego: `type`, własnego: `beverageType`). */
@@ -246,8 +247,8 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       onStepChange: (stepIndex, step) => {
         if (getVoiceAnnounceEnabled()) {
           const lang = announceLanguage();
-          const stepName = lang === 'en' ? (step.nameEn || step.namePl) : step.namePl;
-          const stepInstr = lang === 'en' ? (step.instructionEn || step.instructionPl) : step.instructionPl;
+          const stepName = pickBilingual(lang, step.namePl, step.nameEn || step.namePl);
+          const stepInstr = pickBilingual(lang, step.instructionPl, step.instructionEn || step.instructionPl);
           announceStep(
             stepIndex + 1,
             scaledSteps.length,

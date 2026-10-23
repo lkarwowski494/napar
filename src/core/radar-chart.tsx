@@ -8,6 +8,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Svg, { Polygon, Line, Circle, Text as SvgText } from 'react-native-svg';
 import { theme } from './theme';
+import { pickBilingual } from './i18n-loader';
 
 export interface SensoryProfile {
   acidity: number; // 1 - 5
@@ -145,7 +146,7 @@ export const SensoryRadarChart: React.FC<SensoryRadarChartProps> = ({
           SENSORY_AXES.map((axis, i) => {
             const labelRadius = maxRadius + 16;
             const { x, y } = getCoordinates(i, labelRadius);
-            const labelText = language === 'pl' ? axis.labelPl : axis.labelEn;
+            const labelText = pickBilingual(language, axis.labelPl, axis.labelEn);
 
             // Anchor adjustment based on angle
             let textAnchor: 'middle' | 'start' | 'end' = 'middle';
@@ -201,7 +202,7 @@ export const SensoryScoreEditor: React.FC<SensoryScoreEditorProps> = ({
     <View style={styles.editorContainer}>
       {SENSORY_AXES.map((axis) => {
         const val = profile[axis.key] ?? 3;
-        const name = language === 'pl' ? axis.labelPl : axis.labelEn;
+        const name = pickBilingual(language, axis.labelPl, axis.labelEn);
 
         return (
           <View key={axis.key} style={styles.editorRow}>
