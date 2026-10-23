@@ -151,3 +151,18 @@ Właściciel: decyzje nieblokujące zgodnie z rekomendacją. Lista punktów 2–
 | 3 | Stare dane mogą przepaść | Wcześniejsze wartości limitu (15, 5, 10) zostają w pliku z datą jako historia; obowiązuje 7 dni; nic nie usuwamy | Zrobione tym wpisem |
 | 4 | Zrobimy później | Model kawy i przychód odkładamy do czasu, aż będzie rozkład częstotliwości | Odroczone |
 | 5 | Przegląd lepszym modelem Claude | Przegląd rejestru twierdzeń i modelu limitu wykonamy później, mocniejszym modelem | Odroczone |
+
+**Wynik punktu 2 (23.10.2026).** Model `trening` (`docs/monetyzacja/limit-dni.mjs`, repo `trening` tylko do odczytu, bez zmian) uruchomiony na kopii danych z rozkładem częstotliwości kawy jako wrażliwością. Scenariusz normalny, płacący na 100 pobrań w 24 mies.:
+
+| Rozkład częstotliwości | 5 dni | 7 dni | 10 dni | 15 dni | Blokada w 1. pełnym miesiącu (7 dni) |
+|---|---|---|---|---|---|
+| Trening (baza z `trening`, 1–5/tydz.) | 1,88 | 1,63 | 1,23 | 0,59 | 77% |
+| Kawa średnio (2–7/tydz.) [OCENA] | 2,25 | 2,16 | 2,00 | 1,76 | 97% |
+| Kawa codziennie (4–7/tydz.) [OCENA] | 2,31 | 2,27 | 2,21 | 2,09 | 100% |
+
+Wnioski:
+1. Przy częstotliwości kawy prawie wszyscy aktywni trafiają na blokadę przy każdym z testowanych limitów. Model nie rozróżnia limitów dla kawy: wynik zależy głównie od przyjętego prawdopodobieństwa zakupu przy blokadzie (1,37%, jedno źródło, [OCENA]), a nie od wartości N.
+2. Model liczy dni treningowe. Napar liczy tylko parzenia w aplikacji (decyzja z 22.10). Tego filtra model nie ma, więc rzeczywista blokada może być niższa niż w tabeli. Nieuwzględnione.
+3. Rozkład częstotliwości kawy nadal nie jest znany. Wartości z tabeli to wrażliwość, nie dane.
+
+Otwarte dla właściciela: (a) przyjąć 7 dni jako wartość roboczą i mierzyć blokady oraz recenzje po premierze; (b) przed premierą zmienić model darmowego poziomu, bo limit dni nie rozdziela użytkowników kawy. Rekomendacja: (a) z pomiarem, bo nie ma danych, które uzasadniałyby (b). Zmiana modelu to decyzja cenowa i wymaga Twojej akceptacji.
