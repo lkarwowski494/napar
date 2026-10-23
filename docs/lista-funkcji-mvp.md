@@ -140,3 +140,14 @@ Warunki bez zmian: blokada nie przerywa trwającego parzenia, historia i eksport
 ## Family Sharing — zatwierdzone (22.10.2026)
 
 Zatwierdzone przez właściciela dla subskrypcji i zakupu dożywotniego. **Nieodwracalne:** Apple (strona „Turn on Family Sharing for in-app purchases”, App Store Connect Help, odczyt 22.10.2026) pisze: „once you turn on Family Sharing for an In-App Purchases in App Store Connect, you can't turn it off”. Włączenie wykonuje właściciel w App Store Connect, po sprawdzeniu, że wybrany produkt jest właściwy.
+
+## Decyzje nieblokujące — domyślne wg rekomendacji (23.10.2026)
+
+Właściciel: decyzje nieblokujące zgodnie z rekomendacją. Lista punktów 2–5 nie była w kontekście po wyczyszczeniu sesji; poniższe przypisanie to moja interpretacja. Jeśli chodziło o inne punkty, ten wpis wymaga poprawki.
+
+| # | Punkt | Decyzja domyślna | Status |
+|---|---|---|---|
+| 2 | Sprawdzenie, jak to zrobiono w `trening` (model limitu: `docs/monetyzacja/limit-dni.mjs`) | Przyjmujemy metodę z `trening`; ponowne uruchomienie z rozkładem częstotliwości kawy przed podaniem liczb przychodu | Otwarte: repo `trening` nie jest w zakresie tej sesji (wymaga `add_repo`) |
+| 3 | Stare dane mogą przepaść | Wcześniejsze wartości limitu (15, 5, 10) zostają w pliku z datą jako historia; obowiązuje 7 dni; nic nie usuwamy | Zrobione tym wpisem |
+| 4 | Zrobimy później | Model kawy i przychód odkładamy do czasu, aż będzie rozkład częstotliwości | Odroczone |
+| 5 | Przegląd lepszym modelem Claude | Przegląd rejestru twierdzeń i modelu limitu wykonamy później, mocniejszym modelem | Odroczone |
