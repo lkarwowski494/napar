@@ -166,3 +166,5 @@ Wnioski:
 3. Rozkład częstotliwości kawy nadal nie jest znany. Wartości z tabeli to wrażliwość, nie dane.
 
 Otwarte dla właściciela: (a) przyjąć 7 dni jako wartość roboczą i mierzyć blokady oraz recenzje po premierze; (b) przed premierą zmienić model darmowego poziomu, bo limit dni nie rozdziela użytkowników kawy. Rekomendacja: (a) z pomiarem, bo nie ma danych, które uzasadniałyby (b). Zmiana modelu to decyzja cenowa i wymaga Twojej akceptacji.
+
+**Decyzja właściciela (23.10.2026): (a).** Limit darmowego poziomu zostaje 7 dni parzenia/mies. jako wartość robocza. Po premierze mierzymy blokady i recenzje 1–2★ z powodu blokady. Wariant (b) nie jest przyjęty. Otwarte: licznik parzeń i blokad w kodzie, zakres i termin ustalimy osobno.
