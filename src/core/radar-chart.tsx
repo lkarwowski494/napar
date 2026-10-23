@@ -3,6 +3,7 @@
 // 5 osi SCA: Kwasowość, Słodycz, Ciało, Czystość, Finisz (skala 1–5)
 // ============================================================================
 
+import type { SupportedLanguage } from './i18n';
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Svg, { Polygon, Line, Circle, Text as SvgText } from 'react-native-svg';
@@ -41,7 +42,7 @@ export const SENSORY_AXES: AxisDefinition[] = [
 interface SensoryRadarChartProps {
   profile: SensoryProfile;
   size?: number;
-  language?: 'pl' | 'en';
+  language?: SupportedLanguage;
   showLabels?: boolean;
 }
 
@@ -179,7 +180,7 @@ export const SensoryRadarChart: React.FC<SensoryRadarChartProps> = ({
 interface SensoryScoreEditorProps {
   profile: SensoryProfile;
   onChange: (newProfile: SensoryProfile) => void;
-  language?: 'pl' | 'en';
+  language?: SupportedLanguage;
 }
 
 export const SensoryScoreEditor: React.FC<SensoryScoreEditorProps> = ({

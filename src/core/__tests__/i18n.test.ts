@@ -6,6 +6,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import {
   detectSystemLanguage,
+  LANGS,
   translations,
   SupportedLanguage,
   LanguageProvider,
@@ -18,7 +19,7 @@ import {
 describe('i18n System', () => {
   test('Wykrywa język systemowy lub domyślny fallback', () => {
     const lang = detectSystemLanguage();
-    expect(['pl', 'en']).toContain(lang);
+    expect(LANGS).toContain(lang);
     const currTr = getCurrentTranslations();
     expect(currTr).toBeDefined();
     expect(currTr.common.cancel).toBeDefined();
@@ -99,7 +100,7 @@ describe('i18n System', () => {
     Intl.DateTimeFormat = jest.fn().mockImplementation(() => ({
       resolvedOptions: () => ({ locale: 'de-DE' }),
     })) as any;
-    expect(detectSystemLanguage()).toBe('en');
+    expect(detectSystemLanguage()).toBe('de');
 
     // 3. Rzucenie błędu wewnątrz try
     Intl.DateTimeFormat = jest.fn().mockImplementation(() => {

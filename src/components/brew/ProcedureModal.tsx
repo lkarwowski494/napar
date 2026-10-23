@@ -7,6 +7,7 @@
 // - Na ostatnim kroku jednoznaczne CTA "Zakończ i zapisz"
 // ============================================================================
 
+import type { SupportedLanguage } from '../../core/i18n';
 import React, { useState, useEffect } from 'react';
 import {
   Modal,
@@ -31,7 +32,7 @@ export interface ProcedureModalProps {
   stepRemainingSeconds: number;
   totalElapsedSeconds: number;
   unitSystem: 'metric' | 'imperial';
-  language?: 'pl' | 'en';
+  language?: SupportedLanguage;
   onPauseResume: () => void;
   onAdjustTimeSeconds: (deltaSeconds: number) => void;
   onResetCurrentStep: (parsedDurationSeconds: number) => void;

@@ -113,7 +113,7 @@ describe('Interaction Guards S1..S16 (NFR-INT-001..016)', () => {
   });
 
   test('S9: Jednolity słownik pojęć — brak zakazanych synonimów w słowniku polskim', () => {
-    const i18nContent = fs.readFileSync(path.join(root, 'src', 'core', 'i18n.tsx'), 'utf8');
+    const i18nContent = fs.readFileSync(path.join(root, 'locales', 'pl.json'), 'utf8');
     // W napar: 'Receptura' lub 'Przepis' dla brew recipes, 'Ziarno' dla coffee beans
     expect(i18nContent).not.toMatch(/\b(Pestka kawy|Plany treningowe|Plan parzenia)\b/i);
   });

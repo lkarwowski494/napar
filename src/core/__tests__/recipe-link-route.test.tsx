@@ -8,7 +8,7 @@ import renderer, { act } from 'react-test-renderer';
 import * as Clipboard from 'expo-clipboard';
 import RecipeLinkScreen from '../../../app/recipe';
 import { ShareRecipeModal } from '../../components/brew/ShareRecipeModal';
-import { LanguageProvider, detectSystemLanguage, translations } from '../i18n';
+import { LanguageProvider, detectSystemLanguage, getTranslations, translations } from '../i18n';
 import { encodeRecipeToShareUrl, decodeRecipeFromShareUrl } from '../recipe-share';
 import { saveRecipe } from '../database';
 import { SavedRecipe } from '../database-schema';
@@ -36,7 +36,7 @@ jest.mock('../database', () => ({
   getUnitSystem: jest.fn(() => 'metric'),
 }));
 
-const T = translations[detectSystemLanguage()];
+const T = getTranslations(detectSystemLanguage());
 
 const sampleRecipe: SavedRecipe = {
   id: 'rec-source-1',

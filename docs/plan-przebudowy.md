@@ -279,6 +279,20 @@ Zrobione na gałęzi `claude/wykonaj-sl7vii`:
 
 Otwarte: pomiar na urządzeniu (dotyk, VoiceOver, Dynamic Type), tłumaczenia nowych kluczy na 33 pozostałe języki.
 
+## Status etapu 3f — architektura i18n dla 35 języków, bez tłumaczeń (23.10.2026)
+
+Zrobione na gałęzi `claude/wykonaj-sl7vii`:
+- **Źródło kluczy:** `locales/pl.json` (504 klucze, typ `Translations`) i `locales/en.json`. Teksty z `src/core/i18n.tsx` przeniesione bez zmiany znaczenia. Plik zawiera już tylko kod React.
+- **Loader:** `src/core/i18n-loader.ts` (`LANGS`: 35 kodów, wybór języka: ustawienie użytkownika, potem język systemu, potem en; fallback: język docelowy, en, sam klucz z ostrzeżeniem w dev). Adapter języka systemu: `src/platform/system-locale.ts`. Testy 100%: `src/core/__tests__/i18n-loader.test.ts`, `src/core/__tests__/i18n-language-selection.test.tsx`, `src/platform/__tests__/system-locale.test.ts`.
+- **Pliki:** 33 pliki `locales/<kod>.json` są kopiami `en.json` do przetłumaczenia. Usunięto `_source.json` i `scripts/generate-locales.mjs`.
+- **Bramki:** `check:i18n` sprawdza 35 plików względem `pl.json` (klucze, parametry, puste wartości, pliki nadmiarowe, HealthKit, ceny w walucie). `check:matrix` czyta klucze z `locales/pl.json`, bez zmiany liczby elementów.
+
+Otwarte:
+- **RTL** (arabski, hebrajski): brak `I18nManager.forceRTL` w aplikacji. Nie wdrożono w tym etapie.
+- **Ustawienie języka** istnieje tylko w stanie React. Klucz `app_language` jest czytany w `brew-context.tsx`, ale nigdzie nie zapisywany. Picker w Ustawieniach nadal pokazuje PL i EN.
+- **Tłumaczenia** 33 języków: obecnie kopie EN.
+- `src/core/knowledge-data.ts` i kontrakty natywne (`LiveActivityLanguage`, `WatchLanguage`) nadal używają `'pl' | 'en'`.
+
 ## Ostatnie zmiany dokumentacji i cen
 
 - `8e9058a`: README i zasady pracy doprowadzone do stanu z 22.10.2026.

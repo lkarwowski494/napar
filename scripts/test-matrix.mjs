@@ -116,66 +116,37 @@ for (const af of appFiles) {
   });
 }
 
-// Category 2 & 3: UI & TEKST (Translations from i18n AST)
-const i18nFile = join(root, 'src', 'core', 'i18n.tsx');
-if (existsSync(i18nFile)) {
-  const i18nContent = readFileSync(i18nFile, 'utf-8');
-  const sf = ts.createSourceFile(i18nFile, i18nContent, ts.ScriptTarget.Latest, true);
+// Category 2 & 3: UI & TEKST (klucze z locales/pl.json — źródło prawdy tłumaczeń)
+const plMessagesFile = join(root, 'locales', 'pl.json');
+if (existsSync(plMessagesFile)) {
+  const plMessages = JSON.parse(readFileSync(plMessagesFile, 'utf-8'));
 
-  function walkObj(node, prefix = '') {
-    if (ts.isObjectLiteralExpression(node)) {
-      for (const prop of node.properties) {
-        if (ts.isPropertyAssignment(prop) && ts.isIdentifier(prop.name)) {
-          const keyName = prop.name.text;
-          const fullKey = prefix ? `${prefix}.${keyName}` : keyName;
-          if (ts.isObjectLiteralExpression(prop.initializer)) {
-            walkObj(prop.initializer, fullKey);
-          } else {
-            // Leaf translation item
-            const isUi =
-              fullKey.startsWith('common.') ||
-              /save|cancel|delete|edit|close|confirm|back|next|finish|Btn|Button|Action|Tab|Select|Toggle|Filter/i.test(
-                keyName
-              );
-            const category = isUi ? 'UI' : 'TEKST';
-            items.push({
-              category,
-              name: fullKey,
-              file: 'src/core/i18n.tsx',
-              matcher: (code) =>
-                code.includes(keyName) ||
-                code.includes(fullKey) ||
-                code.includes(prefix),
-            });
-          }
-        }
+  function walkMessages(node, prefix = '') {
+    for (const [keyName, value] of Object.entries(node)) {
+      const fullKey = prefix ? `${prefix}.${keyName}` : keyName;
+      if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+        walkMessages(value, fullKey);
+      } else {
+        // Leaf translation item
+        const isUi =
+          fullKey.startsWith('common.') ||
+          /save|cancel|delete|edit|close|confirm|back|next|finish|Btn|Button|Action|Tab|Select|Toggle|Filter/i.test(
+            keyName
+          );
+        items.push({
+          category: isUi ? 'UI' : 'TEKST',
+          name: fullKey,
+          file: 'locales/pl.json',
+          matcher: (code) =>
+            code.includes(keyName) ||
+            code.includes(fullKey) ||
+            code.includes(prefix),
+        });
       }
     }
   }
 
-  function findTranslations(node) {
-    if (
-      ts.isVariableDeclaration(node) &&
-      ts.isIdentifier(node.name) &&
-      node.name.text === 'translations' &&
-      node.initializer &&
-      ts.isObjectLiteralExpression(node.initializer)
-    ) {
-      for (const p of node.initializer.properties) {
-        if (
-          ts.isPropertyAssignment(p) &&
-          ts.isIdentifier(p.name) &&
-          p.name.text === 'pl' &&
-          ts.isObjectLiteralExpression(p.initializer)
-        ) {
-          walkObj(p.initializer);
-        }
-      }
-    }
-    ts.forEachChild(node, findTranslations);
-  }
-
-  findTranslations(sf);
+  walkMessages(plMessages);
 }
 
 // Category 4: LOGIKA (Exported Functions in src/core/)

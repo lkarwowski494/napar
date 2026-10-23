@@ -3,6 +3,7 @@
 // Przekształcenie pasywnych list w Proaktywny Kalendarz i Harmonogram Akcji
 // ============================================================================
 
+import type { SupportedLanguage } from '../../core/i18n';
 import React, { useState, useMemo } from 'react';
 import {
   View,
@@ -25,7 +26,7 @@ import { InventoryItem, BrewSession } from '../../core/database-schema';
 export interface ProactiveCalendarCardProps {
   inventory: InventoryItem[];
   sessions: BrewSession[];
-  language?: 'pl' | 'en';
+  language?: SupportedLanguage;
   referenceDateIso?: string;
   onExecuteAction: (action: ProactiveActionItem) => void;
 }

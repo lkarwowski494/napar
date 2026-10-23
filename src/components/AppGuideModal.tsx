@@ -4,6 +4,7 @@
 // and the 5 Bottom Tabs.
 // ============================================================================
 
+import type { SupportedLanguage } from '../core/i18n';
 import React from 'react';
 import {
   Modal,
@@ -20,7 +21,7 @@ import { CompassIcon } from './icons/CraftIcons';
 export interface AppGuideModalProps {
   visible: boolean;
   onClose: () => void;
-  language?: 'pl' | 'en';
+  language?: SupportedLanguage;
 }
 
 export function AppGuideModal({

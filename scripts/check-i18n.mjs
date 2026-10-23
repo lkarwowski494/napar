@@ -1,207 +1,158 @@
 // ============================================================================
-// Apps4Brew Studio — i18n Verification Gate (check-i18n.mjs)
-// Verifies 100% key symmetry, non-empty values, and param integrity across 35 languages
-// TASK-R09-01: Full verification of _source.json and all 35 locale files
+// Napar (Steepwise) — Bramka i18n (check-i18n.mjs)
+// Źródło prawdy kluczy: locales/pl.json. Sprawdza wszystkie 35 plików w locales/:
+// - dokładnie te 35 plików i zgodność listy z LANGS w src/core/i18n-loader.ts,
+// - te same klucze co pl.json (brak = błąd, nadmiarowe = błąd),
+// - wartości tekstowe, niepuste,
+// - identyczne parametry {nazwa} jak w pl.json,
+// - brak fraz o HealthKit / Apple Health i twardych cen w walucie.
 // ============================================================================
 
 import { fileURLToPath } from 'node:url';
-import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { createRequire } from 'node:module';
-import vm from 'node:vm';
-import babel from '@babel/core';
-
-const require = createRequire(import.meta.url);
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const i18nPath = join(root, 'src/core/i18n.tsx');
 const localesDir = join(root, 'locales');
-const sourceJsonPath = join(localesDir, '_source.json');
+const loaderPath = join(root, 'src', 'core', 'i18n-loader.ts');
+const SOURCE = 'pl';
 
-const code = readFileSync(i18nPath, 'utf8');
-
-const transformed = babel.transformSync(code, {
-  filename: 'i18n.tsx',
-  presets: ['babel-preset-expo'],
-}).code;
-
-const context = {
-  exports: {},
-  module: { exports: {} },
-  require,
-};
-vm.createContext(context);
-vm.runInContext(transformed, context);
-
-const tr = context.exports.translations || context.module.exports.translations;
-if (!tr || !tr.pl || !tr.en) {
-  console.error('Error: translations.pl or translations.en not found in i18n.tsx');
-  process.exit(1);
-}
-
-let totalKeys = 0;
-const missingInEn = [];
-const missingInPl = [];
-const emptyValues = [];
-const badParams = [];
-
-const extractParams = (str) =>
-  [...String(str).matchAll(/\{(\w+)\}/g)]
-    .map((m) => m[1])
-    .sort()
-    .join(',');
-
-function checkSymmetry(plObj, enObj, prefix = '') {
-  const plKeys = Object.keys(plObj);
-  const enKeys = Object.keys(enObj);
-
-  for (const k of plKeys) {
-    const fullPath = prefix ? `${prefix}.${k}` : k;
-    if (!(k in enObj)) {
-      missingInEn.push(fullPath);
-      continue;
-    }
-
-    const plVal = plObj[k];
-    const enVal = enObj[k];
-
-    if (typeof plVal === 'object' && plVal !== null) {
-      if (typeof enVal !== 'object' || enVal === null) {
-        missingInEn.push(`${fullPath} (type mismatch: object vs ${typeof enVal})`);
-      } else {
-        checkSymmetry(plVal, enVal, fullPath);
-      }
-    } else {
-      totalKeys++;
-      if (typeof plVal === 'string' && plVal.trim() === '') {
-        emptyValues.push(`PL: ${fullPath}`);
-      }
-      if (typeof enVal === 'string' && enVal.trim() === '') {
-        emptyValues.push(`EN: ${fullPath}`);
-      }
-
-      const plParams = extractParams(plVal);
-      const enParams = extractParams(enVal);
-      if (plParams !== enParams) {
-        badParams.push(`${fullPath} (PL: {${plParams}} vs EN: {${enParams}})`);
-      }
-    }
-  }
-
-  for (const k of enKeys) {
-    const fullPath = prefix ? `${prefix}.${k}` : k;
-    if (!(k in plObj)) {
-      missingInPl.push(fullPath);
-    }
-  }
-}
-
-// 1. Weryfikacja symetrii PL/EN w kodzie i18n.tsx
-checkSymmetry(tr.pl, tr.en);
-console.log(`[i18n] Zweryfikowano ${totalKeys} kluczy w słownikach PL i EN.`);
-
-// 2. Weryfikacja bazy _source.json
-if (!existsSync(sourceJsonPath)) {
-  console.error('[i18n] Błąd: Brak pliku bazowego locales/_source.json');
-  process.exit(1);
-}
-
-const sourceData = JSON.parse(readFileSync(sourceJsonPath, 'utf8'));
-
-// 3. Weryfikacja 35 słowników językowych w locales/
 const EXPECTED_LOCALES = [
-  'en', 'pl', 'de', 'fr', 'es', 'it', 'pt-BR', 'pt-PT', 'nl', 'sv',
-  'da', 'no', 'fi', 'cs', 'sk', 'hu', 'ro', 'bg', 'el', 'tr',
-  'ru', 'uk', 'ja', 'ko', 'zh-Hans', 'zh-Hant', 'id', 'ms', 'th', 'vi',
-  'ar', 'he', 'hi', 'hr', 'ca',
+  'ar', 'bg', 'ca', 'cs', 'da', 'de', 'el', 'es', 'fi', 'fr', 'he', 'hi', 'hr', 'hu', 'id', 'it',
+  'ja', 'ko', 'ms', 'nl', 'no', 'pl', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sk', 'sv', 'th', 'tr', 'uk',
+  'vi', 'zh-Hans', 'zh-Hant', 'en',
 ];
 
-const localeErrors = [];
-let verifiedLocalesCount = 0;
+const FORBIDDEN = [
+  { re: /apple health|healthkit/i, label: 'fraza o HealthKit / Apple Health' },
+  {
+    re: /(?:[$€£]|USD|EUR|GBP)\s?\d|\d[\d.,]*\s?(?:[$€£]|USD|EUR|GBP|zł|PLN)/,
+    label: 'twarda cena w walucie',
+  },
+];
 
-function validateLocaleRecursive(sourceObj, targetObj, localeCode, prefix = '') {
-  for (const [key, sourceVal] of Object.entries(sourceObj)) {
-    if (key === '_meta') continue;
+const errors = [];
+
+// 1. Zestaw plików i zgodność z LANGS w loaderze
+const loaderSource = readFileSync(loaderPath, 'utf8');
+const langsMatch = loaderSource.match(/export const LANGS = \[([\s\S]*?)\] as const;/);
+if (!langsMatch) {
+  errors.push('Nie znaleziono `export const LANGS = [...] as const` w src/core/i18n-loader.ts');
+} else {
+  const loaderLangs = [...langsMatch[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  if (new Set(loaderLangs).size !== loaderLangs.length) {
+    errors.push('LANGS w src/core/i18n-loader.ts zawiera duplikaty');
+  }
+  for (const code of EXPECTED_LOCALES) {
+    if (!loaderLangs.includes(code)) errors.push(`LANGS nie zawiera języka: ${code}`);
+  }
+  for (const code of loaderLangs) {
+    if (!EXPECTED_LOCALES.includes(code)) errors.push(`LANGS zawiera nieoczekiwany język: ${code}`);
+  }
+}
+
+const filesOnDisk = readdirSync(localesDir)
+  .filter((f) => f.endsWith('.json'))
+  .map((f) => f.slice(0, -'.json'.length))
+  .sort();
+const expectedSorted = [...EXPECTED_LOCALES].sort();
+for (const code of expectedSorted) {
+  if (!filesOnDisk.includes(code)) errors.push(`Brak pliku słownika: locales/${code}.json`);
+}
+for (const name of filesOnDisk) {
+  if (!EXPECTED_LOCALES.includes(name)) errors.push(`Nadmiarowy plik w locales/: ${name}.json`);
+}
+
+// 2. Porównanie kluczy i wartości z pl.json
+const flatten = (node, prefix = '', out = new Map()) => {
+  for (const [key, value] of Object.entries(node)) {
     const path = prefix ? `${prefix}.${key}` : key;
+    if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+      flatten(value, path, out);
+    } else {
+      out.set(path, value);
+    }
+  }
+  return out;
+};
 
-    if (!(key in targetObj)) {
-      localeErrors.push(`[${localeCode}] Brak klucza: ${path}`);
+const paramsOf = (value) =>
+  typeof value === 'string'
+    ? [...value.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join(',')
+    : '';
+
+const loadLocale = (code) => {
+  try {
+    return JSON.parse(readFileSync(join(localesDir, `${code}.json`), 'utf8'));
+  } catch (err) {
+    errors.push(`[${code}] Nieczytelny JSON: ${err.message}`);
+    return null;
+  }
+};
+
+const sourceData = loadLocale(SOURCE);
+const sourceMap = sourceData ? flatten(sourceData) : new Map();
+if (sourceData) {
+  for (const [path, value] of sourceMap) {
+    if (typeof value !== 'string' || value.trim() === '') {
+      errors.push(`[${SOURCE}] Wartość źródłowa musi być niepustym tekstem: ${path}`);
+    }
+  }
+}
+
+let verifiedLocales = 0;
+for (const code of EXPECTED_LOCALES) {
+  if (!filesOnDisk.includes(code)) continue;
+  const data = loadLocale(code);
+  if (!data) continue;
+  verifiedLocales++;
+  const map = flatten(data);
+
+  for (const [path, sourceValue] of sourceMap) {
+    if (!map.has(path)) {
+      errors.push(`[${code}] Brak klucza: ${path}`);
       continue;
     }
+    const value = map.get(path);
+    if (typeof value !== 'string') {
+      errors.push(`[${code}] Wartość nie jest tekstem: ${path}`);
+      continue;
+    }
+    if (value.trim() === '') {
+      errors.push(`[${code}] Pusta wartość: ${path}`);
+      continue;
+    }
+    const wanted = paramsOf(sourceValue);
+    const got = paramsOf(value);
+    if (wanted !== got) {
+      errors.push(`[${code}] Niezgodne parametry dla ${path}: ${SOURCE} {${wanted}} vs {${got}}`);
+    }
+  }
 
-    const targetVal = targetObj[key];
-    if (typeof sourceVal === 'object' && sourceVal !== null && !Array.isArray(sourceVal)) {
-      if (typeof targetVal !== 'object' || targetVal === null) {
-        localeErrors.push(`[${localeCode}] Niezgodność typu dla ${path}: oczekiwano obiektu`);
-      } else {
-        validateLocaleRecursive(sourceVal, targetVal, localeCode, path);
-      }
-    } else {
-      if (typeof targetVal === 'string' && targetVal.trim() === '') {
-        localeErrors.push(`[${localeCode}] Pusta wartość dla ${path}`);
-      }
-      const sParams = extractParams(sourceVal);
-      const tParams = extractParams(targetVal);
-      if (sParams !== tParams) {
-        localeErrors.push(`[${localeCode}] Niezgodne parametry dla ${path}: źródło {${sParams}} vs {${tParams}}`);
-      }
+  for (const path of map.keys()) {
+    if (!sourceMap.has(path)) errors.push(`[${code}] Nadmiarowy klucz: ${path}`);
+  }
+
+  for (const [path, value] of map) {
+    if (typeof value !== 'string') continue;
+    for (const rule of FORBIDDEN) {
+      if (rule.re.test(value)) errors.push(`[${code}] ${rule.label}: ${path}`);
     }
   }
 }
 
-for (const loc of EXPECTED_LOCALES) {
-  const locPath = join(localesDir, `${loc}.json`);
-  if (!existsSync(locPath)) {
-    localeErrors.push(`Brak pliku słownika: locales/${loc}.json`);
-    continue;
-  }
+// 3. Raport
+const keyCount = sourceMap.size;
+console.log(`[i18n] Klucze źródłowe (${SOURCE}.json): ${keyCount}.`);
+console.log(`[i18n] Zweryfikowano ${verifiedLocales} z ${EXPECTED_LOCALES.length} słowników względem ${SOURCE}.json.`);
 
-  const locData = JSON.parse(readFileSync(locPath, 'utf8'));
-  validateLocaleRecursive(sourceData, locData, loc);
-  verifiedLocalesCount++;
-}
-
-console.log(`[i18n] Zweryfikowano ${verifiedLocalesCount} słowników językowych z zachowaniem 100% symetrii parametrów.`);
-
-if (missingInEn.length > 0) {
-  console.error(`[i18n] Brakujące klucze w słowniku EN (${missingInEn.length}):`);
-  missingInEn.forEach((k) => console.error(`  - ${k}`));
-}
-
-if (missingInPl.length > 0) {
-  console.error(`[i18n] Brakujące klucze w słowniku PL (${missingInPl.length}):`);
-  missingInPl.forEach((k) => console.error(`  - ${k}`));
-}
-
-if (emptyValues.length > 0) {
-  console.error(`[i18n] Puste wartości tłumaczeń (${emptyValues.length}):`);
-  emptyValues.forEach((k) => console.error(`  - ${k}`));
-}
-
-if (badParams.length > 0) {
-  console.error(`[i18n] Niezgodne parametry {placeholder} (${badParams.length}):`);
-  badParams.forEach((k) => console.error(`  - ${k}`));
-}
-
-if (localeErrors.length > 0) {
-  console.error(`[i18n] Błędy w macierzy 35 języków (${localeErrors.length}):`);
-  localeErrors.slice(0, 20).forEach((err) => console.error(`  - ${err}`));
-  if (localeErrors.length > 20) {
-    console.error(`  ...oraz ${localeErrors.length - 20} dalszych błędów.`);
-  }
-}
-
-const hasErrors =
-  missingInEn.length > 0 ||
-  missingInPl.length > 0 ||
-  emptyValues.length > 0 ||
-  badParams.length > 0 ||
-  localeErrors.length > 0;
-
-if (hasErrors) {
-  console.error('[i18n] Weryfikacja symetrii nie powiodła się.');
+if (errors.length > 0) {
+  console.error(`[i18n] Błędy (${errors.length}):`);
+  errors.slice(0, 60).forEach((e) => console.error(`  - ${e}`));
+  if (errors.length > 60) console.error(`  ...oraz ${errors.length - 60} dalszych błędów.`);
+  console.error('[i18n] Weryfikacja nie powiodła się.');
   process.exit(1);
-} else {
-  console.log('[i18n] 100% symetrii językowej (35 języków) zachowane bez błędów.');
-  process.exit(0);
 }
+
+console.log(`[i18n] 100% symetrii kluczy i parametrów (${EXPECTED_LOCALES.length} języków) zachowane bez błędów.`);
+process.exit(0);

@@ -3,6 +3,7 @@
 // System notices, crash recovery banners, and golden rules
 // ============================================================================
 
+import type { SupportedLanguage } from '../../core/i18n';
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
@@ -13,7 +14,7 @@ interface BrewBannersProps {
   corruptState: CorruptStateRecovery | null;
   /** Tekst stanu darmowego limitu dni parzenia; null dla Pro (brak banera). */
   freeDaysText: string | null;
-  language: 'pl' | 'en';
+  language: SupportedLanguage;
   onDismissCorrupt: () => void;
 }
 

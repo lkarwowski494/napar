@@ -1,3 +1,4 @@
+import type { SupportedLanguage } from '../../core/i18n';
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { BrewSession } from '../../core/database-schema';
@@ -10,7 +11,7 @@ import { StarIcon } from '../icons/CraftIcons';
 export interface JournalSessionCardProps {
   session: BrewSession;
   unitSystem: 'metric' | 'imperial';
-  language: 'pl' | 'en';
+  language: SupportedLanguage;
   t: any;
   onBrewAgain: (session: BrewSession) => void;
   onShareSession: (session: BrewSession) => void;

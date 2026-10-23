@@ -79,8 +79,8 @@ Poza MVP (bez zmian w liście):
 
 ## Języki
 
-- W aplikacji działają **dwa języki**: polski i angielski (`src/core/i18n.tsx`, typ `SupportedLanguage = 'pl' | 'en'`).
-- Katalog `locales/` zawiera **35 plików** słowników (w tym `_source.json`, `pl`, `en`). Aplikacja z nich nie korzysta. Słowniki nie są zsynchronizowane z `i18n.tsx`.
+- Interfejs obsługuje **35 języków** (`src/core/i18n-loader.ts`, `LANGS`). Wybór: ustawienie użytkownika, potem język systemu, potem angielski. Źródło kluczy: `locales/pl.json`. Ustawienie języka nie jest jeszcze zapisywane między uruchomieniami.
+- Katalog `locales/` zawiera **35 plików** słowników (`pl.json` to źródło kluczy). Pliki poza `pl` i `en` są na razie kopiami `en.json` (do przetłumaczenia). Brakujący klucz: język docelowy, potem `en`, potem sam klucz.
 - Cel MVP to 35 języków (decyzja właściciela). Tłumaczenia pozostałych 33 są zaplanowane, nie zrobione.
 
 ## Model cenowy (M5 S1)
@@ -110,10 +110,10 @@ Poza MVP (bez zmian w liście):
 |---|---|
 | `npm run verify` | kod 0 |
 | Zestawy testów Jest | 128 (wszystkie przeszły) |
-| Testy Jest | 1329 (wszystkie przeszły) |
+| Testy Jest | 1378 (wszystkie przeszły) |
 | Klucze i18n w PL i EN (`check:i18n`) | 504 |
-| Słowniki w `locales/` (`check:i18n`) | 35 (ładowane w aplikacji: 2) |
-| Elementy macierzy testów (`check:matrix`) | 873 z 873 (to wynik macierzy, nie pokrycie kodu) |
+| Słowniki w `locales/` (`check:i18n`) | 35 (ładowane w aplikacji: 35) |
+| Elementy macierzy testów (`check:matrix`) | 883 z 883 (to wynik macierzy, nie pokrycie kodu) |
 | Zależności produkcyjne sprawdzone pod licencje | 24, 0 naruszeń GPL/LGPL |
 | Pliki z długiem w `check:core-imports` | 14 (`scripts/core-imports-allowlist.json`) |
 | Pokrycie, wszystkie pliki (`npm run test:coverage`, kod 0) | instrukcje 96,83%, gałęzie 87,04%, funkcje 95,51%, linie 97,36% |

@@ -63,7 +63,7 @@ Zasady dla testów i progów:
 
 - Brak zakodowanego na sztywno tekstu w widokach. Teksty idą przez `src/core/i18n.tsx`.
 - Każdy nowy klucz ma wartość w PL i w EN. `npm run check:i18n` musi przejść (494 klucze w PL i EN wg pomiaru 22.10.2026).
-- Słowniki w `locales/` (35 plików) nie są ładowane przez aplikację. Ich uzgodnienie z `i18n.tsx` i tłumaczenie na 33 dodatkowe języki to zaplanowany zakres (pozycja 35 MVP), nie bieżący stan.
+- Słowniki w `locales/` (35 plików) ładuje aplikacja przez `src/core/i18n-loader.ts`. `locales/pl.json` jest źródłem kluczy, a `check:i18n` pilnuje zgodności 35 plików. Tłumaczenie 33 języków poza PL i EN (na razie kopie `en.json`) to zaplanowany zakres (pozycja 35 MVP).
 
 ## 8. Zakupy i model dostępu
 
