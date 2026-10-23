@@ -377,5 +377,28 @@ describe('BrewTimerEngine', () => {
       expect(engine.getSnapshot().stepEndAtMs).not.toBe(first);
       engine.destroy();
     });
+
+    test('nextStep na pauzie: po wznowieniu nowy etap odlicza swój czas, nie resztę poprzedniego', () => {
+      const engine = new BrewTimerEngine(testSteps);
+      engine.start();
+      jest.advanceTimersByTime(10_000);
+      engine.pause();
+      engine.nextStep();
+      engine.resume();
+      expect(engine.getSnapshot().stepEndAtMs).toBe(Date.now() + 60_000);
+      engine.destroy();
+    });
+
+    test('previousStep na pauzie: po wznowieniu cofnięty etap odlicza swój czas', () => {
+      const engine = new BrewTimerEngine(testSteps);
+      engine.start();
+      engine.nextStep();
+      jest.advanceTimersByTime(10_000);
+      engine.pause();
+      engine.previousStep();
+      engine.resume();
+      expect(engine.getSnapshot().stepEndAtMs).toBe(Date.now() + 30_000);
+      engine.destroy();
+    });
   });
 });
