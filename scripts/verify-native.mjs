@@ -60,6 +60,35 @@ try {
     );
   }
 
+  // Statyczna walidacja Android (RD-ENG-11 / BRD-QA-REL 1.0)
+  const androidPackage = appJson.android?.package;
+  check(
+    androidPackage === 'pl.lukasz.napar',
+    `Nieprawidłowy android.package: '${androidPackage}' (wymagane 'pl.lukasz.napar')`
+  );
+  const versionCode = appJson.android?.versionCode;
+  check(
+    typeof versionCode === 'number' && Number.isInteger(versionCode) && versionCode >= 1,
+    `Nieprawidłowy android.versionCode: '${versionCode}' (musi być liczbą całkowitą >= 1)`
+  );
+
+  const allowedAndroidPermissions = new Set([
+    'android.permission.CAMERA',
+    'android.permission.VIBRATE',
+    'android.permission.WAKE_LOCK',
+  ]);
+  const declaredAndroidPermissions = appJson.android?.permissions || [];
+  check(
+    Array.isArray(declaredAndroidPermissions),
+    'app.json -> expo.android.permissions musi być tablicą'
+  );
+  for (const perm of declaredAndroidPermissions) {
+    check(
+      allowedAndroidPermissions.has(perm),
+      `app.json zawiera niedozwolone uprawnienie Android: ${perm}`
+    );
+  }
+
   // 1. Weryfikacja binarnego nagłówka PNG ikony App Store (RD-ENG-11)
   const iconPath = join(root, 'assets', 'icon.png');
   check(existsSync(iconPath), 'Brak pliku assets/icon.png');
