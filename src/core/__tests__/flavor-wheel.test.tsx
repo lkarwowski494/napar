@@ -109,6 +109,23 @@ describe('SCA Flavor Wheel Data & Picker Component', () => {
 
     expect(onToggle).toHaveBeenCalledWith('Jaśmin');
   });
+
+  test('Renderuje FlavorWheelPicker w jezyku angielskim', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <FlavorWheelPicker
+          selectedDescriptors={['Bergamotka']}
+          onToggleDescriptor={jest.fn()}
+          language='en'
+        />
+      );
+    });
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Selected notes (1):');
+    expect(str).toContain('Fruity');
+    expect(str).toContain('Citrus');
+  });
 });
 
 function findPressableWithText(root: any, text: string) {

@@ -244,6 +244,7 @@ export function BrewFinishModal({
             <FlavorWheelPicker
               selectedDescriptors={selectedTags}
               onToggleDescriptor={onToggleTag}
+              language={language}
             />
 
             {/* Profil wody użytej do parzenia */}

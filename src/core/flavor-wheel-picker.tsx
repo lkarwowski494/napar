@@ -8,15 +8,18 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SCA_FLAVOR_WHEEL, FlavorCategory } from './flavor-wheel-data';
 import { theme } from './theme';
 
-interface FlavorWheelPickerProps {
+export interface FlavorWheelPickerProps {
   selectedDescriptors: string[];
   onToggleDescriptor: (descriptor: string) => void;
+  language?: 'pl' | 'en';
 }
 
 export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
   selectedDescriptors,
   onToggleDescriptor,
+  language = 'pl',
 }) => {
+  const isEn = language === 'en';
   const [activeCategoryId, setActiveCategoryId] = useState<string>('fruity');
 
   const activeCategory =
@@ -27,7 +30,11 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
       {/* Wybrane nuty (aktywne chipy) */}
       {selectedDescriptors.length > 0 && (
         <View style={styles.selectedRow}>
-          <Text style={styles.selectedLabel}>{`Wybrane nuty (${selectedDescriptors.length}):`}</Text>
+          <Text style={styles.selectedLabel}>
+            {isEn
+              ? `Selected notes (${selectedDescriptors.length}):`
+              : `Wybrane nuty (${selectedDescriptors.length}):`}
+          </Text>
           <View style={styles.selectedChipsContainer}>
             {selectedDescriptors.map((desc) => (
               <Pressable
@@ -51,6 +58,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
       >
         {SCA_FLAVOR_WHEEL.map((cat) => {
           const isActive = cat.id === activeCategoryId;
+          const categoryName = isEn ? cat.nameEn || cat.namePl : cat.namePl;
           return (
             <Pressable
               key={cat.id}
@@ -69,7 +77,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                   isActive && { color: cat.color, fontWeight: '700' },
                 ]}
               >
-                {cat.namePl}
+                {categoryName}
               </Text>
             </Pressable>
           );
@@ -78,40 +86,43 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
 
       {/* Deskryptory wybranej kategorii (Poziom 2 i 3) */}
       <View style={styles.descriptorsContainer}>
-        {activeCategory.subcategories.map((sub) => (
-          <View key={sub.namePl} style={styles.subcategoryBlock}>
-            <Text style={[styles.subcategoryTitle, { color: activeCategory.color }]}>
-              {sub.namePl}
-            </Text>
-            <View style={styles.descriptorsGrid}>
-              {sub.descriptors.map((desc) => {
-                const isSelected = selectedDescriptors.includes(desc);
-                return (
-                  <Pressable
-                    key={desc}
-                    style={[
-                      styles.descriptorChip,
-                      isSelected && {
-                        backgroundColor: activeCategory.color,
-                        borderColor: activeCategory.color,
-                      },
-                    ]}
-                    onPress={() => onToggleDescriptor(desc)}
-                  >
-                    <Text
+        {activeCategory.subcategories.map((sub) => {
+          const subcategoryName = isEn ? sub.nameEn || sub.namePl : sub.namePl;
+          return (
+            <View key={sub.namePl} style={styles.subcategoryBlock}>
+              <Text style={[styles.subcategoryTitle, { color: activeCategory.color }]}>
+                {subcategoryName}
+              </Text>
+              <View style={styles.descriptorsGrid}>
+                {sub.descriptors.map((desc) => {
+                  const isSelected = selectedDescriptors.includes(desc);
+                  return (
+                    <Pressable
+                      key={desc}
                       style={[
-                        styles.descriptorText,
-                        isSelected && styles.descriptorTextSelected,
+                        styles.descriptorChip,
+                        isSelected && {
+                          backgroundColor: activeCategory.color,
+                          borderColor: activeCategory.color,
+                        },
                       ]}
+                      onPress={() => onToggleDescriptor(desc)}
                     >
-                      {desc}
-                    </Text>
-                  </Pressable>
-                );
-              })}
+                      <Text
+                        style={[
+                          styles.descriptorText,
+                          isSelected && styles.descriptorTextSelected,
+                        ]}
+                      >
+                        {desc}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
       </View>
     </View>
   );
