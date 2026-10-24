@@ -126,9 +126,9 @@ CREATE TABLE IF NOT EXISTS recipes (
 
 CREATE TABLE IF NOT EXISTS brew_sessions (
   id TEXT PRIMARY KEY NOT NULL,
-  recipe_id TEXT,
+  recipe_id TEXT REFERENCES recipes(id) ON DELETE SET NULL,
   recipe_name TEXT,
-  inventory_item_id TEXT,
+  inventory_item_id TEXT REFERENCES inventory_items(id) ON DELETE SET NULL,
   inventory_item_name TEXT,
   beverage_type TEXT NOT NULL,
   method TEXT NOT NULL,
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS brew_sessions (
 
 CREATE TABLE IF NOT EXISTS caffeine_logs (
   id TEXT PRIMARY KEY NOT NULL,
-  brew_session_id TEXT,
+  brew_session_id TEXT REFERENCES brew_sessions(id) ON DELETE CASCADE,
   beverage_name TEXT NOT NULL,
   beverage_type TEXT NOT NULL,
   consumed_at TEXT NOT NULL,

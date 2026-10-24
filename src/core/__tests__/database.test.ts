@@ -205,7 +205,7 @@ describe('Napar SQLite Database & Repositories', () => {
     const initialCreatedAt = first.createdAt;
 
     // Oznacz jako ulubiony
-    toggleRecipeFavorite(first.id, true);
+    updateRecipeFavorite(first.id, true);
     expect(getRecipeById(first.id)?.isFavorite).toBe(true);
 
     // Ponowny seeding (symulacja aktualizacji aplikacji)

@@ -570,13 +570,17 @@ export function saveBrewSession(session: BrewSession): void {
  */
 export function recordBrewSessionTransaction(
   session: BrewSession,
-  inventoryDeduction?: { itemId: string; doseGrams: number }
+  inventoryDeduction?: { itemId: string; doseGrams: number },
+  caffeineLog?: CaffeineLog
 ): void {
   const db = getDatabase();
   const executeOperation = () => {
     saveBrewSession(session);
     if (inventoryDeduction && inventoryDeduction.itemId && inventoryDeduction.doseGrams > 0) {
       deductInventoryWeight(inventoryDeduction.itemId, inventoryDeduction.doseGrams);
+    }
+    if (caffeineLog) {
+      logCaffeine(caffeineLog);
     }
   };
 
@@ -597,6 +601,7 @@ export function recordBrewSessionTransaction(
 
 export function deleteBrewSession(id: string): void {
   const db = getDatabase();
+  db.runSync('DELETE FROM caffeine_logs WHERE brew_session_id = ?', [id]);
   db.runSync('DELETE FROM brew_sessions WHERE id = ?', [id]);
 }
 

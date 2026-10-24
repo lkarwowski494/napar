@@ -225,9 +225,7 @@ describe('BrewContext & BrewProvider', () => {
   });
 
   test('finishAndSaveSession zapisuje sesję kawową, liczy EY% i odlicza stan ze spiżarni', () => {
-    const saveSessionSpy = jest.spyOn(databaseModule, 'saveBrewSession').mockImplementation(jest.fn());
-    const deductSpy = jest.spyOn(databaseModule, 'deductInventoryWeight').mockImplementation(jest.fn());
-    const logCaffeineSpy = jest.spyOn(databaseModule, 'logCaffeine').mockImplementation(jest.fn());
+    const txSpy = jest.spyOn(databaseModule, 'recordBrewSessionTransaction').mockImplementation(jest.fn());
 
     let brewData: any;
     const Consumer = () => {
@@ -273,17 +271,19 @@ describe('BrewContext & BrewProvider', () => {
     expect(savedSession.rating).toBe(5);
     expect(savedSession.inventoryItemId).toBe('inv-item-1');
     expect(savedSession.tdsPercentage).toBe(1.4);
-    expect(savedSession.extractionYieldPercentage).toBeGreaterThan(0);
+    expect(savedSession.extractionYieldPercentage).toBeGreaterThanOrEqual(18);
+    expect(savedSession.extractionYieldPercentage).toBeLessThanOrEqual(22);
     expect(savedSession.caffeineContentMg).toBeGreaterThan(0);
 
-    expect(saveSessionSpy).toHaveBeenCalled();
-    expect(deductSpy).toHaveBeenCalledWith('inv-item-1', brewData.doseGrams);
-    expect(logCaffeineSpy).toHaveBeenCalled();
+    expect(txSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ id: savedSession.id }),
+      { itemId: 'inv-item-1', doseGrams: brewData.doseGrams },
+      expect.objectContaining({ brewSessionId: savedSession.id })
+    );
   });
 
   test('finishAndSaveSession dla herbaty poprawnie szacuje kofeinę i obsługuje wyłączony log kofeiny', () => {
-    const saveSessionSpy = jest.spyOn(databaseModule, 'saveBrewSession').mockImplementation(jest.fn());
-    const logCaffeineSpy = jest.spyOn(databaseModule, 'logCaffeine').mockImplementation(jest.fn());
+    const txSpy = jest.spyOn(databaseModule, 'recordBrewSessionTransaction').mockImplementation(jest.fn());
 
     const teaRecipe = MASTER_RECIPES.find((r) => r.type === 'TEA')!;
 
@@ -317,8 +317,11 @@ describe('BrewContext & BrewProvider', () => {
     expect(savedSession.beverageType).toBe('TEA');
     expect(savedSession.caffeineContentMg).toBeGreaterThan(0);
     expect(savedSession.extractionYieldPercentage).toBeUndefined();
-    expect(saveSessionSpy).toHaveBeenCalled();
-    expect(logCaffeineSpy).not.toHaveBeenCalled();
+    expect(txSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ id: savedSession.id }),
+      undefined,
+      undefined
+    );
   });
 
   test('VoiceOver / Audio Announcements są wywoływane podczas przebiegu timera', () => {

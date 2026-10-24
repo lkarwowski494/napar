@@ -12,6 +12,7 @@ import {
   saveBrewSession,
   logCaffeine,
   deductInventoryWeight,
+  recordBrewSessionTransaction,
   deductBeansForBrew,
   getInventoryItems,
   getRecipes,
@@ -28,6 +29,7 @@ import {
 import { autoBackup } from './backup';
 import {
   calculateExtractionYield,
+  calculateLiquidYield,
   estimateCoffeeCaffeineMg,
   estimateTeaInfusionCaffeineMg,
 } from './domain-rules';
@@ -292,7 +294,11 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let eyPercent: number | undefined;
     if (data.tdsPercentage && data.tdsPercentage > 0) {
       try {
-        const ey = calculateExtractionYield(waterGrams, doseGrams, data.tdsPercentage);
+        const beverageWeightGrams =
+          bevType === 'COFFEE' && method !== 'espresso'
+            ? calculateLiquidYield(waterGrams, doseGrams)
+            : waterGrams;
+        const ey = calculateExtractionYield(beverageWeightGrams, data.tdsPercentage, doseGrams);
         eyPercent = ey.extractionYieldPercent;
       } catch {
         // Pomijamy jeśli błędne dane wejściowe
@@ -331,12 +337,25 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       brewedAt: nowIso,
     };
 
-    saveBrewSession(session);
+    const caffeineLog: CaffeineLog | undefined =
+      data.logToCaffeineTracker !== false && caffeineMg
+        ? {
+            id: `caff-${Date.now()}`,
+            brewSessionId: sessionId,
+            beverageName: selectedInventoryItem?.name || recipe.name,
+            beverageType: bevType === 'COFFEE' ? 'coffee' : 'tea',
+            consumedAt: nowIso,
+            doseGrams,
+            caffeineMg,
+          }
+        : undefined;
 
-    // Automatyczne odjęcie zużytej porcji ze spiżarni (Zadanie N3)
-    if (selectedInventoryItem?.id) {
-      deductInventoryWeight(selectedInventoryItem.id, doseGrams);
-    }
+    const inventoryDeduction =
+      selectedInventoryItem?.id && doseGrams > 0
+        ? { itemId: selectedInventoryItem.id, doseGrams }
+        : undefined;
+
+    recordBrewSessionTransaction(session, inventoryDeduction, caffeineLog);
 
     // Apps4Brew SEC-09: Automatyczna rotacja 10 kopii JSON w tle (Zadanie N5)
     try {
@@ -350,27 +369,13 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Ignoruj błędy kopii zapasowej w tle
     }
 
-    // Zapis w rejestrze kofeiny
-    if (data.logToCaffeineTracker !== false && caffeineMg) {
-      const caffeineLog: CaffeineLog = {
-        id: `caff-${Date.now()}`,
-        brewSessionId: sessionId,
-        beverageName: selectedInventoryItem?.name || recipe.name,
-        beverageType: bevType === 'COFFEE' ? 'coffee' : 'tea',
+    // BR-KOF-002: Apple HealthKit sync
+    if (caffeineLog && getHealthKitSyncEnabled()) {
+      saveDietaryCaffeineSample({
+        caffeineMg: caffeineLog.caffeineMg,
         consumedAt: nowIso,
-        doseGrams,
-        caffeineMg,
-      };
-      logCaffeine(caffeineLog);
-
-      // BR-KOF-002: Apple HealthKit sync
-      if (getHealthKitSyncEnabled()) {
-        saveDietaryCaffeineSample({
-          caffeineMg,
-          consumedAt: nowIso,
-          beverageName: selectedInventoryItem?.name || recipe.name,
-        }).catch(() => {});
-      }
+        beverageName: caffeineLog.beverageName,
+      }).catch(() => {});
     }
 
     return session;
