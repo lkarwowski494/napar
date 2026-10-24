@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../core/i18n';
 import {
   View,
   Text,
@@ -39,6 +40,8 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
   beveragePreference,
   onUseTemplate,
 }) => {
+  const { language } = useTranslation();
+  const isEn = language === 'en';
   const [compendiumTab, setCompendiumTab] = useState<'varieties' | 'processes' | 'origins' | 'tea'>(() => {
     return beveragePreference === 'tea' ? 'tea' : 'varieties';
   });
@@ -141,8 +144,8 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 </View>
                 <Text style={styles.compCardSub}>Pochodzenie: {v.nativeRegion}</Text>
                 <Text style={styles.compCardLineage}>Rodowód: {v.geneticLineage}</Text>
-                <Text style={styles.compCardSensory}>{v.sensoryProfilePl}</Text>
-                <Text style={styles.compCardDesc}>{v.descriptionPl}</Text>
+                <Text style={styles.compCardSensory}>{(isEn && v.sensoryProfileEn) ? v.sensoryProfileEn : v.sensoryProfilePl}</Text>
+                <Text style={styles.compCardDesc}>{(isEn && v.descriptionEn) ? v.descriptionEn : v.descriptionPl}</Text>
 
                 <View style={styles.badgesRow}>
                   <View style={styles.badgePill}><Text style={styles.badgeText}>Kwasowość: {v.cupCharacteristics.acidity}</Text></View>
@@ -180,8 +183,8 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                   <Text style={styles.compCardTag}>Suszenie: {p.dryingDurationDays}</Text>
                 </View>
                 <Text style={styles.compCardSub}>Zużycie wody: {p.waterConsumption}</Text>
-                <Text style={styles.compCardSensory}>{p.sensoryImpactPl}</Text>
-                <Text style={styles.compCardDesc}>{p.descriptionPl}</Text>
+                <Text style={styles.compCardSensory}>{(isEn && p.sensoryImpactEn) ? p.sensoryImpactEn : p.sensoryImpactPl}</Text>
+                <Text style={styles.compCardDesc}>{(isEn && p.descriptionEn) ? p.descriptionEn : p.descriptionPl}</Text>
 
                 <View style={styles.notesTagsRow}>
                   {p.keyNotesPl.map((n, i) => (
@@ -200,8 +203,8 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 </View>
                 <Text style={styles.compCardSub}>Główne regiony: {o.primaryRegions.join(', ')}</Text>
                 <Text style={styles.compCardLineage}>Zbiory: {o.harvestMonths} · Odmiany: {o.mainVarieties.join(', ')}</Text>
-                <Text style={styles.compCardSensory}>{o.flavorProfilePl}</Text>
-                <Text style={styles.compCardDesc}>{o.descriptionPl}</Text>
+                <Text style={styles.compCardSensory}>{(isEn && o.flavorProfileEn) ? o.flavorProfileEn : o.flavorProfilePl}</Text>
+                <Text style={styles.compCardDesc}>{(isEn && o.descriptionEn) ? o.descriptionEn : o.descriptionPl}</Text>
 
                 <Pressable
                   style={styles.compUseBtn}
@@ -228,7 +231,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 </View>
                 <Text style={styles.compCardSub}>Temperatura parzenia: {t.waterTemperatureCelsius}°C</Text>
                 <Text style={styles.compCardLineage}>Metoda Sha Qing: {t.killGreenMethod}</Text>
-                <Text style={styles.compCardSensory}>{t.sensoryProfilePl}</Text>
+                <Text style={styles.compCardSensory}>{(isEn && t.sensoryProfileEn) ? t.sensoryProfileEn : t.sensoryProfilePl}</Text>
                 <Text style={styles.compCardDesc}>Słynne odmiany: {t.famousVarietiesPl.join(', ')}</Text>
                 <Text style={styles.compCardHealth}>{t.healthAttributesPl}</Text>
 

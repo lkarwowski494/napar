@@ -32,7 +32,8 @@ export function BrewActiveFocusTimer({
   onAdjustStepDuration,
   onFinish,
 }: BrewActiveFocusTimerProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const isEn = language === 'en';
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -54,9 +55,9 @@ export function BrewActiveFocusTimer({
         ]}
         accessible={true}
         accessibilityRole="timer"
-        accessibilityLabel={`Całkowity czas: ${formatTime(snapshot.totalElapsedSeconds)}`}
+        accessibilityLabel={`${t.brew.totalTimeAccessibility || 'Całkowity czas'}: ${formatTime(snapshot.totalElapsedSeconds)}`}
       >
-        <Text style={styles.timerTotalLabel}>CAŁKOWITY CZAS</Text>
+        <Text style={styles.timerTotalLabel}>{t.brew.totalTimeLabel || 'CAŁKOWITY CZAS'}</Text>
         <Text style={styles.timerDisplay}>
           {formatTime(snapshot.totalElapsedSeconds)}
         </Text>
@@ -77,11 +78,24 @@ export function BrewActiveFocusTimer({
             style={styles.activeStepBox}
             accessible={true}
             accessibilityLiveRegion="assertive"
-            accessibilityLabel={`Krok ${snapshot.currentStepIndex + 1} z ${snapshot.totalSteps}: ${snapshot.currentStep.namePl}. Cel wody: ${snapshot.targetWaterGrams} gramów, pozostało ${snapshot.stepRemainingSeconds} sekund.`}
+            accessibilityLabel={
+              t.brew.stepAccessibility
+                ? t.brew.stepAccessibility
+                    .replace('{current}', String(snapshot.currentStepIndex + 1))
+                    .replace('{total}', String(snapshot.totalSteps))
+                    .replace('{stepName}', (isEn && snapshot.currentStep?.nameEn) ? snapshot.currentStep.nameEn : snapshot.currentStep?.namePl)
+                    .replace('{water}', String(snapshot.targetWaterGrams))
+                    .replace('{seconds}', String(snapshot.stepRemainingSeconds))
+                : `Krok ${snapshot.currentStepIndex + 1} z ${snapshot.totalSteps}`
+            }
           >
             <View style={styles.stepHeaderRow}>
               <Text style={styles.stepBadge}>
-                {`Krok ${snapshot.currentStepIndex + 1} z ${snapshot.totalSteps}`}
+                {t.brew.stepBadge
+                  ? t.brew.stepBadge
+                      .replace('{current}', String(snapshot.currentStepIndex + 1))
+                      .replace('{total}', String(snapshot.totalSteps))
+                  : `Krok ${snapshot.currentStepIndex + 1} z ${snapshot.totalSteps}`}
               </Text>
               <View style={styles.countdownAdjustRow}>
                 {(isRunning || isPaused) && (
@@ -90,7 +104,7 @@ export function BrewActiveFocusTimer({
                     onPress={() => onAdjustStepDuration(-10)}
                     hitSlop={8}
                     accessibilityRole="button"
-                    accessibilityLabel="Odejmij 10 sekund"
+                    accessibilityLabel={t.brew.subTime10Accessibility || 'Odejmij 10 sekund'}
                   >
                     <Text style={styles.timeAdjustPillText}>{t.brew.subTime10}</Text>
                   </Pressable>
@@ -104,7 +118,7 @@ export function BrewActiveFocusTimer({
                     onPress={() => onAdjustStepDuration(10)}
                     hitSlop={8}
                     accessibilityRole="button"
-                    accessibilityLabel="Dodaj 10 sekund"
+                    accessibilityLabel={t.brew.addTime10Accessibility || 'Dodaj 10 sekund'}
                   >
                     <Text style={styles.timeAdjustPillText}>{t.brew.addTime10}</Text>
                   </Pressable>
@@ -114,11 +128,11 @@ export function BrewActiveFocusTimer({
 
             <View style={styles.heroTargetContainer}>
               <Text style={styles.heroTargetText}>
-                {`Zalej do: ${snapshot.targetWaterGrams} g`}
+                {`${t.brew.pourUpTo || "Zalej do"}: ${snapshot.targetWaterGrams} g`}
               </Text>
               <View style={styles.heroTargetSubRow}>
                 <Text style={styles.heroTargetSubText}>
-                  {snapshot.currentStep.namePl}
+                  {(isEn && snapshot.currentStep.nameEn) ? snapshot.currentStep.nameEn : snapshot.currentStep.namePl}
                 </Text>
                 {snapshot.recommendedPourRate > 0 && (
                   <Text style={styles.pourRateBadge}>
@@ -129,7 +143,7 @@ export function BrewActiveFocusTimer({
             </View>
 
             <Text style={styles.stepInstruction}>
-              {snapshot.currentStep.instructionPl}
+              {(isEn && snapshot.currentStep.instructionEn) ? snapshot.currentStep.instructionEn : snapshot.currentStep.instructionPl}
             </Text>
           </View>
         )}
@@ -142,11 +156,11 @@ export function BrewActiveFocusTimer({
             style={styles.mainStartButton}
             onPress={onStart}
             accessibilityRole="button"
-            accessibilityLabel="Rozpocznij parzenie"
-            accessibilityHint="Uruchamia stoper i pierwszy etap parzenia"
+            accessibilityLabel={t.brew.startBrewAccessibility || 'Rozpocznij parzenie'}
+            accessibilityHint={t.brew.startBrewHint || 'Uruchamia stoper i pierwszy etap parzenia'}
             testID="start-brew-btn"
           >
-            <Text style={styles.mainStartButtonText}>ROZPOCZNIJ PARZENIE</Text>
+            <Text style={styles.mainStartButtonText}>{t.brew.startBrewBtn || 'ROZPOCZNIJ PARZENIE'}</Text>
           </Pressable>
         )}
 
@@ -157,20 +171,20 @@ export function BrewActiveFocusTimer({
               onPress={onPreviousStep}
               disabled={snapshot.currentStepIndex === 0}
               accessibilityRole="button"
-              accessibilityLabel="Poprzedni krok"
-              accessibilityHint="Cofa do poprzedniego etapu parzenia"
+              accessibilityLabel={t.brew.previousStepAccessibility || 'Poprzedni krok'}
+              accessibilityHint={t.brew.previousStepHint || 'Cofa do poprzedniego etapu parzenia'}
             >
-              <Text style={styles.secondaryButtonText}>◀ Wstecz</Text>
+              <Text style={styles.secondaryButtonText}>{t.brew.previousStepBtn || '◀ Wstecz'}</Text>
             </Pressable>
 
             <Pressable
               style={styles.pauseButton}
               onPress={onPause}
               accessibilityRole="button"
-              accessibilityLabel="Wstrzymaj parzenie"
-              accessibilityHint="Zatrzymuje odliczanie czasu"
+              accessibilityLabel={t.brew.pauseBrewAccessibility || 'Wstrzymaj parzenie'}
+              accessibilityHint={t.brew.pauseBrewHint || 'Zatrzymuje odliczanie czasu'}
             >
-              <Text style={styles.pauseButtonText}>PAUZA</Text>
+              <Text style={styles.pauseButtonText}>{t.brew.pauseBrewBtn || 'PAUZA'}</Text>
             </Pressable>
 
             <Pressable
@@ -178,16 +192,18 @@ export function BrewActiveFocusTimer({
               onPress={onNextStep}
               accessibilityRole="button"
               accessibilityLabel={
-                snapshot.isLastStep ? 'Zakończ parzenie' : 'Następny krok'
+                snapshot.isLastStep
+                  ? (t.brew.finishBrewAccessibility || 'Zakończ parzenie')
+                  : (t.brew.nextStepAccessibility || 'Następny krok')
               }
               accessibilityHint={
                 snapshot.isLastStep
-                  ? 'Kończy parzenie i otwiera arkusz oceny'
-                  : 'Przechodzi do kolejnego etapu zalewania'
+                  ? (t.brew.finishBrewHint || 'Kończy parzenie i otwiera arkusz oceny')
+                  : (t.brew.nextStepHint || 'Przechodzi do kolejnego etapu zalewania')
               }
             >
               <Text style={styles.nextButtonText}>
-                {snapshot.isLastStep ? 'Zakończ ▶' : 'Dalej ▶'}
+                {snapshot.isLastStep ? (t.brew.finishBrewBtn || 'Zakończ ▶') : (t.brew.nextStepBtn || 'Dalej ▶')}
               </Text>
             </Pressable>
           </>
@@ -199,30 +215,30 @@ export function BrewActiveFocusTimer({
               style={styles.resetButton}
               onPress={onReset}
               accessibilityRole="button"
-              accessibilityLabel="Zresetuj stoper"
-              accessibilityHint="Zeruje czas i wraca do stanu początkowego"
+              accessibilityLabel={t.brew.resetTimerAccessibility || 'Zresetuj stoper'}
+              accessibilityHint={t.brew.resetTimerHint || 'Zeruje czas i wraca do stanu początkowego'}
             >
-              <Text style={styles.resetButtonText}>Reset</Text>
+              <Text style={styles.resetButtonText}>{t.brew.resetBrew || 'Reset'}</Text>
             </Pressable>
 
             <Pressable
               style={styles.mainStartButton}
               onPress={onResume}
               accessibilityRole="button"
-              accessibilityLabel="Wznów parzenie"
-              accessibilityHint="Wznawia odliczanie czasu parzenia"
+              accessibilityLabel={t.brew.resumeBrewAccessibility || 'Wznów parzenie'}
+              accessibilityHint={t.brew.resumeBrewHint || 'Wznawia odliczanie czasu parzenia'}
             >
-              <Text style={styles.mainStartButtonText}>WZNÓW</Text>
+              <Text style={styles.mainStartButtonText}>{t.brew.resumeBrew || 'WZNÓW'}</Text>
             </Pressable>
 
             <Pressable
               style={styles.secondaryButton}
               onPress={onFinish}
               accessibilityRole="button"
-              accessibilityLabel="Zapisz sesję"
-              accessibilityHint="Otwiera arkusz degustacyjny do zapisu notatek"
+              accessibilityLabel={t.brew.saveSessionAccessibility || 'Zapisz sesję'}
+              accessibilityHint={t.brew.saveSessionHint || 'Otwiera arkusz degustacyjny do zapisu notatek'}
             >
-              <Text style={styles.secondaryButtonText}>Zapisz</Text>
+              <Text style={styles.secondaryButtonText}>{t.brew.saveSessionBtn || 'Zapisz'}</Text>
             </Pressable>
           </>
         )}
