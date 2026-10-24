@@ -30,6 +30,8 @@ export function JournalSessionCard({
   formatDateTime,
   formatSeconds,
 }: JournalSessionCardProps) {
+  const isEn = language === 'en';
+
   return (
     <View style={styles.sessionCard}>
       <View style={styles.cardHeader}>
@@ -39,8 +41,8 @@ export function JournalSessionCard({
           </Text>
           <Text style={styles.beanTitle}>
             {session.inventoryItemName
-              ? `Ziarna: ${session.inventoryItemName}`
-              : `${session.beverageType === 'COFFEE' ? 'Kawa' : 'Herbata'} · ${session.method}`}
+              ? `${isEn ? 'Beans' : 'Ziarna'}: ${session.inventoryItemName}`
+              : `${session.beverageType === 'COFFEE' ? (isEn ? 'Coffee' : 'Kawa') : (isEn ? 'Tea' : 'Herbata')} · ${session.method}`}
           </Text>
         </View>
 
@@ -55,11 +57,11 @@ export function JournalSessionCard({
       {/* Metryki parzenia */}
       <View style={styles.metricsRow}>
         <View style={styles.metricItem}>
-          <Text style={styles.metricLabel}>CZAS</Text>
+          <Text style={styles.metricLabel}>{isEn ? 'TIME' : 'CZAS'}</Text>
           <Text style={styles.metricVal}>{formatSeconds(session.totalTimeSeconds)}</Text>
         </View>
         <View style={styles.metricItem}>
-          <Text style={styles.metricLabel}>DOZA / WODA</Text>
+          <Text style={styles.metricLabel}>{isEn ? 'DOSE / WATER' : 'DOZA / WODA'}</Text>
           <Text style={styles.metricVal}>
             {formatDoseWeight(session.doseGrams, unitSystem)} / {formatWaterWeight(session.waterGrams, unitSystem)}
           </Text>
@@ -70,7 +72,7 @@ export function JournalSessionCard({
         </View>
         {session.caffeineContentMg && (
           <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>KOFEINA</Text>
+            <Text style={styles.metricLabel}>{isEn ? 'CAFFEINE' : 'KOFEINA'}</Text>
             <Text style={styles.metricValHighlight}>
               ~{Math.round(session.caffeineContentMg)} mg
             </Text>
@@ -97,11 +99,11 @@ export function JournalSessionCard({
           >
             <Text style={styles.balanceText}>
               {session.tasteBalance === 'balanced'
-                ? 'Zbalansowana'
+                ? (isEn ? 'Balanced' : 'Zbalansowana')
                 : session.tasteBalance === 'sour'
-                ? 'Za kwaśna'
+                ? (isEn ? 'Too sour' : 'Za kwaśna')
                 : session.tasteBalance === 'bitter'
-                ? 'Za gorzka'
+                ? (isEn ? 'Too bitter' : 'Za gorzka')
                 : session.tasteBalance}
             </Text>
           </View>
@@ -152,6 +154,7 @@ export function JournalSessionCard({
             testID={`brew-again-btn-${session.id}`}
             style={styles.cardActionBtn}
             onPress={() => onBrewAgain(session)}
+            hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
             accessibilityRole="button"
             accessibilityLabel={`${t.journal.brewAgain}: ${session.recipeName || session.method}`}
           >
@@ -162,6 +165,7 @@ export function JournalSessionCard({
             testID={`share-session-btn-${session.id}`}
             style={[styles.cardActionBtn, styles.cardActionBtnSecondary]}
             onPress={() => onShareSession(session)}
+            hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
             accessibilityRole="button"
             accessibilityLabel={`${t.journal.shareSession}: ${session.recipeName || session.method}`}
           >
@@ -171,11 +175,11 @@ export function JournalSessionCard({
           <Pressable
             testID={`delete-session-btn-${session.id}`}
             onPress={() => onDelete(session)}
-            hitSlop={10}
+            hitSlop={{ top: 10, bottom: 10, left: 8, right: 8 }}
             accessibilityRole="button"
-            accessibilityLabel={`Usuń sesję: ${session.recipeName || session.method}`}
+            accessibilityLabel={`${isEn ? 'Delete session' : 'Usuń sesję'}: ${session.recipeName || session.method}`}
           >
-            <Text style={styles.deleteText}>Usuń</Text>
+            <Text style={styles.deleteText}>{isEn ? 'Delete' : 'Usuń'}</Text>
           </Pressable>
         </View>
       </View>
@@ -324,8 +328,10 @@ const styles = StyleSheet.create({
   },
   cardActionBtn: {
     backgroundColor: theme.colors.copperMuted,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    minHeight: 36,
+    justifyContent: 'center',
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
     borderColor: theme.colors.copper,

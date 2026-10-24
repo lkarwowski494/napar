@@ -138,5 +138,13 @@ describe('JournalSessionCard Component', () => {
     });
 
     expect(tree!.toJSON()).toBeDefined();
+    const str = JSON.stringify(tree!.toJSON());
+    expect(str).toContain('Delete');
+    expect(str).toContain('TIME');
+    expect(str).toContain('DOSE / WATER');
+
+    const root = tree!.root;
+    const brewBtn = root.findByProps({ testID: 'brew-again-btn-session-no-beans' });
+    expect(brewBtn.props.hitSlop).toBeDefined();
   });
 });
