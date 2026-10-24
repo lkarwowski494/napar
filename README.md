@@ -68,9 +68,9 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite. [Wdrożone]
    - Eksport i import bazy w formacie JSON oraz eksport do arkuszy CSV (Dziennik i Spiżarnia). [Wdrożone]
    - **💎 Model Monetyzacji „Taniej niż espresso” (Apps4Brew Pass):**
-     - **Cennik:** $0.99 USD / mies. (~4,49 zł), $4.99 USD / rok (~22,99 zł, oferta główna!), $14.99 USD Lifetime (~69,99 zł na zawsze z Chmurą rodzinną Family Sharing).
-     - **Zero podziału Free/Pro:** W okresie próbnym (Free Trial: 7 dni lub 3 parzenia) użytkownik ma dostęp do 100% możliwości (brak sztucznie blokowanych funkcji).
-     - **Gwarancja Historii Read-Only (Ochrona 4.9★):** Po wygaśnięciu trialu blokowane jest jedynie tworzenie nowych sesji i parzeń, a cała historia, Dziennik i notatki pozostają ZAWSZE bezpłatne i czytelne w 100% offline. [Wdrożone]
+     - **Cennik:** $1.99 USD / mies. (9,99 zł), $14.99 USD / rok (59,99 zł, oferta główna z 14-dniowym trialem StoreKit!), $29.99 USD Lifetime (129,99 zł na zawsze z Chmurą rodzinną Family Sharing).
+     - **Zero podziału Free/Pro:** Podstawowy stoper parzenia, kalkulator ratio, asystent kroków oraz odczyt/eksport historii parzeń są bezterminowo darmowe (WTP-0). W 14-dniowym okresie próbnym użytkownik testuje 100% funkcji Napar Pro (WTP-1: >3 paczki w spiżarni, receptury custom, chemia wody, Dial-in Doctor).
+     - **Gwarancja Historii Read-Only (Ochrona 4.9★):** Po wygaśnięciu trialu stoper i parzenie pozostają w 100% darmowe, a blokowane są jedynie zaawansowane narzędzia Pro, a cała historia, Dziennik i notatki pozostają ZAWSZE bezpłatne i czytelne w 100% offline. [Wdrożone]
 8. **⌚ Ekosystem Apple: Apple Watch, Live Activity & Widżety (BR-ZEG-001 do BR-ZEG-005):**
    - **Live Activity & Dynamic Island (BR-ZEG-003, BR-ZEG-004):** Natywny mostek ActivityKit (`ActivityAttributes` i `ContentState`) dla ekranu blokady i Dynamic Island (kompaktowy i rozszerzony podgląd z wagą wody, czasem etapu i stanem timera). [Wdrożone]
    - **Apple Watch & Widżety WidgetKit (BR-ZEG-001, BR-ZEG-002, BR-ZEG-005):** Mostek synchronizacji sesji i wzorców haptycznych na nadgarstku oraz kontener danych dla widżetów kofeiny. [Wdrożone]

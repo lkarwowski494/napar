@@ -45,7 +45,14 @@ jest.mock('expo-sqlite', () => ({
 describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
   beforeEach(() => {
     mockSettings.clear();
+    const { clearAccessListenersForTesting } = require('../app-access');
+    clearAccessListenersForTesting();
     resetTrialForTesting();
+  });
+
+  afterEach(() => {
+    const { clearAccessListenersForTesting } = require('../app-access');
+    clearAccessListenersForTesting();
   });
 
   test('Początkowy stan aplikacji: aktywny trial z pełnym dostępem (100% funkcji)', () => {

@@ -1,3 +1,4 @@
+import * as Linking from 'expo-linking';
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
@@ -58,14 +59,20 @@ export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
         <Pressable
           testID="open-apps4brew-pass-btn"
           style={styles.passCtaBtn}
-          onPress={onOpenPassModal}
+          onPress={() => {
+          if (isSubscribed) {
+            void Linking.openURL('https://apps.apple.com/account/subscriptions');
+          } else {
+            onOpenPassModal();
+          }
+        }}
           accessibilityRole="button"
-          accessibilityLabel={isSubscribed ? 'Apps4Brew Pass: Aktywny' : 'Odblokuj Apps4Brew Pass ($0.99 / $4.99 / $14.99)'}
+          accessibilityLabel={isSubscribed ? 'Apps4Brew Pass: Aktywny — Zarządzaj Subskrypcją' : 'Odblokuj Apps4Brew Pass ($1.99 / $14.99 / $29.99)'}
         >
           <Text style={styles.passCtaBtnText}>
             {isSubscribed
               ? 'Licencja Aktywna — Zarządzaj Planem'
-              : 'Przejdź do planów ($0.99 / $4.99 / $14.99)'}
+              : 'Przejdź do planów ($1.99 / $14.99 / $29.99)'}
           </Text>
         </Pressable>
       </View>

@@ -282,10 +282,6 @@ export function useBrewWorkflow() {
   }, [doseGrams, waterGrams]);
 
   const handleStartTimer = () => {
-    if (!canCreate) {
-      setShowPaywallModal(true);
-      return;
-    }
     if (
       selectedInventoryItem &&
       selectedInventoryItem.remainingWeightGrams < doseGrams

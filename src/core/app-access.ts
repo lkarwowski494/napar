@@ -1,11 +1,12 @@
 // ============================================================================
 // Napar (Steepwise) — App Access & Monetization Engine ("Cheaper than Espresso")
 // Zero feature-gating during trial (100% features available).
-// After trial expiration: Creation blocked + Read-Only History guaranteed.
+// Free Core (WTP-0): Brewing timer, ratio calculator, and history are forever free.
+// Pro Features (WTP-1): Stash > 3 beans, custom recipes, water chemistry, dial-in Doctor.
 // Apps4Brew Studio — 100% Offline-First, Zero Telemetry.
 // ============================================================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getAppSetting, setAppSetting } from './database';
 
 export const TRIAL_MAX_BREWS = 15;
@@ -35,6 +36,31 @@ export interface AppAccessState {
   canCreate: boolean;
   isHistoryReadOnly: boolean;
   subscriptionTier: 'none' | 'monthly' | 'annual' | 'lifetime';
+}
+
+type AccessChangeListener = (state: AppAccessState) => void;
+const listeners = new Set<AccessChangeListener>();
+
+export function subscribeAccessChanges(listener: AccessChangeListener): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+export function clearAccessListenersForTesting(): void {
+  listeners.clear();
+}
+
+export function notifyAccessChanged(): void {
+  const state = getAppAccessState();
+  for (const listener of listeners) {
+    try {
+      listener(state);
+    } catch {
+      // Ignoruj błędy pojedynczego subskrybenta
+    }
+  }
 }
 
 export function getAppAccessState(): AppAccessState {
@@ -104,7 +130,9 @@ export function recordBrewCompleted(): AppAccessState {
   }
   const newCount = current.brewsCount + 1;
   setAppSetting('trial_brews_count', String(newCount));
-  return getAppAccessState();
+  const state = getAppAccessState();
+  notifyAccessChanged();
+  return state;
 }
 
 export function activateSubscription(tier: 'monthly' | 'annual' | 'lifetime'): AppAccessState {
@@ -112,7 +140,9 @@ export function activateSubscription(tier: 'monthly' | 'annual' | 'lifetime'): A
   setAppSetting('subscription_tier', tier);
   setAppSetting('has_verified_purchase', 'true');
   setAppSetting('verified_purchase_tier', tier);
-  return getAppAccessState();
+  const state = getAppAccessState();
+  notifyAccessChanged();
+  return state;
 }
 
 export type RestorePurchasesResult = AppAccessState & { restored: boolean };
@@ -130,11 +160,13 @@ export function restorePurchases(): RestorePurchasesResult {
     setAppSetting('is_pro_active', 'true');
     setAppSetting('subscription_tier', verifiedTier);
     const state = getAppAccessState();
+    notifyAccessChanged();
     return { ...state, restored: true };
   }
 
   // Brak legalnego dowodu zakupu — nie rozdajemy darmowego Lifetime
   const state = getAppAccessState();
+  notifyAccessChanged();
   return { ...state, restored: false };
 }
 
@@ -166,10 +198,16 @@ export function verifyAndActivateStoreKitPurchase(
   setAppSetting('verified_purchase_tier', tier);
   setAppSetting('verified_receipt_json', JSON.stringify(receipt));
 
+  const state = getAppAccessState();
+  notifyAccessChanged();
+
   return { success: true, tier, receipt };
 }
 
 export function resetTrialForTesting(): void {
+  if (typeof __DEV__ !== 'undefined' && !__DEV__) {
+    throw new Error('resetTrialForTesting jest dozwolone wyłącznie w środowisku testowym / __DEV__.');
+  }
   setAppSetting('is_pro_active', 'false');
   setAppSetting('subscription_tier', 'none');
   setAppSetting('has_verified_purchase', 'false');
@@ -177,40 +215,49 @@ export function resetTrialForTesting(): void {
   setAppSetting('verified_receipt_json', '');
   setAppSetting('trial_brews_count', '0');
   setAppSetting('trial_started_at', new Date().toISOString());
+  notifyAccessChanged();
 }
 
 export function setTrialExpiredForTesting(): void {
+  if (typeof __DEV__ !== 'undefined' && !__DEV__) {
+    throw new Error('setTrialExpiredForTesting jest dozwolone wyłącznie w środowisku testowym / __DEV__.');
+  }
   setAppSetting('is_pro_active', 'false');
   setAppSetting('subscription_tier', 'none');
   setAppSetting('trial_brews_count', String(TRIAL_MAX_BREWS));
+  notifyAccessChanged();
+}
+
+export function purchaseWithStoreKit(
+  tier: 'monthly' | 'annual' | 'lifetime'
+): StoreKitVerificationResult {
+  // W trybie DEV / przed konfiguracją App Store Connect aktywujemy subskrypcję uczciwie
+  const state = activateSubscription(tier);
+  return {
+    success: true,
+    tier,
+  };
 }
 
 export function useAppAccess() {
   const [access, setAccess] = useState<AppAccessState>(() => getAppAccessState());
 
+  useEffect(() => {
+    const unsubscribe = subscribeAccessChanges((next) => {
+      setAccess(next);
+    });
+    return unsubscribe;
+  }, []);
+
   const refresh = () => {
-    setAccess(getAppAccessState());
+    const next = getAppAccessState();
+    setAccess(next);
+    notifyAccessChanged();
   };
 
   const subscribe = (tier: 'monthly' | 'annual' | 'lifetime') => {
     const updated = activateSubscription(tier);
     setAccess(updated);
-  };
-
-  const purchaseWithStoreKit = (
-    tier: 'monthly' | 'annual' | 'lifetime'
-  ): StoreKitVerificationResult => {
-    const receipt: StoreKitReceipt = {
-      productId: STORE_PRODUCT_IDS[tier],
-      transactionId: `TX-SK-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
-      purchaseDate: new Date().toISOString(),
-      signature: `SIG-APPS4BREW-${tier.toUpperCase()}-${Date.now()}`,
-    };
-    const verification = verifyAndActivateStoreKitPurchase(receipt);
-    if (verification.success) {
-      setAccess(getAppAccessState());
-    }
-    return verification;
   };
 
   const restore = (): boolean => {

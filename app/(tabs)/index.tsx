@@ -269,10 +269,6 @@ export default function BrewScreen() {
         testID="open-procedure-modal-btn"
         style={styles.openProcedureCta}
         onPress={() => {
-          if (!canCreate) {
-            setShowPaywallModal(true);
-            return;
-          }
           if (!isRunning && !isPaused) {
             startTimer();
           }
