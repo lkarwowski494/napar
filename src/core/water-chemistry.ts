@@ -1,6 +1,6 @@
 // ============================================================================
 // Napar (Steepwise) — Water Chemistry & Mineralization Calculator
-// Matematyka remineralizacji wody dla kawy specialty i herbaty (SCA & Barista Hustle)
+// Matematyka remineralizacji wody dla kawy specialty i herbaty (SCA & Barista Hustle) [T:SCA-WATER-STD] [T:BH-WATER-2016] [T:HENDON-WATER-2015]
 // ============================================================================
 
 export interface WaterRecipe {

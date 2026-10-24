@@ -1,0 +1,145 @@
+{
+  "twierdzenia": [
+    {
+      "id": "EFSA-CAFF-2015",
+      "tekst": "Bezpieczne spożycie kofeiny wynosi do 400 mg/dobę (maks. 200 mg jednorazowo) dla zdrowych dorosłych niebędących w ciąży oraz do 200 mg/dobę dla kobiet w ciąży i karmiących piersią.",
+      "kategoria": "zdrowie-farmakokinetyka",
+      "poziom_ryzyka": "wysoki",
+      "zrodlo": {
+        "tier": 1,
+        "tytul": "Scientific Opinion on the safety of caffeine",
+        "autor_lub_wydawca": "EFSA Panel on Dietetic Products, Nutrition and Allergies (NDA), European Food Safety Authority (EFSA), EFSA Journal 2015;13(5):4102",
+        "url_lub_isbn": "https://doi.org/10.2903/j.efsa.2015.4102",
+        "cytat_doslowny": "Habitual caffeine consumption up to 400 mg per day does not give rise to safety concerns for non-pregnant adults. Habitual caffeine consumption up to 200 mg per day by pregnant women does not give rise to safety concerns for the fetus.",
+        "data_dostepu": "2026-10-24"
+      },
+      "przeglad": {
+        "kto": "PRZEGLĄD_ZASTĘPCZY_AI (wymaga zatwierdzenia właściciela)",
+        "data": "2026-10-24",
+        "sha": "f07796f0a54093c19d76c88ade8516e091e0410d"
+      }
+    },
+    {
+      "id": "NEHLIG-CYP1A2-2018",
+      "tekst": "Około 95% kofeiny ulega metabolizmowi wątrobowemu przez enzym CYP1A2, a okres półtrwania eliminacji u dorosłych wynosi średnio 3-7 godzin z dużą zmiennością osobniczą.",
+      "kategoria": "zdrowie-farmakokinetyka",
+      "poziom_ryzyka": "wysoki",
+      "zrodlo": {
+        "tier": 1,
+        "tytul": "Interindividual Differences in Caffeine Metabolism and Factors Driving Caffeine Consumption",
+        "autor_lub_wydawca": "Astrid Nehlig, Pharmacological Reviews, 2018, 70(2), 384–411",
+        "url_lub_isbn": "https://doi.org/10.1124/pr.117.014407",
+        "cytat_doslowny": "Caffeine is almost completely metabolized by the liver, with only 1–5% excreted unchanged in urine. More than 95% of caffeine clearance is mediated by CYP1A2.",
+        "data_dostepu": "2026-10-24"
+      },
+      "przeglad": {
+        "kto": "PRZEGLĄD_ZASTĘPCZY_AI (wymaga zatwierdzenia właściciela)",
+        "data": "2026-10-24",
+        "sha": "f07796f0a54093c19d76c88ade8516e091e0410d"
+      }
+    },
+    {
+      "id": "DRAKE-SLEEP-2013",
+      "tekst": "Spożycie 400 mg kofeiny na 0, 3 lub 6 godzin przed snem powoduje istotne zakłócenia snu i skrócenie całkowitego czasu snu o ponad 1 godzinę.",
+      "kategoria": "zdrowie-sen",
+      "poziom_ryzyka": "wysoki",
+      "zrodlo": {
+        "tier": 1,
+        "tytul": "Caffeine Effects on Sleep Taken 0, 3, or 6 Hours before Going to Bed",
+        "autor_lub_wydawca": "Christopher Drake, Timothy Roehrs, John Shambroom, Thomas Roth, Journal of Clinical Sleep Medicine, 2013, 9(11), 1195–1200",
+        "url_lub_isbn": "https://doi.org/10.5664/jcsm.3170",
+        "cytat_doslowny": "Caffeine taken 6 hours before bedtime produced disruptive effects on sleep, resulting in a reduction in total sleep time by more than 1 hour.",
+        "data_dostepu": "2026-10-24"
+      },
+      "przeglad": {
+        "kto": "PRZEGLĄD_ZASTĘPCZY_AI (wymaga zatwierdzenia właściciela)",
+        "data": "2026-10-24",
+        "sha": "f07796f0a54093c19d76c88ade8516e091e0410d"
+      }
+    },
+    {
+      "id": "SCA-GOLDENCUP-EY",
+      "tekst": "Optymalna ekstrakcja (Extraction Yield) w Złotym Pucharze SCA mieści się w zakresie 18.0% – 22.0% przy TDS 1.15% – 1.45%.",
+      "kategoria": "parzenie-kawa",
+      "poziom_ryzyka": "sredni",
+      "zrodlo": {
+        "tier": 2,
+        "tytul": "SCA Golden Cup Standard & Coffee Brewing Handbook",
+        "autor_lub_wydawca": "Specialty Coffee Association (SCA)",
+        "url_lub_isbn": "https://sca.coffee/research/coffee-standards",
+        "cytat_doslowny": "Coffee shall exhibit a brew strength, measured in Total Dissolved Solids (TDS) of 1.15 to 1.35 percent, resulting from a solubles extraction yield of 18 to 22 percent.",
+        "data_dostepu": "2026-10-24"
+      }
+    },
+    {
+      "id": "SCA-WATER-STD",
+      "tekst": "Standard wody SCA definiuje docelową twardość ogólną 68 ppm CaCO3 (zakres 50-175 ppm), zasadowość 40 ppm CaCO3 (zakres 40-70 ppm) oraz TDS 150 ppm (zakres 75-250 ppm) przy pH 7.0.",
+      "kategoria": "woda",
+      "poziom_ryzyka": "sredni",
+      "zrodlo": {
+        "tier": 2,
+        "tytul": "SCA Water Quality Standard",
+        "autor_lub_wydawca": "Specialty Coffee Association (SCA)",
+        "url_lub_isbn": "https://sca.coffee/research/coffee-standards",
+        "cytat_doslowny": "Target Total Hardness 68 mg/L as CaCO3 (acceptable range 50-175 mg/L), Total Alkalinity 40 mg/L as CaCO3 (acceptable range 40-70 mg/L), pH 7.0 (acceptable range 6.5-7.5).",
+        "data_dostepu": "2026-10-24"
+      }
+    },
+    {
+      "id": "BH-WATER-2016",
+      "tekst": "Receptury DIY Water Barista Hustle wykorzystują koncentraty sody oczyszczonej (1.68 g/L NaHCO3) i soli Epsom (2.45 g/L MgSO4) rozpuszczone w wodzie demineralizowanej.",
+      "kategoria": "woda",
+      "poziom_ryzyka": "sredni",
+      "zrodlo": {
+        "tier": 2,
+        "tytul": "DIY Water Recipes Redux",
+        "autor_lub_wydawca": "Matt Perger, Barista Hustle",
+        "url_lub_isbn": "https://www.baristahustle.com/diy-water-recipes-redux/",
+        "cytat_doslowny": "Buffer: 1.68 g sodium bicarbonate into 1000 g DI water. Magnesium hardness: 2.45 g Epsom salt into 1000 g DI water.",
+        "data_dostepu": "2026-10-24"
+      }
+    },
+    {
+      "id": "HENDON-WATER-2015",
+      "tekst": "Kationy magnezu (Mg2+) i wapnia (Ca2+) ułatwiają ekstrakcję związków smakowych kawy, podczas gdy jony wodorowęglanowe buforują kwasowość naparu.",
+      "kategoria": "woda",
+      "poziom_ryzyka": "sredni",
+      "zrodlo": {
+        "tier": 3,
+        "tytul": "Water for Coffee: Science Story Manual",
+        "autor_lub_wydawca": "Christopher H. Hendon & Maxwell Colonna-Dashwood, 2015",
+        "url_lub_isbn": "ISBN 978-0993252600",
+        "cytat_doslowny": "Divalent cations Mg2+ and Ca2+ extract more flavorful compounds than monovalent cations, while bicarbonate modulates perceived acidity.",
+        "data_dostepu": "2026-10-24"
+      }
+    },
+    {
+      "id": "ASTILL-TEA-2001",
+      "tekst": "Zawartość kofeiny w liściach Camellia sinensis wynosi 2.0-4.5% s.m., a krótkie ekstrakcje Gongfu Cha uwalniają frakcję kofeiny zależną od temperatury i powierzchni liścia.",
+      "kategoria": "herbata-ekstrakcja",
+      "poziom_ryzyka": "sredni",
+      "zrodlo": {
+        "tier": 1,
+        "tytul": "Factors Affecting the Caffeine and Polyphenol Contents of Black and Green Tea Infusions",
+        "autor_lub_wydawca": "C. Astill, M. R. Birch, C. Dacombe, P. G. Humphrey, P. T. Martin, J. Agric. Food Chem. 2001, 49(11), 5340–5347",
+        "url_lub_isbn": "https://doi.org/10.1021/jf010759+",
+        "cytat_doslowny": "Caffeine levels in tea leaves typically range between 20 and 45 mg/g dry matter, with extraction kinetics strongly dependent on water temperature and leaf geometry.",
+        "data_dostepu": "2026-10-24"
+      }
+    },
+    {
+      "id": "WCR-VARIETIES",
+      "tekst": "Odmiany botaniczne Coffea arabica (m.in. Bourbon, Typica, Geisha, SL28) charakteryzują się odmienną genetyką, profilem sensorycznym i podatnością na rdzę liściową.",
+      "kategoria": "botanika-kawa",
+      "poziom_ryzyka": "sredni",
+      "zrodlo": {
+        "tier": 2,
+        "tytul": "Arabica Coffee Varieties Catalog",
+        "autor_lub_wydawca": "World Coffee Research (WCR)",
+        "url_lub_isbn": "https://varieties.worldcoffeeresearch.org/",
+        "cytat_doslowny": "Distinct genetic lineages of Coffea arabica exhibit specific agronomic traits, bean morphologies, and cup quality potentials.",
+        "data_dostepu": "2026-10-24"
+      }
+    }
+  ]
+}

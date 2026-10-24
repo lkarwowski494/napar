@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Knowledge Base i18n Strings Catalog (TASK-R09-02)
+// Napar (Steepwise) — Knowledge Base i18n Strings Catalog (TASK-R09-02) [T:ASTILL-TEA-2001] [T:WCR-VARIETIES]
 // ============================================================================
 
 export interface KnowledgeLocaleEntry {

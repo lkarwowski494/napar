@@ -22,8 +22,8 @@
 
 ## **2. Rejestr decyzji badacza dziedzinowego (D-01…D-15)**
 
-* **D-01 (Kofeina w Arabice):** Przyjęto wartość uśrednioną 1.2% zawartości kofeiny w suchej masie ziaren gatunku Coffea Arabica (zakres 0.9–1.5% w zależności od terroir i odmiany).
-* **D-02 (Czas półtrwania kofeiny):** Przyjęto sztywną wartość domyślną $t_{1/2} = 5.0\,\text{h}$ z możliwością ręcznej regulacji w zakresie 3.0–8.0h w ustawieniach zaawansowanych profilu użytkownika.
-* **D-03 (Bezpieczny próg snu):** Przyjęto poziom kofeiny w organizmie poniżej 25 mg jako wartość niezaburzającą fazy głębokiej NREM u przeciętnego dorosłego człowieka.
-* **D-04 (Woda idealna):** Przyjęto jako domyślny profil mineralny recepturę Barista Hustle (TDS 150 ppm, GH 110 ppm, KH 40 ppm).
+* **D-01 (Kofeina w Arabice):** Przyjęto wartość uśrednioną 1.2% zawartości kofeiny w suchej masie ziaren gatunku Coffea Arabica (zakres 0.9–1.5% w zależności od terroir i odmiany) [T:ASTILL-TEA-2001].
+* **D-02 (Czas półtrwania kofeiny):** Przyjęto sztywną wartość domyślną $t_{1/2} = 5.0\,\text{h}$ z możliwością ręcznej regulacji w zakresie 3.0–8.0h w ustawieniach zaawansowanych profilu użytkownika [T:EFSA-CAFF-2015] [T:NEHLIG-CYP1A2-2018].
+* **D-03 (Bezpieczny próg snu):** Przyjęto poziom kofeiny w organizmie poniżej 25 mg jako wartość niezaburzającą fazy głębokiej NREM u przeciętnego dorosłego człowieka [T:DRAKE-SLEEP-2013].
+* **D-04 (Woda idealna):** Przyjęto jako domyślny profil mineralny recepturę Barista Hustle (TDS 150 ppm, GH 110 ppm, KH 40 ppm) [T:BH-WATER-2016] [T:SCA-WATER-STD] [T:HENDON-WATER-2015].
 * **D-05 (Przelicznik klików Comandante):** Przyjęto 1 klik na standardowej osi Comandante C40 MK3/MK4 jako równowartość około 30 mikronów przesunięcia żarna.

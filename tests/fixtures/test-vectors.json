@@ -7,7 +7,7 @@
     "extraction_yield": [
       {
         "id": "EY-SCA-01",
-        "citation": "Specialty Coffee Association, Coffee Brewing Handbook, 2020, s. 12",
+        "citation": "Specialty Coffee Association, Coffee Brewing Handbook, 2020, s. 12 [T:SCA-GOLDENCUP-EY]",
         "formula": "EY% = (Beverage Weight * TDS%) / Dose, where Beverage Weight = Water - (Dose * 2.0)",
         "inputs": {
           "waterGrams": 250,
@@ -22,7 +22,7 @@
       },
       {
         "id": "EY-SCA-02",
-        "citation": "Specialty Coffee Association, Coffee Brewing Handbook, 2020, s. 12",
+        "citation": "Specialty Coffee Association, Coffee Brewing Handbook, 2020, s. 12 [T:SCA-GOLDENCUP-EY]",
         "formula": "EY% = (Liquid Water * TDS%) / Dose",
         "inputs": {
           "waterGrams": 200,
@@ -80,7 +80,7 @@
     "water_chemistry": [
       {
         "id": "WATER-HENDON-01",
-        "citation": "Christopher H. Hendon & Maxwell Colonna-Dashwood, Water for Coffee, 2015, s. 88",
+        "citation": "Christopher H. Hendon & Maxwell Colonna-Dashwood, Water for Coffee, 2015, s. 88 [T:HENDON-WATER-2015]",
         "formula": "1 dH = 17.848 ppm CaCO3",
         "inputs": {
           "ppmCaCO3": 71.392
@@ -91,7 +91,7 @@
       },
       {
         "id": "WATER-BH-01",
-        "citation": "Matt Perger, Barista Hustle Water Recipes, 2017",
+        "citation": "Matt Perger, Barista Hustle Water Recipes, 2017 [T:BH-WATER-2016]",
         "formula": "Buffer Concentrate: 1g in 1L = 2 ppm KH; Hardness Concentrate: 1g in 1L = 2 ppm GH",
         "inputs": {
           "targetBufferKhPpm": 40,
@@ -107,7 +107,7 @@
     "caffeine_pharmacokinetics": [
       {
         "id": "KOF-NAS-01",
-        "citation": "Institute of Medicine (US), Caffeine for the Sustainment of Mental Task Performance, National Academies Press, 2001, Rozdz. 2",
+        "citation": "Institute of Medicine (US), Caffeine for the Sustainment of Mental Task Performance, National Academies Press, 2001, Rozdz. 2 [T:EFSA-CAFF-2015]",
         "formula": "C(t) = C0 * 0.5^(t / 5.0)",
         "inputs": {
           "initialDoseMg": 160,
@@ -120,7 +120,7 @@
       },
       {
         "id": "KOF-NAS-02",
-        "citation": "Institute of Medicine (US), Caffeine for the Sustainment of Mental Task Performance, National Academies Press, 2001, Rozdz. 2",
+        "citation": "Institute of Medicine (US), Caffeine for the Sustainment of Mental Task Performance, National Academies Press, 2001, Rozdz. 2 [T:EFSA-CAFF-2015]",
         "formula": "C(t) = C0 * 0.5^(t / 5.0)",
         "inputs": {
           "initialDoseMg": 160,

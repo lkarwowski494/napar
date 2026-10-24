@@ -77,7 +77,7 @@ export function calculateLiquidYield(waterGrams: number, doseGrams: number, rete
 /**
  * RD-03: Wydajność ekstrakcji (Extraction Yield - EY %)
  * EY = (Masa naparu * TDS%) / Doza sucha
- * Standard SCA Golden Cup: 18.0% - 22.0%
+ * Standard SCA Golden Cup: 18.0% - 22.0% [T:SCA-GOLDENCUP-EY]
  */
 export function calculateExtractionYield(
   beverageWeightGrams: number,
@@ -191,7 +191,7 @@ export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number, infus
 }
 
 /**
- * RD-17: Farmakokinetyka eliminacji kofeiny (model jedno-kompartmentowy)
+ * RD-17: Farmakokinetyka eliminacji kofeiny (model jedno-kompartmentowy) [T:EFSA-CAFF-2015] [T:NEHLIG-CYP1A2-2018]
  * C(t) = C0 * (1/2)^(t / t1/2)
  */
 export function calculateRemainingCaffeineMg(initialDoseMg: number, hoursPassed: number, halfLifeHours = 5.0): number {
@@ -201,7 +201,7 @@ export function calculateRemainingCaffeineMg(initialDoseMg: number, hoursPassed:
 }
 
 /**
- * RD-20: Obliczenie stężenia kofeiny przed snem
+ * RD-20: Obliczenie stężenia kofeiny przed snem [T:DRAKE-SLEEP-2013]
  */
 export function evaluateBedtimeCaffeine(
   intakes: Array<{ doseMg: number; hoursUntilBedtime: number }>,
