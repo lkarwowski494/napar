@@ -95,12 +95,17 @@ export function getAppAccessState(): AppAccessState {
   const now = new Date();
   const elapsedMs = Math.max(0, now.getTime() - startDate.getTime());
   const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
-  const daysRemaining = Math.max(0, TRIAL_DURATION_DAYS - elapsedDays);
+  const maxDaysSeen = parseInt(getAppSetting('trial_max_days_seen', '0'), 10) || 0;
+  const effectiveElapsedDays = Math.max(elapsedDays, maxDaysSeen);
+  if (elapsedDays > maxDaysSeen) {
+    setAppSetting('trial_max_days_seen', String(elapsedDays));
+  }
+  const daysRemaining = Math.max(0, TRIAL_DURATION_DAYS - effectiveElapsedDays);
 
   const brewsCount = parseInt(getAppSetting('trial_brews_count', '0'), 10) || 0;
   const brewsRemaining = Math.max(0, TRIAL_MAX_BREWS - brewsCount);
 
-  const isExpired = brewsCount >= TRIAL_MAX_BREWS || elapsedDays >= TRIAL_DURATION_DAYS;
+  const isExpired = brewsCount >= TRIAL_MAX_BREWS || effectiveElapsedDays >= TRIAL_DURATION_DAYS;
 
   if (isExpired) {
     return {
@@ -227,6 +232,7 @@ export function resetTrialForTesting(): void {
   setAppSetting('verified_purchase_tier', '');
   setAppSetting('verified_receipt_json', '');
   setAppSetting('trial_brews_count', '0');
+  setAppSetting('trial_max_days_seen', '0');
   setAppSetting('trial_started_at', new Date().toISOString());
   notifyAccessChanged();
 }

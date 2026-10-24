@@ -104,6 +104,18 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(state.isHistoryReadOnly).toBe(true);
   });
 
+  test('Cofnięcie zegara systemowego nie przywraca zużytych dni okresu próbnego (monotonic trial days)', () => {
+    const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
+    setAppSetting('trial_started_at', tenDaysAgo);
+    let state = getAppAccessState();
+    expect(state.daysRemaining).toBe(4);
+
+    const oneDayAgo = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString();
+    setAppSetting('trial_started_at', oneDayAgo);
+    state = getAppAccessState();
+    expect(state.daysRemaining).toBe(4);
+  });
+
   test('Wygasły trial (canCreate=false) nie blokuje usuwania własnych danych użytkownika (M1-audytor-generalny-012)', () => {
     setTrialExpiredForTesting();
     const state = getAppAccessState();
