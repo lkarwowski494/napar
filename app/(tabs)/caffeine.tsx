@@ -44,33 +44,43 @@ export default function CaffeineScreen() {
   const [bedtimeHour, setBedtimeHourState] = useState(() => {
     try {
       return getBedtimeHour();
-    } catch {
+    } catch (err) {
+      console.error('[caffeine] Failed to get bedtimeHour:', err);
       return 23;
     }
   });
   const [halfLifeHours, setHalfLifeHoursState] = useState(() => {
     try {
       return getCaffeineHalfLife();
-    } catch {
+    } catch (err) {
+      console.error('[caffeine] Failed to get caffeineHalfLife:', err);
       return 5.0;
     }
   });
   const [showQuickAddModal, setShowQuickAddModal] = useState(false);
 
   const handleBedtimeChange = (newHour: number) => {
+    const prev = bedtimeHour;
     const clamped = Math.max(18, Math.min(28, newHour));
     setBedtimeHourState(clamped);
     try {
       setBedtimeHour(clamped);
-    } catch {}
+    } catch (err) {
+      console.error('[caffeine] Failed to persist bedtimeHour:', err);
+      setBedtimeHourState(prev);
+    }
   };
 
   const handleHalfLifeChange = (newHours: number) => {
+    const prev = halfLifeHours;
     const clamped = Number(Math.max(3.0, Math.min(8.0, newHours)).toFixed(1));
     setHalfLifeHoursState(clamped);
     try {
       setCaffeineHalfLife(clamped);
-    } catch {}
+    } catch (err) {
+      console.error('[caffeine] Failed to persist caffeineHalfLife:', err);
+      setHalfLifeHoursState(prev);
+    }
   };
 
   const loadLogs = () => {
@@ -79,8 +89,9 @@ export default function CaffeineScreen() {
       todayStart.setHours(0, 0, 0, 0);
       const data = getCaffeineLogs(todayStart.toISOString());
       setLogs(data);
-    } catch {
-      // fallback
+    } catch (err) {
+      console.error('[caffeine] Failed to load caffeine logs:', err);
+      setLogs([]);
     }
   };
 

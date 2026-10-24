@@ -209,13 +209,13 @@ export function useBrewWorkflow() {
           destructive: true,
           onConfirm: () => {
             resetTimer();
-            selectRecipe(r as any);
+            selectRecipe(r);
             setServings(1);
             setShowRecipeModal(false);
           },
         });
       } else {
-        selectRecipe(r as any);
+        selectRecipe(r);
         setServings(1);
         setShowRecipeModal(false);
       }
@@ -257,7 +257,7 @@ export function useBrewWorkflow() {
   const handleQuickReBrew = (s: BrewSession) => {
     const foundRecipe = allRecipes.find((r) => r.name === s.recipeName);
     if (foundRecipe) {
-      selectRecipe(foundRecipe as any);
+      selectRecipe(foundRecipe);
     }
     if (s.doseGrams) setDoseGrams(s.doseGrams);
     if (s.waterGrams) setWaterGrams(s.waterGrams);
@@ -308,7 +308,7 @@ export function useBrewWorkflow() {
       if (decoded && decoded.recipe) {
         saveRecipe(decoded.recipe);
         refreshData();
-        selectRecipe(decoded.recipe as any);
+        selectRecipe(decoded.recipe);
         Alert.alert(
           'Zeskanowano recepturę!',
           `Receptura "${decoded.recipe.name}" została zapisana w Twojej bazie.`
@@ -323,7 +323,7 @@ export function useBrewWorkflow() {
 
   const shareUrl = useMemo(() => {
     try {
-      return encodeRecipeToShareUrl(recipe as any);
+      return encodeRecipeToShareUrl(recipe);
     } catch {
       return '';
     }
