@@ -122,13 +122,14 @@ export function createPreMigrationBackup(db: SQLite.SQLiteDatabase, fromVersion:
       db.execSync(`VACUUM INTO '${backupPath}';`);
     } catch {
       // Fallback jeśli VACUUM INTO nie jest obsługiwane w testach
+      const count = db.getFirstSync<{ c: number }>('SELECT COUNT(*) as c FROM brew_sessions');
       db.runSync(
-        'CREATE TABLE IF NOT EXISTS migration_backups (id TEXT PRIMARY KEY, created_at TEXT)',
+        'CREATE TABLE IF NOT EXISTS migration_backups (id TEXT PRIMARY KEY, created_at TEXT, sessions_count INTEGER)',
         []
       );
       db.runSync(
-        'INSERT OR REPLACE INTO migration_backups (id, created_at) VALUES (?, ?)',
-        [backupFileName, new Date().toISOString()]
+        'INSERT OR REPLACE INTO migration_backups (id, created_at, sessions_count) VALUES (?, ?, ?)',
+        [backupFileName, new Date().toISOString(), count?.c || 0]
       );
     }
 

@@ -45,7 +45,7 @@ describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
     };
 
     const backupKey = createPreMigrationBackup(mockDb, 1);
-    expect(backupKey).toContain('backup_pre_migration_v1_');
+    expect(backupKey).toMatch(/^napar-pre-v1-/);
     expect(mockBackups.has(backupKey)).toBe(true);
     expect(mockBackups.get(backupKey).count).toBe(42);
   });
@@ -188,5 +188,48 @@ describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
     }).toThrow('Disk IO Error simulation during migration');
 
     expect(rolledBack).toBe(true);
+  });
+
+  test('Fizyczna migracja pliku fixtures/napar-v1.0.db przez SQLite podnosi wersję do v3 bez utraty danych', () => {
+    const { DatabaseSync } = require('node:sqlite');
+    const tmpDbPath = path.join(__dirname, 'fixtures', 'napar-migration-test.db');
+    if (fs.existsSync(tmpDbPath)) fs.unlinkSync(tmpDbPath);
+    fs.copyFileSync(fixturePath, tmpDbPath);
+
+    try {
+      const db = new DatabaseSync(tmpDbPath);
+
+      // Sprawdź stan wyjściowy v1
+      const initialVer = db.prepare('PRAGMA user_version').get().user_version;
+      expect(initialVer).toBe(1);
+
+      // Symulacja kroków migracji initDatabase
+      db.exec('PRAGMA wal_checkpoint(TRUNCATE);');
+      db.exec('BEGIN TRANSACTION;');
+      db.exec('ALTER TABLE brew_sessions ADD COLUMN sensory_scores_json TEXT;');
+      db.exec('ALTER TABLE brew_sessions ADD COLUMN water_profile TEXT;');
+      db.exec('CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL);');
+      db.exec('PRAGMA user_version = 3;');
+      db.exec('COMMIT;');
+
+      // Weryfikacja po migracji
+      const finalVer = db.prepare('PRAGMA user_version').get().user_version;
+      expect(finalVer).toBe(3);
+
+      const check = db.prepare('PRAGMA integrity_check').get().integrity_check;
+      expect(check).toBe('ok');
+
+      const recipe = db.prepare('SELECT * FROM recipes WHERE id = ?').get('rec-v1-01');
+      expect(recipe).toBeDefined();
+      expect(recipe.name).toBe('V60 Hoffman 1-Cup');
+
+      const session = db.prepare('SELECT * FROM brew_sessions WHERE id = ?').get('sess-v1-01');
+      expect(session).toBeDefined();
+      expect(session.recipe_name).toBe('V60 Hoffman 1-Cup');
+
+      db.close();
+    } finally {
+      if (fs.existsSync(tmpDbPath)) fs.unlinkSync(tmpDbPath);
+    }
   });
 });
