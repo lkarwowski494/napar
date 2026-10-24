@@ -63,10 +63,10 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
           <Text style={styles.metabolismTitle}>Metabolizm kofeiny (t₁/₂)</Text>
           <Text style={styles.metabolismSubtitle}>
             {halfLifeHours <= 3.5
-              ? 'Szybki klirens (CYP1A2 *1A)'
+              ? 'Szybki metabolizm (orientacyjnie)'
               : halfLifeHours >= 6.5
-              ? 'Wolny klirens wątrobowy'
-              : 'Standardowy klirens (EFSA)'}
+              ? 'Wolny metabolizm (orientacyjnie)'
+              : 'Standardowy metabolizm (EFSA)'}
           </Text>
         </View>
         <View style={styles.bedtimeStepper}>

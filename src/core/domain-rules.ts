@@ -228,7 +228,7 @@ export function evaluateBedtimeCaffeine(
 
   let messagePl: string;
   if (isSafeForSleep) {
-    messagePl = `Poziom kofeiny o porze snu (${totalRemaining} mg) jest bezpieczny dla fazy głębokiej NREM.`;
+    messagePl = `Szacowany poziom kofeiny o porze snu (${totalRemaining} mg) mieści się w orientacyjnym progu niskiego wpływu na sen.`;
   } else {
     messagePl = `Poziom kofeiny (${totalRemaining} mg) przekracza próg ${safeThresholdMg} mg — ryzyko spłycenia snu.`;
   }

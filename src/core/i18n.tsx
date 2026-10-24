@@ -301,8 +301,8 @@ export const translations = {
       halfLifeDesc: 'Czas półtrwania (3.0h–8.0h). Domyślnie 5.0h (standard EFSA).',
       bedtimeTitle: 'Godzina Pójścia Spać',
       bedtimeCurfew: 'Limit Spożycia Przed Snem',
-      safeAtBedtime: 'Bezpieczny poziom do snu głębokiego NREM (< 25 mg)',
-      riskAtBedtime: 'Uwaga: wysoki poziom kofeiny może zaburzać fazę snu głębokiego NREM',
+      safeAtBedtime: 'Orientacyjny próg niskiego wpływu na sen (< 25 mg)',
+      riskAtBedtime: 'Uwaga: podwyższony poziom kofeiny przed snem może wydłużać zasypianie wg EFSA',
       logDoseBtn: '+ Zarejestruj Dawkę',
     },
     sensory: {
@@ -723,7 +723,7 @@ export const translations = {
       bedtimeTitle: 'Target Bedtime',
       bedtimeCurfew: 'Bedtime Sleep Curfew',
       safeAtBedtime: 'Safe level for restorative NREM sleep (< 25 mg)',
-      riskAtBedtime: 'Caution: Elevated caffeine can disrupt deep NREM sleep architecture',
+      riskAtBedtime: 'Notice: Elevated caffeine close to bedtime may increase sleep latency per EFSA',
       logDoseBtn: '+ Log Caffeine Dose',
     },
     sensory: {

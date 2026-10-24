@@ -178,7 +178,10 @@ export default function CaffeineScreen() {
           {Math.round(currentTotalMg)} mg
         </Text>
         <Text style={styles.summarySub}>
-          Dobowy bilans: {Math.round(totalConsumedTodayMg)} mg / 400 mg (Zalecenie EFSA)
+          Dobowy bilans: {Math.round(totalConsumedTodayMg)} mg / 400 mg (EFSA 2015)
+        </Text>
+        <Text style={styles.efsaNoteText}>
+          Limit dzienny (EFSA 2015): 400 mg dla zdrowych dorosłych (maks. 200 mg w jednej dawce) · 200 mg w ciąży i podczas laktacji.
         </Text>
 
         <View style={styles.efsaProgressBar}>
@@ -235,6 +238,14 @@ export default function CaffeineScreen() {
         onSelectOption={handleQuickAdd}
       />
 
+      {/* Zastrzeżenie medyczne i źródła (App Store 1.4.1 / EFSA 2015) */}
+      <View style={styles.disclaimerCard}>
+        <Text style={styles.disclaimerTitle}>Zastrzeżenie informacyjne (EFSA 2015)</Text>
+        <Text style={styles.disclaimerText}>
+          Informacja edukacyjna — nie stanowi porady medycznej ani diagnozy. Szacunki oparte na modelu jednokompartmentowym I rzędu (t₁/₂ = 3–12 h); rzeczywisty metabolizm zależy m.in. od aktywności enzymu CYP1A2, ciąży, leków i wrażliwości receptorów adenozynowych. Przed decyzjami zdrowotnymi skonsultuj się z lekarzem. Źródła: EFSA NDA Panel (2015, doi:10.2903/j.efsa.2015.4102); Nehlig (2018, doi:10.1124/pr.117.014407); Drake et al. (2013, doi:10.5664/jcsm.3170).
+        </Text>
+      </View>
+
       {/* Apps4Brew Pass Paywall Modal */}
       <Apps4BrewPassModal
         visible={showPaywall}
@@ -280,7 +291,35 @@ const styles = StyleSheet.create({
   summarySub: {
     fontSize: 13,
     color: theme.colors.textSecondary,
+    marginBottom: 6,
+  },
+  efsaNoteText: {
+    color: theme.colors.textMuted,
+    fontSize: 11,
+    lineHeight: 15,
     marginBottom: 14,
+    textAlign: 'center',
+  },
+  disclaimerCard: {
+    backgroundColor: theme.colors.bgCard,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  disclaimerTitle: {
+    color: theme.colors.copper,
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  disclaimerText: {
+    color: theme.colors.textMuted,
+    fontSize: 11,
+    lineHeight: 16,
   },
   efsaProgressBar: {
     width: '100%',

@@ -436,7 +436,7 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
     "sensoryProfileEn": "Crystalline, gentle, and honeyed liquor. Fuzzy silvery buds and leaves deliver sweet melon, dried hay, white blossoms, and mild linden honey.",
     "descriptionPl": "Wyjątkowo subtelna herbata poddawana jedynie procesowi więdnięcia i suszenia bez rolowania i podgrzewania w woku. Pochodzi z prowincji Fujian.",
     "descriptionEn": "The least processed tea variety, consisting solely of gentle withering and sun-drying without rolling or mechanical firing. Native to Fujian.",
-    "healthAttributesPl": "Najmniej przetworzona ze wszystkich herbat, zachowuje najwyższe stężenie przeciwutleniaczy polifenolowych.",
+    "healthAttributesPl": "Najmniej przetworzona ze wszystkich herbat, bogata w naturalne polifenole roślinne (katechiny i flawonoidy).",
     "famousVarietiesPl": [
       "Bai Hao Yin Zhen (Srebrne Igły)",
       "Pai Mu Tan (Biała Piwonia)",
@@ -451,7 +451,7 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
     "sensoryProfileEn": "Packed with soothing L-theanine and antioxidant catechins. Japanese styles display rich marine umami and steamed spinach; Chinese styles feature sweet roasted chestnut and snow pea.",
     "descriptionPl": "Oksydacja enzymatyczna jest zatrzymywana natychmiast po zbiorze poprzez zastosowanie wysokiej temperatury (Sha Qing lub parowanie), co pozwala zachować żywy zielony kolor i świeżość.",
     "descriptionEn": "Enzymatic oxidation is stopped immediately after harvest through intense pan-firing or steaming, preserving vibrant emerald color and grassy freshness.",
-    "healthAttributesPl": "Wysoka zawartość L-teaniny stymuluje fale mózgowe alfa (spokój i skupienie bez senności).",
+    "healthAttributesPl": "Zawiera naturalną L-teaninę oraz kofeinę o zrównoważonym profilu uwalniania.",
     "famousVarietiesPl": [
       "Long Jing (Smocza Studnia)",
       "Bi Luo Chun",
@@ -467,7 +467,7 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
     "sensoryProfileEn": "One of the rarest tea types globally. The slow micro-steaming removes grassy astringency, yielding a silky, buttery nectar with dried apricot and roasted almond notes.",
     "descriptionPl": "Mistrzowska herbata cesarska. Kluczowy etap Men Huang (żółknięcie w zamknięciu) polega na kilkukrotnym owijaniu ciepłych liści wilgotnym papierem lub tkaniną, co inicjuje łagodną autooksydację.",
     "descriptionEn": "An imperial artisan delicacy. The labor-intensive Men Huang step involves wrapping warm leaves in damp cloths to gently transform grassy tannins into sweet aromatics.",
-    "healthAttributesPl": "Wyjątkowo łagodna dla żołądka dzięki przekształceniu polifenoli podczas fazy Men Huang.",
+    "healthAttributesPl": "Tradycyjnie ceniona za łagodny profil sensoryczny uzyskany podczas powolnej autooksydacji Men Huang.",
     "famousVarietiesPl": [
       "Jun Shan Yin Zhen (Srebrne Igły z Wyspy Junshan)",
       "Meng Ding Huang Ya",
@@ -481,7 +481,7 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
     "sensoryProfileEn": "The pinnacle of tea processing complexity. Ranging from light floral lilacs and orchid blossoms (Tie Guan Yin, Ali Shan) to deeply roasted mineral rock teas (Da Hong Pao, Rou Gui).",
     "descriptionPl": "Mistrzowie herbaty kontrolują oksydację poprzez mechaniczne obijanie brzegów liści na bambusowych tacach. Pozwala to na jednoczesne zachowanie świeżości wnętrza liścia i dojrzałości jego brzegów.",
     "descriptionEn": "Crafted through rhythmic bruising of leaf edges on bamboo trays. Balances the fresh vitality of green tea with the warm complexity of black tea.",
-    "healthAttributesPl": "Zrównoważona zawartość polifenoli i teaniny, doskonała dla trawienia po posiłkach.",
+    "healthAttributesPl": "Połączenie polifenoli i kofeiny o zróżnicowanym profilu w zależności od stopnia prażenia.",
     "famousVarietiesPl": [
       "Da Hong Pao (Wielka Czerwona Szata)",
       "Tie Guan Yin (Żelazna Bogini)",
@@ -497,7 +497,7 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
     "sensoryProfileEn": "Known as Red Tea in Asia for its radiant amber-ruby broth. Warming tones of barley malt, wild dark honey, cocoa nibs, dried figs, and muscatel grapes.",
     "descriptionPl": "Liście są w 100% utleniane enzymatycznie po intensywnym rolowaniu niszczącym ściany komórkowe. Klasyczny Zheng Shan Xiao Zhong z gór Wuyi dał początek światowej kulturze czarnej herbaty.",
     "descriptionEn": "Fully oxidized tea with leaves completely rolled to release enzymatic polyphenols. Originating in the Wuyi Mountains, it sparked worldwide tea trade routes.",
-    "healthAttributesPl": "Zawiera teaflawiny i tearubiginy wspierające układ krążenia i naturalną witalność.",
+    "healthAttributesPl": "Zawiera charakterystyczne teaflawiny i tearubiginy powstałe w procesie pełnej oksydacji enzymatycznej.",
     "famousVarietiesPl": [
       "Zheng Shan Xiao Zhong (Lapsang Souchong)",
       "Keemun (Qimen Hong Cha)",
@@ -513,7 +513,7 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
     "sensoryProfileEn": "Living fermented tea that ages like vintage wine. Raw Sheng puerh starts brisk, floral, and tannic, evolving into camphor and sweet dried plums. Ripe Shou delivers rich forest floor, wet stone, and dark peat.",
     "descriptionPl": "Herbata poddawana fermentacji z udziałem mikroorganizmów (Aspergillus, drożdże). Puerhy z Yunnanu prasowane są w tradycyjne dyski Bing Cha (357g) lub cegły.",
     "descriptionEn": "Microbiologically post-fermented tea from large-leaf ancient Yunnan trees (Daye). Pressed into traditional 357g cakes (Bing Cha) or bricks for long-term aging.",
-    "healthAttributesPl": "Tradycyjnie stosowana w medycynie chińskiej dla wsparcia metabolizmu lipidów i flory bakteryjnej jelit.",
+    "healthAttributesPl": "Herbata postfermentowana o unikalnym profilu mikrobiologicznym, tradycyjnie serwowana po obfitych posiłkach.",
     "famousVarietiesPl": [
       "Sheng Puerh (Raw Puerh z wiekowych drzew Gushu)",
       "Shou Puerh (Ripe Puerh)",
