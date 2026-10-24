@@ -338,6 +338,8 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.md,
     paddingHorizontal: 12,
     paddingVertical: 8,
+    minHeight: 44,
+    justifyContent: 'center',
     maxWidth: 160,
   },
   favoriteChipActive: {

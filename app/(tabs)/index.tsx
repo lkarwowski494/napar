@@ -207,14 +207,20 @@ export default function BrewScreen() {
           style={styles.reBrewBanner}
           onPress={() => handleQuickReBrew(recentFiveStarSession)}
           accessibilityRole="button"
-          accessibilityLabel={`Powtórz ostatni udany napar: ${recentFiveStarSession.recipeName || recentFiveStarSession.method}`}
+          accessibilityLabel={
+            language === 'en'
+              ? `Re-brew last cup: ${recentFiveStarSession.recipeName || recentFiveStarSession.method}`
+              : `Powtórz ostatni udany napar: ${recentFiveStarSession.recipeName || recentFiveStarSession.method}`
+          }
           testID="quick-rebrew-banner"
         >
           <View style={styles.reBrewIconBox}>
             <StarIcon size={14} color={theme.colors.copper} filled />
           </View>
           <View style={styles.reBrewInfo}>
-            <Text style={styles.reBrewEyebrow}>POWTÓRZ OSTATNI NAPAR (1-TAP)</Text>
+            <Text style={styles.reBrewEyebrow}>
+              {language === 'en' ? 'REPEAT LAST BREW (1-TAP)' : 'POWTÓRZ OSTATNI NAPAR (1-TAP)'}
+            </Text>
             <Text style={styles.reBrewTitle} numberOfLines={1}>
               {recentFiveStarSession.recipeName || recentFiveStarSession.method} · {recentFiveStarSession.doseGrams}g / {recentFiveStarSession.waterGrams}g
             </Text>

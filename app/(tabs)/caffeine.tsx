@@ -47,7 +47,7 @@ export default function CaffeineScreen() {
     try {
       return getBedtimeHour();
     } catch (err) {
-      console.error('[caffeine] Failed to get bedtimeHour:', err);
+      // fallback to default bedtime
       return 23;
     }
   });
@@ -55,7 +55,7 @@ export default function CaffeineScreen() {
     try {
       return getCaffeineHalfLife();
     } catch (err) {
-      console.error('[caffeine] Failed to get caffeineHalfLife:', err);
+      // fallback to default half-life
       return 5.0;
     }
   });
@@ -68,7 +68,7 @@ export default function CaffeineScreen() {
     try {
       setBedtimeHour(clamped);
     } catch (err) {
-      console.error('[caffeine] Failed to persist bedtimeHour:', err);
+      // silent persistence rollback
       setBedtimeHourState(prev);
     }
   };
@@ -80,7 +80,7 @@ export default function CaffeineScreen() {
     try {
       setCaffeineHalfLife(clamped);
     } catch (err) {
-      console.error('[caffeine] Failed to persist caffeineHalfLife:', err);
+      // silent persistence rollback
       setHalfLifeHoursState(prev);
     }
   };
@@ -92,7 +92,7 @@ export default function CaffeineScreen() {
       const data = getCaffeineLogs(todayStart.toISOString());
       setLogs(data);
     } catch (err) {
-      console.error('[caffeine] Failed to load caffeine logs:', err);
+      // fallback to empty logs
       setLogs([]);
     }
   };

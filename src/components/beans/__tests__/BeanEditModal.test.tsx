@@ -193,4 +193,40 @@ describe('BeanEditModal Component', () => {
       expect.any(Array)
     );
   });
+
+  test('TASK-07-JAK: Anulowanie edycji po manipulacji wagą (-15g) nie zapisuje zmian w bazie', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BeanEditModal
+          visible={true}
+          item={mockItem}
+          onClose={mockOnClose}
+          canCreate={true}
+          onRequirePaywall={mockOnRequirePaywall}
+          onSaved={mockOnSaved}
+          onDeleted={mockOnDeleted}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const minusBtn = root.findAllByProps({ testID: 'quick-weight-minus-18' })[0];
+    expect(minusBtn).toBeDefined();
+
+    renderer.act(() => {
+      minusBtn.props.onPress();
+    });
+
+    const cancelBtn = root.findByProps({ accessibilityLabel: 'Anuluj' });
+    expect(cancelBtn).toBeDefined();
+
+    renderer.act(() => {
+      cancelBtn.props.onPress();
+    });
+
+    expect(mockOnClose).toHaveBeenCalled();
+    expect(database.saveInventoryItem).not.toHaveBeenCalled();
+    expect(mockOnSaved).not.toHaveBeenCalled();
+  });
 });

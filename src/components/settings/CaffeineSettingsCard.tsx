@@ -99,7 +99,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
         <View style={styles.actionRow}>
           <View style={{ flex: 1, paddingRight: 10 }}>
             <Text style={styles.actionTitle}>
-              {t.settings.healthKitTitle || 'Synchronizuj Kofeinę z Apple Health'}
+              {`${t.settings.healthKitTitle || 'Synchronizuj Kofeinę z Apple Health'} (v1.2)`}
             </Text>
             <Text style={styles.actionSubtitle}>
               {t.settings.healthKitSubtitle || 'Automatycznie zapisuj spożytą kofeinę (Dietary Caffeine) w aplikacji Zdrowie bez wysyłania danych na zewnątrz.'}

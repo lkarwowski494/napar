@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import * as Linking from 'expo-linking';
+
 import {
   StyleSheet,
   Pressable,
@@ -225,6 +226,7 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+
       {/* Preferencje Aplikacji: Język, Rodzaj naparów, Jednostki, Dostępność, Filozofia */}
       <AppPreferencesCard
         t={t}

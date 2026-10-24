@@ -38,7 +38,15 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
   const [reduceMotion, setReduceMotion] = useState(false);
 
   useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion).catch(() => {});
+    let active = true;
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then((val) => {
+        if (active) setReduceMotion(val);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleStart = () => {

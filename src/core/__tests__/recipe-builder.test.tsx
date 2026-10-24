@@ -494,7 +494,7 @@ describe('Custom Recipe Builder & Persistence', () => {
       renderer.create(<RecipeBuilderScreen />);
     });
 
-    expect(warnSpy).toHaveBeenCalledWith('Błąd wczytywania receptury:', expect.any(Error));
+    expect(warnSpy).toHaveBeenCalledWith('[recipe-builder] Failed to load recipe:', expect.any(Error));
     warnSpy.mockRestore();
     mockSearchParams = {};
   });

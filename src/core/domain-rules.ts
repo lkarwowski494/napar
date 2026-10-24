@@ -13,6 +13,7 @@ export interface RestingWindowResult {
   daysSinceRoast: number;
   stage: 'degassing' | 'peak' | 'stable' | 'aging';
   messagePl: string;
+  messageEn?: string;
   badgeColor: 'amber' | 'green' | 'blue' | 'gray';
 }
 
@@ -21,6 +22,7 @@ export interface BedtimeCaffeineEvaluation {
   safeThresholdMg: number;
   isSafeForSleep: boolean;
   messagePl: string;
+  messageEn?: string;
 }
 
 export interface TasteDiagnosis {
@@ -134,6 +136,7 @@ export function evaluateRestingWindow(roastDateInput: Date | string, currentDate
       daysSinceRoast,
       stage: 'degassing',
       messagePl: 'Zbyt świeża (Odgazowanie CO₂) — odczekaj do 7. dnia po wypale',
+      messageEn: 'Too fresh (CO₂ degassing) — wait until day 7 post-roast',
       badgeColor: 'amber',
     };
   } else if (daysSinceRoast <= 35) {
@@ -141,6 +144,7 @@ export function evaluateRestingWindow(roastDateInput: Date | string, currentDate
       daysSinceRoast,
       stage: 'peak',
       messagePl: 'Szczyt smaku (Peak Flavor) — idealne okno ekstrakcji (7–35 dni)',
+      messageEn: 'Peak flavor — ideal extraction window (7–35 days)',
       badgeColor: 'green',
     };
   } else if (daysSinceRoast <= 60) {
@@ -148,6 +152,7 @@ export function evaluateRestingWindow(roastDateInput: Date | string, currentDate
       daysSinceRoast,
       stage: 'stable',
       messagePl: 'Stabilna jakość ziaren (36–60 dni) — zmiel o 1 klik drobniej dla zachowania słodyczy',
+      messageEn: 'Stable bean quality (36–60 days) — grind 1 click finer to preserve sweetness',
       badgeColor: 'blue',
     };
   } else {
@@ -155,6 +160,7 @@ export function evaluateRestingWindow(roastDateInput: Date | string, currentDate
       daysSinceRoast,
       stage: 'aging',
       messagePl: 'Ziarna tracą lotne aromaty (>60 dni) — zwiększ dozę lub zmiel o 1–2 kliki drobniej',
+      messageEn: 'Aromatics fading (>60 days) — increase dose or grind 1–2 clicks finer',
       badgeColor: 'gray',
     };
   }

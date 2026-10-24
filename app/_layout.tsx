@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar, View, ActivityIndicator } from 'react-native';
-import { LanguageProvider } from '../src/core/i18n';
+import { LanguageProvider, useTranslation } from '../src/core/i18n';
 import { BrewProvider } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
 import { crashLoopGuard, recordStartupSuccess } from '../src/core/startup-guard';
@@ -19,6 +19,50 @@ function StartupSuccessNotifier() {
     void recordStartupSuccess();
   }, []);
   return null;
+}
+
+function RootStack() {
+  const { language } = useTranslation();
+  return (
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: theme.colors.bgCard,
+        },
+        headerTintColor: theme.colors.textPrimary,
+        headerTitleStyle: {
+          fontWeight: '600',
+          fontSize: 17,
+        },
+        contentStyle: {
+          backgroundColor: theme.colors.bg,
+        },
+      }}
+    >
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="settings"
+        options={{
+          presentation: 'modal',
+          title: language === 'en' ? 'Settings & Backup' : 'Ustawienia i Kopia',
+        }}
+      />
+      <Stack.Screen
+        name="recipe-builder"
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="gongfu"
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+        }}
+      />
+    </Stack>
+  );
 }
 
 export default function RootLayout() {
@@ -72,44 +116,7 @@ export default function RootLayout() {
         <BrewProvider>
           <StatusBar barStyle="light-content" />
           <StartupSuccessNotifier />
-          <Stack
-            screenOptions={{
-              headerStyle: {
-                backgroundColor: theme.colors.bgCard,
-              },
-              headerTintColor: theme.colors.textPrimary,
-              headerTitleStyle: {
-                fontWeight: '600',
-                fontSize: 17,
-              },
-              contentStyle: {
-                backgroundColor: theme.colors.bg,
-              },
-            }}
-          >
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="settings"
-              options={{
-                presentation: 'modal',
-                title: 'Ustawienia i Kopia',
-              }}
-            />
-            <Stack.Screen
-              name="recipe-builder"
-              options={{
-                presentation: 'modal',
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="gongfu"
-              options={{
-                presentation: 'modal',
-                headerShown: false,
-              }}
-            />
-          </Stack>
+          <RootStack />
         </BrewProvider>
       </LanguageProvider>
     </SafeAreaProvider>

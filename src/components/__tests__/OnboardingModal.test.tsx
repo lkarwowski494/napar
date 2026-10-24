@@ -8,9 +8,9 @@ import { OnboardingModal } from '../OnboardingModal';
 import { LanguageProvider } from '../../core/i18n';
 
 describe('OnboardingModal Component', () => {
-  it('renders onboarding modal with 3 preference options and welcome copy', () => {
+  it('renders onboarding modal with 3 preference options and welcome copy', async () => {
     let tree: any;
-    act(() => {
+    await act(async () => {
       tree = renderer.create(
         <LanguageProvider>
           <OnboardingModal visible={true} onComplete={jest.fn()} />
@@ -37,10 +37,10 @@ describe('OnboardingModal Component', () => {
     expect(submitBtn).toBeTruthy();
   });
 
-  it('selects coffee only and completes onboarding with "coffee"', () => {
+  it('selects coffee only and completes onboarding with "coffee"', async () => {
     const mockComplete = jest.fn();
     let tree: any;
-    act(() => {
+    await act(async () => {
       tree = renderer.create(
         <LanguageProvider>
           <OnboardingModal visible={true} onComplete={mockComplete} />
@@ -52,21 +52,21 @@ describe('OnboardingModal Component', () => {
     const coffeeCard = root.findByProps({ testID: 'onboarding-pref-coffee' });
     const submitBtn = root.findByProps({ testID: 'onboarding-submit-btn' });
 
-    act(() => {
+    await act(async () => {
       coffeeCard.props.onPress();
     });
 
-    act(() => {
+    await act(async () => {
       submitBtn.props.onPress();
     });
 
     expect(mockComplete).toHaveBeenCalledWith('coffee');
   });
 
-  it('selects tea only and completes onboarding with "tea"', () => {
+  it('selects tea only and completes onboarding with "tea"', async () => {
     const mockComplete = jest.fn();
     let tree: any;
-    act(() => {
+    await act(async () => {
       tree = renderer.create(
         <LanguageProvider>
           <OnboardingModal visible={true} onComplete={mockComplete} />
@@ -78,21 +78,21 @@ describe('OnboardingModal Component', () => {
     const teaCard = root.findByProps({ testID: 'onboarding-pref-tea' });
     const submitBtn = root.findByProps({ testID: 'onboarding-submit-btn' });
 
-    act(() => {
+    await act(async () => {
       teaCard.props.onPress();
     });
 
-    act(() => {
+    await act(async () => {
       submitBtn.props.onPress();
     });
 
     expect(mockComplete).toHaveBeenCalledWith('tea');
   });
 
-  it('selects both and completes onboarding with "both"', () => {
+  it('selects both and completes onboarding with "both"', async () => {
     const mockComplete = jest.fn();
     let tree: any;
-    act(() => {
+    await act(async () => {
       tree = renderer.create(
         <LanguageProvider>
           <OnboardingModal visible={true} onComplete={mockComplete} />
@@ -104,11 +104,11 @@ describe('OnboardingModal Component', () => {
     const bothCard = root.findByProps({ testID: 'onboarding-pref-both' });
     const submitBtn = root.findByProps({ testID: 'onboarding-submit-btn' });
 
-    act(() => {
+    await act(async () => {
       bothCard.props.onPress();
     });
 
-    act(() => {
+    await act(async () => {
       submitBtn.props.onPress();
     });
 

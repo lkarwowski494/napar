@@ -82,7 +82,9 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
               onPress={() => {
                 Share.share({
                   title: recipe.name,
-                  message: `${recipe.name} — receptura parzenia w Napar:\n${shareUrl}`,
+                  message: t?.appName === 'Steepwise'
+                    ? `${recipe.name} — brew recipe in Steepwise:\n${shareUrl}`
+                    : `${recipe.name} — receptura parzenia w Napar:\n${shareUrl}`,
                   url: shareUrl,
                 });
               }}
@@ -96,7 +98,7 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
               testID="copy-link-btn"
               style={[styles.shareActionBtn, styles.shareActionBtnSecondary]}
               onPress={() => {
-                Alert.alert('Link receptury', shareUrl);
+                Alert.alert(t.brew?.qrCopied || 'Link receptury', shareUrl);
               }}
             >
               <Text style={styles.shareActionBtnTextSecondary}>

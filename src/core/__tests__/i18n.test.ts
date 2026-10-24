@@ -4,6 +4,29 @@
 
 import React from 'react';
 import renderer from 'react-test-renderer';
+
+const mockSettings = new Map<string, string>();
+const mockDb: any = {
+  settings: mockSettings,
+  execSync: jest.fn(),
+  getFirstSync: jest.fn((query: string, params?: any[]) => {
+    if (query.includes('FROM app_settings WHERE key = ?')) {
+      const val = mockSettings.get(params?.[0]);
+      return val !== undefined ? { value: val } : null;
+    }
+    return null;
+  }),
+  getAllSync: jest.fn(() => []),
+  runSync: jest.fn((query: string, params?: any[]) => {
+    if (query.includes('INSERT OR REPLACE INTO app_settings')) {
+      mockSettings.set(params![0], params![1]);
+    }
+  }),
+};
+
+jest.mock('expo-sqlite', () => ({
+  openDatabaseSync: jest.fn(() => mockDb),
+}));
 import {
   detectSystemLanguage,
   translations,
@@ -15,6 +38,7 @@ import {
   plural,
   getPluralCategory,
 } from '../i18n';
+import { getAppSetting } from '../database';
 
 describe('i18n System', () => {
   test('Wykrywa język systemowy lub domyślny fallback', () => {
@@ -130,6 +154,7 @@ describe('i18n System', () => {
     });
     expect(contextValue.language).toBe('en');
     expect(contextValue.t.appName).toBe('Steepwise');
+    expect(getAppSetting('app_language')).toBe('en');
 
     renderer.act(() => {
       contextValue.setLanguage('pl');

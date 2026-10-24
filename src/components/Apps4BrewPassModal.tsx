@@ -35,7 +35,7 @@ export function Apps4BrewPassModal({
   onPurchaseSuccess,
   onSubscribed,
 }: Apps4BrewPassModalProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { purchaseWithStoreKit, restore, status, brewsRemaining, daysRemaining } = useAppAccess();
   const [isProcessing, setIsProcessing] = React.useState(false);
 
@@ -120,13 +120,18 @@ export function Apps4BrewPassModal({
           {status === 'trial_active' ? (
             <View style={styles.trialStatusCard}>
               <Text style={styles.trialStatusText}>
-                Pozostało Ci {brewsRemaining} {brewsRemaining === 1 ? 'parzenie' : 'parzenia'} w bezpłatnym okresie próbnym ({daysRemaining} dni).
+                {language === 'en'
+                  ? `You have ${brewsRemaining} brew${brewsRemaining === 1 ? '' : 's'} remaining in your free trial (${daysRemaining} days).`
+                  : `Pozostało Ci ${brewsRemaining} ${brewsRemaining === 1 ? 'parzenie' : 'parzenia'} w bezpłatnym okresie próbnym (${daysRemaining} dni).`}
               </Text>
             </View>
           ) : (
             <View style={[styles.trialStatusCard, styles.trialExpiredCard]}>
               <Text style={styles.trialExpiredText}>
-                Twój bezpłatny okres próbny dobiegł końca. Wybierz plan poniżej, aby parzyć kolejne filiżanki.
+                {t.paywall?.trialExpiredNotice ||
+                  (language === 'en'
+                    ? 'Your free trial has ended. Choose a plan below to continue brewing.'
+                    : 'Twój bezpłatny okres próbny dobiegł końca. Wybierz plan poniżej, aby parzyć kolejne filiżanki.')}
               </Text>
             </View>
           )}
@@ -220,7 +225,9 @@ export function Apps4BrewPassModal({
                 accessibilityRole="link"
                 accessibilityLabel={t.paywall?.eulaLabel || 'Regulamin usługi EULA'}
               >
-                <Text style={styles.legalLinkText}>Regulamin (EULA) ↗</Text>
+                <Text style={styles.legalLinkText}>
+                  {t.paywall?.eulaLabel ? `${t.paywall.eulaLabel} ↗` : (language === 'en' ? 'Terms of Use (EULA) ↗' : 'Regulamin (EULA) ↗')}
+                </Text>
               </Pressable>
               <Text style={styles.legalLinkDivider}>·</Text>
               <Pressable
@@ -229,13 +236,17 @@ export function Apps4BrewPassModal({
                 accessibilityRole="link"
                 accessibilityLabel={t.paywall?.privacyLabel || 'Polityka Prywatności'}
               >
-                <Text style={styles.legalLinkText}>Polityka Prywatności ↗</Text>
+                <Text style={styles.legalLinkText}>
+                  {t.paywall?.privacyLabel ? `${t.paywall.privacyLabel} ↗` : (language === 'en' ? 'Privacy Policy ↗' : 'Polityka Prywatności ↗')}
+                </Text>
               </Pressable>
             </View>
           </View>
 
           <Text style={styles.footerNote}>
-            100% Offline-First · Zero kont i logowania · Chmura rodzinna Apple Family Sharing
+            {language === 'en'
+              ? '100% Offline-First · Zero accounts & login · Apple Family Sharing'
+              : '100% Offline-First · Zero kont i logowania · Chmura rodzinna Apple Family Sharing'}
           </Text>
         </ScrollView>
       </SafeAreaView>

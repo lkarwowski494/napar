@@ -6,6 +6,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+
 export type SupportedLanguage = 'pl' | 'en';
 
 export function detectSystemLanguage(): SupportedLanguage {
@@ -1133,8 +1134,53 @@ const LanguageContext = createContext<LanguageContextType>({
   t: translations.pl,
 });
 
+function getStoredLanguage(): SupportedLanguage | null {
+  try {
+    const db = require('./database');
+    if (db && typeof db.getAppSetting === 'function') {
+      const persisted = db.getAppSetting('app_language', '');
+      if (persisted === 'pl' || persisted === 'en') {
+        return persisted;
+      }
+    }
+  } catch {
+    // fallback
+  }
+  return null;
+}
+
+function persistLanguage(lang: SupportedLanguage): void {
+  try {
+    const db = require('./database');
+    if (db && typeof db.setAppSetting === 'function') {
+      db.setAppSetting('app_language', lang);
+    }
+  } catch {
+    // fallback
+  }
+}
+
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<SupportedLanguage>(() => detectSystemLanguage());
+  const [language, setLanguageState] = useState<SupportedLanguage>(() => {
+    try {
+      const persisted = getStoredLanguage();
+      if (persisted === 'pl' || persisted === 'en') {
+        return persisted;
+      }
+    } catch {
+      // safe fallback
+    }
+    return getStoredLanguage() || detectSystemLanguage();
+  });
+
+  const setLanguage = (lang: SupportedLanguage) => {
+    setLanguageState(lang);
+    try {
+      persistLanguage(lang);
+    } catch {
+      // safe fallback
+    }
+  };
 
   const value = {
     language,
@@ -1150,6 +1196,14 @@ export function useTranslation(): LanguageContextType {
 }
 
 export function getCurrentTranslations(): Translations {
+  try {
+    const persisted = getStoredLanguage();
+    if (persisted === 'pl' || persisted === 'en') {
+      return translations[persisted] || translations.en;
+    }
+  } catch {
+    // fallback
+  }
   const lang = detectSystemLanguage();
   return translations[lang] || translations.en;
 }

@@ -28,7 +28,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
   onSelectForBrew,
   onOpenEdit,
 }) => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const resting =
     item.type === 'coffee' && item.roastOrHarvestDate
       ? evaluateRestingWindow(item.roastOrHarvestDate)
@@ -74,7 +74,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
               resting.stage === 'aging' && styles.restingPastText,
             ]}
           >
-            {resting.messagePl}
+            {language === 'en' ? (resting.messageEn || resting.messagePl) : resting.messagePl}
           </Text>
         </View>
       )}

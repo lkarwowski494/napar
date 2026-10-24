@@ -101,7 +101,7 @@ export default function RecipeBuilderScreen() {
           }
         }
       } catch (err) {
-        console.warn('Błąd wczytywania receptury:', err);
+        console.warn('[recipe-builder] Failed to load recipe:', err);
       }
     }
   }, [id]);

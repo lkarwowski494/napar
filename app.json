@@ -55,7 +55,7 @@
         "UIRequiresFullScreen": true,
         "ITSAppUsesNonExemptEncryption": false,
         "CFBundleAllowMixedLocalizations": true,
-        "NSCameraUsageDescription": "Napar potrzebuje dostępu do aparatu, aby skanować kody QR receptur parzenia kawy i herbaty.",
+        "NSCameraUsageDescription": "Napar requires camera access to scan coffee and tea recipe QR codes.",
         "CFBundleLocalizations": [
           "en",
           "pl",
@@ -114,7 +114,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Napar potrzebuje dostępu do aparatu, aby skanować kody QR receptur parzenia kawy i herbaty.",
+          "cameraPermission": "Napar requires camera access to scan coffee and tea recipe QR codes.",
           "microphonePermission": false
         }
       ],

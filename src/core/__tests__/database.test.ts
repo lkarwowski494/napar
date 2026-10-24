@@ -238,6 +238,9 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(SCHEMA_SQL).toContain(
       'CREATE INDEX IF NOT EXISTS idx_recipes_fav_method_name ON recipes(is_favorite DESC, method, name)'
     );
+    expect(SCHEMA_SQL).toContain('idx_sessions_inventory_item');
+    expect(SCHEMA_SQL).toContain('idx_caffeine_brew_session'
+    );
   });
 
   test('Operacje na spiżarni (Inventory): dodanie, odjęcie gramatury, pobranie, usunięcie', () => {

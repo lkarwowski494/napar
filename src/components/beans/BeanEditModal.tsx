@@ -292,18 +292,21 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             />
             <View style={styles.weightQuickButtonsRow}>
               <Pressable
+                testID="quick-weight-minus-18"
                 style={styles.quickWeightBtn}
                 onPress={() => handleAdjustRemainingWeight(isImperial ? -0.5 : -15)}
               >
                 <Text style={styles.quickWeightBtnText}>{isImperial ? '-0.5 oz' : '-15 g'}</Text>
               </Pressable>
               <Pressable
+                testID="quick-weight-minus-18"
                 style={styles.quickWeightBtn}
                 onPress={() => handleAdjustRemainingWeight(isImperial ? -0.6 : -18)}
               >
                 <Text style={styles.quickWeightBtnText}>{isImperial ? '-0.6 oz' : '-18 g'}</Text>
               </Pressable>
               <Pressable
+                testID="quick-weight-minus-18"
                 style={styles.quickWeightBtn}
                 onPress={() => handleAdjustRemainingWeight(isImperial ? 0.5 : 15)}
               >
