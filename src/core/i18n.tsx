@@ -99,6 +99,35 @@ export const translations = {
       duplicateSuccess: 'Receptura została sklonowana do Twoich własnych receptur.',
       addTime10: '+10s',
       subTime10: '-10s',
+      totalTimeLabel: 'CAŁKOWITY CZAS',
+      totalTimeAccessibility: 'Całkowity czas',
+      stepBadge: 'Krok {current} z {total}',
+      stepAccessibility: 'Krok {current} z {total}: {stepName}. Cel wody: {water} gramów, pozostało {seconds} sekund.',
+      subTime10Accessibility: 'Odejmij 10 sekund',
+      addTime10Accessibility: 'Dodaj 10 sekund',
+      pourUpTo: 'Zalej do',
+      startBrewAccessibility: 'Rozpocznij parzenie',
+      startBrewHint: 'Uruchamia stoper i pierwszy etap parzenia',
+      startBrewBtn: 'ROZPOCZNIJ PARZENIE',
+      previousStepAccessibility: 'Poprzedni krok',
+      previousStepHint: 'Cofa do poprzedniego etapu parzenia',
+      previousStepBtn: '◀ Wstecz',
+      pauseBrewAccessibility: 'Wstrzymaj parzenie',
+      pauseBrewHint: 'Zatrzymuje odliczanie czasu',
+      pauseBrewBtn: 'PAUZA',
+      nextStepAccessibility: 'Następny krok',
+      nextStepHint: 'Przechodzi do kolejnego etapu zalewania',
+      nextStepBtn: 'Dalej ▶',
+      finishBrewAccessibility: 'Zakończ parzenie',
+      finishBrewHint: 'Kończy parzenie i otwiera arkusz oceny',
+      finishBrewBtn: 'Zakończ ▶',
+      resetTimerAccessibility: 'Zresetuj stoper',
+      resetTimerHint: 'Zeruje czas i wraca do stanu początkowego',
+      resumeBrewAccessibility: 'Wznów parzenie',
+      resumeBrewHint: 'Wznawia odliczanie czasu parzenia',
+      saveSessionAccessibility: 'Zapisz sesję',
+      saveSessionHint: 'Otwiera arkusz degustacyjny do zapisu notatek',
+      saveSessionBtn: 'Zapisz',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha',
@@ -520,6 +549,35 @@ export const translations = {
       duplicateSuccess: 'Recipe duplicated to your custom recipes.',
       addTime10: '+10s',
       subTime10: '-10s',
+      totalTimeLabel: 'TOTAL TIME',
+      totalTimeAccessibility: 'Total time',
+      stepBadge: 'Step {current} of {total}',
+      stepAccessibility: 'Step {current} of {total}: {stepName}. Target water: {water} grams, {seconds} seconds remaining.',
+      subTime10Accessibility: 'Subtract 10 seconds',
+      addTime10Accessibility: 'Add 10 seconds',
+      pourUpTo: 'Pour up to',
+      startBrewAccessibility: 'Start brewing',
+      startBrewHint: 'Starts the timer and first brew step',
+      startBrewBtn: 'START BREWING',
+      previousStepAccessibility: 'Previous step',
+      previousStepHint: 'Goes back to previous brew step',
+      previousStepBtn: '◀ Back',
+      pauseBrewAccessibility: 'Pause brewing',
+      pauseBrewHint: 'Pauses time countdown',
+      pauseBrewBtn: 'PAUSE',
+      nextStepAccessibility: 'Next step',
+      nextStepHint: 'Advances to next pour step',
+      nextStepBtn: 'Next ▶',
+      finishBrewAccessibility: 'Finish brewing',
+      finishBrewHint: 'Finishes brewing and opens rating sheet',
+      finishBrewBtn: 'Finish ▶',
+      resetTimerAccessibility: 'Reset timer',
+      resetTimerHint: 'Resets time and returns to initial state',
+      resumeBrewAccessibility: 'Resume brewing',
+      resumeBrewHint: 'Resumes brew time countdown',
+      saveSessionAccessibility: 'Save session',
+      saveSessionHint: 'Opens tasting sheet to save notes',
+      saveSessionBtn: 'Save',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha',
@@ -901,6 +959,34 @@ export function getCurrentTranslations(): Translations {
 }
 
 /**
+ * Wykrywa kategorię liczby mnogiej zgodnie z regułami CLDR / Intl.PluralRules.
+ * Posiada wbudowany bezpieczny fallback dla środowiska Hermes / braku pełnego Intl.
+ */
+export function getPluralCategory(
+  lang: string,
+  count: number
+): 'zero' | 'one' | 'two' | 'few' | 'many' | 'other' {
+  try {
+    if (typeof Intl !== 'undefined' && typeof Intl.PluralRules === 'function') {
+      return new Intl.PluralRules(lang).select(count) as any;
+    }
+  } catch {
+    // bezpieczny fallback dla Hermesa
+  }
+
+  const abs = Math.abs(Math.floor(count));
+  if (lang.toLowerCase().startsWith('pl')) {
+    const n = abs % 100;
+    const n10 = n % 10;
+    if (abs === 1) return 'one';
+    if (n10 >= 2 && n10 <= 4 && (n < 12 || n > 14)) return 'few';
+    return 'many';
+  }
+
+  return abs === 1 ? 'one' : 'other';
+}
+
+/**
  * Polska odmiana gramatyczna liczebników (RD-ENG-09, NFR-I18N-007).
  * Dla n = |x| mod 100, n10 = n mod 10:
  * - jeśli |x| === 1 -> one (np. 1 seria, 1 sekunda, 1 klik)
@@ -917,17 +1003,18 @@ export function pluralPl(count: number, one: string, few: string, many: string):
 }
 
 /**
- * Uniwersalny helper pluralizacji dla języków aplikacji ('pl' | 'en')
+ * Uniwersalny helper pluralizacji dla języków aplikacji ('pl' | 'en') oparty o Intl.PluralRules
  */
 export function plural(
   lang: SupportedLanguage,
   count: number,
-  forms: { one: string; few?: string; many?: string; other?: string }
+  forms: { one: string; few?: string; many?: string; other?: string; zero?: string; two?: string }
 ): string {
-  if (lang === 'pl') {
-    return pluralPl(count, forms.one, forms.few ?? forms.one, forms.many ?? forms.few ?? forms.one);
+  const category = getPluralCategory(lang, count);
+  if (forms[category]) {
+    return forms[category]!;
   }
-  const abs = Math.abs(Math.floor(count));
-  if (abs === 1) return forms.one;
+  if (category === 'few' && forms.many) return forms.many;
+  if (category === 'many' && forms.few) return forms.few;
   return forms.other ?? forms.many ?? forms.few ?? forms.one;
 }

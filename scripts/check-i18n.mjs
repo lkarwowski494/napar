@@ -149,6 +149,8 @@ function validateLocaleRecursive(sourceObj, targetObj, localeCode, prefix = '') 
   }
 }
 
+const enContent = readFileSync(join(localesDir, 'en.json'), 'utf8');
+
 for (const loc of EXPECTED_LOCALES) {
   const locPath = join(localesDir, `${loc}.json`);
   if (!existsSync(locPath)) {
@@ -156,7 +158,12 @@ for (const loc of EXPECTED_LOCALES) {
     continue;
   }
 
-  const locData = JSON.parse(readFileSync(locPath, 'utf8'));
+  const raw = readFileSync(locPath, 'utf8');
+  if (loc !== 'en' && raw.trim() === enContent.trim()) {
+    localeErrors.push(`[${loc}] Plik słownika jest nieprzetłumaczoną kopią 1:1 en.json. Wymagane unikalne tłumaczenie.`);
+  }
+
+  const locData = JSON.parse(raw);
   validateLocaleRecursive(sourceData, locData, loc);
   verifiedLocalesCount++;
 }
