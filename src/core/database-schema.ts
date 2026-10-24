@@ -168,5 +168,6 @@ CREATE TABLE IF NOT EXISTS app_settings (
 CREATE INDEX IF NOT EXISTS idx_inventory_archived ON inventory_items(is_archived);
 CREATE INDEX IF NOT EXISTS idx_sessions_brewed_at ON brew_sessions(brewed_at);
 CREATE INDEX IF NOT EXISTS idx_caffeine_consumed_at ON caffeine_logs(consumed_at);
+CREATE INDEX IF NOT EXISTS idx_recipes_fav_method_name ON recipes(is_favorite DESC, method, name);
 `;
 

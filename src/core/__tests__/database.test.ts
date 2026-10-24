@@ -53,7 +53,7 @@ import {
   getBeveragePreference,
   setBeveragePreference,
 } from '../database';
-import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../database-schema';
+import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog, SCHEMA_SQL } from '../database-schema';
 
 // Mock expo-sqlite with in-memory SQLite emulation
 const mockDb: any = {
@@ -231,6 +231,13 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(mockDb.execSync).toHaveBeenCalledWith('PRAGMA busy_timeout = 5000;');
     // Powinno zainicjalizować przepisy wzorcowe
     expect(mockDb.recipes.size).toBeGreaterThanOrEqual(10);
+  });
+
+  test('tworzy indeks idx_recipes_fav_method_name dla optymalizacji ekranu przepisów (M1-audytor-generalny-049)', () => {
+    expect(SCHEMA_SQL).toContain('idx_recipes_fav_method_name');
+    expect(SCHEMA_SQL).toContain(
+      'CREATE INDEX IF NOT EXISTS idx_recipes_fav_method_name ON recipes(is_favorite DESC, method, name)'
+    );
   });
 
   test('Operacje na spiżarni (Inventory): dodanie, odjęcie gramatury, pobranie, usunięcie', () => {
