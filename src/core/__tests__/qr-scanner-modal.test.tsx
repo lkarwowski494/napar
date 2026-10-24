@@ -94,4 +94,29 @@ describe('QrScannerModal Component (Zadanie N6)', () => {
       tree.unmount();
     });
   });
+
+  test('Renderuje skaner w języku angielskim z poprawnymi tekstami', () => {
+    (ExpoCamera.useCameraPermissions as jest.Mock).mockReturnValue([
+      { granted: false, canAskAgain: true, status: 'undetermined' },
+      jest.fn(),
+      jest.fn(),
+    ]);
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <QrScannerModal visible={true} onClose={jest.fn()} onScanRecipe={jest.fn()} language="en" />
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('QR Recipe Scanner');
+    expect(str).toContain('Camera Access Required');
+    expect(str).toContain('Allow Camera Access');
+    expect(str).toContain('Cancel');
+
+    renderer.act(() => {
+      tree.unmount();
+    });
+  });
 });

@@ -780,6 +780,7 @@ describe('Napar SQLite Database & Repositories', () => {
       stepsJson: '[]',
       isCustom: true,
       isFavorite: false,
+      createdAt: '2026-10-24T12:00:00.000Z',
     };
     saveRecipe(customRecipe);
     expect(mockDb.recipes.has('rec-custom-del')).toBe(true);

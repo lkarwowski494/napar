@@ -18,17 +18,20 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { theme } from './theme';
 import { CameraIcon } from '../components/icons/CraftIcons';
 
-interface QrScannerModalProps {
+export interface QrScannerModalProps {
   visible: boolean;
   onClose: () => void;
   onScanRecipe: (data: string) => void;
+  language?: 'pl' | 'en';
 }
 
 export const QrScannerModal: React.FC<QrScannerModalProps> = ({
   visible,
   onClose,
   onScanRecipe,
+  language = 'pl',
 }) => {
+  const isEn = language === 'en';
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const timeoutRef = React.useRef<any>(null);
@@ -63,11 +66,11 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
             style={styles.closeBtn}
             onPress={onClose}
             accessibilityRole="button"
-            accessibilityLabel="Zamknij skaner"
+            accessibilityLabel={isEn ? "Close scanner" : "Zamknij skaner"}
           >
-            <Text style={styles.closeBtnText}>Anuluj</Text>
+            <Text style={styles.closeBtnText}>{isEn ? "Cancel" : "Anuluj"}</Text>
           </Pressable>
-          <Text style={styles.headerTitle}>Skaner Receptur QR</Text>
+          <Text style={styles.headerTitle}>{isEn ? "QR Recipe Scanner" : "Skaner Receptur QR"}</Text>
           <View style={{ width: 60 }} />
         </View>
 
@@ -76,9 +79,9 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
             <View style={{ marginBottom: 16 }}>
               <CameraIcon size={44} color={theme.colors.copper} />
             </View>
-            <Text style={styles.permissionTitle}>Dostęp do Aparatu</Text>
+            <Text style={styles.permissionTitle}>{isEn ? "Camera Access Required" : "Dostęp do Aparatu"}</Text>
             <Text style={styles.permissionDesc}>
-              Aparat jest potrzebny, aby natychmiast zeskanować kod QR z telefonu innego baristy i zaimportować recepturę w 100% offline.
+              {isEn ? "Camera access is required to instantly scan coffee and tea recipe QR codes peer-to-peer 100% offline." : "Aparat jest potrzebny, aby natychmiast zeskanować kod QR z telefonu innego baristy i zaimportować recepturę w 100% offline."}
             </Text>
             <Pressable
               testID="qr-scanner-permission-btn"
@@ -91,12 +94,12 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
                 }
               }}
               accessibilityRole="button"
-              accessibilityLabel="Zezwól na aparat"
+              accessibilityLabel={isEn ? "Allow camera access" : "Zezwól na aparat"}
             >
               <Text style={styles.permissionBtnText}>
                 {permission && !permission.granted && !permission.canAskAgain
-                  ? 'Otwórz Ustawienia'
-                  : 'Zezwól na dostęp do aparatu'}
+                  ? (isEn ? 'Open Settings' : 'Otwórz Ustawienia')
+                  : (isEn ? 'Allow Camera Access' : 'Zezwól na dostęp do aparatu')}
               </Text>
             </Pressable>
           </View>
@@ -121,7 +124,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
                 <View style={[styles.corner, styles.bottomRight]} />
               </View>
               <Text style={styles.hintText}>
-                Skieruj aparat na kod QR receptury w aplikacji Napar
+                {isEn ? "Point camera at recipe QR code in Napar app" : "Skieruj aparat na kod QR receptury w aplikacji Napar"}
               </Text>
             </View>
           </View>
