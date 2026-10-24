@@ -129,6 +129,17 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(caffeine).toBe(290.4);
     });
 
+    it('estimates tea infusion caffeine with exponential decay bounded under 89% (M1-audytor-generalny-033)', () => {
+      const totalLeafCaffeine = 100.0;
+      let sumExtracted = 0;
+      for (let n = 1; n <= 20; n++) {
+        const extracted = estimateTeaInfusionCaffeineMg(totalLeafCaffeine, n);
+        sumExtracted += extracted;
+      }
+      expect(sumExtracted).toBeLessThan(89.0);
+      expect(sumExtracted).toBeGreaterThan(85.0);
+    });
+
     it('estimates espresso extraction efficiency', () => {
       // 18g * 12 * 0.75 = 162.0 mg
       const caffeine = estimateCoffeeCaffeineMg(18.0, 'arabica', 'espresso');
@@ -159,10 +170,10 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
 
     it('calculates Gongfu Cha decaying tea caffeine per infusion', () => {
       const totalLeaf = 100.0;
-      expect(estimateTeaInfusionCaffeineMg(totalLeaf, 1)).toBe(45.0);
-      expect(estimateTeaInfusionCaffeineMg(totalLeaf, 2)).toBe(30.0);
-      expect(estimateTeaInfusionCaffeineMg(totalLeaf, 3)).toBe(15.0);
-      expect(estimateTeaInfusionCaffeineMg(totalLeaf, 4)).toBe(5.0);
+      expect(estimateTeaInfusionCaffeineMg(totalLeaf, 1)).toBe(40.0);
+      expect(estimateTeaInfusionCaffeineMg(totalLeaf, 2)).toBe(22.0);
+      expect(estimateTeaInfusionCaffeineMg(totalLeaf, 3)).toBe(12.1);
+      expect(estimateTeaInfusionCaffeineMg(totalLeaf, 4)).toBe(6.7);
     });
   });
 
@@ -250,9 +261,9 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(estimateTeaInfusionCaffeineMg(0, 1)).toBe(0);
       expect(estimateTeaInfusionCaffeineMg(100, 0)).toBe(0);
       expect(estimateTeaInfusionCaffeineMg(100, -1)).toBe(0);
-      // 5th infusion: 2%
-      expect(estimateTeaInfusionCaffeineMg(100, 5)).toBe(2.0);
-      // 6th infusion: 2%
+      // 5th infusion: 0.40 * 0.55^4 * 100 = 3.7 mg
+      expect(estimateTeaInfusionCaffeineMg(100, 5)).toBe(3.7);
+      // 6th infusion: 0.40 * 0.55^5 * 100 = 2.0 mg
       expect(estimateTeaInfusionCaffeineMg(100, 6)).toBe(2.0);
     });
 

@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
 import { formatDoseWeight } from '../../core/unit-converter';
+import { estimateCoffeeCaffeineMg } from '../../core/domain-rules';
 import { theme } from '../../core/theme';
 
 interface CaffeineQuickAddModalProps {
@@ -27,37 +28,47 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
         <View style={styles.modalCard}>
           <Text style={styles.modalCardTitle}>Szybkie dodanie kofeiny</Text>
 
-          <Pressable
-            style={styles.quickOption}
-            onPress={() => onSelectOption('Kawa przelewowa (V60 / Drip)', 'coffee', 18, 140)}
-          >
-            <Text style={styles.quickOptionName}>Przelew / Drip (V60, Chemex)</Text>
-            <Text style={styles.quickOptionMg}>~140 mg ({formatDoseWeight(18, unitSystem)})</Text>
-          </Pressable>
+          {(() => {
+            const v60Mg = Math.round(estimateCoffeeCaffeineMg(18, 'arabica', 'filter'));
+            const doubleEspressoMg = Math.round(estimateCoffeeCaffeineMg(18, 'arabica', 'espresso'));
+            const singleEspressoMg = Math.round(estimateCoffeeCaffeineMg(9, 'arabica', 'espresso'));
+            const aeropressMg = Math.round(estimateCoffeeCaffeineMg(15, 'arabica', 'immersion'));
+            return (
+              <>
+                <Pressable
+                  style={styles.quickOption}
+                  onPress={() => onSelectOption('Kawa przelewowa (V60 / Drip)', 'coffee', 18, v60Mg)}
+                >
+                  <Text style={styles.quickOptionName}>Przelew / Drip (V60, Chemex)</Text>
+                  <Text style={styles.quickOptionMg}>~{v60Mg} mg ({formatDoseWeight(18, unitSystem)})</Text>
+                </Pressable>
 
-          <Pressable
-            style={styles.quickOption}
-            onPress={() => onSelectOption('Podwójne Espresso', 'coffee', 18, 130)}
-          >
-            <Text style={styles.quickOptionName}>Podwójne Espresso (Doppio)</Text>
-            <Text style={styles.quickOptionMg}>~130 mg ({formatDoseWeight(18, unitSystem)})</Text>
-          </Pressable>
+                <Pressable
+                  style={styles.quickOption}
+                  onPress={() => onSelectOption('Podwójne Espresso', 'coffee', 18, doubleEspressoMg)}
+                >
+                  <Text style={styles.quickOptionName}>Podwójne Espresso (Doppio)</Text>
+                  <Text style={styles.quickOptionMg}>~{doubleEspressoMg} mg ({formatDoseWeight(18, unitSystem)})</Text>
+                </Pressable>
 
-          <Pressable
-            style={styles.quickOption}
-            onPress={() => onSelectOption('Pojedyncze Espresso', 'coffee', 9, 65)}
-          >
-            <Text style={styles.quickOptionName}>Pojedyncze Espresso</Text>
-            <Text style={styles.quickOptionMg}>~65 mg ({formatDoseWeight(9, unitSystem)})</Text>
-          </Pressable>
+                <Pressable
+                  style={styles.quickOption}
+                  onPress={() => onSelectOption('Pojedyncze Espresso', 'coffee', 9, singleEspressoMg)}
+                >
+                  <Text style={styles.quickOptionName}>Pojedyncze Espresso</Text>
+                  <Text style={styles.quickOptionMg}>~{singleEspressoMg} mg ({formatDoseWeight(9, unitSystem)})</Text>
+                </Pressable>
 
-          <Pressable
-            style={styles.quickOption}
-            onPress={() => onSelectOption('AeroPress', 'coffee', 15, 110)}
-          >
-            <Text style={styles.quickOptionName}>AeroPress</Text>
-            <Text style={styles.quickOptionMg}>~110 mg ({formatDoseWeight(15, unitSystem)})</Text>
-          </Pressable>
+                <Pressable
+                  style={styles.quickOption}
+                  onPress={() => onSelectOption('AeroPress', 'coffee', 15, aeropressMg)}
+                >
+                  <Text style={styles.quickOptionName}>AeroPress</Text>
+                  <Text style={styles.quickOptionMg}>~{aeropressMg} mg ({formatDoseWeight(15, unitSystem)})</Text>
+                </Pressable>
+              </>
+            );
+          })()}
 
           <Pressable
             style={styles.quickOption}

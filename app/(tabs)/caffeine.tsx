@@ -25,6 +25,7 @@ import {
   calculateRemainingCaffeineMg,
   evaluateBedtimeCaffeine,
   calculateHoursUntilSafeCaffeine,
+  estimateCoffeeCaffeineMg,
 } from '../../src/core/domain-rules';
 import { CaffeineCurveChart } from '../../src/core/caffeine-chart';
 import { theme } from '../../src/core/theme';
@@ -118,7 +119,8 @@ export default function CaffeineScreen() {
   const bedtimeEval = evaluateBedtimeCaffeine(intakesForEvaluation, 25.0, halfLifeHours);
 
   // Curfew (godzina graniczna dla nowej filiżanki 140mg)
-  const hoursUntilSafe = calculateHoursUntilSafeCaffeine(140, 25.0, halfLifeHours);
+  const standardV60Mg = Math.round(estimateCoffeeCaffeineMg(18, 'arabica', 'filter'));
+  const hoursUntilSafe = calculateHoursUntilSafeCaffeine(standardV60Mg, 25.0, halfLifeHours);
   const curfewDate = new Date(targetBedtime.getTime() - hoursUntilSafe * 3600 * 1000);
   const curfewTimeString = `${curfewDate.getHours().toString().padStart(2, '0')}:${curfewDate
     .getMinutes()

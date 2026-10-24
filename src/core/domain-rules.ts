@@ -186,14 +186,7 @@ export function estimateCoffeeCaffeineMg(
  */
 export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number, infusionNumber: number): number {
   if (totalLeafCaffeineMg <= 0 || infusionNumber <= 0) return 0;
-
-  let fraction = 0.05;
-  if (infusionNumber === 1) fraction = 0.45;
-  else if (infusionNumber === 2) fraction = 0.30;
-  else if (infusionNumber === 3) fraction = 0.15;
-  else if (infusionNumber === 4) fraction = 0.05;
-  else fraction = 0.02;
-
+  const fraction = 0.40 * Math.pow(0.55, infusionNumber - 1);
   return Number((totalLeafCaffeineMg * fraction).toFixed(1));
 }
 

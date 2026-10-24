@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
+import { estimateCoffeeCaffeineMg } from '../../core/domain-rules';
 
 interface BedtimeCurfewCardProps {
   bedtimeHour: number;
@@ -114,7 +115,7 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
       <View style={styles.curfewAdviceBox}>
         <Text style={styles.curfewAdviceLabel}>BEZPIECZNA GODZINA (CURFEW)</Text>
         <Text style={styles.curfewAdviceVal}>
-          Ostatni przelew (140 mg) wypij do {curfewTimeString}
+          Ostatni przelew ({Math.round(estimateCoffeeCaffeineMg(18, 'arabica', 'filter'))} mg) wypij do {curfewTimeString}
         </Text>
       </View>
     </View>
