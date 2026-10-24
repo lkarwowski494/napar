@@ -18,6 +18,8 @@ import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
 import { getUnitSystem, getBeveragePreference } from '../../src/core/database';
 import { useBrew } from '../../src/core/brew-context';
+import { useAppAccess } from '../../src/core/app-access';
+import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { WaterChemistryTab } from '../../src/components/dialin/WaterChemistryTab';
 import { ExtractionYieldTab } from '../../src/components/dialin/ExtractionYieldTab';
 import { BrewRatioTab } from '../../src/components/dialin/BrewRatioTab';
@@ -40,6 +42,17 @@ export default function DialInScreen() {
     }
   })();
   const [activeTab, setActiveTab] = useState<'doctor' | 'ratio' | 'ey' | 'water'>('doctor');
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
+  const { canCreate, isSubscribed } = useAppAccess();
+
+  const handleSelectTab = (tab: 'doctor' | 'ratio' | 'ey' | 'water') => {
+    // Pro Gate WTP-1 (DEC-03): Doctor and Water require active subscription or active trial
+    if ((tab === 'doctor' || tab === 'water') && !canCreate && !isSubscribed) {
+      setShowPaywallModal(true);
+      return;
+    }
+    setActiveTab(tab);
+  };
 
   // Stan: Dial-in Doctor
   const [selectedIssue, setSelectedIssue] = useState<string>('sour');
@@ -82,7 +95,7 @@ export default function DialInScreen() {
       <View style={styles.segmentBar}>
         <Pressable
           style={[styles.segmentBtn, activeTab === 'doctor' && styles.segmentBtnActive]}
-          onPress={() => setActiveTab('doctor')}
+          onPress={() => handleSelectTab('doctor')}
         >
           <Text
             style={[
@@ -96,7 +109,7 @@ export default function DialInScreen() {
 
         <Pressable
           style={[styles.segmentBtn, activeTab === 'ratio' && styles.segmentBtnActive]}
-          onPress={() => setActiveTab('ratio')}
+          onPress={() => handleSelectTab('ratio')}
         >
           <Text
             style={[
@@ -110,7 +123,7 @@ export default function DialInScreen() {
 
         <Pressable
           style={[styles.segmentBtn, activeTab === 'ey' && styles.segmentBtnActive]}
-          onPress={() => setActiveTab('ey')}
+          onPress={() => handleSelectTab('ey')}
         >
           <Text
             style={[
@@ -124,7 +137,7 @@ export default function DialInScreen() {
 
         <Pressable
           style={[styles.segmentBtn, activeTab === 'water' && styles.segmentBtnActive]}
-          onPress={() => setActiveTab('water')}
+          onPress={() => handleSelectTab('water')}
         >
           <Text
             style={[
@@ -273,6 +286,10 @@ export default function DialInScreen() {
         </View>
         <Text style={styles.caffeineWorkshopArrow}>→</Text>
       </Pressable>
+      <Apps4BrewPassModal
+        visible={showPaywallModal}
+        onClose={() => setShowPaywallModal(false)}
+      />
     </ScrollView>
   );
 }

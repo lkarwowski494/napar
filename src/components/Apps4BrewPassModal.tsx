@@ -1,3 +1,4 @@
+import * as Linking from 'expo-linking';
 // ============================================================================
 // Napar (Steepwise) — Apps4Brew Pass Paywall Modal ("Cheaper than Espresso")
 // Pricing: $0.99/mo, $4.99/yr, $14.99 Lifetime.
@@ -207,8 +208,34 @@ export function Apps4BrewPassModal({
             <Text style={styles.restoreBtnText}>{t.paywall.restore}</Text>
           </Pressable>
 
+          {/* Ujawnienia subskrypcyjne App Store 3.1.2(c) */}
+          <View style={styles.legalNoticeContainer}>
+            <Text style={styles.legalNoticeText}>
+              Subskrypcja roczna i miesięczna odnawia się automatycznie, chyba że zostanie anulowana co najmniej 24 godziny przed końcem bieżącego okresu rozliczeniowego. Płatność zostanie pobrana z Twojego konta Apple ID / App Store w momencie potwierdzenia zakupu. Możesz zarządzać subskrypcją i wyłączyć automatyczne odnawianie w ustawieniach konta Apple ID w dowolnym momencie.
+            </Text>
+            <View style={styles.legalLinksRow}>
+              <Pressable
+                testID="eula-link-btn"
+                onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/terms.html')}
+                accessibilityRole="link"
+                accessibilityLabel="Regulamin usługi EULA"
+              >
+                <Text style={styles.legalLinkText}>Regulamin (EULA) ↗</Text>
+              </Pressable>
+              <Text style={styles.legalLinkDivider}>·</Text>
+              <Pressable
+                testID="privacy-link-btn"
+                onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/privacy.html')}
+                accessibilityRole="link"
+                accessibilityLabel="Polityka Prywatności"
+              >
+                <Text style={styles.legalLinkText}>Polityka Prywatności ↗</Text>
+              </Pressable>
+            </View>
+          </View>
+
           <Text style={styles.footerNote}>
-            100% Offline-First · Zero kont i logowania · Chmura rodzinna Apple/Google Family Sharing
+            100% Offline-First · Zero kont i logowania · Chmura rodzinna Apple Family Sharing
           </Text>
         </ScrollView>
       </SafeAreaView>
@@ -430,5 +457,33 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     textAlign: 'center',
     lineHeight: 16,
+  },
+  legalNoticeContainer: {
+    width: '100%',
+    paddingHorizontal: 8,
+    marginVertical: 12,
+    alignItems: 'center',
+  },
+  legalNoticeText: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 15,
+    marginBottom: 8,
+  },
+  legalLinksRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  legalLinkText: {
+    fontSize: 12,
+    color: theme.colors.copper,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  legalLinkDivider: {
+    color: theme.colors.textMuted,
+    fontSize: 12,
   },
 });
