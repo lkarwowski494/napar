@@ -63,6 +63,10 @@ jest.mock('expo-router', () => ({
 }));
 
 import GongfuScreen from '../../../app/gongfu';
+import { GongfuSessionSetup } from '../../components/gongfu/GongfuSessionSetup';
+import { GongfuInfusionHistory } from '../../components/gongfu/GongfuInfusionHistory';
+import { createGongfuSession } from '../gongfu-session';
+import { translations } from '../i18n';
 import { Alert } from 'react-native';
 import * as databaseModule from '../database';
 
@@ -320,5 +324,61 @@ describe('GongfuScreen Component', () => {
     });
 
     mockDb.settings.clear();
+  });
+
+  test('GongfuSessionSetup zawiera 7 typów herbat z lokalizacją EN/PL', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <GongfuSessionSetup
+          teaType="wulong_rock"
+          onSelectTeaType={jest.fn()}
+          teaName="Da Hong Pao"
+          onChangeTeaName={jest.fn()}
+          leafDoseGrams="7"
+          onChangeLeafDose={jest.fn()}
+          vesselCapacityMl="110"
+          onChangeVesselCapacity={jest.fn()}
+          waterTempCelsius="96"
+          onChangeWaterTemp={jest.fn()}
+          unitSystem="metric"
+          language="en"
+          t={translations.en}
+        />
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Rock Oolong');
+    expect(str).toContain('High Mountain');
+    expect(str).toContain('Green');
+    expect(str).toContain('White');
+    expect(str).toContain('Black');
+  });
+
+  test('GongfuInfusionHistory wyświetla zunifikowany model kofeiny w j. angielskim', () => {
+    const session = createGongfuSession({
+      teaName: 'Long Jing',
+      teaType: 'green',
+      leafDoseGrams: 5.0,
+      vesselCapacityMl: 100,
+      waterTempCelsius: 85,
+    });
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <GongfuInfusionHistory
+          session={session}
+          nextInfusionNum={1}
+          leafDoseGrams="5"
+          language="en"
+          t={translations.en}
+        />
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Steep #1 delivers ~60 mg (RD-19 extraction kinetics).');
   });
 });

@@ -10,7 +10,7 @@ import { GongfuTeaType } from '../../core/gongfu-session';
 import { gramsToOunces, mlToFluidOunces, celsiusToFahrenheit } from '../../core/unit-converter';
 import { theme } from '../../core/theme';
 
-interface GongfuSessionSetupProps {
+export interface GongfuSessionSetupProps {
   teaType: GongfuTeaType;
   onSelectTeaType: (type: GongfuTeaType) => void;
   teaName: string;
@@ -22,8 +22,19 @@ interface GongfuSessionSetupProps {
   waterTempCelsius: string;
   onChangeWaterTemp: (temp: string) => void;
   unitSystem: 'metric' | 'imperial';
+  language?: 'pl' | 'en';
   t: any;
 }
+
+const TEA_TYPE_OPTIONS: Array<{ id: GongfuTeaType; labelPl: string; labelEn: string }> = [
+  { id: 'wulong_rock', labelPl: 'Wulong Skalny', labelEn: 'Rock Oolong' },
+  { id: 'wulong_high_mountain', labelPl: 'Wysokogórski', labelEn: 'High Mountain' },
+  { id: 'puerh_sheng', labelPl: 'Sheng Puerh', labelEn: 'Sheng Puerh' },
+  { id: 'puerh_shou', labelPl: 'Shou Puerh', labelEn: 'Shou Puerh' },
+  { id: 'white', labelPl: 'Biała', labelEn: 'White' },
+  { id: 'black', labelPl: 'Czarna', labelEn: 'Black' },
+  { id: 'green', labelPl: 'Zielona', labelEn: 'Green' },
+];
 
 export const GongfuSessionSetup: React.FC<GongfuSessionSetupProps> = ({
   teaType,
@@ -37,8 +48,10 @@ export const GongfuSessionSetup: React.FC<GongfuSessionSetupProps> = ({
   waterTempCelsius,
   onChangeWaterTemp,
   unitSystem,
+  language = 'pl',
   t,
 }) => {
+  const isEn = language === 'en';
   const isImp = unitSystem === 'imperial';
   const leafBase = parseFloat(leafDoseGrams) || 0;
   const vesselBase = parseFloat(vesselCapacityMl) || 0;
@@ -47,34 +60,31 @@ export const GongfuSessionSetup: React.FC<GongfuSessionSetupProps> = ({
   const displayLeaf = isImp ? gramsToOunces(leafBase) : leafBase;
   const displayVessel = isImp ? mlToFluidOunces(vesselBase) : vesselBase;
   const displayTemp = isImp ? celsiusToFahrenheit(tempBase) : tempBase;
+
   return (
     <>
       {/* Wybór rodzaju herbaty */}
       <View style={styles.teaTypeRow}>
-        {(
-          [
-            { id: 'wulong_rock', label: 'Wulong Skalny' },
-            { id: 'puerh_sheng', label: 'Sheng Puerh' },
-            { id: 'puerh_shou', label: 'Shou Puerh' },
-            { id: 'white', label: 'Biała' },
-            { id: 'black', label: 'Czarna' },
-          ] as const
-        ).map((item) => (
-          <Pressable
-            key={item.id}
-            style={[styles.teaTypeChip, teaType === item.id && styles.teaTypeChipActive]}
-            onPress={() => onSelectTeaType(item.id)}
-          >
-            <Text
-              style={[
-                styles.teaTypeChipText,
-                teaType === item.id && styles.teaTypeChipTextActive,
-              ]}
+        {TEA_TYPE_OPTIONS.map((item) => {
+          const isActive = teaType === item.id;
+          const label = isEn ? item.labelEn : item.labelPl;
+          return (
+            <Pressable
+              key={item.id}
+              style={[styles.teaTypeChip, isActive && styles.teaTypeChipActive]}
+              onPress={() => onSelectTeaType(item.id)}
             >
-              {item.label}
-            </Text>
-          </Pressable>
-        ))}
+              <Text
+                style={[
+                  styles.teaTypeChipText,
+                  isActive && styles.teaTypeChipTextActive,
+                ]}
+              >
+                {label}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       {/* Karta Parametrów Liścia */}
@@ -83,7 +93,7 @@ export const GongfuSessionSetup: React.FC<GongfuSessionSetupProps> = ({
         <Field
           value={teaName}
           onChangeText={onChangeTeaName}
-          placeholder="Nazwa herbaty..."
+          placeholder={isEn ? 'Tea name...' : 'Nazwa herbaty...'}
         />
 
         <View style={styles.paramsRow}>

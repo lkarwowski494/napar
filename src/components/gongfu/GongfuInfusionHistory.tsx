@@ -6,12 +6,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { GongfuSession, estimateTotalLeafCaffeineMg } from '../../core/gongfu-session';
+import { estimateTeaInfusionCaffeineMg } from '../../core/domain-rules';
 import { theme } from '../../core/theme';
 
-interface GongfuInfusionHistoryProps {
+export interface GongfuInfusionHistoryProps {
   session: GongfuSession;
   nextInfusionNum: number;
   leafDoseGrams: string;
+  language?: 'pl' | 'en';
   t: any;
 }
 
@@ -19,10 +21,19 @@ export const GongfuInfusionHistory: React.FC<GongfuInfusionHistoryProps> = ({
   session,
   nextInfusionNum,
   leafDoseGrams,
+  language = 'pl',
   t,
 }) => {
+  const isEn = language === 'en';
   const leafDose = parseFloat(leafDoseGrams) || 7;
   const totalLeafCaffeine = estimateTotalLeafCaffeineMg(leafDose);
+  const nextInfusionCaffeine = totalLeafCaffeine > 0
+    ? estimateTeaInfusionCaffeineMg(totalLeafCaffeine, nextInfusionNum)
+    : 0;
+
+  const caffeineSubText = isEn
+    ? `Steep #${nextInfusionNum} delivers ~${nextInfusionCaffeine} mg (RD-19 extraction kinetics).`
+    : `Zalanie #${nextInfusionNum} dostarczy ok. ${nextInfusionCaffeine} mg (model kinetyki RD-19).`;
 
   return (
     <>
@@ -32,22 +43,7 @@ export const GongfuInfusionHistory: React.FC<GongfuInfusionHistoryProps> = ({
           <Text style={styles.caffeineTitle}>{t.gongfu.totalCaffeine}</Text>
           <Text style={styles.caffeineValue}>~{session.totalCaffeineMg} mg</Text>
         </View>
-        <Text style={styles.caffeineSub}>
-          Zalanie #{nextInfusionNum} dostarczy ok.{' '}
-          {totalLeafCaffeine > 0
-            ? (
-                totalLeafCaffeine *
-                (nextInfusionNum === 1
-                  ? 0.45
-                  : nextInfusionNum === 2
-                  ? 0.3
-                  : nextInfusionNum === 3
-                  ? 0.15
-                  : 0.05)
-              ).toFixed(1)
-            : 0}{' '}
-          mg (model kinetyki RD-19).
-        </Text>
+        <Text style={styles.caffeineSub}>{caffeineSubText}</Text>
       </View>
 
       {/* Historia Zalań Sesji */}
