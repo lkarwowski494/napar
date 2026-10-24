@@ -308,7 +308,7 @@ export default function SettingsScreen() {
         <View style={styles.divider} />
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Zgodność licencyjna</Text>
-          <Text style={styles.infoValue}>GPLv3 / Open Core</Text>
+          <Text style={styles.infoValue}>Proprietary (Apps4Brew)</Text>
         </View>
         <View style={styles.divider} />
         <Pressable

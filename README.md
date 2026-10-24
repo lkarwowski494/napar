@@ -201,4 +201,4 @@ napar/
 
 ## 📄 Licencja
 
-GPLv3 / Open Core — tworzone z pasją w duchu rzemiosła specialty.
+Copyright (c) 2026 Apps4Brew. All rights reserved. Oprogramowanie prawnie chronione.

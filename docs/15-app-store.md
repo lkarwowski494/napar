@@ -36,7 +36,7 @@
   `https://lkarwowski494.github.io/napar/privacy.html`
 * **Adres strony marketingowej:**
   `https://lkarwowski494.github.io/napar/`
-* **E-mail kontaktowy:** `kontakt@apps4craft.pl`
+* **E-mail kontaktowy:** `kontakt@apps4brew.pl`
 * **Szyfrowanie (*ITSAppUsesNonExemptEncryption*):** `false` (standardowe HTTPS bez niestandardowej kryptografii zastrzeżonej)
 
 ---
