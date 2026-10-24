@@ -4,6 +4,30 @@
 // ============================================================================
 
 export const theme = {
+  lightColors: {
+    bg: '#FBF9F6',
+    bgCard: '#FFFFFF',
+    bgCardSecondary: '#F2EFEB',
+    border: '#E2DDD6',
+    borderLight: '#ECE7E1',
+    copper: '#B85D20',
+    copperLight: '#D97736',
+    copperMuted: 'rgba(184, 93, 32, 0.12)',
+    emerald: '#1F614D',
+    emeraldLight: '#2A7B62',
+    emeraldMuted: 'rgba(31, 97, 77, 0.12)',
+    sage: '#3B7A2E',
+    textPrimary: '#1C1917',
+    textSecondary: '#57534E',
+    textMuted: '#78716C',
+    statusPeak: '#3B7A2E',
+    statusPeakMuted: 'rgba(59, 122, 46, 0.12)',
+    statusDegassing: '#B85D20',
+    statusStable: '#2B6684',
+    statusAging: '#78716C',
+    danger: '#B91C1C',
+    dangerMuted: 'rgba(185, 28, 28, 0.12)',
+  },
   colors: {
     bg: '#121214',
     bgCard: '#1C1C1F',

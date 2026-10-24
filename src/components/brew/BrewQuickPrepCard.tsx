@@ -110,6 +110,7 @@ export function BrewQuickPrepCard({
               style={styles.stepBtn}
               onPress={() => onDoseChange(Math.max(1, doseGrams - 1))}
               disabled={disabled}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               accessibilityRole="button"
               accessibilityLabel="Zmniejsz dozę kawy"
             >
@@ -120,6 +121,7 @@ export function BrewQuickPrepCard({
               style={styles.stepBtn}
               onPress={() => onDoseChange(doseGrams + 1)}
               disabled={disabled}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               accessibilityRole="button"
               accessibilityLabel="Zwiększ dozę kawy"
             >
@@ -140,6 +142,7 @@ export function BrewQuickPrepCard({
                 style={styles.stepBtn}
                 onPress={() => onWaterChange(Math.max(10, waterGrams - 10))}
                 disabled={disabled}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 accessibilityRole="button"
                 accessibilityLabel="Zmniejsz ilość wody"
               >
@@ -154,6 +157,7 @@ export function BrewQuickPrepCard({
                 style={styles.stepBtn}
                 onPress={() => onWaterChange(waterGrams + 10)}
                 disabled={disabled}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 accessibilityRole="button"
                 accessibilityLabel="Zwiększ ilość wody"
               >

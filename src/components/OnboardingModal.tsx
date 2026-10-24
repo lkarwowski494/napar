@@ -3,7 +3,7 @@
 // Allows third-wave coffee purists and artisan tea masters to personalize their UI
 // ============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  AccessibilityInfo,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BeveragePreference } from '../core/database';
@@ -34,13 +35,18 @@ interface OnboardingModalProps {
 export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
   const { t, language } = useTranslation();
   const [selectedPref, setSelectedPref] = useState<BeveragePreference>('both');
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion).catch(() => {});
+  }, []);
 
   const handleStart = () => {
     onComplete(selectedPref);
   };
 
   return (
-    <Modal visible={visible} animationType="fade" transparent={false}>
+    <Modal visible={visible} animationType={reduceMotion ? "none" : "fade"} transparent={false}>
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom', 'left', 'right']}>
         <ScrollView
           style={styles.scroll}

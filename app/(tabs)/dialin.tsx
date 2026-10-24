@@ -94,6 +94,9 @@ export default function DialInScreen() {
       {/* Przełącznik zakładek */}
       <View style={styles.segmentBar}>
         <Pressable
+          accessibilityRole="tab"
+          accessibilityLabel="Dial-in Doctor"
+          accessibilityState={{ selected: activeTab === 'doctor' }}
           style={[styles.segmentBtn, activeTab === 'doctor' && styles.segmentBtnActive]}
           onPress={() => handleSelectTab('doctor')}
         >
@@ -108,6 +111,9 @@ export default function DialInScreen() {
         </Pressable>
 
         <Pressable
+          accessibilityRole="tab"
+          accessibilityLabel="Ratio"
+          accessibilityState={{ selected: activeTab === 'ratio' }}
           style={[styles.segmentBtn, activeTab === 'ratio' && styles.segmentBtnActive]}
           onPress={() => handleSelectTab('ratio')}
         >
@@ -122,6 +128,9 @@ export default function DialInScreen() {
         </Pressable>
 
         <Pressable
+          accessibilityRole="tab"
+          accessibilityLabel="Ekstrakcja EY"
+          accessibilityState={{ selected: activeTab === 'ey' }}
           style={[styles.segmentBtn, activeTab === 'ey' && styles.segmentBtnActive]}
           onPress={() => handleSelectTab('ey')}
         >
@@ -136,6 +145,9 @@ export default function DialInScreen() {
         </Pressable>
 
         <Pressable
+          accessibilityRole="tab"
+          accessibilityLabel="Woda SCA"
+          accessibilityState={{ selected: activeTab === 'water' }}
           style={[styles.segmentBtn, activeTab === 'water' && styles.segmentBtnActive]}
           onPress={() => handleSelectTab('water')}
         >

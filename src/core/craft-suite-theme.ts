@@ -23,9 +23,9 @@ export const CRAFT_APPS: Record<CraftAppId, CraftAppTheme> = {
     id: 'napar',
     name: 'Napar',
     domain: 'Kawa & Herbata (Ekstrakcja)',
-    accent: '#C86A28', // Warm Copper
+    accent: '#D97736', // Warm Copper
     accentLight: '#E5A96A', // Crema Gold
-    accentMuted: 'rgba(200, 106, 40, 0.15)',
+    accentMuted: 'rgba(217, 119, 54, 0.15)',
     secondaryAccent: '#2A7B62', // Tea Emerald
     heroDescriptor: 'Czas parzenia i przepływ wody',
   },

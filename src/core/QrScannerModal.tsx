@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Modal,
   Pressable,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -82,11 +83,21 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
             <Pressable
               testID="qr-scanner-permission-btn"
               style={styles.permissionBtn}
-              onPress={requestPermission}
+              onPress={() => {
+                if (permission && !permission.granted && !permission.canAskAgain) {
+                  Linking.openSettings();
+                } else {
+                  requestPermission();
+                }
+              }}
               accessibilityRole="button"
               accessibilityLabel="Zezwól na aparat"
             >
-              <Text style={styles.permissionBtnText}>Zezwól na dostęp do aparatu</Text>
+              <Text style={styles.permissionBtnText}>
+                {permission && !permission.granted && !permission.canAskAgain
+                  ? 'Otwórz Ustawienia'
+                  : 'Zezwól na dostęp do aparatu'}
+              </Text>
             </Pressable>
           </View>
         ) : (

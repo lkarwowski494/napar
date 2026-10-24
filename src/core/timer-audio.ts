@@ -9,6 +9,7 @@ import { createAudioPlayer, AudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 import { announce } from './announce';
 import { getCurrentTranslations } from './i18n';
+import { getHapticsEnabled } from './database';
 
 let soundInstance: AudioPlayer | null = null;
 
@@ -77,10 +78,12 @@ export async function notifyTimerStepWarning(secondsLeft = 3): Promise<boolean> 
   announce(template.replace('{seconds}', String(secondsLeft)));
 
   // 2. Haptic warning
-  try {
-    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-  } catch {
-    // Ignore in non-native / test environments
+  if (getHapticsEnabled()) {
+    try {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    } catch {
+      // Ignore in non-native / test environments
+    }
   }
 
   // 3. Audio chime
@@ -99,10 +102,12 @@ export async function notifyTimerFinished(stepName?: string): Promise<boolean> {
   announce(message);
 
   // 2. Haptic success
-  try {
-    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  } catch {
-    // Ignore in non-native / test environments
+  if (getHapticsEnabled()) {
+    try {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      // Ignore in non-native / test environments
+    }
   }
 
   // 3. Audio chime

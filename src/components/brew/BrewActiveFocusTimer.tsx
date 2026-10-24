@@ -1,3 +1,28 @@
+export function DripperExtractionGauge({
+  stepProgress,
+  targetWaterGrams,
+  currentStepIndex,
+  totalSteps,
+}: {
+  stepProgress: number;
+  targetWaterGrams: number;
+  currentStepIndex: number;
+  totalSteps: number;
+}) {
+  const percent = Math.min(100, Math.max(0, Math.round(stepProgress * 100)));
+  return (
+    <View style={styles.gaugeContainer} testID="dripper-extraction-gauge">
+      <View style={styles.gaugeHeader}>
+        <Text style={styles.gaugeLabel}>EKSTRAKCJA & PRZEPŁYW</Text>
+        <Text style={styles.gaugePercent}>{percent}% ({targetWaterGrams}g)</Text>
+      </View>
+      <View style={styles.stepProgressContainer}>
+        <View style={[styles.stepProgressBar, { width: `${percent}%` }]} />
+      </View>
+    </View>
+  );
+}
+
 // ============================================================================
 // Napar (Steepwise) — BrewActiveFocusTimer Component (Apps4Craft Design System)
 // Immersive Focus Mode: Clear typography readable from 1 meter, fat thumb controls.
@@ -62,15 +87,13 @@ export function BrewActiveFocusTimer({
           {formatTime(snapshot.totalElapsedSeconds)}
         </Text>
 
-        {/* Pasek postępu kroku */}
-        <View style={styles.stepProgressContainer}>
-          <View
-            style={[
-              styles.stepProgressBar,
-              { width: `${Math.round(snapshot.stepProgress * 100)}%` },
-            ]}
-          />
-        </View>
+        {/* Wizualny wskaźnik ekstrakcji i przepływu (DEC-08) */}
+        <DripperExtractionGauge
+          stepProgress={snapshot.stepProgress}
+          targetWaterGrams={snapshot.targetWaterGrams}
+          currentStepIndex={snapshot.currentStepIndex}
+          totalSteps={snapshot.totalSteps}
+        />
 
         {/* Informacja o bieżącym etapie */}
         {snapshot.currentStep && (
@@ -276,6 +299,29 @@ const styles = StyleSheet.create({
     marginVertical: 4,
     color: theme.colors.textPrimary,
   },
+  gaugeContainer: {
+    width: '100%',
+    marginBottom: 16,
+  },
+  gaugeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  gaugeLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    color: theme.colors.copper,
+    textTransform: 'uppercase',
+  },
+  gaugePercent: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    fontVariant: ['tabular-nums'],
+  },
   stepProgressContainer: {
     width: '100%',
     height: 6,
@@ -408,7 +454,7 @@ const styles = StyleSheet.create({
     minHeight: 56,
   },
   mainStartButtonText: {
-    color: '#FFFFFF',
+    color: '#121214',
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 0.8,

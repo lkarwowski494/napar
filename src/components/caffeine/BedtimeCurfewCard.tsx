@@ -104,7 +104,7 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
         ]}
       >
         <Text style={styles.curfewVerdictText}>
-          Poziom kofeiny o {bedtimeHour}:00: {bedtimeEval.totalRemainingMg} mg
+          {bedtimeEval.isSafeForSleep ? '✓ ' : '⚠ '}Poziom kofeiny o {bedtimeHour}:00: {bedtimeEval.totalRemainingMg} mg
         </Text>
       </View>
 
