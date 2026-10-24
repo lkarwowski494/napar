@@ -5,6 +5,7 @@
 import {
   utf8ToBase64,
   base64ToUtf8,
+  normalizeBase64,
   recipeToCompactPayload,
   encodeRecipeToShareUrl,
   decodeRecipeFromShareUrl,
@@ -196,6 +197,8 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     // Stwórz wariant ze spacjami zamiast plusów (np. gdy komunikator lub url decoder zamienił + na spacji)
     const spacedB64 = standardB64.replace(/\+/g, ' ');
 
+    expect(normalizeBase64(urlSafeB64)).toBe(standardB64);
+    expect(normalizeBase64(spacedB64)).toBe(standardB64);
     expect(base64ToUtf8(urlSafeB64)).toBe(originalJson);
     expect(base64ToUtf8(spacedB64)).toBe(originalJson);
 
