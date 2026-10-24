@@ -81,7 +81,8 @@ export function ProcedureModal({
   // Parsowany czas z tekstu kroku (Zero-Click Context Tool)
   const parsedDurationSec = parseStepDurationSeconds(
     currentStep?.instructionPl,
-    currentStep?.durationSeconds
+    currentStep?.durationSeconds,
+    true
   );
 
   const [localRemaining, setLocalRemaining] = useState<number>(

@@ -30,6 +30,23 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(parseStepDurationSeconds('Wait 25 sec and pour', 30)).toBe(25);
     });
 
+    it('prioritizes explicit step.durationSeconds over regex parsed text in recipes (M1-audytor-generalny-031)', () => {
+      expect(
+        parseStepDurationSeconds(
+          'Zalej 200g wrzątku w 10 sekund i zamieszaj 3 razy ruchem prostoliniowym.',
+          30,
+          true
+        )
+      ).toBe(30);
+      expect(
+        parseStepDurationSeconds(
+          'Maceracja przez 45s, a w 2:30 naciśnij dźwignię, aby spuścić napar.',
+          60,
+          true
+        )
+      ).toBe(60);
+    });
+
     it('falls back to fallbackSeconds when no duration is present in text', () => {
       expect(parseStepDurationSeconds('Zalej równomiernie do pełnej wagi', 50)).toBe(50);
       expect(parseStepDurationSeconds('', 40)).toBe(40);

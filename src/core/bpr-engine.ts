@@ -47,8 +47,12 @@ const WEEKDAYS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
  */
 export function parseStepDurationSeconds(
   instruction: string | undefined | null,
-  fallbackSeconds = 30
+  fallbackSeconds = 30,
+  prioritizeFallback = false
 ): number {
+  if (prioritizeFallback && typeof fallbackSeconds === 'number' && fallbackSeconds > 0) {
+    return Math.round(fallbackSeconds);
+  }
   const safeFallback = Math.max(1, Math.round(fallbackSeconds || 30));
   if (!instruction || typeof instruction !== 'string') {
     return safeFallback;
