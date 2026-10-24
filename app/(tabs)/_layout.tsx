@@ -63,9 +63,7 @@ export default function TabLayout() {
             letterSpacing: -0.3,
             color: theme.colors.textPrimary,
           },
-          headerRight: () => (
-            <AppGuideHeaderButton onOpen={() => setShowGuideModal(true)} />
-          ),
+          // Guide button moved to Settings (DEC-06)
           tabBarStyle: {
             backgroundColor: theme.colors.bgCard,
             borderTopColor: theme.colors.border,
@@ -152,7 +150,6 @@ export default function TabLayout() {
         <Tabs.Screen
           name="caffeine"
           options={{
-            href: null,
             title: 'Kofeina',
             headerTitle: 'Monitor Kofeiny',
             tabBarIcon: ({ focused }) => (

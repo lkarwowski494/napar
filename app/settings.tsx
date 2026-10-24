@@ -52,7 +52,6 @@ import { useAppAccess } from '../src/core/app-access';
 import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
 import { JsonExportModal, JsonImportModal } from '../src/components/settings/JsonBackupModals';
 import { CsvExportModal } from '../src/components/settings/CsvExportModal';
-import { CraftFamilyShowcase } from '../src/components/settings/CraftFamilyShowcase';
 import { CaffeineSettingsCard } from '../src/components/settings/CaffeineSettingsCard';
 import { DataBackupCard } from '../src/components/settings/DataBackupCard';
 import { GrinderSelectionCard } from '../src/components/settings/GrinderSelectionCard';
@@ -258,9 +257,6 @@ export default function SettingsScreen() {
         onExportInventoryCsv={handleExportInventoryCsv}
         t={t}
       />
-
-      {/* Ekosystem Craft Suite (Apps4Brew) */}
-      <CraftFamilyShowcase language={language} />
 
       {/* Status Apps4Brew Pass (Pro) */}
       <PassSettingsCard

@@ -21,7 +21,6 @@ import { BrewBanners } from '../../src/components/brew/BrewBanners';
 import { BrewHeader } from '../../src/components/brew/BrewHeader';
 import { BrewQuickPrepCard } from '../../src/components/brew/BrewQuickPrepCard';
 import { BrewActiveFocusTimer } from '../../src/components/brew/BrewActiveFocusTimer';
-import { BrewProAccordion } from '../../src/components/brew/BrewProAccordion';
 import { RecipeSelectModal } from '../../src/components/brew/RecipeSelectModal';
 import { InventorySelectModal } from '../../src/components/brew/InventorySelectModal';
 import { BrewModalsContainer } from '../../src/components/brew/BrewModalsContainer';
@@ -306,15 +305,6 @@ export default function BrewScreen() {
         onFinish={() => setShowFinishModal(true)}
       />
 
-      {/* Akordeon PRO: Schowany pod rozwijanym panelem (Progressive Disclosure) */}
-      {!isRunning && !isPaused && (
-        <BrewProAccordion
-          waterProfile={waterProfile}
-          onSelectWaterProfile={setWaterProfile}
-          tdsInput={tdsInput}
-          onChangeTds={setTdsInput}
-        />
-      )}
 
       {/* Wszystkie modale obwodowe */}
       <BrewModalsContainer workflow={workflow} />
