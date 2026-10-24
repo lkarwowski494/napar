@@ -4,8 +4,10 @@
 // ============================================================================
 
 import React, { useState } from 'react';
+import * as Linking from 'expo-linking';
 import {
   StyleSheet,
+  Pressable,
   ScrollView,
   Alert,
   View,
@@ -315,6 +317,30 @@ export default function SettingsScreen() {
           <Text style={styles.infoLabel}>Zgodność licencyjna</Text>
           <Text style={styles.infoValue}>GPLv3 / Open Core</Text>
         </View>
+        <View style={styles.divider} />
+        <Pressable
+          style={styles.infoRow}
+          onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/privacy.html')}
+        >
+          <Text style={styles.infoLabel}>Polityka Prywatności</Text>
+          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>Otwórz ↗</Text>
+        </Pressable>
+        <View style={styles.divider} />
+        <Pressable
+          style={styles.infoRow}
+          onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/terms.html')}
+        >
+          <Text style={styles.infoLabel}>Regulamin (EULA)</Text>
+          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>Otwórz ↗</Text>
+        </Pressable>
+        <View style={styles.divider} />
+        <Pressable
+          style={styles.infoRow}
+          onPress={() => Linking.openURL('mailto:kontakt@apps4brew.pl')}
+        >
+          <Text style={styles.infoLabel}>Kontakt i Wsparcie</Text>
+          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>kontakt@apps4brew.pl ↗</Text>
+        </Pressable>
       </View>
 
       {/* Apps4Brew Pass Paywall Modal */}

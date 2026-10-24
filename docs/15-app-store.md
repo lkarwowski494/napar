@@ -31,11 +31,11 @@
 ## 2. Adresy URL i Zgodność Prawna
 
 * **Adres URL wsparcia technicznego (*Support URL*):**
-  `https://lukasz.github.io/napar/support.html`
+  `https://lkarwowski494.github.io/napar/support.html`
 * **Adres URL polityki prywatności (*Privacy Policy URL*):**
-  `https://lukasz.github.io/napar/privacy.html`
+  `https://lkarwowski494.github.io/napar/privacy.html`
 * **Adres strony marketingowej:**
-  `https://lukasz.github.io/napar/`
+  `https://lkarwowski494.github.io/napar/`
 * **E-mail kontaktowy:** `kontakt@apps4craft.pl`
 * **Szyfrowanie (*ITSAppUsesNonExemptEncryption*):** `false` (standardowe HTTPS bez niestandardowej kryptografii zastrzeżonej)
 
