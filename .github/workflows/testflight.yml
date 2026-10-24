@@ -7,9 +7,6 @@ on:
         description: 'Notatka do wydania (opcjonalnie)'
         required: false
         default: ''
-  push:
-    tags:
-      - 'v*'
 
 concurrency:
   group: testflight
@@ -30,6 +27,7 @@ jobs:
   build:
     name: Archive & Upload (.ipa -> TestFlight)
     runs-on: macos-26
+    environment: production
     timeout-minutes: 90
     outputs:
       version: ${{ steps.ver.outputs.version }}
