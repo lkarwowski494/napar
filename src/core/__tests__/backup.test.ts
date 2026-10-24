@@ -29,6 +29,7 @@ jest.mock('expo-sqlite', () => ({
     execSync: jest.fn(),
     getFirstSync: jest.fn(),
     getAllSync: jest.fn(() => []),
+    withTransactionSync: jest.fn((cb: () => void) => cb()),
     prepareSync: jest.fn(() => ({
       executeSync: jest.fn(),
       finalizeSync: jest.fn(),
@@ -55,6 +56,10 @@ jest.mock('expo-file-system/legacy', () => {
     readAsStringAsync: jest.fn(async (path: string) => files[path] || ''),
     writeAsStringAsync: jest.fn(async (path: string, content: string) => {
       files[path] = content;
+    }),
+    moveAsync: jest.fn(async ({ from, to }: { from: string; to: string }) => {
+      files[to] = files[from];
+      delete files[from];
     }),
     deleteAsync: jest.fn(async (path: string) => {
       delete files[path];

@@ -165,10 +165,17 @@ async function writeBackupFile(
 
   const envelope = buildBackup(state);
   const targetPath = `${dir}${name}`;
+  const tmpPath = `${dir}${name}.tmp`;
 
   try {
-    await FileSystem.writeAsStringAsync(targetPath, JSON.stringify(envelope, null, 2));
+    await FileSystem.writeAsStringAsync(tmpPath, JSON.stringify(envelope, null, 2));
+    await FileSystem.moveAsync({ from: tmpPath, to: targetPath });
   } catch (e) {
+    try {
+      await FileSystem.deleteAsync(tmpPath, { idempotent: true });
+    } catch {
+      // Ignoruj błąd
+    }
     try {
       await FileSystem.deleteAsync(targetPath, { idempotent: true });
     } catch {

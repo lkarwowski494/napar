@@ -1,3 +1,4 @@
+import { saveCorruptState } from './backup';
 // ============================================================================
 // Napar (Steepwise) — SQLite Database Client & Repositories
 // ============================================================================
@@ -779,17 +780,28 @@ export function importDataJson(jsonStr: string): void {
     throw new Error('Nieprawidłowy format pliku kopii zapasowej (version !== 1)');
   }
 
-  for (const item of data.inventory || []) {
-    saveInventoryItem(item);
-  }
-  for (const recipe of data.customRecipes || []) {
-    saveRecipe(recipe);
-  }
-  for (const session of data.sessions || []) {
-    saveBrewSession(session);
-  }
-  for (const log of data.caffeineLogs || []) {
-    logCaffeine(log);
+  const db = getDatabase();
+  try {
+    const runInTx = typeof (db as any).withTransactionSync === 'function'
+      ? (cb: () => void) => (db as any).withTransactionSync(cb)
+      : (cb: () => void) => cb();
+    runInTx(() => {
+      for (const item of data.inventory || []) {
+        saveInventoryItem(item);
+      }
+      for (const recipe of data.customRecipes || []) {
+        saveRecipe(recipe);
+      }
+      for (const session of data.sessions || []) {
+        saveBrewSession(session);
+      }
+      for (const log of data.caffeineLogs || []) {
+        logCaffeine(log);
+      }
+    });
+  } catch (err: any) {
+    void saveCorruptState(jsonStr, `Database transaction error during importDataJson: ${err?.message || err}`).catch(() => {});
+    throw err;
   }
 }
 
