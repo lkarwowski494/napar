@@ -126,32 +126,32 @@ export function evaluateRestingWindow(roastDateInput: Date | string, currentDate
   const diffTime = now.getTime() - roastDate.getTime();
   const daysSinceRoast = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
 
-  if (daysSinceRoast <= 5) {
+  if (daysSinceRoast <= 6) {
     return {
       daysSinceRoast,
       stage: 'degassing',
-      messagePl: 'Intensywne odgazowywanie CO₂ — zalecana dłuższa preinfuzja (blooming)',
+      messagePl: 'Zbyt świeża (Odgazowanie CO₂) — odczekaj do 7. dnia po wypale',
       badgeColor: 'amber',
     };
-  } else if (daysSinceRoast <= 30) {
+  } else if (daysSinceRoast <= 35) {
     return {
       daysSinceRoast,
       stage: 'peak',
-      messagePl: 'Szczytowa jakość degustacyjna (Peak Flavor) — pełnia aromatów',
+      messagePl: 'Szczyt smaku (Peak Flavor) — idealne okno ekstrakcji (7–35 dni)',
       badgeColor: 'green',
     };
   } else if (daysSinceRoast <= 60) {
     return {
       daysSinceRoast,
       stage: 'stable',
-      messagePl: 'Stabilna jakość ziaren — optymalny czas do codziennego parzenia',
+      messagePl: 'Stabilna jakość ziaren (36–60 dni) — zmiel o 1 klik drobniej dla zachowania słodyczy',
       badgeColor: 'blue',
     };
   } else {
     return {
       daysSinceRoast,
       stage: 'aging',
-      messagePl: 'Ziarna dojrzałe — zalecane wcześniejsze zużycie lub przechowywanie w zamrażarce',
+      messagePl: 'Ziarna tracą lotne aromaty (>60 dni) — zwiększ dozę lub zmiel o 1–2 kliki drobniej',
       badgeColor: 'gray',
     };
   }

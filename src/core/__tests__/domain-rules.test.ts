@@ -68,24 +68,40 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
     });
   });
 
-  describe('RD-07: Resting Window & Freshness', () => {
+  describe('RD-07: Resting Window & Freshness (M1-audytor-generalny-032)', () => {
     const baseDate = new Date('2026-10-15T12:00:00Z');
 
-    it('detects degassing phase (0-5 days)', () => {
+    it('detects degassing phase (0-6 days)', () => {
       const roastDate = new Date('2026-10-13T12:00:00Z'); // 2 days
       const result = evaluateRestingWindow(roastDate, baseDate);
       expect(result.stage).toBe('degassing');
       expect(result.badgeColor).toBe('amber');
+
+      // Day 6 boundary
+      const day6Roast = new Date('2026-10-09T12:00:00Z'); // 6 days
+      expect(evaluateRestingWindow(day6Roast, baseDate).stage).toBe('degassing');
     });
 
-    it('detects peak flavor phase (6-30 days)', () => {
+    it('detects peak flavor phase (7-35 days)', () => {
+      // Day 7 boundary
+      const day7Roast = new Date('2026-10-08T12:00:00Z'); // 7 days
+      expect(evaluateRestingWindow(day7Roast, baseDate).stage).toBe('peak');
+
       const roastDate = new Date('2026-10-01T12:00:00Z'); // 14 days
       const result = evaluateRestingWindow(roastDate, baseDate);
       expect(result.stage).toBe('peak');
       expect(result.badgeColor).toBe('green');
+
+      // Day 35 boundary
+      const day35Roast = new Date('2026-09-10T12:00:00Z'); // 35 days
+      expect(evaluateRestingWindow(day35Roast, baseDate).stage).toBe('peak');
     });
 
-    it('detects stable phase (31-60 days)', () => {
+    it('detects stable phase (36-60 days)', () => {
+      // Day 36 boundary
+      const day36Roast = new Date('2026-09-09T12:00:00Z'); // 36 days
+      expect(evaluateRestingWindow(day36Roast, baseDate).stage).toBe('stable');
+
       const roastDate = new Date('2026-08-30T12:00:00Z'); // ~46 days
       const result = evaluateRestingWindow(roastDate, baseDate);
       expect(result.stage).toBe('stable');
