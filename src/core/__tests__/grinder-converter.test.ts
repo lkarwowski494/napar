@@ -184,5 +184,19 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(odeRec.grinderName).toBe('Fellow Ode Gen 2');
     expect(odeRec.formatted).toBe('5');
   });
+
+  test('TASK-P3-07-TRE: Obsługuje formatowanie nastaw i opisy żaren w języku angielskim', () => {
+    const c40En = convertMicronsToGrinder(720, 'comandante_c40', 'en');
+    expect(c40En.formatted).toBe('24 clicks');
+
+    const encoreEn = convertMicronsToGrinder(720, 'baratza_encore', 'en');
+    expect(encoreEn.formatted).toBe('Setting #16');
+
+    const kUltraEn = convertMicronsToGrinder(720, '1zpresso_k_ultra', 'en');
+    expect(kUltraEn.formatted).toContain('clicks');
+
+    const c40 = SUPPORTED_GRINDERS.find((g) => g.id === 'comandante_c40');
+    expect(c40?.burrTypeEn).toBe('Nitro Blade (39mm conical)');
+  });
 });
 

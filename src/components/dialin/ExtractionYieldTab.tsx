@@ -66,7 +66,7 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
             </Text>
             <TextInput
               style={styles.calcInput}
-              keyboardType="numeric"
+              keyboardType="decimal-pad"
               value={eyWater}
               onChangeText={setEyWater}
               placeholder="250"
@@ -77,7 +77,7 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
             <Text style={styles.inputTitle}>{t.dialin.eyDoseInput || 'Doza ziaren (g)'}</Text>
             <TextInput
               style={styles.calcInput}
-              keyboardType="numeric"
+              keyboardType="decimal-pad"
               value={eyDose}
               onChangeText={setEyDose}
               placeholder="15"
@@ -86,10 +86,12 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
           </View>
         </View>
 
-        <Text style={[styles.inputTitle, { marginTop: 12 }]}>{t.dialin.eyTdsInput || 'TDS (%) z refraktometru'}</Text>
+        <Text style={[styles.inputTitle, { marginTop: 12 }]}>
+          {t.dialin.eyTdsInput || (language === 'en' ? 'Refractometer TDS (%)' : 'TDS (%) z refraktometru')}
+        </Text>
         <TextInput
           style={styles.calcInput}
-          keyboardType="numeric"
+          keyboardType="decimal-pad"
           value={eyTds}
           onChangeText={setEyTds}
           placeholder="1.35"

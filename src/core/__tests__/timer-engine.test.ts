@@ -274,5 +274,38 @@ describe('BrewTimerEngine', () => {
 
       engine.destroy();
     });
+
+    test('TASK-P3-01-PRO: Kaskadowe przeliczanie etapów po długim uśpieniu w tle (multi-step jump)', () => {
+      const engine = new BrewTimerEngine(testSteps);
+      engine.start();
+
+      // Skok czasu o 50 sekund (Krok 1 trwa 30s, Krok 2 trwa 60s)
+      jest.advanceTimersByTime(50000);
+      engine.syncWithRealTime();
+
+      const snap = engine.getSnapshot();
+      expect(snap.status).toBe('running');
+      expect(snap.currentStepIndex).toBe(1);
+      expect(snap.stepElapsedSeconds).toBe(20);
+      expect(snap.stepRemainingSeconds).toBe(40);
+      expect(snap.totalElapsedSeconds).toBe(50);
+
+      // Skok o kolejne 50 sekund (łącznie 100s > 90s łącznego czasu etapów)
+      jest.advanceTimersByTime(50000);
+      engine.syncWithRealTime();
+
+      expect(engine.getSnapshot().status).toBe('finished');
+      engine.destroy();
+    });
+
+    test('TASK-P3-01-PRO: Klonowanie tablicy etapów chroni źródłowe obiekty przed mutacją', () => {
+      const originalSteps = [{ stepNumber: 1, namePl: 'Step 1', targetWaterGrams: 50, durationSeconds: 30, instructionPl: 'Inst' }];
+      const engine = new BrewTimerEngine(originalSteps);
+      engine.adjustStepDuration(15);
+
+      expect(engine.getSnapshot().currentStep?.durationSeconds).toBe(45);
+      expect(originalSteps[0].durationSeconds).toBe(30);
+      engine.destroy();
+    });
   });
 });

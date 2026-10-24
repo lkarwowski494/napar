@@ -19,6 +19,7 @@ describe('BrewQuickPrepCard Component', () => {
     batchScaling: {
       grindAdjustmentClicks: 2,
       recommendationPl: 'Dla 2 porcji zwiększ mielenie o 2 kliki.',
+      recommendationEn: 'For 2 cups: grind 2 clicks coarser.',
     },
   };
 
@@ -67,6 +68,18 @@ describe('BrewQuickPrepCard Component', () => {
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('+2 kliki grubiej');
     expect(str).toContain('Dla 2 porcji zwiększ mielenie o 2 kliki.');
+  });
+
+  test('TASK-P3-04-ODK: Wybór 2 porcji w trybie angielskim wyświetla rekomendację po angielsku', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewQuickPrepCard {...defaultProps} language="en" servings={2} />
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('For 2 cups: grind 2 clicks coarser.');
   });
 
   test('Steppery wody (+ / −) i chipsy proporcji wywołują onWaterChange', () => {

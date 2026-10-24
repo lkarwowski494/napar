@@ -9,12 +9,14 @@ import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
 import { theme } from '../../core/theme';
 import { WATER_RECIPES } from '../../core/water-chemistry';
 import { LabIcon } from '../icons/CraftIcons';
+import { useTranslation } from '../../core/i18n';
 
 interface BrewProAccordionProps {
   waterProfile: string;
   onSelectWaterProfile: (id: string) => void;
   tdsInput: string;
   onChangeTds: (val: string) => void;
+  language?: 'pl' | 'en';
 }
 
 export function BrewProAccordion({
@@ -22,8 +24,17 @@ export function BrewProAccordion({
   onSelectWaterProfile,
   tdsInput,
   onChangeTds,
+  language: langProp,
 }: BrewProAccordionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  let contextLang: 'pl' | 'en' = 'pl';
+  try {
+    const tr = useTranslation();
+    if (tr && tr.language) contextLang = tr.language;
+  } catch {
+    // fallback
+  }
+  const language = langProp || contextLang;
 
   return (
     <View style={styles.container} testID="pro-accordion">
@@ -32,11 +43,17 @@ export function BrewProAccordion({
         style={styles.header}
         onPress={() => setIsExpanded(!isExpanded)}
         accessibilityRole="button"
-        accessibilityLabel="Rozwiń parametry wody i mineralizację"
+        accessibilityLabel={
+          language === 'en'
+            ? 'Toggle water parameters and mineralization'
+            : 'Rozwiń parametry wody i mineralizację'
+        }
       >
         <View style={styles.headerTitleRow}>
           <LabIcon size={18} color={theme.colors.copper} />
-          <Text style={styles.headerTitle}>Zaawansowane: Woda & TDS</Text>
+          <Text style={styles.headerTitle}>
+            {language === 'en' ? 'Advanced: Water & TDS' : 'Zaawansowane: Woda & TDS'}
+          </Text>
         </View>
         <Text style={styles.headerArrow}>{isExpanded ? '▴' : '▾'}</Text>
       </Pressable>
@@ -44,7 +61,11 @@ export function BrewProAccordion({
       {isExpanded && (
         <View style={styles.body} testID="pro-accordion-body">
           {/* Chemia wody Barista Hustle / SCA */}
-          <Text style={styles.sectionLabel}>Profil Wody (Barista Hustle / SCA)</Text>
+          <Text style={styles.sectionLabel}>
+            {language === 'en'
+              ? 'Water Profile (Barista Hustle / SCA)'
+              : 'Profil Wody (Barista Hustle / SCA)'}
+          </Text>
           <View style={styles.chipsRow}>
             {WATER_RECIPES.map((w) => {
               const active = waterProfile === w.id;
@@ -67,13 +88,15 @@ export function BrewProAccordion({
 
           {/* TDS Refractometr */}
           <View style={styles.tdsRow}>
-            <Text style={styles.tdsLabel}>Odczyt refractometru TDS (%):</Text>
+            <Text style={styles.tdsLabel}>
+              {language === 'en' ? 'Refractometer TDS (%):' : 'Odczyt refractometru TDS (%):'}
+            </Text>
             <TextInput
               testID="pro-tds-input"
               style={styles.tdsInput}
-              placeholder="np. 1.35"
+              placeholder={language === 'en' ? 'e.g. 1.35' : 'np. 1.35'}
               placeholderTextColor={theme.colors.textMuted}
-              keyboardType="numeric"
+              keyboardType="decimal-pad"
               value={tdsInput}
               onChangeText={onChangeTds}
             />

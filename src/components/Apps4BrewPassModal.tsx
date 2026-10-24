@@ -61,10 +61,19 @@ export function Apps4BrewPassModal({
         }
         onClose();
       } else {
-        Alert.alert(t.settings.restoreNotFoundTitle, result.error || 'Błąd autoryzacji transakcji StoreKit');
+        const errorMsg =
+          result.errorCode === 'invalid_signature'
+            ? (language === 'en' ? 'Invalid StoreKit transaction signature' : 'Nieprawidłowy podpis transakcji StoreKit')
+            : result.errorCode === 'unknown_product'
+            ? (language === 'en' ? 'Unknown StoreKit product identifier' : 'Nieznany identyfikator produktu StoreKit')
+            : (language === 'en' ? 'StoreKit transaction authorization failed' : 'Błąd autoryzacji transakcji StoreKit');
+        Alert.alert(t.settings.restoreNotFoundTitle, errorMsg);
       }
     } catch {
-      Alert.alert(t.settings.restoreNotFoundTitle, 'Nie udało się zrealizować transakcji StoreKit');
+      Alert.alert(
+        t.settings.restoreNotFoundTitle,
+        language === 'en' ? 'Could not complete StoreKit transaction' : 'Nie udało się zrealizować transakcji StoreKit'
+      );
     } finally {
       setIsProcessing(false);
     }

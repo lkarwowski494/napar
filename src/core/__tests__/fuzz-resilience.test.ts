@@ -99,7 +99,7 @@ describe('Chaos & Fuzzing: Extraction Mathematics & Physical Limits', () => {
 
       expect(res.rawValue).toBeGreaterThanOrEqual(5);
       expect(res.rawValue).toBeLessThanOrEqual(45);
-      expect(res.formatted).toContain('klików');
+      expect(res.formatted).toMatch(/\d+\s+(klików|clicks)/);
     }
   });
 });

@@ -7,13 +7,17 @@
 export interface GrinderModel {
   id: string;
   name: string;
-  burrType: string; // np. 'Żarna stożkowe 39mm Nitro Blade', 'Żarna płaskie 64mm'
-  stepMicrons: number; // krok w mikronach
+  namePl?: string;
+  nameEn?: string;
+  burrType: string;
+  burrTypePl?: string;
+  burrTypeEn?: string;
+  stepMicrons: number;
   minSetting: number;
   maxSetting: number;
-  formatSetting: (rawClicks: number) => string;
-  parseSetting: (text: string) => number; // zwraca szacowaną wartość w mikronach
-  micronsPerSettingOffset: number; // baza offsetowa dla zera
+  formatSetting: (rawClicks: number, language?: string) => string;
+  parseSetting: (text: string) => number;
+  micronsPerSettingOffset: number;
 }
 
 export interface GrindCategory {
@@ -85,11 +89,13 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     id: 'comandante_c40',
     name: 'Comandante C40 MK3/MK4',
     burrType: 'Nitro Blade (39mm stożkowe)',
+    burrTypePl: 'Nitro Blade (39mm stożkowe)',
+    burrTypeEn: 'Nitro Blade (39mm conical)',
     stepMicrons: 30.0,
     minSetting: 5,
     maxSetting: 45,
     micronsPerSettingOffset: 0,
-    formatSetting: (clicks: number) => `${Math.round(clicks)} klików`,
+    formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `${Math.round(clicks)} clicks` : `${Math.round(clicks)} klików`,
     parseSetting: (text: string) => {
       const num = parseFloat(text.replace(/[^0-9.]/g, '')) || 24;
       return num * 30.0;
@@ -99,11 +105,13 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     id: 'timemore_c2_c3',
     name: 'Timemore Chestnut C2 / C3',
     burrType: 'Stal nierdzewna (38mm stożkowe)',
+    burrTypePl: 'Stal nierdzewna (38mm stożkowe)',
+    burrTypeEn: 'Stainless steel (38mm conical)',
     stepMicrons: 35.0,
     minSetting: 6,
     maxSetting: 36,
     micronsPerSettingOffset: 0,
-    formatSetting: (clicks: number) => `${Math.round(clicks)} klików`,
+    formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `${Math.round(clicks)} clicks` : `${Math.round(clicks)} klików`,
     parseSetting: (text: string) => {
       const num = parseFloat(text.replace(/[^0-9.]/g, '')) || 18;
       return num * 35.0;
@@ -113,14 +121,17 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     id: '1zpresso_k_ultra',
     name: '1Zpresso K-Ultra / K-Max',
     burrType: 'K-Burr (48mm heptagonalne)',
+    burrTypePl: 'K-Burr (48mm heptagonalne)',
+    burrTypeEn: 'K-Burr (48mm heptagonal)',
     stepMicrons: 20.0,
     minSetting: 20,
     maxSetting: 110,
     micronsPerSettingOffset: 0,
-    formatSetting: (clicks: number) => {
+    formatSetting: (clicks: number, lang = 'pl') => {
       const whole = Math.floor(clicks / 10);
       const frac = Math.round(clicks % 10);
-      return `${whole}.${frac} (${clicks} klików)`;
+      const unit = lang === 'en' ? 'clicks' : 'klików';
+      return `${whole}.${frac} (${clicks} ${unit})`;
     },
     parseSetting: (text: string) => {
       // Jeśli format 7.5 -> 75 klików * 20um
@@ -135,6 +146,8 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     id: 'fellow_ode_gen2',
     name: 'Fellow Ode Gen 2',
     burrType: 'Gen 2 Flat Burrs (64mm płaskie)',
+    burrTypePl: 'Gen 2 Flat Burrs (64mm płaskie)',
+    burrTypeEn: 'Gen 2 Flat Burrs (64mm flat)',
     stepMicrons: 40.0, // ok. 40 mikronów na 1 krok (1/3 numeru)
     minSetting: 1,
     maxSetting: 31,
@@ -159,11 +172,13 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     id: 'baratza_encore',
     name: 'Baratza Encore / ESP',
     burrType: 'M2 / M3 Stożkowe (40mm)',
+    burrTypePl: 'M2 / M3 Stożkowe (40mm)',
+    burrTypeEn: 'M2 / M3 Conical (40mm)',
     stepMicrons: 35.0,
     minSetting: 1,
     maxSetting: 40,
     micronsPerSettingOffset: 150,
-    formatSetting: (clicks: number) => `Nastawa #${Math.round(clicks)}`,
+    formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `Setting #${Math.round(clicks)}` : `Nastawa #${Math.round(clicks)}`,
     parseSetting: (text: string) => {
       const num = parseFloat(text.replace(/[^0-9.]/g, '')) || 16;
       return 150 + num * 35.0;
@@ -173,11 +188,13 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     id: 'kingrinder_k6',
     name: 'Kingrinder K6',
     burrType: 'Seven-Core (48mm stożkowe)',
+    burrTypePl: 'Seven-Core (48mm stożkowe)',
+    burrTypeEn: 'Seven-Core (48mm conical)',
     stepMicrons: 16.0,
     minSetting: 25,
     maxSetting: 140,
     micronsPerSettingOffset: 0,
-    formatSetting: (clicks: number) => `${Math.round(clicks)} klików`,
+    formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `${Math.round(clicks)} clicks` : `${Math.round(clicks)} klików`,
     parseSetting: (text: string) => {
       const num = parseFloat(text.replace(/[^0-9.]/g, '')) || 90;
       return num * 16.0;
@@ -187,12 +204,14 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     id: 'wilfa_svart',
     name: 'Wilfa Svart Aroma / Classic',
     burrType: 'Stożkowe stalowe (40mm)',
+    burrTypePl: 'Stożkowe stalowe (40mm)',
+    burrTypeEn: 'Conical steel (40mm)',
     stepMicrons: 45.0,
     minSetting: 1,
     maxSetting: 20,
     micronsPerSettingOffset: 250,
-    formatSetting: (clicks: number) => {
-      if (clicks <= 3) return 'Moka / Aeropress (Drobno)';
+    formatSetting: (clicks: number, lang = 'pl') => {
+      if (clicks <= 3) return lang === 'en' ? 'Moka / Aeropress (Fine)' : 'Moka / Aeropress (Drobno)';
       if (clicks <= 8) return `Filter #${Math.round(clicks)} (V60 / Drip)`;
       if (clicks <= 14) return `Filter #${Math.round(clicks)} (Chemex)`;
       return `French Press #${Math.round(clicks)}`;
@@ -206,14 +225,18 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     id: 'kinu_m47',
     name: 'Kinu M47 (Classic/Simplicity/Phoenix)',
     burrType: 'Black Fusion (47mm stożkowe)',
+    burrTypePl: 'Black Fusion (47mm stożkowe)',
+    burrTypeEn: 'Black Fusion (47mm conical)',
     stepMicrons: 10.0,
     minSetting: 10,
     maxSetting: 50,
     micronsPerSettingOffset: 0,
-    formatSetting: (clicks: number) => {
+    formatSetting: (clicks: number, lang = 'pl') => {
       const major = Math.floor(clicks / 10);
       const minor = Math.round(clicks % 10);
-      return `${major}.${minor} obrotu (${clicks} klików)`;
+      const unitRot = lang === 'en' ? 'rotations' : 'obrotu';
+      const unitClick = lang === 'en' ? 'clicks' : 'klików';
+      return `${major}.${minor} ${unitRot} (${clicks} ${unitClick})`;
     },
     parseSetting: (text: string) => {
       const num = parseFloat(text) || 3.5;
@@ -224,11 +247,13 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     id: 'eureka_mignon',
     name: 'Eureka Mignon (Filtro / Crono / Specialita)',
     burrType: 'Płaskie żarna 50mm / 55mm',
+    burrTypePl: 'Płaskie żarna 50mm / 55mm',
+    burrTypeEn: 'Flat burrs 50mm / 55mm',
     stepMicrons: 25.0,
     minSetting: 1,
     maxSetting: 30,
     micronsPerSettingOffset: 200,
-    formatSetting: (clicks: number) => `Pozycja #${Math.round(clicks * 10) / 10}`,
+    formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `Position #${Math.round(clicks * 10) / 10}` : `Pozycja #${Math.round(clicks * 10) / 10}`,
     parseSetting: (text: string) => {
       const num = parseFloat(text.replace(/[^0-9.]/g, '')) || 5;
       return 200 + num * 25.0;
@@ -237,19 +262,23 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
   {
     id: 'generic_grinder',
     name: 'Inny młynek (Skala uniwersalna µm)',
+    namePl: 'Inny młynek (Skala uniwersalna µm)',
+    nameEn: 'Other grinder (Universal µm scale)',
     burrType: 'Uniwersalna skala mikronowa',
+    burrTypePl: 'Uniwersalna skala mikronowa',
+    burrTypeEn: 'Universal micron scale',
     stepMicrons: 10.0,
     minSetting: 20,
     maxSetting: 140,
     micronsPerSettingOffset: 0,
-    formatSetting: (clicks: number) => {
+    formatSetting: (clicks: number, lang = 'pl') => {
       const microns = clicks * 10.0;
-      let desc = 'Średnio';
-      if (microns < 450) desc = 'Bardzo drobno (Espresso)';
-      else if (microns < 610) desc = 'Drobno (AeroPress)';
-      else if (microns < 810) desc = 'Średnio (V60 / Drip)';
-      else if (microns < 1010) desc = 'Średnio-grubo (Chemex)';
-      else desc = 'Grubo (French Press / Cold Brew)';
+      let desc = lang === 'en' ? 'Medium' : 'Średnio';
+      if (microns < 450) desc = lang === 'en' ? 'Extra Fine (Espresso)' : 'Bardzo drobno (Espresso)';
+      else if (microns < 610) desc = lang === 'en' ? 'Fine (AeroPress)' : 'Drobno (AeroPress)';
+      else if (microns < 810) desc = lang === 'en' ? 'Medium (V60 / Drip)' : 'Średnio (V60 / Drip)';
+      else if (microns < 1010) desc = lang === 'en' ? 'Medium-Coarse (Chemex)' : 'Średnio-grubo (Chemex)';
+      else desc = lang === 'en' ? 'Coarse (French Press / Cold Brew)' : 'Grubo (French Press / Cold Brew)';
       return `${Math.round(microns)} µm · ${desc}`;
     },
     parseSetting: (text: string) => {
@@ -264,7 +293,8 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
  */
 export function convertMicronsToGrinder(
   microns: number,
-  grinderId: string
+  grinderId: string,
+  language = 'pl'
 ): { formatted: string; rawValue: number; grinderName: string } {
   const grinder =
     SUPPORTED_GRINDERS.find((g) => g.id === grinderId) || SUPPORTED_GRINDERS[0];
@@ -275,7 +305,7 @@ export function convertMicronsToGrinder(
   const clampedClicks = Math.max(grinder.minSetting, Math.min(grinder.maxSetting, rawClicks));
 
   return {
-    formatted: grinder.formatSetting(clampedClicks),
+    formatted: grinder.formatSetting(clampedClicks, language),
     rawValue: clampedClicks,
     grinderName: grinder.name,
   };
@@ -287,7 +317,8 @@ export function convertMicronsToGrinder(
 export function convertBetweenGrinders(
   sourceGrinderId: string,
   sourceValue: number | string,
-  targetGrinderId: string
+  targetGrinderId: string,
+  language = 'pl'
 ): { targetFormatted: string; microns: number } {
   const sourceGrinder =
     SUPPORTED_GRINDERS.find((g) => g.id === sourceGrinderId) || SUPPORTED_GRINDERS[0];
@@ -301,7 +332,7 @@ export function convertBetweenGrinders(
     microns = sourceGrinder.parseSetting(sourceValue);
   }
 
-  const result = convertMicronsToGrinder(microns, targetGrinder.id);
+  const result = convertMicronsToGrinder(microns, targetGrinder.id, language);
   return {
     targetFormatted: result.formatted,
     microns: Math.round(microns),

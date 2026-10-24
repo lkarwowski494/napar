@@ -3,24 +3,40 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 import { CheckIcon } from '../icons/CraftIcons';
 import { SUPPORTED_GRINDERS } from '../../core/grinder-converter';
+import { useTranslation } from '../../core/i18n';
 
 export interface GrinderSelectionCardProps {
   selectedGrinder: string;
   onSelectGrinder: (grinderId: string) => void;
   title: string;
+  language?: string;
 }
 
 export const GrinderSelectionCard: React.FC<GrinderSelectionCardProps> = ({
   selectedGrinder,
   onSelectGrinder,
   title,
+  language: langProp,
 }) => {
+  let contextLang = 'pl';
+  try {
+    const tr = useTranslation();
+    if (tr && tr.language) contextLang = tr.language;
+  } catch {
+    // safe fallback
+  }
+  const language = langProp || contextLang;
+
   return (
     <View>
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.cardGroup}>
         {SUPPORTED_GRINDERS.map((grinder, idx) => {
           const isSelected = selectedGrinder === grinder.id;
+          const statusText = isSelected
+            ? (language === 'en' ? 'selected' : 'wybrany')
+            : (language === 'en' ? 'select' : 'wybierz');
+
           return (
             <React.Fragment key={grinder.id}>
               {idx > 0 && <View style={styles.divider} />}
@@ -31,7 +47,7 @@ export const GrinderSelectionCard: React.FC<GrinderSelectionCardProps> = ({
                 ]}
                 onPress={() => onSelectGrinder(grinder.id)}
                 accessibilityRole="button"
-                accessibilityLabel={`${grinder.name}, ${isSelected ? 'wybrany' : 'wybierz'}`}
+                accessibilityLabel={`${language === 'en' ? (grinder.nameEn || grinder.name) : (grinder.namePl || grinder.name)}, ${statusText}`}
               >
                 <View style={{ flex: 1 }}>
                   <Text
@@ -40,10 +56,12 @@ export const GrinderSelectionCard: React.FC<GrinderSelectionCardProps> = ({
                       isSelected && { color: theme.colors.copper, fontWeight: '700' },
                     ]}
                   >
-                    {grinder.name}
+                    {language === 'en' ? (grinder.nameEn || grinder.name) : (grinder.namePl || grinder.name)}
                   </Text>
                   <Text style={styles.actionSubtitle}>
-                    {grinder.stepMicrons} µm/klik · Zakres: {grinder.minSetting}–{grinder.maxSetting}
+                    {language === 'en'
+                      ? `${grinder.stepMicrons} µm/click · Range: ${grinder.minSetting}–${grinder.maxSetting}`
+                      : `${grinder.stepMicrons} µm/klik · Zakres: ${grinder.minSetting}–${grinder.maxSetting}`}
                   </Text>
                 </View>
                 {isSelected ? (
@@ -99,12 +117,10 @@ const styles = StyleSheet.create({
   },
   actionSubtitle: {
     fontSize: 12,
-    color: theme.colors.textSecondary,
-    lineHeight: 16,
+    color: theme.colors.textMuted,
   },
   divider: {
     height: 1,
     backgroundColor: theme.colors.border,
-    marginLeft: 16,
   },
 });

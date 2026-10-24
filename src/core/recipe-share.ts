@@ -11,9 +11,11 @@ export const RECIPE_SHARE_WEB_URL = 'https://napar.app/recipe';
 
 export interface CompactRecipeStep {
   n: string; // Nazwa kroku (namePl)
+  ne?: string; // Nazwa kroku (nameEn)
   d: number; // Czas trwania (durationSeconds)
   w: number; // Docelowa waga zalań (targetWaterGrams)
   i: string; // Instrukcja (instructionPl)
+  ie?: string; // Instrukcja (instructionEn)
 }
 
 export interface CompactRecipePayload {
@@ -84,9 +86,11 @@ export function recipeToCompactPayload(
 
   const compactSteps: CompactRecipeStep[] = rawSteps.map((st) => ({
     n: st.namePl,
+    ...(st.nameEn ? { ne: st.nameEn } : {}),
     d: st.durationSeconds,
     w: st.targetWaterGrams,
     i: st.instructionPl,
+    ...(st.instructionEn ? { ie: st.instructionEn } : {}),
   }));
 
   const name = recipe.name;
@@ -135,7 +139,10 @@ export function encodeRecipeToShareUrl(
 /**
  * Importuje i weryfikuje przepis z linku lub surowego ciągu danych
  */
-export function decodeRecipeFromShareUrl(urlOrRawData: string): {
+export function decodeRecipeFromShareUrl(
+  urlOrRawData: string,
+  language = 'pl'
+): {
   recipe: SavedRecipe;
   originalSteps: RecipeStep[];
 } | null {
@@ -165,12 +172,21 @@ export function decodeRecipeFromShareUrl(urlOrRawData: string): {
       return null;
     }
 
+    const isEn = language === 'en';
+    const defaultAuthor = isEn ? 'Shared Recipe' : 'Udostępniona receptura';
+    const defaultDesc = isEn
+      ? `Imported via QR code / link (${parsed.m})`
+      : `Zaimportowano przez kod QR / link (${parsed.m})`;
+    const defaultStepName = (stepIdx: number) => (isEn ? `Step ${stepIdx}` : `Krok ${stepIdx}`);
+
     const steps: RecipeStep[] = (parsed.s || []).map((st, idx) => ({
       stepNumber: idx + 1,
-      namePl: st.n || `Krok ${idx + 1}`,
+      namePl: st.n || defaultStepName(idx + 1),
+      ...(st.ne ? { nameEn: st.ne } : (isEn && st.n ? { nameEn: st.n } : {})),
       durationSeconds: Number(st.d) || 30,
       targetWaterGrams: Number(st.w) || 0,
       instructionPl: st.i || '',
+      ...(st.ie ? { instructionEn: st.ie } : (isEn && st.i ? { instructionEn: st.i } : {})),
     }));
 
     const recipeId = `shared-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
@@ -181,8 +197,8 @@ export function decodeRecipeFromShareUrl(urlOrRawData: string): {
       name: parsed.n,
       beverageType: parsed.b === 'TEA' ? 'TEA' : 'COFFEE',
       method: parsed.m,
-      author: parsed.a || 'Udostępniona receptura',
-      description: parsed.desc || `Zaimportowano przez kod QR / link (${parsed.m})`,
+      author: parsed.a || defaultAuthor,
+      description: parsed.desc || defaultDesc,
       doseGrams: parsed.d,
       waterGrams: parsed.w,
       waterTempCelsius: parsed.t || 92,

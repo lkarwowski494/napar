@@ -179,13 +179,18 @@ export interface StoreKitVerificationResult {
   tier?: 'monthly' | 'annual' | 'lifetime';
   receipt?: StoreKitReceipt;
   error?: string;
+  errorCode?: 'invalid_signature' | 'unknown_product';
 }
 
 export function verifyAndActivateStoreKitPurchase(
   receipt: StoreKitReceipt
 ): StoreKitVerificationResult {
   if (!receipt || !receipt.transactionId || !receipt.signature) {
-    return { success: false, error: 'Nieprawidłowy podpis transakcji StoreKit' };
+    return {
+      success: false,
+      error: 'Nieprawidłowy podpis transakcji StoreKit',
+      errorCode: 'invalid_signature',
+    };
   }
   let tier: 'monthly' | 'annual' | 'lifetime' | null = null;
   if (receipt.productId === STORE_PRODUCT_IDS.monthly) tier = 'monthly';
@@ -193,7 +198,11 @@ export function verifyAndActivateStoreKitPurchase(
   else if (receipt.productId === STORE_PRODUCT_IDS.lifetime) tier = 'lifetime';
 
   if (!tier) {
-    return { success: false, error: 'Nieznany identyfikator produktu StoreKit' };
+    return {
+      success: false,
+      error: 'Nieznany identyfikator produktu StoreKit',
+      errorCode: 'unknown_product',
+    };
   }
 
   setAppSetting('is_pro_active', 'true');

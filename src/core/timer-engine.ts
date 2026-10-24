@@ -61,12 +61,12 @@ export class BrewTimerEngine {
   private appStateSubscription: NativeEventSubscription | null = null;
 
   constructor(steps: RecipeStep[], callbacks: TimerCallbacks = {}) {
-    this.steps = steps;
+    this.steps = steps.map((s) => ({ ...s }));
     this.callbacks = callbacks;
   }
 
   public setSteps(steps: RecipeStep[]): void {
-    this.steps = steps;
+    this.steps = steps.map((s) => ({ ...s }));
     this.reset();
   }
 
@@ -289,36 +289,46 @@ export class BrewTimerEngine {
   private tick(): void {
     if (this.status !== 'running') return;
 
-    const currentStep = this.getCurrentStep();
-    if (!currentStep) return;
-
     const now = Date.now();
-    const remaining = this.stepEndAtMs !== null
-      ? remainingTimerSec(this.stepEndAtMs, now)
-      : Math.max(0, currentStep.durationSeconds - this.stepElapsedSeconds);
-    this.stepElapsedSeconds = Math.max(0, currentStep.durationSeconds - remaining);
-
     if (this.totalStartAtMs !== null) {
       this.totalElapsedSeconds = Math.floor(
         (this.pausedTotalElapsedMs + (now - this.totalStartAtMs)) / 1000
       );
     }
 
-    // Odliczanie ostatnich 3 sekund etapu
-    if (remaining > 0 && remaining <= 3) {
-      this.triggerHaptic('warning');
-      if (this.soundEnabled && remaining === 3) {
-        void playTimerChime();
-      }
-      if (this.callbacks.onWarning) {
-        this.callbacks.onWarning(remaining);
-      }
-    }
+    while (this.status === 'running') {
+      const currentStep = this.getCurrentStep();
+      if (!currentStep) break;
 
-    if (remaining <= 0 || this.stepElapsedSeconds >= currentStep.durationSeconds) {
+      const remaining = this.stepEndAtMs !== null
+        ? remainingTimerSec(this.stepEndAtMs, now)
+        : Math.max(0, currentStep.durationSeconds - this.stepElapsedSeconds);
+
+      if (remaining > 0) {
+        this.stepElapsedSeconds = Math.max(0, currentStep.durationSeconds - remaining);
+        if (remaining <= 3) {
+          this.triggerHaptic('warning');
+          if (this.soundEnabled && remaining === 3) {
+            void playTimerChime();
+          }
+          if (this.callbacks.onWarning) {
+            this.callbacks.onWarning(remaining);
+          }
+        }
+        break;
+      }
+
+      // Krok wygasł (remaining <= 0)
       if (this.currentStepIndex < this.steps.length - 1) {
-        this.nextStep();
-        return;
+        this.currentStepIndex++;
+        const nextStep = this.getCurrentStep();
+        const nextDurationMs = nextStep ? nextStep.durationSeconds * 1000 : 0;
+        this.stepEndAtMs = (this.stepEndAtMs !== null ? this.stepEndAtMs : now) + nextDurationMs;
+        this.stepElapsedSeconds = 0;
+        this.triggerHaptic('step');
+        if (nextStep && this.callbacks.onStepChange) {
+          this.callbacks.onStepChange(this.currentStepIndex, nextStep);
+        }
       } else {
         this.finish();
         return;

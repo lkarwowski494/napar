@@ -258,6 +258,7 @@ export default function SettingsScreen() {
         selectedGrinder={selectedGrinder}
         onSelectGrinder={handleSelectGrinder}
         title={t.settings.grinderSection}
+        language={language}
       />
 
       {/* Kopia Zapasowa & Eksport (ZP-02, ZP-06, ZP-07, ZP-08, ZP-10) */}

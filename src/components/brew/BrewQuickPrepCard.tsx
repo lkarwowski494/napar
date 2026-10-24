@@ -28,8 +28,10 @@ interface BrewQuickPrepCardProps {
   batchScaling: {
     grindAdjustmentClicks: number;
     recommendationPl: string;
+    recommendationEn?: string;
   };
   unitSystem?: UnitSystem;
+  language?: 'pl' | 'en';
 }
 
 export function BrewQuickPrepCard({
@@ -44,8 +46,10 @@ export function BrewQuickPrepCard({
   disabled = false,
   batchScaling,
   unitSystem = 'metric',
+  language: languageProp,
 }: BrewQuickPrepCardProps) {
-  const { t, language } = useTranslation();
+  const { t, language: contextLang } = useTranslation();
+  const language = languageProp || contextLang;
   const currentRatioNum = doseGrams > 0 ? (waterGrams / doseGrams).toFixed(1) : '16.7';
   const currentRatioVal = parseFloat(currentRatioNum);
 
@@ -97,7 +101,9 @@ export function BrewQuickPrepCard({
 
         {servings > 1 && (
           <Text style={styles.batchAdviceText}>
-            {batchScaling.recommendationPl}
+            {language === 'en'
+              ? (batchScaling.recommendationEn || batchScaling.recommendationPl)
+              : batchScaling.recommendationPl}
           </Text>
         )}
       </View>

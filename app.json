@@ -92,7 +92,8 @@
           "hi",
           "hr",
           "ca"
-        ]
+        ],
+        "CFBundleDisplayName": "Napar"
       }
     },
     "android": {

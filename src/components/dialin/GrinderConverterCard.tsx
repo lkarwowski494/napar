@@ -50,10 +50,13 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
 
       <View style={styles.grinderCategoryDetailsCard}>
         <Text style={styles.grinderMethodsText}>
-          Metody: {language === 'pl' ? activeGrindCategory.methodsPl : activeGrindCategory.methodsEn}
+          {language === 'en' ? 'Methods: ' : 'Metody: '}
+          {language === 'pl' ? activeGrindCategory.methodsPl : activeGrindCategory.methodsEn}
         </Text>
         <Text style={styles.grinderMicronsRange}>
-          Średnia cząstek: {activeGrindCategory.micronMin} – {activeGrindCategory.micronMax} µm (punkt odniesienia: {activeGrindCategory.defaultMicrons} µm)
+          {language === 'en'
+            ? `Particle size: ${activeGrindCategory.micronMin} – ${activeGrindCategory.micronMax} µm (benchmark: ${activeGrindCategory.defaultMicrons} µm)`
+            : `Średnia cząstek: ${activeGrindCategory.micronMin} – ${activeGrindCategory.micronMax} µm (punkt odniesienia: ${activeGrindCategory.defaultMicrons} µm)`}
         </Text>
       </View>
 
@@ -63,11 +66,12 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
 
       <View style={styles.grindersGrid}>
         {SUPPORTED_GRINDERS.map((grinder) => {
-          const setting = convertMicronsToGrinder(activeGrindCategory.defaultMicrons, grinder.id);
+          const setting = convertMicronsToGrinder(activeGrindCategory.defaultMicrons, grinder.id, language);
+          const burrText = language === 'en' ? (grinder.burrTypeEn || grinder.burrType) : (grinder.burrTypePl || grinder.burrType);
           return (
             <View key={grinder.id} style={styles.grinderSettingCard}>
-              <Text style={styles.grinderNameText}>{grinder.name}</Text>
-              <Text style={styles.grinderBurrText}>{grinder.burrType}</Text>
+              <Text style={styles.grinderNameText}>{language === 'en' ? (grinder.nameEn || grinder.name) : (grinder.namePl || grinder.name)}</Text>
+              <Text style={styles.grinderBurrText}>{burrText}</Text>
               <Text style={styles.grinderSettingValue}>{setting.formatted}</Text>
             </View>
           );

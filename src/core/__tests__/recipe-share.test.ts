@@ -156,4 +156,33 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
       global.Buffer = origBuffer;
     }
   });
+
+  test('TASK-P3-09-WZR: Eksport i import receptury zachowuje angielskie metadane kroków i generuje angielskie fallbacki', () => {
+    const url = encodeRecipeToShareUrl(sampleSavedRecipe);
+    const decodedEn = decodeRecipeFromShareUrl(url, 'en');
+
+    expect(decodedEn).not.toBeNull();
+    expect(decodedEn?.originalSteps[0].nameEn).toBe('Bloom');
+    expect(decodedEn?.originalSteps[0].instructionEn).toBe('Pour 60g and swirl');
+
+    // Receptura bez autora i opisu w trybie EN generuje angielskie fallbacki
+    const minimalPayload = encodeRecipeToShareUrl({
+      id: 'min-rec',
+      name: 'Custom Aero',
+      beverageType: 'COFFEE',
+      method: 'AeroPress',
+      doseGrams: 14,
+      waterGrams: 200,
+      waterTempCelsius: 85,
+      recommendedRatio: 14.3,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: new Date().toISOString(),
+    });
+
+    const decodedMin = decodeRecipeFromShareUrl(minimalPayload, 'en');
+    expect(decodedMin?.recipe.author).toBe('Shared Recipe');
+    expect(decodedMin?.recipe.description).toContain('Imported via QR code');
+  });
 });

@@ -43,7 +43,9 @@ export const BrewBanners: React.FC<BrewBannersProps> = ({
             style={styles.corruptDismissBtn}
             onPress={onDismissCorrupt}
             accessibilityRole="button"
-            accessibilityLabel="Odrzuć komunikat awarii"
+            accessibilityLabel={
+              language === 'pl' ? 'Odrzuć komunikat awarii' : 'Dismiss crash message'
+            }
           >
             <Text style={styles.corruptDismissText}>
               {language === 'pl' ? 'Odrzuć' : 'Dismiss'}
@@ -57,7 +59,9 @@ export const BrewBanners: React.FC<BrewBannersProps> = ({
         <View style={styles.readOnlyBanner}>
           <ShieldIcon size={16} color={theme.colors.copper} />
           <Text style={styles.readOnlyBannerText}>
-            Tryb Tylko do Odczytu — Twoje receptury i historia są bezpieczne. Parzenie i edycja wymagają Apps4Brew Pass.
+            {language === 'pl'
+              ? 'Tryb Tylko do Odczytu — Twoje receptury i historia są bezpieczne. Parzenie i edycja wymagają Apps4Brew Pass.'
+              : 'Read-Only Mode — Your recipes and history are safe. Brewing and editing require Apps4Brew Pass.'}
           </Text>
         </View>
       )}
