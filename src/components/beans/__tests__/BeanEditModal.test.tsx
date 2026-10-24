@@ -12,6 +12,7 @@ import * as database from '../../../core/database';
 jest.mock('../../../core/database', () => ({
   saveInventoryItem: jest.fn(),
   deleteInventoryItem: jest.fn(),
+  getUnitSystem: jest.fn(() => 'metric'),
 }));
 
 describe('BeanEditModal Component', () => {

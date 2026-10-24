@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
-import { saveInventoryItem } from '../../core/database';
+import { saveInventoryItem, getUnitSystem } from '../../core/database';
+import { ouncesToGrams } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
 import { KnowledgeTemplate } from './BeanCompendiumModal';
 
@@ -36,6 +37,8 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
   presetTemplate,
   onSaved,
 }) => {
+  const unitSystem = getUnitSystem();
+  const isImperial = unitSystem === 'imperial';
   const [name, setName] = useState('');
   const [type, setType] = useState<'coffee' | 'tea'>(() => {
     return beveragePreference === 'tea' ? 'tea' : 'coffee';
@@ -238,10 +241,10 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             </View>
 
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.inputLabel}>Waga paczki (g)</Text>
+              <Text style={styles.inputLabel}>{isImperial ? 'Waga paczki (oz)' : 'Waga paczki (g)'}</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="250"
+                placeholder={isImperial ? '8.8' : '250'}
                 placeholderTextColor={theme.colors.textMuted}
                 keyboardType="numeric"
                 value={initialWeight}

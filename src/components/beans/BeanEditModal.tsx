@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
-import { saveInventoryItem, deleteInventoryItem } from '../../core/database';
+import { saveInventoryItem, deleteInventoryItem, getUnitSystem } from '../../core/database';
+import { gramsToOunces, ouncesToGrams, roundTo } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
 
 export interface BeanEditModalProps {
@@ -35,6 +36,8 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
   onSaved,
   onDeleted,
 }) => {
+  const unitSystem = getUnitSystem();
+  const isImperial = unitSystem === 'imperial';
   const [editName, setEditName] = useState('');
   const [editType, setEditType] = useState<'coffee' | 'tea'>('coffee');
   const [editRoaster, setEditRoaster] = useState('');
@@ -262,7 +265,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
               />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.inputLabel}>Waga początkowa (g)</Text>
+              <Text style={styles.inputLabel}>{isImperial ? 'Waga początkowa (oz)' : 'Waga początkowa (g)'}</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="250"
@@ -276,7 +279,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
           {/* Pozostała waga z szybkimi przyciskami korekty (BR-MAG-004) */}
           <View style={styles.weightEditSection}>
-            <Text style={styles.inputLabel}>Pozostała waga w paczce (g) *</Text>
+            <Text style={styles.inputLabel}>{isImperial ? 'Pozostała waga w paczce (oz) *' : 'Pozostała waga w paczce (g) *'}</Text>
             <TextInput
               style={styles.textInput}
               placeholder="np. 180"
@@ -288,27 +291,27 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             <View style={styles.weightQuickButtonsRow}>
               <Pressable
                 style={styles.quickWeightBtn}
-                onPress={() => handleAdjustRemainingWeight(-15)}
+                onPress={() => handleAdjustRemainingWeight(isImperial ? -0.5 : -15)}
               >
-                <Text style={styles.quickWeightBtnText}>-15 g</Text>
+                <Text style={styles.quickWeightBtnText}>{isImperial ? '-0.5 oz' : '-15 g'}</Text>
               </Pressable>
               <Pressable
                 style={styles.quickWeightBtn}
-                onPress={() => handleAdjustRemainingWeight(-18)}
+                onPress={() => handleAdjustRemainingWeight(isImperial ? -0.6 : -18)}
               >
-                <Text style={styles.quickWeightBtnText}>-18 g</Text>
+                <Text style={styles.quickWeightBtnText}>{isImperial ? '-0.6 oz' : '-18 g'}</Text>
               </Pressable>
               <Pressable
                 style={styles.quickWeightBtn}
-                onPress={() => handleAdjustRemainingWeight(15)}
+                onPress={() => handleAdjustRemainingWeight(isImperial ? 0.5 : 15)}
               >
-                <Text style={styles.quickWeightBtnText}>+15 g</Text>
+                <Text style={styles.quickWeightBtnText}>{isImperial ? '+0.5 oz' : '+15 g'}</Text>
               </Pressable>
               <Pressable
                 style={[styles.quickWeightBtn, styles.quickWeightZeroBtn]}
                 onPress={() => setEditRemainingWeight('0')}
               >
-                <Text style={styles.quickWeightZeroText}>0 g (pusta)</Text>
+                <Text style={styles.quickWeightZeroText}>{isImperial ? '0 oz (pusta)' : '0 g (pusta)'}</Text>
               </Pressable>
             </View>
           </View>

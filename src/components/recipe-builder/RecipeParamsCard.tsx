@@ -7,7 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Field, NumInput } from '../ui';
 import { theme } from '../../core/theme';
-import { formatTemperature, formatDoseWeight, formatWaterWeight } from '../../core/unit-converter';
+import { formatTemperature, formatDoseWeight, formatWaterWeight, gramsToOunces, mlToFluidOunces, celsiusToFahrenheit } from '../../core/unit-converter';
 
 interface RecipeParamsCardProps {
   doseGrams: string;
@@ -45,27 +45,46 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
 
       <View style={styles.row}>
         <View style={styles.flex1}>
-          <Text style={styles.fieldLabel}>{t.recipeBuilder.doseLabel}</Text>
+          <Text style={styles.fieldLabel}>
+            {unitSystem === 'imperial'
+              ? (t.recipeBuilder.doseLabelImperial || 'Doza surowca (oz)')
+              : t.recipeBuilder.doseLabel}
+          </Text>
           <NumInput
-            value={doseNum}
+            value={unitSystem === 'imperial' ? gramsToOunces(doseNum) : doseNum}
+            stored={doseNum}
             onChangeNumber={(n) => onChangeDose(n.toString())}
-            unit="g"
+            unit={unitSystem === 'imperial' ? 'oz' : 'g'}
           />
         </View>
         <View style={[styles.flex1, { marginHorizontal: 10 }]}>
-          <Text style={styles.fieldLabel}>{t.recipeBuilder.waterLabel}</Text>
+          <Text style={styles.fieldLabel}>
+            {unitSystem === 'imperial'
+              ? (t.recipeBuilder.waterLabelImperial || 'Objętość wody (fl oz)')
+              : t.recipeBuilder.waterLabel}
+          </Text>
           <NumInput
-            value={waterNum}
+            value={unitSystem === 'imperial' ? mlToFluidOunces(waterNum) : waterNum}
+            stored={waterNum}
             onChangeNumber={(n) => onChangeWater(n.toString())}
-            unit="g"
+            unit={unitSystem === 'imperial' ? 'fl oz' : 'g'}
           />
         </View>
         <View style={styles.flex1}>
-          <Text style={styles.fieldLabel}>{t.recipeBuilder.tempLabel}</Text>
+          <Text style={styles.fieldLabel}>
+            {unitSystem === 'imperial'
+              ? (t.recipeBuilder.tempLabelImperial || 'Temperatura (°F)')
+              : t.recipeBuilder.tempLabel}
+          </Text>
           <NumInput
-            value={parseFloat(waterTempCelsius) || 0}
+            value={
+              unitSystem === 'imperial'
+                ? celsiusToFahrenheit(parseFloat(waterTempCelsius) || 93)
+                : (parseFloat(waterTempCelsius) || 0)
+            }
+            stored={parseFloat(waterTempCelsius) || 0}
             onChangeNumber={(n) => onChangeWaterTemp(n.toString())}
-            unit="°C"
+            unit={unitSystem === 'imperial' ? '°F' : '°C'}
           />
         </View>
       </View>

@@ -227,8 +227,8 @@ export default function DialInScreen() {
                   <Text style={styles.diagActionLabel}>TEMPERATURA WODY</Text>
                   <Text style={styles.diagActionVal}>
                     {diagnosis.tempAdjustment === 'higher'
-                      ? 'Podnieś o +2°C do 95°C'
-                      : 'Obniż o 2–4°C'}
+                      ? (unitSystem === 'imperial' ? 'Podnieś o +4°F do 203°F' : 'Podnieś o +2°C do 95°C')
+                      : (unitSystem === 'imperial' ? 'Obniż o 4–7°F' : 'Obniż o 2–4°C')}
                   </Text>
                 </View>
               )}

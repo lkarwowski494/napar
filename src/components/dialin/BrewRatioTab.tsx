@@ -22,6 +22,7 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
   unitSystem,
   beveragePreference,
 }) => {
+  const isImperial = unitSystem === 'imperial';
   const [calcDirection, setCalcDirection] = useState<'doseToWater' | 'waterToDose'>('doseToWater');
   const [doseInput, setDoseInput] = useState('18');
   const [waterInput, setWaterInput] = useState('300');
@@ -146,7 +147,7 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
 
         {calcDirection === 'doseToWater' ? (
           <>
-            <Text style={styles.inputTitle}>{t.dialin.doseInputLabel || 'Doza suchej kawy / herbaty (g)'}</Text>
+            <Text style={styles.inputTitle}>{isImperial ? (t.dialin.doseInputLabelImperial || 'Doza suchej kawy / herbaty (oz)') : (t.dialin.doseInputLabel || 'Doza suchej kawy / herbaty (g)')}</Text>
             <TextInput
               testID="dose-input"
               accessibilityLabel={t.dialin.doseInputLabel || 'Doza suchej kawy / herbaty'}
@@ -160,7 +161,7 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
           </>
         ) : (
           <>
-            <Text style={styles.inputTitle}>{t.dialin.waterInputLabel || 'Docelowa objętość wody (g)'}</Text>
+            <Text style={styles.inputTitle}>{isImperial ? (t.dialin.waterInputLabelImperial || 'Docelowa objętość wody (fl oz)') : (t.dialin.waterInputLabel || 'Docelowa objętość wody (g)')}</Text>
             <TextInput
               testID="water-input"
               accessibilityLabel={t.dialin.waterInputLabel || 'Docelowa objętość wody'}
