@@ -49,14 +49,34 @@ export function utf8ToBase64(str: string): string {
 }
 
 /**
+ * Normalizuje ciąg Base64:
+ * 1. Zastępuje białe znaki/spacje znakami '+' (artefakt komunikatorów i dekodowania parametrów query)
+ * 2. Zamienia wariant URL-Safe Base64 ('-' na '+', '_' na '/')
+ * 3. Uzupełnia brakujący padding '='
+ */
+export function normalizeBase64(b64: string): string {
+  let normalized = b64.trim().replace(/\s+/g, '+').replace(/-/g, '+').replace(/_/g, '/');
+  const mod = normalized.length % 4;
+  if (mod === 2) {
+    normalized += '==';
+  } else if (mod === 3) {
+    normalized += '=';
+  } else if (mod === 1) {
+    normalized += '===';
+  }
+  return normalized;
+}
+
+/**
  * Bezpieczne dekodowanie Base64 do UTF-8
  */
 export function base64ToUtf8(b64: string): string {
+  const normalized = normalizeBase64(b64);
   if (typeof Buffer !== 'undefined') {
-    return Buffer.from(b64, 'base64').toString('utf-8');
+    return Buffer.from(normalized, 'base64').toString('utf-8');
   }
   // Fallback
-  const binary = atob(b64);
+  const binary = atob(normalized);
   return decodeURIComponent(
     binary
       .split('')

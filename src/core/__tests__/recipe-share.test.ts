@@ -185,4 +185,23 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decodedMin?.recipe.author).toBe('Shared Recipe');
     expect(decodedMin?.recipe.description).toContain('Imported via QR code');
   });
+
+  test('TASK-P4-11-WZR: normalizeBase64 radzi sobie z URL-Safe base64, spacjami z komunikatorów i brakiem paddingu', () => {
+    const originalJson = JSON.stringify({ v: 1, n: 'Matcha / Special + Roast', b: 'TEA', m: 'Chasen', d: 2, w: 70, t: 80, r: 35, s: [] });
+    const standardB64 = Buffer.from(originalJson, 'utf-8').toString('base64');
+    
+    // Stwórz wariant URL-Safe (- zamiast +, _ zamiast /, bez paddingu =)
+    const urlSafeB64 = standardB64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    
+    // Stwórz wariant ze spacjami zamiast plusów (np. gdy komunikator lub url decoder zamienił + na spacji)
+    const spacedB64 = standardB64.replace(/\+/g, ' ');
+
+    expect(base64ToUtf8(urlSafeB64)).toBe(originalJson);
+    expect(base64ToUtf8(spacedB64)).toBe(originalJson);
+
+    // Oraz przez dekodowanie pełnego share URL
+    const decodedFromUrlSafe = decodeRecipeFromShareUrl(`https://napar.app/recipe?v=1&d=${urlSafeB64}`);
+    expect(decodedFromUrlSafe).not.toBeNull();
+    expect(decodedFromUrlSafe?.recipe.name).toBe('Matcha / Special + Roast');
+  });
 });
