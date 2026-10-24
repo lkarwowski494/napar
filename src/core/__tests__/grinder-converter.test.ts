@@ -67,7 +67,7 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(kUltra.parseSetting('50')).toBe(1000); // 50 * 20um = 1000um
 
     const ode = SUPPORTED_GRINDERS.find((g) => g.id === 'fellow_ode_gen2')!;
-    expect(ode.parseSetting('4')).toBe(200 + 4 * 3 * 40);
+    expect(ode.parseSetting('4')).toBe(200 + ((4 - 1) * 3 + 1) * 40.0);
 
     const encore = SUPPORTED_GRINDERS.find((g) => g.id === 'baratza_encore')!;
     expect(encore.parseSetting('#18')).toBe(150 + 18 * 35);
@@ -118,7 +118,11 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(kUltra.parseSetting('tekst')).toBe(7.5 * 10 * 20.0);
 
     const ode = SUPPORTED_GRINDERS.find((g) => g.id === 'fellow_ode_gen2')!;
-    expect(ode.parseSetting('brak_cyfr')).toBe(200 + 5.0 * 3 * 40.0);
+    expect(ode.parseSetting('brak_cyfr')).toBe(200 + ((5 - 1) * 3 + 1) * 40.0);
+
+    // Fellow Ode Gen 2 round-trip (M1-audytor-generalny-034)
+    const odeRoundTrip = convertBetweenGrinders('fellow_ode_gen2', '5', 'fellow_ode_gen2');
+    expect(odeRoundTrip.targetFormatted).toBe('5');
 
     const encore = SUPPORTED_GRINDERS.find((g) => g.id === 'baratza_encore')!;
     expect(encore.parseSetting('brak')).toBe(150 + 16 * 35.0);

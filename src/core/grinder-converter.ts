@@ -147,8 +147,12 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
       return `${major}${subChar}`;
     },
     parseSetting: (text: string) => {
-      const val = parseFloat(text) || 5.0;
-      return 200 + val * 3 * 40.0;
+      let sub = 0;
+      if (text.includes('⅓') || text.includes('1/3')) sub = 1;
+      else if (text.includes('⅔') || text.includes('2/3')) sub = 2;
+      const num = parseInt(text.replace(/[^0-9]/g, ''), 10) || 5;
+      const clicks = (num - 1) * 3 + 1 + sub;
+      return 200 + clicks * 40.0;
     },
   },
   {

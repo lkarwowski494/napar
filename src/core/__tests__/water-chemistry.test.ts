@@ -32,6 +32,7 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(res.targetKhPpm).toBe(40);
     expect(res.concentrateBufferGrams).toBe(20.0);
     expect(res.concentrateHardnessGrams).toBe(40.0);
+    expect(res.baseWaterGrams).toBe(940.0);
   });
 
   test('Prawidłowo skaluje koncentraty dla 5.0 litrów wody (bańka RO)', () => {
@@ -41,6 +42,7 @@ describe('Water Chemistry & Mineralization Module', () => {
     const res = calculateWaterMinerals(5.0, 80, 40);
     expect(res.concentrateBufferGrams).toBe(100.0);
     expect(res.concentrateHardnessGrams).toBe(200.0);
+    expect(res.baseWaterGrams).toBe(4700.0);
 
     // Suche sole dla 5L
     // NaHCO3: 40 * 0.00168 * 5 = 0.336g

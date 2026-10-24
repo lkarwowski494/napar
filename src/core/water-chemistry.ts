@@ -170,6 +170,7 @@ export interface WaterCalculationResult {
   // Metoda A: Gotowe butelki koncentratu Barista Hustle (1.68g NaHCO3 / 500g i 2.45g MgSO4 / 500g)
   concentrateBufferGrams: number;
   concentrateHardnessGrams: number;
+  baseWaterGrams: number; // Dopełnienie do 1000g na każdy litr (woda demineralizowana/RO)
   // Metoda B: Bezpośrednie odważenie suchych soli do wody bazowej
   dryBakingSodaNaHCO3Grams: number;
   dryEpsomSaltMgSO4Grams: number;
@@ -207,12 +208,16 @@ export function calculateWaterMinerals(
   // CaCl2*2H2O (wapń): 1 ppm GH = 0.00147 g na 1L
   const dryCaCl2 = Number((gh * 0.00147 * vol).toFixed(3));
 
+  const totalWaterGrams = vol * 1000;
+  const baseWater = Number((totalWaterGrams - concentrateBuffer - concentrateHardness).toFixed(1));
+
   return {
     waterVolumeLiters: vol,
     targetGhPpm: gh,
     targetKhPpm: kh,
     concentrateBufferGrams: concentrateBuffer,
     concentrateHardnessGrams: concentrateHardness,
+    baseWaterGrams: baseWater,
     dryBakingSodaNaHCO3Grams: dryNaHCO3,
     dryEpsomSaltMgSO4Grams: dryMgSO4,
     dryCalciumChlorideCaCl2Grams: dryCaCl2,

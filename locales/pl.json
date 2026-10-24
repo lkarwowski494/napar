@@ -279,7 +279,7 @@
     "dryEpsom": "Sól Epsom (MgSO₄ · 7H₂O)",
     "dryCalcium": "Chlorek wapnia (CaCl₂ · 2H₂O)",
     "ppmCaCO3": "ppm CaCO₃",
-    "concentrateHelp": "Dodaj odmierzone gramy koncentratów prosto do naczynia z wodą demineralizowaną.",
+    "concentrateHelp": "Dodaj odmierzone gramy koncentratów prosto do naczynia i dopełnij wodą demineralizowaną do 1000g (1L).",
     "diagnosisHeader": "Diagnoza sensoryczna wody",
     "diagnosisProblem": "Efekt w filiżance",
     "diagnosisCause": "Przyczyna chemiczna",
