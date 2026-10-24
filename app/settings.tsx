@@ -334,6 +334,14 @@ export default function SettingsScreen() {
           <Text style={styles.infoLabel}>Kontakt i Wsparcie</Text>
           <Text style={[styles.infoValue, { color: theme.colors.copper }]}>kontakt@apps4brew.pl ↗</Text>
         </Pressable>
+        <View style={styles.divider} />
+        <Pressable
+          style={styles.infoRow}
+          onPress={() => Linking.openURL('https://apps.apple.com/app/id6470000000?action=write-review')}
+        >
+          <Text style={styles.infoLabel}>Oceń w App Store</Text>
+          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>Wystaw ocenę ↗</Text>
+        </Pressable>
       </View>
 
       {/* Apps4Brew Pass Paywall Modal */}

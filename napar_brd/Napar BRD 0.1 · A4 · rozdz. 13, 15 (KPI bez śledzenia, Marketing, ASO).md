@@ -35,6 +35,6 @@ Zgodnie z Zasadą Produktu ZP-10 („Data Not Collected”) aplikacja nie zawier
 * **US:** `coffee,tea,timer,pourover,v60,aeropress,gongfu,caffeine,brewing,barista,chemex,espresso,tracker,sleep`
 
 ### **15.3 Organiczne kanały dotarcia (Społeczność i rekomendacje)**
-1. **Społeczności Reddit:** r/Coffee (1.6M subskrybentów), r/tea (850k subskrybentów), r/espresso, r/pourover. Publikacja bezinteresownego przewodnika po ekstrakcji z darmowym linkiem do Naparu.
+1. **Społeczności Reddit:** r/Coffee (1.6M subskrybentów), r/tea (850k subskrybentów), r/espresso, r/pourover. Aktywność organiczna zgodnie z regulaminem r/Coffee (zasada 9:1 wkładu merytorycznego do autopromocji) oraz udział w cotygodniowych wątkach dyskusyjnych bez bezpośredniego spamowania linkami.
 2. **Polskie fora i grupy:** Grupy na Facebooku „Kawa Specialty Polska”, Wykop tag `#kawa` i `#herbata`.
 3. **Współpraca z palarniami specialty:** Umieszczanie kodu QR do predefiniowanej receptury ziaren bezpośrednio na etykietach paczek zaprzyjaźnionych palarni rzemieślniczych.
