@@ -202,7 +202,7 @@ export function initDatabase(db?: SQLite.SQLiteDatabase): void {
 
 function seedMasterRecipes(db: SQLite.SQLiteDatabase): void {
   const insertStmt = db.prepareSync(`
-    INSERT OR REPLACE INTO recipes (
+    INSERT INTO recipes (
       id, name, beverage_type, method, author, description,
       dose_g, water_g, water_temp_c, grind_size_description,
       recommended_ratio, steps_json, is_custom, is_favorite, created_at
@@ -211,6 +211,19 @@ function seedMasterRecipes(db: SQLite.SQLiteDatabase): void {
       $doseG, $waterG, $waterTempC, $grindSize,
       $ratio, $stepsJson, 0, 0, $createdAt
     )
+    ON CONFLICT(id) DO UPDATE SET
+      name = excluded.name,
+      beverage_type = excluded.beverage_type,
+      method = excluded.method,
+      author = excluded.author,
+      description = excluded.description,
+      dose_g = excluded.dose_g,
+      water_g = excluded.water_g,
+      water_temp_c = excluded.water_temp_c,
+      grind_size_description = excluded.grind_size_description,
+      recommended_ratio = excluded.recommended_ratio,
+      steps_json = excluded.steps_json,
+      is_custom = excluded.is_custom
   `);
 
   try {
@@ -362,11 +375,25 @@ export function getRecipeById(id: string): SavedRecipe | null {
 export function saveRecipe(recipe: SavedRecipe): void {
   const db = getDatabase();
   db.runSync(
-    `INSERT OR REPLACE INTO recipes (
+    `INSERT INTO recipes (
       id, name, beverage_type, method, author, description,
       dose_g, water_g, water_temp_c, grind_size_description,
       recommended_ratio, steps_json, is_custom, is_favorite, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      name = excluded.name,
+      beverage_type = excluded.beverage_type,
+      method = excluded.method,
+      author = excluded.author,
+      description = excluded.description,
+      dose_g = excluded.dose_g,
+      water_g = excluded.water_g,
+      water_temp_c = excluded.water_temp_c,
+      grind_size_description = excluded.grind_size_description,
+      recommended_ratio = excluded.recommended_ratio,
+      steps_json = excluded.steps_json,
+      is_custom = excluded.is_custom,
+      is_favorite = excluded.is_favorite`,
     [
       recipe.id,
       recipe.name,

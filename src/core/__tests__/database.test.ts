@@ -118,12 +118,14 @@ const mockDb: any = {
       }
     } else if (query.includes('DELETE FROM inventory_items WHERE id = ?')) {
       mockDb.inventory.delete(params![0]);
-    } else if (query.includes('INSERT OR REPLACE INTO recipes')) {
+    } else if (query.includes('INTO recipes')) {
       const [id, name, type, method, author, desc, dose, water, temp, grind, ratio, steps, custom, fav, created] = params!;
+      const existing = mockDb.recipes.get(id);
       mockDb.recipes.set(id, {
         id, name, beverage_type: type, method, author, description: desc,
         dose_g: dose, water_g: water, water_temp_c: temp, grind_size_description: grind,
-        recommended_ratio: ratio, steps_json: steps, is_custom: custom, is_favorite: fav, created_at: created
+        recommended_ratio: ratio, steps_json: steps, is_custom: custom, is_favorite: fav,
+        created_at: existing ? existing.created_at : created
       });
     } else if (query.includes('UPDATE recipes SET is_favorite = ?')) {
       const [fav, id] = params!;
@@ -159,6 +161,7 @@ const mockDb: any = {
   }),
   prepareSync: jest.fn(() => ({
     executeSync: jest.fn((params: any) => {
+      const existing = mockDb.recipes.get(params.$id);
       mockDb.recipes.set(params.$id, {
         id: params.$id,
         name: params.$name,
@@ -173,8 +176,8 @@ const mockDb: any = {
         recommended_ratio: params.$ratio,
         steps_json: params.$stepsJson,
         is_custom: 0,
-        is_favorite: 0,
-        created_at: params.$createdAt,
+        is_favorite: existing ? existing.is_favorite : 0,
+        created_at: existing ? existing.created_at : params.$createdAt,
       });
     }),
     finalizeSync: jest.fn(),
@@ -192,6 +195,25 @@ describe('Napar SQLite Database & Repositories', () => {
     mockDb.sessions.clear();
     mockDb.caffeine.clear();
     mockDb.settings.clear();
+  });
+
+  test('seedMasterRecipes zachowuje is_favorite i created_at przy ponownym seedingu (M1-audytor-generalny-001)', () => {
+    initDatabase(mockDb as any);
+    const recipes = getRecipes();
+    expect(recipes.length).toBeGreaterThan(0);
+    const first = recipes[0];
+    const initialCreatedAt = first.createdAt;
+
+    // Oznacz jako ulubiony
+    toggleRecipeFavorite(first.id, true);
+    expect(getRecipeById(first.id)?.isFavorite).toBe(true);
+
+    // Ponowny seeding (symulacja aktualizacji aplikacji)
+    initDatabase(mockDb as any);
+    const reloaded = getRecipeById(first.id);
+    expect(reloaded).not.toBeNull();
+    expect(reloaded!.isFavorite).toBe(true);
+    expect(reloaded!.createdAt).toBe(initialCreatedAt);
   });
 
   test('Inicjalizacja bazy i seeding domyślnych przepisów', () => {
