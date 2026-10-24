@@ -169,5 +169,19 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(ics).toContain('SUMMARY:Szczyt świeżości (Peak): Kenya AA Peak');
       expect(ics).toContain('END:VCALENDAR');
     });
+
+    it('escapes special characters (; , \\) in RFC 5545 TEXT and supports English export', () => {
+      const schedule = buildProactiveActionSchedule(refIso, sampleInventory, sampleSessions);
+      const icsEn = generateActionIcsContent(schedule[0], 'en');
+      expect(icsEn).toContain('PRODID:-//Apps4Brew Studio//Napar Steepwise//EN');
+      expect(icsEn).toContain('SUMMARY:Peak freshness window: Kenya AA Peak');
+
+      const testAction = {
+        ...schedule[0],
+        titlePl: 'Kawa, specialty; palona\\ręcznie',
+      };
+      const icsEscaped = generateActionIcsContent(testAction, 'pl');
+      expect(icsEscaped).toContain('SUMMARY:Kawa\\, specialty\\; palona\\\\ręcznie');
+    });
   });
 });

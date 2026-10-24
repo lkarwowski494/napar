@@ -69,9 +69,10 @@ export function ProactiveCalendarCard({
 
   const handleExportIcs = async (action: ProactiveActionItem) => {
     try {
-      const ics = generateActionIcsContent(action);
+      const ics = generateActionIcsContent(action, isEn ? 'en' : 'pl');
+      const title = isEn ? action.titleEn || action.titlePl : action.titlePl;
       await Share.share({
-        title: `${action.titlePl}.ics`,
+        title: `${title}.ics`,
         message: ics,
       });
     } catch {

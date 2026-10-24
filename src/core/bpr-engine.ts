@@ -365,17 +365,33 @@ export function buildFourteenDayCalendar(
  * Generuje zawartość pliku kalendarzowego iCalendar (.ics, RFC 5545)
  * dla wybranej akcji z harmonogramu.
  */
-export function generateActionIcsContent(action: ProactiveActionItem): string {
+export function escapeIcsText(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\r?\n/g, '\\n');
+}
+
+export function generateActionIcsContent(
+  action: ProactiveActionItem,
+  language: 'pl' | 'en' = 'pl'
+): string {
+  const isEn = language === 'en';
   const cleanDate = (action.dateIso || '2026-10-17').replace(/-/g, '');
   const dtStart = `${cleanDate}T080000Z`;
   const dtEnd = `${cleanDate}T081500Z`;
-  const summary = action.titlePl.replace(/[\r\n]+/g, ' ');
-  const description = action.subtitlePl.replace(/[\r\n]+/g, ' ');
+  const rawSummary = isEn ? action.titleEn || action.titlePl : action.titlePl;
+  const rawDescription = isEn ? action.subtitleEn || action.subtitlePl : action.subtitlePl;
+
+  const summary = escapeIcsText(rawSummary);
+  const description = escapeIcsText(rawDescription);
 
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Apps4Brew Studio//Napar Steepwise//PL',
+    `PRODID:-//Apps4Brew Studio//Napar Steepwise//${isEn ? 'EN' : 'PL'}`,
     'BEGIN:VEVENT',
     `UID:${action.id}@napar.apps4brew.studio`,
     `DTSTAMP:${dtStart}`,
