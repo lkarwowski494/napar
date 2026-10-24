@@ -1,22 +1,77 @@
 // ============================================================================
 // Napar (Steepwise) — Root Layout (Expo Router)
 // Apps4Brew: Pure local state, zero login, artisanal dark theme
+// Includes Crash Loop Guard & Safe Mode (TASK-R12-01 & TASK-R12-02)
 // ============================================================================
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar } from 'react-native';
+import { StatusBar, View, ActivityIndicator } from 'react-native';
 import { LanguageProvider } from '../src/core/i18n';
 import { BrewProvider } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
+import { crashLoopGuard, recordStartupSuccess } from '../src/core/startup-guard';
+import { SafeModeView } from '../src/components/SafeModeView';
+
+function StartupSuccessNotifier() {
+  useEffect(() => {
+    void recordStartupSuccess();
+  }, []);
+  return null;
+}
 
 export default function RootLayout() {
+  const [isSafeMode, setIsSafeMode] = useState<boolean>(false);
+  const [isReady, setIsReady] = useState<boolean>(false);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const { shouldEnterSafeMode } = await crashLoopGuard.recordStartupAttempt();
+        if (shouldEnterSafeMode) {
+          if (active) setIsSafeMode(true);
+        }
+      } catch {
+        if (active) setIsSafeMode(true);
+      } finally {
+        if (active) setIsReady(true);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleRetry = async () => {
+    await crashLoopGuard.resetCrashCount();
+    setIsSafeMode(false);
+  };
+
+  if (!isReady) {
+    return (
+      <View style={{ flex: 1, backgroundColor: theme.colors.bg, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={theme.colors.copper} />
+      </View>
+    );
+  }
+
+  if (isSafeMode) {
+    return (
+      <SafeAreaProvider>
+        <StatusBar barStyle="light-content" />
+        <SafeModeView onRetry={handleRetry} />
+      </SafeAreaProvider>
+    );
+  }
+
   return (
     <SafeAreaProvider>
       <LanguageProvider>
         <BrewProvider>
           <StatusBar barStyle="light-content" />
+          <StartupSuccessNotifier />
           <Stack
             screenOptions={{
               headerStyle: {
