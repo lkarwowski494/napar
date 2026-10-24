@@ -8,12 +8,12 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | Kategoria | Łącznie | Pokryte | Pokrycie % | Status |
 | :--- | :---: | :---: | :---: | :---: |
 | **EKRAN** | 9 | 9 | **100.0%** | ✅ POKRYTE |
-| **UI** | 61 | 61 | **100.0%** | ✅ POKRYTE |
-| **TEKST** | 324 | 324 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 192 | 192 | **100.0%** | ✅ POKRYTE |
+| **UI** | 73 | 73 | **100.0%** | ✅ POKRYTE |
+| **TEKST** | 341 | 341 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 197 | 197 | **100.0%** | ✅ POKRYTE |
 | **WYMIAR** | 37 | 37 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **623** | Pokrytych: **623** | Brakujących: **0**
+Łącznie elementów: **657** | Pokrytych: **657** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -100,6 +100,35 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `brew.duplicateSuccess` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.addTime10` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.subTime10` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.totalTimeLabel` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.totalTimeAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.stepBadge` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.stepAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.subTime10Accessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.addTime10Accessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.pourUpTo` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.startBrewAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.startBrewHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.startBrewBtn` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.previousStepAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.previousStepHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.previousStepBtn` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.pauseBrewAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.pauseBrewHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.pauseBrewBtn` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.nextStepAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.nextStepHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.nextStepBtn` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.finishBrewAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.finishBrewHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.finishBrewBtn` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.resetTimerAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.resetTimerHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.resumeBrewAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.resumeBrewHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.saveSessionAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.saveSessionHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.saveSessionBtn` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `gongfu.modeTitle` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `TEKST` | `gongfu.modeDesc` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `TEKST` | `gongfu.infusionNumber` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
@@ -290,34 +319,5 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `caffeine.riskAtBedtime` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/oracle-coffee.test.ts |
 | `UI` | `caffeine.logDoseBtn` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/oracle-coffee.test.ts |
 | `TEKST` | `sensory.title` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
-| `TEKST` | `sensory.subtitle` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `sensory.acidity` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `sensory.sweetness` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `sensory.body` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `sensory.clarity` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `UI` | `sensory.finish` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/bpr-components.test.tsx |
-| `TEKST` | `batch.label` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/close-button-guard.test.tsx |
-| `TEKST` | `batch.cups` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `batch.cup1` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `batch.cup2` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `batch.cup3` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `batch.cup4` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `batch.grindAdjustmentNotice` | `src/core/i18n.tsx` | ✅ | src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
-| `TEKST` | `favorites.title` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/interaction-guards.test.ts |
-| `TEKST` | `favorites.addToFav` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/brew-screen.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `favorites.removeFromFav` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/brew-screen.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `favorites.quickBrew` | `src/core/i18n.tsx` | ✅ | src/core/__tests__/brew-screen.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `settings.title` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
-| `TEKST` | `settings.languageSection` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `settings.languageAuto` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `settings.beverageSection` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `settings.beverageDesc` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `settings.beverageBoth` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `settings.beverageBothDesc` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `settings.beverageCoffeeOnly` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `settings.beverageCoffeeOnlyDesc` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `settings.beverageTeaOnly` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `settings.beverageTeaOnlyDesc` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `TEKST` | `settings.caffeineSettingsSection` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 
-*(... i 323 kolejnych elementów w pełnym wykazie)*
+*(... i 357 kolejnych elementów w pełnym wykazie)*

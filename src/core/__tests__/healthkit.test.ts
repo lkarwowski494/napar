@@ -22,6 +22,7 @@ import {
   revokeHealthKitPermissions,
   saveDietaryCaffeineSample,
   HK_QUANTITY_TYPE_DIETARY_CAFFEINE,
+  HealthKitAuthorizationStatus,
 } from '../healthkit';
 import * as databaseModule from '../database';
 
@@ -114,5 +115,10 @@ describe('Apple HealthKit Dietary Caffeine Bridge (BR-KOF-002 & DEC-01)', () => 
     expect(res.quantityType).toBe(HK_QUANTITY_TYPE_DIETARY_CAFFEINE);
     expect(res.sampleId).toBeUndefined();
     expect(res.error).toContain('DEC-01');
+  });
+
+  test('HealthKitAuthorizationStatus typ definiuje stany autoryzacji', () => {
+    const status: HealthKitAuthorizationStatus = getHealthKitAuthorizationStatus();
+    expect(['not_determined', 'sharing_authorized', 'sharing_denied']).toContain(status);
   });
 });

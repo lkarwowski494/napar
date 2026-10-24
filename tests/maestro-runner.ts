@@ -100,42 +100,40 @@ export function loadMaestroFlows(maestroDir?: string): MaestroFlow[] {
   });
 }
 
-export function executeMaestroFlow(
-  flow: MaestroFlow,
-  _simulatedTime: Date,
-  _dictionary: Record<string, any> = {}
-): { executedCount: number; passed: boolean; screenshots: string[] } {
-  let executedCount = 0;
-  const screenshots: string[] = [];
+export function validateMaestroFlowSyntax(
+  flow: MaestroFlow
+): { valid: boolean; commandCount: number } {
+  if (!flow.appId || flow.appId.trim().length === 0) {
+    throw new Error('[Maestro-Validator] Missing appId in ' + flow.rawPath);
+  }
+  let commandCount = 0;
 
   for (const step of flow.commands) {
     if (step.launchApp) {
-      executedCount++;
+      commandCount++;
     } else if (step.assertVisible) {
       const textToFind = step.assertVisible;
       if (!textToFind || typeof textToFind !== 'string' || textToFind.trim().length === 0) {
-        throw new Error(`[Maestro-Runner] Invalid assertVisible text in ${flow.rawPath}`);
+        throw new Error('[Maestro-Validator] Invalid assertVisible text in ' + flow.rawPath);
       }
-      executedCount++;
+      commandCount++;
     } else if (step.tapOn) {
       const target = step.tapOn;
       if (!target || typeof target !== 'string' || target.trim().length === 0) {
-        throw new Error(`[Maestro-Runner] Invalid tapOn target in ${flow.rawPath}`);
+        throw new Error('[Maestro-Validator] Invalid tapOn target in ' + flow.rawPath);
       }
-      executedCount++;
+      commandCount++;
     } else if (step.takeScreenshot) {
-      screenshots.push(step.takeScreenshot);
-      executedCount++;
+      commandCount++;
     } else if (step.inputText) {
-      executedCount++;
+      commandCount++;
     } else {
-      executedCount++;
+      commandCount++;
     }
   }
 
   return {
-    executedCount,
-    passed: true,
-    screenshots,
+    valid: true,
+    commandCount,
   };
 }

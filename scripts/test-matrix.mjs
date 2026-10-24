@@ -372,9 +372,10 @@ if (results.length > 300) {
 }
 
 const matrixDocPath = join(root, 'docs', '22-macierz-testow.md');
-writeFileSync(matrixDocPath, md, 'utf-8');
-
-console.log(`[test-matrix] Zaktualizowano ${matrixDocPath}`);
+if (!isCheckMode) {
+  writeFileSync(matrixDocPath, md, 'utf-8');
+  console.log(`[test-matrix] Zaktualizowano ${matrixDocPath}`);
+}
 console.log(
   `[test-matrix] Wyniki: ${items.length - missingCount}/${items.length} elementów (${
     missingCount === 0 ? '100%' : 'Braki: ' + missingCount

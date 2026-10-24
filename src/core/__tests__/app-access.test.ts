@@ -227,4 +227,17 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     });
     expect(invalidResult.success).toBe(false);
   });
+  test('rejestruje subskrybentów zmian dostępu i wywołuje notifyAccessChanged oraz purchaseWithStoreKit', async () => {
+    const { subscribeAccessChanges, notifyAccessChanged, purchaseWithStoreKit } = require('../app-access');
+    let called = false;
+    const unsub = subscribeAccessChanges(() => {
+      called = true;
+    });
+    notifyAccessChanged();
+    expect(called).toBe(true);
+    unsub();
+
+    const purchaseRes = await purchaseWithStoreKit('monthly');
+    expect(purchaseRes).toBeDefined();
+  });
 });

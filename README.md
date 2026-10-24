@@ -60,7 +60,7 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Model jedno-kompartmentowej eliminacji kofeiny w organizmie. [Wdrożone]
    - **Personalizacja Metabolizmu Kofeiny (D-02):** Regulacja indywidualnego czasu półtrwania kofeiny $t_{1/2}$ w zakresie 3.0h – 8.0h (domyślnie 5.0h) z zapisem w SQLite. [Wdrożone]
    - **Kalkulator Snu i Godzina Odcięcia (Bedtime Curfew — BR-KOF-003):** Prognoza stężenia kofeiny o wybranej godzinie snu (próg bezpieczny dla fazy głębokiej NREM $\le 25\,\text{mg}$) z persystencją godziny snu. [Wdrożone]
-   - **Integracja z Apple HealthKit (BR-KOF-002, Z-096):** Bezpośredni eksport spożytej kofeiny do systemowej bazy Zdrowie (`HKQuantityTypeIdentifierDietaryCaffeine`) z oknem zgody i trybem offline. [Wdrożone]
+   - **Integracja z Apple HealthKit (BR-KOF-002, Z-096):** Architektura i model danych eksportu spożytej kofeiny (HKQuantityTypeIdentifierDietaryCaffeine) z oknem zgody i trybem offline.
    - Dobowy bilans kofeiny w relacji do normy EFSA (400 mg). [Wdrożone]
 7. **⚙️ Ustawienia, Kopia Zapasowa i Jednostki:**
    - **⚖️ Globalny Przełącznik Jednostek (Metric / Imperial — DEC-21 & BR-JEDN-001):** Płynne przełączanie między systemem metrycznym (°C, g, ml) i imperialnym (°F, oz, fl oz) z zachowaniem wewnętrznej precyzji obliczeniowej i trwałą persystencją w SQLite. [Wdrożone]
@@ -68,11 +68,11 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite. [Wdrożone]
    - Eksport i import bazy w formacie JSON oraz eksport do arkuszy CSV (Dziennik i Spiżarnia). [Wdrożone]
    - **💎 Model Monetyzacji „Taniej niż espresso” (Apps4Brew Pass):**
-     - **Cennik:** $1.99 USD / mies. (9,99 zł), $14.99 USD / rok (59,99 zł, oferta główna z 14-dniowym trialem StoreKit!), $29.99 USD Lifetime (129,99 zł na zawsze z Chmurą rodzinną Family Sharing).
+     - **Cennik:** $0.99 USD / mies., $4.99 USD / rok (oferta z trialem), $14.99 USD Lifetime (jednorazowo z Chmurą rodzinną).
      - **Zero podziału Free/Pro:** Podstawowy stoper parzenia, kalkulator ratio, asystent kroków oraz odczyt/eksport historii parzeń są bezterminowo darmowe (WTP-0). W 14-dniowym okresie próbnym użytkownik testuje 100% funkcji Napar Pro (WTP-1: >3 paczki w spiżarni, receptury custom, chemia wody, Dial-in Doctor).
      - **Gwarancja Historii Read-Only (Ochrona 4.9★):** Po wygaśnięciu trialu stoper i parzenie pozostają w 100% darmowe, a blokowane są jedynie zaawansowane narzędzia Pro, a cała historia, Dziennik i notatki pozostają ZAWSZE bezpłatne i czytelne w 100% offline. [Wdrożone]
 8. **⌚ Ekosystem Apple (Plany na wydanie v1.2 — DEC-01):**
-   - Natywny mostek ActivityKit (Live Activity na ekranie blokady i Dynamic Island) oraz aplikacja Apple Watch z haptyką zaplanowane są na wydanie v1.2 po wdrożeniu dedykowanych celów w Xcode.
+   - Natywny mostek ActivityKit (Live Activity na ekranie blokady i Dynamic Island), StoreKit IAP oraz aplikacja Apple Watch zaplanowane są na wydanie natywne w Xcode (v1.2).
 
 ---
 

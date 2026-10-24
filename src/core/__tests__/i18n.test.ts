@@ -13,6 +13,7 @@ import {
   getCurrentTranslations,
   pluralPl,
   plural,
+  getPluralCategory,
 } from '../i18n';
 
 describe('i18n System', () => {
@@ -184,5 +185,12 @@ describe('i18n System', () => {
       expect(plural('en', 2, { one: 'second', other: 'seconds' })).toBe('seconds');
       expect(plural('en', 25, { one: 'second', other: 'seconds' })).toBe('seconds');
     });
+  });
+  test('getPluralCategory wylicza reguły liczby mnogiej', () => {
+    expect(getPluralCategory('pl', 1)).toBe('one');
+    expect(getPluralCategory('pl', 2)).toBe('few');
+    expect(getPluralCategory('pl', 5)).toBe('many');
+    expect(getPluralCategory('en', 1)).toBe('one');
+    expect(getPluralCategory('en', 2)).toBe('other');
   });
 });
