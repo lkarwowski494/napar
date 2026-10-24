@@ -11,6 +11,7 @@ import {
   ScrollView,
   Pressable,
   Alert,
+  AppState,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -83,6 +84,7 @@ export default function GongfuScreen() {
   const [currentRating, setCurrentRating] = useState<number>(5);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const targetEndMsRef = useRef<number | null>(null);
 
   // Wczytanie spiżarni herbat
   useEffect(() => {
@@ -118,28 +120,40 @@ export default function GongfuScreen() {
     };
   }, [isSteeping]);
 
-  // Odliczanie stopera
+  // Odliczanie stopera z zegarem delta Date.now() i nasłuchem AppState (M1-audytor-generalny-025)
   useEffect(() => {
-    if (isSteeping) {
-      timerRef.current = setInterval(() => {
-        setRemainingSeconds((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current!);
-            setIsSteeping(false);
-            setSteepFinished(true);
-            void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            void playTimerChime();
-            announce(t.gongfu.pourNow);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } else {
+    if (!isSteeping) {
       if (timerRef.current) clearInterval(timerRef.current);
+      return;
     }
+
+    const updateTimer = () => {
+      if (!targetEndMsRef.current) return;
+      const left = Math.max(0, Math.ceil((targetEndMsRef.current - Date.now()) / 1000));
+      setRemainingSeconds(left);
+      if (left <= 0) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        targetEndMsRef.current = null;
+        setIsSteeping(false);
+        setSteepFinished(true);
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        void playTimerChime();
+        announce(t.gongfu.pourNow);
+      }
+    };
+
+    updateTimer();
+    timerRef.current = setInterval(updateTimer, 250);
+
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+        updateTimer();
+      }
+    });
+
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      subscription.remove();
     };
   }, [isSteeping, t.gongfu.pourNow]);
 
@@ -148,6 +162,7 @@ export default function GongfuScreen() {
       setShowPaywall(true);
       return;
     }
+    targetEndMsRef.current = Date.now() + targetSeconds * 1000;
     setRemainingSeconds(targetSeconds);
     setSteepFinished(false);
     setIsSteeping(true);
@@ -162,6 +177,7 @@ export default function GongfuScreen() {
   };
 
   const handleRecordCurrentInfusion = () => {
+    targetEndMsRef.current = null;
     const actualSteep = targetSeconds - remainingSeconds > 0 ? targetSeconds - remainingSeconds : targetSeconds;
     const updated = recordGongfuInfusion(session, {
       durationSeconds: actualSteep,
