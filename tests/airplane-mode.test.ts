@@ -73,7 +73,7 @@ const mockDb: any = {
         existing.remaining_weight_g = newW;
         existing.updated_at = updated;
       }
-    } else if (query.includes('INSERT OR REPLACE INTO recipes')) {
+    } else if (query.includes('INTO recipes')) {
       const [id, name, bType, method, author, desc, dose, water, temp, grind, ratio, steps, isCustom, isFav, created] = params!;
       mockRecipes.set(id, {
         id, name, beverage_type: bType, method, author, description: desc, dose_g: dose, water_g: water,

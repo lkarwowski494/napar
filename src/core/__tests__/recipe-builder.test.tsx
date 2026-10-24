@@ -38,7 +38,7 @@ const mockDb: any = {
     finalizeSync: jest.fn(),
   })),
   runSync: jest.fn((query: string, params?: any[]) => {
-    if (query.includes('INSERT OR REPLACE INTO recipes')) {
+    if (query.includes('INTO recipes')) {
       const [id, name, type, method, author, desc, dose, water, temp, grind, ratio, steps, custom, fav, created] = params!;
       mockDb.recipes.set(id, {
         id,

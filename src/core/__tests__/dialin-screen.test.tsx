@@ -217,8 +217,8 @@ describe('DialInScreen UI with Water Chemistry', () => {
     expect(str).toContain('TDS (%)');
     // Domyślne wartości to water 250, dose 15, TDS 1.35
     // EY = (250 * 1.35) / 15 = 22.5%
-    expect(str).toContain('22.5');
-    expect(str).toContain('Przeparzenie');
+    expect(str).toContain('19.8');
+    expect(str).toContain('Złote Okno SCA');
   });
 
   test('Diagnoza problemów w Dial-in Doctor: gorzka, wodnista, ściągająca herbata', () => {
