@@ -4,6 +4,7 @@
 // ============================================================================
 
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import renderer from 'react-test-renderer';
 import {
   Btn,
@@ -29,11 +30,10 @@ describe('Accessibility Matrix & Touch Targets (NFR-A11Y-001..008, RD-ENG-03)', 
     expect(btn.props.accessibilityLabel).toBe('Zapisz recepturę');
 
     // RD-ENG-03: Effective touch target
-    const style = btn.props.style || {};
-    const minHeight = style.minHeight || 44;
-    const minWidth = style.minWidth || 44;
-    expect(minHeight).toBeGreaterThanOrEqual(44);
-    expect(minWidth).toBeGreaterThanOrEqual(44);
+    const resolvedStyle = typeof btn.props.style === "function" ? btn.props.style({ pressed: false }) : btn.props.style;
+    const flatStyle = StyleSheet.flatten(resolvedStyle);
+    expect(flatStyle.minHeight).toBeGreaterThanOrEqual(44);
+    expect(flatStyle.minWidth).toBeGreaterThanOrEqual(44);
   });
 
   test('CloseButton has accessibilityRole="button", non-empty label and >= 44pt target', () => {
@@ -46,11 +46,10 @@ describe('Accessibility Matrix & Touch Targets (NFR-A11Y-001..008, RD-ENG-03)', 
     expect(btn.props.accessibilityLabel).toBe('Zamknij');
     expect(btn.props.accessibilityRole).toBe('button');
 
-    const style = btn.props.style || {};
-    const minHeight = style.minHeight || 44;
-    const minWidth = style.minWidth || 44;
-    expect(minHeight).toBeGreaterThanOrEqual(44);
-    expect(minWidth).toBeGreaterThanOrEqual(44);
+    const resolvedStyle = typeof btn.props.style === "function" ? btn.props.style({ pressed: false }) : btn.props.style;
+    const flatStyle = StyleSheet.flatten(resolvedStyle);
+    expect(flatStyle.minHeight).toBeGreaterThanOrEqual(44);
+    expect(flatStyle.minWidth).toBeGreaterThanOrEqual(44);
   });
 
   test('SearchField has clear button with accessible label and hitSlop >= 44pt effective target', () => {
@@ -66,11 +65,10 @@ describe('Accessibility Matrix & Touch Targets (NFR-A11Y-001..008, RD-ENG-03)', 
     expect(clearBtn.props.accessibilityLabel).toBe('Wyczyść wyszukiwanie');
 
     // hitSlop ensures effective touch target >= 44pt (RD-ENG-03)
-    const hitSlop = clearBtn.props.hitSlop || {};
-    const effW = (clearBtn.props.style?.minWidth || 44) + (hitSlop.left || 0) + (hitSlop.right || 0);
-    const effH = (clearBtn.props.style?.minHeight || 44) + (hitSlop.top || 0) + (hitSlop.bottom || 0);
-    expect(effW).toBeGreaterThanOrEqual(44);
-    expect(effH).toBeGreaterThanOrEqual(44);
+    const hitSlop = clearBtn.props.hitSlop;
+    expect(hitSlop).toBeDefined();
+    expect(hitSlop.left).toBeGreaterThanOrEqual(8);
+    expect(hitSlop.top).toBeGreaterThanOrEqual(8);
   });
 
   test('NumInput has minHeight >= 44pt and accessible label', () => {

@@ -15,23 +15,11 @@ concurrency:
 
 jobs:
   test-tz:
-    name: Jest (${{ matrix.tz }})
+    name: Jest across Timezones (Single Loop Job)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        tz:
-          - UTC
-          - Europe/Warsaw
-          - America/New_York
-          - America/Los_Angeles
-          - Asia/Tokyo
-          - Pacific/Auckland
-          - Pacific/Honolulu
+    timeout-minutes: 20
 
     env:
-      TZ: ${{ matrix.tz }}
       NODE_OPTIONS: --max-old-space-size=3072
       FORCE_COLOR: '1'
 
@@ -50,7 +38,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Verify system timezone & run full test suite
+      - name: Verify system timezone & run test suite in loop
         run: |
-          echo "Uruchamianie w strefie TZ=$TZ ($(date))"
-          npx jest --runInBand
+          for tz in UTC Europe/Warsaw America/New_York America/Los_Angeles Asia/Tokyo Pacific/Auckland Pacific/Honolulu; do
+            echo "=== Uruchamianie w strefie TZ=$tz ($(TZ=$tz date)) ==="
+            TZ=$tz npx jest tests/ --runInBand
+          done

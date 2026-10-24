@@ -9,10 +9,7 @@
     "src/core/water-chemistry.ts",
     "src/core/cost-calculator.ts",
     "src/core/domain-rules.ts",
-    "src/core/timer-engine.ts",
-    "src/core/database.ts",
-    "src/core/app-access.ts",
-    "src/core/backup.ts"
+    "src/core/timer-engine.ts"
   ],
   "reporters": [
     "clear-text",

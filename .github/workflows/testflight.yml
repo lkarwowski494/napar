@@ -272,6 +272,15 @@ jobs:
             echo "| **Notatka** | ${RELEASE_NOTES:-*(brak)*} |"
           } >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Archive Hermes sourcemaps and dSYM symbols
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hermes-sourcemaps-dsym-${{ github.run_number }}
+          path: |
+            ${{ runner.temp }}/${{ env.APP_SCHEME }}.xcarchive/dSYMs
+          retention-days: 30
+
       - name: Upload scrubbed logs on failure only (retention 1 day)
         if: failure()
         uses: actions/upload-artifact@v4

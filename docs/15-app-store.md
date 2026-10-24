@@ -177,3 +177,34 @@ Workflow wydawniczy `.github/workflows/testflight.yml` wymaga 4 poufnych paramet
 | `ASC_KEY_ID` | Identyfikator klucza App Store Connect API | `2X9R4HXF34` |
 | `ASC_ISSUER_ID` | UUID wystawcy z App Store Connect | `69a6de70-…-47e3a6200fd6` |
 | `ASC_KEY_P8_BASE64` | Zawartość pliku `AuthKey_*.p8` zakodowana w Base64 | `LS0tLS1CRUdJTi...` |
+
+---
+
+## 9. Plan Wydania Produkcyjnego i Procedura Wycofania (Phased Release & Rollback)
+
+### 9.1. Harmonogram Wydania Produkcyjnego
+1. **Tryb publikacji:** Wydanie ręczne po zatwierdzeniu przez App Store Review (*Manual Release*). Publikacja następuje w oknie o niskiej aktywności użytkowników (wtorek–środa, 10:00 CET).
+2. **Stopniowe wdrażanie aktualizacji (*Phased Release for Automatic Updates*):**
+   Wdrożenie w 7-dniowym cyklu z automatyczną dystrybucją do użytkowników włączających auto-aktualizacje:
+   - Dzień 1: 1%
+   - Dzień 2: 2%
+   - Dzień 3: 5%
+   - Dzień 4: 10%
+   - Dzień 5: 20%
+   - Dzień 6: 50%
+   - Dzień 7: 100%
+
+### 9.2. Monitorowanie Jakości i Wskaźniki Krytyczne
+- **Próg awaryjności (Crash-free Sessions):** $\ge 99.5\%$.
+- **Krytyczne błędy migracji bazy SQLite:** 0 zgłoszeń (błąd `sqlite3_step` przy starcie blokuje wydanie).
+- **Zgłoszenia utraty danych:** 0 zgłoszeń.
+
+### 9.3. Procedura Zatrzymania i Wycofania (*Rollback & Pause*)
+1. **Wstrzymanie Phased Release:**
+   W przypadku wykrycia regresji krytycznej lub crash-rate $< 99.5\%$, administrator natychmiast klika **Pause Phased Release** w App Store Connect. Wstrzymanie może trwać do 30 dni.
+2. **Wycofanie wersji v1.0.0 (Nowa Aplikacja):**
+   Jeśli błąd wystąpi w premierowej wersji v1.0.0 przed wdrożeniem u 100% użytkowników, aplikacja zostaje tymczasowo ukryta przez opcję **Remove from Sale** w sekcji *Pricing and Availability*.
+3. **Ścieżka Hotfix (Wydanie Awaryjne):**
+   - Przygotowanie gałęzi `hotfix/v1.0.1` z naprawą defektu.
+   - Podbicie wersji do `v1.0.1` (`buildNumber + 1`).
+   - Wysłanie wniosku o przyspieszony przegląd (*Expedited App Review Request*) z uzasadnieniem: krytyczny błąd integralności danych lokalnych.

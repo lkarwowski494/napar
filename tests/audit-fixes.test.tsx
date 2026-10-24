@@ -313,6 +313,9 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
     test('TST-03: Testy własnościowe fast-check weryfikują niezmienniki domenowe', () => {
       const propTestPath = join(root, 'tests', 'domain-properties.test.ts');
       expect(existsSync(propTestPath)).toBe(true);
+      const content = readFileSync(propTestPath, 'utf8');
+      expect(content).toContain('fast-check');
+      expect(content).toContain('fc.assert');
     });
 
     test('TST-04: Niezależne wyrocznie prawdy w Pythonie 3 generują spójne korpusy', () => {
@@ -320,11 +323,16 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
       const contrastCorpus = join(root, 'tests', 'fixtures', 'theme-contrast-corpus.json');
       expect(existsSync(coffeeCorpus)).toBe(true);
       expect(existsSync(contrastCorpus)).toBe(true);
+      const parsedCoffee = JSON.parse(readFileSync(coffeeCorpus, 'utf8'));
+      expect(parsedCoffee.extraction_yield.length).toBeGreaterThan(0);
+      expect(parsedCoffee.water_hardness.length).toBeGreaterThan(0);
     });
 
-    test('TST-05: Interpreter scenariuszy Maestro obsługuje 7 flow w testach Jest', () => {
+    test('TST-05: Weryfikator scenariuszy Maestro obsługuje 7 flow w testach Jest', () => {
       const maestroTest = join(root, 'tests', 'maestro-flows.test.ts');
       expect(existsSync(maestroTest)).toBe(true);
+      const content = readFileSync(maestroTest, 'utf8');
+      expect(content).toContain('validateMaestroFlowSyntax');
     });
   });
 
