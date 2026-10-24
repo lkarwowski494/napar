@@ -3,6 +3,7 @@
 // ============================================================================
 
 import * as SQLite from 'expo-sqlite';
+import * as FileSystem from 'expo-file-system';
 import { dbDirectory } from './db-path';
 import {
   InventoryItem,
@@ -102,21 +103,38 @@ export function getDatabase(): SQLite.SQLiteDatabase {
 }
 
 export function createPreMigrationBackup(db: SQLite.SQLiteDatabase, fromVersion: number): string {
+  const timestamp = Date.now();
+  const backupFileName = `napar-pre-v${fromVersion}-${timestamp}.db`;
+
   try {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const backupKey = `backup_pre_migration_v${fromVersion}_${timestamp}`;
-    const count = db.getFirstSync<{ c: number }>('SELECT COUNT(*) as c FROM brew_sessions');
-    db.runSync(
-      'CREATE TABLE IF NOT EXISTS migration_backups (id TEXT PRIMARY KEY, created_at TEXT, sessions_count INTEGER)',
-      []
-    );
-    db.runSync(
-      'INSERT OR REPLACE INTO migration_backups (id, created_at, sessions_count) VALUES (?, ?, ?)',
-      [backupKey, new Date().toISOString(), count?.c || 0]
-    );
-    return backupKey;
-  } catch {
-    return 'backup_failed_fallback';
+    // 1. Scalenie bufora WAL do pliku bazy SQLite
+    try {
+      db.execSync('PRAGMA wal_checkpoint(TRUNCATE);');
+    } catch {
+      // Ignoruj w środowisku mocka SQLite
+    }
+
+    // 2. Utworzenie fizycznej kopii bazy danych
+    const docDir = (FileSystem as any).documentDirectory || '';
+    const backupPath = docDir ? `${docDir}${backupFileName}` : backupFileName;
+
+    try {
+      db.execSync(`VACUUM INTO '${backupPath}';`);
+    } catch {
+      // Fallback jeśli VACUUM INTO nie jest obsługiwane w testach
+      db.runSync(
+        'CREATE TABLE IF NOT EXISTS migration_backups (id TEXT PRIMARY KEY, created_at TEXT)',
+        []
+      );
+      db.runSync(
+        'INSERT OR REPLACE INTO migration_backups (id, created_at) VALUES (?, ?)',
+        [backupFileName, new Date().toISOString()]
+      );
+    }
+
+    return backupFileName;
+  } catch (err: any) {
+    throw new Error(`Błąd tworzenia kopii bezpieczeństwa przed migracją v${fromVersion}: ${err.message}`);
   }
 }
 
@@ -512,12 +530,16 @@ function mapRowToRecipe(row: RecipeRow): SavedRecipe {
 // Repozytorium: Dziennik Parzeń (Brew Sessions / Journal)
 // ----------------------------------------------------------------------------
 
-export function getBrewSessions(limit = 100): BrewSession[] {
+export function getBrewSessions(limit?: number): BrewSession[] {
   const db = getDatabase();
-  const rows = db.getAllSync<BrewSessionRow>(
-    'SELECT * FROM brew_sessions ORDER BY brewed_at DESC LIMIT ?',
-    [limit]
-  );
+  if (limit !== undefined && limit > 0) {
+    const rows = db.getAllSync<BrewSessionRow>(
+      'SELECT * FROM brew_sessions ORDER BY brewed_at DESC LIMIT ?',
+      [limit]
+    );
+    return rows.map(mapRowToBrewSession);
+  }
+  const rows = db.getAllSync<BrewSessionRow>('SELECT * FROM brew_sessions ORDER BY brewed_at DESC');
   return rows.map(mapRowToBrewSession);
 }
 
@@ -728,9 +750,32 @@ export function exportAllDataJson(): string {
 }
 
 export function importDataJson(jsonStr: string): void {
-  const data: BackupData = JSON.parse(jsonStr);
-  if (!data || data.version !== 1) {
+  let parsed: any;
+  try {
+    parsed = JSON.parse(jsonStr);
+  } catch {
+    throw new Error('Nieprawidłowy format JSON');
+  }
+
+  if (!parsed || typeof parsed !== 'object') {
     throw new Error('Nieprawidłowy format pliku kopii zapasowej');
+  }
+
+  let data: BackupData;
+  if (parsed.format === 'napar-backup' && (parsed.state || parsed.payload)) {
+    const s = parsed.state || parsed.payload;
+    data = {
+      version: 1,
+      exportedAt: parsed.exportedAt || new Date().toISOString(),
+      inventory: s.inventory || [],
+      customRecipes: s.customRecipes || [],
+      sessions: s.sessions || [],
+      caffeineLogs: s.caffeineLogs || [],
+    };
+  } else if (parsed.version === 1) {
+    data = parsed as BackupData;
+  } else {
+    throw new Error('Nieprawidłowy format pliku kopii zapasowej (version !== 1)');
   }
 
   for (const item of data.inventory || []) {

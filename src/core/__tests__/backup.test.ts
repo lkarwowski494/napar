@@ -4,6 +4,7 @@
 
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
+import { importDataJson, getRecipes, saveRecipe } from '../database';
 import {
   buildBackup,
   localISODate,
@@ -21,6 +22,19 @@ import {
   AUTO_RE,
   SAFETY_RE,
 } from '../backup';
+
+jest.mock('expo-sqlite', () => ({
+  openDatabaseSync: jest.fn(() => ({
+    runSync: jest.fn(),
+    execSync: jest.fn(),
+    getFirstSync: jest.fn(),
+    getAllSync: jest.fn(() => []),
+    prepareSync: jest.fn(() => ({
+      executeSync: jest.fn(),
+      finalizeSync: jest.fn(),
+    })),
+  })),
+}));
 
 jest.mock('expo-sharing', () => ({
   isAvailableAsync: jest.fn().mockResolvedValue(true),
@@ -82,6 +96,30 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
     const d = new Date(2026, 9, 16, 11, 30, 45); // 16 Oct 2026 11:30:45
     expect(localISODate(d)).toBe('2026-10-16');
     expect(stampOf(d)).toBe('2026-10-16-113045');
+  });
+
+  test('importDataJson akceptuje kopertę NaparBackupEnvelope (M1-audytor-generalny-005)', () => {
+    const testState: NaparBackupData = {
+      inventory: [],
+      customRecipes: [{
+        id: 'rec-custom-envelope',
+        name: 'Envelope Recipe',
+        beverageType: 'COFFEE',
+        method: 'v60',
+        doseGrams: 15,
+        waterGrams: 250,
+        waterTempCelsius: 93,
+        recommendedRatio: 16.6,
+        stepsJson: '[]',
+        isCustom: true,
+        isFavorite: false,
+        createdAt: new Date().toISOString(),
+      }],
+      sessions: [],
+      caffeineLogs: [],
+    };
+    const envelope = buildBackup(testState);
+    expect(() => importDataJson(JSON.stringify(envelope))).not.toThrow();
   });
 
   test('parseAndValidateBackup poprawnie waliduje poprawny JSON', () => {

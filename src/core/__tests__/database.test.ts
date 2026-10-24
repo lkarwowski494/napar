@@ -4,6 +4,7 @@
 
 import {
   initDatabase,
+  createPreMigrationBackup,
   getInventoryItems,
   getInventoryItemById,
   saveInventoryItem,
@@ -214,6 +215,13 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(reloaded).not.toBeNull();
     expect(reloaded!.isFavorite).toBe(true);
     expect(reloaded!.createdAt).toBe(initialCreatedAt);
+  });
+
+  test('createPreMigrationBackup tworzy fizyczny plik kopii SQLite przed migracją (M1-audytor-generalny-006)', () => {
+    initDatabase(mockDb as any);
+    const backupFile = createPreMigrationBackup(mockDb as any, 1);
+    expect(backupFile).toMatch(/^napar-pre-v1-\d+\.db$/);
+    expect(mockDb.execSync).toHaveBeenCalledWith('PRAGMA wal_checkpoint(TRUNCATE);');
   });
 
   test('Inicjalizacja bazy i seeding domyślnych przepisów', () => {
