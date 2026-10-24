@@ -28,7 +28,7 @@ import {
 } from '../../src/core/domain-rules';
 import { CaffeineCurveChart } from '../../src/core/caffeine-chart';
 import { theme } from '../../src/core/theme';
-import { getHealthKitSyncEnabled, saveDietaryCaffeineSample } from '../../src/core/healthkit';
+import { getHealthKitSyncEnabled } from '../../src/core/healthkit';
 import { useAppAccess } from '../../src/core/app-access';
 import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { BedtimeCurfewCard } from '../../src/components/caffeine/BedtimeCurfewCard';
@@ -142,14 +142,7 @@ export default function CaffeineScreen() {
     };
     logCaffeine(log);
 
-    // BR-KOF-002: Apple HealthKit sync
-    if (getHealthKitSyncEnabled()) {
-      saveDietaryCaffeineSample({
-        caffeineMg: mg,
-        consumedAt,
-        beverageName: name,
-      }).catch(() => {});
-    }
+    // HealthKit deferred to v1.2 (DEC-01)
 
     loadLogs();
     setShowQuickAddModal(false);

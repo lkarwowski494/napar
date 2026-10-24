@@ -1,19 +1,19 @@
 // ============================================================================
-// Napar (Steepwise) — Apple HealthKit Integration Bridge (BR-KOF-002)
-// Zapis spożytej dawki kofeiny (HKQuantityTypeIdentifierDietaryCaffeine)
-// 100% lokalnie, offline-first, bez analityki i bez chmury
+// Napar (Steepwise) — Apple HealthKit Dietary Caffeine Bridge (BR-KOF-002)
+// Status v1.0: Deferred to v1.2 per Architectural Decision DEC-01 (Scope Contract).
+// Safe stub with zero fake samples, 100% type-safe, zero mock IDs.
+// Apps4Brew Studio — 100% Offline-First, Zero Telemetry.
 // ============================================================================
 
 import { Platform } from 'react-native';
 import { getAppSetting, setAppSetting } from './database';
 
-export type HealthKitAuthStatus = 'not_determined' | 'authorized' | 'denied' | 'unavailable';
+export const HK_QUANTITY_TYPE_DIETARY_CAFFEINE = 'HKQuantityTypeIdentifierDietaryCaffeine';
 
 export interface DietaryCaffeineSample {
   caffeineMg: number;
   consumedAt: string; // ISO 8601
-  beverageName: string;
-  metadata?: Record<string, string | number>;
+  beverageName?: string;
 }
 
 export interface HealthKitSaveResult {
@@ -25,39 +25,41 @@ export interface HealthKitSaveResult {
   error?: string;
 }
 
-export const HK_QUANTITY_TYPE_DIETARY_CAFFEINE = 'HKQuantityTypeIdentifierDietaryCaffeine';
+export type HealthKitAuthorizationStatus =
+  | 'not_determined'
+  | 'authorized'
+  | 'denied'
+  | 'unavailable';
 
 /**
- * Sprawdza czy urządzenie wspiera integrację HealthKit (iOS).
+ * Sprawdza czy HealthKit jest dostępny w bieżącym wydaniu aplikacji.
+ * Zgodnie z decyzją architektoniczną DEC-01 (opcja a) natywny mostek
+ * HealthKit został odłożony do wydania v1.2.
  */
 export function isHealthKitAvailable(): boolean {
-  return Platform.OS === 'ios';
+  return false;
 }
 
 /**
- * Sprawdza czy użytkownik aktywował synchronizację w ustawieniach aplikacji.
+ * Zwraca preferencję synchronizacji HealthKit zapisaną w SQLite.
  */
 export function getHealthKitSyncEnabled(): boolean {
   return getAppSetting('healthkit_sync_enabled', 'false') === 'true';
 }
 
 /**
- * Ustawia preferencję synchronizacji w bazie danych.
+ * Zapisuje preferencję synchronizacji HealthKit w SQLite.
  */
 export function setHealthKitSyncEnabled(enabled: boolean): void {
   setAppSetting('healthkit_sync_enabled', enabled ? 'true' : 'false');
 }
 
 /**
- * Zwraca status uprawnień do HealthKit.
+ * Zwraca status autoryzacji HealthKit.
  */
-export function getHealthKitAuthorizationStatus(): HealthKitAuthStatus {
+export function getHealthKitAuthorizationStatus(): HealthKitAuthorizationStatus {
   if (!isHealthKitAvailable()) {
     return 'unavailable';
-  }
-  const status = getAppSetting('healthkit_auth_status', 'not_determined');
-  if (status === 'authorized' || status === 'denied' || status === 'not_determined') {
-    return status;
   }
   return 'not_determined';
 }
@@ -66,12 +68,7 @@ export function getHealthKitAuthorizationStatus(): HealthKitAuthStatus {
  * Prosi użytkownika o uprawnienia do zapisu Dietary Caffeine w Apple Health.
  */
 export async function requestHealthKitPermissions(): Promise<boolean> {
-  if (!isHealthKitAvailable()) {
-    return false;
-  }
-  setAppSetting('healthkit_auth_status', 'authorized');
-  setHealthKitSyncEnabled(true);
-  return true;
+  return false;
 }
 
 /**
@@ -83,7 +80,7 @@ export function revokeHealthKitPermissions(): void {
 }
 
 /**
- * Zapisuje próbkę ilościową kofeiny w HealthKit jako HKQuantityTypeIdentifierDietaryCaffeine.
+ * Bezpieczny punkt wejścia do zapisu próbki kofeiny (odłożony do v1.2).
  */
 export async function saveDietaryCaffeineSample(
   sample: DietaryCaffeineSample
@@ -109,24 +106,11 @@ export async function saveDietaryCaffeineSample(
     };
   }
 
-  const authStatus = getHealthKitAuthorizationStatus();
-  if (authStatus !== 'authorized') {
-    return {
-      success: false,
-      quantityType: HK_QUANTITY_TYPE_DIETARY_CAFFEINE,
-      caffeineMg: sample.caffeineMg,
-      consumedAt: sample.consumedAt,
-      error: 'Brak uprawnień do zapisu w Apple Health (HKAuthorizationStatusNotDetermined lub Denied).',
-    };
-  }
-
-  const sampleId = `hk-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-
   return {
-    success: true,
-    sampleId,
+    success: false,
     quantityType: HK_QUANTITY_TYPE_DIETARY_CAFFEINE,
-    caffeineMg: Number(sample.caffeineMg.toFixed(1)),
+    caffeineMg: sample.caffeineMg,
     consumedAt: sample.consumedAt,
+    error: 'Synchronizacja z Apple HealthKit została odłożona do wydania v1.2 (DEC-01).',
   };
 }

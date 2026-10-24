@@ -1,7 +1,8 @@
 // ============================================================================
 // Napar (Steepwise) — ActivityKit Live Activity & Dynamic Island Bridge
-// BR-ZEG-003 & BR-ZEG-004: Lock Screen Widget & Dynamic Island (iPhone 14 Pro+)
-// 100% Offline-first, Zero-login, Local payload builder & native bridge
+// Status v1.0: Deferred to v1.2 per Architectural Decision DEC-01 (Scope Contract).
+// Safe stub with zero fake identifiers, 100% type-safe, zero mock state.
+// Apps4Brew Studio — 100% Offline-First, Zero Telemetry.
 // ============================================================================
 
 import { Platform } from 'react-native';
@@ -46,75 +47,61 @@ export interface LiveActivityPayload {
   dynamicIsland: DynamicIslandPayload;
 }
 
-let currentActiveActivityId: string | null = null;
-
 /**
- * Sprawdza czy urządzenie wspiera ActivityKit (iOS 16.1+).
+ * Sprawdza czy Live Activity jest wspierane w bieżącym wydaniu.
+ * Zgodnie z decyzją architektoniczną DEC-01 (opcja a) mostek ActivityKit
+ * został odłożony do wydania v1.2 po wdrożeniu natywnego targetu WidgetKit.
  */
 export function isLiveActivitySupported(): boolean {
-  return Platform.OS === 'ios';
+  return false;
 }
 
-/**
- * Zwraca czy Live Activity jest włączone w ustawieniach.
- */
 export function getLiveActivityEnabled(): boolean {
-  return getAppSetting('live_activity_enabled', 'true') !== 'false';
+  return getAppSetting('live_activity_enabled', 'false') === 'true';
 }
 
-/**
- * Ustawia preferencję Live Activity w bazie SQLite.
- */
 export function setLiveActivityEnabled(enabled: boolean): void {
   setAppSetting('live_activity_enabled', enabled ? 'true' : 'false');
 }
 
-/**
- * Formatuje sekundy do formatu M:SS
- */
 export function formatActivityTimer(seconds: number): string {
-  const s = Math.max(0, Math.floor(seconds));
-  const m = Math.floor(s / 60);
-  const rem = s % 60;
-  return `${m}:${rem.toString().padStart(2, '0')}`;
+  const safeSec = Math.max(0, Math.floor(seconds));
+  const mins = Math.floor(safeSec / 60);
+  const remSec = safeSec % 60;
+  return `${mins}:${remSec.toString().padStart(2, '0')}`;
 }
 
-/**
- * Buduje payload dla Dynamic Island (kompaktowy i rozszerzony)
- */
 export function buildDynamicIslandPayload(
   attributes: BrewActivityAttributes,
   state: BrewActivityContentState,
   language: 'pl' | 'en' = 'pl'
 ): DynamicIslandPayload {
-  const icon = attributes.beverageType === 'TEA' ? '🍵' : '☕';
-  const remainingFormatted = formatActivityTimer(state.stepRemainingSeconds);
+  const icon = attributes.beverageType === 'COFFEE' ? '☕' : '🍵';
+  const timeFormatted = formatActivityTimer(state.stepRemainingSeconds);
+  const stepName = language === 'en' ? state.stepNameEn : state.stepNamePl;
+  const subtitle =
+    language === 'en'
+      ? `${stepName} · Step ${state.stepIndex + 1} of ${state.totalSteps}`
+      : `${stepName} · Krok ${state.stepIndex + 1} z ${state.totalSteps}`;
 
-  const stepName = language === 'pl' ? state.stepNamePl : state.stepNameEn;
-  const stepProgress = language === 'pl'
-    ? `Krok ${state.stepIndex + 1} z ${state.totalSteps}`
-    : `Step ${state.stepIndex + 1} of ${state.totalSteps}`;
-
-  const targetText = language === 'pl'
-    ? `Docelowo: ${state.targetWaterGrams} g (z ${attributes.totalWaterGrams} g)`
-    : `Target: ${state.targetWaterGrams} g (of ${attributes.totalWaterGrams} g)`;
+  const targetWater =
+    language === 'en'
+      ? `Target: ${state.targetWaterGrams} g (of ${attributes.totalWaterGrams} g)`
+      : `Docelowo: ${state.targetWaterGrams} g (z ${attributes.totalWaterGrams} g)`;
 
   return {
     compactLeading: icon,
-    compactTrailing: remainingFormatted,
+    compactTrailing: timeFormatted,
     expandedLeadingIcon: icon,
-    expandedTrailingTime: remainingFormatted,
+    expandedTrailingTime: timeFormatted,
     expandedCenterTitle: attributes.recipeName,
-    expandedCenterSubtitle: `${stepName} · ${stepProgress}`,
-    expandedBottomTarget: targetText,
+    expandedCenterSubtitle: subtitle,
+    expandedBottomTarget: targetWater,
     isPaused: state.isPaused,
     isFinished: state.isFinished,
   };
 }
 
-/**
- * Buduje pełny payload dla Live Activity na zablokowanym ekranie i Dynamic Island
- */
 export function buildLiveActivityPayload(
   attributes: BrewActivityAttributes,
   state: BrewActivityContentState,
@@ -127,74 +114,37 @@ export function buildLiveActivityPayload(
   };
 }
 
-/**
- * Rozpoczyna sesję Live Activity
- */
 export async function startLiveActivity(
-  attributes: BrewActivityAttributes,
-  initialState: BrewActivityContentState,
-  language: 'pl' | 'en' = 'pl'
+  _attributes: BrewActivityAttributes,
+  _initialState: BrewActivityContentState,
+  _language: 'pl' | 'en' = 'pl'
 ): Promise<{ activityId?: string; success: boolean; error?: string }> {
-  if (!isLiveActivitySupported()) {
-    return { success: false, error: 'Live Activity wymaga systemu iOS 16.1+.' };
-  }
-
-  if (!getLiveActivityEnabled()) {
-    return { success: false, error: 'Live Activity jest wyłączone w ustawieniach aplikacji.' };
-  }
-
-  const activityId = `act-${attributes.sessionId}-${Date.now()}`;
-  currentActiveActivityId = activityId;
-
   return {
-    activityId,
-    success: true,
+    success: false,
+    error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',
   };
 }
 
-/**
- * Aktualizuje stan aktywnego widgetu Live Activity
- */
 export async function updateLiveActivity(
-  activityId: string,
-  state: BrewActivityContentState
+  _activityId: string,
+  _state: BrewActivityContentState
 ): Promise<{ success: boolean; error?: string }> {
-  if (!isLiveActivitySupported()) {
-    return { success: false, error: 'Live Activity wymaga systemu iOS 16.1+.' };
-  }
-
-  if (!activityId || activityId !== currentActiveActivityId) {
-    return { success: false, error: 'Nie znaleziono aktywnej sesji Live Activity o podanym ID.' };
-  }
-
   return {
-    success: true,
+    success: false,
+    error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',
   };
 }
 
-/**
- * Kończy sesję Live Activity na zablokowanym ekranie i Dynamic Island
- */
 export async function endLiveActivity(
-  activityId: string,
-  dismissalPolicy: 'immediate' | 'after_delay' = 'immediate'
+  _activityId: string,
+  _dismissalPolicy: 'immediate' | 'after_delay' = 'immediate'
 ): Promise<{ success: boolean; error?: string }> {
-  if (!isLiveActivitySupported()) {
-    return { success: false, error: 'Live Activity wymaga systemu iOS 16.1+.' };
-  }
-
-  if (activityId === currentActiveActivityId) {
-    currentActiveActivityId = null;
-  }
-
   return {
-    success: true,
+    success: false,
+    error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',
   };
 }
 
-/**
- * Zwraca identyfikator aktualnej sesji Live Activity lub null
- */
 export function getActiveLiveActivityId(): string | null {
-  return currentActiveActivityId;
+  return null;
 }

@@ -1,6 +1,6 @@
 // ============================================================================
 // Napar (Steepwise) — Unit Tests: Live Activity & Dynamic Island Bridge
-// BR-ZEG-003 & BR-ZEG-004
+// BR-ZEG-003 & BR-ZEG-004 & DEC-01
 // ============================================================================
 
 jest.mock('expo-sqlite', () => ({
@@ -29,7 +29,7 @@ import {
 } from '../live-activity';
 import * as databaseModule from '../database';
 
-describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-004)', () => {
+describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-004 & DEC-01)', () => {
   const store = new Map<string, string>();
 
   const mockAttributesCoffee: BrewActivityAttributes = {
@@ -76,22 +76,22 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     jest.restoreAllMocks();
   });
 
-  test('isLiveActivitySupported zwraca true na iOS i false na Androidzie', () => {
+  test('isLiveActivitySupported zwraca false w v1.0 per DEC-01', () => {
     Platform.OS = 'ios';
-    expect(isLiveActivitySupported()).toBe(true);
+    expect(isLiveActivitySupported()).toBe(false);
 
     Platform.OS = 'android';
     expect(isLiveActivitySupported()).toBe(false);
   });
 
   test('Pobiera i zapisuje preferencję włączenia Live Activity w bazie', () => {
-    expect(getLiveActivityEnabled()).toBe(true);
-
-    setLiveActivityEnabled(false);
     expect(getLiveActivityEnabled()).toBe(false);
 
     setLiveActivityEnabled(true);
     expect(getLiveActivityEnabled()).toBe(true);
+
+    setLiveActivityEnabled(false);
+    expect(getLiveActivityEnabled()).toBe(false);
   });
 
   test('formatActivityTimer poprawnie formatuje sekundy do M:SS', () => {
@@ -128,62 +128,20 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(payload.dynamicIsland.compactLeading).toBe('☕');
   });
 
-  test('startLiveActivity obsługuje brak wsparcia platformy i wyłączenie w ustawieniach', async () => {
-    // 1. Android
-    Platform.OS = 'android';
-    const resAndroid = await startLiveActivity(mockAttributesCoffee, mockState);
-    expect(resAndroid.success).toBe(false);
-    expect(resAndroid.error).toContain('iOS 16.1+');
+  test('startLiveActivity, updateLiveActivity oraz endLiveActivity są bezpiecznymi no-op w v1.0 (DEC-01)', async () => {
+    const res = await startLiveActivity(mockAttributesCoffee, mockState);
+    expect(res.success).toBe(false);
+    expect(res.activityId).toBeUndefined();
+    expect(res.error).toContain('DEC-01');
 
-    // 2. iOS z wyłączoną funkcją
-    Platform.OS = 'ios';
-    setLiveActivityEnabled(false);
-    const resDisabled = await startLiveActivity(mockAttributesCoffee, mockState);
-    expect(resDisabled.success).toBe(false);
-    expect(resDisabled.error).toContain('wyłączone w ustawieniach');
-  });
+    const updateRes = await updateLiveActivity('test-id', mockState);
+    expect(updateRes.success).toBe(false);
+    expect(updateRes.error).toContain('DEC-01');
 
-  test('Cykl życia Live Activity: start, update oraz end', async () => {
-    Platform.OS = 'ios';
-    setLiveActivityEnabled(true);
+    const endRes = await endLiveActivity('test-id');
+    expect(endRes.success).toBe(false);
+    expect(endRes.error).toContain('DEC-01');
 
-    // 1. Start
-    const startRes = await startLiveActivity(mockAttributesCoffee, mockState);
-    expect(startRes.success).toBe(true);
-    expect(startRes.activityId).toBeTruthy();
-    expect(getActiveLiveActivityId()).toBe(startRes.activityId);
-
-    const activityId = startRes.activityId!;
-
-    // 2. Update z poprawnym ID
-    const updatedState: BrewActivityContentState = {
-      ...mockState,
-      stepRemainingSeconds: 20,
-      totalElapsedSeconds: 100,
-    };
-    const updateRes = await updateLiveActivity(activityId, updatedState);
-    expect(updateRes.success).toBe(true);
-
-    // 3. Update z nieistniejącym ID
-    const updateBadRes = await updateLiveActivity('invalid-id', updatedState);
-    expect(updateBadRes.success).toBe(false);
-    expect(updateBadRes.error).toContain('Nie znaleziono aktywnej sesji');
-
-    // 4. Update na Androidzie
-    Platform.OS = 'android';
-    const updateAndroid = await updateLiveActivity(activityId, updatedState);
-    expect(updateAndroid.success).toBe(false);
-    Platform.OS = 'ios';
-
-    // 5. End na Androidzie
-    Platform.OS = 'android';
-    const endAndroid = await endLiveActivity(activityId);
-    expect(endAndroid.success).toBe(false);
-    Platform.OS = 'ios';
-
-    // 6. End pomyślny
-    const endRes = await endLiveActivity(activityId);
-    expect(endRes.success).toBe(true);
     expect(getActiveLiveActivityId()).toBeNull();
   });
 });

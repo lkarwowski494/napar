@@ -41,6 +41,7 @@ import {
 import { useBrew } from '../src/core/brew-context';
 import {
   getHealthKitSyncEnabled,
+  setHealthKitSyncEnabled,
   requestHealthKitPermissions,
   revokeHealthKitPermissions,
 } from '../src/core/healthkit';
@@ -117,14 +118,10 @@ export default function SettingsScreen() {
   const [importJsonText, setImportJsonText] = useState('');
   const [exportedCsvText, setExportedCsvText] = useState('');
 
-  const handleToggleHealthKit = async () => {
+  const handleToggleHealthKit = () => {
     const next = !healthKitSync;
     setHealthKitSync(next);
-    if (next) {
-      await requestHealthKitPermissions();
-    } else {
-      revokeHealthKitPermissions();
-    }
+    setHealthKitSyncEnabled(next);
   };
 
   const handleHalfLifeChange = (newHours: number) => {

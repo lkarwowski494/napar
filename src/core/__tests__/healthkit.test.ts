@@ -1,5 +1,6 @@
 // ============================================================================
 // Napar (Steepwise) — Unit Tests: Apple HealthKit Bridge (BR-KOF-002)
+// Aligned with Architectural Decision DEC-01 (Deferred to v1.2, zero fake IDs)
 // ============================================================================
 
 jest.mock('expo-sqlite', () => ({
@@ -24,7 +25,7 @@ import {
 } from '../healthkit';
 import * as databaseModule from '../database';
 
-describe('Apple HealthKit Dietary Caffeine Bridge (BR-KOF-002)', () => {
+describe('Apple HealthKit Dietary Caffeine Bridge (BR-KOF-002 & DEC-01)', () => {
   const store = new Map<string, string>();
 
   beforeEach(() => {
@@ -42,9 +43,9 @@ describe('Apple HealthKit Dietary Caffeine Bridge (BR-KOF-002)', () => {
     jest.restoreAllMocks();
   });
 
-  test('isHealthKitAvailable zwraca true na iOS i false na Androidzie', () => {
+  test('isHealthKitAvailable zwraca false w v1.0 zgodnie z DEC-01', () => {
     Platform.OS = 'ios';
-    expect(isHealthKitAvailable()).toBe(true);
+    expect(isHealthKitAvailable()).toBe(false);
 
     Platform.OS = 'android';
     expect(isHealthKitAvailable()).toBe(false);
@@ -60,45 +61,25 @@ describe('Apple HealthKit Dietary Caffeine Bridge (BR-KOF-002)', () => {
     expect(getHealthKitSyncEnabled()).toBe(false);
   });
 
-  test('Zwraca status uprawnień: unavailable na innej platformie, not_determined, authorized, denied', () => {
+  test('Zwraca status uprawnień: unavailable w v1.0 bez natywnego mostka', () => {
     Platform.OS = 'android';
     expect(getHealthKitAuthorizationStatus()).toBe('unavailable');
 
     Platform.OS = 'ios';
-    expect(getHealthKitAuthorizationStatus()).toBe('not_determined');
-
-    store.set('healthkit_auth_status', 'authorized');
-    expect(getHealthKitAuthorizationStatus()).toBe('authorized');
-
-    store.set('healthkit_auth_status', 'denied');
-    expect(getHealthKitAuthorizationStatus()).toBe('denied');
-
-    // Nieznana wartość cofa do not_determined
-    store.set('healthkit_auth_status', 'something_invalid');
-    expect(getHealthKitAuthorizationStatus()).toBe('not_determined');
+    expect(getHealthKitAuthorizationStatus()).toBe('unavailable');
   });
 
-  test('requestHealthKitPermissions prosi o uprawnienia i ustawia status authorized na iOS', async () => {
+  test('requestHealthKitPermissions zwraca false w v1.0 bez natywnego modułu', async () => {
     Platform.OS = 'ios';
-    const granted = await requestHealthKitPermissions();
-    expect(granted).toBe(true);
-    expect(getHealthKitAuthorizationStatus()).toBe('authorized');
-    expect(getHealthKitSyncEnabled()).toBe(true);
-  });
-
-  test('requestHealthKitPermissions zwraca false na platformie bez HealthKit', async () => {
-    Platform.OS = 'android';
     const granted = await requestHealthKitPermissions();
     expect(granted).toBe(false);
   });
 
-  test('revokeHealthKitPermissions odwołuje uprawnienia i wyłącza synchronizację', () => {
-    Platform.OS = 'ios';
-    requestHealthKitPermissions();
-    expect(getHealthKitAuthorizationStatus()).toBe('authorized');
+  test('revokeHealthKitPermissions wyłącza synchronizację', () => {
+    setHealthKitSyncEnabled(true);
+    expect(getHealthKitSyncEnabled()).toBe(true);
 
     revokeHealthKitPermissions();
-    expect(getHealthKitAuthorizationStatus()).toBe('denied');
     expect(getHealthKitSyncEnabled()).toBe(false);
   });
 
@@ -122,34 +103,16 @@ describe('Apple HealthKit Dietary Caffeine Bridge (BR-KOF-002)', () => {
     expect(res.error).toContain('Nieprawidłowy znacznik czasu');
   });
 
-  test('saveDietaryCaffeineSample zwraca błąd gdy brak uprawnień HealthKit', async () => {
+  test('saveDietaryCaffeineSample bezpiecznie odrzuca zapis bez generowania fikcyjnych próbek (DEC-01)', async () => {
     Platform.OS = 'ios';
-    revokeHealthKitPermissions();
-
-    const res = await saveDietaryCaffeineSample({
-      caffeineMg: 120,
-      consumedAt: new Date().toISOString(),
-      beverageName: 'V60',
-    });
-    expect(res.success).toBe(false);
-    expect(res.error).toContain('Brak uprawnień do zapisu w Apple Health');
-  });
-
-  test('saveDietaryCaffeineSample pomyślnie zapisuje próbkę ilościową gdy autoryzowany', async () => {
-    Platform.OS = 'ios';
-    await requestHealthKitPermissions();
-
-    const nowIso = new Date().toISOString();
     const res = await saveDietaryCaffeineSample({
       caffeineMg: 135.5,
-      consumedAt: nowIso,
+      consumedAt: new Date().toISOString(),
       beverageName: 'V60 Etiopia Gedeb',
     });
-
-    expect(res.success).toBe(true);
+    expect(res.success).toBe(false);
     expect(res.quantityType).toBe(HK_QUANTITY_TYPE_DIETARY_CAFFEINE);
-    expect(res.caffeineMg).toBe(135.5);
-    expect(res.consumedAt).toBe(nowIso);
-    expect(res.sampleId).toMatch(/^hk-/);
+    expect(res.sampleId).toBeUndefined();
+    expect(res.error).toContain('DEC-01');
   });
 });
