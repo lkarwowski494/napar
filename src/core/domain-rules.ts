@@ -7,6 +7,7 @@ export interface ExtractionYieldResult {
   extractionYieldPercent: number;
   rating: 'under' | 'ideal' | 'over';
   descriptionPl: string;
+  descriptionEn?: string;
 }
 
 export interface RestingWindowResult {
@@ -97,22 +98,27 @@ export function calculateExtractionYield(
 
   let rating: 'under' | 'ideal' | 'over';
   let descriptionPl: string;
+  let descriptionEn: string;
 
   if (ey < 18.0) {
     rating = 'under';
     descriptionPl = 'Niedoparzenie (Under-extracted) — dominacja kwasowości, brak słodyczy';
+    descriptionEn = 'Under-extracted — sour acidity dominates, lacking sweetness';
   } else if (ey > 22.0) {
     rating = 'over';
     descriptionPl = 'Przeparzenie (Over-extracted) — suchość, posmak popiołowy i gorycz';
+    descriptionEn = 'Over-extracted — harsh bitterness, dryness and astringency';
   } else {
     rating = 'ideal';
     descriptionPl = 'Zrównoważona ekstrakcja (Golden Cup) — pełna słodycz, czysty bukiet';
+    descriptionEn = 'Balanced Golden Cup extraction — sweet, vibrant and clean';
   }
 
   return {
     extractionYieldPercent: ey,
     rating,
     descriptionPl,
+    descriptionEn,
   };
 }
 

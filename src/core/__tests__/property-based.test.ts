@@ -67,12 +67,13 @@ describe('Property-Based & Invariant Tests: Brewing Science & Mathematics (fast-
         fc.float({ min: 0.5, max: 3.0, noNaN: true }),
         (tds) => {
           const res = calculateExtractionYield(250, tds, 15);
+          const hasEn = typeof res.descriptionEn === 'string' && res.descriptionEn.length > 0;
           if (res.extractionYieldPercent < 18.0) {
-            return res.rating === 'under';
+            return res.rating === 'under' && hasEn && res.descriptionEn!.includes('Under-extracted');
           } else if (res.extractionYieldPercent > 22.0) {
-            return res.rating === 'over';
+            return res.rating === 'over' && hasEn && res.descriptionEn!.includes('Over-extracted');
           } else {
-            return res.rating === 'ideal';
+            return res.rating === 'ideal' && hasEn && res.descriptionEn!.includes('Golden Cup');
           }
         }
       ),
@@ -105,13 +106,28 @@ describe('Property-Based & Invariant Tests: Brewing Science & Mathematics (fast-
   });
 
   test('Własność 5: Stabilność dwukierunkowej konwersji między młynkami (Round-trip stability)', () => {
+    // Kierunek 1: Comandante C40 -> Timemore C2/C3 -> Comandante C40
     fc.assert(
       fc.property(
-        fc.integer({ min: 12, max: 36 }),
+        fc.integer({ min: 14, max: 32 }),
         (clicks) => {
           const step1 = convertBetweenGrinders('comandante_c40', clicks, 'timemore_c2_c3');
           const step2 = convertBetweenGrinders('timemore_c2_c3', step1.targetFormatted, 'comandante_c40');
           const originalMicrons = clicks * 30.0;
+          return Math.abs(step2.microns - originalMicrons) <= 35;
+        }
+      ),
+      { seed, numRuns: 25 }
+    );
+
+    // Kierunek 2: Timemore C2/C3 -> Comandante C40 -> Timemore C2/C3
+    fc.assert(
+      fc.property(
+        fc.integer({ min: 14, max: 30 }),
+        (clicks) => {
+          const step1 = convertBetweenGrinders('timemore_c2_c3', clicks, 'comandante_c40');
+          const step2 = convertBetweenGrinders('comandante_c40', step1.targetFormatted, 'timemore_c2_c3');
+          const originalMicrons = clicks * 35.0;
           return Math.abs(step2.microns - originalMicrons) <= 35;
         }
       ),
