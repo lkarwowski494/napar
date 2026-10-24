@@ -334,6 +334,9 @@ export function parseAndValidateBackup(rawJson: string): NaparBackupEnvelope {
   if (!Array.isArray(state.sessions)) {
     throw new Error('Nieprawidłowa struktura sesji ("sessions" musi być tablicą)');
   }
+  if (state.caffeineLogs !== undefined && !Array.isArray(state.caffeineLogs)) {
+    throw new Error('Nieprawidłowa struktura logu kofeiny ("caffeineLogs" musi być tablicą)');
+  }
 
   return envelope as NaparBackupEnvelope;
 }

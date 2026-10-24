@@ -178,6 +178,15 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
         })
       )
     ).toThrow('Nieprawidłowa struktura sesji');
+    expect(() =>
+      parseAndValidateBackup(
+        JSON.stringify({
+          format: 'napar-backup',
+          schemaVersion: 1,
+          state: { inventory: [], customRecipes: [], sessions: [], caffeineLogs: 'not an array' },
+        })
+      )
+    ).toThrow('Nieprawidłowa struktura logu kofeiny');
   });
 
   test('exportBackup udostępnia plik przez Sharing.shareAsync', async () => {
