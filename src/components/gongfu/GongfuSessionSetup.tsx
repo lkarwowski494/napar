@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Field, NumInput } from '../ui';
 import { GongfuTeaType } from '../../core/gongfu-session';
+import { gramsToOunces, mlToFluidOunces, celsiusToFahrenheit } from '../../core/unit-converter';
 import { theme } from '../../core/theme';
 
 interface GongfuSessionSetupProps {
@@ -38,6 +39,14 @@ export const GongfuSessionSetup: React.FC<GongfuSessionSetupProps> = ({
   unitSystem,
   t,
 }) => {
+  const isImp = unitSystem === 'imperial';
+  const leafBase = parseFloat(leafDoseGrams) || 0;
+  const vesselBase = parseFloat(vesselCapacityMl) || 0;
+  const tempBase = parseFloat(waterTempCelsius) || 0;
+
+  const displayLeaf = isImp ? gramsToOunces(leafBase) : leafBase;
+  const displayVessel = isImp ? mlToFluidOunces(vesselBase) : vesselBase;
+  const displayTemp = isImp ? celsiusToFahrenheit(tempBase) : tempBase;
   return (
     <>
       {/* Wybór rodzaju herbaty */}
@@ -81,29 +90,32 @@ export const GongfuSessionSetup: React.FC<GongfuSessionSetupProps> = ({
           <View style={styles.paramBox}>
             <Text style={styles.paramSub}>{t.gongfu.leafDose}</Text>
             <NumInput
-              value={parseFloat(leafDoseGrams) || 0}
+              value={displayLeaf}
+              stored={leafBase}
               onChangeNumber={(n) => onChangeLeafDose(n.toString())}
-              unit={unitSystem === 'imperial' ? 'oz' : 'g'}
+              unit={isImp ? 'oz' : 'g'}
             />
-            <Text style={styles.unitText}>{unitSystem === 'imperial' ? 'oz' : 'g'}</Text>
+            <Text style={styles.unitText}>{isImp ? 'oz' : 'g'}</Text>
           </View>
           <View style={styles.paramBox}>
             <Text style={styles.paramSub}>{t.gongfu.vesselCapacity}</Text>
             <NumInput
-              value={parseFloat(vesselCapacityMl) || 0}
+              value={displayVessel}
+              stored={vesselBase}
               onChangeNumber={(n) => onChangeVesselCapacity(n.toString())}
-              unit={unitSystem === 'imperial' ? 'fl oz' : 'ml'}
+              unit={isImp ? 'fl oz' : 'ml'}
             />
-            <Text style={styles.unitText}>{unitSystem === 'imperial' ? 'fl oz' : 'ml'}</Text>
+            <Text style={styles.unitText}>{isImp ? 'fl oz' : 'ml'}</Text>
           </View>
           <View style={styles.paramBox}>
             <Text style={styles.paramSub}>{t.gongfu.waterTemp}</Text>
             <NumInput
-              value={parseFloat(waterTempCelsius) || 0}
+              value={displayTemp}
+              stored={tempBase}
               onChangeNumber={(n) => onChangeWaterTemp(n.toString())}
-              unit={unitSystem === 'imperial' ? '°F' : '°C'}
+              unit={isImp ? '°F' : '°C'}
             />
-            <Text style={styles.unitText}>{unitSystem === 'imperial' ? '°F' : '°C'}</Text>
+            <Text style={styles.unitText}>{isImp ? '°F' : '°C'}</Text>
           </View>
         </View>
       </View>

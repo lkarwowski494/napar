@@ -117,6 +117,19 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(wInKeep('20,5', 'g')).toBe(20.5);
     });
 
+    test('Gongfu 7.0 g z uncjami (0.25 oz) zachowuje 7.0 g bez mnożenia przez 28.35x (M1-audytor-generalny-004)', () => {
+      const baseLeaf = 7.0;
+      const displayedOz = String(gramsToOunces(baseLeaf)); // '0.25'
+      expect(displayedOz).toBe('0.25');
+      const preservedGrams = wInKeep(displayedOz, 'oz', baseLeaf);
+      expect(preservedGrams).toBe(7.0);
+
+      const baseVessel = 100;
+      const displayedFlOz = String(mlToFluidOunces(baseVessel)); // '3.38'
+      const preservedMl = wInKeep(displayedFlOz, 'fl oz', baseVessel);
+      expect(preservedMl).toBe(100);
+    });
+
     test('Inwariant 100 cykli otwarcia i zapisu formularza bez dryfu', () => {
       let baseVal = 15.0; // 15g kawy
       for (let i = 0; i < 100; i++) {

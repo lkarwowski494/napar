@@ -121,8 +121,9 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
       }
       return roundTo(((xIn - 32) * 5) / 9, 2);
     } else {
-      const fPrev = roundTo(prevBase * cu, 1);
-      if (roundTo(xIn, 1) === fPrev) {
+      const fPrev1 = roundTo(prevBase * cu, 1);
+      const fPrev2 = roundTo(prevBase * cu, 2);
+      if (roundTo(xIn, 1) === fPrev1 || roundTo(xIn, 2) === fPrev2) {
         return prevBase;
       }
       return roundTo(xIn / cu, 2);
