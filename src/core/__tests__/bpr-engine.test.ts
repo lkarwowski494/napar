@@ -3,6 +3,7 @@ import {
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
+  escapeIcsText,
 } from '../bpr-engine';
 import { InventoryItem, BrewSession } from '../database-schema';
 
@@ -182,6 +183,7 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       };
       const icsEscaped = generateActionIcsContent(testAction, 'pl');
       expect(icsEscaped).toContain('SUMMARY:Kawa\\, specialty\\; palona\\\\ręcznie');
+      expect(escapeIcsText('A, B; C\\ D\nE')).toBe('A\\, B\\; C\\\\ D\\nE');
     });
   });
 });
