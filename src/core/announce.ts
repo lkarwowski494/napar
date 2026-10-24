@@ -82,10 +82,12 @@ export function formatFinishAnnouncement(
   const mins = Math.floor(totalSeconds / 60);
   const secs = totalSeconds % 60;
   if (language === 'en') {
-    const timeStr = mins > 0 ? `${mins} min ${secs} s` : `${secs} seconds`;
+    const secWord = secs === 1 ? 'second' : 'seconds';
+    const timeStr = mins > 0 ? `${mins} min ${secs} s` : `${secs} ${secWord}`;
     return `Brewing of ${recipeName} finished. Total time: ${timeStr}. Enjoy your cup!`;
   }
-  const timeStr = mins > 0 ? `${mins} min ${secs} s` : `${secs} sekund`;
+  const secWord = pluralPl(secs, 'sekunda', 'sekundy', 'sekund');
+  const timeStr = mins > 0 ? `${mins} min ${secs} s` : `${secs} ${secWord}`;
   return `Parzenie ${recipeName} zakończone. Całkowity czas: ${timeStr}. Smacznego!`;
 }
 

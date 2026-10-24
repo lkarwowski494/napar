@@ -145,6 +145,14 @@ describe('Confirm & Announce helpers', () => {
       'Brewing of Espresso finished. Total time: 28 seconds. Enjoy your cup!'
     );
 
+    // 1 sekunda (liczba pojedyncza)
+    expect(formatFinishAnnouncement('Ristretto', 1, 'pl')).toBe(
+      'Parzenie Ristretto zakończone. Całkowity czas: 1 sekunda. Smacznego!'
+    );
+    expect(formatFinishAnnouncement('Ristretto', 1, 'en')).toBe(
+      'Brewing of Ristretto finished. Total time: 1 second. Enjoy your cup!'
+    );
+
     // Domyślny język (PL)
     expect(formatFinishAnnouncement('Drip', 120)).toBe(
       'Parzenie Drip zakończone. Całkowity czas: 2 min 0 s. Smacznego!'

@@ -35,7 +35,17 @@ export async function playTimerChime(): Promise<boolean> {
     player.play();
     soundInstance = player;
 
+    let sub: any = null;
+
     const cleanup = () => {
+      if (sub && typeof sub.remove === 'function') {
+        try {
+          sub.remove();
+        } catch {
+          // safe fallback
+        }
+        sub = null;
+      }
       try {
         player.remove();
       } catch {
@@ -48,12 +58,9 @@ export async function playTimerChime(): Promise<boolean> {
 
     if (typeof (player as any).addListener === 'function') {
       try {
-        const sub = (player as any).addListener('playbackStatusUpdate', (status: any) => {
+        sub = (player as any).addListener('playbackStatusUpdate', (status: any) => {
           if (status?.didJustFinish) {
             cleanup();
-            if (sub && typeof sub.remove === 'function') {
-              sub.remove();
-            }
           }
         });
       } catch {
