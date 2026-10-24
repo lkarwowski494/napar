@@ -140,11 +140,6 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
   const handleDeleteItem = () => {
     if (!item) return;
-    if (!canCreate) {
-      onClose();
-      onRequirePaywall();
-      return;
-    }
     Alert.alert(
       'Usunąć paczkę?',
       `Czy na pewno chcesz bezpowrotnie usunąć "${item.name}" ze spiżarni?`,

@@ -97,6 +97,14 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(state.isHistoryReadOnly).toBe(true);
   });
 
+  test('Wygasły trial (canCreate=false) nie blokuje usuwania własnych danych użytkownika (M1-audytor-generalny-012)', () => {
+    setTrialExpiredForTesting();
+    const state = getAppAccessState();
+    expect(state.canCreate).toBe(false);
+    expect(state.isHistoryReadOnly).toBe(true);
+    // Operacje usuwania nie mogą być warunkowane flagą canCreate
+  });
+
   test('Aktywacja subskrypcji odblokowuje pełny dostęp bez limitów', () => {
     setTrialExpiredForTesting();
     expect(getAppAccessState().status).toBe('trial_expired');

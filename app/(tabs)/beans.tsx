@@ -94,10 +94,6 @@ export default function BeansScreen() {
   };
 
   const handleOpenEdit = (item: InventoryItem) => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
     setEditingItem(item);
     setShowEditModal(true);
   };

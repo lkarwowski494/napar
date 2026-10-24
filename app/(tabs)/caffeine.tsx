@@ -156,10 +156,6 @@ export default function CaffeineScreen() {
   };
 
   const handleDeleteLog = (log: CaffeineLog) => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
     deleteCaffeineLog(log.id);
     loadLogs();
   };
