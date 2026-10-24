@@ -19,6 +19,10 @@ jest.mock('expo-file-system/legacy', () => {
     readDirectoryAsync: jest.fn(async () =>
       Object.keys(files).map((p) => p.split('/').pop())
     ),
+    moveAsync: jest.fn(async ({ from, to }) => {
+      files[to] = files[from] || '';
+      delete files[from];
+    }),
     __files: files,
     __reset: () => {
       for (const k of Object.keys(files)) {

@@ -333,7 +333,8 @@ describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
       expect(full.attributes.recipeName).toBe('V60');
 
       const endRes = await endLiveActivity('unknown_activity_id');
-      expect(endRes.success).toBe(true);
+      expect(endRes.success).toBe(false);
+      expect(endRes.error).toContain('DEC-01');
     });
   });
 

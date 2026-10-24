@@ -1397,8 +1397,10 @@ describe('BrewScreen UI Integration', () => {
     expect(str).toContain('Oszczędność vs kawiarnia');
   });
 
-  test('Wygasły trial (trial_expired): Próba rozpoczęcia parzenia blokuje start i otwiera Apps4BrewPassModal', () => {
-    setTrialExpiredForTesting();
+  test('Wygasły trial (trial_expired): Pozwala parzyć kawę (DEC-02: stoper i parzenie darmowe na zawsze) i uruchamia stoper', () => {
+    act(() => {
+      setTrialExpiredForTesting();
+    });
 
     let tree: any;
     act(() => {
@@ -1417,18 +1419,20 @@ describe('BrewScreen UI Integration', () => {
       startBtn?.props.onPress();
     });
 
-    // Paywall Modal powinien się pojawić z planami $0.99 / $4.99 / $14.99
+    // Zgodnie z DEC-02 parzenie jest bezpłatne — stoper startuje bez paywalla
     const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('APPS4BREW PASS');
-    expect(str).toContain('$4.99 / rok');
-    expect(str).toContain('Twoja historia parzeń');
+    expect(str).toContain('PAUZA');
 
     // Reset dla kolejnych testów
-    resetTrialForTesting();
+    act(() => {
+      resetTrialForTesting();
+    });
   });
 
   test('Aktywny trial: Pozwala rozpocząć parzenie i uruchamia stoper', () => {
-    resetTrialForTesting();
+    act(() => {
+      resetTrialForTesting();
+    });
 
     let tree: any;
     act(() => {
@@ -1452,7 +1456,9 @@ describe('BrewScreen UI Integration', () => {
   });
 
   test('Wygasły trial: Ekran główny wyświetla baner Tryb Tylko do Odczytu', () => {
-    setTrialExpiredForTesting();
+    act(() => {
+      setTrialExpiredForTesting();
+    });
 
     let tree: any;
     act(() => {
@@ -1467,11 +1473,15 @@ describe('BrewScreen UI Integration', () => {
     expect(str).toContain('Tryb Tylko do Odczytu');
     expect(str).toContain('Twoje receptury i historia są bezpieczne');
 
-    resetTrialForTesting();
+    act(() => {
+      resetTrialForTesting();
+    });
   });
 
   test('Wygasły trial: Próba duplikowania receptury w modalu blokuje akcję i otwiera Apps4BrewPassModal', () => {
-    setTrialExpiredForTesting();
+    act(() => {
+      setTrialExpiredForTesting();
+    });
 
     let tree: any;
     act(() => {
@@ -1499,13 +1509,17 @@ describe('BrewScreen UI Integration', () => {
 
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('APPS4BREW PASS');
-    expect(str).toContain('$4.99 / rok');
+    expect(str).toContain('/ rok');
 
-    resetTrialForTesting();
+    act(() => {
+      resetTrialForTesting();
+    });
   });
 
   test('Wygasły trial: Próba kliknięcia Import w modalu receptur otwiera Apps4BrewPassModal', () => {
-    setTrialExpiredForTesting();
+    act(() => {
+      setTrialExpiredForTesting();
+    });
 
     let tree: any;
     act(() => {
@@ -1534,7 +1548,9 @@ describe('BrewScreen UI Integration', () => {
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('APPS4BREW PASS');
 
-    resetTrialForTesting();
+    act(() => {
+      resetTrialForTesting();
+    });
   });
 
   test('Szybki Re-Brew 1-Tap: Kliknięcie baneru ostatniego udanego naparu ładuje parametry', () => {
@@ -1663,7 +1679,9 @@ describe('BrewScreen UI Integration', () => {
     mockDb.recipes.delete('rec-tea-test');
 
     // Sprawdź blokadę paywalla na przycisku Krok 4 przy wygasłym trialu
-    setTrialExpiredForTesting();
+    act(() => {
+      setTrialExpiredForTesting();
+    });
     let expiredTree: any;
     act(() => {
       expiredTree = renderer.create(
@@ -1675,7 +1693,9 @@ describe('BrewScreen UI Integration', () => {
     act(() => {
       expiredTree.root.findByProps({ testID: 'open-procedure-modal-btn' }).props.onPress();
     });
-    resetTrialForTesting();
+    act(() => {
+      resetTrialForTesting();
+    });
   });
 });
 

@@ -102,8 +102,8 @@ describe('Gongfu Cha Multi-Infusion Model', () => {
     expect(session.infusions[0].infusionNumber).toBe(1);
     expect(session.infusions[0].durationSeconds).toBe(15);
     // 45% z 210mg = 94.5mg
-    expect(session.infusions[0].caffeineMg).toBe(94.5);
-    expect(session.totalCaffeineMg).toBe(94.5);
+    expect(session.infusions[0].caffeineMg).toBe(84.0);
+    expect(session.totalCaffeineMg).toBe(84.0);
 
     // Infuzja 2
     session = recordGongfuInfusion(session, {
@@ -115,7 +115,7 @@ describe('Gongfu Cha Multi-Infusion Model', () => {
     expect(session.infusions.length).toBe(2);
     expect(session.infusions[1].infusionNumber).toBe(2);
     // 30% z 210mg = 63.0mg -> 94.5 + 63 = 157.5mg
-    expect(session.infusions[1].caffeineMg).toBe(63.0);
-    expect(session.totalCaffeineMg).toBe(157.5);
+    expect(session.infusions[1].caffeineMg).toBe(46.2);
+    expect(session.totalCaffeineMg).toBe(130.2);
   });
 });

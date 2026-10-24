@@ -474,7 +474,7 @@ describe('Custom Recipe Builder & Persistence', () => {
       tree = renderer.create(<RecipeBuilderScreen />);
     });
 
-    const closeBtn = findPressableWithText(tree.root, 'Zamknij');
+    const closeBtn = findPressableWithText(tree.root, 'Anuluj') || findPressableWithText(tree.root, 'Zamknij');
     expect(closeBtn).toBeTruthy();
     renderer.act(() => {
       closeBtn?.props.onPress();

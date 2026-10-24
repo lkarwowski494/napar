@@ -119,6 +119,6 @@ describe('Apple HealthKit Dietary Caffeine Bridge (BR-KOF-002 & DEC-01)', () => 
 
   test('HealthKitAuthorizationStatus typ definiuje stany autoryzacji', () => {
     const status: HealthKitAuthorizationStatus = getHealthKitAuthorizationStatus();
-    expect(['not_determined', 'sharing_authorized', 'sharing_denied']).toContain(status);
+    expect(['not_determined', 'authorized', 'denied', 'unavailable']).toContain(status);
   });
 });

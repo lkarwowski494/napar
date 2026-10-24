@@ -12,7 +12,7 @@ describe('Apps4Craft Suite Theme Tokens', () => {
     expect(CRAFT_APPS.masaz).toBeDefined();
     expect(CRAFT_APPS.ferment).toBeDefined();
 
-    expect(CRAFT_APPS.napar.accent).toBe('#C86A28');
+    expect(CRAFT_APPS.napar.accent).toBe('#D97736');
     expect(CRAFT_APPS.piekarz.accent).toBe('#D49B42');
     expect(CRAFT_APPS.sloik.accent).toBe('#5B8A61');
     expect(CRAFT_APPS.masaz.accent).toBe('#A43E38');

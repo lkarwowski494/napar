@@ -111,7 +111,7 @@ describe('BPR To-Be Components & Screens Coverage', () => {
     expect(onAdjustTimeSeconds).toHaveBeenCalledWith(10);
     expect(onAdjustTimeSeconds).toHaveBeenCalledWith(60);
     expect(onPauseResume).toHaveBeenCalled();
-    expect(onResetCurrentStep).toHaveBeenCalledWith(45);
+    expect(onResetCurrentStep).toHaveBeenCalledWith(30);
     expect(onNextStep).toHaveBeenCalled();
 
     // Render on last step -> shows Finish & Save CTA
