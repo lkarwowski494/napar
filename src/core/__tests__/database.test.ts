@@ -17,6 +17,7 @@ import {
   toggleRecipeFavorite,
   updateRecipeFavorite,
   duplicateRecipe,
+  deleteRecipe,
   getBrewSessions,
   getBrewSessionById,
   saveBrewSession,
@@ -135,7 +136,14 @@ const mockDb: any = {
         existing.is_favorite = fav;
       }
     } else if (query.includes('DELETE FROM recipes WHERE id = ?')) {
-      mockDb.recipes.delete(params![0]);
+      if (query.includes('AND is_custom = 1')) {
+        const existing = mockDb.recipes.get(params![0]);
+        if (existing && existing.is_custom === 1) {
+          mockDb.recipes.delete(params![0]);
+        }
+      } else {
+        mockDb.recipes.delete(params![0]);
+      }
     } else if (query.includes('INSERT OR REPLACE INTO brew_sessions')) {
       const [id, rId, rName, iId, iName, type, method, dose, water, temp, waterProfile, grind, time, rating, tags, balance, tds, ey, caff, notes, inf, sensory, brewed] = params!;
       mockDb.sessions.set(id, {
@@ -755,6 +763,36 @@ describe('Napar SQLite Database & Repositories', () => {
 
     updateRecipeFavorite('rec-fav-test', false);
     expect(getRecipeById('rec-fav-test')?.isFavorite).toBe(false);
+  });
+
+  test('deleteRecipe usuwa receptury własne (is_custom=1), ale chroni wzorcowe (is_custom=0)', () => {
+    initDatabase(mockDb as any);
+    // 1. Zapisz recepturę własną
+    const customRecipe: SavedRecipe = {
+      id: 'rec-custom-del',
+      name: 'Custom V60',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      recommendedRatio: 16.7,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+    };
+    saveRecipe(customRecipe);
+    expect(mockDb.recipes.has('rec-custom-del')).toBe(true);
+
+    // 2. Usuń recepturę własną - powinna zostać usunięta
+    deleteRecipe('rec-custom-del');
+    expect(mockDb.recipes.has('rec-custom-del')).toBe(false);
+
+    // 3. Próba usunięcia receptury wzorcowej Hoffmann V60 (is_custom=0)
+    expect(mockDb.recipes.has('v60-hoffmann-single')).toBe(true);
+    deleteRecipe('v60-hoffmann-single');
+    // Receptura wzorcowa NIE MOŻE zostać usunięta
+    expect(mockDb.recipes.has('v60-hoffmann-single')).toBe(true);
   });
 
   test('deleteBrewSession usuwa sesję z bazy', () => {
