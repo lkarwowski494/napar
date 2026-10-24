@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
+import { useTranslation } from '../../src/core/i18n';
 import {
   getInventoryItems,
   saveInventoryItem,
@@ -32,6 +33,7 @@ import { BeanItemCard } from '../../src/components/beans/BeanItemCard';
 export default function BeansScreen() {
   const router = useRouter();
   const { selectInventoryItem, beveragePreference } = useBrew();
+  const { t } = useTranslation();
   const { canCreate, isHistoryReadOnly, refresh } = useAppAccess();
   const [unitSystem] = useState<'metric' | 'imperial'>(() => {
     try {
@@ -139,7 +141,7 @@ export default function BeansScreen() {
         <View style={styles.readOnlyBanner}>
           <ShieldIcon size={14} color={theme.colors.copper} />
           <Text style={styles.readOnlyText}>
-            Tryb tylko do odczytu (wygasła subskrypcja)
+            {t.stash?.readOnlyNotice || 'Tryb tylko do odczytu (wygasła subskrypcja)'}
           </Text>
         </View>
       )}
@@ -160,7 +162,7 @@ export default function BeansScreen() {
             <View style={{ marginBottom: 16 }}>
               <BeansIcon size={48} color={theme.colors.copper} />
             </View>
-            <Text style={styles.emptyTitle}>Twoja spiżarnia jest pusta</Text>
+            <Text style={styles.emptyTitle}>{t.stash?.emptyTitle || 'Twoja spiżarnia jest pusta'}</Text>
             <Text style={styles.emptySub}>
               Dodaj swoją pierwszą kawę ziarnistą lub herbatę liściastą, aby śledzić świeżość,
               odmiany botaniczne i wagę.

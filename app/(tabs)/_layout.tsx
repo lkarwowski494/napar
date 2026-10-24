@@ -18,8 +18,9 @@ import {
   CompassIcon,
 } from '../../src/components/icons/CraftIcons';
 import { AppGuideModal } from '../../src/components/AppGuideModal';
+import { useTranslation } from '../../src/core/i18n';
 
-function AppGuideHeaderButton({ onOpen }: { onOpen: () => void }) {
+function AppGuideHeaderButton({ onOpen, label }: { onOpen: () => void; label: string }) {
   return (
     <Pressable
       testID="header-guide-btn"
@@ -27,15 +28,16 @@ function AppGuideHeaderButton({ onOpen }: { onOpen: () => void }) {
       style={styles.headerGuideButton}
       onPress={onOpen}
       accessibilityRole="button"
-      accessibilityLabel="Jak działa aplikacja?"
+      accessibilityLabel={label}
     >
       <CompassIcon size={14} color={theme.colors.copper} />
-      <Text style={styles.headerGuideButtonText}>Jak działa aplikacja?</Text>
+      <Text style={styles.headerGuideButtonText}>{label}</Text>
     </Pressable>
   );
 }
 
 export default function TabLayout() {
+  const { t, language } = useTranslation();
   const [showGuideModal, setShowGuideModal] = useState(false);
 
   let insets = { bottom: 0, top: 0, left: 0, right: 0 };
@@ -87,7 +89,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: 'Parzenie',
+            title: t.tabs?.brew || 'Parzenie',
             headerTitle: 'Napar',
             tabBarIcon: ({ focused }) => (
               <BrewIcon
@@ -100,8 +102,8 @@ export default function TabLayout() {
         <Tabs.Screen
           name="beans"
           options={{
-            title: 'Spiżarnia',
-            headerTitle: 'Spiżarnia',
+            title: t.tabs?.beans || 'Spiżarnia',
+            headerTitle: t.stash?.title || 'Spiżarnia',
             tabBarIcon: ({ focused }) => (
               <BeansIcon
                 size={22}
@@ -113,8 +115,8 @@ export default function TabLayout() {
         <Tabs.Screen
           name="journal"
           options={{
-            title: 'Dziennik',
-            headerTitle: 'Dziennik Degustacji',
+            title: t.tabs?.journal || 'Dziennik',
+            headerTitle: t.journal?.title || 'Dziennik',
             tabBarIcon: ({ focused }) => (
               <JournalIcon
                 size={22}
@@ -126,8 +128,8 @@ export default function TabLayout() {
         <Tabs.Screen
           name="dialin"
           options={{
-            title: 'Warsztat',
-            headerTitle: 'Warsztat & Dial-in',
+            title: t.tabs?.dialin || 'Warsztat',
+            headerTitle: t.dialin?.title || 'Warsztat & Dial-in',
             tabBarIcon: ({ focused }) => (
               <LabIcon
                 size={22}
@@ -139,8 +141,8 @@ export default function TabLayout() {
         <Tabs.Screen
           name="settings"
           options={{
-            title: 'Ustawienia',
-            headerTitle: 'Ustawienia & Kopia',
+            title: t.tabs?.settings || 'Ustawienia',
+            headerTitle: t.settings?.title || 'Ustawienia',
             tabBarIcon: ({ focused }) => (
               <SettingsIcon
                 size={22}
@@ -153,8 +155,8 @@ export default function TabLayout() {
           name="caffeine"
           options={{
             href: null,
-            title: 'Kofeina',
-            headerTitle: 'Monitor Kofeiny',
+            title: t.tabs?.caffeine || 'Kofeina',
+            headerTitle: t.caffeine?.title || 'Monitor Kofeiny',
             tabBarIcon: ({ focused }) => (
               <CaffeineIcon
                 size={22}
@@ -167,6 +169,7 @@ export default function TabLayout() {
       <AppGuideModal
         visible={showGuideModal}
         onClose={() => setShowGuideModal(false)}
+        language={language}
       />
     </>
   );

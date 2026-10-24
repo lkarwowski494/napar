@@ -9,6 +9,7 @@ import { InventoryItem } from '../../core/database-schema';
 import { evaluateRestingWindow } from '../../core/domain-rules';
 import { formatDoseWeight } from '../../core/unit-converter';
 import { theme } from '../../core/theme';
+import { useTranslation } from '../../core/i18n';
 
 interface BeanItemCardProps {
   item: InventoryItem;
@@ -27,6 +28,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
   onSelectForBrew,
   onOpenEdit,
 }) => {
+  const { t } = useTranslation();
   const resting =
     item.type === 'coffee' && item.roastOrHarvestDate
       ? evaluateRestingWindow(item.roastOrHarvestDate)
@@ -46,7 +48,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={{ padding: 4 }}
           accessibilityRole="button"
-          accessibilityLabel={item.isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+          accessibilityLabel={item.isFavorite ? (t.stash?.favoriteRemove || 'Usuń z ulubionych') : (t.stash?.favoriteAdd || 'Dodaj do ulubionych')}
         >
           <Text style={[styles.favIcon, item.isFavorite && styles.favIconActive]}>
             {item.isFavorite ? '★' : '☆'}
@@ -99,7 +101,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
       {item.remainingWeightGrams === 0 && !item.isArchived && (
         <View style={styles.emptyStashBanner}>
           <Text style={styles.emptyStashText}>
-            Paczka skończona (0 g). Przenieść do archiwum?
+            {t.stash?.archivePrompt || 'Paczka skończona (0 g). Przenieść do archiwum?'}
           </Text>
           <Pressable
             style={styles.archiveEmptyBtn}
@@ -115,7 +117,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
       {/* Dolny pasek karty: Waga i akcje */}
       <View style={styles.itemFooter}>
         <View>
-          <Text style={styles.weightLabel}>Pozostało</Text>
+          <Text style={styles.weightLabel}>{t.stash?.remainingGrams || 'Pozostało'}</Text>
           <Text style={styles.weightValue}>
             {formatDoseWeight(item.remainingWeightGrams, unitSystem)} /{' '}
             {formatDoseWeight(item.initialWeightGrams, unitSystem)}

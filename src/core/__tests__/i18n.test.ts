@@ -185,6 +185,36 @@ describe('i18n System', () => {
       expect(plural('en', 2, { one: 'second', other: 'seconds' })).toBe('seconds');
       expect(plural('en', 25, { one: 'second', other: 'seconds' })).toBe('seconds');
     });
+    test('getPluralCategory fallback w środowisku bez Intl.PluralRules (Hermes)', () => {
+      const originalPluralRules = (Intl as any).PluralRules;
+      try {
+        (Intl as any).PluralRules = undefined;
+        expect(getPluralCategory('pl', 1)).toBe('one');
+        expect(getPluralCategory('pl', 2)).toBe('few');
+        expect(getPluralCategory('pl', 5)).toBe('many');
+        expect(getPluralCategory('pl', 12)).toBe('many');
+        expect(getPluralCategory('pl', 22)).toBe('few');
+        expect(getPluralCategory('en', 1)).toBe('one');
+        expect(getPluralCategory('en', 2)).toBe('other');
+
+        // Test gdy rzuca wyjątek
+        (Intl as any).PluralRules = jest.fn(() => { throw new Error('Hermes fallback simulation'); });
+        expect(getPluralCategory('pl', 22)).toBe('few');
+      } finally {
+        (Intl as any).PluralRules = originalPluralRules;
+      }
+    });
+
+    test('plural() fallback gałęzi gdy brakuje specyficznych formularzy', () => {
+      // category few ale podano tylko many
+      expect(plural('pl', 2, { one: 'sekunda', many: 'sekund' })).toBe('sekund');
+      // category many ale podano tylko few
+      expect(plural('pl', 5, { one: 'sekunda', few: 'sekundy' })).toBe('sekundy');
+      // brak few i many, tylko other
+      expect(plural('pl', 5, { one: 'sekunda', other: 'inny' })).toBe('inny');
+      // tylko one
+      expect(plural('pl', 5, { one: 'sekunda' })).toBe('sekunda');
+    });
   });
   test('getPluralCategory wylicza reguły liczby mnogiej', () => {
     expect(getPluralCategory('pl', 1)).toBe('one');

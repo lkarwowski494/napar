@@ -171,7 +171,7 @@ export default function SettingsScreen() {
     try {
       const csv = exportSessionsCsv();
       setExportedCsvText(csv);
-      setCsvModalTitle('Eksport Dziennika (CSV)');
+      setCsvModalTitle(language === 'pl' ? 'Eksport Dziennika (CSV)' : 'Journal Export (CSV)');
       setShowCsvModal(true);
     } catch (e: any) {
       Alert.alert('Nie udało się wyeksportować', e?.message || 'Nie udało się wyeksportować danych.');
@@ -182,7 +182,7 @@ export default function SettingsScreen() {
     try {
       const csv = exportInventoryCsv();
       setExportedCsvText(csv);
-      setCsvModalTitle('Eksport Spiżarni (CSV)');
+      setCsvModalTitle(language === 'pl' ? 'Eksport Spiżarni (CSV)' : 'Stash Export (CSV)');
       setShowCsvModal(true);
     } catch (e: any) {
       Alert.alert('Nie udało się wyeksportować', e?.message || 'Nie udało się wyeksportować danych.');
@@ -192,7 +192,10 @@ export default function SettingsScreen() {
   const handleImport = async () => {
     try {
       if (!importJsonText.trim()) {
-        Alert.alert('Nie udało się zaimportować', 'Wklej prawidłowy tekst JSON kopii zapasowej.');
+        Alert.alert(
+          language === 'pl' ? 'Nie udało się zaimportować' : 'Import failed',
+          language === 'pl' ? 'Wklej prawidłowy tekst JSON kopii zapasowej.' : 'Paste valid backup JSON text.'
+        );
         return;
       }
       // Apps4Brew SEC-09 & BR-TEST-022: Tworzenie kopii bezpieczeństwa przed niszczącym importem
@@ -208,9 +211,15 @@ export default function SettingsScreen() {
       setShowImportModal(false);
       setImportJsonText('');
       refreshAccess();
-      Alert.alert('Sukces!', 'Dane zostały pomyślnie zaimportowane do Twojej lokalnej bazy.');
+      Alert.alert(
+        language === 'pl' ? 'Sukces!' : 'Success!',
+        language === 'pl' ? 'Dane zostały pomyślnie zaimportowane do Twojej lokalnej bazy.' : 'Data successfully imported to your local database.'
+      );
     } catch (e: any) {
-      Alert.alert('Nie udało się zaimportować', e?.message || 'Niepoprawny format danych JSON.');
+      Alert.alert(
+        language === 'pl' ? 'Nie udało się zaimportować' : 'Import failed',
+        e?.message || (language === 'pl' ? 'Niepoprawny format danych JSON.' : 'Invalid JSON data format.')
+      );
     }
   };
 
@@ -294,53 +303,61 @@ export default function SettingsScreen() {
       />
 
       {/* O aplikacji */}
-      <Text style={styles.sectionTitle}>O Aplikacji</Text>
+      <Text style={styles.sectionTitle}>{language === 'pl' ? 'O Aplikacji' : 'About App'}</Text>
       <View style={styles.cardGroup}>
         <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Wersja</Text>
+          <Text style={styles.infoLabel}>{language === 'pl' ? 'Wersja' : 'Version'}</Text>
           <Text style={styles.infoValue}>1.0.0 (Build 1)</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Ekosystem</Text>
+          <Text style={styles.infoLabel}>{language === 'pl' ? 'Ekosystem' : 'Ecosystem'}</Text>
           <Text style={styles.infoValue}>Apps4Brew Specialty Portfolio</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Zgodność licencyjna</Text>
+          <Text style={styles.infoLabel}>{language === 'pl' ? 'Zgodność licencyjna' : 'License'}</Text>
           <Text style={styles.infoValue}>Proprietary (Apps4Brew)</Text>
         </View>
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
           onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/privacy.html')}
+          accessibilityRole="link"
+          accessibilityLabel={t.paywall?.privacyLabel || (language === 'pl' ? 'Polityka Prywatności' : 'Privacy Policy')}
         >
-          <Text style={styles.infoLabel}>Polityka Prywatności</Text>
-          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>Otwórz ↗</Text>
+          <Text style={styles.infoLabel}>{t.paywall?.privacyLabel || (language === 'pl' ? 'Polityka Prywatności' : 'Privacy Policy')}</Text>
+          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>{language === 'pl' ? 'Otwórz ↗' : 'Open ↗'}</Text>
         </Pressable>
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
           onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/terms.html')}
+          accessibilityRole="link"
+          accessibilityLabel={t.paywall?.eulaLabel || (language === 'pl' ? 'Regulamin (EULA)' : 'Terms of Service (EULA)')}
         >
-          <Text style={styles.infoLabel}>Regulamin (EULA)</Text>
-          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>Otwórz ↗</Text>
+          <Text style={styles.infoLabel}>{t.paywall?.eulaLabel || (language === 'pl' ? 'Regulamin (EULA)' : 'Terms of Service (EULA)')}</Text>
+          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>{language === 'pl' ? 'Otwórz ↗' : 'Open ↗'}</Text>
         </Pressable>
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
           onPress={() => Linking.openURL('mailto:kontakt@apps4brew.pl')}
+          accessibilityRole="link"
+          accessibilityLabel={language === 'pl' ? 'Kontakt i Wsparcie' : 'Contact & Support'}
         >
-          <Text style={styles.infoLabel}>Kontakt i Wsparcie</Text>
+          <Text style={styles.infoLabel}>{language === 'pl' ? 'Kontakt i Wsparcie' : 'Contact & Support'}</Text>
           <Text style={[styles.infoValue, { color: theme.colors.copper }]}>kontakt@apps4brew.pl ↗</Text>
         </Pressable>
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
           onPress={() => Linking.openURL('https://apps.apple.com/app/id6470000000?action=write-review')}
+          accessibilityRole="link"
+          accessibilityLabel={language === 'pl' ? 'Oceń w App Store' : 'Rate in App Store'}
         >
-          <Text style={styles.infoLabel}>Oceń w App Store</Text>
-          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>Wystaw ocenę ↗</Text>
+          <Text style={styles.infoLabel}>{language === 'pl' ? 'Oceń w App Store' : 'Rate in App Store'}</Text>
+          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>{language === 'pl' ? 'Wystaw ocenę ↗' : 'Write review ↗'}</Text>
         </Pressable>
       </View>
 

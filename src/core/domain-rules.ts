@@ -25,9 +25,12 @@ export interface BedtimeCaffeineEvaluation {
 
 export interface TasteDiagnosis {
   issue: string;
+  issueEn?: string;
   recommendationPl: string;
+  recommendationEn?: string;
   grindAdjustment?: 'finer' | 'coarser';
   tempAdjustment?: 'higher' | 'lower';
+  steepTimeAdjustmentSeconds?: number;
 }
 
 /**
@@ -248,7 +251,9 @@ export function calculateHoursUntilSafeCaffeine(doseMg: number, safeThresholdMg 
 
 export interface TasteDiagnosis {
   issue: string;
+  issueEn?: string;
   recommendationPl: string;
+  recommendationEn?: string;
   grindAdjustment?: 'finer' | 'coarser';
   tempAdjustment?: 'higher' | 'lower';
   steepTimeAdjustmentSeconds?: number;
@@ -279,7 +284,9 @@ export function diagnoseExtractionTaste(params: {
   if (params.isSour) {
     diagnoses.push({
       issue: 'Zbyt kwaśna / cierpka (Niedoparzenie)',
+      issueEn: 'Too sour / astringent (Under-extracted)',
       recommendationPl: 'Zmiel drobniej (np. -2 kliki na młynku) lub podwyższ temperaturę wody o 2°C, aby zwiększyć ekstrakcję cukrów.',
+      recommendationEn: 'Grind finer (e.g. -2 clicks on grinder) or raise water temperature by 2°C to increase sweetness extraction.',
       grindAdjustment: 'finer',
       tempAdjustment: 'higher',
     });
@@ -288,7 +295,9 @@ export function diagnoseExtractionTaste(params: {
   if (params.isBitter || params.isAstringent) {
     diagnoses.push({
       issue: 'Gorzka / sucha w ustach (Przeparzenie)',
+      issueEn: 'Bitter / dry mouthfeel (Over-extracted)',
       recommendationPl: 'Zmiel grubiej (np. +2 kliki na młynku) lub obniż temperaturę wody o 2-3°C, aby ograniczyć wymywanie tanin i gorzkich kwasów.',
+      recommendationEn: 'Grind coarser (e.g. +2 clicks on grinder) or lower water temperature by 2-3°C to reduce harsh tannins.',
       grindAdjustment: 'coarser',
       tempAdjustment: 'lower',
     });
@@ -297,14 +306,18 @@ export function diagnoseExtractionTaste(params: {
   if (params.isWatery) {
     diagnoses.push({
       issue: 'Płaska / rozwodniona (Za niska doza lub za gruby przemiał)',
+      issueEn: 'Flat / watery (Under-dosed or too coarse)',
       recommendationPl: 'Zwiększ dozę kawy o +1g lub zmniejsz współczynnik ratio (np. z 1:17 na 1:15.5).',
+      recommendationEn: 'Increase coffee dose by +1g or tighten brew ratio (e.g. from 1:17 to 1:15.5).',
     });
   }
 
   if (params.isTooIntense) {
     diagnoses.push({
       issue: 'Zbyt ciężka / przytłaczająca',
+      issueEn: 'Too heavy / overwhelming',
       recommendationPl: 'Wydłuż ratio (np. z 1:15 na 1:16.6) dodając więcej wody, by otworzyć bukiet aromatyczny.',
+      recommendationEn: 'Lengthen brew ratio (e.g. from 1:15 to 1:16.6) with more water to open aromatic clarity.',
     });
   }
 
@@ -325,7 +338,9 @@ export function diagnoseTeaTaste(params: {
   if (params.isScaldedOrCooked) {
     diagnoses.push({
       issue: 'Poparzone liście / ugotowany posmak (Za gorąca woda)',
+      issueEn: 'Scalded leaves / cooked taste (Water too hot)',
       recommendationPl: 'Obniż temperaturę wody do 70–80°C dla zielonej/białej herbaty, aby chronić aminokwasy L-teaniny i zapobiec gorzkiemu wyciekowi katechin.',
+      recommendationEn: 'Lower water temperature to 70-80°C for green/white tea to protect L-theanine amino acids and prevent bitter catechin leaching.',
       tempAdjustment: 'lower',
       steepTimeAdjustmentSeconds: -5,
     });
@@ -334,7 +349,9 @@ export function diagnoseTeaTaste(params: {
   if (params.isBitterOrAstringent) {
     diagnoses.push({
       issue: 'Nadmierna ściągająca cierpkość (Zbyt długa infuzja lub za duża doza)',
+      issueEn: 'Excessive astringent bitterness (Steep too long or dose too high)',
       recommendationPl: 'Skróć czas parzenia o 5–10 sekund w metodzie Gongfu Cha lub obniż temperaturę wody o 3–5°C.',
+      recommendationEn: 'Shorten steep time by 5-10 seconds in Gongfu Cha or reduce water temperature by 3-5°C.',
       tempAdjustment: 'lower',
       steepTimeAdjustmentSeconds: -10,
     });
@@ -343,7 +360,9 @@ export function diagnoseTeaTaste(params: {
   if (params.isWeakOrWatery) {
     diagnoses.push({
       issue: 'Zbyt wodnisty / brak głębi aromatu (Niedostateczna infuzja)',
+      issueEn: 'Too watery / lack of aroma depth (Under-extracted infusion)',
       recommendationPl: 'Wydłuż czas parzenia o 10–15 sekund lub podnieś temperaturę wody o 3–5°C (szczególnie dla dojrzałych puerhów i oolongów skalnych).',
+      recommendationEn: 'Lengthen steep time by 10-15 seconds or raise water temperature by 3-5°C (especially for aged puerh and rock oolong).',
       tempAdjustment: 'higher',
       steepTimeAdjustmentSeconds: 15,
     });

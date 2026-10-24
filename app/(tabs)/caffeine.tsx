@@ -29,6 +29,7 @@ import {
 } from '../../src/core/domain-rules';
 import { CaffeineCurveChart } from '../../src/core/caffeine-chart';
 import { theme } from '../../src/core/theme';
+import { useTranslation } from '../../src/core/i18n';
 import { getHealthKitSyncEnabled } from '../../src/core/healthkit';
 import { useAppAccess } from '../../src/core/app-access';
 import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
@@ -37,6 +38,7 @@ import { CaffeineLogList } from '../../src/components/caffeine/CaffeineLogList';
 import { CaffeineQuickAddModal } from '../../src/components/caffeine/CaffeineQuickAddModal';
 
 export default function CaffeineScreen() {
+  const { t, language } = useTranslation();
   const { canCreate, isHistoryReadOnly, refresh } = useAppAccess();
   const [showPaywall, setShowPaywall] = useState(false);
   const unitSystem = getUnitSystem();
@@ -172,22 +174,30 @@ export default function CaffeineScreen() {
       {isHistoryReadOnly && (
         <View style={styles.readOnlyBanner}>
           <Text style={styles.readOnlyBannerText}>
-            Tryb Tylko do Odczytu — Twoja historia kofeiny jest bezpieczna. Nowe wpisy wymagają Apps4Brew Pass.
+            {t.caffeine.readOnlyNotice || (language === 'pl'
+              ? 'Tryb Tylko do Odczytu — Twoja historia kofeiny jest bezpieczna. Nowe wpisy wymagają Apps4Brew Pass.'
+              : 'Read-Only Mode — Your caffeine logs are secure. New entries require Apps4Brew Pass.')}
           </Text>
         </View>
       )}
 
       {/* Karta Stężenia Kofeiny Teraz */}
       <View style={styles.summaryCard}>
-        <Text style={styles.summaryLabel}>AKTYWNA KOFEINA W KRWIOBIEGU</Text>
+        <Text style={styles.summaryLabel}>
+          {t.caffeine.activeCaffeineTitle || (language === 'pl' ? 'AKTYWNA KOFEINA W KRWIOBIEGU' : 'ACTIVE CAFFEINE IN BLOODSTREAM')}
+        </Text>
         <Text style={styles.activeCaffeineNumber}>
           {Math.round(currentTotalMg)} mg
         </Text>
         <Text style={styles.summarySub}>
-          Dobowy bilans: {Math.round(totalConsumedTodayMg)} mg / 400 mg (EFSA 2015)
+          {(t.caffeine.dailyTotalLabel || (language === 'pl' ? 'Dobowy bilans: {current} mg / {max} mg (EFSA 2015)' : 'Daily total: {current} mg / {max} mg (EFSA 2015)'))
+            .replace('{current}', String(Math.round(totalConsumedTodayMg)))
+            .replace('{max}', '400')}
         </Text>
         <Text style={styles.efsaNoteText}>
-          Limit dzienny (EFSA 2015): 400 mg dla zdrowych dorosłych (maks. 200 mg w jednej dawce) · 200 mg w ciąży i podczas laktacji.
+          {t.caffeine.efsaDisclaimer || (language === 'pl'
+            ? 'Limit dzienny (EFSA 2015): 400 mg dla zdrowych dorosłych (maks. 200 mg w jednej dawce) · 200 mg w ciąży i podczas laktacji.'
+            : 'Daily limit (EFSA 2015): 400 mg for healthy adults (max 200 mg single dose) · 200 mg during pregnancy & lactation.')}
         </Text>
 
         <View style={styles.efsaProgressBar}>

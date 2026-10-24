@@ -165,34 +165,34 @@ export default function DialInScreen() {
       {/* 1. DIAL-IN DOCTOR */}
       {activeTab === 'doctor' && (
         <View>
-          <Text style={styles.sectionHeader}>Diagnoza Niepożądanego Smaku</Text>
+          <Text style={styles.sectionHeader}>{t.dialin?.issueDiagnosisTitle || 'Diagnoza Niepożądanego Smaku'}</Text>
           <Text style={styles.sectionSub}>
-            Wybierz dominujący problem w filiżance. Kompas ekstrakcji wskaże precyzyjną korektę mielenia i temperatury.
+            {t.dialin?.issueDiagnosisSubtitle || 'Wybierz dominujący problem w filiżance. Kompas ekstrakcji wskaże precyzyjną korektę mielenia i temperatury.'}
           </Text>
 
           <View style={styles.issuesList}>
             {[
               {
                 id: 'sour',
-                title: 'Zbyt kwaśna / ostra / trawiasta',
-                desc: 'Brak słodyczy, cierpki finisz, cytrynowa kwasowość.',
+                title: t.dialin?.issueSourTitle || 'Zbyt kwaśna / ostra / trawiasta',
+                desc: t.dialin?.issueSourDesc || 'Brak słodyczy, cierpki finisz, cytrynowa kwasowość.',
               },
               {
                 id: 'bitter',
-                title: 'Za gorzka / ściągająca / sucha',
-                desc: 'Wrażenie suchości na języku (ashy), popiołowość, ciemna gorycz.',
+                title: t.dialin?.issueBitterTitle || 'Za gorzka / ściągająca / sucha',
+                desc: t.dialin?.issueBitterDesc || 'Wrażenie suchości na języku (ashy), popiołowość, ciemna gorycz.',
               },
               {
                 id: 'weak',
-                title: 'Płaska / mdła / wodnista',
-                desc: 'Brak ciała, herbaciana konsystencja bez wyrazistej słodyczy.',
+                title: t.dialin?.issueWeakTitle || 'Płaska / mdła / wodnista',
+                desc: t.dialin?.issueWeakDesc || 'Brak ciała, herbaciana konsystencja bez wyrazistej słodyczy.',
               },
               ...(beveragePreference !== 'coffee'
                 ? [
                     {
                       id: 'astringent_tea',
-                      title: 'Herbata ściągająca gardło',
-                      desc: 'Zbyt wysoka temperatura zniszczyła subtelne katechiny i l-teaninę.',
+                      title: t.dialin?.issueTeaAstringentTitle || 'Herbata ściągająca gardło',
+                      desc: t.dialin?.issueTeaAstringentDesc || 'Zbyt wysoka temperatura zniszczyła subtelne katechiny i l-teaninę.',
                     },
                   ]
                 : []),
@@ -214,33 +214,33 @@ export default function DialInScreen() {
           {/* Wynik diagnozy */}
           <View style={styles.diagnosisCard}>
             <View style={styles.diagHeaderRow}>
-              <Text style={styles.diagBadge}>RECEPTA SENSORYCZNA</Text>
-              <Text style={styles.diagProblem}>{diagnosis.issue}</Text>
+              <Text style={styles.diagBadge}>{t.dialin?.recipeSensoryBadge || 'RECEPTA SENSORYCZNA'}</Text>
+              <Text style={styles.diagProblem}>{language === 'pl' ? diagnosis.issue : (diagnosis.issueEn || diagnosis.issue)}</Text>
             </View>
 
             <Text style={styles.diagRecommendation}>
-              {diagnosis.recommendationPl}
+              {language === 'pl' ? diagnosis.recommendationPl : (diagnosis.recommendationEn || diagnosis.recommendationPl)}
             </Text>
 
             <View style={styles.diagActionRow}>
               {diagnosis.grindAdjustment && (
                 <View style={styles.diagActionBox}>
-                  <Text style={styles.diagActionLabel}>KOREKTA MIELENIA</Text>
+                  <Text style={styles.diagActionLabel}>{t.dialin?.grindCorrection || 'KOREKTA MIELENIA'}</Text>
                   <Text style={styles.diagActionVal}>
                     {diagnosis.grindAdjustment === 'finer'
-                      ? '▼ Zmiel drobniej (o 2–3 kliki)'
-                      : '▲ Zmiel grubiej (o 2–4 kliki)'}
+                      ? (t.dialin?.grindFiner || '▼ Zmiel drobniej (o 2–3 kliki)')
+                      : (t.dialin?.grindCoarser || '▲ Zmiel grubiej (o 2–4 kliki)')}
                   </Text>
                 </View>
               )}
 
               {diagnosis.tempAdjustment && (
                 <View style={styles.diagActionBox}>
-                  <Text style={styles.diagActionLabel}>TEMPERATURA WODY</Text>
+                  <Text style={styles.diagActionLabel}>{t.dialin?.waterTemp || 'TEMPERATURA WODY'}</Text>
                   <Text style={styles.diagActionVal}>
                     {diagnosis.tempAdjustment === 'higher'
-                      ? (unitSystem === 'imperial' ? 'Podnieś o +4°F do 203°F' : 'Podnieś o +2°C do 95°C')
-                      : (unitSystem === 'imperial' ? 'Obniż o 4–7°F' : 'Obniż o 2–4°C')}
+                      ? (unitSystem === 'imperial' ? (t.dialin?.tempHigherImperial || 'Podnieś o +4°F do 203°F') : (t.dialin?.tempHigherMetric || 'Podnieś o +2°C do 95°C'))
+                      : (unitSystem === 'imperial' ? (t.dialin?.tempLowerImperial || 'Obniż o 4–7°F') : (t.dialin?.tempLowerMetric || 'Obniż o 2–4°C'))}
                   </Text>
                 </View>
               )}

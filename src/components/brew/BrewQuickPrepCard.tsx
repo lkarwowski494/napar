@@ -45,7 +45,7 @@ export function BrewQuickPrepCard({
   batchScaling,
   unitSystem = 'metric',
 }: BrewQuickPrepCardProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const currentRatioNum = doseGrams > 0 ? (waterGrams / doseGrams).toFixed(1) : '16.7';
   const currentRatioVal = parseFloat(currentRatioNum);
 
@@ -58,7 +58,9 @@ export function BrewQuickPrepCard({
           {servings > 1 && (
             <View style={styles.batchBadge}>
               <Text style={styles.batchBadgeText}>
-                {`+${batchScaling.grindAdjustmentClicks} kliki grubiej`}
+                {language === 'en'
+                  ? `+${batchScaling.grindAdjustmentClicks} clicks coarser`
+                  : `+${batchScaling.grindAdjustmentClicks} kliki grubiej`}
               </Text>
             </View>
           )}
@@ -104,7 +106,7 @@ export function BrewQuickPrepCard({
       <View style={styles.parametersRow}>
         {/* 1. Doza */}
         <View style={styles.paramBox}>
-          <Text style={styles.paramEyebrow}>DOZA</Text>
+          <Text style={styles.paramEyebrow}>{language === 'en' ? 'DOSE' : 'DOZA'}</Text>
           <View style={styles.stepperRow}>
             <Pressable
               style={styles.stepBtn}
@@ -112,7 +114,7 @@ export function BrewQuickPrepCard({
               disabled={disabled}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               accessibilityRole="button"
-              accessibilityLabel="Zmniejsz dozę kawy"
+              accessibilityLabel={language === 'en' ? 'Decrease coffee dose' : 'Zmniejsz dozę kawy'}
             >
               <Text style={styles.stepBtnText}>−</Text>
             </Pressable>
@@ -123,7 +125,7 @@ export function BrewQuickPrepCard({
               disabled={disabled}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               accessibilityRole="button"
-              accessibilityLabel="Zwiększ dozę kawy"
+              accessibilityLabel={language === 'en' ? 'Increase coffee dose' : 'Zwiększ dozę kawy'}
             >
               <Text style={styles.stepBtnText}>+</Text>
             </Pressable>
@@ -135,7 +137,7 @@ export function BrewQuickPrepCard({
 
         {/* 2. Woda łącznie ze stepperem ±10g */}
         <View style={styles.paramBox}>
-          <Text style={styles.paramEyebrow}>WODA</Text>
+          <Text style={styles.paramEyebrow}>{language === 'en' ? 'WATER' : 'WODA'}</Text>
           <View style={styles.stepperRow}>
             {onWaterChange && (
               <Pressable
@@ -144,7 +146,7 @@ export function BrewQuickPrepCard({
                 disabled={disabled}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 accessibilityRole="button"
-                accessibilityLabel="Zmniejsz ilość wody"
+                accessibilityLabel={language === 'en' ? 'Decrease water' : 'Zmniejsz ilość wody'}
               >
                 <Text style={styles.stepBtnText}>−</Text>
               </Pressable>
@@ -159,7 +161,7 @@ export function BrewQuickPrepCard({
                 disabled={disabled}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 accessibilityRole="button"
-                accessibilityLabel="Zwiększ ilość wody"
+                accessibilityLabel={language === 'en' ? 'Increase water' : 'Zwiększ ilość wody'}
               >
                 <Text style={styles.stepBtnText}>+</Text>
               </Pressable>
@@ -172,9 +174,9 @@ export function BrewQuickPrepCard({
 
         {/* 3. Temperatura i profil zmielenia */}
         <View style={styles.paramBox}>
-          <Text style={styles.paramEyebrow}>TEMP / MIELENIE</Text>
+          <Text style={styles.paramEyebrow}>{language === 'en' ? 'TEMP / GRIND' : 'TEMP / MIELENIE'}</Text>
           <Text style={styles.paramSubValue}>
-            {`${formatTemperature(waterTempCelsius, unitSystem)} · ${grindSetting || 'Średnio'}`}
+            {`${formatTemperature(waterTempCelsius, unitSystem)} · ${grindSetting || (language === 'en' ? 'Medium' : 'Średnio')}`}
           </Text>
         </View>
       </View>
@@ -183,14 +185,14 @@ export function BrewQuickPrepCard({
       {onWaterChange && (
         <View style={styles.ratioSection}>
           <View style={styles.ratioHeaderRow}>
-            <Text style={styles.ratioSectionTitle}>PROPORCJA (RATIO)</Text>
+            <Text style={styles.ratioSectionTitle}>{language === 'en' ? 'RATIO' : 'PROPORCJA (RATIO)'}</Text>
             <Text style={styles.currentRatioBadge}>{`1 : ${currentRatioNum}`}</Text>
           </View>
           <View style={styles.ratioChipsRow}>
             {[
-              { ratio: 15.0, label: '1:15', desc: 'Mocna' },
-              { ratio: 16.7, label: '1:16.7', desc: 'Złoty Standard' },
-              { ratio: 18.0, label: '1:18', desc: 'Lekka' },
+              { ratio: 15.0, label: '1:15', desc: language === 'en' ? 'Strong' : 'Mocna' },
+              { ratio: 16.7, label: '1:16.7', desc: language === 'en' ? 'Golden Standard' : 'Złoty Standard' },
+              { ratio: 18.0, label: '1:18', desc: language === 'en' ? 'Light' : 'Lekka' },
             ].map((r) => {
               const isActive = Math.abs(currentRatioVal - r.ratio) < 0.35;
               return (

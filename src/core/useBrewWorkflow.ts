@@ -269,8 +269,11 @@ export function useBrewWorkflow() {
       if (item) selectInventoryItem(item);
     }
     Alert.alert(
-      'Załadowano parametry!',
-      `Receptura "${s.recipeName || s.method}" (${s.doseGrams}g / ${s.waterGrams}g) jest gotowa.`
+      t.brew.paramsLoaded || 'Załadowano parametry!',
+      (t.brew.recipeLoadedDesc || 'Receptura "{name}" ({dose}g / {water}g) jest gotowa.')
+        .replace('{name}', s.recipeName || s.method)
+        .replace('{dose}', String(s.doseGrams))
+        .replace('{water}', String(s.waterGrams))
     );
   };
 
@@ -287,9 +290,12 @@ export function useBrewWorkflow() {
       selectedInventoryItem.remainingWeightGrams < doseGrams
     ) {
       confirmAction({
-        title: 'Mało ziaren w paczce!',
-        message: `W paczce "${selectedInventoryItem.name}" pozostało tylko ${selectedInventoryItem.remainingWeightGrams}g, a doza wymaga ${doseGrams}g. Czy chcesz zaparzyć blend z innymi ziarnami?`,
-        actionText: 'Parz Blend',
+        title: t.brew.lowBeansTitle || 'Mało ziaren w paczce!',
+        message: (t.brew.lowBeansDesc || 'W paczce "{name}" pozostało tylko {remaining}g, a doza wymaga {dose}g. Czy chcesz zaparzyć blend z innymi ziarnami?')
+          .replace('{name}', selectedInventoryItem.name)
+          .replace('{remaining}', String(selectedInventoryItem.remainingWeightGrams))
+          .replace('{dose}', String(doseGrams)),
+        actionText: t.brew.brewBlendAction || 'Parz Blend',
         onConfirm: () => startTimer(),
       });
       return;
@@ -310,14 +316,15 @@ export function useBrewWorkflow() {
         refreshData();
         selectRecipe(decoded.recipe);
         Alert.alert(
-          'Zeskanowano recepturę!',
-          `Receptura "${decoded.recipe.name}" została zapisana w Twojej bazie.`
+          t.brew.scanSuccessTitle || 'Zeskanowano recepturę!',
+          (t.brew.scanSuccessDesc || 'Receptura "{name}" została zapisana w Twojej bazie.')
+            .replace('{name}', decoded.recipe.name)
         );
       } else {
-        Alert.alert('Nie udało się zeskanować', 'Kod QR nie zawiera prawidłowej receptury Napar.');
+        Alert.alert(t.brew.scanErrorTitle || 'Nie udało się zeskanować', t.brew.scanErrorInvalid || 'Kod QR nie zawiera prawidłowej receptury Napar.');
       }
     } catch {
-      Alert.alert('Nie udało się zeskanować', 'Nie udało się przetworzyć danych z kodu QR.');
+      Alert.alert(t.brew.scanErrorTitle || 'Nie udało się zeskanować', t.brew.scanErrorProcess || 'Nie udało się przetworzyć danych z kodu QR.');
     }
   };
 
@@ -403,7 +410,7 @@ export function useBrewWorkflow() {
     recordBrew();
     setShowFinishModal(false);
     resetTimer();
-    Alert.alert('Zapisano!', 'Sesja parzenia została utrwalona w Twoim Dzienniku.');
+    Alert.alert(t.brew.savedSessionTitle || 'Zapisano!', t.brew.savedSessionDesc || 'Sesja parzenia została utrwalona w Twoim Dzienniku.');
   };
 
   const toggleTag = (tag: string) => {

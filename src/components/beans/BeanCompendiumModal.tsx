@@ -40,7 +40,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
   beveragePreference,
   onUseTemplate,
 }) => {
-  const { language } = useTranslation();
+  const { t, language } = useTranslation();
   const isEn = language === 'en';
   const [compendiumTab, setCompendiumTab] = useState<'varieties' | 'processes' | 'origins' | 'tea'>(() => {
     return beveragePreference === 'tea' ? 'tea' : 'varieties';
@@ -65,8 +65,8 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
       <SafeAreaView style={styles.compendiumModalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <View style={styles.modalHeader}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.modalTitle}>Kompendium Wiedzy</Text>
-            <Text style={styles.compendiumHeaderSub}>Odmiany botaniczne, obróbki, terroir i herbaty</Text>
+            <Text style={styles.modalTitle}>{t.stash?.compendium || (isEn ? 'Knowledge Compendium' : 'Kompendium Wiedzy')}</Text>
+            <Text style={styles.compendiumHeaderSub}>{t.stash?.compendiumSubtitle || (isEn ? 'Botanical varieties, processes, terroir and tea' : 'Odmiany botaniczne, obróbki, terroir i herbaty')}</Text>
           </View>
           <Pressable
             testID="compendium-close-button"
@@ -74,9 +74,9 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
             onPress={onClose}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             accessibilityRole="button"
-            accessibilityLabel="Zamknij"
+            accessibilityLabel={t.common?.close || (isEn ? 'Close' : 'Zamknij')}
           >
-            <Text style={styles.modalCloseText}>Zamknij</Text>
+            <Text style={styles.modalCloseText}>{t.common?.close || (isEn ? 'Close' : 'Zamknij')}</Text>
           </Pressable>
         </View>
 
@@ -84,7 +84,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
         <View style={styles.compendiumSearchBox}>
           <TextInput
             style={styles.compendiumSearchInput}
-            placeholder="Szukaj odmiany, kraju, nuty lub herbaty..."
+            placeholder={isEn ? 'Search variety, origin, flavor or tea...' : 'Szukaj odmiany, kraju, nuty lub herbaty...'}
             placeholderTextColor={theme.colors.textMuted}
             value={compendiumSearch}
             onChangeText={setCompendiumSearch}
@@ -100,7 +100,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 onPress={() => setCompendiumTab('varieties')}
               >
                 <Text style={[styles.compTabText, compendiumTab === 'varieties' && styles.compTabTextActive]}>
-                  Odmiany ({filteredVarieties.length})
+                  {isEn ? `Varieties (${filteredVarieties.length})` : `Odmiany (${filteredVarieties.length})`}
                 </Text>
               </Pressable>
               <Pressable
@@ -108,7 +108,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 onPress={() => setCompendiumTab('processes')}
               >
                 <Text style={[styles.compTabText, compendiumTab === 'processes' && styles.compTabTextActive]}>
-                  Obróbki ({filteredProcesses.length})
+                  {isEn ? `Processes (${filteredProcesses.length})` : `Obróbki (${filteredProcesses.length})`}
                 </Text>
               </Pressable>
               <Pressable
@@ -116,7 +116,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 onPress={() => setCompendiumTab('origins')}
               >
                 <Text style={[styles.compTabText, compendiumTab === 'origins' && styles.compTabTextActive]}>
-                  Terroir ({filteredOrigins.length})
+                  {isEn ? `Terroir (${filteredOrigins.length})` : `Terroir (${filteredOrigins.length})`}
                 </Text>
               </Pressable>
             </>
@@ -127,7 +127,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
               onPress={() => setCompendiumTab('tea')}
             >
               <Text style={[styles.compTabText, compendiumTab === 'tea' && styles.compTabTextActive]}>
-                Herbaty ({filteredTeas.length})
+                {isEn ? `Teas (${filteredTeas.length})` : `Herbaty (${filteredTeas.length})`}
               </Text>
             </Pressable>
           )}
@@ -142,15 +142,15 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                   <Text style={styles.compCardTitle}>{v.name}</Text>
                   <Text style={styles.compCardTag}>{v.recommendedRoast}</Text>
                 </View>
-                <Text style={styles.compCardSub}>Pochodzenie: {v.nativeRegion}</Text>
-                <Text style={styles.compCardLineage}>Rodowód: {v.geneticLineage}</Text>
+                <Text style={styles.compCardSub}>{isEn ? `Origin: ${v.nativeRegion}` : `Pochodzenie: ${v.nativeRegion}`}</Text>
+                <Text style={styles.compCardLineage}>{isEn ? `Lineage: ${v.geneticLineage}` : `Rodowód: ${v.geneticLineage}`}</Text>
                 <Text style={styles.compCardSensory}>{(isEn && v.sensoryProfileEn) ? v.sensoryProfileEn : v.sensoryProfilePl}</Text>
                 <Text style={styles.compCardDesc}>{(isEn && v.descriptionEn) ? v.descriptionEn : v.descriptionPl}</Text>
 
                 <View style={styles.badgesRow}>
-                  <View style={styles.badgePill}><Text style={styles.badgeText}>Kwasowość: {v.cupCharacteristics.acidity}</Text></View>
-                  <View style={styles.badgePill}><Text style={styles.badgeText}>Body: {v.cupCharacteristics.body}</Text></View>
-                  <View style={styles.badgePill}><Text style={styles.badgeText}>Słodycz: {v.cupCharacteristics.sweetness}</Text></View>
+                  <View style={styles.badgePill}><Text style={styles.badgeText}>{isEn ? `Acidity: ${v.cupCharacteristics.acidity}` : `Kwasowość: ${v.cupCharacteristics.acidity}`}</Text></View>
+                  <View style={styles.badgePill}><Text style={styles.badgeText}>{isEn ? `Body: ${v.cupCharacteristics.body}` : `Body: ${v.cupCharacteristics.body}`}</Text></View>
+                  <View style={styles.badgePill}><Text style={styles.badgeText}>{isEn ? `Sweetness: ${v.cupCharacteristics.sweetness}` : `Słodycz: ${v.cupCharacteristics.sweetness}`}</Text></View>
                 </View>
 
                 <View style={styles.notesTagsRow}>
@@ -170,7 +170,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                     })
                   }
                 >
-                  <Text style={styles.compUseBtnText}>+ Użyj jako szablon w spiżarni</Text>
+                  <Text style={styles.compUseBtnText}>{isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni'}</Text>
                 </Pressable>
               </View>
             ))}
@@ -180,9 +180,9 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
               <View key={p.id} style={styles.compCard}>
                 <View style={styles.compCardHeader}>
                   <Text style={styles.compCardTitle}>{p.name}</Text>
-                  <Text style={styles.compCardTag}>Suszenie: {p.dryingDurationDays}</Text>
+                  <Text style={styles.compCardTag}>{isEn ? `Drying: ${p.dryingDurationDays}` : `Suszenie: ${p.dryingDurationDays}`}</Text>
                 </View>
-                <Text style={styles.compCardSub}>Zużycie wody: {p.waterConsumption}</Text>
+                <Text style={styles.compCardSub}>{isEn ? `Water consumption: ${p.waterConsumption}` : `Zużycie wody: ${p.waterConsumption}`}</Text>
                 <Text style={styles.compCardSensory}>{(isEn && p.sensoryImpactEn) ? p.sensoryImpactEn : p.sensoryImpactPl}</Text>
                 <Text style={styles.compCardDesc}>{(isEn && p.descriptionEn) ? p.descriptionEn : p.descriptionPl}</Text>
 
@@ -201,8 +201,8 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                   <Text style={styles.compCardTitle}>{`${o.country} (${o.countryCode})`}</Text>
                   <Text style={styles.compCardTag}>{o.typicalAltitudeMeters}</Text>
                 </View>
-                <Text style={styles.compCardSub}>Główne regiony: {o.primaryRegions.join(', ')}</Text>
-                <Text style={styles.compCardLineage}>Zbiory: {o.harvestMonths} · Odmiany: {o.mainVarieties.join(', ')}</Text>
+                <Text style={styles.compCardSub}>{isEn ? `Primary regions: ${o.primaryRegions.join(', ')}` : `Główne regiony: ${o.primaryRegions.join(', ')}`}</Text>
+                <Text style={styles.compCardLineage}>{isEn ? `Harvest: ${o.harvestMonths} · Varieties: ${o.mainVarieties.join(', ')}` : `Zbiory: ${o.harvestMonths} · Odmiany: ${o.mainVarieties.join(', ')}`}</Text>
                 <Text style={styles.compCardSensory}>{(isEn && o.flavorProfileEn) ? o.flavorProfileEn : o.flavorProfilePl}</Text>
                 <Text style={styles.compCardDesc}>{(isEn && o.descriptionEn) ? o.descriptionEn : o.descriptionPl}</Text>
 
@@ -217,7 +217,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                     })
                   }
                 >
-                  <Text style={styles.compUseBtnText}>+ Użyj jako szablon w spiżarni</Text>
+                  <Text style={styles.compUseBtnText}>{isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni'}</Text>
                 </Pressable>
               </View>
             ))}
@@ -226,13 +226,13 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
             filteredTeas.map((t) => (
               <View key={t.id} style={styles.compCard}>
                 <View style={styles.compCardHeader}>
-                  <Text style={styles.compCardTitle}>{`${t.namePl} · ${t.traditionalName}`}</Text>
-                  <Text style={styles.compCardTag}>Oksydacja: {t.oxidationRangePercent}</Text>
+                  <Text style={styles.compCardTitle}>{`${isEn && t.nameEn ? t.nameEn : t.namePl} · ${t.traditionalName}`}</Text>
+                  <Text style={styles.compCardTag}>{isEn ? `Oxidation: ${t.oxidationRangePercent}` : `Oksydacja: ${t.oxidationRangePercent}`}</Text>
                 </View>
-                <Text style={styles.compCardSub}>Temperatura parzenia: {t.waterTemperatureCelsius}°C</Text>
-                <Text style={styles.compCardLineage}>Metoda Sha Qing: {t.killGreenMethod}</Text>
+                <Text style={styles.compCardSub}>{isEn ? `Brewing temp: ${t.waterTemperatureCelsius}°C` : `Temperatura parzenia: ${t.waterTemperatureCelsius}°C`}</Text>
+                <Text style={styles.compCardLineage}>{isEn ? `Sha Qing method: ${t.killGreenMethod}` : `Metoda Sha Qing: ${t.killGreenMethod}`}</Text>
                 <Text style={styles.compCardSensory}>{(isEn && t.sensoryProfileEn) ? t.sensoryProfileEn : t.sensoryProfilePl}</Text>
-                <Text style={styles.compCardDesc}>Słynne odmiany: {t.famousVarietiesPl.join(', ')}</Text>
+                <Text style={styles.compCardDesc}>{isEn ? `Famous varieties: ${t.famousVarietiesPl.join(', ')}` : `Słynne odmiany: ${t.famousVarietiesPl.join(', ')}`}</Text>
                 <Text style={styles.compCardHealth}>{t.healthAttributesPl}</Text>
 
                 <Pressable
@@ -246,7 +246,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                     })
                   }
                 >
-                  <Text style={styles.compUseBtnText}>+ Użyj jako szablon w spiżarni</Text>
+                  <Text style={styles.compUseBtnText}>{isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni'}</Text>
                 </Pressable>
               </View>
             ))}

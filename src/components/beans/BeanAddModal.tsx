@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
+import { useTranslation } from '../../core/i18n';
 import { saveInventoryItem, getUnitSystem } from '../../core/database';
 import { ouncesToGrams } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
@@ -37,6 +38,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
   presetTemplate,
   onSaved,
 }) => {
+  const { t } = useTranslation();
   const unitSystem = getUnitSystem();
   const isImperial = unitSystem === 'imperial';
   const [name, setName] = useState('');
@@ -95,7 +97,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
       return;
     }
     if (!name.trim()) {
-      Alert.alert('Błąd', 'Podaj nazwę kawy lub herbaty.');
+      Alert.alert(t.common?.error || 'Błąd', t.stash?.nameError || 'Podaj nazwę kawy lub herbaty.');
       return;
     }
     const weightNum = parseFloat(initialWeight) || 250;
@@ -127,14 +129,14 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
     onSaved();
     onClose();
     resetForm();
-    Alert.alert('Dodano!', `Paczka "${newItem.name}" jest gotowa w spiżarni.`);
+    Alert.alert(t.stash?.addSuccessTitle || 'Dodano!', (t.stash?.addSuccess || 'Paczka "{name}" jest gotowa w spiżarni.').replace('{name}', newItem.name));
   };
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>Dodaj do Spiżarni</Text>
+          <Text style={styles.modalTitle}>{t.stash?.addTitle || 'Dodaj do Spiżarni'}</Text>
           <Pressable
             style={styles.modalCloseBtn}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -155,7 +157,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
                 onPress={() => setType('coffee')}
               >
                 <Text style={[styles.typeBtnText, type === 'coffee' && styles.typeBtnTextActive]}>
-                  Kawa ziarnista
+                  {t.stash?.typeCoffee || 'Kawa ziarnista'}
                 </Text>
               </Pressable>
               <Pressable
@@ -163,7 +165,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
                 onPress={() => setType('tea')}
               >
                 <Text style={[styles.typeBtnText, type === 'tea' && styles.typeBtnTextActive]}>
-                  Herbata liściasta
+                  {t.stash?.typeTea || 'Herbata liściasta'}
                 </Text>
               </Pressable>
             </View>
@@ -174,32 +176,32 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             onPress={onOpenCompendium}
           >
             <Text style={styles.compendiumPromptText}>
-              Szukasz inspiracji? Otwórz Bazę Wiedzy (odmiany, terroir, herbata)
+              {t.stash?.compendiumPrompt || 'Szukasz inspiracji? Otwórz Bazę Wiedzy (odmiany, terroir, herbata)'}
             </Text>
           </Pressable>
 
-          <Text style={styles.inputLabel}>Nazwa ziaren / herbaty *</Text>
+          <Text style={styles.inputLabel}>{t.stash?.nameLabel || 'Nazwa ziaren / herbaty *'}</Text>
           <TextInput
             style={styles.textInput}
-            placeholder="np. Etiopia Yirgacheffe Washed"
+            placeholder={t.stash?.namePlaceholder || 'np. Etiopia Yirgacheffe Washed'}
             placeholderTextColor={theme.colors.textMuted}
             value={name}
             onChangeText={setName}
           />
 
-          <Text style={styles.inputLabel}>Palarnia / Producent</Text>
+          <Text style={styles.inputLabel}>{t.stash?.roaster || 'Palarnia / Producent'}</Text>
           <TextInput
             style={styles.textInput}
-            placeholder="np. Hard Beans, Coffeedesk, Wuyi Star"
+            placeholder={t.stash?.roasterPlaceholder || 'np. Hard Beans, Coffeedesk, Wuyi Star'}
             placeholderTextColor={theme.colors.textMuted}
             value={roaster}
             onChangeText={setRoaster}
           />
 
-          <Text style={styles.inputLabel}>Kraj / Pochodzenie</Text>
+          <Text style={styles.inputLabel}>{t.stash?.origin || 'Kraj / Pochodzenie'}</Text>
           <TextInput
             style={styles.textInput}
-            placeholder="np. Yirgacheffe, Etiopia"
+            placeholder={t.stash?.originPlaceholder || 'np. Yirgacheffe, Etiopia'}
             placeholderTextColor={theme.colors.textMuted}
             value={origin}
             onChangeText={setOrigin}
@@ -207,20 +209,20 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
 
           <View style={styles.formRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.inputLabel}>Odmiana botaniczna</Text>
+              <Text style={styles.inputLabel}>{t.stash?.variety || 'Botaniczna odmiana'}</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="np. Geisha, SL28, Bourbon"
+                placeholder={t.stash?.varietyPlaceholder || 'np. Geisha, SL28, Bourbon'}
                 placeholderTextColor={theme.colors.textMuted}
                 value={variety}
                 onChangeText={setVariety}
               />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.inputLabel}>Obróbka (Process)</Text>
+              <Text style={styles.inputLabel}>{t.stash?.process || 'Obróbka'}</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="np. Washed, Natural, Honey"
+                placeholder={t.stash?.processPlaceholder || 'np. Washed, Natural, Honey'}
                 placeholderTextColor={theme.colors.textMuted}
                 value={process}
                 onChangeText={setProcess}
@@ -230,7 +232,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
 
           <View style={styles.formRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.inputLabel}>Data palenia / zbioru</Text>
+              <Text style={styles.inputLabel}>{t.stash?.roastDate || 'Data palenia / Zbioru'}</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="YYYY-MM-DD"
@@ -241,7 +243,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             </View>
 
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.inputLabel}>{isImperial ? 'Waga paczki (oz)' : 'Waga paczki (g)'}</Text>
+              <Text style={styles.inputLabel}>{isImperial ? (t.stash?.weightLabelImperial || 'Waga paczki (oz)') : (t.stash?.weightLabelMetric || 'Waga paczki (g)')}</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder={isImperial ? '8.8' : '250'}
@@ -253,10 +255,10 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             </View>
           </View>
 
-          <Text style={styles.inputLabel}>Nuty smakowe (po przecinku)</Text>
+          <Text style={styles.inputLabel}>{t.stash?.notesLabel || 'Nuty smakowe (po przecinku)'}</Text>
           <TextInput
             style={styles.textInput}
-            placeholder="np. jaśmin, brzoskwinia, bergamotka"
+            placeholder={t.stash?.notesPlaceholder || 'np. jaśmin, brzoskwinia, bergamotka'}
             placeholderTextColor={theme.colors.textMuted}
             value={notesStr}
             onChangeText={setNotesStr}

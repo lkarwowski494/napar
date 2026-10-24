@@ -98,8 +98,9 @@ export default function JournalScreen() {
 
   const handleDelete = (session: BrewSession) => {
     confirmAction({
-      title: 'Usuń wpis',
-      message: `Czy na pewno chcesz usunąć sesję "${session.recipeName || session.method}"?`,
+      title: t.journal.deleteEntryTitle || (language === 'pl' ? 'Usuń wpis' : 'Delete entry'),
+      message: (t.journal.deleteEntryMsg || (language === 'pl' ? 'Czy na pewno chcesz usunąć sesję "{name}"?' : 'Are you sure you want to delete session "{name}"?'))
+        .replace('{name}', session.recipeName || session.method),
       actionText: t.common.delete,
       destructive: true,
       onConfirm: () => {
@@ -140,7 +141,10 @@ export default function JournalScreen() {
       if (action.waterTempCelsius) setWaterTempCelsius(action.waterTempCelsius);
 
       router.navigate('/');
-      Alert.alert('Załadowano parametry parzenia', action.titlePl);
+      Alert.alert(
+        t.journal.paramsLoadedTitle || (language === 'pl' ? 'Załadowano parametry parzenia' : 'Brew parameters loaded'),
+        language === 'en' ? (action.titleEn || action.titlePl) : action.titlePl
+      );
     } catch {
       router.navigate('/');
     }

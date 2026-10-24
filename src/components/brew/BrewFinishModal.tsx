@@ -71,7 +71,8 @@ export function BrewFinishModal({
   onSkip,
   onSave,
 }: BrewFinishModalProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const curr = language === 'pl' ? 'PLN' : '$';
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -87,13 +88,13 @@ export function BrewFinishModal({
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 24 }}
           >
-            <Text style={styles.modalTitle}>Zakończono Parzenie!</Text>
+            <Text style={styles.modalTitle}>{t.brew?.finishModalTitle || 'Zakończono Parzenie!'}</Text>
             <Text style={styles.modalSub}>
-              {`Czas: ${formatTime(totalElapsedSeconds)} · Woda: ${Math.round(waterGrams)}g`}
+              {`${language === 'pl' ? 'Czas' : 'Time'}: ${formatTime(totalElapsedSeconds)} · ${language === 'pl' ? 'Woda' : 'Water'}: ${Math.round(waterGrams)}g`}
             </Text>
 
             {/* Ocena w gwiazdkach */}
-            <Text style={styles.sectionLabel}>Twoja Ocena</Text>
+            <Text style={styles.sectionLabel}>{t.brew?.yourRating || 'Twoja Ocena'}</Text>
             <View style={styles.starRow}>
               {[1, 2, 3, 4, 5].map((s) => (
                 <Pressable
@@ -101,7 +102,7 @@ export function BrewFinishModal({
                   testID={`star-rating-${s}`}
                   onPress={() => onChangeRating(s)}
                   accessibilityRole="button"
-                  accessibilityLabel={`Ocena ${s} z 5`}
+                  accessibilityLabel={(t.brew?.starRatingLabel || (language === 'pl' ? 'Ocena {rating} z 5' : 'Rating {rating} of 5')).replace('{rating}', String(s))}
                 >
                   <Text style={[styles.starIcon, rating >= s && styles.starActive]}>
                     ★
@@ -111,13 +112,13 @@ export function BrewFinishModal({
             </View>
 
             {/* Balans smaku */}
-            <Text style={styles.sectionLabel}>Profil Balansu</Text>
+            <Text style={styles.sectionLabel}>{t.brew?.tasteProfileLabel || 'Profil Balansu'}</Text>
             <View style={styles.balanceRow}>
               {[
-                { key: 'balanced', label: 'Zbalansowana' },
-                { key: 'sour', label: 'Za kwaśna' },
-                { key: 'bitter', label: 'Za gorzka' },
-                { key: 'weak', label: 'Wodnista' },
+                { key: 'balanced', label: t.brew?.tasteBalanced || 'Zbalansowana' },
+                { key: 'sour', label: t.brew?.tasteSour || 'Za kwaśna' },
+                { key: 'bitter', label: t.brew?.tasteBitter || 'Za gorzka' },
+                { key: 'weak', label: t.brew?.tasteWeak || 'Wodnista' },
               ].map((b) => (
                 <Pressable
                   key={b.key}
@@ -128,7 +129,7 @@ export function BrewFinishModal({
                   ]}
                   onPress={() => onChangeTasteBalance(b.key)}
                   accessibilityRole="button"
-                  accessibilityLabel={`Balans: ${b.label}`}
+                  accessibilityLabel={b.label}
                 >
                   <Text
                     style={[
@@ -147,12 +148,22 @@ export function BrewFinishModal({
               <View style={styles.doctorAdviceCard} testID="doctor-advice-sour">
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                   <CompassIcon size={14} color={theme.colors.copper} />
-                  <Text style={styles.doctorTitle}>Recepta Dial-in Doctor:</Text>
+                  <Text style={styles.doctorTitle}>{t.brew?.doctorRecipeTitle || 'Recepta Dial-in Doctor:'}</Text>
                 </View>
                 <Text style={styles.doctorText}>
-                  Za kwaśna (niedoparzenie)? Następnym razem:{' '}
-                  <Text style={styles.doctorBold}>zmiel drobniej o 2 kliki</Text> lub podnieś temperaturę wody o{' '}
-                  <Text style={styles.doctorBold}>+2°C</Text>.
+                  {language === 'en' ? (
+                    <>
+                      Too sour (under-extracted)? Next time:{' '}
+                      <Text style={styles.doctorBold}>grind finer by 2 clicks</Text> or raise water temperature by{' '}
+                      <Text style={styles.doctorBold}>+2°C</Text>.
+                    </>
+                  ) : (
+                    <>
+                      Za kwaśna (niedoparzenie)? Następnym razem:{' '}
+                      <Text style={styles.doctorBold}>zmiel drobniej o 2 kliki</Text> lub podnieś temperaturę wody o{' '}
+                      <Text style={styles.doctorBold}>+2°C</Text>.
+                    </>
+                  )}
                 </Text>
               </View>
             )}
@@ -161,12 +172,22 @@ export function BrewFinishModal({
               <View style={styles.doctorAdviceCard} testID="doctor-advice-bitter">
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                   <CompassIcon size={14} color={theme.colors.copper} />
-                  <Text style={styles.doctorTitle}>Recepta Dial-in Doctor:</Text>
+                  <Text style={styles.doctorTitle}>{t.brew?.doctorRecipeTitle || 'Recepta Dial-in Doctor:'}</Text>
                 </View>
                 <Text style={styles.doctorText}>
-                  Za gorzka / ściągająca (przeparzenie)? Następnym razem:{' '}
-                  <Text style={styles.doctorBold}>zmiel grubiej o 2 kliki</Text> lub obniż temperaturę wody o{' '}
-                  <Text style={styles.doctorBold}>-2°C</Text>.
+                  {language === 'en' ? (
+                    <>
+                      Too bitter / astringent (over-extracted)? Next time:{' '}
+                      <Text style={styles.doctorBold}>grind coarser by 2 clicks</Text> or lower water temperature by{' '}
+                      <Text style={styles.doctorBold}>-2°C</Text>.
+                    </>
+                  ) : (
+                    <>
+                      Za gorzka / ściągająca (przeparzenie)? Następnym razem:{' '}
+                      <Text style={styles.doctorBold}>zmiel grubiej o 2 kliki</Text> lub obniż temperaturę wody o{' '}
+                      <Text style={styles.doctorBold}>-2°C</Text>.
+                    </>
+                  )}
                 </Text>
               </View>
             )}
@@ -175,11 +196,20 @@ export function BrewFinishModal({
               <View style={styles.doctorAdviceCard} testID="doctor-advice-weak">
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                   <CompassIcon size={14} color={theme.colors.copper} />
-                  <Text style={styles.doctorTitle}>Recepta Dial-in Doctor:</Text>
+                  <Text style={styles.doctorTitle}>{t.brew?.doctorRecipeTitle || 'Recepta Dial-in Doctor:'}</Text>
                 </View>
                 <Text style={styles.doctorText}>
-                  Zbyt wodnista (niska ekstrakcja)? Zwiększ dozę o{' '}
-                  <Text style={styles.doctorBold}>+1.5g</Text> lub wydłuż czas kontaktu z wodą.
+                  {language === 'en' ? (
+                    <>
+                      Too watery (low extraction)? Increase dose by{' '}
+                      <Text style={styles.doctorBold}>+1.5g</Text> or extend water contact time.
+                    </>
+                  ) : (
+                    <>
+                      Zbyt wodnista (niska ekstrakcja)? Zwiększ dozę o{' '}
+                      <Text style={styles.doctorBold}>+1.5g</Text> lub wydłuż czas kontaktu z wodą.
+                    </>
+                  )}
                 </Text>
               </View>
             )}
@@ -188,10 +218,10 @@ export function BrewFinishModal({
               <View style={[styles.doctorAdviceCard, styles.doctorAdviceSuccess]} testID="doctor-advice-balanced">
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                   <StarIcon size={14} color="#4CAF50" filled />
-                  <Text style={styles.doctorTitleSuccess}>Idealny Balans:</Text>
+                  <Text style={styles.doctorTitleSuccess}>{t.brew?.doctorBalancedTitle || 'Idealny Balans:'}</Text>
                 </View>
                 <Text style={styles.doctorText}>
-                  Wzorcowa ekstrakcja specialty. Zapisz tę sesję w Dzienniku, aby powtórzyć parametry!
+                  {t.brew?.doctorBalancedAdvice || 'Wzorcowa ekstrakcja specialty. Zapisz tę sesję w Dzienniku, aby powtórzyć parametry!'}
                 </Text>
               </View>
             )}
@@ -210,29 +240,30 @@ export function BrewFinishModal({
             />
 
             {/* Hierarchiczne Koło Smaków SCA */}
-            <Text style={[styles.sectionLabel, { marginTop: 14 }]}>Koło Smaków SCA</Text>
+            <Text style={[styles.sectionLabel, { marginTop: 14 }]}>{t.brew?.flavorWheelTitle || 'Koło Smaków SCA'}</Text>
             <FlavorWheelPicker
               selectedDescriptors={selectedTags}
               onToggleDescriptor={onToggleTag}
             />
 
             {/* Profil wody użytej do parzenia */}
-            <Text style={[styles.sectionLabel, { marginTop: 14 }]}>Woda użyta do parzenia</Text>
+            <Text style={[styles.sectionLabel, { marginTop: 14 }]}>{t.brew?.waterUsedTitle || 'Woda użyta do parzenia'}</Text>
             <View style={styles.waterChipsRow}>
               {WATER_RECIPES.map((w) => {
                 const active = waterProfile === w.id;
+                const waterName = language === 'pl' ? w.namePl : w.nameEn;
                 return (
                   <Pressable
                     key={w.id}
                     testID={`water-chip-${w.id}`}
                     accessibilityRole="button"
                     accessibilityState={{ selected: active }}
-                    accessibilityLabel={`Woda ${w.namePl}, GH ${w.targetGhPpm}, KH ${w.targetKhPpm}`}
+                    accessibilityLabel={`${language === 'pl' ? 'Woda' : 'Water'} ${waterName}, GH ${w.targetGhPpm}, KH ${w.targetKhPpm}`}
                     style={[styles.waterChip, active && styles.waterChipActive]}
                     onPress={() => onChangeWaterProfile(w.id)}
                   >
                     <Text style={[styles.waterChipText, active && styles.waterChipTextActive]}>
-                      {w.namePl}
+                      {waterName}
                     </Text>
                   </Pressable>
                 );
@@ -241,10 +272,10 @@ export function BrewFinishModal({
 
             {/* Opcjonalny TDS */}
             <View style={styles.tdsInputRow}>
-              <Text style={styles.tdsInputLabel}>Odczyt TDS refractometru (%):</Text>
+              <Text style={styles.tdsInputLabel}>{t.brew?.tdsLabel || 'Odczyt TDS refractometru (%):'}</Text>
               <TextInput
                 style={styles.tdsTextInput}
-                placeholder="np. 1.35"
+                placeholder={t.brew?.tdsPlaceholder || 'np. 1.35'}
                 placeholderTextColor={theme.colors.textMuted}
                 keyboardType="numeric"
                 value={tdsInput}
@@ -253,11 +284,11 @@ export function BrewFinishModal({
             </View>
 
             {/* Notatki baristy */}
-            <Text style={styles.sectionLabel}>Notatki Baristy</Text>
+            <Text style={styles.sectionLabel}>{t.brew?.baristaNotesTitle || 'Notatki Baristy'}</Text>
             <TextInput
               testID="finish-notes-input"
               style={styles.notesInput}
-              placeholder="np. słodka brzoskwinia, delikatna jaśminowa kwasowość..."
+              placeholder={t.brew?.baristaNotesPlaceholder || 'np. słodka brzoskwinia, delikatna jaśminowa kwasowość...'}
               placeholderTextColor={theme.colors.textMuted}
               value={notes}
               onChangeText={onChangeNotes}
@@ -266,12 +297,20 @@ export function BrewFinishModal({
 
             {/* Ekonomia Rzemiosła (Koszt vs Kawiarnia) */}
             <View style={styles.finishCostCard} testID="finish-cost-card">
-              <Text style={styles.finishCostTitle}>Ekonomia Rzemiosła</Text>
+              <Text style={styles.finishCostTitle}>{t.brew?.craftEconomicsTitle || 'Ekonomia Rzemiosła'}</Text>
               <Text style={styles.finishCostSubtitle}>
-                {`Koszt tego naparu: ${brewCost.totalHomeCost.toFixed(2)} PLN (ziarna: ${brewCost.coffeeCost.toFixed(2)} zł, woda: ${brewCost.waterCost.toFixed(2)} zł)`}
+                {language === 'pl'
+                  ? `Koszt tego naparu: ${brewCost.totalHomeCost.toFixed(2)} PLN (ziarna: ${brewCost.coffeeCost.toFixed(2)} zł, woda: ${brewCost.waterCost.toFixed(2)} zł)`
+                  : (t.brew?.craftCostPerCup || 'Cost of this brew: {total} {curr} (beans: {beans} {curr}, water: {water} {curr})')
+                      .replace('{total}', brewCost.totalHomeCost.toFixed(2))
+                      .replace('{beans}', brewCost.coffeeCost.toFixed(2))
+                      .replace('{water}', brewCost.waterCost.toFixed(2))
+                      .replace(/{curr}/g, curr)}
               </Text>
               <Text style={styles.finishCostSavings}>
-                {`Oszczędność vs kawiarnia specialty (18 zł): `}
+                {language === 'pl'
+                  ? 'Oszczędność vs kawiarnia specialty (18 zł): '
+                  : (t.brew?.craftSavingsLabel || 'Savings vs cafe cup: ') + ' '}
                 <Text style={styles.finishCostSavingsBold}>
                   {`+${brewCost.savingsPerCup.toFixed(2)} PLN`}
                 </Text>
@@ -285,18 +324,18 @@ export function BrewFinishModal({
                 style={styles.finishCancelBtn}
                 onPress={onSkip}
                 accessibilityRole="button"
-                accessibilityLabel="Pomiń zapis"
+                accessibilityLabel={t.brew?.skipBtn || 'Pomiń'}
               >
-                <Text style={styles.finishCancelText}>Pomiń</Text>
+                <Text style={styles.finishCancelText}>{t.brew?.skipBtn || 'Pomiń'}</Text>
               </Pressable>
               <Pressable
                 testID="finish-save-btn"
                 style={styles.finishSaveBtn}
                 onPress={onSave}
                 accessibilityRole="button"
-                accessibilityLabel="Zapisz w Dzienniku"
+                accessibilityLabel={t.brew?.saveToJournalBtn || 'Zapisz w Dzienniku'}
               >
-                <Text style={styles.finishSaveText}>Zapisz w Dzienniku</Text>
+                <Text style={styles.finishSaveText}>{t.brew?.saveToJournalBtn || 'Zapisz w Dzienniku'}</Text>
               </Pressable>
             </View>
           </ScrollView>

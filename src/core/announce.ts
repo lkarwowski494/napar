@@ -5,6 +5,7 @@
 
 import { useEffect } from 'react';
 import { AccessibilityInfo } from 'react-native';
+import { pluralPl } from './i18n';
 
 export const announce = (text: string): void => {
   try {
@@ -37,7 +38,8 @@ export function formatStepAnnouncement(
     return `Step ${stepNumber} of ${totalSteps}: ${stepName}. Target water: ${targetWaterGrams} g. Step duration: ${durationSeconds} seconds.${instr}`;
   }
   const instr = instruction ? ` ${instruction}` : '';
-  return `Krok ${stepNumber} z ${totalSteps}: ${stepName}. Cel wody: ${targetWaterGrams} g. Czas trwania: ${durationSeconds} sekund.${instr}`;
+  const secWord = pluralPl(durationSeconds, 'sekunda', 'sekundy', 'sekund');
+  return `Krok ${stepNumber} z ${totalSteps}: ${stepName}. Cel wody: ${targetWaterGrams} g. Czas trwania: ${durationSeconds} ${secWord}.${instr}`;
 }
 
 /**
@@ -50,7 +52,8 @@ export function formatCountdownAnnouncement(
   if (language === 'en') {
     return `${secondsRemaining} seconds remaining in this step.`;
   }
-  return `${secondsRemaining} sekundy do końca etapu.`;
+  const secWord = pluralPl(secondsRemaining, 'sekunda', 'sekundy', 'sekund');
+  return `${secondsRemaining} ${secWord} do końca etapu.`;
 }
 
 /**

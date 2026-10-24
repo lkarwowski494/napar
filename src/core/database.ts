@@ -592,22 +592,7 @@ export function saveBrewSession(session: BrewSession): void {
 /**
  * Atomic transaction recording a brew session and deducting corresponding inventory (TASK-R08-04)
  */
-export function recordBrewSessionTransaction(
-  session: BrewSession,
-  inventoryDeduction?: { itemId: string; doseGrams: number },
-  caffeineLog?: CaffeineLog
-): void {
-  const db = getDatabase();
-  const executeOperation = () => {
-    saveBrewSession(session);
-    if (inventoryDeduction && inventoryDeduction.itemId && inventoryDeduction.doseGrams > 0) {
-      deductInventoryWeight(inventoryDeduction.itemId, inventoryDeduction.doseGrams);
-    }
-    if (caffeineLog) {
-      logCaffeine(caffeineLog);
-    }
-  };
-
+function runInTransactionSync(db: SQLite.SQLiteDatabase, executeOperation: () => void): void {
   const txDb = db as unknown as { withTransactionSync?: (fn: () => void) => void };
   if (typeof txDb.withTransactionSync === 'function') {
     txDb.withTransactionSync(executeOperation);
@@ -623,10 +608,29 @@ export function recordBrewSessionTransaction(
   }
 }
 
+export function recordBrewSessionTransaction(
+  session: BrewSession,
+  inventoryDeduction?: { itemId: string; doseGrams: number },
+  caffeineLog?: CaffeineLog
+): void {
+  const db = getDatabase();
+  runInTransactionSync(db, () => {
+    saveBrewSession(session);
+    if (inventoryDeduction && inventoryDeduction.itemId && inventoryDeduction.doseGrams > 0) {
+      deductInventoryWeight(inventoryDeduction.itemId, inventoryDeduction.doseGrams);
+    }
+    if (caffeineLog) {
+      logCaffeine(caffeineLog);
+    }
+  });
+}
+
 export function deleteBrewSession(id: string): void {
   const db = getDatabase();
-  db.runSync('DELETE FROM caffeine_logs WHERE brew_session_id = ?', [id]);
-  db.runSync('DELETE FROM brew_sessions WHERE id = ?', [id]);
+  runInTransactionSync(db, () => {
+    db.runSync('DELETE FROM caffeine_logs WHERE brew_session_id = ?', [id]);
+    db.runSync('DELETE FROM brew_sessions WHERE id = ?', [id]);
+  });
 }
 
 function mapRowToBrewSession(row: BrewSessionRow): BrewSession {
@@ -784,7 +788,24 @@ export function importDataJson(jsonStr: string): void {
   try {
     const runInTx = typeof (db as any).withTransactionSync === 'function'
       ? (cb: () => void) => (db as any).withTransactionSync(cb)
-      : (cb: () => void) => cb();
+      : (cb: () => void) => {
+          if (typeof (db as any).execSync === 'function') {
+            (db as any).execSync('BEGIN IMMEDIATE TRANSACTION;');
+            try {
+              cb();
+              (db as any).execSync('COMMIT;');
+            } catch (txErr) {
+              try {
+                (db as any).execSync('ROLLBACK;');
+              } catch {
+                // ignore rollback error
+              }
+              throw txErr;
+            }
+          } else {
+            cb();
+          }
+        };
     runInTx(() => {
       for (const item of data.inventory || []) {
         saveInventoryItem(item);

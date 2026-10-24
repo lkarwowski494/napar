@@ -211,14 +211,14 @@ export function Apps4BrewPassModal({
           {/* Ujawnienia subskrypcyjne App Store 3.1.2(c) */}
           <View style={styles.legalNoticeContainer}>
             <Text style={styles.legalNoticeText}>
-              Subskrypcja roczna i miesięczna odnawia się automatycznie, chyba że zostanie anulowana co najmniej 24 godziny przed końcem bieżącego okresu rozliczeniowego. Płatność zostanie pobrana z Twojego konta Apple ID / App Store w momencie potwierdzenia zakupu. Możesz zarządzać subskrypcją i wyłączyć automatyczne odnawianie w ustawieniach konta Apple ID w dowolnym momencie.
+              {t.paywall?.legalNotice || 'Subskrypcja roczna i miesięczna odnawia się automatycznie, chyba że zostanie anulowana co najmniej 24 godziny przed końcem bieżącego okresu rozliczeniowego.'}
             </Text>
             <View style={styles.legalLinksRow}>
               <Pressable
                 testID="eula-link-btn"
                 onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/terms.html')}
                 accessibilityRole="link"
-                accessibilityLabel="Regulamin usługi EULA"
+                accessibilityLabel={t.paywall?.eulaLabel || 'Regulamin usługi EULA'}
               >
                 <Text style={styles.legalLinkText}>Regulamin (EULA) ↗</Text>
               </Pressable>
@@ -227,7 +227,7 @@ export function Apps4BrewPassModal({
                 testID="privacy-link-btn"
                 onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/privacy.html')}
                 accessibilityRole="link"
-                accessibilityLabel="Polityka Prywatności"
+                accessibilityLabel={t.paywall?.privacyLabel || 'Polityka Prywatności'}
               >
                 <Text style={styles.legalLinkText}>Polityka Prywatności ↗</Text>
               </Pressable>

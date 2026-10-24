@@ -493,6 +493,15 @@ describe('Napar SQLite Database & Repositories', () => {
     recordBrewSessionTransaction(session, { itemId: 'bean-tx-1', doseGrams: 10 });
     expect(mockDb.withTransactionSync).toHaveBeenCalled();
     mockDb.withTransactionSync = originalWithTx;
+
+    // Error rollback in fallback transaction
+    const originalRunSync = mockDb.runSync;
+    mockDb.runSync = jest.fn(() => { throw new Error('Transaction failure'); });
+    expect(() => {
+      recordBrewSessionTransaction(session);
+    }).toThrow('Transaction failure');
+    expect(mockDb.execSync).toHaveBeenCalledWith('ROLLBACK;');
+    mockDb.runSync = originalRunSync;
   });
 
   test('Eksport i import kopii zapasowej w formacie JSON (inventory, recipes, sessions, caffeine)', () => {

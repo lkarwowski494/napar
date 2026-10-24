@@ -68,9 +68,11 @@ export function ProcedureModal({
           {
             stepNumber: 1,
             namePl: 'Ekstrakcja główna',
+            nameEn: 'Main Extraction',
             targetWaterGrams: 250,
             durationSeconds: 120,
             instructionPl: 'Zalej równomiernie przez 2 minuty.',
+            instructionEn: 'Pour evenly over 2 minutes.',
           },
         ];
 
@@ -171,7 +173,7 @@ export function ProcedureModal({
             </View>
 
             <Text style={styles.stepName} testID="procedure-step-name">
-              {currentStep.namePl}
+              {isEn && currentStep.nameEn ? currentStep.nameEn : currentStep.namePl}
             </Text>
 
             <View style={styles.targetWaterBanner}>
@@ -184,7 +186,7 @@ export function ProcedureModal({
             </View>
 
             <Text style={styles.stepInstruction} testID="procedure-step-instruction">
-              {currentStep.instructionPl}
+              {isEn && currentStep.instructionEn ? currentStep.instructionEn : currentStep.instructionPl}
             </Text>
           </View>
 
@@ -240,7 +242,7 @@ export function ProcedureModal({
                 ]}
                 onPress={onPauseResume}
                 accessibilityRole="button"
-                accessibilityLabel={isRunning ? 'Pauza' : 'Wznów'}
+                accessibilityLabel={isRunning ? (isEn ? 'Pause' : 'Pauza') : (isEn ? 'Resume' : 'Wznów')}
               >
                 <Text style={styles.pauseResumeBtnText}>
                   {isRunning

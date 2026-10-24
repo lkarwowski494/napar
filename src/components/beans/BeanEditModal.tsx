@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
+import { useTranslation } from '../../core/i18n';
 import { saveInventoryItem, deleteInventoryItem, getUnitSystem } from '../../core/database';
 import { gramsToOunces, ouncesToGrams, roundTo } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
@@ -36,6 +37,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
   onSaved,
   onDeleted,
 }) => {
+  const { t } = useTranslation();
   const unitSystem = getUnitSystem();
   const isImperial = unitSystem === 'imperial';
   const [editName, setEditName] = useState('');
@@ -84,7 +86,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
       return;
     }
     if (!editName.trim()) {
-      Alert.alert('Błąd', 'Podaj nazwę kawy lub herbaty.');
+      Alert.alert(t.common?.error || 'Błąd', t.stash?.nameError || 'Podaj nazwę kawy lub herbaty.');
       return;
     }
     const initW = parseFloat(editInitialWeight) || 250;
@@ -119,7 +121,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
     saveInventoryItem(updatedItem);
     onSaved();
     onClose();
-    Alert.alert('Zapisano!', `Paczka "${updatedItem.name}" została zaktualizowana.`);
+    Alert.alert(t.stash?.updateSuccessTitle || 'Zapisano!', (t.stash?.updateSuccess || 'Paczka "{name}" została zaktualizowana.').replace('{name}', updatedItem.name));
   };
 
   const handleMarkAsFinished = () => {
@@ -138,7 +140,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
     saveInventoryItem(updatedItem);
     onSaved();
     onClose();
-    Alert.alert('Zarchiwizowano', 'Paczka została oznaczona jako zużyta (0 g) i przeniesiona do archiwum.');
+    Alert.alert(t.stash?.archivedSuccessTitle || 'Zarchiwizowano', t.stash?.archivedSuccess || 'Paczka została oznaczona jako zużyta (0 g) i przeniesiona do archiwum.');
   };
 
   const handleDeleteItem = () => {
@@ -166,7 +168,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <View style={styles.modalHeader}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.modalTitle}>Edytuj Paczkę</Text>
+            <Text style={styles.modalTitle}>{t.stash?.editTitle || 'Edytuj Paczkę'}</Text>
             <Text style={styles.modalHeaderSub}>Koryguj wagę, parametry lub zarchiwizuj</Text>
           </View>
           <Pressable
@@ -203,7 +205,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             </View>
           )}
 
-          <Text style={styles.inputLabel}>Nazwa ziaren / herbaty *</Text>
+          <Text style={styles.inputLabel}>{t.stash?.nameLabel || 'Nazwa ziaren / herbaty *'}</Text>
           <TextInput
             style={styles.textInput}
             placeholder="np. Etiopia Yirgacheffe Washed"
@@ -212,7 +214,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             onChangeText={setEditName}
           />
 
-          <Text style={styles.inputLabel}>Palarnia / Producent</Text>
+          <Text style={styles.inputLabel}>{t.stash?.roaster || 'Palarnia / Producent'}</Text>
           <TextInput
             style={styles.textInput}
             placeholder="np. Hard Beans, Coffeedesk, Wuyi Star"
@@ -221,7 +223,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             onChangeText={setEditRoaster}
           />
 
-          <Text style={styles.inputLabel}>Kraj / Pochodzenie</Text>
+          <Text style={styles.inputLabel}>{t.stash?.origin || 'Kraj / Pochodzenie'}</Text>
           <TextInput
             style={styles.textInput}
             placeholder="np. Yirgacheffe, Etiopia"
@@ -232,7 +234,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
           <View style={styles.formRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.inputLabel}>Odmiana botaniczna</Text>
+              <Text style={styles.inputLabel}>{t.stash?.variety || 'Botaniczna odmiana'}</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="np. Geisha, SL28, Bourbon"
@@ -242,7 +244,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
               />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.inputLabel}>Obróbka (Process)</Text>
+              <Text style={styles.inputLabel}>{t.stash?.process || 'Obróbka'}</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="np. Washed, Natural, Honey"
@@ -255,7 +257,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
           <View style={styles.formRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.inputLabel}>Data palenia / zbioru</Text>
+              <Text style={styles.inputLabel}>{t.stash?.roastDate || 'Data palenia / Zbioru'}</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="YYYY-MM-DD"
@@ -316,7 +318,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             </View>
           </View>
 
-          <Text style={styles.inputLabel}>Nuty smakowe (po przecinku)</Text>
+          <Text style={styles.inputLabel}>{t.stash?.notesLabel || 'Nuty smakowe (po przecinku)'}</Text>
           <TextInput
             style={styles.textInput}
             placeholder="np. jaśmin, brzoskwinia, bergamotka"

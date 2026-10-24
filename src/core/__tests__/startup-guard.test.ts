@@ -2,7 +2,7 @@
 // Napar (Steepwise) — Unit Tests: Startup Crash Loop Guard (TASK-R12-01)
 // ============================================================================
 
-import { crashLoopGuard } from '../startup-guard';
+import { crashLoopGuard, recordStartupSuccess } from '../startup-guard';
 import * as FileSystem from 'expo-file-system';
 
 jest.mock('expo-file-system', () => {
@@ -59,5 +59,34 @@ describe('Startup Crash Loop Guard (TASK-R12-01)', () => {
     const nextAttempt = await crashLoopGuard.recordStartupAttempt();
     expect(nextAttempt.crashCount).toBe(1);
     expect(nextAttempt.shouldEnterSafeMode).toBe(false);
+  });
+  test('resetCrashCount zeruje stan licznika awarii', async () => {
+    await crashLoopGuard.recordStartupAttempt();
+    await crashLoopGuard.resetCrashCount();
+    const state = await crashLoopGuard.readState();
+    expect(state.crash_count).toBe(0);
+  });
+
+  test('recordStartupSuccess zeruje stan awarii przy udanym starcie', async () => {
+    await crashLoopGuard.recordStartupAttempt();
+    await recordStartupSuccess();
+    const state = await crashLoopGuard.readState();
+    expect(state.crash_count).toBe(0);
+  });
+
+  test('readState i writeState obsługują błędy wejścia/wyjścia FileSystem bez awarii', async () => {
+    const origRead = (FileSystem as any).readAsStringAsync;
+    const origWrite = (FileSystem as any).writeAsStringAsync;
+    try {
+      (FileSystem as any).readAsStringAsync = jest.fn().mockRejectedValueOnce(new Error('I/O error'));
+      const state = await crashLoopGuard.readState();
+      expect(state.crash_count).toBe(0);
+
+      (FileSystem as any).writeAsStringAsync = jest.fn().mockRejectedValueOnce(new Error('Disk full'));
+      await expect(crashLoopGuard.writeState({ crash_count: 1, lastAttemptAt: new Date().toISOString() })).resolves.not.toThrow();
+    } finally {
+      (FileSystem as any).readAsStringAsync = origRead;
+      (FileSystem as any).writeAsStringAsync = origWrite;
+    }
   });
 });
