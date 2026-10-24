@@ -15,6 +15,7 @@ import {
   LabIcon,
   CaffeineIcon,
   SettingsIcon,
+  CompassIcon,
 } from '../../src/components/icons/CraftIcons';
 import { AppGuideModal } from '../../src/components/AppGuideModal';
 
@@ -28,7 +29,8 @@ function AppGuideHeaderButton({ onOpen }: { onOpen: () => void }) {
       accessibilityRole="button"
       accessibilityLabel="Jak działa aplikacja?"
     >
-      <Text style={styles.headerGuideButtonText}>🧭 Jak działa aplikacja?</Text>
+      <CompassIcon size={14} color={theme.colors.copper} />
+      <Text style={styles.headerGuideButtonText}>Jak działa aplikacja?</Text>
     </Pressable>
   );
 }
@@ -178,6 +180,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
     borderColor: theme.colors.copper,
+    flexDirection: 'row',
+    gap: 6,
     justifyContent: 'center',
     alignItems: 'center',
   },

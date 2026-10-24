@@ -159,7 +159,7 @@ export function ProactiveCalendarCard({
         })}
       </ScrollView>
 
-      {/* Przełącznik Harmonogramu Akcji: [⚡ Najbliższe] / [📅 Wszystkie] */}
+      {/* Przełącznik Harmonogramu Akcji: [Najbliższe] / [Wszystkie] */}
       <View style={styles.scheduleHeaderRow}>
         <Text style={styles.scheduleSectionTitle}>
           {isEn ? '1-TAP ACTION FEED' : 'HARMONOGRAM AKCJI (1-TAP)'}
@@ -184,7 +184,7 @@ export function ProactiveCalendarCard({
                 scheduleFilter === 'upcoming' && styles.modeBtnTextActive,
               ]}
             >
-              {isEn ? '⚡ Upcoming' : '⚡ Najbliższe'}
+              {isEn ? 'Upcoming' : 'Najbliższe'}
             </Text>
           </Pressable>
           <Pressable
@@ -206,7 +206,7 @@ export function ProactiveCalendarCard({
                 scheduleFilter === 'all' && styles.modeBtnTextActive,
               ]}
             >
-              {isEn ? '📅 All' : '📅 Wszystkie'}
+              {isEn ? 'All' : 'Wszystkie'}
             </Text>
           </Pressable>
         </View>
@@ -272,7 +272,7 @@ export function ProactiveCalendarCard({
                   isEn ? 'Export .ics reminder' : 'Eksportuj przypomnienie .ics'
                 }
               >
-                <Text style={styles.icsExportBtnText}>📅 .ics</Text>
+                <Text style={styles.icsExportBtnText}>.ics</Text>
               </Pressable>
             </View>
           </View>

@@ -227,7 +227,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                   subsetFilter === 'ALL' && styles.subsetChipTextActive,
                 ]}
               >
-                📚 Wszystkie
+                Wszystkie
               </Text>
             </Pressable>
             <Pressable
@@ -246,7 +246,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                   subsetFilter === 'FAVORITES' && styles.subsetChipTextActive,
                 ]}
               >
-                ⭐ Klasyki / Ulubione
+                Klasyki / Ulubione
               </Text>
             </Pressable>
             <Pressable
@@ -265,7 +265,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                   subsetFilter === 'CUSTOM' && styles.subsetChipTextActive,
                 ]}
               >
-                ✍️ Własne Presety
+                Własne Presety
               </Text>
             </Pressable>
           </View>
@@ -388,7 +388,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 accessibilityLabel="Zwiń lub rozwiń kategorię Kawa Specialty"
               >
                 <Text style={styles.categoryAccordionTitle}>
-                  ☕ Kawa Specialty — Przelew i Immersion ({coffeeGroup.length})
+                  Kawa Specialty — Przelew i Immersion ({coffeeGroup.length})
                 </Text>
                 <Text style={styles.categoryAccordionArrow}>
                   {collapsedCategories['COFFEE'] ? '▸' : '▾'}
@@ -409,7 +409,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 accessibilityLabel="Zwiń lub rozwiń kategorię Herbata Rzemieślnicza"
               >
                 <Text style={styles.categoryAccordionTitle}>
-                  🍃 Herbata Rzemieślnicza & Gongfu ({teaGroup.length})
+                  Herbata Rzemieślnicza & Gongfu ({teaGroup.length})
                 </Text>
                 <Text style={styles.categoryAccordionArrow}>
                   {collapsedCategories['TEA'] ? '▸' : '▾'}

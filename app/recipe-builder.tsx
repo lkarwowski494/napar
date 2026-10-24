@@ -33,7 +33,7 @@ import { RecipeTypeSelector } from '../src/components/recipe-builder/RecipeTypeS
 export default function RecipeBuilderScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { canCreate, refresh } = useAppAccess();
   const [unitSystem] = useState<'metric' | 'imperial'>(() => {
     try {
@@ -156,6 +156,29 @@ export default function RecipeBuilderScreen() {
     setSteps(updated);
   };
 
+  const isDirty = name.trim().length > 0 || author.trim().length > 0 || description.trim().length > 0 || grindSize.trim().length > 0;
+
+  const handleClose = () => {
+    if (isDirty) {
+      Alert.alert(
+        language === 'en' ? 'Discard changes?' : 'Odrzucić zmiany?',
+        language === 'en'
+          ? 'You have unsaved changes. Are you sure you want to discard them?'
+          : 'Masz niezapisane zmiany w formularzu. Czy na pewno chcesz je odrzucić?',
+        [
+          { text: language === 'en' ? 'Keep Editing' : 'Wróć do edycji', style: 'cancel' },
+          {
+            text: language === 'en' ? 'Discard' : 'Odrzuć zmiany',
+            style: 'destructive',
+            onPress: () => router.back(),
+          },
+        ]
+      );
+    } else {
+      router.back();
+    }
+  };
+
   const handleSave = () => {
     if (!canCreate) {
       setShowPaywall(true);
@@ -233,13 +256,13 @@ export default function RecipeBuilderScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.back()}
+          onPress={handleClose}
           hitSlop={8}
           style={styles.headerBtn}
           accessibilityRole="button"
-          accessibilityLabel={t.common.close}
+          accessibilityLabel={t.common.cancel}
         >
-          <Text style={styles.headerBtnText}>✕ {t.common.close}</Text>
+          <Text style={styles.headerBtnText}>{t.common.cancel}</Text>
         </Pressable>
         <Text style={styles.headerTitle}>
           {isEditing ? t.recipeBuilder.titleEdit : t.recipeBuilder.titleNew}

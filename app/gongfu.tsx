@@ -278,7 +278,7 @@ export default function GongfuScreen() {
           accessibilityRole="button"
           accessibilityLabel={t.common.close}
         >
-          <Text style={styles.closeBtnText}>✕ {t.common.close}</Text>
+          <Text style={styles.closeBtnText}>{t.common.close}</Text>
         </Pressable>
         <Text style={styles.headerTitle}>{t.gongfu.modeTitle}</Text>
         <Pressable onPress={handleFinishAndSaveSession} hitSlop={8} style={styles.finishBtn}>

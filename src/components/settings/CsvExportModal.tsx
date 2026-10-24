@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.md,
     padding: 14,
     color: theme.colors.textPrimary,
-    fontFamily: 'Courier',
+    fontFamily: theme.typography.monospace,
     fontSize: 12,
     marginBottom: 16,
     textAlignVertical: 'top',

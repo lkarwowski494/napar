@@ -15,7 +15,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../core/theme';
-import { CompassIcon } from './icons/CraftIcons';
+import {
+  CompassIcon,
+  BrewIcon,
+  BeansIcon,
+  JournalIcon,
+  LabIcon,
+  SettingsIcon,
+} from './icons/CraftIcons';
 
 export interface AppGuideModalProps {
   visible: boolean;
@@ -78,18 +85,18 @@ export function AppGuideModal({
 
   const tabsInfo = isEn
     ? [
-        { icon: '☕', name: 'Brew', desc: 'Causal 1 → 2 → 3 → 4 brewing flow & Procedure Assistant.' },
-        { icon: '🫘', name: 'Stash', desc: 'Coffee & tea freshness tracker (Resting & Peak Window).' },
-        { icon: '📅', name: 'Journal', desc: '14-day Proactive Calendar, 1-Tap Action Feed & tasting history.' },
-        { icon: '🧭', name: 'Dial-in', desc: 'Taste defect compass, Ratio, TDS/EY% & SCA Water Chemistry.' },
-        { icon: '⚙️', name: 'Settings', desc: 'Units, grinder model, language, and 100% offline JSON/CSV backup.' },
+        { Icon: BrewIcon, name: 'Brew', desc: 'Causal 1 → 2 → 3 → 4 brewing flow & Procedure Assistant.' },
+        { Icon: BeansIcon, name: 'Stash', desc: 'Coffee & tea freshness tracker (Resting & Peak Window).' },
+        { Icon: JournalIcon, name: 'Journal', desc: '14-day Proactive Calendar, 1-Tap Action Feed & tasting history.' },
+        { Icon: LabIcon, name: 'Dial-in', desc: 'Taste defect compass, Ratio, TDS/EY% & SCA Water Chemistry.' },
+        { Icon: SettingsIcon, name: 'Settings', desc: 'Units, grinder model, language, and 100% offline JSON/CSV backup.' },
       ]
     : [
-        { icon: '☕', name: 'Parzenie', desc: 'Główny proces przyczynowo-skutkowy 1 → 2 → 3 → 4 i Asystent Procedury.' },
-        { icon: '🫘', name: 'Spiżarnia', desc: 'Śledzenie świeżości ziaren po wypale (Resting & Peak Window) oraz herbat.' },
-        { icon: '📅', name: 'Dziennik', desc: '14-dniowy Kalendarz, Harmonogram Akcji 1-Tap oraz historia i analityka.' },
-        { icon: '🧭', name: 'Warsztat', desc: 'Kompas korekty smaku Dial-in Doctor, Ratio, TDS/EY% i Woda SCA.' },
-        { icon: '⚙️', name: 'Ustawienia', desc: 'Jednostki, młynek domowy, język oraz lokalna kopia zapasowa JSON/CSV.' },
+        { Icon: BrewIcon, name: 'Parzenie', desc: 'Główny proces przyczynowo-skutkowy 1 → 2 → 3 → 4 i Asystent Procedury.' },
+        { Icon: BeansIcon, name: 'Spiżarnia', desc: 'Śledzenie świeżości ziaren po wypale (Resting & Peak Window) oraz herbat.' },
+        { Icon: JournalIcon, name: 'Dziennik', desc: '14-dniowy Kalendarz, Harmonogram Akcji 1-Tap oraz historia i analityka.' },
+        { Icon: LabIcon, name: 'Warsztat', desc: 'Kompas korekty smaku Dial-in Doctor, Ratio, TDS/EY% i Woda SCA.' },
+        { Icon: SettingsIcon, name: 'Ustawienia', desc: 'Jednostki, młynek domowy, język oraz lokalna kopia zapasowa JSON/CSV.' },
       ];
 
   if (!visible) {
@@ -156,7 +163,7 @@ export function AppGuideModal({
             </Text>
             {tabsInfo.map((tab) => (
               <View key={tab.name} style={styles.tabRow}>
-                <Text style={styles.tabEmoji}>{tab.icon}</Text>
+                <View style={styles.tabIconBox}><tab.Icon size={20} color={theme.colors.copper} /></View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.tabName}>{tab.name}</Text>
                   <Text style={styles.tabDesc}>{tab.desc}</Text>
@@ -303,10 +310,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
-  tabEmoji: {
-    fontSize: 18,
-    width: 26,
-    textAlign: 'center',
+  tabIconBox: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.sm,
   },
   tabName: {
     fontSize: 13,

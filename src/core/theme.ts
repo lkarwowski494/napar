@@ -3,6 +3,8 @@
 // Calm, artisanal aesthetic (Apps4Brew: warm copper, tea emerald, deep slate)
 // ============================================================================
 
+import { Platform } from 'react-native';
+
 export const theme = {
   lightColors: {
     bg: '#FBF9F6',
@@ -46,6 +48,7 @@ export const theme = {
     sage: '#4E9F3D',
     
     // Teksty
+    white: '#FFFFFF',
     textPrimary: '#F4EFEA',
     textSecondary: '#A09C96',
     textMuted: '#8C8884',
@@ -99,6 +102,12 @@ export const theme = {
       fontWeight: '300' as const,
       letterSpacing: -1,
       fontVariant: ['tabular-nums'] as any,
+      color: '#F4EFEA',
+    },
+    monospace: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }) as string,
+    code: {
+      fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }) as string,
+      fontSize: 12,
       color: '#F4EFEA',
     },
   },
