@@ -6,11 +6,11 @@
   },
   "extraction_yield": [
     {
-      "waterGrams": 250.0,
+      "waterGrams": 220.0,
       "tdsPercent": 1.35,
       "coffeeDoseGrams": 15.0,
-      "expectedExtractionYieldPercent": 22.5,
-      "expectedRating": "over"
+      "expectedExtractionYieldPercent": 19.8,
+      "expectedRating": "ideal"
     },
     {
       "waterGrams": 200.0,

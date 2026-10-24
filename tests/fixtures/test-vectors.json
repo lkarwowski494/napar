@@ -8,15 +8,16 @@
       {
         "id": "EY-SCA-01",
         "citation": "Specialty Coffee Association, Coffee Brewing Handbook, 2020, s. 12",
-        "formula": "EY% = (Liquid Water * TDS%) / Dose",
+        "formula": "EY% = (Beverage Weight * TDS%) / Dose, where Beverage Weight = Water - (Dose * 2.0)",
         "inputs": {
-          "waterGrams": 250.0,
+          "waterGrams": 250,
           "tdsPercent": 1.35,
-          "coffeeDoseGrams": 15.0
+          "coffeeDoseGrams": 15,
+          "beverageWeightGrams": 220
         },
         "expected": {
-          "extractionYieldPercent": 22.5,
-          "rating": "over"
+          "extractionYieldPercent": 19.8,
+          "rating": "ideal"
         }
       },
       {
@@ -24,12 +25,12 @@
         "citation": "Specialty Coffee Association, Coffee Brewing Handbook, 2020, s. 12",
         "formula": "EY% = (Liquid Water * TDS%) / Dose",
         "inputs": {
-          "waterGrams": 200.0,
-          "tdsPercent": 1.20,
-          "coffeeDoseGrams": 12.0
+          "waterGrams": 200,
+          "tdsPercent": 1.2,
+          "coffeeDoseGrams": 12
         },
         "expected": {
-          "extractionYieldPercent": 20.0,
+          "extractionYieldPercent": 20,
           "rating": "ideal"
         }
       },
@@ -38,12 +39,12 @@
         "citation": "Specialty Coffee Association, Coffee Brewing Handbook, 2020, s. 14",
         "formula": "EY% = (Liquid Water * TDS%) / Dose",
         "inputs": {
-          "waterGrams": 250.0,
-          "tdsPercent": 0.90,
-          "coffeeDoseGrams": 15.0
+          "waterGrams": 250,
+          "tdsPercent": 0.9,
+          "coffeeDoseGrams": 15
         },
         "expected": {
-          "extractionYieldPercent": 15.0,
+          "extractionYieldPercent": 15,
           "rating": "under"
         }
       }
@@ -54,12 +55,12 @@
         "citation": "Jonathan Gagné, The Physics of Filter Coffee, Skyhorse Publishing, 2021, s. 45",
         "formula": "Yield = Water - (Dose * 2.0)",
         "inputs": {
-          "waterGrams": 300.0,
-          "coffeeDoseGrams": 18.0,
-          "retentionFactor": 2.0
+          "waterGrams": 300,
+          "coffeeDoseGrams": 18,
+          "retentionFactor": 2
         },
         "expected": {
-          "liquidYieldGrams": 264.0
+          "liquidYieldGrams": 264
         }
       },
       {
@@ -67,12 +68,12 @@
         "citation": "Jonathan Gagné, The Physics of Filter Coffee, Skyhorse Publishing, 2021, s. 47",
         "formula": "Yield = Water - (Dose * 2.1)",
         "inputs": {
-          "waterGrams": 500.0,
-          "coffeeDoseGrams": 30.0,
+          "waterGrams": 500,
+          "coffeeDoseGrams": 30,
           "retentionFactor": 2.1
         },
         "expected": {
-          "liquidYieldGrams": 437.0
+          "liquidYieldGrams": 437
         }
       }
     ],
@@ -85,7 +86,7 @@
           "ppmCaCO3": 71.392
         },
         "expected": {
-          "degreesGerman": 4.0
+          "degreesGerman": 4
         }
       },
       {
@@ -93,13 +94,13 @@
         "citation": "Matt Perger, Barista Hustle Water Recipes, 2017",
         "formula": "Buffer Concentrate: 1g in 1L = 2 ppm KH; Hardness Concentrate: 1g in 1L = 2 ppm GH",
         "inputs": {
-          "targetBufferKhPpm": 40.0,
-          "targetHardnessGhPpm": 80.0,
-          "targetWaterLiters": 1.0
+          "targetBufferKhPpm": 40,
+          "targetHardnessGhPpm": 80,
+          "targetWaterLiters": 1
         },
         "expected": {
-          "bufferConcentrateGrams": 20.0,
-          "hardnessConcentrateGrams": 40.0
+          "bufferConcentrateGrams": 20,
+          "hardnessConcentrateGrams": 40
         }
       }
     ],
@@ -109,12 +110,12 @@
         "citation": "Institute of Medicine (US), Caffeine for the Sustainment of Mental Task Performance, National Academies Press, 2001, Rozdz. 2",
         "formula": "C(t) = C0 * 0.5^(t / 5.0)",
         "inputs": {
-          "initialDoseMg": 160.0,
-          "elapsedHours": 5.0,
-          "halfLifeHours": 5.0
+          "initialDoseMg": 160,
+          "elapsedHours": 5,
+          "halfLifeHours": 5
         },
         "expected": {
-          "remainingMg": 80.0
+          "remainingMg": 80
         }
       },
       {
@@ -122,12 +123,12 @@
         "citation": "Institute of Medicine (US), Caffeine for the Sustainment of Mental Task Performance, National Academies Press, 2001, Rozdz. 2",
         "formula": "C(t) = C0 * 0.5^(t / 5.0)",
         "inputs": {
-          "initialDoseMg": 160.0,
-          "elapsedHours": 10.0,
-          "halfLifeHours": 5.0
+          "initialDoseMg": 160,
+          "elapsedHours": 10,
+          "halfLifeHours": 5
         },
         "expected": {
-          "remainingMg": 40.0,
+          "remainingMg": 40,
           "safeForSleepUnder50Mg": true
         }
       }

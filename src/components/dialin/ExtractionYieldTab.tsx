@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
-import { calculateExtractionYield } from '../../core/domain-rules';
+import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
+import { calculateExtractionYield, calculateLiquidYield } from '../../core/domain-rules';
 import { theme } from '../../core/theme';
 
 export interface ExtractionYieldTabProps {
@@ -9,6 +9,7 @@ export interface ExtractionYieldTabProps {
 }
 
 export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language, t }) => {
+  const [methodMode, setMethodMode] = useState<'pourover' | 'espresso'>('pourover');
   const [eyWater, setEyWater] = useState('250');
   const [eyDose, setEyDose] = useState('15');
   const [eyTds, setEyTds] = useState('1.35');
@@ -19,13 +20,15 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
     const tds = parseFloat(eyTds);
     if (!isNaN(w) && !isNaN(d) && !isNaN(tds) && w > 0 && d > 0 && tds > 0) {
       try {
-        return calculateExtractionYield(w, tds, d);
+        const beverageWeightGrams =
+          methodMode === 'pourover' ? calculateLiquidYield(w, d) : w;
+        return calculateExtractionYield(beverageWeightGrams, tds, d);
       } catch {
         return null;
       }
     }
     return null;
-  }, [eyWater, eyDose, eyTds]);
+  }, [eyWater, eyDose, eyTds, methodMode]);
 
   return (
     <View>
@@ -35,9 +38,32 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
       </Text>
 
       <View style={styles.calcCard}>
+        <View style={styles.modeRow}>
+          <Pressable
+            style={[styles.modeBtn, methodMode === 'pourover' && styles.modeBtnActive]}
+            onPress={() => setMethodMode('pourover')}
+          >
+            <Text style={[styles.modeBtnText, methodMode === 'pourover' && styles.modeBtnTextActive]}>
+              Przelew (Pour-over)
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.modeBtn, methodMode === 'espresso' && styles.modeBtnActive]}
+            onPress={() => setMethodMode('espresso')}
+          >
+            <Text style={[styles.modeBtnText, methodMode === 'espresso' && styles.modeBtnTextActive]}>
+              Espresso
+            </Text>
+          </Pressable>
+        </View>
+
         <View style={styles.eyInputsRow}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.inputTitle}>{t.dialin.eyWaterInput || 'Woda zalana (g)'}</Text>
+            <Text style={styles.inputTitle}>
+              {methodMode === 'pourover'
+                ? t.dialin?.eyWaterInput || 'Woda zalana (g)'
+                : 'Uzysk espresso / Yield (g)'}
+            </Text>
             <TextInput
               style={styles.calcInput}
               keyboardType="numeric"
@@ -123,6 +149,32 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: theme.colors.border,
+  },
+  modeRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  modeBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: 'center',
+    backgroundColor: theme.colors.bgCardSecondary,
+  },
+  modeBtnActive: {
+    borderColor: theme.colors.copper,
+    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+  },
+  modeBtnText: {
+    color: theme.colors.textMuted,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  modeBtnTextActive: {
+    color: theme.colors.copper,
   },
   inputTitle: {
     fontSize: 13,
