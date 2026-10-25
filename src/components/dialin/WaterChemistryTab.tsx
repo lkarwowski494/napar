@@ -61,6 +61,11 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
                 styles.volumeChip,
                 waterVolumeInput === vol && styles.volumeChipActive,
               ]}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              accessibilityRole="button"
+              accessibilityLabel={`${vol} L`}
+              accessibilityState={{ selected: waterVolumeInput === vol }}
+              testID={`volume-chip-${vol}`}
               onPress={() => setWaterVolumeInput(vol)}
             >
               <Text
@@ -97,6 +102,11 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
                 styles.waterRecipeCard,
                 isSelected && styles.waterRecipeCardActive,
               ]}
+              hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+              accessibilityRole="button"
+              accessibilityLabel={language === 'pl' ? recipe.namePl : recipe.nameEn}
+              accessibilityState={{ selected: isSelected }}
+              testID={`water-recipe-${recipe.id}`}
               onPress={() => {
                 setIsCustomWater(false);
                 setSelectedWaterRecipeId(recipe.id);
@@ -127,6 +137,10 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
             styles.waterRecipeCard,
             isCustomWater && styles.waterRecipeCardActive,
           ]}
+          hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+          accessibilityRole="button"
+          accessibilityLabel="Własny profil (Custom GH / KH)"
+          accessibilityState={{ selected: isCustomWater }}
           onPress={() => setIsCustomWater(true)}
         >
           <Text style={styles.waterRecipeName}>Własny profil (Custom GH / KH)</Text>
