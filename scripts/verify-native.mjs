@@ -22,6 +22,16 @@ const check = (cond, msg) => {
 
 try {
   // 0. Statyczna walidacja app.json (zawsze działa we wszystkich środowiskach)
+  // Sprawdzenie koloru tła dark-mode dla splash screen i adaptive icon (TASK-P7-10-WYD)
+  check(
+    appJson.splash?.backgroundColor === '#121214',
+    `app.json -> expo.splash.backgroundColor musi być równe '#121214' (otrzymano '${appJson.splash?.backgroundColor}')`
+  );
+  check(
+    appJson.android?.adaptiveIcon?.backgroundColor === '#121214',
+    `app.json -> expo.android.adaptiveIcon.backgroundColor musi być równe '#121214' (otrzymano '${appJson.android?.adaptiveIcon?.backgroundColor}')`
+  );
+
   const expectedBundleId = appJson.ios?.bundleIdentifier;
   check(Boolean(expectedBundleId), 'Brak bundleIdentifier w app.json -> expo.ios');
   check(
