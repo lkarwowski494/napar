@@ -188,7 +188,18 @@ export function decodeRecipeFromShareUrl(
     const jsonStr = base64ToUtf8(base64Data);
     const parsed: CompactRecipePayload = JSON.parse(jsonStr);
 
-    if (parsed.v !== 1 || !parsed.n || !parsed.m || typeof parsed.d !== 'number' || typeof parsed.w !== 'number') {
+    if (
+      parsed.v !== 1 ||
+      !parsed.n ||
+      !parsed.m ||
+      typeof parsed.d !== 'number' ||
+      !Number.isFinite(parsed.d) ||
+      parsed.d <= 0 ||
+      typeof parsed.w !== 'number' ||
+      !Number.isFinite(parsed.w) ||
+      parsed.w <= 0 ||
+      (parsed.s !== undefined && !Array.isArray(parsed.s))
+    ) {
       return null;
     }
 

@@ -207,4 +207,20 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decodedFromUrlSafe).not.toBeNull();
     expect(decodedFromUrlSafe?.recipe.name).toBe('Matcha / Special + Roast');
   });
+
+  test('TASK-P5-11-WZR: decodeRecipeFromShareUrl odrzuca niepoprawne fizycznie wartości dozy/wody i błędne typy kroków', () => {
+    const makePayload = (patch: any) => {
+      const data = { v: 1, n: 'Test', b: 'COFFEE', m: 'V60', d: 15, w: 250, ...patch };
+      return utf8ToBase64(JSON.stringify(data));
+    };
+
+    expect(decodeRecipeFromShareUrl(makePayload({ d: 0 }))).toBeNull();
+    expect(decodeRecipeFromShareUrl(makePayload({ d: -5 }))).toBeNull();
+    expect(decodeRecipeFromShareUrl(makePayload({ d: NaN }))).toBeNull();
+    expect(decodeRecipeFromShareUrl(makePayload({ w: 0 }))).toBeNull();
+    expect(decodeRecipeFromShareUrl(makePayload({ w: -100 }))).toBeNull();
+    expect(decodeRecipeFromShareUrl(makePayload({ w: Infinity }))).toBeNull();
+    expect(decodeRecipeFromShareUrl(makePayload({ s: 'nie tablica' }))).toBeNull();
+    expect(decodeRecipeFromShareUrl(makePayload({ s: 123 }))).toBeNull();
+  });
 });
