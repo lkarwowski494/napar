@@ -266,4 +266,11 @@ describe('i18n System', () => {
     expect(getPluralCategory('en', 1)).toBe('one');
     expect(getPluralCategory('en', 2)).toBe('other');
   });
+
+  test('TASK-P8-09-LOK: Klucze methodsLabel i particleRangeDesc są zdefiniowane i zsynchronizowane', () => {
+    expect(translations.pl.grinder.methodsLabel).toBe('Metody:');
+    expect(translations.en.grinder.methodsLabel).toBe('Methods:');
+    expect(translations.pl.grinder.particleRangeDesc).toContain('{min}');
+    expect(translations.en.grinder.particleRangeDesc).toContain('{min}');
+  });
 });

@@ -395,7 +395,9 @@
     "subtitle": "Przeliczaj kliki i nastawy między młynkami Comandante, Timemore, 1Zpresso, Fellow Ode, Baratza i Kingrinder.",
     "categorySelect": "Metoda i stopień mielenia",
     "allGrindersHeader": "Odpowiedniki nastaw dla Twojego młynka",
-    "micronsLabel": "Szacowana grubość cząstek"
+    "micronsLabel": "Szacowana grubość cząstek",
+    "methodsLabel": "Metody:",
+    "particleRangeDesc": "Średnia cząstek: {min} – {max} µm (punkt odniesienia: {default} µm)"
   },
   "caffeine": {
     "title": "Kinetyka Kofeiny",

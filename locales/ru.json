@@ -395,7 +395,9 @@
     "subtitle": "Convert clicks and settings across Comandante, Timemore, 1Zpresso, Fellow Ode, Baratza, and Kingrinder.",
     "categorySelect": "Method & Grind Size",
     "allGrindersHeader": "Target Settings by Grinder Model",
-    "micronsLabel": "Estimated particle size"
+    "micronsLabel": "Estimated particle size",
+    "methodsLabel": "Методы:",
+    "particleRangeDesc": "Размер частиц: {min} – {max} мкм (эталон: {default} мкм)"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

@@ -420,6 +420,8 @@ export const translations = {
       categorySelect: 'Metoda i stopień mielenia',
       allGrindersHeader: 'Odpowiedniki nastaw dla Twojego młynka',
       micronsLabel: 'Szacowana grubość cząstek',
+      methodsLabel: 'Metody:',
+      particleRangeDesc: 'Średnia cząstek: {min} – {max} µm (punkt odniesienia: {default} µm)',
     },
     caffeine: {
       title: 'Kinetyka Kofeiny',
@@ -979,6 +981,8 @@ export const translations = {
       categorySelect: 'Method & Grind Size',
       allGrindersHeader: 'Target Settings by Grinder Model',
       micronsLabel: 'Estimated particle size',
+      methodsLabel: 'Methods:',
+      particleRangeDesc: 'Particle size: {min} – {max} µm (benchmark: {default} µm)',
     },
     caffeine: {
       title: 'Caffeine Kinetics',

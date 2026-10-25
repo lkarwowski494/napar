@@ -6,6 +6,7 @@ import {
   convertMicronsToGrinder,
 } from '../../core/grinder-converter';
 import { theme } from '../../core/theme';
+import { formatTemplate } from '../../core/i18n';
 
 export interface GrinderConverterCardProps {
   language: string;
@@ -54,11 +55,17 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
 
       <View style={styles.grinderCategoryDetailsCard}>
         <Text style={styles.grinderMethodsText}>
-          {language === 'en' ? 'Methods: ' : 'Metody: '}
+          {(t.grinder?.methodsLabel || (language === 'en' ? 'Methods:' : 'Metody:')) + ' '}
           {language === 'pl' ? activeGrindCategory.methodsPl : activeGrindCategory.methodsEn}
         </Text>
         <Text style={styles.grinderMicronsRange}>
-          {language === 'en'
+          {t.grinder?.particleRangeDesc
+            ? formatTemplate(t.grinder.particleRangeDesc, {
+                min: activeGrindCategory.micronMin,
+                max: activeGrindCategory.micronMax,
+                default: activeGrindCategory.defaultMicrons,
+              })
+            : language === 'en'
             ? `Particle size: ${activeGrindCategory.micronMin} – ${activeGrindCategory.micronMax} µm (benchmark: ${activeGrindCategory.defaultMicrons} µm)`
             : `Średnia cząstek: ${activeGrindCategory.micronMin} – ${activeGrindCategory.micronMax} µm (punkt odniesienia: ${activeGrindCategory.defaultMicrons} µm)`}
         </Text>
