@@ -81,16 +81,31 @@ export function buildDynamicIslandPayload(
 ): DynamicIslandPayload {
   const icon = attributes.beverageType === 'COFFEE' ? '☕' : '🍵';
   const timeFormatted = formatActivityTimer(state.stepRemainingSeconds);
-  const stepName = language === 'en' ? state.stepNameEn : state.stepNamePl;
+  const stepName =
+    (language === 'en' ? state.stepNameEn : state.stepNamePl) ||
+    state.stepNamePl ||
+    state.stepNameEn ||
+    (language === 'en' ? 'Step' : 'Krok');
+  const safeStepIdx = Math.max(0, state.stepIndex);
+  const safeTotalSteps = Math.max(1, state.totalSteps);
   const subtitle =
     language === 'en'
-      ? `${stepName} · Step ${state.stepIndex + 1} of ${state.totalSteps}`
-      : `${stepName} · Krok ${state.stepIndex + 1} z ${state.totalSteps}`;
+      ? `${stepName} · Step ${safeStepIdx + 1} of ${safeTotalSteps}`
+      : `${stepName} · Krok ${safeStepIdx + 1} z ${safeTotalSteps}`;
+
+  const safeTargetWater =
+    Number.isFinite(state.targetWaterGrams) && state.targetWaterGrams >= 0
+      ? Math.round(state.targetWaterGrams)
+      : 0;
+  const safeTotalWater =
+    Number.isFinite(attributes.totalWaterGrams) && attributes.totalWaterGrams >= 0
+      ? Math.round(attributes.totalWaterGrams)
+      : 0;
 
   const targetWater =
     language === 'en'
-      ? `Target: ${state.targetWaterGrams} g (of ${attributes.totalWaterGrams} g)`
-      : `Docelowo: ${state.targetWaterGrams} g (z ${attributes.totalWaterGrams} g)`;
+      ? `Target: ${safeTargetWater} g (of ${safeTotalWater} g)`
+      : `Docelowo: ${safeTargetWater} g (z ${safeTotalWater} g)`;
 
   return {
     compactLeading: icon,

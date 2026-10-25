@@ -147,4 +147,23 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
 
     expect(getActiveLiveActivityId()).toBeNull();
   });
+
+  test('TASK-P8-12-NIE: buildDynamicIslandPayload zabezpiecza targetWaterGrams przed NaN i stosuje fallback nazwy kroku', () => {
+    const corruptState: any = {
+      ...mockState,
+      stepNameEn: '',
+      stepNamePl: '',
+      targetWaterGrams: NaN,
+      stepIndex: -5,
+      totalSteps: 0,
+    };
+    const corruptAttr: any = {
+      ...mockAttributesCoffee,
+      totalWaterGrams: Infinity,
+    };
+
+    const payload = buildDynamicIslandPayload(corruptAttr, corruptState, 'en');
+    expect(payload.expandedBottomTarget).toBe('Target: 0 g (of 0 g)');
+    expect(payload.expandedCenterSubtitle).toContain('Step · Step 1 of 1');
+  });
 });
