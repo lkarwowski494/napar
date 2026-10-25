@@ -94,6 +94,13 @@ describe('i18n System', () => {
     );
   });
 
+  test('TASK-P6-09-LOK: Klucze stepperów kofeiny i snu są zdefiniowane w PL i EN', () => {
+    expect(translations.pl.settings.decreaseHalfLife).toBe('Zmniejsz czas półtrwania');
+    expect(translations.en.settings.decreaseHalfLife).toBe('Decrease half-life');
+    expect(translations.pl.settings.earlierBedtime).toBe('Wcześniejsza godzina snu');
+    expect(translations.en.settings.earlierBedtime).toBe('Earlier bedtime');
+  });
+
   test('Klucze ulubionych i akcji szybkiego parzenia', () => {
     expect(translations.pl.favorites.addToFav).toBe('Dodaj do ulubionych');
     expect(translations.pl.favorites.removeFromFav).toBe('Usuń z ulubionych');

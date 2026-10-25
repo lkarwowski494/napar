@@ -503,7 +503,11 @@
     "privacyBullet4": "Pełna wolność: darmowy eksport i import bazy w formacie JSON.",
     "exportBtn": "Eksportuj Kopię JSON",
     "importBtn": "Przywróć z Kopii JSON",
-    "backupSuccess": "Kopia zapasowa wyeksportowana pomyślnie."
+    "backupSuccess": "Kopia zapasowa wyeksportowana pomyślnie.",
+    "decreaseHalfLife": "Zmniejsz czas półtrwania",
+    "increaseHalfLife": "Zwiększ czas półtrwania",
+    "earlierBedtime": "Wcześniejsza godzina snu",
+    "laterBedtime": "Późniejsza godzina snu"
   },
   "paywall": {
     "title": "Taniej niż jedno espresso",
