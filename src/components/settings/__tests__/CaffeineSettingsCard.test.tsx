@@ -127,4 +127,27 @@ describe('CaffeineSettingsCard Component', () => {
     });
     expect(mockOnToggleHealthKit).toHaveBeenCalled();
   });
+
+  test('TASK-P6-04-STU: Renderuje zlokalizowane etykiety accessibilityLabel w trybie angielskim', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <CaffeineSettingsCard
+          halfLifeHours={5.0}
+          onHalfLifeChange={mockOnHalfLifeChange}
+          bedtimeHour={23}
+          onBedtimeChange={mockOnBedtimeChange}
+          healthKitSync={true}
+          onToggleHealthKit={mockOnToggleHealthKit}
+          t={translations.en}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    expect(root.findByProps({ accessibilityLabel: 'Decrease half-life' })).toBeDefined();
+    expect(root.findByProps({ accessibilityLabel: 'Increase half-life' })).toBeDefined();
+    expect(root.findByProps({ accessibilityLabel: 'Earlier bedtime' })).toBeDefined();
+    expect(root.findByProps({ accessibilityLabel: 'Later bedtime' })).toBeDefined();
+  });
 });

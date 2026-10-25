@@ -42,7 +42,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               hitSlop={8}
               accessibilityRole="button"
               onPress={() => onHalfLifeChange(halfLifeHours - 0.5)}
-              accessibilityLabel="Zmniejsz czas półtrwania"
+              accessibilityLabel={t.settings.decreaseHalfLife || 'Zmniejsz czas półtrwania'}
             >
               <Text style={styles.stepperBtnText}>−</Text>
             </Pressable>
@@ -52,7 +52,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               hitSlop={8}
               accessibilityRole="button"
               onPress={() => onHalfLifeChange(halfLifeHours + 0.5)}
-              accessibilityLabel="Zwiększ czas półtrwania"
+              accessibilityLabel={t.settings.increaseHalfLife || 'Zwiększ czas półtrwania'}
             >
               <Text style={styles.stepperBtnText}>+</Text>
             </Pressable>
@@ -76,7 +76,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               hitSlop={8}
               accessibilityRole="button"
               onPress={() => onBedtimeChange(bedtimeHour - 1)}
-              accessibilityLabel="Wcześniejsza godzina snu"
+              accessibilityLabel={t.settings.earlierBedtime || 'Wcześniejsza godzina snu'}
             >
               <Text style={styles.stepperBtnText}>−</Text>
             </Pressable>
@@ -86,7 +86,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               hitSlop={8}
               accessibilityRole="button"
               onPress={() => onBedtimeChange(bedtimeHour + 1)}
-              accessibilityLabel="Późniejsza godzina snu"
+              accessibilityLabel={t.settings.laterBedtime || 'Późniejsza godzina snu'}
             >
               <Text style={styles.stepperBtnText}>+</Text>
             </Pressable>
