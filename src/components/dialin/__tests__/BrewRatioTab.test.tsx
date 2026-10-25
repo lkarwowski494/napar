@@ -129,4 +129,24 @@ describe('BrewRatioTab Component', () => {
 
     expect(tree!.toJSON()).toBeDefined();
   });
+
+  test('TASK-P7-04-STU: Kontrolki kierunku i chipy proporcji deklarują accessibilityState oraz hitSlop', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewRatioTab language="pl" t={t} unitSystem="metric" beveragePreference="both" />
+      );
+    });
+    const root = tree!.root;
+    const doseToWaterBtn = root.findByProps({ testID: 'calc-dir-doseToWater' });
+    const waterToDoseBtn = root.findByProps({ testID: 'calc-dir-waterToDose' });
+
+    expect(doseToWaterBtn.props.accessibilityState).toEqual({ selected: true });
+    expect(doseToWaterBtn.props.hitSlop).toEqual({ top: 8, bottom: 8, left: 8, right: 8 });
+    expect(waterToDoseBtn.props.accessibilityState).toEqual({ selected: false });
+
+    const defaultRatioChip = root.findByProps({ testID: 'ratio-chip-16.6' });
+    expect(defaultRatioChip.props.accessibilityState).toEqual({ selected: true });
+    expect(defaultRatioChip.props.hitSlop).toEqual({ top: 8, bottom: 8, left: 8, right: 8 });
+  });
 });

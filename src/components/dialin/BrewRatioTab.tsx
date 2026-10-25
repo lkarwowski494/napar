@@ -109,6 +109,8 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
             testID="calc-dir-doseToWater"
             accessibilityRole="button"
             accessibilityLabel={t.dialin.directionDoseToWater || 'Doza → Woda'}
+            accessibilityState={{ selected: calcDirection === 'doseToWater' }}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={[
               styles.directionBtn,
               calcDirection === 'doseToWater' && styles.directionBtnActive,
@@ -128,6 +130,8 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
             testID="calc-dir-waterToDose"
             accessibilityRole="button"
             accessibilityLabel={t.dialin.directionWaterToDose || 'Woda → Doza'}
+            accessibilityState={{ selected: calcDirection === 'waterToDose' }}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={[
               styles.directionBtn,
               calcDirection === 'waterToDose' && styles.directionBtnActive,
@@ -190,6 +194,8 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
               testID={`ratio-chip-${item.r}`}
               accessibilityRole="button"
               accessibilityLabel={`Proporcja ${item.label}`}
+              accessibilityState={{ selected: ratioVal === item.r }}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               style={[
                 styles.ratioChip,
                 ratioVal === item.r && styles.ratioChipActive,
