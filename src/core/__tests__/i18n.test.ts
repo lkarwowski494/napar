@@ -37,6 +37,7 @@ import {
   pluralPl,
   plural,
   getPluralCategory,
+  formatTemplate,
 } from '../i18n';
 import { getAppSetting } from '../database';
 
@@ -241,6 +242,14 @@ describe('i18n System', () => {
       expect(plural('pl', 5, { one: 'sekunda' })).toBe('sekunda');
     });
   });
+  test('TASK-P5-09-LOK: formatTemplate wielokrotnie podstawia tokeny w szablonie', () => {
+    expect(formatTemplate('', { name: 'V60' })).toBe('');
+    expect(formatTemplate('Parz {name} z {name}!', { name: 'V60' })).toBe('Parz V60 z V60!');
+    expect(formatTemplate('{dose}g kawy na {water}g wody (ratio {dose}:{water})', { dose: 15, water: 250 }))
+      .toBe('15g kawy na 250g wody (ratio 15:250)');
+    expect(formatTemplate('Brak tokenow', { foo: 'bar' })).toBe('Brak tokenow');
+  });
+
   test('getPluralCategory wylicza reguły liczby mnogiej', () => {
     expect(getPluralCategory('pl', 1)).toBe('one');
     expect(getPluralCategory('pl', 2)).toBe('few');

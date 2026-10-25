@@ -1268,3 +1268,15 @@ export function plural(
   if (category === 'many' && forms.few) return forms.few;
   return forms.other ?? forms.many ?? forms.few ?? forms.one;
 }
+
+/**
+ * Uniwersalny formatator szablonów z podstawianiem tokenów {param} (wielokrotne wystąpienia)
+ */
+export function formatTemplate(template: string, params: Record<string, string | number>): string {
+  if (!template) return '';
+  let result = template;
+  for (const [key, value] of Object.entries(params)) {
+    result = result.split(`{${key}}`).join(String(value));
+  }
+  return result;
+}
