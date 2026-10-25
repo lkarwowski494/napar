@@ -32,6 +32,7 @@ import {
   calculateLiquidYield,
   estimateCoffeeCaffeineMg,
   estimateTeaInfusionCaffeineMg,
+  estimateTotalLeafCaffeineMg,
 } from './domain-rules';
 import { getRecommendedGrindForRecipe } from './grinder-converter';
 import { getHealthKitSyncEnabled, saveDietaryCaffeineSample } from './healthkit';
@@ -309,7 +310,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (bevType === 'COFFEE') {
       caffeineMg = estimateCoffeeCaffeineMg(doseGrams);
     } else {
-      caffeineMg = estimateTeaInfusionCaffeineMg(doseGrams * 30, 1);
+      caffeineMg = estimateTeaInfusionCaffeineMg(estimateTotalLeafCaffeineMg(doseGrams), 1);
     }
 
     const session: BrewSession = {

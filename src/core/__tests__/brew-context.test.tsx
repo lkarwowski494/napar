@@ -580,4 +580,45 @@ describe('BrewContext & BrewProvider', () => {
     const isTea = 'beverageType' in brewData.recipe ? brewData.recipe.beverageType === 'TEA' : brewData.recipe.type === 'TEA';
     expect(isTea).toBe(true);
   });
+  test('TASK-P5-06-TRE: Oblicza kofeinę dla herbaty za pomocą estimateTotalLeafCaffeineMg w finishAndSaveSession', () => {
+    let brewData: any;
+    const Consumer = () => {
+      brewData = useBrew();
+      return null;
+    };
+
+    renderer.act(() => {
+      renderer.create(
+        <BrewProvider>
+          <Consumer />
+        </BrewProvider>
+      );
+    });
+
+    const recordSpy = jest.spyOn(databaseModule, 'recordBrewSessionTransaction').mockImplementation(() => {});
+
+    // Ustaw przepis na herbatę
+    renderer.act(() => {
+      brewData.setBeveragePreference('tea');
+      brewData.setDoseGrams(5); // 5g liści
+    });
+
+    renderer.act(() => {
+      brewData.finishAndSaveSession({
+        rating: 5,
+      });
+    });
+
+    expect(recordSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        beverageType: 'TEA',
+        caffeineContentMg: 60, // 5g * 30mg * 0.40 = 60mg
+      }),
+      undefined,
+      expect.objectContaining({
+        caffeineMg: 60,
+      })
+    );
+    recordSpy.mockRestore();
+  });
 });

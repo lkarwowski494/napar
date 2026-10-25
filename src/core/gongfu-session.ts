@@ -3,7 +3,8 @@
 // Apps4Brew: 100% Offline, wielokrotne ekstrakcje liścia herbaty
 // ============================================================================
 
-import { estimateTeaInfusionCaffeineMg } from './domain-rules';
+import { estimateTeaInfusionCaffeineMg, estimateTotalLeafCaffeineMg } from './domain-rules';
+export { estimateTotalLeafCaffeineMg };
 
 export type GongfuTeaType =
   | 'wulong_rock' // Wulong Skalny (Da Hong Pao, Rou Gui)
@@ -117,9 +118,7 @@ export function getRecommendedGongfuSteepSeconds(
 /**
  * Szacuje całkowity ładunek kofeiny w suchych liściach (3.0% wagi suchej)
  */
-export function estimateTotalLeafCaffeineMg(leafDoseGrams: number): number {
-  return Number((leafDoseGrams * 1000 * 0.03).toFixed(1));
-}
+// estimateTotalLeafCaffeineMg is re-exported from domain-rules
 
 /**
  * Tworzy nową sesję Gongfu Cha

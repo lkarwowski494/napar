@@ -196,6 +196,14 @@ export function estimateCoffeeCaffeineMg(
 }
 
 /**
+ * Szacuje całkowity ładunek kofeiny w suchych liściach herbaty (3.0% wagi suchej)
+ */
+export function estimateTotalLeafCaffeineMg(leafDoseGrams: number): number {
+  if (!Number.isFinite(leafDoseGrams) || leafDoseGrams <= 0) return 0;
+  return Number((leafDoseGrams * 1000 * 0.03).toFixed(1));
+}
+
+/**
  * RD-19: Uwalnianie kofeiny w wielokrotnych zalaniach herbaty Gongfu Cha
  * 1 zalanie: 45%, 2 zalanie: 30%, 3 zalanie: 15%, kolejne: 10% łącznie
  */
