@@ -238,6 +238,7 @@ export function resetTrialForTesting(): void {
   setAppSetting('verified_purchase_tier', '');
   setAppSetting('verified_receipt_json', '');
   setAppSetting('trial_brews_count', '0');
+  setAppSetting('trial_max_brews_seen', '0');
   setAppSetting('trial_max_days_seen', '0');
   setAppSetting('trial_started_at', new Date().toISOString());
   notifyAccessChanged();
@@ -250,6 +251,7 @@ export function setTrialExpiredForTesting(): void {
   setAppSetting('is_pro_active', 'false');
   setAppSetting('subscription_tier', 'none');
   setAppSetting('trial_brews_count', String(TRIAL_MAX_BREWS));
+  setAppSetting('trial_max_brews_seen', String(TRIAL_MAX_BREWS));
   notifyAccessChanged();
 }
 

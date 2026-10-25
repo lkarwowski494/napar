@@ -271,4 +271,18 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(stateProtected.brewsCount).toBe(10);
     expect(stateProtected.brewsRemaining).toBe(5);
   });
+
+  test('TASK-P6-02-MON: resetTrialForTesting czyści również monotoniczny trial_max_brews_seen', () => {
+    for (let i = 0; i < 15; i++) {
+      recordBrewCompleted();
+    }
+    expect(getAppAccessState().status).toBe('trial_expired');
+
+    resetTrialForTesting();
+
+    const state = getAppAccessState();
+    expect(state.status).toBe('trial_active');
+    expect(state.brewsCount).toBe(0);
+    expect(state.brewsRemaining).toBe(15);
+  });
 });
