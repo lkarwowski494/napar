@@ -27,6 +27,10 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
         {GRIND_CATEGORIES.map((cat) => (
           <Pressable
             key={cat.id}
+            testID={`grind-category-${cat.id}`}
+            accessibilityRole="button"
+            accessibilityState={{ selected: selectedGrindCategoryId === cat.id }}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={[
               styles.grindCategoryChip,
               selectedGrindCategoryId === cat.id && styles.grindCategoryChipActive,
