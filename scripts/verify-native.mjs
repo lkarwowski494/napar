@@ -142,6 +142,29 @@ try {
     }
   }
 
+  // 1c. Weryfikacja binarnego nagłówka PNG ekranu powitalnego splash.png (TASK-P6-10-WYD)
+  const splashPath = join(root, 'assets', 'splash.png');
+  check(existsSync(splashPath), 'Brak pliku assets/splash.png');
+  if (existsSync(splashPath)) {
+    const buf = readFileSync(splashPath);
+    check(buf.length >= 26, 'Plik assets/splash.png jest zbyt krótki');
+    if (buf.length >= 26) {
+      const isPng =
+        buf[0] === 0x89 &&
+        buf[1] === 0x50 &&
+        buf[2] === 0x4e &&
+        buf[3] === 0x47 &&
+        buf[4] === 0x0d &&
+        buf[5] === 0x0a &&
+        buf[6] === 0x1a &&
+        buf[7] === 0x0a;
+      check(isPng, 'assets/splash.png nie posiada prawidłowej sygnatury PNG (89 50 4E 47)');
+      const w = buf.readUInt32BE(16);
+      const h = buf.readUInt32BE(20);
+      check(w >= 512 && h >= 512, `Ekran powitalny splash ma wymiary ${w}x${h} (wymagane min. 512x512)`);
+    }
+  }
+
   // 2. Prebuild na Linuksie / macOS (jeśli nie jesteśmy na czystym Windows bez narzędzi Cocoa)
   if (!hadIos) {
     if (process.platform === 'win32') {
