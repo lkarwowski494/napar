@@ -133,7 +133,7 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
             </View>
 
             <Text style={styles.eyDescriptionText}>
-              {eyResult.descriptionPl}
+              {language === 'en' ? eyResult.descriptionEn : eyResult.descriptionPl}
             </Text>
           </View>
         )}

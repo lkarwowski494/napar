@@ -351,7 +351,14 @@
     "tempLowerMetric": "Obniż o 2–4°C",
     "tempLowerImperial": "Obniż o 4–7°F",
     "normBalance": "Balans w normie",
-    "normBalanceDesc": "Filiżanka mieści się w standardowym oknie ekstrakcji."
+    "normBalanceDesc": "Filiżanka mieści się w standardowym oknie ekstrakcji.",
+    "eyTitle": "Kalkulator Wydajności Ekstrakcji (EY%)",
+    "eySubtitle": "Oblicz ekstrakcję (Extraction Yield) na podstawie TDS z refraktometru lub szacunków.",
+    "eyPouroverMode": "Przelew (Pour-over)",
+    "eyEspressoMode": "Espresso",
+    "eyWaterInput": "Woda zalana (g)",
+    "eyDoseInput": "Doza ziaren (g)",
+    "eyTdsInput": "TDS (%) z refraktometru"
   },
   "water": {
     "tabTitle": "Woda SCA",

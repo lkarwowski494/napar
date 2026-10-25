@@ -351,7 +351,14 @@
     "tempLowerMetric": "Decrease by 2–4°C",
     "tempLowerImperial": "Decrease by 4–7°F",
     "normBalance": "Balance in normal range",
-    "normBalanceDesc": "The cup is well within the standard extraction sweet spot."
+    "normBalanceDesc": "The cup is well within the standard extraction sweet spot.",
+    "eyTitle": "Calcolatore della Resa di Estrazione (EY%)",
+    "eySubtitle": "Calcola la resa di estrazione in base al TDS del rifrattometro o alle stime.",
+    "eyPouroverMode": "Filtro (Pour-over)",
+    "eyEspressoMode": "Espresso",
+    "eyWaterInput": "Acqua versata (g)",
+    "eyDoseInput": "Dose di caffè (g)",
+    "eyTdsInput": "TDS del rifrattometro (%)"
   },
   "water": {
     "tabTitle": "SCA Water",

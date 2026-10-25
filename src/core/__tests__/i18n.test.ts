@@ -95,6 +95,8 @@ describe('i18n System', () => {
   });
 
   test('TASK-P6-09-LOK: Klucze stepperów kofeiny i snu są zdefiniowane w PL i EN', () => {
+    expect(translations.pl.dialin.eyTitle).toBe('Kalkulator Wydajności Ekstrakcji (EY%)');
+    expect(translations.en.dialin.eyTitle).toBe('Extraction Yield Calculator (EY%)');
     expect(translations.pl.settings.decreaseHalfLife).toBe('Zmniejsz czas półtrwania');
     expect(translations.en.settings.decreaseHalfLife).toBe('Decrease half-life');
     expect(translations.pl.settings.earlierBedtime).toBe('Wcześniejsza godzina snu');
