@@ -40,19 +40,29 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
       <View style={styles.calcCard}>
         <View style={styles.modeRow}>
           <Pressable
+            testID="ey-mode-pourover"
+            accessibilityRole="button"
+            accessibilityLabel={t?.dialin?.eyPouroverMode || 'Przelew (Pour-over)'}
+            accessibilityState={{ selected: methodMode === 'pourover' }}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={[styles.modeBtn, methodMode === 'pourover' && styles.modeBtnActive]}
             onPress={() => setMethodMode('pourover')}
           >
             <Text style={[styles.modeBtnText, methodMode === 'pourover' && styles.modeBtnTextActive]}>
-              Przelew (Pour-over)
+              {t?.dialin?.eyPouroverMode || 'Przelew (Pour-over)'}
             </Text>
           </Pressable>
           <Pressable
+            testID="ey-mode-espresso"
+            accessibilityRole="button"
+            accessibilityLabel={t?.dialin?.eyEspressoMode || 'Espresso'}
+            accessibilityState={{ selected: methodMode === 'espresso' }}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={[styles.modeBtn, methodMode === 'espresso' && styles.modeBtnActive]}
             onPress={() => setMethodMode('espresso')}
           >
             <Text style={[styles.modeBtnText, methodMode === 'espresso' && styles.modeBtnTextActive]}>
-              Espresso
+              {t?.dialin?.eyEspressoMode || 'Espresso'}
             </Text>
           </Pressable>
         </View>
