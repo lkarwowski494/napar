@@ -252,4 +252,23 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const purchaseRes = await purchaseWithStoreKit('monthly');
     expect(purchaseRes).toBeDefined();
   });
+
+  test('TASK-P5-02-MON: Monotoniczny trial_max_brews_seen chroni przed cofnięciem licznika zaparzeń', () => {
+    // Zasymuluj wykonanie 10 zaparzeń
+    for (let i = 0; i < 10; i++) {
+      recordBrewCompleted();
+    }
+    const state10 = getAppAccessState();
+    expect(state10.brewsCount).toBe(10);
+    expect(state10.brewsRemaining).toBe(5);
+
+    // Próba manipulacji / obniżenia licznika zaparzeń w app_settings do 2
+    const { setAppSetting } = require('../database');
+    setAppSetting('trial_brews_count', '2');
+
+    // Mimo obniżenia trial_brews_count, monotoniczny trial_max_brews_seen utrzymuje wartość 10
+    const stateProtected = getAppAccessState();
+    expect(stateProtected.brewsCount).toBe(10);
+    expect(stateProtected.brewsRemaining).toBe(5);
+  });
 });

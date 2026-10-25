@@ -102,15 +102,20 @@ export function getAppAccessState(): AppAccessState {
   }
   const daysRemaining = Math.max(0, TRIAL_DURATION_DAYS - effectiveElapsedDays);
 
-  const brewsCount = parseInt(getAppSetting('trial_brews_count', '0'), 10) || 0;
-  const brewsRemaining = Math.max(0, TRIAL_MAX_BREWS - brewsCount);
+  const brewsCount = Math.max(0, parseInt(getAppSetting('trial_brews_count', '0'), 10) || 0);
+  const maxBrewsSeen = Math.max(0, parseInt(getAppSetting('trial_max_brews_seen', '0'), 10) || 0);
+  const effectiveBrewsCount = Math.max(brewsCount, maxBrewsSeen);
+  if (brewsCount > maxBrewsSeen) {
+    setAppSetting('trial_max_brews_seen', String(brewsCount));
+  }
+  const brewsRemaining = Math.max(0, TRIAL_MAX_BREWS - effectiveBrewsCount);
 
-  const isExpired = brewsCount >= TRIAL_MAX_BREWS || effectiveElapsedDays >= TRIAL_DURATION_DAYS;
+  const isExpired = effectiveBrewsCount >= TRIAL_MAX_BREWS || effectiveElapsedDays >= TRIAL_DURATION_DAYS;
 
   if (isExpired) {
     return {
       status: 'trial_expired',
-      brewsCount,
+      brewsCount: effectiveBrewsCount,
       brewsRemaining: 0,
       daysRemaining,
       isSubscribed: false,
@@ -122,7 +127,7 @@ export function getAppAccessState(): AppAccessState {
 
   return {
     status: 'trial_active',
-    brewsCount,
+    brewsCount: effectiveBrewsCount,
     brewsRemaining,
     daysRemaining,
     isSubscribed: false,
@@ -139,6 +144,7 @@ export function recordBrewCompleted(): AppAccessState {
   }
   const newCount = current.brewsCount + 1;
   setAppSetting('trial_brews_count', String(newCount));
+  setAppSetting('trial_max_brews_seen', String(newCount));
   const state = getAppAccessState();
   notifyAccessChanged();
   return state;
