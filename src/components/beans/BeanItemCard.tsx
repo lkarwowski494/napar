@@ -18,6 +18,7 @@ interface BeanItemCardProps {
   onToggleArchive: (item: InventoryItem) => void;
   onSelectForBrew: (item: InventoryItem) => void;
   onOpenEdit: (item: InventoryItem) => void;
+  language?: 'pl' | 'en';
 }
 
 export const BeanItemCard: React.FC<BeanItemCardProps> = ({
@@ -27,8 +28,11 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
   onToggleArchive,
   onSelectForBrew,
   onOpenEdit,
+  language: propLanguage,
 }) => {
-  const { t, language } = useTranslation();
+  const { t, language: contextLang } = useTranslation();
+  const language = propLanguage || contextLang || 'pl';
+  const isEn = language === 'en';
   const resting =
     item.type === 'coffee' && item.roastOrHarvestDate
       ? evaluateRestingWindow(item.roastOrHarvestDate)
@@ -107,9 +111,8 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             style={styles.archiveEmptyBtn}
             onPress={() => onToggleArchive(item)}
             accessibilityRole="button"
-            accessibilityLabel="Archiwizuj teraz"
-          >
-            <Text style={styles.archiveEmptyBtnText}>Archiwizuj teraz</Text>
+            accessibilityLabel={isEn ? "Archive now" : "Archiwizuj teraz"}>
+            <Text style={styles.archiveEmptyBtnText}>{isEn ? "Archive now" : "Archiwizuj teraz"}</Text>
           </Pressable>
         </View>
       )}
@@ -129,10 +132,11 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             <Pressable
               style={styles.brewActionBtn}
               onPress={() => onSelectForBrew(item)}
+              hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
               accessibilityRole="button"
-              accessibilityLabel="Parz z tych ziaren"
+              accessibilityLabel={isEn ? "Brew with these beans" : "Parz z tych ziaren"}
             >
-              <Text style={styles.brewActionText}>Parz z tych ziaren</Text>
+              <Text style={styles.brewActionText}>{isEn ? "Brew" : "Parz z tych ziaren"}</Text>
             </Pressable>
           )}
           <Pressable
@@ -140,19 +144,17 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             onPress={() => onOpenEdit(item)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessibilityRole="button"
-            accessibilityLabel="Edytuj paczkę"
-          >
-            <Text style={styles.editActionText}>Edytuj</Text>
+            accessibilityLabel={isEn ? "Edit item" : "Edytuj paczkę"}>
+            <Text style={styles.editActionText}>{isEn ? "Edit" : "Edytuj"}</Text>
           </Pressable>
           <Pressable
             style={styles.archiveActionBtn}
             onPress={() => onToggleArchive(item)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessibilityRole="button"
-            accessibilityLabel={item.isArchived ? 'Przywróć z archiwum' : 'Archiwizuj paczkę'}
-          >
+            accessibilityLabel={item.isArchived ? (isEn ? "Restore item" : "Przywróć z archiwum") : (isEn ? "Archive item" : "Archiwizuj paczkę")}>
             <Text style={styles.archiveActionText}>
-              {item.isArchived ? 'Przywróć' : 'Archiwizuj'}
+              {item.isArchived ? (isEn ? "Restore" : "Przywróć") : (isEn ? "Archive" : "Archiwizuj")}
             </Text>
           </Pressable>
         </View>
@@ -318,6 +320,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
+    minHeight: 36,
+    justifyContent: 'center',
   },
   brewActionText: {
     color: '#FFFFFF',

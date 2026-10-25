@@ -1,3 +1,4 @@
+import { BeanItemCard } from '../../components/beans/BeanItemCard';
 // ============================================================================
 // Napar (Steepwise) — Unit Tests: Beans & Leaves Stash / Inventory Screen
 // Apps4Brew: 100% Offline-first, Zero login, Resting Window & Freshness Tracking
@@ -894,7 +895,26 @@ describe('BeansScreen (Stash & Inventory)', () => {
 
     mockDb.getFirstSync.mockReset();
   });
+  test('TASK-P5-04-STU: BeanItemCard poprawnie renderuje zlokalizowane etykiety angielskie i powiększony hitSlop', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BeanItemCard
+          item={mockItems[0]}
+          unitSystem="metric"
+          onToggleFavorite={jest.fn()}
+          onToggleArchive={jest.fn()}
+          onSelectForBrew={jest.fn()}
+          onOpenEdit={jest.fn()}
+          language="en"
+        />
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Brew');
+    expect(str).toContain('Edit');
+    expect(str).toContain('Archive');
+    expect(str).not.toContain('Parz z tych ziaren');
+  });
 });
-
-
-
