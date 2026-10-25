@@ -220,6 +220,17 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
 
     const byTeaSensory = searchTeaCategories('kwiatowy');
     expect(byTeaSensory.length).toBeGreaterThanOrEqual(1);
+
+    // TASK-P7-06-TRE: Wyszukiwanie po angielskich profilach sensorycznych i deskryptorach
+    const byVarEnSensory = searchCoffeeVarieties('crystal clarity');
+    expect(byVarEnSensory.length).toBeGreaterThanOrEqual(1);
+    expect(byVarEnSensory[0].id).toBe('variety-geisha');
+
+    const byProcEnSensory = searchCoffeeProcesses('cleanliness');
+    expect(byProcEnSensory.length).toBeGreaterThanOrEqual(1);
+
+    const byTeaEnSensory = searchTeaCategories('silky');
+    expect(byTeaEnSensory.length).toBeGreaterThanOrEqual(1);
   });
 
   test('Pobieranie opisów i profili sensorycznych przez getKnowledgeDescription i getKnowledgeSensoryProfile', () => {

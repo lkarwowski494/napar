@@ -558,7 +558,8 @@ export function searchCoffeeVarieties(query: string): CoffeeVarietyInfo[] {
     v.nativeRegion.toLowerCase().includes(q) ||
     v.keyNotesPl.some((k) => k.toLowerCase().includes(q)) ||
     v.keyNotesEn.some((k) => k.toLowerCase().includes(q)) ||
-    v.sensoryProfilePl.toLowerCase().includes(q)
+    v.sensoryProfilePl.toLowerCase().includes(q) ||
+    v.sensoryProfileEn.toLowerCase().includes(q)
   );
 }
 
@@ -569,7 +570,9 @@ export function searchCoffeeProcesses(query: string): CoffeeProcessInfo[] {
     p.name.toLowerCase().includes(q) ||
     p.processType.toLowerCase().includes(q) ||
     p.keyNotesPl.some((k) => k.toLowerCase().includes(q)) ||
-    p.sensoryImpactPl.toLowerCase().includes(q)
+    p.keyNotesEn.some((k) => k.toLowerCase().includes(q)) ||
+    p.sensoryImpactPl.toLowerCase().includes(q) ||
+    p.sensoryImpactEn.toLowerCase().includes(q)
   );
 }
 
@@ -596,7 +599,8 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
     t.traditionalName.toLowerCase().includes(q) ||
     t.famousVarietiesPl.some((v) => v.toLowerCase().includes(q)) ||
     t.famousRegions.some((r) => r.toLowerCase().includes(q)) ||
-    t.sensoryProfilePl.toLowerCase().includes(q)
+    t.sensoryProfilePl.toLowerCase().includes(q) ||
+    t.sensoryProfileEn.toLowerCase().includes(q)
   );
 }
 
