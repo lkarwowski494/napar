@@ -161,7 +161,7 @@ describe('SensoryScoreEditor', () => {
 
     // Próba zmniejszenia poniżej 1
     const decAcidityBtn = editorTree.root.findByProps({
-      accessibilityLabel: 'Zmniejsz Acidity',
+      accessibilityLabel: 'Decrease Acidity',
     });
     renderer.act(() => {
       decAcidityBtn.props.onPress();
@@ -173,7 +173,7 @@ describe('SensoryScoreEditor', () => {
 
     // Próba zwiększenia powyżej 5
     const incSweetnessBtn = editorTree.root.findByProps({
-      accessibilityLabel: 'Zwiększ Sweetness',
+      accessibilityLabel: 'Increase Sweetness',
     });
     renderer.act(() => {
       incSweetnessBtn.props.onPress();

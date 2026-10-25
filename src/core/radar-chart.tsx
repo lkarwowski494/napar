@@ -210,8 +210,8 @@ export const SensoryScoreEditor: React.FC<SensoryScoreEditorProps> = ({
                 style={[styles.stepBtn, val <= 1 && styles.stepBtnDisabled]}
                 onPress={() => updateAxis(axis.key, -1)}
                 disabled={val <= 1}
-                hitSlop={6}
-                accessibilityLabel={`Zmniejsz ${name}`}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityLabel={language === 'en' ? `Decrease ${name}` : `Zmniejsz ${name}`}
               >
                 <Text style={styles.stepBtnText}>−</Text>
               </Pressable>
@@ -222,8 +222,8 @@ export const SensoryScoreEditor: React.FC<SensoryScoreEditorProps> = ({
                 style={[styles.stepBtn, val >= 5 && styles.stepBtnDisabled]}
                 onPress={() => updateAxis(axis.key, 1)}
                 disabled={val >= 5}
-                hitSlop={6}
-                accessibilityLabel={`Zwiększ ${name}`}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityLabel={language === 'en' ? `Increase ${name}` : `Zwiększ ${name}`}
               >
                 <Text style={styles.stepBtnText}>+</Text>
               </Pressable>
