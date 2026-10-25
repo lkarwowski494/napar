@@ -348,11 +348,14 @@ export function convertBetweenGrinders(
 /**
  * Zwraca szacowany rozmiar cząstek w mikronach dla danej metody lub opisu przemiału receptury
  */
-export function getRecipeMicrons(recipe: {
+export function getRecipeMicrons(recipe?: {
   method?: string;
   grindSettingDescriptionPl?: string;
   grind_size_description?: string;
-}): number {
+} | null): number {
+  if (!recipe || typeof recipe !== 'object') {
+    return 720;
+  }
   const method = (recipe.method || '').toUpperCase();
   const desc = (recipe.grindSettingDescriptionPl || recipe.grind_size_description || '').toLowerCase();
 
@@ -381,7 +384,7 @@ export function getRecipeMicrons(recipe: {
  * Zwraca rekomendację nastawy dla konkretnego młynka i receptury
  */
 export function getRecommendedGrindForRecipe(
-  recipe: { method?: string; grindSettingDescriptionPl?: string; grind_size_description?: string },
+  recipe: { method?: string; grindSettingDescriptionPl?: string; grind_size_description?: string } | null | undefined,
   grinderId: string
 ): { formatted: string; rawValue: number; grinderName: string; microns: number } {
   const microns = getRecipeMicrons(recipe);

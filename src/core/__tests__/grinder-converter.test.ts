@@ -215,4 +215,19 @@ describe('Grinder Dial-in Converter Module', () => {
     const betweenInvalidStr = convertBetweenGrinders('comandante_c40', 'invalid-clicks', 'timemore_c2_c3');
     expect(Number.isFinite(betweenInvalidStr.microns)).toBe(true);
   });
+
+  test('TASK-P8-07-JAK: getRecipeMicrons i getRecommendedGrindForRecipe są odporne na undefined / null recipe', () => {
+    // Nie rzuca błędu, zwraca bezpieczny fallback 720 µm
+    expect(getRecipeMicrons(undefined)).toBe(720);
+    expect(getRecipeMicrons(null)).toBe(720);
+    expect(getRecipeMicrons({} as any)).toBe(720);
+
+    const recUndef = getRecommendedGrindForRecipe(undefined, 'comandante_c40');
+    expect(recUndef.microns).toBe(720);
+    expect(recUndef.rawValue).toBe(24);
+
+    const recNull = getRecommendedGrindForRecipe(null, 'fellow_ode_gen2');
+    expect(recNull.microns).toBe(720);
+    expect(recNull.formatted).toBe('5');
+  });
 });
