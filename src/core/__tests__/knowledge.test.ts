@@ -123,6 +123,8 @@ describe('Baza Wiedzy: Terroir i Regiony Kawowe (COFFEE_ORIGINS)', () => {
       expect(origin.flavorProfilePl.trim().length).toBeGreaterThan(0);
       expect(origin.flavorProfileEn.trim().length).toBeGreaterThan(0);
       expect(origin.keyNotesPl.length).toBeGreaterThan(0);
+      expect(origin.keyNotesEn.length).toBeGreaterThan(0);
+      expect(origin.keyNotesPl.length).toBe(origin.keyNotesEn.length);
     }
   });
 

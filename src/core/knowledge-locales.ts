@@ -341,7 +341,14 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
   "origin-ethiopia": {
     "flavorProfilePl": "Światowa stolica aromatu kwiatowego: jaśmin, herbata Earl Grey, bergamotka, soczyste owoce cytrusowe i morele.",
     "flavorProfileEn": "The global capital of floral complexity: jasmine, Earl Grey tea, bergamot, lively citrus, and sun-ripened apricots.",
-    "descriptionPl": "Kolebka kawy Arabica. Uprawiana głównie w zacienionych ogrodach leśnych (Garden Coffee) przez setki tysięcy drobnych rolników zrzeszonych w spółdzielniach.",
+        "keyNotesEn": [
+      "jasmine",
+      "bergamot",
+      "Earl Grey",
+      "apricot",
+      "peach"
+    ],
+"descriptionPl": "Kolebka kawy Arabica. Uprawiana głównie w zacienionych ogrodach leśnych (Garden Coffee) przez setki tysięcy drobnych rolników zrzeszonych w spółdzielniach.",
     "descriptionEn": "The birthplace of coffee. Grown mostly in shaded smallholder gardens under canopy trees at breathtaking high altitudes.",
     "keyNotesPl": [
       "jaśmin",
@@ -354,7 +361,14 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
   "origin-kenya": {
     "flavorProfilePl": "Niezrównana kwasowość kwasu fosforowego, intensywna czarna porzeczka, rabarbar, owoce leśne i soczysty finisz.",
     "flavorProfileEn": "Unrivalled sparkling phosphoric acidity, intense blackcurrant, tart rhubarb, forest berries, and sweet savory juiciness.",
-    "descriptionPl": "Żyzne czerwone gleby wulkaniczne wokół Mount Kenya oraz rygorystyczny system stacji mycia (wet mills/factories) tworzą jedne z najczystszych i najbardziej wyrazistych kaw świata.",
+        "keyNotesEn": [
+      "blackcurrant",
+      "rhubarb",
+      "blackberry",
+      "plum",
+      "red grapefruit"
+    ],
+"descriptionPl": "Żyzne czerwone gleby wulkaniczne wokół Mount Kenya oraz rygorystyczny system stacji mycia (wet mills/factories) tworzą jedne z najczystszych i najbardziej wyrazistych kaw świata.",
     "descriptionEn": "Red volcanic soils around Mount Kenya and rigorous wet-mill sorting at cooperative factories produce some of the most vibrant coffees on Earth.",
     "keyNotesPl": [
       "czarna porzeczka",
@@ -367,7 +381,14 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
   "origin-colombia": {
     "flavorProfilePl": "Czysta słodycz trzcinowa (panela), czerwone jabłko, karmel, cytrusy i jedwabiste, zbalansowane body.",
     "flavorProfileEn": "Pure cane sugar sweetness (panela), crisp red apple, caramel, citrus zest, and silky balanced body.",
-    "descriptionPl": "Trzeci producent kawy na świecie i lider jakości specialty. Zróżnicowane łańcuchy Andów pozwalają na zbiory świeżej kawy w różnych regionach przez 12 miesięcy w roku.",
+        "keyNotesEn": [
+      "panela",
+      "red apple",
+      "caramel",
+      "orange",
+      "milk chocolate"
+    ],
+"descriptionPl": "Trzeci producent kawy na świecie i lider jakości specialty. Zróżnicowane łańcuchy Andów pozwalają na zbiory świeżej kawy w różnych regionach przez 12 miesięcy w roku.",
     "descriptionEn": "A global powerhouse of specialty coffee. Three cordilleras of the Andes create distinct microclimates, enabling fresh harvest year-round.",
     "keyNotesPl": [
       "panela",
@@ -380,7 +401,14 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
   "origin-guatemala": {
     "flavorProfilePl": "Wpływ żyznych popiołów wulkanicznych: bogata czekolada deserowa, kakao, nuty korzenne, jabłkowa kwasowość i gęste body.",
     "flavorProfileEn": "Rich volcanic soil influence: dark chocolate, baker cocoa, warm spices, crisp malic acidity, and syrupy body.",
-    "descriptionPl": "Kraj wulkanów i mikroklimatów. W regionie Huehuetenango suche, gorące wiatry z Meksyku chronią uprawy przed przymrozkami na wysokościach sięgających 2000 m n.p.m.",
+        "keyNotesEn": [
+      "dark chocolate",
+      "cocoa",
+      "cinnamon",
+      "apple",
+      "hazelnut"
+    ],
+"descriptionPl": "Kraj wulkanów i mikroklimatów. W regionie Huehuetenango suche, gorące wiatry z Meksyku chronią uprawy przed przymrozkami na wysokościach sięgających 2000 m n.p.m.",
     "descriptionEn": "Land of volcanoes and microclimates. In Huehuetenango, warm winds from Mexican plains protect highland coffee farms from frost up to 2,000m.",
     "keyNotesPl": [
       "czekolada deserowa",
@@ -393,7 +421,14 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
   "origin-costa-rica": {
     "flavorProfilePl": "Światowy lider innowacji honey/anaerobic. Niezwykle słodki profil miodowy, żółte owoce, morele i maślany finisz.",
     "flavorProfileEn": "Pioneers of honey and experimental anaerobic fermentations. Intensely sweet honeyed cup, apricot, yellow stone fruits, and buttered finish.",
-    "descriptionPl": "Kraj o najwyższych standardach ekologicznych i technicznych. Uprawa Robusty była tu prawnie zakazana przez dziesięciolecia, by chronić reputację kostarykańskiej Arabiki.",
+        "keyNotesEn": [
+      "honey",
+      "apricot",
+      "yellow peach",
+      "vanilla",
+      "caramel"
+    ],
+"descriptionPl": "Kraj o najwyższych standardach ekologicznych i technicznych. Uprawa Robusty była tu prawnie zakazana przez dziesięciolecia, by chronić reputację kostarykańskiej Arabiki.",
     "descriptionEn": "World-renowned for ecological sustainability and micro-mill processing innovation. Robusta cultivation was banned for decades to protect Arabica pedigree.",
     "keyNotesPl": [
       "miód",
@@ -406,7 +441,14 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
   "origin-brazil": {
     "flavorProfilePl": "Fundament słodyczy i kremowego espresso. Niska kwasowość, orzechy laskowe, migdały, mleczna czekolada i suszone owoce.",
     "flavorProfileEn": "The cornerstone of sweet, chocolatey espresso blends. Mild acidity, toasted hazelnuts, milk chocolate, and sun-dried fruit sweetness.",
-    "descriptionPl": "Największy producent kawy na świecie od ponad 150 lat. Oprócz wielkich farm zmechanizowanych, regiony Sul de Minas i Cerrado produkują wybitne Yellow Bourbony o rzemieślniczym charakterze.",
+        "keyNotesEn": [
+      "hazelnut",
+      "milk chocolate",
+      "almonds",
+      "caramel",
+      "dried plum"
+    ],
+"descriptionPl": "Największy producent kawy na świecie od ponad 150 lat. Oprócz wielkich farm zmechanizowanych, regiony Sul de Minas i Cerrado produkują wybitne Yellow Bourbony o rzemieślniczym charakterze.",
     "descriptionEn": "The world’s largest coffee producer for over 150 years. Alongside vast mechanized estates, mountainous micro-regions craft exceptional specialty lots.",
     "keyNotesPl": [
       "orzech laskowy",
@@ -419,7 +461,14 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
   "origin-panama": {
     "flavorProfilePl": "Kolebka najsłynniejszych aukcji Best of Panama. Mglisty mikroklimat Bajareque tworzy eteryczne nuty jaśminu, bergamotki, papai i białej brzoskwini.",
     "flavorProfileEn": "Home to record-breaking Best of Panama auctions. The misty Bajareque microclimate crafts ethereal floral jasmine, bergamot, and white peach notes.",
-    "descriptionPl": "Wulkan Barú zapewnia unikalny mikroklimat z zimnymi mgłami (Bajareque), które spowalniają dojrzewanie owoców kawowca, potęgując koncentrację cukrów i aromatów kwiatowych.",
+        "keyNotesEn": [
+      "jasmine",
+      "bergamot",
+      "white peach",
+      "orange blossom",
+      "papaya"
+    ],
+"descriptionPl": "Wulkan Barú zapewnia unikalny mikroklimat z zimnymi mgłami (Bajareque), które spowalniają dojrzewanie owoców kawowca, potęgując koncentrację cukrów i aromatów kwiatowych.",
     "descriptionEn": "Volcán Barú cradles an extraordinary terroir where cool Bajareque mists delay cherry maturation, packing the beans with intense sugars and delicate aromatics.",
     "keyNotesPl": [
       "jaśmin",

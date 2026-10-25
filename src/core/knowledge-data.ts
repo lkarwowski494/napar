@@ -57,6 +57,7 @@ export interface CoffeeOriginInfo {
   flavorProfilePl: string;
   flavorProfileEn: string;
   keyNotesPl: string[];
+  keyNotesEn: string[];
   descriptionPl: string;
   descriptionEn: string;
 }
@@ -354,6 +355,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
     flavorProfilePl: getLocale('origin-ethiopia').flavorProfilePl!,
     flavorProfileEn: getLocale('origin-ethiopia').flavorProfileEn!,
     keyNotesPl: getLocale('origin-ethiopia').keyNotesPl!,
+    keyNotesEn: getLocale('origin-ethiopia').keyNotesEn!,
     descriptionPl: getLocale('origin-ethiopia').descriptionPl,
     descriptionEn: getLocale('origin-ethiopia').descriptionEn,
   },
@@ -368,6 +370,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
     flavorProfilePl: getLocale('origin-kenya').flavorProfilePl!,
     flavorProfileEn: getLocale('origin-kenya').flavorProfileEn!,
     keyNotesPl: getLocale('origin-kenya').keyNotesPl!,
+    keyNotesEn: getLocale('origin-kenya').keyNotesEn!,
     descriptionPl: getLocale('origin-kenya').descriptionPl,
     descriptionEn: getLocale('origin-kenya').descriptionEn,
   },
@@ -382,6 +385,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
     flavorProfilePl: getLocale('origin-colombia').flavorProfilePl!,
     flavorProfileEn: getLocale('origin-colombia').flavorProfileEn!,
     keyNotesPl: getLocale('origin-colombia').keyNotesPl!,
+    keyNotesEn: getLocale('origin-colombia').keyNotesEn!,
     descriptionPl: getLocale('origin-colombia').descriptionPl,
     descriptionEn: getLocale('origin-colombia').descriptionEn,
   },
@@ -396,6 +400,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
     flavorProfilePl: getLocale('origin-guatemala').flavorProfilePl!,
     flavorProfileEn: getLocale('origin-guatemala').flavorProfileEn!,
     keyNotesPl: getLocale('origin-guatemala').keyNotesPl!,
+    keyNotesEn: getLocale('origin-guatemala').keyNotesEn!,
     descriptionPl: getLocale('origin-guatemala').descriptionPl,
     descriptionEn: getLocale('origin-guatemala').descriptionEn,
   },
@@ -410,6 +415,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
     flavorProfilePl: getLocale('origin-costa-rica').flavorProfilePl!,
     flavorProfileEn: getLocale('origin-costa-rica').flavorProfileEn!,
     keyNotesPl: getLocale('origin-costa-rica').keyNotesPl!,
+    keyNotesEn: getLocale('origin-costa-rica').keyNotesEn!,
     descriptionPl: getLocale('origin-costa-rica').descriptionPl,
     descriptionEn: getLocale('origin-costa-rica').descriptionEn,
   },
@@ -424,6 +430,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
     flavorProfilePl: getLocale('origin-brazil').flavorProfilePl!,
     flavorProfileEn: getLocale('origin-brazil').flavorProfileEn!,
     keyNotesPl: getLocale('origin-brazil').keyNotesPl!,
+    keyNotesEn: getLocale('origin-brazil').keyNotesEn!,
     descriptionPl: getLocale('origin-brazil').descriptionPl,
     descriptionEn: getLocale('origin-brazil').descriptionEn,
   },
@@ -438,6 +445,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
     flavorProfilePl: getLocale('origin-panama').flavorProfilePl!,
     flavorProfileEn: getLocale('origin-panama').flavorProfileEn!,
     keyNotesPl: getLocale('origin-panama').keyNotesPl!,
+    keyNotesEn: getLocale('origin-panama').keyNotesEn!,
     descriptionPl: getLocale('origin-panama').descriptionPl,
     descriptionEn: getLocale('origin-panama').descriptionEn,
   },
@@ -572,7 +580,10 @@ export function searchCoffeeOrigins(query: string): CoffeeOriginInfo[] {
     o.country.toLowerCase().includes(q) ||
     o.primaryRegions.some((r) => r.toLowerCase().includes(q)) ||
     o.mainVarieties.some((v) => v.toLowerCase().includes(q)) ||
-    o.flavorProfilePl.toLowerCase().includes(q)
+    o.flavorProfilePl.toLowerCase().includes(q) ||
+    o.flavorProfileEn.toLowerCase().includes(q) ||
+    o.keyNotesPl.some((k) => k.toLowerCase().includes(q)) ||
+    o.keyNotesEn.some((k) => k.toLowerCase().includes(q))
   );
 }
 
