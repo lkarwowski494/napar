@@ -108,4 +108,15 @@ describe('BrewFinishModal Component', () => {
     act(() => saveBtn.props.onPress());
     expect(defaultProps.onSave).toHaveBeenCalled();
   });
+
+  test('TASK-P5-03-ZAK: Renderuje oszczędności w formacie waluty angielskiej bez PLN', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<BrewFinishModal {...defaultProps} language="en" />);
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('+$14.70');
+    expect(str).not.toContain('+14.70 PLN');
+  });
 });

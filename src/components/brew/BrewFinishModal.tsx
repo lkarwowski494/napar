@@ -45,6 +45,7 @@ interface BrewFinishModalProps {
   notes: string;
   onChangeNotes: (notes: string) => void;
   brewCost: BrewCostMetrics;
+  language?: 'pl' | 'en';
   onSkip: () => void;
   onSave: () => void;
 }
@@ -68,10 +69,12 @@ export function BrewFinishModal({
   notes,
   onChangeNotes,
   brewCost,
+  language: propLanguage,
   onSkip,
   onSave,
 }: BrewFinishModalProps) {
-  const { t, language } = useTranslation();
+  const { t, language: contextLang } = useTranslation();
+  const language = propLanguage || contextLang || 'pl';
   const curr = language === 'pl' ? 'PLN' : '$';
 
   const formatTime = (seconds: number) => {
@@ -310,10 +313,12 @@ export function BrewFinishModal({
               </Text>
               <Text style={styles.finishCostSavings}>
                 {language === 'pl'
-                  ? 'Oszczędność vs kawiarnia specialty (18 zł): '
-                  : (t.brew?.craftSavingsLabel || 'Savings vs cafe cup: ') + ' '}
+                  ? `Oszczędność vs kawiarnia specialty (${brewCost.cafePrice.toFixed(0)} zł): `
+                  : (t.brew?.craftSavingsLabel || `Savings vs cafe cup (${curr}${brewCost.cafePrice.toFixed(0)}): `) + ' '}
                 <Text style={styles.finishCostSavingsBold}>
-                  {`+${brewCost.savingsPerCup.toFixed(2)} PLN`}
+                  {language === 'pl'
+                    ? `+${brewCost.savingsPerCup.toFixed(2)} PLN`
+                    : `+${curr}${brewCost.savingsPerCup.toFixed(2)}`}
                 </Text>
               </Text>
             </View>
