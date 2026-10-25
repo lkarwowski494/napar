@@ -91,9 +91,13 @@ export function getAppAccessState(): AppAccessState {
     setAppSetting('trial_started_at', trialStartedAt);
   }
 
-  const startDate = new Date(trialStartedAt);
   const now = new Date();
-  const elapsedMs = Math.max(0, now.getTime() - startDate.getTime());
+  const startDate = new Date(trialStartedAt);
+  const startTime = Number.isFinite(startDate.getTime()) ? startDate.getTime() : now.getTime();
+  if (!Number.isFinite(startDate.getTime())) {
+    setAppSetting('trial_started_at', now.toISOString());
+  }
+  const elapsedMs = Math.max(0, now.getTime() - startTime);
   const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
   const maxDaysSeen = parseInt(getAppSetting('trial_max_days_seen', '0'), 10) || 0;
   const effectiveElapsedDays = Math.max(elapsedDays, maxDaysSeen);

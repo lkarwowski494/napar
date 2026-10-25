@@ -285,4 +285,14 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(state.brewsCount).toBe(0);
     expect(state.brewsRemaining).toBe(15);
   });
+
+  test('TASK-P7-02-MON: Uszkodzony ciąg trial_started_at nie powoduje NaN w elapsedDays i daysRemaining', () => {
+    resetTrialForTesting();
+    setAppSetting('trial_started_at', 'corrupted-non-iso-date');
+
+    const state = getAppAccessState();
+    expect(Number.isFinite(state.daysRemaining)).toBe(true);
+    expect(state.daysRemaining).toBe(TRIAL_DURATION_DAYS);
+    expect(state.status).toBe('trial_active');
+  });
 });
