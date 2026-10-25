@@ -99,7 +99,7 @@ export function getAppAccessState(): AppAccessState {
   }
   const elapsedMs = Math.max(0, now.getTime() - startTime);
   const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
-  const maxDaysSeen = parseInt(getAppSetting('trial_max_days_seen', '0'), 10) || 0;
+  const maxDaysSeen = Math.max(0, parseInt(getAppSetting('trial_max_days_seen', '0'), 10) || 0);
   const effectiveElapsedDays = Math.max(elapsedDays, maxDaysSeen);
   if (elapsedDays > maxDaysSeen) {
     setAppSetting('trial_max_days_seen', String(elapsedDays));
@@ -256,6 +256,7 @@ export function setTrialExpiredForTesting(): void {
   setAppSetting('subscription_tier', 'none');
   setAppSetting('trial_brews_count', String(TRIAL_MAX_BREWS));
   setAppSetting('trial_max_brews_seen', String(TRIAL_MAX_BREWS));
+  setAppSetting('trial_max_days_seen', String(TRIAL_DURATION_DAYS));
   notifyAccessChanged();
 }
 

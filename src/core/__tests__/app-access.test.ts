@@ -16,7 +16,7 @@ import {
   TRIAL_DURATION_DAYS,
   STORE_PRODUCT_IDS,
 } from '../app-access';
-import { initDatabase, setAppSetting } from '../database';
+import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
 const mockSettings = new Map<string, string>();
 
@@ -294,5 +294,18 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(Number.isFinite(state.daysRemaining)).toBe(true);
     expect(state.daysRemaining).toBe(TRIAL_DURATION_DAYS);
     expect(state.status).toBe('trial_active');
+  });
+
+  test('TASK-P8-02-MON: maxDaysSeen jest chronione przed wartościami ujemnymi, a setTrialExpiredForTesting ustawia pełne wygaśnięcie dni', () => {
+    resetTrialForTesting();
+    setAppSetting('trial_max_days_seen', '-5');
+    const state = getAppAccessState();
+    expect(state.daysRemaining).toBe(TRIAL_DURATION_DAYS);
+
+    setTrialExpiredForTesting();
+    const expiredState = getAppAccessState();
+    expect(expiredState.status).toBe('trial_expired');
+    expect(expiredState.daysRemaining).toBe(0);
+    expect(getAppSetting('trial_max_days_seen', '0')).toBe(String(TRIAL_DURATION_DAYS));
   });
 });
