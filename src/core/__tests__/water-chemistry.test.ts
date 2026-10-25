@@ -8,6 +8,7 @@ import {
   calculateWaterMinerals,
   diagnoseWaterSensoryImpact,
   getWaterProfileName,
+  ppmCaCO3ToDegreesDH,
 } from '../water-chemistry';
 
 describe('Water Chemistry & Mineralization Module', () => {
@@ -98,5 +99,31 @@ describe('Water Chemistry & Mineralization Module', () => {
     // 5. Złote okno (optymalna woda)
     const optimal = diagnoseWaterSensoryImpact(80, 40);
     expect(optimal.problemPl).toContain('Optymalny profil wody');
+  });
+  test('TASK-P6-07-JAK: Odporność na wartości NaN i Infinity w kalkulatorze i diagnostyku chemii wody', () => {
+    // calculateWaterMinerals fallback na bezpieczne wartości domyślne
+    const nanRes = calculateWaterMinerals(NaN, NaN, NaN);
+    expect(nanRes.waterVolumeLiters).toBe(1.0);
+    expect(nanRes.concentrateBufferGrams).toBe(0);
+    expect(nanRes.concentrateHardnessGrams).toBe(0);
+
+    const infRes = calculateWaterMinerals(Infinity, -50, Infinity);
+    expect(infRes.waterVolumeLiters).toBe(1.0);
+    expect(infRes.concentrateHardnessGrams).toBe(0);
+    expect(infRes.concentrateBufferGrams).toBe(0);
+
+    // diagnoseWaterSensoryImpact nie zwraca fałszywego Golden Zone dla NaN/Infinity
+    const nanDiag = diagnoseWaterSensoryImpact(NaN, NaN);
+    expect(nanDiag.problemPl).toContain('Nieprawidłowe dane');
+    expect(nanDiag.problemEn).toContain('Invalid input');
+
+    const infDiag = diagnoseWaterSensoryImpact(Infinity, 40);
+    expect(infDiag.problemPl).toContain('Nieprawidłowe dane');
+
+    // ppmCaCO3ToDegreesDH zwraca 0 dla wartości ujemnych, NaN i Infinity
+    expect(ppmCaCO3ToDegreesDH(NaN)).toBe(0);
+    expect(ppmCaCO3ToDegreesDH(-10)).toBe(0);
+    expect(ppmCaCO3ToDegreesDH(Infinity)).toBe(0);
+    expect(ppmCaCO3ToDegreesDH(17.848)).toBe(1);
   });
 });

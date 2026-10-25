@@ -188,9 +188,9 @@ export function calculateWaterMinerals(
   targetGh: number,
   targetKh: number
 ): WaterCalculationResult {
-  const vol = Math.max(0.1, waterVolumeLiters);
-  const gh = Math.max(0, targetGh);
-  const kh = Math.max(0, targetKh);
+  const vol = Number.isFinite(waterVolumeLiters) && waterVolumeLiters > 0 ? Math.max(0.1, waterVolumeLiters) : 1.0;
+  const gh = Number.isFinite(targetGh) && targetGh >= 0 ? Math.max(0, targetGh) : 0;
+  const kh = Number.isFinite(targetKh) && targetKh >= 0 ? Math.max(0, targetKh) : 0;
 
   // W systemie koncentratów Barista Hustle:
   // 1g Buffer Concentrate dodany do 1L wody = 2 ppm KH
@@ -240,6 +240,17 @@ export function diagnoseWaterSensoryImpact(
   ghPpm: number,
   khPpm: number
 ): WaterDiagnosticResult {
+  if (!Number.isFinite(ghPpm) || !Number.isFinite(khPpm)) {
+    return {
+      problemPl: 'Nieprawidłowe dane wejściowe parametrów wody.',
+      problemEn: 'Invalid input data for water chemistry parameters.',
+      causePl: 'Wartości GH lub KH nie są prawidłowymi liczbami skończonymi.',
+      causeEn: 'GH or KH values are not valid finite numbers.',
+      recommendationPl: 'Wprowadź poprawne, dodatnie wartości liczbowe dla twardości GH i buforu KH.',
+      recommendationEn: 'Enter valid positive numerical values for GH hardness and KH buffer.',
+    };
+  }
+
   if (khPpm > 75) {
     return {
       problemPl: 'Płaski napar, brak żywej kwasowości owocowej, posmak kredowy.',
@@ -298,6 +309,7 @@ export function diagnoseWaterSensoryImpact(
  * Konwertuje twardość z ppm CaCO3 na stopnie niemieckie dH (1 dH = 17.848 ppm CaCO3)
  */
 export function ppmCaCO3ToDegreesDH(ppm: number): number {
+  if (!Number.isFinite(ppm) || ppm < 0) return 0;
   return Number((ppm / 17.848).toFixed(4));
 }
 
