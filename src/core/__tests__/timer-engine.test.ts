@@ -4,6 +4,7 @@
 
 import { BrewTimerEngine, TimerSnapshot, remainingTimerSec } from '../timer-engine';
 import { RecipeStep } from '../recipes-data';
+import * as timerAudioModule from '../timer-audio';
 
 // Mock expo modules
 jest.mock('expo-haptics', () => ({
@@ -332,6 +333,17 @@ describe('BrewTimerEngine', () => {
       expect(engine.getSnapshot().stepRemainingSeconds).toBe(25);
 
       engine.destroy();
+    });
+
+    test('TASK-P7-08-PRO: reset() oraz destroy() wywołują stopTimerChime()', () => {
+      const spy = jest.spyOn(timerAudioModule, 'stopTimerChime').mockImplementation(() => {});
+      const engine = new BrewTimerEngine(testSteps);
+      engine.reset();
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      engine.destroy();
+      expect(spy).toHaveBeenCalledTimes(2);
+      spy.mockRestore();
     });
   });
 });

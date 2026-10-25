@@ -7,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { AppState, AppStateStatus, NativeEventSubscription } from 'react-native';
 import { RecipeStep } from './recipes-data';
-import { playTimerChime } from './timer-audio';
+import { playTimerChime, stopTimerChime } from './timer-audio';
 
 export type TimerStatus = 'idle' | 'running' | 'paused' | 'finished';
 
@@ -156,6 +156,7 @@ export class BrewTimerEngine {
   public reset(): void {
     this.removeAppStateListener();
     this.clearInterval();
+    stopTimerChime();
     this.status = 'idle';
     this.currentStepIndex = 0;
     this.stepElapsedSeconds = 0;
@@ -248,6 +249,7 @@ export class BrewTimerEngine {
   public destroy(): void {
     this.removeAppStateListener();
     this.clearInterval();
+    stopTimerChime();
     try {
       deactivateKeepAwake();
     } catch {
