@@ -17,6 +17,7 @@ export interface KnowledgeLocaleEntry {
   keyNotesEn?: string[];
   healthAttributesPl?: string;
   famousVarietiesPl?: string[];
+  famousVarietiesEn?: string[];
 }
 
 export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
@@ -491,6 +492,12 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
       "Pai Mu Tan (Biała Piwonia)",
       "Shou Mei",
       "Gong Mei"
+    ],
+    "famousVarietiesEn": [
+      "Silver Needle (Bai Hao Yin Zhen)",
+      "White Peony (Bai Mu Dan)",
+      "Shou Mei",
+      "Gong Mei"
     ]
   },
   "tea-green": {
@@ -507,6 +514,13 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
       "Sencha Asamushi/Fukamushi",
       "Gyokuro Uji",
       "Matcha (Usucha/Koicha)"
+    ],
+    "famousVarietiesEn": [
+      "Dragon Well (Longjing)",
+      "Bi Luo Chun",
+      "Sencha (Asamushi / Fukamushi)",
+      "Gyokuro",
+      "Matcha"
     ]
   },
   "tea-yellow": {
@@ -521,6 +535,11 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
       "Jun Shan Yin Zhen (Srebrne Igły z Wyspy Junshan)",
       "Meng Ding Huang Ya",
       "Huo Shan Huang Ya"
+    ],
+    "famousVarietiesEn": [
+      "Junshan Silver Needle (Jun Shan Yin Zhen)",
+      "Mengding Yellow Sprout",
+      "Huoshan Yellow Sprout"
     ]
   },
   "tea-oolong": {
@@ -537,6 +556,13 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
       "Dan Cong (Fenghuang)",
       "Dong Ding Oolong",
       "Ali Shan High Mountain"
+    ],
+    "famousVarietiesEn": [
+      "Big Red Robe (Da Hong Pao)",
+      "Iron Goddess of Mercy (Tie Guan Yin)",
+      "Phoenix Dan Cong",
+      "Dong Ding Oolong",
+      "Alishan High Mountain Oolong"
     ]
   },
   "tea-black": {
@@ -553,6 +579,13 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
       "Dian Hong (Yunnan Red)",
       "Darjeeling First/Second Flush",
       "Assam CTC"
+    ],
+    "famousVarietiesEn": [
+      "Lapsang Souchong (Zheng Shan Xiao Zhong)",
+      "Keemun Black Tea",
+      "Dian Hong (Yunnan Red)",
+      "Darjeeling First / Second Flush",
+      "Assam Single Estate"
     ]
   },
   "tea-puerh": {
@@ -568,6 +601,12 @@ export const KNOWLEDGE_LOCALES: Record<string, KnowledgeLocaleEntry> = {
       "Shou Puerh (Ripe Puerh)",
       "Anhua Heicha (Cegły Qianliang)",
       "Liu Bao Heicha"
+    ],
+    "famousVarietiesEn": [
+      "Sheng Pu-erh (Raw Ancient Tree Gushu)",
+      "Shou Pu-erh (Ripe / Fermented)",
+      "Anhua Dark Tea (Qianliang Tea Brick)",
+      "Liu Bao Dark Tea"
     ]
   }
 };

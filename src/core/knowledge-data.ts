@@ -73,6 +73,7 @@ export interface TeaCategoryInfo {
   sensoryProfilePl: string;
   sensoryProfileEn: string;
   famousVarietiesPl: string[];
+  famousVarietiesEn: string[];
   famousRegions: string[];
   healthAttributesPl: string;
   descriptionPl: string;
@@ -463,6 +464,7 @@ export const TEA_CATEGORIES: TeaCategoryInfo[] = [
     sensoryProfilePl: getLocale('tea-white').sensoryProfilePl!,
     sensoryProfileEn: getLocale('tea-white').sensoryProfileEn!,
     famousVarietiesPl: getLocale('tea-white').famousVarietiesPl!,
+    famousVarietiesEn: getLocale('tea-white').famousVarietiesEn || [],
     famousRegions: ["Fuding (Fujian, Chiny)","Zhenghe (Fujian, Chiny)"],
     healthAttributesPl: getLocale('tea-white').healthAttributesPl!,
     descriptionPl: getLocale('tea-white').descriptionPl,
@@ -479,6 +481,7 @@ export const TEA_CATEGORIES: TeaCategoryInfo[] = [
     sensoryProfilePl: getLocale('tea-green').sensoryProfilePl!,
     sensoryProfileEn: getLocale('tea-green').sensoryProfileEn!,
     famousVarietiesPl: getLocale('tea-green').famousVarietiesPl!,
+    famousVarietiesEn: getLocale('tea-green').famousVarietiesEn || [],
     famousRegions: ["Hangzhou (Zhejiang, Chiny)","Uji (Kioto, Japonia)","Shizuoka (Japonia)"],
     healthAttributesPl: getLocale('tea-green').healthAttributesPl!,
     descriptionPl: getLocale('tea-green').descriptionPl,
@@ -495,6 +498,7 @@ export const TEA_CATEGORIES: TeaCategoryInfo[] = [
     sensoryProfilePl: getLocale('tea-yellow').sensoryProfilePl!,
     sensoryProfileEn: getLocale('tea-yellow').sensoryProfileEn!,
     famousVarietiesPl: getLocale('tea-yellow').famousVarietiesPl!,
+    famousVarietiesEn: getLocale('tea-yellow').famousVarietiesEn || [],
     famousRegions: ["Jezioro Dongting (Hunan, Chiny)","Góra Mengding (Syczuan, Chiny)","Huo Shan (Anhui, Chiny)"],
     healthAttributesPl: getLocale('tea-yellow').healthAttributesPl!,
     descriptionPl: getLocale('tea-yellow').descriptionPl,
@@ -511,6 +515,7 @@ export const TEA_CATEGORIES: TeaCategoryInfo[] = [
     sensoryProfilePl: getLocale('tea-oolong').sensoryProfilePl!,
     sensoryProfileEn: getLocale('tea-oolong').sensoryProfileEn!,
     famousVarietiesPl: getLocale('tea-oolong').famousVarietiesPl!,
+    famousVarietiesEn: getLocale('tea-oolong').famousVarietiesEn || [],
     famousRegions: ["Wuyi Shan (Fujian, Chiny)","Anxi (Fujian, Chiny)","Fenghuang Shan (Guangdong, Chiny)","Nantou (Tajwan)"],
     healthAttributesPl: getLocale('tea-oolong').healthAttributesPl!,
     descriptionPl: getLocale('tea-oolong').descriptionPl,
@@ -527,6 +532,7 @@ export const TEA_CATEGORIES: TeaCategoryInfo[] = [
     sensoryProfilePl: getLocale('tea-black').sensoryProfilePl!,
     sensoryProfileEn: getLocale('tea-black').sensoryProfileEn!,
     famousVarietiesPl: getLocale('tea-black').famousVarietiesPl!,
+    famousVarietiesEn: getLocale('tea-black').famousVarietiesEn || [],
     famousRegions: ["Wuyi Shan (Fujian, Chiny)","Qimen (Anhui, Chiny)","Dianxi (Yunnan, Chiny)","Darjeeling & Assam (Indie)"],
     healthAttributesPl: getLocale('tea-black').healthAttributesPl!,
     descriptionPl: getLocale('tea-black').descriptionPl,
@@ -543,6 +549,7 @@ export const TEA_CATEGORIES: TeaCategoryInfo[] = [
     sensoryProfilePl: getLocale('tea-puerh').sensoryProfilePl!,
     sensoryProfileEn: getLocale('tea-puerh').sensoryProfileEn!,
     famousVarietiesPl: getLocale('tea-puerh').famousVarietiesPl!,
+    famousVarietiesEn: getLocale('tea-puerh').famousVarietiesEn || [],
     famousRegions: ["Xishuangbanna (Yunnan, Chiny)","Pu’er (Yunnan, Chiny)","Lincang (Yunnan, Chiny)","Anhua (Hunan, Chiny)"],
     healthAttributesPl: getLocale('tea-puerh').healthAttributesPl!,
     descriptionPl: getLocale('tea-puerh').descriptionPl,
@@ -598,6 +605,7 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
     t.nameEn.toLowerCase().includes(q) ||
     t.traditionalName.toLowerCase().includes(q) ||
     t.famousVarietiesPl.some((v) => v.toLowerCase().includes(q)) ||
+    (t.famousVarietiesEn && t.famousVarietiesEn.some((v) => v.toLowerCase().includes(q))) ||
     t.famousRegions.some((r) => r.toLowerCase().includes(q)) ||
     t.sensoryProfilePl.toLowerCase().includes(q) ||
     t.sensoryProfileEn.toLowerCase().includes(q)

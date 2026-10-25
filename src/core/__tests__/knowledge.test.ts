@@ -163,6 +163,8 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
       expect(tea.sensoryProfilePl.trim().length).toBeGreaterThan(0);
       expect(tea.sensoryProfileEn.trim().length).toBeGreaterThan(0);
       expect(tea.famousVarietiesPl.length).toBeGreaterThan(0);
+      expect(tea.famousVarietiesEn.length).toBeGreaterThan(0);
+      expect(tea.famousVarietiesPl.length).toBe(tea.famousVarietiesEn.length);
       expect(tea.famousRegions.length).toBeGreaterThan(0);
       expect(tea.healthAttributesPl.trim().length).toBeGreaterThan(0);
     }
@@ -183,6 +185,15 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(puerh.length).toBeGreaterThanOrEqual(1);
 
     expect(findTeaCategoryById('tea-white')).toBeDefined();
+
+    // TASK-P8-06-TRE: Wyszukiwanie herbat po angielskich nazwach odmian
+    const dragonWell = searchTeaCategories('Dragon Well');
+    expect(dragonWell.length).toBe(1);
+    expect(dragonWell[0].id).toBe('tea-green');
+
+    const bigRedRobe = searchTeaCategories('Big Red Robe');
+    expect(bigRedRobe.length).toBe(1);
+    expect(bigRedRobe[0].id).toBe('tea-oolong');
     expect(findTeaCategoryById('non-existent-tea')).toBeUndefined();
   });
 
