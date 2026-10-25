@@ -210,15 +210,17 @@ export function decodeRecipeFromShareUrl(
       : `Zaimportowano przez kod QR / link (${parsed.m})`;
     const defaultStepName = (stepIdx: number) => (isEn ? `Step ${stepIdx}` : `Krok ${stepIdx}`);
 
-    const steps: RecipeStep[] = (parsed.s || []).map((st, idx) => ({
-      stepNumber: idx + 1,
-      namePl: st.n || defaultStepName(idx + 1),
-      ...(st.ne ? { nameEn: st.ne } : (isEn && st.n ? { nameEn: st.n } : {})),
-      durationSeconds: Number(st.d) || 30,
-      targetWaterGrams: Number(st.w) || 0,
-      instructionPl: st.i || '',
-      ...(st.ie ? { instructionEn: st.ie } : (isEn && st.i ? { instructionEn: st.i } : {})),
-    }));
+    const steps: RecipeStep[] = (parsed.s || [])
+      .filter((st): st is CompactRecipeStep => typeof st === 'object' && st !== null)
+      .map((st, idx) => ({
+        stepNumber: idx + 1,
+        namePl: typeof st.n === 'string' && st.n.trim() ? st.n : defaultStepName(idx + 1),
+        ...(st.ne && typeof st.ne === 'string' ? { nameEn: st.ne } : (isEn && typeof st.n === 'string' && st.n ? { nameEn: st.n } : {})),
+        durationSeconds: typeof st.d === 'number' && Number.isFinite(st.d) && st.d > 0 ? Math.round(st.d) : 30,
+        targetWaterGrams: typeof st.w === 'number' && Number.isFinite(st.w) && st.w >= 0 ? Math.round(st.w) : 0,
+        instructionPl: typeof st.i === 'string' ? st.i : '',
+        ...(st.ie && typeof st.ie === 'string' ? { instructionEn: st.ie } : (isEn && typeof st.i === 'string' && st.i ? { instructionEn: st.i } : {})),
+      }));
 
     const recipeId = `shared-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const nowIso = new Date().toISOString();

@@ -233,4 +233,31 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decodeRecipeFromShareUrl(makePayload({ s: 'nie tablica' }))).toBeNull();
     expect(decodeRecipeFromShareUrl(makePayload({ s: 123 }))).toBeNull();
   });
+
+  test('TASK-P7-11-WZR: decodeRecipeFromShareUrl filtruje nieobiektowe elementy i zabezpiecza Infinity/NaN w krokach', () => {
+    const payloadWithCorruptSteps = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Corrupt Steps Test',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 250,
+      s: [
+        null,
+        123,
+        { n: 'Valid Step', d: Infinity, w: NaN, i: 'Instruction' },
+        { n: '', d: -10, w: Infinity }
+      ]
+    }));
+
+    const result = decodeRecipeFromShareUrl(payloadWithCorruptSteps);
+    expect(result).not.toBeNull();
+    expect(result?.originalSteps.length).toBe(2);
+    expect(result?.originalSteps[0].namePl).toBe('Valid Step');
+    expect(result?.originalSteps[0].durationSeconds).toBe(30);
+    expect(result?.originalSteps[0].targetWaterGrams).toBe(0);
+    expect(result?.originalSteps[1].namePl).toBe('Krok 2');
+    expect(result?.originalSteps[1].durationSeconds).toBe(30);
+    expect(result?.originalSteps[1].targetWaterGrams).toBe(0);
+  });
 });
