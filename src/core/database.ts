@@ -350,7 +350,8 @@ export function deductBeansForBrew(itemId: string, grams: number): void {
 function mapRowToInventoryItem(row: InventoryRow): InventoryItem {
   let flavorNotes: string[] = [];
   try {
-    flavorNotes = row.flavor_notes_json ? JSON.parse(row.flavor_notes_json) : [];
+    const parsed = row.flavor_notes_json ? JSON.parse(row.flavor_notes_json) : [];
+    flavorNotes = Array.isArray(parsed) ? parsed : [];
   } catch {
     flavorNotes = [];
   }
@@ -642,7 +643,8 @@ export function deleteBrewSession(id: string): void {
 function mapRowToBrewSession(row: BrewSessionRow): BrewSession {
   let flavorTags: string[] = [];
   try {
-    flavorTags = row.flavor_tags_json ? JSON.parse(row.flavor_tags_json) : [];
+    const parsedTags = row.flavor_tags_json ? JSON.parse(row.flavor_tags_json) : [];
+    flavorTags = Array.isArray(parsedTags) ? parsedTags : [];
   } catch {
     flavorTags = [];
   }
@@ -650,7 +652,11 @@ function mapRowToBrewSession(row: BrewSessionRow): BrewSession {
   let sensory: SensoryProfile | undefined = undefined;
   if (row.sensory_scores_json) {
     try {
-      sensory = JSON.parse(row.sensory_scores_json) as SensoryProfile;
+      const parsedSensory = JSON.parse(row.sensory_scores_json);
+      sensory =
+        parsedSensory && typeof parsedSensory === 'object' && !Array.isArray(parsedSensory)
+          ? (parsedSensory as SensoryProfile)
+          : undefined;
     } catch {
       sensory = undefined;
     }

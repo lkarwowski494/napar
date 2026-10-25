@@ -905,6 +905,38 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(session).not.toBeNull();
     expect(session?.flavorTags).toEqual([]);
     expect(session?.sensory).toBeUndefined();
+
+    // TASK-P6-12-NIE: Odporność na JSON null, liczby, tablice i obiekty o nieodpowiednich typach
+    mockDb.inventory.set('null-json-bean', {
+      id: 'null-json-bean',
+      name: 'Null JSON Bean',
+      type: 'coffee',
+      initial_weight_g: 250,
+      remaining_weight_g: 200,
+      flavor_notes_json: 'null',
+      is_favorite: 0,
+      is_archived: 0,
+      created_at: '2026-10-15',
+      updated_at: '2026-10-15',
+    });
+    expect(getInventoryItemById('null-json-bean')?.flavorNotes).toEqual([]);
+
+    mockDb.sessions.set('malformed-types-sess', {
+      id: 'malformed-types-sess',
+      recipe_name: 'Malformed Types Session',
+      beverage_type: 'COFFEE',
+      method: 'V60',
+      dose_g: 15,
+      water_g: 250,
+      water_temp_c: 93,
+      total_time_seconds: 180,
+      flavor_tags_json: '12345',
+      sensory_scores_json: '"string-instead-of-object"',
+      brewed_at: '2026-10-15T12:00:00Z',
+    });
+    const malformedSess = getBrewSessionById('malformed-types-sess');
+    expect(malformedSess?.flavorTags).toEqual([]);
+    expect(malformedSess?.sensory).toBeUndefined();
   });
 
   test('Pobiera i zapisuje ustawienia aplikacji (getAppSetting, setAppSetting)', () => {
