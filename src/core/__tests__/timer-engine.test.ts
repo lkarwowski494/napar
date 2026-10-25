@@ -307,5 +307,31 @@ describe('BrewTimerEngine', () => {
       expect(originalSteps[0].durationSeconds).toBe(30);
       engine.destroy();
     });
+
+    test('TASK-P5-08-PRO: adjustStepDuration w stanie paused zachowuje skorygowany czas po wznowieniu', () => {
+      const engine = new BrewTimerEngine(testSteps);
+      engine.start();
+
+      jest.advanceTimersByTime(10000); // 10s upłynęło z 30s
+      engine.pause();
+      expect(engine.getSnapshot().status).toBe('paused');
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(20);
+
+      // Dodajemy 10 sekund podczas pauzy
+      engine.adjustStepDuration(10);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(30);
+
+      // Wznawiamy timer
+      engine.resume();
+      expect(engine.getSnapshot().status).toBe('running');
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(30);
+
+      // Odliczamy 5 sekund
+      jest.advanceTimersByTime(5000);
+      engine.syncWithRealTime();
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(25);
+
+      engine.destroy();
+    });
   });
 });

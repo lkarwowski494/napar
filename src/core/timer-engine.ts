@@ -216,6 +216,9 @@ export class BrewTimerEngine {
       const remSec = Math.max(1, currentStep.durationSeconds - this.stepElapsedSeconds);
       this.stepEndAtMs = Date.now() + remSec * 1000;
       this.pausedRemainingMs = null;
+    } else if (this.status === 'paused' && this.pausedRemainingMs !== null) {
+      const maxAllowedMs = Math.max(1000, (newDuration - this.stepElapsedSeconds) * 1000);
+      this.pausedRemainingMs = Math.min(maxAllowedMs, Math.max(1000, this.pausedRemainingMs + deltaSeconds * 1000));
     }
     this.notifyTick();
   }
