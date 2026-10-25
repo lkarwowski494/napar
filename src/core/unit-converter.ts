@@ -9,6 +9,7 @@ export type UnitSystem = 'metric' | 'imperial';
  * Przelicza stopnie Celsjusza na Fahrenheita
  */
 export function celsiusToFahrenheit(c: number): number {
+  if (!Number.isFinite(c)) return 0;
   return Math.round((c * 9) / 5 + 32);
 }
 
@@ -16,6 +17,7 @@ export function celsiusToFahrenheit(c: number): number {
  * Przelicza stopnie Fahrenheita na Celsjusza
  */
 export function fahrenheitToCelsius(f: number): number {
+  if (!Number.isFinite(f)) return 0;
   return Math.round(((f - 32) * 5) / 9);
 }
 
@@ -23,6 +25,7 @@ export function fahrenheitToCelsius(f: number): number {
  * Przelicza gramy na uncje wagowe (oz)
  */
 export function gramsToOunces(g: number): number {
+  if (!Number.isFinite(g) || g < 0) return 0;
   return parseFloat((g * 0.03527396195).toFixed(2));
 }
 
@@ -30,6 +33,7 @@ export function gramsToOunces(g: number): number {
  * Przelicza uncje wagowe (oz) na gramy
  */
 export function ouncesToGrams(oz: number): number {
+  if (!Number.isFinite(oz) || oz < 0) return 0;
   return Math.round(oz / 0.03527396195);
 }
 
@@ -37,6 +41,7 @@ export function ouncesToGrams(oz: number): number {
  * Przelicza mililitry / gramy wody na uncje objętościowe (fl oz)
  */
 export function mlToFluidOunces(ml: number): number {
+  if (!Number.isFinite(ml) || ml < 0) return 0;
   return parseFloat((ml * 0.0338140227).toFixed(2));
 }
 
@@ -44,6 +49,7 @@ export function mlToFluidOunces(ml: number): number {
  * Przelicza uncje objętościowe (fl oz) na mililitry / gramy wody
  */
 export function fluidOuncesToMl(flOz: number): number {
+  if (!Number.isFinite(flOz) || flOz < 0) return 0;
   return Math.round(flOz / 0.0338140227);
 }
 

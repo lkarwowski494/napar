@@ -138,5 +138,26 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       }
       expect(baseVal).toBe(15.0);
     });
+
+    test('TASK-P6-03-ZAK: Odporność na wartości ujemne, NaN i Infinity', () => {
+      expect(gramsToOunces(-10)).toBe(0);
+      expect(gramsToOunces(NaN)).toBe(0);
+      expect(gramsToOunces(Infinity)).toBe(0);
+
+      expect(ouncesToGrams(-5)).toBe(0);
+      expect(ouncesToGrams(NaN)).toBe(0);
+      expect(ouncesToGrams(Infinity)).toBe(0);
+
+      expect(mlToFluidOunces(-100)).toBe(0);
+      expect(mlToFluidOunces(NaN)).toBe(0);
+      expect(mlToFluidOunces(Infinity)).toBe(0);
+
+      expect(fluidOuncesToMl(-10)).toBe(0);
+      expect(fluidOuncesToMl(NaN)).toBe(0);
+      expect(fluidOuncesToMl(Infinity)).toBe(0);
+
+      expect(celsiusToFahrenheit(NaN)).toBe(0);
+      expect(fahrenheitToCelsius(NaN)).toBe(0);
+    });
   });
 });
