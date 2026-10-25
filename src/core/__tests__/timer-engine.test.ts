@@ -345,5 +345,18 @@ describe('BrewTimerEngine', () => {
       expect(spy).toHaveBeenCalledTimes(2);
       spy.mockRestore();
     });
+
+    test('TASK-P8-08-PRO: remainingTimerSec chroni przed NaN/Infinity, a destroy czyści callbacks i steps', () => {
+      expect(remainingTimerSec(NaN)).toBe(0);
+      expect(remainingTimerSec(Infinity)).toBe(0);
+      expect(remainingTimerSec(1000, NaN)).toBe(0);
+
+      const onTick = jest.fn();
+      const engine = new BrewTimerEngine(testSteps, { onTick });
+      engine.destroy();
+
+      expect((engine as any).callbacks).toEqual({});
+      expect((engine as any).steps).toEqual([]);
+    });
   });
 });

@@ -39,6 +39,9 @@ export interface TimerCallbacks {
  * r = max(0, ceil((endAtMs - nowMs) / 1000))
  */
 export function remainingTimerSec(endAtMs: number, nowMs: number = Date.now()): number {
+  if (!Number.isFinite(endAtMs) || !Number.isFinite(nowMs)) {
+    return 0;
+  }
   return Math.max(0, Math.ceil((endAtMs - nowMs) / 1000));
 }
 
@@ -250,6 +253,8 @@ export class BrewTimerEngine {
     this.removeAppStateListener();
     this.clearInterval();
     stopTimerChime();
+    this.callbacks = {};
+    this.steps = [];
     try {
       deactivateKeepAwake();
     } catch {
