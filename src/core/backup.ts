@@ -337,6 +337,12 @@ export function parseAndValidateBackup(rawJson: string): NaparBackupEnvelope {
   if (state.caffeineLogs !== undefined && !Array.isArray(state.caffeineLogs)) {
     throw new Error('Nieprawidłowa struktura logu kofeiny ("caffeineLogs" musi być tablicą)');
   }
+  if (
+    state.settings !== undefined &&
+    (typeof state.settings !== 'object' || state.settings === null || Array.isArray(state.settings))
+  ) {
+    throw new Error('Nieprawidłowa struktura ustawień ("settings" musi być obiektem)');
+  }
 
   if (typeof envelope.exportedAt !== 'string' || !envelope.exportedAt.trim()) {
     throw new Error('Nieprawidłowy lub brakujący znacznik czasu eksportu (exportedAt)');

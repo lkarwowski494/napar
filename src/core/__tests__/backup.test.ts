@@ -207,6 +207,38 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
         })
       )
     ).toThrow('Nieprawidłowy lub brakujący znacznik czasu eksportu');
+
+    // TASK-P8-05-ARC: Walidacja typu pola settings
+    expect(() =>
+      parseAndValidateBackup(
+        JSON.stringify({
+          format: 'napar-backup',
+          schemaVersion: 1,
+          exportedAt: '2026-10-25T20:00:00.000Z',
+          state: {
+            inventory: [],
+            customRecipes: [],
+            sessions: [],
+            settings: 'invalid-string-settings',
+          },
+        })
+      )
+    ).toThrow('Nieprawidłowa struktura ustawień ("settings" musi być obiektem)');
+    expect(() =>
+      parseAndValidateBackup(
+        JSON.stringify({
+          format: 'napar-backup',
+          schemaVersion: 1,
+          exportedAt: '2026-10-25T20:00:00.000Z',
+          state: {
+            inventory: [],
+            customRecipes: [],
+            sessions: [],
+            settings: [1, 2, 3],
+          },
+        })
+      )
+    ).toThrow('Nieprawidłowa struktura ustawień ("settings" musi być obiektem)');
   });
 
   test('exportBackup udostępnia plik przez Sharing.shareAsync', async () => {
