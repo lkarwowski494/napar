@@ -41,7 +41,7 @@ export interface TasteDiagnosis {
  * Oblicza masę wody dla zadanej dozy i współczynnika (np. 1:16.6)
  */
 export function calculateBrewWater(doseGrams: number, ratio: number): number {
-  if (doseGrams <= 0 || ratio <= 0) {
+  if (!Number.isFinite(doseGrams) || !Number.isFinite(ratio) || doseGrams <= 0 || ratio <= 0) {
     throw new Error('Doza i ratio muszą być większe od zera');
   }
   return Number((doseGrams * ratio).toFixed(1));
@@ -51,7 +51,7 @@ export function calculateBrewWater(doseGrams: number, ratio: number): number {
  * RD-01b: Oblicza dozę kawy/herbaty dla zadanej objętości wody
  */
 export function calculateBrewDose(waterGrams: number, ratio: number): number {
-  if (waterGrams <= 0 || ratio <= 0) {
+  if (!Number.isFinite(waterGrams) || !Number.isFinite(ratio) || waterGrams <= 0 || ratio <= 0) {
     throw new Error('Woda i ratio muszą być większe od zera');
   }
   return Number((waterGrams / ratio).toFixed(1));
@@ -61,7 +61,7 @@ export function calculateBrewDose(waterGrams: number, ratio: number): number {
  * RD-01c: Oblicza współczynnik ratio dla zadanej dozy i wody (np. 15g, 250g -> 16.7)
  */
 export function calculateBrewRatio(doseGrams: number, waterGrams: number): number {
-  if (doseGrams <= 0 || waterGrams <= 0) {
+  if (!Number.isFinite(doseGrams) || !Number.isFinite(waterGrams) || doseGrams <= 0 || waterGrams <= 0) {
     return 0;
   }
   return Number((waterGrams / doseGrams).toFixed(1));
@@ -72,7 +72,7 @@ export function calculateBrewRatio(doseGrams: number, waterGrams: number): numbe
  * Domyślny współczynnik: 2.0g wody na każdy 1g zmielonej kawy
  */
 export function calculateLiquidYield(waterGrams: number, doseGrams: number, retentionFactor = 2.0): number {
-  if (waterGrams <= 0 || doseGrams <= 0 || retentionFactor < 0) {
+  if (!Number.isFinite(waterGrams) || !Number.isFinite(doseGrams) || !Number.isFinite(retentionFactor) || waterGrams <= 0 || doseGrams <= 0 || retentionFactor < 0) {
     throw new Error('Nieprawidłowe parametry wyliczania uzysku');
   }
   const retained = doseGrams * retentionFactor;
@@ -90,7 +90,7 @@ export function calculateExtractionYield(
   tdsPercent: number,
   doseGrams: number
 ): ExtractionYieldResult {
-  if (beverageWeightGrams <= 0 || tdsPercent <= 0 || doseGrams <= 0) {
+  if (!Number.isFinite(beverageWeightGrams) || !Number.isFinite(tdsPercent) || !Number.isFinite(doseGrams) || beverageWeightGrams <= 0 || tdsPercent <= 0 || doseGrams <= 0) {
     throw new Error('Parametry ekstrakcji muszą być większe od zera');
   }
 
@@ -182,7 +182,7 @@ export function estimateCoffeeCaffeineMg(
   beanType: 'arabica' | 'robusta' = 'arabica',
   method: 'filter' | 'espresso' | 'immersion' | 'cold_brew' = 'filter'
 ): number {
-  if (doseGrams <= 0) return 0;
+  if (!Number.isFinite(doseGrams) || doseGrams <= 0) return 0;
 
   const baseRatePerGram = beanType === 'robusta' ? 22.0 : 12.0;
 
@@ -208,7 +208,7 @@ export function estimateTotalLeafCaffeineMg(leafDoseGrams: number): number {
  * 1 zalanie: 45%, 2 zalanie: 30%, 3 zalanie: 15%, kolejne: 10% łącznie
  */
 export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number, infusionNumber: number): number {
-  if (totalLeafCaffeineMg <= 0 || infusionNumber <= 0) return 0;
+  if (!Number.isFinite(totalLeafCaffeineMg) || !Number.isFinite(infusionNumber) || totalLeafCaffeineMg <= 0 || infusionNumber <= 0) return 0;
   const fraction = 0.40 * Math.pow(0.55, infusionNumber - 1);
   return Number((totalLeafCaffeineMg * fraction).toFixed(1));
 }
@@ -218,7 +218,7 @@ export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number, infus
  * C(t) = C0 * (1/2)^(t / t1/2)
  */
 export function calculateRemainingCaffeineMg(initialDoseMg: number, hoursPassed: number, halfLifeHours = 5.0): number {
-  if (initialDoseMg <= 0 || hoursPassed < 0 || halfLifeHours <= 0) return 0;
+  if (!Number.isFinite(initialDoseMg) || !Number.isFinite(hoursPassed) || !Number.isFinite(halfLifeHours) || initialDoseMg <= 0 || hoursPassed < 0 || halfLifeHours <= 0) return 0;
   const remaining = initialDoseMg * Math.pow(0.5, hoursPassed / halfLifeHours);
   return Number(remaining.toFixed(1));
 }
@@ -261,7 +261,14 @@ export function evaluateBedtimeCaffeine(
  * RD-21: Oblicza minimalną liczbę godzin przed snem, po której można wypić daną dawkę
  */
 export function calculateHoursUntilSafeCaffeine(doseMg: number, safeThresholdMg = 25.0, halfLifeHours = 5.0): number {
-  if (doseMg <= safeThresholdMg) return 0;
+  if (
+    !Number.isFinite(doseMg) ||
+    !Number.isFinite(safeThresholdMg) ||
+    !Number.isFinite(halfLifeHours) ||
+    doseMg <= safeThresholdMg ||
+    safeThresholdMg <= 0 ||
+    halfLifeHours <= 0
+  ) return 0;
   // dose * (0.5)^(t / halfLife) = threshold
   // t / halfLife = log2(dose / threshold)
   const ratio = doseMg / safeThresholdMg;

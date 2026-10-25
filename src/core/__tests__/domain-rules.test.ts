@@ -6,6 +6,7 @@ import {
   calculateExtractionYield,
   evaluateRestingWindow,
   estimateCoffeeCaffeineMg,
+  estimateTotalLeafCaffeineMg,
   estimateTeaInfusionCaffeineMg,
   calculateRemainingCaffeineMg,
   evaluateBedtimeCaffeine,
@@ -316,6 +317,37 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       });
       expect(viaExtraction.length).toBe(1);
       expect(viaExtraction[0].issue).toContain('Poparzone liście');
+    });
+
+    it('TASK-P5-07-JAK: rzuca błąd lub zwraca 0 dla wartości NaN oraz Infinity (IEEE-754 resilience)', () => {
+      // calculateBrewWater, calculateBrewDose, calculateLiquidYield, calculateExtractionYield
+      expect(() => calculateBrewWater(NaN, 16)).toThrow();
+      expect(() => calculateBrewWater(15, Infinity)).toThrow();
+      expect(() => calculateBrewDose(NaN, 16)).toThrow();
+      expect(() => calculateBrewDose(250, Infinity)).toThrow();
+      expect(() => calculateLiquidYield(NaN, 15)).toThrow();
+      expect(() => calculateLiquidYield(250, NaN)).toThrow();
+      expect(() => calculateLiquidYield(250, 15, Infinity)).toThrow();
+      expect(() => calculateExtractionYield(NaN, 1.35, 15)).toThrow();
+      expect(() => calculateExtractionYield(250, NaN, 15)).toThrow();
+      expect(() => calculateExtractionYield(250, 1.35, Infinity)).toThrow();
+
+      // calculateBrewRatio
+      expect(calculateBrewRatio(NaN, 250)).toBe(0);
+      expect(calculateBrewRatio(15, Infinity)).toBe(0);
+
+      // Kofeina
+      expect(estimateCoffeeCaffeineMg(NaN)).toBe(0);
+      expect(estimateCoffeeCaffeineMg(Infinity)).toBe(0);
+      expect(estimateTotalLeafCaffeineMg(NaN)).toBe(0);
+      expect(estimateTotalLeafCaffeineMg(Infinity)).toBe(0);
+      expect(estimateTeaInfusionCaffeineMg(NaN, 1)).toBe(0);
+      expect(estimateTeaInfusionCaffeineMg(100, NaN)).toBe(0);
+      expect(calculateRemainingCaffeineMg(NaN, 2)).toBe(0);
+      expect(calculateRemainingCaffeineMg(100, NaN)).toBe(0);
+      expect(calculateHoursUntilSafeCaffeine(NaN)).toBe(0);
+      expect(calculateHoursUntilSafeCaffeine(100, NaN)).toBe(0);
+      expect(calculateHoursUntilSafeCaffeine(100, 25, Infinity)).toBe(0);
     });
   });
 });
