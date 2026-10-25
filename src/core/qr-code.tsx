@@ -23,7 +23,8 @@ export function generateQrMatrix(
   value: string,
   errorCorrectionLevel: 'L' | 'M' | 'Q' | 'H' = 'M'
 ): { size: number; modules: boolean[][] } {
-  const qr = QRCode.create(value, { errorCorrectionLevel });
+  const text = typeof value === 'string' && value.trim() ? value : 'napar://empty';
+  const qr = QRCode.create(text, { errorCorrectionLevel });
   const size = qr.modules.size;
   const matrix: boolean[][] = [];
 

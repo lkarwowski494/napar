@@ -130,6 +130,16 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     ).toBeNull();
   });
 
+  test('TASK-P6-11-WZR: generateQrMatrix obsługuje pusty string i spacje bez rzucania błędem', () => {
+    const emptyResult = generateQrMatrix('');
+    expect(emptyResult.size).toBeGreaterThan(0);
+    expect(emptyResult.modules.length).toBe(emptyResult.size);
+
+    const whitespaceResult = generateQrMatrix('   \n\t  ');
+    expect(whitespaceResult.size).toBeGreaterThan(0);
+    expect(whitespaceResult.modules.length).toBe(whitespaceResult.size);
+  });
+
   test('Generuje poprawną macierz modułów kodu QR dla URL receptury (generateQrMatrix)', () => {
     const shareUrl = encodeRecipeToShareUrl(sampleSavedRecipe);
     const qrResult = generateQrMatrix(shareUrl);
