@@ -326,7 +326,10 @@ export function saveInventoryItem(item: InventoryItem): void {
 
 export function deleteInventoryItem(id: string): void {
   const db = getDatabase();
-  db.runSync('DELETE FROM inventory_items WHERE id = ?', [id]);
+  runInTransactionSync(db, () => {
+    db.runSync('UPDATE brew_sessions SET inventory_item_id = NULL WHERE inventory_item_id = ?', [id]);
+    db.runSync('DELETE FROM inventory_items WHERE id = ?', [id]);
+  });
 }
 
 export function deductInventoryWeight(id: string, doseGrams: number): void {

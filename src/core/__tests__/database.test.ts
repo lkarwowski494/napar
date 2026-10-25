@@ -118,6 +118,12 @@ const mockDb: any = {
         existing.remaining_weight_g = newW;
         existing.updated_at = updated;
       }
+    } else if (query.includes('UPDATE brew_sessions SET inventory_item_id = NULL WHERE inventory_item_id = ?')) {
+      for (const session of mockDb.sessions.values()) {
+        if (session.inventory_item_id === params![0]) {
+          session.inventory_item_id = null;
+        }
+      }
     } else if (query.includes('DELETE FROM inventory_items WHERE id = ?')) {
       mockDb.inventory.delete(params![0]);
     } else if (query.includes('INTO recipes')) {
@@ -1023,5 +1029,45 @@ describe('Napar SQLite Database & Repositories', () => {
       expect(escapeCsvCell('')).toBe('');
       expect(escapeCsvCell(123)).toBe('123');
     });
+  });
+
+  test('TASK-P5-05-ARC: deleteInventoryItem unieważnia referencje w brew_sessions (SET NULL) i usuwa pozycję', () => {
+    initDatabase(mockDb as any);
+    const item: InventoryItem = {
+      id: 'bean-fk-test',
+      name: 'Test Ziarno FK',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 250,
+      flavorNotes: [],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-10-25T10:00:00.000Z',
+      updatedAt: '2026-10-25T10:00:00.000Z',
+    };
+    saveInventoryItem(item);
+    expect(mockDb.inventory.has('bean-fk-test')).toBe(true);
+
+    const session: BrewSession = {
+      id: 'sess-fk-test',
+      recipeId: 'rec-test',
+      recipeName: 'V60 Test',
+      inventoryItemId: 'bean-fk-test',
+      inventoryItemName: 'Test Ziarno FK',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      flavorTags: [],
+      totalTimeSeconds: 150,
+      brewedAt: '2026-10-25T10:05:00.000Z',
+    };
+    saveBrewSession(session);
+    expect(getBrewSessions().find((s) => s.id === 'sess-fk-test')?.inventoryItemId).toBe('bean-fk-test');
+
+    deleteInventoryItem('bean-fk-test');
+    expect(mockDb.inventory.has('bean-fk-test')).toBe(false);
+    expect(getBrewSessions().find((s) => s.id === 'sess-fk-test')?.inventoryItemId).toBeUndefined();
   });
 });
