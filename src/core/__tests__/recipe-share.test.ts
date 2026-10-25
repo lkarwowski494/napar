@@ -260,4 +260,23 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(result?.originalSteps[1].durationSeconds).toBe(30);
     expect(result?.originalSteps[1].targetWaterGrams).toBe(0);
   });
+
+  test('TASK-P8-11-WZR: decodeRecipeFromShareUrl zabezpiecza parsed.t i parsed.r przed NaN i wartościami poza zakresem', () => {
+    const payloadWithInvalidTempAndRatio = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Temp and Ratio Guard',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 250,
+      t: NaN,
+      r: Infinity,
+      s: []
+    }));
+
+    const result = decodeRecipeFromShareUrl(payloadWithInvalidTempAndRatio);
+    expect(result).not.toBeNull();
+    expect(result?.recipe.waterTempCelsius).toBe(92);
+    expect(result?.recipe.recommendedRatio).toBe(16.7);
+  });
 });
