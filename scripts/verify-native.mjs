@@ -32,6 +32,20 @@ try {
     `app.json -> expo.android.adaptiveIcon.backgroundColor musi być równe '#121214' (otrzymano '${appJson.android?.adaptiveIcon?.backgroundColor}')`
   );
 
+  // Niezmienniki orientacji, stylu i urządzeń (TASK-P8-10-WYD)
+  check(
+    appJson.orientation === 'portrait',
+    `app.json -> expo.orientation musi być równe 'portrait' (otrzymano '${appJson.orientation}')`
+  );
+  check(
+    appJson.userInterfaceStyle === 'dark',
+    `app.json -> expo.userInterfaceStyle musi być równe 'dark' (otrzymano '${appJson.userInterfaceStyle}')`
+  );
+  check(
+    appJson.ios?.supportsTablet === false,
+    `app.json -> expo.ios.supportsTablet musi być równe false (otrzymano '${appJson.ios?.supportsTablet}')`
+  );
+
   const expectedBundleId = appJson.ios?.bundleIdentifier;
   check(Boolean(expectedBundleId), 'Brak bundleIdentifier w app.json -> expo.ios');
   check(
