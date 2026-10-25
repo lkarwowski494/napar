@@ -124,6 +124,12 @@ const mockDb: any = {
           session.inventory_item_id = null;
         }
       }
+    } else if (query.includes('UPDATE brew_sessions SET recipe_id = NULL WHERE recipe_id = ?')) {
+      for (const session of mockDb.sessions.values()) {
+        if (session.recipe_id === params![0]) {
+          session.recipe_id = null;
+        }
+      }
     } else if (query.includes('DELETE FROM inventory_items WHERE id = ?')) {
       mockDb.inventory.delete(params![0]);
     } else if (query.includes('INTO recipes')) {
@@ -791,9 +797,27 @@ describe('Napar SQLite Database & Repositories', () => {
     saveRecipe(customRecipe);
     expect(mockDb.recipes.has('rec-custom-del')).toBe(true);
 
-    // 2. Usuń recepturę własną - powinna zostać usunięta
+    // 1b. Zapisz powiązaną sesję parzenia
+    saveBrewSession({
+      id: 'sess-with-custom-rec',
+      recipeId: 'rec-custom-del',
+      recipeName: 'Custom V60',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      totalTimeSeconds: 160,
+      flavorTags: [],
+      brewedAt: '2026-10-25T10:00:00.000Z',
+    });
+    expect(getBrewSessionById('sess-with-custom-rec')?.recipeId).toBe('rec-custom-del');
+
+    // 2. Usuń recepturę własną - powinna zostać usunięta, a w sesji recipeId zresetowane do null (TASK-P6-05-ARC)
     deleteRecipe('rec-custom-del');
     expect(mockDb.recipes.has('rec-custom-del')).toBe(false);
+    expect(getBrewSessionById('sess-with-custom-rec')?.recipeId).toBeUndefined();
+    expect(mockDb.sessions.get('sess-with-custom-rec').recipe_id).toBeNull();
 
     // 3. Próba usunięcia receptury wzorcowej Hoffmann V60 (is_custom=0)
     expect(mockDb.recipes.has('v60-hoffmann-single')).toBe(true);

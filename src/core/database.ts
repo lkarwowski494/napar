@@ -439,7 +439,10 @@ export function saveRecipe(recipe: SavedRecipe): void {
 
 export function deleteRecipe(id: string): void {
   const db = getDatabase();
-  db.runSync('DELETE FROM recipes WHERE id = ? AND is_custom = 1', [id]);
+  runInTransactionSync(db, () => {
+    db.runSync('UPDATE brew_sessions SET recipe_id = NULL WHERE recipe_id = ?', [id]);
+    db.runSync('DELETE FROM recipes WHERE id = ? AND is_custom = 1', [id]);
+  });
 }
 
 export function toggleRecipeFavorite(id: string): boolean {
