@@ -60,13 +60,14 @@ export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
           testID="open-apps4brew-pass-btn"
           style={styles.passCtaBtn}
           onPress={onOpenPassModal}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           accessibilityRole="button"
-          accessibilityLabel={isSubscribed ? 'Apps4Brew Pass: Aktywny' : 'Odblokuj Apps4Brew Pass ($1.99 / $14.99 / $29.99)'}
+          accessibilityLabel={isSubscribed ? 'Apps4Brew Pass: Aktywny' : 'Odblokuj Apps4Brew Pass ($0.99 / $4.99 / $14.99)'}
         >
           <Text style={styles.passCtaBtnText}>
             {isSubscribed
               ? 'Szczegóły licencji / Przywróć zakupy'
-              : 'Przejdź do planów ($1.99 / $14.99 / $29.99)'}
+              : 'Przejdź do planów ($0.99 / $4.99 / $14.99)'}
           </Text>
         </Pressable>
 
@@ -75,6 +76,7 @@ export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
             testID="manage-plan-btn"
             style={[styles.passCtaBtn, { marginTop: 8, backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.colors.border }]}
             onPress={() => void Linking.openURL('https://apps.apple.com/account/subscriptions')}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessibilityRole="link"
             accessibilityLabel="Zarządzaj subskrypcją w App Store"
           >
