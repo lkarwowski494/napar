@@ -198,5 +198,21 @@ describe('Grinder Dial-in Converter Module', () => {
     const c40 = SUPPORTED_GRINDERS.find((g) => g.id === 'comandante_c40');
     expect(c40?.burrTypeEn).toBe('Nitro Blade (39mm conical)');
   });
-});
 
+  test('TASK-P8-03-ZAK: Chroni convertMicronsToGrinder i convertBetweenGrinders przed NaN i Infinity', () => {
+    // NaN lub <= 0 powinno bezpiecznie użyć domyślnego 720 µm
+    const nanRes = convertMicronsToGrinder(NaN, 'comandante_c40');
+    expect(nanRes.rawValue).toBe(24);
+    expect(nanRes.formatted).toContain('24 klików');
+
+    const infRes = convertMicronsToGrinder(Infinity, 'comandante_c40');
+    expect(infRes.rawValue).toBe(24); // bezpieczny fallback do 720 µm
+
+    const betweenNaN = convertBetweenGrinders('comandante_c40', NaN, 'timemore_c2_c3');
+    expect(betweenNaN.microns).toBe(720);
+    expect(betweenNaN.targetFormatted).toContain('21 klików');
+
+    const betweenInvalidStr = convertBetweenGrinders('comandante_c40', 'invalid-clicks', 'timemore_c2_c3');
+    expect(Number.isFinite(betweenInvalidStr.microns)).toBe(true);
+  });
+});

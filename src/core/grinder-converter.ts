@@ -299,7 +299,8 @@ export function convertMicronsToGrinder(
   const grinder =
     SUPPORTED_GRINDERS.find((g) => g.id === grinderId) || SUPPORTED_GRINDERS[0];
 
-  const targetMicrons = Math.max(150, Math.min(1500, microns));
+  const safeMicrons = Number.isFinite(microns) && microns > 0 ? microns : 720;
+  const targetMicrons = Math.max(150, Math.min(1500, safeMicrons));
   const effectiveMicrons = Math.max(0, targetMicrons - grinder.micronsPerSettingOffset);
   const rawClicks = Math.round(effectiveMicrons / grinder.stepMicrons);
   const clampedClicks = Math.max(grinder.minSetting, Math.min(grinder.maxSetting, rawClicks));
@@ -327,9 +328,14 @@ export function convertBetweenGrinders(
 
   let microns = 720;
   if (typeof sourceValue === 'number') {
-    microns = sourceGrinder.micronsPerSettingOffset + sourceValue * sourceGrinder.stepMicrons;
-  } else {
-    microns = sourceGrinder.parseSetting(sourceValue);
+    if (Number.isFinite(sourceValue) && sourceValue >= 0) {
+      microns = sourceGrinder.micronsPerSettingOffset + sourceValue * sourceGrinder.stepMicrons;
+    }
+  } else if (typeof sourceValue === 'string') {
+    const parsed = sourceGrinder.parseSetting(sourceValue);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      microns = parsed;
+    }
   }
 
   const result = convertMicronsToGrinder(microns, targetGrinder.id, language);
