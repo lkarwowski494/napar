@@ -50,10 +50,13 @@ export function parseStepDurationSeconds(
   fallbackSeconds = 30,
   prioritizeFallback = false
 ): number {
-  if (prioritizeFallback && typeof fallbackSeconds === 'number' && fallbackSeconds > 0) {
-    return Math.round(fallbackSeconds);
+  const safeFallback =
+    Number.isFinite(fallbackSeconds) && fallbackSeconds > 0
+      ? Math.round(fallbackSeconds)
+      : 30;
+  if (prioritizeFallback) {
+    return safeFallback;
   }
-  const safeFallback = Math.max(1, Math.round(fallbackSeconds || 30));
   if (!instruction || typeof instruction !== 'string') {
     return safeFallback;
   }

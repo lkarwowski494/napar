@@ -54,6 +54,14 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(parseStepDurationSeconds(null, 35)).toBe(35);
       expect(parseStepDurationSeconds(undefined)).toBe(30);
     });
+
+    it('TASK-P7-07-JAK: safely handles NaN and Infinity for fallbackSeconds', () => {
+      expect(parseStepDurationSeconds('Brak czasu w instrukcji', NaN)).toBe(30);
+      expect(parseStepDurationSeconds('Brak czasu w instrukcji', Infinity)).toBe(30);
+      expect(parseStepDurationSeconds('Brak czasu w instrukcji', -10)).toBe(30);
+      expect(parseStepDurationSeconds(undefined, NaN, true)).toBe(30);
+      expect(parseStepDurationSeconds(undefined, Infinity, true)).toBe(30);
+    });
   });
 
   describe('buildProactiveActionSchedule & buildFourteenDayCalendar', () => {
