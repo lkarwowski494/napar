@@ -187,6 +187,26 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
         })
       )
     ).toThrow('Nieprawidłowa struktura logu kofeiny');
+    expect(() =>
+      parseAndValidateBackup(
+        JSON.stringify({
+          format: 'napar-backup',
+          schemaVersion: 1,
+          state: { inventory: [], customRecipes: [], sessions: [] },
+          // brak exportedAt
+        })
+      )
+    ).toThrow('Nieprawidłowy lub brakujący znacznik czasu eksportu');
+    expect(() =>
+      parseAndValidateBackup(
+        JSON.stringify({
+          format: 'napar-backup',
+          schemaVersion: 1,
+          state: { inventory: [], customRecipes: [], sessions: [] },
+          exportedAt: 12345,
+        })
+      )
+    ).toThrow('Nieprawidłowy lub brakujący znacznik czasu eksportu');
   });
 
   test('exportBackup udostępnia plik przez Sharing.shareAsync', async () => {

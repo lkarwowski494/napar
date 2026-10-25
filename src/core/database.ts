@@ -789,27 +789,7 @@ export function importDataJson(jsonStr: string): void {
 
   const db = getDatabase();
   try {
-    const runInTx = typeof (db as any).withTransactionSync === 'function'
-      ? (cb: () => void) => (db as any).withTransactionSync(cb)
-      : (cb: () => void) => {
-          if (typeof (db as any).execSync === 'function') {
-            (db as any).execSync('BEGIN IMMEDIATE TRANSACTION;');
-            try {
-              cb();
-              (db as any).execSync('COMMIT;');
-            } catch (txErr) {
-              try {
-                (db as any).execSync('ROLLBACK;');
-              } catch {
-                // ignore rollback error
-              }
-              throw txErr;
-            }
-          } else {
-            cb();
-          }
-        };
-    runInTx(() => {
+    runInTransactionSync(db, () => {
       for (const item of data.inventory || []) {
         saveInventoryItem(item);
       }
