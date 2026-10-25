@@ -7,6 +7,7 @@ import * as Haptics from 'expo-haptics';
 import * as announceModule from '../announce';
 import {
   playTimerChime,
+  stopTimerChime,
   notifyTimerStepWarning,
   notifyTimerFinished,
   CHIME_AUDIO_DATA_URI,
@@ -39,6 +40,7 @@ describe('Timer Audio & Chime Engine', () => {
   });
 
   afterEach(() => {
+    stopTimerChime();
     announceSpy.mockRestore();
   });
 
@@ -89,5 +91,12 @@ describe('Timer Audio & Chime Engine', () => {
     expect(buffer.slice(12, 16).toString('ascii')).toBe('fmt ');
     // Dane PCM muszą zawierać rzeczywiste próbki audio (> 1000 bajtów)
     expect(buffer.length).toBeGreaterThan(1000);
+  });
+
+  test('stopTimerChime zatrzymuje instancję i usuwa zasób odtwarzacza (TASK-P6-08-PRO)', async () => {
+    await playTimerChime();
+    expect(mockPlay).toHaveBeenCalled();
+    stopTimerChime();
+    expect(mockRemove).toHaveBeenCalled();
   });
 });

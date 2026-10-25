@@ -8,10 +8,11 @@
 import { createAudioPlayer, AudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 import { announce } from './announce';
-import { getCurrentTranslations } from './i18n';
+import { getCurrentTranslations, formatTemplate } from './i18n';
 import { getHapticsEnabled } from './database';
 
 let soundInstance: AudioPlayer | null = null;
+let cleanupTimer: any = null;
 
 // Gentle short acoustic chime tone encoded as valid RIFF WAV with PCM samples (880Hz kitchen chime)
 export const CHIME_AUDIO_DATA_URI =
@@ -20,6 +21,24 @@ export const CHIME_AUDIO_DATA_URI =
 /**
  * Plays the acoustic chime tone safely and disposes resources on completion.
  */
+/**
+ * Stops any actively playing timer chime and safely disposes audio resources.
+ */
+export function stopTimerChime(): void {
+  if (cleanupTimer) {
+    clearTimeout(cleanupTimer);
+    cleanupTimer = null;
+  }
+  if (soundInstance) {
+    try {
+      soundInstance.remove();
+    } catch {
+      // Ignoruj błąd rozładowania
+    }
+    soundInstance = null;
+  }
+}
+
 export async function playTimerChime(): Promise<boolean> {
   try {
     if (soundInstance) {
@@ -38,6 +57,10 @@ export async function playTimerChime(): Promise<boolean> {
     let sub: any = null;
 
     const cleanup = () => {
+      if (cleanupTimer) {
+        clearTimeout(cleanupTimer);
+        cleanupTimer = null;
+      }
       if (sub && typeof sub.remove === 'function') {
         try {
           sub.remove();
@@ -68,7 +91,7 @@ export async function playTimerChime(): Promise<boolean> {
       }
     }
 
-    setTimeout(cleanup, 1500);
+    cleanupTimer = setTimeout(cleanup, 1500);
     return true;
   } catch {
     return false;
@@ -82,7 +105,7 @@ export async function notifyTimerStepWarning(secondsLeft = 3): Promise<boolean> 
   // 1. Accessibility announcement (i18n localized)
   const t = getCurrentTranslations();
   const template = t.common.timerStepWarning || 'Pozostały {seconds} sekundy do końca zalania';
-  announce(template.replace('{seconds}', String(secondsLeft)));
+  announce(formatTemplate(template, { seconds: secondsLeft }));
 
   // 2. Haptic warning
   if (getHapticsEnabled()) {
@@ -104,7 +127,7 @@ export async function notifyTimerFinished(stepName?: string): Promise<boolean> {
   // 1. Accessibility announcement (i18n localized)
   const t = getCurrentTranslations();
   const message = stepName
-    ? (t.common.stepFinished || 'Krok ukończony: {step}').replace('{step}', stepName)
+    ? formatTemplate(t.common.stepFinished || 'Krok ukończony: {step}', { step: stepName })
     : (t.common.brewingFinished || 'Parzenie zakończone!');
   announce(message);
 
