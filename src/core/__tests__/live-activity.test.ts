@@ -101,6 +101,9 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(formatActivityTimer(75)).toBe('1:15');
     expect(formatActivityTimer(300)).toBe('5:00');
     expect(formatActivityTimer(-10)).toBe('0:00');
+    expect(formatActivityTimer(NaN)).toBe('0:00');
+    expect(formatActivityTimer(Infinity)).toBe('0:00');
+    expect(formatActivityTimer(-Infinity)).toBe('0:00');
   });
 
   test('buildDynamicIslandPayload generuje poprawny payload dla kawy i herbaty (PL & EN)', () => {

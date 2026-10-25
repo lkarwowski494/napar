@@ -65,7 +65,10 @@ export function setLiveActivityEnabled(enabled: boolean): void {
 }
 
 export function formatActivityTimer(seconds: number): string {
-  const safeSec = Math.max(0, Math.floor(seconds));
+  if (!Number.isFinite(seconds) || seconds < 0) {
+    return '0:00';
+  }
+  const safeSec = Math.floor(seconds);
   const mins = Math.floor(safeSec / 60);
   const remSec = safeSec % 60;
   return `${mins}:${remSec.toString().padStart(2, '0')}`;
