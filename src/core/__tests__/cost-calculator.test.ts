@@ -87,4 +87,26 @@ describe('Cost Calculator Engine (Craft Economics)', () => {
     expect(metrics.savingsPerCup).toBe(0);
     expect(metrics.savingsPercent).toBe(0);
   });
+
+  test('TASK-P7-03-ZAK: Odporność na wartości Infinity i NaN w parametrach wejściowych', () => {
+    const nanMetrics = calculateBrewCost({
+      doseGrams: NaN,
+      waterWeightGrams: NaN,
+      waterLiters: NaN,
+      beanPricePerKg: Infinity,
+      cafeReferencePrice: NaN,
+      electricityPricePerKwh: Infinity,
+      filterPaperCost: NaN,
+      kettleBoilMinutes: Infinity,
+      kettlePowerKw: NaN,
+      waterSaltsCostPerLiter: Infinity,
+    });
+
+    expect(Number.isFinite(nanMetrics.totalHomeCost)).toBe(true);
+    expect(Number.isFinite(nanMetrics.savingsPerCup)).toBe(true);
+    expect(Number.isFinite(nanMetrics.savingsPercent)).toBe(true);
+    expect(nanMetrics.coffeeCost).toBe(0); // dose NaN -> 0
+    expect(nanMetrics.cafePrice).toBe(DEFAULT_BREW_COST_PARAMETERS.cafeReferencePrice); // NaN -> default
+    expect(nanMetrics.waterCost).toBe(0.01); // 0.25L * 0.05 default
+  });
 });
