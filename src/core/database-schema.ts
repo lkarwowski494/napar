@@ -169,6 +169,7 @@ CREATE INDEX IF NOT EXISTS idx_inventory_archived ON inventory_items(is_archived
 CREATE INDEX IF NOT EXISTS idx_inventory_active_fav_updated ON inventory_items(is_archived, is_favorite DESC, updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_sessions_brewed_at ON brew_sessions(brewed_at);
 CREATE INDEX IF NOT EXISTS idx_sessions_inventory_item ON brew_sessions(inventory_item_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_recipe_id ON brew_sessions(recipe_id);
 CREATE INDEX IF NOT EXISTS idx_caffeine_consumed_at ON caffeine_logs(consumed_at);
 CREATE INDEX IF NOT EXISTS idx_caffeine_brew_session ON caffeine_logs(brew_session_id);
 CREATE INDEX IF NOT EXISTS idx_recipes_fav_method_name ON recipes(is_favorite DESC, method, name);
