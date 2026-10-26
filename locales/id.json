@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Dripper keramik Jepang dengan 20 lekukan rusuk yang kompatibel dengan filter kerucut dan wave.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Alat seduh imersi piston serbaguna yang menghasilkan ekstraksi kaya dengan waktu seduh singkat."
+    "aeropressDesc": "Alat seduh imersi piston serbaguna yang menghasilkan ekstraksi kaya dengan waktu seduh singkat.",
+    "methodIbrik": "Cezve / Ibrik",
+    "ibrikDesc": "Alat seduh kopi Turki tradisional yang menghasilkan kopi pekat, kaya rasa, dan tanpa filter."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

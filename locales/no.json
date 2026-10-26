@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Japansk keramisk kaffetrakt med 20 riller, kompatibel med kjegle- og bølgefiltre.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Allsidig stempel-immersjonsbrygger som gir rik ekstraksjon med kort trekketid."
+    "aeropressDesc": "Allsidig stempel-immersjonsbrygger som gir rik ekstraksjon med kort trekketid.",
+    "methodIbrik": "Cezve / Ibrik",
+    "ibrikDesc": "Tradisjonell tyrkisk kaffekanne for kraftig, ufiltrert kaffe med fyldig crema."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

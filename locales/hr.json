@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Japanski keramički dripper s 20 rebara kompatibilan s konusnim i valovitim filtrima.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Svestrani klipni uranjajući aparat za kavu za bogatu ekstrakciju uz kratko vrijeme pripreme."
+    "aeropressDesc": "Svestrani klipni uranjajući aparat za kavu za bogatu ekstrakciju uz kratko vrijeme pripreme.",
+    "methodIbrik": "Džezva / Ibrik",
+    "ibrikDesc": "Tradicionalna posuda za tursku kavu koja daje gust, intenzivan i nefiltriran napitak."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

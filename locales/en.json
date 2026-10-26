@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Japanese 20-rib ceramic dripper compatible with both conical and wave filters.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Versatile piston immersion brewer offering rich extraction with short steep time."
+    "aeropressDesc": "Versatile piston immersion brewer offering rich extraction with short steep time.",
+    "methodIbrik": "Cezve / Ibrik",
+    "ibrikDesc": "Traditional Turkish decoction brewer producing an intense, unfiltered full-bodied brew."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

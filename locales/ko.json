@@ -175,7 +175,9 @@
     "methodOrigami": "오리가미 드리퍼",
     "origamiDesc": "20개의 세로 리브로 원추형 및 웨이브 필터를 모두 지원하는 세라믹 드리퍼.",
     "methodAeropress": "에어로프레스",
-    "aeropressDesc": "짧은 추출 시간으로 풍부한 바디감과 향미를 추출하는 다목적 피스톤 침출식 브루어."
+    "aeropressDesc": "짧은 추출 시간으로 풍부한 바디감과 향미를 추출하는 다목적 피스톤 침출식 브루어.",
+    "methodIbrik": "체즈베 / 이브릭",
+    "ibrikDesc": "진하고 풍부한 바디감의 무여과 터키식 커피를 추출하는 전통 구리 주전자."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

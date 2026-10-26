@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Japán kerámia csepegtető 20 bordával kónikus és hullámos szűrőkhöz.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Sokoldalú dugattyús áztatós kávékészítő gazdag kivonatolással és rövid áztatási idővel."
+    "aeropressDesc": "Sokoldalú dugattyús áztatós kávékészítő gazdag kivonatolással és rövid áztatási idővel.",
+    "methodIbrik": "Dzezva / Ibrik",
+    "ibrikDesc": "Hagyományos török kávéfőző edény sűrű, intenzív és szűretlen kávéhoz."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

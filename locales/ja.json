@@ -175,7 +175,9 @@
     "methodOrigami": "オリガミドリッパー",
     "origamiDesc": "20本の美しいリブ構造で円すい形とウェーブ形両方のフィルターに対応する美濃焼ドリッパー。",
     "methodAeropress": "エアロプレス",
-    "aeropressDesc": "短い抽出時間で豊かなコクと風味を引き出すピストン浸漬式コーヒー抽出器具。"
+    "aeropressDesc": "短い抽出時間で豊かなコクと風味を引き出すピストン浸漬式コーヒー抽出器具。",
+    "methodIbrik": "イブリック / ジェズヴェ",
+    "ibrikDesc": "濃厚でコクのある無濾過コーヒーを抽出する伝統的なトルコ式コーヒーポット。"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Damlatıcı",
     "origamiDesc": "Koni ve dalga tipi filtrelerle uyumlu 20 kanallı Japon seramik damlatıcı.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Kısa demleme süresiyle zengin ekstraksiyon sunan çok yönlü pistonlu daldırma demleyici."
+    "aeropressDesc": "Kısa demleme süresiyle zengin ekstraksiyon sunan çok yönlü pistonlu daldırma demleyici.",
+    "methodIbrik": "Cezve / İbrik",
+    "ibrikDesc": "Yoğun gövdeli, köpüklü ve filtrelenmemiş geleneksel Türk kahvesi pişirme kabı."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

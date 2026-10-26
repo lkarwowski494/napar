@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Japanse keramische filterhouder met 20 ribben, geschikt voor kegel- en golfpapieren.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Veelzijdige zuiger-immersiebrouwer voor een rijke extractie met korte zettijd."
+    "aeropressDesc": "Veelzijdige zuiger-immersiebrouwer voor een rijke extractie met korte zettijd.",
+    "methodIbrik": "Cezve / Ibrik",
+    "ibrikDesc": "Traditionele Turkse koffiepot voor een krachtige, ongefilterde en volle koffie."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

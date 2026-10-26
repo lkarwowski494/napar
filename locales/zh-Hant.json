@@ -175,7 +175,9 @@
     "methodOrigami": "Origami摺紙濾杯",
     "origamiDesc": "20道縱向導流肋骨設計，完美兼顧錐形濾紙與蛋糕波浪濾紙。",
     "methodAeropress": "愛樂壓",
-    "aeropressDesc": "多功能活塞浸泡式萃取器具，萃取時間短且風味濃郁醇厚。"
+    "aeropressDesc": "多功能活塞浸泡式萃取器具，萃取時間短且風味濃郁醇厚。",
+    "methodIbrik": "土耳其壺 (Cezve / Ibrik)",
+    "ibrikDesc": "傳統土耳其咖啡壺，萃取醇厚濃郁且帶有豐富泡沫的未過濾咖啡。"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

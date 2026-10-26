@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Phễu sứ Nhật Bản với 20 rãnh gấp tương thích cả giấy lọc hình nón và giấy gợn sóng.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Dụng cụ pha cà phê ngâm piston đa năng mang lại chiết xuất đậm đà với thời gian ủ ngắn."
+    "aeropressDesc": "Dụng cụ pha cà phê ngâm piston đa năng mang lại chiết xuất đậm đà với thời gian ủ ngắn.",
+    "methodIbrik": "Cezve / Ibrik",
+    "ibrikDesc": "Ấm pha cà phê Thổ Nhĩ Kỳ truyền thống cho hương vị đậm đà, nguyên bản và không lọc."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

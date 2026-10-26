@@ -347,4 +347,11 @@ describe('i18n System', () => {
     expect(translations.pl.brew.aeropressDesc).toContain('tłokowy');
     expect(translations.en.brew.aeropressDesc).toContain('piston');
   });
+
+  test('TASK-P30-09-LOK: Klucze methodIbrik i ibrikDesc są zdefiniowane w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodIbrik).toBe('Tygielek (Cezve / Ibrik)');
+    expect(translations.en.brew.methodIbrik).toBe('Cezve / Ibrik');
+    expect(translations.pl.brew.ibrikDesc).toContain('turecku');
+    expect(translations.en.brew.ibrikDesc).toContain('Turkish');
+  });
 });

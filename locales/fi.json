@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Japanilainen 20-urainen keraaminen suodatinsuppilo kartio- ja aaltosuodattimille.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Monipuolinen mäntäuuttolaite, joka tuottaa täyteläisen uuton lyhyellä uuttoajalla."
+    "aeropressDesc": "Monipuolinen mäntäuuttolaite, joka tuottaa täyteläisen uuton lyhyellä uuttoajalla.",
+    "methodIbrik": "Cezve / Ibrik",
+    "ibrikDesc": "Perinteinen turkkilainen kahvipannu, jolla saadaan täyteläinen, vahva ja suodattamaton kahvi."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

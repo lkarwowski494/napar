@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Dripper seramik Jepun dengan 20 alur tulang serasi untuk penapis kon dan wave.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Pembancuh rendaman omboh serba boleh yang memberikan pengekstrakan kaya dengan masa rendaman singkat."
+    "aeropressDesc": "Pembancuh rendaman omboh serba boleh yang memberikan pengekstrakan kaya dengan masa rendaman singkat.",
+    "methodIbrik": "Cezve / Ibrik",
+    "ibrikDesc": "Cerek kopi Turki tradisional yang menghasilkan seduhan pekat, padat, dan tanpa ditapis."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

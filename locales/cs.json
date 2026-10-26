@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Japonský keramický dripper s 20 žebry kompatibilní s kuželovými i plochými filtry.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Všestranný pístový kávovar kombinující imerzi s krátkou dobou louhování."
+    "aeropressDesc": "Všestranný pístový kávovar kombinující imerzi s krátkou dobou louhování.",
+    "methodIbrik": "Džezva / Ibrik",
+    "ibrikDesc": "Tradiční turecká konvička pro přípravu husté, intenzivní a nefiltrované kávy."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

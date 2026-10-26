@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Dripper japonais en céramique à 20 cannelures, compatible avec filtres coniques et wave.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Cafetière à immersion et piston polyvalente offrant une extraction riche avec un temps d'infusion court."
+    "aeropressDesc": "Cafetière à immersion et piston polyvalente offrant une extraction riche avec un temps d'infusion court.",
+    "methodIbrik": "Cezve / Ibrik",
+    "ibrikDesc": "Cafetière turque traditionnelle produisant un café dense, intense et non filtré."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

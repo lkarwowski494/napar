@@ -175,7 +175,9 @@
     "methodOrigami": "Origami Dripper",
     "origamiDesc": "Dripper japonez din ceramică cu 20 de nervuri compatibil cu filtre conice și wave.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Dispozitiv versatil de imersie cu piston ce oferă o extracție bogată cu timp scurt de infuzare."
+    "aeropressDesc": "Dispozitiv versatil de imersie cu piston ce oferă o extracție bogată cu timp scurt de infuzare.",
+    "methodIbrik": "Ibric / Cezve",
+    "ibrikDesc": "Vas tradițional pentru cafea la nisip sau turcească, cu zaț dens și gust intens."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

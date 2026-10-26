@@ -175,7 +175,9 @@
     "methodOrigami": "Dripper Origami",
     "origamiDesc": "Japoński ceramiczny dripper o 20 żebrach umożliwiający użycie filtrów stożkowych i falistych.",
     "methodAeropress": "AeroPress",
-    "aeropressDesc": "Wszechstronny ciśnieniowy zaparzacz tłokowy łączący immersję z krótkim czasem parzenia."
+    "aeropressDesc": "Wszechstronny ciśnieniowy zaparzacz tłokowy łączący immersję z krótkim czasem parzenia.",
+    "methodIbrik": "Tygielek (Cezve / Ibrik)",
+    "ibrikDesc": "Tradycyjny tygielek do kawy po turecku dający gęsty, intensywny napar z cremą i pianką."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
