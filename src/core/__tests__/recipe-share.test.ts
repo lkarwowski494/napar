@@ -843,4 +843,31 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(Object.is(result?.recipe.recommendedRatio, -0)).toBe(false);
     expect(result?.recipe.recommendedRatio).toBe(12.2); // 220 / 18
   });
+
+  test('TASK-P36-11-WZR: recipeToCompactPayload i decodeRecipeFromShareUrl wspierają numeryczne opisy mielenia', () => {
+    const recipeWithNumericGrind: any = {
+      name: 'Numeric Grind Recipe',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: 15,
+      waterGrams: 250,
+      grindSizeDescription: 24, // number zamiast string
+      stepsJson: '[]',
+    };
+    const payload = recipeToCompactPayload(recipeWithNumericGrind);
+    expect(payload.g).toBe('24');
+
+    const rawData = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Decoded Numeric Grind',
+      b: 'COFFEE',
+      m: 'v60',
+      d: 15,
+      w: 250,
+      g: 16,
+      s: [],
+    }));
+    const decoded = decodeRecipeFromShareUrl(rawData);
+    expect(decoded?.recipe.grindSizeDescription).toBe('16');
+  });
 });

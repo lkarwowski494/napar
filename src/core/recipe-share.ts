@@ -193,7 +193,9 @@ export function recipeToCompactPayload(
   const temp = Object.is(rawTempVal, -0) ? 0 : rawTempVal;
 
   const grind =
-    typeof rawGrind === 'string' && rawGrind.trim() ? rawGrind.trim().slice(0, 200) : undefined;
+    typeof rawGrind === 'string' && rawGrind.trim()
+      ? rawGrind.trim().slice(0, 200)
+      : (typeof rawGrind === 'number' && Number.isFinite(rawGrind) ? String(rawGrind) : undefined);
   const computedRatio = Number((water / (dose || 1)).toFixed(1));
   const rawRatioNum = typeof rawRatio === 'number' ? rawRatio : (typeof rawRatio === 'string' ? parseFloat(rawRatio as any) : NaN);
   const ratioCandidate =
@@ -332,7 +334,10 @@ export function decodeRecipeFromShareUrl(
         const rawDecodedTemp = typeof parsed.t === 'number' ? parsed.t : (typeof parsed.t === 'string' ? parseFloat(parsed.t) : NaN);
         return Number.isFinite(rawDecodedTemp) && rawDecodedTemp >= 0 && rawDecodedTemp <= 100 && !Object.is(rawDecodedTemp, -0) ? Math.max(0, Math.min(100, Math.round(rawDecodedTemp))) : 92;
       })(),
-      grindSizeDescription: typeof parsed.g === 'string' ? parsed.g.trim().slice(0, 200) : '',
+      grindSizeDescription:
+        typeof parsed.g === 'string'
+          ? parsed.g.trim().slice(0, 200)
+          : (typeof parsed.g === 'number' && Number.isFinite(parsed.g) ? String(parsed.g) : ''),
       recommendedRatio: (() => {
         const rawDecodedRatio = typeof parsed.r === 'number' ? parsed.r : (typeof parsed.r === 'string' ? parseFloat(parsed.r) : NaN);
         let ratioVal = Number.isFinite(rawDecodedRatio) && rawDecodedRatio > 0 && !Object.is(rawDecodedRatio, -0)
