@@ -1220,4 +1220,44 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded?.originalSteps[0].durationSeconds).toBe(35);
     expect(decoded?.originalSteps[0].targetWaterGrams).toBe(51);
   });
+
+  test('TASK-P49-11-WZR: decodeRecipeFromShareUrl i recipeToCompactPayload sanityzuja puste/whitespace wlasciwosci i stepsJson', () => {
+    const payloadWithWhitespace = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Whitespace Test',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 250,
+      g: '   ',
+      a: '   ',
+      desc: '   ',
+      s: [null, undefined, 42, 'invalid', { n: 'Valid Step', d: 30, w: 50 }],
+    }));
+
+    const decodedPl = decodeRecipeFromShareUrl(payloadWithWhitespace, 'pl');
+    expect(decodedPl).not.toBeNull();
+    expect(decodedPl?.recipe.grindSizeDescription).toBe('Średnio');
+    expect(decodedPl?.recipe.author).toBe('Udostępniona receptura');
+    expect(decodedPl?.recipe.description).toBe('Zaimportowano przez kod QR / link (V60)');
+    expect(decodedPl?.originalSteps.length).toBe(1);
+    expect(decodedPl?.originalSteps[0].namePl).toBe('Valid Step');
+
+    const decodedEn = decodeRecipeFromShareUrl(payloadWithWhitespace, 'en');
+    expect(decodedEn?.recipe.grindSizeDescription).toBe('Medium');
+    expect(decodedEn?.recipe.author).toBe('Shared Recipe');
+    expect(decodedEn?.recipe.description).toBe('Imported via QR code / link (V60)');
+
+    const dummyWithInvalidStepsJson: any = {
+      id: 'inv-steps',
+      name: 'No Steps',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: 15,
+      waterGrams: 250,
+      stepsJson: null,
+    };
+    const compact = recipeToCompactPayload(dummyWithInvalidStepsJson);
+    expect(compact.s).toEqual([]);
+  });
 });

@@ -114,7 +114,7 @@ export function recipeToCompactPayload(
 
   if (isSaved) {
     try {
-      const parsed = JSON.parse(recipe.stepsJson);
+      const parsed = typeof recipe.stepsJson === 'string' ? JSON.parse(recipe.stepsJson) : [];
       rawSteps = Array.isArray(parsed) ? parsed : [];
     } catch {
       rawSteps = [];
@@ -356,9 +356,9 @@ export function decodeRecipeFromShareUrl(
         return Number.isFinite(rawDecodedTemp) && rawDecodedTemp >= 0 && rawDecodedTemp <= 100 && !Object.is(rawDecodedTemp, -0) ? Math.max(0, Math.min(100, Math.round(rawDecodedTemp))) : 92;
       })(),
       grindSizeDescription:
-        typeof parsed.g === 'string'
+        typeof parsed.g === 'string' && parsed.g.trim()
           ? parsed.g.trim().slice(0, 200)
-          : (typeof parsed.g === 'number' && Number.isFinite(parsed.g) ? String(parsed.g) : ''),
+          : (typeof parsed.g === 'number' && Number.isFinite(parsed.g) ? String(parsed.g) : (isEn ? 'Medium' : 'Średnio')),
       recommendedRatio: (() => {
         const rawDecodedRatio = typeof parsed.r === 'number' ? parsed.r : (typeof parsed.r === 'string' ? parseFloat(String(parsed.r).replace(',', '.')) : NaN);
         let ratioVal = Number.isFinite(rawDecodedRatio) && rawDecodedRatio > 0 && !Object.is(rawDecodedRatio, -0)
