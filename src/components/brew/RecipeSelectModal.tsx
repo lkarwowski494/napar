@@ -68,7 +68,9 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
 
   if (!inline && !visible) return null;
 
-  const displayedRecipes = recipes.filter((r) => {
+  const safeRecipes = Array.isArray(recipes) ? recipes : [];
+  const displayedRecipes = safeRecipes.filter((r) => {
+    if (!r || typeof r !== 'object') return false;
     const itemType = 'beverageType' in r ? r.beverageType : r.type;
     if (categoryFilter !== 'ALL' && itemType !== categoryFilter) {
       return false;
@@ -91,10 +93,10 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
   });
 
   const coffeeGroup = displayedRecipes.filter(
-    (r) => ('beverageType' in r ? r.beverageType : r.type) === 'COFFEE'
+    (r) => r && typeof r === 'object' && ('beverageType' in r ? r.beverageType : r.type) === 'COFFEE'
   );
   const teaGroup = displayedRecipes.filter(
-    (r) => ('beverageType' in r ? r.beverageType : r.type) === 'TEA'
+    (r) => r && typeof r === 'object' && ('beverageType' in r ? r.beverageType : r.type) === 'TEA'
   );
 
   const renderRecipeCard = (r: any) => (
@@ -205,6 +207,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
           onPress={onClose}
           accessibilityRole="button"
           accessibilityLabel={t?.common?.close || 'Zamknij'}
+          accessibilityHint={t?.common?.closeHint || 'Zamyka okno wyboru receptury'}
         >
           <Text style={styles.modalCloseText}>{t?.common?.close || 'Zamknij'}</Text>
         </Pressable>
@@ -219,7 +222,9 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               placeholderTextColor={theme.colors.textMuted}
               value={searchQuery}
               onChangeText={(txt) => setSearchQuery(typeof txt === 'string' ? txt.slice(0, 100) : '')}
+              accessibilityRole="search"
               accessibilityLabel={t?.brew?.recipeSearchPlaceholder || 'Szukaj receptury, metody'}
+              accessibilityHint={t?.brew?.recipeSearchHint || 'Wpisz nazwę, metodę lub autora aby przefiltrować listę'}
             />
             {searchQuery.length > 0 && (
               <Pressable
@@ -319,7 +324,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                     categoryFilter === 'ALL' && styles.recipeFilterTabTextActive,
                   ]}
                 >
-                  Wszystkie ({recipes.length})
+                  Wszystkie ({safeRecipes.filter((r) => r && typeof r === 'object').length})
                 </Text>
               </Pressable>
               <Pressable
@@ -339,7 +344,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                     categoryFilter === 'COFFEE' && styles.recipeFilterTabTextActive,
                   ]}
                 >
-                  Kawa ({recipes.filter((r) => ('beverageType' in r ? r.beverageType === 'COFFEE' : r.type === 'COFFEE')).length})
+                  Kawa ({safeRecipes.filter((r) => r && typeof r === 'object' && ('beverageType' in r ? r.beverageType === 'COFFEE' : r.type === 'COFFEE')).length})
                 </Text>
               </Pressable>
               <Pressable
@@ -359,7 +364,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                     categoryFilter === 'TEA' && styles.recipeFilterTabTextActive,
                   ]}
                 >
-                  Herbata ({recipes.filter((r) => ('beverageType' in r ? r.beverageType === 'TEA' : r.type === 'TEA')).length})
+                  Herbata ({safeRecipes.filter((r) => r && typeof r === 'object' && ('beverageType' in r ? r.beverageType === 'TEA' : r.type === 'TEA')).length})
                 </Text>
               </Pressable>
             </View>

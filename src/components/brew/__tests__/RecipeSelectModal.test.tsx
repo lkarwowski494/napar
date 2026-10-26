@@ -220,4 +220,30 @@ describe('RecipeSelectModal Component', () => {
     expect(root.findByProps({ testID: 'recipe-option-rec-pl' })).toBeDefined();
     expect(() => root.findByProps({ testID: 'recipe-option-rec-en' })).toThrow();
   });
+
+  test('TASK-P49-01-ODK: RecipeSelectModal renderuje z accessibilityRole="search", accessibilityHint oraz odpornoscia na null w recipes', () => {
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(
+        <RecipeSelectModal
+          {...defaultProps}
+          recipes={[null, undefined, { id: 'valid-1', name: 'Valid V60', type: 'COFFEE', method: 'V60', isCustom: false, isFavorite: false }] as any}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const searchInput = root.findByProps({ testID: 'recipe-search-input' });
+    expect(searchInput.props.accessibilityRole).toBe('search');
+    expect(searchInput.props.accessibilityHint).toBeDefined();
+
+    const closeBtn = root.findByProps({ testID: 'close-recipe-modal-btn' });
+    expect(closeBtn.props.accessibilityHint).toBeDefined();
+
+    expect(() => {
+      act(() => {
+        renderer.create(<RecipeSelectModal {...defaultProps} recipes={null as any} />);
+      });
+    }).not.toThrow();
+  });
 });
