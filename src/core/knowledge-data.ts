@@ -655,12 +655,18 @@ export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
 }
 
 export function getKnowledgeDescription(id: string, lang: 'pl' | 'en' = 'pl'): string {
-  const loc = getLocale(id);
+  if (!id || typeof id !== 'string') return '';
+  const cleanId = id.trim();
+  const loc = KNOWLEDGE_LOCALES[cleanId];
+  if (!loc) return '';
   return lang === 'en' ? loc.descriptionEn : loc.descriptionPl;
 }
 
 export function getKnowledgeSensoryProfile(id: string, lang: 'pl' | 'en' = 'pl'): string {
-  const loc = getLocale(id);
+  if (!id || typeof id !== 'string') return '';
+  const cleanId = id.trim();
+  const loc = KNOWLEDGE_LOCALES[cleanId];
+  if (!loc) return '';
   if (loc.sensoryProfilePl || loc.sensoryProfileEn) {
     return (lang === 'en' ? loc.sensoryProfileEn : loc.sensoryProfilePl) || '';
   }

@@ -321,4 +321,14 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     const byTeaDescEn = searchTeaCategories('leaves');
     expect(byTeaDescEn.length).toBeGreaterThanOrEqual(1);
   });
+
+  test('TASK-P14-06-TRE: getKnowledgeDescription i getKnowledgeSensoryProfile bezpiecznie zwracają pusty string dla nieznanych ID i nullish', () => {
+    expect(getKnowledgeDescription('non-existent-id')).toBe('');
+    expect(getKnowledgeDescription('')).toBe('');
+    expect(getKnowledgeDescription(null as any)).toBe('');
+
+    expect(getKnowledgeSensoryProfile('non-existent-id')).toBe('');
+    expect(getKnowledgeSensoryProfile('')).toBe('');
+    expect(getKnowledgeSensoryProfile(null as any)).toBe('');
+  });
 });
