@@ -551,4 +551,30 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded).not.toBeNull();
     expect(decoded?.originalSteps[0].namePl.length).toBe(100);
   });
+  test('TASK-P23-11-WZR: recipeToCompactPayload i decodeRecipeFromShareUrl ściśle zaokrąglają temperaturę do liczb całkowitych', () => {
+    const recipe: any = {
+      name: 'Temp Float Recipe',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93.7,
+      stepsJson: '[]',
+    };
+    const payload = recipeToCompactPayload(recipe);
+    expect(payload.t).toBe(94);
+
+    const raw = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Temp Float Test',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 250,
+      t: 88.3,
+    }));
+    const decoded = decodeRecipeFromShareUrl(raw);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.recipe.waterTempCelsius).toBe(88);
+  });
 });
