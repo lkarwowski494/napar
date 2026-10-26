@@ -633,10 +633,11 @@ export function duplicateRecipe(
   const now = new Date().toISOString();
   const id = `custom-clone-${Date.now()}`;
   const safeSuffix = typeof copySuffix === 'string' ? copySuffix : ' (Kopia)';
-  const baseName = typeof recipe.name === 'string' && recipe.name.trim() ? recipe.name.trim() : 'Receptura';
+  const maxBaseLen = Math.max(1, 100 - safeSuffix.length);
+  const baseName = typeof recipe.name === 'string' && recipe.name.trim() ? recipe.name.trim().slice(0, maxBaseLen) : 'Receptura';
   const name = `${baseName}${safeSuffix}`;
   const rawType = recipe.beverageType || recipe.type;
-  const beverageType = rawType === 'TEA' ? 'TEA' : 'COFFEE';
+  const beverageType = typeof rawType === 'string' && rawType.trim().toUpperCase() === 'TEA' ? 'TEA' : 'COFFEE';
   const method = typeof recipe.method === 'string' && recipe.method.trim() ? recipe.method.trim() : 'V60';
 
   const rawDose = recipe.doseGrams ?? recipe.coffeeOrTeaDoseGrams;

@@ -1840,4 +1840,25 @@ describe('Napar SQLite Database & Repositories', () => {
       [10]
     );
   });
+
+  test('TASK-P42-05-ARC: duplicateRecipe normalizuje beverageType (np. tea) i ogranicza dlugosc nazwy do 100 znakow', () => {
+    initDatabase(mockDb as any);
+    const longName = 'A'.repeat(120);
+    const recipeToClone: any = {
+      id: 'rec-test-clone',
+      name: longName,
+      beverageType: '  tea  ',
+      method: 'Gaiwan',
+      doseGrams: 5,
+      waterGrams: 100,
+      waterTempCelsius: 85,
+      recommendedRatio: 20,
+      stepsJson: '[]',
+    };
+
+    const cloned = duplicateRecipe(recipeToClone);
+    expect(cloned.beverageType).toBe('TEA');
+    expect(cloned.name.length).toBeLessThanOrEqual(100);
+    expect(cloned.name.endsWith(' (Kopia)')).toBe(true);
+  });
 });
