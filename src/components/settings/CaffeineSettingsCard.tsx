@@ -36,7 +36,12 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               {t.settings.caffeineHalfLifeDesc || 'Wskaźnik klirensu wątrobowego (3.0h–8.0h, domyślnie 5.0h wg EFSA).'}
             </Text>
           </View>
-          <View style={styles.stepperContainer}>
+          <View
+            style={styles.stepperContainer}
+            accessibilityRole="adjustable"
+            accessibilityLabel={t.settings.caffeineHalfLifeTitle || 'Czas Półtrwania Kofeiny'}
+            accessibilityValue={{ min: 3.0, max: 8.0, now: halfLifeHours, text: `${halfLifeHours.toFixed(1)} h` }}
+          >
             <Pressable
               style={styles.stepperBtn}
               hitSlop={8}
@@ -70,7 +75,12 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               {t.settings.bedtimeHourDesc || 'Używana do kalkulacji nocnego curfew i progu 25 mg dla fazy NREM.'}
             </Text>
           </View>
-          <View style={styles.stepperContainer}>
+          <View
+            style={styles.stepperContainer}
+            accessibilityRole="adjustable"
+            accessibilityLabel={t.settings.bedtimeHourTitle || 'Docelowa Godzina Snu'}
+            accessibilityValue={{ min: 18, max: 28, now: bedtimeHour, text: `${bedtimeHour}:00` }}
+          >
             <Pressable
               style={styles.stepperBtn}
               hitSlop={8}
