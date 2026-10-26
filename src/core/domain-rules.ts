@@ -59,12 +59,15 @@ export function calculateBrewDose(waterGrams: number, ratio: number): number {
 
 /**
  * RD-01c: Oblicza współczynnik ratio dla zadanej dozy i wody (np. 15g, 250g -> 16.7)
+ * Zabezpieczenie przed astronomicznymi wartościami poprzez clamp maxRatio (domyślnie 100.0)
  */
-export function calculateBrewRatio(doseGrams: number, waterGrams: number): number {
+export function calculateBrewRatio(doseGrams: number, waterGrams: number, maxRatio = 100.0): number {
   if (!Number.isFinite(doseGrams) || !Number.isFinite(waterGrams) || doseGrams <= 0 || waterGrams <= 0) {
     return 0;
   }
-  return Number((waterGrams / doseGrams).toFixed(1));
+  const ratio = waterGrams / doseGrams;
+  const clamped = Number.isFinite(maxRatio) && maxRatio > 0 ? Math.min(ratio, maxRatio) : ratio;
+  return Number(clamped.toFixed(1));
 }
 
 /**

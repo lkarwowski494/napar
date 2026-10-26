@@ -265,10 +265,13 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
   });
 
   describe('Edge cases, boundaries & zero handling across domain rules', () => {
-    it('calculateBrewRatio returns 0 on non-positive input', () => {
+    it('calculateBrewRatio returns 0 on non-positive input and clamps to maxRatio', () => {
       expect(calculateBrewRatio(0, 250)).toBe(0);
       expect(calculateBrewRatio(15, 0)).toBe(0);
       expect(calculateBrewRatio(-5, -100)).toBe(0);
+      expect(calculateBrewRatio(15, 250)).toBe(16.7);
+      expect(calculateBrewRatio(0.1, 1000)).toBe(100.0);
+      expect(calculateBrewRatio(0.1, 1000, 50.0)).toBe(50.0);
     });
 
     it('calculateLiquidYield throws on non-positive water/dose or negative factor', () => {
