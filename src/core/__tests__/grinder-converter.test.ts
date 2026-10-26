@@ -309,4 +309,10 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ method: 'ICE_DRIP' })).toBe(1150);
     expect(getRecipeMicrons({ method: 'Cold Brew 24h' })).toBe(1150);
   });
+  test('TASK-P23-08-PRO: getRecipeMicrons rozpoznaje kawiarkę (Moka Pot) i zwraca 450 µm', () => {
+    expect(getRecipeMicrons({ method: 'MOKA' })).toBe(450);
+    expect(getRecipeMicrons({ method: 'moka' })).toBe(450);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio drobno pod kawiarkę' })).toBe(450);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-fine for moka pot' })).toBe(450);
+  });
 });
