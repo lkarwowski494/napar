@@ -112,6 +112,16 @@ try {
     `app.json -> expo.name musi być równe 'Napar' (otrzymano '${appJson.name}')`
   );
 
+  // Weryfikacja spójności nazwy wyświetlanej iOS w app.json (TASK-P35-10-WYD)
+  check(
+    appJson.ios?.infoPlist?.CFBundleDisplayName === 'Napar',
+    `app.json -> expo.ios.infoPlist.CFBundleDisplayName musi być równe 'Napar' (otrzymano '${appJson.ios?.infoPlist?.CFBundleDisplayName}')`
+  );
+  check(
+    appJson.ios?.infoPlist?.CFBundleDisplayName === appJson.name,
+    `app.json -> expo.ios.infoPlist.CFBundleDisplayName musi odpowiadać expo.name ('${appJson.name}')`
+  );
+
   // Weryfikacja semver wersji aplikacji w app.json (TASK-P22-10-WYD)
   check(
     typeof appJson.version === 'string' && /^\d+\.\d+\.\d+$/.test(appJson.version),
