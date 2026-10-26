@@ -32,12 +32,16 @@ export const RecipeBasicInfoCard: React.FC<RecipeBasicInfoCardProps> = ({
   t,
 }) => {
   return (
-    <View style={styles.card}>
-      <Text style={styles.fieldLabel}>{t.recipeBuilder.nameLabel} *</Text>
+    <View style={styles.card} testID="recipe-basic-info-card">
+      <Text style={styles.fieldLabel} accessibilityRole="header">
+        {t.recipeBuilder.nameLabel} *
+      </Text>
       <Field
         value={name}
         onChangeText={onChangeName}
         placeholder={t.recipeBuilder.namePlaceholder}
+        accessibilityLabel={t.recipeBuilder.nameLabel}
+        testID="recipe-name-field"
       />
 
       <View style={styles.row}>
@@ -47,6 +51,8 @@ export const RecipeBasicInfoCard: React.FC<RecipeBasicInfoCardProps> = ({
             value={method}
             onChangeText={onChangeMethod}
             placeholder={t.recipeBuilder.methodPlaceholder}
+            accessibilityLabel={t.recipeBuilder.methodLabel}
+            testID="recipe-method-field"
           />
         </View>
         <View style={[styles.flex1, { marginLeft: 10 }]}>
@@ -55,6 +61,8 @@ export const RecipeBasicInfoCard: React.FC<RecipeBasicInfoCardProps> = ({
             value={author}
             onChangeText={onChangeAuthor}
             placeholder={t.recipeBuilder.authorPlaceholder}
+            accessibilityLabel={t.recipeBuilder.authorLabel}
+            testID="recipe-author-field"
           />
         </View>
       </View>
@@ -64,6 +72,8 @@ export const RecipeBasicInfoCard: React.FC<RecipeBasicInfoCardProps> = ({
         value={description}
         onChangeText={onChangeDescription}
         placeholder={t.recipeBuilder.descriptionPlaceholder}
+        accessibilityLabel={t.recipeBuilder.descriptionLabel}
+        testID="recipe-description-field"
         multiline
         numberOfLines={2}
       />
