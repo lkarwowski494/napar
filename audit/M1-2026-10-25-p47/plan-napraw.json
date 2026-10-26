@@ -44,40 +44,40 @@
     "perspective": "06-TRE",
     "title": "Rozszerzenie bazy wiedzy procesów obróbki kawy o natural carbonic maceration i yeast fermentation w knowledge-data",
     "file": "src/core/knowledge-data.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "1cfd2eb"
   },
   {
     "id": "TASK-P47-07-JAK",
     "perspective": "07-JAK",
-    "title": "Sanityzacja wartości mineralizacji wody i odporność na przecinki dziesiętne w water-chemistry",
+    "title": "Sanityzacja wartości mineralizacji wody i dodanie wód Spa Reine i Evian w water-chemistry",
     "file": "src/core/water-chemistry.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "bfa52fd"
   },
   {
     "id": "TASK-P47-08-PRO",
     "perspective": "08-PRO",
-    "title": "Rozpoznawanie metod Cupping i Siphon w getRecipeMicrons w grinder-converter",
+    "title": "Rozpoznawanie metod Cupping i Siphon Technica w getRecipeMicrons w grinder-converter",
     "file": "src/core/grinder-converter.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "08b8958"
   },
   {
     "id": "TASK-P47-09-LOK",
     "perspective": "09-LOK",
-    "title": "Weryfikacja spójności słowników 35 języków i zachowanie 100% matrycy testów",
+    "title": "Dodanie kluczy jednostek imperialnych w 35 językach i zachowanie 100% matrycy testów",
     "file": "locales/*",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "cd2c46a"
   },
   {
     "id": "TASK-P47-10-WYD",
     "perspective": "10-WYD",
-    "title": "Weryfikacja poprawności deklaracji Required Reason API w PrivacyInfo.xcprivacy w verify-native",
+    "title": "Weryfikacja poprawności uprawnień Androida (READ_PHONE_STATE, BODY_SENSORS) w verify-native",
     "file": "scripts/verify-native.mjs",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "9eeadf1"
   },
   {
     "id": "TASK-P47-11-WZR",
