@@ -730,16 +730,41 @@ export function getBrewSessionById(id: string): BrewSession | null {
 export function saveBrewSession(session: BrewSession): void {
   if (!session || typeof session !== 'object') return;
   const db = getDatabase();
-  const dose = Number.isFinite(session.doseGrams) && session.doseGrams > 0 ? session.doseGrams : 15;
-  const water = Number.isFinite(session.waterGrams) && session.waterGrams > 0 ? session.waterGrams : 250;
-  const temp = Number.isFinite(session.waterTempCelsius) && session.waterTempCelsius > 0 ? session.waterTempCelsius : 92;
-  const totalTime = Number.isFinite(session.totalTimeSeconds) && session.totalTimeSeconds >= 0 ? session.totalTimeSeconds : 0;
-  const sanitizedRating = session.rating != null && Number.isFinite(session.rating) && session.rating >= 0 && session.rating <= 5
-    ? session.rating
-    : null;
-  const sanitizedTds = session.tdsPercentage != null && Number.isFinite(session.tdsPercentage) && session.tdsPercentage >= 0 ? session.tdsPercentage : null;
-  const sanitizedEy = session.extractionYieldPercentage != null && Number.isFinite(session.extractionYieldPercentage) && session.extractionYieldPercentage >= 0 ? session.extractionYieldPercentage : null;
-  const sanitizedCaffeine = session.caffeineContentMg != null && Number.isFinite(session.caffeineContentMg) && session.caffeineContentMg >= 0 ? session.caffeineContentMg : null;
+
+  const rawDose = typeof session.doseGrams === 'number' ? session.doseGrams : (typeof session.doseGrams === 'string' ? parseFloat(session.doseGrams) : NaN);
+  const safeDose = Number.isFinite(rawDose) && rawDose > 0 ? Number(rawDose.toFixed(1)) : 15;
+  const dose = Object.is(safeDose, -0) ? 15 : safeDose;
+
+  const rawWater = typeof session.waterGrams === 'number' ? session.waterGrams : (typeof session.waterGrams === 'string' ? parseFloat(session.waterGrams) : NaN);
+  const safeWater = Number.isFinite(rawWater) && rawWater > 0 ? Number(rawWater.toFixed(1)) : 250;
+  const water = Object.is(safeWater, -0) ? 250 : safeWater;
+
+  const isColdBrew = (session.method && /cold|ice|zimn/i.test(session.method)) || (session.recipeName && /cold|ice|zimn/i.test(session.recipeName));
+  const rawTemp = typeof session.waterTempCelsius === 'number' ? session.waterTempCelsius : (typeof session.waterTempCelsius === 'string' ? parseFloat(session.waterTempCelsius) : NaN);
+  const safeTemp = Number.isFinite(rawTemp) && (rawTemp > 0 || (isColdBrew && rawTemp === 0))
+    ? Math.min(100, Math.max(0, Math.round(rawTemp)))
+    : 92;
+  const temp = Object.is(safeTemp, -0) ? 0 : safeTemp;
+
+  const rawTotalTime = typeof session.totalTimeSeconds === 'number' ? session.totalTimeSeconds : (typeof session.totalTimeSeconds === 'string' ? parseFloat(session.totalTimeSeconds) : NaN);
+  const safeTotalTime = Number.isFinite(rawTotalTime) && rawTotalTime >= 0 ? Math.round(rawTotalTime) : 0;
+  const totalTime = Object.is(safeTotalTime, -0) ? 0 : safeTotalTime;
+
+  const rawRating = typeof session.rating === 'number' ? session.rating : (typeof session.rating === 'string' ? parseFloat(session.rating) : NaN);
+  const safeRating = Number.isFinite(rawRating) && rawRating >= 0 && rawRating <= 5 ? Number(rawRating.toFixed(1)) : null;
+  const sanitizedRating = safeRating != null && Object.is(safeRating, -0) ? 0 : safeRating;
+
+  const rawTds = typeof session.tdsPercentage === 'number' ? session.tdsPercentage : (typeof session.tdsPercentage === 'string' ? parseFloat(session.tdsPercentage) : NaN);
+  const safeTds = Number.isFinite(rawTds) && rawTds >= 0 ? Number(rawTds.toFixed(2)) : null;
+  const sanitizedTds = safeTds != null && Object.is(safeTds, -0) ? 0 : safeTds;
+
+  const rawEy = typeof session.extractionYieldPercentage === 'number' ? session.extractionYieldPercentage : (typeof session.extractionYieldPercentage === 'string' ? parseFloat(session.extractionYieldPercentage) : NaN);
+  const safeEy = Number.isFinite(rawEy) && rawEy >= 0 ? Number(rawEy.toFixed(2)) : null;
+  const sanitizedEy = safeEy != null && Object.is(safeEy, -0) ? 0 : safeEy;
+
+  const rawCaffeine = typeof session.caffeineContentMg === 'number' ? session.caffeineContentMg : (typeof session.caffeineContentMg === 'string' ? parseFloat(session.caffeineContentMg) : NaN);
+  const safeCaffeine = Number.isFinite(rawCaffeine) && rawCaffeine >= 0 ? Number(rawCaffeine.toFixed(1)) : null;
+  const sanitizedCaffeine = safeCaffeine != null && Object.is(safeCaffeine, -0) ? 0 : safeCaffeine;
 
   db.runSync(
     `INSERT OR REPLACE INTO brew_sessions (

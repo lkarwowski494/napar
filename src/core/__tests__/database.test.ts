@@ -1604,4 +1604,35 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(saved?.recommendedRatio).toBe(15.15);
     expect(Object.is(saved?.doseGrams, -0)).toBe(false);
   });
+
+  test('TASK-P34-05-ARC: saveBrewSession parsuje numeryczne stringi dla dozy, wody, temp, czasu, oceny, tds, ey, kofeiny oraz chroni przed -0', () => {
+    initDatabase(mockDb as any);
+    const stringParamSession: any = {
+      id: 'sess-string-params',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: '18.5',
+      waterGrams: '300.0',
+      waterTempCelsius: '94.2',
+      totalTimeSeconds: '185',
+      rating: '4.5',
+      tdsPercentage: '1.42',
+      extractionYieldPercentage: '20.15',
+      caffeineContentMg: '125.0',
+      brewedAt: '2026-10-26T14:00:00.000Z',
+    };
+    saveBrewSession(stringParamSession);
+
+    const saved = getBrewSessionById('sess-string-params');
+    expect(saved).not.toBeNull();
+    expect(saved?.doseGrams).toBe(18.5);
+    expect(saved?.waterGrams).toBe(300);
+    expect(saved?.waterTempCelsius).toBe(94);
+    expect(saved?.totalTimeSeconds).toBe(185);
+    expect(saved?.rating).toBe(4.5);
+    expect(saved?.tdsPercentage).toBe(1.42);
+    expect(saved?.extractionYieldPercentage).toBe(20.15);
+    expect(saved?.caffeineContentMg).toBe(125);
+    expect(Object.is(saved?.doseGrams, -0)).toBe(false);
+  });
 });
