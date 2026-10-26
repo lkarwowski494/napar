@@ -426,6 +426,18 @@ export function findWaterRecipeById(id: string): WaterRecipe | undefined {
   });
 }
 
+const BOTTLED_ALIASES: Record<string, string> = {
+  volvic: 'volvic',
+  zywiec: 'zywiec_zdroj',
+  'zywiec-zdroj': 'zywiec_zdroj',
+  'zywiec-zdroj-niegazowany': 'zywiec_zdroj',
+  zywiecki: 'zywiecki_krysztal',
+  'zywiecki-krysztal': 'zywiecki_krysztal',
+  muszyna: 'muszynianka',
+  muszynianka: 'muszynianka',
+  cechini: 'muszynianka',
+};
+
 export function findBottledWaterById(id: string): BottledWaterProfile | undefined {
   if (typeof id !== 'string') return undefined;
   const cleanId = id.trim().toLowerCase();
@@ -433,6 +445,13 @@ export function findBottledWaterById(id: string): BottledWaterProfile | undefine
   const underscoreId = cleanId.replace(/-/g, '_');
   const hyphenId = cleanId.replace(/_/g, '-');
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const aliasId = BOTTLED_ALIASES[normId] || BOTTLED_ALIASES[normId.replace(/[\s_-]+/g, '')];
+  if (aliasId) {
+    const directMatch = BOTTLED_WATER_BENCHMARKS.find((w) => w.id === aliasId);
+    if (directMatch) return directMatch;
+  }
+
   return BOTTLED_WATER_BENCHMARKS.find((w) => {
     if (!w || typeof w !== 'object') return false;
     if (typeof w.id === 'string') {

@@ -529,5 +529,13 @@ describe('Water Chemistry & Mineralization Module', () => {
     const diag = diagnoseWaterSensoryImpact('60,5', '30,5');
     expect(diag.problemPl).toContain('Golden Zone');
   });
+
+  test('TASK-P46-07-JAK: findBottledWaterById dopasowuje popularne aliasy wód (zywiec, muszyna, cechini, zywiecki)', () => {
+    expect(findBottledWaterById('zywiec')?.id).toBe('zywiec_zdroj');
+    expect(findBottledWaterById('zywiec-zdroj-niegazowany')?.id).toBe('zywiec_zdroj');
+    expect(findBottledWaterById('zywiecki')?.id).toBe('zywiecki_krysztal');
+    expect(findBottledWaterById('muszyna')?.id).toBe('muszynianka');
+    expect(findBottledWaterById('cechini')?.id).toBe('muszynianka');
+  });
 });
 
