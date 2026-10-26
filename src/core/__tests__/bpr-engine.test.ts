@@ -317,5 +317,14 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(Object.is(action.waterTempCelsius, -0)).toBe(false);
       expect(action.subtitlePl).toBe('15g / 250g · 93°C');
     });
+
+    it('TASK-P38-03-ZAK: wczesne wyjscie dla pustych ciagow i ochrona przed -0 w parseStepDurationSeconds', () => {
+      expect(parseStepDurationSeconds('   ', 45)).toBe(45);
+      expect(parseStepDurationSeconds('', 60)).toBe(60);
+      expect(parseStepDurationSeconds('odczekaj 0 s', 30)).toBe(30);
+      const res = parseStepDurationSeconds('odczekaj 40 sekund', 30);
+      expect(res).toBe(40);
+      expect(Object.is(res, -0)).toBe(false);
+    });
   });
 });

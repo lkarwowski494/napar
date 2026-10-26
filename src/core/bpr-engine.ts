@@ -66,11 +66,11 @@ export function parseStepDurationSeconds(
   if (prioritizeFallback) {
     return safeFallback;
   }
-  if (!instruction || typeof instruction !== 'string') {
+  if (!instruction || typeof instruction !== 'string' || !instruction.trim()) {
     return safeFallback;
   }
 
-  const normalized = instruction.toLowerCase().replace(/,/g, '.');
+  const normalized = instruction.trim().toLowerCase().replace(/,/g, '.');
 
   // 1. Zakres minut: np. "10-15 minut", "10–15 min", "2 do 3 minut"
   const minRangeMatch = normalized.match(
@@ -79,7 +79,8 @@ export function parseStepDurationSeconds(
   if (minRangeMatch) {
     const minVal = parseFloat(minRangeMatch[1]);
     if (!Number.isNaN(minVal) && minVal > 0) {
-      return Math.max(1, Math.min(86400, Math.round(minVal * 60)));
+      const res = Math.max(1, Math.min(86400, Math.round(minVal * 60)));
+      return Object.is(res, -0) ? safeFallback : res;
     }
   }
 
@@ -90,7 +91,8 @@ export function parseStepDurationSeconds(
   if (secRangeMatch) {
     const secVal = parseFloat(secRangeMatch[1]);
     if (!Number.isNaN(secVal) && secVal > 0) {
-      return Math.max(1, Math.min(86400, Math.round(secVal)));
+      const res = Math.max(1, Math.min(86400, Math.round(secVal)));
+      return Object.is(res, -0) ? safeFallback : res;
     }
   }
 
@@ -101,7 +103,8 @@ export function parseStepDurationSeconds(
   if (minSingleMatch) {
     const mins = parseFloat(minSingleMatch[1]);
     if (!Number.isNaN(mins) && mins > 0) {
-      return Math.max(1, Math.min(86400, Math.round(mins * 60)));
+      const res = Math.max(1, Math.min(86400, Math.round(mins * 60)));
+      return Object.is(res, -0) ? safeFallback : res;
     }
   }
 
@@ -112,7 +115,8 @@ export function parseStepDurationSeconds(
   if (secSingleMatch) {
     const secs = parseFloat(secSingleMatch[1]);
     if (!Number.isNaN(secs) && secs > 0) {
-      return Math.max(1, Math.min(86400, Math.round(secs)));
+      const res = Math.max(1, Math.min(86400, Math.round(secs)));
+      return Object.is(res, -0) ? safeFallback : res;
     }
   }
 
