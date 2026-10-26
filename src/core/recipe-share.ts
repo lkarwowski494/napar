@@ -305,7 +305,8 @@ export function decodeRecipeFromShareUrl(
       return null;
     }
 
-    const isEn = typeof language === 'string' && language.trim().toLowerCase() === 'en';
+    const cleanLang = typeof language === 'string' ? language.trim().toLowerCase() : 'pl';
+    const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
     const defaultAuthor = isEn ? 'Shared Recipe' : 'Udostępniona receptura';
     const defaultDesc = isEn
       ? `Imported via QR code / link (${parsed.m})`

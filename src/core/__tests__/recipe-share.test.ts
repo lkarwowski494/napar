@@ -1004,4 +1004,38 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     };
     expect(recipeToCompactPayload(teaRecipeWhitespace).b).toBe('TEA');
   });
+
+  test('TASK-P42-11-WZR: decodeRecipeFromShareUrl scisle clampuje temperature i ratio z ochrona przed -0 oraz wspiera en-US', () => {
+    // Temperatura ponad 100°C -> fallback do 92°C
+    const tempOver = utf8ToBase64(JSON.stringify({
+      v: 1, n: 'Hot', b: 'COFFEE', m: 'v60', d: 15, w: 250, t: 150,
+    }));
+    expect(decodeRecipeFromShareUrl(tempOver)?.recipe.waterTempCelsius).toBe(92);
+
+    // Temperatura -0 -> bezpieczne 0
+    const tempNegZero = utf8ToBase64(JSON.stringify({
+      v: 1, n: 'Cold', b: 'COFFEE', m: 'v60', d: 15, w: 250, t: -0,
+    }));
+    const resNegZero = decodeRecipeFromShareUrl(tempNegZero);
+    expect(resNegZero?.recipe.waterTempCelsius).toBe(0);
+    expect(Object.is(resNegZero?.recipe.waterTempCelsius, -0)).toBe(false);
+
+    // Ratio ujemne / -0 -> fallback 16.7
+    const ratioNeg = utf8ToBase64(JSON.stringify({
+      v: 1, n: 'Ratio', b: 'COFFEE', m: 'v60', d: 15, w: 250, r: -0,
+    }));
+    const resRatioNeg = decodeRecipeFromShareUrl(ratioNeg);
+    expect(resRatioNeg?.recipe.recommendedRatio).toBe(16.7);
+    expect(Object.is(resRatioNeg?.recipe.recommendedRatio, -0)).toBe(false);
+
+    // Wsparcie wariantu regionalnego języka 'en-US'
+    const valid = utf8ToBase64(JSON.stringify({
+      v: 1, n: 'Specialty V60', b: 'COFFEE', m: 'v60', d: 15, w: 250, t: 93, r: 16.67,
+    }));
+    const decodedRegional = decodeRecipeFromShareUrl(valid, 'en-US');
+    expect(decodedRegional).not.toBeNull();
+    expect(decodedRegional?.recipe.author).toBe('Shared Recipe');
+    expect(decodedRegional?.recipe.waterTempCelsius).toBe(93);
+    expect(decodedRegional?.recipe.recommendedRatio).toBe(16.67);
+  });
 });
