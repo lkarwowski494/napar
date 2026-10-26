@@ -234,5 +234,39 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(parseStepDurationSeconds('odczekaj 999999 sekund')).toBe(86400);
       expect(parseStepDurationSeconds(null, -0)).toBe(30);
     });
+
+    it('TASK-P34-03-ZAK: buildProactiveActionSchedule stosuje poprawną gramatykę interwałów po wypale (post-roast)', () => {
+      const refIso = '2026-10-26T12:00:00Z';
+      // 10 dni po wypale (szczyt świeżości Peak)
+      const inventoryItemPeak: any = {
+        id: 'coffee-peak-10',
+        name: 'Kolumbia Geisha',
+        type: 'coffee',
+        roastOrHarvestDate: '2026-10-16T12:00:00Z',
+        remainingWeightGrams: 200,
+        isArchived: false,
+      };
+
+      // 40 dni po wypale (starzejące się ziarna)
+      const inventoryItemAging: any = {
+        id: 'coffee-aging-40',
+        name: 'Etiopia Yirgacheffe',
+        type: 'coffee',
+        roastOrHarvestDate: '2026-09-16T12:00:00Z',
+        remainingWeightGrams: 100,
+        isArchived: false,
+      };
+
+      const schedule = buildProactiveActionSchedule(refIso, [inventoryItemPeak, inventoryItemAging], []);
+      const peakAction = schedule.find((a) => a.id === 'action-peak-now-coffee-peak-10');
+      expect(peakAction).toBeDefined();
+      expect(peakAction?.subtitlePl).toContain('10 dni po wypale');
+      expect(peakAction?.subtitleEn).toContain('10 days post-roast');
+
+      const agingAction = schedule.find((a) => a.id === 'action-aging-coffee-aging-40');
+      expect(agingAction).toBeDefined();
+      expect(agingAction?.subtitlePl).toContain('40 dni po wypale');
+      expect(agingAction?.subtitleEn).toContain('40 days post-roast');
+    });
   });
 });

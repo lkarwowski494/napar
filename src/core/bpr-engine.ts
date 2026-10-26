@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { InventoryItem, BrewSession } from './database-schema';
+import { pluralPl } from './i18n';
 
 export interface CalendarDayItem {
   dateIso: string; // YYYY-MM-DD
@@ -167,9 +168,13 @@ export function buildProactiveActionSchedule(
             roastDate.getUTCDate()
           )
         );
-        const daysSinceRoast = Math.floor(
+        const rawDays = Math.floor(
           (refDayStart.getTime() - roastDayStart.getTime()) / (1000 * 3600 * 24)
         );
+        const daysSinceRoast = Object.is(rawDays, -0) ? 0 : rawDays;
+        const safeDaysRoast = Math.max(0, daysSinceRoast);
+        const daysRoastPl = `${safeDaysRoast} ${pluralPl(safeDaysRoast, 'dzień', 'dni', 'dni')} po wypale`;
+        const daysRoastEn = `${safeDaysRoast} day${safeDaysRoast === 1 ? '' : 's'} post-roast`;
 
         if (daysSinceRoast < 7) {
           // Ziarna jeszcze odgazowują — zaplanuj otwarcie okna Peak w 7. dniu po wypale
@@ -204,8 +209,8 @@ export function buildProactiveActionSchedule(
             bucketLabelEn: 'TODAY',
             titlePl: `Szczyt świeżości (Peak): ${item.name}`,
             titleEn: `Peak freshness window: ${item.name}`,
-            subtitlePl: `${daysSinceRoast} dni po wypale · Pozostało ${item.remainingWeightGrams}g — zaparz teraz`,
-            subtitleEn: `${daysSinceRoast} days post-roast · ${item.remainingWeightGrams}g left — brew now`,
+            subtitlePl: `${daysRoastPl} · Pozostało ${item.remainingWeightGrams}g — zaparz teraz`,
+            subtitleEn: `${daysRoastEn} · ${item.remainingWeightGrams}g left — brew now`,
             badgeColor: 'success',
             inventoryItemId: item.id,
             recommendedMethod: 'V60',
@@ -223,8 +228,8 @@ export function buildProactiveActionSchedule(
             bucketLabelEn: 'TOMORROW',
             titlePl: `Końcówka świeżości: ${item.name}`,
             titleEn: `Use aging beans: ${item.name}`,
-            subtitlePl: `${daysSinceRoast} dni po wypale · Zwiększ dozę lub zmiel drobniej (${item.remainingWeightGrams}g)`,
-            subtitleEn: `${daysSinceRoast} days post-roast · Up-dose or grind finer (${item.remainingWeightGrams}g)`,
+            subtitlePl: `${daysRoastPl} · Zwiększ dozę lub zmiel drobniej (${item.remainingWeightGrams}g)`,
+            subtitleEn: `${daysRoastEn} · Up-dose or grind finer (${item.remainingWeightGrams}g)`,
             badgeColor: 'warning',
             inventoryItemId: item.id,
             recommendedMethod: 'AeroPress',
