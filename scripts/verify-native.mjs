@@ -198,6 +198,8 @@ try {
     'android.permission.READ_MEDIA_VIDEO',
     'android.permission.READ_MEDIA_AUDIO',
     'android.permission.POST_NOTIFICATIONS',
+    'android.permission.SYSTEM_ALERT_WINDOW',
+    'android.permission.REQUEST_INSTALL_PACKAGES',
   ];
   for (const forbidden of forbiddenPerms) {
     check(
@@ -539,6 +541,8 @@ try {
     'android.permission.READ_MEDIA_VIDEO',
     'android.permission.READ_MEDIA_AUDIO',
     'android.permission.POST_NOTIFICATIONS',
+    'android.permission.SYSTEM_ALERT_WINDOW',
+    'android.permission.REQUEST_INSTALL_PACKAGES',
   ];
   for (const forbidden of forbiddenAndroidPermissions) {
     check(

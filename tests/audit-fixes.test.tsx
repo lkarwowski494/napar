@@ -405,6 +405,18 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
       expect(content).toContain('android.permission.READ_MEDIA_VIDEO');
     });
 
+    test('TASK-P53-10-WYD: verify-native.mjs weryfikuje naglowki PNG (magic bytes) zasobow graficznych i blokuje SYSTEM_ALERT_WINDOW', () => {
+      const verifyScript = join(root, 'scripts', 'verify-native.mjs');
+      expect(existsSync(verifyScript)).toBe(true);
+      const content = readFileSync(verifyScript, 'utf8');
+      expect(content).toContain('0x89');
+      expect(content).toContain('0x50');
+      expect(content).toContain('0x4e');
+      expect(content).toContain('0x47');
+      expect(content).toContain('android.permission.SYSTEM_ALERT_WINDOW');
+      expect(content).toContain('android.permission.REQUEST_INSTALL_PACKAGES');
+    });
+
     test('SEC-03: Publiczne repozytorium nie zawiera nieautoryzowanych wywołań sieciowych', () => {
       const publicRepoTest = join(root, 'tests', 'public-repo.test.ts');
       expect(existsSync(publicRepoTest)).toBe(true);
