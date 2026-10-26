@@ -132,4 +132,32 @@ describe('RecipeSelectModal Component', () => {
     expect(root.findByProps({ testID: 'recipe-option-master-fav' })).toBeDefined();
     expect(root.findByProps({ testID: 'recipe-option-custom-fav' })).toBeDefined();
   });
+
+  test('TASK-P44-04-STU: bezpieczny fallback t?.brew i t?.common zapobiega crashom przy niekompletnym obiekcie t', () => {
+    const incompleteT: any = {
+      brew: {},
+      common: {},
+    };
+
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(
+        <RecipeSelectModal
+          {...defaultProps}
+          t={incompleteT}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const title = root.findByProps({ testID: 'recipe-modal-title' });
+    expect(title.props.children).toBe('Wybierz recepturę');
+
+    const addBtn = root.findByProps({ testID: 'add-custom-recipe-btn' });
+    expect(addBtn).toBeDefined();
+    const importBtn = root.findByProps({ testID: 'import-recipe-btn' });
+    expect(importBtn).toBeDefined();
+    const closeBtn = root.findByProps({ testID: 'close-recipe-modal-btn' });
+    expect(closeBtn.props.accessibilityLabel).toBe('Zamknij');
+  });
 });

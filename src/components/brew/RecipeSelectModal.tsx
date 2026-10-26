@@ -195,16 +195,16 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
   const innerContent = (
     <>
       <View style={styles.modalHeader}>
-        <Text style={styles.modalTitle}>{t.brew.chooseRecipe}</Text>
+        <Text style={styles.modalTitle} testID="recipe-modal-title">{t?.brew?.chooseRecipe || 'Wybierz recepturę'}</Text>
         <Pressable
           testID="close-recipe-modal-btn"
           style={styles.modalCloseBtn}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           onPress={onClose}
           accessibilityRole="button"
-          accessibilityLabel={t.common.close}
+          accessibilityLabel={t?.common?.close || 'Zamknij'}
         >
-          <Text style={styles.modalCloseText}>{t.common.close}</Text>
+          <Text style={styles.modalCloseText}>{t?.common?.close || 'Zamknij'}</Text>
         </Pressable>
       </View>
       <ScrollView style={inline ? styles.inlineScrollView : undefined} nestedScrollEnabled={inline}>
@@ -370,7 +370,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               onPress={onAddCustomRecipe}
             >
               <Text style={styles.addCustomRecipeBtnText}>
-                {t.brew.customRecipe}
+                {t?.brew?.customRecipe || 'Receptura autorska'}
               </Text>
             </Pressable>
 
@@ -393,7 +393,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               testID="import-recipe-btn"
             >
               <Text style={styles.importRecipeModalBtnText}>
-                {t.brew.importRecipe}
+                {t?.brew?.importRecipe || 'Importuj'}
               </Text>
             </Pressable>
 
