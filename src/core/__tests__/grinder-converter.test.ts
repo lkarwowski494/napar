@@ -494,4 +494,13 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ method: 'TOWER', grindSettingDescriptionEn: 'Coarse grind for cold drip system' })).toBe(1150);
     expect(getRecipeMicrons({ method: 'CUSTOM', grindSettingDescriptionPl: 'Ustawienie pod powolny ice drip' })).toBe(1150);
   });
+
+  test('TASK-P42-08-PRO: getRecipeMicrons rozpoznaje slow drip i ice brew w method i desc jako grube mielenie (1150 µm)', () => {
+    expect(getRecipeMicrons({ method: 'SLOW_DRIP' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Slow Drip Tower' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'ICE_BREW' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Ice Brew Jar' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod powolny ekstraktor slow drip' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse grind for ice brew immersion' })).toBe(1150);
+  });
 });

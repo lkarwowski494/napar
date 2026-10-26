@@ -571,6 +571,12 @@ export function getRecipeMicrons(recipe?: {
     desc.includes('cold drip') ||
     desc.includes('ice drip') ||
     desc.includes('cold brew') ||
+    method.includes('SLOW_DRIP') ||
+    method.includes('SLOW DRIP') ||
+    desc.includes('slow drip') ||
+    method.includes('ICE_BREW') ||
+    method.includes('ICE BREW') ||
+    desc.includes('ice brew') ||
     method.includes('MIZUDASHI') ||
     desc.includes('mizudashi') ||
     method.includes('DUTCH') ||
