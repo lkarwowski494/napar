@@ -278,4 +278,33 @@ describe('BrewActiveFocusTimer Component', () => {
     const timerDisplay = treeTimer.root.findByProps({ testID: 'timer-display' });
     expect(timerDisplay.props.children).toBe('01:15');
   });
+
+  test('TASK-P52-01-ODK: BrewActiveFocusTimer wspiera opcjonalne propsy t i language oraz lokalizuje etykiety i podpowiedzi a11y w trybie EN', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewActiveFocusTimer
+          {...defaultProps}
+          snapshot={{
+            ...defaultSnapshot,
+            status: 'paused',
+          }}
+          language="en"
+        />
+      );
+    });
+
+    const root = tree.root;
+    const resetBtn = root.findByProps({ testID: 'reset-brew-btn' });
+    expect(resetBtn.props.accessibilityLabel).toBe('Reset timer');
+    expect(resetBtn.props.accessibilityHint).toBe('Resets time and returns to initial state');
+
+    const resumeBtn = root.findByProps({ testID: 'resume-brew-btn' });
+    expect(resumeBtn.props.accessibilityLabel).toBe('Resume brewing');
+    expect(resumeBtn.props.accessibilityHint).toBe('Resumes brew time countdown');
+
+    const saveBtn = root.findByProps({ testID: 'save-brew-btn' });
+    expect(saveBtn.props.accessibilityLabel).toBe('Save session');
+    expect(saveBtn.props.accessibilityHint).toBe('Opens tasting sheet to save notes');
+  });
 });

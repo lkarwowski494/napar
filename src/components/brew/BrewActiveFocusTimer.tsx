@@ -54,7 +54,7 @@ export function DripperExtractionGauge({
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
-import { useTranslation } from '../../core/i18n';
+import { translations, useTranslation } from '../../core/i18n';
 
 interface BrewActiveFocusTimerProps {
   snapshot: any;
@@ -66,6 +66,8 @@ interface BrewActiveFocusTimerProps {
   onPreviousStep: () => void;
   onAdjustStepDuration: (delta: number) => void;
   onFinish: () => void;
+  t?: any;
+  language?: string;
 }
 
 export function BrewActiveFocusTimer({
@@ -78,10 +80,15 @@ export function BrewActiveFocusTimer({
   onPreviousStep,
   onAdjustStepDuration,
   onFinish,
+  t: customT,
+  language: customLang,
 }: BrewActiveFocusTimerProps) {
-  const { t, language } = useTranslation();
-  const cleanLang = typeof language === 'string' ? language.trim().toLowerCase() : 'pl';
+  const { t: hookT, language: hookLang } = useTranslation();
+  const activeLang = customLang || hookLang;
+  const cleanLang = typeof activeLang === 'string' ? activeLang.trim().toLowerCase() : 'pl';
   const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
+  const defaultT = isEn ? (translations?.en || hookT) : hookT;
+  const t = customT || defaultT;
 
   const formatTime = (seconds: number | string) => {
     const rawSec = typeof seconds === 'number' ? seconds : (typeof seconds === 'string' ? parseFloat(seconds) : 0);
@@ -224,11 +231,11 @@ export function BrewActiveFocusTimer({
             style={styles.mainStartButton}
             onPress={onStart}
             accessibilityRole="button"
-            accessibilityLabel={t.brew.startBrewAccessibility || 'Rozpocznij parzenie'}
-            accessibilityHint={t.brew.startBrewHint || 'Uruchamia stoper i pierwszy etap parzenia'}
+            accessibilityLabel={t.brew?.startBrewAccessibility || (isEn ? 'Start brewing' : 'Rozpocznij parzenie')}
+            accessibilityHint={t.brew?.startBrewHint || (isEn ? 'Starts the timer and first brew step' : 'Uruchamia stoper i pierwszy etap parzenia')}
             testID="start-brew-btn"
           >
-            <Text style={styles.mainStartButtonText}>{t.brew.startBrewBtn || 'ROZPOCZNIJ PARZENIE'}</Text>
+            <Text style={styles.mainStartButtonText}>{t.brew?.startBrewBtn || (isEn ? 'START BREWING' : 'ROZPOCZNIJ PARZENIE')}</Text>
           </Pressable>
         )}
 
@@ -243,22 +250,22 @@ export function BrewActiveFocusTimer({
               disabled={snapshot.currentStepIndex === 0}
               accessibilityRole="button"
               accessibilityState={{ disabled: snapshot.currentStepIndex === 0 }}
-              accessibilityLabel={t.brew.previousStepAccessibility || 'Poprzedni krok'}
-              accessibilityHint={t.brew.previousStepHint || 'Cofa do poprzedniego etapu parzenia'}
+              accessibilityLabel={t.brew?.previousStepAccessibility || (isEn ? 'Previous step' : 'Poprzedni krok')}
+              accessibilityHint={t.brew?.previousStepHint || (isEn ? 'Returns to the previous brewing stage' : 'Cofa do poprzedniego etapu parzenia')}
               testID="previous-step-btn"
             >
-              <Text style={styles.secondaryButtonText}>{t.brew.previousStepBtn || '◀ Wstecz'}</Text>
+              <Text style={styles.secondaryButtonText}>{t.brew?.previousStepBtn || (isEn ? '◀ Back' : '◀ Wstecz')}</Text>
             </Pressable>
 
             <Pressable
               style={styles.pauseButton}
               onPress={onPause}
               accessibilityRole="button"
-              accessibilityLabel={t.brew.pauseBrewAccessibility || 'Wstrzymaj parzenie'}
-              accessibilityHint={t.brew.pauseBrewHint || 'Zatrzymuje odliczanie czasu'}
+              accessibilityLabel={t.brew?.pauseBrewAccessibility || (isEn ? 'Pause brewing' : 'Wstrzymaj parzenie')}
+              accessibilityHint={t.brew?.pauseBrewHint || (isEn ? 'Pauses countdown' : 'Zatrzymuje odliczanie czasu')}
               testID="pause-brew-btn"
             >
-              <Text style={styles.pauseButtonText}>{t.brew.pauseBrewBtn || 'PAUZA'}</Text>
+              <Text style={styles.pauseButtonText}>{t.brew?.pauseBrewBtn || (isEn ? 'PAUSE' : 'PAUZA')}</Text>
             </Pressable>
 
             <Pressable
@@ -267,18 +274,18 @@ export function BrewActiveFocusTimer({
               accessibilityRole="button"
               accessibilityLabel={
                 snapshot.isLastStep
-                  ? (t.brew.finishBrewAccessibility || 'Zakończ parzenie')
-                  : (t.brew.nextStepAccessibility || 'Następny krok')
+                  ? (t.brew?.finishBrewAccessibility || (isEn ? 'Finish brewing' : 'Zakończ parzenie'))
+                  : (t.brew?.nextStepAccessibility || (isEn ? 'Next step' : 'Następny krok'))
               }
               accessibilityHint={
                 snapshot.isLastStep
-                  ? (t.brew.finishBrewHint || 'Kończy parzenie i otwiera arkusz oceny')
-                  : (t.brew.nextStepHint || 'Przechodzi do kolejnego etapu zalewania')
+                  ? (t.brew?.finishBrewHint || (isEn ? 'Finishes brew and opens tasting sheet' : 'Kończy parzenie i otwiera arkusz oceny'))
+                  : (t.brew?.nextStepHint || (isEn ? 'Advances to next pour step' : 'Przechodzi do kolejnego etapu zalewania'))
               }
               testID="next-step-btn"
             >
               <Text style={styles.nextButtonText}>
-                {snapshot.isLastStep ? (t.brew.finishBrewBtn || 'Zakończ ▶') : (t.brew.nextStepBtn || 'Dalej ▶')}
+                {snapshot.isLastStep ? (t.brew?.finishBrewBtn || (isEn ? 'Finish ▶' : 'Zakończ ▶')) : (t.brew?.nextStepBtn || (isEn ? 'Next ▶' : 'Dalej ▶'))}
               </Text>
             </Pressable>
           </>
@@ -290,33 +297,33 @@ export function BrewActiveFocusTimer({
               style={styles.resetButton}
               onPress={onReset}
               accessibilityRole="button"
-              accessibilityLabel={t.brew.resetTimerAccessibility || 'Zresetuj stoper'}
-              accessibilityHint={t.brew.resetTimerHint || 'Zeruje czas i wraca do stanu początkowego'}
+              accessibilityLabel={t.brew?.resetTimerAccessibility || (isEn ? 'Reset timer' : 'Zresetuj stoper')}
+              accessibilityHint={t.brew?.resetTimerHint || (isEn ? 'Resets timer to initial state' : 'Zeruje czas i wraca do stanu początkowego')}
               testID="reset-brew-btn"
             >
-              <Text style={styles.resetButtonText}>{t.brew.resetBrew || 'Reset'}</Text>
+              <Text style={styles.resetButtonText}>{t.brew?.resetBrew || 'Reset'}</Text>
             </Pressable>
 
             <Pressable
               style={styles.mainStartButton}
               onPress={onResume}
               accessibilityRole="button"
-              accessibilityLabel={t.brew.resumeBrewAccessibility || 'Wznów parzenie'}
-              accessibilityHint={t.brew.resumeBrewHint || 'Wznawia odliczanie czasu parzenia'}
+              accessibilityLabel={t.brew?.resumeBrewAccessibility || (isEn ? 'Resume brewing' : 'Wznów parzenie')}
+              accessibilityHint={t.brew?.resumeBrewHint || (isEn ? 'Resumes brew countdown' : 'Wznawia odliczanie czasu parzenia')}
               testID="resume-brew-btn"
             >
-              <Text style={styles.mainStartButtonText}>{t.brew.resumeBrew || 'WZNÓW'}</Text>
+              <Text style={styles.mainStartButtonText}>{t.brew?.resumeBrew || (isEn ? 'RESUME' : 'WZNÓW')}</Text>
             </Pressable>
 
             <Pressable
               style={styles.secondaryButton}
               onPress={onFinish}
               accessibilityRole="button"
-              accessibilityLabel={t.brew.saveSessionAccessibility || 'Zapisz sesję'}
-              accessibilityHint={t.brew.saveSessionHint || 'Otwiera arkusz degustacyjny do zapisu notatek'}
+              accessibilityLabel={t.brew?.saveSessionAccessibility || (isEn ? 'Save session' : 'Zapisz sesję')}
+              accessibilityHint={t.brew?.saveSessionHint || (isEn ? 'Opens tasting sheet to record notes' : 'Otwiera arkusz degustacyjny do zapisu notatek')}
               testID="save-brew-btn"
             >
-              <Text style={styles.secondaryButtonText}>{t.brew.saveSessionBtn || 'Zapisz'}</Text>
+              <Text style={styles.secondaryButtonText}>{t.brew?.saveSessionBtn || (isEn ? 'Save' : 'Zapisz')}</Text>
             </Pressable>
           </>
         )}
