@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Selecciona del rebost",
-    "unassignedInventory": "Sense assignar (General)"
+    "unassignedInventory": "Sense assignar (General)",
+    "clearSearch": "Neteja la cerca",
+    "noSearchResults": "No s'han trobat resultats"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

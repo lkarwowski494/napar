@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "पैंट्री से चुनें",
-    "unassignedInventory": "अनअसाइन किया गया (सामान्य)"
+    "unassignedInventory": "अनअसाइन किया गया (सामान्य)",
+    "clearSearch": "खोज साफ़ करें",
+    "noSearchResults": "कोई खोज परिणाम नहीं मिला"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

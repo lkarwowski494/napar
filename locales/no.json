@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Velg fra spiskammerset",
-    "unassignedInventory": "Ikke tilordnet (Generelt)"
+    "unassignedInventory": "Ikke tilordnet (Generelt)",
+    "clearSearch": "Tøm søk",
+    "noSearchResults": "Ingen søkeresultater funnet"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

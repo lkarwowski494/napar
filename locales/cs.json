@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Vybrat ze spíže",
-    "unassignedInventory": "Nepřiřazeno (Obecné)"
+    "unassignedInventory": "Nepřiřazeno (Obecné)",
+    "clearSearch": "Vymazat hledání",
+    "noSearchResults": "Nebyly nalezeny žádné výsledky"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

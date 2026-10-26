@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Selecionar da despensa",
-    "unassignedInventory": "Não atribuído (Geral)"
+    "unassignedInventory": "Não atribuído (Geral)",
+    "clearSearch": "Limpar busca",
+    "noSearchResults": "Nenhum resultado encontrado"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

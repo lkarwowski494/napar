@@ -152,7 +152,9 @@
     "skipBtn": "Pomiń",
     "saveToJournalBtn": "Zapisz w Dzienniku",
     "selectInventoryTitle": "Wybierz ze Spiżarni",
-    "unassignedInventory": "Brak przypisania (ogólne)"
+    "unassignedInventory": "Brak przypisania (ogólne)",
+    "clearSearch": "Wyczyść wyszukiwanie",
+    "noSearchResults": "Brak wyników wyszukiwania"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

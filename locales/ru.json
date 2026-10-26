@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Выбрать из кладовой",
-    "unassignedInventory": "Не назначено (Общее)"
+    "unassignedInventory": "Не назначено (Общее)",
+    "clearSearch": "Очистить поиск",
+    "noSearchResults": "Результаты поиска не найдены"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Избор от килера",
-    "unassignedInventory": "Неразпределено (Общо)"
+    "unassignedInventory": "Неразпределено (Общо)",
+    "clearSearch": "Изчистване на търсенето",
+    "noSearchResults": "Няма намерени резултати"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

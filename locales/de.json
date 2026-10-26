@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Aus Vorratskammer wählen",
-    "unassignedInventory": "Nicht zugewiesen (Allgemein)"
+    "unassignedInventory": "Nicht zugewiesen (Allgemein)",
+    "clearSearch": "Suche löschen",
+    "noSearchResults": "Keine Suchergebnisse gefunden"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

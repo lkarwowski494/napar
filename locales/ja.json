@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "パントリーから選択",
-    "unassignedInventory": "未割り当て（一般）"
+    "unassignedInventory": "未割り当て（一般）",
+    "clearSearch": "検索をクリア",
+    "noSearchResults": "検索結果が見つかりません"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

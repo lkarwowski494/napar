@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Kilerden Seç",
-    "unassignedInventory": "Atanmamış (Genel)"
+    "unassignedInventory": "Atanmamış (Genel)",
+    "clearSearch": "Aramayı temizle",
+    "noSearchResults": "Arama sonucu bulunamadı"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

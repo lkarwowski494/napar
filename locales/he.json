@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "בחר מהמזווה",
-    "unassignedInventory": "לא הוקצה (כללי)"
+    "unassignedInventory": "לא הוקצה (כללי)",
+    "clearSearch": "נקה חיפוש",
+    "noSearchResults": "לא נמצאו תוצאות חיפוש"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

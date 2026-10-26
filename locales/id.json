@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Pilih dari Dapur",
-    "unassignedInventory": "Belum Ditetapkan (Umum)"
+    "unassignedInventory": "Belum Ditetapkan (Umum)",
+    "clearSearch": "Hapus pencarian",
+    "noSearchResults": "Hasil pencarian tidak ditemukan"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

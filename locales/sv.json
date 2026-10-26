@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Välj från skafferiet",
-    "unassignedInventory": "Otilldelad (Allmänt)"
+    "unassignedInventory": "Otilldelad (Allmänt)",
+    "clearSearch": "Rensa sökning",
+    "noSearchResults": "Inga sökresultat hittades"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Valitse ruokakomerosta",
-    "unassignedInventory": "Määrittämätön (Yleinen)"
+    "unassignedInventory": "Määrittämätön (Yleinen)",
+    "clearSearch": "Tyhjennä haku",
+    "noSearchResults": "Hakutuloksia ei löytynyt"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

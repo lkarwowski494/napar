@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Odaberi iz smočnice",
-    "unassignedInventory": "Nedodijeljeno (Općenito)"
+    "unassignedInventory": "Nedodijeljeno (Općenito)",
+    "clearSearch": "Očisti pretraživanje",
+    "noSearchResults": "Nema rezultata pretraživanja"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

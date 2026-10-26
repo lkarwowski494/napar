@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Selectați din cămară",
-    "unassignedInventory": "Neatribuit (General)"
+    "unassignedInventory": "Neatribuit (General)",
+    "clearSearch": "Ștergeți căutarea",
+    "noSearchResults": "Nu s-au găsit rezultate"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

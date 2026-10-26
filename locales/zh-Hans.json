@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "从储藏室选择",
-    "unassignedInventory": "未分配（通用）"
+    "unassignedInventory": "未分配（通用）",
+    "clearSearch": "清除搜索",
+    "noSearchResults": "未找到搜索结果"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

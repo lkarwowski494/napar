@@ -159,7 +159,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Select from Pantry",
-    "unassignedInventory": "Unassigned (General)"
+    "unassignedInventory": "Unassigned (General)",
+    "clearSearch": "Clear search",
+    "noSearchResults": "No search results found"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

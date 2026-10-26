@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Επιλογή από το ντουλάπι",
-    "unassignedInventory": "Χωρίς ανάθεση (Γενικό)"
+    "unassignedInventory": "Χωρίς ανάθεση (Γενικό)",
+    "clearSearch": "Εκκαθάριση αναζήτησης",
+    "noSearchResults": "Δεν βρέθηκαν αποτελέσματα"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

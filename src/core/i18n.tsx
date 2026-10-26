@@ -177,6 +177,8 @@ export const translations = {
       craftSavingsLabel: 'Oszczędność vs kawiarnia specialty: +{savings} {curr}',
       skipBtn: 'Pomiń',
       saveToJournalBtn: 'Zapisz w Dzienniku',
+      clearSearch: 'Wyczyść wyszukiwanie',
+      noSearchResults: 'Brak wyników wyszukiwania',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha',
@@ -748,6 +750,8 @@ export const translations = {
       craftSavingsLabel: 'Savings vs cafe cup: +{savings} {curr}',
       skipBtn: 'Skip',
       saveToJournalBtn: 'Save to Journal',
+      clearSearch: 'Clear search',
+      noSearchResults: 'No search results found',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha',

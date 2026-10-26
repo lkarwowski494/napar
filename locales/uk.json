@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Вибрати з комори",
-    "unassignedInventory": "Не призначено (Загальне)"
+    "unassignedInventory": "Не призначено (Загальне)",
+    "clearSearch": "Очистити пошук",
+    "noSearchResults": "Результатів пошуку не знайдено"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

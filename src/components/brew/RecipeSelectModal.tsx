@@ -216,7 +216,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 onPress={() => setSearchQuery('')}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 accessibilityRole="button"
-                accessibilityLabel="Wyczyść wyszukiwanie"
+                accessibilityLabel={t?.brew?.clearSearch || 'Wyczyść wyszukiwanie'}
                 style={styles.clearSearchBtn}
               >
                 <Text style={styles.clearSearchText}>✕</Text>

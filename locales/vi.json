@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Chọn từ kho",
-    "unassignedInventory": "Chưa chỉ định (Chung)"
+    "unassignedInventory": "Chưa chỉ định (Chung)",
+    "clearSearch": "Xóa tìm kiếm",
+    "noSearchResults": "Không tìm thấy kết quả"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

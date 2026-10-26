@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "เลือกจากคลัง",
-    "unassignedInventory": "ยังไม่ได้กำหนด (ทั่วไป)"
+    "unassignedInventory": "ยังไม่ได้กำหนด (ทั่วไป)",
+    "clearSearch": "ล้างการค้นหา",
+    "noSearchResults": "ไม่พบผลการค้นหา"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

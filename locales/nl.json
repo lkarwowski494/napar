@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Selecteer uit voorraad",
-    "unassignedInventory": "Niet toegewezen (Algemeen)"
+    "unassignedInventory": "Niet toegewezen (Algemeen)",
+    "clearSearch": "Zoekopdracht wissen",
+    "noSearchResults": "Geen zoekresultaten gevonden"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

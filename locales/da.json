@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Vælg fra spisekammeret",
-    "unassignedInventory": "Ikke tildelt (Generelt)"
+    "unassignedInventory": "Ikke tildelt (Generelt)",
+    "clearSearch": "Ryd søgning",
+    "noSearchResults": "Ingen søgeresultater fundet"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

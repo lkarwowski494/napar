@@ -152,7 +152,9 @@
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
     "selectInventoryTitle": "Választás a kamrából",
-    "unassignedInventory": "Nem rendelt (Általános)"
+    "unassignedInventory": "Nem rendelt (Általános)",
+    "clearSearch": "Keresés törlése",
+    "noSearchResults": "Nincs találat"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
