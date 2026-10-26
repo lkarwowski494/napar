@@ -283,5 +283,15 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(ics).toContain('SUMMARY:Parzenie V60\\; z balansem\\, owocowe');
       expect(ics).toContain('DESCRIPTION:Kawa 15g\\; woda 250g\\, 93°C');
     });
+
+    it('TASK-P36-03-ZAK: buildFourteenDayCalendar jest odporne na pustą datę, null i uszkodzone tablice', () => {
+      const daysFromEmpty = buildFourteenDayCalendar('', null as any, undefined as any);
+      expect(daysFromEmpty).toHaveLength(14);
+      expect(daysFromEmpty[0].isToday).toBe(true);
+
+      const daysFromInvalidDate = buildFourteenDayCalendar('not-a-date' as any, [] as any, [] as any);
+      expect(daysFromInvalidDate).toHaveLength(14);
+      expect(daysFromInvalidDate[0].isToday).toBe(true);
+    });
   });
 });

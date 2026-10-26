@@ -319,7 +319,10 @@ export function buildFourteenDayCalendar(
   inventory: InventoryItem[],
   sessions: BrewSession[]
 ): CalendarDayItem[] {
-  const parsedDate = referenceDateIso ? new Date(referenceDateIso) : new Date();
+  const safeInventory = Array.isArray(inventory) ? inventory : [];
+  const safeSessions = Array.isArray(sessions) ? sessions : [];
+  const safeStr = typeof referenceDateIso === 'string' && referenceDateIso.trim() ? referenceDateIso.trim() : '';
+  const parsedDate = safeStr ? new Date(safeStr) : new Date();
   const baseDate = Number.isFinite(parsedDate.getTime()) ? parsedDate : new Date();
   const safeDateIso = baseDate.toISOString();
   const todayStart = new Date(
@@ -332,12 +335,12 @@ export function buildFourteenDayCalendar(
 
   const schedule = buildProactiveActionSchedule(
     safeDateIso,
-    inventory,
-    sessions
+    safeInventory,
+    safeSessions
   );
 
   const sessionCountsByDate: Record<string, number> = {};
-  for (const s of sessions || []) {
+  for (const s of safeSessions) {
     if (s && typeof s === 'object' && s.brewedAt) {
       const d = new Date(s.brewedAt);
       if (!Number.isNaN(d.getTime())) {
