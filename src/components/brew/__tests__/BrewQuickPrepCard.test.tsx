@@ -179,4 +179,24 @@ describe('BrewQuickPrepCard Component', () => {
     expect(decEn.props.accessibilityHint).toBe('Decreases dose by 1 gram');
     expect(incEn.props.accessibilityHint).toBe('Increases dose by 1 gram');
   });
+
+  test('TASK-P28-01-ODK: steppery wody (+ / -) deklarują accessibilityHint w języku polskim i angielskim', () => {
+    let treePl: any;
+    act(() => {
+      treePl = renderer.create(<BrewQuickPrepCard {...defaultProps} language="pl" onWaterChange={jest.fn()} />);
+    });
+    const decPl = treePl.root.findByProps({ accessibilityLabel: 'Zmniejsz ilość wody' });
+    const incPl = treePl.root.findByProps({ accessibilityLabel: 'Zwiększ ilość wody' });
+    expect(decPl.props.accessibilityHint).toBe('Zmniejsza ilość wody o 10 gramów');
+    expect(incPl.props.accessibilityHint).toBe('Zwiększa ilość wody o 10 gramów');
+
+    let treeEn: any;
+    act(() => {
+      treeEn = renderer.create(<BrewQuickPrepCard {...defaultProps} language="en" onWaterChange={jest.fn()} />);
+    });
+    const decEn = treeEn.root.findByProps({ accessibilityLabel: 'Decrease water' });
+    const incEn = treeEn.root.findByProps({ accessibilityLabel: 'Increase water' });
+    expect(decEn.props.accessibilityHint).toBe('Decreases water by 10 grams');
+    expect(incEn.props.accessibilityHint).toBe('Increases water by 10 grams');
+  });
 });

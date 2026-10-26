@@ -157,6 +157,7 @@ export function BrewQuickPrepCard({
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 accessibilityRole="button"
                 accessibilityLabel={language === 'en' ? 'Decrease water' : 'Zmniejsz ilość wody'}
+                accessibilityHint={language === 'en' ? 'Decreases water by 10 grams' : 'Zmniejsza ilość wody o 10 gramów'}
               >
                 <Text style={styles.stepBtnText}>−</Text>
               </Pressable>
@@ -172,6 +173,7 @@ export function BrewQuickPrepCard({
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 accessibilityRole="button"
                 accessibilityLabel={language === 'en' ? 'Increase water' : 'Zwiększ ilość wody'}
+                accessibilityHint={language === 'en' ? 'Increases water by 10 grams' : 'Zwiększa ilość wody o 10 gramów'}
               >
                 <Text style={styles.stepBtnText}>+</Text>
               </Pressable>
