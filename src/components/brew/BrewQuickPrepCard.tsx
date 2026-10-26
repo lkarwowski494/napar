@@ -124,11 +124,13 @@ export function BrewQuickPrepCard({
           <Text style={styles.paramEyebrow}>{language === 'en' ? 'DOSE' : 'DOZA'}</Text>
           <View style={styles.stepperRow}>
             <Pressable
-              style={styles.stepBtn}
+              testID="dose-decrease-btn"
+              style={[styles.stepBtn, (disabled || doseGrams <= 1) && styles.stepBtnDisabled]}
               onPress={() => onDoseChange(Math.max(1, doseGrams - 1))}
-              disabled={disabled}
+              disabled={disabled || doseGrams <= 1}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               accessibilityRole="button"
+              accessibilityState={{ disabled: disabled || doseGrams <= 1 }}
               accessibilityLabel={language === 'en' ? 'Decrease coffee dose' : 'Zmniejsz dozę kawy'}
               accessibilityHint={language === 'en' ? 'Decreases dose by 1 gram' : 'Zmniejsza dozę o 1 gram'}
             >
@@ -136,11 +138,13 @@ export function BrewQuickPrepCard({
             </Pressable>
             <Text style={styles.paramValue}>{formatDoseWeight(doseGrams, unitSystem)}</Text>
             <Pressable
-              style={styles.stepBtn}
-              onPress={() => onDoseChange(doseGrams + 1)}
-              disabled={disabled}
+              testID="dose-increase-btn"
+              style={[styles.stepBtn, (disabled || doseGrams >= 1000) && styles.stepBtnDisabled]}
+              onPress={() => onDoseChange(Math.min(1000, doseGrams + 1))}
+              disabled={disabled || doseGrams >= 1000}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               accessibilityRole="button"
+              accessibilityState={{ disabled: disabled || doseGrams >= 1000 }}
               accessibilityLabel={language === 'en' ? 'Increase coffee dose' : 'Zwiększ dozę kawy'}
               accessibilityHint={language === 'en' ? 'Increases dose by 1 gram' : 'Zwiększa dozę o 1 gram'}
             >
@@ -158,11 +162,13 @@ export function BrewQuickPrepCard({
           <View style={styles.stepperRow}>
             {onWaterChange && (
               <Pressable
-                style={styles.stepBtn}
+                testID="water-decrease-btn"
+                style={[styles.stepBtn, (disabled || waterGrams <= 10) && styles.stepBtnDisabled]}
                 onPress={() => onWaterChange(Math.max(10, waterGrams - 10))}
-                disabled={disabled}
+                disabled={disabled || waterGrams <= 10}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 accessibilityRole="button"
+                accessibilityState={{ disabled: disabled || waterGrams <= 10 }}
                 accessibilityLabel={language === 'en' ? 'Decrease water' : 'Zmniejsz ilość wody'}
                 accessibilityHint={language === 'en' ? 'Decreases water by 10 grams' : 'Zmniejsza ilość wody o 10 gramów'}
               >
@@ -174,11 +180,13 @@ export function BrewQuickPrepCard({
             </Text>
             {onWaterChange && (
               <Pressable
-                style={styles.stepBtn}
-                onPress={() => onWaterChange(waterGrams + 10)}
-                disabled={disabled}
+                testID="water-increase-btn"
+                style={[styles.stepBtn, (disabled || waterGrams >= 50000) && styles.stepBtnDisabled]}
+                onPress={() => onWaterChange(Math.min(50000, waterGrams + 10))}
+                disabled={disabled || waterGrams >= 50000}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 accessibilityRole="button"
+                accessibilityState={{ disabled: disabled || waterGrams >= 50000 }}
                 accessibilityLabel={language === 'en' ? 'Increase water' : 'Zwiększ ilość wody'}
                 accessibilityHint={language === 'en' ? 'Increases water by 10 grams' : 'Zwiększa ilość wody o 10 gramów'}
               >
@@ -368,6 +376,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCardSecondary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  stepBtnDisabled: {
+    opacity: 0.35,
   },
   stepBtnText: {
     color: theme.colors.textPrimary,

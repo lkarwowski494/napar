@@ -318,4 +318,46 @@ describe('BrewQuickPrepCard Component', () => {
     expect(badgeZero.props.children).toBe('1 : 20.0');
     expect(badgeZero.props.accessibilityLabel).toBe('Bieżąca proporcja 1 do 20.0');
   });
+
+  test('TASK-P39-01-ODK: steppery dozy i wody posiadaja testID, accessibilityState disabled i ograniczenia krancowe', () => {
+    let treeMin: any;
+    act(() => {
+      treeMin = renderer.create(
+        <BrewQuickPrepCard
+          {...defaultProps}
+          doseGrams={1}
+          waterGrams={10}
+          onWaterChange={jest.fn()}
+        />
+      );
+    });
+
+    const doseDec = treeMin.root.findByProps({ testID: 'dose-decrease-btn' });
+    expect(doseDec.props.accessibilityState).toEqual({ disabled: true });
+    expect(doseDec.props.disabled).toBe(true);
+
+    const waterDec = treeMin.root.findByProps({ testID: 'water-decrease-btn' });
+    expect(waterDec.props.accessibilityState).toEqual({ disabled: true });
+    expect(waterDec.props.disabled).toBe(true);
+
+    let treeMax: any;
+    act(() => {
+      treeMax = renderer.create(
+        <BrewQuickPrepCard
+          {...defaultProps}
+          doseGrams={1000}
+          waterGrams={50000}
+          onWaterChange={jest.fn()}
+        />
+      );
+    });
+
+    const doseInc = treeMax.root.findByProps({ testID: 'dose-increase-btn' });
+    expect(doseInc.props.accessibilityState).toEqual({ disabled: true });
+    expect(doseInc.props.disabled).toBe(true);
+
+    const waterInc = treeMax.root.findByProps({ testID: 'water-increase-btn' });
+    expect(waterInc.props.accessibilityState).toEqual({ disabled: true });
+    expect(waterInc.props.disabled).toBe(true);
+  });
 });
