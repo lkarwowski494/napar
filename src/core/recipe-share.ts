@@ -228,16 +228,20 @@ export function recipeToCompactPayload(
  */
 export function encodeRecipeToShareUrl(
   recipe: SavedRecipe | MasterRecipe,
-  useWebScheme = false
+  useWebScheme: boolean | string = false
 ): string {
+  const isWeb =
+    useWebScheme === true ||
+    (typeof useWebScheme === 'string' &&
+      (useWebScheme.trim().toLowerCase() === 'true' || useWebScheme.trim() === '1'));
+  const base = isWeb ? RECIPE_SHARE_WEB_URL : RECIPE_SHARE_PROTOCOL;
+
   if (!recipe || typeof recipe !== 'object') {
-    const base = useWebScheme ? RECIPE_SHARE_WEB_URL : RECIPE_SHARE_PROTOCOL;
     return `${base}?v=1&d=`;
   }
   const payload = recipeToCompactPayload(recipe);
   const jsonStr = JSON.stringify(payload);
   const base64Str = utf8ToBase64(jsonStr);
-  const base = useWebScheme ? RECIPE_SHARE_WEB_URL : RECIPE_SHARE_PROTOCOL;
   return `${base}?v=1&d=${encodeURIComponent(base64Str)}`;
 }
 
