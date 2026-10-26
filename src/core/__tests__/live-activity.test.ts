@@ -781,4 +781,38 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(validTeaRes.success).toBe(false); // v1.0 DEC-01 stub
     expect(validTeaRes.error).toBe('ActivityKit Live Activity niedostępne w v1.0 (DEC-01).');
   });
+
+  test('TASK-P46-12-NIE: startLiveActivity i updateLiveActivity ściśle weryfikują liczby całkowite dla stepIndex oraz totalSteps', async () => {
+    // 1. Niecałkowity stepIndex (float)
+    const floatStepIdxState: any = { ...mockState, stepIndex: 1.5 };
+    const resFloatIdx = await startLiveActivity(mockAttributesCoffee, floatStepIdxState);
+    expect(resFloatIdx.success).toBe(false);
+    expect(resFloatIdx.error).toContain('Nieprawidłowy indeks kroku');
+
+    const resUpdateFloatIdx = await updateLiveActivity('act-123', floatStepIdxState);
+    expect(resUpdateFloatIdx.success).toBe(false);
+    expect(resUpdateFloatIdx.error).toContain('Nieprawidłowy indeks kroku');
+
+    // 2. Minus zero (-0) stepIndex
+    const negZeroIdxState: any = { ...mockState, stepIndex: -0 };
+    const resNegZeroIdx = await startLiveActivity(mockAttributesCoffee, negZeroIdxState);
+    expect(resNegZeroIdx.success).toBe(false);
+    expect(resNegZeroIdx.error).toContain('Nieprawidłowy indeks kroku');
+
+    // 3. Niecałkowity totalSteps (float)
+    const floatTotalStepsState: any = { ...mockState, totalSteps: 3.5 };
+    const resFloatTotal = await startLiveActivity(mockAttributesCoffee, floatTotalStepsState);
+    expect(resFloatTotal.success).toBe(false);
+    expect(resFloatTotal.error).toContain('Nieprawidłowa łączna liczba kroków');
+
+    const resUpdateFloatTotal = await updateLiveActivity('act-123', floatTotalStepsState);
+    expect(resUpdateFloatTotal.success).toBe(false);
+    expect(resUpdateFloatTotal.error).toContain('Nieprawidłowa łączna liczba kroków');
+
+    // 4. Poprawny stringowy integer '2' dla stepIndex i '4' dla totalSteps
+    const stringIntState: any = { ...mockState, stepIndex: '2', totalSteps: '4' };
+    const resStrStart = await startLiveActivity(mockAttributesCoffee, stringIntState);
+    expect(resStrStart.success).toBe(false); // stub DEC-01
+    expect(resStrStart.error).toBe('ActivityKit Live Activity niedostępne w v1.0 (DEC-01).');
+  });
 });

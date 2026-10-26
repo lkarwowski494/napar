@@ -335,13 +335,19 @@ export async function startLiveActivity(
       error: 'Nieprawidłowy stan początkowy aktywności Live Activity.',
     };
   }
-  if (!Number.isFinite(initialState.stepIndex) || initialState.stepIndex < 0) {
+  const rawStepIdx = typeof initialState.stepIndex === 'number'
+    ? initialState.stepIndex
+    : (typeof initialState.stepIndex === 'string' ? parseFloat(initialState.stepIndex) : NaN);
+  if (!Number.isFinite(rawStepIdx) || !Number.isInteger(rawStepIdx) || rawStepIdx < 0 || Object.is(rawStepIdx, -0)) {
     return {
       success: false,
       error: 'Nieprawidłowy indeks kroku w stanie Live Activity.',
     };
   }
-  if (!Number.isFinite(initialState.totalSteps) || initialState.totalSteps <= 0) {
+  const rawTotSteps = typeof initialState.totalSteps === 'number'
+    ? initialState.totalSteps
+    : (typeof initialState.totalSteps === 'string' ? parseFloat(initialState.totalSteps) : NaN);
+  if (!Number.isFinite(rawTotSteps) || !Number.isInteger(rawTotSteps) || rawTotSteps <= 0 || Object.is(rawTotSteps, -0)) {
     return {
       success: false,
       error: 'Nieprawidłowa łączna liczba kroków w stanie Live Activity.',
@@ -387,13 +393,19 @@ export async function updateLiveActivity(
       error: 'Nieprawidłowy stan aktywności Live Activity.',
     };
   }
-  if (!Number.isFinite(_state.stepIndex) || _state.stepIndex < 0) {
+  const rawStepIdx = typeof _state.stepIndex === 'number'
+    ? _state.stepIndex
+    : (typeof _state.stepIndex === 'string' ? parseFloat(_state.stepIndex) : NaN);
+  if (!Number.isFinite(rawStepIdx) || !Number.isInteger(rawStepIdx) || rawStepIdx < 0 || Object.is(rawStepIdx, -0)) {
     return {
       success: false,
       error: 'Nieprawidłowy indeks kroku w stanie Live Activity.',
     };
   }
-  if (!Number.isFinite(_state.totalSteps) || _state.totalSteps <= 0) {
+  const rawTotSteps = typeof _state.totalSteps === 'number'
+    ? _state.totalSteps
+    : (typeof _state.totalSteps === 'string' ? parseFloat(_state.totalSteps) : NaN);
+  if (!Number.isFinite(rawTotSteps) || !Number.isInteger(rawTotSteps) || rawTotSteps <= 0 || Object.is(rawTotSteps, -0)) {
     return {
       success: false,
       error: 'Nieprawidłowa łączna liczba kroków w stanie Live Activity.',
