@@ -310,9 +310,9 @@ export function verifyAndActivateStoreKitPurchase(
   }
   const cleanProductId = typeof receipt.productId === 'string' ? receipt.productId.trim().toLowerCase() : '';
   let tier: 'monthly' | 'annual' | 'lifetime' | null = null;
-  if (cleanProductId === STORE_PRODUCT_IDS.monthly.toLowerCase()) tier = 'monthly';
-  else if (cleanProductId === STORE_PRODUCT_IDS.annual.toLowerCase()) tier = 'annual';
-  else if (cleanProductId === STORE_PRODUCT_IDS.lifetime.toLowerCase()) tier = 'lifetime';
+  if (cleanProductId === STORE_PRODUCT_IDS.monthly.toLowerCase() || cleanProductId === 'monthly') tier = 'monthly';
+  else if (cleanProductId === STORE_PRODUCT_IDS.annual.toLowerCase() || cleanProductId === 'annual') tier = 'annual';
+  else if (cleanProductId === STORE_PRODUCT_IDS.lifetime.toLowerCase() || cleanProductId === 'lifetime') tier = 'lifetime';
 
   if (!tier) {
     return {
@@ -322,8 +322,17 @@ export function verifyAndActivateStoreKitPurchase(
     };
   }
 
+  const purchaseTime = new Date(receipt.purchaseDate.trim()).getTime();
+  if (isNaN(purchaseTime) || purchaseTime <= 0) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy podpis transakcji StoreKit',
+      errorCode: 'invalid_signature',
+    };
+  }
+
   const sanitizedReceipt: StoreKitReceipt = {
-    productId: cleanProductId,
+    productId: STORE_PRODUCT_IDS[tier],
     transactionId: receipt.transactionId.trim(),
     purchaseDate: receipt.purchaseDate.trim(),
     signature: receipt.signature.trim(),

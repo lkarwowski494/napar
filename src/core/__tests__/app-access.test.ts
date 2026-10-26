@@ -808,4 +808,23 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(state.daysRemaining).toBe(14);
     expect(Number.isFinite(state.daysRemaining)).toBe(true);
   });
+
+  test('TASK-P47-02-MON: verifyAndActivateStoreKitPurchase akceptuje krotkie identyfikatory tierow (monthly, annual, lifetime)', () => {
+    resetTrialForTesting();
+    const shortReceipt = {
+      productId: 'annual',
+      transactionId: 'TX-ANNUAL-999',
+      purchaseDate: new Date().toISOString(),
+      signature: 'SIG-VALID-999',
+    };
+
+    const res = verifyAndActivateStoreKitPurchase(shortReceipt as any);
+    expect(res.success).toBe(true);
+    expect(res.tier).toBe('annual');
+    expect(res.receipt?.productId).toBe('pl.lukasz.napar.annual');
+
+    const state = getAppAccessState();
+    expect(state.isSubscribed).toBe(true);
+    expect(state.subscriptionTier).toBe('annual');
+  });
 });
