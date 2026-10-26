@@ -315,6 +315,24 @@ export async function startLiveActivity(
       error: 'Nieprawidłowa łączna liczba kroków w stanie Live Activity.',
     };
   }
+  const rawRemaining = typeof initialState.stepRemainingSeconds === 'number'
+    ? initialState.stepRemainingSeconds
+    : (typeof initialState.stepRemainingSeconds === 'string' ? parseFloat(initialState.stepRemainingSeconds) : NaN);
+  if (!Number.isFinite(rawRemaining) || rawRemaining < 0 || Object.is(rawRemaining, -0) || rawRemaining > 86400) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy pozostały czas kroku w stanie Live Activity (wymagany zakres [0, 86400]).',
+    };
+  }
+  const rawTargetWater = typeof initialState.targetWaterGrams === 'number'
+    ? initialState.targetWaterGrams
+    : (typeof initialState.targetWaterGrams === 'string' ? parseFloat(initialState.targetWaterGrams) : NaN);
+  if (!Number.isFinite(rawTargetWater) || rawTargetWater < 0 || Object.is(rawTargetWater, -0) || rawTargetWater > 50000) {
+    return {
+      success: false,
+      error: 'Nieprawidłowa docelowa waga wody w stanie Live Activity (wymagany zakres [0, 50000]).',
+    };
+  }
   return {
     success: false,
     error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',
@@ -383,7 +401,8 @@ export async function endLiveActivity(
       error: 'Nieprawidłowy identyfikator aktywności Live Activity.',
     };
   }
-  if (dismissalPolicy && dismissalPolicy !== 'immediate' && dismissalPolicy !== 'after_delay') {
+  const cleanPolicy = typeof dismissalPolicy === 'string' ? dismissalPolicy.trim().toLowerCase() : 'immediate';
+  if (cleanPolicy !== 'immediate' && cleanPolicy !== 'after_delay') {
     return {
       success: false,
       error: 'Nieprawidłowa polityka zakończenia Live Activity (dozwolone: immediate, after_delay).',

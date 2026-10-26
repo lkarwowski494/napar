@@ -697,4 +697,36 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(payload.dynamicIsland.expandedCenterSubtitle).toContain('Step 2 of 3');
     expect(payload.dynamicIsland.expandedBottomTarget).toContain('Target:');
   });
+
+  test('TASK-P43-12-NIE: startLiveActivity waliduje zakres stepRemainingSeconds i targetWaterGrams a endLiveActivity normalizuje dismissalPolicy', async () => {
+    // startLiveActivity z ujemnym czasem kroku
+    const badTimeRes = await startLiveActivity(
+      mockAttributesCoffee,
+      { ...mockState, stepRemainingSeconds: -5 }
+    );
+    expect(badTimeRes.success).toBe(false);
+    expect(badTimeRes.error).toContain('Nieprawidłowy pozostały czas kroku');
+
+    // startLiveActivity ze zbyt dużą wodą (> 50000)
+    const badWaterRes = await startLiveActivity(
+      mockAttributesCoffee,
+      { ...mockState, targetWaterGrams: 55000 }
+    );
+    expect(badWaterRes.success).toBe(false);
+    expect(badWaterRes.error).toContain('Nieprawidłowa docelowa waga wody');
+
+    // endLiveActivity z case-insensitive polityką
+    const endUpper = await endLiveActivity('act-123', 'IMMEDIATE' as any);
+    expect(endUpper.success).toBe(false); // v1.0 stub DEC-01
+    expect(endUpper.error).toBe('ActivityKit Live Activity niedostępne w v1.0 (DEC-01).');
+
+    const endDelayed = await endLiveActivity('act-123', ' AFTER_DELAY ' as any);
+    expect(endDelayed.success).toBe(false);
+    expect(endDelayed.error).toBe('ActivityKit Live Activity niedostępne w v1.0 (DEC-01).');
+
+    // Nieprawidłowa polityka
+    const endInvalid = await endLiveActivity('act-123', 'unknown_policy' as any);
+    expect(endInvalid.success).toBe(false);
+    expect(endInvalid.error).toContain('Nieprawidłowa polityka zakończenia Live Activity');
+  });
 });
