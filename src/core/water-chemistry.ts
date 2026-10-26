@@ -261,6 +261,16 @@ export function diagnoseWaterSensoryImpact(
   ghPpm: number,
   khPpm: number
 ): WaterDiagnosticResult {
+  if (typeof ghPpm === 'boolean' || typeof khPpm === 'boolean') {
+    return {
+      problemPl: 'Nieprawidłowe dane wejściowe parametrów wody.',
+      problemEn: 'Invalid input data for water chemistry parameters.',
+      causePl: 'Wartości GH lub KH nie mogą być typu logicznego (boolean).',
+      causeEn: 'GH or KH values cannot be of boolean type.',
+      recommendationPl: 'Wprowadź poprawne, dodatnie wartości liczbowe dla twardości GH i buforu KH.',
+      recommendationEn: 'Enter valid positive numerical values for GH hardness and KH buffer.',
+    };
+  }
   const rawGh = typeof ghPpm === 'string' ? parseFloat(ghPpm) : Number(ghPpm);
   const rawKh = typeof khPpm === 'string' ? parseFloat(khPpm) : Number(khPpm);
   let safeGh = Number.isFinite(rawGh) ? rawGh : NaN;
@@ -348,6 +358,7 @@ export function diagnoseWaterSensoryImpact(
  * Konwertuje twardość z ppm CaCO3 na stopnie niemieckie dH (1 dH = 17.848 ppm CaCO3)
  */
 export function ppmCaCO3ToDegreesDH(ppm: number): number {
+  if (typeof ppm === 'boolean') return 0;
   const numPpm = typeof ppm === 'string' ? parseFloat(ppm) : Number(ppm);
   if (!Number.isFinite(numPpm) || numPpm <= 0) return 0;
   const safePpm = Math.min(10000, numPpm);
@@ -360,6 +371,7 @@ export function ppmCaCO3ToDegreesDH(ppm: number): number {
  * Konwertuje twardość ze stopni niemieckich dH na ppm CaCO3 (1 dH = 17.848 ppm CaCO3)
  */
 export function degreesDHToPpmCaCO3(dH: number): number {
+  if (typeof dH === 'boolean') return 0;
   const numDH = typeof dH === 'string' ? parseFloat(dH) : Number(dH);
   if (!Number.isFinite(numDH) || numDH <= 0) return 0;
   const safeDH = Math.min(500, numDH);

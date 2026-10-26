@@ -352,4 +352,15 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(getWaterProfileName('sca_standard', 'pl')).toBe('Standard SCA (Specialty Coffee)');
     expect(getWaterProfileName('  ')).toBe('');
   });
+
+  test('TASK-P33-07-JAK: diagnoseWaterSensoryImpact, ppmCaCO3ToDegreesDH i degreesDHToPpmCaCO3 odrzucają typy boolean', () => {
+    const boolDiag = diagnoseWaterSensoryImpact(true as any, false as any);
+    expect(boolDiag.problemPl).toContain('Nieprawidłowe dane wejściowe');
+    expect(boolDiag.causePl).toContain('boolean');
+
+    expect(ppmCaCO3ToDegreesDH(true as any)).toBe(0);
+    expect(ppmCaCO3ToDegreesDH(false as any)).toBe(0);
+    expect(degreesDHToPpmCaCO3(true as any)).toBe(0);
+    expect(degreesDHToPpmCaCO3(false as any)).toBe(0);
+  });
 });
