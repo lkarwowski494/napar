@@ -85,18 +85,16 @@ export function getAppAccessState(): AppAccessState {
   }
 
   // Sprawdź datę pierwszej instalacji
-  let trialStartedAt = getAppSetting('trial_started_at', '');
-  if (!trialStartedAt) {
-    trialStartedAt = new Date().toISOString();
+  const rawStarted = getAppSetting('trial_started_at', '');
+  let trialStartedAt = typeof rawStarted === 'string' ? rawStarted.trim() : '';
+  const now = new Date();
+  if (!trialStartedAt || isNaN(new Date(trialStartedAt).getTime())) {
+    trialStartedAt = now.toISOString();
     setAppSetting('trial_started_at', trialStartedAt);
   }
 
-  const now = new Date();
   const startDate = new Date(trialStartedAt);
   const startTime = Number.isFinite(startDate.getTime()) ? startDate.getTime() : now.getTime();
-  if (!Number.isFinite(startDate.getTime())) {
-    setAppSetting('trial_started_at', now.toISOString());
-  }
   const elapsedMs = Math.max(0, now.getTime() - startTime);
   const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
   const maxDaysSeen = Math.max(0, parseInt(getAppSetting('trial_max_days_seen', '0'), 10) || 0);

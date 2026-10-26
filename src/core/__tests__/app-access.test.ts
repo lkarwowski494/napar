@@ -524,4 +524,13 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const stateFallback = activateSubscription(' nieznany ' as any);
     expect(stateFallback.subscriptionTier).toBe('annual');
   });
+
+  test('TASK-P27-02-MON: getAppAccessState naprawia uszkodzony trial_started_at (whitespace / invalid)', () => {
+    resetTrialForTesting();
+    const { setAppSetting } = require('../database');
+    setAppSetting('trial_started_at', '   ');
+    const state = getAppAccessState();
+    expect(state.status).toBe('trial_active');
+    expect(state.daysRemaining).toBe(14);
+  });
 });
