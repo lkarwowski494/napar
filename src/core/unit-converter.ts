@@ -57,6 +57,9 @@ export function fluidOuncesToMl(flOz: number): number {
  * Formatuje temperaturę zgodnie z wybranym układem jednostek
  */
 export function formatTemperature(celsius: number, unitSystem: UnitSystem = 'metric'): string {
+  if (!Number.isFinite(celsius)) {
+    return unitSystem === 'imperial' ? '32°F' : '0°C';
+  }
   if (unitSystem === 'imperial') {
     return `${celsiusToFahrenheit(celsius)}°F`;
   }
@@ -67,6 +70,9 @@ export function formatTemperature(celsius: number, unitSystem: UnitSystem = 'met
  * Formatuje wagę suchą kawy / herbaty zgodnie z wybranym układem jednostek
  */
 export function formatDoseWeight(grams: number, unitSystem: UnitSystem = 'metric'): string {
+  if (!Number.isFinite(grams) || grams < 0) {
+    return unitSystem === 'imperial' ? '0 oz' : '0g';
+  }
   if (unitSystem === 'imperial') {
     return `${gramsToOunces(grams)} oz`;
   }
@@ -77,6 +83,9 @@ export function formatDoseWeight(grams: number, unitSystem: UnitSystem = 'metric
  * Formatuje objętość lub wagę wody
  */
 export function formatWaterWeight(grams: number, unitSystem: UnitSystem = 'metric'): string {
+  if (!Number.isFinite(grams) || grams < 0) {
+    return unitSystem === 'imperial' ? '0 fl oz' : '0g';
+  }
   if (unitSystem === 'imperial') {
     return `${mlToFluidOunces(grams)} fl oz`;
   }
@@ -87,7 +96,9 @@ export function formatWaterWeight(grams: number, unitSystem: UnitSystem = 'metri
  * Pomocnicze zaokrąglanie do określonej liczby miejsc po przecinku
  */
 export function roundTo(val: number, decimals: number): number {
-  const factor = Math.pow(10, decimals);
+  if (!Number.isFinite(val)) return 0;
+  const safeDec = Math.max(0, Math.min(10, Math.floor(decimals) || 0));
+  const factor = Math.pow(10, safeDec);
   return Math.round(val * factor) / factor;
 }
 

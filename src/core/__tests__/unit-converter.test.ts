@@ -159,5 +159,22 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(celsiusToFahrenheit(NaN)).toBe(0);
       expect(fahrenheitToCelsius(NaN)).toBe(0);
     });
+
+    test('TASK-P10-03-ZAK: formatTemperature, formatDoseWeight, formatWaterWeight i roundTo są odporne na NaN/Infinity', () => {
+      expect(formatTemperature(NaN, 'metric')).toBe('0°C');
+      expect(formatTemperature(NaN, 'imperial')).toBe('32°F');
+      expect(formatTemperature(-Infinity, 'metric')).toBe('0°C');
+
+      expect(formatDoseWeight(NaN, 'metric')).toBe('0g');
+      expect(formatDoseWeight(-10, 'metric')).toBe('0g');
+      expect(formatDoseWeight(NaN, 'imperial')).toBe('0 oz');
+
+      expect(formatWaterWeight(NaN, 'metric')).toBe('0g');
+      expect(formatWaterWeight(-50, 'metric')).toBe('0g');
+      expect(formatWaterWeight(NaN, 'imperial')).toBe('0 fl oz');
+
+      expect(roundTo(NaN, 2)).toBe(0);
+      expect(roundTo(Infinity, 2)).toBe(0);
+    });
   });
 });
