@@ -112,8 +112,8 @@ export function buildDynamicIslandPayload(
     safeState.stepNamePl ||
     safeState.stepNameEn ||
     (language === 'en' ? 'Step' : 'Krok');
-  const safeStepIdx = Math.max(0, safeState.stepIndex || 0);
   const safeTotalSteps = Math.max(1, safeState.totalSteps || 1);
+  const safeStepIdx = Math.min(safeTotalSteps - 1, Math.max(0, safeState.stepIndex || 0));
   const subtitle =
     language === 'en'
       ? `${stepName} · Step ${safeStepIdx + 1} of ${safeTotalSteps}`

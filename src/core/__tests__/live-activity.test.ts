@@ -267,4 +267,15 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(fullPayload.contentState.isFinished).toBe(true);
     expect(fullPayload.contentState.isPaused).toBe(false);
   });
+
+  test('TASK-P17-12-NIE: buildDynamicIslandPayload ogranicza safeStepIdx poniżej safeTotalSteps', () => {
+    const overflowState: any = {
+      stepIndex: 10,
+      totalSteps: 3,
+      stepNameEn: 'Pour',
+    };
+    const island = buildDynamicIslandPayload(mockAttributesCoffee, overflowState, 'en');
+    // totalSteps = 3, safeStepIdx ograniczone do 2 (krok 3 z 3, a nie 11 z 3)
+    expect(island.expandedCenterSubtitle).toBe('Pour · Step 3 of 3');
+  });
 });
