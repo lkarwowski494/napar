@@ -96,7 +96,8 @@ export function calculateLiquidYield(
     ? Math.min(retentionFactor, maxRetentionFactor)
     : retentionFactor;
   const retained = doseGrams * safeRetention;
-  const yieldGrams = Math.max(0, waterGrams - retained);
+  let yieldGrams = Math.max(0, waterGrams - retained);
+  if (Object.is(yieldGrams, -0)) yieldGrams = 0;
   return Number(yieldGrams.toFixed(1));
 }
 
@@ -160,7 +161,7 @@ export function calculateExtractionYield(
  * >60: utrata lotnych aromatów (aging)
  */
 export function evaluateRestingWindow(roastDateInput: Date | string, currentDateInput?: Date | string): RestingWindowResult {
-  if (!roastDateInput) {
+  if (!roastDateInput || (typeof roastDateInput === 'string' && !roastDateInput.trim())) {
     return {
       daysSinceRoast: 0,
       stage: 'degassing',

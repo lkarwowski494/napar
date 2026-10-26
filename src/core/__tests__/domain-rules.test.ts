@@ -522,4 +522,20 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(calculateBrewRatio(1, 500, NaN as any)).toBe(100.0);
     });
   });
+
+  describe('TASK-P28-03-ZAK: evaluateRestingWindow traktuje whitespace jako brak daty, a calculateLiquidYield chroni przed -0', () => {
+    it('zwraca brak daty palenia dla ciagu whitespace', () => {
+      const res = evaluateRestingWindow('   ');
+      expect(res.messagePl).toBe('Brak daty palenia — świeżość nieznana');
+      expect(res.messageEn).toBe('No roast date — freshness unknown');
+      expect(res.daysSinceRoast).toBe(0);
+    });
+
+    it('gwarantuje scisle 0 bez -0 dla calculateLiquidYield', () => {
+      // woda 30g, doza 15g, retencja 2.0 -> 30 - 30 = 0
+      const yieldGrams = calculateLiquidYield(30, 15, 2.0);
+      expect(yieldGrams).toBe(0);
+      expect(Object.is(yieldGrams, -0)).toBe(false);
+    });
+  });
 });
