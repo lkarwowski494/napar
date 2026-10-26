@@ -367,5 +367,31 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(action.titlePl).toContain('Powtórz udany napar herbaty');
       expect(action.recommendedMethod).toBe('Kyusu');
     });
+
+    it('TASK-P42-03-ZAK: generateActionIcsContent normalizuje wielkosc liter jezyka i wspiera warianty regionalne en-US', () => {
+      const action: any = {
+        id: 'action-lang-test',
+        titlePl: 'Parzenie V60',
+        titleEn: 'V60 Brew Session',
+        subtitlePl: 'Doza 15g, woda 250g',
+        subtitleEn: 'Dose 15g, water 250g',
+        dateIso: '2026-11-01',
+      };
+      // Wielkie litery 'EN'
+      const icsUpperEn = generateActionIcsContent(action, 'EN' as any);
+      expect(icsUpperEn).toContain('SUMMARY:V60 Brew Session');
+      expect(icsUpperEn).toContain('DESCRIPTION:Dose 15g\\, water 250g');
+      expect(icsUpperEn).toContain('//EN');
+
+      // Wariant regionalny 'en-US'
+      const icsRegionalEn = generateActionIcsContent(action, 'en-US' as any);
+      expect(icsRegionalEn).toContain('SUMMARY:V60 Brew Session');
+      expect(icsRegionalEn).toContain('//EN');
+
+      // Nieznany / fallback pl
+      const icsFallback = generateActionIcsContent(action, 'de' as any);
+      expect(icsFallback).toContain('SUMMARY:Parzenie V60');
+      expect(icsFallback).toContain('//PL');
+    });
   });
 });

@@ -423,12 +423,13 @@ export function escapeIcsText(str: string): string {
 
 export function generateActionIcsContent(
   action: ProactiveActionItem,
-  language: 'pl' | 'en' = 'pl'
+  language: 'pl' | 'en' | string = 'pl'
 ): string {
   if (!action || typeof action !== 'object') {
     throw new Error('Nieprawidłowy obiekt akcji kalendarza');
   }
-  const isEn = language === 'en';
+  const cleanLang = typeof language === 'string' ? language.trim().toLowerCase() : 'pl';
+  const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
   const rawDateStr = typeof action.dateIso === 'string' && action.dateIso.trim() ? action.dateIso.trim() : '';
   const dateMatch = rawDateStr.match(/^(\d{4}-\d{2}-\d{2})/);
   const todayIso = new Date().toISOString().slice(0, 10);
