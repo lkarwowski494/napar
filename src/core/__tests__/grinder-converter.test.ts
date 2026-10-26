@@ -321,4 +321,12 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio-drobno pod syfon próżniowy' })).toBe(650);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-fine for vacuum siphon' })).toBe(650);
   });
+  test('TASK-P25-08-PRO: getRecipeMicrons rozpoznaje French Press i praskę francuską i zwraca 1150 µm', () => {
+    expect(getRecipeMicrons({ method: 'FRENCH_PRESS' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'FRENCHPRESS' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'French Press' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'PRASKA_FRANCUSKA' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod praskę francuską' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse for french press immersion' })).toBe(1150);
+  });
 });

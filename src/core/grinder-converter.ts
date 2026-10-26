@@ -414,7 +414,21 @@ export function getRecipeMicrons(recipe?: {
   if (method === 'CHEMEX' || method === 'CLEVER_DRIPPER' || method === 'CUPPING') {
     return 880;
   }
-  if (method === 'FRENCH_PRESS' || method.includes('COLD') || method.includes('ICE') || method === 'COLD_BREW' || method === 'COLD_DRIP' || desc.includes('coarse')) {
+  if (
+    method === 'FRENCH_PRESS' ||
+    method === 'FRENCHPRESS' ||
+    method === 'FRENCH PRESS' ||
+    method === 'PRASKA_FRANCUSKA' ||
+    method === 'PRASKA' ||
+    method.includes('FRENCH') ||
+    desc.includes('french') ||
+    desc.includes('prask') ||
+    method.includes('COLD') ||
+    method.includes('ICE') ||
+    method === 'COLD_BREW' ||
+    method === 'COLD_DRIP' ||
+    desc.includes('coarse')
+  ) {
     return 1150;
   }
   return 720;
