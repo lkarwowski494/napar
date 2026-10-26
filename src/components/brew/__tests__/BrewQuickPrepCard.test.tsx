@@ -262,4 +262,60 @@ describe('BrewQuickPrepCard Component', () => {
     expect(ratioGroupEn.props.accessibilityRole).toBe('radiogroup');
     expect(ratioGroupEn.props.accessibilityLabel).toBe('Select coffee to water ratio');
   });
+
+  test('TASK-P34-01-ODK: currentRatioBadge posiada accessibilityRole text oraz zlokalizowany accessibilityLabel', () => {
+    let treePl: any;
+    act(() => {
+      treePl = renderer.create(
+        <BrewQuickPrepCard
+          {...defaultProps}
+          doseGrams={20}
+          waterGrams={300}
+          onWaterChange={jest.fn()}
+          language="pl"
+        />
+      );
+    });
+
+    const badgePl = treePl.root.findByProps({ testID: 'current-ratio-badge' });
+    expect(badgePl.props.accessibilityRole).toBe('text');
+    expect(badgePl.props.accessibilityLabel).toBe('Bieżąca proporcja 1 do 15.0');
+
+    let treeEn: any;
+    act(() => {
+      treeEn = renderer.create(
+        <BrewQuickPrepCard
+          {...defaultProps}
+          doseGrams={15}
+          waterGrams={250}
+          onWaterChange={jest.fn()}
+          language="en"
+        />
+      );
+    });
+
+    const badgeEn = treeEn.root.findByProps({ testID: 'current-ratio-badge' });
+    expect(badgeEn.props.accessibilityRole).toBe('text');
+    expect(badgeEn.props.accessibilityLabel).toBe('Current ratio 1 to 16.7');
+  });
+
+  test('TASK-P34-01-ODK: odporność na niepoprawne lub zerowe dozy w wyliczaniu proporcji', () => {
+    let treeZero: any;
+    act(() => {
+      treeZero = renderer.create(
+        <BrewQuickPrepCard
+          {...defaultProps}
+          doseGrams={0}
+          waterGrams={300}
+          onWaterChange={jest.fn()}
+          language="pl"
+        />
+      );
+    });
+
+    const badgeZero = treeZero.root.findByProps({ testID: 'current-ratio-badge' });
+    // 300 / 15 (fallback) = 20.0
+    expect(badgeZero.props.children).toBe('1 : 20.0');
+    expect(badgeZero.props.accessibilityLabel).toBe('Bieżąca proporcja 1 do 20.0');
+  });
 });

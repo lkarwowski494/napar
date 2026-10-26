@@ -50,7 +50,9 @@ export function BrewQuickPrepCard({
 }: BrewQuickPrepCardProps) {
   const { t, language: contextLang } = useTranslation();
   const language = languageProp || contextLang;
-  const currentRatioNum = doseGrams > 0 ? (waterGrams / doseGrams).toFixed(1) : '16.7';
+  const safeDose = Number.isFinite(doseGrams) && doseGrams > 0 ? doseGrams : 15;
+  const safeWater = Number.isFinite(waterGrams) && waterGrams > 0 ? waterGrams : 250;
+  const currentRatioNum = (safeWater / safeDose).toFixed(1);
   const currentRatioVal = parseFloat(currentRatioNum);
 
   return (
@@ -203,7 +205,18 @@ export function BrewQuickPrepCard({
         <View style={styles.ratioSection}>
           <View style={styles.ratioHeaderRow}>
             <Text style={styles.ratioSectionTitle}>{language === 'en' ? 'RATIO' : 'PROPORCJA (RATIO)'}</Text>
-            <Text style={styles.currentRatioBadge}>{`1 : ${currentRatioNum}`}</Text>
+            <Text
+              testID="current-ratio-badge"
+              style={styles.currentRatioBadge}
+              accessibilityRole="text"
+              accessibilityLabel={
+                language === 'en'
+                  ? `Current ratio 1 to ${currentRatioNum}`
+                  : `Bieżąca proporcja 1 do ${currentRatioNum}`
+              }
+            >
+              {`1 : ${currentRatioNum}`}
+            </Text>
           </View>
           <View
             testID="ratio-chips-group"
@@ -222,7 +235,7 @@ export function BrewQuickPrepCard({
                   key={r.label}
                   testID={`ratio-chip-${r.label.replace(':', '-')}`}
                   style={[styles.ratioChip, isActive && styles.ratioChipActive]}
-                  onPress={() => onWaterChange(Math.round(doseGrams * r.ratio))}
+                  onPress={() => onWaterChange(Math.round(safeDose * r.ratio))}
                   disabled={disabled}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: isActive }}
