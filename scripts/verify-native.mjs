@@ -114,6 +114,14 @@ try {
     `app.json -> expo.android.versionCode musi być dodatnią liczbą całkowitą (otrzymano '${appJson.android?.versionCode}')`
   );
 
+  // Weryfikacja wymaganych uprawnień Androida w app.json (TASK-P25-10-WYD)
+  const androidPerms = Array.isArray(appJson.android?.permissions) ? appJson.android.permissions : [];
+  for (const requiredPerm of ['android.permission.CAMERA', 'android.permission.VIBRATE', 'android.permission.WAKE_LOCK']) {
+    check(
+      androidPerms.includes(requiredPerm),
+      'app.json -> expo.android.permissions musi zawierać ' + requiredPerm
+    );
+  }
   // Weryfikacja ścieżki ikony oraz numerycznego buildNumber (TASK-P12-10-WYD)
   check(
     appJson.icon === './assets/icon.png',
