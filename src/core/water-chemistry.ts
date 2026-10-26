@@ -301,6 +301,78 @@ export function calculateWaterMinerals(
   };
 }
 
+export interface CationHardnessBreakdown {
+  calciumIonPpm: number;
+  magnesiumIonPpm: number;
+  calciumGhPpm: number;
+  magnesiumGhPpm: number;
+  totalGhPpm: number;
+  cationRatioMgToCa: number;
+  dominantCation: 'magnesium' | 'calcium' | 'balanced';
+}
+
+/**
+ * Oblicza rozbicie twardości ogólnej (GH) na wkład kationów wapnia (Ca2+) i magnezu (Mg2+)
+ * zgodnie ze współczynnikami SCA/Hendon (1 mg/L Ca2+ = 2.497 ppm CaCO3; 1 mg/L Mg2+ = 4.118 ppm CaCO3).
+ */
+export function calculateCationHardnessBreakdown(
+  calciumIonPpm: number | string,
+  magnesiumIonPpm: number | string
+): CationHardnessBreakdown {
+  const isInvalid = (val: any) =>
+    val === null ||
+    val === undefined ||
+    typeof val === 'boolean' ||
+    typeof val === 'object' ||
+    typeof val === 'symbol';
+
+  const rawCa = isInvalid(calciumIonPpm)
+    ? 0
+    : typeof calciumIonPpm === 'string'
+    ? parseFloat(calciumIonPpm.trim().replace(/,/g, '.'))
+    : Number(calciumIonPpm);
+
+  const rawMg = isInvalid(magnesiumIonPpm)
+    ? 0
+    : typeof magnesiumIonPpm === 'string'
+    ? parseFloat(magnesiumIonPpm.trim().replace(/,/g, '.'))
+    : Number(magnesiumIonPpm);
+
+  const safeCa = Number.isFinite(rawCa) && rawCa >= 0 && !Object.is(rawCa, -0) ? Math.min(2000, rawCa) : 0;
+  const safeMg = Number.isFinite(rawMg) && rawMg >= 0 && !Object.is(rawMg, -0) ? Math.min(2000, rawMg) : 0;
+
+  // 1 mg/L Ca2+ = 2.497 ppm CaCO3
+  const caGh = Number((safeCa * 2.497).toFixed(2));
+  // 1 mg/L Mg2+ = 4.118 ppm CaCO3
+  const mgGh = Number((safeMg * 4.118).toFixed(2));
+  const totalGh = Number((caGh + mgGh).toFixed(2));
+
+  let ratio = 1;
+  let dominant: 'magnesium' | 'calcium' | 'balanced' = 'balanced';
+  if (safeCa > 0 && safeMg > 0) {
+    ratio = Number((safeMg / safeCa).toFixed(2));
+    if (ratio > 1.2) dominant = 'magnesium';
+    else if (ratio < 0.8) dominant = 'calcium';
+    else dominant = 'balanced';
+  } else if (safeMg > 0) {
+    ratio = Infinity;
+    dominant = 'magnesium';
+  } else if (safeCa > 0) {
+    ratio = 0;
+    dominant = 'calcium';
+  }
+
+  return {
+    calciumIonPpm: safeCa,
+    magnesiumIonPpm: safeMg,
+    calciumGhPpm: Object.is(caGh, -0) ? 0 : caGh,
+    magnesiumGhPpm: Object.is(mgGh, -0) ? 0 : mgGh,
+    totalGhPpm: Object.is(totalGh, -0) ? 0 : totalGh,
+    cationRatioMgToCa: Object.is(ratio, -0) ? 0 : ratio,
+    dominantCation: dominant,
+  };
+}
+
 /**
  * Oblicza ilość buforu (NaHCO3 w gramach oraz koncentratu BH w gramach/ml)
  * potrzebną do podniesienia zasadowości z poziomu currentKh do targetKh w zadanej objętości wody.

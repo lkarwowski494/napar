@@ -7,6 +7,7 @@ import {
   BOTTLED_WATER_BENCHMARKS,
   calculateWaterMinerals,
   calculateBufferAddition,
+  calculateCationHardnessBreakdown,
   diagnoseWaterSensoryImpact,
   getWaterProfileName,
   ppmCaCO3ToDegreesDH,
@@ -638,6 +639,29 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(findBottledWaterById('zywiec zdrój')?.id).toBe('zywiec_zdroj');
     expect(findBottledWaterById('cechini muszyna')?.id).toBe('muszynianka');
     expect(findBottledWaterById('tesco')?.id).toBe('ashbeck');
+  });
+
+  test('TASK-P52-07-JAK: calculateCationHardnessBreakdown oblicza rozbicie twardosci Ca/Mg i chroni przed blednymi typami', () => {
+    // 1. Prawidłowe obliczenia dla 10 mg/L Ca i 15 mg/L Mg
+    const res = calculateCationHardnessBreakdown(10, 15);
+    expect(res.calciumGhPpm).toBe(24.97);
+    expect(res.magnesiumGhPpm).toBe(61.77);
+    expect(res.totalGhPpm).toBe(86.74);
+    expect(res.cationRatioMgToCa).toBe(1.5);
+    expect(res.dominantCation).toBe('magnesium');
+
+    // 2. Przecinki dziesiętne w stringach
+    const commaRes = calculateCationHardnessBreakdown('20,5', '5,5');
+    expect(commaRes.calciumIonPpm).toBe(20.5);
+    expect(commaRes.magnesiumIonPpm).toBe(5.5);
+    expect(commaRes.dominantCation).toBe('calcium');
+
+    // 3. Odporność na null, obiekty, ujemne i -0
+    const edgeRes = calculateCationHardnessBreakdown(null as any, -10);
+    expect(edgeRes.calciumIonPpm).toBe(0);
+    expect(edgeRes.magnesiumIonPpm).toBe(0);
+    expect(edgeRes.totalGhPpm).toBe(0);
+    expect(edgeRes.dominantCation).toBe('balanced');
   });
 });
 
