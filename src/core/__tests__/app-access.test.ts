@@ -308,4 +308,20 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(expiredState.daysRemaining).toBe(0);
     expect(getAppSetting('trial_max_days_seen', '0')).toBe(String(TRIAL_DURATION_DAYS));
   });
+
+  test('TASK-P9-02-MON: restorePurchases odrzuca nieznany lub uszkodzony tier zakupu', () => {
+    resetTrialForTesting();
+    setAppSetting('has_verified_purchase', 'true');
+    setAppSetting('verified_purchase_tier', 'invalid_corrupt_tier');
+
+    const result = restorePurchases();
+    expect(result.restored).toBe(false);
+    expect(result.isSubscribed).toBe(false);
+
+    setAppSetting('verified_purchase_tier', 'annual');
+    const validResult = restorePurchases();
+    expect(validResult.restored).toBe(true);
+    expect(validResult.isSubscribed).toBe(true);
+    expect(validResult.subscriptionTier).toBe('annual');
+  });
 });

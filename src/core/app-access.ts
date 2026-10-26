@@ -175,7 +175,8 @@ export function restorePurchases(): RestorePurchasesResult {
     | 'lifetime'
     | '';
 
-  if (hasVerifiedPurchase && verifiedTier) {
+  const allowedTiers: readonly string[] = ['monthly', 'annual', 'lifetime'];
+  if (hasVerifiedPurchase && allowedTiers.includes(verifiedTier)) {
     setAppSetting('is_pro_active', 'true');
     setAppSetting('subscription_tier', verifiedTier);
     const state = getAppAccessState();
