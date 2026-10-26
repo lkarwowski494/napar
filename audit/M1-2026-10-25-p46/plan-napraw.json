@@ -84,15 +84,15 @@
     "perspective": "11-WZR",
     "title": "Defensywna obsługa pustej tablicy kroków w recipeToCompactPayload i decodeRecipeFromShareUrl",
     "file": "src/core/recipe-share.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "2031417"
   },
   {
     "id": "TASK-P46-12-NIE",
     "perspective": "12-NIE",
     "title": "Ścisła walidacja całkowitych liczb kroków w updateLiveActivity i startLiveActivity",
     "file": "src/core/live-activity.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "c1a7150"
   }
 ]
