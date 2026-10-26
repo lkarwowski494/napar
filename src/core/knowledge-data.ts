@@ -587,8 +587,10 @@ export function searchCoffeeProcesses(query: string): CoffeeProcessInfo[] {
   return COFFEE_PROCESSES.filter((p) =>
     p.name.toLowerCase().includes(q) ||
     p.processType.toLowerCase().includes(q) ||
-    p.keyNotesPl.some((k) => k.toLowerCase().includes(q)) ||
-    p.keyNotesEn.some((k) => k.toLowerCase().includes(q)) ||
+    (Array.isArray(p.keyNotesPl) && p.keyNotesPl.some((k) => typeof k === 'string' && k.toLowerCase().includes(q))) ||
+    (Array.isArray(p.keyNotesEn) && p.keyNotesEn.some((k) => typeof k === 'string' && k.toLowerCase().includes(q))) ||
+    (p.dryingDurationDays && p.dryingDurationDays.toLowerCase().includes(q)) ||
+    (p.waterConsumption && p.waterConsumption.toLowerCase().includes(q)) ||
     p.sensoryImpactPl.toLowerCase().includes(q) ||
     p.sensoryImpactEn.toLowerCase().includes(q) ||
     p.descriptionPl.toLowerCase().includes(q) ||

@@ -356,4 +356,13 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     const byAltitude = searchCoffeeOrigins('2200');
     expect(byAltitude.length).toBeGreaterThanOrEqual(1);
   });
+
+  test('TASK-P17-06-TRE: searchCoffeeProcesses przeszukuje dryingDurationDays oraz waterConsumption', () => {
+    const byWater = searchCoffeeProcesses('Zerowe');
+    expect(byWater.length).toBeGreaterThanOrEqual(1);
+    expect(byWater.some((p) => p.waterConsumption === 'Zerowe')).toBe(true);
+
+    const byDrying = searchCoffeeProcesses('dni');
+    expect(byDrying.length).toBeGreaterThanOrEqual(1);
+  });
 });
