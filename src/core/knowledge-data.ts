@@ -699,6 +699,15 @@ const VARIETY_ALIASES: Record<string, string> = {
   orangebourbon: 'variety-bourbon',
   'orange-bourbon': 'variety-bourbon',
   'orange bourbon': 'variety-bourbon',
+  maracaturra: 'variety-pacamara-maragogype',
+  'anacafe-14': 'variety-pacamara-maragogype',
+  anacafe14: 'variety-pacamara-maragogype',
+  k7: 'variety-sl28-sl34',
+  obata: 'variety-caturra-catuai',
+  catigua: 'variety-caturra-catuai',
+  'bourbon-pointu': 'variety-bourbon',
+  bourbonpointu: 'variety-bourbon',
+  papayo: 'variety-bourbon',
 };
 
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
@@ -959,6 +968,14 @@ const TEA_ALIASES: Record<string, string> = {
   shou: 'tea-puerh',
   'sheng-puerh': 'tea-puerh',
   'shou-puerh': 'tea-puerh',
+  'pu-erh': 'tea-puerh',
+  'pu erh': 'tea-puerh',
+  "pu'erh": 'tea-puerh',
+  "pu'er": 'tea-puerh',
+  hojicha: 'tea-green',
+  houjicha: 'tea-green',
+  kukicha: 'tea-green',
+  fukamushi: 'tea-green',
 };
 
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {

@@ -864,4 +864,24 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeProcessById('experimental')?.id).toBe('process-anaerobic');
     expect(findCoffeeProcessById('eksperymentalna')?.id).toBe('process-anaerobic');
   });
+
+  test('TASK-P48-06-TRE: findCoffeeVarietyById wspiera odmiany maracaturra, anacafe-14, k7, obata, bourbon-pointu oraz findTeaCategoryById wspiera pu-erh, hojicha i kukicha', () => {
+    expect(findCoffeeVarietyById('maracaturra')?.id).toBe('variety-pacamara-maragogype');
+    expect(findCoffeeVarietyById('anacafe-14')?.id).toBe('variety-pacamara-maragogype');
+    expect(findCoffeeVarietyById('anacafe14')?.id).toBe('variety-pacamara-maragogype');
+    expect(findCoffeeVarietyById('k7')?.id).toBe('variety-sl28-sl34');
+    expect(findCoffeeVarietyById('obata')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('catigua')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('bourbon-pointu')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('bourbonpointu')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('papayo')?.id).toBe('variety-bourbon');
+
+    expect(findTeaCategoryById('pu-erh')?.id).toBe('tea-puerh');
+    expect(findTeaCategoryById('pu erh')?.id).toBe('tea-puerh');
+    expect(findTeaCategoryById("pu'erh")?.id).toBe('tea-puerh');
+    expect(findTeaCategoryById('hojicha')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('houjicha')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('kukicha')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('fukamushi')?.id).toBe('tea-green');
+  });
 });
