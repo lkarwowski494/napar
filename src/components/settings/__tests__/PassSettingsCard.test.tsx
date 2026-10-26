@@ -59,4 +59,40 @@ describe('PassSettingsCard Component', () => {
     expect(manageBtn.props.hitSlop).toEqual({ top: 8, bottom: 8, left: 8, right: 8 });
     expect(manageBtn.props.accessibilityRole).toBe('link');
   });
+
+  test('TASK-P12-02-MON: Bezpiecznie renderuje przy braku subscriptionTier (undefined/null) oraz stosuje polską odmianę parzeń', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <PassSettingsCard
+          isSubscribed={true}
+          subscriptionTier={undefined as any}
+          accessStatus="subscribed"
+          brewsRemaining={0}
+          onOpenPassModal={jest.fn()}
+          t={t}
+        />
+      );
+    });
+
+    const str = JSON.stringify(tree!.toJSON());
+    expect(str).toContain('"children":["PRO"," PRO"]');
+
+    // Odmiana 5 parzeń
+    renderer.act(() => {
+      tree = renderer.create(
+        <PassSettingsCard
+          isSubscribed={false}
+          subscriptionTier="none"
+          accessStatus="trial_active"
+          brewsRemaining={5}
+          onOpenPassModal={jest.fn()}
+          t={t}
+        />
+      );
+    });
+    const str5 = JSON.stringify(tree!.toJSON());
+    expect(str5).toContain('TRIAL');
+    expect(str5).toContain('parzeń');
+  });
 });

@@ -20,6 +20,9 @@ export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
   onOpenPassModal,
   t,
 }) => {
+  const safeTier = typeof subscriptionTier === 'string' && subscriptionTier.trim() ? subscriptionTier.trim() : 'PRO';
+  const remainingLabel = brewsRemaining === 1 ? 'parzenie' : (brewsRemaining >= 2 && brewsRemaining <= 4 ? 'parzenia' : 'parzeń');
+
   return (
     <View>
       <Text style={styles.sectionTitle}>{t.settings.proTitle} — Apps4Brew Pass</Text>
@@ -29,13 +32,13 @@ export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
           {isSubscribed ? (
             <View style={styles.proActiveBadge}>
               <Text style={styles.proActiveText}>
-                {subscriptionTier.toUpperCase()} PRO
+                {safeTier.toUpperCase()} PRO
               </Text>
             </View>
           ) : accessStatus === 'trial_active' ? (
             <View style={[styles.proActiveBadge, { backgroundColor: theme.colors.copperMuted }]}>
               <Text style={[styles.proActiveText, { color: theme.colors.copper }]}>
-                TRIAL ({brewsRemaining} {brewsRemaining === 1 ? 'parzenie' : 'parzenia'})
+                TRIAL ({brewsRemaining} {remainingLabel})
               </Text>
             </View>
           ) : (
