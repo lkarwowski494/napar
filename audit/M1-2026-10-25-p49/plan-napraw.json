@@ -49,7 +49,7 @@
       "title": "Rozszerzenie taksonomii procesów fermentacji kawy i herbaty w knowledge-data",
       "target_file": "src/core/knowledge-data.ts",
       "test_file": "src/core/__tests__/knowledge.test.ts",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P49-07-JAK",
@@ -57,7 +57,7 @@
       "title": "Walidacja granic buforu zasadowości w water-chemistry",
       "target_file": "src/core/water-chemistry.ts",
       "test_file": "src/core/__tests__/water-chemistry.test.ts",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P49-08-PRO",
@@ -65,7 +65,7 @@
       "title": "Optymalizacja mikronów dla metody AeroPress Inverted w grinder-converter",
       "target_file": "src/core/grinder-converter.ts",
       "test_file": "tests/audit-fixes.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P49-09-LOK",
@@ -73,7 +73,7 @@
       "title": "Symetria kluczy wyszukiwania i podpowiedzi kroków w 35 językach",
       "target_file": "src/core/i18n.tsx",
       "test_file": "tests/i18n-no-polish-in-en.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P49-10-WYD",
@@ -81,7 +81,7 @@
       "title": "Weryfikacja braku uprawnień lokalizacyjnych i telemetrycznych w verify-native.mjs",
       "target_file": "scripts/verify-native.mjs",
       "test_file": "tests/audit-fixes.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P49-11-WZR",
