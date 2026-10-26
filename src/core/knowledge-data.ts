@@ -751,10 +751,57 @@ export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined
   });
 }
 
+const ORIGIN_ALIASES: Record<string, string> = {
+  // Ethiopia
+  eth: 'origin-ethiopia',
+  ethiopia: 'origin-ethiopia',
+  etiopia: 'origin-ethiopia',
+  et: 'origin-ethiopia',
+  // Kenya
+  ken: 'origin-kenya',
+  kenya: 'origin-kenya',
+  kenia: 'origin-kenya',
+  ke: 'origin-kenya',
+  // Colombia
+  col: 'origin-colombia',
+  colombia: 'origin-colombia',
+  kolumbia: 'origin-colombia',
+  co: 'origin-colombia',
+  // Guatemala
+  gtm: 'origin-guatemala',
+  guatemala: 'origin-guatemala',
+  gwatemala: 'origin-guatemala',
+  gt: 'origin-guatemala',
+  // Costa Rica
+  cri: 'origin-costa-rica',
+  'costa-rica': 'origin-costa-rica',
+  'costa rica': 'origin-costa-rica',
+  costarica: 'origin-costa-rica',
+  kostaryka: 'origin-costa-rica',
+  cr: 'origin-costa-rica',
+  // Brazil
+  bra: 'origin-brazil',
+  brazil: 'origin-brazil',
+  brasil: 'origin-brazil',
+  brazylia: 'origin-brazil',
+  br: 'origin-brazil',
+  // Panama
+  pan: 'origin-panama',
+  panama: 'origin-panama',
+  pa: 'origin-panama',
+};
+
 export function findCoffeeOriginById(id: string): CoffeeOriginInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const mappedId = ORIGIN_ALIASES[cleanId] || ORIGIN_ALIASES[normId];
+  if (mappedId) {
+    const directMatch = COFFEE_ORIGINS.find((o) => o.id === mappedId);
+    if (directMatch) return directMatch;
+  }
+
   return COFFEE_ORIGINS.find((o) => {
     if (o.id && typeof o.id === 'string' && o.id.trim().toLowerCase() === cleanId) return true;
     if (o.countryCode && typeof o.countryCode === 'string' && o.countryCode.trim().toLowerCase() === cleanId) return true;

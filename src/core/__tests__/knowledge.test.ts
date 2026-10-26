@@ -739,4 +739,19 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeProcessById('thermal-shock')?.id).toBe('process-anaerobic');
     expect(findCoffeeProcessById('szok-termiczny')?.id).toBe('process-anaerobic');
   });
+
+  test('TASK-P40-06-TRE: findCoffeeOriginById wspiera 3-literowe kody ISO oraz alternatywne warianty pisowni (eth, ken, col, gtm, cri, bra, pan)', () => {
+    expect(findCoffeeOriginById('eth')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('etiopia')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('ken')?.id).toBe('origin-kenya');
+    expect(findCoffeeOriginById('col')?.id).toBe('origin-colombia');
+    expect(findCoffeeOriginById('kolumbia')?.id).toBe('origin-colombia');
+    expect(findCoffeeOriginById('gtm')?.id).toBe('origin-guatemala');
+    expect(findCoffeeOriginById('cri')?.id).toBe('origin-costa-rica');
+    expect(findCoffeeOriginById('kostaryka')?.id).toBe('origin-costa-rica');
+    expect(findCoffeeOriginById('bra')?.id).toBe('origin-brazil');
+    expect(findCoffeeOriginById('brasil')?.id).toBe('origin-brazil');
+    expect(findCoffeeOriginById('brazylia')?.id).toBe('origin-brazil');
+    expect(findCoffeeOriginById('pan')?.id).toBe('origin-panama');
+  });
 });
