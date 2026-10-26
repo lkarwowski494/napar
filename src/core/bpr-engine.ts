@@ -284,6 +284,8 @@ export function buildProactiveActionSchedule(
       const safeWater = Number.isFinite(rawWater) && rawWater > 0 ? (Object.is(rawWater, -0) ? 250 : rawWater) : 250;
       const rawTemp = typeof topSession.waterTempCelsius === 'number' ? topSession.waterTempCelsius : parseFloat(String(topSession.waterTempCelsius));
       const safeTemp = Number.isFinite(rawTemp) && rawTemp > 0 ? (Object.is(rawTemp, -0) ? 93 : rawTemp) : 93;
+      const isTea = (typeof topSession.beverageType === 'string' && topSession.beverageType.trim().toUpperCase() === 'TEA') ||
+        (typeof topSession.method === 'string' && /gaiwan|gongfu|tea|herb/i.test(topSession.method));
 
       actions.push({
         id: `action-repeat-${topSession.id}`,
@@ -291,13 +293,17 @@ export function buildProactiveActionSchedule(
         daysOffset: 0,
         bucketLabelPl: 'DZIŚ',
         bucketLabelEn: 'TODAY',
-        titlePl: `Powtórz udany przepis: ${topSession.recipeName || topSession.method || 'Przepis'}`,
-        titleEn: `Repeat top recipe: ${topSession.recipeName || topSession.method || 'Recipe'}`,
+        titlePl: isTea
+          ? `Powtórz udany napar herbaty: ${topSession.recipeName || topSession.method || 'Herbata'}`
+          : `Powtórz udany przepis: ${topSession.recipeName || topSession.method || 'Przepis'}`,
+        titleEn: isTea
+          ? `Repeat top tea session: ${topSession.recipeName || topSession.method || 'Tea'}`
+          : `Repeat top recipe: ${topSession.recipeName || topSession.method || 'Recipe'}`,
         subtitlePl: `${safeDose}g / ${safeWater}g · ${safeTemp}°C`,
         subtitleEn: `${safeDose}g / ${safeWater}g · ${safeTemp}°C`,
-        badgeColor: 'copper',
+        badgeColor: isTea ? 'success' : 'copper',
         recipeId: topSession.recipeId,
-        recommendedMethod: topSession.method || 'V60',
+        recommendedMethod: topSession.method || (isTea ? 'Gaiwan' : 'V60'),
         doseGrams: safeDose,
         waterGrams: safeWater,
         waterTempCelsius: safeTemp,

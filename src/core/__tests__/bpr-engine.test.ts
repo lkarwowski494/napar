@@ -347,5 +347,25 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(ics).toContain(`DTSTART:${todayIso}T080000Z`);
       expect(ics).toContain(`DTEND:${todayIso}T081500Z`);
     });
+
+    it('TASK-P41-03-ZAK: buildProactiveActionSchedule rozpoznaje sesje herbaty (beverageType/method) stosujac styl success i Gaiwan', () => {
+      const teaSession: any = {
+        id: 'sess-tea-repeat',
+        recipeId: 'rec-sencha',
+        recipeName: 'Sencha Asamushi',
+        beverageType: 'tea', // lowercase
+        method: 'Kyusu',
+        rating: 5,
+        doseGrams: 5,
+        waterGrams: 150,
+        waterTempCelsius: 75,
+      };
+      const schedule = buildProactiveActionSchedule('', [], [teaSession]);
+      expect(schedule).toHaveLength(1);
+      const action = schedule[0];
+      expect(action.badgeColor).toBe('success');
+      expect(action.titlePl).toContain('Powtórz udany napar herbaty');
+      expect(action.recommendedMethod).toBe('Kyusu');
+    });
   });
 });
