@@ -65,10 +65,11 @@ export function setLiveActivityEnabled(enabled: boolean): void {
 }
 
 export function formatActivityTimer(seconds: number): string {
-  if (!Number.isFinite(seconds) || seconds < 0) {
+  const numSeconds = typeof seconds === 'number' ? seconds : Number(seconds);
+  if (!Number.isFinite(numSeconds) || numSeconds < 0) {
     return '0:00';
   }
-  const safeSec = Math.floor(seconds);
+  const safeSec = Math.floor(numSeconds);
   const totalMins = Math.floor(safeSec / 60);
   const remSec = safeSec % 60;
   if (totalMins >= 60) {
@@ -190,9 +191,15 @@ export async function startLiveActivity(
 }
 
 export async function updateLiveActivity(
-  _activityId: string,
+  activityId: string,
   _state: BrewActivityContentState
 ): Promise<{ success: boolean; error?: string }> {
+  if (!activityId || typeof activityId !== 'string' || !activityId.trim()) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy identyfikator aktywności Live Activity.',
+    };
+  }
   return {
     success: false,
     error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',
@@ -200,9 +207,15 @@ export async function updateLiveActivity(
 }
 
 export async function endLiveActivity(
-  _activityId: string,
+  activityId: string,
   _dismissalPolicy: 'immediate' | 'after_delay' = 'immediate'
 ): Promise<{ success: boolean; error?: string }> {
+  if (!activityId || typeof activityId !== 'string' || !activityId.trim()) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy identyfikator aktywności Live Activity.',
+    };
+  }
   return {
     success: false,
     error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',

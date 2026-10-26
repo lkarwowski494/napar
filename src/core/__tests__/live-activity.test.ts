@@ -197,4 +197,20 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     );
     expect(payloadBlankTitle.expandedCenterTitle).toBe('Napar');
   });
+
+  test('TASK-P13-12-NIE: formatActivityTimer koercuje ciągi znaków, a update/endLiveActivity walidują activityId', async () => {
+    expect(formatActivityTimer('45' as any)).toBe('0:45');
+    expect(formatActivityTimer('75' as any)).toBe('1:15');
+
+    const updateEmpty = await updateLiveActivity('', mockState);
+    expect(updateEmpty.success).toBe(false);
+    expect(updateEmpty.error).toContain('Nieprawidłowy identyfikator');
+
+    const updateWhitespace = await updateLiveActivity('   ', mockState);
+    expect(updateWhitespace.success).toBe(false);
+
+    const endEmpty = await endLiveActivity('');
+    expect(endEmpty.success).toBe(false);
+    expect(endEmpty.error).toContain('Nieprawidłowy identyfikator');
+  });
 });
