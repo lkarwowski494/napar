@@ -97,12 +97,13 @@ export function getAppAccessState(): AppAccessState {
   const startTime = Number.isFinite(startDate.getTime()) ? startDate.getTime() : now.getTime();
   const elapsedMs = Math.max(0, now.getTime() - startTime);
   const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
-  const maxDaysSeen = Math.max(0, parseInt(getAppSetting('trial_max_days_seen', '0'), 10) || 0);
-  const effectiveElapsedDays = Math.max(elapsedDays, maxDaysSeen);
+  const rawMaxDays = parseInt(getAppSetting('trial_max_days_seen', '0'), 10);
+  const maxDaysSeen = Number.isFinite(rawMaxDays) && rawMaxDays > 0 ? Math.floor(rawMaxDays) : 0;
+  const effectiveElapsedDays = Math.floor(Math.max(elapsedDays, maxDaysSeen));
   if (elapsedDays > maxDaysSeen) {
     setAppSetting('trial_max_days_seen', String(elapsedDays));
   }
-  const daysRemaining = Math.max(0, Math.min(TRIAL_DURATION_DAYS, TRIAL_DURATION_DAYS - effectiveElapsedDays));
+  const daysRemaining = Math.floor(Math.max(0, Math.min(TRIAL_DURATION_DAYS, TRIAL_DURATION_DAYS - effectiveElapsedDays)));
 
   const rawBrews = parseInt(getAppSetting('trial_brews_count', '0'), 10);
   const brewsCount = Number.isFinite(rawBrews) && rawBrews > 0 ? Math.floor(rawBrews) : 0;
@@ -139,6 +140,17 @@ export function getAppAccessState(): AppAccessState {
     isHistoryReadOnly: false,
     subscriptionTier: 'none',
   };
+}
+
+/**
+ * Zwraca liczbę dni pozostałych w okresie próbnym, gwarantując zakres [0, TRIAL_DURATION_DAYS] lub Infinity dla subskrypcji.
+ */
+export function getTrialDaysRemaining(): number {
+  const state = getAppAccessState();
+  if (state.isSubscribed) return Infinity;
+  return Number.isFinite(state.daysRemaining) && state.daysRemaining >= 0
+    ? Math.floor(Math.min(TRIAL_DURATION_DAYS, state.daysRemaining))
+    : 0;
 }
 
 export function recordBrewCompleted(): AppAccessState {

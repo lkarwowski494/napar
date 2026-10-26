@@ -17,6 +17,7 @@ import {
   STORE_PRODUCT_IDS,
   purchaseWithStoreKit,
   verifyAndActivateStoreKitPurchase,
+  getTrialDaysRemaining,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -561,5 +562,23 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const stateExpired = recordBrewCompleted();
     expect(stateExpired.status).toBe('trial_expired');
     expect(stateExpired.brewsCount).toBeLessThanOrEqual(25);
+  });
+
+  test('TASK-P30-02-MON: getTrialDaysRemaining zwraca [0, 14] lub Infinity dla subskrypcji i chroni przed NaN', () => {
+    resetTrialForTesting();
+    expect(getTrialDaysRemaining()).toBe(14);
+
+    // Symulacja uszkodzonego trial_max_days_seen
+    setAppSetting('trial_max_days_seen', 'invalid_number');
+    expect(getTrialDaysRemaining()).toBe(14);
+
+    // Użytkownik z subskrypcją
+    activateSubscription('monthly');
+    expect(getTrialDaysRemaining()).toBe(Infinity);
+
+    // Wygasły okres próbny
+    resetTrialForTesting();
+    setTrialExpiredForTesting();
+    expect(getTrialDaysRemaining()).toBe(0);
   });
 });
