@@ -438,4 +438,16 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(res.rating).toBe('over');
     });
   });
+
+  describe('TASK-P21-03-ZAK: calculateBrewWater clampuje masę wody do maxWaterGrams', () => {
+    it('clampuje obliczoną objętość wody do domyślnego limitu 50000g', () => {
+      const water = calculateBrewWater(5000, 20); // 100000g -> clamp do 50000.0g
+      expect(water).toBe(50000.0);
+    });
+
+    it('akceptuje niestandardowy maxWaterGrams', () => {
+      const water = calculateBrewWater(100, 16, 1200.0); // 1600g -> clamp do 1200.0g
+      expect(water).toBe(1200.0);
+    });
+  });
 });

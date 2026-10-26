@@ -39,12 +39,15 @@ export interface TasteDiagnosis {
 /**
  * RD-01: Proporcja parzenia (Brew Ratio)
  * Oblicza masę wody dla zadanej dozy i współczynnika (np. 1:16.6)
+ * Zabezpieczenie przed przepełnieniem masy wody poprzez clamp maxWaterGrams (domyślnie 50000g)
  */
-export function calculateBrewWater(doseGrams: number, ratio: number): number {
+export function calculateBrewWater(doseGrams: number, ratio: number, maxWaterGrams = 50000.0): number {
   if (!Number.isFinite(doseGrams) || !Number.isFinite(ratio) || doseGrams <= 0 || ratio <= 0) {
     throw new Error('Doza i ratio muszą być większe od zera');
   }
-  return Number((doseGrams * ratio).toFixed(1));
+  const rawWater = doseGrams * ratio;
+  const clamped = Number.isFinite(maxWaterGrams) && maxWaterGrams > 0 ? Math.min(rawWater, maxWaterGrams) : rawWater;
+  return Number(clamped.toFixed(1));
 }
 
 /**
