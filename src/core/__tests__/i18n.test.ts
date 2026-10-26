@@ -398,4 +398,9 @@ describe('i18n System', () => {
     expect(translations.pl.brew.methodWalkuere).toBe('Walküre / Bayreuth');
     expect(translations.en.brew.methodWalkuere).toBe('Walküre / Bayreuth');
   });
+
+  test('TASK-P39-09-LOK: Klucz methodBialetti jest zdefiniowany w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodBialetti).toBe('Kawiarka (Bialetti / Moka)');
+    expect(translations.en.brew.methodBialetti).toBe('Moka Pot (Bialetti)');
+  });
 });
