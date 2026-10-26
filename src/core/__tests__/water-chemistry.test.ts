@@ -441,5 +441,17 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(getWaterProfileName('sca_standard', null as any)).toBe('Standard SCA (Specialty Coffee)');
     expect(getWaterProfileName(null as any, 'en')).toBe('');
   });
+
+  test('TASK-P40-07-JAK: ppmCaCO3ToDegreesDH i degreesDHToPpmCaCO3 rygorystycznie odrzucaja obiekty, tablice i symbole', () => {
+    expect(ppmCaCO3ToDegreesDH({} as any)).toBe(0);
+    expect(ppmCaCO3ToDegreesDH([] as any)).toBe(0);
+    expect(ppmCaCO3ToDegreesDH(Symbol('sym') as any)).toBe(0);
+    expect(ppmCaCO3ToDegreesDH('  17.848  ' as any)).toBe(1);
+
+    expect(degreesDHToPpmCaCO3({} as any)).toBe(0);
+    expect(degreesDHToPpmCaCO3([] as any)).toBe(0);
+    expect(degreesDHToPpmCaCO3(Symbol('sym') as any)).toBe(0);
+    expect(degreesDHToPpmCaCO3('  1  ' as any)).toBe(17.85);
+  });
 });
 
