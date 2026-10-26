@@ -123,6 +123,34 @@ try {
     'app.json -> expo.plugins expo-camera musi mieć jawnie microphonePermission: false'
   );
 
+  // Weryfikacja konfiguracji zasobów wizualnych i pluginu lokalizacji (TASK-P17-10-WYD)
+  check(
+    appJson.android?.adaptiveIcon?.foregroundImage === './assets/adaptive-icon.png' &&
+      existsSync(join(root, 'assets/adaptive-icon.png')),
+    "app.json -> expo.android.adaptiveIcon.foregroundImage musi wskazywać na istniejący plik './assets/adaptive-icon.png'"
+  );
+  check(
+    appJson.splash?.image === './assets/splash.png' &&
+      existsSync(join(root, 'assets/splash.png')),
+    "app.json -> expo.splash.image musi wskazywać na istniejący plik './assets/splash.png'"
+  );
+  check(
+    appJson.splash?.resizeMode === 'contain',
+    "app.json -> expo.splash.resizeMode musi być równe 'contain'"
+  );
+
+  const localizationPlugin = appJson.plugins?.find(
+    (p) => Array.isArray(p) && p[0] === 'expo-localization'
+  );
+  const supportedLocales = localizationPlugin && localizationPlugin[1]?.supportedLocales;
+  check(
+    Array.isArray(supportedLocales) &&
+      supportedLocales.length === 35 &&
+      supportedLocales.includes('pl') &&
+      supportedLocales.includes('en'),
+    `app.json -> expo.plugins expo-localization musi deklarować 35 języków, w tym 'pl' i 'en' (otrzymano ${supportedLocales?.length})`
+  );
+
   const ver = appJson.version;
   check(/^\d+\.\d+(\.\d+)?$/.test(ver), `Wersja '${ver}' w app.json musi mieć format X.Y lub X.Y.Z`);
 
