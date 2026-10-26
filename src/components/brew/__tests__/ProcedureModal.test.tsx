@@ -237,4 +237,29 @@ describe('ProcedureModal Component', () => {
     expect(add10.props.accessibilityHint).toBeDefined();
     expect(add60.props.accessibilityHint).toBeDefined();
   });
+
+  it('TASK-P44-01-ODK: progress bar posiada semantykę a11y oraz wspiera warianty językowe i bezpieczny zegar', async () => {
+    let tree: any;
+    await act(async () => {
+      tree = renderer.create(
+        <ProcedureModal
+          {...defaultProps}
+          language="en-US"
+          currentStepIndex={1}
+          stepRemainingSeconds={"45" as any}
+          totalElapsedSeconds={"-0" as any}
+        />
+      );
+    });
+
+    const root = tree.root;
+    const progressTrack = root.findByProps({ testID: 'procedure-progress-track' });
+    expect(progressTrack.props.accessible).toBe(true);
+    expect(progressTrack.props.accessibilityRole).toBe('progressbar');
+    expect(progressTrack.props.accessibilityValue).toEqual({ min: 1, max: 3, now: 2 });
+    expect(progressTrack.props.accessibilityLabel).toBe('Step 2 of 3');
+
+    const counter = root.findByProps({ testID: 'procedure-step-counter' });
+    expect(counter.props.children).toBe('STEP 2 OF 3');
+  });
 });

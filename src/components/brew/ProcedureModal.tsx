@@ -61,7 +61,8 @@ export function ProcedureModal({
   onFinishAndSave,
   onClose,
 }: ProcedureModalProps) {
-  const isEn = language === 'en';
+  const cleanLang = typeof language === 'string' ? language.trim().toLowerCase() : 'pl';
+  const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
   const filteredSteps = Array.isArray(steps) ? steps.filter(Boolean) : [];
   const safeSteps: RecipeStep[] =
     filteredSteps.length > 0
@@ -111,9 +112,10 @@ export function ProcedureModal({
     return null;
   }
 
-  const formatClock = (sec: number) => {
-    if (!Number.isFinite(sec) || sec < 0) return '00:00';
-    const clamped = Math.max(0, Math.round(sec));
+  const formatClock = (sec: number | string) => {
+    const rawVal = typeof sec === 'number' ? sec : (typeof sec === 'string' ? parseFloat(sec) : NaN);
+    if (!Number.isFinite(rawVal) || rawVal <= 0 || Object.is(rawVal, -0)) return '00:00';
+    const clamped = Math.min(86400, Math.max(0, Math.round(rawVal)));
     const m = Math.floor(clamped / 60);
     const s = clamped % 60;
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
@@ -160,7 +162,18 @@ export function ProcedureModal({
         </View>
 
         {/* Pasek postępu kroków (1 .. N) */}
-        <View style={styles.progressTrackRow}>
+        <View
+          style={styles.progressTrackRow}
+          testID="procedure-progress-track"
+          accessible={true}
+          accessibilityRole="progressbar"
+          accessibilityValue={{ min: 1, max: safeSteps.length, now: boundedIdx + 1 }}
+          accessibilityLabel={
+            isEn
+              ? `Step ${boundedIdx + 1} of ${safeSteps.length}`
+              : `Krok ${boundedIdx + 1} z ${safeSteps.length}`
+          }
+        >
           {safeSteps.map((st, idx) => (
             <View
               key={st.stepNumber || idx}
