@@ -442,4 +442,18 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(res.success).toBe(false);
     expect(res.errorCode).toBe('invalid_signature');
   });
+
+  test('TASK-P20-02-MON: brewsRemaining jest ściśle clampowane do [0, TRIAL_MAX_BREWS] przy ujemnych lub astronomicznych wartościach bazy', () => {
+    resetTrialForTesting();
+    setAppSetting('trial_brews_count', '9999');
+    setAppSetting('trial_max_brews_seen', '9999');
+    let state = getAppAccessState();
+    expect(state.brewsRemaining).toBe(0);
+
+    resetTrialForTesting();
+    setAppSetting('trial_brews_count', '-50');
+    setAppSetting('trial_max_brews_seen', '-50');
+    state = getAppAccessState();
+    expect(state.brewsRemaining).toBe(TRIAL_MAX_BREWS);
+  });
 });
