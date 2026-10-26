@@ -638,4 +638,18 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(afterBrew.brewsCount).toBe(1);
     expect(Object.is(afterBrew.brewsCount, -0)).toBe(false);
   });
+
+  test('TASK-P37-02-MON: ścisła nieujemność i ochrona przed -0 dla brewsCount i elapsed w getAppAccessState', () => {
+    resetTrialForTesting();
+    setAppSetting('trial_brews_count', '-0');
+    setAppSetting('trial_max_brews_seen', '-0');
+    setAppSetting('trial_max_days_seen', '-0');
+    const state = getAppAccessState();
+    expect(state.brewsCount).toBe(0);
+    expect(Object.is(state.brewsCount, -0)).toBe(false);
+    expect(state.brewsRemaining).toBe(TRIAL_MAX_BREWS);
+    expect(Object.is(state.brewsRemaining, -0)).toBe(false);
+    expect(state.daysRemaining).toBe(TRIAL_DURATION_DAYS);
+    expect(Object.is(state.daysRemaining, -0)).toBe(false);
+  });
 });
