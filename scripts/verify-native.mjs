@@ -79,6 +79,16 @@ try {
     'app.json -> expo.ios.requireFullScreen musi być równe true'
   );
 
+  // Weryfikacja ścieżki ikony oraz numerycznego buildNumber (TASK-P12-10-WYD)
+  check(
+    appJson.icon === './assets/icon.png',
+    `app.json -> expo.icon musi wskazywać na './assets/icon.png' (otrzymano '${appJson.icon}')`
+  );
+  check(
+    typeof appJson.ios?.buildNumber === 'string' && /^\d+$/.test(appJson.ios?.buildNumber),
+    `app.json -> expo.ios.buildNumber musi być ciągiem cyfr (otrzymano '${appJson.ios?.buildNumber}')`
+  );
+
   // Weryfikacja braku uprawnień mikrofonowych w pluginie expo-camera (Zero Audio / Privacy)
   const cameraPlugin = appJson.plugins?.find(
     (p) => Array.isArray(p) && p[0] === 'expo-camera'
