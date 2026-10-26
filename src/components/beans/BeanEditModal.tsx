@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
-import { useTranslation } from '../../core/i18n';
+import { useTranslation, formatTemplate } from '../../core/i18n';
 import { saveInventoryItem, deleteInventoryItem, getUnitSystem } from '../../core/database';
 import { gramsToOunces, ouncesToGrams, roundTo } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
@@ -128,7 +128,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
     saveInventoryItem(updatedItem);
     onSaved();
     onClose();
-    Alert.alert(t.stash?.updateSuccessTitle || 'Zapisano!', (t.stash?.updateSuccess || 'Paczka "{name}" została zaktualizowana.').replace('{name}', updatedItem.name));
+    Alert.alert(t.stash?.updateSuccessTitle || 'Zapisano!', formatTemplate(t.stash?.updateSuccess || 'Paczka "{name}" została zaktualizowana.', { name: updatedItem.name }));
   };
 
   const handleMarkAsFinished = () => {

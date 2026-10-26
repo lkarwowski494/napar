@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
-import { useTranslation } from '../../core/i18n';
+import { useTranslation, formatTemplate } from '../../core/i18n';
 import { saveInventoryItem, getUnitSystem } from '../../core/database';
 import { ouncesToGrams } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
@@ -130,7 +130,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
     onSaved();
     onClose();
     resetForm();
-    Alert.alert(t.stash?.addSuccessTitle || 'Dodano!', (t.stash?.addSuccess || 'Paczka "{name}" jest gotowa w spiżarni.').replace('{name}', newItem.name));
+    Alert.alert(t.stash?.addSuccessTitle || 'Dodano!', formatTemplate(t.stash?.addSuccess || 'Paczka "{name}" jest gotowa w spiżarni.', { name: newItem.name }));
   };
 
   return (
