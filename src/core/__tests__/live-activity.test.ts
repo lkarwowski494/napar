@@ -253,4 +253,18 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(payload.attributes.beverageType).toBe('COFFEE');
     expect(payload.attributes.totalWaterGrams).toBe(0);
   });
+
+  test('TASK-P16-12-NIE: buildDynamicIslandPayload i buildLiveActivityPayload wykluczają isPaused gdy isFinished===true', () => {
+    const finishedPausedState: any = {
+      isPaused: true,
+      isFinished: true,
+    };
+    const island = buildDynamicIslandPayload(mockAttributesCoffee, finishedPausedState);
+    expect(island.isFinished).toBe(true);
+    expect(island.isPaused).toBe(false);
+
+    const fullPayload = buildLiveActivityPayload(mockAttributesCoffee, finishedPausedState);
+    expect(fullPayload.contentState.isFinished).toBe(true);
+    expect(fullPayload.contentState.isPaused).toBe(false);
+  });
 });

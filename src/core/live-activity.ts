@@ -141,7 +141,7 @@ export function buildDynamicIslandPayload(
     expandedCenterTitle: (safeAttr.recipeName && safeAttr.recipeName.trim()) || 'Napar',
     expandedCenterSubtitle: subtitle,
     expandedBottomTarget: targetWater,
-    isPaused: Boolean(safeState.isPaused),
+    isPaused: Boolean(safeState.isPaused && !safeState.isFinished),
     isFinished: Boolean(safeState.isFinished),
   };
 }
@@ -178,7 +178,7 @@ export function buildLiveActivityPayload(
         stepDurationSeconds: Math.max(0, Number.isFinite(state.stepDurationSeconds) ? Math.round(state.stepDurationSeconds) : 0),
         totalElapsedSeconds: Math.max(0, Number.isFinite(state.totalElapsedSeconds) ? Math.round(state.totalElapsedSeconds) : 0),
         targetWaterGrams: Math.max(0, Number.isFinite(state.targetWaterGrams) ? Math.round(state.targetWaterGrams) : 0),
-        isPaused: Boolean(state.isPaused),
+        isPaused: Boolean(state.isPaused && !state.isFinished),
         isFinished: Boolean(state.isFinished),
       }
     : {
