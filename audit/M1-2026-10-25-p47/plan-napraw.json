@@ -4,40 +4,40 @@
     "perspective": "01-ODK",
     "title": "Normalizacja diakrytyków przez normSearch, uwzględnienie description w wyszukiwaniu oraz limit długości zapytania w RecipeSelectModal",
     "file": "src/components/brew/RecipeSelectModal.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "1411820"
   },
   {
     "id": "TASK-P47-02-MON",
     "perspective": "02-MON",
     "title": "Rozszerzenie weryfikacji StoreKit o krótkie identyfikatory tierów (monthly, annual, lifetime) oraz walidację okna czasowego zakupu",
     "file": "src/core/app-access.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "b3aecee"
   },
   {
     "id": "TASK-P47-03-ZAK",
     "perspective": "03-ZAK",
     "title": "Oczyszczanie niedozwolonych znaków kontrolnych RFC 5545 w escapeIcsText zapobiegające uszkodzeniu importu w Apple Calendar",
     "file": "src/core/bpr-engine.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "52a27a1"
   },
   {
     "id": "TASK-P47-04-STU",
     "perspective": "04-STU",
     "title": "Odporność na przecinek dziesiętny w doseGrams, waterGrams i waterTempCelsius oraz limit długości opisu mielenia w RecipeParamsCard",
     "file": "src/components/recipe-builder/RecipeParamsCard.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "2cb8875"
   },
   {
     "id": "TASK-P47-05-ARC",
     "perspective": "05-ARC",
     "title": "Wprowadzenie obsługi przecinka dziesiętnego, clampowania zakresów dozy [1, 1000] i wody [10, 50000] oraz serializacji obiektowego stepsJson w saveRecipe",
     "file": "src/core/database.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "838b960"
   },
   {
     "id": "TASK-P47-06-TRE",

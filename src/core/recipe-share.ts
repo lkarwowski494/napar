@@ -127,8 +127,8 @@ export function recipeToCompactPayload(
     .filter((st): st is RecipeStep => typeof st === 'object' && st !== null)
     .slice(0, 100)
     .map((st) => {
-      const rawDur = typeof st.durationSeconds === 'number' ? st.durationSeconds : (typeof st.durationSeconds === 'string' ? parseFloat(st.durationSeconds.replace(',', '.')) : NaN);
-      const rawW = typeof st.targetWaterGrams === 'number' ? st.targetWaterGrams : (typeof st.targetWaterGrams === 'string' ? parseFloat(st.targetWaterGrams.replace(',', '.')) : NaN);
+      const rawDur = typeof st.durationSeconds === 'number' ? st.durationSeconds : parseFloat(String(st.durationSeconds).replace(',', '.'));
+      const rawW = typeof st.targetWaterGrams === 'number' ? st.targetWaterGrams : parseFloat(String(st.targetWaterGrams).replace(',', '.'));
       const safeW = Number.isFinite(rawW) && rawW >= 0 ? Math.min(50000, Math.round(rawW)) : 0;
       const fallbackName = typeof st.nameEn === 'string' && st.nameEn.trim() ? st.nameEn.trim().slice(0, 100) : 'Step';
       const fallbackInstr = typeof st.instructionEn === 'string' ? st.instructionEn.trim().slice(0, 2000) : '';
@@ -178,8 +178,8 @@ export function recipeToCompactPayload(
     : (recipe as MasterRecipe).grindSettingDescriptionPl;
   const rawRatio = recipe.recommendedRatio;
 
-  const parsedDose = typeof rawDose === 'number' ? rawDose : (typeof rawDose === 'string' ? parseFloat(rawDose.replace(',', '.')) : NaN);
-  const parsedWater = typeof rawWater === 'number' ? rawWater : (typeof rawWater === 'string' ? parseFloat(rawWater.replace(',', '.')) : NaN);
+  const parsedDose = typeof rawDose === 'number' ? rawDose : parseFloat(String(rawDose).replace(',', '.'));
+  const parsedWater = typeof rawWater === 'number' ? rawWater : parseFloat(String(rawWater).replace(',', '.'));
   const rawDoseVal =
     Number.isFinite(parsedDose) && parsedDose > 0 ? Number(Math.min(1000, Math.max(1, parsedDose)).toFixed(1)) : 15;
   const dose = Object.is(rawDoseVal, -0) ? 15 : rawDoseVal;
@@ -188,7 +188,7 @@ export function recipeToCompactPayload(
     Number.isFinite(parsedWater) && parsedWater > 0 ? Number(Math.min(50000, Math.max(10, parsedWater)).toFixed(1)) : 250;
   const water = Object.is(rawWaterVal, -0) ? 250 : rawWaterVal;
 
-  const parsedTemp = typeof rawTemp === 'number' ? rawTemp : (typeof rawTemp === 'string' ? parseFloat(rawTemp.replace(',', '.')) : NaN);
+  const parsedTemp = typeof rawTemp === 'number' ? rawTemp : parseFloat(String(rawTemp).replace(',', '.'));
   const rawTempVal =
     Number.isFinite(parsedTemp) && parsedTemp >= 0 && parsedTemp <= 100
       ? Math.round(parsedTemp)
@@ -200,7 +200,7 @@ export function recipeToCompactPayload(
       ? rawGrind.trim().slice(0, 200)
       : (typeof rawGrind === 'number' && Number.isFinite(rawGrind) ? String(rawGrind) : undefined);
   const computedRatio = Number((water / (dose || 1)).toFixed(1));
-  const rawRatioNum = typeof rawRatio === 'number' ? rawRatio : (typeof rawRatio === 'string' ? parseFloat((rawRatio as any).replace(',', '.')) : NaN);
+  const rawRatioNum = typeof rawRatio === 'number' ? rawRatio : parseFloat(String(rawRatio).replace(',', '.'));
   const ratioCandidate =
     Number.isFinite(rawRatioNum) && rawRatioNum > 0
       ? Number(Math.min(100, Math.max(1, rawRatioNum)).toFixed(2))
@@ -323,8 +323,8 @@ export function decodeRecipeFromShareUrl(
     const steps: RecipeStep[] = (parsed.s || [])
       .filter((st): st is CompactRecipeStep => typeof st === 'object' && st !== null)
       .map((st, idx) => {
-        const rawSec = typeof st.d === 'number' ? st.d : (typeof st.d === 'string' ? parseFloat(st.d.replace(',', '.')) : NaN);
-        const rawWater = typeof st.w === 'number' ? st.w : (typeof st.w === 'string' ? parseFloat(st.w.replace(',', '.')) : NaN);
+        const rawSec = typeof st.d === 'number' ? st.d : parseFloat(String(st.d).replace(',', '.'));
+        const rawWater = typeof st.w === 'number' ? st.w : parseFloat(String(st.w).replace(',', '.'));
         const safeStepWater = Number.isFinite(rawWater) && rawWater >= 0 ? Math.max(0, Math.min(50000, Math.round(rawWater))) : 0;
         const fallbackStepPlName = typeof st.ne === 'string' && st.ne.trim() ? st.ne.trim().slice(0, 100) : defaultStepName(idx + 1);
         const fallbackStepInstrPl = typeof st.ie === 'string' ? st.ie.slice(0, 2000) : '';

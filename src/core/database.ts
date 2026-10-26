@@ -502,22 +502,22 @@ export function saveRecipe(recipe: SavedRecipe): void {
   const safeId = typeof recipe.id === 'string' ? recipe.id.trim() : '';
   if (!safeId) return;
 
-  const rawDose = typeof recipe.doseGrams === 'number' ? recipe.doseGrams : (typeof recipe.doseGrams === 'string' ? parseFloat(recipe.doseGrams.replace(',', '.')) : NaN);
+  const rawDose = typeof recipe.doseGrams === 'number' ? recipe.doseGrams : parseFloat(String(recipe.doseGrams).replace(',', '.'));
   const safeDose = Number.isFinite(rawDose) && rawDose > 0 ? Number(Math.min(1000, Math.max(1, rawDose)).toFixed(1)) : 15;
   const dose = Object.is(safeDose, -0) ? 15 : safeDose;
 
-  const rawWater = typeof recipe.waterGrams === 'number' ? recipe.waterGrams : (typeof recipe.waterGrams === 'string' ? parseFloat(recipe.waterGrams.replace(',', '.')) : NaN);
+  const rawWater = typeof recipe.waterGrams === 'number' ? recipe.waterGrams : parseFloat(String(recipe.waterGrams).replace(',', '.'));
   const safeWater = Number.isFinite(rawWater) && rawWater > 0 ? Number(Math.min(50000, Math.max(10, rawWater)).toFixed(1)) : 250;
   const water = Object.is(safeWater, -0) ? 250 : safeWater;
 
   const isColdBrew = (recipe.method && /cold|ice|zimn/i.test(recipe.method)) || (recipe.name && /cold|ice|zimn/i.test(recipe.name));
-  const rawTemp = typeof recipe.waterTempCelsius === 'number' ? recipe.waterTempCelsius : (typeof recipe.waterTempCelsius === 'string' ? parseFloat(recipe.waterTempCelsius.replace(',', '.')) : NaN);
+  const rawTemp = typeof recipe.waterTempCelsius === 'number' ? recipe.waterTempCelsius : parseFloat(String(recipe.waterTempCelsius).replace(',', '.'));
   const safeTemp = Number.isFinite(rawTemp) && (rawTemp > 0 || (isColdBrew && rawTemp === 0))
     ? Math.min(100, Math.max(0, Math.round(rawTemp)))
     : 92;
   const temp = Object.is(safeTemp, -0) ? 0 : safeTemp;
 
-  const rawRatio = typeof recipe.recommendedRatio === 'number' ? recipe.recommendedRatio : (typeof recipe.recommendedRatio === 'string' ? parseFloat(recipe.recommendedRatio.replace(',', '.')) : NaN);
+  const rawRatio = typeof recipe.recommendedRatio === 'number' ? recipe.recommendedRatio : parseFloat(String(recipe.recommendedRatio).replace(',', '.'));
   const safeRatio = Number.isFinite(rawRatio) && rawRatio > 0 ? Number(Math.min(100, Math.max(1, rawRatio)).toFixed(2)) : 16;
   const ratio = Object.is(safeRatio, -0) ? 16 : safeRatio;
 
