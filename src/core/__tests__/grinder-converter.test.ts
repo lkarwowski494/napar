@@ -344,4 +344,13 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-coarse for chemex paper filter' })).toBe(880);
     expect(getRecipeMicrons({ grind_size_description: 'Chemex grind' })).toBe(880);
   });
+
+  test('TASK-P28-08-PRO: getRecipeMicrons rozpoznaje warianty Kalita Wave, Origami i Switch', () => {
+    expect(getRecipeMicrons({ method: 'KALITA_WAVE' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'Kalita Wave 185' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'ORIGAMI_DRIPPER' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'HARIO_SWITCH' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'Kalita', grindSettingDescriptionPl: '28 klików Comandante' })).toBe(850);
+    expect(getRecipeMicrons({ method: 'Origami', grindSettingDescriptionPl: '18 klików' })).toBe(600);
+  });
 });

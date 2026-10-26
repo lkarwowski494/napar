@@ -406,7 +406,20 @@ export function getRecipeMicrons(recipe?: {
     if (desc.includes('16') || desc.includes('18')) return 520;
     return 560;
   }
-  if (method === 'V60' || method === 'ORIGAMI' || method === 'KALITA' || method === 'SWITCH') {
+  if (
+    method === 'V60' ||
+    method.includes('V60') ||
+    desc.includes('v60') ||
+    method === 'ORIGAMI' ||
+    method.includes('ORIGAMI') ||
+    desc.includes('origami') ||
+    method === 'KALITA' ||
+    method.includes('KALITA') ||
+    desc.includes('kalita') ||
+    method === 'SWITCH' ||
+    method.includes('SWITCH') ||
+    desc.includes('switch')
+  ) {
     if (desc.includes('28') || desc.includes('30') || desc.includes('grubo') || desc.includes('coarse')) return 850;
     if (desc.includes('18') || desc.includes('20')) return 600;
     return 720;
