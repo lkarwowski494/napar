@@ -99,102 +99,117 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
     (r) => r && typeof r === 'object' && ('beverageType' in r ? r.beverageType : r.type) === 'TEA'
   );
 
-  const renderRecipeCard = (r: any) => (
-    <Pressable
-      key={r.id}
-      testID={`recipe-option-${r.id}`}
-      accessibilityRole="button"
-      accessibilityState={{ selected: activeRecipeId === r.id }}
-      accessibilityLabel={`Wybierz przepis: ${r.name}`}
-      style={[
-        styles.recipeOptionItem,
-        activeRecipeId === r.id && styles.recipeOptionActive,
-      ]}
-      onPress={() => onSelectRecipe(r)}
-    >
-      <View style={styles.recipeOptionHeader}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.recipeOptionName}>{r.name}</Text>
-          <Text style={styles.recipeOptionMethod}>
-            {'beverageType' in r ? r.beverageType : r.type} · {r.method}
-            {r.isCustom ? ' · Autorska' : ''}
-          </Text>
-        </View>
-        <Pressable
-          style={styles.favToggleBtn}
-          hitSlop={10}
-          onPress={(e) => {
-            e.stopPropagation();
-            onToggleFavorite(r.id);
-          }}
-          accessibilityRole="button"
-          accessibilityState={{ selected: Boolean(r.isFavorite) }}
-          accessibilityLabel={`Ulubione: ${r.name}`}
-          accessibilityHint={
-            r.isFavorite
-              ? (t?.stash?.favoriteRemove || 'Usuń z ulubionych')
-              : (t?.stash?.favoriteAdd || 'Dodaj do ulubionych')
-          }
-        >
-          <Text
-            style={[
-              styles.favToggleIcon,
-              r.isFavorite && styles.favToggleIconActive,
-            ]}
-          >
-            {r.isFavorite ? '★' : '☆'}
-          </Text>
-        </Pressable>
-        <Pressable
-          testID={`duplicate-recipe-${r.id}`}
-          style={styles.duplicateRecipeBtn}
-          hitSlop={8}
-          onPress={(e) => {
-            e?.stopPropagation?.();
-            onDuplicateRecipe(r);
-          }}
-          accessibilityRole="button"
-          accessibilityLabel={`${t?.brew?.duplicateRecipe || 'Duplikuj recepturę'}: ${r.name}`}
-        >
-          <CopyIcon size={16} color={theme.colors.textSecondary} />
-        </Pressable>
-        {r.isCustom && (
+  const isEn =
+    t?.common?.close === 'Close' ||
+    (typeof t?.brew?.recipe === 'string' && t?.brew?.recipe.toLowerCase() === 'recipe');
+
+  const renderRecipeCard = (r: any) => {
+    const recipeName = r?.name || '';
+    const selectLabel = isEn ? `Select recipe: ${recipeName}` : `Wybierz przepis: ${recipeName}`;
+    const favLabel = isEn ? `Favorite: ${recipeName}` : `Ulubione: ${recipeName}`;
+    const customSuffix = r?.isCustom ? (isEn ? ' · Custom' : ' · Autorska') : '';
+    const authorText = r?.author || (isEn ? 'Custom recipe' : 'Receptura własna');
+    const doseUnitText = isEn ? ' coffee/tea · ' : ' kawy/herbaty · ';
+    const waterUnitText = isEn ? ' water · ' : ' wody · ';
+
+    return (
+      <Pressable
+        key={r.id}
+        testID={`recipe-option-${r.id}`}
+        accessibilityRole="button"
+        accessibilityState={{ selected: activeRecipeId === r.id }}
+        accessibilityLabel={selectLabel}
+        style={[
+          styles.recipeOptionItem,
+          activeRecipeId === r.id && styles.recipeOptionActive,
+        ]}
+        onPress={() => onSelectRecipe(r)}
+      >
+        <View style={styles.recipeOptionHeader}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.recipeOptionName}>{r.name}</Text>
+            <Text style={styles.recipeOptionMethod}>
+              {'beverageType' in r ? r.beverageType : r.type} · {r.method}
+              {customSuffix}
+            </Text>
+          </View>
           <Pressable
-            style={styles.editRecipeBtn}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={t?.brew?.editRecipe || 'Edytuj recepturę'}
-            testID={`edit-recipe-${r.id}`}
+            testID={`fav-toggle-${r.id}`}
+            style={styles.favToggleBtn}
+            hitSlop={10}
             onPress={(e) => {
               e.stopPropagation();
-              onEditRecipe(r.id);
+              onToggleFavorite(r.id);
             }}
+            accessibilityRole="button"
+            accessibilityState={{ selected: Boolean(r.isFavorite) }}
+            accessibilityLabel={favLabel}
+            accessibilityHint={
+              r.isFavorite
+                ? (t?.stash?.favoriteRemove || (isEn ? 'Remove from favorites' : 'Usuń z ulubionych'))
+                : (t?.stash?.favoriteAdd || (isEn ? 'Add to favorites' : 'Dodaj do ulubionych'))
+            }
           >
-            <EditIcon size={16} color={theme.colors.textSecondary} />
+            <Text
+              style={[
+                styles.favToggleIcon,
+                r.isFavorite && styles.favToggleIconActive,
+              ]}
+            >
+              {r.isFavorite ? '★' : '☆'}
+            </Text>
           </Pressable>
-        )}
-      </View>
-      <Text style={styles.recipeOptionAuthor}>
-        {r.author || 'Receptura własna'}
-      </Text>
-      <Text style={styles.recipeOptionDetails}>
-        {formatDoseWeight(
-          'doseGrams' in r ? r.doseGrams : r.coffeeOrTeaDoseGrams,
-          unitSystem
-        )}{' '}
-        kawy/herbaty ·{' '}
-        {formatWaterWeight(
-          'waterGrams' in r ? r.waterGrams : r.waterWeightGrams,
-          unitSystem
-        )}{' '}
-        wody ·{' '}
-        {formatTemperature(
-          'waterTempCelsius' in r ? r.waterTempCelsius : r.waterTemperatureCelsius,
-          unitSystem
-        )}
-      </Text>
-    </Pressable>
-  );
+          <Pressable
+            testID={`duplicate-recipe-${r.id}`}
+            style={styles.duplicateRecipeBtn}
+            hitSlop={8}
+            onPress={(e) => {
+              e?.stopPropagation?.();
+              onDuplicateRecipe(r);
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={`${t?.brew?.duplicateRecipe || (isEn ? 'Duplicate recipe' : 'Duplikuj recepturę')}: ${recipeName}`}
+          >
+            <CopyIcon size={16} color={theme.colors.textSecondary} />
+          </Pressable>
+          {r.isCustom && (
+            <Pressable
+              style={styles.editRecipeBtn}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={t?.brew?.editRecipe || (isEn ? 'Edit recipe' : 'Edytuj recepturę')}
+              testID={`edit-recipe-${r.id}`}
+              onPress={(e) => {
+                e.stopPropagation();
+                onEditRecipe(r.id);
+              }}
+            >
+              <EditIcon size={16} color={theme.colors.textSecondary} />
+            </Pressable>
+          )}
+        </View>
+        <Text style={styles.recipeOptionAuthor}>
+          {authorText}
+        </Text>
+        <Text style={styles.recipeOptionDetails}>
+          {formatDoseWeight(
+            'doseGrams' in r ? r.doseGrams : r.coffeeOrTeaDoseGrams,
+            unitSystem
+          )}
+          {doseUnitText}
+          {formatWaterWeight(
+            'waterGrams' in r ? r.waterGrams : r.waterWeightGrams,
+            unitSystem
+          )}
+          {waterUnitText}
+          {formatTemperature(
+            'waterTempCelsius' in r ? r.waterTempCelsius : r.waterTemperatureCelsius,
+            unitSystem
+          )}
+        </Text>
+      </Pressable>
+    );
+  };
 
   const innerContent = (
     <>
@@ -206,10 +221,10 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           onPress={onClose}
           accessibilityRole="button"
-          accessibilityLabel={t?.common?.close || 'Zamknij'}
-          accessibilityHint={t?.common?.closeHint || 'Zamyka okno wyboru receptury'}
+          accessibilityLabel={t?.common?.close || (isEn ? 'Close' : 'Zamknij')}
+          accessibilityHint={t?.common?.closeHint || (isEn ? 'Closes recipe selection' : 'Zamyka okno wyboru receptury')}
         >
-          <Text style={styles.modalCloseText}>{t?.common?.close || 'Zamknij'}</Text>
+          <Text style={styles.modalCloseText}>{t?.common?.close || (isEn ? 'Close' : 'Zamknij')}</Text>
         </Pressable>
       </View>
       <ScrollView style={inline ? styles.inlineScrollView : undefined} nestedScrollEnabled={inline}>

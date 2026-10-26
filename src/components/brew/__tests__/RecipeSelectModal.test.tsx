@@ -246,4 +246,41 @@ describe('RecipeSelectModal Component', () => {
       });
     }).not.toThrow();
   });
+
+  test('TASK-P51-01-ODK: RecipeSelectModal w trybie jezyka angielskiego lokalizuje etykiety a11y i warianty autorskie', () => {
+    const enCustomRecipe = {
+      id: 'custom-en-1',
+      name: 'My Special V60',
+      type: 'COFFEE',
+      method: 'V60',
+      isCustom: true,
+      isFavorite: false,
+    };
+
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(
+        <RecipeSelectModal
+          {...defaultProps}
+          t={translations.en}
+          recipes={[enCustomRecipe]}
+          activeRecipeId="custom-en-1"
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const recipeOption = root.findByProps({ testID: 'recipe-option-custom-en-1' });
+    expect(recipeOption.props.accessibilityLabel).toBe('Select recipe: My Special V60');
+
+    const favBtn = root.findByProps({ testID: 'fav-toggle-custom-en-1' });
+    expect(favBtn.props.accessibilityLabel).toBe('Favorite: My Special V60');
+
+    // Weryfikacja braku polskich wycieków w tekstach
+    const renderedText = JSON.stringify(tree!.toJSON());
+    expect(renderedText).not.toContain('Wybierz przepis');
+    expect(renderedText).not.toContain('Ulubione:');
+    expect(renderedText).not.toContain('Autorska');
+    expect(renderedText).toContain('Custom');
+  });
 });
