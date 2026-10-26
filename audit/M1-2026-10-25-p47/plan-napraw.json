@@ -84,15 +84,15 @@
     "perspective": "11-WZR",
     "title": "Defensywna normalizacja i obcięcie do 100 znaków nazw kroków w recipe-share",
     "file": "src/core/recipe-share.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "6872355"
   },
   {
     "id": "TASK-P47-12-NIE",
     "perspective": "12-NIE",
     "title": "Ochrona przed wartościami ujemnymi i NaN w totalElapsedSeconds w live-activity",
     "file": "src/core/live-activity.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "2b48de9"
   }
 ]

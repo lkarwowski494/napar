@@ -39,5 +39,13 @@
 | TASK-P47-08-PRO | Prostota | Completed | `src/core/grinder-converter.ts` | `08b8958` |
 | TASK-P47-09-LOK | Lokalizacja | Completed | `locales/*` | `cd2c46a` |
 | TASK-P47-10-WYD | Wydajność | Completed | `scripts/verify-native.mjs` | `9eeadf1` |
-| TASK-P47-11-WZR | Wzorce | Pending | `src/core/recipe-share.ts` | - |
-| TASK-P47-12-NIE | Niezawodność | Pending | `src/core/live-activity.ts` | - |
+| TASK-P47-11-WZR | Wzorce | Completed | `src/core/recipe-share.ts` | `6872355` |
+| TASK-P47-12-NIE | Niezawodność | Completed | `src/core/live-activity.ts` | `2b48de9` |
+
+---
+
+## Podsumowanie Przebiegu 47
+Wszystkie 12 perspektyw audytowych (01-ODK do 12-NIE) zostało zrealizowanych w ścisłym reżimie TDD.
+103 zestawy testów (1144+ testów), 581 kluczy i18n w 35 językach ze 100% symetrią parametrów oraz 836/836 elementy matrycy testów przechodzą w 100% pomyślnie.
+Projekt jest w 100% gotowy do inicjalizacji Przebiegu 48 (P48).
+
