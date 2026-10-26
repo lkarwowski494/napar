@@ -104,7 +104,7 @@ export function getAppAccessState(): AppAccessState {
   if (elapsedDays > maxDaysSeen) {
     setAppSetting('trial_max_days_seen', String(elapsedDays));
   }
-  const daysRemaining = Math.max(0, TRIAL_DURATION_DAYS - effectiveElapsedDays);
+  const daysRemaining = Math.max(0, Math.min(TRIAL_DURATION_DAYS, TRIAL_DURATION_DAYS - effectiveElapsedDays));
 
   const rawBrews = parseInt(getAppSetting('trial_brews_count', '0'), 10);
   const brewsCount = Number.isFinite(rawBrews) && rawBrews > 0 ? rawBrews : 0;

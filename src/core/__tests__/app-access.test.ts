@@ -456,4 +456,20 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     state = getAppAccessState();
     expect(state.brewsRemaining).toBe(TRIAL_MAX_BREWS);
   });
+
+  test('TASK-P21-02-MON: daysRemaining jest ściśle clampowane do zakresu [0, TRIAL_DURATION_DAYS]', () => {
+    resetTrialForTesting();
+    setAppSetting('trial_max_days_seen', '999');
+    let state = getAppAccessState();
+    expect(state.daysRemaining).toBe(0);
+
+    resetTrialForTesting();
+    // Przeszła lub przyszła anomalia daty (np. cofnięcie zegara na ujemny czas)
+    const futureDate = new Date(Date.now() + 100 * 24 * 60 * 60 * 1000).toISOString();
+    setAppSetting('trial_started_at', futureDate);
+    setAppSetting('trial_max_days_seen', '0');
+    state = getAppAccessState();
+    expect(state.daysRemaining).toBeLessThanOrEqual(TRIAL_DURATION_DAYS);
+    expect(state.daysRemaining).toBeGreaterThanOrEqual(0);
+  });
 });
