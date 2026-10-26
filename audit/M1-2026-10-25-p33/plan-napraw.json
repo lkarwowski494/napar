@@ -1,0 +1,98 @@
+[
+  {
+    "id": "TASK-P33-01-ODK",
+    "perspective": "01-ODK",
+    "title": "Dedykowane etykiety dostepnosci i testy jednostkowe w RecipeBasicInfoCard",
+    "file": "src/components/recipe-builder/RecipeBasicInfoCard.tsx",
+    "status": "completed",
+    "commit": "638abb9"
+  },
+  {
+    "id": "TASK-P33-02-MON",
+    "perspective": "02-MON",
+    "title": "Ochrona przed -0 w getTrialDaysRemaining, getTrialBrewsRemaining i getAppAccessState",
+    "file": "src/core/app-access.ts",
+    "status": "completed",
+    "commit": "8216b71"
+  },
+  {
+    "id": "TASK-P33-03-ZAK",
+    "perspective": "03-ZAK",
+    "title": "Parsowanie stringow dla fallbackSeconds oraz clampowanie czasu w parseStepDurationSeconds",
+    "file": "src/core/bpr-engine.ts",
+    "status": "completed",
+    "commit": "0dd0246"
+  },
+  {
+    "id": "TASK-P33-04-STU",
+    "perspective": "04-STU",
+    "title": "Zlokalizowany t.recipeBuilder.calculatedRatio w badge proporcji w RecipeParamsCard",
+    "file": "src/components/recipe-builder/RecipeParamsCard.tsx",
+    "status": "completed",
+    "commit": "6bce73a"
+  },
+  {
+    "id": "TASK-P33-05-ARC",
+    "perspective": "05-ARC",
+    "title": "Bezpieczne parsowanie stringow i ochrona przed -0 dla parametrow receptury w saveRecipe",
+    "file": "src/core/database.ts",
+    "status": "completed",
+    "commit": "a3c3ff1"
+  },
+  {
+    "id": "TASK-P33-06-TRE",
+    "perspective": "06-TRE",
+    "title": "Dopasowywanie podciagow i tokenow w findTeaCategoryById",
+    "file": "src/core/knowledge-data.ts",
+    "status": "completed",
+    "commit": "3709dda"
+  },
+  {
+    "id": "TASK-P33-07-JAK",
+    "perspective": "07-JAK",
+    "title": "Odrzucanie typow boolean w diagnoseWaterSensoryImpact i konwerterach dH/ppm",
+    "file": "src/core/water-chemistry.ts",
+    "status": "completed",
+    "commit": "ebd21c3"
+  },
+  {
+    "id": "TASK-P33-08-PRO",
+    "perspective": "08-PRO",
+    "title": "Rozpoznawanie AeroPress Go, Clear, XL i Delter Coffee Press w getRecipeMicrons",
+    "file": "src/core/grinder-converter.ts",
+    "status": "completed",
+    "commit": "5952a92"
+  },
+  {
+    "id": "TASK-P33-09-LOK",
+    "perspective": "09-LOK",
+    "title": "Dodanie klucza calculatedRatio w 35 jezykach (565 kluczy)",
+    "file": "locales/",
+    "status": "completed",
+    "commit": "b1ab3e4"
+  },
+  {
+    "id": "TASK-P33-10-WYD",
+    "perspective": "10-WYD",
+    "title": "Statyczna weryfikacja private: true oraz main w package.json w verify-native.mjs",
+    "file": "scripts/verify-native.mjs",
+    "status": "completed",
+    "commit": "f29344f"
+  },
+  {
+    "id": "TASK-P33-11-WZR",
+    "perspective": "11-WZR",
+    "title": "Parsowanie numerycznych stringow w krokach w recipeToCompactPayload",
+    "file": "src/core/recipe-share.ts",
+    "status": "completed",
+    "commit": "6f31b1a"
+  },
+  {
+    "id": "TASK-P33-12-NIE",
+    "perspective": "12-NIE",
+    "title": "Parsowanie stringow i ochrona -0 dla gramatury wody w buildLiveActivityPayload",
+    "file": "src/core/live-activity.ts",
+    "status": "completed",
+    "commit": "6793bde"
+  }
+]
