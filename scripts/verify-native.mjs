@@ -246,6 +246,16 @@ try {
     "app.json -> expo.splash.resizeMode musi być równe 'contain'"
   );
 
+  // Weryfikacja ciemnego tła ekranu powitalnego i spójności z ikoną adaptacyjną (TASK-P36-10-WYD)
+  check(
+    appJson.splash?.backgroundColor === '#121214',
+    `app.json -> expo.splash.backgroundColor musi być '#121214' (ciemne tło zapobiegające rozbłyskom, otrzymano '${appJson.splash?.backgroundColor}')`
+  );
+  check(
+    appJson.splash?.backgroundColor === appJson.android?.adaptiveIcon?.backgroundColor,
+    'app.json -> expo.splash.backgroundColor musi być spójne z expo.android.adaptiveIcon.backgroundColor'
+  );
+
   const localizationPlugin = appJson.plugins?.find(
     (p) => Array.isArray(p) && p[0] === 'expo-localization'
   );
