@@ -66,6 +66,21 @@ describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
     const lineageResults = searchCoffeeVarieties('Tanganyika');
     expect(lineageResults.length).toBeGreaterThanOrEqual(1);
     expect(lineageResults.some((v) => v.id === 'variety-sl28-sl34')).toBe(true);
+
+    // TASK-P13-06-TRE: Sanacja i trimowanie id w funkcjach pomocniczych find*ById
+    expect(findCoffeeVarietyById('  variety-geisha  ')).toBeDefined();
+    expect(findCoffeeVarietyById('')).toBeUndefined();
+    expect(findCoffeeVarietyById(null as any)).toBeUndefined();
+
+    expect(findCoffeeProcessById('  process-washed  ')).toBeDefined();
+    expect(findCoffeeProcessById('')).toBeUndefined();
+    expect(findCoffeeProcessById(null as any)).toBeUndefined();
+
+    expect(findCoffeeOriginById('  origin-ethiopia  ')).toBeDefined();
+    expect(findCoffeeOriginById('')).toBeUndefined();
+
+    expect(findTeaCategoryById('  tea-green  ')).toBeDefined();
+    expect(findTeaCategoryById('')).toBeUndefined();
   });
 });
 
