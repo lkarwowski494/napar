@@ -1374,11 +1374,13 @@ describe('Napar SQLite Database & Repositories', () => {
       updated_at: '2026-10-26T10:00:00Z',
     };
 
+    const originalGetFirstSync = mockDb.getFirstSync;
     mockDb.getFirstSync = jest.fn(() => mockRow);
     const item = getInventoryItemById('bean-affinity-test');
     expect(item).not.toBeNull();
     expect(item?.initialWeightGrams).toBe(250);
     expect(item?.remainingWeightGrams).toBe(180.5);
+    mockDb.getFirstSync = originalGetFirstSync;
   });
   test('TASK-P23-05-ARC: saveRecipe bezpiecznie ignoruje null oraz undefined bez rzucania błędem', () => {
     initDatabase(mockDb as any);
@@ -1407,5 +1409,13 @@ describe('Napar SQLite Database & Repositories', () => {
 
     setBeveragePreference('niepoprawny' as any);
     expect(getBeveragePreference()).toBe('both');
+  });
+
+  test('TASK-P27-05-ARC: setUnitSystem waliduje dozwolone jednostki i stosuje fallback metric', () => {
+    setUnitSystem('imperial');
+    expect(getUnitSystem()).toBe('imperial');
+
+    setUnitSystem('niepoprawny' as any);
+    expect(getUnitSystem()).toBe('metric');
   });
 });

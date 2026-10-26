@@ -1086,7 +1086,8 @@ export function getUnitSystem(): 'metric' | 'imperial' {
 }
 
 export function setUnitSystem(unit: 'metric' | 'imperial'): void {
-  setAppSetting('unit_system', unit);
+  const safeUnit = unit === 'imperial' ? 'imperial' : 'metric';
+  setAppSetting('unit_system', safeUnit);
 }
 
 export function getVoiceAnnounceEnabled(): boolean {
