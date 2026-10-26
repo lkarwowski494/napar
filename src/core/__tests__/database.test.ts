@@ -1517,4 +1517,38 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(retrieved?.origin).toBe('Ethiopia');
     expect(retrieved?.process).toBe('Washed');
   });
+
+  test('TASK-P31-05-ARC: duplicateRecipe trimuje i zabezpiecza nazwe, parsuje stringi dozy i wody oraz fallbacki', () => {
+    initDatabase(mockDb as any);
+    const recipeToClone: any = {
+      id: 'source-rec-1',
+      name: '   Specialty Drip   ',
+      beverageType: 'COFFEE',
+      method: '  V60 02  ',
+      author: '   Champion   ',
+      description: '   Sweet cup   ',
+      doseGrams: '18.5',
+      waterGrams: '300.0',
+      waterTempCelsius: '94',
+      recommendedRatio: '16.2',
+    };
+    const cloned = duplicateRecipe(recipeToClone, ' (Duplikat)');
+    expect(cloned.name).toBe('Specialty Drip (Duplikat)');
+    expect(cloned.method).toBe('V60 02');
+    expect(cloned.author).toBe('Champion (Modyfikacja)');
+    expect(cloned.description).toBe('Sweet cup');
+    expect(cloned.doseGrams).toBe(18.5);
+    expect(cloned.waterGrams).toBe(300);
+    expect(cloned.waterTempCelsius).toBe(94);
+    expect(cloned.recommendedRatio).toBe(16.2);
+
+    // Receptura z pustą nazwą
+    const emptyNameRecipe: any = {
+      id: 'empty-name-rec',
+      name: '    ',
+      method: 'Kalita',
+    };
+    const clonedEmpty = duplicateRecipe(emptyNameRecipe);
+    expect(clonedEmpty.name).toBe('Receptura (Kopia)');
+  });
 });

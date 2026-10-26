@@ -603,26 +603,53 @@ export function duplicateRecipe(
   }
   const now = new Date().toISOString();
   const id = `custom-clone-${Date.now()}`;
-  const name = `${recipe.name}${copySuffix}`;
-  const beverageType = recipe.beverageType || recipe.type || 'COFFEE';
-  const doseGrams = recipe.doseGrams ?? recipe.coffeeOrTeaDoseGrams ?? 15;
-  const waterGrams = recipe.waterGrams ?? recipe.waterWeightGrams ?? 250;
-  const waterTempCelsius = recipe.waterTempCelsius ?? recipe.waterTemperatureCelsius ?? 93;
-  const grindSizeDescription = recipe.grindSizeDescription || recipe.grindSettingDescriptionPl;
+  const safeSuffix = typeof copySuffix === 'string' ? copySuffix : ' (Kopia)';
+  const baseName = typeof recipe.name === 'string' && recipe.name.trim() ? recipe.name.trim() : 'Receptura';
+  const name = `${baseName}${safeSuffix}`;
+  const rawType = recipe.beverageType || recipe.type;
+  const beverageType = rawType === 'TEA' ? 'TEA' : 'COFFEE';
+  const method = typeof recipe.method === 'string' && recipe.method.trim() ? recipe.method.trim() : 'V60';
+
+  const rawDose = recipe.doseGrams ?? recipe.coffeeOrTeaDoseGrams;
+  const numDose = typeof rawDose === 'number' ? rawDose : (typeof rawDose === 'string' ? parseFloat(rawDose) : NaN);
+  const doseGrams = Number.isFinite(numDose) && numDose > 0 ? Number(Math.min(1000, numDose).toFixed(1)) : 15;
+
+  const rawWater = recipe.waterGrams ?? recipe.waterWeightGrams;
+  const numWater = typeof rawWater === 'number' ? rawWater : (typeof rawWater === 'string' ? parseFloat(rawWater) : NaN);
+  const waterGrams = Number.isFinite(numWater) && numWater > 0 ? Number(Math.min(50000, numWater).toFixed(1)) : 250;
+
+  const rawTemp = recipe.waterTempCelsius ?? recipe.waterTemperatureCelsius;
+  const numTemp = typeof rawTemp === 'number' ? rawTemp : (typeof rawTemp === 'string' ? parseFloat(rawTemp) : NaN);
+  const waterTempCelsius = Number.isFinite(numTemp) && numTemp >= 0 && numTemp <= 100 ? Math.round(numTemp) : 93;
+
+  const grindSizeDescription = recipe.grindSizeDescription || recipe.grindSettingDescriptionPl || '';
   const stepsJson = recipe.stepsJson || (recipe.steps ? JSON.stringify(recipe.steps) : '[]');
+
+  const rawRatio = recipe.recommendedRatio;
+  const numRatio = typeof rawRatio === 'number' ? rawRatio : (typeof rawRatio === 'string' ? parseFloat(rawRatio) : NaN);
+  const recommendedRatio = Number.isFinite(numRatio) && numRatio > 0
+    ? Number(numRatio.toFixed(2))
+    : Number((waterGrams / doseGrams).toFixed(1));
+
+  const author = typeof recipe.author === 'string' && recipe.author.trim()
+    ? `${recipe.author.trim()} (Modyfikacja)`
+    : 'Własna';
+  const description = typeof recipe.description === 'string' && recipe.description.trim()
+    ? recipe.description.trim()
+    : undefined;
 
   const cloned: SavedRecipe = {
     id,
     name,
     beverageType,
-    method: recipe.method,
-    author: recipe.author ? `${recipe.author} (Modyfikacja)` : 'Własna',
-    description: recipe.description,
+    method,
+    author,
+    description,
     doseGrams,
     waterGrams,
     waterTempCelsius,
     grindSizeDescription,
-    recommendedRatio: recipe.recommendedRatio,
+    recommendedRatio,
     stepsJson,
     isCustom: true,
     isFavorite: false,
