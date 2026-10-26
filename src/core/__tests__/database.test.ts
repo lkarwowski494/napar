@@ -1309,4 +1309,28 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(() => deleteInventoryItem('   ')).not.toThrow();
     expect(() => deleteInventoryItem(null as any)).not.toThrow();
   });
+
+  test('TASK-P19-05-ARC: saveRecipe wspiera 0°C dla Cold Brew oraz zabezpiecza uszkodzony stepsJson', () => {
+    initDatabase(mockDb as any);
+    const coldRecipe: SavedRecipe = {
+      id: 'recipe-cold-brew-test',
+      name: 'Cold Brew Drip',
+      beverageType: 'COFFEE',
+      method: 'Cold Drip',
+      doseGrams: 30,
+      waterGrams: 300,
+      waterTempCelsius: 0,
+      recommendedRatio: 10,
+      stepsJson: 'invalid-json-content',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-26T10:00:00Z',
+    };
+
+    saveRecipe(coldRecipe);
+    const loaded = getRecipeById('recipe-cold-brew-test');
+    expect(loaded).not.toBeNull();
+    expect(loaded?.waterTempCelsius).toBe(0);
+    expect(loaded?.stepsJson).toBe('[]');
+  });
 });

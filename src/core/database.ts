@@ -437,10 +437,26 @@ export function getRecipeById(id: string): SavedRecipe | null {
 
 export function saveRecipe(recipe: SavedRecipe): void {
   const db = getDatabase();
+  const safeId = typeof recipe.id === 'string' ? recipe.id.trim() : '';
+  if (!safeId) return;
+
   const dose = Number.isFinite(recipe.doseGrams) && recipe.doseGrams > 0 ? recipe.doseGrams : 15;
   const water = Number.isFinite(recipe.waterGrams) && recipe.waterGrams > 0 ? recipe.waterGrams : 250;
-  const temp = Number.isFinite(recipe.waterTempCelsius) && recipe.waterTempCelsius > 0 ? recipe.waterTempCelsius : 92;
+  const isColdBrew = (recipe.method && /cold|ice|zimn/i.test(recipe.method)) || (recipe.name && /cold|ice|zimn/i.test(recipe.name));
+  const temp = Number.isFinite(recipe.waterTempCelsius) && (recipe.waterTempCelsius > 0 || (isColdBrew && recipe.waterTempCelsius === 0))
+    ? Math.min(100, Math.max(0, recipe.waterTempCelsius))
+    : 92;
   const ratio = Number.isFinite(recipe.recommendedRatio) && recipe.recommendedRatio > 0 ? recipe.recommendedRatio : 16;
+
+  let safeStepsJson = '[]';
+  if (typeof recipe.stepsJson === 'string' && recipe.stepsJson.trim()) {
+    try {
+      JSON.parse(recipe.stepsJson.trim());
+      safeStepsJson = recipe.stepsJson.trim();
+    } catch {
+      safeStepsJson = '[]';
+    }
+  }
 
   db.runSync(
     `INSERT INTO recipes (
@@ -463,7 +479,7 @@ export function saveRecipe(recipe: SavedRecipe): void {
       is_custom = excluded.is_custom,
       is_favorite = excluded.is_favorite`,
     [
-      recipe.id,
+      safeId,
       recipe.name,
       recipe.beverageType,
       recipe.method,
@@ -474,7 +490,7 @@ export function saveRecipe(recipe: SavedRecipe): void {
       temp,
       recipe.grindSizeDescription ?? null,
       ratio,
-      recipe.stepsJson,
+      safeStepsJson,
       recipe.isCustom ? 1 : 0,
       recipe.isFavorite ? 1 : 0,
       recipe.createdAt || new Date().toISOString(),
@@ -579,7 +595,12 @@ function mapRowToRecipe(row: RecipeRow): SavedRecipe {
     description: row.description || undefined,
     doseGrams: Number.isFinite(row.dose_g) && row.dose_g > 0 ? row.dose_g : 15,
     waterGrams: Number.isFinite(row.water_g) && row.water_g > 0 ? row.water_g : 250,
-    waterTempCelsius: Number.isFinite(row.water_temp_c) && row.water_temp_c > 0 ? row.water_temp_c : 92,
+    waterTempCelsius: (() => {
+      const isCold = (row.method && /cold|ice|zimn/i.test(row.method)) || (row.name && /cold|ice|zimn/i.test(row.name));
+      return Number.isFinite(row.water_temp_c) && (row.water_temp_c > 0 || (isCold && row.water_temp_c === 0))
+        ? row.water_temp_c
+        : 92;
+    })(),
     grindSizeDescription: row.grind_size_description || undefined,
     recommendedRatio: Number.isFinite(row.recommended_ratio) && row.recommended_ratio > 0 ? row.recommended_ratio : 16,
     stepsJson: row.steps_json,
