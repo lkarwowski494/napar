@@ -437,7 +437,23 @@ export function getRecipeMicrons(recipe?: {
   if (method === 'MOKA' || desc.includes('kawiark') || desc.includes('moka')) {
     return 450;
   }
-  if (method === 'SIPHON' || method === 'SYFON' || desc.includes('siphon') || desc.includes('syfon')) {
+  if (
+    method === 'SIPHON' ||
+    method === 'SYFON' ||
+    method.includes('SIPHON') ||
+    method.includes('SYFON') ||
+    method.includes('SYPHON') ||
+    desc.includes('siphon') ||
+    desc.includes('syfon') ||
+    desc.includes('syphon') ||
+    method === 'VACPOT' ||
+    method === 'VAC_POT' ||
+    method.includes('VACPOT') ||
+    method.includes('VAC POT') ||
+    method.includes('VAC_POT') ||
+    desc.includes('vacpot') ||
+    desc.includes('vac pot')
+  ) {
     return 650;
   }
   if (
@@ -531,6 +547,12 @@ export function getRecipeMicrons(recipe?: {
     desc.includes('karlsbad') ||
     method.includes('BAYREUTH') ||
     desc.includes('bayreuth') ||
+    method.includes('WALKUERE') ||
+    method.includes('WALKÜRE') ||
+    method.includes('WALKURE') ||
+    desc.includes('walküre') ||
+    desc.includes('walkuere') ||
+    desc.includes('walkure') ||
     desc.includes('coarse')
   ) {
     return 1150;

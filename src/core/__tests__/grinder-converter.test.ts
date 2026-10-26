@@ -449,4 +449,18 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Very coarse grind for Toddy immersion' })).toBe(1150);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse porcelain filter bayreuth pot' })).toBe(1150);
   });
+
+  test('TASK-P38-08-PRO: getRecipeMicrons rozpoznaje metody Walkuere oraz Vacpot', () => {
+    // Walkuere / Walküre -> 1150 µm
+    expect(getRecipeMicrons({ method: 'WALKUERE' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Walküre Bayreuth' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod zaparzacz Walkuere' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse grind for walküre porcelain brewer' })).toBe(1150);
+
+    // Vacpot / Syfon -> 650 µm
+    expect(getRecipeMicrons({ method: 'VACPOT' })).toBe(650);
+    expect(getRecipeMicrons({ method: 'Vac Pot Syphon' })).toBe(650);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio pod vacpot' })).toBe(650);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium grind for vac pot' })).toBe(650);
+  });
 });
