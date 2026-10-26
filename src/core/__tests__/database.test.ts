@@ -1927,6 +1927,7 @@ describe('Napar SQLite Database & Repositories', () => {
       stepsJson: '[]',
       isCustom: true,
       isFavorite: false,
+      createdAt: '2026-10-26T12:00:00Z',
     });
 
     const saved = getRecipeById(testRecipeId);
