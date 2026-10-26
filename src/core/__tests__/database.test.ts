@@ -1887,4 +1887,25 @@ describe('Napar SQLite Database & Repositories', () => {
     };
     expect(() => importDataJson(JSON.stringify(arrayWithNulls))).not.toThrow();
   });
+
+  test('TASK-P44-05-ARC: logCaffeine generuje fallback ID, parsuje wagi string, normalizuje beverageType i chroni przed -0', () => {
+    initDatabase(mockDb as any);
+    logCaffeine({
+      id: '   ' as any,
+      beverageName: 'Sencha Green',
+      beverageType: ' TEA ' as any,
+      consumedAt: '2026-10-26T14:00:00Z',
+      doseGrams: '4.5' as any,
+      caffeineMg: '-0' as any,
+    });
+
+    const logs = getCaffeineLogs('2026-10-26T00:00:00Z');
+    const added = logs.find((l) => l.beverageName === 'Sencha Green');
+    expect(added).toBeDefined();
+    expect(added?.id).toMatch(/^caff_\d+_[a-z0-9]+$/);
+    expect(added?.doseGrams).toBe(4.5);
+    expect(added?.caffeineMg).toBe(0);
+    expect(Object.is(added?.caffeineMg, -0)).toBe(false);
+    expect(added?.beverageType).toBe('tea');
+  });
 });

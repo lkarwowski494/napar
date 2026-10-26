@@ -1010,18 +1010,55 @@ export function logCaffeine(log: CaffeineLog): void {
     return;
   }
   const db = getDatabase();
-  const safeDose = Number.isFinite(log.doseGrams) && log.doseGrams >= 0 ? log.doseGrams : 0;
-  const safeCaffeine = Number.isFinite(log.caffeineMg) && log.caffeineMg >= 0 ? log.caffeineMg : 0;
+  const safeId =
+    typeof log.id === 'string' && log.id.trim()
+      ? log.id.trim()
+      : `caff_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+
+  const parsedDose =
+    typeof log.doseGrams === 'number'
+      ? log.doseGrams
+      : typeof log.doseGrams === 'string'
+      ? parseFloat(log.doseGrams)
+      : 0;
+  let safeDose = Number.isFinite(parsedDose) && parsedDose >= 0 ? parsedDose : 0;
+  if (Object.is(safeDose, -0)) safeDose = 0;
+
+  const parsedCaffeine =
+    typeof log.caffeineMg === 'number'
+      ? log.caffeineMg
+      : typeof log.caffeineMg === 'string'
+      ? parseFloat(log.caffeineMg)
+      : 0;
+  let safeCaffeine = Number.isFinite(parsedCaffeine) && parsedCaffeine >= 0 ? parsedCaffeine : 0;
+  if (Object.is(safeCaffeine, -0)) safeCaffeine = 0;
+
+  const rawType =
+    typeof log.beverageType === 'string' && log.beverageType.trim()
+      ? log.beverageType.trim().toLowerCase()
+      : 'coffee';
+  const safeBeverageType: 'coffee' | 'tea' = rawType === 'tea' ? 'tea' : 'coffee';
+
+  const safeBeverageName =
+    typeof log.beverageName === 'string' && log.beverageName.trim()
+      ? log.beverageName.trim()
+      : 'Napar';
+
+  const safeConsumedAt =
+    typeof log.consumedAt === 'string' && log.consumedAt.trim()
+      ? log.consumedAt.trim()
+      : new Date().toISOString();
+
   db.runSync(
     `INSERT OR REPLACE INTO caffeine_logs (
       id, brew_session_id, beverage_name, beverage_type, consumed_at, dose_g, caffeine_mg
     ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
     [
-      log.id,
+      safeId,
       log.brewSessionId ?? null,
-      log.beverageName || 'Napar',
-      log.beverageType || 'COFFEE',
-      log.consumedAt || new Date().toISOString(),
+      safeBeverageName,
+      safeBeverageType,
+      safeConsumedAt,
       safeDose,
       safeCaffeine,
     ]
