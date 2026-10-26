@@ -563,6 +563,13 @@ describe('Napar SQLite Database & Repositories', () => {
     mockDb.runSync = originalRunSync;
   });
 
+  test('TASK-P16-05-ARC: saveBrewSession oraz recordBrewSessionTransaction bezpiecznie ignorują null/undefined session', () => {
+    expect(() => saveBrewSession(null as any)).not.toThrow();
+    expect(() => saveBrewSession(undefined as any)).not.toThrow();
+    expect(() => recordBrewSessionTransaction(null as any)).not.toThrow();
+    expect(() => recordBrewSessionTransaction(undefined as any)).not.toThrow();
+  });
+
   test('Eksport i import kopii zapasowej w formacie JSON (inventory, recipes, sessions, caffeine)', () => {
     const item: InventoryItem = {
       id: 'tea-1',

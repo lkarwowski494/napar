@@ -598,6 +598,7 @@ export function getBrewSessionById(id: string): BrewSession | null {
 }
 
 export function saveBrewSession(session: BrewSession): void {
+  if (!session || typeof session !== 'object') return;
   const db = getDatabase();
   const dose = Number.isFinite(session.doseGrams) && session.doseGrams > 0 ? session.doseGrams : 15;
   const water = Number.isFinite(session.waterGrams) && session.waterGrams > 0 ? session.waterGrams : 250;
@@ -667,6 +668,7 @@ export function recordBrewSessionTransaction(
   inventoryDeduction?: { itemId: string; doseGrams: number },
   caffeineLog?: CaffeineLog
 ): void {
+  if (!session || typeof session !== 'object') return;
   const db = getDatabase();
   runInTransactionSync(db, () => {
     saveBrewSession(session);
