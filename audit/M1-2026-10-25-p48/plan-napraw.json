@@ -89,7 +89,7 @@
       "title": "Defensywne parsowanie obiektów i kroków w recipe-share",
       "target_file": "src/core/recipe-share.ts",
       "test_file": "src/core/__tests__/recipe-share.test.ts",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P48-12-NIE",
@@ -97,7 +97,7 @@
       "title": "Ochrona przed NaN i ujemnymi krokami w live-activity",
       "target_file": "src/core/live-activity.ts",
       "test_file": "src/core/__tests__/live-activity.test.ts",
-      "status": "pending"
+      "status": "completed"
     }
   ]
 }
