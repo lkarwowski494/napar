@@ -141,7 +141,8 @@ export function buildProactiveActionSchedule(
   inventory: InventoryItem[],
   sessions: BrewSession[]
 ): ProactiveActionItem[] {
-  const parsedDate = referenceDateIso ? new Date(referenceDateIso) : new Date();
+  const safeStr = typeof referenceDateIso === 'string' && referenceDateIso.trim() ? referenceDateIso.trim() : '';
+  const parsedDate = safeStr ? new Date(safeStr) : new Date();
   const baseDate = Number.isFinite(parsedDate.getTime()) ? parsedDate : new Date();
   const refDayStart = new Date(
     Date.UTC(
@@ -152,7 +153,10 @@ export function buildProactiveActionSchedule(
   );
 
   const actions: ProactiveActionItem[] = [];
-  const activeItems = (inventory || []).filter(
+  const safeInventory = Array.isArray(inventory) ? inventory : [];
+  const safeSessions = Array.isArray(sessions) ? sessions : [];
+
+  const activeItems = safeInventory.filter(
     (item): item is InventoryItem =>
       Boolean(item && typeof item === 'object' && !item.isArchived && item.remainingWeightGrams > 0)
   );
@@ -265,27 +269,34 @@ export function buildProactiveActionSchedule(
 
   // Jeśli brak aktywnych paczek lub jako uzupełnienie harmonogramu: dodaj kalibrację / powtórkę z najlepszej sesji
   if (actions.length === 0) {
-    const validSessions = (sessions || []).filter(
+    const validSessions = safeSessions.filter(
       (s): s is BrewSession => Boolean(s && typeof s === 'object')
     );
     const topSession = validSessions.find((s) => (s.rating || 0) >= 4) || validSessions[0];
     if (topSession) {
+      const rawDose = typeof topSession.doseGrams === 'number' ? topSession.doseGrams : parseFloat(String(topSession.doseGrams));
+      const safeDose = Number.isFinite(rawDose) && rawDose > 0 ? (Object.is(rawDose, -0) ? 15 : rawDose) : 15;
+      const rawWater = typeof topSession.waterGrams === 'number' ? topSession.waterGrams : parseFloat(String(topSession.waterGrams));
+      const safeWater = Number.isFinite(rawWater) && rawWater > 0 ? (Object.is(rawWater, -0) ? 250 : rawWater) : 250;
+      const rawTemp = typeof topSession.waterTempCelsius === 'number' ? topSession.waterTempCelsius : parseFloat(String(topSession.waterTempCelsius));
+      const safeTemp = Number.isFinite(rawTemp) && rawTemp > 0 ? (Object.is(rawTemp, -0) ? 93 : rawTemp) : 93;
+
       actions.push({
         id: `action-repeat-${topSession.id}`,
         dateIso: toDateKey(refDayStart),
         daysOffset: 0,
         bucketLabelPl: 'DZIŚ',
         bucketLabelEn: 'TODAY',
-        titlePl: `Powtórz udany przepis: ${topSession.recipeName || topSession.method}`,
-        titleEn: `Repeat top recipe: ${topSession.recipeName || topSession.method}`,
-        subtitlePl: `${topSession.doseGrams}g / ${topSession.waterGrams}g · ${topSession.waterTempCelsius}°C`,
-        subtitleEn: `${topSession.doseGrams}g / ${topSession.waterGrams}g · ${topSession.waterTempCelsius}°C`,
+        titlePl: `Powtórz udany przepis: ${topSession.recipeName || topSession.method || 'Przepis'}`,
+        titleEn: `Repeat top recipe: ${topSession.recipeName || topSession.method || 'Recipe'}`,
+        subtitlePl: `${safeDose}g / ${safeWater}g · ${safeTemp}°C`,
+        subtitleEn: `${safeDose}g / ${safeWater}g · ${safeTemp}°C`,
         badgeColor: 'copper',
         recipeId: topSession.recipeId,
-        recommendedMethod: topSession.method,
-        doseGrams: topSession.doseGrams,
-        waterGrams: topSession.waterGrams,
-        waterTempCelsius: topSession.waterTempCelsius,
+        recommendedMethod: topSession.method || 'V60',
+        doseGrams: safeDose,
+        waterGrams: safeWater,
+        waterTempCelsius: safeTemp,
       });
     } else {
       actions.push({

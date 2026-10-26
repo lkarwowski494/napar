@@ -293,5 +293,29 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(daysFromInvalidDate).toHaveLength(14);
       expect(daysFromInvalidDate[0].isToday).toBe(true);
     });
+
+    it('TASK-P37-03-ZAK: sanityzuje parametry receptury sesji w buildProactiveActionSchedule', () => {
+      const corruptSession: any = {
+        id: 'sess-corrupt',
+        recipeId: 'rec-test',
+        method: 'Chemex',
+        recipeName: 'Chemex Classic',
+        rating: 5,
+        doseGrams: 'NaN',
+        waterGrams: -0,
+        waterTempCelsius: null,
+      };
+
+      const schedule = buildProactiveActionSchedule('', [], [corruptSession]);
+      expect(schedule).toHaveLength(1);
+      const action = schedule[0];
+      expect(action.doseGrams).toBe(15);
+      expect(action.waterGrams).toBe(250);
+      expect(action.waterTempCelsius).toBe(93);
+      expect(Object.is(action.doseGrams, -0)).toBe(false);
+      expect(Object.is(action.waterGrams, -0)).toBe(false);
+      expect(Object.is(action.waterTempCelsius, -0)).toBe(false);
+      expect(action.subtitlePl).toBe('15g / 250g · 93°C');
+    });
   });
 });
