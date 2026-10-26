@@ -65,7 +65,10 @@ export function setLiveActivityEnabled(enabled: boolean): void {
 }
 
 export function formatActivityTimer(seconds: number): string {
-  if (typeof seconds === 'boolean' || seconds === null || seconds === undefined) {
+  if (typeof seconds !== 'number' && typeof seconds !== 'string') {
+    return '0:00';
+  }
+  if (typeof seconds === 'string' && !seconds.trim()) {
     return '0:00';
   }
   const numSeconds = typeof seconds === 'number' ? seconds : Number(seconds);
@@ -73,6 +76,9 @@ export function formatActivityTimer(seconds: number): string {
     return '0:00';
   }
   const safeSec = Math.max(0, Math.min(86400, Math.floor(numSeconds)));
+  if (Object.is(safeSec, -0) || safeSec <= 0) {
+    return '0:00';
+  }
   const totalMins = Math.floor(safeSec / 60);
   const remSec = safeSec % 60;
   if (totalMins >= 60) {

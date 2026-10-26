@@ -641,4 +641,14 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(Object.is(payloadNegZero.contentState.stepDurationSeconds, -0)).toBe(false);
     expect(Object.is(payloadNegZero.contentState.totalElapsedSeconds, -0)).toBe(false);
   });
+
+  test('TASK-P38-12-NIE: formatActivityTimer scisle odrzuca symbole, obiekty, tablice, pusty string oraz -0', () => {
+    expect(formatActivityTimer(Symbol('sec') as any)).toBe('0:00');
+    expect(formatActivityTimer({} as any)).toBe('0:00');
+    expect(formatActivityTimer([] as any)).toBe('0:00');
+    expect(formatActivityTimer('' as any)).toBe('0:00');
+    expect(formatActivityTimer('   ' as any)).toBe('0:00');
+    expect(formatActivityTimer('-0' as any)).toBe('0:00');
+    expect(formatActivityTimer(-0)).toBe('0:00');
+  });
 });
