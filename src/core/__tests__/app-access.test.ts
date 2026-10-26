@@ -548,4 +548,18 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(resultInvalid.success).toBe(true);
     expect(resultInvalid.tier).toBe('annual');
   });
+
+  test('TASK-P29-02-MON: recordBrewCompleted sanityzuje stan licznika i ogranicza gorny limit po wygasnieciu', () => {
+    resetTrialForTesting();
+    const { setAppSetting } = require('../database');
+    setAppSetting('trial_brews_count', '-5');
+    const state = recordBrewCompleted();
+    expect(state.brewsCount).toBe(1);
+
+    setAppSetting('trial_brews_count', '999');
+    setTrialExpiredForTesting();
+    const stateExpired = recordBrewCompleted();
+    expect(stateExpired.status).toBe('trial_expired');
+    expect(stateExpired.brewsCount).toBeLessThanOrEqual(25);
+  });
 });

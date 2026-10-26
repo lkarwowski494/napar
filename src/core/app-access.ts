@@ -146,7 +146,8 @@ export function recordBrewCompleted(): AppAccessState {
   if (current.isSubscribed) {
     return current;
   }
-  const newCount = current.brewsCount + 1;
+  const currentCount = Number.isFinite(current.brewsCount) && current.brewsCount >= 0 ? current.brewsCount : 0;
+  const newCount = Math.min(TRIAL_MAX_BREWS + 10, currentCount + 1);
   setAppSetting('trial_brews_count', String(newCount));
   setAppSetting('trial_max_brews_seen', String(newCount));
   const state = getAppAccessState();
