@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { InventoryItem } from '../../core/database-schema';
 import { theme } from '../../core/theme';
 import { BookIcon } from '../icons/CraftIcons';
+import { useTranslation } from '../../core/i18n';
 
 interface BeanTopBarProps {
   items: InventoryItem[];
@@ -24,53 +25,64 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
   onOpenCompendium,
   onOpenAdd,
 }) => {
+  const { language: contextLang } = useTranslation();
+  const isEn = contextLang === 'en';
   const safeItems = Array.isArray(items) ? items : [];
+
+  const allCount = safeItems.filter((i) => !i?.isArchived).length;
+  const coffeeCount = safeItems.filter((i) => !i?.isArchived && i?.type === 'coffee').length;
+  const teaCount = safeItems.filter((i) => !i?.isArchived && i?.type === 'tea').length;
+  const archivedCount = safeItems.filter((i) => Boolean(i?.isArchived)).length;
 
   return (
     <View style={styles.topBar}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
         <Pressable
+          testID="filter-chip-all"
           style={[styles.filterChip, filter === 'all' && styles.filterChipActive]}
           onPress={() => onFilterChange('all')}
           accessibilityRole="button"
           accessibilityState={{ selected: filter === 'all' }}
-          accessibilityLabel="Filtr: Wszystkie pozycje"
+          accessibilityLabel={isEn ? 'Filter: All items' : 'Filtr: Wszystkie pozycje'}
         >
           <Text style={[styles.filterChipText, filter === 'all' && styles.filterChipTextActive]}>
-            Wszystkie ({safeItems.filter((i) => !i?.isArchived).length})
+            {isEn ? `All (${allCount})` : `Wszystkie (${allCount})`}
           </Text>
         </Pressable>
         <Pressable
+          testID="filter-chip-coffee"
           style={[styles.filterChip, filter === 'coffee' && styles.filterChipActive]}
           onPress={() => onFilterChange('coffee')}
           accessibilityRole="button"
           accessibilityState={{ selected: filter === 'coffee' }}
-          accessibilityLabel="Filtr: Kawa"
+          accessibilityLabel={isEn ? 'Filter: Coffee' : 'Filtr: Kawa'}
         >
           <Text style={[styles.filterChipText, filter === 'coffee' && styles.filterChipTextActive]}>
-            Kawa ({safeItems.filter((i) => !i?.isArchived && i?.type === 'coffee').length})
+            {isEn ? `Coffee (${coffeeCount})` : `Kawa (${coffeeCount})`}
           </Text>
         </Pressable>
         <Pressable
+          testID="filter-chip-tea"
           style={[styles.filterChip, filter === 'tea' && styles.filterChipActive]}
           onPress={() => onFilterChange('tea')}
           accessibilityRole="button"
           accessibilityState={{ selected: filter === 'tea' }}
-          accessibilityLabel="Filtr: Herbata"
+          accessibilityLabel={isEn ? 'Filter: Tea' : 'Filtr: Herbata'}
         >
           <Text style={[styles.filterChipText, filter === 'tea' && styles.filterChipTextActive]}>
-            Herbata ({safeItems.filter((i) => !i?.isArchived && i?.type === 'tea').length})
+            {isEn ? `Tea (${teaCount})` : `Herbata (${teaCount})`}
           </Text>
         </Pressable>
         <Pressable
+          testID="filter-chip-archived"
           style={[styles.filterChip, filter === 'archived' && styles.filterChipActive]}
           onPress={() => onFilterChange('archived')}
           accessibilityRole="button"
           accessibilityState={{ selected: filter === 'archived' }}
-          accessibilityLabel="Filtr: Archiwum"
+          accessibilityLabel={isEn ? 'Filter: Archive' : 'Filtr: Archiwum'}
         >
           <Text style={[styles.filterChipText, filter === 'archived' && styles.filterChipTextActive]}>
-            Archiwum ({safeItems.filter((i) => Boolean(i?.isArchived)).length})
+            {isEn ? `Archive (${archivedCount})` : `Archiwum (${archivedCount})`}
           </Text>
         </Pressable>
       </ScrollView>
@@ -81,10 +93,10 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
         style={styles.compendiumButton}
         onPress={onOpenCompendium}
         accessibilityRole="button"
-        accessibilityLabel="Otwórz kompendium wiedzy"
+        accessibilityLabel={isEn ? 'Open knowledge compendium' : 'Otwórz kompendium wiedzy'}
       >
         <BookIcon size={14} color={theme.colors.copper} />
-        <Text style={styles.compendiumButtonText}>Kompendium</Text>
+        <Text style={styles.compendiumButtonText}>{isEn ? 'Compendium' : 'Kompendium'}</Text>
       </Pressable>
 
       {/* Przycisk dodawania nowej paczki */}
@@ -93,9 +105,9 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
         style={styles.addButton}
         onPress={onOpenAdd}
         accessibilityRole="button"
-        accessibilityLabel="Dodaj nową kawę lub herbatę do spiżarni"
+        accessibilityLabel={isEn ? 'Add new coffee or tea to stash' : 'Dodaj nową kawę lub herbatę do spiżarni'}
       >
-        <Text style={styles.addButtonText}>+ Dodaj</Text>
+        <Text style={styles.addButtonText}>{isEn ? '+ Add' : '+ Dodaj'}</Text>
       </Pressable>
     </View>
   );

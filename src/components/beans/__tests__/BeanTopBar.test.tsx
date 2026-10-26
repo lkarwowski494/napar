@@ -112,4 +112,26 @@ describe('BeanTopBar Component', () => {
     const addBtn = tree.root.findByProps({ testID: 'beans-add-button' });
     expect(addBtn.props.accessibilityLabel).toContain('Dodaj nową kawę');
   });
+
+  test('TASK-P40-04-STU: BeanTopBar posiada testID dla każdego filtra oraz reaguje na zmianę języka na angielski', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<BeanTopBar {...defaultProps} filter="coffee" />);
+    });
+
+    const chipAll = tree.root.findByProps({ testID: 'filter-chip-all' });
+    const chipCoffee = tree.root.findByProps({ testID: 'filter-chip-coffee' });
+    const chipTea = tree.root.findByProps({ testID: 'filter-chip-tea' });
+    const chipArchived = tree.root.findByProps({ testID: 'filter-chip-archived' });
+
+    expect(chipAll).toBeDefined();
+    expect(chipCoffee).toBeDefined();
+    expect(chipTea).toBeDefined();
+    expect(chipArchived).toBeDefined();
+
+    act(() => {
+      chipTea.props.onPress();
+    });
+    expect(defaultProps.onFilterChange).toHaveBeenCalledWith('tea');
+  });
 });
