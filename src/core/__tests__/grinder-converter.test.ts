@@ -407,4 +407,13 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio drobno pod delter press' })).toBe(560);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-fine grind for aeropress go' })).toBe(560);
   });
+
+  test('TASK-P34-08-PRO: getRecipeMicrons rozpoznaje Batch Brew, Moccamaster i ekspres przelewowy zwracajac 820 µm', () => {
+    expect(getRecipeMicrons({ method: 'BATCH_BREW' })).toBe(820);
+    expect(getRecipeMicrons({ method: 'Batch Brew' })).toBe(820);
+    expect(getRecipeMicrons({ method: 'Moccamaster KBG' })).toBe(820);
+    expect(getRecipeMicrons({ method: 'Ekspres Przelewowy' })).toBe(820);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio-grubo pod batch brew i moccamaster' })).toBe(820);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-coarse grind for filter batch machine' })).toBe(820);
+  });
 });

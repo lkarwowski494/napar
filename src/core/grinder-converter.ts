@@ -485,6 +485,20 @@ export function getRecipeMicrons(recipe?: {
     return 880;
   }
   if (
+    method === 'BATCH_BREW' ||
+    method === 'BATCH BREW' ||
+    method === 'BATCH' ||
+    method.includes('BATCH') ||
+    method.includes('MOCCAMASTER') ||
+    method.includes('PRZELEWOW') ||
+    desc.includes('batch brew') ||
+    desc.includes('batch') ||
+    desc.includes('moccamaster') ||
+    desc.includes('przelewowy')
+  ) {
+    return 820;
+  }
+  if (
     method === 'FRENCH_PRESS' ||
     method === 'FRENCHPRESS' ||
     method === 'FRENCH PRESS' ||
