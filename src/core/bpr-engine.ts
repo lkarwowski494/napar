@@ -72,6 +72,23 @@ export function parseStepDurationSeconds(
 
   const normalized = instruction.trim().toLowerCase().replace(/,/g, '.');
 
+  // 0. Ułamki i naturalne wyrażenia czasu (pół minuty, 1/2 minuty, kwadrans)
+  if (/(?:p[oó][lł]torej\s*minut|one\s+and\s+a\s+half\s*min|1\s+1\/2\s*min)/i.test(normalized)) {
+    return 90;
+  }
+  if (/(?:p[oó][lł]\s*minut|half\s*(?:a\s*)?minut|1\/2\s*min)/i.test(normalized)) {
+    return 30;
+  }
+  if (/(?:3\/4\s*minut)/i.test(normalized)) {
+    return 45;
+  }
+  if (/(?:1\/4\s*minut|quarter\s*minut)/i.test(normalized)) {
+    return 15;
+  }
+  if (/(?:kwadrans|quarter\s*of\s*an\s*hour)/i.test(normalized)) {
+    return 900;
+  }
+
   // 1. Zakres minut: np. "10-15 minut", "10–15 min", "2 do 3 minut", "2 to 3 mins"
   const minRangeMatch = normalized.match(
     /(\d+(?:\.\d+)?)\s*(?:[-–—]|do|to)\s*(\d+(?:\.\d+)?)\s*(?:minut(?:[a-ząęółśżźćń]+)?|minutes?|mins?|min\b)/i

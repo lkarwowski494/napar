@@ -553,5 +553,16 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       const icsEn = generateActionIcsContent(nonStringActionEn, 'en');
       expect(icsEn).toContain('SUMMARY:Napar Brew Session');
     });
+
+    it('TASK-P51-03-ZAK: parseStepDurationSeconds parsuje ulamkowe i naturalne wyrazania czasu (pol minuty, poltorej minuty, half a minute, 1/2 min)', () => {
+      expect(parseStepDurationSeconds('Odczekaj pół minuty po preinfuzji')).toBe(30);
+      expect(parseStepDurationSeconds('odczekaj pol minuty')).toBe(30);
+      expect(parseStepDurationSeconds('wait half a minute')).toBe(30);
+      expect(parseStepDurationSeconds('parz przez 1/2 minuty')).toBe(30);
+      expect(parseStepDurationSeconds('maceruj przez półtorej minuty')).toBe(90);
+      expect(parseStepDurationSeconds('parz poltorej minuty')).toBe(90);
+      expect(parseStepDurationSeconds('infuse for 1.5 min')).toBe(90);
+      expect(parseStepDurationSeconds('odczekaj kwadrans na ostygnięcie')).toBe(900);
+    });
   });
 });
