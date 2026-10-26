@@ -268,5 +268,20 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(agingAction?.subtitlePl).toContain('40 dni po wypale');
       expect(agingAction?.subtitleEn).toContain('40 days post-roast');
     });
+
+    it('TASK-P35-03-ZAK: generateActionIcsContent parsuje pełne ISO stringi daty i sanityzuje UID', () => {
+      const actionWithFullIso: any = {
+        id: 'action:peak/123@special!',
+        dateIso: '2026-10-26T15:30:00.000Z',
+        titlePl: 'Parzenie V60; z balansem, owocowe',
+        subtitlePl: 'Kawa 15g; woda 250g, 93°C',
+      };
+      const ics = generateActionIcsContent(actionWithFullIso, 'pl');
+      expect(ics).toContain('DTSTART:20261026T080000Z');
+      expect(ics).toContain('DTEND:20261026T081500Z');
+      expect(ics).toContain('UID:action_peak_123_special_@napar.apps4brew.studio');
+      expect(ics).toContain('SUMMARY:Parzenie V60\\; z balansem\\, owocowe');
+      expect(ics).toContain('DESCRIPTION:Kawa 15g\\; woda 250g\\, 93°C');
+    });
   });
 });

@@ -406,11 +406,12 @@ export function generateActionIcsContent(
   }
   const isEn = language === 'en';
   const rawDateStr = typeof action.dateIso === 'string' && action.dateIso.trim() ? action.dateIso.trim() : '';
-  const rawDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDateStr) ? rawDateStr : '2026-10-17';
+  const dateMatch = rawDateStr.match(/^(\d{4}-\d{2}-\d{2})/);
+  const rawDate = dateMatch ? dateMatch[1] : '2026-10-17';
   const cleanDate = rawDate.replace(/-/g, '');
   const dtStart = `${cleanDate}T080000Z`;
   const dtEnd = `${cleanDate}T081500Z`;
-  const actionId = typeof action.id === 'string' && action.id.trim() ? action.id.trim() : `action-${Date.now()}`;
+  const actionId = typeof action.id === 'string' && action.id.trim() ? action.id.trim().replace(/[^a-zA-Z0-9_-]/g, '_') : `action-${Date.now()}`;
   const rawSummary = (isEn ? action.titleEn || action.titlePl : action.titlePl) || 'Sesja parzenia Napar';
   const rawDescription = (isEn ? action.subtitleEn || action.subtitlePl : action.subtitlePl) || '';
 
