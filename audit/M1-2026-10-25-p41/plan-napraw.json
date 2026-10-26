@@ -1,0 +1,98 @@
+[
+  {
+    "id": "TASK-P41-01-ODK",
+    "perspective": "01-ODK",
+    "title": "Identyfikatory testID i semantyczne etykiety dostępności w nagłówku parzenia BrewHeader",
+    "file": "src/components/brew/BrewHeader.tsx",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P41-02-MON",
+    "perspective": "02-MON",
+    "title": "Sanitacja i walidacja tieru subskrypcji oraz ochrona przed pustym ciagiem w activateSubscription",
+    "file": "src/core/app-access.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P41-03-ZAK",
+    "perspective": "03-ZAK",
+    "title": "Normalizacja beverageType w buildProactiveActionSchedule pod katem parzenia herbaty",
+    "file": "src/core/bpr-engine.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P41-04-STU",
+    "perspective": "04-STU",
+    "title": "Ochrona przed przekroczeniem limitow dlugosci pol i clampowanie wag w BeanAddModal",
+    "file": "src/components/beans/BeanAddModal.tsx",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P41-05-ARC",
+    "perspective": "05-ARC",
+    "title": "Sanitacja parametru offset i ochrona przed NaN oraz -0 w getBrewSessions",
+    "file": "src/core/database.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P41-06-TRE",
+    "perspective": "06-TRE",
+    "title": "Rozszerzenie VARIETY_ALIASES o sidra, wush-wush, batian, ruiru-11 i sl-34 w bazie wiedzy",
+    "file": "src/core/knowledge-data.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P41-07-JAK",
+    "perspective": "07-JAK",
+    "title": "Ochrona przed -0 i stringami -0 w parametrze waterVolumeLiters w calculateWaterMinerals",
+    "file": "src/core/water-chemistry.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P41-08-PRO",
+    "perspective": "08-PRO",
+    "title": "Rozpoznawanie Cold Drip i Ice Drip w opisach grindu oraz metodzie w getRecipeMicrons",
+    "file": "src/core/grinder-converter.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P41-09-LOK",
+    "perspective": "09-LOK",
+    "title": "Dodanie klucza brew.methodColdDrip w 35 jezykach i rozszerzenie matrycy testow do 828",
+    "file": "locales/*",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P41-10-WYD",
+    "perspective": "10-WYD",
+    "title": "Statyczna weryfikacja obecnosci skryptu test:coverage w package.json",
+    "file": "scripts/verify-native.mjs",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P41-11-WZR",
+    "perspective": "11-WZR",
+    "title": "Usuwanie pustych i whitespace-only desc oraz normalizacja beverageType w recipeToCompactPayload",
+    "file": "src/core/recipe-share.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P41-12-NIE",
+    "perspective": "12-NIE",
+    "title": "Ochrona stepDurationSeconds przed -0 i stringiem -0 w buildDynamicIslandPayload",
+    "file": "src/core/live-activity.ts",
+    "status": "pending",
+    "commit": null
+  }
+]
