@@ -65,6 +65,9 @@ export function setLiveActivityEnabled(enabled: boolean): void {
 }
 
 export function formatActivityTimer(seconds: number): string {
+  if (typeof seconds === 'boolean' || seconds === null || seconds === undefined) {
+    return '0:00';
+  }
   const numSeconds = typeof seconds === 'number' ? seconds : Number(seconds);
   if (!Number.isFinite(numSeconds) || numSeconds <= 0) {
     return '0:00';

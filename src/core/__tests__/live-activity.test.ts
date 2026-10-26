@@ -329,4 +329,12 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(island.expandedCenterSubtitle).toContain(longStepState.stepNamePl.slice(0, 30));
     expect(island.expandedCenterSubtitle).toContain('· Krok 2 z 3');
   });
+  test('TASK-P23-12-NIE: formatActivityTimer ściśle odrzuca typ boolean, obiekty i nienumeryczne stringi i zwraca 0:00', () => {
+    expect(formatActivityTimer(true as any)).toBe('0:00');
+    expect(formatActivityTimer(false as any)).toBe('0:00');
+    expect(formatActivityTimer('niepoprawny_czas' as any)).toBe('0:00');
+    expect(formatActivityTimer({} as any)).toBe('0:00');
+    expect(formatActivityTimer(null as any)).toBe('0:00');
+    expect(formatActivityTimer(undefined as any)).toBe('0:00');
+  });
 });
