@@ -349,6 +349,7 @@ export function purchaseWithStoreKit(
     purchaseDate: new Date().toISOString(),
     signature: `valid-receipt-signature-${activeTier}`,
   };
+  setAppSetting('verified_receipt_json', JSON.stringify(receipt));
   return {
     success: true,
     tier: activeTier,

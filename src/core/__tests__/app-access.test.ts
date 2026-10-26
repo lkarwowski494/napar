@@ -695,4 +695,24 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(res.restored).toBe(false);
     expect(res.isSubscribed).toBe(false);
   });
+
+  test('TASK-P41-02-MON: purchaseWithStoreKit zapisuje verified_receipt_json, a activateSubscription obsluguje nie-stringi i niepoprawne tiery', () => {
+    resetTrialForTesting();
+    const purchaseResult = purchaseWithStoreKit('monthly');
+    expect(purchaseResult.success).toBe(true);
+    expect(purchaseResult.tier).toBe('monthly');
+    const storedReceipt = getAppSetting('verified_receipt_json', '');
+    expect(storedReceipt).toContain('valid-receipt-signature-monthly');
+
+    // restorePurchases przywraca teraz także receipt
+    const restoreResult = restorePurchases();
+    expect(restoreResult.restored).toBe(true);
+    expect(restoreResult.receipt?.signature).toBe('valid-receipt-signature-monthly');
+
+    // activateSubscription fallback do 'annual' dla pustych/błędnych tierów
+    const invalidSub = activateSubscription('invalid_tier' as any);
+    expect(invalidSub.subscriptionTier).toBe('annual');
+    const nullSub = activateSubscription(null as any);
+    expect(nullSub.subscriptionTier).toBe('annual');
+  });
 });
