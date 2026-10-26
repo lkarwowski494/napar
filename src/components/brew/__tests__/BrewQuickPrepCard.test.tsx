@@ -159,4 +159,24 @@ describe('BrewQuickPrepCard Component', () => {
     const chipEn = treeEn.root.findByProps({ testID: 'batch-chip-3' });
     expect(chipEn.props.accessibilityHint).toBe('Scales recipe for 3 servings');
   });
+
+  test('TASK-P27-01-ODK: steppery dozy (+ / -) deklarują accessibilityHint w języku polskim i angielskim', () => {
+    let treePl: any;
+    act(() => {
+      treePl = renderer.create(<BrewQuickPrepCard {...defaultProps} language="pl" />);
+    });
+    const decPl = treePl.root.findByProps({ accessibilityLabel: 'Zmniejsz dozę kawy' });
+    const incPl = treePl.root.findByProps({ accessibilityLabel: 'Zwiększ dozę kawy' });
+    expect(decPl.props.accessibilityHint).toBe('Zmniejsza dozę o 1 gram');
+    expect(incPl.props.accessibilityHint).toBe('Zwiększa dozę o 1 gram');
+
+    let treeEn: any;
+    act(() => {
+      treeEn = renderer.create(<BrewQuickPrepCard {...defaultProps} language="en" />);
+    });
+    const decEn = treeEn.root.findByProps({ accessibilityLabel: 'Decrease coffee dose' });
+    const incEn = treeEn.root.findByProps({ accessibilityLabel: 'Increase coffee dose' });
+    expect(decEn.props.accessibilityHint).toBe('Decreases dose by 1 gram');
+    expect(incEn.props.accessibilityHint).toBe('Increases dose by 1 gram');
+  });
 });

@@ -123,6 +123,7 @@ export function BrewQuickPrepCard({
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               accessibilityRole="button"
               accessibilityLabel={language === 'en' ? 'Decrease coffee dose' : 'Zmniejsz dozę kawy'}
+              accessibilityHint={language === 'en' ? 'Decreases dose by 1 gram' : 'Zmniejsza dozę o 1 gram'}
             >
               <Text style={styles.stepBtnText}>−</Text>
             </Pressable>
@@ -134,6 +135,7 @@ export function BrewQuickPrepCard({
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               accessibilityRole="button"
               accessibilityLabel={language === 'en' ? 'Increase coffee dose' : 'Zwiększ dozę kawy'}
+              accessibilityHint={language === 'en' ? 'Increases dose by 1 gram' : 'Zwiększa dozę o 1 gram'}
             >
               <Text style={styles.stepBtnText}>+</Text>
             </Pressable>
