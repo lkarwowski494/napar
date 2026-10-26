@@ -21,15 +21,22 @@ export const RecipeTypeSelector: React.FC<RecipeTypeSelectorProps> = ({
   teaLabel,
 }) => {
   return (
-    <View style={styles.typeSelectorRow}>
+    <View
+      style={styles.typeSelectorRow}
+      accessibilityRole="radiogroup"
+      accessibilityLabel="Wybór typu naparu / Beverage type selection"
+      testID="recipe-type-selector"
+    >
       <Pressable
         style={[
           styles.typeTab,
           beverageType === 'COFFEE' && styles.typeTabActiveCoffee,
         ]}
         onPress={() => onSelectType('COFFEE')}
-        accessibilityRole="button"
+        accessibilityRole="radio"
+        accessibilityState={{ selected: beverageType === 'COFFEE' }}
         accessibilityLabel={coffeeLabel}
+        accessibilityHint="Przełącza parametry i metody na profil kawowy / Switches to coffee brewing profile"
       >
         <Text
           style={[
@@ -46,8 +53,10 @@ export const RecipeTypeSelector: React.FC<RecipeTypeSelectorProps> = ({
           beverageType === 'TEA' && styles.typeTabActiveTea,
         ]}
         onPress={() => onSelectType('TEA')}
-        accessibilityRole="button"
+        accessibilityRole="radio"
+        accessibilityState={{ selected: beverageType === 'TEA' }}
         accessibilityLabel={teaLabel}
+        accessibilityHint="Przełącza parametry i metody na profil herbaciany / Switches to tea brewing profile"
       >
         <Text
           style={[
