@@ -647,13 +647,38 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return COFFEE_VARIETIES.find((v) => v.id && v.id.trim().toLowerCase() === cleanId);
+  const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return COFFEE_VARIETIES.find((v) => {
+    if (v.id && v.id.trim().toLowerCase() === cleanId) return true;
+    if (v.name) {
+      const vNameClean = v.name.trim().toLowerCase();
+      const vNameNorm = v.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      if (vNameClean === cleanId || vNameNorm === normId) return true;
+      if (vNameClean.includes(cleanId) || cleanId.includes(vNameClean)) return true;
+      const tokens = vNameNorm.split(/[\s/(),-]+/).filter(Boolean);
+      if (tokens.some((tok) => tok === normId || cleanId.includes(tok))) return true;
+    }
+    return false;
+  });
 }
 
 export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return COFFEE_PROCESSES.find((p) => p.id && p.id.trim().toLowerCase() === cleanId);
+  const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return COFFEE_PROCESSES.find((p) => {
+    if (p.id && p.id.trim().toLowerCase() === cleanId) return true;
+    if (p.processType && p.processType.trim().toLowerCase() === cleanId) return true;
+    if (p.name) {
+      const pNameClean = p.name.trim().toLowerCase();
+      const pNameNorm = p.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      if (pNameClean === cleanId || pNameNorm === normId) return true;
+      if (pNameClean.includes(cleanId) || cleanId.includes(pNameClean)) return true;
+      const tokens = pNameNorm.split(/[\s/(),-]+/).filter(Boolean);
+      if (tokens.some((tok) => tok === normId || cleanId.includes(tok))) return true;
+    }
+    return false;
+  });
 }
 
 export function findCoffeeOriginById(id: string): CoffeeOriginInfo | undefined {

@@ -530,4 +530,28 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findTeaCategoryById('   ')).toBeUndefined();
     expect(findTeaCategoryById('Nieznana Herbata')).toBeUndefined();
   });
+
+  test('TASK-P31-06-TRE: findCoffeeVarietyById oraz findCoffeeProcessById wspieraja wyszukiwanie po nazwie i typie procesu', () => {
+    // Odmiana po nazwie
+    const geishaByName = findCoffeeVarietyById('Geisha / Gesha');
+    expect(geishaByName).toBeDefined();
+    expect(geishaByName?.id).toBe('variety-geisha');
+
+    const geishaBySubstr = findCoffeeVarietyById('Gesha');
+    expect(geishaBySubstr).toBeDefined();
+    expect(geishaBySubstr?.id).toBe('variety-geisha');
+
+    // Proces po processType
+    const washedByType = findCoffeeProcessById('WASHED');
+    expect(washedByType).toBeDefined();
+    expect(washedByType?.id).toBe('process-washed');
+
+    // Proces po nazwie
+    const naturalByName = findCoffeeProcessById('Sucha (Natural)');
+    expect(naturalByName).toBeDefined();
+    expect(naturalByName?.id).toBe('process-natural');
+
+    expect(findCoffeeVarietyById('   ')).toBeUndefined();
+    expect(findCoffeeProcessById('   ')).toBeUndefined();
+  });
 });
