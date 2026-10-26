@@ -34,10 +34,10 @@
 | TASK-P48-03-ZAK | Zaskoczenie | Completed | `src/core/bpr-engine.ts` | `bde3cb2` |
 | TASK-P48-04-STU | Studiowanie | Completed | `src/components/recipe-builder/RecipeBasicInfoCard.tsx` | `d6e57d1` |
 | TASK-P48-05-ARC | Architektura | Completed | `src/core/database.ts` | `f0b3502` |
-| TASK-P48-06-TRE | Treść | In Progress | `src/core/knowledge-data.ts` | - |
-| TASK-P48-07-JAK | Jakość | Planned | `src/core/water-chemistry.ts` | - |
-| TASK-P48-08-PRO | Prostota | Planned | `src/core/grinder-converter.ts` | - |
-| TASK-P48-09-LOK | Lokalizacja | Planned | `locales/*` | - |
-| TASK-P48-10-WYD | Wydajność | Planned | `scripts/verify-native.mjs` | - |
-| TASK-P48-11-WZR | Wzorce | Planned | `src/core/recipe-share.ts` | - |
+| TASK-P48-06-TRE | Treść | Completed | `src/core/knowledge-data.ts` | `3bd4d97` |
+| TASK-P48-07-JAK | Jakość | Completed | `src/core/water-chemistry.ts` | `abf2dcd` |
+| TASK-P48-08-PRO | Prostota | Completed | `src/core/grinder-converter.ts` | `c97df1a` |
+| TASK-P48-09-LOK | Lokalizacja | Completed | `locales/*` | `b932995` |
+| TASK-P48-10-WYD | Wydajność | Completed | `scripts/verify-native.mjs` | `d8d2f94` |
+| TASK-P48-11-WZR | Wzorce | In Progress | `src/core/recipe-share.ts` | - |
 | TASK-P48-12-NIE | Niezawodność | Planned | `src/core/live-activity.ts` | - |

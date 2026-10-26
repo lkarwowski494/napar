@@ -49,7 +49,7 @@
       "title": "Rozszerzenie bazy wiedzy o rzadkie odmiany botaniczne kawy w knowledge-data",
       "target_file": "src/core/knowledge-data.ts",
       "test_file": "src/core/__tests__/knowledge.test.ts",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P48-07-JAK",
@@ -57,7 +57,7 @@
       "title": "Dodanie profilu SCA Standard Water i walidacja minerałów w water-chemistry",
       "target_file": "src/core/water-chemistry.ts",
       "test_file": "src/core/__tests__/water-chemistry.test.ts",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P48-08-PRO",
@@ -65,7 +65,7 @@
       "title": "Rozszerzenie profili młynków o Kinu M47 i 1Zpresso J-Max w grinder-converter",
       "target_file": "src/core/grinder-converter.ts",
       "test_file": "tests/audit-fixes.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P48-09-LOK",
@@ -73,7 +73,7 @@
       "title": "Rozszerzenie słowników 35 języków o status trial i zachowanie matrycy",
       "target_file": "src/core/i18n.tsx",
       "test_file": "tests/i18n-no-polish-in-en.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P48-10-WYD",
@@ -81,7 +81,7 @@
       "title": "Weryfikacja deklaracji uprawnień natywnych w scripts/verify-native.mjs",
       "target_file": "scripts/verify-native.mjs",
       "test_file": "tests/audit-fixes.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P48-11-WZR",
