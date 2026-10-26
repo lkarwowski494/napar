@@ -45,12 +45,19 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
     <>
       {/* Przełącznik Języka (PL / EN) */}
       <Text style={styles.sectionTitle}>{t.settings.languageSection}</Text>
-      <View style={styles.langSelectorRow}>
+      <View
+        testID="language-radiogroup"
+        style={styles.langSelectorRow}
+        accessibilityRole="radiogroup"
+        accessibilityLabel={t.settings.languageSection || 'Wybór języka'}
+      >
         <Pressable
           style={[styles.langTab, language === 'pl' && styles.langTabActive]}
           onPress={() => onSetLanguage('pl')}
-          accessibilityRole="button"
+          accessibilityRole="radio"
+          accessibilityState={{ selected: language === 'pl' }}
           accessibilityLabel="Polski (Napar)"
+          accessibilityHint="Ustawia język interfejsu na polski"
         >
           <Text style={[styles.langTabText, language === 'pl' && styles.langTabTextActive]}>
             Polski (Napar)
@@ -59,8 +66,10 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
         <Pressable
           style={[styles.langTab, language === 'en' && styles.langTabActive]}
           onPress={() => onSetLanguage('en')}
-          accessibilityRole="button"
+          accessibilityRole="radio"
+          accessibilityState={{ selected: language === 'en' }}
           accessibilityLabel="English (Steepwise)"
+          accessibilityHint="Sets interface language to English"
         >
           <Text style={[styles.langTabText, language === 'en' && styles.langTabTextActive]}>
             English (Steepwise)
@@ -70,13 +79,20 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
 
       {/* Preferencje Naparów (Kawa / Herbata / Kawa i herbata) */}
       <Text style={styles.sectionTitle}>{t.settings.beverageSection}</Text>
-      <View style={styles.cardGroup}>
+      <View
+        testID="beverage-preference-radiogroup"
+        style={styles.cardGroup}
+        accessibilityRole="radiogroup"
+        accessibilityLabel={t.settings.beverageSection || 'Preferencje naparów'}
+      >
         <Pressable
           testID="beverage-pref-both"
           style={styles.actionRow}
           onPress={() => onSelectBeveragePreference('both')}
-          accessibilityRole="button"
+          accessibilityRole="radio"
+          accessibilityState={{ selected: beveragePreference === 'both' }}
           accessibilityLabel={t.settings.beverageBoth}
+          accessibilityHint={t.settings.beverageBothDesc}
         >
           <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
             <Text style={[styles.actionTitle, beveragePreference === 'both' && styles.actionTitleActive]}>
@@ -95,8 +111,10 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
           testID="beverage-pref-coffee"
           style={styles.actionRow}
           onPress={() => onSelectBeveragePreference('coffee')}
-          accessibilityRole="button"
+          accessibilityRole="radio"
+          accessibilityState={{ selected: beveragePreference === 'coffee' }}
           accessibilityLabel={t.settings.beverageCoffeeOnly}
+          accessibilityHint={t.settings.beverageCoffeeOnlyDesc}
         >
           <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
             <Text style={[styles.actionTitle, beveragePreference === 'coffee' && styles.actionTitleActive]}>
@@ -115,8 +133,10 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
           testID="beverage-pref-tea"
           style={styles.actionRow}
           onPress={() => onSelectBeveragePreference('tea')}
-          accessibilityRole="button"
+          accessibilityRole="radio"
+          accessibilityState={{ selected: beveragePreference === 'tea' }}
           accessibilityLabel={t.settings.beverageTeaOnly}
+          accessibilityHint={t.settings.beverageTeaOnlyDesc}
         >
           <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
             <Text style={[styles.actionTitle, beveragePreference === 'tea' && styles.actionTitleActive]}>
@@ -132,13 +152,20 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
 
       {/* Przełącznik Jednostek Miar (Metric / Imperial) */}
       <Text style={styles.sectionTitle}>{t.settings.unitSection}</Text>
-      <View style={styles.langSelectorRow}>
+      <View
+        testID="unit-system-radiogroup"
+        style={styles.langSelectorRow}
+        accessibilityRole="radiogroup"
+        accessibilityLabel={t.settings.unitSection || 'Wybór jednostek miar'}
+      >
         <Pressable
           testID="unit-metric-btn"
           style={[styles.langTab, unitSystem === 'metric' && styles.langTabActive]}
           onPress={() => onSelectUnitSystem('metric')}
-          accessibilityRole="button"
+          accessibilityRole="radio"
+          accessibilityState={{ selected: unitSystem === 'metric' }}
           accessibilityLabel={t.settings.unitMetric}
+          accessibilityHint="Ustawia jednostki metryczne (gramy, mililitry, stopnie Celsjusza)"
         >
           <Text style={[styles.langTabText, unitSystem === 'metric' && styles.langTabTextActive]}>
             {t.settings.unitMetric}
@@ -148,8 +175,10 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
           testID="unit-imperial-btn"
           style={[styles.langTab, unitSystem === 'imperial' && styles.langTabActive]}
           onPress={() => onSelectUnitSystem('imperial')}
-          accessibilityRole="button"
+          accessibilityRole="radio"
+          accessibilityState={{ selected: unitSystem === 'imperial' }}
           accessibilityLabel={t.settings.unitImperial}
+          accessibilityHint="Sets imperial units (ounces, fluid ounces, degrees Fahrenheit)"
         >
           <Text style={[styles.langTabText, unitSystem === 'imperial' && styles.langTabTextActive]}>
             {t.settings.unitImperial}
