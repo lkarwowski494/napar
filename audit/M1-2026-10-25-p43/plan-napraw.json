@@ -4,95 +4,95 @@
     "perspective": "01-ODK",
     "title": "Dostępność starRow i sanityzacja kosztów oraz wody w BrewFinishModal",
     "file": "src/components/brew/BrewFinishModal.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "38bf713"
   },
   {
     "id": "TASK-P43-02-MON",
     "perspective": "02-MON",
     "title": "Weryfikacja struktury paragonu w restorePurchases i case-insensitivity w verifyAndActivateStoreKitPurchase",
     "file": "src/core/app-access.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "f730b49"
   },
   {
     "id": "TASK-P43-03-ZAK",
     "perspective": "03-ZAK",
     "title": "RFC 5545 DTSTAMP timestamp w generateActionIcsContent i sanityzacja wag w bpr-engine",
     "file": "src/core/bpr-engine.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "6c12f08"
   },
   {
     "id": "TASK-P43-04-STU",
     "perspective": "04-STU",
     "title": "Naprawa filtrowania FAVORITES w RecipeSelectModal i testID przycisku duplikacji",
     "file": "src/components/brew/RecipeSelectModal.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "877ba4b"
   },
   {
     "id": "TASK-P43-05-ARC",
     "perspective": "05-ARC",
     "title": "Zabezpieczenie importDataJson przed nie-tablicami w polach kopii zapasowej",
     "file": "src/core/database.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "26bda06"
   },
   {
     "id": "TASK-P43-06-TRE",
     "perspective": "06-TRE",
     "title": "Rozszerzenie TEA_ALIASES o odmiany herbat sencha, matcha, darjeeling, oolong i baimudan",
     "file": "src/core/knowledge-data.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "d233bf9"
   },
   {
     "id": "TASK-P43-07-JAK",
     "perspective": "07-JAK",
     "title": "Wsparcie wariantów językowych en-US w getWaterProfileName i ochrona przed nie-stringami",
     "file": "src/core/water-chemistry.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "cc47213"
   },
   {
     "id": "TASK-P43-08-PRO",
     "perspective": "08-PRO",
     "title": "Rozpoznawanie Flair, Cafelat Robot w Espresso oraz Orea, April, Melitta w Drip w getRecipeMicrons",
     "file": "src/core/grinder-converter.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "cae0830"
   },
   {
     "id": "TASK-P43-09-LOK",
     "perspective": "09-LOK",
     "title": "Dodanie klucza brew.editRecipe w 35 językach i rozszerzenie matrycy testów do 830",
     "file": "locales/*",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "094ec60"
   },
   {
     "id": "TASK-P43-10-WYD",
     "perspective": "10-WYD",
     "title": "Statyczna weryfikacja obecności skryptów check, verify i devDependency typescript w package.json",
     "file": "scripts/verify-native.mjs",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "ad8ac19"
   },
   {
     "id": "TASK-P43-11-WZR",
     "perspective": "11-WZR",
     "title": "Case-insensitive normalizacja typu naparu coffee/tea w decodeRecipeFromShareUrl",
     "file": "src/core/recipe-share.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "8ed961d"
   },
   {
     "id": "TASK-P43-12-NIE",
     "perspective": "12-NIE",
     "title": "Walidacja zakresu parametrów początkowych w startLiveActivity i normalizacja dismissalPolicy",
     "file": "src/core/live-activity.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "1283d3e"
   }
 ]
