@@ -216,4 +216,12 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(extremeKh.problemPl).toContain('skrajne zasolenie');
     expect(extremeKh.causePl).toContain('> 1000 ppm CaCO3');
   });
+  test('TASK-P22-07-JAK: calculateWaterMinerals clampuje objętość do 1000L oraz twardość do 5000 ppm', () => {
+    const hugeVol = calculateWaterMinerals(100000, 100, 50);
+    expect(hugeVol.waterVolumeLiters).toBe(1000);
+
+    const hugeMinerals = calculateWaterMinerals(1.0, 99999, 99999);
+    expect(hugeMinerals.targetGhPpm).toBe(5000);
+    expect(hugeMinerals.targetKhPpm).toBe(5000);
+  });
 });

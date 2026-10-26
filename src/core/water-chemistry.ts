@@ -194,9 +194,9 @@ export function calculateWaterMinerals(
   targetGh: number,
   targetKh: number
 ): WaterCalculationResult {
-  const vol = Number.isFinite(waterVolumeLiters) && waterVolumeLiters > 0 ? Math.max(0.1, waterVolumeLiters) : 1.0;
-  const gh = Number.isFinite(targetGh) && targetGh >= 0 ? Math.max(0, targetGh) : 0;
-  const kh = Number.isFinite(targetKh) && targetKh >= 0 ? Math.max(0, targetKh) : 0;
+  const vol = Number.isFinite(waterVolumeLiters) && waterVolumeLiters > 0 ? Math.max(0.1, Math.min(1000.0, waterVolumeLiters)) : 1.0;
+  const gh = Number.isFinite(targetGh) && targetGh >= 0 ? Math.max(0, Math.min(5000, targetGh)) : 0;
+  const kh = Number.isFinite(targetKh) && targetKh >= 0 ? Math.max(0, Math.min(5000, targetKh)) : 0;
 
   // W systemie koncentratów Barista Hustle:
   // 1g Buffer Concentrate dodany do 1L wody = 2 ppm KH
