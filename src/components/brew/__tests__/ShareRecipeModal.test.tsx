@@ -40,4 +40,17 @@ describe('ShareRecipeModal Component', () => {
     expect(copyBtn.props.accessibilityRole).toBe('button');
     expect(copyBtn.props.accessibilityLabel).toBe(t.brew.qrCopyLink);
   });
+  test('TASK-P23-04-STU: przyciski udostępniania i kopiowania posiadają zdefiniowane accessibilityHint', () => {
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(<ShareRecipeModal {...defaultProps} />);
+    });
+    const root = tree!.root;
+
+    const shareBtn = root.findByProps({ testID: 'share-link-btn' });
+    const copyBtn = root.findByProps({ testID: 'copy-link-btn' });
+
+    expect(shareBtn.props.accessibilityHint).toBeDefined();
+    expect(copyBtn.props.accessibilityHint).toBeDefined();
+  });
 });
