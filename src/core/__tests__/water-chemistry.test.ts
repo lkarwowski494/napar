@@ -317,4 +317,28 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(resNaN.targetKhPpm).toBe(0);
     expect(resNaN.baseWaterGrams).toBe(1000);
   });
+
+  test('TASK-P31-07-JAK: findBottledWaterById oraz findWaterRecipeById wspieraja wyszukiwanie po nazwie marki i zlokalizowanych nazwach', () => {
+    // Woda butelkowana po brandName
+    const zywiecByName = findBottledWaterById('Żywiec Zdrój (Niegazowany)');
+    expect(zywiecByName).toBeDefined();
+    expect(zywiecByName?.id).toBe('zywiec_zdroj');
+
+    const volvicByBrand = findBottledWaterById('Volvic');
+    expect(volvicByBrand).toBeDefined();
+    expect(volvicByBrand?.id).toBe('volvic');
+
+    // Receptura po namePl
+    const scaByPl = findWaterRecipeById('Standard SCA (Specialty Coffee)');
+    expect(scaByPl).toBeDefined();
+    expect(scaByPl?.id).toBe('sca_standard');
+
+    // Receptura po nameEn
+    const scaByEn = findWaterRecipeById('SCA Standard Water');
+    expect(scaByEn).toBeDefined();
+    expect(scaByEn?.id).toBe('sca_standard');
+
+    expect(findBottledWaterById('   ')).toBeUndefined();
+    expect(findWaterRecipeById('   ')).toBeUndefined();
+  });
 });

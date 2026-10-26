@@ -367,13 +367,38 @@ export function degreesDHToPpmCaCO3(dH: number): number {
 }
 
 export function findWaterRecipeById(id: string): WaterRecipe | undefined {
-  if (!id || typeof id !== 'string') return undefined;
+  if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return WATER_RECIPES.find((r) => r.id.toLowerCase() === cleanId);
+  const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return WATER_RECIPES.find((r) => {
+    if (r.id.toLowerCase() === cleanId) return true;
+    if (r.namePl) {
+      const plClean = r.namePl.toLowerCase();
+      const plNorm = r.namePl.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      if (plClean === cleanId || plNorm === normId || plClean.includes(cleanId) || cleanId.includes(plClean)) return true;
+    }
+    if (r.nameEn) {
+      const enClean = r.nameEn.toLowerCase();
+      const enNorm = r.nameEn.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      if (enClean === cleanId || enNorm === normId || enClean.includes(cleanId) || cleanId.includes(enClean)) return true;
+    }
+    return false;
+  });
 }
 
 export function findBottledWaterById(id: string): BottledWaterProfile | undefined {
-  if (!id || typeof id !== 'string') return undefined;
+  if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return BOTTLED_WATER_BENCHMARKS.find((w) => w.id.toLowerCase() === cleanId);
+  const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return BOTTLED_WATER_BENCHMARKS.find((w) => {
+    if (w.id.toLowerCase() === cleanId) return true;
+    if (w.brandName) {
+      const brandClean = w.brandName.toLowerCase();
+      const brandNorm = w.brandName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      if (brandClean === cleanId || brandNorm === normId || brandClean.includes(cleanId) || cleanId.includes(brandClean)) return true;
+      const tokens = brandNorm.split(/[\s/(),-]+/).filter(Boolean);
+      if (tokens.some((tok) => tok === normId || cleanId.includes(tok))) return true;
+    }
+    return false;
+  });
 }
