@@ -325,10 +325,10 @@ export function useAppAccess() {
     setAccess(updated);
   };
 
-  const restore = (): boolean => {
+  const restore = (): RestorePurchasesResult => {
     const res = restorePurchases();
     setAccess(res);
-    return res.restored;
+    return res;
   };
 
   const purchase = (tier: 'monthly' | 'annual' | 'lifetime' = 'annual'): StoreKitVerificationResult => {

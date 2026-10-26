@@ -191,11 +191,11 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(hookData.isSubscribed).toBe(true);
     expect(hookData.subscriptionTier).toBe('monthly');
 
-    let restoredResult: boolean = false;
+    let restoredResult: any;
     act(() => {
       restoredResult = hookData.restore();
     });
-    expect(restoredResult).toBe(true);
+    expect(restoredResult.restored).toBe(true);
     expect(hookData.subscriptionTier).toBe('monthly');
 
     act(() => {
@@ -397,5 +397,27 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     });
     expect(hookData.status).toBe('subscribed');
     expect(hookData.isSubscribed).toBe(true);
+  });
+
+  test('TASK-P16-02-MON: useAppAccess().restore() zwraca pełną strukturę RestorePurchasesResult', () => {
+    resetTrialForTesting();
+    activateSubscription('annual');
+    let hookData: any;
+    function TestComponent() {
+      hookData = useAppAccess();
+      return null;
+    }
+    act(() => {
+      renderer.create(React.createElement(TestComponent));
+    });
+
+    let res: any;
+    act(() => {
+      res = hookData.restore();
+    });
+    expect(res).toBeDefined();
+    expect(res.restored).toBe(true);
+    expect(res.subscriptionTier).toBe('annual');
+    expect(res.isSubscribed).toBe(true);
   });
 });
