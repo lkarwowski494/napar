@@ -218,6 +218,7 @@ export function ProcedureModal({
                 testID="procedure-sub-60-btn"
                 style={styles.adjustChip}
                 onPress={() => onAdjustTimeSeconds(-60)}
+                hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel="-1 min"
               >
@@ -228,6 +229,7 @@ export function ProcedureModal({
                 testID="procedure-sub-10-btn"
                 style={styles.adjustChip}
                 onPress={() => onAdjustTimeSeconds(-10)}
+                hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel="-10 s"
               >
@@ -236,6 +238,7 @@ export function ProcedureModal({
 
               <Pressable
                 testID="procedure-pause-resume-btn"
+                hitSlop={6}
                 style={[
                   styles.pauseResumeBtn,
                   !isRunning && styles.pauseResumeBtnPaused,
@@ -259,6 +262,7 @@ export function ProcedureModal({
                 testID="procedure-add-10-btn"
                 style={styles.adjustChip}
                 onPress={() => onAdjustTimeSeconds(10)}
+                hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel="+10 s"
               >
@@ -269,6 +273,7 @@ export function ProcedureModal({
                 testID="procedure-add-60-btn"
                 style={styles.adjustChip}
                 onPress={() => onAdjustTimeSeconds(60)}
+                hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel="+1 min"
               >
@@ -280,6 +285,7 @@ export function ProcedureModal({
               testID="procedure-reset-step-btn"
               style={styles.resetStepBtn}
               onPress={() => onResetCurrentStep(parsedDurationSec)}
+              hitSlop={8}
               accessibilityRole="button"
               accessibilityLabel={isEn ? 'Reset step timer' : 'Resetuj czas kroku'}
             >
