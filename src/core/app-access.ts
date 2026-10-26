@@ -295,7 +295,8 @@ export function setTrialExpiredForTesting(): void {
 export function purchaseWithStoreKit(
   tier: 'monthly' | 'annual' | 'lifetime'
 ): StoreKitVerificationResult {
-  const safeTier = tier === 'monthly' || tier === 'annual' || tier === 'lifetime' ? tier : 'annual';
+  const cleanTier = typeof tier === 'string' ? tier.trim() : '';
+  const safeTier = cleanTier === 'monthly' || cleanTier === 'annual' || cleanTier === 'lifetime' ? cleanTier : 'annual';
   const state = activateSubscription(safeTier);
   const activeTier = (state.subscriptionTier !== 'none' ? state.subscriptionTier : 'annual') as 'monthly' | 'annual' | 'lifetime';
   const receipt: StoreKitReceipt = {

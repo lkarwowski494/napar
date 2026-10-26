@@ -504,4 +504,11 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(result.success).toBe(true);
     expect(result.tier).toBe('monthly');
   });
+
+  test('TASK-P25-02-MON: purchaseWithStoreKit poprawnie trimuje spacje w parametrze tier', () => {
+    resetTrialForTesting();
+    const result = purchaseWithStoreKit('  lifetime  ' as any);
+    expect(result.success).toBe(true);
+    expect(result.tier).toBe('lifetime');
+  });
 });
