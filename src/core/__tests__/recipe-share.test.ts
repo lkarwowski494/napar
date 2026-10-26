@@ -452,4 +452,20 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded?.recipe.doseGrams).toBe(15.3);
     expect(decoded?.recipe.waterGrams).toBe(250);
   });
+
+  test('TASK-P17-11-WZR: decodeRecipeFromShareUrl zachowuje 0°C dla receptur Cold Brew / Ice Drip', () => {
+    const raw = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Cold Brew Kyoto',
+      b: 'COFFEE',
+      m: 'Cold Brew',
+      d: 40,
+      w: 500,
+      t: 0,
+      s: [{ n: 'Ice Drip', d: 14400, w: 500 }],
+    }));
+    const decoded = decodeRecipeFromShareUrl(`napar://recipe?d=${encodeURIComponent(raw)}`);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.recipe.waterTempCelsius).toBe(0);
+  });
 });

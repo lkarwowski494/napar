@@ -303,7 +303,7 @@ export function decodeRecipeFromShareUrl(
       description: parsed.desc || defaultDesc,
       doseGrams: Number(parsed.d.toFixed(1)),
       waterGrams: Number(parsed.w.toFixed(1)),
-      waterTempCelsius: typeof parsed.t === 'number' && Number.isFinite(parsed.t) && parsed.t > 0 && parsed.t <= 100 ? Math.round(parsed.t) : 92,
+      waterTempCelsius: typeof parsed.t === 'number' && Number.isFinite(parsed.t) && parsed.t >= 0 && parsed.t <= 100 ? Math.round(parsed.t) : 92,
       grindSizeDescription: typeof parsed.g === 'string' ? parsed.g : '',
       recommendedRatio: typeof parsed.r === 'number' && Number.isFinite(parsed.r) && parsed.r > 0 ? Number(parsed.r.toFixed(2)) : Number((parsed.w / (parsed.d || 1)).toFixed(1)),
       stepsJson: JSON.stringify(steps),
