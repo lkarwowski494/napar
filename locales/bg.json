@@ -157,7 +157,9 @@
     "noSearchResults": "Няма намерени резултати",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Стартира традиционната чаена церемония Gongfu Cha с многократни запарки"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

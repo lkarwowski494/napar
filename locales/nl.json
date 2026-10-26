@@ -157,7 +157,9 @@
     "noSearchResults": "Geen zoekresultaten gevonden",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Start de traditionele Gongfu Cha-theeceremonie met meerdere infusies"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

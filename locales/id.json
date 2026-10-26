@@ -157,7 +157,9 @@
     "noSearchResults": "Hasil pencarian tidak ditemukan",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Memulai upacara teh Gongfu Cha tradisional dengan beberapa seduhan"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

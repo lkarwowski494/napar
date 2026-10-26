@@ -157,7 +157,9 @@
     "noSearchResults": "Nebyly nalezeny žádné výsledky",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Spustí tradiční čajový obřad Gongfu Cha s vícenásobnými nálevy"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

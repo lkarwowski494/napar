@@ -157,7 +157,9 @@
     "noSearchResults": "لم يتم العثور على نتائج",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "يبدأ حفل شاي غونغفو تشا التقليدي متعدد النقعات"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

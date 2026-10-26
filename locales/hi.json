@@ -157,7 +157,9 @@
     "noSearchResults": "कोई खोज परिणाम नहीं मिला",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "पारंपरिक बहु-इन्फ्यूजन गोंगफू चा चाय समारोह शुरू करता है"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

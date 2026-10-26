@@ -157,7 +157,9 @@
     "noSearchResults": "Результаты поиска не найдены",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Запускает традиционную чайную церемонию Гунфу Ча с многократными проливами"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

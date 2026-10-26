@@ -157,7 +157,9 @@
     "noSearchResults": "Không tìm thấy kết quả",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Bắt đầu nghi lễ pha trà Công Phu Trà truyền thống với nhiều lần hãm"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

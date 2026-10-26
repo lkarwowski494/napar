@@ -157,7 +157,9 @@
     "noSearchResults": "Nincs találat",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Elindítja a hagyományos Gongfu Cha többszörös felöntéses teaszertartást"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

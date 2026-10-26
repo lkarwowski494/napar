@@ -157,7 +157,9 @@
     "noSearchResults": "Inga sökresultat hittades",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Startar den traditionella teceremonin Gongfu Cha med flera infusioner"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

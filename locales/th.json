@@ -157,7 +157,9 @@
     "noSearchResults": "ไม่พบผลการค้นหา",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "เริ่มพิธีชงชาแบบกังฟูชาดั้งเดิมที่มีการชงหลายรอบ"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

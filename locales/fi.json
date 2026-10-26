@@ -157,7 +157,9 @@
     "noSearchResults": "Hakutuloksia ei löytynyt",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Käynnistää perinteisen Gongfu Cha -teeseremonian useilla haudutuksilla"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

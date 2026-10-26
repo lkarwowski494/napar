@@ -157,7 +157,9 @@
     "noSearchResults": "Δεν βρέθηκαν αποτελέσματα",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Ξεκινά την παραδοσιακή τελετή τσαγιού Gongfu Cha με πολλαπλές εκχυλίσεις"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

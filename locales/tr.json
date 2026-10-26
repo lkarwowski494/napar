@@ -157,7 +157,9 @@
     "noSearchResults": "Arama sonucu bulunamadı",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Geleneksel çoklu demlemeli Gongfu Cha çay seremonisini başlatır"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

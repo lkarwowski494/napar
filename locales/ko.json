@@ -157,7 +157,9 @@
     "noSearchResults": "검색 결과가 없습니다",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "다도 (Gongfu Cha)",
+    "gongfuModeHint": "여러 번 우리는 전통 공푸차 다도 의식을 시작합니다"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

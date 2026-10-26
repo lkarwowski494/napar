@@ -157,7 +157,9 @@
     "noSearchResults": "検索結果が見つかりません",
     "subsetAll": "すべて",
     "subsetFavorites": "クラシック＆お気に入り",
-    "subsetCustom": "カスタムレシピ"
+    "subsetCustom": "カスタムレシピ",
+    "gongfuModeBtn": "工夫茶 (Gongfu Cha)",
+    "gongfuModeHint": "複数回の抽出を行う伝統的な工夫茶セレモニーを開始します"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

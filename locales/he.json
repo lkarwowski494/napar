@@ -157,7 +157,9 @@
     "noSearchResults": "לא נמצאו תוצאות חיפוש",
     "subsetAll": "All",
     "subsetFavorites": "Classics & Favorites",
-    "subsetCustom": "Custom Recipes"
+    "subsetCustom": "Custom Recipes",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "מתחיל את טקס תה הגונגפו צ'ה המסורתי עם חליטות מרובות"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

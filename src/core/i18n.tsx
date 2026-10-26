@@ -182,6 +182,8 @@ export const translations = {
       subsetAll: 'Wszystkie',
       subsetFavorites: 'Klasyki / Ulubione',
       subsetCustom: 'Własne receptury',
+      gongfuModeBtn: 'Gongfu Cha',
+      gongfuModeHint: 'Uruchamia tradycyjną ceremonię parzenia herbaty Gongfu Cha z wielokrotnymi infuzjami',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha',
@@ -758,6 +760,8 @@ export const translations = {
       subsetAll: 'All',
       subsetFavorites: 'Classics & Favorites',
       subsetCustom: 'Custom Recipes',
+      gongfuModeBtn: 'Gongfu Cha',
+      gongfuModeHint: 'Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha',

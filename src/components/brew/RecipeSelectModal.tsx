@@ -372,10 +372,10 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 style={styles.gongfuModalBtn}
                 onPress={onOpenGongfu}
                 accessibilityRole="button"
-                accessibilityLabel="Gongfu Cha"
-                accessibilityHint="Uruchamia tradycyjną ceremonię parzenia herbaty Gongfu Cha z wielokrotnymi infuzjami"
+                accessibilityLabel={t?.brew?.gongfuModeBtn || 'Gongfu Cha'}
+                accessibilityHint={t?.brew?.gongfuModeHint || 'Uruchamia tradycyjną ceremonię parzenia herbaty Gongfu Cha z wielokrotnymi infuzjami'}
               >
-                <Text style={styles.gongfuModalBtnText}>Gongfu Cha</Text>
+                <Text style={styles.gongfuModalBtnText}>{t?.brew?.gongfuModeBtn || 'Gongfu Cha'}</Text>
               </Pressable>
             )}
 

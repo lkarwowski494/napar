@@ -157,7 +157,9 @@
     "noSearchResults": "Nessun risultato trovato",
     "subsetAll": "Tutti",
     "subsetFavorites": "Classici e preferiti",
-    "subsetCustom": "Ricette personalizzate"
+    "subsetCustom": "Ricette personalizzate",
+    "gongfuModeBtn": "Gongfu Cha",
+    "gongfuModeHint": "Avvia la tradizionale cerimonia del tè Gongfu Cha con infusioni multiple"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

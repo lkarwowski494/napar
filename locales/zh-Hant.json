@@ -157,7 +157,9 @@
     "noSearchResults": "未找到搜尋結果",
     "subsetAll": "全部",
     "subsetFavorites": "經典與收藏",
-    "subsetCustom": "自定義食譜"
+    "subsetCustom": "自定義食譜",
+    "gongfuModeBtn": "功夫茶",
+    "gongfuModeHint": "啟動多次沖泡的傳統工夫茶茶道"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
