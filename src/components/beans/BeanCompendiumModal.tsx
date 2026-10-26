@@ -96,6 +96,10 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
           {beveragePreference !== 'tea' && (
             <>
               <Pressable
+                testID="compendium-tab-varieties"
+                accessibilityRole="tab"
+                accessibilityState={{ selected: compendiumTab === 'varieties' }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={[styles.compTabBtn, compendiumTab === 'varieties' && styles.compTabBtnActive]}
                 onPress={() => setCompendiumTab('varieties')}
               >
@@ -104,6 +108,10 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 </Text>
               </Pressable>
               <Pressable
+                testID="compendium-tab-processes"
+                accessibilityRole="tab"
+                accessibilityState={{ selected: compendiumTab === 'processes' }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={[styles.compTabBtn, compendiumTab === 'processes' && styles.compTabBtnActive]}
                 onPress={() => setCompendiumTab('processes')}
               >
@@ -112,6 +120,10 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 </Text>
               </Pressable>
               <Pressable
+                testID="compendium-tab-origins"
+                accessibilityRole="tab"
+                accessibilityState={{ selected: compendiumTab === 'origins' }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={[styles.compTabBtn, compendiumTab === 'origins' && styles.compTabBtnActive]}
                 onPress={() => setCompendiumTab('origins')}
               >
@@ -123,6 +135,10 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
           )}
           {beveragePreference !== 'coffee' && (
             <Pressable
+              testID="compendium-tab-tea"
+              accessibilityRole="tab"
+              accessibilityState={{ selected: compendiumTab === 'tea' }}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               style={[styles.compTabBtn, compendiumTab === 'tea' && styles.compTabBtnActive]}
               onPress={() => setCompendiumTab('tea')}
             >
@@ -160,6 +176,10 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 </View>
 
                 <Pressable
+                  testID={`comp-use-btn-${v.id}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={isEn ? `Use ${v.name} as template` : `Użyj ${v.name} jako szablon`}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   style={styles.compUseBtn}
                   onPress={() =>
                     onUseTemplate({
@@ -207,6 +227,10 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 <Text style={styles.compCardDesc}>{(isEn && o.descriptionEn) ? o.descriptionEn : o.descriptionPl}</Text>
 
                 <Pressable
+                  testID={`comp-use-btn-${o.id}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={isEn ? `Use ${o.country} as template` : `Użyj ${o.country} jako szablon`}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   style={styles.compUseBtn}
                   onPress={() =>
                     onUseTemplate({
@@ -236,6 +260,10 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 <Text style={styles.compCardHealth}>{t.healthAttributesPl}</Text>
 
                 <Pressable
+                  testID={`comp-use-btn-${t.id}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={isEn ? `Use ${t.nameEn || t.namePl} as template` : `Użyj ${t.namePl} jako szablon`}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   style={styles.compUseBtn}
                   onPress={() =>
                     onUseTemplate({
