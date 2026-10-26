@@ -70,6 +70,12 @@ describe('AST Test Matrix: Logika and Wymiar 100% Coverage (BR-TEST-028..031)', 
       expect(short).toEqual([255, 255, 255]);
       const dark = parseHexColor('#121214');
       expect(dark).toEqual([18, 18, 20]);
+      expect(parseHexColor('')).toEqual([0, 0, 0]);
+      expect(parseHexColor(null as any)).toEqual([0, 0, 0]);
+      expect(parseHexColor(undefined as any)).toEqual([0, 0, 0]);
+      expect(parseHexColor('#12')).toEqual([0, 0, 0]);
+      expect(sRgbChannelLuminance(NaN)).toBe(0);
+      expect(sRgbChannelLuminance(-10)).toBe(0);
     });
 
     test('sRgbChannelLuminance calculates correct luminance component', () => {

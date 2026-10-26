@@ -4,14 +4,20 @@
 // ============================================================================
 
 export function parseHexColor(hex: string): [number, number, number] {
+  if (!hex || typeof hex !== 'string') return [0, 0, 0];
   let clean = hex.replace('#', '').trim();
   if (clean.length === 3) {
     clean = clean.split('').map((c) => c + c).join('');
   }
+  if (clean.length < 6) return [0, 0, 0];
   const r = parseInt(clean.substring(0, 2), 16);
   const g = parseInt(clean.substring(2, 4), 16);
   const b = parseInt(clean.substring(4, 6), 16);
-  return [r, g, b];
+  return [
+    Number.isFinite(r) ? Math.max(0, Math.min(255, r)) : 0,
+    Number.isFinite(g) ? Math.max(0, Math.min(255, g)) : 0,
+    Number.isFinite(b) ? Math.max(0, Math.min(255, b)) : 0,
+  ];
 }
 
 /**
@@ -19,7 +25,8 @@ export function parseHexColor(hex: string): [number, number, number] {
  * s(c) = c/12.92 gdy c <= 0.04045, inaczej ((c + 0.055)/1.055)^2.4
  */
 export function sRgbChannelLuminance(c: number): number {
-  const norm = c / 255.0;
+  if (!Number.isFinite(c) || c <= 0) return 0;
+  const norm = Math.min(1.0, c / 255.0);
   if (norm <= 0.04045) {
     return norm / 12.92;
   }
