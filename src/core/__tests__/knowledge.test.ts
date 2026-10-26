@@ -434,4 +434,22 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(originRes.length).toBeGreaterThanOrEqual(1);
     expect(originRes.some((o) => o.id === 'origin-ethiopia')).toBe(true);
   });
+
+  test('TASK-P25-06-TRE: getKnowledgeDescription i getKnowledgeSensoryProfile normalizują wielkość liter w ID', () => {
+    const descPl = getKnowledgeDescription('   VARIETY-GEISHA   ', 'pl');
+    expect(descPl.length).toBeGreaterThan(0);
+    expect(descPl).toContain('Najbardziej ceniona');
+
+    const sensoryPl = getKnowledgeSensoryProfile('VARIETY-GEISHA', 'pl');
+    expect(sensoryPl.length).toBeGreaterThan(0);
+    expect(sensoryPl).toContain('Krystaliczna czystość');
+
+    const descEn = getKnowledgeDescription('VARIETY-SL28-SL34', 'en');
+    expect(descEn.length).toBeGreaterThan(0);
+    expect(descEn).toContain('Bred in Kenya');
+
+    const sensoryEn = getKnowledgeSensoryProfile('VARIETY-SL28-SL34', 'en');
+    expect(sensoryEn.length).toBeGreaterThan(0);
+    expect(sensoryEn).toContain('phosphoric acidity');
+  });
 });

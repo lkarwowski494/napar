@@ -670,7 +670,7 @@ export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
 
 export function getKnowledgeDescription(id: string, lang: 'pl' | 'en' = 'pl'): string {
   if (!id || typeof id !== 'string') return '';
-  const cleanId = id.trim();
+  const cleanId = id.trim().toLowerCase();
   const loc = KNOWLEDGE_LOCALES[cleanId];
   if (!loc) return '';
   return lang === 'en' ? loc.descriptionEn : loc.descriptionPl;
@@ -678,7 +678,7 @@ export function getKnowledgeDescription(id: string, lang: 'pl' | 'en' = 'pl'): s
 
 export function getKnowledgeSensoryProfile(id: string, lang: 'pl' | 'en' = 'pl'): string {
   if (!id || typeof id !== 'string') return '';
-  const cleanId = id.trim();
+  const cleanId = id.trim().toLowerCase();
   const loc = KNOWLEDGE_LOCALES[cleanId];
   if (!loc) return '';
   if (loc.sensoryProfilePl || loc.sensoryProfileEn) {
