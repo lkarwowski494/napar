@@ -153,6 +153,17 @@ export function getTrialDaysRemaining(): number {
     : 0;
 }
 
+/**
+ * Zwraca liczbę parzeń pozostałych w okresie próbnym, gwarantując zakres [0, TRIAL_MAX_BREWS] lub Infinity dla subskrypcji.
+ */
+export function getTrialBrewsRemaining(): number {
+  const state = getAppAccessState();
+  if (state.isSubscribed) return Infinity;
+  return Number.isFinite(state.brewsRemaining) && state.brewsRemaining >= 0
+    ? Math.floor(Math.min(TRIAL_MAX_BREWS, state.brewsRemaining))
+    : 0;
+}
+
 export function recordBrewCompleted(): AppAccessState {
   const current = getAppAccessState();
   if (current.isSubscribed) {

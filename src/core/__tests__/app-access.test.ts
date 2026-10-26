@@ -18,6 +18,7 @@ import {
   purchaseWithStoreKit,
   verifyAndActivateStoreKitPurchase,
   getTrialDaysRemaining,
+  getTrialBrewsRemaining,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -580,5 +581,22 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     resetTrialForTesting();
     setTrialExpiredForTesting();
     expect(getTrialDaysRemaining()).toBe(0);
+  });
+
+  test('TASK-P31-02-MON: getTrialBrewsRemaining zwraca [0, TRIAL_MAX_BREWS] lub Infinity dla subskrypcji', () => {
+    resetTrialForTesting();
+    expect(getTrialBrewsRemaining()).toBe(TRIAL_MAX_BREWS);
+
+    recordBrewCompleted();
+    expect(getTrialBrewsRemaining()).toBe(TRIAL_MAX_BREWS - 1);
+
+    // Po aktywacji subskrypcji
+    activateSubscription('annual');
+    expect(getTrialBrewsRemaining()).toBe(Infinity);
+
+    // Po wygaśnięciu okresu próbnego
+    resetTrialForTesting();
+    setTrialExpiredForTesting();
+    expect(getTrialBrewsRemaining()).toBe(0);
   });
 });
