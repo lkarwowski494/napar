@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from '../../core/i18n';
+import { useTranslation, formatTemplate } from '../../core/i18n';
 import {
   View,
   Text,
@@ -190,7 +190,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                     })
                   }
                 >
-                  <Text style={styles.compUseBtnText}>{isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni'}</Text>
+                  <Text style={styles.compUseBtnText}>{(t as any).stash?.useTemplate || (isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni')}</Text>
                 </Pressable>
               </View>
             ))}
@@ -241,40 +241,40 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                     })
                   }
                 >
-                  <Text style={styles.compUseBtnText}>{isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni'}</Text>
+                  <Text style={styles.compUseBtnText}>{(t as any).stash?.useTemplate || (isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni')}</Text>
                 </Pressable>
               </View>
             ))}
 
           {compendiumTab === 'tea' &&
-            filteredTeas.map((t) => (
-              <View key={t.id} style={styles.compCard}>
+            filteredTeas.map((teaItem) => (
+              <View key={teaItem.id} style={styles.compCard}>
                 <View style={styles.compCardHeader}>
-                  <Text style={styles.compCardTitle}>{`${isEn && t.nameEn ? t.nameEn : t.namePl} · ${t.traditionalName}`}</Text>
-                  <Text style={styles.compCardTag}>{isEn ? `Oxidation: ${t.oxidationRangePercent}` : `Oksydacja: ${t.oxidationRangePercent}`}</Text>
+                  <Text style={styles.compCardTitle}>{`${isEn && teaItem.nameEn ? teaItem.nameEn : teaItem.namePl} · ${teaItem.traditionalName}`}</Text>
+                  <Text style={styles.compCardTag}>{isEn ? `Oxidation: ${teaItem.oxidationRangePercent}` : `Oksydacja: ${teaItem.oxidationRangePercent}`}</Text>
                 </View>
-                <Text style={styles.compCardSub}>{isEn ? `Brewing temp: ${t.waterTemperatureCelsius}°C` : `Temperatura parzenia: ${t.waterTemperatureCelsius}°C`}</Text>
-                <Text style={styles.compCardLineage}>{isEn ? `Sha Qing method: ${t.killGreenMethod}` : `Metoda Sha Qing: ${t.killGreenMethod}`}</Text>
-                <Text style={styles.compCardSensory}>{(isEn && t.sensoryProfileEn) ? t.sensoryProfileEn : t.sensoryProfilePl}</Text>
-                <Text style={styles.compCardDesc}>{isEn ? `Famous varieties: ${t.famousVarietiesPl.join(', ')}` : `Słynne odmiany: ${t.famousVarietiesPl.join(', ')}`}</Text>
-                <Text style={styles.compCardHealth}>{t.healthAttributesPl}</Text>
+                <Text style={styles.compCardSub}>{isEn ? `Brewing temp: ${teaItem.waterTemperatureCelsius}°C` : `Temperatura parzenia: ${teaItem.waterTemperatureCelsius}°C`}</Text>
+                <Text style={styles.compCardLineage}>{isEn ? `Sha Qing method: ${teaItem.killGreenMethod}` : `Metoda Sha Qing: ${teaItem.killGreenMethod}`}</Text>
+                <Text style={styles.compCardSensory}>{(isEn && teaItem.sensoryProfileEn) ? teaItem.sensoryProfileEn : teaItem.sensoryProfilePl}</Text>
+                <Text style={styles.compCardDesc}>{isEn ? `Famous varieties: ${teaItem.famousVarietiesPl.join(', ')}` : `Słynne odmiany: ${teaItem.famousVarietiesPl.join(', ')}`}</Text>
+                <Text style={styles.compCardHealth}>{teaItem.healthAttributesPl}</Text>
 
                 <Pressable
-                  testID={`comp-use-btn-${t.id}`}
+                  testID={`comp-use-btn-${teaItem.id}`}
                   accessibilityRole="button"
-                  accessibilityLabel={isEn ? `Use ${t.nameEn || t.namePl} as template` : `Użyj ${t.namePl} jako szablon`}
+                  accessibilityLabel={isEn ? `Use ${teaItem.nameEn || teaItem.namePl} as template` : `Użyj ${teaItem.namePl} jako szablon`}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   style={styles.compUseBtn}
                   onPress={() =>
                     onUseTemplate({
-                      name: t.famousVarietiesPl[0].split('(')[0].trim(),
+                      name: teaItem.famousVarietiesPl[0].split('(')[0].trim(),
                       type: 'tea',
-                      origin: t.famousRegions[0].split('(')[0].trim(),
-                      notes: [t.namePl, 'Tradycyjna'],
+                      origin: teaItem.famousRegions[0].split('(')[0].trim(),
+                      notes: [teaItem.namePl, 'Tradycyjna'],
                     })
                   }
                 >
-                  <Text style={styles.compUseBtnText}>{isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni'}</Text>
+                  <Text style={styles.compUseBtnText}>{(t as any).stash?.useTemplate || (isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni')}</Text>
                 </Pressable>
               </View>
             ))}
