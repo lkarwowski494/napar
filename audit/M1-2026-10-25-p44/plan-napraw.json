@@ -4,95 +4,95 @@
     "perspective": "01-ODK",
     "title": "Dostępność progressbar, sanityzacja formatClock i normalizacja języka w ProcedureModal",
     "file": "src/components/brew/ProcedureModal.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "2b780b3"
   },
   {
     "id": "TASK-P44-02-MON",
     "perspective": "02-MON",
     "title": "Stan disabled na przyciskach planów i normalizacja języka w Apps4BrewPassModal",
     "file": "src/components/Apps4BrewPassModal.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "eeb3fad"
   },
   {
     "id": "TASK-P44-03-ZAK",
     "perspective": "03-ZAK",
     "title": "Rozszerzenie parsowania czasu trwania kroków o angielskie warianty mins i seconds w parseStepDurationSeconds",
     "file": "src/core/bpr-engine.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "3b1a082"
   },
   {
     "id": "TASK-P44-04-STU",
     "perspective": "04-STU",
     "title": "Ochrona przed brakiem sekcji t.brew i bezpieczne fallbacki w RecipeSelectModal",
     "file": "src/components/brew/RecipeSelectModal.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "02d3e12"
   },
   {
     "id": "TASK-P44-05-ARC",
     "perspective": "05-ARC",
     "title": "Sanityzacja pól, generowanie ID i ochrona przed -0 w logCaffeine",
     "file": "src/core/database.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "2e3e8c8"
   },
   {
     "id": "TASK-P44-06-TRE",
     "perspective": "06-TRE",
     "title": "Rozszerzenie ORIGIN_ALIASES o mikro-regiony specialty coffee (Yirgacheffe, Guji, Huila, Tarrazu, Boquete)",
     "file": "src/core/knowledge-data.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "bbe94dd"
   },
   {
     "id": "TASK-P44-07-JAK",
     "perspective": "07-JAK",
     "title": "Normalizacja myślników i podkreśleń w identyfikatorach w findWaterRecipeById",
     "file": "src/core/water-chemistry.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "99c8d5d"
   },
   {
     "id": "TASK-P44-08-PRO",
     "perspective": "08-PRO",
     "title": "Rozpoznawanie La Pavoni, Cremina w Espresso oraz Kono, LilyDrip w Pour-over w getRecipeMicrons",
     "file": "src/core/grinder-converter.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "f0366a3"
   },
   {
     "id": "TASK-P44-09-LOK",
     "perspective": "09-LOK",
     "title": "Dodanie klucza brew.pourToWeightOnScale w 35 językach i rozszerzenie matrycy testów do 831",
     "file": "locales/*",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "5aeee93"
   },
   {
     "id": "TASK-P44-10-WYD",
     "perspective": "10-WYD",
     "title": "Statyczna weryfikacja buildNumber w app.json oraz devDependencies @types/react i @types/jest w package.json",
     "file": "scripts/verify-native.mjs",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "ad81dc0"
   },
   {
     "id": "TASK-P44-11-WZR",
     "perspective": "11-WZR",
     "title": "Bezpieczne parsowanie flagi useWebScheme w encodeRecipeToShareUrl",
     "file": "src/core/recipe-share.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "8361c9e"
   },
   {
     "id": "TASK-P44-12-NIE",
     "perspective": "12-NIE",
     "title": "Ochrona przed nienapisowymi typami recipeName, sessionId, method w buildLiveActivityPayload",
     "file": "src/core/live-activity.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "77557e3"
   }
 ]
