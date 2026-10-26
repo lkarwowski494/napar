@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony"
+    "gongfuModeHint": "Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony",
+    "methodSiphon": "Siphon",
+    "siphonDesc": "Vacuum brewing with exceptional clarity and deep aroma"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

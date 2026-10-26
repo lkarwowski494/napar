@@ -163,7 +163,9 @@
     "subsetFavorites": "經典與收藏",
     "subsetCustom": "自定義食譜",
     "gongfuModeBtn": "功夫茶",
-    "gongfuModeHint": "啟動多次沖泡的傳統工夫茶茶道"
+    "gongfuModeHint": "啟動多次沖泡的傳統工夫茶茶道",
+    "methodSiphon": "虹吸壺",
+    "siphonDesc": "真空虹吸萃取，口感純淨明亮，香氣深邃"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

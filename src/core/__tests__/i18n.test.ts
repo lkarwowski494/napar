@@ -308,4 +308,10 @@ describe('i18n System', () => {
     expect(translations.pl.common.looseLeafTea).toBe('Herbata liściasta');
     expect(translations.en.common.looseLeafTea).toBe('Loose leaf tea');
   });
+  test('TASK-P24-09-LOK: Klucze methodSiphon i siphonDesc są zdefiniowane w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodSiphon).toBe('Syfon');
+    expect(translations.en.brew.methodSiphon).toBe('Siphon');
+    expect(translations.pl.brew.siphonDesc).toContain('próżniowe');
+    expect(translations.en.brew.siphonDesc).toContain('Vacuum brewing');
+  });
 });

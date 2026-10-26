@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Memulai upacara teh Gongfu Cha tradisional dengan beberapa seduhan"
+    "gongfuModeHint": "Memulai upacara teh Gongfu Cha tradisional dengan beberapa seduhan",
+    "methodSiphon": "Sifon",
+    "siphonDesc": "Penyeduhan vakum dengan kejernihan luar biasa dan aroma mendalam"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

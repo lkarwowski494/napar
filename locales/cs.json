@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Spustí tradiční čajový obřad Gongfu Cha s vícenásobnými nálevy"
+    "gongfuModeHint": "Spustí tradiční čajový obřad Gongfu Cha s vícenásobnými nálevy",
+    "methodSiphon": "Vakuový sifon",
+    "siphonDesc": "Vakuová extrakce s mimořádnou čistotou a hlubokým aromatem"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

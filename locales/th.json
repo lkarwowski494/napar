@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "เริ่มพิธีชงชาแบบกังฟูชาดั้งเดิมที่มีการชงหลายรอบ"
+    "gongfuModeHint": "เริ่มพิธีชงชาแบบกังฟูชาดั้งเดิมที่มีการชงหลายรอบ",
+    "methodSiphon": "ไซฟอน",
+    "siphonDesc": "การสกัดแบบสุญญากาศที่ให้ความสะอาดและกลิ่นหอมล้ำลึก"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

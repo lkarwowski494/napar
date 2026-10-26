@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Pornește ceremonia tradițională a ceaiului Gongfu Cha cu infuzii multiple"
+    "gongfuModeHint": "Pornește ceremonia tradițională a ceaiului Gongfu Cha cu infuzii multiple",
+    "methodSiphon": "Sifon",
+    "siphonDesc": "Preparare în vid cu o claritate excepțională și aromă profundă"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

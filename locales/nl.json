@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Start de traditionele Gongfu Cha-theeceremonie met meerdere infusies"
+    "gongfuModeHint": "Start de traditionele Gongfu Cha-theeceremonie met meerdere infusies",
+    "methodSiphon": "Sifon",
+    "siphonDesc": "Vacuümbereiding met uitzonderlijke helderheid en diep aroma"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

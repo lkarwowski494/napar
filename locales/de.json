@@ -163,7 +163,9 @@
     "subsetFavorites": "Klassiker & Favoriten",
     "subsetCustom": "Eigene Rezepte",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Startet die traditionelle Gongfu-Cha-Teezeremonie mit mehreren Aufgüssen"
+    "gongfuModeHint": "Startet die traditionelle Gongfu-Cha-Teezeremonie mit mehreren Aufgüssen",
+    "methodSiphon": "Syphon",
+    "siphonDesc": "Vakuumbrühen mit außergewöhnlicher Klarheit und tiefem Aroma"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

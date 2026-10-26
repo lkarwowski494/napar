@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Elindítja a hagyományos Gongfu Cha többszörös felöntéses teaszertartást"
+    "gongfuModeHint": "Elindítja a hagyományos Gongfu Cha többszörös felöntéses teaszertartást",
+    "methodSiphon": "Szifon",
+    "siphonDesc": "Vákuumos kávéfőzés kivételes tisztasággal és mély aromával"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

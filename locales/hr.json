@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Pokreće tradicionalnu ceremoniju čaja Gongfu Cha s višestrukim infuzijama"
+    "gongfuModeHint": "Pokreće tradicionalnu ceremoniju čaja Gongfu Cha s višestrukim infuzijama",
+    "methodSiphon": "Sifon",
+    "siphonDesc": "Vakuumsko kuhanje s iznimnom čistoćom i dubokom aromom"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

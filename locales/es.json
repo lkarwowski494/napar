@@ -163,7 +163,9 @@
     "subsetFavorites": "Clásicos y favoritos",
     "subsetCustom": "Recetas personalizadas",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Inicia la tradicional ceremonia de té Gongfu Cha con múltiples infusiones"
+    "gongfuModeHint": "Inicia la tradicional ceremonia de té Gongfu Cha con múltiples infusiones",
+    "methodSiphon": "Sifón",
+    "siphonDesc": "Extracción al vacío con claridad excepcional y aroma profundo"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

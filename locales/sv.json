@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Startar den traditionella teceremonin Gongfu Cha med flera infusioner"
+    "gongfuModeHint": "Startar den traditionella teceremonin Gongfu Cha med flera infusioner",
+    "methodSiphon": "Sifon",
+    "siphonDesc": "Vakuumextraktion med exceptionell renhet och djup arom"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "يبدأ حفل شاي غونغفو تشا التقليدي متعدد النقعات"
+    "gongfuModeHint": "يبدأ حفل شاي غونغفو تشا التقليدي متعدد النقعات",
+    "methodSiphon": "سيفون",
+    "siphonDesc": "تخمير بالتفريغ الهوائي بنقاء استثنائي ورائحة عميقة"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

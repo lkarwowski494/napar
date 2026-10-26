@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "पारंपरिक बहु-इन्फ्यूजन गोंगफू चा चाय समारोह शुरू करता है"
+    "gongfuModeHint": "पारंपरिक बहु-इन्फ्यूजन गोंगफू चा चाय समारोह शुरू करता है",
+    "methodSiphon": "साइफन",
+    "siphonDesc": "असाधारण स्पष्टता और गहरी सुगंध के साथ वैक्यूम ब्रूइंग"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

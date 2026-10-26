@@ -163,7 +163,9 @@
     "subsetFavorites": "Klasyki / Ulubione",
     "subsetCustom": "Własne receptury",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Uruchamia tradycyjną ceremonię parzenia herbaty Gongfu Cha z wielokrotnymi infuzjami"
+    "gongfuModeHint": "Uruchamia tradycyjną ceremonię parzenia herbaty Gongfu Cha z wielokrotnymi infuzjami",
+    "methodSiphon": "Syfon",
+    "siphonDesc": "Parzenie próżniowe o wyjątkowej czystości i głębokim aromacie"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Geleneksel çoklu demlemeli Gongfu Cha çay seremonisini başlatır"
+    "gongfuModeHint": "Geleneksel çoklu demlemeli Gongfu Cha çay seremonisini başlatır",
+    "methodSiphon": "Sifon",
+    "siphonDesc": "Olağanüstü berraklık ve derin aromaya sahip vakumlu demleme"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

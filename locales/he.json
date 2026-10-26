@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "מתחיל את טקס תה הגונגפו צ'ה המסורתי עם חליטות מרובות"
+    "gongfuModeHint": "מתחיל את טקס תה הגונגפו צ'ה המסורתי עם חליטות מרובות",
+    "methodSiphon": "סיפון",
+    "siphonDesc": "חליטת ואקום עם צלילות יוצאת דופן וארומה עמוקה"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

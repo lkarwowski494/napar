@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Bắt đầu nghi lễ pha trà Công Phu Trà truyền thống với nhiều lần hãm"
+    "gongfuModeHint": "Bắt đầu nghi lễ pha trà Công Phu Trà truyền thống với nhiều lần hãm",
+    "methodSiphon": "Syphon",
+    "siphonDesc": "Pha chân không với độ trong trẻo đặc biệt và hương thơm sâu lắng"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

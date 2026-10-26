@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Inicia a tradicional cerimônia de chá Gongfu Cha com múltiplas infusões"
+    "gongfuModeHint": "Inicia a tradicional cerimônia de chá Gongfu Cha com múltiplas infusões",
+    "methodSiphon": "Sifão",
+    "siphonDesc": "Extração a vácuo com excepcional clareza e aroma profundo"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

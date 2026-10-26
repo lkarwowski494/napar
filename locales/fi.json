@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Käynnistää perinteisen Gongfu Cha -teeseremonian useilla haudutuksilla"
+    "gongfuModeHint": "Käynnistää perinteisen Gongfu Cha -teeseremonian useilla haudutuksilla",
+    "methodSiphon": "Sifonki",
+    "siphonDesc": "Tyhjiöuutto poikkeuksellisen kirkkaudella ja syvällä aromilla"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

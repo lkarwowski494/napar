@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Ξεκινά την παραδοσιακή τελετή τσαγιού Gongfu Cha με πολλαπλές εκχυλίσεις"
+    "gongfuModeHint": "Ξεκινά την παραδοσιακή τελετή τσαγιού Gongfu Cha με πολλαπλές εκχυλίσεις",
+    "methodSiphon": "Σιφόνι",
+    "siphonDesc": "Εκχύλιση υπό κενό με εξαιρετική διαύγεια και βαθύ άρωμα"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

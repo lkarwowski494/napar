@@ -163,7 +163,9 @@
     "subsetFavorites": "Classics & Favorites",
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
-    "gongfuModeHint": "Стартира традиционната чаена церемония Gongfu Cha с многократни запарки"
+    "gongfuModeHint": "Стартира традиционната чаена церемония Gongfu Cha с многократни запарки",
+    "methodSiphon": "Сифон",
+    "siphonDesc": "Вакуумно приготвяне с изключителна чистота и дълбок аромат"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
