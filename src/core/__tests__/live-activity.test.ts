@@ -278,4 +278,10 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     // totalSteps = 3, safeStepIdx ograniczone do 2 (krok 3 z 3, a nie 11 z 3)
     expect(island.expandedCenterSubtitle).toBe('Pour · Step 3 of 3');
   });
+
+  test('TASK-P18-12-NIE: formatActivityTimer ogranicza maksymalny czas do 24 godzin (86400s) i chroni przed Infinity', () => {
+    expect(formatActivityTimer(Infinity)).toBe('0:00');
+    expect(formatActivityTimer(-Infinity)).toBe('0:00');
+    expect(formatActivityTimer(1000000)).toBe('24:00:00');
+  });
 });

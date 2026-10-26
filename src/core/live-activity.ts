@@ -69,7 +69,7 @@ export function formatActivityTimer(seconds: number): string {
   if (!Number.isFinite(numSeconds) || numSeconds < 0) {
     return '0:00';
   }
-  const safeSec = Math.floor(numSeconds);
+  const safeSec = Math.min(86400, Math.floor(numSeconds));
   const totalMins = Math.floor(safeSec / 60);
   const remSec = safeSec % 60;
   if (totalMins >= 60) {
