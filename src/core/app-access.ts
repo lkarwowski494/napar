@@ -193,22 +193,40 @@ export function formatTrialStatusSummary(
   language: 'pl' | 'en' | string = 'pl'
 ): string {
   const isEn = typeof language === 'string' && (language.trim().toLowerCase() === 'en' || language.trim().toLowerCase().startsWith('en'));
+  if (!state || typeof state !== 'object') {
+    return isEn ? 'Trial status unknown' : 'Stan okresu próbnego nieznany';
+  }
   if (state.isSubscribed) {
     return isEn ? 'Apps4Brew Pass Active' : 'Apps4Brew Pass Aktywny';
   }
   if (state.status === 'trial_expired') {
     return isEn ? 'Trial expired' : 'Okres próbny zakończony';
   }
-  const brews = Number.isFinite(state.brewsRemaining) && state.brewsRemaining >= 0
+  const rawBrews = Number.isFinite(state.brewsRemaining) && state.brewsRemaining >= 0
     ? Math.floor(state.brewsRemaining)
     : 0;
-  const days = Number.isFinite(state.daysRemaining) && state.daysRemaining >= 0
+  const brews = Object.is(rawBrews, -0) ? 0 : rawBrews;
+
+  const rawDays = Number.isFinite(state.daysRemaining) && state.daysRemaining >= 0
     ? Math.floor(state.daysRemaining)
     : 0;
+  const days = Object.is(rawDays, -0) ? 0 : rawDays;
+
   if (isEn) {
-    return `Trial: ${brews} brews · ${days} days remaining`;
+    const brewWord = brews === 1 ? 'brew' : 'brews';
+    const dayWord = days === 1 ? 'day' : 'days';
+    return `Trial: ${brews} ${brewWord} · ${days} ${dayWord} remaining`;
   }
-  const brewUnit = brews === 1 ? 'parzenie' : (brews >= 2 && brews <= 4 ? 'parzenia' : 'parzeń');
+  let brewUnit = 'parzeń';
+  if (brews === 1) {
+    brewUnit = 'parzenie';
+  } else {
+    const mod10 = brews % 10;
+    const mod100 = brews % 100;
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) {
+      brewUnit = 'parzenia';
+    }
+  }
   const dayUnit = days === 1 ? 'dzień' : 'dni';
   return `Okres próbny: ${brews} ${brewUnit} · ${days} ${dayUnit}`;
 }

@@ -874,4 +874,42 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(formatTrialStatusSummary(expState, 'pl')).toBe('Okres próbny zakończony');
     expect(formatTrialStatusSummary(expState, 'en')).toBe('Trial expired');
   });
+
+  test('TASK-P50-02-MON: formatTrialStatusSummary chroni przed undefined/null oraz stosuje poprawna polska fleksje (parzenie, parzenia, parzen)', () => {
+    const { formatTrialStatusSummary } = require('../app-access');
+
+    // 1. Odporność na null i undefined
+    expect(formatTrialStatusSummary(undefined as any, 'pl')).toBe('Stan okresu próbnego nieznany');
+    expect(formatTrialStatusSummary(null as any, 'en')).toBe('Trial status unknown');
+
+    // 2. Poprawna polska fleksja
+    const baseState: any = {
+      status: 'trial_active',
+      brewsCount: 0,
+      brewsRemaining: 1,
+      daysRemaining: 1,
+      isSubscribed: false,
+      canCreate: true,
+      isHistoryReadOnly: false,
+      subscriptionTier: 'none',
+    };
+
+    expect(formatTrialStatusSummary(baseState, 'pl')).toBe('Okres próbny: 1 parzenie · 1 dzień');
+
+    expect(formatTrialStatusSummary({ ...baseState, brewsRemaining: 3, daysRemaining: 3 }, 'pl')).toBe(
+      'Okres próbny: 3 parzenia · 3 dni'
+    );
+
+    expect(formatTrialStatusSummary({ ...baseState, brewsRemaining: 14, daysRemaining: 14 }, 'pl')).toBe(
+      'Okres próbny: 14 parzeń · 14 dni'
+    );
+
+    expect(formatTrialStatusSummary({ ...baseState, brewsRemaining: 22, daysRemaining: 22 }, 'pl')).toBe(
+      'Okres próbny: 22 parzenia · 22 dni'
+    );
+
+    expect(formatTrialStatusSummary({ ...baseState, brewsRemaining: 25, daysRemaining: 25 }, 'pl')).toBe(
+      'Okres próbny: 25 parzeń · 25 dni'
+    );
+  });
 });
