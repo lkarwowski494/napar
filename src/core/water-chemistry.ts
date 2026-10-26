@@ -240,7 +240,7 @@ export function diagnoseWaterSensoryImpact(
   ghPpm: number,
   khPpm: number
 ): WaterDiagnosticResult {
-  if (!Number.isFinite(ghPpm) || !Number.isFinite(khPpm)) {
+  if (!Number.isFinite(ghPpm) || !Number.isFinite(khPpm) || ghPpm < 0 || khPpm < 0) {
     return {
       problemPl: 'Nieprawidłowe dane wejściowe parametrów wody.',
       problemEn: 'Invalid input data for water chemistry parameters.',
@@ -321,3 +321,10 @@ export function degreesDHToPpmCaCO3(dH: number): number {
   return Number((dH * 17.848).toFixed(2));
 }
 
+export function findWaterRecipeById(id: string): WaterRecipe | undefined {
+  return WATER_RECIPES.find((r) => r.id === id);
+}
+
+export function findBottledWaterById(id: string): BottledWaterProfile | undefined {
+  return BOTTLED_WATER_BENCHMARKS.find((w) => w.id === id);
+}

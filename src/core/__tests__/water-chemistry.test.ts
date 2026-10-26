@@ -10,6 +10,8 @@ import {
   getWaterProfileName,
   ppmCaCO3ToDegreesDH,
   degreesDHToPpmCaCO3,
+  findWaterRecipeById,
+  findBottledWaterById,
 } from '../water-chemistry';
 
 describe('Water Chemistry & Mineralization Module', () => {
@@ -140,5 +142,19 @@ describe('Water Chemistry & Mineralization Module', () => {
     const ppm = degreesDHToPpmCaCO3(10);
     const dHBack = Math.round(ppmCaCO3ToDegreesDH(ppm));
     expect(dHBack).toBe(10);
+  });
+
+  test('TASK-P11-08-PRO: diagnoseWaterSensoryImpact odrzuca ujemne GH/KH, a helpery findWaterRecipeById i findBottledWaterById wyszukują profile', () => {
+    const negGh = diagnoseWaterSensoryImpact(-10, 40);
+    expect(negGh.problemPl).toContain('Nieprawidłowe dane');
+
+    const negKh = diagnoseWaterSensoryImpact(80, -20);
+    expect(negKh.problemPl).toContain('Nieprawidłowe dane');
+
+    expect(findWaterRecipeById('sca_standard')?.id).toBe('sca_standard');
+    expect(findWaterRecipeById('non-existent')).toBeUndefined();
+
+    expect(findBottledWaterById('volvic')?.id).toBe('volvic');
+    expect(findBottledWaterById('non-existent')).toBeUndefined();
   });
 });
