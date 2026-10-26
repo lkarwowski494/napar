@@ -182,4 +182,40 @@ describe('RecipeStepEditor Component (TASK-P32-01-ODK)', () => {
       });
     }).not.toThrow();
   });
+
+  test('TASK-P52-04-STU: onChangeNumber bezpiecznie parsuje stringi z przecinkami oraz ujemne wartosci i -0', () => {
+    const onUpdateStep = jest.fn();
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <RecipeStepEditor
+          steps={sampleSteps}
+          onAddStep={jest.fn()}
+          onRemoveStep={jest.fn()}
+          onUpdateStep={onUpdateStep}
+          t={translations.pl}
+        />
+      );
+    });
+
+    // 1. Przecinek w wodzie
+    const waterInput = tree.root.findByProps({ testID: 'step-water-1' });
+    act(() => {
+      waterInput.props.onChangeNumber('120,5');
+    });
+    expect(onUpdateStep).toHaveBeenCalledWith(0, 'targetWaterGrams', 121);
+
+    // 2. Przecinek w czasie trwania
+    const durInput = tree.root.findByProps({ testID: 'step-duration-1' });
+    act(() => {
+      durInput.props.onChangeNumber('45,4');
+    });
+    expect(onUpdateStep).toHaveBeenCalledWith(0, 'durationSeconds', 45);
+
+    // 3. -0 i ujemne wartosci
+    act(() => {
+      durInput.props.onChangeNumber(-0);
+    });
+    expect(onUpdateStep).toHaveBeenCalledWith(0, 'durationSeconds', 0);
+  });
 });

@@ -90,7 +90,10 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
                 testID={`step-water-${stepNum}`}
                 value={step.targetWaterGrams}
                 onChangeNumber={(val) => {
-                  const rawVal = Number.isFinite(val) ? val : 0;
+                  const parsedVal = typeof val === 'number'
+                    ? val
+                    : (typeof val === 'string' ? parseFloat(val.replace(',', '.')) : 0);
+                  const rawVal = Number.isFinite(parsedVal) ? parsedVal : 0;
                   const safeVal = Math.max(0, Math.min(50000, Math.round(rawVal)));
                   onUpdateStep(index, 'targetWaterGrams', Object.is(safeVal, -0) ? 0 : safeVal);
                 }}
@@ -107,7 +110,10 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
                 testID={`step-duration-${stepNum}`}
                 value={step.durationSeconds}
                 onChangeNumber={(val) => {
-                  const rawVal = Number.isFinite(val) ? val : 0;
+                  const parsedVal = typeof val === 'number'
+                    ? val
+                    : (typeof val === 'string' ? parseFloat(val.replace(',', '.')) : 0);
+                  const rawVal = Number.isFinite(parsedVal) ? parsedVal : 0;
                   const safeVal = Math.max(0, Math.min(86400, Math.round(rawVal)));
                   onUpdateStep(index, 'durationSeconds', Object.is(safeVal, -0) ? 0 : safeVal);
                 }}
