@@ -1962,7 +1962,9 @@ describe('Napar SQLite Database & Repositories', () => {
       inventoryItemName: '   ' + 'I'.repeat(250) + '   ',
       doseGrams: 16,
       waterGrams: 250,
+      waterTempCelsius: 93,
       totalTimeSeconds: 150,
+      flavorTags: [],
       brewedAt: '2026-10-26T16:00:00Z',
     });
 

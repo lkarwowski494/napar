@@ -87,7 +87,7 @@ export function BrewFinishModal({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const rawWater = typeof waterGrams === 'number' ? waterGrams : (typeof waterGrams === 'string' ? parseFloat(waterGrams.replace(/,/g, '.')) : 0);
+  const rawWater = typeof waterGrams === 'number' ? waterGrams : (typeof (waterGrams as any) === 'string' ? parseFloat((waterGrams as any).replace(/,/g, '.')) : 0);
   const safeWater = Number.isFinite(rawWater) && rawWater > 0 && !Object.is(rawWater, -0) ? Math.min(50000, Math.round(rawWater)) : 0;
 
   const rawRating = typeof rating === 'number' ? rating : (typeof rating === 'string' ? parseFloat(rating) : 0);
