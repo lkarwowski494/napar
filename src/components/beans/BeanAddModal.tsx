@@ -195,6 +195,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           <Text style={styles.inputLabel}>{t.stash?.nameLabel || 'Nazwa ziaren / herbaty *'}</Text>
           <TextInput
             style={styles.textInput}
+            accessibilityLabel={t.stash?.nameLabel || 'Nazwa ziaren / herbaty'}
             placeholder={t.stash?.namePlaceholder || 'np. Etiopia Yirgacheffe Washed'}
             placeholderTextColor={theme.colors.textMuted}
             value={name}
@@ -204,6 +205,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           <Text style={styles.inputLabel}>{t.stash?.roaster || 'Palarnia / Producent'}</Text>
           <TextInput
             style={styles.textInput}
+            accessibilityLabel={t.stash?.roaster || 'Palarnia / Producent'}
             placeholder={t.stash?.roasterPlaceholder || 'np. Hard Beans, Coffeedesk, Wuyi Star'}
             placeholderTextColor={theme.colors.textMuted}
             value={roaster}
@@ -213,6 +215,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           <Text style={styles.inputLabel}>{t.stash?.origin || 'Kraj / Pochodzenie'}</Text>
           <TextInput
             style={styles.textInput}
+            accessibilityLabel={t.stash?.origin || 'Kraj / Pochodzenie'}
             placeholder={t.stash?.originPlaceholder || 'np. Yirgacheffe, Etiopia'}
             placeholderTextColor={theme.colors.textMuted}
             value={origin}
@@ -224,6 +227,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
               <Text style={styles.inputLabel}>{t.stash?.variety || 'Botaniczna odmiana'}</Text>
               <TextInput
                 style={styles.textInput}
+                accessibilityLabel={t.stash?.variety || 'Botaniczna odmiana'}
                 placeholder={t.stash?.varietyPlaceholder || 'np. Geisha, SL28, Bourbon'}
                 placeholderTextColor={theme.colors.textMuted}
                 value={variety}
@@ -234,6 +238,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
               <Text style={styles.inputLabel}>{t.stash?.process || 'Obróbka'}</Text>
               <TextInput
                 style={styles.textInput}
+                accessibilityLabel={t.stash?.process || 'Obróbka'}
                 placeholder={t.stash?.processPlaceholder || 'np. Washed, Natural, Honey'}
                 placeholderTextColor={theme.colors.textMuted}
                 value={process}
@@ -247,6 +252,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
               <Text style={styles.inputLabel}>{t.stash?.roastDate || 'Data palenia / Zbioru'}</Text>
               <TextInput
                 style={styles.textInput}
+                accessibilityLabel={t.stash?.roastDate || 'Data palenia / Zbioru'}
                 placeholder="YYYY-MM-DD"
                 placeholderTextColor={theme.colors.textMuted}
                 value={roastDate}
@@ -258,6 +264,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
               <Text style={styles.inputLabel}>{isImperial ? (t.stash?.weightLabelImperial || 'Waga paczki (oz)') : (t.stash?.weightLabelMetric || 'Waga paczki (g)')}</Text>
               <TextInput
                 style={styles.textInput}
+                accessibilityLabel={isImperial ? (t.stash?.weightLabelImperial || 'Waga paczki (oz)') : (t.stash?.weightLabelMetric || 'Waga paczki (g)')}
                 placeholder={isImperial ? '8.8' : '250'}
                 placeholderTextColor={theme.colors.textMuted}
                 keyboardType="numeric"
@@ -270,6 +277,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           <Text style={styles.inputLabel}>{t.stash?.notesLabel || 'Nuty smakowe (po przecinku)'}</Text>
           <TextInput
             style={styles.textInput}
+            accessibilityLabel={t.stash?.notesLabel || 'Nuty smakowe (po przecinku)'}
             placeholder={t.stash?.notesPlaceholder || 'np. jaśmin, brzoskwinia, bergamotka'}
             placeholderTextColor={theme.colors.textMuted}
             value={notesStr}
