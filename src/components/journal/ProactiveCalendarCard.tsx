@@ -165,7 +165,11 @@ export function ProactiveCalendarCard({
         <Text style={styles.scheduleSectionTitle}>
           {isEn ? '1-TAP ACTION FEED' : 'HARMONOGRAM AKCJI (1-TAP)'}
         </Text>
-        <View style={styles.modeSwitchRow}>
+        <View
+          style={styles.modeSwitchRow}
+          accessibilityRole="radiogroup"
+          accessibilityLabel={isEn ? 'Filter actions schedule' : 'Filtruj harmonogram akcji'}
+        >
           <Pressable
             testID="schedule-filter-upcoming"
             style={[
@@ -176,8 +180,10 @@ export function ProactiveCalendarCard({
               setSelectedDateIso(null);
               setScheduleFilter('upcoming');
             }}
-            accessibilityRole="button"
+            accessibilityRole="radio"
+            accessibilityState={{ selected: scheduleFilter === 'upcoming' }}
             accessibilityLabel={isEn ? 'Upcoming actions' : 'Najbliższe akcje'}
+            accessibilityHint={isEn ? 'Shows upcoming proactive brewing actions' : 'Wyświetla najbliższe zaplanowane akcje parzenia'}
           >
             <Text
               style={[
@@ -198,8 +204,10 @@ export function ProactiveCalendarCard({
               setSelectedDateIso(null);
               setScheduleFilter('all');
             }}
-            accessibilityRole="button"
+            accessibilityRole="radio"
+            accessibilityState={{ selected: scheduleFilter === 'all' }}
             accessibilityLabel={isEn ? 'All scheduled actions' : 'Wszystkie akcje'}
+            accessibilityHint={isEn ? 'Shows all scheduled actions' : 'Wyświetla wszystkie zaplanowane akcje'}
           >
             <Text
               style={[
