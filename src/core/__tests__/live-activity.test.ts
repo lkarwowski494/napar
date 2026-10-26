@@ -534,4 +534,38 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resMinusZero.success).toBe(false);
     expect(resMinusZero.error).toContain('Nieprawidłowa gramatura wody');
   });
+
+  test('TASK-P35-12-NIE: updateLiveActivity waliduje stepRemainingSeconds clampując do [0, 86400] i chroniąc przed -0', async () => {
+    const badRemainingNegative: any = {
+      ...mockState,
+      stepRemainingSeconds: -5,
+    };
+    const resNegative = await updateLiveActivity('valid-act-id', badRemainingNegative);
+    expect(resNegative.success).toBe(false);
+    expect(resNegative.error).toContain('Nieprawidłowy pozostały czas kroku');
+
+    const badRemainingMinusZero: any = {
+      ...mockState,
+      stepRemainingSeconds: -0,
+    };
+    const resMinusZero = await updateLiveActivity('valid-act-id', badRemainingMinusZero);
+    expect(resMinusZero.success).toBe(false);
+    expect(resMinusZero.error).toContain('Nieprawidłowy pozostały czas kroku');
+
+    const badRemainingHuge: any = {
+      ...mockState,
+      stepRemainingSeconds: 999999,
+    };
+    const resHuge = await updateLiveActivity('valid-act-id', badRemainingHuge);
+    expect(resHuge.success).toBe(false);
+    expect(resHuge.error).toContain('Nieprawidłowy pozostały czas kroku');
+
+    const validRemaining: any = {
+      ...mockState,
+      stepRemainingSeconds: 45,
+    };
+    const resValid = await updateLiveActivity('valid-act-id', validRemaining);
+    expect(resValid.success).toBe(false);
+    expect(resValid.error).toContain('DEC-01');
+  });
 });

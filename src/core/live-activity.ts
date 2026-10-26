@@ -324,6 +324,15 @@ export async function updateLiveActivity(
       error: 'Nieprawidłowa łączna liczba kroków w stanie Live Activity.',
     };
   }
+  const rawRemaining = typeof _state.stepRemainingSeconds === 'number'
+    ? _state.stepRemainingSeconds
+    : (typeof _state.stepRemainingSeconds === 'string' ? parseFloat(_state.stepRemainingSeconds) : NaN);
+  if (!Number.isFinite(rawRemaining) || rawRemaining < 0 || Object.is(rawRemaining, -0) || rawRemaining > 86400) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy pozostały czas kroku w stanie Live Activity (wymagany zakres [0, 86400]).',
+    };
+  }
   return {
     success: false,
     error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',
