@@ -1,0 +1,98 @@
+[
+  {
+    "id": "TASK-P36-01-ODK",
+    "perspective": "01-ODK",
+    "title": "Semantyczne accessibilityState i etykiety dostepnosci w BrewProAccordion",
+    "file": "src/components/brew/BrewProAccordion.tsx",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P36-02-MON",
+    "perspective": "02-MON",
+    "title": "Normalizacja wielkosci liter tieru w restorePurchases oraz ochrona przed -0 w recordBrewCompleted",
+    "file": "src/core/app-access.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P36-03-ZAK",
+    "perspective": "03-ZAK",
+    "title": "Zabezpieczenie buildFourteenDayCalendar przed niepoprawnym typem daty i tablic",
+    "file": "src/core/bpr-engine.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P36-04-STU",
+    "perspective": "04-STU",
+    "title": "Semantyczne accessibilityState dla filtrow i ochrona przed pustym items w BeanTopBar",
+    "file": "src/components/beans/BeanTopBar.tsx",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P36-05-ARC",
+    "perspective": "05-ARC",
+    "title": "Sanityzacja pol receptury w saveRecipe oraz bezpieczna doza w recordBrewSessionTransaction",
+    "file": "src/core/database.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P36-06-TRE",
+    "perspective": "06-TRE",
+    "title": "Wsparcie dla popularnych aliasow procesow obrobki kawy w findCoffeeProcessById",
+    "file": "src/core/knowledge-data.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P36-07-JAK",
+    "perspective": "07-JAK",
+    "title": "Odrzucanie wartosci null i undefined w diagnoseWaterSensoryImpact",
+    "file": "src/core/water-chemistry.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P36-08-PRO",
+    "perspective": "08-PRO",
+    "title": "Rozpoznawanie Mizudashi, Dutch Coffee i Kyoto Cold Brew w getRecipeMicrons",
+    "file": "src/core/grinder-converter.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P36-09-LOK",
+    "perspective": "09-LOK",
+    "title": "Dodanie klucza brew.methodGina w 35 jezykach i rozszerzenie matrycy testow do 823",
+    "file": "locales/*",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P36-10-WYD",
+    "perspective": "10-WYD",
+    "title": "Statyczna weryfikacja expo.splash.backgroundColor i spojnosci z adaptiveIcon",
+    "file": "scripts/verify-native.mjs",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P36-11-WZR",
+    "perspective": "11-WZR",
+    "title": "Obsluga numerycznych opisow mielenia w recipeToCompactPayload i decodeRecipeFromShareUrl",
+    "file": "src/core/recipe-share.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P36-12-NIE",
+    "perspective": "12-NIE",
+    "title": "Walidacja docelowej wagi wody targetWaterGrams i ochrona przed -0 w updateLiveActivity",
+    "file": "src/core/live-activity.ts",
+    "status": "pending",
+    "commit": null
+  }
+]
