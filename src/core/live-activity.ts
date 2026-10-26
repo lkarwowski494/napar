@@ -111,7 +111,7 @@ export function buildDynamicIslandPayload(
   const icon = safeAttr.beverageType === 'TEA' ? '🍵' : '☕';
   const rawDuration = Math.max(0, Number.isFinite(safeState.stepDurationSeconds) ? Math.round(safeState.stepDurationSeconds) : 0);
   const rawRemaining = Math.max(0, Number.isFinite(safeState.stepRemainingSeconds) ? Math.round(safeState.stepRemainingSeconds) : 0);
-  const safeRemaining = rawDuration > 0 ? Math.min(rawDuration, rawRemaining) : rawRemaining;
+  const safeRemaining = safeState.isFinished ? 0 : (rawDuration > 0 ? Math.min(rawDuration, rawRemaining) : rawRemaining);
   const timeFormatted = formatActivityTimer(safeRemaining);
   const rawStepName =
     (language === 'en' ? safeState.stepNameEn : safeState.stepNamePl) ||
@@ -194,6 +194,7 @@ export function buildLiveActivityPayload(
         stepNamePl: state.stepNamePl || 'Parzenie',
         stepNameEn: state.stepNameEn || 'Brewing',
         stepRemainingSeconds: (() => {
+          if (state.isFinished) return 0;
           const rawDur = Math.max(0, Number.isFinite(state.stepDurationSeconds) ? Math.round(state.stepDurationSeconds) : 0);
           const rawRem = Math.max(0, Number.isFinite(state.stepRemainingSeconds) ? Math.round(state.stepRemainingSeconds) : 0);
           return rawDur > 0 ? Math.min(rawDur, rawRem) : rawRem;
