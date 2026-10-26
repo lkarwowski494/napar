@@ -136,6 +136,16 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       // 15g * 12 * 0.88 = 158.4 mg
       const caffeine = estimateCoffeeCaffeineMg(15.0, 'arabica', 'filter');
       expect(caffeine).toBe(158.4);
+
+      // TASK-P17-07-JAK: normalizacja wielkości liter oraz clamp dozy
+      const upperCase = estimateCoffeeCaffeineMg(15.0, 'ARABICA' as any, 'FILTER' as any);
+      expect(upperCase).toBe(158.4);
+
+      const robustaUpper = estimateCoffeeCaffeineMg(15.0, 'ROBUSTA' as any, 'espresso' as any);
+      expect(robustaUpper).toBe(Number((15 * 22 * 0.75).toFixed(1)));
+
+      const clamped = estimateCoffeeCaffeineMg(5000.0, 'arabica', 'filter');
+      expect(clamped).toBe(Number((1000 * 12 * 0.88).toFixed(1)));
     });
 
     it('estimates caffeine for Robusta correctly', () => {

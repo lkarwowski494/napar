@@ -207,15 +207,19 @@ export function estimateCoffeeCaffeineMg(
   method: 'filter' | 'espresso' | 'immersion' | 'cold_brew' = 'filter'
 ): number {
   if (!Number.isFinite(doseGrams) || doseGrams <= 0) return 0;
+  const safeDose = Math.min(1000, doseGrams);
 
-  const baseRatePerGram = beanType === 'robusta' ? 22.0 : 12.0;
+  const normalizedBean = typeof beanType === 'string' && beanType.toLowerCase().trim() === 'robusta' ? 'robusta' : 'arabica';
+  const normalizedMethod = typeof method === 'string' ? method.toLowerCase().trim() : 'filter';
+
+  const baseRatePerGram = normalizedBean === 'robusta' ? 22.0 : 12.0;
 
   let extractionEfficiency = 0.88; // Domyślnie filtr/drip
-  if (method === 'espresso') extractionEfficiency = 0.75;
-  if (method === 'immersion') extractionEfficiency = 0.85;
-  if (method === 'cold_brew') extractionEfficiency = 0.92;
+  if (normalizedMethod === 'espresso') extractionEfficiency = 0.75;
+  if (normalizedMethod === 'immersion') extractionEfficiency = 0.85;
+  if (normalizedMethod === 'cold_brew') extractionEfficiency = 0.92;
 
-  const totalMg = doseGrams * baseRatePerGram * extractionEfficiency;
+  const totalMg = safeDose * baseRatePerGram * extractionEfficiency;
   return Number(totalMg.toFixed(1));
 }
 
