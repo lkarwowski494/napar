@@ -96,7 +96,20 @@ export function parseStepDurationSeconds(
     }
   }
 
-  // 3. Pojedyncze minuty (+ opcjonalne sekundy): np. "przez 2 minuty", "1.5 min", "wait 2 mins", "steep 4 minutes"
+  // 3. Złożone minuty i sekundy: np. "1 min 30 sek", "2 minuty i 15 sekund", "1 min 45 s"
+  const compoundMatch = normalized.match(
+    /(\d+(?:\.\d+)?)\s*(?:minut(?:[a-ząęółśżźćń]+)?|minutes?|mins?|min\b)\s*(?:i|and)?\s*(\d+(?:\.\d+)?)\s*(?:sekund(?:[a-ząęółśżźćń]+)?|sek\b|secs?\b|sec(?:onds?)?\b|s\b)/i
+  );
+  if (compoundMatch) {
+    const mins = parseFloat(compoundMatch[1]);
+    const secs = parseFloat(compoundMatch[2]);
+    if (!Number.isNaN(mins) && !Number.isNaN(secs) && (mins > 0 || secs > 0)) {
+      const res = Math.max(1, Math.min(86400, Math.round(mins * 60 + secs)));
+      return Object.is(res, -0) ? safeFallback : res;
+    }
+  }
+
+  // 4. Pojedyncze minuty (+ opcjonalne sekundy): np. "przez 2 minuty", "1.5 min", "wait 2 mins", "steep 4 minutes"
   const minSingleMatch = normalized.match(
     /(\d+(?:\.\d+)?)\s*(?:minut(?:[a-ząęółśżźćń]+)?|minutes?|mins?|min\b)/i
   );
@@ -175,6 +188,9 @@ export function buildProactiveActionSchedule(
       ? item.remainingWeightGrams
       : (typeof item.remainingWeightGrams === 'string' ? parseFloat(item.remainingWeightGrams) : NaN);
     const safeRemainingWeight = Number.isFinite(rawW) && rawW > 0 ? (Object.is(rawW, -0) ? 0 : rawW) : 0;
+    if (safeRemainingWeight <= 0) {
+      continue;
+    }
 
     if (item.type === 'coffee') {
       const roastDate =

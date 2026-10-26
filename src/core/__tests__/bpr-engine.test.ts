@@ -482,5 +482,28 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(escaped).not.toContain('\x08');
       expect(escaped).not.toContain('\x1F');
     });
+
+    it('TASK-P48-03-ZAK: parseStepDurationSeconds obsluguje zlozone jednostki minut i sekund oraz ignoruje paczki z 0g w spiżarni', () => {
+      // 1. Złożone minuty i sekundy
+      expect(parseStepDurationSeconds('Zaparzaj przez 1 min 30 sek pod przykryciem', 30)).toBe(90);
+      expect(parseStepDurationSeconds('Odczekaj 2 minuty i 15 sekund', 30)).toBe(135);
+      expect(parseStepDurationSeconds('Steep for 1 min 45 s', 30)).toBe(105);
+
+      // 2. Paczka z zerową wagą pozostałą (remainingWeightGrams <= 0) jest ignorowana
+      const emptyBagInventory: any[] = [
+        {
+          id: 'coffee-empty',
+          name: 'Pusta paczka',
+          type: 'coffee',
+          roastOrHarvestDate: '2026-10-15',
+          remainingWeightGrams: 0,
+          isArchived: false,
+        },
+      ];
+      const schedule = buildProactiveActionSchedule('2026-10-26T08:00:00.000Z', emptyBagInventory as any, []);
+      // Powinno pominąć pustą paczkę i wygenerować domyślną kalibrację zamiast akcji dla 0g
+      expect(schedule.some((act) => act.inventoryItemId === 'coffee-empty')).toBe(false);
+      expect(schedule[0].id).toBe('action-default-calibration');
+    });
   });
 });
