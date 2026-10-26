@@ -1490,4 +1490,31 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(fromCorrupted?.extractionYieldPercentage).toBeUndefined();
     expect(fromCorrupted?.caffeineContentMg).toBeUndefined();
   });
+
+  test('TASK-P30-05-ARC: saveInventoryItem oraz mapRowToInventoryItem trimuja i usuwaja whitespace z pol tekstowych', () => {
+    initDatabase(mockDb as any);
+    const itemWithWhitespace: any = {
+      id: 'item-whitespace-test',
+      name: 'Test Ziarno',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 250,
+      roastOrHarvestDate: '   ',
+      roasterOrProducer: '  Hoppenworth & Ploch  ',
+      origin: '  Ethiopia  ',
+      variety: '   ',
+      process: '  Washed  ',
+      flavorNotes: [],
+      isFavorite: false,
+      isArchived: false,
+    };
+    saveInventoryItem(itemWithWhitespace);
+    const retrieved = getInventoryItemById('item-whitespace-test');
+    expect(retrieved).not.toBeNull();
+    expect(retrieved?.roastOrHarvestDate).toBeUndefined();
+    expect(retrieved?.variety).toBeUndefined();
+    expect(retrieved?.roasterOrProducer).toBe('Hoppenworth & Ploch');
+    expect(retrieved?.origin).toBe('Ethiopia');
+    expect(retrieved?.process).toBe('Washed');
+  });
 });

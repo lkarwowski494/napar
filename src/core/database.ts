@@ -309,6 +309,26 @@ export function saveInventoryItem(item: InventoryItem): void {
   const sanitizedRating = item.rating != null && Number.isFinite(item.rating) && item.rating >= 0 && item.rating <= 5
     ? item.rating
     : null;
+  const sanitizedRoastDate =
+    typeof item.roastOrHarvestDate === 'string' && item.roastOrHarvestDate.trim().length > 0
+      ? item.roastOrHarvestDate.trim()
+      : null;
+  const sanitizedRoaster =
+    typeof item.roasterOrProducer === 'string' && item.roasterOrProducer.trim().length > 0
+      ? item.roasterOrProducer.trim()
+      : null;
+  const sanitizedOrigin =
+    typeof item.origin === 'string' && item.origin.trim().length > 0
+      ? item.origin.trim()
+      : null;
+  const sanitizedVariety =
+    typeof item.variety === 'string' && item.variety.trim().length > 0
+      ? item.variety.trim()
+      : null;
+  const sanitizedProcess =
+    typeof item.process === 'string' && item.process.trim().length > 0
+      ? item.process.trim()
+      : null;
 
   db.runSync(
     `INSERT OR REPLACE INTO inventory_items (
@@ -321,12 +341,12 @@ export function saveInventoryItem(item: InventoryItem): void {
       item.id,
       item.name,
       item.type,
-      item.roasterOrProducer ?? null,
-      item.origin ?? null,
-      item.roastOrHarvestDate ?? null,
+      sanitizedRoaster,
+      sanitizedOrigin,
+      sanitizedRoastDate,
       item.roastProfile ?? null,
-      item.process ?? null,
-      item.variety ?? null,
+      sanitizedProcess,
+      sanitizedVariety,
       initWeight,
       remWeight,
       JSON.stringify(item.flavorNotes || []),
@@ -399,12 +419,30 @@ function mapRowToInventoryItem(row: InventoryRow): InventoryItem {
     id: row.id || '',
     name: row.name || '',
     type: row.type === 'tea' ? 'tea' : 'coffee',
-    roasterOrProducer: row.roaster_or_producer || undefined,
-    origin: row.origin || undefined,
-    roastOrHarvestDate: row.roast_or_harvest_date || undefined,
-    roastProfile: row.roast_profile || undefined,
-    process: row.process || undefined,
-    variety: row.variety || undefined,
+    roasterOrProducer:
+      typeof row.roaster_or_producer === 'string' && row.roaster_or_producer.trim().length > 0
+        ? row.roaster_or_producer.trim()
+        : undefined,
+    origin:
+      typeof row.origin === 'string' && row.origin.trim().length > 0
+        ? row.origin.trim()
+        : undefined,
+    roastOrHarvestDate:
+      typeof row.roast_or_harvest_date === 'string' && row.roast_or_harvest_date.trim().length > 0
+        ? row.roast_or_harvest_date.trim()
+        : undefined,
+    roastProfile:
+      typeof row.roast_profile === 'string' && row.roast_profile.trim().length > 0
+        ? row.roast_profile.trim()
+        : undefined,
+    process:
+      typeof row.process === 'string' && row.process.trim().length > 0
+        ? row.process.trim()
+        : undefined,
+    variety:
+      typeof row.variety === 'string' && row.variety.trim().length > 0
+        ? row.variety.trim()
+        : undefined,
     initialWeightGrams:
       Number.isFinite(Number(row.initial_weight_g)) && Number(row.initial_weight_g) >= 0
         ? Number(row.initial_weight_g)
