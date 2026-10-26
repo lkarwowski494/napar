@@ -90,6 +90,12 @@ try {
     `app.json -> expo.ios.bundleIdentifier musi być równe 'pl.lukasz.napar' (otrzymano '${iosBundleId}')`
   );
 
+  // Weryfikacja nazwy aplikacji w app.json (TASK-P21-10-WYD)
+  check(
+    appJson.name === 'Napar',
+    `app.json -> expo.name musi być równe 'Napar' (otrzymano '${appJson.name}')`
+  );
+
   // Weryfikacja ścieżki ikony oraz numerycznego buildNumber (TASK-P12-10-WYD)
   check(
     appJson.icon === './assets/icon.png',
