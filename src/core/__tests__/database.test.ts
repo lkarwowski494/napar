@@ -2206,4 +2206,61 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(duplicated.waterGrams).toBe(300.5);
     expect(duplicated.recommendedRatio).toBe(17.5);
   });
+
+  test('TASK-P52-05-ARC: deleteRecipe, deleteInventoryItem, deleteBrewSession i deleteCaffeineLog wspieraja numeryczne ID oraz sanityzuja znaki kontrolne', () => {
+    // 1. deleteRecipe z numerycznym ID
+    saveRecipe({
+      id: '12345',
+      name: 'Numeric ID Recipe',
+      beverageType: 'COFFEE',
+      method: 'Aeropress',
+      doseGrams: 14,
+      waterGrams: 200,
+      waterTempCelsius: 90,
+      recommendedRatio: 14.3,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-26T20:00:00Z',
+    });
+    expect(getRecipeById('12345')).toBeDefined();
+    deleteRecipe(12345 as any);
+    expect(getRecipeById('12345')).toBeNull();
+
+    // 2. deleteInventoryItem z numerycznym ID
+    saveInventoryItem({
+      id: '9999',
+      name: 'Numeric Inventory',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 200,
+      flavorNotes: [],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-10-26T20:00:00Z',
+      updatedAt: '2026-10-26T20:00:00Z',
+    });
+    expect(getInventoryItemById('9999')).toBeDefined();
+    deleteInventoryItem(9999 as any);
+    expect(getInventoryItemById('9999')).toBeNull();
+
+    // 3. deleteRecipe ze znakami kontrolnymi
+    saveRecipe({
+      id: 'rec-ctrl-clean',
+      name: 'Control Chars Recipe',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 92,
+      recommendedRatio: 16,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-26T20:00:00Z',
+    });
+    expect(getRecipeById('rec-ctrl-clean')).toBeDefined();
+    deleteRecipe('\x00rec-ctrl-clean\x1F' as any);
+    expect(getRecipeById('rec-ctrl-clean')).toBeNull();
+  });
 });

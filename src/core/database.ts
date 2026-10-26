@@ -382,8 +382,9 @@ export function saveInventoryItem(item: InventoryItem): void {
 }
 
 export function deleteInventoryItem(id: string): void {
-  if (!id || typeof id !== 'string' || !id.trim()) return;
-  const safeId = id.trim();
+  const rawId = typeof id === 'string' ? id : (typeof id === 'number' && Number.isFinite(id) ? String(id) : '');
+  const safeId = rawId.replace(/[\x00-\x1F\x7F]/g, '').trim();
+  if (!safeId) return;
   const db = getDatabase();
   runInTransactionSync(db, () => {
     db.runSync('UPDATE brew_sessions SET inventory_item_id = NULL WHERE inventory_item_id = ?', [safeId]);
@@ -610,8 +611,9 @@ export function saveRecipe(recipe: SavedRecipe): void {
 }
 
 export function deleteRecipe(id: string): void {
-  if (!id || typeof id !== 'string' || !id.trim()) return;
-  const safeId = id.trim();
+  const rawId = typeof id === 'string' ? id : (typeof id === 'number' && Number.isFinite(id) ? String(id) : '');
+  const safeId = rawId.replace(/[\x00-\x1F\x7F]/g, '').trim();
+  if (!safeId) return;
   const db = getDatabase();
   runInTransactionSync(db, () => {
     db.runSync('UPDATE brew_sessions SET recipe_id = NULL WHERE recipe_id = ?', [safeId]);
@@ -620,8 +622,9 @@ export function deleteRecipe(id: string): void {
 }
 
 export function toggleRecipeFavorite(id: string): boolean {
-  if (!id || typeof id !== 'string' || !id.trim()) return false;
-  const safeId = id.trim();
+  const rawId = typeof id === 'string' ? id : (typeof id === 'number' && Number.isFinite(id) ? String(id) : '');
+  const safeId = rawId.replace(/[\x00-\x1F\x7F]/g, '').trim();
+  if (!safeId) return false;
   const db = getDatabase();
   const recipe = getRecipeById(safeId);
   if (!recipe) return false;
@@ -631,8 +634,9 @@ export function toggleRecipeFavorite(id: string): boolean {
 }
 
 export function updateRecipeFavorite(id: string, isFavorite: boolean | string | number): void {
-  if (!id || typeof id !== 'string' || !id.trim()) return;
-  const safeId = id.trim();
+  const rawId = typeof id === 'string' ? id : (typeof id === 'number' && Number.isFinite(id) ? String(id) : '');
+  const safeId = rawId.replace(/[\x00-\x1F\x7F]/g, '').trim();
+  if (!safeId) return;
   const db = getDatabase();
   const favVal = isFavorite === true || isFavorite === 1 || isFavorite === 'true' || isFavorite === '1' ? 1 : 0;
   db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [favVal, safeId]);
@@ -964,8 +968,9 @@ export function recordBrewSessionTransaction(
 }
 
 export function deleteBrewSession(id: string): void {
-  if (!id || typeof id !== 'string' || !id.trim()) return;
-  const safeId = id.trim();
+  const rawId = typeof id === 'string' ? id : (typeof id === 'number' && Number.isFinite(id) ? String(id) : '');
+  const safeId = rawId.replace(/[\x00-\x1F\x7F]/g, '').trim();
+  if (!safeId) return;
   const db = getDatabase();
   runInTransactionSync(db, () => {
     db.runSync('DELETE FROM caffeine_logs WHERE brew_session_id = ?', [safeId]);
@@ -1124,8 +1129,9 @@ export function logCaffeine(log: CaffeineLog): void {
 }
 
 export function deleteCaffeineLog(id: string): void {
-  if (!id || typeof id !== 'string' || !id.trim()) return;
-  const safeId = id.trim();
+  const rawId = typeof id === 'string' ? id : (typeof id === 'number' && Number.isFinite(id) ? String(id) : '');
+  const safeId = rawId.replace(/[\x00-\x1F\x7F]/g, '').trim();
+  if (!safeId) return;
   const db = getDatabase();
   db.runSync('DELETE FROM caffeine_logs WHERE id = ?', [safeId]);
 }
