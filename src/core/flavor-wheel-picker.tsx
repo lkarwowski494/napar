@@ -42,6 +42,8 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                 style={styles.activeChip}
                 onPress={() => onToggleDescriptor(desc)}
                 hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel={isEn ? `Remove ${desc}` : `Usuń ${desc}`}
               >
                 <Text style={styles.activeChipText}>{desc} ✕</Text>
               </Pressable>
@@ -55,6 +57,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.categoryScroll}
+        accessibilityRole="tablist"
       >
         {SCA_FLAVOR_WHEEL.map((cat) => {
           const isActive = cat.id === activeCategoryId;
@@ -70,6 +73,9 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                 },
               ]}
               onPress={() => setActiveCategoryId(cat.id)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: isActive }}
+              accessibilityLabel={categoryName}
             >
               <Text
                 style={[
@@ -107,6 +113,9 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                         },
                       ]}
                       onPress={() => onToggleDescriptor(desc)}
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: isSelected }}
+                      accessibilityLabel={desc}
                     >
                       <Text
                         style={[

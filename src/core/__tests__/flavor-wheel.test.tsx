@@ -126,6 +126,31 @@ describe('SCA Flavor Wheel Data & Picker Component', () => {
     expect(str).toContain('Fruity');
     expect(str).toContain('Citrus');
   });
+
+  test('TASK-P15-04-STU: FlavorWheelPicker deklaruje poprawne role i stany accessibility (a11y)', () => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <FlavorWheelPicker
+          selectedDescriptors={['Bergamotka']}
+          onToggleDescriptor={jest.fn()}
+          language='pl'
+        />
+      );
+    });
+
+    const activeChip = findPressableWithText(tree.root, 'Bergamotka');
+    expect(activeChip.props.accessibilityRole).toBe('button');
+    expect(activeChip.props.accessibilityLabel).toBe('Usuń Bergamotka');
+
+    const fruityTab = findPressableWithText(tree.root, 'Owoce');
+    expect(fruityTab.props.accessibilityRole).toBe('tab');
+    expect(fruityTab.props.accessibilityState).toEqual({ selected: true });
+
+    const citrusChip = findPressableWithText(tree.root, 'Cytryna');
+    expect(citrusChip.props.accessibilityRole).toBe('checkbox');
+    expect(citrusChip.props.accessibilityState).toEqual({ checked: false });
+  });
 });
 
 function findPressableWithText(root: any, text: string) {
