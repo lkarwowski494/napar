@@ -144,6 +144,9 @@ export function BrewHeader({
                     isSelected && styles.favoriteChipActive,
                   ]}
                   onPress={() => onSelectRecipe(fav)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: isSelected }}
+                  accessibilityLabel={`Ulubiony przepis: ${fav.name}, metoda ${fav.method}, doza ${favDose}g`}
                 >
                   <Text
                     style={[
@@ -216,6 +219,11 @@ export function BrewHeader({
           onPress={onOpenInventoryModal}
           accessibilityRole="button"
           accessibilityLabel="Wybierz ziarna ze spiżarni"
+          accessibilityHint={
+            selectedInventoryItem
+              ? `${selectedInventoryItem.name}, pozostało ${selectedInventoryItem.remainingWeightGrams}g`
+              : undefined
+          }
         >
           <Text style={styles.selectorEyebrow}>SPIŻARNIA</Text>
           <Text style={styles.selectorValue} numberOfLines={1}>
@@ -257,6 +265,8 @@ export function BrewHeader({
           testID="gongfu-mode-btn"
           style={styles.gongfuBanner}
           onPress={onNavigateToGongfu}
+          accessibilityRole="button"
+          accessibilityLabel="Przejdź do trybu wieloetapowego parzenia Gongfu Cha"
         >
           <Text style={styles.gongfuBannerText}>
             Przejdź do Trybu Wielokrotnych Zalań (Gongfu Cha Tracker) →

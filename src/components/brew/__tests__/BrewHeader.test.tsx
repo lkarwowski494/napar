@@ -147,4 +147,40 @@ describe('BrewHeader Component', () => {
     act(() => coffeeBtn.props.onPress());
     expect(onBeverageTypeChangeMock).toHaveBeenCalledWith('COFFEE');
   });
+
+  test('Weryfikacja ról semantycznych i etykiet a11y (TASK-P37-01-ODK)', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewHeader
+          {...defaultProps}
+          recipe={{
+            id: 'tea-1',
+            name: 'Oolong Da Hong Pao',
+            method: 'Gongfu',
+            beverageType: 'TEA',
+          }}
+        />
+      );
+    });
+
+    // Ulubiony chip
+    const favChip = tree.root.findByProps({
+      accessibilityLabel: 'Ulubiony przepis: AeroPress Champion, metoda AeroPress, doza 14g',
+    });
+    expect(favChip).toBeTruthy();
+    expect(favChip.props.accessibilityRole).toBe('button');
+    expect(favChip.props.accessibilityState).toEqual({ selected: false });
+
+    // Spiżarnia z hintem
+    const stashCard = tree.root.findByProps({ testID: 'open-inventory-modal-btn' });
+    expect(stashCard.props.accessibilityRole).toBe('button');
+    expect(stashCard.props.accessibilityLabel).toBe('Wybierz ziarna ze spiżarni');
+    expect(stashCard.props.accessibilityHint).toBe('Etiopia Yirgacheffe, pozostało 180g');
+
+    // Baner Gongfu z accessibilityRole i accessibilityLabel
+    const gongfuBtn = tree.root.findByProps({ testID: 'gongfu-mode-btn' });
+    expect(gongfuBtn.props.accessibilityRole).toBe('button');
+    expect(gongfuBtn.props.accessibilityLabel).toBe('Przejdź do trybu wieloetapowego parzenia Gongfu Cha');
+  });
 });
