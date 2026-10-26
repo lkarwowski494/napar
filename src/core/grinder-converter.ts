@@ -95,7 +95,10 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     minSetting: 5,
     maxSetting: 45,
     micronsPerSettingOffset: 0,
-    formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `${Math.round(clicks)} clicks` : `${Math.round(clicks)} klików`,
+    formatSetting: (clicks: number, lang = 'pl') => {
+      const c = Object.is(Math.round(clicks), -0) ? 0 : Math.round(clicks);
+      return lang === 'en' ? `${c} clicks` : `${c} klików`;
+    },
     parseSetting: (text: string) => {
       const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 24;
@@ -112,7 +115,10 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     minSetting: 6,
     maxSetting: 36,
     micronsPerSettingOffset: 0,
-    formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `${Math.round(clicks)} clicks` : `${Math.round(clicks)} klików`,
+    formatSetting: (clicks: number, lang = 'pl') => {
+      const c = Object.is(Math.round(clicks), -0) ? 0 : Math.round(clicks);
+      return lang === 'en' ? `${c} clicks` : `${c} klików`;
+    },
     parseSetting: (text: string) => {
       const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 18;
@@ -182,7 +188,10 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     minSetting: 1,
     maxSetting: 40,
     micronsPerSettingOffset: 150,
-    formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `Setting #${Math.round(clicks)}` : `Nastawa #${Math.round(clicks)}`,
+    formatSetting: (clicks: number, lang = 'pl') => {
+      const c = Object.is(Math.round(clicks), -0) ? 0 : Math.round(clicks);
+      return lang === 'en' ? `Setting #${c}` : `Nastawa #${c}`;
+    },
     parseSetting: (text: string) => {
       const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 16;
@@ -349,41 +358,72 @@ const GRINDER_ALIASES: Record<string, string> = {
   comandante: 'comandante_c40',
   'c40-mk3': 'comandante_c40',
   'c40-mk4': 'comandante_c40',
+  'c40 mk3': 'comandante_c40',
+  'c40 mk4': 'comandante_c40',
+  c40mk3: 'comandante_c40',
+  c40mk4: 'comandante_c40',
+  'comandante-c40': 'comandante_c40',
+  'comandante c40': 'comandante_c40',
   c2: 'timemore_c2_c3',
   c3: 'timemore_c2_c3',
   timemore: 'timemore_c2_c3',
   'timemore-c2': 'timemore_c2_c3',
   'timemore-c3': 'timemore_c2_c3',
   'timemore-c2-c3': 'timemore_c2_c3',
+  'timemore c2': 'timemore_c2_c3',
+  'timemore c3': 'timemore_c2_c3',
+  chestnut: 'timemore_c2_c3',
+  'timemore chestnut': 'timemore_c2_c3',
+  c3s: 'timemore_c2_c3',
+  'c3 esp': 'timemore_c2_c3',
   svart: 'wilfa_svart',
   wilfa: 'wilfa_svart',
   'wilfa-svart': 'wilfa_svart',
+  'wilfa svart': 'wilfa_svart',
   wilfasvart: 'wilfa_svart',
+  'svart aroma': 'wilfa_svart',
   kultra: '1zpresso_k_ultra',
   'k-ultra': '1zpresso_k_ultra',
   '1zpresso-k-ultra': '1zpresso_k_ultra',
+  '1zpresso k-ultra': '1zpresso_k_ultra',
+  kmax: '1zpresso_k_ultra',
+  'k-max': '1zpresso_k_ultra',
   ode: 'fellow_ode_gen2',
   'ode-gen2': 'fellow_ode_gen2',
+  'ode gen 2': 'fellow_ode_gen2',
+  'ode 2': 'fellow_ode_gen2',
+  'ode-2': 'fellow_ode_gen2',
   'fellow-ode': 'fellow_ode_gen2',
+  'fellow ode': 'fellow_ode_gen2',
   encore: 'baratza_encore',
   baratza: 'baratza_encore',
   'baratza-encore': 'baratza_encore',
+  'encore-esp': 'baratza_encore',
+  'encore esp': 'baratza_encore',
+  'baratza esp': 'baratza_encore',
   k6: 'kingrinder_k6',
   kingrinder: 'kingrinder_k6',
   'kingrinder-k6': 'kingrinder_k6',
+  'kingrinder k6': 'kingrinder_k6',
+  'k-6': 'kingrinder_k6',
   kinu: 'kinu_m47',
   m47: 'kinu_m47',
   'kinu-m47': 'kinu_m47',
+  'kinu m47': 'kinu_m47',
   mignon: 'eureka_mignon',
   eureka: 'eureka_mignon',
   'eureka-mignon': 'eureka_mignon',
+  'eureka mignon': 'eureka_mignon',
+  specialita: 'eureka_mignon',
   zp6: '1zpresso_zp6',
   'zp6-special': '1zpresso_zp6',
   'zp-6': '1zpresso_zp6',
   '1zpresso-zp6': '1zpresso_zp6',
+  '1zpresso zp6': '1zpresso_zp6',
   jmax: '1zpresso_j_max',
   'j-max': '1zpresso_j_max',
   '1zpresso-j-max': '1zpresso_j_max',
+  '1zpresso j-max': '1zpresso_j_max',
 };
 
 export function findGrinderById(id: string): GrinderModel | undefined {
@@ -491,6 +531,8 @@ export function getRecipeMicrons(recipe?: {
     desc.includes('tygielek') ||
     desc.includes('cezve') ||
     desc.includes('ibrik') ||
+    desc.includes('dżezw') ||
+    desc.includes('dzezw') ||
     desc.includes('espresso') ||
     desc.includes('americano') ||
     desc.includes('lungo') ||
@@ -535,17 +577,23 @@ export function getRecipeMicrons(recipe?: {
     method === 'TURKISH' ||
     method === 'CEZVE' ||
     method === 'IBRIK' ||
-    method.includes('IBRIK')
+    method.includes('IBRIK') ||
+    method.includes('DZEZW') ||
+    method.includes('DŻEZW')
   ) {
     if (
       desc.includes('turkish') ||
       desc.includes('tygielek') ||
       desc.includes('cezve') ||
       desc.includes('ibrik') ||
+      desc.includes('dżezw') ||
+      desc.includes('dzezw') ||
       method === 'TURKISH' ||
       method === 'CEZVE' ||
       method === 'IBRIK' ||
-      method.includes('IBRIK')
+      method.includes('IBRIK') ||
+      method.includes('DZEZW') ||
+      method.includes('DŻEZW')
     ) {
       return 200;
     }

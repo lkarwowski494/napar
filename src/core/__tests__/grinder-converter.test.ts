@@ -682,4 +682,33 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Drobno pod wietnamski phin' })).toBe(480);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine grind for Vietnamese phin filter' })).toBe(480);
   });
+
+  test('TASK-P53-08-PRO: formatSetting chroni przed -0, a findGrinderById i getRecipeMicrons wspieraja nowe aliasy i Delter/Cezve', () => {
+    // 1. Ochrona formatSetting przed -0
+    const c40 = findGrinderById('comandante_c40');
+    expect(c40?.formatSetting(-0, 'pl')).toBe('0 klików');
+    expect(c40?.formatSetting(-0, 'en')).toBe('0 clicks');
+
+    const encore = findGrinderById('baratza_encore');
+    expect(encore?.formatSetting(-0, 'pl')).toBe('Nastawa #0');
+    expect(encore?.formatSetting(-0, 'en')).toBe('Setting #0');
+
+    // 2. Rozszerzone aliasy młynków w findGrinderById
+    expect(findGrinderById('c40 mk4')?.id).toBe('comandante_c40');
+    expect(findGrinderById('comandante c40')?.id).toBe('comandante_c40');
+    expect(findGrinderById('timemore c2')?.id).toBe('timemore_c2_c3');
+    expect(findGrinderById('chestnut')?.id).toBe('timemore_c2_c3');
+    expect(findGrinderById('fellow ode')?.id).toBe('fellow_ode_gen2');
+    expect(findGrinderById('ode 2')?.id).toBe('fellow_ode_gen2');
+    expect(findGrinderById('encore esp')?.id).toBe('baratza_encore');
+    expect(findGrinderById('wilfa svart')?.id).toBe('wilfa_svart');
+    expect(findGrinderById('specialita')?.id).toBe('eureka_mignon');
+
+    // 3. getRecipeMicrons dla Delter Coffee Press (560 µm) i Cezve / Dżezwa (200 µm)
+    expect(getRecipeMicrons({ method: 'DELTER' })).toBe(560);
+    expect(getRecipeMicrons({ method: 'Delter Coffee Press' })).toBe(560);
+    expect(getRecipeMicrons({ method: 'CEZVE' })).toBe(200);
+    expect(getRecipeMicrons({ method: 'Dżezwa turecka' })).toBe(200);
+    expect(getRecipeMicrons({ method: 'IBRIK' })).toBe(200);
+  });
 });
