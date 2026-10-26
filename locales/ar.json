@@ -237,7 +237,8 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "paramsAndRatio": "المعايير والنسبة",
-    "stepName": "اسم الخطوة"
+    "stepName": "اسم الخطوة",
+    "calculatedRatio": "النسبة المحسوبة"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

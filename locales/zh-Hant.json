@@ -237,7 +237,8 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "paramsAndRatio": "沖煮參數與粉水比",
-    "stepName": "步驟名稱"
+    "stepName": "步驟名稱",
+    "calculatedRatio": "計算比例"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

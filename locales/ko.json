@@ -237,7 +237,8 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "paramsAndRatio": "파라미터 및 비율",
-    "stepName": "단계 이름"
+    "stepName": "단계 이름",
+    "calculatedRatio": "계산된 비율"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

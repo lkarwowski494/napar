@@ -237,7 +237,8 @@
     "fillRequired": "Wypełnij nazwę i dodaj przynajmniej jeden krok parzenia.",
     "duplicateBtn": "Duplikuj jako nową recepturę",
     "paramsAndRatio": "Parametry & Proporcja",
-    "stepName": "Nazwa kroku"
+    "stepName": "Nazwa kroku",
+    "calculatedRatio": "Wyliczona proporcja"
   },
   "stash": {
     "title": "Spiżarnia Ziaren & Herbat",

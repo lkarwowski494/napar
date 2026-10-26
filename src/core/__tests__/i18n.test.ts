@@ -368,4 +368,9 @@ describe('i18n System', () => {
     expect(translations.pl.recipeBuilder.stepName).toBe('Nazwa kroku');
     expect(translations.en.recipeBuilder.stepName).toBe('Step name');
   });
+
+  test('TASK-P33-09-LOK: Klucz calculatedRatio jest zdefiniowany w recipeBuilder w PL i EN', () => {
+    expect(translations.pl.recipeBuilder.calculatedRatio).toBe('Wyliczona proporcja');
+    expect(translations.en.recipeBuilder.calculatedRatio).toBe('Calculated ratio');
+  });
 });

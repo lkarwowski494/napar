@@ -237,7 +237,8 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "paramsAndRatio": "Parametri și Raport",
-    "stepName": "Numele pasului"
+    "stepName": "Numele pasului",
+    "calculatedRatio": "Raport calculat"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

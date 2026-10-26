@@ -244,7 +244,8 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "paramsAndRatio": "Parameters & Ratio",
-    "stepName": "Step name"
+    "stepName": "Step name",
+    "calculatedRatio": "Calculated ratio"
   },
   "stash": {
     "title": "Coffee & Tea Stash",
