@@ -461,9 +461,17 @@ export async function updateLiveActivity(
 
 export async function endLiveActivity(
   activityId: string,
-  dismissalPolicy: 'immediate' | 'after_delay' = 'immediate'
+  dismissalPolicy: 'immediate' | 'after_delay' | string = 'immediate',
+  finalContentState?: BrewLiveActivityState
 ): Promise<{ success: boolean; error?: string }> {
-  if (!activityId || typeof activityId !== 'string' || !activityId.trim()) {
+  if (!activityId || typeof activityId !== 'string') {
+    return {
+      success: false,
+      error: 'Nieprawidłowy identyfikator aktywności Live Activity.',
+    };
+  }
+  const cleanId = activityId.replace(/[\x00-\x1F\x7F]/g, '').trim().slice(0, 256);
+  if (!cleanId) {
     return {
       success: false,
       error: 'Nieprawidłowy identyfikator aktywności Live Activity.',
@@ -476,6 +484,25 @@ export async function endLiveActivity(
       error: 'Nieprawidłowa polityka zakończenia Live Activity (dozwolone: immediate, after_delay).',
     };
   }
+
+  if (finalContentState !== undefined && finalContentState !== null) {
+    if (typeof finalContentState !== 'object') {
+      return {
+        success: false,
+        error: 'Nieprawidłowy stan końcowy Live Activity.',
+      };
+    }
+    const rawStepIdx = typeof finalContentState.stepIndex === 'number'
+      ? finalContentState.stepIndex
+      : (typeof (finalContentState as any).stepIndex === 'string' ? parseFloat(String((finalContentState as any).stepIndex).replace(',', '.')) : NaN);
+    if (!Number.isFinite(rawStepIdx) || rawStepIdx < 0) {
+      return {
+        success: false,
+        error: 'Nieprawidłowy indeks kroku w stanie końcowym Live Activity.',
+      };
+    }
+  }
+
   return {
     success: false,
     error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',

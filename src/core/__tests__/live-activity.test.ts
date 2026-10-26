@@ -971,4 +971,27 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(formatActivityTimer(' 90,5 ' as any)).toBe('1:30');
     expect(formatActivityTimer(' 125,8 ' as any)).toBe('2:05');
   });
+
+  test('TASK-P52-12-NIE: endLiveActivity waliduje finalContentState, sanityzuje znaki kontrolne w ID i normalizuje wielkosc liter dismissalPolicy', async () => {
+    // 1. Znaki kontrolne w ID
+    const resCtrl = await endLiveActivity('\x00\x1F');
+    expect(resCtrl.success).toBe(false);
+    expect(resCtrl.error).toContain('Nieprawidłowy identyfikator');
+
+    // 2. Normalizacja wielkości liter dismissalPolicy
+    const resUpper = await endLiveActivity('act-test-id', '  IMMEDIATE  ' as any);
+    expect(resUpper.error).toBe('ActivityKit Live Activity niedostępne w v1.0 (DEC-01).');
+
+    // 3. Walidacja finalContentState
+    const resBadType = await endLiveActivity('act-test-id', 'immediate', 'not-an-object' as any);
+    expect(resBadType.success).toBe(false);
+    expect(resBadType.error).toContain('Nieprawidłowy stan końcowy');
+
+    const resNegativeIndex = await endLiveActivity('act-test-id', 'after_delay', { ...mockState, stepIndex: -2 } as any);
+    expect(resNegativeIndex.success).toBe(false);
+    expect(resNegativeIndex.error).toContain('Nieprawidłowy indeks kroku');
+
+    const resValidFinal = await endLiveActivity('act-test-id', 'after_delay', { ...mockState, stepIndex: 3 });
+    expect(resValidFinal.error).toBe('ActivityKit Live Activity niedostępne w v1.0 (DEC-01).');
+  });
 });
