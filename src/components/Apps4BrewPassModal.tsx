@@ -44,7 +44,7 @@ export function Apps4BrewPassModal({
     setIsProcessing(true);
     try {
       const result = purchaseWithStoreKit(tier);
-      if (result.success) {
+      if (result && result.success) {
         Alert.alert(
           t.settings.purchaseSuccessTitle,
           tier === 'annual'
@@ -61,10 +61,11 @@ export function Apps4BrewPassModal({
         }
         onClose();
       } else {
+        const errorCode = result ? result.errorCode : undefined;
         const errorMsg =
-          result.errorCode === 'invalid_signature'
+          errorCode === 'invalid_signature'
             ? (language === 'en' ? 'Invalid StoreKit transaction signature' : 'Nieprawidłowy podpis transakcji StoreKit')
-            : result.errorCode === 'unknown_product'
+            : errorCode === 'unknown_product'
             ? (language === 'en' ? 'Unknown StoreKit product identifier' : 'Nieznany identyfikator produktu StoreKit')
             : (language === 'en' ? 'StoreKit transaction authorization failed' : 'Błąd autoryzacji transakcji StoreKit');
         Alert.alert(t.settings.restoreNotFoundTitle, errorMsg);
