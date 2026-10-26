@@ -139,6 +139,19 @@ describe('Baza Wiedzy: Terroir i Regiony Kawowe (COFFEE_ORIGINS)', () => {
     expect(yirgacheffe.length).toBe(1);
     expect(yirgacheffe[0].id).toBe('origin-ethiopia');
 
+    // TASK-P9-06-TRE: Wyszukiwanie po angielskiej nazwie kraju
+    const ethiopiaEn = searchCoffeeOrigins('Ethiopia');
+    expect(ethiopiaEn.length).toBe(1);
+    expect(ethiopiaEn[0].id).toBe('origin-ethiopia');
+
+    const brazilEn = searchCoffeeOrigins('Brazil');
+    expect(brazilEn.length).toBe(1);
+    expect(brazilEn[0].id).toBe('origin-brazil');
+
+    const costaRicaEn = searchCoffeeOrigins('Costa Rica');
+    expect(costaRicaEn.length).toBe(1);
+    expect(costaRicaEn[0].id).toBe('origin-costa-rica');
+
     expect(findCoffeeOriginById('origin-kenya')).toBeDefined();
     expect(findCoffeeOriginById('non-existent-origin')).toBeUndefined();
   });

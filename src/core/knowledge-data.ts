@@ -49,6 +49,7 @@ export interface CoffeeProcessInfo {
 export interface CoffeeOriginInfo {
   id: string;
   country: string;
+  countryEn?: string;
   countryCode: string;
   primaryRegions: string[];
   typicalAltitudeMeters: string;
@@ -348,6 +349,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
   {
     id: 'origin-ethiopia',
     country: 'Etiopia',
+    countryEn: 'Ethiopia',
     countryCode: 'ET',
     primaryRegions: ["Yirgacheffe","Guji","Sidama","Harrar","Jimma"],
     typicalAltitudeMeters: '1800 – 2200 m n.p.m.',
@@ -363,6 +365,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
   {
     id: 'origin-kenya',
     country: 'Kenia',
+    countryEn: 'Kenya',
     countryCode: 'KE',
     primaryRegions: ["Nyeri","Kirinyaga","Murang’a","Kiambu","Embu"],
     typicalAltitudeMeters: '1600 – 2100 m n.p.m.',
@@ -378,6 +381,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
   {
     id: 'origin-colombia',
     country: 'Kolumbia',
+    countryEn: 'Colombia',
     countryCode: 'CO',
     primaryRegions: ["Huila","Nariño","Antioquia","Tolima","Cauca"],
     typicalAltitudeMeters: '1400 – 2100 m n.p.m.',
@@ -393,6 +397,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
   {
     id: 'origin-guatemala',
     country: 'Gwatemala',
+    countryEn: 'Guatemala',
     countryCode: 'GT',
     primaryRegions: ["Antigua","Huehuetenango","Cobán","Fraijanes","Atitlán"],
     typicalAltitudeMeters: '1500 – 2000 m n.p.m.',
@@ -408,6 +413,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
   {
     id: 'origin-costa-rica',
     country: 'Kostaryka',
+    countryEn: 'Costa Rica',
     countryCode: 'CR',
     primaryRegions: ["Tarrazú","West Valley","Central Valley","Brunca"],
     typicalAltitudeMeters: '1200 – 1900 m n.p.m.',
@@ -423,6 +429,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
   {
     id: 'origin-brazil',
     country: 'Brazylia',
+    countryEn: 'Brazil',
     countryCode: 'BR',
     primaryRegions: ["Sul de Minas","Cerrado Mineiro","Mogiana","Espírito Santo"],
     typicalAltitudeMeters: '800 – 1350 m n.p.m.',
@@ -438,6 +445,7 @@ export const COFFEE_ORIGINS: CoffeeOriginInfo[] = [
   {
     id: 'origin-panama',
     country: 'Panama',
+    countryEn: 'Panama',
     countryCode: 'PA',
     primaryRegions: ["Boquete","Volcán","Renacimiento"],
     typicalAltitudeMeters: '1400 – 2000 m n.p.m.',
@@ -588,6 +596,7 @@ export function searchCoffeeOrigins(query: string): CoffeeOriginInfo[] {
   const q = query.toLowerCase().trim();
   return COFFEE_ORIGINS.filter((o) =>
     o.country.toLowerCase().includes(q) ||
+    (o.countryEn && o.countryEn.toLowerCase().includes(q)) ||
     o.primaryRegions.some((r) => r.toLowerCase().includes(q)) ||
     o.mainVarieties.some((v) => v.toLowerCase().includes(q)) ||
     o.flavorProfilePl.toLowerCase().includes(q) ||
