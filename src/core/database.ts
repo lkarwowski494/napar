@@ -442,6 +442,7 @@ export function getRecipeById(id: string): SavedRecipe | null {
 }
 
 export function saveRecipe(recipe: SavedRecipe): void {
+  if (!recipe || typeof recipe !== 'object') return;
   const db = getDatabase();
   const safeId = typeof recipe.id === 'string' ? recipe.id.trim() : '';
   if (!safeId) return;

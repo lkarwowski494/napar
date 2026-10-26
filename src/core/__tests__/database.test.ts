@@ -1380,4 +1380,10 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(item?.initialWeightGrams).toBe(250);
     expect(item?.remainingWeightGrams).toBe(180.5);
   });
+  test('TASK-P23-05-ARC: saveRecipe bezpiecznie ignoruje null oraz undefined bez rzucania błędem', () => {
+    initDatabase(mockDb as any);
+    expect(() => saveRecipe(null as any)).not.toThrow();
+    expect(() => saveRecipe(undefined as any)).not.toThrow();
+    expect(() => saveRecipe({} as any)).not.toThrow();
+  });
 });
