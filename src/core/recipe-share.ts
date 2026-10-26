@@ -251,11 +251,14 @@ export function decodeRecipeFromShareUrl(
   recipe: SavedRecipe;
   originalSteps: RecipeStep[];
 } | null {
-  if (!urlOrRawData || typeof urlOrRawData !== 'string') {
+  if (typeof urlOrRawData !== 'string') {
     return null;
   }
 
   const trimmed = urlOrRawData.trim();
+  if (!trimmed) {
+    return null;
+  }
   let base64Data = trimmed;
 
   if (trimmed.includes('d=') || trimmed.includes('data=')) {
@@ -302,7 +305,7 @@ export function decodeRecipeFromShareUrl(
       return null;
     }
 
-    const isEn = language === 'en';
+    const isEn = typeof language === 'string' && language.trim().toLowerCase() === 'en';
     const defaultAuthor = isEn ? 'Shared Recipe' : 'Udostępniona receptura';
     const defaultDesc = isEn
       ? `Imported via QR code / link (${parsed.m})`

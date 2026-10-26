@@ -957,4 +957,28 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(encodeRecipeToShareUrl(undefined as any)).toBe('napar://recipe?v=1&d=');
     expect(encodeRecipeToShareUrl(null as any, true)).toBe('https://napar.app/recipe?v=1&d=');
   });
+
+  test('TASK-P40-11-WZR: decodeRecipeFromShareUrl wczesnie odrzuca nienapisowe wejscia, spacje oraz normalizuje language', () => {
+    expect(decodeRecipeFromShareUrl(null as any)).toBeNull();
+    expect(decodeRecipeFromShareUrl(undefined as any)).toBeNull();
+    expect(decodeRecipeFromShareUrl(12345 as any)).toBeNull();
+    expect(decodeRecipeFromShareUrl({} as any)).toBeNull();
+    expect(decodeRecipeFromShareUrl([] as any)).toBeNull();
+    expect(decodeRecipeFromShareUrl('')).toBeNull();
+    expect(decodeRecipeFromShareUrl('   ')).toBeNull();
+
+    // Normalizacja jezyka '  EN  '
+    const rawValid = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'English Recipe',
+      b: 'COFFEE',
+      m: 'v60',
+      d: 15,
+      w: 250,
+      s: [{ n: 'Bloom', d: 30, w: 50 }],
+    }));
+    const decodedEn = decodeRecipeFromShareUrl(rawValid, '  EN  ');
+    expect(decodedEn).not.toBeNull();
+    expect(decodedEn?.originalSteps[0].nameEn).toBe('Bloom');
+  });
 });
