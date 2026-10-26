@@ -110,11 +110,12 @@ export function buildDynamicIslandPayload(
   const rawRemaining = Math.max(0, Number.isFinite(safeState.stepRemainingSeconds) ? Math.round(safeState.stepRemainingSeconds) : 0);
   const safeRemaining = rawDuration > 0 ? Math.min(rawDuration, rawRemaining) : rawRemaining;
   const timeFormatted = formatActivityTimer(safeRemaining);
-  const stepName =
+  const rawStepName =
     (language === 'en' ? safeState.stepNameEn : safeState.stepNamePl) ||
     safeState.stepNamePl ||
     safeState.stepNameEn ||
     (language === 'en' ? 'Step' : 'Krok');
+  const stepName = typeof rawStepName === 'string' ? rawStepName.trim().slice(0, 30) : (language === 'en' ? 'Step' : 'Krok');
   const safeTotalSteps = Math.max(1, safeState.totalSteps || 1);
   const safeStepIdx = Math.min(safeTotalSteps - 1, Math.max(0, safeState.stepIndex || 0));
   const subtitle =

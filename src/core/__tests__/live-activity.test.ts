@@ -318,4 +318,15 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(fullPayload.attributes.recipeName.length).toBeLessThanOrEqual(40);
     expect(fullPayload.attributes.recipeName).toBe(longNameAttr.recipeName.slice(0, 40));
   });
+  test('TASK-P22-12-NIE: buildDynamicIslandPayload ogranicza długość stepName do 30 znaków w podtytule', () => {
+    const longStepState: any = {
+      ...mockState,
+      stepNamePl: 'Bardzo Długa Nazwa Kroku Parzenia Przekraczająca Limit Trzydziestu Znaków',
+      totalSteps: 3,
+      stepIndex: 1,
+    };
+    const island = buildDynamicIslandPayload(mockAttributesCoffee, longStepState, 'pl');
+    expect(island.expandedCenterSubtitle).toContain(longStepState.stepNamePl.slice(0, 30));
+    expect(island.expandedCenterSubtitle).toContain('· Krok 2 z 3');
+  });
 });
