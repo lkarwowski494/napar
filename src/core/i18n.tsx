@@ -336,6 +336,7 @@ export const translations = {
       favoriteRemove: 'Usuń z ulubionych',
       emptyTitle: 'Twoja spiżarnia jest pusta',
       emptyDesc: 'Dodaj swoją pierwszą kawę ziarnistą lub herbatę liściastą, aby śledzić świeżość, odmiany botaniczne i wagę.',
+      emptyNote: 'Brak innych pozycji w spiżarni',
       readOnlyNotice: 'Tryb tylko do odczytu (wygasła subskrypcja)',
     },
     journal: {
@@ -955,6 +956,7 @@ export const translations = {
       favoriteRemove: 'Remove from favorites',
       emptyTitle: 'Your stash is empty',
       emptyDesc: 'Add your first coffee beans or tea leaves to track freshness, botanical varieties and weight.',
+      emptyNote: 'No other items in stash',
       readOnlyNotice: 'Read-only mode (trial expired)',
     },
     journal: {

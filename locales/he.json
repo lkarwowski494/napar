@@ -312,7 +312,8 @@
     "emptyTitle": "Your stash is empty",
     "emptyDesc": "Add your first coffee beans or tea leaves to track freshness, botanical varieties and weight.",
     "readOnlyNotice": "Read-only mode (trial expired)",
-    "markFinishedAndArchive": "סמן כהסתיים והעבר לארכיון"
+    "markFinishedAndArchive": "סמן כהסתיים והעבר לארכיון",
+    "emptyNote": "אין פריטים נוספים במזווה"
   },
   "journal": {
     "title": "Tasting Journal",
