@@ -358,6 +358,8 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
       expect(content).toContain('@types/qrcode');
       expect(content).toContain('READ_PHONE_STATE');
       expect(content).toContain('BODY_SENSORS');
+      expect(content).toContain('BLUETOOTH_SCAN');
+      expect(content).toContain('NSBluetoothAlwaysUsageDescription');
     });
 
     test('SEC-03: Publiczne repozytorium nie zawiera nieautoryzowanych wywołań sieciowych', () => {

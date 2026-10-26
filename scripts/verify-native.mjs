@@ -176,11 +176,19 @@ try {
     'android.permission.ACCESS_COARSE_LOCATION',
     'android.permission.ACCESS_BACKGROUND_LOCATION',
     'android.permission.READ_CONTACTS',
+    'android.permission.WRITE_CONTACTS',
     'android.permission.READ_CALENDAR',
+    'android.permission.WRITE_CALENDAR',
+    'android.permission.READ_SMS',
     'android.permission.SEND_SMS',
+    'android.permission.RECEIVE_SMS',
     'android.permission.READ_PHONE_STATE',
+    'android.permission.READ_CALL_LOG',
     'android.permission.BODY_SENSORS',
     'android.permission.ACTIVITY_RECOGNITION',
+    'android.permission.BLUETOOTH_SCAN',
+    'android.permission.BLUETOOTH_CONNECT',
+    'android.permission.BLUETOOTH_ADVERTISE',
   ];
   for (const forbidden of forbiddenPerms) {
     check(
@@ -399,6 +407,7 @@ try {
     'NSMotionUsageDescription',
     'NSSpeechRecognitionUsageDescription',
     'NSBluetoothAlwaysUsageDescription',
+    'NSBluetoothPeripheralUsageDescription',
     'NSUserTrackingUsageDescription',
     'NSAppleMusicUsageDescription',
   ];
@@ -498,6 +507,9 @@ try {
     'android.permission.READ_CALL_LOG',
     'android.permission.BODY_SENSORS',
     'android.permission.ACTIVITY_RECOGNITION',
+    'android.permission.BLUETOOTH_SCAN',
+    'android.permission.BLUETOOTH_CONNECT',
+    'android.permission.BLUETOOTH_ADVERTISE',
   ];
   for (const forbidden of forbiddenAndroidPermissions) {
     check(
