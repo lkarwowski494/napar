@@ -272,12 +272,18 @@ export async function updateLiveActivity(
 
 export async function endLiveActivity(
   activityId: string,
-  _dismissalPolicy: 'immediate' | 'after_delay' = 'immediate'
+  dismissalPolicy: 'immediate' | 'after_delay' = 'immediate'
 ): Promise<{ success: boolean; error?: string }> {
   if (!activityId || typeof activityId !== 'string' || !activityId.trim()) {
     return {
       success: false,
       error: 'Nieprawidłowy identyfikator aktywności Live Activity.',
+    };
+  }
+  if (dismissalPolicy && dismissalPolicy !== 'immediate' && dismissalPolicy !== 'after_delay') {
+    return {
+      success: false,
+      error: 'Nieprawidłowa polityka zakończenia Live Activity (dozwolone: immediate, after_delay).',
     };
   }
   return {

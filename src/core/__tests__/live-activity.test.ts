@@ -374,4 +374,18 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resUndefined.success).toBe(false);
     expect(resUndefined.error).toBe('Nieprawidłowy stan aktywności Live Activity.');
   });
+
+  test('TASK-P27-12-NIE: endLiveActivity waliduje dismissalPolicy oraz activityId', async () => {
+    const resBadPolicy = await endLiveActivity('valid-id', 'invalid_policy' as any);
+    expect(resBadPolicy.success).toBe(false);
+    expect(resBadPolicy.error).toContain('Nieprawidłowa polityka zakończenia');
+
+    const resEmptyId = await endLiveActivity('   ');
+    expect(resEmptyId.success).toBe(false);
+    expect(resEmptyId.error).toContain('Nieprawidłowy identyfikator');
+
+    const resAfterDelay = await endLiveActivity('valid-id', 'after_delay');
+    expect(resAfterDelay.success).toBe(false);
+    expect(resAfterDelay.error).toContain('DEC-01');
+  });
 });
