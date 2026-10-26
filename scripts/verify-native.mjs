@@ -169,14 +169,18 @@ try {
     );
   }
 
-  // Weryfikacja braku inwazyjnych uprawnień Androida (Zero Telemetry & Privacy, TASK-P29-10-WYD)
+  // Weryfikacja braku inwazyjnych uprawnień Androida (Zero Telemetry & Privacy, TASK-P29-10-WYD, TASK-P47-10-WYD)
   const forbiddenPerms = [
     'android.permission.RECORD_AUDIO',
     'android.permission.ACCESS_FINE_LOCATION',
     'android.permission.ACCESS_COARSE_LOCATION',
+    'android.permission.ACCESS_BACKGROUND_LOCATION',
     'android.permission.READ_CONTACTS',
     'android.permission.READ_CALENDAR',
     'android.permission.SEND_SMS',
+    'android.permission.READ_PHONE_STATE',
+    'android.permission.BODY_SENSORS',
+    'android.permission.ACTIVITY_RECOGNITION',
   ];
   for (const forbidden of forbiddenPerms) {
     check(
