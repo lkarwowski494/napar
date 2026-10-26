@@ -70,6 +70,8 @@
     "qrCopied": "Link receptury skopiowany do schowka!",
     "qrScannerTitle": "Skaner Receptur QR",
     "scanHint": "Skieruj aparat na kod QR receptury w aplikacji Napar",
+    "procedureAssistantTitle": "ASYSTENT PROCEDURY KROK PO KROKU",
+    "totalBrewTime": "Całkowity czas parzenia: {time}",
     "importModalTitle": "Importuj Recepturę",
     "importModalDesc": "Wklej link napar:// lub https://napar.app otrzymany od baristy lub z kodu QR.",
     "importInputPlaceholder": "Wklej link napar://recipe?v=1&d=...",

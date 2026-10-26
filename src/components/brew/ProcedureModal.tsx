@@ -39,6 +39,7 @@ export interface ProcedureModalProps {
   onNextStep: () => void;
   onFinishAndSave: () => void;
   onClose: () => void;
+  t?: any;
 }
 
 export function ProcedureModal({
@@ -51,6 +52,7 @@ export function ProcedureModal({
   totalElapsedSeconds,
   unitSystem,
   language = 'pl',
+  t,
   onPauseResume,
   onAdjustTimeSeconds,
   onResetCurrentStep,
@@ -117,6 +119,15 @@ export function ProcedureModal({
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
+  const assistantTitle =
+    t?.brew?.procedureAssistantTitle ||
+    (isEn ? 'STEP-BY-STEP PROCEDURE ASSISTANT' : 'ASYSTENT PROCEDURY KROK PO KROKU');
+  const elapsedText = t?.brew?.totalBrewTime
+    ? t.brew.totalBrewTime.replace('{time}', formatClock(totalElapsedSeconds))
+    : isEn
+    ? `Total brew time: ${formatClock(totalElapsedSeconds)}`
+    : `Całkowity czas parzenia: ${formatClock(totalElapsedSeconds)}`;
+
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
       <SafeAreaView
@@ -128,7 +139,7 @@ export function ProcedureModal({
         <View style={styles.topHeader}>
           <View style={{ flex: 1 }}>
             <Text style={styles.eyebrow}>
-              {isEn ? 'STEP-BY-STEP PROCEDURE ASSISTANT' : 'ASYSTENT PROCEDURY KROK PO KROKU'}
+              {assistantTitle}
             </Text>
             <Text style={styles.recipeTitle} numberOfLines={1}>
               {recipeName}
@@ -216,9 +227,7 @@ export function ProcedureModal({
             </Text>
 
             <Text style={styles.totalElapsedSub}>
-              {isEn
-                ? `Total brew time: ${formatClock(totalElapsedSeconds)}`
-                : `Całkowity czas parzenia: ${formatClock(totalElapsedSeconds)}`}
+              {elapsedText}
             </Text>
 
             {/* Przyciski szybkiej korekty czasu (-1 min, -10 s, Pauza/Wznów, +10 s, +1 min, Reset) */}

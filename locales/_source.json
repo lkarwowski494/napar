@@ -3,7 +3,7 @@
     "generator": "Apps4Brew i18n Builder",
     "canonicalSource": "en",
     "totalKeys": 19,
-    "timestamp": "2026-10-26T08:33:12.606Z",
+    "timestamp": "2026-10-26T08:59:59.078Z",
     "supportedLocalesCount": 35
   },
   "appName": "Steepwise",
@@ -77,6 +77,8 @@
     "qrCopied": "Recipe link copied to clipboard!",
     "qrScannerTitle": "QR Recipe Scanner",
     "scanHint": "Point camera at recipe QR code in Napar app",
+    "procedureAssistantTitle": "STEP-BY-STEP PROCEDURE ASSISTANT",
+    "totalBrewTime": "Total brew time: {time}",
     "importModalTitle": "Import Recipe",
     "importModalDesc": "Paste a napar:// or https://napar.app link received from a friend or QR code.",
     "importInputPlaceholder": "Paste link napar://recipe?v=1&d=...",

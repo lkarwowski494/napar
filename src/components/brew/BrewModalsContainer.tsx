@@ -96,6 +96,7 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         totalElapsedSeconds={snapshot.totalElapsedSeconds}
         unitSystem={unitSystem}
         language={language}
+        t={t}
         onPauseResume={() => {
           if (isRunning) {
             pauseTimer();

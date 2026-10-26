@@ -196,4 +196,28 @@ describe('ProcedureModal Component', () => {
     expect(str).toContain('Całkowity czas parzenia: 00:00');
     expect(str).not.toContain('NaN');
   });
+
+  it('TASK-P16-09-LOK: ProcedureModal renderuje zlokalizowany nagłówek i czas całkowity z przekazanego słownika t', async () => {
+    const customT = {
+      brew: {
+        procedureAssistantTitle: 'PRZEWODNIK KROK PO KROKU',
+        totalBrewTime: 'Czas łączny ekstrakcji: {time}',
+      },
+    };
+
+    let tree: any;
+    await act(async () => {
+      tree = renderer.create(
+        <ProcedureModal
+          {...defaultProps}
+          totalElapsedSeconds={125}
+          t={customT}
+        />
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('PRZEWODNIK KROK PO KROKU');
+    expect(str).toContain('Czas łączny ekstrakcji: 02:05');
+  });
 });
