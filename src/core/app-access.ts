@@ -176,7 +176,8 @@ export type RestorePurchasesResult = AppAccessState & {
 export function restorePurchases(): RestorePurchasesResult {
   const verifiedVal = getAppSetting('has_verified_purchase', 'false');
   const hasVerifiedPurchase = verifiedVal === 'true' || verifiedVal === '1';
-  const verifiedTier = getAppSetting('verified_purchase_tier', '') as
+  const rawTier = getAppSetting('verified_purchase_tier', '');
+  const verifiedTier = (typeof rawTier === 'string' ? rawTier.trim() : '') as
     | 'monthly'
     | 'annual'
     | 'lifetime'

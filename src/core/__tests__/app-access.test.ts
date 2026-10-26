@@ -482,4 +482,13 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(Number.isInteger(state.brewsRemaining)).toBe(true);
     expect(state.brewsRemaining).toBe(TRIAL_MAX_BREWS - 3);
   });
+  test('TASK-P23-02-MON: restorePurchases poprawnie trimuje spacje w verified_purchase_tier', () => {
+    resetTrialForTesting();
+    setAppSetting('has_verified_purchase', 'true');
+    setAppSetting('verified_purchase_tier', '  annual  ');
+    const res = restorePurchases();
+    expect(res.restored).toBe(true);
+    expect(res.subscriptionTier).toBe('annual');
+    expect(res.isSubscribed).toBe(true);
+  });
 });
