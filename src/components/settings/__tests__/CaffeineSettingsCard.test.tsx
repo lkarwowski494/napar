@@ -174,4 +174,27 @@ describe('CaffeineSettingsCard Component', () => {
     expect(bedtimeStepper.props.accessibilityRole).toBe('adjustable');
     expect(bedtimeStepper.props.accessibilityHint).toBe(t.settings.bedtimeHourDesc);
   });
+
+  test('TASK-P26-04-STU: toggle-healthkit-btn deklaruje accessibilityState checked oraz accessibilityHint', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <CaffeineSettingsCard
+          halfLifeHours={5.0}
+          onHalfLifeChange={mockOnHalfLifeChange}
+          bedtimeHour={23}
+          onBedtimeChange={mockOnBedtimeChange}
+          healthKitSync={true}
+          onToggleHealthKit={mockOnToggleHealthKit}
+          t={t}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const hkBtn = root.findByProps({ testID: 'toggle-healthkit-btn' });
+    expect(hkBtn.props.accessibilityRole).toBe('switch');
+    expect(hkBtn.props.accessibilityState).toEqual({ checked: true });
+    expect(hkBtn.props.accessibilityHint).toBe(t.settings.healthKitSubtitle);
+  });
 });

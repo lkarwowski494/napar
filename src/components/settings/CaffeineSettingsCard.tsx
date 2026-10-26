@@ -127,6 +127,8 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
             ]}
             onPress={onToggleHealthKit}
             accessibilityRole="switch"
+            accessibilityState={{ checked: Boolean(healthKitSync) }}
+            accessibilityHint={t.settings.healthKitSubtitle || 'Włącza lub wyłącza synchronizację z Apple Health'}
             accessibilityLabel={`${t.settings.healthKitTitle}: ${healthKitSync ? t.settings.enabled : t.settings.disabled}`}
           >
             <Text
