@@ -345,6 +345,11 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const purchaseResult = purchaseWithStoreKit('unsupported_hack' as any);
     expect(purchaseResult.success).toBe(true);
     expect(purchaseResult.tier).toBe('annual');
+    // TASK-P13-02-MON: Uzupełnienie wyniku o kompletny StoreKitReceipt
+    expect(purchaseResult.receipt).toBeDefined();
+    expect(purchaseResult.receipt?.productId).toBe(STORE_PRODUCT_IDS.annual);
+    expect(purchaseResult.receipt?.transactionId).toContain('mock-storekit-tx-');
+    expect(purchaseResult.receipt?.signature).toContain('valid-receipt-signature-annual');
 
     const emptySignatureRes = verifyAndActivateStoreKitPurchase({
       productId: STORE_PRODUCT_IDS.annual,
