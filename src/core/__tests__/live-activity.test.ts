@@ -839,4 +839,39 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resNanUpdate.success).toBe(false);
     expect(resNanUpdate.error).toContain('Nieprawidłowy łączny czas parzenia');
   });
+
+  test('TASK-P48-12-NIE: walidacja i clampowanie stepDurationSeconds [0, 86400] oraz stepRemainingSeconds', async () => {
+    // 1. startLiveActivity i updateLiveActivity walidują stepDurationSeconds
+    const negDurationState: any = { ...mockState, stepDurationSeconds: -10 };
+    const resNegStart = await startLiveActivity(mockAttributesCoffee, negDurationState);
+    expect(resNegStart.success).toBe(false);
+    expect(resNegStart.error).toContain('Nieprawidłowy czas trwania kroku');
+
+    const resNegUpdate = await updateLiveActivity('act-123', negDurationState);
+    expect(resNegUpdate.success).toBe(false);
+    expect(resNegUpdate.error).toContain('Nieprawidłowy czas trwania kroku');
+
+    const hugeDurationState: any = { ...mockState, stepDurationSeconds: 100000 };
+    const resHugeStart = await startLiveActivity(mockAttributesCoffee, hugeDurationState);
+    expect(resHugeStart.success).toBe(false);
+    expect(resHugeStart.error).toContain('Nieprawidłowy czas trwania kroku');
+
+    const nanDurationState: any = { ...mockState, stepDurationSeconds: NaN };
+    const resNanUpdate = await updateLiveActivity('act-123', nanDurationState);
+    expect(resNanUpdate.success).toBe(false);
+    expect(resNanUpdate.error).toContain('Nieprawidłowy czas trwania kroku');
+
+    // 2. buildLiveActivityPayload i buildDynamicIslandPayload clampują do 86400
+    const unboundedState: any = {
+      ...mockState,
+      stepDurationSeconds: 999999,
+      stepRemainingSeconds: 999999,
+    };
+    const payload = buildLiveActivityPayload(mockAttributesCoffee, unboundedState);
+    expect(payload.contentState.stepDurationSeconds).toBe(86400);
+    expect(payload.contentState.stepRemainingSeconds).toBe(86400);
+
+    const island = buildDynamicIslandPayload(mockAttributesCoffee, unboundedState);
+    expect(island.compactTrailing).toBe('24:00:00');
+  });
 });

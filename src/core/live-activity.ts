@@ -147,10 +147,10 @@ export function buildDynamicIslandPayload(
 
   const icon = safeAttr.beverageType === 'TEA' ? '🍵' : '☕';
   const rawDurVal = typeof safeState.stepDurationSeconds === 'number' ? safeState.stepDurationSeconds : (typeof safeState.stepDurationSeconds === 'string' ? parseFloat(safeState.stepDurationSeconds) : NaN);
-  let rawDuration = Math.max(0, Number.isFinite(rawDurVal) ? Math.round(rawDurVal) : 0);
+  let rawDuration = Math.max(0, Math.min(86400, Number.isFinite(rawDurVal) ? Math.round(rawDurVal) : 0));
   if (Object.is(rawDuration, -0)) rawDuration = 0;
   const rawRemVal = typeof safeState.stepRemainingSeconds === 'number' ? safeState.stepRemainingSeconds : (typeof safeState.stepRemainingSeconds === 'string' ? parseFloat(safeState.stepRemainingSeconds) : NaN);
-  let rawRemaining = Math.max(0, Number.isFinite(rawRemVal) ? Math.round(rawRemVal) : 0);
+  let rawRemaining = Math.max(0, Math.min(86400, Number.isFinite(rawRemVal) ? Math.round(rawRemVal) : 0));
   if (Object.is(rawRemaining, -0)) rawRemaining = 0;
   let safeRemaining = safeState.isFinished ? 0 : (rawDuration > 0 ? Math.min(rawDuration, rawRemaining) : rawRemaining);
   if (Object.is(safeRemaining, -0)) safeRemaining = 0;
@@ -245,15 +245,15 @@ export function buildLiveActivityPayload(
         stepRemainingSeconds: (() => {
           if (state.isFinished) return 0;
           const rawDurVal = typeof state.stepDurationSeconds === 'number' ? state.stepDurationSeconds : (typeof state.stepDurationSeconds === 'string' ? parseFloat(state.stepDurationSeconds) : NaN);
-          const rawDur = Math.max(0, Number.isFinite(rawDurVal) ? Math.round(rawDurVal) : 0);
+          const rawDur = Math.max(0, Math.min(86400, Number.isFinite(rawDurVal) ? Math.round(rawDurVal) : 0));
           const rawRemVal = typeof state.stepRemainingSeconds === 'number' ? state.stepRemainingSeconds : (typeof state.stepRemainingSeconds === 'string' ? parseFloat(state.stepRemainingSeconds) : NaN);
-          const rawRem = Math.max(0, Number.isFinite(rawRemVal) ? Math.round(rawRemVal) : 0);
+          const rawRem = Math.max(0, Math.min(86400, Number.isFinite(rawRemVal) ? Math.round(rawRemVal) : 0));
           const res = rawDur > 0 ? Math.min(rawDur, rawRem) : rawRem;
           return Object.is(res, -0) ? 0 : res;
         })(),
         stepDurationSeconds: (() => {
           const rawVal = typeof state.stepDurationSeconds === 'number' ? state.stepDurationSeconds : (typeof state.stepDurationSeconds === 'string' ? parseFloat(state.stepDurationSeconds) : NaN);
-          const res = Math.max(0, Number.isFinite(rawVal) ? Math.round(rawVal) : 0);
+          const res = Math.max(0, Math.min(86400, Number.isFinite(rawVal) ? Math.round(rawVal) : 0));
           return Object.is(res, -0) ? 0 : res;
         })(),
         totalElapsedSeconds: (() => {
@@ -353,6 +353,15 @@ export async function startLiveActivity(
       error: 'Nieprawidłowa łączna liczba kroków w stanie Live Activity.',
     };
   }
+  const rawDuration = typeof initialState.stepDurationSeconds === 'number'
+    ? initialState.stepDurationSeconds
+    : (typeof initialState.stepDurationSeconds === 'string' ? parseFloat(initialState.stepDurationSeconds) : NaN);
+  if (!Number.isFinite(rawDuration) || rawDuration < 0 || Object.is(rawDuration, -0) || rawDuration > 86400) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy czas trwania kroku w stanie Live Activity (wymagany zakres [0, 86400]).',
+    };
+  }
   const rawRemaining = typeof initialState.stepRemainingSeconds === 'number'
     ? initialState.stepRemainingSeconds
     : (typeof initialState.stepRemainingSeconds === 'string' ? parseFloat(initialState.stepRemainingSeconds) : NaN);
@@ -418,6 +427,15 @@ export async function updateLiveActivity(
     return {
       success: false,
       error: 'Nieprawidłowa łączna liczba kroków w stanie Live Activity.',
+    };
+  }
+  const rawDuration = typeof _state.stepDurationSeconds === 'number'
+    ? _state.stepDurationSeconds
+    : (typeof _state.stepDurationSeconds === 'string' ? parseFloat(_state.stepDurationSeconds) : NaN);
+  if (!Number.isFinite(rawDuration) || rawDuration < 0 || Object.is(rawDuration, -0) || rawDuration > 86400) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy czas trwania kroku w stanie Live Activity (wymagany zakres [0, 86400]).',
     };
   }
   const rawRemaining = typeof _state.stepRemainingSeconds === 'number'
