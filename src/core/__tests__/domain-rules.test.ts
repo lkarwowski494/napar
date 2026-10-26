@@ -450,4 +450,17 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(water).toBe(1200.0);
     });
   });
+  describe('TASK-P22-03-ZAK: calculateExtractionYield clampuje masę naparu do maxBeverageGrams', () => {
+    it('clampuje objętość naparu do domyślnego limitu 50000g', () => {
+      const res = calculateExtractionYield(100000, 1.5, 15);
+      // beverageWeight 100000 clampowane do 50000g -> (50000 * 1.5) / 15 = 5000.0%
+      expect(res.extractionYieldPercent).toBe(5000);
+    });
+
+    it('akceptuje niestandardowy maxBeverageGrams', () => {
+      const res = calculateExtractionYield(2000, 1.5, 15, 30.0, 500.0);
+      // beverageWeight 2000 clampowane do 500.0g -> (500 * 1.5) / 15 = 50.0%
+      expect(res.extractionYieldPercent).toBe(50);
+    });
+  });
 });
