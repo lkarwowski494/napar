@@ -235,6 +235,29 @@ try {
   const ver = appJson.version;
   check(/^\d+\.\d+(\.\d+)?$/.test(ver), `Wersja '${ver}' w app.json musi mieć format X.Y lub X.Y.Z`);
 
+  // Weryfikacja spójności wersji i zależności z package.json (TASK-P28-10-WYD)
+  const pkgJsonPath = join(root, 'package.json');
+  check(existsSync(pkgJsonPath), 'Brak pliku package.json w katalogu głównym projektu');
+  if (existsSync(pkgJsonPath)) {
+    const pkgJson = JSON.parse(readFileSync(pkgJsonPath, 'utf8'));
+    check(
+      pkgJson.version === appJson.version,
+      `Wersja w package.json (${pkgJson.version}) musi być identyczna z app.json (${appJson.version})`
+    );
+    check(
+      pkgJson.name === appJson.slug,
+      `Nazwa w package.json (${pkgJson.name}) musi odpowiadać slug w app.json (${appJson.slug})`
+    );
+    const deps = pkgJson.dependencies || {};
+    const criticalPlugins = ['expo-router', 'expo-sqlite', 'expo-camera', 'expo-localization'];
+    for (const plugin of criticalPlugins) {
+      check(
+        Boolean(deps[plugin]),
+        `Krytyczny plugin '${plugin}' zadeklarowany w app.json musi znajdować się w dependencies package.json`
+      );
+    }
+  }
+
   const forbiddenPermissions = [
     'NSMicrophoneUsageDescription',
     'NSLocationWhenInUseUsageDescription',
