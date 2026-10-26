@@ -729,4 +729,22 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(endInvalid.success).toBe(false);
     expect(endInvalid.error).toContain('Nieprawidłowa polityka zakończenia Live Activity');
   });
+
+  test('TASK-P44-12-NIE: buildLiveActivityPayload i buildDynamicIslandPayload weryfikuja typy atrybutow (recipeName, sessionId, method) i stosuja bezpieczne fallbacki', () => {
+    const corruptAttrs: any = {
+      sessionId: 12345, // not a string
+      recipeName: true,  // not a string
+      method: null,      // not a string
+      totalWaterGrams: '300',
+    };
+
+    const payloadLive = buildLiveActivityPayload(corruptAttrs, mockState, 'pl');
+    expect(payloadLive.attributes.sessionId).toBe('sess_unknown');
+    expect(payloadLive.attributes.recipeName).toBe('Napar');
+    expect(payloadLive.attributes.method).toBe('Drip');
+    expect(payloadLive.dynamicIsland.expandedCenterTitle).toBe('Napar');
+
+    const payloadIsland = buildDynamicIslandPayload(corruptAttrs, mockState, 'pl');
+    expect(payloadIsland.expandedCenterTitle).toBe('Napar');
+  });
 });

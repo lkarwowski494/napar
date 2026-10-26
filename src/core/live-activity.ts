@@ -94,12 +94,40 @@ export function buildDynamicIslandPayload(
   state?: BrewActivityContentState | null,
   language: 'pl' | 'en' | string = 'pl'
 ): DynamicIslandPayload {
-  const safeAttr: BrewActivityAttributes = attributes || {
-    sessionId: '',
-    recipeName: 'Napar',
-    method: '',
-    beverageType: 'COFFEE',
-    totalWaterGrams: 0,
+  const safeSessionId =
+    attributes && typeof attributes.sessionId === 'string' && attributes.sessionId.trim()
+      ? attributes.sessionId.trim()
+      : 'sess_unknown';
+  const safeRecipeName =
+    attributes && typeof attributes.recipeName === 'string' && attributes.recipeName.trim()
+      ? attributes.recipeName.trim().slice(0, 40)
+      : 'Napar';
+  const safeMethod =
+    attributes && typeof attributes.method === 'string' && attributes.method.trim()
+      ? attributes.method.trim()
+      : 'Drip';
+  const safeBevType =
+    attributes && attributes.beverageType === 'TEA' ? 'TEA' : 'COFFEE';
+  const rawTotWater =
+    attributes
+      ? (typeof attributes.totalWaterGrams === 'number'
+          ? attributes.totalWaterGrams
+          : typeof attributes.totalWaterGrams === 'string'
+          ? parseFloat(attributes.totalWaterGrams)
+          : NaN)
+      : 0;
+  let safeTotalWater =
+    Number.isFinite(rawTotWater) && rawTotWater >= 0
+      ? Math.min(50000, Math.round(rawTotWater))
+      : 0;
+  if (Object.is(safeTotalWater, -0)) safeTotalWater = 0;
+
+  const safeAttr: BrewActivityAttributes = {
+    sessionId: safeSessionId,
+    recipeName: safeRecipeName,
+    method: safeMethod,
+    beverageType: safeBevType,
+    totalWaterGrams: safeTotalWater,
   };
   const safeState: BrewActivityContentState = state || {
     stepIndex: 0,
@@ -152,27 +180,10 @@ export function buildDynamicIslandPayload(
       : 0;
   if (Object.is(safeTargetWater, -0)) safeTargetWater = 0;
 
-  const rawTotalWater =
-    typeof safeAttr.totalWaterGrams === 'number'
-      ? safeAttr.totalWaterGrams
-      : typeof safeAttr.totalWaterGrams === 'string'
-      ? parseFloat(safeAttr.totalWaterGrams)
-      : NaN;
-  let safeTotalWater =
-    Number.isFinite(rawTotalWater) && rawTotalWater >= 0
-      ? Math.min(50000, Math.round(rawTotalWater))
-      : 0;
-  if (Object.is(safeTotalWater, -0)) safeTotalWater = 0;
-
   const targetWater =
     isEn
       ? `Target: ${safeTargetWater} g (of ${safeTotalWater} g)`
       : `Docelowo: ${safeTargetWater} g (z ${safeTotalWater} g)`;
-
-  const safeRecipeName =
-    safeAttr.recipeName && safeAttr.recipeName.trim()
-      ? safeAttr.recipeName.trim().slice(0, 40)
-      : 'Napar';
 
   return {
     compactLeading: icon,
@@ -193,28 +204,33 @@ export function buildLiveActivityPayload(
   language: 'pl' | 'en' | string = 'pl'
 ): LiveActivityPayload {
   const dynamicIsland = buildDynamicIslandPayload(attributes, state, language);
-  const safeAttr: BrewActivityAttributes = attributes
-    ? {
-        sessionId: attributes.sessionId || '',
-        recipeName:
-          attributes.recipeName && attributes.recipeName.trim()
-            ? attributes.recipeName.trim().slice(0, 40)
-            : 'Napar',
-        method: attributes.method || '',
-        beverageType: attributes.beverageType === 'TEA' ? 'TEA' : 'COFFEE',
-        totalWaterGrams: (() => {
-          const rawW = typeof attributes.totalWaterGrams === 'number' ? attributes.totalWaterGrams : (typeof attributes.totalWaterGrams === 'string' ? parseFloat(attributes.totalWaterGrams) : NaN);
-          const res = Math.max(0, Math.min(50000, Number.isFinite(rawW) ? Math.round(rawW) : 0));
-          return Object.is(res, -0) ? 0 : res;
-        })(),
-      }
-    : {
-        sessionId: '',
-        recipeName: 'Napar',
-        method: '',
-        beverageType: 'COFFEE',
-        totalWaterGrams: 0,
-      };
+  const safeAttr: BrewActivityAttributes = {
+    sessionId:
+      attributes && typeof attributes.sessionId === 'string' && attributes.sessionId.trim()
+        ? attributes.sessionId.trim()
+        : 'sess_unknown',
+    recipeName:
+      attributes && typeof attributes.recipeName === 'string' && attributes.recipeName.trim()
+        ? attributes.recipeName.trim().slice(0, 40)
+        : 'Napar',
+    method:
+      attributes && typeof attributes.method === 'string' && attributes.method.trim()
+        ? attributes.method.trim()
+        : 'Drip',
+    beverageType: attributes && attributes.beverageType === 'TEA' ? 'TEA' : 'COFFEE',
+    totalWaterGrams: (() => {
+      const rawW =
+        attributes
+          ? typeof attributes.totalWaterGrams === 'number'
+            ? attributes.totalWaterGrams
+            : typeof attributes.totalWaterGrams === 'string'
+            ? parseFloat(attributes.totalWaterGrams)
+            : NaN
+          : NaN;
+      const res = Math.max(0, Math.min(50000, Number.isFinite(rawW) ? Math.round(rawW) : 0));
+      return Object.is(res, -0) ? 0 : res;
+    })(),
+  };
 
   const safeTotalSteps = state ? Math.max(1, Number.isFinite(state.totalSteps) ? Math.round(state.totalSteps) : 1) : 1;
   const rawStepIdx = state ? Math.max(0, Number.isFinite(state.stepIndex) ? Math.round(state.stepIndex) : 0) : 0;
