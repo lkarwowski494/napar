@@ -1,0 +1,104 @@
+{
+  "audit_run": "M1-2026-10-25-p50",
+  "generated_at": "2026-10-26T22:53:00Z",
+  "auditor": "M1 Audytor Generalny",
+  "scope": "Przebieg 50 (P50) — Pełna pętla 12 perspektyw jakościowych (01-ODK .. 12-NIE)",
+  "tasks": [
+    {
+      "id": "TASK-P50-01-ODK",
+      "perspective": "01-ODK",
+      "title": "Dostępność, lokalizacja przycisków i ochrona przed null w InventorySelectModal",
+      "target_file": "src/components/brew/InventorySelectModal.tsx",
+      "test_file": "src/components/brew/__tests__/InventorySelectModal.test.tsx",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P50-02-MON",
+      "perspective": "02-MON",
+      "title": "Ochrona przed undefined i poprawna polska pluralizacja w formatTrialStatusSummary",
+      "target_file": "src/core/app-access.ts",
+      "test_file": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P50-03-ZAK",
+      "perspective": "03-ZAK",
+      "title": "Bezpieczny fallback bez rzucania wyjątków w eksporcie kalendarza generateActionIcsContent",
+      "target_file": "src/core/bpr-engine.ts",
+      "test_file": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P50-04-STU",
+      "perspective": "04-STU",
+      "title": "Defensywne fallbacki t.recipeBuilder i etykiety dostępności w RecipeParamsCard",
+      "target_file": "src/components/recipe-builder/RecipeParamsCard.tsx",
+      "test_file": "src/components/recipe-builder/__tests__/RecipeParamsCard.test.tsx",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P50-05-ARC",
+      "perspective": "05-ARC",
+      "title": "Normalizacja wielkości liter typu pozycji i obsługa przecinka dziesiętnego w deductInventoryWeight",
+      "target_file": "src/core/database.ts",
+      "test_file": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P50-06-TRE",
+      "perspective": "06-TRE",
+      "title": "Rozszerzenie profili minerałów wody i opisów buforów w knowledge-data",
+      "target_file": "src/core/knowledge-data.ts",
+      "test_file": "src/core/__tests__/knowledge.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P50-07-JAK",
+      "perspective": "07-JAK",
+      "title": "Walidacja granic dozowania minerałów wody i ochrona przed NaN w water-chemistry",
+      "target_file": "src/core/water-chemistry.ts",
+      "test_file": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P50-08-PRO",
+      "perspective": "08-PRO",
+      "title": "Kalibracja zakresów mikronów dla metod maceracji na zimno w grinder-converter",
+      "target_file": "src/core/grinder-converter.ts",
+      "test_file": "src/core/__tests__/grinder-converter.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P50-09-LOK",
+      "perspective": "09-LOK",
+      "title": "Symetria kluczy wyboru spiżarni i podpowiedzi w 35 językach",
+      "target_file": "src/core/i18n.tsx",
+      "test_file": "tests/i18n-no-polish-in-en.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P50-10-WYD",
+      "perspective": "10-WYD",
+      "title": "Weryfikacja braku uprawnień telemetrycznych i lokalizacyjnych w skryptach audytowych",
+      "target_file": "scripts/verify-native.mjs",
+      "test_file": "tests/audit-fixes.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P50-11-WZR",
+      "perspective": "11-WZR",
+      "title": "Odporność na NaN w wyliczaniu ratio i ujemny czas trwania kroków w recipe-share",
+      "target_file": "src/core/recipe-share.ts",
+      "test_file": "src/core/__tests__/recipe-share.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P50-12-NIE",
+      "perspective": "12-NIE",
+      "title": "Precyzyjna obsługa przecinków dziesiętnych w startLiveActivity i updateLiveActivity",
+      "target_file": "src/core/live-activity.ts",
+      "test_file": "src/core/__tests__/live-activity.test.ts",
+      "status": "pending"
+    }
+  ]
+}
