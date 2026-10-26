@@ -49,6 +49,8 @@ export const QrCodeSvg: React.FC<QrCodeSvgProps> = ({
   backgroundColor = '#FFFFFF',
   testID,
 }) => {
+  const safeSize = typeof size === 'number' && Number.isFinite(size) && size > 0 ? size : 200;
+
   const { pathData, moduleCount } = useMemo(() => {
     try {
       const qr = QRCode.create(value || 'napar://empty', { errorCorrectionLevel: 'M' });
@@ -74,10 +76,10 @@ export const QrCodeSvg: React.FC<QrCodeSvgProps> = ({
   }
 
   return (
-    <View style={[styles.container, { width: size, height: size }]} testID={testID}>
+    <View style={[styles.container, { width: safeSize, height: safeSize }]} testID={testID}>
       <Svg
-        width={size}
-        height={size}
+        width={safeSize}
+        height={safeSize}
         viewBox={`0 0 ${moduleCount} ${moduleCount}`}
       >
         <Rect width={moduleCount} height={moduleCount} fill={backgroundColor} />
