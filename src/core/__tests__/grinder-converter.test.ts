@@ -584,4 +584,21 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ method: 'Brazylijski Kapping' })).toBe(880);
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod kapping sensoryczny' })).toBe(880);
   });
+
+  test('TASK-P48-08-PRO: model 1Zpresso J-Max w SUPPORTED_GRINDERS oraz metoda Tetsu Kasuya 4:6 jako 950 µm', () => {
+    // 1. Model 1Zpresso J-Max
+    const jmax = findGrinderById('1zpresso_j_max');
+    expect(jmax).toBeDefined();
+    expect(jmax?.name).toContain('1Zpresso J-Max');
+    expect(jmax?.stepMicrons).toBeCloseTo(8.4, 1);
+    expect(jmax?.formatSetting(95, 'pl')).toContain('klików');
+    expect(jmax?.formatSetting(95, 'en')).toContain('clicks');
+
+    // 2. Metoda Tetsu Kasuya 4:6 (grube mielenie 950 µm pod metodę 4:6)
+    expect(getRecipeMicrons({ method: 'KASUYA' })).toBe(950);
+    expect(getRecipeMicrons({ method: 'Tetsu Kasuya 4:6' })).toBe(950);
+    expect(getRecipeMicrons({ method: 'V60 Kasuya Model' })).toBe(950);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod metodę Kasuya 4:6' })).toBe(950);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse grind for Tetsu Kasuya 4:6 method' })).toBe(950);
+  });
 });

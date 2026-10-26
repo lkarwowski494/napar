@@ -269,6 +269,29 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     },
   },
   {
+    id: '1zpresso_j_max',
+    name: '1Zpresso J-Max / J-Ultra',
+    burrType: 'Żarna tytanowe (48mm stożkowe)',
+    burrTypePl: 'Żarna tytanowe (48mm stożkowe)',
+    burrTypeEn: 'Titanium-coated burrs (48mm conical)',
+    stepMicrons: 8.4,
+    minSetting: 30,
+    maxSetting: 220,
+    micronsPerSettingOffset: 0,
+    formatSetting: (clicks: number, lang = 'pl') => {
+      const rot = Math.floor(clicks / 90);
+      const sub = Math.floor((clicks % 90) / 10);
+      const click = Math.round(clicks % 10);
+      const unit = lang === 'en' ? 'clicks' : 'klików';
+      return `${rot}.${sub}.${click} (${clicks} ${unit})`;
+    },
+    parseSetting: (text: string) => {
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
+      const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 50;
+      return num * 8.4;
+    },
+  },
+  {
     id: 'generic_grinder',
     name: 'Inny młynek (Skala uniwersalna µm)',
     namePl: 'Inny młynek (Skala uniwersalna µm)',
@@ -535,6 +558,15 @@ export function getRecipeMicrons(recipe?: {
   ) {
     if (desc.includes('grubo') || desc.includes('coarse')) return 750;
     return 600;
+  }
+  if (
+    method === 'KASUYA' ||
+    method.includes('KASUYA') ||
+    method.includes('4:6') ||
+    desc.includes('kasuya') ||
+    desc.includes('4:6')
+  ) {
+    return 950;
   }
   if (
     method === 'V60' ||
