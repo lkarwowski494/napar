@@ -136,12 +136,17 @@ export function buildDynamicIslandPayload(
       ? `Target: ${safeTargetWater} g (of ${safeTotalWater} g)`
       : `Docelowo: ${safeTargetWater} g (z ${safeTotalWater} g)`;
 
+  const safeRecipeName =
+    safeAttr.recipeName && safeAttr.recipeName.trim()
+      ? safeAttr.recipeName.trim().slice(0, 40)
+      : 'Napar';
+
   return {
     compactLeading: icon,
     compactTrailing: timeFormatted,
     expandedLeadingIcon: icon,
     expandedTrailingTime: timeFormatted,
-    expandedCenterTitle: (safeAttr.recipeName && safeAttr.recipeName.trim()) || 'Napar',
+    expandedCenterTitle: safeRecipeName,
     expandedCenterSubtitle: subtitle,
     expandedBottomTarget: targetWater,
     isPaused: Boolean(safeState.isPaused && !safeState.isFinished),
@@ -158,7 +163,10 @@ export function buildLiveActivityPayload(
   const safeAttr: BrewActivityAttributes = attributes
     ? {
         sessionId: attributes.sessionId || '',
-        recipeName: attributes.recipeName && attributes.recipeName.trim() ? attributes.recipeName.trim() : 'Napar',
+        recipeName:
+          attributes.recipeName && attributes.recipeName.trim()
+            ? attributes.recipeName.trim().slice(0, 40)
+            : 'Napar',
         method: attributes.method || '',
         beverageType: attributes.beverageType === 'TEA' ? 'TEA' : 'COFFEE',
         totalWaterGrams: Math.max(0, Number.isFinite(attributes.totalWaterGrams) ? Math.round(attributes.totalWaterGrams) : 0),

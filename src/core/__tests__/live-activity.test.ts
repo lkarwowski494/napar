@@ -302,4 +302,20 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(formatActivityTimer(0)).toBe('0:00');
     expect(formatActivityTimer(-15)).toBe('0:00');
   });
+  test('TASK-P21-12-NIE: buildDynamicIslandPayload i buildLiveActivityPayload ograniczają recipeName do 40 znaków', () => {
+    const longNameAttr: BrewActivityAttributes = {
+      sessionId: 'sess-long',
+      recipeName: 'Very Long Recipe Name That Definitely Exceeds The Maximum Allowed Forty Character Limit For Dynamic Island Banner',
+      method: 'V60',
+      beverageType: 'COFFEE',
+      totalWaterGrams: 300,
+    };
+    const island = buildDynamicIslandPayload(longNameAttr, mockState);
+    expect(island.expandedCenterTitle.length).toBeLessThanOrEqual(40);
+    expect(island.expandedCenterTitle).toBe(longNameAttr.recipeName.slice(0, 40));
+
+    const fullPayload = buildLiveActivityPayload(longNameAttr, mockState);
+    expect(fullPayload.attributes.recipeName.length).toBeLessThanOrEqual(40);
+    expect(fullPayload.attributes.recipeName).toBe(longNameAttr.recipeName.slice(0, 40));
+  });
 });
