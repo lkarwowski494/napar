@@ -83,6 +83,13 @@ try {
     'app.json -> expo.ios.requireFullScreen musi być równe true'
   );
 
+  // Weryfikacja formatu expo.ios.bundleIdentifier w app.json (TASK-P20-10-WYD)
+  const iosBundleId = appJson.ios?.bundleIdentifier;
+  check(
+    typeof iosBundleId === 'string' && /^[a-zA-Z0-9.-]+$/.test(iosBundleId) && iosBundleId === 'pl.lukasz.napar',
+    `app.json -> expo.ios.bundleIdentifier musi być równe 'pl.lukasz.napar' (otrzymano '${iosBundleId}')`
+  );
+
   // Weryfikacja ścieżki ikony oraz numerycznego buildNumber (TASK-P12-10-WYD)
   check(
     appJson.icon === './assets/icon.png',
