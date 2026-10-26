@@ -188,6 +188,27 @@ export function getTrialBrewsRemaining(): number {
 /**
  * Zwraca spójne tekstowe podsumowanie stanu okresu próbnego / subskrypcji.
  */
+/**
+ * Zwraca czytelną, zlokalizowaną nazwę poziomu subskrypcji
+ */
+export function formatSubscriptionTierName(
+  tier: string | undefined | null,
+  language: 'pl' | 'en' | string = 'pl'
+): string {
+  const isEn = typeof language === 'string' && (language.trim().toLowerCase() === 'en' || language.trim().toLowerCase().startsWith('en'));
+  const cleanTier = typeof tier === 'string' ? tier.trim().toLowerCase() : '';
+  switch (cleanTier) {
+    case 'monthly':
+      return isEn ? 'Monthly Pass' : 'Subskrypcja Miesięczna';
+    case 'annual':
+      return isEn ? 'Annual Pass' : 'Subskrypcja Roczna';
+    case 'lifetime':
+      return isEn ? 'Lifetime Pass' : 'Dostęp Dożywotni';
+    default:
+      return isEn ? 'No active pass' : 'Brak subskrypcji';
+  }
+}
+
 export function formatTrialStatusSummary(
   state: AppAccessState,
   language: 'pl' | 'en' | string = 'pl'
@@ -344,6 +365,7 @@ export function verifyAndActivateStoreKitPurchase(
     !receipt.transactionId.trim() ||
     typeof receipt.signature !== 'string' ||
     !receipt.signature.trim() ||
+    receipt.signature.trim().length < 8 ||
     typeof receipt.purchaseDate !== 'string' ||
     !receipt.purchaseDate.trim() ||
     isNaN(new Date(receipt.purchaseDate.trim()).getTime())

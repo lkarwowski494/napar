@@ -912,4 +912,32 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
       'Okres próbny: 25 parzeń · 25 dni'
     );
   });
+
+  test('TASK-P51-02-MON: formatSubscriptionTierName formatuje poziomy subskrypcji oraz verifyAndActivateStoreKitPurchase odrzuca zbyt krotkie sygnatury', () => {
+    // @ts-ignore
+    const { formatSubscriptionTierName, verifyAndActivateStoreKitPurchase } = require('../app-access');
+
+    // 1. formatSubscriptionTierName
+    expect(formatSubscriptionTierName('monthly', 'pl')).toBe('Subskrypcja Miesięczna');
+    expect(formatSubscriptionTierName('monthly', 'en')).toBe('Monthly Pass');
+    expect(formatSubscriptionTierName('annual', 'pl')).toBe('Subskrypcja Roczna');
+    expect(formatSubscriptionTierName('annual', 'en')).toBe('Annual Pass');
+    expect(formatSubscriptionTierName('lifetime', 'pl')).toBe('Dostęp Dożywotni');
+    expect(formatSubscriptionTierName('lifetime', 'en')).toBe('Lifetime Pass');
+    expect(formatSubscriptionTierName('none', 'pl')).toBe('Brak subskrypcji');
+    expect(formatSubscriptionTierName('none', 'en')).toBe('No active pass');
+    expect(formatSubscriptionTierName(null, 'pl')).toBe('Brak subskrypcji');
+    expect(formatSubscriptionTierName(undefined, 'en')).toBe('No active pass');
+
+    // 2. verifyAndActivateStoreKitPurchase odrzuca sygnaturę krótszą niż 8 znaków po trimie
+    const shortSigReceipt = {
+      productId: 'pl.lukasz.napar.annual',
+      transactionId: 'tx-valid-1234',
+      purchaseDate: new Date().toISOString(),
+      signature: '  abc  ',
+    };
+    const res = verifyAndActivateStoreKitPurchase(shortSigReceipt);
+    expect(res.success).toBe(false);
+    expect(res.errorCode).toBe('invalid_signature');
+  });
 });
