@@ -827,8 +827,20 @@ export function saveBrewSession(session: BrewSession): void {
         .slice(0, 30)
     : [];
 
+  const safeId = typeof session.id === 'string' && session.id.trim() ? session.id.trim() : `sess_${Date.now()}`;
   const safeRecipeId = typeof session.recipeId === 'string' && session.recipeId.trim() ? session.recipeId.trim() : null;
   const safeInventoryItemId = typeof session.inventoryItemId === 'string' && session.inventoryItemId.trim() ? session.inventoryItemId.trim() : null;
+  const safeRecipeName = typeof session.recipeName === 'string' && session.recipeName.trim()
+    ? session.recipeName.trim().slice(0, 200)
+    : 'Napar';
+  const safeInventoryItemName = typeof session.inventoryItemName === 'string' && session.inventoryItemName.trim()
+    ? session.inventoryItemName.trim().slice(0, 200)
+    : null;
+  const rawBev = typeof session.beverageType === 'string' ? session.beverageType.trim().toUpperCase() : '';
+  const safeBeverage = rawBev === 'TEA' ? 'TEA' : 'COFFEE';
+  const safeMethod = typeof session.method === 'string' && session.method.trim()
+    ? session.method.trim().slice(0, 50)
+    : 'v60';
 
   db.runSync(
     `INSERT OR REPLACE INTO brew_sessions (
@@ -839,13 +851,13 @@ export function saveBrewSession(session: BrewSession): void {
       caffeine_content_mg, notes, infusion_number, sensory_scores_json, brewed_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
-      session.id,
+      safeId,
       safeRecipeId,
-      session.recipeName ?? null,
+      safeRecipeName,
       safeInventoryItemId,
-      session.inventoryItemName ?? null,
-      session.beverageType,
-      session.method,
+      safeInventoryItemName,
+      safeBeverage,
+      safeMethod,
       dose,
       water,
       temp,

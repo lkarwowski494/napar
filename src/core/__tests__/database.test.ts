@@ -1950,4 +1950,27 @@ describe('Napar SQLite Database & Repositories', () => {
     updateRecipeFavorite(testRecipeId, 1 as any);
     expect(getRecipeById(testRecipeId)?.isFavorite).toBe(true);
   });
+
+  test('TASK-P46-05-ARC: saveBrewSession sanityzuje recipeName, method, beverageType oraz inventoryItemName', () => {
+    initDatabase(mockDb as any);
+    const testSessionId = 'sess-p46-arc';
+    saveBrewSession({
+      id: testSessionId,
+      recipeName: '   ' + 'R'.repeat(250) + '   ',
+      method: '   ' + 'M'.repeat(80) + '   ',
+      beverageType: ' tea ' as any,
+      inventoryItemName: '   ' + 'I'.repeat(250) + '   ',
+      doseGrams: 16,
+      waterGrams: 250,
+      totalTimeSeconds: 150,
+      brewedAt: '2026-10-26T16:00:00Z',
+    });
+
+    const saved = getBrewSessionById(testSessionId);
+    expect(saved).toBeDefined();
+    expect(saved?.recipeName).toBe('R'.repeat(200));
+    expect(saved?.method).toBe('M'.repeat(50));
+    expect(saved?.beverageType).toBe('TEA');
+    expect(saved?.inventoryItemName).toBe('I'.repeat(200));
+  });
 });
