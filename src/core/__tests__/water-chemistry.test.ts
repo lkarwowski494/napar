@@ -197,4 +197,14 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(findBottledWaterById('VOLVIC')?.id).toBe('volvic');
     expect(findBottledWaterById('  Zywiec_Zdroj  ')?.id).toBe('zywiec_zdroj');
   });
+
+  test('TASK-P20-07-JAK: ppmCaCO3ToDegreesDH i degreesDHToPpmCaCO3 gwarantują ściśle 0 dla wejść <= 0 i -0', () => {
+    expect(ppmCaCO3ToDegreesDH(-0)).toBe(0);
+    expect(ppmCaCO3ToDegreesDH(0)).toBe(0);
+    expect(ppmCaCO3ToDegreesDH(-100)).toBe(0);
+
+    expect(degreesDHToPpmCaCO3(-0)).toBe(0);
+    expect(degreesDHToPpmCaCO3(0)).toBe(0);
+    expect(degreesDHToPpmCaCO3(-100)).toBe(0);
+  });
 });

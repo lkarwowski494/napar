@@ -315,7 +315,7 @@ export function diagnoseWaterSensoryImpact(
  * Konwertuje twardość z ppm CaCO3 na stopnie niemieckie dH (1 dH = 17.848 ppm CaCO3)
  */
 export function ppmCaCO3ToDegreesDH(ppm: number): number {
-  if (!Number.isFinite(ppm) || ppm < 0) return 0;
+  if (!Number.isFinite(ppm) || ppm <= 0) return 0;
   return Number((ppm / 17.848).toFixed(4));
 }
 
@@ -323,7 +323,7 @@ export function ppmCaCO3ToDegreesDH(ppm: number): number {
  * Konwertuje twardość ze stopni niemieckich dH na ppm CaCO3 (1 dH = 17.848 ppm CaCO3)
  */
 export function degreesDHToPpmCaCO3(dH: number): number {
-  if (!Number.isFinite(dH) || dH < 0) return 0;
+  if (!Number.isFinite(dH) || dH <= 0) return 0;
   return Number((dH * 17.848).toFixed(2));
 }
 
