@@ -719,6 +719,9 @@ const VARIETY_ALIASES: Record<string, string> = {
   'san-ramon': 'variety-typica',
   sanramon: 'variety-typica',
   marsellesa: 'variety-castillo-colombia',
+  mejorado: 'variety-typica',
+  arusha: 'variety-typica',
+  tekisic: 'variety-bourbon',
 };
 
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
@@ -899,6 +902,10 @@ const ORIGIN_ALIASES: Record<string, string> = {
   antioquia: 'origin-colombia',
   cauca: 'origin-colombia',
   tolima: 'origin-colombia',
+  pitalito: 'origin-colombia',
+  'san agustin': 'origin-colombia',
+  'san-agustin': 'origin-colombia',
+  sanagustin: 'origin-colombia',
   // Guatemala
   gtm: 'origin-guatemala',
   guatemala: 'origin-guatemala',
@@ -917,6 +924,15 @@ const ORIGIN_ALIASES: Record<string, string> = {
   kostaryka: 'origin-costa-rica',
   cr: 'origin-costa-rica',
   tarrazu: 'origin-costa-rica',
+  'west valley': 'origin-costa-rica',
+  'west-valley': 'origin-costa-rica',
+  westvalley: 'origin-costa-rica',
+  'central valley': 'origin-costa-rica',
+  'central-valley': 'origin-costa-rica',
+  centralvalley: 'origin-costa-rica',
+  'tres rios': 'origin-costa-rica',
+  'tres-rios': 'origin-costa-rica',
+  tresrios: 'origin-costa-rica',
   // Brazil
   bra: 'origin-brazil',
   brazil: 'origin-brazil',
@@ -936,6 +952,9 @@ const ORIGIN_ALIASES: Record<string, string> = {
   boquete: 'origin-panama',
   volcan: 'origin-panama',
   renacimiento: 'origin-panama',
+  jaramillo: 'origin-panama',
+  'los pozos': 'origin-panama',
+  'los-pozos': 'origin-panama',
 };
 
 export function findCoffeeOriginById(id: string): CoffeeOriginInfo | undefined {
@@ -1059,6 +1078,23 @@ const TEA_ALIASES: Record<string, string> = {
   'da hong pao': 'tea-oolong',
   'big red robe': 'tea-oolong',
   'big-red-robe': 'tea-oolong',
+  huangcha: 'tea-yellow',
+  'yellow tea': 'tea-yellow',
+  'yellow-tea': 'tea-yellow',
+  yellowtea: 'tea-yellow',
+  'junshan yinzhen': 'tea-yellow',
+  'junshan-yinzhen': 'tea-yellow',
+  junshanyinzhen: 'tea-yellow',
+  'huoshan huangya': 'tea-yellow',
+  'huoshan-huangya': 'tea-yellow',
+  'mengding huangya': 'tea-yellow',
+  'mengding-huangya': 'tea-yellow',
+  'hei cha': 'tea-puerh',
+  'hei-cha': 'tea-puerh',
+  heicha: 'tea-puerh',
+  'liu bao': 'tea-puerh',
+  'liu-bao': 'tea-puerh',
+  liubao: 'tea-puerh',
 };
 
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {

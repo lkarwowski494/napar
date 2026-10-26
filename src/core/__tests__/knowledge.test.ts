@@ -951,4 +951,27 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeVarietyById('san ramon')?.id).toBe('variety-typica');
     expect(findCoffeeVarietyById('marsellesa')?.id).toBe('variety-castillo-colombia');
   });
+
+  test('TASK-P52-06-TRE: findTeaCategoryById wspiera huangcha, hei cha i genmaicha, a regiony i kultywary kawy wspieraja nowe aliasy', () => {
+    // 1. Nowe kategorie herbaty
+    expect(findTeaCategoryById('huangcha')?.id).toBe('tea-yellow');
+    expect(findTeaCategoryById('yellow tea')?.id).toBe('tea-yellow');
+    expect(findTeaCategoryById('junshan yinzhen')?.id).toBe('tea-yellow');
+    expect(findTeaCategoryById('hei cha')?.id).toBe('tea-puerh');
+    expect(findTeaCategoryById('liu bao')?.id).toBe('tea-puerh');
+    expect(findTeaCategoryById('genmaicha')?.id).toBe('tea-green');
+
+    // 2. Regiony kawy
+    expect(findCoffeeOriginById('west valley')?.id).toBe('origin-costa-rica');
+    expect(findCoffeeOriginById('tres rios')?.id).toBe('origin-costa-rica');
+    expect(findCoffeeOriginById('pitalito')?.id).toBe('origin-colombia');
+    expect(findCoffeeOriginById('san agustin')?.id).toBe('origin-colombia');
+    expect(findCoffeeOriginById('jaramillo')?.id).toBe('origin-panama');
+
+    // 3. Kultywary kawy
+    expect(findCoffeeVarietyById('sidra')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('mejorado')?.id).toBe('variety-typica');
+    expect(findCoffeeVarietyById('arusha')?.id).toBe('variety-typica');
+    expect(findCoffeeVarietyById('tekisic')?.id).toBe('variety-bourbon');
+  });
 });
