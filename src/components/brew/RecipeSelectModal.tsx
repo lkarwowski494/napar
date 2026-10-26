@@ -123,7 +123,14 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
             e.stopPropagation();
             onToggleFavorite(r.id);
           }}
+          accessibilityRole="button"
+          accessibilityState={{ selected: Boolean(r.isFavorite) }}
           accessibilityLabel={`Ulubione: ${r.name}`}
+          accessibilityHint={
+            r.isFavorite
+              ? (t?.stash?.favoriteRemove || 'Usuń z ulubionych')
+              : (t?.stash?.favoriteAdd || 'Dodaj do ulubionych')
+          }
         >
           <Text
             style={[

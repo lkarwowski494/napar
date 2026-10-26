@@ -284,4 +284,43 @@ describe('TASK-R07-01: Lean BPR P16 Inline Selection (De-Modalization)', () => {
     expect(item.props.accessibilityLabel).toContain('Kenya Nyeri AA');
     expect(item.props.accessibilityHint).toBeDefined();
   });
+
+  test('TASK-P24-01-ODK: RecipeSelectModal favToggleBtn posiada accessibilityRole="button", accessibilityState i accessibilityHint', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <RecipeSelectModal
+          inline={true}
+          visible={true}
+          onClose={() => {}}
+          recipes={MASTER_RECIPES}
+          activeRecipeId="v60-kasuya-4-6"
+          beveragePreference="both"
+          categoryFilter="ALL"
+          onCategoryFilterChange={() => {}}
+          onSelectRecipe={() => {}}
+          onToggleFavorite={() => {}}
+          onDuplicateRecipe={() => {}}
+          onEditRecipe={() => {}}
+          onAddCustomRecipe={() => {}}
+          onOpenGongfu={() => {}}
+          onOpenImport={() => {}}
+          onOpenQrScanner={() => {}}
+          unitSystem="metric"
+          t={{
+            brew: { chooseRecipe: 'Wybierz recepturę', duplicateRecipe: 'Duplikuj' },
+            common: { close: 'Zamknij' },
+            stash: { favoriteAdd: 'Dodaj do ulubionych', favoriteRemove: 'Usuń z ulubionych' },
+          }}
+        />
+      );
+    });
+
+    const favBtns = tree.root.findAllByProps({ accessibilityRole: 'button' })
+      .filter((b: any) => typeof b.props.accessibilityLabel === 'string' && b.props.accessibilityLabel.startsWith('Ulubione:'));
+    expect(favBtns.length).toBeGreaterThan(0);
+    expect(favBtns[0].props.accessibilityRole).toBe('button');
+    expect(favBtns[0].props.accessibilityState).toBeDefined();
+    expect(favBtns[0].props.accessibilityHint).toBeDefined();
+  });
 });
