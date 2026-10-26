@@ -397,4 +397,14 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Podwójne espresso pod flat white' })).toBe(350);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine espresso grind for cortado' })).toBe(350);
   });
+
+  test('TASK-P33-08-PRO: getRecipeMicrons rozpoznaje AeroPress Go, Clear, XL i Delter Coffee Press zwracajac 560 µm', () => {
+    expect(getRecipeMicrons({ method: 'AEROPRESS_GO' })).toBe(560);
+    expect(getRecipeMicrons({ method: 'AeroPress Clear' })).toBe(560);
+    expect(getRecipeMicrons({ method: 'AeroPress XL' })).toBe(560);
+    expect(getRecipeMicrons({ method: 'DELTER' })).toBe(560);
+    expect(getRecipeMicrons({ method: 'Delter Coffee Press' })).toBe(560);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio drobno pod delter press' })).toBe(560);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-fine grind for aeropress go' })).toBe(560);
+  });
 });
