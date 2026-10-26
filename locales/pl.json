@@ -248,7 +248,8 @@
     "deleteRecipeConfirmTitle": "Usunąć recepturę?",
     "deleteRecipeConfirmMsg": "Ta operacja jest nieodwracalna.",
     "fillRequired": "Wypełnij nazwę i dodaj przynajmniej jeden krok parzenia.",
-    "duplicateBtn": "Duplikuj jako nową recepturę"
+    "duplicateBtn": "Duplikuj jako nową recepturę",
+    "stepNumberPrefix": "Krok"
   },
   "stash": {
     "title": "Spiżarnia Ziaren & Herbat",
