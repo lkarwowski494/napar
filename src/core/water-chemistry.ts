@@ -257,6 +257,17 @@ export function diagnoseWaterSensoryImpact(
     };
   }
 
+  if (ghPpm > 1000 || khPpm > 1000) {
+    return {
+      problemPl: 'Woda niezdatna do parzenia speciality (skrajne zasolenie/mineralizacja).',
+      problemEn: 'Water unsuitable for specialty brewing (extreme salinity/mineralization).',
+      causePl: 'Ekstremalna mineralizacja (GH lub KH > 1000 ppm CaCO3) uniemożliwia jakąkolwiek kontrolowaną ekstrakcję.',
+      causeEn: 'Extreme mineralization (GH or KH > 1000 ppm CaCO3) completely prevents controlled extraction.',
+      recommendationPl: 'Użyj czystej wody z odwróconej osmozy (RO) lub wody destylowanej do przygotowania bazy.',
+      recommendationEn: 'Use clean reverse osmosis (RO) or distilled water as brewing base.',
+    };
+  }
+
   if (khPpm > 75) {
     return {
       problemPl: 'Płaski napar, brak żywej kwasowości owocowej, posmak kredowy.',

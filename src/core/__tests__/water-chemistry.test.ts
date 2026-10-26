@@ -207,4 +207,13 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(degreesDHToPpmCaCO3(0)).toBe(0);
     expect(degreesDHToPpmCaCO3(-100)).toBe(0);
   });
+  test('TASK-P21-07-JAK: diagnoseWaterSensoryImpact diagnozuje skrajne zasolenie i mineralizację (GH > 1000 lub KH > 1000)', () => {
+    const extremeGh = diagnoseWaterSensoryImpact(1500, 40);
+    expect(extremeGh.problemPl).toContain('skrajne zasolenie');
+    expect(extremeGh.problemEn).toContain('extreme salinity');
+
+    const extremeKh = diagnoseWaterSensoryImpact(80, 1200);
+    expect(extremeKh.problemPl).toContain('skrajne zasolenie');
+    expect(extremeKh.causePl).toContain('> 1000 ppm CaCO3');
+  });
 });
