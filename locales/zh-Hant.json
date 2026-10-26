@@ -572,7 +572,8 @@
     "privacyBullet4": "Total freedom: free full backup and restore in open JSON format.",
     "exportBtn": "Export JSON Backup",
     "importBtn": "Restore from JSON Backup",
-    "backupSuccess": "Backup exported successfully."
+    "backupSuccess": "Backup exported successfully.",
+    "trialRemainingSummary": "試用期：剩餘 {brews} 次沖煮 · {days} 天"
   },
   "paywall": {
     "title": "Cheaper than Espresso",
