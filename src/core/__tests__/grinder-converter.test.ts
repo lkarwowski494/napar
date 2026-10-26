@@ -387,4 +387,14 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Ultradrobny przemiał pod tygielek ibrik' })).toBe(200);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Extra fine powder for ibrik' })).toBe(200);
   });
+
+  test('TASK-P32-08-PRO: getRecipeMicrons rozpoznaje Flat White, Cortado i Macchiato zwracajac 350 µm', () => {
+    expect(getRecipeMicrons({ method: 'FLAT_WHITE' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'Flat White' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'CORTADO' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'Cortado' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'MACCHIATO' })).toBe(350);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Podwójne espresso pod flat white' })).toBe(350);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine espresso grind for cortado' })).toBe(350);
+  });
 });

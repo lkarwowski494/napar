@@ -404,10 +404,17 @@ export function getRecipeMicrons(recipe?: {
     desc.includes('espresso') ||
     desc.includes('americano') ||
     desc.includes('lungo') ||
+    desc.includes('flat white') ||
+    desc.includes('cortado') ||
+    desc.includes('macchiato') ||
     method === 'ESPRESSO' ||
     method.includes('ESPRESSO') ||
     method.includes('AMERICANO') ||
     method.includes('LUNGO') ||
+    method.includes('FLAT_WHITE') ||
+    method.includes('FLAT WHITE') ||
+    method.includes('CORTADO') ||
+    method.includes('MACCHIATO') ||
     method === 'TURKISH' ||
     method === 'CEZVE' ||
     method === 'IBRIK' ||
