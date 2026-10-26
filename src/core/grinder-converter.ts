@@ -511,6 +511,18 @@ export function getRecipeMicrons(recipe?: {
     return 560;
   }
   if (
+    method === 'PULSAR' ||
+    method.includes('PULSAR') ||
+    desc.includes('pulsar') ||
+    method.includes('NEXTLEVEL') ||
+    method.includes('NEXT LEVEL') ||
+    desc.includes('nextlevel') ||
+    desc.includes('next level')
+  ) {
+    if (desc.includes('grubo') || desc.includes('coarse')) return 750;
+    return 600;
+  }
+  if (
     method === 'V60' ||
     method.includes('V60') ||
     desc.includes('v60') ||
@@ -523,6 +535,16 @@ export function getRecipeMicrons(recipe?: {
     method === 'SWITCH' ||
     method.includes('SWITCH') ||
     desc.includes('switch') ||
+    method === 'MUGEN' ||
+    method.includes('MUGEN') ||
+    desc.includes('mugen') ||
+    method.includes('CAFEC') ||
+    desc.includes('cafec') ||
+    desc.includes('flower dripper') ||
+    desc.includes('deep 27') ||
+    desc.includes('deep27') ||
+    method.includes('DEEP 27') ||
+    method.includes('DEEP_27') ||
     method === 'TRINITY' ||
     method === 'TRINITY_ONE' ||
     method.includes('TRINITY') ||

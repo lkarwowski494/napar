@@ -540,4 +540,24 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio pod dripper Kono' })).toBe(720);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Pour-over grind for LilyDrip cone' })).toBe(720);
   });
+
+  test('TASK-P45-08-PRO: getRecipeMicrons rozpoznaje drippery NextLevel Pulsar (600 µm) oraz Hario Mugen i Cafec Flower / Deep 27 (720 µm)', () => {
+    // NextLevel Pulsar (600 µm)
+    expect(getRecipeMicrons({ method: 'PULSAR' })).toBe(600);
+    expect(getRecipeMicrons({ method: 'NextLevel Pulsar' })).toBe(600);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Mielenie pod Pulsar dripper' })).toBe(600);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Dial-in for NextLevel Brewer' })).toBe(600);
+    expect(getRecipeMicrons({ method: 'PULSAR', grindSettingDescriptionPl: 'Grubo pod pulsara' })).toBe(750);
+
+    // Hario Mugen (720 µm)
+    expect(getRecipeMicrons({ method: 'MUGEN' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'Hario Mugen Single Pour' })).toBe(720);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio pod dripper Mugen' })).toBe(720);
+
+    // Cafec Flower / Deep 27 (720 µm)
+    expect(getRecipeMicrons({ method: 'Cafec Flower Dripper' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'Cafec Deep 27' })).toBe(720);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Mielenie pod Cafec Deep27' })).toBe(720);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Pour over for Cafec Flower dripper' })).toBe(720);
+  });
 });
