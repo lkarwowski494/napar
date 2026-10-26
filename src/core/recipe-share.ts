@@ -331,11 +331,11 @@ export function decodeRecipeFromShareUrl(
         return {
           stepNumber: idx + 1,
           namePl: typeof st.n === 'string' && st.n.trim() ? st.n.trim().slice(0, 100) : fallbackStepPlName,
-          ...(st.ne && typeof st.ne === 'string' ? { nameEn: st.ne.trim().slice(0, 100) } : (isEn && typeof st.n === 'string' && st.n ? { nameEn: st.n.trim().slice(0, 100) } : {})),
+          ...(typeof st.ne === 'string' && st.ne.trim() ? { nameEn: st.ne.trim().slice(0, 100) } : (isEn && typeof st.n === 'string' && st.n.trim() ? { nameEn: st.n.trim().slice(0, 100) } : {})),
           durationSeconds: Number.isFinite(rawSec) && rawSec > 0 ? Math.max(1, Math.min(86400, Math.round(rawSec))) : 30,
           targetWaterGrams: Object.is(safeStepWater, -0) || safeStepWater <= 0 ? 0 : safeStepWater,
           instructionPl: typeof st.i === 'string' && st.i.trim() ? st.i.slice(0, 2000) : fallbackStepInstrPl,
-          ...(st.ie && typeof st.ie === 'string' ? { instructionEn: st.ie.slice(0, 2000) } : (isEn && typeof st.i === 'string' && st.i ? { instructionEn: st.i.slice(0, 2000) } : {})),
+          ...(typeof st.ie === 'string' && st.ie.trim() ? { instructionEn: st.ie.trim().slice(0, 2000) } : (isEn && typeof st.i === 'string' && st.i.trim() ? { instructionEn: st.i.trim().slice(0, 2000) } : {})),
         };
       });
 
