@@ -1096,19 +1096,32 @@ export function importDataJson(jsonStr: string): void {
   }
 
   const db = getDatabase();
+  const safeInventory = Array.isArray(data.inventory) ? data.inventory : [];
+  const safeCustomRecipes = Array.isArray(data.customRecipes) ? data.customRecipes : [];
+  const safeSessions = Array.isArray(data.sessions) ? data.sessions : [];
+  const safeCaffeineLogs = Array.isArray(data.caffeineLogs) ? data.caffeineLogs : [];
+
   try {
     runInTransactionSync(db, () => {
-      for (const item of data.inventory || []) {
-        saveInventoryItem(item);
+      for (const item of safeInventory) {
+        if (item && typeof item === 'object') {
+          saveInventoryItem(item);
+        }
       }
-      for (const recipe of data.customRecipes || []) {
-        saveRecipe(recipe);
+      for (const recipe of safeCustomRecipes) {
+        if (recipe && typeof recipe === 'object') {
+          saveRecipe(recipe);
+        }
       }
-      for (const session of data.sessions || []) {
-        saveBrewSession(session);
+      for (const session of safeSessions) {
+        if (session && typeof session === 'object') {
+          saveBrewSession(session);
+        }
       }
-      for (const log of data.caffeineLogs || []) {
-        logCaffeine(log);
+      for (const log of safeCaffeineLogs) {
+        if (log && typeof log === 'object') {
+          logCaffeine(log);
+        }
       }
     });
   } catch (err: any) {

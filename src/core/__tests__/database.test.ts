@@ -1861,4 +1861,30 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(cloned.name.length).toBeLessThanOrEqual(100);
     expect(cloned.name.endsWith(' (Kopia)')).toBe(true);
   });
+
+  test('TASK-P43-05-ARC: importDataJson chroni przed nie-tablicami i elementami nie-obiektowymi w polach kopii zapasowej', () => {
+    initDatabase(mockDb as any);
+    const corruptedBackup = {
+      version: 1,
+      exportedAt: '2026-10-26T12:00:00.000Z',
+      inventory: 'not-an-array' as any,
+      customRecipes: 123 as any,
+      sessions: null as any,
+      caffeineLogs: undefined as any,
+    };
+
+    // Nie powinno rzucać błędem TypeError: not iterable
+    expect(() => importDataJson(JSON.stringify(corruptedBackup))).not.toThrow();
+
+    // Kopia zapasowa z tablicami zawierającymi elementy null/string
+    const arrayWithNulls = {
+      version: 1,
+      exportedAt: '2026-10-26T12:00:00.000Z',
+      inventory: [null, 'invalid', { id: 'inv-valid', name: 'Ethiopia Yirgacheffe', type: 'coffee', initialWeightGrams: 250, remainingWeightGrams: 200, isArchived: false, isFavorite: false }],
+      customRecipes: [undefined, 42],
+      sessions: [null],
+      caffeineLogs: ['invalid'],
+    };
+    expect(() => importDataJson(JSON.stringify(arrayWithNulls))).not.toThrow();
+  });
 });
