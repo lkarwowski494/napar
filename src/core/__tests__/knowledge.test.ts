@@ -727,4 +727,16 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeVarietyById('pink-bourbon')?.id).toBe('variety-pink-bourbon');
     expect(findCoffeeVarietyById('pinkbourbon')?.id).toBe('variety-pink-bourbon');
   });
+
+  test('TASK-P39-06-TRE: findCoffeeProcessById wspiera aliasy semi-washed, pulped-natural, wet-hulled oraz szok termiczny', () => {
+    expect(findCoffeeProcessById('semi-washed')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('semiwashed')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('pulped-natural')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('wet-hulled')?.id).toBe('process-wet-hulled');
+    expect(findCoffeeProcessById('giling-basah')?.id).toBe('process-wet-hulled');
+    expect(findCoffeeProcessById('carbonic-maceration')?.id).toBe('process-carbonic-maceration');
+    expect(findCoffeeProcessById('maceracja-weglowa')?.id).toBe('process-carbonic-maceration');
+    expect(findCoffeeProcessById('thermal-shock')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('szok-termiczny')?.id).toBe('process-anaerobic');
+  });
 });
