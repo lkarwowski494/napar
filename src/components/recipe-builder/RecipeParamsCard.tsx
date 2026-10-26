@@ -41,7 +41,9 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
 
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>Parametry & Proporcja</Text>
+      <Text style={styles.cardTitle} accessibilityRole="header">
+        {t.recipeBuilder?.paramsAndRatio || 'Parametry & Proporcja'}
+      </Text>
 
       <View style={styles.row}>
         <View style={styles.flex1}>
@@ -90,14 +92,24 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
       </View>
 
       {/* Badge wyliczonego ratio */}
-      <View style={styles.ratioBadge}>
+      <View
+        style={styles.ratioBadge}
+        accessibilityRole="summary"
+        accessibilityLabel={`Wyliczona proporcja parzenia: 1 do ${currentRatio}`}
+        testID="recipe-ratio-badge"
+      >
         <Text style={styles.ratioBadgeText}>
           Wyliczona proporcja: <Text style={styles.ratioValue}>1 : {currentRatio}</Text>
         </Text>
       </View>
 
       {/* Podgląd w wybranym układzie jednostek */}
-      <View style={styles.unitPreviewBadge}>
+      <View
+        style={styles.unitPreviewBadge}
+        accessibilityRole="text"
+        accessibilityLabel={`Podsumowanie jednostek: ${formatDoseWeight(doseNum, unitSystem)}, ${formatWaterWeight(waterNum, unitSystem)}, ${formatTemperature(parseFloat(waterTempCelsius) || 93, unitSystem)}`}
+        testID="recipe-unit-preview-badge"
+      >
         <Text style={styles.unitPreviewBadgeText}>
           {formatDoseWeight(doseNum, unitSystem)} / {formatWaterWeight(waterNum, unitSystem)} · {formatTemperature(parseFloat(waterTempCelsius) || 93, unitSystem)}
         </Text>
