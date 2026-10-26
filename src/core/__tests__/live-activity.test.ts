@@ -447,4 +447,22 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(formatActivityTimer(false as any)).toBe('0:00');
     expect(formatActivityTimer(true as any)).toBe('0:00');
   });
+
+  test('TASK-P31-12-NIE: startLiveActivity waliduje stepIndex oraz totalSteps w initialState', async () => {
+    const badStepIndexState: any = {
+      ...mockState,
+      stepIndex: -1,
+    };
+    const resBadIdx = await startLiveActivity(mockAttributesCoffee, badStepIndexState);
+    expect(resBadIdx.success).toBe(false);
+    expect(resBadIdx.error).toContain('Nieprawidłowy indeks kroku');
+
+    const badTotalStepsState: any = {
+      ...mockState,
+      totalSteps: 0,
+    };
+    const resBadTotal = await startLiveActivity(mockAttributesCoffee, badTotalStepsState);
+    expect(resBadTotal.success).toBe(false);
+    expect(resBadTotal.error).toContain('Nieprawidłowa łączna liczba kroków');
+  });
 });
