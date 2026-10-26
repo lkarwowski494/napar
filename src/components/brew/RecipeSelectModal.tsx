@@ -159,7 +159,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
             style={styles.editRecipeBtn}
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel="Edytuj recepturę"
+            accessibilityLabel={t?.brew?.editRecipe || 'Edytuj recepturę'}
             testID={`edit-recipe-${r.id}`}
             onPress={(e) => {
               e.stopPropagation();
