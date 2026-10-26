@@ -191,14 +191,22 @@ export function decodeRecipeFromShareUrl(
     if (
       parsed.v !== 1 ||
       !parsed.n ||
+      typeof parsed.n !== 'string' ||
+      parsed.n.length > 200 ||
       !parsed.m ||
+      typeof parsed.m !== 'string' ||
+      parsed.m.length > 50 ||
+      (parsed.a !== undefined && (typeof parsed.a !== 'string' || parsed.a.length > 100)) ||
+      (parsed.desc !== undefined && (typeof parsed.desc !== 'string' || parsed.desc.length > 1000)) ||
       typeof parsed.d !== 'number' ||
       !Number.isFinite(parsed.d) ||
       parsed.d <= 0 ||
+      parsed.d > 1000 ||
       typeof parsed.w !== 'number' ||
       !Number.isFinite(parsed.w) ||
       parsed.w <= 0 ||
-      (parsed.s !== undefined && !Array.isArray(parsed.s))
+      parsed.w > 50000 ||
+      (parsed.s !== undefined && (!Array.isArray(parsed.s) || parsed.s.length > 100))
     ) {
       return null;
     }

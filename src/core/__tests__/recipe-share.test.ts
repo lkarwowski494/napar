@@ -261,6 +261,28 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(result?.originalSteps[1].targetWaterGrams).toBe(0);
   });
 
+  test('TASK-P9-11-WZR: decodeRecipeFromShareUrl odrzuca payloady o przekroczonych limitach rozmiaru (DoS / Memory Bomb guard)', () => {
+    const makePayload = (patch: any) => {
+      const data = { v: 1, n: 'Valid Name', b: 'COFFEE', m: 'V60', d: 15, w: 250, ...patch };
+      return utf8ToBase64(JSON.stringify(data));
+    };
+
+    // Zbyt długa nazwa (> 200 znaków)
+    expect(decodeRecipeFromShareUrl(makePayload({ n: 'A'.repeat(201) }))).toBeNull();
+    // Zbyt długa metoda (> 50 znaków)
+    expect(decodeRecipeFromShareUrl(makePayload({ m: 'M'.repeat(51) }))).toBeNull();
+    // Zbyt duża doza (> 1000g)
+    expect(decodeRecipeFromShareUrl(makePayload({ d: 1001 }))).toBeNull();
+    // Zbyt duża ilość wody (> 50000g)
+    expect(decodeRecipeFromShareUrl(makePayload({ w: 50001 }))).toBeNull();
+    // Zbyt wiele kroków (> 100)
+    const tooManySteps = Array.from({ length: 101 }, (_, i) => ({ n: `Step ${i}`, d: 30, w: 10 }));
+    expect(decodeRecipeFromShareUrl(makePayload({ s: tooManySteps }))).toBeNull();
+
+    // Wartości graniczne dopuszczalne
+    expect(decodeRecipeFromShareUrl(makePayload({ n: 'A'.repeat(200), m: 'M'.repeat(50), d: 1000, w: 50000 }))).not.toBeNull();
+  });
+
   test('TASK-P8-11-WZR: decodeRecipeFromShareUrl zabezpiecza parsed.t i parsed.r przed NaN i wartościami poza zakresem', () => {
     const payloadWithInvalidTempAndRatio = utf8ToBase64(JSON.stringify({
       v: 1,
