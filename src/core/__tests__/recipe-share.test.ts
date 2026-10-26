@@ -800,4 +800,24 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(payload.s[0].d).toBe(45);
     expect(payload.s[0].w).toBe(50);
   });
+
+  test('TASK-P34-11-WZR: recipeToCompactPayload clampuje doze [1, 1000] i wode [10, 50000] oraz chroni przed -0 w wyliczaniu ratio', () => {
+    const edgeRecipe: any = {
+      name: 'Edge Clamp Recipe',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: 0.1, // poniżej 1g -> min 1g
+      waterGrams: 5,   // poniżej 10g -> min 10g
+      waterTempCelsius: 93,
+      recommendedRatio: -0,
+      stepsJson: '[]',
+    };
+    const payload = recipeToCompactPayload(edgeRecipe);
+    expect(payload.d).toBe(1);
+    expect(payload.w).toBe(10);
+    expect(Object.is(payload.d, -0)).toBe(false);
+    expect(Object.is(payload.w, -0)).toBe(false);
+    expect(Object.is(payload.r, -0)).toBe(false);
+    expect(payload.r).toBe(10); // 10 / 1 = 10.0
+  });
 });

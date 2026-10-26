@@ -177,22 +177,30 @@ export function recipeToCompactPayload(
 
   const parsedDose = typeof rawDose === 'number' ? rawDose : (typeof rawDose === 'string' ? parseFloat(rawDose) : NaN);
   const parsedWater = typeof rawWater === 'number' ? rawWater : (typeof rawWater === 'string' ? parseFloat(rawWater) : NaN);
-  const dose =
-    Number.isFinite(parsedDose) && parsedDose > 0 ? Number(Math.min(1000, parsedDose).toFixed(1)) : 15;
-  const water =
-    Number.isFinite(parsedWater) && parsedWater > 0 ? Number(Math.min(50000, parsedWater).toFixed(1)) : 250;
+  const rawDoseVal =
+    Number.isFinite(parsedDose) && parsedDose > 0 ? Number(Math.min(1000, Math.max(1, parsedDose)).toFixed(1)) : 15;
+  const dose = Object.is(rawDoseVal, -0) ? 15 : rawDoseVal;
+
+  const rawWaterVal =
+    Number.isFinite(parsedWater) && parsedWater > 0 ? Number(Math.min(50000, Math.max(10, parsedWater)).toFixed(1)) : 250;
+  const water = Object.is(rawWaterVal, -0) ? 250 : rawWaterVal;
+
   const parsedTemp = typeof rawTemp === 'number' ? rawTemp : (typeof rawTemp === 'string' ? parseFloat(rawTemp) : NaN);
-  const temp =
+  const rawTempVal =
     Number.isFinite(parsedTemp) && parsedTemp >= 0 && parsedTemp <= 100
       ? Math.round(parsedTemp)
       : 92;
+  const temp = Object.is(rawTempVal, -0) ? 0 : rawTempVal;
+
   const grind =
     typeof rawGrind === 'string' && rawGrind.trim() ? rawGrind.trim().slice(0, 200) : undefined;
   const computedRatio = Number((water / (dose || 1)).toFixed(1));
-  const ratio =
-    Number.isFinite(rawRatio) && rawRatio > 0
-      ? Number(rawRatio.toFixed(2))
+  const rawRatioNum = typeof rawRatio === 'number' ? rawRatio : (typeof rawRatio === 'string' ? parseFloat(rawRatio as any) : NaN);
+  const ratioCandidate =
+    Number.isFinite(rawRatioNum) && rawRatioNum > 0
+      ? Number(rawRatioNum.toFixed(2))
       : (Number.isFinite(computedRatio) && computedRatio > 0 ? computedRatio : 16.7);
+  const ratio = Object.is(ratioCandidate, -0) ? 16.7 : ratioCandidate;
 
   return {
     v: 1,
