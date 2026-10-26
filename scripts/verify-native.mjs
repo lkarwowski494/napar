@@ -32,14 +32,30 @@ try {
     `app.json -> expo.android.adaptiveIcon.backgroundColor musi być równe '#121214' (otrzymano '${appJson.android?.adaptiveIcon?.backgroundColor}')`
   );
 
-  // Niezmienniki orientacji, stylu i urządzeń (TASK-P8-10-WYD)
+  // Niezmienniki orientacji, stylu i urządzeń (TASK-P8-10-WYD, TASK-P34-10-WYD)
   check(
     appJson.orientation === 'portrait',
     `app.json -> expo.orientation musi być równe 'portrait' (otrzymano '${appJson.orientation}')`
   );
   check(
+    !appJson.ios?.orientation || appJson.ios.orientation === 'portrait',
+    `app.json -> expo.ios.orientation musi być 'portrait' jeśli zdefiniowane (otrzymano '${appJson.ios?.orientation}')`
+  );
+  check(
+    !appJson.android?.orientation || appJson.android.orientation === 'portrait',
+    `app.json -> expo.android.orientation musi być 'portrait' jeśli zdefiniowane (otrzymano '${appJson.android?.orientation}')`
+  );
+  check(
     appJson.userInterfaceStyle === 'dark',
     `app.json -> expo.userInterfaceStyle musi być równe 'dark' (otrzymano '${appJson.userInterfaceStyle}')`
+  );
+  check(
+    !appJson.ios?.userInterfaceStyle || appJson.ios.userInterfaceStyle === 'dark',
+    `app.json -> expo.ios.userInterfaceStyle musi być 'dark' jeśli zdefiniowane (otrzymano '${appJson.ios?.userInterfaceStyle}')`
+  );
+  check(
+    !appJson.android?.userInterfaceStyle || appJson.android.userInterfaceStyle === 'dark',
+    `app.json -> expo.android.userInterfaceStyle musi być 'dark' jeśli zdefiniowane (otrzymano '${appJson.android?.userInterfaceStyle}')`
   );
   check(
     appJson.ios?.supportsTablet === false,
@@ -273,11 +289,11 @@ try {
       `package.json main musi wskazywać na 'expo-router/entry' (otrzymano '${pkgJson.main}')`
     );
     const deps = pkgJson.dependencies || {};
-    const criticalPlugins = ['expo-router', 'expo-sqlite', 'expo-camera', 'expo-localization'];
+    const criticalPlugins = ['expo', 'react-native', 'react', 'expo-router', 'expo-sqlite', 'expo-camera', 'expo-localization'];
     for (const plugin of criticalPlugins) {
       check(
         Boolean(deps[plugin]),
-        `Krytyczny plugin '${plugin}' zadeklarowany w app.json musi znajdować się w dependencies package.json`
+        `Krytyczny pakiet '${plugin}' musi znajdować się w dependencies package.json`
       );
     }
   }
