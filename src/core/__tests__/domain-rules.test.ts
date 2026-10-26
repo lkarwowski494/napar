@@ -463,4 +463,17 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(res.extractionYieldPercent).toBe(50);
     });
   });
+  describe('TASK-P23-03-ZAK: calculateLiquidYield clampuje współczynnik retencji do maxRetentionFactor', () => {
+    it('clampuje retentionFactor do domyślnego limitu 10.0', () => {
+      // 100g wody, 5g dozy, retentionFactor 50 clampowany do 10.0 -> 100 - (5 * 10) = 50.0g
+      const yieldGrams = calculateLiquidYield(100.0, 5.0, 50.0);
+      expect(yieldGrams).toBe(50.0);
+    });
+
+    it('akceptuje niestandardowy maxRetentionFactor', () => {
+      // 100g wody, 10g dozy, retentionFactor 10 clampowany do 5.0 -> 100 - (10 * 5) = 50.0g
+      const yieldGrams = calculateLiquidYield(100.0, 10.0, 10.0, 5.0);
+      expect(yieldGrams).toBe(50.0);
+    });
+  });
 });

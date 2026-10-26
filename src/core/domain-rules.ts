@@ -80,11 +80,19 @@ export function calculateBrewRatio(doseGrams: number, waterGrams: number, maxRat
  * RD-02: Absorpcja wody przez zmieloną kawę (Water Retention Index)
  * Domyślny współczynnik: 2.0g wody na każdy 1g zmielonej kawy
  */
-export function calculateLiquidYield(waterGrams: number, doseGrams: number, retentionFactor = 2.0): number {
+export function calculateLiquidYield(
+  waterGrams: number,
+  doseGrams: number,
+  retentionFactor = 2.0,
+  maxRetentionFactor = 10.0
+): number {
   if (!Number.isFinite(waterGrams) || !Number.isFinite(doseGrams) || !Number.isFinite(retentionFactor) || waterGrams <= 0 || doseGrams <= 0 || retentionFactor < 0) {
     throw new Error('Nieprawidłowe parametry wyliczania uzysku');
   }
-  const retained = doseGrams * retentionFactor;
+  const safeRetention = Number.isFinite(maxRetentionFactor) && maxRetentionFactor > 0
+    ? Math.min(retentionFactor, maxRetentionFactor)
+    : retentionFactor;
+  const retained = doseGrams * safeRetention;
   const yieldGrams = Math.max(0, waterGrams - retained);
   return Number(yieldGrams.toFixed(1));
 }
