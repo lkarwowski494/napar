@@ -47,69 +47,70 @@ function roundGrosze(val: number): number {
 /**
  * Calculates itemized costs for a cup of coffee and monetary savings vs cafe.
  */
-export function calculateBrewCost(input: BrewCostInput): BrewCostMetrics {
+export function calculateBrewCost(input?: BrewCostInput): BrewCostMetrics {
+  const safeInput = input || ({} as BrewCostInput);
   const dose =
-    input.doseGrams !== undefined && Number.isFinite(input.doseGrams) && input.doseGrams > 0
-      ? input.doseGrams
+    safeInput.doseGrams !== undefined && Number.isFinite(safeInput.doseGrams) && safeInput.doseGrams > 0
+      ? safeInput.doseGrams
       : 0;
 
   // Water volume in liters
   let waterLiters: number;
-  if (input.waterLiters !== undefined && Number.isFinite(input.waterLiters) && input.waterLiters > 0) {
-    waterLiters = input.waterLiters;
+  if (safeInput.waterLiters !== undefined && Number.isFinite(safeInput.waterLiters) && safeInput.waterLiters > 0) {
+    waterLiters = safeInput.waterLiters;
   } else if (
-    input.waterWeightGrams !== undefined &&
-    Number.isFinite(input.waterWeightGrams) &&
-    input.waterWeightGrams > 0
+    safeInput.waterWeightGrams !== undefined &&
+    Number.isFinite(safeInput.waterWeightGrams) &&
+    safeInput.waterWeightGrams > 0
   ) {
-    waterLiters = input.waterWeightGrams / 1000;
+    waterLiters = safeInput.waterWeightGrams / 1000;
   } else {
     waterLiters = 0.25; // 250ml default single cup
   }
 
   const beanPrice =
-    input.beanPricePerKg !== undefined && Number.isFinite(input.beanPricePerKg) && input.beanPricePerKg >= 0
-      ? input.beanPricePerKg
+    safeInput.beanPricePerKg !== undefined && Number.isFinite(safeInput.beanPricePerKg) && safeInput.beanPricePerKg >= 0
+      ? safeInput.beanPricePerKg
       : DEFAULT_BREW_COST_PARAMETERS.beanPricePerKg;
 
   const waterSaltsCost =
-    input.waterSaltsCostPerLiter !== undefined &&
-    Number.isFinite(input.waterSaltsCostPerLiter) &&
-    input.waterSaltsCostPerLiter >= 0
-      ? input.waterSaltsCostPerLiter
+    safeInput.waterSaltsCostPerLiter !== undefined &&
+    Number.isFinite(safeInput.waterSaltsCostPerLiter) &&
+    safeInput.waterSaltsCostPerLiter >= 0
+      ? safeInput.waterSaltsCostPerLiter
       : DEFAULT_BREW_COST_PARAMETERS.waterSaltsCostPerLiter;
 
   const kettlePower =
-    input.kettlePowerKw !== undefined && Number.isFinite(input.kettlePowerKw) && input.kettlePowerKw >= 0
-      ? input.kettlePowerKw
+    safeInput.kettlePowerKw !== undefined && Number.isFinite(safeInput.kettlePowerKw) && safeInput.kettlePowerKw >= 0
+      ? safeInput.kettlePowerKw
       : DEFAULT_BREW_COST_PARAMETERS.kettlePowerKw;
 
   const boilMinutes =
-    input.kettleBoilMinutes !== undefined &&
-    Number.isFinite(input.kettleBoilMinutes) &&
-    input.kettleBoilMinutes >= 0
-      ? input.kettleBoilMinutes
+    safeInput.kettleBoilMinutes !== undefined &&
+    Number.isFinite(safeInput.kettleBoilMinutes) &&
+    safeInput.kettleBoilMinutes >= 0
+      ? safeInput.kettleBoilMinutes
       : DEFAULT_BREW_COST_PARAMETERS.kettleBoilMinutes;
 
   const electricityPrice =
-    input.electricityPricePerKwh !== undefined &&
-    Number.isFinite(input.electricityPricePerKwh) &&
-    input.electricityPricePerKwh >= 0
-      ? input.electricityPricePerKwh
+    safeInput.electricityPricePerKwh !== undefined &&
+    Number.isFinite(safeInput.electricityPricePerKwh) &&
+    safeInput.electricityPricePerKwh >= 0
+      ? safeInput.electricityPricePerKwh
       : DEFAULT_BREW_COST_PARAMETERS.electricityPricePerKwh;
 
   const filterCostVal =
-    input.filterPaperCost !== undefined &&
-    Number.isFinite(input.filterPaperCost) &&
-    input.filterPaperCost >= 0
-      ? input.filterPaperCost
+    safeInput.filterPaperCost !== undefined &&
+    Number.isFinite(safeInput.filterPaperCost) &&
+    safeInput.filterPaperCost >= 0
+      ? safeInput.filterPaperCost
       : DEFAULT_BREW_COST_PARAMETERS.filterPaperCost;
 
   const cafePrice =
-    input.cafeReferencePrice !== undefined &&
-    Number.isFinite(input.cafeReferencePrice) &&
-    input.cafeReferencePrice >= 0
-      ? input.cafeReferencePrice
+    safeInput.cafeReferencePrice !== undefined &&
+    Number.isFinite(safeInput.cafeReferencePrice) &&
+    safeInput.cafeReferencePrice >= 0
+      ? safeInput.cafeReferencePrice
       : DEFAULT_BREW_COST_PARAMETERS.cafeReferencePrice;
 
   // 1. Coffee cost
@@ -132,7 +133,7 @@ export function calculateBrewCost(input: BrewCostInput): BrewCostMetrics {
   // 6. Savings comparison
   const savingsPerCup = roundGrosze(Math.max(0, cafePrice - totalHomeCost));
   const savingsPercent =
-    cafePrice > 0 ? Math.round((savingsPerCup / cafePrice) * 1000) / 10 : 0;
+    cafePrice > 0 ? Math.min(100, Math.max(0, Math.round((savingsPerCup / cafePrice) * 1000) / 10)) : 0;
 
   return {
     coffeeCost,

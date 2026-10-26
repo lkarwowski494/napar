@@ -109,4 +109,22 @@ describe('Cost Calculator Engine (Craft Economics)', () => {
     expect(nanMetrics.cafePrice).toBe(DEFAULT_BREW_COST_PARAMETERS.cafeReferencePrice); // NaN -> default
     expect(nanMetrics.waterCost).toBe(0.01); // 0.25L * 0.05 default
   });
+
+  test('TASK-P10-07-JAK: calculateBrewCost jest odporne na brak argumentu i ogranicza savingsPercent do 100%', () => {
+    const defaultMetrics = calculateBrewCost(undefined);
+    expect(defaultMetrics).toBeDefined();
+    expect(defaultMetrics.totalHomeCost).toBeGreaterThan(0);
+    expect(defaultMetrics.savingsPercent).toBeLessThanOrEqual(100);
+    expect(defaultMetrics.savingsPercent).toBeGreaterThanOrEqual(0);
+
+    const highSavings = calculateBrewCost({
+      doseGrams: 1,
+      beanPricePerKg: 10,
+      filterPaperCost: 0,
+      electricityPricePerKwh: 0,
+      waterSaltsCostPerLiter: 0,
+      cafeReferencePrice: 1000,
+    });
+    expect(highSavings.savingsPercent).toBeLessThanOrEqual(100);
+  });
 });
