@@ -199,4 +199,27 @@ describe('BrewQuickPrepCard Component', () => {
     expect(decEn.props.accessibilityHint).toBe('Decreases water by 10 grams');
     expect(incEn.props.accessibilityHint).toBe('Increases water by 10 grams');
   });
+
+  test('TASK-P29-01-ODK: chipsy proporcji posiadają accessibilityRole radio, accessibilityState oraz accessibilityHint', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewQuickPrepCard
+          {...defaultProps}
+          doseGrams={15}
+          waterGrams={250}
+          onWaterChange={jest.fn()}
+          language="pl"
+        />
+      );
+    });
+
+    const goldenChip = tree.root.findByProps({ testID: 'ratio-chip-1-16.7' });
+    expect(goldenChip.props.accessibilityRole).toBe('radio');
+    expect(goldenChip.props.accessibilityState).toEqual({ selected: true });
+    expect(goldenChip.props.accessibilityHint).toBe('Ustawia ilość wody dla proporcji 1:16.7');
+
+    const strongChip = tree.root.findByProps({ testID: 'ratio-chip-1-15' });
+    expect(strongChip.props.accessibilityState).toEqual({ selected: false });
+  });
 });

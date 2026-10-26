@@ -210,9 +210,14 @@ export function BrewQuickPrepCard({
               return (
                 <Pressable
                   key={r.label}
+                  testID={`ratio-chip-${r.label.replace(':', '-')}`}
                   style={[styles.ratioChip, isActive && styles.ratioChipActive]}
                   onPress={() => onWaterChange(Math.round(doseGrams * r.ratio))}
                   disabled={disabled}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: isActive }}
+                  accessibilityLabel={language === 'en' ? `Ratio ${r.label} (${r.desc})` : `Proporcja ${r.label} (${r.desc})`}
+                  accessibilityHint={language === 'en' ? `Sets water for ratio ${r.label}` : `Ustawia ilość wody dla proporcji ${r.label}`}
                 >
                   <Text style={[styles.ratioChipText, isActive && styles.ratioChipTextActive]}>
                     {r.label}
