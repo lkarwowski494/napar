@@ -383,12 +383,17 @@ export function generateActionIcsContent(
   action: ProactiveActionItem,
   language: 'pl' | 'en' = 'pl'
 ): string {
+  if (!action || typeof action !== 'object') {
+    throw new Error('Nieprawidłowy obiekt akcji kalendarza');
+  }
   const isEn = language === 'en';
-  const cleanDate = (action.dateIso || '2026-10-17').replace(/-/g, '');
+  const rawDate = typeof action.dateIso === 'string' && action.dateIso.trim() ? action.dateIso.trim() : '2026-10-17';
+  const cleanDate = rawDate.replace(/-/g, '');
   const dtStart = `${cleanDate}T080000Z`;
   const dtEnd = `${cleanDate}T081500Z`;
-  const rawSummary = isEn ? action.titleEn || action.titlePl : action.titlePl;
-  const rawDescription = isEn ? action.subtitleEn || action.subtitlePl : action.subtitlePl;
+  const actionId = typeof action.id === 'string' && action.id.trim() ? action.id.trim() : `action-${Date.now()}`;
+  const rawSummary = (isEn ? action.titleEn || action.titlePl : action.titlePl) || 'Sesja parzenia Napar';
+  const rawDescription = (isEn ? action.subtitleEn || action.subtitlePl : action.subtitlePl) || '';
 
   const summary = escapeIcsText(rawSummary);
   const description = escapeIcsText(rawDescription);
@@ -398,7 +403,7 @@ export function generateActionIcsContent(
     'VERSION:2.0',
     `PRODID:-//Apps4Brew Studio//Napar Steepwise//${isEn ? 'EN' : 'PL'}`,
     'BEGIN:VEVENT',
-    `UID:${action.id}@napar.apps4brew.studio`,
+    `UID:${actionId}@napar.apps4brew.studio`,
     `DTSTAMP:${dtStart}`,
     `DTSTART:${dtStart}`,
     `DTEND:${dtEnd}`,

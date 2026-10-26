@@ -205,5 +205,15 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(daysFromCorrupt[0].dateIso).not.toContain('NaN');
       expect(Number.isFinite(daysFromCorrupt[0].dayNumber)).toBe(true);
     });
+
+    it('TASK-P13-07-JAK: generateActionIcsContent chroni przed null/undefined i uzupełnia brakujące ID/tytuł', () => {
+      expect(() => generateActionIcsContent(null as any)).toThrow('Nieprawidłowy obiekt akcji kalendarza');
+      expect(() => generateActionIcsContent(undefined as any)).toThrow('Nieprawidłowy obiekt akcji kalendarza');
+
+      const fallbackIcs = generateActionIcsContent({} as any);
+      expect(fallbackIcs).toContain('BEGIN:VCALENDAR');
+      expect(fallbackIcs).toContain('UID:action-');
+      expect(fallbackIcs).toContain('SUMMARY:Sesja parzenia Napar');
+    });
   });
 });
