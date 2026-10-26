@@ -173,15 +173,16 @@ export function recipeToCompactPayload(
   const water =
     Number.isFinite(rawWater) && rawWater > 0 ? Number(rawWater.toFixed(1)) : 250;
   const temp =
-    Number.isFinite(rawTemp) && rawTemp > 0 && rawTemp <= 100
+    Number.isFinite(rawTemp) && rawTemp >= 0 && rawTemp <= 100
       ? Math.round(rawTemp)
       : 92;
   const grind =
     typeof rawGrind === 'string' && rawGrind.trim() ? rawGrind.trim() : undefined;
+  const computedRatio = Number((water / (dose || 1)).toFixed(1));
   const ratio =
     Number.isFinite(rawRatio) && rawRatio > 0
       ? Number(rawRatio.toFixed(2))
-      : Number((water / (dose || 1)).toFixed(1));
+      : (Number.isFinite(computedRatio) && computedRatio > 0 ? computedRatio : 16.7);
 
   return {
     v: 1,

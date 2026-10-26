@@ -468,4 +468,20 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded).not.toBeNull();
     expect(decoded?.recipe.waterTempCelsius).toBe(0);
   });
+
+  test('TASK-P18-11-WZR: recipeToCompactPayload zachowuje 0°C oraz zabezpiecza r (ratio) przed NaN', () => {
+    const recipeWithZeroTemp: any = {
+      name: 'Kyoto Cold Drip',
+      beverageType: 'COFFEE',
+      method: 'COLD_BREW',
+      doseGrams: 30,
+      waterGrams: 450,
+      waterTempCelsius: 0,
+      recommendedRatio: NaN,
+      stepsJson: '[]',
+    };
+    const payload = recipeToCompactPayload(recipeWithZeroTemp);
+    expect(payload.t).toBe(0);
+    expect(payload.r).toBe(15);
+  });
 });
