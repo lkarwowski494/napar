@@ -171,9 +171,9 @@ export function recipeToCompactPayload(
   const rawRatio = recipe.recommendedRatio;
 
   const dose =
-    Number.isFinite(rawDose) && rawDose > 0 ? Number(rawDose.toFixed(1)) : 15;
+    Number.isFinite(rawDose) && rawDose > 0 ? Number(Math.min(1000, rawDose).toFixed(1)) : 15;
   const water =
-    Number.isFinite(rawWater) && rawWater > 0 ? Number(rawWater.toFixed(1)) : 250;
+    Number.isFinite(rawWater) && rawWater > 0 ? Number(Math.min(50000, rawWater).toFixed(1)) : 250;
   const parsedTemp = typeof rawTemp === 'number' ? rawTemp : (typeof rawTemp === 'string' ? parseFloat(rawTemp) : NaN);
   const temp =
     Number.isFinite(parsedTemp) && parsedTemp >= 0 && parsedTemp <= 100

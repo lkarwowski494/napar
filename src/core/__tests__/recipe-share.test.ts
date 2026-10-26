@@ -577,4 +577,18 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded).not.toBeNull();
     expect(decoded?.recipe.waterTempCelsius).toBe(88);
   });
+  test('TASK-P24-11-WZR: recipeToCompactPayload clampuje doze do 1000g i wode do 50000g', () => {
+    const hugeRecipe: any = {
+      name: 'Huge Batch Recipe',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 5000,
+      waterGrams: 90000,
+      waterTempCelsius: 92,
+      stepsJson: '[]',
+    };
+    const payload = recipeToCompactPayload(hugeRecipe);
+    expect(payload.d).toBe(1000);
+    expect(payload.w).toBe(50000);
+  });
 });
