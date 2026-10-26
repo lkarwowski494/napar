@@ -544,6 +544,14 @@ export function getRecipeMicrons(recipe?: {
     desc.includes('prismo') ||
     desc.includes('flow control')
   ) {
+    if (desc.includes('grubo') || desc.includes('coarse')) return 850;
+    if (
+      !desc.includes('drobno') &&
+      !desc.includes('fine') &&
+      (desc.includes('średnio') || desc.includes('srednio') || desc.includes('medium'))
+    ) {
+      return 720;
+    }
     if (desc.includes('16') || desc.includes('18')) return 520;
     return 560;
   }

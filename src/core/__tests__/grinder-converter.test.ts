@@ -601,4 +601,18 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod metodę Kasuya 4:6' })).toBe(950);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse grind for Tetsu Kasuya 4:6 method' })).toBe(950);
   });
+
+  test('TASK-P49-08-PRO: getRecipeMicrons dla AeroPress uwzglednia opisy srednio (720 µm) i grubo (850 µm)', () => {
+    // Standard AeroPress (560 µm)
+    expect(getRecipeMicrons({ method: 'AeroPress Standard' })).toBe(560);
+
+    // AeroPress Inverted ze średnim przemiałem (720 µm)
+    expect(getRecipeMicrons({ method: 'AeroPress Inverted', grindSettingDescriptionPl: 'Średnio (około 23 klików)' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'AeroPress', grindSettingDescriptionEn: 'Medium grind for inverted immersion' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'INVERTED', grindSettingDescriptionPl: 'Srednio pod odwroconego aeropressa' })).toBe(720);
+
+    // AeroPress Inverted z grubym przemiałem (850 µm)
+    expect(getRecipeMicrons({ method: 'AeroPress Inverted', grindSettingDescriptionPl: 'Grubo pod długą macerację' })).toBe(850);
+    expect(getRecipeMicrons({ method: 'AeroPress', grindSettingDescriptionEn: 'Coarse grind for 3-minute steep' })).toBe(850);
+  });
 });
