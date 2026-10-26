@@ -92,7 +92,7 @@ export function formatActivityTimer(seconds: number): string {
 export function buildDynamicIslandPayload(
   attributes?: BrewActivityAttributes | null,
   state?: BrewActivityContentState | null,
-  language: 'pl' | 'en' = 'pl'
+  language: 'pl' | 'en' | string = 'pl'
 ): DynamicIslandPayload {
   const safeAttr: BrewActivityAttributes = attributes || {
     sessionId: '',
@@ -114,6 +114,9 @@ export function buildDynamicIslandPayload(
     isFinished: false,
   };
 
+  const cleanLang = typeof language === 'string' ? language.trim().toLowerCase() : 'pl';
+  const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
+
   const icon = safeAttr.beverageType === 'TEA' ? '🍵' : '☕';
   const rawDurVal = typeof safeState.stepDurationSeconds === 'number' ? safeState.stepDurationSeconds : (typeof safeState.stepDurationSeconds === 'string' ? parseFloat(safeState.stepDurationSeconds) : NaN);
   let rawDuration = Math.max(0, Number.isFinite(rawDurVal) ? Math.round(rawDurVal) : 0);
@@ -125,15 +128,15 @@ export function buildDynamicIslandPayload(
   if (Object.is(safeRemaining, -0)) safeRemaining = 0;
   const timeFormatted = formatActivityTimer(safeRemaining);
   const rawStepName =
-    (language === 'en' ? safeState.stepNameEn : safeState.stepNamePl) ||
+    (isEn ? safeState.stepNameEn : safeState.stepNamePl) ||
     safeState.stepNamePl ||
     safeState.stepNameEn ||
-    (language === 'en' ? 'Step' : 'Krok');
-  const stepName = typeof rawStepName === 'string' ? rawStepName.trim().slice(0, 30) : (language === 'en' ? 'Step' : 'Krok');
+    (isEn ? 'Step' : 'Krok');
+  const stepName = typeof rawStepName === 'string' ? rawStepName.trim().slice(0, 30) : (isEn ? 'Step' : 'Krok');
   const safeTotalSteps = Math.max(1, safeState.totalSteps || 1);
   const safeStepIdx = Math.min(safeTotalSteps - 1, Math.max(0, safeState.stepIndex || 0));
   const subtitle =
-    language === 'en'
+    isEn
       ? `${stepName} · Step ${safeStepIdx + 1} of ${safeTotalSteps}`
       : `${stepName} · Krok ${safeStepIdx + 1} z ${safeTotalSteps}`;
 
@@ -162,7 +165,7 @@ export function buildDynamicIslandPayload(
   if (Object.is(safeTotalWater, -0)) safeTotalWater = 0;
 
   const targetWater =
-    language === 'en'
+    isEn
       ? `Target: ${safeTargetWater} g (of ${safeTotalWater} g)`
       : `Docelowo: ${safeTargetWater} g (z ${safeTotalWater} g)`;
 
@@ -187,7 +190,7 @@ export function buildDynamicIslandPayload(
 export function buildLiveActivityPayload(
   attributes?: BrewActivityAttributes | null,
   state?: BrewActivityContentState | null,
-  language: 'pl' | 'en' = 'pl'
+  language: 'pl' | 'en' | string = 'pl'
 ): LiveActivityPayload {
   const dynamicIsland = buildDynamicIslandPayload(attributes, state, language);
   const safeAttr: BrewActivityAttributes = attributes
@@ -239,12 +242,12 @@ export function buildLiveActivityPayload(
         })(),
         totalElapsedSeconds: (() => {
           const rawVal = typeof state.totalElapsedSeconds === 'number' ? state.totalElapsedSeconds : (typeof state.totalElapsedSeconds === 'string' ? parseFloat(state.totalElapsedSeconds) : NaN);
-          const res = Math.max(0, Number.isFinite(rawVal) ? Math.round(rawVal) : 0);
+          const res = Math.max(0, Math.min(86400, Number.isFinite(rawVal) ? Math.round(rawVal) : 0));
           return Object.is(res, -0) ? 0 : res;
         })(),
         targetWaterGrams: (() => {
           const rawW = typeof state.targetWaterGrams === 'number' ? state.targetWaterGrams : (typeof state.targetWaterGrams === 'string' ? parseFloat(state.targetWaterGrams) : NaN);
-          const res = Math.max(0, Number.isFinite(rawW) ? Math.round(rawW) : 0);
+          const res = Math.max(0, Math.min(50000, Number.isFinite(rawW) ? Math.round(rawW) : 0));
           return Object.is(res, -0) ? 0 : res;
         })(),
         isPaused: Boolean(state.isPaused && !state.isFinished),
