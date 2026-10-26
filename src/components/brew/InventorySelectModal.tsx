@@ -59,6 +59,8 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
       <Pressable
         testID="inventory-option-unassigned"
         accessibilityRole="radio"
+        accessibilityLabel={t?.brew?.unassignedInventory || 'Brak przypisania (ogólne)'}
+        accessibilityHint="Parz bez przypisywania do paczki ze spiżarni i bez odliczania gramatury"
         accessibilityState={{ selected: isUnassignedSelected }}
         style={[
           styles.recipeOptionItem,
@@ -87,6 +89,8 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
               key={item.id}
               testID={`inventory-option-${item.id}`}
               accessibilityRole="radio"
+              accessibilityLabel={`${item.name}, ${item.roasterOrProducer || ''}, pozostało ${item.remainingWeightGrams}g`}
+              accessibilityHint="Wybiera tę pozycję ze spiżarni do zaparzenia"
               accessibilityState={{ selected: isItemSelected }}
               style={[
                 styles.recipeOptionItem,

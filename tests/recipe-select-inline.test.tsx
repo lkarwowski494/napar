@@ -248,4 +248,40 @@ describe('TASK-R07-01: Lean BPR P16 Inline Selection (De-Modalization)', () => {
     expect(gongfuBtn.props.accessibilityLabel).toBe('Gongfu Cha');
     expect(gongfuBtn.props.accessibilityHint).toBeDefined();
   });
+  test('TASK-P23-01-ODK: InventorySelectModal posiada zdefiniowane accessibilityLabel i accessibilityHint na opcjach', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <InventorySelectModal
+          inline={true}
+          visible={true}
+          onClose={() => {}}
+          inventory={[
+            {
+              id: 'bean-p23-1',
+              name: 'Kenya Nyeri AA',
+              type: 'coffee',
+              initialWeightGrams: 250,
+              remainingWeightGrams: 150,
+              flavorNotes: ['czarna porzeczka'],
+              isFavorite: true,
+              isArchived: false,
+              createdAt: '2026-10-10',
+              updatedAt: '2026-10-10',
+            },
+          ]}
+          selectedItem={null}
+          onSelectItem={() => {}}
+        />
+      );
+    });
+
+    const unassigned = tree.root.findByProps({ testID: 'inventory-option-unassigned' });
+    expect(unassigned.props.accessibilityLabel).toBeDefined();
+    expect(unassigned.props.accessibilityHint).toBeDefined();
+
+    const item = tree.root.findByProps({ testID: 'inventory-option-bean-p23-1' });
+    expect(item.props.accessibilityLabel).toContain('Kenya Nyeri AA');
+    expect(item.props.accessibilityHint).toBeDefined();
+  });
 });
