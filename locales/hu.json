@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Elindítja a hagyományos Gongfu Cha többszörös felöntéses teaszertartást",
     "methodSiphon": "Szifon",
-    "siphonDesc": "Vákuumos kávéfőzés kivételes tisztasággal és mély aromával"
+    "siphonDesc": "Vákuumos kávéfőzés kivételes tisztasággal és mély aromával",
+    "methodFrenchPress": "Dugattyús kávéfőző",
+    "frenchPressDesc": "Klasszikus áztatási módszer dugattyúval a telt, testes ízélményért."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

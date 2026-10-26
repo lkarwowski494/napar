@@ -314,4 +314,10 @@ describe('i18n System', () => {
     expect(translations.pl.brew.siphonDesc).toContain('próżniowe');
     expect(translations.en.brew.siphonDesc).toContain('Vacuum brewing');
   });
+  test('TASK-P25-09-LOK: Klucze methodFrenchPress i frenchPressDesc są zdefiniowane w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodFrenchPress).toBe('Praska francuska');
+    expect(translations.en.brew.methodFrenchPress).toBe('French Press');
+    expect(translations.pl.brew.frenchPressDesc).toContain('immersyjna');
+    expect(translations.en.brew.frenchPressDesc).toContain('immersion');
+  });
 });

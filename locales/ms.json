@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Memulakan upacara teh Gongfu Cha tradisional dengan beberapa infusi",
     "methodSiphon": "Sifon",
-    "siphonDesc": "Penyeduhan vakum dengan kejelasan luar biasa dan aroma mendalam"
+    "siphonDesc": "Penyeduhan vakum dengan kejelasan luar biasa dan aroma mendalam",
+    "methodFrenchPress": "French Press",
+    "frenchPressDesc": "Kaedah rendaman klasik dengan pelocok untuk rasa kopi yang padat dan berisi."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

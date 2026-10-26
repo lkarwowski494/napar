@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony",
     "methodSiphon": "Siphon",
-    "siphonDesc": "Vacuum brewing with exceptional clarity and deep aroma"
+    "siphonDesc": "Vacuum brewing with exceptional clarity and deep aroma",
+    "methodFrenchPress": "French Press",
+    "frenchPressDesc": "Classic immersion plunger brew producing a heavy, full-bodied cup."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

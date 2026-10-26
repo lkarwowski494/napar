@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Memulai upacara teh Gongfu Cha tradisional dengan beberapa seduhan",
     "methodSiphon": "Sifon",
-    "siphonDesc": "Penyeduhan vakum dengan kejernihan luar biasa dan aroma mendalam"
+    "siphonDesc": "Penyeduhan vakum dengan kejernihan luar biasa dan aroma mendalam",
+    "methodFrenchPress": "French Press",
+    "frenchPressDesc": "Metode seduh imersif klasik dengan penekan untuk rasa penuh dan kental."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "पारंपरिक बहु-इन्फ्यूजन गोंगफू चा चाय समारोह शुरू करता है",
     "methodSiphon": "साइफन",
-    "siphonDesc": "असाधारण स्पष्टता और गहरी सुगंध के साथ वैक्यूम ब्रूइंग"
+    "siphonDesc": "असाधारण स्पष्टता और गहरी सुगंध के साथ वैक्यूम ब्रूइंग",
+    "methodFrenchPress": "फ्रेंच प्रेस",
+    "frenchPressDesc": "प्लंजर के साथ क्लासिक इमर्शन विधि जो एक समृद्ध और गाढ़ा स्वाद देती है।"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

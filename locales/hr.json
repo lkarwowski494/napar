@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Pokreće tradicionalnu ceremoniju čaja Gongfu Cha s višestrukim infuzijama",
     "methodSiphon": "Sifon",
-    "siphonDesc": "Vakuumsko kuhanje s iznimnom čistoćom i dubokom aromom"
+    "siphonDesc": "Vakuumsko kuhanje s iznimnom čistoćom i dubokom aromom",
+    "methodFrenchPress": "French press",
+    "frenchPressDesc": "Klasična imerzijska metoda s klipom za puno i bogato tijelo."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

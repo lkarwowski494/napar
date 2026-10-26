@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Startar den traditionella teceremonin Gongfu Cha med flera infusioner",
     "methodSiphon": "Sifon",
-    "siphonDesc": "Vakuumextraktion med exceptionell renhet och djup arom"
+    "siphonDesc": "Vakuumextraktion med exceptionell renhet och djup arom",
+    "methodFrenchPress": "Presskanna",
+    "frenchPressDesc": "Klassisk infusionsbryggning med pressfilter som ger en fyllig kopp."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

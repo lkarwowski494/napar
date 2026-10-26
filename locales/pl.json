@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Uruchamia tradycyjną ceremonię parzenia herbaty Gongfu Cha z wielokrotnymi infuzjami",
     "methodSiphon": "Syfon",
-    "siphonDesc": "Parzenie próżniowe o wyjątkowej czystości i głębokim aromacie"
+    "siphonDesc": "Parzenie próżniowe o wyjątkowej czystości i głębokim aromacie",
+    "methodFrenchPress": "Praska francuska",
+    "frenchPressDesc": "Klasyczna metoda immersyjna z tłokiem siatkowym dająca pełne ciało."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Starter den traditionelle Gongfu Cha-teceremoni med flere infusioner",
     "methodSiphon": "Syfon",
-    "siphonDesc": "Vakuumbrygning med enestående klarhed og dyb aroma"
+    "siphonDesc": "Vakuumbrygning med enestående klarhed og dyb aroma",
+    "methodFrenchPress": "Stempelkande",
+    "frenchPressDesc": "Klassisk nedsænkningsbrygning med stempel, der giver en fyldig krop."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

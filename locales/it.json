@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Avvia la tradizionale cerimonia del tè Gongfu Cha con infusioni multiple",
     "methodSiphon": "Sifone",
-    "siphonDesc": "Estrazione a vuoto con eccezionale purezza e aroma profondo"
+    "siphonDesc": "Estrazione a vuoto con eccezionale purezza e aroma profondo",
+    "methodFrenchPress": "Caffettiera a stantuffo",
+    "frenchPressDesc": "Estrazione classica a immersione per una bevanda dal corpo ricco e vellutato."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -165,7 +165,9 @@
     "gongfuModeBtn": "다도 (Gongfu Cha)",
     "gongfuModeHint": "여러 번 우리는 전통 공푸차 다도 의식을 시작합니다",
     "methodSiphon": "사이폰",
-    "siphonDesc": "뛰어난 클린컵과 깊은 아로마를 자랑하는 진공 사이폰 추출"
+    "siphonDesc": "뛰어난 클린컵과 깊은 아로마를 자랑하는 진공 사이폰 추출",
+    "methodFrenchPress": "프렌치 프레스",
+    "frenchPressDesc": "플런저를 이용한 클래식 침출 방식으로 풍부하고 묵직한 바디감을 제공합니다."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

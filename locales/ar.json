@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "يبدأ حفل شاي غونغفو تشا التقليدي متعدد النقعات",
     "methodSiphon": "سيفون",
-    "siphonDesc": "تخمير بالتفريغ الهوائي بنقاء استثنائي ورائحة عميقة"
+    "siphonDesc": "تخمير بالتفريغ الهوائي بنقاء استثنائي ورائحة عميقة",
+    "methodFrenchPress": "فرنش بريس",
+    "frenchPressDesc": "طريقة نقع تقليدية بالمكبس تمنح قواماً غنياً وكثيفاً."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

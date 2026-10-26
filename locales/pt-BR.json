@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Inicia a tradicional cerimônia de chá Gongfu Cha com múltiplas infusões",
     "methodSiphon": "Sifão",
-    "siphonDesc": "Extração a vácuo com excepcional clareza e aroma profundo"
+    "siphonDesc": "Extração a vácuo com excepcional clareza e aroma profundo",
+    "methodFrenchPress": "Prensa francesa",
+    "frenchPressDesc": "Método clássico de imersão com êmbolo proporcionando corpo denso e aveludado."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

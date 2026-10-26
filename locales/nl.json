@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Start de traditionele Gongfu Cha-theeceremonie met meerdere infusies",
     "methodSiphon": "Sifon",
-    "siphonDesc": "Vacuümbereiding met uitzonderlijke helderheid en diep aroma"
+    "siphonDesc": "Vacuümbereiding met uitzonderlijke helderheid en diep aroma",
+    "methodFrenchPress": "Doordrukkan",
+    "frenchPressDesc": "Klassieke immersiemethode met zuiger voor een volle, rijke body."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Inicia la tradicional cerimònia del te Gongfu Cha amb múltiples infusions",
     "methodSiphon": "Sifó",
-    "siphonDesc": "Extracció al buit amb una claredat excepcional i una aroma profunda"
+    "siphonDesc": "Extracció al buit amb una claredat excepcional i una aroma profunda",
+    "methodFrenchPress": "Premsa francesa",
+    "frenchPressDesc": "Mètode clàssic d'immersió amb èmbol que produeix un cos ric i dens."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

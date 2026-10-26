@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Стартира традиционната чаена церемония Gongfu Cha с многократни запарки",
     "methodSiphon": "Сифон",
-    "siphonDesc": "Вакуумно приготвяне с изключителна чистота и дълбок аромат"
+    "siphonDesc": "Вакуумно приготвяне с изключителна чистота и дълбок аромат",
+    "methodFrenchPress": "Френска преса",
+    "frenchPressDesc": "Класически метод на имерсия с бутало за плътно и наситено тяло."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

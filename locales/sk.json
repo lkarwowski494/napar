@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Spustí tradičný čajový obrad Gongfu Cha s viacnásobnými nálevmi",
     "methodSiphon": "Vákuový sifón",
-    "siphonDesc": "Vákuová extrakcia s mimoriadnou čistotou a hlbokým arómou"
+    "siphonDesc": "Vákuová extrakcia s mimoriadnou čistotou a hlbokým arómou",
+    "methodFrenchPress": "French press",
+    "frenchPressDesc": "Klasická imerzná metóda s piestovým filtrom pre plné a bohaté telo."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

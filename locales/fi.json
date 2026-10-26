@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Käynnistää perinteisen Gongfu Cha -teeseremonian useilla haudutuksilla",
     "methodSiphon": "Sifonki",
-    "siphonDesc": "Tyhjiöuutto poikkeuksellisen kirkkaudella ja syvällä aromilla"
+    "siphonDesc": "Tyhjiöuutto poikkeuksellisen kirkkaudella ja syvällä aromilla",
+    "methodFrenchPress": "Pressopannu",
+    "frenchPressDesc": "Perinteinen uuttomenetelmä männällä, joka tuottaa täyteläisen suutuntuman."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Starter den tradisjonelle te-seremonien Gongfu Cha med flere infusjoner",
     "methodSiphon": "Sifon",
-    "siphonDesc": "Vakuumbrygging med eksepsjonell klarhet og dyp aroma"
+    "siphonDesc": "Vakuumbrygging med eksepsjonell klarhet og dyp aroma",
+    "methodFrenchPress": "Presskanne",
+    "frenchPressDesc": "Klassisk nedsenkingsbrygging med stempel som gir en fyldig munnfølelse."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

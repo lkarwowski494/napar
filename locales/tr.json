@@ -165,7 +165,9 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Geleneksel çoklu demlemeli Gongfu Cha çay seremonisini başlatır",
     "methodSiphon": "Sifon",
-    "siphonDesc": "Olağanüstü berraklık ve derin aromaya sahip vakumlu demleme"
+    "siphonDesc": "Olağanüstü berraklık ve derin aromaya sahip vakumlu demleme",
+    "methodFrenchPress": "French Press",
+    "frenchPressDesc": "Yoğun gövdeli ve zengin aromalı klasik daldırma pistonlu demleme yöntemi."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -165,7 +165,9 @@
     "gongfuModeBtn": "功夫茶",
     "gongfuModeHint": "啟動多次沖泡的傳統工夫茶茶道",
     "methodSiphon": "虹吸壺",
-    "siphonDesc": "真空虹吸萃取，口感純淨明亮，香氣深邃"
+    "siphonDesc": "真空虹吸萃取，口感純淨明亮，香氣深邃",
+    "methodFrenchPress": "法式濾壓壺",
+    "frenchPressDesc": "經典的浸泡式濾壓萃取，賦予咖啡醇厚濃郁的風味與口感。"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
