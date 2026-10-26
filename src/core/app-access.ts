@@ -196,7 +196,11 @@ export function formatSubscriptionTierName(
   language: 'pl' | 'en' | string = 'pl'
 ): string {
   const isEn = typeof language === 'string' && (language.trim().toLowerCase() === 'en' || language.trim().toLowerCase().startsWith('en'));
-  const cleanTier = typeof tier === 'string' ? tier.trim().toLowerCase() : '';
+  let cleanTier = typeof tier === 'string' ? tier.trim().toLowerCase() : '';
+  if (cleanTier === STORE_PRODUCT_IDS.monthly.toLowerCase() || cleanTier.includes('monthly')) cleanTier = 'monthly';
+  else if (cleanTier === STORE_PRODUCT_IDS.annual.toLowerCase() || cleanTier.includes('annual')) cleanTier = 'annual';
+  else if (cleanTier === STORE_PRODUCT_IDS.lifetime.toLowerCase() || cleanTier.includes('lifetime')) cleanTier = 'lifetime';
+
   switch (cleanTier) {
     case 'monthly':
       return isEn ? 'Monthly Pass' : 'Subskrypcja Miesięczna';
@@ -223,13 +227,19 @@ export function formatTrialStatusSummary(
   if (state.status === 'trial_expired') {
     return isEn ? 'Trial expired' : 'Okres próbny zakończony';
   }
-  const rawBrews = Number.isFinite(state.brewsRemaining) && state.brewsRemaining >= 0
-    ? Math.floor(state.brewsRemaining)
+  const rawBrewsVal = typeof state.brewsRemaining === 'number'
+    ? state.brewsRemaining
+    : (typeof (state as any).brewsRemaining === 'string' ? parseFloat(String((state as any).brewsRemaining).replace(',', '.')) : 0);
+  const rawBrews = Number.isFinite(rawBrewsVal) && rawBrewsVal >= 0
+    ? Math.floor(rawBrewsVal)
     : 0;
   const brews = Object.is(rawBrews, -0) ? 0 : rawBrews;
 
-  const rawDays = Number.isFinite(state.daysRemaining) && state.daysRemaining >= 0
-    ? Math.floor(state.daysRemaining)
+  const rawDaysVal = typeof state.daysRemaining === 'number'
+    ? state.daysRemaining
+    : (typeof (state as any).daysRemaining === 'string' ? parseFloat(String((state as any).daysRemaining).replace(',', '.')) : 0);
+  const rawDays = Number.isFinite(rawDaysVal) && rawDaysVal >= 0
+    ? Math.floor(rawDaysVal)
     : 0;
   const days = Object.is(rawDays, -0) ? 0 : rawDays;
 

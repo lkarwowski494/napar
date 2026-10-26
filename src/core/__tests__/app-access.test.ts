@@ -19,6 +19,8 @@ import {
   verifyAndActivateStoreKitPurchase,
   getTrialDaysRemaining,
   getTrialBrewsRemaining,
+  formatSubscriptionTierName,
+  formatTrialStatusSummary,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -939,5 +941,22 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const res = verifyAndActivateStoreKitPurchase(shortSigReceipt);
     expect(res.success).toBe(false);
     expect(res.errorCode).toBe('invalid_signature');
+  });
+
+  test('TASK-P52-02-MON: formatSubscriptionTierName wspiera identyfikatory StoreKit a formatTrialStatusSummary wspiera stringi z przecinkami', () => {
+    // 1. Identyfikatory StoreKit w formatSubscriptionTierName
+    expect(formatSubscriptionTierName('pl.lukasz.napar.monthly', 'pl')).toBe('Subskrypcja Miesięczna');
+    expect(formatSubscriptionTierName('pl.lukasz.napar.annual', 'en')).toBe('Annual Pass');
+    expect(formatSubscriptionTierName('pl.lukasz.napar.lifetime', 'pl')).toBe('Dostęp Dożywotni');
+
+    // 2. Stringi z przecinkami w formatTrialStatusSummary
+    const commaState: any = {
+      status: 'trial_active',
+      brewsRemaining: '12,5',
+      daysRemaining: '7,8',
+      isSubscribed: false,
+    };
+    expect(formatTrialStatusSummary(commaState, 'pl')).toBe('Okres próbny: 12 parzeń · 7 dni');
+    expect(formatTrialStatusSummary(commaState, 'en')).toBe('Trial: 12 brews · 7 days remaining');
   });
 });
