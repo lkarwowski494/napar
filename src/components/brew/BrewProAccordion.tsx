@@ -43,6 +43,7 @@ export function BrewProAccordion({
         style={styles.header}
         onPress={() => setIsExpanded(!isExpanded)}
         accessibilityRole="button"
+        accessibilityState={{ expanded: isExpanded }}
         accessibilityLabel={
           language === 'en'
             ? 'Toggle water parameters and mineralization'
@@ -76,7 +77,12 @@ export function BrewProAccordion({
                   style={[styles.chip, active && styles.chipActive]}
                   onPress={() => onSelectWaterProfile(w.id)}
                   accessibilityRole="button"
-                  accessibilityLabel={`Profil wody ${w.namePl}`}
+                  accessibilityState={{ selected: active }}
+                  accessibilityLabel={
+                    language === 'en'
+                      ? `Water profile ${w.nameEn || w.namePl}`
+                      : `Profil wody ${w.namePl}`
+                  }
                 >
                   <Text style={[styles.chipText, active && styles.chipTextActive]}>
                     {w.namePl}
@@ -99,6 +105,11 @@ export function BrewProAccordion({
               keyboardType="decimal-pad"
               value={tdsInput}
               onChangeText={onChangeTds}
+              accessibilityLabel={
+                language === 'en'
+                  ? 'Refractometer TDS percentage'
+                  : 'Odczyt TDS z refraktometru w procentach'
+              }
             />
           </View>
         </View>

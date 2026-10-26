@@ -62,4 +62,33 @@ describe('BrewProAccordion Component', () => {
     act(() => tdsInput.props.onChangeText('1.42'));
     expect(defaultProps.onChangeTds).toHaveBeenCalledWith('1.42');
   });
+
+  test('TASK-P36-01-ODK: BrewProAccordion definiuje accessibilityState dla akordeonu i chipow oraz etykiete tds', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<BrewProAccordion {...defaultProps} language="en" />);
+    });
+
+    const toggleBtn = tree.root.findByProps({ testID: 'pro-accordion-toggle-btn' });
+    expect(toggleBtn.props.accessibilityRole).toBe('button');
+    expect(toggleBtn.props.accessibilityState).toEqual({ expanded: false });
+
+    // Rozwiń
+    act(() => {
+      toggleBtn.props.onPress();
+    });
+    expect(toggleBtn.props.accessibilityState).toEqual({ expanded: true });
+
+    // Chips
+    const activeChip = tree.root.findByProps({ testID: 'pro-water-chip-melbourne_soft' });
+    expect(activeChip.props.accessibilityState).toEqual({ selected: true });
+    expect(activeChip.props.accessibilityLabel).toContain('Water profile');
+
+    const inactiveChip = tree.root.findByProps({ testID: 'pro-water-chip-scott_rao_wonder' });
+    expect(inactiveChip.props.accessibilityState).toEqual({ selected: false });
+
+    // TDS Input
+    const tdsInput = tree.root.findByProps({ testID: 'pro-tds-input' });
+    expect(tdsInput.props.accessibilityLabel).toBe('Refractometer TDS percentage');
+  });
 });
