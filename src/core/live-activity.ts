@@ -180,10 +180,22 @@ export function buildLiveActivityPayload(
 }
 
 export async function startLiveActivity(
-  _attributes: BrewActivityAttributes,
-  _initialState: BrewActivityContentState,
+  attributes: BrewActivityAttributes,
+  initialState: BrewActivityContentState,
   _language: 'pl' | 'en' = 'pl'
 ): Promise<{ activityId?: string; success: boolean; error?: string }> {
+  if (!attributes || typeof attributes !== 'object') {
+    return {
+      success: false,
+      error: 'Nieprawidłowe atrybuty aktywności Live Activity.',
+    };
+  }
+  if (!initialState || typeof initialState !== 'object') {
+    return {
+      success: false,
+      error: 'Nieprawidłowy stan początkowy aktywności Live Activity.',
+    };
+  }
   return {
     success: false,
     error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',

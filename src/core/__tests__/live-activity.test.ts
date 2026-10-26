@@ -213,4 +213,14 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(endEmpty.success).toBe(false);
     expect(endEmpty.error).toContain('Nieprawidłowy identyfikator');
   });
+
+  test('TASK-P14-12-NIE: startLiveActivity waliduje obecność poprawnych obiektów attributes i initialState', async () => {
+    const resNullAttr = await startLiveActivity(null as any, mockState);
+    expect(resNullAttr.success).toBe(false);
+    expect(resNullAttr.error).toContain('Nieprawidłowe atrybuty');
+
+    const resNullState = await startLiveActivity(mockAttributesCoffee, null as any);
+    expect(resNullState.success).toBe(false);
+    expect(resNullState.error).toContain('Nieprawidłowy stan początkowy');
+  });
 });
