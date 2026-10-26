@@ -1,0 +1,103 @@
+{
+  "run": 49,
+  "date": "2026-10-26",
+  "baseline_commit": "c098a8a",
+  "tasks": [
+    {
+      "id": "TASK-P49-01-ODK",
+      "perspective": "01-ODK",
+      "title": "Dostępność i odporność RecipeSelectModal (search role, a11y hints, safe array)",
+      "target_file": "src/components/brew/RecipeSelectModal.tsx",
+      "test_file": "src/components/brew/__tests__/RecipeSelectModal.test.tsx",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P49-02-MON",
+      "perspective": "02-MON",
+      "title": "Dostępność planów StoreKit i obsługa zamknięcia w Apps4BrewPassModal",
+      "target_file": "src/components/Apps4BrewPassModal.tsx",
+      "test_file": "src/components/__tests__/Apps4BrewPassModal.test.tsx",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P49-03-ZAK",
+      "perspective": "03-ZAK",
+      "title": "Niewrażliwość na wielkość liter typów spiżarni w bpr-engine",
+      "target_file": "src/core/bpr-engine.ts",
+      "test_file": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P49-04-STU",
+      "perspective": "04-STU",
+      "title": "Defensywne renderowanie kroków i etykiety a11y w RecipeStepEditor",
+      "target_file": "src/components/recipe-builder/RecipeStepEditor.tsx",
+      "test_file": "src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P49-05-ARC",
+      "perspective": "05-ARC",
+      "title": "Przecinki dziesiętne w saveBrewSession i normalizacja typu naparu w saveRecipe",
+      "target_file": "src/core/database.ts",
+      "test_file": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P49-06-TRE",
+      "perspective": "06-TRE",
+      "title": "Rozszerzenie taksonomii procesów fermentacji kawy i herbaty w knowledge-data",
+      "target_file": "src/core/knowledge-data.ts",
+      "test_file": "src/core/__tests__/knowledge.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P49-07-JAK",
+      "perspective": "07-JAK",
+      "title": "Walidacja granic buforu zasadowości w water-chemistry",
+      "target_file": "src/core/water-chemistry.ts",
+      "test_file": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P49-08-PRO",
+      "perspective": "08-PRO",
+      "title": "Optymalizacja mikronów dla metody AeroPress Inverted w grinder-converter",
+      "target_file": "src/core/grinder-converter.ts",
+      "test_file": "tests/audit-fixes.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P49-09-LOK",
+      "perspective": "09-LOK",
+      "title": "Symetria kluczy wyszukiwania i podpowiedzi kroków w 35 językach",
+      "target_file": "src/core/i18n.tsx",
+      "test_file": "tests/i18n-no-polish-in-en.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P49-10-WYD",
+      "perspective": "10-WYD",
+      "title": "Weryfikacja braku uprawnień lokalizacyjnych i telemetrycznych w verify-native.mjs",
+      "target_file": "scripts/verify-native.mjs",
+      "test_file": "tests/audit-fixes.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P49-11-WZR",
+      "perspective": "11-WZR",
+      "title": "Sanityzacja pustych tablic kroków i właściwości w recipe-share",
+      "target_file": "src/core/recipe-share.ts",
+      "test_file": "src/core/__tests__/recipe-share.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P49-12-NIE",
+      "perspective": "12-NIE",
+      "title": "Odporność na ujemny czas trwania i nieznane stany w live-activity",
+      "target_file": "src/core/live-activity.ts",
+      "test_file": "src/core/__tests__/live-activity.test.ts",
+      "status": "pending"
+    }
+  ]
+}
