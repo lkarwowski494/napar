@@ -46,4 +46,23 @@ describe('RecipeParamsCard Component (TASK-P31-04-STU)', () => {
     expect(ratioBadge.props.accessibilityLabel).toContain('Calculated ratio: 1 do 16.7');
     expect(JSON.stringify(treeEn.toJSON())).toContain('Calculated ratio');
   });
+
+  test('TASK-P47-04-STU: prawidlowo obsluguje przecinki dziesietne w dozie, wodzie i temperaturze', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <RecipeParamsCard
+          {...defaultProps}
+          doseGrams="15,5"
+          waterGrams="250,5"
+          waterTempCelsius="92,5"
+        />
+      );
+    });
+
+    const unitBadge = tree.root.findByProps({ testID: 'recipe-unit-preview-badge' });
+    expect(unitBadge.props.accessibilityLabel).toContain('15.5g');
+    expect(unitBadge.props.accessibilityLabel).toContain('250.5g');
+    expect(unitBadge.props.accessibilityLabel).toContain('93°C');
+  });
 });

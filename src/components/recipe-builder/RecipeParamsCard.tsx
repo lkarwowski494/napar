@@ -36,8 +36,14 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
   unitSystem,
   t,
 }) => {
-  const doseNum = parseFloat(doseGrams) || 0;
-  const waterNum = parseFloat(waterGrams) || 0;
+  const parsedDose = typeof doseGrams === 'number' ? doseGrams : parseFloat(String(doseGrams).replace(',', '.'));
+  const doseNum = Number.isFinite(parsedDose) && parsedDose >= 0 ? Math.min(1000, parsedDose) : 0;
+
+  const parsedWater = typeof waterGrams === 'number' ? waterGrams : parseFloat(String(waterGrams).replace(',', '.'));
+  const waterNum = Number.isFinite(parsedWater) && parsedWater >= 0 ? Math.min(50000, parsedWater) : 0;
+
+  const parsedTemp = typeof waterTempCelsius === 'number' ? waterTempCelsius : parseFloat(String(waterTempCelsius).replace(',', '.'));
+  const tempNum = Number.isFinite(parsedTemp) && parsedTemp >= 0 ? Math.min(100, Math.max(0, parsedTemp)) : 93;
 
   return (
     <View style={styles.card}>
@@ -55,7 +61,10 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
           <NumInput
             value={unitSystem === 'imperial' ? gramsToOunces(doseNum) : doseNum}
             stored={doseNum}
-            onChangeNumber={(n) => onChangeDose(n.toString())}
+            onChangeNumber={(n) => {
+              const safe = Number.isFinite(n) && n >= 0 ? Math.min(1000, n) : 0;
+              onChangeDose(safe.toString());
+            }}
             unit={unitSystem === 'imperial' ? 'oz' : 'g'}
           />
         </View>
@@ -68,7 +77,10 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
           <NumInput
             value={unitSystem === 'imperial' ? mlToFluidOunces(waterNum) : waterNum}
             stored={waterNum}
-            onChangeNumber={(n) => onChangeWater(n.toString())}
+            onChangeNumber={(n) => {
+              const safe = Number.isFinite(n) && n >= 0 ? Math.min(50000, n) : 0;
+              onChangeWater(safe.toString());
+            }}
             unit={unitSystem === 'imperial' ? 'fl oz' : 'g'}
           />
         </View>
@@ -81,11 +93,14 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
           <NumInput
             value={
               unitSystem === 'imperial'
-                ? celsiusToFahrenheit(parseFloat(waterTempCelsius) || 93)
-                : (parseFloat(waterTempCelsius) || 0)
+                ? celsiusToFahrenheit(tempNum)
+                : tempNum
             }
-            stored={parseFloat(waterTempCelsius) || 0}
-            onChangeNumber={(n) => onChangeWaterTemp(n.toString())}
+            stored={tempNum}
+            onChangeNumber={(n) => {
+              const safe = Number.isFinite(n) && n >= 0 ? Math.min(100, Math.max(0, n)) : 0;
+              onChangeWaterTemp(safe.toString());
+            }}
             unit={unitSystem === 'imperial' ? '°F' : '°C'}
           />
         </View>
@@ -107,18 +122,18 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
       <View
         style={styles.unitPreviewBadge}
         accessibilityRole="text"
-        accessibilityLabel={`Podsumowanie jednostek: ${formatDoseWeight(doseNum, unitSystem)}, ${formatWaterWeight(waterNum, unitSystem)}, ${formatTemperature(parseFloat(waterTempCelsius) || 93, unitSystem)}`}
+        accessibilityLabel={`Podsumowanie jednostek: ${formatDoseWeight(doseNum, unitSystem)}, ${formatWaterWeight(waterNum, unitSystem)}, ${formatTemperature(tempNum, unitSystem)}`}
         testID="recipe-unit-preview-badge"
       >
         <Text style={styles.unitPreviewBadgeText}>
-          {formatDoseWeight(doseNum, unitSystem)} / {formatWaterWeight(waterNum, unitSystem)} · {formatTemperature(parseFloat(waterTempCelsius) || 93, unitSystem)}
+          {formatDoseWeight(doseNum, unitSystem)} / {formatWaterWeight(waterNum, unitSystem)} · {formatTemperature(tempNum, unitSystem)}
         </Text>
       </View>
 
       <Text style={styles.fieldLabel}>{t.recipeBuilder.grindLabel}</Text>
       <Field
         value={grindSize}
-        onChangeText={onChangeGrindSize}
+        onChangeText={(val) => onChangeGrindSize(typeof val === 'string' ? val.slice(0, 200) : '')}
         placeholder={t.recipeBuilder.grindPlaceholder}
       />
     </View>
