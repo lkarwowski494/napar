@@ -4,95 +4,95 @@
     "perspective": "01-ODK",
     "title": "Dostępność i lokalizacja DripperExtractionGauge oraz sanityzacja formatTime w BrewActiveFocusTimer",
     "file": "src/components/brew/BrewActiveFocusTimer.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "8ee5c7c"
   },
   {
     "id": "TASK-P45-02-MON",
     "perspective": "02-MON",
     "title": "Gwarancja 0 dni w getTrialDaysRemaining przy wygaszonym okresie próbnym (status trial_expired)",
     "file": "src/core/app-access.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "e5950b0"
   },
   {
     "id": "TASK-P45-03-ZAK",
     "perspective": "03-ZAK",
     "title": "Walidacja poprawności daty kalendarzowej w generateActionIcsContent i ochrona przed niepoprawnymi stringami w bpr-engine",
     "file": "src/core/bpr-engine.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "ff83564"
   },
   {
     "id": "TASK-P45-04-STU",
     "perspective": "04-STU",
     "title": "Ochrona przed brakiem sekcji t.recipeBuilder, lokalizacja prefiksu kroku i testID przycisku w RecipeStepEditor",
     "file": "src/components/recipe-builder/RecipeStepEditor.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "6ad9327"
   },
   {
     "id": "TASK-P45-05-ARC",
     "perspective": "05-ARC",
     "title": "Rygorystyczna koercja isFavorite w updateRecipeFavorite oraz trimowanie pól tekstowych w saveRecipe",
     "file": "src/core/database.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "9d5fb47"
   },
   {
     "id": "TASK-P45-06-TRE",
     "perspective": "06-TRE",
     "title": "Rozszerzenie VARIETY_ALIASES o odmiany specialty (mokka, java, laurina, pacas, mundo novo, parainema)",
     "file": "src/core/knowledge-data.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "3493981"
   },
   {
     "id": "TASK-P45-07-JAK",
     "perspective": "07-JAK",
     "title": "Obsługa przecinka dziesiętnego w calculateWaterMinerals, diagnoseWaterSensoryImpact i konwerterach dH",
     "file": "src/core/water-chemistry.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "601cd70"
   },
   {
     "id": "TASK-P45-08-PRO",
     "perspective": "08-PRO",
     "title": "Rozpoznawanie Mugen, Pulsar oraz Cafec Flower / Deep 27 w getRecipeMicrons",
     "file": "src/core/grinder-converter.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "ac3e81b"
   },
   {
     "id": "TASK-P45-09-LOK",
     "perspective": "09-LOK",
     "title": "Dodanie klucza recipeBuilder.stepNumberPrefix w 35 językach i rozszerzenie matrycy testów do 832",
     "file": "locales/*",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "afebfaf"
   },
   {
     "id": "TASK-P45-10-WYD",
     "perspective": "10-WYD",
     "title": "Statyczna weryfikacja android.package, android.versionCode oraz devDependency fast-check w verify-native.mjs",
     "file": "scripts/verify-native.mjs",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "487780f"
   },
   {
     "id": "TASK-P45-11-WZR",
     "perspective": "11-WZR",
     "title": "Case-insensitive dopasowanie parametru zapytania URL (?d= / ?D= / ?data= / ?DATA=) w decodeRecipeFromShareUrl",
     "file": "src/core/recipe-share.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "cc4df07"
   },
   {
     "id": "TASK-P45-12-NIE",
     "perspective": "12-NIE",
     "title": "Walidacja attributes.beverageType oraz attributes.method w startLiveActivity",
     "file": "src/core/live-activity.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "ebe47df"
   }
 ]
