@@ -3,7 +3,7 @@
     "generator": "Apps4Brew i18n Builder",
     "canonicalSource": "en",
     "totalKeys": 19,
-    "timestamp": "2026-10-26T18:43:57.009Z",
+    "timestamp": "2026-10-26T19:02:08.523Z",
     "supportedLocalesCount": 35
   },
   "appName": "Steepwise",
@@ -142,6 +142,7 @@
     "methodWalkuere": "Walküre / Bayreuth",
     "methodBialetti": "Moka Pot (Bialetti)",
     "methodFlair": "Manual Lever (Flair / Robot)",
+    "methodColdDrip": "Cold Drip / Ice Drip",
     "resetTimerAccessibility": "Reset timer",
     "resetTimerHint": "Resets time and returns to initial state",
     "resumeBrewAccessibility": "Resume brewing",

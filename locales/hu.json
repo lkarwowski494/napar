@@ -135,6 +135,7 @@
     "methodWalkuere": "Walküre / Bayreuth",
     "methodBialetti": "Moka Pot (Bialetti)",
     "methodFlair": "Manual Lever (Flair / Robot)",
+    "methodColdDrip": "Cold Drip / Ice Drip",
     "resetTimerAccessibility": "Reset timer",
     "resetTimerHint": "Resets time and returns to initial state",
     "resumeBrewAccessibility": "Resume brewing",

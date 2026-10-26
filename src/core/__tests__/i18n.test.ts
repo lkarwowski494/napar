@@ -408,4 +408,9 @@ describe('i18n System', () => {
     expect(translations.pl.brew.methodFlair).toBe('Ekspres dźwigniowy (Flair / Robot)');
     expect(translations.en.brew.methodFlair).toBe('Manual Lever (Flair / Robot)');
   });
+
+  test('TASK-P41-09-LOK: Klucz methodColdDrip jest zdefiniowany w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodColdDrip).toBe('Cold Drip / Ice Drip');
+    expect(translations.en.brew.methodColdDrip).toBe('Cold Drip / Ice Drip');
+  });
 });

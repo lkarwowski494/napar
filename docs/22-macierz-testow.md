@@ -9,11 +9,11 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | :--- | :---: | :---: | :---: | :---: |
 | **EKRAN** | 9 | 9 | **100.0%** | ✅ POKRYTE |
 | **UI** | 92 | 92 | **100.0%** | ✅ POKRYTE |
-| **TEKST** | 480 | 480 | **100.0%** | ✅ POKRYTE |
+| **TEKST** | 481 | 481 | **100.0%** | ✅ POKRYTE |
 | **LOGIKA** | 209 | 209 | **100.0%** | ✅ POKRYTE |
 | **WYMIAR** | 37 | 37 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **827** | Pokrytych: **827** | Brakujących: **0**
+Łącznie elementów: **828** | Pokrytych: **828** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -159,6 +159,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `brew.methodWalkuere` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.methodBialetti` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.methodFlair` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.methodColdDrip` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.resetTimerAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.resetTimerHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.resumeBrewAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
@@ -318,6 +319,5 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `stash.useTemplate` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `TEKST` | `stash.favoriteAdd` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `TEKST` | `stash.favoriteRemove` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `TEKST` | `stash.emptyTitle` | `src/core/i18n.tsx` | ✅ | tests/interaction-guards.test.ts, tests/recipe-select-inline.test.tsx |
 
-*(... i 527 kolejnych elementów w pełnym wykazie)*
+*(... i 528 kolejnych elementów w pełnym wykazie)*
