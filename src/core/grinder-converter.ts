@@ -308,7 +308,7 @@ export function findGrinderById(id: string): GrinderModel | undefined {
  * Konwertuje rozmiar cząstek w mikronach na czytelną nastawę dla zadanego modelu młynka
  */
 export function convertMicronsToGrinder(
-  microns: number,
+  microns: number | string,
   grinderId: string,
   language = 'pl'
 ): { formatted: string; rawValue: number; grinderName: string } {
@@ -316,7 +316,8 @@ export function convertMicronsToGrinder(
   const grinder =
     SUPPORTED_GRINDERS.find((g) => g.id.toLowerCase() === cleanId) || SUPPORTED_GRINDERS[0];
 
-  const safeMicrons = Number.isFinite(microns) && microns > 0 ? microns : 720;
+  const parsedMicrons = typeof microns === 'string' ? parseFloat(microns) : Number(microns);
+  const safeMicrons = Number.isFinite(parsedMicrons) && parsedMicrons > 0 && !Object.is(parsedMicrons, -0) ? parsedMicrons : 720;
   const targetMicrons = Math.max(150, Math.min(1500, safeMicrons));
   const effectiveMicrons = Math.max(0, targetMicrons - grinder.micronsPerSettingOffset);
   const rawClicks = Math.round(effectiveMicrons / grinder.stepMicrons);
@@ -349,15 +350,18 @@ export function convertBetweenGrinders(
 
   let microns = 720;
   if (typeof sourceValue === 'number') {
-    if (Number.isFinite(sourceValue) && sourceValue >= 0) {
+    if (Number.isFinite(sourceValue) && sourceValue >= 0 && !Object.is(sourceValue, -0)) {
       microns = sourceGrinder.micronsPerSettingOffset + sourceValue * sourceGrinder.stepMicrons;
     }
   } else if (typeof sourceValue === 'string') {
     const normalized = sourceValue.trim().replace(',', '.');
     const parsed = sourceGrinder.parseSetting(normalized);
-    if (Number.isFinite(parsed) && parsed > 0) {
+    if (Number.isFinite(parsed) && parsed > 0 && !Object.is(parsed, -0)) {
       microns = parsed;
     }
+  }
+  if (!Number.isFinite(microns) || microns <= 0 || Object.is(microns, -0)) {
+    microns = 720;
   }
 
   const result = convertMicronsToGrinder(microns, targetGrinder.id, language);

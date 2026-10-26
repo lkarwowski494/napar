@@ -353,4 +353,23 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ method: 'Kalita', grindSettingDescriptionPl: '28 klików Comandante' })).toBe(850);
     expect(getRecipeMicrons({ method: 'Origami', grindSettingDescriptionPl: '18 klików' })).toBe(600);
   });
+
+  test('TASK-P29-08-PRO: convertMicronsToGrinder i convertBetweenGrinders parsuja stringi i chronia przed -0', () => {
+    // String microns
+    const fromString = convertMicronsToGrinder('750' as any, 'comandante_c40');
+    expect(fromString.rawValue).toBe(25);
+    expect(fromString.formatted).toBe('25 klików');
+
+    // Chroni przed -0 i niedodatnimi
+    const fromNegZero = convertMicronsToGrinder(-0, 'comandante_c40');
+    expect(fromNegZero.rawValue).toBe(24); // 720 microns default -> 24 clicks
+
+    // convertBetweenGrinders z -0 i stringiem
+    const betweenNegZero = convertBetweenGrinders('comandante_c40', -0, 'timemore_c2');
+    expect(betweenNegZero.microns).toBe(720);
+
+    const betweenString = convertBetweenGrinders('comandante_c40', '24', 'comandante_c40');
+    expect(betweenString.microns).toBeGreaterThan(0);
+    expect(Object.is(betweenString.microns, -0)).toBe(false);
+  });
 });
