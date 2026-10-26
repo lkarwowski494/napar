@@ -491,11 +491,14 @@ export function getRecipeMicrons(recipe?: {
     method.includes('AEROPRESS') ||
     method.includes('DELTER') ||
     method.includes('INVERTED') ||
+    method.includes('PRISMO') ||
     desc.includes('aeropress') ||
     desc.includes('delter') ||
     desc.includes('inverted') ||
     desc.includes('odwrócon') ||
-    desc.includes('odwrocon')
+    desc.includes('odwrocon') ||
+    desc.includes('prismo') ||
+    desc.includes('flow control')
   ) {
     if (desc.includes('16') || desc.includes('18')) return 520;
     return 560;
@@ -521,7 +524,19 @@ export function getRecipeMicrons(recipe?: {
     method.includes('GINA') ||
     desc.includes('gina') ||
     method.includes('TSUBAME') ||
-    desc.includes('tsubame')
+    desc.includes('tsubame') ||
+    method === 'OREA' ||
+    method.includes('OREA') ||
+    desc.includes('orea') ||
+    method === 'APRIL' ||
+    method.includes('APRIL') ||
+    desc.includes('april') ||
+    method === 'MELITTA' ||
+    method.includes('MELITTA') ||
+    desc.includes('melitta') ||
+    method === 'BEEHOUSE' ||
+    method.includes('BEEHOUSE') ||
+    desc.includes('beehouse')
   ) {
     if (desc.includes('28') || desc.includes('30') || desc.includes('grubo') || desc.includes('coarse')) return 850;
     if (desc.includes('18') || desc.includes('20')) return 600;

@@ -503,4 +503,23 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod powolny ekstraktor slow drip' })).toBe(1150);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse grind for ice brew immersion' })).toBe(1150);
   });
+
+  test('TASK-P43-08-PRO: getRecipeMicrons rozpoznaje drippery Orea, April, Melitta, Beehouse (720 µm) oraz akcesoria Prismo i Flow Control (560 µm)', () => {
+    // Drippery przelewowe (720 µm)
+    expect(getRecipeMicrons({ method: 'OREA' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'Orea V3 Brewer' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'APRIL' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'April Plastic Brewer' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'MELITTA' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'Melitta 102' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'BEEHOUSE' })).toBe(720);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio pod dripper Orea' })).toBe(720);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Pour-over grind for April brewer' })).toBe(720);
+
+    // AeroPress akcesoria ciśnieniowe (560 µm)
+    expect(getRecipeMicrons({ method: 'PRISMO' })).toBe(560);
+    expect(getRecipeMicrons({ method: 'Fellow Prismo AeroPress' })).toBe(560);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Drobno pod nakładkę prismo' })).toBe(560);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine grind for aeropress flow control filter cap' })).toBe(560);
+  });
 });
