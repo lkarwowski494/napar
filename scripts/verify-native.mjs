@@ -102,6 +102,12 @@ try {
     `app.json -> expo.version musi być w formacie semver X.Y.Z (otrzymano '${appJson.version}')`
   );
 
+  // Weryfikacja formatu expo.android.package w app.json (TASK-P23-10-WYD)
+  check(
+    typeof appJson.android?.package === 'string' && /^[a-zA-Z0-9._]+$/.test(appJson.android.package) && appJson.android.package === 'pl.lukasz.napar',
+    `app.json -> expo.android.package musi być równe 'pl.lukasz.napar' (otrzymano '${appJson.android?.package}')`
+  );
+
   // Weryfikacja ścieżki ikony oraz numerycznego buildNumber (TASK-P12-10-WYD)
   check(
     appJson.icon === './assets/icon.png',
