@@ -791,6 +791,16 @@ export function saveBrewSession(session: BrewSession): void {
   const safeCaffeine = Number.isFinite(rawCaffeine) && rawCaffeine >= 0 ? Number(rawCaffeine.toFixed(1)) : null;
   const sanitizedCaffeine = safeCaffeine != null && Object.is(safeCaffeine, -0) ? 0 : safeCaffeine;
 
+  const safeFlavorTags = Array.isArray(session.flavorTags)
+    ? session.flavorTags
+        .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
+        .map((t) => t.trim().slice(0, 50))
+        .slice(0, 30)
+    : [];
+
+  const safeRecipeId = typeof session.recipeId === 'string' && session.recipeId.trim() ? session.recipeId.trim() : null;
+  const safeInventoryItemId = typeof session.inventoryItemId === 'string' && session.inventoryItemId.trim() ? session.inventoryItemId.trim() : null;
+
   db.runSync(
     `INSERT OR REPLACE INTO brew_sessions (
       id, recipe_id, recipe_name, inventory_item_id, inventory_item_name,
@@ -801,9 +811,9 @@ export function saveBrewSession(session: BrewSession): void {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       session.id,
-      session.recipeId ?? null,
+      safeRecipeId,
       session.recipeName ?? null,
-      session.inventoryItemId ?? null,
+      safeInventoryItemId,
       session.inventoryItemName ?? null,
       session.beverageType,
       session.method,
@@ -814,7 +824,7 @@ export function saveBrewSession(session: BrewSession): void {
       session.grindSetting ?? null,
       totalTime,
       sanitizedRating,
-      JSON.stringify(session.flavorTags || []),
+      JSON.stringify(safeFlavorTags),
       session.tasteBalance ?? null,
       sanitizedTds,
       sanitizedEy,

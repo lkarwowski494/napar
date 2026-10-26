@@ -1734,4 +1734,28 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(Object.is(cloned.waterTempCelsius, -0)).toBe(false);
     expect(Object.is(cloned.recommendedRatio, -0)).toBe(false);
   });
+
+  test('TASK-P38-05-ARC: saveBrewSession sanityzuje flavorTags, recipeId oraz inventoryItemId', () => {
+    initDatabase(mockDb as any);
+    const sessionWithMessyFields: any = {
+      id: 'sess-messy-fields',
+      recipeId: '   ',
+      inventoryItemId: '  ',
+      recipeName: 'V60 Clean',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: 15,
+      waterGrams: 250,
+      totalTimeSeconds: 150,
+      flavorTags: ['  jaśmin  ', '', '   ', 'cytrusy'],
+      brewedAt: '2026-10-26T12:00:00Z',
+    };
+    saveBrewSession(sessionWithMessyFields);
+
+    const saved = getBrewSessionById('sess-messy-fields');
+    expect(saved).not.toBeNull();
+    expect(saved?.recipeId).toBeUndefined();
+    expect(saved?.inventoryItemId).toBeUndefined();
+    expect(saved?.flavorTags).toEqual(['jaśmin', 'cytrusy']);
+  });
 });
