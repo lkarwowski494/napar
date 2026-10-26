@@ -82,6 +82,20 @@ describe('Timer Audio & Chime Engine', () => {
     expect(announceSpy).toHaveBeenCalledWith('Parzenie zakończone!');
   });
 
+  test('TASK-P12-12-NIE: sanityzuje secondsLeft i stepName przed anonsowaniem syntezy mowy', async () => {
+    await notifyTimerStepWarning(NaN);
+    expect(announceSpy).toHaveBeenCalledWith('Pozostały 3 sekundy do końca zalania');
+
+    await notifyTimerStepWarning(-2);
+    expect(announceSpy).toHaveBeenCalledWith('Pozostały 3 sekundy do końca zalania');
+
+    await notifyTimerFinished('   ');
+    expect(announceSpy).toHaveBeenCalledWith('Parzenie zakończone!');
+
+    await notifyTimerFinished(null as any);
+    expect(announceSpy).toHaveBeenCalledWith('Parzenie zakończone!');
+  });
+
   test('CHIME_AUDIO_DATA_URI zawiera prawidłowy plik audio RIFF WAV z rzeczywistymi próbkami PCM', () => {
     expect(CHIME_AUDIO_DATA_URI.startsWith('data:audio/wav;base64,')).toBe(true);
     const base64Data = CHIME_AUDIO_DATA_URI.replace('data:audio/wav;base64,', '');

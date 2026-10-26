@@ -102,10 +102,11 @@ export async function playTimerChime(): Promise<boolean> {
  * Triggered at 3 seconds before step end (Apps4Brew T-014 / BR-ZEG-002).
  */
 export async function notifyTimerStepWarning(secondsLeft = 3): Promise<boolean> {
+  const safeSeconds = Number.isFinite(secondsLeft) && secondsLeft > 0 ? Math.round(secondsLeft) : 3;
   // 1. Accessibility announcement (i18n localized)
   const t = getCurrentTranslations();
   const template = t.common.timerStepWarning || 'Pozostały {seconds} sekundy do końca zalania';
-  announce(formatTemplate(template, { seconds: secondsLeft }));
+  announce(formatTemplate(template, { seconds: safeSeconds }));
 
   // 2. Haptic warning
   if (getHapticsEnabled()) {
@@ -124,10 +125,11 @@ export async function notifyTimerStepWarning(secondsLeft = 3): Promise<boolean> 
  * Triggered when a timer step or entire session finishes.
  */
 export async function notifyTimerFinished(stepName?: string): Promise<boolean> {
+  const safeStepName = typeof stepName === 'string' && stepName.trim() ? stepName.trim() : undefined;
   // 1. Accessibility announcement (i18n localized)
   const t = getCurrentTranslations();
-  const message = stepName
-    ? formatTemplate(t.common.stepFinished || 'Krok ukończony: {step}', { step: stepName })
+  const message = safeStepName
+    ? formatTemplate(t.common.stepFinished || 'Krok ukończony: {step}', { step: safeStepName })
     : (t.common.brewingFinished || 'Parzenie zakończone!');
   announce(message);
 
