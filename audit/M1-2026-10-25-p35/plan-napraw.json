@@ -4,95 +4,95 @@
     "perspective": "01-ODK",
     "title": "Semantyczna rola timer, liveRegion i etykiety odczytu czasu w BrewActiveFocusTimer",
     "file": "src/components/brew/BrewActiveFocusTimer.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "3bc9773"
   },
   {
     "id": "TASK-P35-02-MON",
     "perspective": "02-MON",
     "title": "Parsowanie numerycznych stringow dla liczby zaparzen w trialu w getAppAccessState",
     "file": "src/core/app-access.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "a71e718"
   },
   {
     "id": "TASK-P35-03-ZAK",
     "perspective": "03-ZAK",
     "title": "Ścisła zgodność formatowania timestampow UTC i ucieczka znakow w generateActionIcsContent",
     "file": "src/core/bpr-engine.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "6b3fd1b"
   },
   {
     "id": "TASK-P35-04-STU",
     "perspective": "04-STU",
-    "title": "Semantyczne accessibilityRole i etykiety dostepnosci dla badge wagi ziaren w BeanCard",
-    "file": "src/components/beans/BeanCard.tsx",
-    "status": "pending",
-    "commit": null
+    "title": "Semantyczne accessibilityRole i etykiety dostepnosci dla badge wagi ziaren w BeanItemCard",
+    "file": "src/components/beans/BeanItemCard.tsx",
+    "status": "completed",
+    "commit": "1a0aff0"
   },
   {
     "id": "TASK-P35-05-ARC",
     "perspective": "05-ARC",
     "title": "Parsowanie numerycznych stringow i ochrona przed -0 dla zaawansowanych metryk w saveInventoryItem",
     "file": "src/core/database.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "6ca04af"
   },
   {
     "id": "TASK-P35-06-TRE",
     "perspective": "06-TRE",
     "title": "Wsparcie dla popularnych aliasow (gesha, sl-28, bourbon) w findCoffeeVarietyById",
     "file": "src/core/knowledge-data.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "f371e6b"
   },
   {
     "id": "TASK-P35-07-JAK",
     "perspective": "07-JAK",
     "title": "Ochrona przed -0 i clampowanie wejsc w ppmCaCO3ToDegreesDH oraz degreesDHToPpmCaCO3",
     "file": "src/core/water-chemistry.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "4dc7fa9"
   },
   {
     "id": "TASK-P35-08-PRO",
     "perspective": "08-PRO",
     "title": "Wsparcie dla Trinity ONE, Gina i wariantow Kalita Wave Tsubame (720 mikronow) w getRecipeMicrons",
     "file": "src/core/grinder-converter.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "e231f8c"
   },
   {
     "id": "TASK-P35-09-LOK",
     "perspective": "09-LOK",
     "title": "Dodanie klucza brew.methodMoccamaster w 35 jezykach i rozszerzenie matrycy testow do 822",
     "file": "locales/*",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "c3cb67a"
   },
   {
     "id": "TASK-P35-10-WYD",
     "perspective": "10-WYD",
     "title": "Statyczna weryfikacja CFBundleDisplayName i spójności z appJson.name w scripts/verify-native.mjs",
     "file": "scripts/verify-native.mjs",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "def5dad"
   },
   {
     "id": "TASK-P35-11-WZR",
     "perspective": "11-WZR",
     "title": "Sanityzacja dlugosci method i scisla walidacja zakresu temperatury w decodeRecipeFromShareUrl",
     "file": "src/core/recipe-share.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "967a1a0"
   },
   {
     "id": "TASK-P35-12-NIE",
     "perspective": "12-NIE",
     "title": "Clampowanie stepRemainingSeconds i ochrona przed -0 w updateLiveActivity",
     "file": "src/core/live-activity.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "cd6db4a"
   }
 ]
