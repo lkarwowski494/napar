@@ -65,4 +65,20 @@ describe('RecipeParamsCard Component (TASK-P31-04-STU)', () => {
     expect(unitBadge.props.accessibilityLabel).toContain('250.5g');
     expect(unitBadge.props.accessibilityLabel).toContain('93°C');
   });
+
+  test('TASK-P50-04-STU: bezpieczny fallback t?.recipeBuilder zapobiega crashom przy pustym/niekompletnym t', () => {
+    let treeEmpty: any;
+    expect(() => {
+      act(() => {
+        treeEmpty = renderer.create(<RecipeParamsCard {...defaultProps} t={{} as any} />);
+      });
+    }).not.toThrow();
+
+    const root = treeEmpty!.root;
+    const header = root.findByProps({ accessibilityRole: 'header' });
+    expect(header.props.children).toBe('Parametry & Proporcja');
+
+    const grindInput = root.findByProps({ placeholder: 'np. Średnio (22 kliki)' });
+    expect(grindInput).toBeTruthy();
+  });
 });

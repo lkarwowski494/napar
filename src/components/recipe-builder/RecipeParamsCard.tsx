@@ -45,19 +45,33 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
   const parsedTemp = typeof waterTempCelsius === 'number' ? waterTempCelsius : parseFloat(String(waterTempCelsius).replace(',', '.'));
   const tempNum = Number.isFinite(parsedTemp) && parsedTemp >= 0 ? Math.min(100, Math.max(0, parsedTemp)) : 93;
 
+  const isEn = typeof t?.brew?.recipe === 'string' && t?.brew?.recipe.toLowerCase() === 'recipe';
+  const doseLabel = unitSystem === 'imperial'
+    ? (t?.recipeBuilder?.doseLabelImperial || (isEn ? 'Dose (oz)' : 'Doza surowca (oz)'))
+    : (t?.recipeBuilder?.doseLabel || (isEn ? 'Dose (g)' : 'Doza surowca (g)'));
+
+  const waterLabel = unitSystem === 'imperial'
+    ? (t?.recipeBuilder?.waterLabelImperial || (isEn ? 'Water (fl oz)' : 'Objętość wody (fl oz)'))
+    : (t?.recipeBuilder?.waterLabel || (isEn ? 'Water (g)' : 'Objętość wody (g)'));
+
+  const tempLabel = unitSystem === 'imperial'
+    ? (t?.recipeBuilder?.tempLabelImperial || (isEn ? 'Temperature (°F)' : 'Temperatura (°F)'))
+    : (t?.recipeBuilder?.tempLabel || (isEn ? 'Temperature (°C)' : 'Temperatura (°C)'));
+
+  const grindLabel = t?.recipeBuilder?.grindLabel || (isEn ? 'Grind size' : 'Grubość mielenia');
+  const grindPlaceholder = t?.recipeBuilder?.grindPlaceholder || (isEn ? 'e.g. Medium (22 clicks)' : 'np. Średnio (22 kliki)');
+  const cardTitle = t?.recipeBuilder?.paramsAndRatio || (isEn ? 'Parameters & Ratio' : 'Parametry & Proporcja');
+  const calculatedRatio = t?.recipeBuilder?.calculatedRatio || (isEn ? 'Calculated ratio' : 'Wyliczona proporcja');
+
   return (
     <View style={styles.card}>
       <Text style={styles.cardTitle} accessibilityRole="header">
-        {t.recipeBuilder?.paramsAndRatio || 'Parametry & Proporcja'}
+        {cardTitle}
       </Text>
 
       <View style={styles.row}>
         <View style={styles.flex1}>
-          <Text style={styles.fieldLabel}>
-            {unitSystem === 'imperial'
-              ? (t.recipeBuilder.doseLabelImperial || 'Doza surowca (oz)')
-              : t.recipeBuilder.doseLabel}
-          </Text>
+          <Text style={styles.fieldLabel}>{doseLabel}</Text>
           <NumInput
             value={unitSystem === 'imperial' ? gramsToOunces(doseNum) : doseNum}
             stored={doseNum}
@@ -69,11 +83,7 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
           />
         </View>
         <View style={[styles.flex1, { marginHorizontal: 10 }]}>
-          <Text style={styles.fieldLabel}>
-            {unitSystem === 'imperial'
-              ? (t.recipeBuilder.waterLabelImperial || 'Objętość wody (fl oz)')
-              : t.recipeBuilder.waterLabel}
-          </Text>
+          <Text style={styles.fieldLabel}>{waterLabel}</Text>
           <NumInput
             value={unitSystem === 'imperial' ? mlToFluidOunces(waterNum) : waterNum}
             stored={waterNum}
@@ -85,11 +95,7 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
           />
         </View>
         <View style={styles.flex1}>
-          <Text style={styles.fieldLabel}>
-            {unitSystem === 'imperial'
-              ? (t.recipeBuilder.tempLabelImperial || 'Temperatura (°F)')
-              : t.recipeBuilder.tempLabel}
-          </Text>
+          <Text style={styles.fieldLabel}>{tempLabel}</Text>
           <NumInput
             value={
               unitSystem === 'imperial'
@@ -110,11 +116,11 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
       <View
         style={styles.ratioBadge}
         accessibilityRole="summary"
-        accessibilityLabel={`${t.recipeBuilder?.calculatedRatio || 'Wyliczona proporcja'}: 1 do ${currentRatio}`}
+        accessibilityLabel={`${calculatedRatio}: 1 do ${currentRatio}`}
         testID="recipe-ratio-badge"
       >
         <Text style={styles.ratioBadgeText}>
-          {t.recipeBuilder?.calculatedRatio || 'Wyliczona proporcja'}: <Text style={styles.ratioValue}>1 : {currentRatio}</Text>
+          {calculatedRatio}: <Text style={styles.ratioValue}>1 : {currentRatio}</Text>
         </Text>
       </View>
 
@@ -130,11 +136,13 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
         </Text>
       </View>
 
-      <Text style={styles.fieldLabel}>{t.recipeBuilder.grindLabel}</Text>
+      <Text style={styles.fieldLabel}>{grindLabel}</Text>
       <Field
         value={grindSize}
         onChangeText={(val) => onChangeGrindSize(typeof val === 'string' ? val.slice(0, 200) : '')}
-        placeholder={t.recipeBuilder.grindPlaceholder}
+        placeholder={grindPlaceholder}
+        accessibilityLabel={grindLabel}
+        accessibilityHint={isEn ? 'Enter grind size description or grinder setting' : 'Wpisz opis grubości mielenia lub nastawę młynka'}
       />
     </View>
   );
