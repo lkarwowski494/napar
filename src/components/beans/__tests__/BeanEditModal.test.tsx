@@ -308,4 +308,47 @@ describe('BeanEditModal Component', () => {
     expect(Object.is(saved.remainingWeightGrams, -0)).toBe(false);
     expect(saved.name.length).toBeLessThanOrEqual(200);
   });
+
+  test('TASK-P42-04-STU: BeanEditModal posiada testID na polach edycji i przyciskach akcji oraz accessibilityState disabled', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BeanEditModal
+          visible={true}
+          item={mockItem}
+          onClose={mockOnClose}
+          canCreate={true}
+          onRequirePaywall={mockOnRequirePaywall}
+          onSaved={mockOnSaved}
+          onDeleted={mockOnDeleted}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    expect(root.findByProps({ testID: 'bean-edit-name-input' })).toBeDefined();
+    expect(root.findByProps({ testID: 'bean-edit-roaster-input' })).toBeDefined();
+    expect(root.findByProps({ testID: 'bean-edit-origin-input' })).toBeDefined();
+    expect(root.findByProps({ testID: 'bean-edit-variety-input' })).toBeDefined();
+    expect(root.findByProps({ testID: 'bean-edit-process-input' })).toBeDefined();
+    expect(root.findByProps({ testID: 'bean-edit-roast-date-input' })).toBeDefined();
+    expect(root.findByProps({ testID: 'bean-edit-initial-weight-input' })).toBeDefined();
+    expect(root.findByProps({ testID: 'bean-edit-remaining-weight-input' })).toBeDefined();
+    expect(root.findByProps({ testID: 'bean-edit-notes-input' })).toBeDefined();
+
+    const saveBtn = root.findByProps({ testID: 'save-bean-edit-btn' });
+    expect(saveBtn).toBeDefined();
+    expect(saveBtn.props.accessibilityState).toEqual({ disabled: false });
+
+    expect(root.findByProps({ testID: 'mark-finished-btn' })).toBeDefined();
+    expect(root.findByProps({ testID: 'delete-pack-btn' })).toBeDefined();
+
+    // Wyczyszczenie nazwy powoduje disabled: true
+    const nameInput = root.findByProps({ testID: 'bean-edit-name-input' });
+    renderer.act(() => {
+      nameInput.props.onChangeText('');
+    });
+    expect(saveBtn.props.accessibilityState).toEqual({ disabled: true });
+    expect(saveBtn.props.disabled).toBe(true);
+  });
 });

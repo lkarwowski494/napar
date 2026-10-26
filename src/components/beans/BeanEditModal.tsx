@@ -223,6 +223,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
           <Text style={styles.inputLabel}>{t.stash?.nameLabel || 'Nazwa ziaren / herbaty *'}</Text>
           <TextInput
+            testID="bean-edit-name-input"
             style={styles.textInput}
             placeholder="np. Etiopia Yirgacheffe Washed"
             placeholderTextColor={theme.colors.textMuted}
@@ -233,6 +234,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
           <Text style={styles.inputLabel}>{t.stash?.roaster || 'Palarnia / Producent'}</Text>
           <TextInput
+            testID="bean-edit-roaster-input"
             style={styles.textInput}
             placeholder="np. Hard Beans, Coffeedesk, Wuyi Star"
             placeholderTextColor={theme.colors.textMuted}
@@ -243,6 +245,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
           <Text style={styles.inputLabel}>{t.stash?.origin || 'Kraj / Pochodzenie'}</Text>
           <TextInput
+            testID="bean-edit-origin-input"
             style={styles.textInput}
             placeholder="np. Yirgacheffe, Etiopia"
             placeholderTextColor={theme.colors.textMuted}
@@ -255,6 +258,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             <View style={{ flex: 1 }}>
               <Text style={styles.inputLabel}>{t.stash?.variety || 'Botaniczna odmiana'}</Text>
               <TextInput
+                testID="bean-edit-variety-input"
                 style={styles.textInput}
                 placeholder="np. Geisha, SL28, Bourbon"
                 placeholderTextColor={theme.colors.textMuted}
@@ -266,6 +270,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             <View style={{ flex: 1, marginLeft: 12 }}>
               <Text style={styles.inputLabel}>{t.stash?.process || 'Obróbka'}</Text>
               <TextInput
+                testID="bean-edit-process-input"
                 style={styles.textInput}
                 placeholder="np. Washed, Natural, Honey"
                 placeholderTextColor={theme.colors.textMuted}
@@ -280,6 +285,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             <View style={{ flex: 1 }}>
               <Text style={styles.inputLabel}>{t.stash?.roastDate || 'Data palenia / Zbioru'}</Text>
               <TextInput
+                testID="bean-edit-roast-date-input"
                 style={styles.textInput}
                 placeholder="YYYY-MM-DD"
                 placeholderTextColor={theme.colors.textMuted}
@@ -291,6 +297,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             <View style={{ flex: 1, marginLeft: 12 }}>
               <Text style={styles.inputLabel}>{isImperial ? 'Waga początkowa (oz)' : 'Waga początkowa (g)'}</Text>
               <TextInput
+                testID="bean-edit-initial-weight-input"
                 style={styles.textInput}
                 placeholder={isImperial ? '8.8' : '250'}
                 placeholderTextColor={theme.colors.textMuted}
@@ -306,6 +313,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           <View style={styles.weightEditSection}>
             <Text style={styles.inputLabel}>{isImperial ? 'Pozostała waga w paczce (oz) *' : 'Pozostała waga w paczce (g) *'}</Text>
             <TextInput
+              testID="bean-edit-remaining-weight-input"
               style={styles.textInput}
               placeholder={isImperial ? '6.3' : 'np. 180'}
               placeholderTextColor={theme.colors.textMuted}
@@ -347,11 +355,13 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
           <Text style={styles.inputLabel}>{t.stash?.notesLabel || 'Nuty smakowe (po przecinku)'}</Text>
           <TextInput
+            testID="bean-edit-notes-input"
             style={styles.textInput}
             placeholder="np. jaśmin, brzoskwinia, bergamotka"
             placeholderTextColor={theme.colors.textMuted}
             value={editNotesStr}
             onChangeText={setEditNotesStr}
+            maxLength={1000}
           />
 
           {/* Ocena paczki */}
@@ -372,15 +382,19 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           </View>
 
           <Pressable
-            style={styles.saveSubmitBtn}
+            testID="save-bean-edit-btn"
+            style={[styles.saveSubmitBtn, !editName.trim() && { opacity: 0.5 }]}
             onPress={handleSaveEdit}
+            disabled={!editName.trim()}
             accessibilityRole="button"
+            accessibilityState={{ disabled: !editName.trim() }}
             accessibilityLabel="Zapisz zmiany"
           >
             <Text style={styles.saveSubmitText}>Zapisz zmiany</Text>
           </Pressable>
 
           <Pressable
+            testID="mark-finished-btn"
             style={styles.markFinishedBtn}
             onPress={handleMarkAsFinished}
             accessibilityRole="button"
@@ -390,6 +404,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           </Pressable>
 
           <Pressable
+            testID="delete-pack-btn"
             style={styles.deletePackBtn}
             onPress={handleDeleteItem}
             accessibilityRole="button"
