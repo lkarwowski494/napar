@@ -21,13 +21,34 @@ export interface JournalAnalyticsResult {
   topFlavorTags: { tag: string; count: number }[];
 }
 
-export function computeJournalAnalytics(relevantSessions: BrewSession[]): JournalAnalyticsResult {
-  const totalBrews = relevantSessions.length;
-  const totalDoseGrams = relevantSessions.reduce((acc, s) => acc + (s.doseGrams || 0), 0);
-  const totalWaterGrams = relevantSessions.reduce((acc, s) => acc + (s.waterGrams || 0), 0);
+export function computeJournalAnalytics(relevantSessions?: BrewSession[] | null): JournalAnalyticsResult {
+  const safeSessions = Array.isArray(relevantSessions)
+    ? relevantSessions.filter((s): s is BrewSession => !!s && typeof s === 'object')
+    : [];
+
+  const totalBrews = safeSessions.length;
+  const totalDoseGrams = safeSessions.reduce((acc, s) => {
+    const d = typeof s.doseGrams === 'number' && Number.isFinite(s.doseGrams) && s.doseGrams > 0 ? s.doseGrams : 0;
+    return acc + d;
+  }, 0);
+  const totalWaterGrams = safeSessions.reduce((acc, s) => {
+    const w = typeof s.waterGrams === 'number' && Number.isFinite(s.waterGrams) && s.waterGrams > 0 ? s.waterGrams : 0;
+    return acc + w;
+  }, 0);
   const totalWaterLiters = (totalWaterGrams / 1000).toFixed(1);
-  const totalCaffeineMg = Math.round(relevantSessions.reduce((acc, s) => acc + (s.caffeineContentMg || 0), 0));
-  const ratedSessions = relevantSessions.filter((s) => typeof s.rating === 'number' && s.rating > 0);
+  const totalCaffeineMg = Math.round(
+    safeSessions.reduce((acc, s) => {
+      const c =
+        typeof s.caffeineContentMg === 'number' && Number.isFinite(s.caffeineContentMg) && s.caffeineContentMg > 0
+          ? s.caffeineContentMg
+          : 0;
+      return acc + c;
+    }, 0)
+  );
+
+  const ratedSessions = safeSessions.filter(
+    (s) => typeof s.rating === 'number' && Number.isFinite(s.rating) && s.rating > 0
+  );
   const avgRating =
     ratedSessions.length > 0
       ? (ratedSessions.reduce((acc, s) => acc + s.rating!, 0) / ratedSessions.length).toFixed(1)
@@ -35,8 +56,8 @@ export function computeJournalAnalytics(relevantSessions: BrewSession[]): Journa
 
   // Rozkład metod
   const methodCounts: Record<string, number> = {};
-  for (const s of relevantSessions) {
-    const m = s.method || 'Inna';
+  for (const s of safeSessions) {
+    const m = typeof s.method === 'string' && s.method.trim() ? s.method.trim() : 'Inna';
     methodCounts[m] = (methodCounts[m] || 0) + 1;
   }
   const methodsList = Object.entries(methodCounts)
@@ -48,18 +69,20 @@ export function computeJournalAnalytics(relevantSessions: BrewSession[]): Journa
     .sort((a, b) => b.count - a.count);
 
   // Średni radar sensoryczny
-  const sensorySessions = relevantSessions.filter((s) => s.sensory);
+  const sensorySessions = safeSessions.filter((s) => s.sensory && typeof s.sensory === 'object');
   let avgSensory: SensoryProfile | null = null;
   if (sensorySessions.length > 0) {
     const sumSensory = sensorySessions.reduce(
       (acc, s) => {
         const sc = s.sensory!;
+        const num = (val: unknown) =>
+          typeof val === 'number' && Number.isFinite(val) && val >= 0 ? val : 0;
         return {
-          acidity: acc.acidity + (sc.acidity || 0),
-          sweetness: acc.sweetness + (sc.sweetness || 0),
-          body: acc.body + (sc.body || 0),
-          clarity: acc.clarity + (sc.clarity || 0),
-          finish: acc.finish + (sc.finish || 0),
+          acidity: acc.acidity + num(sc.acidity),
+          sweetness: acc.sweetness + num(sc.sweetness),
+          body: acc.body + num(sc.body),
+          clarity: acc.clarity + num(sc.clarity),
+          finish: acc.finish + num(sc.finish),
         };
       },
       { acidity: 0, sweetness: 0, body: 0, clarity: 0, finish: 0 }
@@ -83,7 +106,7 @@ export function computeJournalAnalytics(relevantSessions: BrewSession[]): Journa
     weak: 0,
     too_strong: 0,
   };
-  for (const s of relevantSessions) {
+  for (const s of safeSessions) {
     if (s.tasteBalance && balanceCounts[s.tasteBalance] !== undefined) {
       balanceCounts[s.tasteBalance]++;
     }
@@ -91,10 +114,13 @@ export function computeJournalAnalytics(relevantSessions: BrewSession[]): Journa
 
   // Nuty smakowe (Top flavor tags)
   const tagCounts: Record<string, number> = {};
-  for (const s of relevantSessions) {
+  for (const s of safeSessions) {
     if (s.flavorTags && Array.isArray(s.flavorTags)) {
       for (const t of s.flavorTags) {
-        tagCounts[t] = (tagCounts[t] || 0) + 1;
+        if (typeof t === 'string' && t.trim()) {
+          const tag = t.trim();
+          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+        }
       }
     }
   }
@@ -118,6 +144,6 @@ export function computeJournalAnalytics(relevantSessions: BrewSession[]): Journa
   };
 }
 
-export function useJournalAnalytics(relevantSessions: BrewSession[]): JournalAnalyticsResult {
+export function useJournalAnalytics(relevantSessions?: BrewSession[] | null): JournalAnalyticsResult {
   return useMemo(() => computeJournalAnalytics(relevantSessions), [relevantSessions]);
 }
