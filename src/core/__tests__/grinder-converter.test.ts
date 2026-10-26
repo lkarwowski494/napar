@@ -380,4 +380,11 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Drobny przemiał pod espresso tonic' })).toBe(350);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine grind for lungo extraction' })).toBe(350);
   });
+
+  test('TASK-P31-08-PRO: getRecipeMicrons rozpoznaje Ibrik i Cezve zwracajac 200 µm', () => {
+    expect(getRecipeMicrons({ method: 'IBRIK' })).toBe(200);
+    expect(getRecipeMicrons({ method: 'Cezve / Ibrik' })).toBe(200);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Ultradrobny przemiał pod tygielek ibrik' })).toBe(200);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Extra fine powder for ibrik' })).toBe(200);
+  });
 });
