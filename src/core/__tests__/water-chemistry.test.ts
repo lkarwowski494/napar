@@ -185,4 +185,16 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(findBottledWaterById('   ')).toBeUndefined();
     expect(findBottledWaterById(null as any)).toBeUndefined();
   });
+
+  test('TASK-P19-07-JAK: baseWaterGrams jest nieujemne przy skrajnych dawkach soli, a findById jest case-insensitive', () => {
+    // Ekstremalnie wysokie dawki soli nie powodują ujemnej masy wody bazowej
+    const res = calculateWaterMinerals(1.0, 5000, 5000);
+    expect(res.baseWaterGrams).toBeGreaterThanOrEqual(0);
+
+    // Case-insensitivity w findWaterRecipeById i findBottledWaterById
+    expect(findWaterRecipeById('SCA_STANDARD')?.id).toBe('sca_standard');
+    expect(findWaterRecipeById('  Scott_Rao_Wonder  ')?.id).toBe('scott_rao_wonder');
+    expect(findBottledWaterById('VOLVIC')?.id).toBe('volvic');
+    expect(findBottledWaterById('  Zywiec_Zdroj  ')?.id).toBe('zywiec_zdroj');
+  });
 });

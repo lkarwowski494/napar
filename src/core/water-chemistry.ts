@@ -215,7 +215,7 @@ export function calculateWaterMinerals(
   const dryCaCl2 = Number((gh * 0.00147 * vol).toFixed(3));
 
   const totalWaterGrams = vol * 1000;
-  const baseWater = Number((totalWaterGrams - concentrateBuffer - concentrateHardness).toFixed(1));
+  const baseWater = Number(Math.max(0, totalWaterGrams - concentrateBuffer - concentrateHardness).toFixed(1));
 
   return {
     waterVolumeLiters: vol,
@@ -329,12 +329,12 @@ export function degreesDHToPpmCaCO3(dH: number): number {
 
 export function findWaterRecipeById(id: string): WaterRecipe | undefined {
   if (!id || typeof id !== 'string') return undefined;
-  const cleanId = id.trim();
-  return WATER_RECIPES.find((r) => r.id === cleanId);
+  const cleanId = id.trim().toLowerCase();
+  return WATER_RECIPES.find((r) => r.id.toLowerCase() === cleanId);
 }
 
 export function findBottledWaterById(id: string): BottledWaterProfile | undefined {
   if (!id || typeof id !== 'string') return undefined;
-  const cleanId = id.trim();
-  return BOTTLED_WATER_BENCHMARKS.find((w) => w.id === cleanId);
+  const cleanId = id.trim().toLowerCase();
+  return BOTTLED_WATER_BENCHMARKS.find((w) => w.id.toLowerCase() === cleanId);
 }
