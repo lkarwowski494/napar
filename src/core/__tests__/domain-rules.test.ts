@@ -555,4 +555,27 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(Object.is(estimateCoffeeCaffeineMg(0), -0)).toBe(false);
     });
   });
+
+  describe('TASK-P30-03-ZAK: evaluateBedtimeCaffeine defensywnie obsluguje puste i uszkodzone intakes oraz stringi', () => {
+    it('zwraca bezpieczny status i 0 mg dla pustej tablicy intakes lub null', () => {
+      const resEmpty = evaluateBedtimeCaffeine([]);
+      expect(resEmpty.totalRemainingMg).toBe(0);
+      expect(resEmpty.isSafeForSleep).toBe(true);
+
+      const resNull = evaluateBedtimeCaffeine(null as any);
+      expect(resNull.totalRemainingMg).toBe(0);
+      expect(resNull.isSafeForSleep).toBe(true);
+    });
+
+    it('parsuje stringi dla dawek i godzin oraz chroni przed ujemnymi/NaN', () => {
+      const intakes = [
+        { doseMg: '100' as any, hoursUntilBedtime: '5' as any }, // 100mg * 0.5 = 50mg
+        { doseMg: -20, hoursUntilBedtime: 2 }, // ignorowane
+        { doseMg: NaN, hoursUntilBedtime: 1 }, // ignorowane
+      ];
+      const res = evaluateBedtimeCaffeine(intakes, 25.0, 5.0);
+      expect(res.totalRemainingMg).toBe(50.0);
+      expect(res.isSafeForSleep).toBe(false);
+    });
+  });
 });

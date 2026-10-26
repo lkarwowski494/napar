@@ -296,18 +296,23 @@ export function evaluateBedtimeCaffeine(
   halfLifeHours = 5.0
 ): BedtimeCaffeineEvaluation {
   const safeIntakes = Array.isArray(intakes) ? intakes.filter(Boolean) : [];
-  const safeThreshold = Number.isFinite(safeThresholdMg) && safeThresholdMg >= 0 ? safeThresholdMg : 25.0;
-  const safeHalfLife = Number.isFinite(halfLifeHours) && halfLifeHours > 0 ? halfLifeHours : 5.0;
+  const safeThreshold = Number.isFinite(safeThresholdMg) && safeThresholdMg >= 0 ? Math.min(1000, safeThresholdMg) : 25.0;
+  const safeHalfLife = Number.isFinite(halfLifeHours) && halfLifeHours > 0 ? Math.min(24, halfLifeHours) : 5.0;
 
   let totalRemaining = 0;
 
   for (const intake of safeIntakes) {
-    if (intake && Number.isFinite(intake.hoursUntilBedtime) && intake.hoursUntilBedtime >= 0) {
-      totalRemaining += calculateRemainingCaffeineMg(intake.doseMg, intake.hoursUntilBedtime, safeHalfLife);
+    if (intake && typeof intake === 'object') {
+      const parsedHours = typeof intake.hoursUntilBedtime === 'string' ? parseFloat(intake.hoursUntilBedtime) : Number(intake.hoursUntilBedtime);
+      const parsedDose = typeof intake.doseMg === 'string' ? parseFloat(intake.doseMg) : Number(intake.doseMg);
+      if (Number.isFinite(parsedHours) && parsedHours >= 0 && Number.isFinite(parsedDose) && parsedDose > 0) {
+        totalRemaining += calculateRemainingCaffeineMg(parsedDose, parsedHours, safeHalfLife);
+      }
     }
   }
 
   totalRemaining = Number(totalRemaining.toFixed(1));
+  if (Object.is(totalRemaining, -0) || totalRemaining < 0) totalRemaining = 0;
   const isSafeForSleep = totalRemaining <= safeThreshold;
 
   let messagePl: string;
