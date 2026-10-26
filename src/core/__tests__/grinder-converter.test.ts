@@ -230,4 +230,14 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(recNull.microns).toBe(720);
     expect(recNull.formatted).toBe('5');
   });
+
+  test('TASK-P14-08-PRO: parseSetting każdego młynka jest odporne na null, undefined i wartości nienumeryczne', () => {
+    for (const g of SUPPORTED_GRINDERS) {
+      expect(() => g.parseSetting(null as any)).not.toThrow();
+      expect(() => g.parseSetting(undefined as any)).not.toThrow();
+      expect(() => g.parseSetting('')).not.toThrow();
+      expect(Number.isFinite(g.parseSetting(null as any))).toBe(true);
+      expect(Number.isFinite(g.parseSetting(undefined as any))).toBe(true);
+    }
+  });
 });
