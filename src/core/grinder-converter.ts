@@ -97,7 +97,7 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     micronsPerSettingOffset: 0,
     formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `${Math.round(clicks)} clicks` : `${Math.round(clicks)} klików`,
     parseSetting: (text: string) => {
-      const str = typeof text === 'string' ? text : String(text || '');
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 24;
       return num * 30.0;
     },
@@ -114,7 +114,7 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     micronsPerSettingOffset: 0,
     formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `${Math.round(clicks)} clicks` : `${Math.round(clicks)} klików`,
     parseSetting: (text: string) => {
-      const str = typeof text === 'string' ? text : String(text || '');
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 18;
       return num * 35.0;
     },
@@ -137,7 +137,7 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     },
     parseSetting: (text: string) => {
       // Jeśli format 7.5 -> 75 klików * 20um
-      const str = typeof text === 'string' ? text : String(text || '');
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str) || 7.5;
       if (num < 15) {
         return num * 10 * 20.0;
@@ -163,7 +163,7 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
       return `${major}${subChar}`;
     },
     parseSetting: (text: string) => {
-      const str = typeof text === 'string' ? text : String(text || '');
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       let sub = 0;
       if (str.includes('⅓') || str.includes('1/3')) sub = 1;
       else if (str.includes('⅔') || str.includes('2/3')) sub = 2;
@@ -184,7 +184,7 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     micronsPerSettingOffset: 150,
     formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `Setting #${Math.round(clicks)}` : `Nastawa #${Math.round(clicks)}`,
     parseSetting: (text: string) => {
-      const str = typeof text === 'string' ? text : String(text || '');
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 16;
       return 150 + num * 35.0;
     },
@@ -201,7 +201,7 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     micronsPerSettingOffset: 0,
     formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `${Math.round(clicks)} clicks` : `${Math.round(clicks)} klików`,
     parseSetting: (text: string) => {
-      const str = typeof text === 'string' ? text : String(text || '');
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 90;
       return num * 16.0;
     },
@@ -223,7 +223,7 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
       return `French Press #${Math.round(clicks)}`;
     },
     parseSetting: (text: string) => {
-      const str = typeof text === 'string' ? text : String(text || '');
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 7;
       return 250 + num * 45.0;
     },
@@ -246,7 +246,7 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
       return `${major}.${minor} ${unitRot} (${clicks} ${unitClick})`;
     },
     parseSetting: (text: string) => {
-      const str = typeof text === 'string' ? text : String(text || '');
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str) || 3.5;
       return num < 10 ? num * 10 * 10.0 : num * 10.0;
     },
@@ -263,7 +263,7 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     micronsPerSettingOffset: 200,
     formatSetting: (clicks: number, lang = 'pl') => lang === 'en' ? `Position #${Math.round(clicks * 10) / 10}` : `Pozycja #${Math.round(clicks * 10) / 10}`,
     parseSetting: (text: string) => {
-      const str = typeof text === 'string' ? text : String(text || '');
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 5;
       return 200 + num * 25.0;
     },
@@ -291,7 +291,7 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
       return `${Math.round(microns)} µm · ${desc}`;
     },
     parseSetting: (text: string) => {
-      const str = typeof text === 'string' ? text : String(text || '');
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 720;
       return num;
     },
@@ -351,7 +351,8 @@ export function convertBetweenGrinders(
       microns = sourceGrinder.micronsPerSettingOffset + sourceValue * sourceGrinder.stepMicrons;
     }
   } else if (typeof sourceValue === 'string') {
-    const parsed = sourceGrinder.parseSetting(sourceValue);
+    const normalized = sourceValue.trim().replace(',', '.');
+    const parsed = sourceGrinder.parseSetting(normalized);
     if (Number.isFinite(parsed) && parsed > 0) {
       microns = parsed;
     }

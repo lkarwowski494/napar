@@ -256,4 +256,17 @@ describe('Grinder Dial-in Converter Module', () => {
     const plGeneric = convertMicronsToGrinder(720, 'generic_grinder', 'pl');
     expect(plGeneric.grinderName).toContain('Inny młynek');
   });
+
+  test('TASK-P17-08-PRO: obsługa przecinka dziesiętnego w convertBetweenGrinders oraz parseSetting', () => {
+    const kUltra = SUPPORTED_GRINDERS.find((g) => g.id === '1zpresso_k_ultra')!;
+    // '3,5' z przecinkiem powinno sparsować się tak samo jak '3.5'
+    expect(kUltra.parseSetting('3,5')).toBe(700);
+
+    const kinu = SUPPORTED_GRINDERS.find((g) => g.id === 'kinu_m47')!;
+    expect(kinu.parseSetting('3,5')).toBe(350);
+
+    const converted = convertBetweenGrinders('1zpresso_k_ultra', '3,5', 'comandante_c40');
+    expect(converted.microns).toBe(700);
+    expect(converted.targetFormatted).toContain('23 klików');
+  });
 });
