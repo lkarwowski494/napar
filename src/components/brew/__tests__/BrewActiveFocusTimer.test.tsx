@@ -242,4 +242,40 @@ describe('BrewActiveFocusTimer Component', () => {
     expect(gaugeEdge.props.accessibilityValue).toEqual({ min: 0, max: 100, now: 0 });
     expect(gaugeEdge.props.accessibilityLabel).toBe('Postęp ekstrakcji: 0%, docelowo 0 g');
   });
+
+  test('TASK-P45-01-ODK: DripperExtractionGauge wspiera tryb angielski isEn oraz BrewActiveFocusTimer wspiera formatTime z stringami', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <DripperExtractionGauge
+          stepProgress={0.6}
+          targetWaterGrams={200}
+          currentStepIndex={1}
+          totalSteps={2}
+          isEn={true}
+        />
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('EXTRACTION & FLOW');
+    const gauge = tree.root.findByProps({ testID: 'dripper-extraction-gauge' });
+    expect(gauge.props.accessibilityLabel).toBe('Extraction progress: 60%, target 200 g');
+
+    // String totalElapsedSeconds w BrewActiveFocusTimer
+    let treeTimer: any;
+    act(() => {
+      treeTimer = renderer.create(
+        <BrewActiveFocusTimer
+          {...defaultProps}
+          snapshot={{
+            ...defaultSnapshot,
+            totalElapsedSeconds: '75' as any,
+          }}
+        />
+      );
+    });
+    const timerDisplay = treeTimer.root.findByProps({ testID: 'timer-display' });
+    expect(timerDisplay.props.children).toBe('01:15');
+  });
 });

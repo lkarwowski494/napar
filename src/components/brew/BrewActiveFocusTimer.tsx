@@ -3,11 +3,13 @@ export function DripperExtractionGauge({
   targetWaterGrams,
   currentStepIndex,
   totalSteps,
+  isEn = false,
 }: {
   stepProgress: number;
   targetWaterGrams: number;
   currentStepIndex: number;
   totalSteps: number;
+  isEn?: boolean;
 }) {
   const rawProgress = typeof stepProgress === 'number' ? stepProgress : (typeof stepProgress === 'string' ? parseFloat(stepProgress) : 0);
   const safeProgress = Number.isFinite(rawProgress) && !Object.is(rawProgress, -0) ? rawProgress : 0;
@@ -15,7 +17,7 @@ export function DripperExtractionGauge({
   const percent = Object.is(rawPercent, -0) ? 0 : rawPercent;
 
   const rawWater = typeof targetWaterGrams === 'number' ? targetWaterGrams : (typeof targetWaterGrams === 'string' ? parseFloat(targetWaterGrams) : 0);
-  const safeWater = Number.isFinite(rawWater) && rawWater >= 0 && !Object.is(rawWater, -0) ? Math.round(rawWater) : 0;
+  const safeWater = Number.isFinite(rawWater) && rawWater >= 0 && !Object.is(rawWater, -0) ? Math.min(50000, Math.round(rawWater)) : 0;
 
   return (
     <View
@@ -24,10 +26,16 @@ export function DripperExtractionGauge({
       accessible={true}
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now: percent }}
-      accessibilityLabel={`Postęp ekstrakcji: ${percent}%, docelowo ${safeWater} g`}
+      accessibilityLabel={
+        isEn
+          ? `Extraction progress: ${percent}%, target ${safeWater} g`
+          : `Postęp ekstrakcji: ${percent}%, docelowo ${safeWater} g`
+      }
     >
       <View style={styles.gaugeHeader}>
-        <Text style={styles.gaugeLabel}>EKSTRAKCJA & PRZEPŁYW</Text>
+        <Text style={styles.gaugeLabel}>
+          {isEn ? 'EXTRACTION & FLOW' : 'EKSTRAKCJA & PRZEPŁYW'}
+        </Text>
         <Text style={styles.gaugePercent}>{percent}% ({safeWater}g)</Text>
       </View>
       <View style={styles.stepProgressContainer}>
@@ -72,11 +80,12 @@ export function BrewActiveFocusTimer({
   onFinish,
 }: BrewActiveFocusTimerProps) {
   const { t, language } = useTranslation();
-  const isEn = language === 'en';
+  const cleanLang = typeof language === 'string' ? language.trim().toLowerCase() : 'pl';
+  const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
 
-  const formatTime = (seconds: number) => {
+  const formatTime = (seconds: number | string) => {
     const rawSec = typeof seconds === 'number' ? seconds : (typeof seconds === 'string' ? parseFloat(seconds) : 0);
-    const safeSec = Number.isFinite(rawSec) && rawSec >= 0 ? Math.floor(rawSec) : 0;
+    const safeSec = Number.isFinite(rawSec) && rawSec >= 0 && !Object.is(rawSec, -0) ? Math.min(86400, Math.floor(rawSec)) : 0;
     const mins = Math.floor(safeSec / 60);
     const secs = safeSec % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -114,6 +123,7 @@ export function BrewActiveFocusTimer({
           targetWaterGrams={snapshot.targetWaterGrams}
           currentStepIndex={snapshot.currentStepIndex}
           totalSteps={snapshot.totalSteps}
+          isEn={isEn}
         />
 
         {/* Informacja o bieżącym etapie */}
