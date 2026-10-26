@@ -175,6 +175,7 @@ try {
     'android.permission.ACCESS_FINE_LOCATION',
     'android.permission.ACCESS_COARSE_LOCATION',
     'android.permission.ACCESS_BACKGROUND_LOCATION',
+    'android.permission.ACCESS_MEDIA_LOCATION',
     'android.permission.READ_CONTACTS',
     'android.permission.WRITE_CONTACTS',
     'android.permission.READ_CALENDAR',
@@ -189,6 +190,7 @@ try {
     'android.permission.BLUETOOTH_SCAN',
     'android.permission.BLUETOOTH_CONNECT',
     'android.permission.BLUETOOTH_ADVERTISE',
+    'com.google.android.gms.permission.AD_ID',
   ];
   for (const forbidden of forbiddenPerms) {
     check(
@@ -401,6 +403,7 @@ try {
     'NSLocationAlwaysUsageDescription',
     'NSLocationAlwaysAndWhenInUseUsageDescription',
     'NSLocationUsageDescription',
+    'NSLocationTemporaryUsageDescriptionDictionary',
     'NSContactsUsageDescription',
     'NSCalendarsUsageDescription',
     'NSRemindersUsageDescription',
@@ -496,6 +499,7 @@ try {
     'android.permission.ACCESS_FINE_LOCATION',
     'android.permission.ACCESS_COARSE_LOCATION',
     'android.permission.ACCESS_BACKGROUND_LOCATION',
+    'android.permission.ACCESS_MEDIA_LOCATION',
     'android.permission.READ_CONTACTS',
     'android.permission.WRITE_CONTACTS',
     'android.permission.READ_CALENDAR',
@@ -510,6 +514,7 @@ try {
     'android.permission.BLUETOOTH_SCAN',
     'android.permission.BLUETOOTH_CONNECT',
     'android.permission.BLUETOOTH_ADVERTISE',
+    'com.google.android.gms.permission.AD_ID',
   ];
   for (const forbidden of forbiddenAndroidPermissions) {
     check(
