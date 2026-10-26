@@ -659,7 +659,11 @@ export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined
 export function findCoffeeOriginById(id: string): CoffeeOriginInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return COFFEE_ORIGINS.find((o) => o.id && o.id.trim().toLowerCase() === cleanId);
+  return COFFEE_ORIGINS.find(
+    (o) =>
+      (o.id && typeof o.id === 'string' && o.id.trim().toLowerCase() === cleanId) ||
+      (o.countryCode && typeof o.countryCode === 'string' && o.countryCode.trim().toLowerCase() === cleanId)
+  );
 }
 
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
