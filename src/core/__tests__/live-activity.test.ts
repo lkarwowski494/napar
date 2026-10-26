@@ -994,4 +994,38 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     const resValidFinal = await endLiveActivity('act-test-id', 'after_delay', { ...mockState, stepIndex: 3 });
     expect(resValidFinal.error).toBe('ActivityKit Live Activity niedostępne w v1.0 (DEC-01).');
   });
+
+  test('TASK-P53-12-NIE: formatActivityTimer parsuje format mm:ss oraz jednostki (45s, 120 sec), a buildDynamicIslandPayload parsuje stringified stepIndex/totalSteps i chroni przed -0/ujemnymi sekundami', () => {
+    // 1. formatActivityTimer z formatem mm:ss i hh:mm:ss
+    expect(formatActivityTimer('01:30')).toBe('1:30');
+    expect(formatActivityTimer('00:45')).toBe('0:45');
+    expect(formatActivityTimer('1:15:30')).toBe('1:15:30');
+    expect(formatActivityTimer('45s')).toBe('0:45');
+    expect(formatActivityTimer(' 120 sec ')).toBe('2:00');
+    expect(formatActivityTimer('-01:30')).toBe('0:00');
+    expect(formatActivityTimer('-45s')).toBe('0:00');
+    expect(formatActivityTimer('-0')).toBe('0:00');
+
+    // 2. buildDynamicIslandPayload parsuje stringified stepIndex ('2') i totalSteps ('4')
+    const stringState: any = {
+      ...mockState,
+      stepIndex: '2',
+      totalSteps: '4',
+      totalElapsedSeconds: '-30',
+      stepRemainingSeconds: '45s',
+      targetWaterGrams: ' 250,5 g ',
+    };
+    const payloadDi = buildDynamicIslandPayload(mockAttributesCoffee, stringState, 'en');
+    expect(payloadDi.expandedCenterSubtitle).toContain('Step 3 of 4');
+    expect(payloadDi.compactTrailing).toBe('0:45');
+    expect(payloadDi.expandedBottomTarget).toContain('Target: 251 g');
+
+    // 3. buildLiveActivityPayload zabezpiecza ujemne wartości i -0 w contentState
+    const payloadLive = buildLiveActivityPayload(mockAttributesCoffee, stringState, 'pl');
+    expect(payloadLive.contentState.stepIndex).toBe(2);
+    expect(payloadLive.contentState.totalSteps).toBe(4);
+    expect(payloadLive.contentState.totalElapsedSeconds).toBe(0);
+    expect(payloadLive.contentState.stepRemainingSeconds).toBe(45);
+    expect(payloadLive.contentState.targetWaterGrams).toBe(251);
+  });
 });
