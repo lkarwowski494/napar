@@ -832,4 +832,18 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeVarietyById('redbourbon')?.id).toBe('variety-bourbon');
     expect(findCoffeeVarietyById('orange bourbon')?.id).toBe('variety-bourbon');
   });
+
+  test('TASK-P46-06-TRE: findCoffeeProcessById wspiera podwarianty obróbki honey (black, red, yellow, white, gold)', () => {
+    expect(findCoffeeProcessById('black honey')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('black-honey')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('blackhoney')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('red honey')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('red-honey')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('redhoney')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('yellow honey')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('yellow-honey')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('yellowhoney')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('white honey')?.id).toBe('process-honey');
+    expect(findCoffeeProcessById('gold honey')?.id).toBe('process-honey');
+  });
 });
