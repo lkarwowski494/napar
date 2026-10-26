@@ -294,4 +294,14 @@ describe('Grinder Dial-in Converter Module', () => {
     const enFine = getRecipeMicrons({ method: 'Aeropress', grindSettingDescriptionEn: 'fine grind' });
     expect(enFine).toBe(560);
   });
+  test('TASK-P21-08-PRO: getRecipeMicrons wspiera przemiał pod tygielek (cezve / turkish) i zwraca 200 µm', () => {
+    expect(getRecipeMicrons({ method: 'TURKISH' })).toBe(200);
+    expect(getRecipeMicrons({ method: 'cezve' })).toBe(200);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Puder pod tygielek' })).toBe(200);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Extra fine turkish powder' })).toBe(200);
+
+    const cezveComandante = getRecommendedGrindForRecipe({ method: 'TURKISH' }, 'comandante_c40');
+    expect(cezveComandante.microns).toBe(200);
+    expect(cezveComandante.rawValue).toBe(7); // 200 / 30 = 6.67 -> 7 clicks
+  });
 });

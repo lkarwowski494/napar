@@ -390,7 +390,10 @@ export function getRecipeMicrons(recipe?: {
       : ''
   ).toLowerCase();
 
-  if (desc.includes('bardzo drobno') || desc.includes('extra fine') || method === 'ESPRESSO') {
+  if (desc.includes('bardzo drobno') || desc.includes('extra fine') || desc.includes('turkish') || desc.includes('tygielek') || desc.includes('cezve') || method === 'ESPRESSO' || method === 'TURKISH' || method === 'CEZVE') {
+    if (desc.includes('turkish') || desc.includes('tygielek') || desc.includes('cezve') || method === 'TURKISH' || method === 'CEZVE') {
+      return 200;
+    }
     return 350;
   }
   if (desc.includes('drobno') || desc.includes('fine') || method === 'AEROPRESS') {
