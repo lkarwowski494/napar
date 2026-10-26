@@ -131,10 +131,31 @@ export function calculateExtractionYield(
  * >60: utrata lotnych aromatów (aging)
  */
 export function evaluateRestingWindow(roastDateInput: Date | string, currentDateInput?: Date | string): RestingWindowResult {
+  if (!roastDateInput) {
+    return {
+      daysSinceRoast: 0,
+      stage: 'degassing',
+      messagePl: 'Brak daty palenia — świeżość nieznana',
+      messageEn: 'No roast date — freshness unknown',
+      badgeColor: 'gray',
+    };
+  }
   const roastDate = new Date(roastDateInput);
   const now = currentDateInput ? new Date(currentDateInput) : new Date();
 
-  const diffTime = now.getTime() - roastDate.getTime();
+  const roastTime = roastDate.getTime();
+  const nowTime = now.getTime();
+  if (!Number.isFinite(roastTime) || !Number.isFinite(nowTime)) {
+    return {
+      daysSinceRoast: 0,
+      stage: 'degassing',
+      messagePl: 'Nieprawidłowy format daty palenia',
+      messageEn: 'Invalid roast date format',
+      badgeColor: 'gray',
+    };
+  }
+
+  const diffTime = nowTime - roastTime;
   const daysSinceRoast = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
 
   if (daysSinceRoast <= 6) {

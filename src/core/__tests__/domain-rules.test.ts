@@ -117,6 +117,18 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(result.stage).toBe('aging');
       expect(result.badgeColor).toBe('gray');
     });
+
+    it('TASK-P16-03-ZAK: evaluateRestingWindow bezpiecznie obsługuje brak lub uszkodzony format daty', () => {
+      const empty = evaluateRestingWindow('');
+      expect(empty.daysSinceRoast).toBe(0);
+      expect(empty.badgeColor).toBe('gray');
+      expect(empty.messageEn).toContain('freshness unknown');
+
+      const corrupted = evaluateRestingWindow('invalid-date-string');
+      expect(corrupted.daysSinceRoast).toBe(0);
+      expect(corrupted.badgeColor).toBe('gray');
+      expect(corrupted.messageEn).toContain('Invalid roast date');
+    });
   });
 
   describe('RD-17 & RD-18: Caffeine Kinetics and Estimation', () => {
