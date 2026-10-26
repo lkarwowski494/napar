@@ -326,5 +326,14 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(res).toBe(40);
       expect(Object.is(res, -0)).toBe(false);
     });
+
+    it('TASK-P39-03-ZAK: escapeIcsText defensywnie odrzuca typy nienapisowe (null, undefined, number, object)', () => {
+      expect(escapeIcsText(null as any)).toBe('');
+      expect(escapeIcsText(undefined as any)).toBe('');
+      expect(escapeIcsText(12345 as any)).toBe('');
+      expect(escapeIcsText({} as any)).toBe('');
+      expect(escapeIcsText([] as any)).toBe('');
+      expect(escapeIcsText(true as any)).toBe('');
+    });
   });
 });

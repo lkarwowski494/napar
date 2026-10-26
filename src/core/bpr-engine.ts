@@ -407,7 +407,7 @@ export function buildFourteenDayCalendar(
  * dla wybranej akcji z harmonogramu.
  */
 export function escapeIcsText(str: string): string {
-  if (!str) return '';
+  if (typeof str !== 'string' || !str) return '';
   return str
     .replace(/\\/g, '\\\\')
     .replace(/;/g, '\\;')
