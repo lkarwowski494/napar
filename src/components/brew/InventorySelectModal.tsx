@@ -28,6 +28,10 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
   onSelectItem,
   inline = false,
 }) => {
+  if (!inline && !visible) return null;
+
+  const isUnassignedSelected = selectedItem === null;
+
   const innerContent = (
     <ScrollView style={inline ? styles.inlineScrollView : undefined} nestedScrollEnabled={inline}>
       <Text style={styles.modalTitle}>Wybierz ze Spiżarni</Text>
@@ -43,7 +47,13 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
       </Pressable>
 
       <Pressable
-        style={styles.recipeOptionItem}
+        testID="inventory-option-unassigned"
+        accessibilityRole="radio"
+        accessibilityState={{ selected: isUnassignedSelected }}
+        style={[
+          styles.recipeOptionItem,
+          isUnassignedSelected && styles.recipeOptionActive,
+        ]}
         onPress={() => {
           onSelectItem(null);
           onClose();
@@ -55,19 +65,23 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
         </Text>
       </Pressable>
 
-      {inventory.map((item) => (
-        <Pressable
-          key={item.id}
-          testID={`inventory-option-${item.id}`}
-          style={[
-            styles.recipeOptionItem,
-            selectedItem?.id === item.id && styles.recipeOptionActive,
-          ]}
-          onPress={() => {
-            onSelectItem(item);
-            onClose();
-          }}
-        >
+      {inventory.map((item) => {
+        const isItemSelected = selectedItem?.id === item.id;
+        return (
+          <Pressable
+            key={item.id}
+            testID={`inventory-option-${item.id}`}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: isItemSelected }}
+            style={[
+              styles.recipeOptionItem,
+              isItemSelected && styles.recipeOptionActive,
+            ]}
+            onPress={() => {
+              onSelectItem(item);
+              onClose();
+            }}
+          >
           <Text style={styles.recipeOptionName}>{item.name}</Text>
           <Text style={styles.recipeOptionAuthor}>
             {item.roasterOrProducer || 'Palarnia'} · {item.origin || ''}
@@ -76,7 +90,8 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
             Pozostało: {item.remainingWeightGrams}g z {item.initialWeightGrams}g
           </Text>
         </Pressable>
-      ))}
+        );
+      })}
     </ScrollView>
   );
 
