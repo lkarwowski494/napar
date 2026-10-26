@@ -422,4 +422,17 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(resFromUndef.targetGhPpm).toBe(0);
     expect(resFromUndef.targetKhPpm).toBe(0);
   });
+
+  test('TASK-P38-07-JAK: findBottledWaterById i findWaterRecipeById defensywnie odrzucaja boolean, liczby i obiekty', () => {
+    expect(findBottledWaterById(true as any)).toBeUndefined();
+    expect(findBottledWaterById(false as any)).toBeUndefined();
+    expect(findBottledWaterById(123 as any)).toBeUndefined();
+    expect(findBottledWaterById({} as any)).toBeUndefined();
+
+    expect(findWaterRecipeById(true as any)).toBeUndefined();
+    expect(findWaterRecipeById(false as any)).toBeUndefined();
+    expect(findWaterRecipeById(456 as any)).toBeUndefined();
+    expect(findWaterRecipeById([] as any)).toBeUndefined();
+  });
 });
+
