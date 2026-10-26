@@ -807,6 +807,17 @@ const PROCESS_ALIASES: Record<string, string> = {
   'wine process': 'process-natural',
   experimental: 'process-anaerobic',
   eksperymentalna: 'process-anaerobic',
+  koji: 'process-anaerobic',
+  'koji-fermentation': 'process-anaerobic',
+  'koji fermentation': 'process-anaerobic',
+  kojifermentation: 'process-anaerobic',
+  aerobic: 'process-anaerobic',
+  'aerobic-fermentation': 'process-anaerobic',
+  'aerobic fermentation': 'process-anaerobic',
+  'yeast-inoculated': 'process-anaerobic',
+  'yeast inoculated': 'process-anaerobic',
+  'extended-fermentation': 'process-anaerobic',
+  'extended fermentation': 'process-anaerobic',
 };
 
 export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined {
@@ -976,6 +987,16 @@ const TEA_ALIASES: Record<string, string> = {
   houjicha: 'tea-green',
   kukicha: 'tea-green',
   fukamushi: 'tea-green',
+  jasmine: 'tea-green',
+  jasmin: 'tea-green',
+  jasminowa: 'tea-green',
+  'oriental-beauty': 'tea-oolong',
+  'oriental beauty': 'tea-oolong',
+  dongfangmeiren: 'tea-oolong',
+  'milk-oolong': 'tea-oolong',
+  'milk oolong': 'tea-oolong',
+  'jin xuan': 'tea-oolong',
+  jinxuan: 'tea-oolong',
 };
 
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {

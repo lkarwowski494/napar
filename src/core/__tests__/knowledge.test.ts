@@ -884,4 +884,23 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findTeaCategoryById('kukicha')?.id).toBe('tea-green');
     expect(findTeaCategoryById('fukamushi')?.id).toBe('tea-green');
   });
+
+  test('TASK-P49-06-TRE: findCoffeeProcessById wspiera koji, aerobic, yeast-inoculated, extended-fermentation oraz findTeaCategoryById wspiera jasmine, oriental beauty i milk oolong', () => {
+    expect(findCoffeeProcessById('koji')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('koji-fermentation')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('koji fermentation')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('aerobic')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('aerobic fermentation')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('yeast-inoculated')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('extended-fermentation')?.id).toBe('process-anaerobic');
+
+    expect(findTeaCategoryById('jasmine')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('jasminowa')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('oriental beauty')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('oriental-beauty')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('dongfangmeiren')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('milk oolong')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('milk-oolong')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('jin xuan')?.id).toBe('tea-oolong');
+  });
 });
