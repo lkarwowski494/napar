@@ -91,6 +91,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               accessibilityRole="button"
               onPress={() => onBedtimeChange(bedtimeHour - 1)}
               accessibilityLabel={t.settings.earlierBedtime || 'Wcześniejsza godzina snu'}
+              accessibilityHint={t.settings.earlierBedtimeHint || 'Ustawia wcześniejszą docelową godzinę snu'}
             >
               <Text style={styles.stepperBtnText}>−</Text>
             </Pressable>
@@ -101,6 +102,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               accessibilityRole="button"
               onPress={() => onBedtimeChange(bedtimeHour + 1)}
               accessibilityLabel={t.settings.laterBedtime || 'Późniejsza godzina snu'}
+              accessibilityHint={t.settings.laterBedtimeHint || 'Ustawia późniejszą docelową godzinę snu'}
             >
               <Text style={styles.stepperBtnText}>+</Text>
             </Pressable>

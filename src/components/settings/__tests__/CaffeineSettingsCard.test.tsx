@@ -197,4 +197,27 @@ describe('CaffeineSettingsCard Component', () => {
     expect(hkBtn.props.accessibilityState).toEqual({ checked: true });
     expect(hkBtn.props.accessibilityHint).toBe(t.settings.healthKitSubtitle);
   });
+
+  test('TASK-P27-04-STU: przyciski steppera godziny snu posiadają accessibilityHint', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <CaffeineSettingsCard
+          halfLifeHours={5.0}
+          onHalfLifeChange={mockOnHalfLifeChange}
+          bedtimeHour={23}
+          onBedtimeChange={mockOnBedtimeChange}
+          healthKitSync={false}
+          onToggleHealthKit={mockOnToggleHealthKit}
+          t={t}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const earlierBtn = root.findByProps({ accessibilityLabel: 'Wcześniejsza godzina snu' });
+    const laterBtn = root.findByProps({ accessibilityLabel: 'Późniejsza godzina snu' });
+    expect(earlierBtn.props.accessibilityHint).toBeDefined();
+    expect(laterBtn.props.accessibilityHint).toBeDefined();
+  });
 });
