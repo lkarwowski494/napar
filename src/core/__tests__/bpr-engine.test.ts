@@ -193,5 +193,17 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(icsEscaped).toContain('SUMMARY:Kawa\\, specialty\\; palona\\\\ręcznie');
       expect(escapeIcsText('A, B; C\\ D\nE')).toBe('A\\, B\\; C\\\\ D\\nE');
     });
+  
+    it('TASK-P11-07-JAK: safely handles empty and corrupt referenceDateIso without generating NaN-NaN-NaN', () => {
+      const scheduleFromEmpty = buildProactiveActionSchedule('', [], []);
+      expect(scheduleFromEmpty.length).toBe(1);
+      expect(scheduleFromEmpty[0].dateIso).not.toContain('NaN');
+      expect(/^\d{4}-\d{2}-\d{2}$/.test(scheduleFromEmpty[0].dateIso)).toBe(true);
+
+      const daysFromCorrupt = buildFourteenDayCalendar('corrupt-date-string', [], []);
+      expect(daysFromCorrupt).toHaveLength(14);
+      expect(daysFromCorrupt[0].dateIso).not.toContain('NaN');
+      expect(Number.isFinite(daysFromCorrupt[0].dayNumber)).toBe(true);
+    });
   });
 });

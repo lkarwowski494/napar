@@ -132,7 +132,8 @@ export function buildProactiveActionSchedule(
   inventory: InventoryItem[],
   sessions: BrewSession[]
 ): ProactiveActionItem[] {
-  const baseDate = new Date(referenceDateIso);
+  const parsedDate = referenceDateIso ? new Date(referenceDateIso) : new Date();
+  const baseDate = Number.isFinite(parsedDate.getTime()) ? parsedDate : new Date();
   const refDayStart = new Date(
     Date.UTC(
       baseDate.getUTCFullYear(),
@@ -301,7 +302,8 @@ export function buildFourteenDayCalendar(
   inventory: InventoryItem[],
   sessions: BrewSession[]
 ): CalendarDayItem[] {
-  const baseDate = new Date(referenceDateIso);
+  const parsedDate = referenceDateIso ? new Date(referenceDateIso) : new Date();
+  const baseDate = Number.isFinite(parsedDate.getTime()) ? parsedDate : new Date();
   const todayStart = new Date(
     Date.UTC(
       baseDate.getUTCFullYear(),
