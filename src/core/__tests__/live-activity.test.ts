@@ -874,4 +874,38 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     const island = buildDynamicIslandPayload(mockAttributesCoffee, unboundedState);
     expect(island.compactTrailing).toBe('24:00:00');
   });
+
+  test('TASK-P49-12-NIE: obsluga europejskiego przecinka dziesietnego w formatActivityTimer, atrybutach i stanie oraz ochrona przed NaN w totalSteps/stepIndex', async () => {
+    // 1. formatActivityTimer wspiera przecinki dziesietne w stringach
+    expect(formatActivityTimer('45,5' as any)).toBe('0:45');
+    expect(formatActivityTimer('125,8' as any)).toBe('2:05');
+
+    // 2. buildDynamicIslandPayload i buildLiveActivityPayload parsuja przecinki dziesietne i bronia przed NaN
+    const commaAttributes: any = {
+      ...mockAttributesCoffee,
+      totalWaterGrams: '250,5',
+    };
+    const commaState: any = {
+      ...mockState,
+      totalSteps: NaN,
+      stepIndex: NaN,
+      stepDurationSeconds: '45,5',
+      stepRemainingSeconds: '30,5',
+      targetWaterGrams: '60,5',
+      totalElapsedSeconds: '15,5',
+    };
+    const island = buildDynamicIslandPayload(commaAttributes, commaState, 'pl');
+    expect(island.compactTrailing).toBe('0:31');
+    expect(island.expandedCenterSubtitle).toContain('Krok 1 z 1');
+    expect(island.expandedBottomTarget).toContain('Docelowo: 61 g (z 251 g)');
+
+    const payload = buildLiveActivityPayload(commaAttributes, commaState, 'pl');
+    expect(payload.attributes.totalWaterGrams).toBe(251);
+    expect(payload.contentState.stepIndex).toBe(0);
+    expect(payload.contentState.totalSteps).toBe(1);
+    expect(payload.contentState.stepDurationSeconds).toBe(46);
+    expect(payload.contentState.stepRemainingSeconds).toBe(31);
+    expect(payload.contentState.targetWaterGrams).toBe(61);
+    expect(payload.contentState.totalElapsedSeconds).toBe(16);
+  });
 });
