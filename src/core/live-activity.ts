@@ -236,6 +236,18 @@ export async function startLiveActivity(
       error: 'Nieprawidłowe atrybuty aktywności Live Activity.',
     };
   }
+  if (!attributes.recipeName || typeof attributes.recipeName !== 'string' || !attributes.recipeName.trim()) {
+    return {
+      success: false,
+      error: 'Nieprawidłowa nazwa receptury w atrybutach Live Activity.',
+    };
+  }
+  if (typeof attributes.totalWaterGrams !== 'number' || !Number.isFinite(attributes.totalWaterGrams) || attributes.totalWaterGrams <= 0) {
+    return {
+      success: false,
+      error: 'Nieprawidłowa gramatura wody w atrybutach Live Activity.',
+    };
+  }
   if (!initialState || typeof initialState !== 'object') {
     return {
       success: false,

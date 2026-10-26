@@ -388,4 +388,26 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resAfterDelay.success).toBe(false);
     expect(resAfterDelay.error).toContain('DEC-01');
   });
+
+  test('TASK-P28-12-NIE: startLiveActivity waliduje recipeName oraz totalWaterGrams', async () => {
+    const invalidNameAttr: any = {
+      recipeId: '1',
+      recipeName: '   ',
+      beverageType: 'coffee',
+      totalWaterGrams: 250,
+    };
+    const resName = await startLiveActivity(invalidNameAttr, mockState);
+    expect(resName.success).toBe(false);
+    expect(resName.error).toContain('Nieprawidłowa nazwa receptury');
+
+    const invalidWaterAttr: any = {
+      recipeId: '1',
+      recipeName: 'Valid Recipe',
+      beverageType: 'coffee',
+      totalWaterGrams: -10,
+    };
+    const resWater = await startLiveActivity(invalidWaterAttr, mockState);
+    expect(resWater.success).toBe(false);
+    expect(resWater.error).toContain('Nieprawidłowa gramatura wody');
+  });
 });
