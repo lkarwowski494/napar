@@ -410,4 +410,30 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resWater.success).toBe(false);
     expect(resWater.error).toContain('Nieprawidłowa gramatura wody');
   });
+
+  test('TASK-P29-12-NIE: updateLiveActivity waliduje stepIndex w przekazanym stanie', async () => {
+    const invalidIndexState: any = {
+      ...mockState,
+      stepIndex: -1,
+    };
+    const resNegative = await updateLiveActivity('valid-id', invalidIndexState);
+    expect(resNegative.success).toBe(false);
+    expect(resNegative.error).toContain('Nieprawidłowy indeks kroku');
+
+    const nanIndexState: any = {
+      ...mockState,
+      stepIndex: NaN,
+    };
+    const resNan = await updateLiveActivity('valid-id', nanIndexState);
+    expect(resNan.success).toBe(false);
+    expect(resNan.error).toContain('Nieprawidłowy indeks kroku');
+
+    const validState: any = {
+      ...mockState,
+      stepIndex: 2,
+    };
+    const resValid = await updateLiveActivity('valid-id', validState);
+    expect(resValid.success).toBe(false);
+    expect(resValid.error).toContain('DEC-01');
+  });
 });
