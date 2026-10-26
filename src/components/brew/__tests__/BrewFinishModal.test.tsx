@@ -160,4 +160,38 @@ describe('BrewFinishModal Component', () => {
     const notesInput = tree.root.findByProps({ testID: 'finish-notes-input' });
     expect(notesInput.props.maxLength).toBe(1000);
   });
+
+  test('TASK-P43-01-ODK: Dostępność starRow jako radiogroup oraz odporność na NaN i wartości ujemne w kosztach i wodzie', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewFinishModal
+          {...defaultProps}
+          waterGrams={NaN as any}
+          rating={-1}
+          brewCost={{
+            coffeeCost: NaN as any,
+            waterCost: -0 as any,
+            electricityKwh: 0,
+            energyCost: 0,
+            filterCost: 0,
+            totalHomeCost: undefined as any,
+            cafePrice: 'invalid' as any,
+            savingsPerCup: null as any,
+            savingsPercent: 0,
+          }}
+        />
+      );
+    });
+
+    const starRow = tree.root.findByProps({ testID: 'star-rating-row' });
+    expect(starRow).toBeDefined();
+    expect(starRow.props.accessible).toBe(true);
+    expect(starRow.props.accessibilityRole).toBe('radiogroup');
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Woda: 0g');
+    expect(str).toContain('Koszt tego naparu: 0.00 PLN');
+    expect(str).toContain('+0.00 PLN');
+  });
 });

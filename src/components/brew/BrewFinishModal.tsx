@@ -80,17 +80,29 @@ export function BrewFinishModal({
   if (!visible) return null;
 
   const formatTime = (seconds: number) => {
-    const s = Math.max(0, Math.floor(Number(seconds) || 0));
+    const rawS = typeof seconds === 'number' ? seconds : (typeof seconds === 'string' ? parseFloat(seconds) : 0);
+    const s = Number.isFinite(rawS) && rawS > 0 ? Math.floor(rawS) : 0;
     const mins = Math.floor(s / 60);
     const secs = s % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const safeTotalHomeCost = (brewCost?.totalHomeCost ?? 0).toFixed(2);
-  const safeCoffeeCost = (brewCost?.coffeeCost ?? 0).toFixed(2);
-  const safeWaterCost = (brewCost?.waterCost ?? 0).toFixed(2);
-  const safeCafePrice = (brewCost?.cafePrice ?? 0).toFixed(0);
-  const safeSavingsPerCup = (brewCost?.savingsPerCup ?? 0).toFixed(2);
+  const rawWater = typeof waterGrams === 'number' ? waterGrams : (typeof waterGrams === 'string' ? parseFloat(waterGrams) : 0);
+  const safeWater = Number.isFinite(rawWater) && rawWater > 0 ? Math.round(rawWater) : 0;
+
+  const rawRating = typeof rating === 'number' ? rating : (typeof rating === 'string' ? parseFloat(rating) : 0);
+  const safeRating = Number.isFinite(rawRating) && rawRating > 0 ? Math.max(0, Math.min(5, Math.floor(rawRating))) : 0;
+
+  const getSafeNum = (val: unknown, fallback = 0) => {
+    const n = typeof val === 'number' ? val : (typeof val === 'string' ? parseFloat(val) : fallback);
+    return Number.isFinite(n) && !Object.is(n, -0) ? n : fallback;
+  };
+
+  const safeTotalHomeCost = getSafeNum(brewCost?.totalHomeCost, 0).toFixed(2);
+  const safeCoffeeCost = getSafeNum(brewCost?.coffeeCost, 0).toFixed(2);
+  const safeWaterCost = getSafeNum(brewCost?.waterCost, 0).toFixed(2);
+  const safeCafePrice = Math.max(0, Math.round(getSafeNum(brewCost?.cafePrice, 0))).toFixed(0);
+  const safeSavingsPerCup = getSafeNum(brewCost?.savingsPerCup, 0).toFixed(2);
 
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
@@ -104,22 +116,28 @@ export function BrewFinishModal({
             <Text style={styles.modalSub}>
               {(t.brew?.finishTimeWater || (language === 'pl' ? 'Czas: {time} · Woda: {water}g' : 'Time: {time} · Water: {water}g'))
                 .replace('{time}', formatTime(totalElapsedSeconds))
-                .replace('{water}', String(Math.round(waterGrams)))}
+                .replace('{water}', String(safeWater))}
             </Text>
 
             {/* Ocena w gwiazdkach */}
             <Text style={styles.sectionLabel}>{t.brew?.yourRating || 'Twoja Ocena'}</Text>
-            <View style={styles.starRow}>
+            <View
+              testID="star-rating-row"
+              style={styles.starRow}
+              accessible={true}
+              accessibilityRole="radiogroup"
+              accessibilityLabel={t.brew?.yourRating || 'Twoja Ocena'}
+            >
               {[1, 2, 3, 4, 5].map((s) => (
                 <Pressable
                   key={s}
                   testID={`star-rating-${s}`}
                   onPress={() => onChangeRating(s)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: rating >= s }}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: safeRating >= s }}
                   accessibilityLabel={(t.brew?.starRatingLabel || (language === 'pl' ? 'Ocena {rating} z 5' : 'Rating {rating} of 5')).replace('{rating}', String(s))}
                 >
-                  <Text style={[styles.starIcon, rating >= s && styles.starActive]}>
+                  <Text style={[styles.starIcon, safeRating >= s && styles.starActive]}>
                     ★
                   </Text>
                 </Pressable>
