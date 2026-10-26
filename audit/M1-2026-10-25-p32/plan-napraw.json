@@ -1,0 +1,98 @@
+[
+  {
+    "id": "TASK-P32-01-ODK",
+    "perspective": "01-ODK",
+    "title": "Dedykowana etykieta dostepnosci i wiekszy hitSlop dla przyciskow usuwania krokow w RecipeStepEditor",
+    "file": "src/components/recipe-builder/RecipeStepEditor.tsx",
+    "status": "completed",
+    "commit": "df97e69"
+  },
+  {
+    "id": "TASK-P32-02-MON",
+    "perspective": "02-MON",
+    "title": "Gramatyczna odmiana parzen i sanacja brewsRemaining w PassSettingsCard",
+    "file": "src/components/settings/PassSettingsCard.tsx",
+    "status": "completed",
+    "commit": "718ac2a"
+  },
+  {
+    "id": "TASK-P32-03-ZAK",
+    "perspective": "03-ZAK",
+    "title": "Parsowanie stringow i ochrona -0 w calculateRemainingCaffeineMg i calculateHoursUntilSafeCaffeine",
+    "file": "src/core/domain-rules.ts",
+    "status": "completed",
+    "commit": "9580b16"
+  },
+  {
+    "id": "TASK-P32-04-STU",
+    "perspective": "04-STU",
+    "title": "Rola header i zlokalizowane etykiety podpol w RecipeStepEditor",
+    "file": "src/components/recipe-builder/RecipeStepEditor.tsx",
+    "status": "completed",
+    "commit": "3a55fd7"
+  },
+  {
+    "id": "TASK-P32-05-ARC",
+    "perspective": "05-ARC",
+    "title": "Parsowanie stringow i ochrona -0 w deductInventoryWeight w database",
+    "file": "src/core/database.ts",
+    "status": "completed",
+    "commit": "6b8eba5"
+  },
+  {
+    "id": "TASK-P32-06-TRE",
+    "perspective": "06-TRE",
+    "title": "Wyszukiwanie pochodzenia kawy po nazwie kraju (country / countryEn) w findCoffeeOriginById",
+    "file": "src/core/knowledge-data.ts",
+    "status": "completed",
+    "commit": "9bcc40e"
+  },
+  {
+    "id": "TASK-P32-07-JAK",
+    "perspective": "07-JAK",
+    "title": "Rozwiazywanie profili wody zarowno po ID jak i po nazwie w getWaterProfileName",
+    "file": "src/core/water-chemistry.ts",
+    "status": "completed",
+    "commit": "cda1b01"
+  },
+  {
+    "id": "TASK-P32-08-PRO",
+    "perspective": "08-PRO",
+    "title": "Rozpoznawanie Flat White, Cortado i Macchiato w getRecipeMicrons w grinder-converter",
+    "file": "src/core/grinder-converter.ts",
+    "status": "completed",
+    "commit": "872d393"
+  },
+  {
+    "id": "TASK-P32-09-LOK",
+    "perspective": "09-LOK",
+    "title": "Dodanie kluczy paramsAndRatio i stepName w 35 jezykach (564 klucze)",
+    "file": "locales/",
+    "status": "completed",
+    "commit": "0490617"
+  },
+  {
+    "id": "TASK-P32-10-WYD",
+    "perspective": "10-WYD",
+    "title": "Statyczna weryfikacja poprawnosci binarnej favicon.png w verify-native.mjs",
+    "file": "scripts/verify-native.mjs",
+    "status": "completed",
+    "commit": "e3c832b"
+  },
+  {
+    "id": "TASK-P32-11-WZR",
+    "perspective": "11-WZR",
+    "title": "Parsowanie stringa ratio i ochrona -0 w decodeRecipeFromShareUrl w recipe-share",
+    "file": "src/core/recipe-share.ts",
+    "status": "completed",
+    "commit": "2144db0"
+  },
+  {
+    "id": "TASK-P32-12-NIE",
+    "perspective": "12-NIE",
+    "title": "Walidacja totalSteps w stanie w updateLiveActivity w live-activity",
+    "file": "src/core/live-activity.ts",
+    "status": "completed",
+    "commit": "001e3ae"
+  }
+]
