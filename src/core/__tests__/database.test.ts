@@ -2073,4 +2073,57 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(clamped?.initialWeightGrams).toBe(100000);
     expect(clamped?.remainingWeightGrams).toBe(100000);
   });
+
+  test('TASK-P49-05-ARC: saveBrewSession wspiera przecinki dziesiętne i clampuje wagę, a saveRecipe normalizuje beverageType', () => {
+    // 1. saveBrewSession z przecinkami dziesiętnymi
+    const sessionId = 'sess-p49-comma';
+    saveBrewSession({
+      id: sessionId,
+      recipeId: 'rec-1',
+      recipeName: 'V60 Comma Test',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: '18,5' as any,
+      waterGrams: '250,5' as any,
+      waterTempCelsius: 93,
+      totalTimeSeconds: 150,
+      rating: '4,5' as any,
+      tdsPercentage: '1,35' as any,
+      extractionYieldPercentage: '20,5' as any,
+      caffeineContentMg: '142,5' as any,
+      flavorTags: ['owocowe'],
+      brewedAt: '2026-10-26T20:00:00Z',
+    });
+
+    const savedSession = getBrewSessionById(sessionId);
+    expect(savedSession).toBeDefined();
+    expect(savedSession?.doseGrams).toBe(18.5);
+    expect(savedSession?.waterGrams).toBe(250.5);
+    expect(savedSession?.rating).toBe(4.5);
+    expect(savedSession?.tdsPercentage).toBe(1.35);
+    expect(savedSession?.extractionYieldPercentage).toBe(20.5);
+    expect(savedSession?.caffeineContentMg).toBe(142.5);
+
+    // 2. saveRecipe z małą literą 'tea'
+    const recipeId = 'rec-p49-tea';
+    saveRecipe({
+      id: recipeId,
+      name: 'Sencha Green Tea',
+      beverageType: 'tea' as any,
+      method: 'Kyusu',
+      doseGrams: 5,
+      waterGrams: 150,
+      waterTempCelsius: 70,
+      grindSizeDescription: 'Całe liście',
+      recommendedRatio: 30,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-26T20:00:00Z',
+    });
+
+    const savedRecipe = getRecipeById(recipeId);
+    expect(savedRecipe).toBeDefined();
+    expect(savedRecipe?.beverageType).toBe('TEA');
+  });
 });
