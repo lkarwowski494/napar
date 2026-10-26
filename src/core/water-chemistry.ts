@@ -162,9 +162,10 @@ export function getWaterProfileName(id: string, language: 'pl' | 'en' | string =
   const cleanId = id.trim();
   if (!cleanId) return '';
   const cleanLang = typeof language === 'string' ? language.trim().toLowerCase() : 'pl';
+  const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
   const recipe = findWaterRecipeById(cleanId);
   if (recipe) {
-    return cleanLang === 'en' ? (recipe.nameEn || recipe.namePl) : (recipe.namePl || recipe.nameEn);
+    return isEn ? (recipe.nameEn || recipe.namePl) : (recipe.namePl || recipe.nameEn);
   }
   const bottled = findBottledWaterById(cleanId);
   if (bottled) {

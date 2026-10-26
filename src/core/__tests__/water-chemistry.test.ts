@@ -483,5 +483,20 @@ describe('Water Chemistry & Mineralization Module', () => {
     const resFromString = diagnoseWaterSensoryImpact('  60  ', '  30  ');
     expect(resFromString.problemPl).toContain('Golden Zone');
   });
+
+  test('TASK-P43-07-JAK: getWaterProfileName wspiera warianty jezykowe en-US i chroni przed nie-stringami', () => {
+    // Wsparcie en-US, en-GB, EN
+    expect(getWaterProfileName('tea_delicate', 'en-US')).toBe('Artisan Tea Water (Green / White)');
+    expect(getWaterProfileName('tea_delicate', 'en-GB')).toBe('Artisan Tea Water (Green / White)');
+    expect(getWaterProfileName('tea_delicate', 'EN' as any)).toBe('Artisan Tea Water (Green / White)');
+    expect(getWaterProfileName('tea_delicate', 'pl')).toBe('Herbata Szlachetna (Zielona / Biała)');
+
+    // Ochrona przed nie-stringami
+    expect(getWaterProfileName(null as any)).toBe('');
+    expect(getWaterProfileName(undefined as any)).toBe('');
+    expect(getWaterProfileName(123 as any)).toBe('');
+    expect(getWaterProfileName({} as any)).toBe('');
+    expect(getWaterProfileName([] as any)).toBe('');
+  });
 });
 
