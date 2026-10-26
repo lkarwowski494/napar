@@ -616,10 +616,14 @@ function mapRowToRecipe(row: RecipeRow): SavedRecipe {
 
 export function getBrewSessions(limit?: number): BrewSession[] {
   const db = getDatabase();
-  if (limit !== undefined && limit > 0) {
+  if (limit !== undefined) {
+    if (!Number.isFinite(limit) || limit <= 0) {
+      return [];
+    }
+    const safeLimit = Math.max(1, Math.floor(limit));
     const rows = db.getAllSync<BrewSessionRow>(
       'SELECT * FROM brew_sessions ORDER BY brewed_at DESC LIMIT ?',
-      [limit]
+      [safeLimit]
     );
     return rows.map(mapRowToBrewSession);
   }

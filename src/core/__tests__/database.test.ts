@@ -1333,4 +1333,11 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(loaded?.waterTempCelsius).toBe(0);
     expect(loaded?.stepsJson).toBe('[]');
   });
+
+  test('TASK-P20-05-ARC: getBrewSessions zwraca pustą tablicę dla limitu <= 0 lub NaN oraz zaokrągla ułamki w dół', () => {
+    initDatabase(mockDb as any);
+    expect(getBrewSessions(0)).toEqual([]);
+    expect(getBrewSessions(-5)).toEqual([]);
+    expect(getBrewSessions(NaN)).toEqual([]);
+  });
 });
