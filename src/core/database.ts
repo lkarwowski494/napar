@@ -461,25 +461,31 @@ export function saveRecipe(recipe: SavedRecipe): void {
 }
 
 export function deleteRecipe(id: string): void {
+  if (!id || typeof id !== 'string' || !id.trim()) return;
+  const safeId = id.trim();
   const db = getDatabase();
   runInTransactionSync(db, () => {
-    db.runSync('UPDATE brew_sessions SET recipe_id = NULL WHERE recipe_id = ?', [id]);
-    db.runSync('DELETE FROM recipes WHERE id = ? AND is_custom = 1', [id]);
+    db.runSync('UPDATE brew_sessions SET recipe_id = NULL WHERE recipe_id = ?', [safeId]);
+    db.runSync('DELETE FROM recipes WHERE id = ? AND is_custom = 1', [safeId]);
   });
 }
 
 export function toggleRecipeFavorite(id: string): boolean {
+  if (!id || typeof id !== 'string' || !id.trim()) return false;
+  const safeId = id.trim();
   const db = getDatabase();
-  const recipe = getRecipeById(id);
+  const recipe = getRecipeById(safeId);
   if (!recipe) return false;
   const newFav = !recipe.isFavorite;
-  db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [newFav ? 1 : 0, id]);
+  db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [newFav ? 1 : 0, safeId]);
   return newFav;
 }
 
 export function updateRecipeFavorite(id: string, isFavorite: boolean): void {
+  if (!id || typeof id !== 'string' || !id.trim()) return;
+  const safeId = id.trim();
   const db = getDatabase();
-  db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [isFavorite ? 1 : 0, id]);
+  db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [isFavorite ? 1 : 0, safeId]);
 }
 
 export function duplicateRecipe(
@@ -505,6 +511,9 @@ export function duplicateRecipe(
   },
   copySuffix = ' (Kopia)'
 ): SavedRecipe {
+  if (!recipe || typeof recipe !== 'object') {
+    throw new Error('Nieprawidłowa receptura do duplikacji');
+  }
   const now = new Date().toISOString();
   const id = `custom-clone-${Date.now()}`;
   const name = `${recipe.name}${copySuffix}`;

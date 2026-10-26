@@ -394,6 +394,20 @@ describe('Napar SQLite Database & Repositories', () => {
 
   test('toggleRecipeFavorite zwraca false gdy receptura nie istnieje', () => {
     expect(toggleRecipeFavorite('non-existent-rec-id')).toBe(false);
+    expect(toggleRecipeFavorite('')).toBe(false);
+    expect(toggleRecipeFavorite(null as any)).toBe(false);
+  });
+
+  test('TASK-P12-05-ARC: duplicateRecipe, deleteRecipe oraz updateRecipeFavorite zabezpieczone przed null/pustym id', () => {
+    expect(() => duplicateRecipe(null as any)).toThrow('Nieprawidłowa receptura do duplikacji');
+    expect(() => duplicateRecipe(undefined as any)).toThrow('Nieprawidłowa receptura do duplikacji');
+
+    expect(() => deleteRecipe('')).not.toThrow();
+    expect(() => deleteRecipe('   ')).not.toThrow();
+    expect(() => deleteRecipe(null as any)).not.toThrow();
+
+    expect(() => updateRecipeFavorite('', true)).not.toThrow();
+    expect(() => updateRecipeFavorite(null as any, true)).not.toThrow();
   });
 
   test('getCaffeineLogs filtruje według sinceIso', () => {
