@@ -283,6 +283,35 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decodeRecipeFromShareUrl(makePayload({ n: 'A'.repeat(200), m: 'M'.repeat(50), d: 1000, w: 50000 }))).not.toBeNull();
   });
 
+  test('TASK-P10-11-WZR: recipeToCompactPayload jest odporne na uszkodzony stepsJson niebędący tablicą oraz null', () => {
+    const corruptSavedRecipe: any = {
+      name: 'Corrupt Steps Recipe',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      recommendedRatio: 16.7,
+      stepsJson: '12345', // liczba zamiast tablicy JSON
+    };
+
+    const payloadNumber = recipeToCompactPayload(corruptSavedRecipe);
+    expect(payloadNumber).toBeDefined();
+    expect(payloadNumber.s).toEqual([]);
+
+    corruptSavedRecipe.stepsJson = '"string-not-array"';
+    const payloadString = recipeToCompactPayload(corruptSavedRecipe);
+    expect(payloadString.s).toEqual([]);
+
+    corruptSavedRecipe.stepsJson = 'null';
+    const payloadNull = recipeToCompactPayload(corruptSavedRecipe);
+    expect(payloadNull.s).toEqual([]);
+
+    const payloadNullRecipe = recipeToCompactPayload(null as any);
+    expect(payloadNullRecipe).toBeDefined();
+    expect(payloadNullRecipe.n).toBe('Recipe');
+  });
+
   test('TASK-P8-11-WZR: decodeRecipeFromShareUrl zabezpiecza parsed.t i parsed.r przed NaN i wartościami poza zakresem', () => {
     const payloadWithInvalidTempAndRatio = utf8ToBase64(JSON.stringify({
       v: 1,

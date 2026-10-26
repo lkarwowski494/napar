@@ -91,27 +91,44 @@ export function base64ToUtf8(b64: string): string {
 export function recipeToCompactPayload(
   recipe: SavedRecipe | MasterRecipe
 ): CompactRecipePayload {
+  if (!recipe || typeof recipe !== 'object') {
+    return {
+      v: 1,
+      n: 'Recipe',
+      b: 'COFFEE',
+      m: 'v60',
+      d: 15,
+      w: 250,
+      t: 92,
+      r: 16.7,
+      s: [],
+    };
+  }
+
   const isSaved = 'stepsJson' in recipe;
   let rawSteps: RecipeStep[] = [];
 
   if (isSaved) {
     try {
-      rawSteps = JSON.parse(recipe.stepsJson);
+      const parsed = JSON.parse(recipe.stepsJson);
+      rawSteps = Array.isArray(parsed) ? parsed : [];
     } catch {
       rawSteps = [];
     }
   } else {
-    rawSteps = (recipe as MasterRecipe).steps || [];
+    rawSteps = Array.isArray((recipe as MasterRecipe).steps) ? (recipe as MasterRecipe).steps : [];
   }
 
-  const compactSteps: CompactRecipeStep[] = rawSteps.map((st) => ({
-    n: st.namePl,
-    ...(st.nameEn ? { ne: st.nameEn } : {}),
-    d: st.durationSeconds,
-    w: st.targetWaterGrams,
-    i: st.instructionPl,
-    ...(st.instructionEn ? { ie: st.instructionEn } : {}),
-  }));
+  const compactSteps: CompactRecipeStep[] = (rawSteps || [])
+    .filter((st): st is RecipeStep => typeof st === 'object' && st !== null)
+    .map((st) => ({
+      n: typeof st.namePl === 'string' && st.namePl ? st.namePl : 'Step',
+      ...(st.nameEn ? { ne: st.nameEn } : {}),
+      d: Number.isFinite(st.durationSeconds) && st.durationSeconds > 0 ? st.durationSeconds : 30,
+      w: Number.isFinite(st.targetWaterGrams) && st.targetWaterGrams >= 0 ? st.targetWaterGrams : 0,
+      i: typeof st.instructionPl === 'string' ? st.instructionPl : '',
+      ...(st.instructionEn ? { ie: st.instructionEn } : {}),
+    }));
 
   const name = recipe.name;
   const beverageType = isSaved
