@@ -388,4 +388,9 @@ describe('i18n System', () => {
     expect(translations.pl.brew.methodGina).toBe('Gina (Goat Story)');
     expect(translations.en.brew.methodGina).toBe('Gina (Goat Story)');
   });
+
+  test('TASK-P37-09-LOK: Klucz methodTrinityOne jest zdefiniowany w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodTrinityOne).toBe('Trinity ONE');
+    expect(translations.en.brew.methodTrinityOne).toBe('Trinity ONE');
+  });
 });

@@ -131,6 +131,7 @@
     "methodBatchBrew": "Batch Brew / Filter Machine",
     "methodMoccamaster": "Moccamaster",
     "methodGina": "Gina (Goat Story)",
+    "methodTrinityOne": "Trinity ONE",
     "resetTimerAccessibility": "Reset timer",
     "resetTimerHint": "Resets time and returns to initial state",
     "resumeBrewAccessibility": "Resume brewing",
