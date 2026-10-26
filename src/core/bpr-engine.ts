@@ -72,9 +72,9 @@ export function parseStepDurationSeconds(
 
   const normalized = instruction.trim().toLowerCase().replace(/,/g, '.');
 
-  // 1. Zakres minut: np. "10-15 minut", "10–15 min", "2 do 3 minut"
+  // 1. Zakres minut: np. "10-15 minut", "10–15 min", "2 do 3 minut", "2 to 3 mins"
   const minRangeMatch = normalized.match(
-    /(\d+(?:\.\d+)?)\s*(?:[-–—]|do|to)\s*(\d+(?:\.\d+)?)\s*(?:minut[ay]?|min\b)/i
+    /(\d+(?:\.\d+)?)\s*(?:[-–—]|do|to)\s*(\d+(?:\.\d+)?)\s*(?:minut(?:[a-ząęółśżźćń]+)?|minutes?|mins?|min\b)/i
   );
   if (minRangeMatch) {
     const minVal = parseFloat(minRangeMatch[1]);
@@ -84,9 +84,9 @@ export function parseStepDurationSeconds(
     }
   }
 
-  // 2. Zakres sekund: np. "30-45 s", "25–30 sekund", "15-20 sec"
+  // 2. Zakres sekund: np. "30-45 s", "25–30 sekund", "15-20 sec", "15-20 secs"
   const secRangeMatch = normalized.match(
-    /(\d+(?:\.\d+)?)\s*(?:[-–—]|do|to)\s*(\d+(?:\.\d+)?)\s*(?:sekund[ay]?|sek\b|sec(?:onds?)?\b|s\b)/i
+    /(\d+(?:\.\d+)?)\s*(?:[-–—]|do|to)\s*(\d+(?:\.\d+)?)\s*(?:sekund(?:[a-ząęółśżźćń]+)?|sek\b|secs?\b|sec(?:onds?)?\b|s\b)/i
   );
   if (secRangeMatch) {
     const secVal = parseFloat(secRangeMatch[1]);
@@ -96,9 +96,9 @@ export function parseStepDurationSeconds(
     }
   }
 
-  // 3. Pojedyncze minuty (+ opcjonalne sekundy): np. "przez 2 minuty", "1.5 min"
+  // 3. Pojedyncze minuty (+ opcjonalne sekundy): np. "przez 2 minuty", "1.5 min", "wait 2 mins", "steep 4 minutes"
   const minSingleMatch = normalized.match(
-    /(\d+(?:\.\d+)?)\s*(?:minut[ay]?|min\b)/i
+    /(\d+(?:\.\d+)?)\s*(?:minut(?:[a-ząęółśżźćń]+)?|minutes?|mins?|min\b)/i
   );
   if (minSingleMatch) {
     const mins = parseFloat(minSingleMatch[1]);
@@ -108,9 +108,9 @@ export function parseStepDurationSeconds(
     }
   }
 
-  // 4. Pojedyncze sekundy: np. "odczekaj 30 s", "przez 45 sekund", "wait 40s"
+  // 4. Pojedyncze sekundy: np. "odczekaj 30 s", "przez 45 sekund", "wait 40s", "pause 25 secs"
   const secSingleMatch = normalized.match(
-    /(\d+(?:\.\d+)?)\s*(?:sekund[ay]?|sek\b|sec(?:onds?)?\b|s\b)/i
+    /(\d+(?:\.\d+)?)\s*(?:sekund(?:[a-ząęółśżźćń]+)?|sek\b|secs?\b|sec(?:onds?)?\b|s\b)/i
   );
   if (secSingleMatch) {
     const secs = parseFloat(secSingleMatch[1]);

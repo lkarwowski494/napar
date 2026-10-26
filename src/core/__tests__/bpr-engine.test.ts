@@ -420,5 +420,14 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(schedule[0].subtitlePl).toContain('250g');
       expect(schedule[0].doseGrams).toBe(18);
     });
+
+    it('TASK-P44-03-ZAK: parseStepDurationSeconds poprawnie rozpoznaje formy mins, secs, odmiany fleksyjne minut/sekund', () => {
+      expect(parseStepDurationSeconds('wait 2 mins', 30)).toBe(120);
+      expect(parseStepDurationSeconds('steep for 3 to 4 mins', 30)).toBe(180);
+      expect(parseStepDurationSeconds('pause for 45 secs', 30)).toBe(45);
+      expect(parseStepDurationSeconds('wait 15-20 secs', 30)).toBe(15);
+      expect(parseStepDurationSeconds('w 5 minutach zalej', 30)).toBe(300);
+      expect(parseStepDurationSeconds('w 10 sekundach zakoncz', 30)).toBe(10);
+    });
   });
 });
