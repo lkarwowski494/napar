@@ -35,4 +35,15 @@ describe('RecipeParamsCard Component (TASK-P31-04-STU)', () => {
     expect(unitBadge.props.accessibilityRole).toBe('text');
     expect(unitBadge.props.accessibilityLabel).toContain('Podsumowanie jednostek');
   });
+
+  test('TASK-P33-04-STU: wykorzystuje zlokalizowany calculatedRatio w badge proporcji', () => {
+    let treeEn: any;
+    act(() => {
+      treeEn = renderer.create(<RecipeParamsCard {...defaultProps} t={translations.en} />);
+    });
+
+    const ratioBadge = treeEn.root.findByProps({ testID: 'recipe-ratio-badge' });
+    expect(ratioBadge.props.accessibilityLabel).toContain('Calculated ratio: 1 do 16.7');
+    expect(JSON.stringify(treeEn.toJSON())).toContain('Calculated ratio');
+  });
 });

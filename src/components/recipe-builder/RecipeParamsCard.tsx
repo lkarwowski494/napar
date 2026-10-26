@@ -95,11 +95,11 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
       <View
         style={styles.ratioBadge}
         accessibilityRole="summary"
-        accessibilityLabel={`Wyliczona proporcja parzenia: 1 do ${currentRatio}`}
+        accessibilityLabel={`${t.recipeBuilder?.calculatedRatio || 'Wyliczona proporcja'}: 1 do ${currentRatio}`}
         testID="recipe-ratio-badge"
       >
         <Text style={styles.ratioBadgeText}>
-          Wyliczona proporcja: <Text style={styles.ratioValue}>1 : {currentRatio}</Text>
+          {t.recipeBuilder?.calculatedRatio || 'Wyliczona proporcja'}: <Text style={styles.ratioValue}>1 : {currentRatio}</Text>
         </Text>
       </View>
 
