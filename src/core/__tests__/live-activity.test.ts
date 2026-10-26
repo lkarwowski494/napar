@@ -491,4 +491,21 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resNaN.success).toBe(false);
     expect(resNaN.error).toContain('Nieprawidłowa łączna liczba kroków');
   });
+
+  test('TASK-P33-12-NIE: buildLiveActivityPayload oraz buildDynamicIslandPayload parsują numeryczne stringi wody i chronią przed -0', () => {
+    const attrWithStrings: any = {
+      ...mockAttributesCoffee,
+      totalWaterGrams: '350.0',
+    };
+    const stateWithStrings: any = {
+      ...mockState,
+      targetWaterGrams: '120.0',
+    };
+    const payload = buildLiveActivityPayload(attrWithStrings, stateWithStrings, 'pl');
+    expect(payload.attributes.totalWaterGrams).toBe(350);
+    expect(payload.contentState.targetWaterGrams).toBe(120);
+    expect(payload.dynamicIsland.expandedBottomTarget).toContain('120 g (z 350 g)');
+    expect(Object.is(payload.attributes.totalWaterGrams, -0)).toBe(false);
+    expect(Object.is(payload.contentState.targetWaterGrams, -0)).toBe(false);
+  });
 });

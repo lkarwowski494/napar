@@ -126,14 +126,29 @@ export function buildDynamicIslandPayload(
       ? `${stepName} · Step ${safeStepIdx + 1} of ${safeTotalSteps}`
       : `${stepName} · Krok ${safeStepIdx + 1} z ${safeTotalSteps}`;
 
-  const safeTargetWater =
-    Number.isFinite(safeState.targetWaterGrams) && safeState.targetWaterGrams >= 0
-      ? Math.round(safeState.targetWaterGrams)
+  const rawTargetWater =
+    typeof safeState.targetWaterGrams === 'number'
+      ? safeState.targetWaterGrams
+      : typeof safeState.targetWaterGrams === 'string'
+      ? parseFloat(safeState.targetWaterGrams)
+      : NaN;
+  let safeTargetWater =
+    Number.isFinite(rawTargetWater) && rawTargetWater >= 0
+      ? Math.round(rawTargetWater)
       : 0;
-  const safeTotalWater =
-    Number.isFinite(safeAttr.totalWaterGrams) && safeAttr.totalWaterGrams >= 0
-      ? Math.round(safeAttr.totalWaterGrams)
+  if (Object.is(safeTargetWater, -0)) safeTargetWater = 0;
+
+  const rawTotalWater =
+    typeof safeAttr.totalWaterGrams === 'number'
+      ? safeAttr.totalWaterGrams
+      : typeof safeAttr.totalWaterGrams === 'string'
+      ? parseFloat(safeAttr.totalWaterGrams)
+      : NaN;
+  let safeTotalWater =
+    Number.isFinite(rawTotalWater) && rawTotalWater >= 0
+      ? Math.round(rawTotalWater)
       : 0;
+  if (Object.is(safeTotalWater, -0)) safeTotalWater = 0;
 
   const targetWater =
     language === 'en'
@@ -173,7 +188,11 @@ export function buildLiveActivityPayload(
             : 'Napar',
         method: attributes.method || '',
         beverageType: attributes.beverageType === 'TEA' ? 'TEA' : 'COFFEE',
-        totalWaterGrams: Math.max(0, Number.isFinite(attributes.totalWaterGrams) ? Math.round(attributes.totalWaterGrams) : 0),
+        totalWaterGrams: (() => {
+          const rawW = typeof attributes.totalWaterGrams === 'number' ? attributes.totalWaterGrams : (typeof attributes.totalWaterGrams === 'string' ? parseFloat(attributes.totalWaterGrams) : NaN);
+          const res = Math.max(0, Number.isFinite(rawW) ? Math.round(rawW) : 0);
+          return Object.is(res, -0) ? 0 : res;
+        })(),
       }
     : {
         sessionId: '',
@@ -201,7 +220,11 @@ export function buildLiveActivityPayload(
         })(),
         stepDurationSeconds: Math.max(0, Number.isFinite(state.stepDurationSeconds) ? Math.round(state.stepDurationSeconds) : 0),
         totalElapsedSeconds: Math.max(0, Number.isFinite(state.totalElapsedSeconds) ? Math.round(state.totalElapsedSeconds) : 0),
-        targetWaterGrams: Math.max(0, Number.isFinite(state.targetWaterGrams) ? Math.round(state.targetWaterGrams) : 0),
+        targetWaterGrams: (() => {
+          const rawW = typeof state.targetWaterGrams === 'number' ? state.targetWaterGrams : (typeof state.targetWaterGrams === 'string' ? parseFloat(state.targetWaterGrams) : NaN);
+          const res = Math.max(0, Number.isFinite(rawW) ? Math.round(rawW) : 0);
+          return Object.is(res, -0) ? 0 : res;
+        })(),
         isPaused: Boolean(state.isPaused && !state.isFinished),
         isFinished: Boolean(state.isFinished),
       }
