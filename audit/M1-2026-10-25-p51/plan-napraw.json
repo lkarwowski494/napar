@@ -1,9 +1,9 @@
 {
   "run": "P51",
   "date": "2026-10-26",
-  "status": "in_progress",
+  "status": "completed",
   "total_tasks": 12,
-  "completed_tasks": 10,
+  "completed_tasks": 12,
   "tasks": [
     {
       "id": "TASK-P51-01-ODK",
@@ -91,7 +91,7 @@
       "title": "Odpornosc na uszkodzone ciagi transferowe w recipe-share",
       "target_file": "src/core/recipe-share.ts",
       "test_file": "src/core/__tests__/recipe-share.test.ts",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P51-12-NIE",
@@ -99,7 +99,7 @@
       "title": "Odpornosc na binarne i specjalne wartosci w live-activity",
       "target_file": "src/core/live-activity.ts",
       "test_file": "src/core/__tests__/live-activity.test.ts",
-      "status": "pending"
+      "status": "completed"
     }
   ]
 }
