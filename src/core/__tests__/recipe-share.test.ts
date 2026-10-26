@@ -676,4 +676,26 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     const b64Method = Buffer.from(JSON.stringify(compactWhitespaceMethod), 'utf8').toString('base64');
     expect(decodeRecipeFromShareUrl(b64Method)).toBeNull();
   });
+
+  test('TASK-P29-11-WZR: recipeToCompactPayload ogranicza dlugosc name (200), method (50) i author (100)', () => {
+    const longRecipe: SavedRecipe = {
+      id: 'long-recipe-test',
+      name: 'A'.repeat(300),
+      beverageType: 'COFFEE',
+      method: 'M'.repeat(100),
+      author: 'Aut'.repeat(50),
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      recommendedRatio: 16.7,
+      isFavorite: false,
+      stepsJson: '[]',
+      isCustom: true,
+      createdAt: '2026-10-26T12:00:00Z',
+    };
+    const payload = recipeToCompactPayload(longRecipe);
+    expect(payload.n.length).toBe(200);
+    expect(payload.m.length).toBe(50);
+    expect(payload.a?.length).toBe(100);
+  });
 });

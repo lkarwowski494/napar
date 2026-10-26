@@ -137,7 +137,7 @@ export function recipeToCompactPayload(
 
   const name =
     typeof recipe.name === 'string' && recipe.name.trim()
-      ? recipe.name.trim()
+      ? recipe.name.trim().slice(0, 200)
       : 'Recipe';
   const rawBeverageType = isSaved
     ? recipe.beverageType
@@ -146,11 +146,11 @@ export function recipeToCompactPayload(
     rawBeverageType === 'TEA' ? 'TEA' : 'COFFEE';
   const method =
     typeof recipe.method === 'string' && recipe.method.trim()
-      ? recipe.method.trim()
+      ? recipe.method.trim().slice(0, 50)
       : 'v60';
   const author =
     typeof recipe.author === 'string' && recipe.author.trim()
-      ? recipe.author.trim()
+      ? recipe.author.trim().slice(0, 100)
       : undefined;
   const rawDesc = isSaved
     ? (typeof recipe.description === 'string' ? recipe.description : undefined)
