@@ -484,3 +484,19 @@ export const MASTER_RECIPES: MasterRecipe[] = [
     ],
   },
 ];
+
+/**
+ * Wyszukuje recepturę wzorcową po jej unikalnym ID
+ */
+export function findMasterRecipeById(id: string): MasterRecipe | undefined {
+  if (!id || typeof id !== 'string') return undefined;
+  const cleanId = id.trim();
+  return MASTER_RECIPES.find((r) => r.id === cleanId);
+}
+
+/**
+ * Filtruje receptury wzorcowe według typu naparu (COFFEE lub TEA)
+ */
+export function getMasterRecipesByType(type: 'COFFEE' | 'TEA'): MasterRecipe[] {
+  return MASTER_RECIPES.filter((r) => r.type === type);
+}
