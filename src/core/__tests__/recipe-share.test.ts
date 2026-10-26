@@ -820,4 +820,27 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(Object.is(payload.r, -0)).toBe(false);
     expect(payload.r).toBe(10); // 10 / 1 = 10.0
   });
+
+  test('TASK-P35-11-WZR: decodeRecipeFromShareUrl sanityzuje dlugosc method i name oraz scisle clampuje waterTempCelsius i chroni przed -0', () => {
+    const rawData = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: '  Drip Coffee Special  ',
+      b: 'COFFEE',
+      m: '  AeroPress Inverted  ',
+      d: 18,
+      w: 220,
+      t: -0,
+      r: -0,
+      s: []
+    }));
+
+    const result = decodeRecipeFromShareUrl(rawData);
+    expect(result).not.toBeNull();
+    expect(result?.recipe.name).toBe('Drip Coffee Special');
+    expect(result?.recipe.method).toBe('AeroPress Inverted');
+    expect(result?.recipe.waterTempCelsius).toBe(0);
+    expect(Object.is(result?.recipe.waterTempCelsius, -0)).toBe(false);
+    expect(Object.is(result?.recipe.recommendedRatio, -0)).toBe(false);
+    expect(result?.recipe.recommendedRatio).toBe(12.2); // 220 / 18
+  });
 });

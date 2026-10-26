@@ -321,21 +321,25 @@ export function decodeRecipeFromShareUrl(
 
     const recipe: SavedRecipe = {
       id: recipeId,
-      name: parsed.n,
+      name: parsed.n.trim().slice(0, 200),
       beverageType: parsed.b === 'TEA' ? 'TEA' : 'COFFEE',
-      method: parsed.m,
+      method: parsed.m.trim().slice(0, 50),
       author: typeof parsed.a === 'string' && parsed.a.trim() ? parsed.a.trim().slice(0, 100) : defaultAuthor,
       description: typeof parsed.desc === 'string' && parsed.desc.trim() ? parsed.desc.trim().slice(0, 1000) : defaultDesc,
       doseGrams: Object.is(Number(parsed.d.toFixed(1)), -0) ? 0 : Number(parsed.d.toFixed(1)),
       waterGrams: Object.is(Number(parsed.w.toFixed(1)), -0) ? 0 : Number(parsed.w.toFixed(1)),
       waterTempCelsius: (() => {
         const rawDecodedTemp = typeof parsed.t === 'number' ? parsed.t : (typeof parsed.t === 'string' ? parseFloat(parsed.t) : NaN);
-        return Number.isFinite(rawDecodedTemp) && rawDecodedTemp >= 0 && rawDecodedTemp <= 100 ? Math.round(rawDecodedTemp) : 92;
+        return Number.isFinite(rawDecodedTemp) && rawDecodedTemp >= 0 && rawDecodedTemp <= 100 && !Object.is(rawDecodedTemp, -0) ? Math.max(0, Math.min(100, Math.round(rawDecodedTemp))) : 92;
       })(),
       grindSizeDescription: typeof parsed.g === 'string' ? parsed.g.trim().slice(0, 200) : '',
       recommendedRatio: (() => {
         const rawDecodedRatio = typeof parsed.r === 'number' ? parsed.r : (typeof parsed.r === 'string' ? parseFloat(parsed.r) : NaN);
-        return Number.isFinite(rawDecodedRatio) && rawDecodedRatio > 0 ? Number(rawDecodedRatio.toFixed(2)) : Number((parsed.w / (parsed.d || 1)).toFixed(1));
+        let ratioVal = Number.isFinite(rawDecodedRatio) && rawDecodedRatio > 0 && !Object.is(rawDecodedRatio, -0)
+          ? Number(rawDecodedRatio.toFixed(2))
+          : Number((parsed.w / (parsed.d || 1)).toFixed(1));
+        if (Object.is(ratioVal, -0)) ratioVal = 0;
+        return ratioVal;
       })(),
       stepsJson: JSON.stringify(steps),
       isCustom: true,
