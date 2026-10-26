@@ -1125,7 +1125,8 @@ export function getCaffeineHalfLife(): number {
 }
 
 export function setCaffeineHalfLife(hours: number): void {
-  const clamped = Math.max(3.0, Math.min(8.0, hours));
+  const safeHours = typeof hours === 'number' && Number.isFinite(hours) ? hours : 5.0;
+  const clamped = Math.max(3.0, Math.min(8.0, safeHours));
   setAppSetting('caffeine_half_life_hours', clamped.toFixed(1));
 }
 
@@ -1138,7 +1139,8 @@ export function getBedtimeHour(): number {
 }
 
 export function setBedtimeHour(hour: number): void {
-  const clamped = Math.max(18, Math.min(28, hour));
+  const safeHour = typeof hour === 'number' && Number.isFinite(hour) ? Math.round(hour) : 23;
+  const clamped = Math.max(18, Math.min(28, safeHour));
   setAppSetting('bedtime_hour', clamped.toString());
 }
 
@@ -1162,7 +1164,8 @@ export function getBeveragePreference(): BeveragePreference {
 }
 
 export function setBeveragePreference(pref: BeveragePreference): void {
-  setAppSetting('beverage_preference', pref);
+  const safePref = pref === 'coffee' || pref === 'tea' ? pref : 'both';
+  setAppSetting('beverage_preference', safePref);
 }
 
 export function getHasCompletedOnboarding(): boolean {

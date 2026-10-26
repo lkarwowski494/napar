@@ -1396,4 +1396,16 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(() => logCaffeine(null as any)).not.toThrow();
     expect(() => logCaffeine(undefined as any)).not.toThrow();
   });
+
+  test('TASK-P26-05-ARC: setCaffeineHalfLife, setBedtimeHour oraz setBeveragePreference chronią przed NaN i błędnymi wartościami', () => {
+    initDatabase(mockDb as any);
+    setCaffeineHalfLife(NaN as any);
+    expect(getCaffeineHalfLife()).toBe(5.0);
+
+    setBedtimeHour(NaN as any);
+    expect(getBedtimeHour()).toBe(23);
+
+    setBeveragePreference('niepoprawny' as any);
+    expect(getBeveragePreference()).toBe('both');
+  });
 });
