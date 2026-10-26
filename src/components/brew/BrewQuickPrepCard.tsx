@@ -70,33 +70,34 @@ export function BrewQuickPrepCard({
           )}
         </View>
 
-        <View style={styles.batchChipsRow}>
-          {[1, 2, 3, 4].map((n) => (
-            <Pressable
-              key={n}
-              style={[
-                styles.batchChip,
-                servings === n && styles.batchChipActive,
-              ]}
-              onPress={() => onServingsChange(n)}
-              disabled={disabled}
-            >
-              <Text
+        <View style={styles.batchChipsRow} accessibilityRole="radiogroup">
+          {[1, 2, 3, 4].map((n) => {
+            const label = n === 1 ? t.batch.cup1 : n === 2 ? t.batch.cup2 : n === 3 ? t.batch.cup3 : t.batch.cup4;
+            return (
+              <Pressable
+                key={n}
+                testID={`batch-chip-${n}`}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: servings === n }}
+                accessibilityLabel={label}
                 style={[
-                  styles.batchChipText,
-                  servings === n && styles.batchChipTextActive,
+                  styles.batchChip,
+                  servings === n && styles.batchChipActive,
                 ]}
+                onPress={() => onServingsChange(n)}
+                disabled={disabled}
               >
-                {n === 1
-                  ? t.batch.cup1
-                  : n === 2
-                  ? t.batch.cup2
-                  : n === 3
-                  ? t.batch.cup3
-                  : t.batch.cup4}
-              </Text>
-            </Pressable>
-          ))}
+                <Text
+                  style={[
+                    styles.batchChipText,
+                    servings === n && styles.batchChipTextActive,
+                  ]}
+                >
+                  {label}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
 
         {servings > 1 && (

@@ -127,4 +127,20 @@ describe('BrewQuickPrepCard Component', () => {
     // 20g * 16.7 = 334g
     expect(onWaterChangeMock).toHaveBeenCalledWith(334);
   });
+
+  test('TASK-P20-04-STU: chipsy porcji deklarują role radio i stan zaznaczenia accessibilityState', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<BrewQuickPrepCard {...defaultProps} servings={2} />);
+    });
+
+    const chip1 = tree.root.findByProps({ testID: 'batch-chip-1' });
+    const chip2 = tree.root.findByProps({ testID: 'batch-chip-2' });
+
+    expect(chip1.props.accessibilityRole).toBe('radio');
+    expect(chip1.props.accessibilityState).toEqual({ selected: false });
+
+    expect(chip2.props.accessibilityRole).toBe('radio');
+    expect(chip2.props.accessibilityState).toEqual({ selected: true });
+  });
 });
