@@ -50,6 +50,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               accessibilityRole="button"
               onPress={() => onHalfLifeChange(halfLifeHours - 0.5)}
               accessibilityLabel={t.settings.decreaseHalfLife || 'Zmniejsz czas półtrwania'}
+              accessibilityHint={t.settings.decreaseHalfLifeHint || 'Zmniejsza czas półtrwania kofeiny o 0.5 godziny'}
             >
               <Text style={styles.stepperBtnText}>−</Text>
             </Pressable>
@@ -60,6 +61,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               accessibilityRole="button"
               onPress={() => onHalfLifeChange(halfLifeHours + 0.5)}
               accessibilityLabel={t.settings.increaseHalfLife || 'Zwiększ czas półtrwania'}
+              accessibilityHint={t.settings.increaseHalfLifeHint || 'Zwiększa czas półtrwania kofeiny o 0.5 godziny'}
             >
               <Text style={styles.stepperBtnText}>+</Text>
             </Pressable>

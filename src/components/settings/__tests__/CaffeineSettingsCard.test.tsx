@@ -220,4 +220,27 @@ describe('CaffeineSettingsCard Component', () => {
     expect(earlierBtn.props.accessibilityHint).toBeDefined();
     expect(laterBtn.props.accessibilityHint).toBeDefined();
   });
+
+  test('TASK-P28-04-STU: przyciski steppera czasu półtrwania posiadają accessibilityHint', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <CaffeineSettingsCard
+          halfLifeHours={5.0}
+          onHalfLifeChange={mockOnHalfLifeChange}
+          bedtimeHour={23}
+          onBedtimeChange={mockOnBedtimeChange}
+          healthKitSync={false}
+          onToggleHealthKit={mockOnToggleHealthKit}
+          t={t}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const decBtn = root.findByProps({ accessibilityLabel: t.settings.decreaseHalfLife });
+    const incBtn = root.findByProps({ accessibilityLabel: t.settings.increaseHalfLife });
+    expect(decBtn.props.accessibilityHint).toBeDefined();
+    expect(incBtn.props.accessibilityHint).toBeDefined();
+  });
 });
