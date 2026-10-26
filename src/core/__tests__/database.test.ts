@@ -1436,4 +1436,58 @@ describe('Napar SQLite Database & Repositories', () => {
     setHasCompletedOnboarding(true);
     expect(getHasCompletedOnboarding()).toBe(true);
   });
+
+  test('TASK-P29-05-ARC: mapRowToBrewSession oraz saveBrewSession sanituja tdsPercentage, extractionYieldPercentage i caffeineContentMg', () => {
+    initDatabase(mockDb as any);
+    const brokenSession: any = {
+      id: 'sess-invalid-metrics',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 92,
+      totalTimeSeconds: 120,
+      tdsPercentage: -1.5,
+      extractionYieldPercentage: NaN,
+      caffeineContentMg: -50,
+      flavorTags: [],
+    };
+    saveBrewSession(brokenSession);
+    const retrieved = getBrewSessionById('sess-invalid-metrics');
+    expect(retrieved).not.toBeNull();
+    expect(retrieved?.tdsPercentage).toBeUndefined();
+    expect(retrieved?.extractionYieldPercentage).toBeUndefined();
+    expect(retrieved?.caffeineContentMg).toBeUndefined();
+
+    mockDb.sessions.set('corrupted-metrics-row', {
+      id: 'corrupted-metrics-row',
+      recipe_id: null,
+      recipe_name: null,
+      inventory_item_id: null,
+      inventory_item_name: null,
+      beverage_type: 'COFFEE',
+      method: 'V60',
+      dose_g: 15,
+      water_g: 250,
+      water_temp_c: 92,
+      water_profile: null,
+      grind_setting: null,
+      total_time_seconds: 120,
+      rating: null,
+      flavor_tags_json: '[]',
+      taste_balance: null,
+      tds_percentage: -2.0,
+      extraction_yield_percentage: NaN,
+      caffeine_content_mg: -100,
+      notes: null,
+      infusion_number: 1,
+      sensory_scores_json: null,
+      brewed_at: '2026-10-26T12:00:00Z',
+    });
+    const fromCorrupted = getBrewSessionById('corrupted-metrics-row');
+    expect(fromCorrupted).not.toBeNull();
+    expect(fromCorrupted?.tdsPercentage).toBeUndefined();
+    expect(fromCorrupted?.extractionYieldPercentage).toBeUndefined();
+    expect(fromCorrupted?.caffeineContentMg).toBeUndefined();
+  });
 });

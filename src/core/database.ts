@@ -659,6 +659,9 @@ export function saveBrewSession(session: BrewSession): void {
   const sanitizedRating = session.rating != null && Number.isFinite(session.rating) && session.rating >= 0 && session.rating <= 5
     ? session.rating
     : null;
+  const sanitizedTds = session.tdsPercentage != null && Number.isFinite(session.tdsPercentage) && session.tdsPercentage >= 0 ? session.tdsPercentage : null;
+  const sanitizedEy = session.extractionYieldPercentage != null && Number.isFinite(session.extractionYieldPercentage) && session.extractionYieldPercentage >= 0 ? session.extractionYieldPercentage : null;
+  const sanitizedCaffeine = session.caffeineContentMg != null && Number.isFinite(session.caffeineContentMg) && session.caffeineContentMg >= 0 ? session.caffeineContentMg : null;
 
   db.runSync(
     `INSERT OR REPLACE INTO brew_sessions (
@@ -685,9 +688,9 @@ export function saveBrewSession(session: BrewSession): void {
       sanitizedRating,
       JSON.stringify(session.flavorTags || []),
       session.tasteBalance ?? null,
-      session.tdsPercentage ?? null,
-      session.extractionYieldPercentage ?? null,
-      session.caffeineContentMg ?? null,
+      sanitizedTds,
+      sanitizedEy,
+      sanitizedCaffeine,
       session.notes ?? null,
       session.infusionNumber ?? 1,
       session.sensory ? JSON.stringify(session.sensory) : null,
@@ -782,11 +785,22 @@ function mapRowToBrewSession(row: BrewSessionRow): BrewSession {
     rating: (row.rating !== null && Number.isFinite(row.rating) && row.rating >= 0 && row.rating <= 5) ? row.rating : undefined,
     flavorTags,
     tasteBalance: row.taste_balance || undefined,
-    tdsPercentage: row.tds_percentage !== null ? row.tds_percentage : undefined,
+    tdsPercentage:
+      row.tds_percentage !== null && Number.isFinite(row.tds_percentage) && row.tds_percentage >= 0
+        ? row.tds_percentage
+        : undefined,
     extractionYieldPercentage:
-      row.extraction_yield_percentage !== null ? row.extraction_yield_percentage : undefined,
+      row.extraction_yield_percentage !== null &&
+      Number.isFinite(row.extraction_yield_percentage) &&
+      row.extraction_yield_percentage >= 0
+        ? row.extraction_yield_percentage
+        : undefined,
     caffeineContentMg:
-      row.caffeine_content_mg !== null ? row.caffeine_content_mg : undefined,
+      row.caffeine_content_mg !== null &&
+      Number.isFinite(row.caffeine_content_mg) &&
+      row.caffeine_content_mg >= 0
+        ? row.caffeine_content_mg
+        : undefined,
     notes: row.notes || undefined,
     infusionNumber: row.infusion_number || 1,
     sensory,
