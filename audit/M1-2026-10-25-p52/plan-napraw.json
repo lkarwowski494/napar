@@ -1,9 +1,9 @@
 {
   "run": "P52",
   "date": "2026-10-26",
-  "status": "in_progress",
+  "status": "completed",
   "total_tasks": 12,
-  "completed_tasks": 10,
+  "completed_tasks": 12,
   "tasks": [
     {
       "id": "TASK-P52-01-ODK",
@@ -98,18 +98,20 @@
     {
       "id": "TASK-P52-11-WZR",
       "perspective": "11-WZR",
-      "title": "Ochrona przed dzieleniem przez zero i nan w recipeToCompactPayload",
+      "title": "Obsluga odwroconego ratio i ochrona przed dzieleniem przez zero w recipe-share",
       "target_file": "src/core/recipe-share.ts",
       "test_file": "src/core/__tests__/recipe-share.test.ts",
-      "status": "pending"
+      "status": "completed",
+      "commit": "3a4ff58"
     },
     {
       "id": "TASK-P52-12-NIE",
       "perspective": "12-NIE",
-      "title": "Walidacja zasad zamykania aktywnosci i odpornosc na bledne stany w live-activity",
+      "title": "Walidacja finalContentState, sanityzacja ID i dismissalPolicy w live-activity",
       "target_file": "src/core/live-activity.ts",
       "test_file": "src/core/__tests__/live-activity.test.ts",
-      "status": "pending"
+      "status": "completed",
+      "commit": "608112f"
     }
   ]
 }
