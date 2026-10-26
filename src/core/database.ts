@@ -284,10 +284,12 @@ export function getInventoryItems(includeArchived = false): InventoryItem[] {
 }
 
 export function getInventoryItemById(id: string): InventoryItem | null {
+  if (!id || typeof id !== 'string' || !id.trim()) return null;
+  const safeId = id.trim();
   const db = getDatabase();
   const row = db.getFirstSync<InventoryRow>(
     'SELECT * FROM inventory_items WHERE id = ?',
-    [id]
+    [safeId]
   );
   return row ? mapRowToInventoryItem(row) : null;
 }
@@ -584,8 +586,10 @@ export function getBrewSessions(limit?: number): BrewSession[] {
 }
 
 export function getBrewSessionById(id: string): BrewSession | null {
+  if (!id || typeof id !== 'string' || !id.trim()) return null;
+  const safeId = id.trim();
   const db = getDatabase();
-  const row = db.getFirstSync<BrewSessionRow>('SELECT * FROM brew_sessions WHERE id = ?', [id]);
+  const row = db.getFirstSync<BrewSessionRow>('SELECT * FROM brew_sessions WHERE id = ?', [safeId]);
   return row ? mapRowToBrewSession(row) : null;
 }
 
@@ -672,10 +676,12 @@ export function recordBrewSessionTransaction(
 }
 
 export function deleteBrewSession(id: string): void {
+  if (!id || typeof id !== 'string' || !id.trim()) return;
+  const safeId = id.trim();
   const db = getDatabase();
   runInTransactionSync(db, () => {
-    db.runSync('DELETE FROM caffeine_logs WHERE brew_session_id = ?', [id]);
-    db.runSync('DELETE FROM brew_sessions WHERE id = ?', [id]);
+    db.runSync('DELETE FROM caffeine_logs WHERE brew_session_id = ?', [safeId]);
+    db.runSync('DELETE FROM brew_sessions WHERE id = ?', [safeId]);
   });
 }
 
@@ -771,8 +777,10 @@ export function logCaffeine(log: CaffeineLog): void {
 }
 
 export function deleteCaffeineLog(id: string): void {
+  if (!id || typeof id !== 'string' || !id.trim()) return;
+  const safeId = id.trim();
   const db = getDatabase();
-  db.runSync('DELETE FROM caffeine_logs WHERE id = ?', [id]);
+  db.runSync('DELETE FROM caffeine_logs WHERE id = ?', [safeId]);
 }
 
 // ----------------------------------------------------------------------------

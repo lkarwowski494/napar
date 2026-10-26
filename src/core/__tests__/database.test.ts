@@ -844,6 +844,24 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(mockDb.recipes.has('v60-hoffmann-single')).toBe(true);
   });
 
+  test('TASK-P13-05-ARC: sanacja pustego/nullish id w getInventoryItemById, getBrewSessionById, deleteBrewSession i deleteCaffeineLog', () => {
+    expect(getInventoryItemById('')).toBeNull();
+    expect(getInventoryItemById('   ')).toBeNull();
+    expect(getInventoryItemById(null as any)).toBeNull();
+
+    expect(getBrewSessionById('')).toBeNull();
+    expect(getBrewSessionById('   ')).toBeNull();
+    expect(getBrewSessionById(null as any)).toBeNull();
+
+    expect(() => deleteBrewSession('')).not.toThrow();
+    expect(() => deleteBrewSession('   ')).not.toThrow();
+    expect(() => deleteBrewSession(null as any)).not.toThrow();
+
+    expect(() => deleteCaffeineLog('')).not.toThrow();
+    expect(() => deleteCaffeineLog('   ')).not.toThrow();
+    expect(() => deleteCaffeineLog(null as any)).not.toThrow();
+  });
+
   test('deleteBrewSession usuwa sesję z bazy', () => {
     const sessionToSave: BrewSession = {
       id: 'sess-del-test',
