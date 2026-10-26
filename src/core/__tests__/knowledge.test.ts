@@ -669,4 +669,46 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(wetHulled).toBeDefined();
     expect(wetHulled?.id).toBe('process-wet-hulled');
   });
+
+  test('TASK-P37-06-TRE: findTeaCategoryById wspiera popularne aliasy kategorii herbaty', () => {
+    const white = findTeaCategoryById('white');
+    expect(white).toBeDefined();
+    expect(white?.id).toBe('tea-white');
+
+    const biala = findTeaCategoryById('biala');
+    expect(biala).toBeDefined();
+    expect(biala?.id).toBe('tea-white');
+
+    const green = findTeaCategoryById('green');
+    expect(green).toBeDefined();
+    expect(green?.id).toBe('tea-green');
+
+    const zielona = findTeaCategoryById('zielona');
+    expect(zielona).toBeDefined();
+    expect(zielona?.id).toBe('tea-green');
+
+    const oolong = findTeaCategoryById('oolong');
+    expect(oolong).toBeDefined();
+    expect(oolong?.id).toBe('tea-oolong');
+
+    const turkusowa = findTeaCategoryById('turkusowa');
+    expect(turkusowa).toBeDefined();
+    expect(turkusowa?.id).toBe('tea-oolong');
+
+    const black = findTeaCategoryById('black');
+    expect(black).toBeDefined();
+    expect(black?.id).toBe('tea-black');
+
+    const czarna = findTeaCategoryById('czarna');
+    expect(czarna).toBeDefined();
+    expect(czarna?.id).toBe('tea-black');
+
+    const puerh = findTeaCategoryById('puerh');
+    expect(puerh).toBeDefined();
+    expect(puerh?.id).toBe('tea-puerh');
+
+    const ciemna = findTeaCategoryById('ciemna');
+    expect(ciemna).toBeDefined();
+    expect(ciemna?.id).toBe('tea-puerh');
+  });
 });

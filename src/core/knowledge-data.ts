@@ -753,10 +753,37 @@ export function findCoffeeOriginById(id: string): CoffeeOriginInfo | undefined {
   });
 }
 
+const TEA_ALIASES: Record<string, string> = {
+  white: 'tea-white',
+  biala: 'tea-white',
+  green: 'tea-green',
+  zielona: 'tea-green',
+  yellow: 'tea-yellow',
+  zolta: 'tea-yellow',
+  oolong: 'tea-oolong',
+  wulong: 'tea-oolong',
+  turkusowa: 'tea-oolong',
+  black: 'tea-black',
+  czarna: 'tea-black',
+  czerwona: 'tea-black',
+  puerh: 'tea-puerh',
+  puer: 'tea-puerh',
+  ciemna: 'tea-puerh',
+  dark: 'tea-puerh',
+  sheng: 'tea-puerh',
+  shou: 'tea-puerh',
+};
+
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const aliasMatchId = TEA_ALIASES[normId] || TEA_ALIASES[normId.replace(/[\s_-]+/g, '')];
+  if (aliasMatchId) {
+    const found = TEA_CATEGORIES.find((t) => t.id === aliasMatchId);
+    if (found) return found;
+  }
 
   return TEA_CATEGORIES.find((t) => {
     if (t.id && typeof t.id === 'string' && t.id.trim().toLowerCase() === cleanId) return true;
