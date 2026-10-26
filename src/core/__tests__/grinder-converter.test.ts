@@ -9,6 +9,7 @@ import {
   convertBetweenGrinders,
   getRecipeMicrons,
   getRecommendedGrindForRecipe,
+  findGrinderById,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -239,5 +240,20 @@ describe('Grinder Dial-in Converter Module', () => {
       expect(Number.isFinite(g.parseSetting(null as any))).toBe(true);
       expect(Number.isFinite(g.parseSetting(undefined as any))).toBe(true);
     }
+  });
+
+  test('TASK-P16-08-PRO: findGrinderById pobiera model młynka lub undefined, a convertMicronsToGrinder wspiera angielską nazwę', () => {
+    expect(findGrinderById('comandante_c40')?.id).toBe('comandante_c40');
+    expect(findGrinderById('  timemore_c2_c3  ')?.id).toBe('timemore_c2_c3');
+    expect(findGrinderById('')).toBeUndefined();
+    expect(findGrinderById('non-existent')).toBeUndefined();
+    expect(findGrinderById(null as any)).toBeUndefined();
+
+    // Sprawdzenie zlokalizowanej nazwy młynka
+    const enGeneric = convertMicronsToGrinder(720, 'generic_grinder', 'en');
+    expect(enGeneric.grinderName).toContain('Other grinder');
+
+    const plGeneric = convertMicronsToGrinder(720, 'generic_grinder', 'pl');
+    expect(plGeneric.grinderName).toContain('Inny młynek');
   });
 });

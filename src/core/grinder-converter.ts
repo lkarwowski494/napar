@@ -298,6 +298,12 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
   },
 ];
 
+export function findGrinderById(id: string): GrinderModel | undefined {
+  if (!id || typeof id !== 'string') return undefined;
+  const cleanId = id.trim();
+  return SUPPORTED_GRINDERS.find((g) => g.id === cleanId);
+}
+
 /**
  * Konwertuje rozmiar cząstek w mikronach na czytelną nastawę dla zadanego modelu młynka
  */
@@ -306,19 +312,22 @@ export function convertMicronsToGrinder(
   grinderId: string,
   language = 'pl'
 ): { formatted: string; rawValue: number; grinderName: string } {
+  const cleanId = typeof grinderId === 'string' ? grinderId.trim() : '';
   const grinder =
-    SUPPORTED_GRINDERS.find((g) => g.id === grinderId) || SUPPORTED_GRINDERS[0];
+    SUPPORTED_GRINDERS.find((g) => g.id === cleanId) || SUPPORTED_GRINDERS[0];
 
   const safeMicrons = Number.isFinite(microns) && microns > 0 ? microns : 720;
   const targetMicrons = Math.max(150, Math.min(1500, safeMicrons));
   const effectiveMicrons = Math.max(0, targetMicrons - grinder.micronsPerSettingOffset);
   const rawClicks = Math.round(effectiveMicrons / grinder.stepMicrons);
   const clampedClicks = Math.max(grinder.minSetting, Math.min(grinder.maxSetting, rawClicks));
+  const grinderName =
+    language === 'en' && grinder.nameEn ? grinder.nameEn : (grinder.namePl || grinder.name);
 
   return {
     formatted: grinder.formatSetting(clampedClicks, language),
     rawValue: clampedClicks,
-    grinderName: grinder.name,
+    grinderName,
   };
 }
 
