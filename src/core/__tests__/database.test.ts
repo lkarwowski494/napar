@@ -1391,4 +1391,9 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(() => saveInventoryItem(null as any)).toThrow('Nieprawidłowy obiekt pozycji spiżarni');
     expect(() => saveInventoryItem(undefined as any)).toThrow('Nieprawidłowy obiekt pozycji spiżarni');
   });
+  test('TASK-P25-05-ARC: logCaffeine bezpiecznie ignoruje null oraz undefined bez rzucania błędem', () => {
+    initDatabase(mockDb as any);
+    expect(() => logCaffeine(null as any)).not.toThrow();
+    expect(() => logCaffeine(undefined as any)).not.toThrow();
+  });
 });

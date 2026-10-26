@@ -823,6 +823,9 @@ export function getCaffeineLogs(sinceIso?: string): CaffeineLog[] {
 }
 
 export function logCaffeine(log: CaffeineLog): void {
+  if (!log || typeof log !== 'object') {
+    return;
+  }
   const db = getDatabase();
   const safeDose = Number.isFinite(log.doseGrams) && log.doseGrams >= 0 ? log.doseGrams : 0;
   const safeCaffeine = Number.isFinite(log.caffeineMg) && log.caffeineMg >= 0 ? log.caffeineMg : 0;
