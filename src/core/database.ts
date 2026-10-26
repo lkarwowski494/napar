@@ -737,19 +737,34 @@ function mapRowToRecipe(row: RecipeRow): SavedRecipe {
 // Repozytorium: Dziennik Parzeń (Brew Sessions / Journal)
 // ----------------------------------------------------------------------------
 
-export function getBrewSessions(limit?: number): BrewSession[] {
+export function getBrewSessions(limit?: number, offset?: number): BrewSession[] {
   const db = getDatabase();
+  const rawOffset = typeof offset === 'number' ? offset : (typeof offset === 'string' ? parseFloat(offset) : NaN);
+  const safeOffset = Number.isFinite(rawOffset) && rawOffset > 0 ? Math.floor(rawOffset) : 0;
+  const normalizedOffset = Object.is(safeOffset, -0) ? 0 : safeOffset;
+
   if (limit !== undefined) {
-    if (!Number.isFinite(limit) || limit <= 0) {
+    const rawLimit = typeof limit === 'number' ? limit : (typeof limit === 'string' ? parseFloat(limit) : NaN);
+    if (!Number.isFinite(rawLimit) || rawLimit <= 0) {
       return [];
     }
-    const safeLimit = Math.max(1, Math.floor(limit));
+    const safeLimit = Math.max(1, Math.floor(rawLimit));
+    const query = normalizedOffset > 0
+      ? 'SELECT * FROM brew_sessions ORDER BY brewed_at DESC LIMIT ? OFFSET ?'
+      : 'SELECT * FROM brew_sessions ORDER BY brewed_at DESC LIMIT ?';
+    const params = normalizedOffset > 0 ? [safeLimit, normalizedOffset] : [safeLimit];
+    const rows = db.getAllSync<BrewSessionRow>(query, params);
+    return rows.map(mapRowToBrewSession);
+  }
+
+  if (normalizedOffset > 0) {
     const rows = db.getAllSync<BrewSessionRow>(
-      'SELECT * FROM brew_sessions ORDER BY brewed_at DESC LIMIT ?',
-      [safeLimit]
+      'SELECT * FROM brew_sessions ORDER BY brewed_at DESC LIMIT -1 OFFSET ?',
+      [normalizedOffset]
     );
     return rows.map(mapRowToBrewSession);
   }
+
   const rows = db.getAllSync<BrewSessionRow>('SELECT * FROM brew_sessions ORDER BY brewed_at DESC');
   return rows.map(mapRowToBrewSession);
 }

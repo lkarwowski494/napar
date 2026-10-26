@@ -96,7 +96,15 @@ const mockDb: any = {
       return rows;
     }
     if (query.includes('FROM brew_sessions')) {
-      return Array.from(mockDb.sessions.values());
+      let rows = Array.from(mockDb.sessions.values());
+      if (query.includes('OFFSET ?') && params && params.length >= 2) {
+        const lim = params[0];
+        const off = params[1];
+        rows = rows.slice(off, lim > 0 ? off + lim : undefined);
+      } else if (query.includes('LIMIT ?') && params && params[0]) {
+        rows = rows.slice(0, params[0]);
+      }
+      return rows;
     }
     if (query.includes('FROM caffeine_logs')) {
       let rows = Array.from(mockDb.caffeine.values());
@@ -1796,5 +1804,40 @@ describe('Napar SQLite Database & Repositories', () => {
 
     const allRecipes = getRecipes('unknown' as any);
     expect(allRecipes.length).toBeGreaterThanOrEqual(coffeeRecipes.length + teaRecipes.length);
+  });
+
+  test('TASK-P41-05-ARC: getBrewSessions wspiera i sanityzuje parametr offset (stringi, ujemne, -0, NaN)', () => {
+    initDatabase(mockDb as any);
+    mockDb.getAllSync.mockClear();
+
+    // Numeryczny offset
+    getBrewSessions(10, 5);
+    expect(mockDb.getAllSync).toHaveBeenCalledWith(
+      expect.stringContaining('LIMIT ? OFFSET ?'),
+      [10, 5]
+    );
+
+    mockDb.getAllSync.mockClear();
+    // Stringowy offset z zaokrągleniem w dół
+    getBrewSessions(20, '15.9' as any);
+    expect(mockDb.getAllSync).toHaveBeenCalledWith(
+      expect.stringContaining('LIMIT ? OFFSET ?'),
+      [20, 15]
+    );
+
+    mockDb.getAllSync.mockClear();
+    // Ujemny offset lub NaN nie dodaje klauzuli OFFSET
+    getBrewSessions(10, -5);
+    expect(mockDb.getAllSync).toHaveBeenCalledWith(
+      expect.stringContaining('LIMIT ?'),
+      [10]
+    );
+
+    mockDb.getAllSync.mockClear();
+    getBrewSessions(10, -0);
+    expect(mockDb.getAllSync).toHaveBeenCalledWith(
+      expect.stringContaining('LIMIT ?'),
+      [10]
+    );
   });
 });
