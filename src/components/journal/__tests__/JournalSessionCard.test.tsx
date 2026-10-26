@@ -147,4 +147,56 @@ describe('JournalSessionCard Component', () => {
     const brewBtn = root.findByProps({ testID: 'brew-again-btn-session-no-beans' });
     expect(brewBtn.props.hitSlop).toBeDefined();
   });
+
+  test('TASK-P34-04-STU: badge oceny oraz badge uzysku ekstrakcji posiadają accessibilityRole text oraz zlokalizowane accessibilityLabel', () => {
+    let treePl: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      treePl = renderer.create(
+        <JournalSessionCard
+          session={mockSession}
+          unitSystem="metric"
+          language="pl"
+          t={t}
+          onBrewAgain={mockOnBrewAgain}
+          onShareSession={mockOnShareSession}
+          onDelete={mockOnDelete}
+          formatDateTime={formatDateTime}
+          formatSeconds={formatSeconds}
+        />
+      );
+    });
+
+    const ratingPl = treePl!.root.findByProps({ testID: 'session-rating-test-session-1' });
+    expect(ratingPl.props.accessibilityRole).toBe('text');
+    expect(ratingPl.props.accessibilityLabel).toBe('Ocena: 4.8 gwiazdek');
+
+    const eyPl = treePl!.root.findByProps({ testID: 'session-ey-test-session-1' });
+    expect(eyPl.props.accessibilityRole).toBe('text');
+    expect(eyPl.props.accessibilityLabel).toBe('Uzysk ekstrakcji: 20.4%, TDS: 1.35%');
+
+    let treeEn: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      treeEn = renderer.create(
+        <JournalSessionCard
+          session={mockSession}
+          unitSystem="metric"
+          language="en"
+          t={translations.en}
+          onBrewAgain={mockOnBrewAgain}
+          onShareSession={mockOnShareSession}
+          onDelete={mockOnDelete}
+          formatDateTime={formatDateTime}
+          formatSeconds={formatSeconds}
+        />
+      );
+    });
+
+    const ratingEn = treeEn!.root.findByProps({ testID: 'session-rating-test-session-1' });
+    expect(ratingEn.props.accessibilityRole).toBe('text');
+    expect(ratingEn.props.accessibilityLabel).toBe('Rating: 4.8 stars');
+
+    const eyEn = treeEn!.root.findByProps({ testID: 'session-ey-test-session-1' });
+    expect(eyEn.props.accessibilityRole).toBe('text');
+    expect(eyEn.props.accessibilityLabel).toBe('Extraction yield: 20.4%, TDS: 1.35%');
+  });
 });

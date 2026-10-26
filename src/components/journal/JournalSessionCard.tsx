@@ -47,7 +47,16 @@ export function JournalSessionCard({
         </View>
 
         {session.rating && (
-          <View style={styles.ratingBadge}>
+          <View
+            testID={`session-rating-${session.id}`}
+            style={styles.ratingBadge}
+            accessibilityRole="text"
+            accessibilityLabel={
+              isEn
+                ? `Rating: ${session.rating.toFixed(1)} stars`
+                : `Ocena: ${session.rating.toFixed(1)} gwiazdek`
+            }
+          >
             <StarIcon size={12} color={theme.colors.copper} filled={true} />
             <Text style={styles.ratingText}>{session.rating.toFixed(1)}</Text>
           </View>
@@ -110,7 +119,16 @@ export function JournalSessionCard({
         )}
 
         {session.extractionYieldPercentage && (
-          <View style={styles.eyBadge}>
+          <View
+            testID={`session-ey-${session.id}`}
+            style={styles.eyBadge}
+            accessibilityRole="text"
+            accessibilityLabel={
+              isEn
+                ? `Extraction yield: ${session.extractionYieldPercentage.toFixed(1)}%${session.tdsPercentage ? `, TDS: ${session.tdsPercentage}%` : ''}`
+                : `Uzysk ekstrakcji: ${session.extractionYieldPercentage.toFixed(1)}%${session.tdsPercentage ? `, TDS: ${session.tdsPercentage}%` : ''}`
+            }
+          >
             <Text style={styles.eyText}>
               EY: {session.extractionYieldPercentage.toFixed(1)}%
               {session.tdsPercentage ? ` (TDS ${session.tdsPercentage}%)` : ''}
