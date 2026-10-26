@@ -229,4 +229,8 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(extreme.baseWaterGrams).toBe(0);
     expect(Object.is(extreme.baseWaterGrams, -0)).toBe(false);
   });
+  test('TASK-P24-07-JAK: ppmCaCO3ToDegreesDH i degreesDHToPpmCaCO3 clampują skrajne wartości wejściowe', () => {
+    expect(ppmCaCO3ToDegreesDH(999999)).toBe(ppmCaCO3ToDegreesDH(10000));
+    expect(degreesDHToPpmCaCO3(999999)).toBe(degreesDHToPpmCaCO3(500));
+  });
 });

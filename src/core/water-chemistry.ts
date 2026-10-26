@@ -328,7 +328,8 @@ export function diagnoseWaterSensoryImpact(
  */
 export function ppmCaCO3ToDegreesDH(ppm: number): number {
   if (!Number.isFinite(ppm) || ppm <= 0) return 0;
-  return Number((ppm / 17.848).toFixed(4));
+  const safePpm = Math.min(10000, ppm);
+  return Number((safePpm / 17.848).toFixed(4));
 }
 
 /**
@@ -336,7 +337,8 @@ export function ppmCaCO3ToDegreesDH(ppm: number): number {
  */
 export function degreesDHToPpmCaCO3(dH: number): number {
   if (!Number.isFinite(dH) || dH <= 0) return 0;
-  return Number((dH * 17.848).toFixed(2));
+  const safeDH = Math.min(500, dH);
+  return Number((safeDH * 17.848).toFixed(2));
 }
 
 export function findWaterRecipeById(id: string): WaterRecipe | undefined {
