@@ -233,4 +233,17 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(ppmCaCO3ToDegreesDH(999999)).toBe(ppmCaCO3ToDegreesDH(10000));
     expect(degreesDHToPpmCaCO3(999999)).toBe(degreesDHToPpmCaCO3(500));
   });
+
+  test('TASK-P25-07-JAK: calculateWaterMinerals parsuje parametry przekazane jako string oraz chroni przed -0', () => {
+    const fromStrings = calculateWaterMinerals('2.5' as any, '80' as any, '40' as any);
+    expect(fromStrings.waterVolumeLiters).toBe(2.5);
+    expect(fromStrings.targetGhPpm).toBe(80);
+    expect(fromStrings.targetKhPpm).toBe(40);
+
+    const negZero = calculateWaterMinerals(1.0, -0, -0);
+    expect(Object.is(negZero.targetGhPpm, -0)).toBe(false);
+    expect(Object.is(negZero.targetKhPpm, -0)).toBe(false);
+    expect(negZero.targetGhPpm).toBe(0);
+    expect(negZero.targetKhPpm).toBe(0);
+  });
 });
