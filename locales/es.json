@@ -250,7 +250,10 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "stepNumberPrefix": "Paso",
-    "addStepHint": "Añade un nuevo paso a la receta de preparación"
+    "addStepHint": "Añade un nuevo paso a la receta de preparación",
+    "doseLabelImperial": "Dosis seca (oz)",
+    "waterLabelImperial": "Volumen de agua (fl oz)",
+    "tempLabelImperial": "Temperatura del agua (°F)"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

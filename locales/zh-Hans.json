@@ -250,7 +250,10 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "stepNumberPrefix": "步骤",
-    "addStepHint": "在冲煮食谱中添加新步骤"
+    "addStepHint": "在冲煮食谱中添加新步骤",
+    "doseLabelImperial": "干粉剂量 (oz)",
+    "waterLabelImperial": "注水体积 (fl oz)",
+    "tempLabelImperial": "水温 (°F)"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

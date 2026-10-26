@@ -257,7 +257,10 @@
     "deleteRecipeConfirmMsg": "This action cannot be undone.",
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
-    "addStepHint": "Adds a new pour step to the brew recipe"
+    "addStepHint": "Adds a new pour step to the brew recipe",
+    "doseLabelImperial": "Doza surowca (oz)",
+    "waterLabelImperial": "Objętość wody (fl oz)",
+    "tempLabelImperial": "Temperatura wody (°F)"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

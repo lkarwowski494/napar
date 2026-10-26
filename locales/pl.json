@@ -250,7 +250,10 @@
     "fillRequired": "Wypełnij nazwę i dodaj przynajmniej jeden krok parzenia.",
     "duplicateBtn": "Duplikuj jako nową recepturę",
     "stepNumberPrefix": "Krok",
-    "addStepHint": "Dodaje nowy krok do receptury parzenia"
+    "addStepHint": "Dodaje nowy krok do receptury parzenia",
+    "doseLabelImperial": "Doza surowca (oz)",
+    "waterLabelImperial": "Objętość wody (fl oz)",
+    "tempLabelImperial": "Temperatura wody (°F)"
   },
   "stash": {
     "title": "Spiżarnia Ziaren & Herbat",

@@ -250,7 +250,10 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "stepNumberPrefix": "Βήμα",
-    "addStepHint": "Προσθέτει ένα νέο βήμα στη συνταγή εκχύλισης"
+    "addStepHint": "Προσθέτει ένα νέο βήμα στη συνταγή εκχύλισης",
+    "doseLabelImperial": "Δόση (oz)",
+    "waterLabelImperial": "Όγκος νερού (fl oz)",
+    "tempLabelImperial": "Θερμοκρασία νερού (°F)"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

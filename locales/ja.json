@@ -250,7 +250,10 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "stepNumberPrefix": "ステップ",
-    "addStepHint": "抽出レシピに新しいステップを追加します"
+    "addStepHint": "抽出レシピに新しいステップを追加します",
+    "doseLabelImperial": "粉量 (oz)",
+    "waterLabelImperial": "湯量 (fl oz)",
+    "tempLabelImperial": "湯温 (°F)"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

@@ -250,7 +250,10 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "stepNumberPrefix": "Vaihe",
-    "addStepHint": "Lisää uuden vaiheen uuttoreseptiin"
+    "addStepHint": "Lisää uuden vaiheen uuttoreseptiin",
+    "doseLabelImperial": "Kuiva-annos (oz)",
+    "waterLabelImperial": "Veden määrä (fl oz)",
+    "tempLabelImperial": "Veden lämpötila (°F)"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

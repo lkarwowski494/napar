@@ -250,7 +250,10 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "stepNumberPrefix": "Стъпка",
-    "addStepHint": "Добавя нова стъпка към рецептата за приготвяне"
+    "addStepHint": "Добавя нова стъпка към рецептата за приготвяне",
+    "doseLabelImperial": "Доза (oz)",
+    "waterLabelImperial": "Обем вода (fl oz)",
+    "tempLabelImperial": "Температура на водата (°F)"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

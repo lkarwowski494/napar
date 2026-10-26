@@ -250,7 +250,10 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "stepNumberPrefix": "שלב",
-    "addStepHint": "מוסיף שלב חדש למתכון החליטה"
+    "addStepHint": "מוסיף שלב חדש למתכון החליטה",
+    "doseLabelImperial": "מינון יבש (oz)",
+    "waterLabelImperial": "נפח מים (fl oz)",
+    "tempLabelImperial": "טמפרטורת מים (°F)"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

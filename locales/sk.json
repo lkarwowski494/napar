@@ -250,7 +250,10 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "stepNumberPrefix": "Krok",
-    "addStepHint": "Pridá nový krok do receptu prípravy"
+    "addStepHint": "Pridá nový krok do receptu prípravy",
+    "doseLabelImperial": "Dávka suroviny (oz)",
+    "waterLabelImperial": "Objem vody (fl oz)",
+    "tempLabelImperial": "Teplota vody (°F)"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

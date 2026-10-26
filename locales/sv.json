@@ -250,7 +250,10 @@
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
     "stepNumberPrefix": "Steg",
-    "addStepHint": "Lägger till ett nytt steg i bryggreceptet"
+    "addStepHint": "Lägger till ett nytt steg i bryggreceptet",
+    "doseLabelImperial": "Torr dos (oz)",
+    "waterLabelImperial": "Vattenvolym (fl oz)",
+    "tempLabelImperial": "Vattentemperatur (°F)"
   },
   "stash": {
     "title": "Coffee & Tea Stash",
