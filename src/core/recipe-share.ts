@@ -208,7 +208,13 @@ export function recipeToCompactPayload(
     if (cleanRatio.includes(':') || cleanRatio.includes('/') || /\b(?:do|to|na)\b/i.test(cleanRatio)) {
       const parts = cleanRatio.split(/[:/]|\b(?:do|to|na)\b/i).map((p: string) => parseFloat(p.trim())).filter(Number.isFinite);
       if (parts.length === 2 && parts[0] > 0 && parts[1] > 0) {
-        rawRatioNum = parts[1] / parts[0];
+        if (parts[0] === 1) {
+          rawRatioNum = parts[1];
+        } else if (parts[1] === 1) {
+          rawRatioNum = parts[0];
+        } else {
+          rawRatioNum = Math.max(parts[0], parts[1]) / Math.min(parts[0], parts[1]);
+        }
       }
     } else {
       rawRatioNum = parseFloat(cleanRatio);
@@ -381,7 +387,13 @@ export function decodeRecipeFromShareUrl(
           if (clean.includes(':') || clean.includes('/') || /\b(?:do|to|na)\b/i.test(clean)) {
             const parts = clean.split(/[:/]|\b(?:do|to|na)\b/i).map((p: string) => parseFloat(p.trim())).filter(Number.isFinite);
             if (parts.length === 2 && parts[0] > 0 && parts[1] > 0) {
-              rawDecodedRatio = parts[1] / parts[0];
+              if (parts[0] === 1) {
+                rawDecodedRatio = parts[1];
+              } else if (parts[1] === 1) {
+                rawDecodedRatio = parts[0];
+              } else {
+                rawDecodedRatio = Math.max(parts[0], parts[1]) / Math.min(parts[0], parts[1]);
+              }
             }
           } else {
             rawDecodedRatio = parseFloat(clean);

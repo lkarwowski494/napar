@@ -1334,4 +1334,62 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded).not.toBeNull();
     expect(decoded?.recipe.recommendedRatio).toBe(15.5);
   });
+
+  test('TASK-P52-11-WZR: recipeToCompactPayload i decodeRecipeFromShareUrl obsluguja odwrocone ratio (16:1, 15/1) i chronia przed dzieleniem przez zero (1:0, 0:0)', () => {
+    // 1. Inverted ratio 16.5:1 i 15/1 w recipeToCompactPayload
+    const recipeInverted: any = {
+      id: 'test-ratio-inv',
+      name: 'V60 Ratio Inverted',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 92,
+      recommendedRatio: '16.5:1',
+      stepsJson: '[]',
+    };
+    const compactInv = recipeToCompactPayload(recipeInverted);
+    expect(compactInv.r).toBe(16.5);
+
+    const recipeDivZero: any = {
+      id: 'test-ratio-zero',
+      name: 'V60 Ratio Zero',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 240, // 240 / 15 = 16.0
+      waterTempCelsius: 92,
+      recommendedRatio: '1:0',
+      stepsJson: '[]',
+    };
+    const compactZero = recipeToCompactPayload(recipeDivZero);
+    expect(compactZero.r).toBe(16);
+
+    // 2. decodeRecipeFromShareUrl z ratio '16:1' oraz '1:0'
+    const payloadInv = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Inverted Ratio Payload',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 240,
+      r: '16:1',
+      s: [],
+    }));
+    const decodedInv = decodeRecipeFromShareUrl(payloadInv);
+    expect(decodedInv?.recipe.recommendedRatio).toBe(16);
+
+    const payloadZero = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Zero Ratio Payload',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 240,
+      r: '1:0',
+      s: [],
+    }));
+    const decodedZero = decodeRecipeFromShareUrl(payloadZero);
+    expect(decodedZero?.recipe.recommendedRatio).toBe(16);
+  });
 });
