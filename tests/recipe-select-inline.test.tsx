@@ -174,4 +174,41 @@ describe('TASK-R07-01: Lean BPR P16 Inline Selection (De-Modalization)', () => {
     expect(customTab.props.accessibilityRole).toBe('tab');
     expect(customTab.props.accessibilityState).toEqual({ selected: false });
   });
+
+  test('TASK-P20-01-ODK: renderRecipeCard deklaruje accessibilityState={{ selected }} dla aktywnej i nieaktywnej receptury', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <RecipeSelectModal
+          inline={true}
+          visible={true}
+          onClose={() => {}}
+          recipes={MASTER_RECIPES}
+          activeRecipeId="v60-kasuya-4-6"
+          beveragePreference="both"
+          categoryFilter="ALL"
+          onCategoryFilterChange={() => {}}
+          onSelectRecipe={() => {}}
+          onToggleFavorite={() => {}}
+          onDuplicateRecipe={() => {}}
+          onEditRecipe={() => {}}
+          onAddCustomRecipe={() => {}}
+          onOpenGongfu={() => {}}
+          onOpenImport={() => {}}
+          onOpenQrScanner={() => {}}
+          unitSystem="metric"
+          t={{
+            brew: { chooseRecipe: 'Wybierz recepturę' },
+            common: { close: 'Zamknij' },
+          }}
+        />
+      );
+    });
+
+    const activeCard = tree.root.findByProps({ testID: 'recipe-option-v60-kasuya-4-6' });
+    expect(activeCard.props.accessibilityState).toEqual({ selected: true });
+
+    const otherCard = tree.root.findByProps({ testID: 'recipe-option-v60-hoffmann-single' });
+    expect(otherCard.props.accessibilityState).toEqual({ selected: false });
+  });
 });

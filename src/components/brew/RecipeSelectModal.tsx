@@ -100,6 +100,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
       key={r.id}
       testID={`recipe-option-${r.id}`}
       accessibilityRole="button"
+      accessibilityState={{ selected: activeRecipeId === r.id }}
       accessibilityLabel={`Wybierz przepis: ${r.name}`}
       style={[
         styles.recipeOptionItem,
