@@ -416,4 +416,16 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio-grubo pod batch brew i moccamaster' })).toBe(820);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-coarse grind for filter batch machine' })).toBe(820);
   });
+
+  test('TASK-P35-08-PRO: getRecipeMicrons rozpoznaje Trinity ONE, Gina oraz Kalita Wave Tsubame zwracajac 720 µm', () => {
+    expect(getRecipeMicrons({ method: 'TRINITY' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'TRINITY_ONE' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'Trinity ONE' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'GINA' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'Goat Story Gina' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'Kalita Wave Tsubame' })).toBe(720);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Drip w Trinity ONE' })).toBe(720);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Filter grind for Gina immersion drip' })).toBe(720);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod Kalita Tsubame (coarse)' })).toBe(850);
+  });
 });

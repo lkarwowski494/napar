@@ -464,7 +464,16 @@ export function getRecipeMicrons(recipe?: {
     desc.includes('kalita') ||
     method === 'SWITCH' ||
     method.includes('SWITCH') ||
-    desc.includes('switch')
+    desc.includes('switch') ||
+    method === 'TRINITY' ||
+    method === 'TRINITY_ONE' ||
+    method.includes('TRINITY') ||
+    desc.includes('trinity') ||
+    method === 'GINA' ||
+    method.includes('GINA') ||
+    desc.includes('gina') ||
+    method.includes('TSUBAME') ||
+    desc.includes('tsubame')
   ) {
     if (desc.includes('28') || desc.includes('30') || desc.includes('grubo') || desc.includes('coarse')) return 850;
     if (desc.includes('18') || desc.includes('20')) return 600;
