@@ -152,6 +152,28 @@ export const BOTTLED_WATER_BENCHMARKS: BottledWaterProfile[] = [
     verdictPl: 'Zbyt twarda do ekstrakcji specialty. Zabija kwasowość, powoduje kredowy posmak i niszczy czajnik.',
     verdictEn: 'Extremely hard mineral water. Mutes acidity, gives chalky taste and scales equipment.',
   },
+  {
+    id: 'spa_reine',
+    brandName: 'Spa Reine',
+    originCountry: 'Belgia',
+    tdsPpm: 33,
+    estimatedGhPpm: 18,
+    estimatedKhPpm: 15,
+    suitability: 'GOOD',
+    verdictPl: 'Bardzo miękka woda górska, idealna do herbat zielonych i jaskrawo kwasowych przelewów.',
+    verdictEn: 'Very soft mountain spring water, great for green tea and bright pour-overs.',
+  },
+  {
+    id: 'evian',
+    brandName: 'Evian',
+    originCountry: 'Francja',
+    tdsPpm: 345,
+    estimatedGhPpm: 220,
+    estimatedKhPpm: 260,
+    suitability: 'NOT_RECOMMENDED',
+    verdictPl: 'Zbyt wysoki bufor wodorowęglanowy gasi kwasowość i spłaszcza profil smakowy filtrów.',
+    verdictEn: 'Very high bicarbonate buffer dulls acidity and flattens filter flavor profiles.',
+  },
 ];
 
 /**
@@ -436,6 +458,10 @@ const BOTTLED_ALIASES: Record<string, string> = {
   muszyna: 'muszynianka',
   muszynianka: 'muszynianka',
   cechini: 'muszynianka',
+  spa: 'spa_reine',
+  spareine: 'spa_reine',
+  'spa-reine': 'spa_reine',
+  evian: 'evian',
 };
 
 export function findBottledWaterById(id: string): BottledWaterProfile | undefined {

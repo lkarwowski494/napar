@@ -537,5 +537,15 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(findBottledWaterById('muszyna')?.id).toBe('muszynianka');
     expect(findBottledWaterById('cechini')?.id).toBe('muszynianka');
   });
+
+  test('TASK-P47-07-JAK: findBottledWaterById wspiera benchmarki spa_reine oraz evian wraz z aliasami', () => {
+    expect(findBottledWaterById('spa_reine')?.brandName).toBe('Spa Reine');
+    expect(findBottledWaterById('spa')?.id).toBe('spa_reine');
+    expect(findBottledWaterById('spareine')?.id).toBe('spa_reine');
+    expect(findBottledWaterById('spa-reine')?.id).toBe('spa_reine');
+
+    expect(findBottledWaterById('evian')?.brandName).toBe('Evian');
+    expect(findBottledWaterById('Evian')?.id).toBe('evian');
+  });
 });
 
