@@ -24,6 +24,7 @@ describe('BeanItemCard Component', () => {
     flavorNotes: ['Jaśmin', 'Bergamotka', 'Biała brzoskwinia'],
     rating: 5,
     createdAt: '2026-10-16T10:00:00Z',
+    updatedAt: '2026-10-16T10:00:00Z',
   };
 
   const defaultProps = {
