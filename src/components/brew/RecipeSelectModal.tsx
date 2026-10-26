@@ -208,7 +208,20 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               placeholderTextColor={theme.colors.textMuted}
               value={searchQuery}
               onChangeText={setSearchQuery}
+              accessibilityLabel={t?.brew?.recipeSearchPlaceholder || 'Szukaj receptury, metody'}
             />
+            {searchQuery.length > 0 && (
+              <Pressable
+                testID="clear-recipe-search-btn"
+                onPress={() => setSearchQuery('')}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                accessibilityRole="button"
+                accessibilityLabel="Wyczyść wyszukiwanie"
+                style={styles.clearSearchBtn}
+              >
+                <Text style={styles.clearSearchText}>✕</Text>
+              </Pressable>
+            )}
           </View>
 
           {/* Filtr pierwszego rzędu: Klasyki i Ulubione / Wszystkie / Własne Presety (BPR Pillar 1) */}
@@ -642,6 +655,8 @@ const styles = StyleSheet.create({
   },
   searchBox: {
     marginBottom: 10,
+    position: 'relative',
+    justifyContent: 'center',
   },
   searchInput: {
     backgroundColor: theme.colors.bgCard,
@@ -649,9 +664,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     paddingHorizontal: 12,
+    paddingRight: 36,
     paddingVertical: 10,
     fontSize: 13,
     color: theme.colors.textPrimary,
+  },
+  clearSearchBtn: {
+    position: 'absolute',
+    right: 10,
+    minWidth: 24,
+    minHeight: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  clearSearchText: {
+    fontSize: 14,
+    color: theme.colors.textMuted,
+    fontWeight: '700',
   },
   subsetFilterRow: {
     flexDirection: 'row',
