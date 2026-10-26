@@ -197,9 +197,18 @@ export function calculateWaterMinerals(
   targetGh: number,
   targetKh: number
 ): WaterCalculationResult {
-  const rawVol = typeof waterVolumeLiters === 'boolean' ? NaN : (typeof waterVolumeLiters === 'string' ? parseFloat(waterVolumeLiters) : Number(waterVolumeLiters));
-  const rawGh = typeof targetGh === 'boolean' ? NaN : (typeof targetGh === 'string' ? parseFloat(targetGh) : Number(targetGh));
-  const rawKh = typeof targetKh === 'boolean' ? NaN : (typeof targetKh === 'string' ? parseFloat(targetKh) : Number(targetKh));
+  const rawVol =
+    waterVolumeLiters === null || waterVolumeLiters === undefined || typeof waterVolumeLiters === 'boolean'
+      ? NaN
+      : (typeof waterVolumeLiters === 'string' ? parseFloat(waterVolumeLiters) : Number(waterVolumeLiters));
+  const rawGh =
+    targetGh === null || targetGh === undefined || typeof targetGh === 'boolean'
+      ? NaN
+      : (typeof targetGh === 'string' ? parseFloat(targetGh) : Number(targetGh));
+  const rawKh =
+    targetKh === null || targetKh === undefined || typeof targetKh === 'boolean'
+      ? NaN
+      : (typeof targetKh === 'string' ? parseFloat(targetKh) : Number(targetKh));
   const vol = Number.isFinite(rawVol) && rawVol > 0 ? Math.max(0.1, Math.min(1000.0, rawVol)) : 1.0;
   let gh = Number.isFinite(rawGh) && rawGh >= 0 ? Math.max(0, Math.min(5000, rawGh)) : 0;
   let kh = Number.isFinite(rawKh) && rawKh >= 0 ? Math.max(0, Math.min(5000, rawKh)) : 0;
@@ -365,7 +374,7 @@ export function diagnoseWaterSensoryImpact(
  * Konwertuje twardość z ppm CaCO3 na stopnie niemieckie dH (1 dH = 17.848 ppm CaCO3)
  */
 export function ppmCaCO3ToDegreesDH(ppm: number): number {
-  if (typeof ppm === 'boolean') return 0;
+  if (ppm === null || ppm === undefined || typeof ppm === 'boolean') return 0;
   const numPpm = typeof ppm === 'string' ? parseFloat(ppm) : Number(ppm);
   if (!Number.isFinite(numPpm) || numPpm <= 0 || Object.is(numPpm, -0)) return 0;
   const safePpm = Math.min(10000, numPpm);
@@ -378,7 +387,7 @@ export function ppmCaCO3ToDegreesDH(ppm: number): number {
  * Konwertuje twardość ze stopni niemieckich dH na ppm CaCO3 (1 dH = 17.848 ppm CaCO3)
  */
 export function degreesDHToPpmCaCO3(dH: number): number {
-  if (typeof dH === 'boolean') return 0;
+  if (dH === null || dH === undefined || typeof dH === 'boolean') return 0;
   const numDH = typeof dH === 'string' ? parseFloat(dH) : Number(dH);
   if (!Number.isFinite(numDH) || numDH <= 0 || Object.is(numDH, -0)) return 0;
   const safeDH = Math.min(500, numDH);

@@ -401,4 +401,25 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(resUndefKh.problemPl).toContain('Nieprawidłowe dane wejściowe');
     expect(resUndefKh.causePl).toContain('nie mogą być puste');
   });
+
+  test('TASK-P37-07-JAK: calculateWaterMinerals, ppmCaCO3ToDegreesDH i degreesDHToPpmCaCO3 bezpiecznie odrzucają null i undefined', () => {
+    // ppmCaCO3ToDegreesDH & degreesDHToPpmCaCO3
+    expect(ppmCaCO3ToDegreesDH(null as any)).toBe(0);
+    expect(ppmCaCO3ToDegreesDH(undefined as any)).toBe(0);
+    expect(degreesDHToPpmCaCO3(null as any)).toBe(0);
+    expect(degreesDHToPpmCaCO3(undefined as any)).toBe(0);
+
+    // calculateWaterMinerals
+    const resFromNulls = calculateWaterMinerals(null as any, null as any, null as any);
+    expect(resFromNulls.waterVolumeLiters).toBe(1.0);
+    expect(resFromNulls.targetGhPpm).toBe(0);
+    expect(resFromNulls.targetKhPpm).toBe(0);
+    expect(resFromNulls.concentrateBufferGrams).toBe(0);
+    expect(resFromNulls.concentrateHardnessGrams).toBe(0);
+
+    const resFromUndef = calculateWaterMinerals(undefined as any, undefined as any, undefined as any);
+    expect(resFromUndef.waterVolumeLiters).toBe(1.0);
+    expect(resFromUndef.targetGhPpm).toBe(0);
+    expect(resFromUndef.targetKhPpm).toBe(0);
+  });
 });
