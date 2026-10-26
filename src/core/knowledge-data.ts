@@ -628,16 +628,16 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
   if (!query || typeof query !== 'string' || !query.trim()) return TEA_CATEGORIES;
   const q = query.toLowerCase().trim();
   return TEA_CATEGORIES.filter((t) =>
-    t.namePl.toLowerCase().includes(q) ||
-    t.nameEn.toLowerCase().includes(q) ||
-    t.traditionalName.toLowerCase().includes(q) ||
+    (t.namePl && t.namePl.toLowerCase().includes(q)) ||
+    (t.nameEn && t.nameEn.toLowerCase().includes(q)) ||
+    (t.traditionalName && t.traditionalName.toLowerCase().includes(q)) ||
     (t.oxidationRangePercent && t.oxidationRangePercent.toLowerCase().includes(q)) ||
     (t.killGreenMethod && t.killGreenMethod.toLowerCase().includes(q)) ||
-    t.famousVarietiesPl.some((v) => v.toLowerCase().includes(q)) ||
-    (t.famousVarietiesEn && t.famousVarietiesEn.some((v) => v.toLowerCase().includes(q))) ||
-    t.famousRegions.some((r) => r.toLowerCase().includes(q)) ||
-    t.sensoryProfilePl.toLowerCase().includes(q) ||
-    t.sensoryProfileEn.toLowerCase().includes(q) ||
+    (Array.isArray(t.famousVarietiesPl) && t.famousVarietiesPl.some((v) => typeof v === 'string' && v.toLowerCase().includes(q))) ||
+    (Array.isArray(t.famousVarietiesEn) && t.famousVarietiesEn.some((v) => typeof v === 'string' && v.toLowerCase().includes(q))) ||
+    (Array.isArray(t.famousRegions) && t.famousRegions.some((r) => typeof r === 'string' && r.toLowerCase().includes(q))) ||
+    (t.sensoryProfilePl && t.sensoryProfilePl.toLowerCase().includes(q)) ||
+    (t.sensoryProfileEn && t.sensoryProfileEn.toLowerCase().includes(q)) ||
     (t.healthAttributesPl && t.healthAttributesPl.toLowerCase().includes(q)) ||
     (t.descriptionPl && t.descriptionPl.toLowerCase().includes(q)) ||
     (t.descriptionEn && t.descriptionEn.toLowerCase().includes(q))

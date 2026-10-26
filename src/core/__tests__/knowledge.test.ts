@@ -413,4 +413,17 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findTeaCategoryById({} as any)).toBeUndefined();
     expect(findTeaCategoryById('   ')).toBeUndefined();
   });
+
+  test('TASK-P23-06-TRE: searchTeaCategories defensywnie przeszukuje odmiany i regiony oraz toleruje spacje', () => {
+    const res = searchTeaCategories('   Uji   ');
+    expect(res.length).toBeGreaterThanOrEqual(1);
+    expect(res.some((t) => t.id === 'tea-green')).toBe(true);
+
+    const varietyRes = searchTeaCategories('Longjing');
+    expect(varietyRes.length).toBeGreaterThanOrEqual(1);
+    expect(varietyRes.some((t) => t.id === 'tea-green')).toBe(true);
+
+    const emptyRes = searchTeaCategories(null as any);
+    expect(emptyRes).toHaveLength(TEA_CATEGORIES.length);
+  });
 });
