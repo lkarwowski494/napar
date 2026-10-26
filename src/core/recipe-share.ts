@@ -230,9 +230,9 @@ export function decodeRecipeFromShareUrl(
   const trimmed = urlOrRawData.trim();
   let base64Data = trimmed;
 
-  if (trimmed.includes('d=')) {
+  if (trimmed.includes('d=') || trimmed.includes('data=')) {
     try {
-      const match = trimmed.match(/[?&]d=([^&#]+)/);
+      const match = trimmed.match(/[?&#](?:d|data)=([^&#]+)/);
       if (match && match[1]) {
         base64Data = decodeURIComponent(match[1]);
       }

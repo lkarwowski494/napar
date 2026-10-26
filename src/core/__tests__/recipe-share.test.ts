@@ -375,4 +375,28 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(base64ToUtf8(null as any)).toBe('');
     expect(base64ToUtf8(undefined as any)).toBe('');
   });
+
+  test('TASK-P14-11-WZR: decodeRecipeFromShareUrl parsuje URL z fragmentem #d= oraz parametrem ?data=', () => {
+    const rawPayload = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Hash Fragment Recipe',
+      b: 'COFFEE',
+      m: 'Aeropress',
+      d: 14,
+      w: 200,
+      s: [{ n: 'Press', d: 60, w: 200 }],
+    }));
+
+    // URL z fragmentem hasha #d=
+    const hashUrl = `napar://recipe#d=${encodeURIComponent(rawPayload)}`;
+    const decodedFromHash = decodeRecipeFromShareUrl(hashUrl);
+    expect(decodedFromHash).not.toBeNull();
+    expect(decodedFromHash?.recipe.name).toBe('Hash Fragment Recipe');
+
+    // URL z parametrem ?data=
+    const dataParamUrl = `https://napar.app/recipe?data=${encodeURIComponent(rawPayload)}`;
+    const decodedFromData = decodeRecipeFromShareUrl(dataParamUrl);
+    expect(decodedFromData).not.toBeNull();
+    expect(decodedFromData?.recipe.name).toBe('Hash Fragment Recipe');
+  });
 });
