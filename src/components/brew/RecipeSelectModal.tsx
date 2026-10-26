@@ -54,8 +54,6 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
   t,
   inline = false,
 }) => {
-  if (!inline && !visible) return null;
-
   const [searchQuery, setSearchQuery] = useState('');
   const [subsetFilter, setSubsetFilter] = useState<'ALL' | 'FAVORITES' | 'CUSTOM'>('ALL');
   const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
@@ -66,6 +64,8 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
       [catKey]: !prev[catKey],
     }));
   };
+
+  if (!inline && !visible) return null;
 
   const displayedRecipes = recipes.filter((r) => {
     const itemType = 'beverageType' in r ? r.beverageType : r.type;
