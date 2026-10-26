@@ -505,5 +505,28 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(schedule.some((act) => act.inventoryItemId === 'coffee-empty')).toBe(false);
       expect(schedule[0].id).toBe('action-default-calibration');
     });
+
+    it('TASK-P49-03-ZAK: buildProactiveActionSchedule case-insensitively obsluguje type coffee i tea (np. COFFEE, TEA, Tea)', () => {
+      const mixedTypeInventory: any[] = [
+        {
+          id: 'coffee-upper',
+          name: 'Kenya Nyeri Peaberry',
+          type: 'COFFEE',
+          roastOrHarvestDate: '2026-10-15',
+          remainingWeightGrams: 200,
+          isArchived: false,
+        },
+        {
+          id: 'tea-mixed',
+          name: 'Gyokuro Uji',
+          type: 'Tea',
+          remainingWeightGrams: 50,
+          isArchived: false,
+        },
+      ];
+      const schedule = buildProactiveActionSchedule('2026-10-26T08:00:00.000Z', mixedTypeInventory as any, []);
+      expect(schedule.some((act) => act.inventoryItemId === 'coffee-upper')).toBe(true);
+      expect(schedule.some((act) => act.inventoryItemId === 'tea-mixed')).toBe(true);
+    });
   });
 });

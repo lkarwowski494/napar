@@ -192,7 +192,8 @@ export function buildProactiveActionSchedule(
       continue;
     }
 
-    if (item.type === 'coffee') {
+    const itemType = typeof item.type === 'string' ? item.type.trim().toLowerCase() : '';
+    if (itemType === 'coffee') {
       const roastDate =
         typeof item.roastOrHarvestDate === 'string' && item.roastOrHarvestDate.trim()
           ? new Date(item.roastOrHarvestDate.trim())
@@ -296,7 +297,7 @@ export function buildProactiveActionSchedule(
           waterTempCelsius: 93,
         });
       }
-    } else if (item.type === 'tea') {
+    } else if (itemType === 'tea') {
       // Herbata liściasta w spiżarni — sesja degustacyjna
       const offset = actions.length === 0 ? 0 : 2;
       const targetDate = addDays(refDayStart, offset);
