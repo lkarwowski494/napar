@@ -403,10 +403,15 @@ export function findWaterRecipeById(id: string): WaterRecipe | undefined {
   if (typeof id !== 'string') return undefined;
   const cleanId = id.trim().toLowerCase();
   if (!cleanId) return undefined;
+  const underscoreId = cleanId.replace(/-/g, '_');
+  const hyphenId = cleanId.replace(/_/g, '-');
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   return WATER_RECIPES.find((r) => {
     if (!r || typeof r !== 'object') return false;
-    if (typeof r.id === 'string' && r.id.toLowerCase() === cleanId) return true;
+    if (typeof r.id === 'string') {
+      const rIdLower = r.id.toLowerCase();
+      if (rIdLower === cleanId || rIdLower === underscoreId || rIdLower === hyphenId) return true;
+    }
     if (typeof r.namePl === 'string') {
       const plClean = r.namePl.toLowerCase();
       const plNorm = r.namePl.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -425,10 +430,15 @@ export function findBottledWaterById(id: string): BottledWaterProfile | undefine
   if (typeof id !== 'string') return undefined;
   const cleanId = id.trim().toLowerCase();
   if (!cleanId) return undefined;
+  const underscoreId = cleanId.replace(/-/g, '_');
+  const hyphenId = cleanId.replace(/_/g, '-');
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   return BOTTLED_WATER_BENCHMARKS.find((w) => {
     if (!w || typeof w !== 'object') return false;
-    if (typeof w.id === 'string' && w.id.toLowerCase() === cleanId) return true;
+    if (typeof w.id === 'string') {
+      const wIdLower = w.id.toLowerCase();
+      if (wIdLower === cleanId || wIdLower === underscoreId || wIdLower === hyphenId) return true;
+    }
     if (typeof w.brandName === 'string') {
       const brandClean = w.brandName.toLowerCase();
       const brandNorm = w.brandName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();

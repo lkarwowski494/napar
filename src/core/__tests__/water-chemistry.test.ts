@@ -498,5 +498,16 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(getWaterProfileName({} as any)).toBe('');
     expect(getWaterProfileName([] as any)).toBe('');
   });
+
+  test('TASK-P44-07-JAK: findWaterRecipeById oraz findBottledWaterById normalizuja myslniki i podkreslenia (kebab-case vs snake_case)', () => {
+    expect(findWaterRecipeById('sca-standard')?.id).toBe('sca_standard');
+    expect(findWaterRecipeById('melbourne-soft')?.id).toBe('melbourne_soft');
+    expect(findWaterRecipeById('barista-hustle-80-40')?.id).toBe('barista_hustle_80_40');
+    expect(findWaterRecipeById('scott-rao-wonder')?.id).toBe('scott_rao_wonder');
+    expect(findWaterRecipeById('tea-delicate')?.id).toBe('tea_delicate');
+    expect(findWaterRecipeById('tea-gongfu-rock-puerh')?.id).toBe('tea_gongfu_rock_puerh');
+    expect(findBottledWaterById('zywiecki-krysztal')?.id).toBe('zywiecki_krysztal');
+    expect(findBottledWaterById('zywiec-zdroj')?.id).toBe('zywiec_zdroj');
+  });
 });
 
