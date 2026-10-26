@@ -85,8 +85,13 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
             value={unitSystem === 'imperial' ? gramsToOunces(doseNum) : doseNum}
             stored={doseNum}
             onChangeNumber={(n) => {
-              const safe = Number.isFinite(n) && n >= 0 ? Math.min(1000, n) : 0;
-              onChangeDose(safe.toString());
+              const rawInput: any = n;
+              const parsed = typeof rawInput === 'number'
+                ? rawInput
+                : (typeof rawInput === 'string' ? parseFloat(rawInput.replace(',', '.')) : 0);
+              const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.min(1000, parsed) : 0;
+              const finalVal = Object.is(safe, -0) ? 0 : safe;
+              onChangeDose(finalVal.toString());
             }}
             unit={unitSystem === 'imperial' ? 'oz' : 'g'}
           />
@@ -97,8 +102,13 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
             value={unitSystem === 'imperial' ? mlToFluidOunces(waterNum) : waterNum}
             stored={waterNum}
             onChangeNumber={(n) => {
-              const safe = Number.isFinite(n) && n >= 0 ? Math.min(50000, n) : 0;
-              onChangeWater(safe.toString());
+              const rawInput: any = n;
+              const parsed = typeof rawInput === 'number'
+                ? rawInput
+                : (typeof rawInput === 'string' ? parseFloat(rawInput.replace(',', '.')) : 0);
+              const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.min(50000, parsed) : 0;
+              const finalVal = Object.is(safe, -0) ? 0 : safe;
+              onChangeWater(finalVal.toString());
             }}
             unit={unitSystem === 'imperial' ? 'fl oz' : 'g'}
           />
@@ -113,8 +123,13 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
             }
             stored={tempNum}
             onChangeNumber={(n) => {
-              const safe = Number.isFinite(n) && n >= 0 ? Math.min(100, Math.max(0, n)) : 0;
-              onChangeWaterTemp(safe.toString());
+              const rawInput: any = n;
+              const parsed = typeof rawInput === 'number'
+                ? rawInput
+                : (typeof rawInput === 'string' ? parseFloat(rawInput.replace(',', '.')) : 0);
+              const safe = Number.isFinite(parsed) && parsed >= 0 ? Math.min(100, Math.max(0, parsed)) : 0;
+              const finalVal = Object.is(safe, -0) ? 0 : safe;
+              onChangeWaterTemp(finalVal.toString());
             }}
             unit={unitSystem === 'imperial' ? '°F' : '°C'}
           />
@@ -137,7 +152,7 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
       <View
         style={styles.unitPreviewBadge}
         accessibilityRole="text"
-        accessibilityLabel={`Podsumowanie jednostek: ${formatDoseWeight(doseNum, unitSystem)}, ${formatWaterWeight(waterNum, unitSystem)}, ${formatTemperature(tempNum, unitSystem)}`}
+        accessibilityLabel={`${isEn ? 'Unit summary' : 'Podsumowanie jednostek'}: ${formatDoseWeight(doseNum, unitSystem)}, ${formatWaterWeight(waterNum, unitSystem)}, ${formatTemperature(tempNum, unitSystem)}`}
         testID="recipe-unit-preview-badge"
       >
         <Text style={styles.unitPreviewBadgeText}>

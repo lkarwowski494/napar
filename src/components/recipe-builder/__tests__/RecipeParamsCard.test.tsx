@@ -1,6 +1,7 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { RecipeParamsCard } from '../RecipeParamsCard';
+import { NumInput } from '../../ui';
 import { translations } from '../../../core/i18n';
 
 describe('RecipeParamsCard Component (TASK-P31-04-STU)', () => {
@@ -108,5 +109,58 @@ describe('RecipeParamsCard Component (TASK-P31-04-STU)', () => {
     const badgeNegZero = treeNegZero.root.findByProps({ testID: 'recipe-ratio-badge' });
     expect(badgeNegZero.props.accessibilityLabel).toContain('1 do 16.7');
     expect(JSON.stringify(treeNegZero.toJSON())).not.toContain('-0');
+  });
+
+  test('TASK-P53-04-STU: onChangeNumber w NumInput chroni przed -0, ujemnymi liczbami i stringami z przecinkiem, a podglad a11y jest zlokalizowany w EN', () => {
+    const onChangeDose = jest.fn();
+    const onChangeWater = jest.fn();
+    const onChangeWaterTemp = jest.fn();
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <RecipeParamsCard
+          {...defaultProps}
+          onChangeDose={onChangeDose}
+          onChangeWater={onChangeWater}
+          onChangeWaterTemp={onChangeWaterTemp}
+          t={translations.en}
+        />
+      );
+    });
+
+    const root = tree.root;
+
+    // NumInput dla dozy
+    const numInputs = root.findAllByType(NumInput);
+    expect(numInputs.length).toBe(3);
+
+    // Symulacja podania -0 lub stringa z przecinkiem do dozy
+    act(() => {
+      numInputs[0].props.onChangeNumber(-0);
+    });
+    expect(onChangeDose).toHaveBeenCalledWith('0');
+
+    act(() => {
+      numInputs[0].props.onChangeNumber('18,5' as any);
+    });
+    expect(onChangeDose).toHaveBeenCalledWith('18.5');
+
+    // Symulacja podania ujemnej wody
+    act(() => {
+      numInputs[1].props.onChangeNumber(-50);
+    });
+    expect(onChangeWater).toHaveBeenCalledWith('0');
+
+    // Symulacja podania stringa z przecinkiem do temperatury
+    act(() => {
+      numInputs[2].props.onChangeNumber('94,5' as any);
+    });
+    expect(onChangeWaterTemp).toHaveBeenCalledWith('94.5');
+
+    // Lokalizacja a11y podglądu jednostek w trybie EN
+    const unitBadge = root.findByProps({ testID: 'recipe-unit-preview-badge' });
+    expect(unitBadge.props.accessibilityLabel).toContain('Unit summary:');
+    expect(unitBadge.props.accessibilityLabel).not.toContain('Podsumowanie jednostek');
   });
 });
