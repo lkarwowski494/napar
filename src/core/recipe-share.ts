@@ -303,8 +303,8 @@ export function decodeRecipeFromShareUrl(
       name: parsed.n,
       beverageType: parsed.b === 'TEA' ? 'TEA' : 'COFFEE',
       method: parsed.m,
-      author: parsed.a || defaultAuthor,
-      description: parsed.desc || defaultDesc,
+      author: typeof parsed.a === 'string' && parsed.a.trim() ? parsed.a.trim().slice(0, 100) : defaultAuthor,
+      description: typeof parsed.desc === 'string' && parsed.desc.trim() ? parsed.desc.trim().slice(0, 1000) : defaultDesc,
       doseGrams: Number(parsed.d.toFixed(1)),
       waterGrams: Number(parsed.w.toFixed(1)),
       waterTempCelsius: (() => {
