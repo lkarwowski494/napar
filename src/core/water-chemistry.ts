@@ -158,8 +158,14 @@ export const BOTTLED_WATER_BENCHMARKS: BottledWaterProfile[] = [
  * Zwraca zlokalizowaną nazwę profilu wody. Nieznane id (np. z importu JSON) zwracane jest bez zmian.
  */
 export function getWaterProfileName(id: string, language: 'pl' | 'en' | string): string {
-  const recipe = WATER_RECIPES.find((r) => r.id === id);
-  if (!recipe) return id;
+  if (!id || typeof id !== 'string') return '';
+  const cleanId = id.trim();
+  const recipe = WATER_RECIPES.find((r) => r.id === cleanId);
+  if (!recipe) {
+    const bottled = BOTTLED_WATER_BENCHMARKS.find((b) => b.id === cleanId);
+    if (bottled) return bottled.brandName;
+    return cleanId;
+  }
   return language === 'pl' ? recipe.namePl : recipe.nameEn;
 }
 

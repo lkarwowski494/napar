@@ -157,4 +157,16 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(findBottledWaterById('volvic')?.id).toBe('volvic');
     expect(findBottledWaterById('non-existent')).toBeUndefined();
   });
+
+  test('TASK-P13-08-PRO: getWaterProfileName wspiera wody butelkowane, receptury specialty i bezpiecznie obsługuje pusty/nullish id', () => {
+    expect(getWaterProfileName('sca_standard', 'pl')).toBe('Standard SCA (Specialty Coffee)');
+    expect(getWaterProfileName('sca_standard', 'en')).toBe('SCA Standard Water');
+
+    expect(getWaterProfileName('volvic', 'pl')).toBe('Volvic');
+    expect(getWaterProfileName('zywiec_zdroj', 'pl')).toContain('Żywiec Zdrój');
+
+    expect(getWaterProfileName('', 'pl')).toBe('');
+    expect(getWaterProfileName(null as any, 'pl')).toBe('');
+    expect(getWaterProfileName(undefined as any, 'pl')).toBe('');
+  });
 });
