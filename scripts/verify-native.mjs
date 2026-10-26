@@ -69,6 +69,16 @@ try {
     `app.json -> expo.scheme musi być równe 'napar' (otrzymano '${appJson.scheme}')`
   );
 
+  // Niezmienność slug projektu oraz pełnoekranowy tryb iOS (TASK-P11-10-WYD)
+  check(
+    appJson.slug === 'napar',
+    `app.json -> expo.slug musi być równe 'napar' (otrzymano '${appJson.slug}')`
+  );
+  check(
+    appJson.ios?.requireFullScreen === true,
+    'app.json -> expo.ios.requireFullScreen musi być równe true'
+  );
+
   // Weryfikacja braku uprawnień mikrofonowych w pluginie expo-camera (Zero Audio / Privacy)
   const cameraPlugin = appJson.plugins?.find(
     (p) => Array.isArray(p) && p[0] === 'expo-camera'
