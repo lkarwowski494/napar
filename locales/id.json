@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Pilih dari Dapur",
     "unassignedInventory": "Belum Ditetapkan (Umum)",
     "clearSearch": "Hapus pencarian",
-    "noSearchResults": "Hasil pencarian tidak ditemukan"
+    "noSearchResults": "Hasil pencarian tidak ditemukan",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

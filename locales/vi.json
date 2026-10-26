@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Chọn từ kho",
     "unassignedInventory": "Chưa chỉ định (Chung)",
     "clearSearch": "Xóa tìm kiếm",
-    "noSearchResults": "Không tìm thấy kết quả"
+    "noSearchResults": "Không tìm thấy kết quả",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

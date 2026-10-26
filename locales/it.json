@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Seleziona dalla dispensa",
     "unassignedInventory": "Non assegnato (Generale)",
     "clearSearch": "Cancella ricerca",
-    "noSearchResults": "Nessun risultato trovato"
+    "noSearchResults": "Nessun risultato trovato",
+    "subsetAll": "Tutti",
+    "subsetFavorites": "Classici e preferiti"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

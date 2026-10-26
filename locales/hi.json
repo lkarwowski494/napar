@@ -154,7 +154,9 @@
     "selectInventoryTitle": "पैंट्री से चुनें",
     "unassignedInventory": "अनअसाइन किया गया (सामान्य)",
     "clearSearch": "खोज साफ़ करें",
-    "noSearchResults": "कोई खोज परिणाम नहीं मिला"
+    "noSearchResults": "कोई खोज परिणाम नहीं मिला",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

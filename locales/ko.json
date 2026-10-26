@@ -154,7 +154,9 @@
     "selectInventoryTitle": "팬트리에서 선택",
     "unassignedInventory": "미할당 (일반)",
     "clearSearch": "검색 지우기",
-    "noSearchResults": "검색 결과가 없습니다"
+    "noSearchResults": "검색 결과가 없습니다",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

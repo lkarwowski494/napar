@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Επιλογή από το ντουλάπι",
     "unassignedInventory": "Χωρίς ανάθεση (Γενικό)",
     "clearSearch": "Εκκαθάριση αναζήτησης",
-    "noSearchResults": "Δεν βρέθηκαν αποτελέσματα"
+    "noSearchResults": "Δεν βρέθηκαν αποτελέσματα",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Selectați din cămară",
     "unassignedInventory": "Neatribuit (General)",
     "clearSearch": "Ștergeți căutarea",
-    "noSearchResults": "Nu s-au găsit rezultate"
+    "noSearchResults": "Nu s-au găsit rezultate",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

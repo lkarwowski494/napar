@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Selecciona del rebost",
     "unassignedInventory": "Sense assignar (General)",
     "clearSearch": "Neteja la cerca",
-    "noSearchResults": "No s'han trobat resultats"
+    "noSearchResults": "No s'han trobat resultats",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

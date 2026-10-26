@@ -154,7 +154,9 @@
     "selectInventoryTitle": "اختر من الخزانة",
     "unassignedInventory": "غير مخصص (عام)",
     "clearSearch": "مسح البحث",
-    "noSearchResults": "لم يتم العثور على نتائج"
+    "noSearchResults": "لم يتم العثور على نتائج",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

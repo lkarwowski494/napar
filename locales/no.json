@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Velg fra spiskammerset",
     "unassignedInventory": "Ikke tilordnet (Generelt)",
     "clearSearch": "Tøm søk",
-    "noSearchResults": "Ingen søkeresultater funnet"
+    "noSearchResults": "Ingen søkeresultater funnet",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

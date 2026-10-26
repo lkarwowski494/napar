@@ -154,7 +154,9 @@
     "selectInventoryTitle": "בחר מהמזווה",
     "unassignedInventory": "לא הוקצה (כללי)",
     "clearSearch": "נקה חיפוש",
-    "noSearchResults": "לא נמצאו תוצאות חיפוש"
+    "noSearchResults": "לא נמצאו תוצאות חיפוש",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Sélectionner dans le garde-manger",
     "unassignedInventory": "Non attribué (Général)",
     "clearSearch": "Effacer la recherche",
-    "noSearchResults": "Aucun résultat trouvé"
+    "noSearchResults": "Aucun résultat trouvé",
+    "subsetAll": "Tous",
+    "subsetFavorites": "Classiques et favoris"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

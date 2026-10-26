@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Vælg fra spisekammeret",
     "unassignedInventory": "Ikke tildelt (Generelt)",
     "clearSearch": "Ryd søgning",
-    "noSearchResults": "Ingen søgeresultater fundet"
+    "noSearchResults": "Ingen søgeresultater fundet",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

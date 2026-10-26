@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Vybrat ze spíže",
     "unassignedInventory": "Nepřiřazeno (Obecné)",
     "clearSearch": "Vymazat hledání",
-    "noSearchResults": "Nebyly nalezeny žádné výsledky"
+    "noSearchResults": "Nebyly nalezeny žádné výsledky",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

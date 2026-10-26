@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Selecionar da despensa",
     "unassignedInventory": "Não atribuído (Geral)",
     "clearSearch": "Limpar busca",
-    "noSearchResults": "Nenhum resultado encontrado"
+    "noSearchResults": "Nenhum resultado encontrado",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

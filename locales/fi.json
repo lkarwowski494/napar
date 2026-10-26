@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Valitse ruokakomerosta",
     "unassignedInventory": "Määrittämätön (Yleinen)",
     "clearSearch": "Tyhjennä haku",
-    "noSearchResults": "Hakutuloksia ei löytynyt"
+    "noSearchResults": "Hakutuloksia ei löytynyt",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

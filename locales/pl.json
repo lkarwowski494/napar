@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Wybierz ze Spiżarni",
     "unassignedInventory": "Brak przypisania (ogólne)",
     "clearSearch": "Wyczyść wyszukiwanie",
-    "noSearchResults": "Brak wyników wyszukiwania"
+    "noSearchResults": "Brak wyników wyszukiwania",
+    "subsetAll": "Wszystkie",
+    "subsetFavorites": "Klasyki / Ulubione"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Kilerden Seç",
     "unassignedInventory": "Atanmamış (Genel)",
     "clearSearch": "Aramayı temizle",
-    "noSearchResults": "Arama sonucu bulunamadı"
+    "noSearchResults": "Arama sonucu bulunamadı",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

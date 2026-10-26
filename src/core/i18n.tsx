@@ -179,6 +179,8 @@ export const translations = {
       saveToJournalBtn: 'Zapisz w Dzienniku',
       clearSearch: 'Wyczyść wyszukiwanie',
       noSearchResults: 'Brak wyników wyszukiwania',
+      subsetAll: 'Wszystkie',
+      subsetFavorites: 'Klasyki / Ulubione',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha',
@@ -752,6 +754,8 @@ export const translations = {
       saveToJournalBtn: 'Save to Journal',
       clearSearch: 'Clear search',
       noSearchResults: 'No search results found',
+      subsetAll: 'All',
+      subsetFavorites: 'Classics & Favorites',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha',

@@ -154,7 +154,9 @@
     "selectInventoryTitle": "เลือกจากคลัง",
     "unassignedInventory": "ยังไม่ได้กำหนด (ทั่วไป)",
     "clearSearch": "ล้างการค้นหา",
-    "noSearchResults": "ไม่พบผลการค้นหา"
+    "noSearchResults": "ไม่พบผลการค้นหา",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Selecteer uit voorraad",
     "unassignedInventory": "Niet toegewezen (Algemeen)",
     "clearSearch": "Zoekopdracht wissen",
-    "noSearchResults": "Geen zoekresultaten gevonden"
+    "noSearchResults": "Geen zoekresultaten gevonden",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

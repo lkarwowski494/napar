@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Välj från skafferiet",
     "unassignedInventory": "Otilldelad (Allmänt)",
     "clearSearch": "Rensa sökning",
-    "noSearchResults": "Inga sökresultat hittades"
+    "noSearchResults": "Inga sökresultat hittades",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

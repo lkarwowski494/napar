@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Избор от килера",
     "unassignedInventory": "Неразпределено (Общо)",
     "clearSearch": "Изчистване на търсенето",
-    "noSearchResults": "Няма намерени резултати"
+    "noSearchResults": "Няма намерени резултати",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

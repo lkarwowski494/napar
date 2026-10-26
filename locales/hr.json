@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Odaberi iz smočnice",
     "unassignedInventory": "Nedodijeljeno (Općenito)",
     "clearSearch": "Očisti pretraživanje",
-    "noSearchResults": "Nema rezultata pretraživanja"
+    "noSearchResults": "Nema rezultata pretraživanja",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

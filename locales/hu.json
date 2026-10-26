@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Választás a kamrából",
     "unassignedInventory": "Nem rendelt (Általános)",
     "clearSearch": "Keresés törlése",
-    "noSearchResults": "Nincs találat"
+    "noSearchResults": "Nincs találat",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

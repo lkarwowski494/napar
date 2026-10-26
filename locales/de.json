@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Aus Vorratskammer wählen",
     "unassignedInventory": "Nicht zugewiesen (Allgemein)",
     "clearSearch": "Suche löschen",
-    "noSearchResults": "Keine Suchergebnisse gefunden"
+    "noSearchResults": "Keine Suchergebnisse gefunden",
+    "subsetAll": "Alle",
+    "subsetFavorites": "Klassiker & Favoriten"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

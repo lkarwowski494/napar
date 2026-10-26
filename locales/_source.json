@@ -161,7 +161,9 @@
     "selectInventoryTitle": "Select from Pantry",
     "unassignedInventory": "Unassigned (General)",
     "clearSearch": "Clear search",
-    "noSearchResults": "No search results found"
+    "noSearchResults": "No search results found",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

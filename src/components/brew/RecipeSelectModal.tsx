@@ -235,7 +235,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               onPress={() => setSubsetFilter('ALL')}
               accessibilityRole="tab"
               accessibilityState={{ selected: subsetFilter === 'ALL' }}
-              accessibilityLabel="Wszystkie presety i klasyki"
+              accessibilityLabel={t?.brew?.subsetAll || 'Wszystkie presety i klasyki'}
             >
               <Text
                 style={[
@@ -243,7 +243,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                   subsetFilter === 'ALL' && styles.subsetChipTextActive,
                 ]}
               >
-                Wszystkie
+                {t?.brew?.subsetAll || 'Wszystkie'}
               </Text>
             </Pressable>
             <Pressable
@@ -255,7 +255,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               onPress={() => setSubsetFilter('FAVORITES')}
               accessibilityRole="tab"
               accessibilityState={{ selected: subsetFilter === 'FAVORITES' }}
-              accessibilityLabel="Klasyki i Ulubione"
+              accessibilityLabel={t?.brew?.subsetFavorites || 'Klasyki i Ulubione'}
             >
               <Text
                 style={[
@@ -263,7 +263,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                   subsetFilter === 'FAVORITES' && styles.subsetChipTextActive,
                 ]}
               >
-                Klasyki / Ulubione
+                {t?.brew?.subsetFavorites || 'Klasyki / Ulubione'}
               </Text>
             </Pressable>
             <Pressable

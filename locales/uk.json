@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Вибрати з комори",
     "unassignedInventory": "Не призначено (Загальне)",
     "clearSearch": "Очистити пошук",
-    "noSearchResults": "Результатів пошуку не знайдено"
+    "noSearchResults": "Результатів пошуку не знайдено",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

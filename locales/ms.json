@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Pilih dari Pantri",
     "unassignedInventory": "Tidak Ditugaskan (Umum)",
     "clearSearch": "Kosongkan carian",
-    "noSearchResults": "Tiada hasil carian dijumpai"
+    "noSearchResults": "Tiada hasil carian dijumpai",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -154,7 +154,9 @@
     "selectInventoryTitle": "Выбрать из кладовой",
     "unassignedInventory": "Не назначено (Общее)",
     "clearSearch": "Очистить поиск",
-    "noSearchResults": "Результаты поиска не найдены"
+    "noSearchResults": "Результаты поиска не найдены",
+    "subsetAll": "All",
+    "subsetFavorites": "Classics & Favorites"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
