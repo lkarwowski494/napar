@@ -420,4 +420,15 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(res.subscriptionTier).toBe('annual');
     expect(res.isSubscribed).toBe(true);
   });
+
+  test('TASK-P18-02-MON: verifyAndActivateStoreKitPurchase odrzuca brakujące lub puste purchaseDate', () => {
+    const res = verifyAndActivateStoreKitPurchase({
+      productId: STORE_PRODUCT_IDS.annual,
+      transactionId: 'tx-123',
+      signature: 'sig-123',
+      purchaseDate: '   ',
+    });
+    expect(res.success).toBe(false);
+    expect(res.errorCode).toBe('invalid_signature');
+  });
 });

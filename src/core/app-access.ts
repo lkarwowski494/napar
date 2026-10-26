@@ -224,7 +224,9 @@ export function verifyAndActivateStoreKitPurchase(
     typeof receipt.transactionId !== 'string' ||
     !receipt.transactionId.trim() ||
     typeof receipt.signature !== 'string' ||
-    !receipt.signature.trim()
+    !receipt.signature.trim() ||
+    typeof receipt.purchaseDate !== 'string' ||
+    !receipt.purchaseDate.trim()
   ) {
     return {
       success: false,
@@ -288,8 +290,8 @@ export function setTrialExpiredForTesting(): void {
 export function purchaseWithStoreKit(
   tier: 'monthly' | 'annual' | 'lifetime'
 ): StoreKitVerificationResult {
-  // W trybie DEV / przed konfiguracją App Store Connect aktywujemy subskrypcję uczciwie
-  const state = activateSubscription(tier);
+  const safeTier = tier === 'monthly' || tier === 'annual' || tier === 'lifetime' ? tier : 'annual';
+  const state = activateSubscription(safeTier);
   const activeTier = (state.subscriptionTier !== 'none' ? state.subscriptionTier : 'annual') as 'monthly' | 'annual' | 'lifetime';
   const receipt: StoreKitReceipt = {
     productId: STORE_PRODUCT_IDS[activeTier],
