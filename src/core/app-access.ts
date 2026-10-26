@@ -130,7 +130,7 @@ export function getAppAccessState(): AppAccessState {
       status: 'trial_expired',
       brewsCount: effectiveBrewsCount,
       brewsRemaining: 0,
-      daysRemaining,
+      daysRemaining: 0,
       isSubscribed: false,
       canCreate: false,
       isHistoryReadOnly: true,
@@ -156,6 +156,7 @@ export function getAppAccessState(): AppAccessState {
 export function getTrialDaysRemaining(): number {
   const state = getAppAccessState();
   if (state.isSubscribed) return Infinity;
+  if (state.status === 'trial_expired') return 0;
   const days = Number.isFinite(state.daysRemaining) && state.daysRemaining >= 0
     ? Math.floor(Math.min(TRIAL_DURATION_DAYS, state.daysRemaining))
     : 0;
@@ -168,6 +169,7 @@ export function getTrialDaysRemaining(): number {
 export function getTrialBrewsRemaining(): number {
   const state = getAppAccessState();
   if (state.isSubscribed) return Infinity;
+  if (state.status === 'trial_expired') return 0;
   const brews = Number.isFinite(state.brewsRemaining) && state.brewsRemaining >= 0
     ? Math.floor(Math.min(TRIAL_MAX_BREWS, state.brewsRemaining))
     : 0;

@@ -783,4 +783,18 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(restoredGood.receipt?.transactionId).toBe('tx-restored-99');
     expect(restoredGood.receipt?.signature).toBe('sig-restored-99');
   });
+
+  test('TASK-P45-02-MON: getTrialDaysRemaining i getTrialBrewsRemaining zwracaja 0 gdy okres probny wygasl', () => {
+    resetTrialForTesting();
+    const { setAppSetting } = require('../database');
+    setAppSetting('trial_brews_count', '15');
+    setAppSetting('trial_max_brews_seen', '15');
+
+    const state = getAppAccessState();
+    expect(state.status).toBe('trial_expired');
+    expect(state.brewsRemaining).toBe(0);
+    expect(state.daysRemaining).toBe(0);
+    expect(getTrialDaysRemaining()).toBe(0);
+    expect(getTrialBrewsRemaining()).toBe(0);
+  });
 });
