@@ -598,4 +598,20 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(Object.is(calculateLiquidYield(250, 15), -0)).toBe(false);
     });
   });
+
+  describe('TASK-P32-03-ZAK: calculateRemainingCaffeineMg i calculateHoursUntilSafeCaffeine parsuja stringi i chronia przed -0', () => {
+    it('calculateRemainingCaffeineMg parsuje numeryczne stringi i chroni przed -0', () => {
+      // 100mg po 5h przy half-life 5h = 50.0mg
+      expect(calculateRemainingCaffeineMg('100' as any, '5' as any, '5' as any)).toBe(50.0);
+      expect(calculateRemainingCaffeineMg(0, 0)).toBe(0);
+      expect(Object.is(calculateRemainingCaffeineMg(0, 0), -0)).toBe(false);
+    });
+
+    it('calculateHoursUntilSafeCaffeine parsuje numeryczne stringi i chroni przed -0', () => {
+      // 100mg do progu 25mg przy t1/2 = 5h -> 10.0h
+      expect(calculateHoursUntilSafeCaffeine('100' as any, '25' as any, '5' as any)).toBe(10.0);
+      expect(calculateHoursUntilSafeCaffeine(20, 25)).toBe(0);
+      expect(Object.is(calculateHoursUntilSafeCaffeine(20, 25), -0)).toBe(false);
+    });
+  });
 });

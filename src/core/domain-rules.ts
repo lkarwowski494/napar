@@ -290,11 +290,29 @@ export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number | stri
  * RD-17: Farmakokinetyka eliminacji kofeiny (model jedno-kompartmentowy) [T:EFSA-CAFF-2015] [T:NEHLIG-CYP1A2-2018]
  * C(t) = C0 * (1/2)^(t / t1/2)
  */
-export function calculateRemainingCaffeineMg(initialDoseMg: number, hoursPassed: number, halfLifeHours = 5.0): number {
-  if (!Number.isFinite(initialDoseMg) || !Number.isFinite(hoursPassed) || !Number.isFinite(halfLifeHours) || initialDoseMg <= 0 || hoursPassed < 0 || halfLifeHours <= 0) return 0;
-  const remaining = initialDoseMg * Math.pow(0.5, hoursPassed / halfLifeHours);
-  const result = Number(remaining.toFixed(1));
-  return Object.is(result, -0) ? 0 : result;
+export function calculateRemainingCaffeineMg(
+  initialDoseMg: number | string,
+  hoursPassed: number | string,
+  halfLifeHours: number | string = 5.0
+): number {
+  const parsedDose = typeof initialDoseMg === 'string' ? parseFloat(initialDoseMg) : Number(initialDoseMg);
+  const parsedHours = typeof hoursPassed === 'string' ? parseFloat(hoursPassed) : Number(hoursPassed);
+  const parsedHalfLife = typeof halfLifeHours === 'string' ? parseFloat(halfLifeHours) : Number(halfLifeHours);
+
+  if (
+    !Number.isFinite(parsedDose) ||
+    !Number.isFinite(parsedHours) ||
+    !Number.isFinite(parsedHalfLife) ||
+    parsedDose <= 0 ||
+    parsedHours < 0 ||
+    parsedHalfLife <= 0
+  ) {
+    return 0;
+  }
+  const remaining = parsedDose * Math.pow(0.5, parsedHours / parsedHalfLife);
+  let result = Number(remaining.toFixed(1));
+  if (Object.is(result, -0) || result <= 0) result = 0;
+  return result;
 }
 
 /**
@@ -347,20 +365,30 @@ export function evaluateBedtimeCaffeine(
 /**
  * RD-21: Oblicza minimalną liczbę godzin przed snem, po której można wypić daną dawkę
  */
-export function calculateHoursUntilSafeCaffeine(doseMg: number, safeThresholdMg = 25.0, halfLifeHours = 5.0): number {
+export function calculateHoursUntilSafeCaffeine(
+  doseMg: number | string,
+  safeThresholdMg: number | string = 25.0,
+  halfLifeHours: number | string = 5.0
+): number {
+  const parsedDose = typeof doseMg === 'string' ? parseFloat(doseMg) : Number(doseMg);
+  const parsedThreshold = typeof safeThresholdMg === 'string' ? parseFloat(safeThresholdMg) : Number(safeThresholdMg);
+  const parsedHalfLife = typeof halfLifeHours === 'string' ? parseFloat(halfLifeHours) : Number(halfLifeHours);
+
   if (
-    !Number.isFinite(doseMg) ||
-    !Number.isFinite(safeThresholdMg) ||
-    !Number.isFinite(halfLifeHours) ||
-    doseMg <= safeThresholdMg ||
-    safeThresholdMg <= 0 ||
-    halfLifeHours <= 0
-  ) return 0;
-  // dose * (0.5)^(t / halfLife) = threshold
-  // t / halfLife = log2(dose / threshold)
-  const ratio = doseMg / safeThresholdMg;
-  const hours = halfLifeHours * (Math.log(ratio) / Math.LN2);
-  return Number(hours.toFixed(1));
+    !Number.isFinite(parsedDose) ||
+    !Number.isFinite(parsedThreshold) ||
+    !Number.isFinite(parsedHalfLife) ||
+    parsedDose <= parsedThreshold ||
+    parsedThreshold <= 0 ||
+    parsedHalfLife <= 0
+  ) {
+    return 0;
+  }
+  const ratio = parsedDose / parsedThreshold;
+  const hours = parsedHalfLife * (Math.log(ratio) / Math.LN2);
+  let result = Number(hours.toFixed(1));
+  if (Object.is(result, -0) || result <= 0) result = 0;
+  return result;
 }
 
 export interface TasteDiagnosis {
