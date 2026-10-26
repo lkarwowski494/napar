@@ -129,11 +129,12 @@ export function recipeToCompactPayload(
     .map((st) => {
       const rawDur = typeof st.durationSeconds === 'number' ? st.durationSeconds : (typeof st.durationSeconds === 'string' ? parseFloat(st.durationSeconds) : NaN);
       const rawW = typeof st.targetWaterGrams === 'number' ? st.targetWaterGrams : (typeof st.targetWaterGrams === 'string' ? parseFloat(st.targetWaterGrams) : NaN);
+      const safeW = Number.isFinite(rawW) && rawW >= 0 ? Math.min(50000, Math.round(rawW)) : 0;
       return {
         n: typeof st.namePl === 'string' && st.namePl.trim() ? st.namePl.trim().slice(0, 100) : 'Step',
         ...(typeof st.nameEn === 'string' && st.nameEn.trim() ? { ne: st.nameEn.trim().slice(0, 100) } : {}),
         d: Number.isFinite(rawDur) && rawDur > 0 ? Math.min(86400, Math.round(rawDur)) : 30,
-        w: Number.isFinite(rawW) && rawW >= 0 ? Math.min(50000, Math.round(rawW)) : 0,
+        w: Object.is(safeW, -0) || safeW <= 0 ? 0 : safeW,
         i: typeof st.instructionPl === 'string' ? st.instructionPl.trim().slice(0, 2000) : '',
         ...(typeof st.instructionEn === 'string' && st.instructionEn.trim() ? { ie: st.instructionEn.trim().slice(0, 2000) } : {}),
       };
@@ -307,12 +308,13 @@ export function decodeRecipeFromShareUrl(
       .map((st, idx) => {
         const rawSec = typeof st.d === 'number' ? st.d : (typeof st.d === 'string' ? parseFloat(st.d) : NaN);
         const rawWater = typeof st.w === 'number' ? st.w : (typeof st.w === 'string' ? parseFloat(st.w) : NaN);
+        const safeStepWater = Number.isFinite(rawWater) && rawWater >= 0 ? Math.max(0, Math.min(50000, Math.round(rawWater))) : 0;
         return {
           stepNumber: idx + 1,
           namePl: typeof st.n === 'string' && st.n.trim() ? st.n.trim().slice(0, 100) : defaultStepName(idx + 1),
           ...(st.ne && typeof st.ne === 'string' ? { nameEn: st.ne.trim().slice(0, 100) } : (isEn && typeof st.n === 'string' && st.n ? { nameEn: st.n.trim().slice(0, 100) } : {})),
           durationSeconds: Number.isFinite(rawSec) && rawSec > 0 ? Math.max(1, Math.min(86400, Math.round(rawSec))) : 30,
-          targetWaterGrams: Number.isFinite(rawWater) && rawWater >= 0 ? Math.max(0, Math.min(50000, Math.round(rawWater))) : 0,
+          targetWaterGrams: Object.is(safeStepWater, -0) || safeStepWater <= 0 ? 0 : safeStepWater,
           instructionPl: typeof st.i === 'string' ? st.i.slice(0, 2000) : '',
           ...(st.ie && typeof st.ie === 'string' ? { instructionEn: st.ie.slice(0, 2000) } : (isEn && typeof st.i === 'string' && st.i ? { instructionEn: st.i.slice(0, 2000) } : {})),
         };

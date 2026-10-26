@@ -870,4 +870,35 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     const decoded = decodeRecipeFromShareUrl(rawData);
     expect(decoded?.recipe.grindSizeDescription).toBe('16');
   });
+
+  test('TASK-P37-11-WZR: ochrona docelowej wody kroków przed -0 w recipeToCompactPayload i decodeRecipeFromShareUrl', () => {
+    const recipeWithNegativeZeroStep: any = {
+      name: 'Neg Zero Step Recipe',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: 15,
+      waterGrams: 250,
+      steps: [
+        { namePl: 'Preinfusion', durationSeconds: 30, targetWaterGrams: -0 },
+      ],
+    };
+    const payload = recipeToCompactPayload(recipeWithNegativeZeroStep);
+    expect(payload.s[0].w).toBe(0);
+    expect(Object.is(payload.s[0].w, -0)).toBe(false);
+
+    const rawData = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Neg Zero Decoded',
+      b: 'COFFEE',
+      m: 'v60',
+      d: 15,
+      w: 250,
+      s: [
+        { n: 'Bloom', d: 30, w: -0 },
+      ],
+    }));
+    const decoded = decodeRecipeFromShareUrl(rawData);
+    expect(decoded?.originalSteps[0].targetWaterGrams).toBe(0);
+    expect(Object.is(decoded?.originalSteps[0].targetWaterGrams, -0)).toBe(false);
+  });
 });
