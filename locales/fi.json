@@ -167,7 +167,9 @@
     "methodSiphon": "Sifonki",
     "siphonDesc": "Tyhjiöuutto poikkeuksellisen kirkkaudella ja syvällä aromilla",
     "methodFrenchPress": "Pressopannu",
-    "frenchPressDesc": "Perinteinen uuttomenetelmä männällä, joka tuottaa täyteläisen suutuntuman."
+    "frenchPressDesc": "Perinteinen uuttomenetelmä männällä, joka tuottaa täyteläisen suutuntuman.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Uutto- ja suodatushybridi pohjaventtiilillä puhtaaseen lopputulokseen."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

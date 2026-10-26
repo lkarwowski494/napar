@@ -167,7 +167,9 @@
     "methodSiphon": "Syphon",
     "siphonDesc": "Vakuumbrühen mit außergewöhnlicher Klarheit und tiefem Aroma",
     "methodFrenchPress": "French Press",
-    "frenchPressDesc": "Klassische Immersionsbrühung mit Stempel für einen kräftigen, vollen Körper."
+    "frenchPressDesc": "Klassische Immersionsbrühung mit Stempel für einen kräftigen, vollen Körper.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Hybrid aus Immersion und Handfilter mit praktischem Bodenventil."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

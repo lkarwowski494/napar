@@ -167,7 +167,9 @@
     "methodSiphon": "虹吸壶",
     "siphonDesc": "真空虹吸萃取，口感纯净明亮，香气深邃",
     "methodFrenchPress": "法压壶",
-    "frenchPressDesc": "经典的滤压浸泡萃取方式，带来醇厚饱满的口感。"
+    "frenchPressDesc": "经典的滤压浸泡萃取方式，带来醇厚饱满的口感。",
+    "methodClever": "聪明杯",
+    "cleverDesc": "结合浸泡与滴滤优点的阀门控流滤杯。"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

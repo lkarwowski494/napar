@@ -167,7 +167,9 @@
     "methodSiphon": "Vákuový sifón",
     "siphonDesc": "Vákuová extrakcia s mimoriadnou čistotou a hlbokým arómou",
     "methodFrenchPress": "French press",
-    "frenchPressDesc": "Klasická imerzná metóda s piestovým filtrom pre plné a bohaté telo."
+    "frenchPressDesc": "Klasická imerzná metóda s piestovým filtrom pre plné a bohaté telo.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Hybridná metóda lúhovania a filtrácie so spodným ventilom."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

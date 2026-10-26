@@ -167,7 +167,9 @@
     "methodSiphon": "サイフォン",
     "siphonDesc": "格別な透明感と奥深い香りを生むサイフォン抽出",
     "methodFrenchPress": "フレンチプレス",
-    "frenchPressDesc": "プランジャーを用いた浸漬抽出で、重厚で豊かなコクをもたらします。"
+    "frenchPressDesc": "プランジャーを用いた浸漬抽出で、重厚で豊かなコクをもたらします。",
+    "methodClever": "クレバードリッパー",
+    "cleverDesc": "浸漬抽出とペーパードリップの良さを兼ね備えたバルブ式ドリッパー。"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

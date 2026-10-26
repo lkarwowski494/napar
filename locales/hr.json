@@ -167,7 +167,9 @@
     "methodSiphon": "Sifon",
     "siphonDesc": "Vakuumsko kuhanje s iznimnom čistoćom i dubokom aromom",
     "methodFrenchPress": "French press",
-    "frenchPressDesc": "Klasična imerzijska metoda s klipom za puno i bogato tijelo."
+    "frenchPressDesc": "Klasična imerzijska metoda s klipom za puno i bogato tijelo.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Hibridna metoda uranjanja i filtracije s kontrolnim ventilom."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

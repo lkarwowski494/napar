@@ -167,7 +167,9 @@
     "methodSiphon": "Sifon",
     "siphonDesc": "Preparare în vid cu o claritate excepțională și aromă profundă",
     "methodFrenchPress": "Presă franceză",
-    "frenchPressDesc": "Metodă clasică de infuzare prin imersie cu piston pentru un corp plin și dens."
+    "frenchPressDesc": "Metodă clasică de infuzare prin imersie cu piston pentru un corp plin și dens.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Hibrid între infuzare prin imersie și filtrare cu supapă de scurgere."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

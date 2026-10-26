@@ -167,7 +167,9 @@
     "methodSiphon": "Sifon",
     "siphonDesc": "Olağanüstü berraklık ve derin aromaya sahip vakumlu demleme",
     "methodFrenchPress": "French Press",
-    "frenchPressDesc": "Yoğun gövdeli ve zengin aromalı klasik daldırma pistonlu demleme yöntemi."
+    "frenchPressDesc": "Yoğun gövdeli ve zengin aromalı klasik daldırma pistonlu demleme yöntemi.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Daldırma ve filtre demlemeyi birleştiren alt vanalı hibrit yöntem."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

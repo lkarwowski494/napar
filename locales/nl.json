@@ -167,7 +167,9 @@
     "methodSiphon": "Sifon",
     "siphonDesc": "Vacuümbereiding met uitzonderlijke helderheid en diep aroma",
     "methodFrenchPress": "Doordrukkan",
-    "frenchPressDesc": "Klassieke immersiemethode met zuiger voor een volle, rijke body."
+    "frenchPressDesc": "Klassieke immersiemethode met zuiger voor een volle, rijke body.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Hybride tussen immersie en filterkoffie met handig afsluitventiel."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

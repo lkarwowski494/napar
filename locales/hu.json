@@ -167,7 +167,9 @@
     "methodSiphon": "Szifon",
     "siphonDesc": "Vákuumos kávéfőzés kivételes tisztasággal és mély aromával",
     "methodFrenchPress": "Dugattyús kávéfőző",
-    "frenchPressDesc": "Klasszikus áztatási módszer dugattyúval a telt, testes ízélményért."
+    "frenchPressDesc": "Klasszikus áztatási módszer dugattyúval a telt, testes ízélményért.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Áztatási és csepegtetős hibrid kávékészítő alsó zárószeleppel."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

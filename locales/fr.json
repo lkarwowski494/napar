@@ -167,7 +167,9 @@
     "methodSiphon": "Siphon",
     "siphonDesc": "Extraction sous vide d'une clarté exceptionnelle et d'un arôme profond",
     "methodFrenchPress": "Cafetière à piston",
-    "frenchPressDesc": "Infusion classique par immersion produisant un corps riche et dense."
+    "frenchPressDesc": "Infusion classique par immersion produisant un corps riche et dense.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Hybride immersion et filtration avec valve d'écoulement contrôlée."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

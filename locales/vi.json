@@ -167,7 +167,9 @@
     "methodSiphon": "Syphon",
     "siphonDesc": "Pha chân không với độ trong trẻo đặc biệt và hương thơm sâu lắng",
     "methodFrenchPress": "Bình ép kiểu Pháp",
-    "frenchPressDesc": "Phương pháp ngâm chiết cổ điển với pít-tông mang lại thể chất đậm đà."
+    "frenchPressDesc": "Phương pháp ngâm chiết cổ điển với pít-tông mang lại thể chất đậm đà.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Phương pháp kết hợp giữa ngâm và lọc nhỏ giọt với van xả đáy."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

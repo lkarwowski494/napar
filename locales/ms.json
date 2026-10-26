@@ -167,7 +167,9 @@
     "methodSiphon": "Sifon",
     "siphonDesc": "Penyeduhan vakum dengan kejelasan luar biasa dan aroma mendalam",
     "methodFrenchPress": "French Press",
-    "frenchPressDesc": "Kaedah rendaman klasik dengan pelocok untuk rasa kopi yang padat dan berisi."
+    "frenchPressDesc": "Kaedah rendaman klasik dengan pelocok untuk rasa kopi yang padat dan berisi.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Kaedah hibrid rendaman dan penapisan dengan injap pelepas bawah."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -167,7 +167,9 @@
     "methodSiphon": "Sifon",
     "siphonDesc": "Penyeduhan vakum dengan kejernihan luar biasa dan aroma mendalam",
     "methodFrenchPress": "French Press",
-    "frenchPressDesc": "Metode seduh imersif klasik dengan penekan untuk rasa penuh dan kental."
+    "frenchPressDesc": "Metode seduh imersif klasik dengan penekan untuk rasa penuh dan kental.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Metode hibrida seduh rendam dan saring dengan katup pembuangan."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

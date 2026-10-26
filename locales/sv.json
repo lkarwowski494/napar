@@ -167,7 +167,9 @@
     "methodSiphon": "Sifon",
     "siphonDesc": "Vakuumextraktion med exceptionell renhet och djup arom",
     "methodFrenchPress": "Presskanna",
-    "frenchPressDesc": "Klassisk infusionsbryggning med pressfilter som ger en fyllig kopp."
+    "frenchPressDesc": "Klassisk infusionsbryggning med pressfilter som ger en fyllig kopp.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Hybrid mellan infusion och droppbryggning med bottenventil."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -167,7 +167,9 @@
     "methodSiphon": "사이폰",
     "siphonDesc": "뛰어난 클린컵과 깊은 아로마를 자랑하는 진공 사이폰 추출",
     "methodFrenchPress": "프렌치 프레스",
-    "frenchPressDesc": "플런저를 이용한 클래식 침출 방식으로 풍부하고 묵직한 바디감을 제공합니다."
+    "frenchPressDesc": "플런저를 이용한 클래식 침출 방식으로 풍부하고 묵직한 바디감을 제공합니다.",
+    "methodClever": "클레버 드리퍼",
+    "cleverDesc": "침출과 여과의 장점을 결합한 밸브 제어 방식의 하이브리드 드리퍼."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

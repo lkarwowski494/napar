@@ -167,7 +167,9 @@
     "methodSiphon": "Sifão",
     "siphonDesc": "Extração a vácuo com excepcional clareza e aroma profundo",
     "methodFrenchPress": "Prensa francesa",
-    "frenchPressDesc": "Método clássico de imersão com êmbolo proporcionando corpo denso e aveludado."
+    "frenchPressDesc": "Método clássico de imersão com êmbolo proporcionando corpo denso e aveludado.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Híbrido de imersão e filtro de papel com válvula de fluxo controlada."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

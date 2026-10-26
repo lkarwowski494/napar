@@ -320,4 +320,10 @@ describe('i18n System', () => {
     expect(translations.pl.brew.frenchPressDesc).toContain('immersyjna');
     expect(translations.en.brew.frenchPressDesc).toContain('immersion');
   });
+  test('TASK-P26-09-LOK: Klucze methodClever i cleverDesc są zdefiniowane w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodClever).toBe('Dripper Clever');
+    expect(translations.en.brew.methodClever).toBe('Clever Dripper');
+    expect(translations.pl.brew.cleverDesc).toContain('zaworem');
+    expect(translations.en.brew.cleverDesc).toContain('valve');
+  });
 });

@@ -167,7 +167,9 @@
     "methodSiphon": "Syfon",
     "siphonDesc": "Parzenie próżniowe o wyjątkowej czystości i głębokim aromacie",
     "methodFrenchPress": "Praska francuska",
-    "frenchPressDesc": "Klasyczna metoda immersyjna z tłokiem siatkowym dająca pełne ciało."
+    "frenchPressDesc": "Klasyczna metoda immersyjna z tłokiem siatkowym dająca pełne ciało.",
+    "methodClever": "Dripper Clever",
+    "cleverDesc": "Połączenie immersji i filtracji z zaworem spustowym dające czysty i pełny napar."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -167,7 +167,9 @@
     "methodSiphon": "Sifon",
     "siphonDesc": "Vakuumbrygging med eksepsjonell klarhet og dyp aroma",
     "methodFrenchPress": "Presskanne",
-    "frenchPressDesc": "Klassisk nedsenkingsbrygging med stempel som gir en fyldig munnfølelse."
+    "frenchPressDesc": "Klassisk nedsenkingsbrygging med stempel som gir en fyldig munnfølelse.",
+    "methodClever": "Clever Dripper",
+    "cleverDesc": "Hybrid mellom nedsenking og dryppfiltrering med bunnventil."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
