@@ -89,6 +89,16 @@ try {
     `app.json -> expo.ios.buildNumber musi być ciągiem cyfr (otrzymano '${appJson.ios?.buildNumber}')`
   );
 
+  // Weryfikacja flag lokalizacyjnych i pełnoekranowych w infoPlist (TASK-P13-10-WYD)
+  check(
+    appJson.ios?.infoPlist?.CFBundleAllowMixedLocalizations === true,
+    'app.json -> expo.ios.infoPlist musi mieć CFBundleAllowMixedLocalizations: true (wymóg lokalizacji 35 języków)'
+  );
+  check(
+    appJson.ios?.infoPlist?.UIRequiresFullScreen === true,
+    'app.json -> expo.ios.infoPlist musi mieć UIRequiresFullScreen: true'
+  );
+
   // Weryfikacja braku uprawnień mikrofonowych w pluginie expo-camera (Zero Audio / Privacy)
   const cameraPlugin = appJson.plugins?.find(
     (p) => Array.isArray(p) && p[0] === 'expo-camera'
