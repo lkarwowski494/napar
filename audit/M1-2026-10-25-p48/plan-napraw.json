@@ -1,0 +1,103 @@
+{
+  "run": 48,
+  "date": "2026-10-26",
+  "baseline_commit": "fc6075f",
+  "tasks": [
+    {
+      "id": "TASK-P48-01-ODK",
+      "perspective": "01-ODK",
+      "title": "Dostępność i defensywność BrewFinishModal (radiogroup i a11y hints)",
+      "target_file": "src/components/brew/BrewFinishModal.tsx",
+      "test_file": "src/components/brew/__tests__/BrewFinishModal.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P48-02-MON",
+      "perspective": "02-MON",
+      "title": "Sanityzacja StoreKit i formatowanie stanu okresu próbnego w app-access",
+      "target_file": "src/core/app-access.ts",
+      "test_file": "tests/audit-fixes.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P48-03-ZAK",
+      "perspective": "03-ZAK",
+      "title": "Ignorowanie pustych paczek i parsowanie złożonych czasów w bpr-engine",
+      "target_file": "src/core/bpr-engine.ts",
+      "test_file": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P48-04-STU",
+      "perspective": "04-STU",
+      "title": "Limity długości pól i defensywność w RecipeBasicInfoCard",
+      "target_file": "src/components/recipe-builder/RecipeBasicInfoCard.tsx",
+      "test_file": "tests/audit-fixes.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P48-05-ARC",
+      "perspective": "05-ARC",
+      "title": "Obsługa przecinka dziesiętnego i clampowanie w saveInventoryItem",
+      "target_file": "src/core/database.ts",
+      "test_file": "tests/audit-fixes.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P48-06-TRE",
+      "perspective": "06-TRE",
+      "title": "Rozszerzenie bazy wiedzy o rzadkie odmiany botaniczne kawy w knowledge-data",
+      "target_file": "src/core/knowledge-data.ts",
+      "test_file": "src/core/__tests__/knowledge.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P48-07-JAK",
+      "perspective": "07-JAK",
+      "title": "Dodanie profilu SCA Standard Water i walidacja minerałów w water-chemistry",
+      "target_file": "src/core/water-chemistry.ts",
+      "test_file": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P48-08-PRO",
+      "perspective": "08-PRO",
+      "title": "Rozszerzenie profili młynków o Kinu M47 i 1Zpresso J-Max w grinder-converter",
+      "target_file": "src/core/grinder-converter.ts",
+      "test_file": "tests/audit-fixes.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P48-09-LOK",
+      "perspective": "09-LOK",
+      "title": "Rozszerzenie słowników 35 języków o status trial i zachowanie matrycy",
+      "target_file": "src/core/i18n.tsx",
+      "test_file": "tests/i18n-no-polish-in-en.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P48-10-WYD",
+      "perspective": "10-WYD",
+      "title": "Weryfikacja deklaracji uprawnień natywnych w scripts/verify-native.mjs",
+      "target_file": "scripts/verify-native.mjs",
+      "test_file": "tests/audit-fixes.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P48-11-WZR",
+      "perspective": "11-WZR",
+      "title": "Defensywne parsowanie obiektów i kroków w recipe-share",
+      "target_file": "src/core/recipe-share.ts",
+      "test_file": "src/core/__tests__/recipe-share.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P48-12-NIE",
+      "perspective": "12-NIE",
+      "title": "Ochrona przed NaN i ujemnymi krokami w live-activity",
+      "target_file": "src/core/live-activity.ts",
+      "test_file": "src/core/__tests__/live-activity.test.ts",
+      "status": "pending"
+    }
+  ]
+}
