@@ -402,8 +402,14 @@ function mapRowToInventoryItem(row: InventoryRow): InventoryItem {
     roastProfile: row.roast_profile || undefined,
     process: row.process || undefined,
     variety: row.variety || undefined,
-    initialWeightGrams: (typeof row.initial_weight_g === 'number' && Number.isFinite(row.initial_weight_g) && row.initial_weight_g >= 0) ? row.initial_weight_g : 250,
-    remainingWeightGrams: (typeof row.remaining_weight_g === 'number' && Number.isFinite(row.remaining_weight_g) && row.remaining_weight_g >= 0) ? row.remaining_weight_g : 0,
+    initialWeightGrams:
+      Number.isFinite(Number(row.initial_weight_g)) && Number(row.initial_weight_g) >= 0
+        ? Number(row.initial_weight_g)
+        : 250,
+    remainingWeightGrams:
+      Number.isFinite(Number(row.remaining_weight_g)) && Number(row.remaining_weight_g) >= 0
+        ? Number(row.remaining_weight_g)
+        : 0,
     flavorNotes,
     rating: (row.rating !== null && row.rating !== undefined && Number.isFinite(row.rating) && row.rating >= 0 && row.rating <= 5) ? row.rating : undefined,
     isFavorite: Boolean(row.is_favorite),

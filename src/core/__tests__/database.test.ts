@@ -1359,4 +1359,25 @@ describe('Napar SQLite Database & Repositories', () => {
       []
     );
   });
+  test('TASK-P22-05-ARC: mapRowToInventoryItem wspiera stringified numery w wagach (SQLite affinity)', () => {
+    initDatabase(mockDb as any);
+    const mockRow: any = {
+      id: 'bean-affinity-test',
+      name: 'Affinity Coffee',
+      type: 'coffee',
+      initial_weight_g: '250',
+      remaining_weight_g: '180.5',
+      flavor_notes_json: '[]',
+      is_favorite: 0,
+      is_archived: 0,
+      created_at: '2026-10-26T10:00:00Z',
+      updated_at: '2026-10-26T10:00:00Z',
+    };
+
+    mockDb.getFirstSync = jest.fn(() => mockRow);
+    const item = getInventoryItemById('bean-affinity-test');
+    expect(item).not.toBeNull();
+    expect(item?.initialWeightGrams).toBe(250);
+    expect(item?.remainingWeightGrams).toBe(180.5);
+  });
 });
