@@ -664,4 +664,13 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     const payload = buildDynamicIslandPayload(attrOver, stateOver, 'pl');
     expect(payload.expandedBottomTarget).toBe('Docelowo: 50000 g (z 50000 g)');
   });
+
+  test('TASK-P40-12-NIE: buildLiveActivityPayload clampuje totalWaterGrams do 50000 w atrybutach', () => {
+    const attrOver: any = {
+      ...mockAttributesCoffee,
+      totalWaterGrams: 999999,
+    };
+    const payload = buildLiveActivityPayload(attrOver, mockState, 'pl');
+    expect(payload.attributes.totalWaterGrams).toBe(50000);
+  });
 });

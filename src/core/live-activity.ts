@@ -198,7 +198,7 @@ export function buildLiveActivityPayload(
         beverageType: attributes.beverageType === 'TEA' ? 'TEA' : 'COFFEE',
         totalWaterGrams: (() => {
           const rawW = typeof attributes.totalWaterGrams === 'number' ? attributes.totalWaterGrams : (typeof attributes.totalWaterGrams === 'string' ? parseFloat(attributes.totalWaterGrams) : NaN);
-          const res = Math.max(0, Number.isFinite(rawW) ? Math.round(rawW) : 0);
+          const res = Math.max(0, Math.min(50000, Number.isFinite(rawW) ? Math.round(rawW) : 0));
           return Object.is(res, -0) ? 0 : res;
         })(),
       }
