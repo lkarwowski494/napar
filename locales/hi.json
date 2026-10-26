@@ -19,7 +19,9 @@
     "brewingFinished": "ब्रूइंग समाप्त!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "विंडो बंद करें",
+    "saveSuccess": "सफलतापूर्वक सहेजा गया"
   },
   "tabs": {
     "brew": "ब्रू",

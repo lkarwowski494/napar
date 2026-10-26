@@ -19,7 +19,9 @@
     "brewingFinished": "Demleme tamamlandı!",
     "grams": "g",
     "seconds": "sn",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Pencereyi kapat",
+    "saveSuccess": "Başarıyla kaydedildi"
   },
   "tabs": {
     "brew": "Demle",

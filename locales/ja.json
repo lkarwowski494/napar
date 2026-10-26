@@ -19,7 +19,9 @@
     "brewingFinished": "抽出が完了しました！",
     "grams": "g",
     "seconds": "秒",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "ウィンドウを閉じる",
+    "saveSuccess": "正常に保存されました"
   },
   "tabs": {
     "brew": "抽出",

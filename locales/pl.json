@@ -19,7 +19,9 @@
     "brewingFinished": "Parzenie zakończone!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Zamknij okno",
+    "saveSuccess": "Zapisano pomyślnie"
   },
   "tabs": {
     "brew": "Parzenie",

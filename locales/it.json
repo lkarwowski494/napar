@@ -19,7 +19,9 @@
     "brewingFinished": "Estrazione completata!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Chiudi finestra",
+    "saveSuccess": "Salvato con successo"
   },
   "tabs": {
     "brew": "Estrazione",

@@ -26,7 +26,9 @@
     "brewingFinished": "Brewing finished!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Close window",
+    "saveSuccess": "Saved successfully"
   },
   "tabs": {
     "brew": "Brew",

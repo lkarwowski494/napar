@@ -19,7 +19,9 @@
     "brewingFinished": "Príprava dokončená!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Zavrieť okno",
+    "saveSuccess": "Úspešne uložené"
   },
   "tabs": {
     "brew": "Príprava",

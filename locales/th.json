@@ -19,7 +19,9 @@
     "brewingFinished": "การสกัดเสร็จสิ้น!",
     "grams": "กรัม",
     "seconds": "วินาที",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "ปิดหน้าต่าง",
+    "saveSuccess": "บันทึกสำเร็จ"
   },
   "tabs": {
     "brew": "ชง",

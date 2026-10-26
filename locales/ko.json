@@ -19,7 +19,9 @@
     "brewingFinished": "추출이 완료되었습니다!",
     "grams": "g",
     "seconds": "초",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "창 닫기",
+    "saveSuccess": "성공적으로 저장되었습니다"
   },
   "tabs": {
     "brew": "추출",

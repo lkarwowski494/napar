@@ -19,7 +19,9 @@
     "brewingFinished": "Preparo concluído!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Fechar janela",
+    "saveSuccess": "Salvo com sucesso"
   },
   "tabs": {
     "brew": "Preparo",

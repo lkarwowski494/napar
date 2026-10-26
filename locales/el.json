@@ -19,7 +19,9 @@
     "brewingFinished": "Η εκχύλιση ολοκληρώθηκε!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Κλείσιμο παραθύρου",
+    "saveSuccess": "Αποθηκεύτηκε επιτυχώς"
   },
   "tabs": {
     "brew": "Εκχύλιση",

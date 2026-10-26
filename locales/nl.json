@@ -19,7 +19,9 @@
     "brewingFinished": "Zetten voltooid!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Venster sluiten",
+    "saveSuccess": "Succesvol opgeslagen"
   },
   "tabs": {
     "brew": "Zetten",

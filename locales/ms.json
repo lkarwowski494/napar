@@ -19,7 +19,9 @@
     "brewingFinished": "Bancuhan selesai!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Tutup tetingkap",
+    "saveSuccess": "Berjaya disimpan"
   },
   "tabs": {
     "brew": "Bancuh",

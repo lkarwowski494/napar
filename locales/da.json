@@ -19,7 +19,9 @@
     "brewingFinished": "Brygning afsluttet!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Luk vindue",
+    "saveSuccess": "Gemt"
   },
   "tabs": {
     "brew": "Bryg",

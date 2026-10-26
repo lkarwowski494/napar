@@ -19,7 +19,9 @@
     "brewingFinished": "Penyeduhan selesai!",
     "grams": "g",
     "seconds": "d",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Tutup jendela",
+    "saveSuccess": "Berhasil disimpan"
   },
   "tabs": {
     "brew": "Seduh",

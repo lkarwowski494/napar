@@ -19,7 +19,9 @@
     "brewingFinished": "Приготвянето завърши!",
     "grams": "г",
     "seconds": "сек",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Затвори прозореца",
+    "saveSuccess": "Успешно запазено"
   },
   "tabs": {
     "brew": "Приготвяне",

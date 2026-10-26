@@ -19,7 +19,9 @@
     "brewingFinished": "Заваривание завершено!",
     "grams": "г",
     "seconds": "сек",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Закрыть окно",
+    "saveSuccess": "Успешно сохранено"
   },
   "tabs": {
     "brew": "Заваривание",

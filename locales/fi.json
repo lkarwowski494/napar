@@ -19,7 +19,9 @@
     "brewingFinished": "Uutto valmis!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Sulje ikkuna",
+    "saveSuccess": "Tallennettu onnistuneesti"
   },
   "tabs": {
     "brew": "Uutto",

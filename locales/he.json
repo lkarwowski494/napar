@@ -19,7 +19,9 @@
     "brewingFinished": "החליטה הסתיימה!",
     "grams": "גרם",
     "seconds": "שניות",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "סגור חלון",
+    "saveSuccess": "נשמר בהצלחה"
   },
   "tabs": {
     "brew": "חליטה",

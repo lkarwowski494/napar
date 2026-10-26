@@ -19,7 +19,9 @@
     "brewingFinished": "Főzés befejezve!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Ablak bezárása",
+    "saveSuccess": "Sikeresen mentve"
   },
   "tabs": {
     "brew": "Készítés",

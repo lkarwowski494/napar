@@ -44,6 +44,8 @@ export const translations = {
       grams: 'g',
       seconds: 's',
       celsius: '°C',
+      modalClose: 'Zamknij okno',
+      saveSuccess: 'Zapisano pomyślnie',
     },
     tabs: {
       brew: 'Parzenie',
@@ -622,6 +624,8 @@ export const translations = {
       grams: 'g',
       seconds: 's',
       celsius: '°C',
+      modalClose: 'Close window',
+      saveSuccess: 'Saved successfully',
     },
     tabs: {
       brew: 'Brew',

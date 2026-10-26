@@ -19,7 +19,9 @@
     "brewingFinished": "Brühen abgeschlossen!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Fenster schließen",
+    "saveSuccess": "Erfolgreich gespeichert"
   },
   "tabs": {
     "brew": "Brühen",

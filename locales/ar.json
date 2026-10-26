@@ -19,7 +19,9 @@
     "brewingFinished": "اكتمل التحضير!",
     "grams": "غ",
     "seconds": "ث",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "إغلاق النافذة",
+    "saveSuccess": "تم الحفظ بنجاح"
   },
   "tabs": {
     "brew": "تحضير",

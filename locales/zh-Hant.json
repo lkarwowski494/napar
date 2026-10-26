@@ -19,7 +19,9 @@
     "brewingFinished": "沖煮完成！",
     "grams": "g",
     "seconds": "秒",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "關閉視窗",
+    "saveSuccess": "儲存成功"
   },
   "tabs": {
     "brew": "沖煮",

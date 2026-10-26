@@ -19,7 +19,9 @@
     "brewingFinished": "Preparare finalizată!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Închide fereastra",
+    "saveSuccess": "Salvat cu succes"
   },
   "tabs": {
     "brew": "Preparare",

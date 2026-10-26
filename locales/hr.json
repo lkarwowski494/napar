@@ -19,7 +19,9 @@
     "brewingFinished": "Kuhanje završeno!",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Zatvori prozor",
+    "saveSuccess": "Uspješno spremljeno"
   },
   "tabs": {
     "brew": "Priprema",

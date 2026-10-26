@@ -19,7 +19,9 @@
     "brewingFinished": "Pha chế hoàn tất!",
     "grams": "g",
     "seconds": "giây",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Đóng cửa sổ",
+    "saveSuccess": "Đã lưu thành công"
   },
   "tabs": {
     "brew": "Pha chế",

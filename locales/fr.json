@@ -19,7 +19,9 @@
     "brewingFinished": "Infusion terminée !",
     "grams": "g",
     "seconds": "s",
-    "celsius": "°C"
+    "celsius": "°C",
+    "modalClose": "Fermer la fenêtre",
+    "saveSuccess": "Enregistré avec succès"
   },
   "tabs": {
     "brew": "Infusion",
