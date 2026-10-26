@@ -222,4 +222,44 @@ describe('BrewQuickPrepCard Component', () => {
     const strongChip = tree.root.findByProps({ testID: 'ratio-chip-1-15' });
     expect(strongChip.props.accessibilityState).toEqual({ selected: false });
   });
+
+  test('TASK-P29-04-STU: kontenery batchChipsRow oraz ratioChipsRow posiadaja accessibilityRole radiogroup i accessibilityLabel', () => {
+    let treePl: any;
+    act(() => {
+      treePl = renderer.create(
+        <BrewQuickPrepCard
+          {...defaultProps}
+          onWaterChange={jest.fn()}
+          language="pl"
+        />
+      );
+    });
+
+    const batchGroupPl = treePl.root.findByProps({ testID: 'batch-chips-group' });
+    expect(batchGroupPl.props.accessibilityRole).toBe('radiogroup');
+    expect(batchGroupPl.props.accessibilityLabel).toBe('Wybierz liczbę porcji');
+
+    const ratioGroupPl = treePl.root.findByProps({ testID: 'ratio-chips-group' });
+    expect(ratioGroupPl.props.accessibilityRole).toBe('radiogroup');
+    expect(ratioGroupPl.props.accessibilityLabel).toBe('Wybierz proporcję kawy do wody');
+
+    let treeEn: any;
+    act(() => {
+      treeEn = renderer.create(
+        <BrewQuickPrepCard
+          {...defaultProps}
+          onWaterChange={jest.fn()}
+          language="en"
+        />
+      );
+    });
+
+    const batchGroupEn = treeEn.root.findByProps({ testID: 'batch-chips-group' });
+    expect(batchGroupEn.props.accessibilityRole).toBe('radiogroup');
+    expect(batchGroupEn.props.accessibilityLabel).toBe('Select number of servings');
+
+    const ratioGroupEn = treeEn.root.findByProps({ testID: 'ratio-chips-group' });
+    expect(ratioGroupEn.props.accessibilityRole).toBe('radiogroup');
+    expect(ratioGroupEn.props.accessibilityLabel).toBe('Select coffee to water ratio');
+  });
 });

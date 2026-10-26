@@ -70,7 +70,12 @@ export function BrewQuickPrepCard({
           )}
         </View>
 
-        <View style={styles.batchChipsRow} accessibilityRole="radiogroup">
+        <View
+          testID="batch-chips-group"
+          style={styles.batchChipsRow}
+          accessibilityRole="radiogroup"
+          accessibilityLabel={language === 'en' ? 'Select number of servings' : 'Wybierz liczbę porcji'}
+        >
           {[1, 2, 3, 4].map((n) => {
             const label = n === 1 ? t.batch.cup1 : n === 2 ? t.batch.cup2 : n === 3 ? t.batch.cup3 : t.batch.cup4;
             return (
@@ -200,7 +205,12 @@ export function BrewQuickPrepCard({
             <Text style={styles.ratioSectionTitle}>{language === 'en' ? 'RATIO' : 'PROPORCJA (RATIO)'}</Text>
             <Text style={styles.currentRatioBadge}>{`1 : ${currentRatioNum}`}</Text>
           </View>
-          <View style={styles.ratioChipsRow}>
+          <View
+            testID="ratio-chips-group"
+            style={styles.ratioChipsRow}
+            accessibilityRole="radiogroup"
+            accessibilityLabel={language === 'en' ? 'Select coffee to water ratio' : 'Wybierz proporcję kawy do wody'}
+          >
             {[
               { ratio: 15.0, label: '1:15', desc: language === 'en' ? 'Strong' : 'Mocna' },
               { ratio: 16.7, label: '1:16.7', desc: language === 'en' ? 'Golden Standard' : 'Złoty Standard' },
