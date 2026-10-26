@@ -379,4 +379,16 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(resKhBool.targetKhPpm).toBe(0);
     expect(resKhBool.concentrateBufferGrams).toBe(0);
   });
+
+  test('TASK-P35-07-JAK: ppmCaCO3ToDegreesDH i degreesDHToPpmCaCO3 ściśle chronią przed -0 oraz stringami -0', () => {
+    expect(Object.is(ppmCaCO3ToDegreesDH(-0), -0)).toBe(false);
+    expect(Object.is(ppmCaCO3ToDegreesDH('-0' as any), -0)).toBe(false);
+    expect(ppmCaCO3ToDegreesDH(-0)).toBe(0);
+    expect(ppmCaCO3ToDegreesDH('-0' as any)).toBe(0);
+
+    expect(Object.is(degreesDHToPpmCaCO3(-0), -0)).toBe(false);
+    expect(Object.is(degreesDHToPpmCaCO3('-0' as any), -0)).toBe(false);
+    expect(degreesDHToPpmCaCO3(-0)).toBe(0);
+    expect(degreesDHToPpmCaCO3('-0' as any)).toBe(0);
+  });
 });

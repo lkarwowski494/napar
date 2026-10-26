@@ -360,7 +360,7 @@ export function diagnoseWaterSensoryImpact(
 export function ppmCaCO3ToDegreesDH(ppm: number): number {
   if (typeof ppm === 'boolean') return 0;
   const numPpm = typeof ppm === 'string' ? parseFloat(ppm) : Number(ppm);
-  if (!Number.isFinite(numPpm) || numPpm <= 0) return 0;
+  if (!Number.isFinite(numPpm) || numPpm <= 0 || Object.is(numPpm, -0)) return 0;
   const safePpm = Math.min(10000, numPpm);
   let result = Number((safePpm / 17.848).toFixed(4));
   if (Object.is(result, -0)) result = 0;
@@ -373,7 +373,7 @@ export function ppmCaCO3ToDegreesDH(ppm: number): number {
 export function degreesDHToPpmCaCO3(dH: number): number {
   if (typeof dH === 'boolean') return 0;
   const numDH = typeof dH === 'string' ? parseFloat(dH) : Number(dH);
-  if (!Number.isFinite(numDH) || numDH <= 0) return 0;
+  if (!Number.isFinite(numDH) || numDH <= 0 || Object.is(numDH, -0)) return 0;
   const safeDH = Math.min(500, numDH);
   let result = Number((safeDH * 17.848).toFixed(2));
   if (Object.is(result, -0)) result = 0;
