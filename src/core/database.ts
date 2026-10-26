@@ -512,7 +512,9 @@ export function getRecipeById(id: string): SavedRecipe | null {
 export function saveRecipe(recipe: SavedRecipe): void {
   if (!recipe || typeof recipe !== 'object') return;
   const db = getDatabase();
-  const safeId = typeof recipe.id === 'string' ? recipe.id.trim() : '';
+  const safeId = typeof recipe.id === 'string'
+    ? recipe.id.trim()
+    : (typeof recipe.id === 'number' && Number.isFinite(recipe.id) ? String(recipe.id) : '');
   if (!safeId) return;
 
   const rawDose = typeof recipe.doseGrams === 'number' ? recipe.doseGrams : parseFloat(String(recipe.doseGrams).replace(',', '.'));
@@ -558,6 +560,12 @@ export function saveRecipe(recipe: SavedRecipe): void {
     try {
       JSON.parse(recipe.stepsJson.trim());
       safeStepsJson = recipe.stepsJson.trim();
+    } catch {
+      safeStepsJson = '[]';
+    }
+  } else if (Array.isArray((recipe as any).steps)) {
+    try {
+      safeStepsJson = JSON.stringify((recipe as any).steps);
     } catch {
       safeStepsJson = '[]';
     }
@@ -1168,9 +1176,17 @@ export function exportAllDataJson(): string {
 }
 
 export function importDataJson(jsonStr: string): void {
+  if (typeof jsonStr !== 'string') {
+    throw new Error('Nieprawidłowy format JSON');
+  }
+  const cleanJson = jsonStr.replace(/^\uFEFF/, '').trim();
+  if (!cleanJson) {
+    throw new Error('Nieprawidłowy format JSON');
+  }
+
   let parsed: any;
   try {
-    parsed = JSON.parse(jsonStr);
+    parsed = JSON.parse(cleanJson);
   } catch {
     throw new Error('Nieprawidłowy format JSON');
   }

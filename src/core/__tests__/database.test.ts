@@ -2263,4 +2263,61 @@ describe('Napar SQLite Database & Repositories', () => {
     deleteRecipe('\x00rec-ctrl-clean\x1F' as any);
     expect(getRecipeById('rec-ctrl-clean')).toBeNull();
   });
+
+  test('TASK-P53-05-ARC: importDataJson radzi sobie z BOM \\uFEFF i odrzuca nie-stringi, a saveRecipe wspiera recipe.steps i numeryczne ID', () => {
+    // 1. importDataJson z BOM \uFEFF na początku pliku
+    const backupObj = {
+      version: 1,
+      exportedAt: '2026-10-26T20:00:00Z',
+      inventory: [
+        {
+          id: 'bom-inv-1',
+          name: 'BOM Coffee',
+          type: 'coffee',
+          initialWeightGrams: 250,
+          remainingWeightGrams: 250,
+          flavorNotes: ['citrus'],
+          isFavorite: false,
+          isArchived: false,
+        },
+      ],
+      customRecipes: [],
+      sessions: [],
+      caffeineLogs: [],
+    };
+    const jsonWithBom = '\uFEFF' + JSON.stringify(backupObj);
+
+    expect(() => importDataJson(jsonWithBom)).not.toThrow();
+    expect(getInventoryItemById('bom-inv-1')).toBeDefined();
+
+    // 2. importDataJson z nie-stringami (null, undefined, number, whitespace)
+    expect(() => importDataJson(null as any)).toThrow('Nieprawidłowy format JSON');
+    expect(() => importDataJson(undefined as any)).toThrow('Nieprawidłowy format JSON');
+    expect(() => importDataJson(12345 as any)).toThrow('Nieprawidłowy format JSON');
+    expect(() => importDataJson('   \n\t  ')).toThrow('Nieprawidłowy format JSON');
+
+    // 3. saveRecipe z obiektem steps: RecipeStep[] oraz numerycznym ID
+    saveRecipe({
+      id: 777 as any,
+      name: 'Steps Array Recipe',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 92,
+      recommendedRatio: 16.7,
+      steps: [
+        { stepIndex: 0, title: 'Bloom', durationSeconds: 45, targetWaterGrams: 50 },
+        { stepIndex: 1, title: 'Pour 2', durationSeconds: 60, targetWaterGrams: 250 },
+      ] as any,
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-26T20:00:00Z',
+    } as any);
+
+    const saved = getRecipeById('777');
+    expect(saved).toBeDefined();
+    expect(saved?.id).toBe('777');
+    expect(saved?.stepsJson).toContain('Bloom');
+  });
 });
