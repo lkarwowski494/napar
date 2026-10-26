@@ -846,4 +846,22 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeProcessById('white honey')?.id).toBe('process-honey');
     expect(findCoffeeProcessById('gold honey')?.id).toBe('process-honey');
   });
+
+  test('TASK-P47-06-TRE: findCoffeeProcessById wspiera natural carbonic, anaerobic natural/washed oraz drozdzowa i experimental', () => {
+    expect(findCoffeeProcessById('natural carbonic')?.id).toBe('process-carbonic-maceration');
+    expect(findCoffeeProcessById('natural-carbonic')?.id).toBe('process-carbonic-maceration');
+    expect(findCoffeeProcessById('natural carbonic maceration')?.id).toBe('process-carbonic-maceration');
+    expect(findCoffeeProcessById('anaerobic natural')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('anaerobic-natural')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('anaerobic washed')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('anaerobic-washed')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('anaerobic honey')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('anaerobico')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('lavado')?.id).toBe('process-washed');
+    expect(findCoffeeProcessById('winey')?.id).toBe('process-natural');
+    expect(findCoffeeProcessById('wine process')?.id).toBe('process-natural');
+    expect(findCoffeeProcessById('fermentacja drozdzowa')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('experimental')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('eksperymentalna')?.id).toBe('process-anaerobic');
+  });
 });
