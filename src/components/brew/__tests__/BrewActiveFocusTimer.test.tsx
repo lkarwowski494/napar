@@ -174,4 +174,35 @@ describe('BrewActiveFocusTimer Component', () => {
     expect(targetPl.props.accessibilityRole).toBe('text');
     expect(targetPl.props.accessibilityLabel).toBe('Zalej do: 120 g');
   });
+
+  test('TASK-P38-01-ODK: previous-step-btn posiada accessibilityState disabled na pierwszym kroku i testID kontrolek', () => {
+    let tree: any;
+    const runningFirstStep = {
+      ...defaultSnapshot,
+      status: 'running',
+      currentStepIndex: 0,
+    };
+
+    act(() => {
+      tree = renderer.create(
+        <BrewActiveFocusTimer {...defaultProps} snapshot={runningFirstStep} />
+      );
+    });
+
+    const prevBtn = tree.root.findByProps({ testID: 'previous-step-btn' });
+    expect(prevBtn.props.accessibilityState).toEqual({ disabled: true });
+    expect(prevBtn.props.disabled).toBe(true);
+
+    const pauseBtn = tree.root.findByProps({ testID: 'pause-brew-btn' });
+    expect(pauseBtn).toBeTruthy();
+
+    const nextBtn = tree.root.findByProps({ testID: 'next-step-btn' });
+    expect(nextBtn).toBeTruthy();
+
+    const sub10Btn = tree.root.findByProps({ testID: 'adjust-time-sub10-btn' });
+    expect(sub10Btn.props.accessibilityHint).toContain('10');
+
+    const add10Btn = tree.root.findByProps({ testID: 'adjust-time-add10-btn' });
+    expect(add10Btn.props.accessibilityHint).toContain('10');
+  });
 });

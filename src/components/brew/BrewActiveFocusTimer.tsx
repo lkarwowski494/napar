@@ -135,6 +135,8 @@ export function BrewActiveFocusTimer({
                     hitSlop={8}
                     accessibilityRole="button"
                     accessibilityLabel={t.brew.subTime10Accessibility || 'Odejmij 10 sekund'}
+                    accessibilityHint={isEn ? 'Decreases current step duration by 10 seconds' : 'Zmniejsza czas trwania bieżącego kroku o 10 sekund'}
+                    testID="adjust-time-sub10-btn"
                   >
                     <Text style={styles.timeAdjustPillText}>{t.brew.subTime10}</Text>
                   </Pressable>
@@ -154,6 +156,8 @@ export function BrewActiveFocusTimer({
                     hitSlop={8}
                     accessibilityRole="button"
                     accessibilityLabel={t.brew.addTime10Accessibility || 'Dodaj 10 sekund'}
+                    accessibilityHint={isEn ? 'Increases current step duration by 10 seconds' : 'Zwiększa czas trwania bieżącego kroku o 10 sekund'}
+                    testID="adjust-time-add10-btn"
                   >
                     <Text style={styles.timeAdjustPillText}>{t.brew.addTime10}</Text>
                   </Pressable>
@@ -207,12 +211,17 @@ export function BrewActiveFocusTimer({
         {isRunning && (
           <>
             <Pressable
-              style={styles.secondaryButton}
+              style={[
+                styles.secondaryButton,
+                snapshot.currentStepIndex === 0 && { opacity: 0.4 },
+              ]}
               onPress={onPreviousStep}
               disabled={snapshot.currentStepIndex === 0}
               accessibilityRole="button"
+              accessibilityState={{ disabled: snapshot.currentStepIndex === 0 }}
               accessibilityLabel={t.brew.previousStepAccessibility || 'Poprzedni krok'}
               accessibilityHint={t.brew.previousStepHint || 'Cofa do poprzedniego etapu parzenia'}
+              testID="previous-step-btn"
             >
               <Text style={styles.secondaryButtonText}>{t.brew.previousStepBtn || '◀ Wstecz'}</Text>
             </Pressable>
@@ -223,6 +232,7 @@ export function BrewActiveFocusTimer({
               accessibilityRole="button"
               accessibilityLabel={t.brew.pauseBrewAccessibility || 'Wstrzymaj parzenie'}
               accessibilityHint={t.brew.pauseBrewHint || 'Zatrzymuje odliczanie czasu'}
+              testID="pause-brew-btn"
             >
               <Text style={styles.pauseButtonText}>{t.brew.pauseBrewBtn || 'PAUZA'}</Text>
             </Pressable>
@@ -241,6 +251,7 @@ export function BrewActiveFocusTimer({
                   ? (t.brew.finishBrewHint || 'Kończy parzenie i otwiera arkusz oceny')
                   : (t.brew.nextStepHint || 'Przechodzi do kolejnego etapu zalewania')
               }
+              testID="next-step-btn"
             >
               <Text style={styles.nextButtonText}>
                 {snapshot.isLastStep ? (t.brew.finishBrewBtn || 'Zakończ ▶') : (t.brew.nextStepBtn || 'Dalej ▶')}
@@ -257,6 +268,7 @@ export function BrewActiveFocusTimer({
               accessibilityRole="button"
               accessibilityLabel={t.brew.resetTimerAccessibility || 'Zresetuj stoper'}
               accessibilityHint={t.brew.resetTimerHint || 'Zeruje czas i wraca do stanu początkowego'}
+              testID="reset-brew-btn"
             >
               <Text style={styles.resetButtonText}>{t.brew.resetBrew || 'Reset'}</Text>
             </Pressable>
@@ -267,6 +279,7 @@ export function BrewActiveFocusTimer({
               accessibilityRole="button"
               accessibilityLabel={t.brew.resumeBrewAccessibility || 'Wznów parzenie'}
               accessibilityHint={t.brew.resumeBrewHint || 'Wznawia odliczanie czasu parzenia'}
+              testID="resume-brew-btn"
             >
               <Text style={styles.mainStartButtonText}>{t.brew.resumeBrew || 'WZNÓW'}</Text>
             </Pressable>
@@ -277,6 +290,7 @@ export function BrewActiveFocusTimer({
               accessibilityRole="button"
               accessibilityLabel={t.brew.saveSessionAccessibility || 'Zapisz sesję'}
               accessibilityHint={t.brew.saveSessionHint || 'Otwiera arkusz degustacyjny do zapisu notatek'}
+              testID="save-brew-btn"
             >
               <Text style={styles.secondaryButtonText}>{t.brew.saveSessionBtn || 'Zapisz'}</Text>
             </Pressable>
