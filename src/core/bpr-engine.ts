@@ -47,13 +47,21 @@ const WEEKDAYS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
  */
 export function parseStepDurationSeconds(
   instruction: string | undefined | null,
-  fallbackSeconds = 30,
+  fallbackSeconds: number | string = 30,
   prioritizeFallback = false
 ): number {
-  const safeFallback =
-    Number.isFinite(fallbackSeconds) && fallbackSeconds > 0
-      ? Math.round(fallbackSeconds)
+  const parsedFallback =
+    typeof fallbackSeconds === 'number'
+      ? fallbackSeconds
+      : typeof fallbackSeconds === 'string'
+      ? parseFloat(fallbackSeconds)
+      : NaN;
+  let safeFallback =
+    Number.isFinite(parsedFallback) && parsedFallback > 0
+      ? Math.max(1, Math.min(86400, Math.round(parsedFallback)))
       : 30;
+  if (Object.is(safeFallback, -0)) safeFallback = 30;
+
   if (prioritizeFallback) {
     return safeFallback;
   }
@@ -70,7 +78,7 @@ export function parseStepDurationSeconds(
   if (minRangeMatch) {
     const minVal = parseFloat(minRangeMatch[1]);
     if (!Number.isNaN(minVal) && minVal > 0) {
-      return Math.round(minVal * 60);
+      return Math.max(1, Math.min(86400, Math.round(minVal * 60)));
     }
   }
 
@@ -81,7 +89,7 @@ export function parseStepDurationSeconds(
   if (secRangeMatch) {
     const secVal = parseFloat(secRangeMatch[1]);
     if (!Number.isNaN(secVal) && secVal > 0) {
-      return Math.round(secVal);
+      return Math.max(1, Math.min(86400, Math.round(secVal)));
     }
   }
 
@@ -92,7 +100,7 @@ export function parseStepDurationSeconds(
   if (minSingleMatch) {
     const mins = parseFloat(minSingleMatch[1]);
     if (!Number.isNaN(mins) && mins > 0) {
-      return Math.round(mins * 60);
+      return Math.max(1, Math.min(86400, Math.round(mins * 60)));
     }
   }
 
@@ -103,7 +111,7 @@ export function parseStepDurationSeconds(
   if (secSingleMatch) {
     const secs = parseFloat(secSingleMatch[1]);
     if (!Number.isNaN(secs) && secs > 0) {
-      return Math.round(secs);
+      return Math.max(1, Math.min(86400, Math.round(secs)));
     }
   }
 

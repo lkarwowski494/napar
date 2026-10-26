@@ -225,5 +225,14 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(calendarWithNulls).toHaveLength(14);
       expect(calendarWithNulls[0].sessionCount).toBe(0);
     });
+
+    it('TASK-P33-03-ZAK: parseStepDurationSeconds parsuje string fallbackSeconds i clampuje do 86400s', () => {
+      expect(parseStepDurationSeconds(null, '45')).toBe(45);
+      expect(parseStepDurationSeconds(null, '0')).toBe(30);
+      expect(parseStepDurationSeconds(null, '-10')).toBe(30);
+      expect(parseStepDurationSeconds('przez 999999 minut')).toBe(86400);
+      expect(parseStepDurationSeconds('odczekaj 999999 sekund')).toBe(86400);
+      expect(parseStepDurationSeconds(null, -0)).toBe(30);
+    });
   });
 });
