@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Všestranný pístový kávovar kombinující imerzi s krátkou dobou louhování.",
     "methodIbrik": "Džezva / Ibrik",
-    "ibrikDesc": "Tradiční turecká konvička pro přípravu husté, intenzivní a nefiltrované kávy."
+    "ibrikDesc": "Tradiční turecká konvička pro přípravu husté, intenzivní a nefiltrované kávy.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Dlouhá macerace ve studené vodě přinášející hladký, přirozeně sladký nálev s nízkou aciditou"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Cafetera d'immersió de pistó versàtil que ofereix una extracció rica amb temps d'infusió curt.",
     "methodIbrik": "Cezve / Ibrik",
-    "ibrikDesc": "Cafetera tradicional turca que produeix un cafè intens, sense filtrar i amb molt de cos."
+    "ibrikDesc": "Cafetera tradicional turca que produeix un cafè intens, sense filtrar i amb molt de cos.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Extracció lenta per immersió en aigua freda que ofereix una beguda suau, dolça i de baixa acidesa"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

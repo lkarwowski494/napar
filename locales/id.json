@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Alat seduh imersi piston serbaguna yang menghasilkan ekstraksi kaya dengan waktu seduh singkat.",
     "methodIbrik": "Cezve / Ibrik",
-    "ibrikDesc": "Alat seduh kopi Turki tradisional yang menghasilkan kopi pekat, kaya rasa, dan tanpa filter."
+    "ibrikDesc": "Alat seduh kopi Turki tradisional yang menghasilkan kopi pekat, kaya rasa, dan tanpa filter.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Ekstraksi perendaman air dingin perlahan yang menghasilkan seduhan lembut, manis alami, dan rendah keasaman"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

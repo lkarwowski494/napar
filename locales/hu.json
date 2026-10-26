@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Sokoldalú dugattyús áztatós kávékészítő gazdag kivonatolással és rövid áztatási idővel.",
     "methodIbrik": "Dzezva / Ibrik",
-    "ibrikDesc": "Hagyományos török kávéfőző edény sűrű, intenzív és szűretlen kávéhoz."
+    "ibrikDesc": "Hagyományos török kávéfőző edény sűrű, intenzív és szűretlen kávéhoz.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Hosszú hidegvizes áztatásos kivonás, amely selymes, természetesen édes és alacsony savtartalmú italt ad"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

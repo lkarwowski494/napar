@@ -177,7 +177,9 @@
     "methodAeropress": "エアロプレス",
     "aeropressDesc": "短い抽出時間で豊かなコクと風味を引き出すピストン浸漬式コーヒー抽出器具。",
     "methodIbrik": "イブリック / ジェズヴェ",
-    "ibrikDesc": "濃厚でコクのある無濾過コーヒーを抽出する伝統的なトルコ式コーヒーポット。"
+    "ibrikDesc": "濃厚でコクのある無濾過コーヒーを抽出する伝統的なトルコ式コーヒーポット。",
+    "methodColdBrew": "水出し (Cold Brew)",
+    "coldBrewDesc": "冷水でじっくり時間をかけて抽出し、まろやかで自然な甘みと低酸味を引き出す抽出法"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

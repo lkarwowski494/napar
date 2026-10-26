@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Dispozitiv versatil de imersie cu piston ce oferă o extracție bogată cu timp scurt de infuzare.",
     "methodIbrik": "Ibric / Cezve",
-    "ibrikDesc": "Vas tradițional pentru cafea la nisip sau turcească, cu zaț dens și gust intens."
+    "ibrikDesc": "Vas tradițional pentru cafea la nisip sau turcească, cu zaț dens și gust intens.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Extracție lentă în apă rece oferind o băutură catifelată, natural dulce și cu aciditate scăzută"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

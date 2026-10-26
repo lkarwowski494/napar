@@ -177,7 +177,9 @@
     "methodAeropress": "에어로프레스",
     "aeropressDesc": "짧은 추출 시간으로 풍부한 바디감과 향미를 추출하는 다목적 피스톤 침출식 브루어.",
     "methodIbrik": "체즈베 / 이브릭",
-    "ibrikDesc": "진하고 풍부한 바디감의 무여과 터키식 커피를 추출하는 전통 구리 주전자."
+    "ibrikDesc": "진하고 풍부한 바디감의 무여과 터키식 커피를 추출하는 전통 구리 주전자.",
+    "methodColdBrew": "콜드브루 (Cold Brew)",
+    "coldBrewDesc": "찬물로 장시간 우려내어 부드럽고 자연스러운 단맛과 낮은 산미를 선사하는 추출 방식"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

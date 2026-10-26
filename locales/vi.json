@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Dụng cụ pha cà phê ngâm piston đa năng mang lại chiết xuất đậm đà với thời gian ủ ngắn.",
     "methodIbrik": "Cezve / Ibrik",
-    "ibrikDesc": "Ấm pha cà phê Thổ Nhĩ Kỳ truyền thống cho hương vị đậm đà, nguyên bản và không lọc."
+    "ibrikDesc": "Ấm pha cà phê Thổ Nhĩ Kỳ truyền thống cho hương vị đậm đà, nguyên bản và không lọc.",
+    "methodColdBrew": "Cà phê ủ lạnh (Cold Brew)",
+    "coldBrewDesc": "Chiết xuất ngâm lạnh chậm rãi mang lại hương vị êm dịu, ngọt tự nhiên và độ chua thấp"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

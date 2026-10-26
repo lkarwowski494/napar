@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Wszechstronny ciśnieniowy zaparzacz tłokowy łączący immersję z krótkim czasem parzenia.",
     "methodIbrik": "Tygielek (Cezve / Ibrik)",
-    "ibrikDesc": "Tradycyjny tygielek do kawy po turecku dający gęsty, intensywny napar z cremą i pianką."
+    "ibrikDesc": "Tradycyjny tygielek do kawy po turecku dający gęsty, intensywny napar z cremą i pianką.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Długotrwała maceracja w zimnej wodzie dająca gładki, naturalnie słodki napar o niskiej kwasowości"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

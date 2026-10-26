@@ -177,7 +177,9 @@
     "methodAeropress": "爱乐压",
     "aeropressDesc": "多功能活塞浸泡式萃取器具，萃取时间短且风味浓郁醇厚。",
     "methodIbrik": "土耳其壶 (Cezve / Ibrik)",
-    "ibrikDesc": "传统土耳其咖啡壶，萃取醇厚浓郁且带有丰富泡沫的未过滤咖啡。"
+    "ibrikDesc": "传统土耳其咖啡壶，萃取醇厚浓郁且带有丰富泡沫的未过滤咖啡。",
+    "methodColdBrew": "冷萃 (Cold Brew)",
+    "coldBrewDesc": "用冷水长时间浸泡萃取，带来顺滑、自然清甜且低酸度的醇厚口感"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

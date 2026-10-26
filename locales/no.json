@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Allsidig stempel-immersjonsbrygger som gir rik ekstraksjon med kort trekketid.",
     "methodIbrik": "Cezve / Ibrik",
-    "ibrikDesc": "Tradisjonell tyrkisk kaffekanne for kraftig, ufiltrert kaffe med fyldig crema."
+    "ibrikDesc": "Tradisjonell tyrkisk kaffekanne for kraftig, ufiltrert kaffe med fyldig crema.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Langsom kaldtvannsekstraksjon som gir en silkemyk, naturlig søt drikk med lav syre"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

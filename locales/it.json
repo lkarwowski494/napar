@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Caffettiera a immersione a stantuffo versatile che offre un'estrazione ricca con breve tempo di infusione.",
     "methodIbrik": "Cezve / Ibrik",
-    "ibrikDesc": "Caffettiera tradizionale turca che produce un caffè denso, corposo e non filtrato."
+    "ibrikDesc": "Caffettiera tradizionale turca che produce un caffè denso, corposo e non filtrato.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Estrazione lenta a freddo per una bevanda morbida, naturalmente dolce e a bassa acidità"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

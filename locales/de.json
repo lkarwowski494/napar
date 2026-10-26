@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Vielseitiger Kolben-Immersionszubereiter für reichhaltige Extraktion bei kurzer Brühzeit.",
     "methodIbrik": "Cezve / Ibrik",
-    "ibrikDesc": "Traditionelle türkische Kaffeekanne für intensiven, ungefilterten und vollmundigen Mokka."
+    "ibrikDesc": "Traditionelle türkische Kaffeekanne für intensiven, ungefilterten und vollmundigen Mokka.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Langsame Kaltwasser-Extraktion für ein samtiges, natürlich süßes Getränk mit milder Säure"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

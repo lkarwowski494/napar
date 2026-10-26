@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Svestrani klipni uranjajući aparat za kavu za bogatu ekstrakciju uz kratko vrijeme pripreme.",
     "methodIbrik": "Džezva / Ibrik",
-    "ibrikDesc": "Tradicionalna posuda za tursku kavu koja daje gust, intenzivan i nefiltriran napitak."
+    "ibrikDesc": "Tradicionalna posuda za tursku kavu koja daje gust, intenzivan i nefiltriran napitak.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Dugotrajna maceracija u hladnoj vodi koja daje gladak, prirodno sladak napitak niske kiselosti"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

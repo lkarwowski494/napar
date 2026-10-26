@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Monipuolinen mäntäuuttolaite, joka tuottaa täyteläisen uuton lyhyellä uuttoajalla.",
     "methodIbrik": "Cezve / Ibrik",
-    "ibrikDesc": "Perinteinen turkkilainen kahvipannu, jolla saadaan täyteläinen, vahva ja suodattamaton kahvi."
+    "ibrikDesc": "Perinteinen turkkilainen kahvipannu, jolla saadaan täyteläinen, vahva ja suodattamaton kahvi.",
+    "methodColdBrew": "Kylmäuutto (Cold Brew)",
+    "coldBrewDesc": "Hidas kylmäuutto tuottaa pehmeän, luontaisen makean ja matalahappoisen juoman"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

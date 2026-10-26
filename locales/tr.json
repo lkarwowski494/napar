@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Kısa demleme süresiyle zengin ekstraksiyon sunan çok yönlü pistonlu daldırma demleyici.",
     "methodIbrik": "Cezve / İbrik",
-    "ibrikDesc": "Yoğun gövdeli, köpüklü ve filtrelenmemiş geleneksel Türk kahvesi pişirme kabı."
+    "ibrikDesc": "Yoğun gövdeli, köpüklü ve filtrelenmemiş geleneksel Türk kahvesi pişirme kabı.",
+    "methodColdBrew": "Soğuk Demleme (Cold Brew)",
+    "coldBrewDesc": "Pürüzsüz, doğal tatlı ve düşük asiditeli bir içecek sunan yavaş soğuk su ekstraksiyonu"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

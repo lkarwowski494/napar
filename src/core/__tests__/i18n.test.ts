@@ -354,4 +354,11 @@ describe('i18n System', () => {
     expect(translations.pl.brew.ibrikDesc).toContain('turecku');
     expect(translations.en.brew.ibrikDesc).toContain('Turkish');
   });
+
+  test('TASK-P31-09-LOK: Klucze methodColdBrew i coldBrewDesc są zdefiniowane w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodColdBrew).toBe('Cold Brew');
+    expect(translations.en.brew.methodColdBrew).toBe('Cold Brew');
+    expect(translations.pl.brew.coldBrewDesc).toContain('zimnej wodzie');
+    expect(translations.en.brew.coldBrewDesc).toContain('cold water');
+  });
 });

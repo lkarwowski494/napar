@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Všestranný piestový ponorný kávovar poskytujúci bohatú extrakciu s krátkym časom lúhovania.",
     "methodIbrik": "Džezva / Ibrik",
-    "ibrikDesc": "Tradičná kanvička na tureckú kávu pre prípravu hustej, intenzívnej a nefiltrovanej kávy."
+    "ibrikDesc": "Tradičná kanvička na tureckú kávu pre prípravu hustej, intenzívnej a nefiltrovanej kávy.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Dlhá macerácia v studenej vode pre jemný, prirodzene sladký nápoj s nízkou aciditou"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

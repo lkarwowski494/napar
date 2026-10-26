@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Veelzijdige zuiger-immersiebrouwer voor een rijke extractie met korte zettijd.",
     "methodIbrik": "Cezve / Ibrik",
-    "ibrikDesc": "Traditionele Turkse koffiepot voor een krachtige, ongefilterde en volle koffie."
+    "ibrikDesc": "Traditionele Turkse koffiepot voor een krachtige, ongefilterde en volle koffie.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Langzame koudwater-immersie-extractie voor een zachte, natuurlijk zoete drank met lage aciditeit"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

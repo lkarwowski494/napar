@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Pembancuh rendaman omboh serba boleh yang memberikan pengekstrakan kaya dengan masa rendaman singkat.",
     "methodIbrik": "Cezve / Ibrik",
-    "ibrikDesc": "Cerek kopi Turki tradisional yang menghasilkan seduhan pekat, padat, dan tanpa ditapis."
+    "ibrikDesc": "Cerek kopi Turki tradisional yang menghasilkan seduhan pekat, padat, dan tanpa ditapis.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Pengekstrakan rendaman air sejuk yang menghasilkan minuman lembut, manis semula jadi dan rendah asid"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

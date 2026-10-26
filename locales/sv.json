@@ -177,7 +177,9 @@
     "methodAeropress": "AeroPress",
     "aeropressDesc": "Mångsidig kolv-immersionsbryggare som ger rik extraktion med kort bryggtid.",
     "methodIbrik": "Cezve / Ibrik",
-    "ibrikDesc": "Traditionell turkisk kaffekanna som ger ett fylligt, intensivt och ofiltrerat kaffe."
+    "ibrikDesc": "Traditionell turkisk kaffekanna som ger ett fylligt, intensivt och ofiltrerat kaffe.",
+    "methodColdBrew": "Cold Brew",
+    "coldBrewDesc": "Långsam kallvattenextraktion som ger en len, naturligt söt dryck med låg syra"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
