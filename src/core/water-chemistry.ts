@@ -345,18 +345,24 @@ export function diagnoseWaterSensoryImpact(
  * Konwertuje twardość z ppm CaCO3 na stopnie niemieckie dH (1 dH = 17.848 ppm CaCO3)
  */
 export function ppmCaCO3ToDegreesDH(ppm: number): number {
-  if (!Number.isFinite(ppm) || ppm <= 0) return 0;
-  const safePpm = Math.min(10000, ppm);
-  return Number((safePpm / 17.848).toFixed(4));
+  const numPpm = typeof ppm === 'string' ? parseFloat(ppm) : Number(ppm);
+  if (!Number.isFinite(numPpm) || numPpm <= 0) return 0;
+  const safePpm = Math.min(10000, numPpm);
+  let result = Number((safePpm / 17.848).toFixed(4));
+  if (Object.is(result, -0)) result = 0;
+  return result;
 }
 
 /**
  * Konwertuje twardość ze stopni niemieckich dH na ppm CaCO3 (1 dH = 17.848 ppm CaCO3)
  */
 export function degreesDHToPpmCaCO3(dH: number): number {
-  if (!Number.isFinite(dH) || dH <= 0) return 0;
-  const safeDH = Math.min(500, dH);
-  return Number((safeDH * 17.848).toFixed(2));
+  const numDH = typeof dH === 'string' ? parseFloat(dH) : Number(dH);
+  if (!Number.isFinite(numDH) || numDH <= 0) return 0;
+  const safeDH = Math.min(500, numDH);
+  let result = Number((safeDH * 17.848).toFixed(2));
+  if (Object.is(result, -0)) result = 0;
+  return result;
 }
 
 export function findWaterRecipeById(id: string): WaterRecipe | undefined {

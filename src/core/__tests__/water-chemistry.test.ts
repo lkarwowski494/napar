@@ -268,4 +268,20 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(Object.is(res.dryEpsomSaltMgSO4Grams, -0)).toBe(false);
     expect(Object.is(res.dryCalciumChlorideCaCl2Grams, -0)).toBe(false);
   });
+
+  test('TASK-P28-07-JAK: ppmCaCO3ToDegreesDH i degreesDHToPpmCaCO3 parsują stringi i chronią przed -0', () => {
+    const dhFromString = ppmCaCO3ToDegreesDH('60' as any);
+    expect(dhFromString).toBeCloseTo(3.3617, 3);
+
+    const ppmFromString = degreesDHToPpmCaCO3('3.5' as any);
+    expect(ppmFromString).toBeCloseTo(62.47, 1);
+
+    const dhNegZero = ppmCaCO3ToDegreesDH(-0);
+    expect(dhNegZero).toBe(0);
+    expect(Object.is(dhNegZero, -0)).toBe(false);
+
+    const ppmNegZero = degreesDHToPpmCaCO3(-0);
+    expect(ppmNegZero).toBe(0);
+    expect(Object.is(ppmNegZero, -0)).toBe(false);
+  });
 });
