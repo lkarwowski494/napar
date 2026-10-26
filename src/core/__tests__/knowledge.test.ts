@@ -365,4 +365,11 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     const byDrying = searchCoffeeProcesses('dni');
     expect(byDrying.length).toBeGreaterThanOrEqual(1);
   });
+
+  test('TASK-P18-06-TRE: funkcje findById są odporne na wielkość liter i białe znaki', () => {
+    expect(findCoffeeVarietyById('  VARIETY-GEISHA  ')?.id).toBe('variety-geisha');
+    expect(findCoffeeProcessById('Process-Washed')?.id).toBe('process-washed');
+    expect(findCoffeeOriginById('ORIGIN-ETHIOPIA')?.id).toBe('origin-ethiopia');
+    expect(findTeaCategoryById('TEA-GREEN')?.id).toBe('tea-green');
+  });
 });

@@ -637,26 +637,26 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
 
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
   if (!id || typeof id !== 'string') return undefined;
-  const cleanId = id.trim();
-  return COFFEE_VARIETIES.find((v) => v.id === cleanId);
+  const cleanId = id.trim().toLowerCase();
+  return COFFEE_VARIETIES.find((v) => v.id.toLowerCase() === cleanId);
 }
 
 export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined {
   if (!id || typeof id !== 'string') return undefined;
-  const cleanId = id.trim();
-  return COFFEE_PROCESSES.find((p) => p.id === cleanId);
+  const cleanId = id.trim().toLowerCase();
+  return COFFEE_PROCESSES.find((p) => p.id.toLowerCase() === cleanId);
 }
 
 export function findCoffeeOriginById(id: string): CoffeeOriginInfo | undefined {
   if (!id || typeof id !== 'string') return undefined;
-  const cleanId = id.trim();
-  return COFFEE_ORIGINS.find((o) => o.id === cleanId);
+  const cleanId = id.trim().toLowerCase();
+  return COFFEE_ORIGINS.find((o) => o.id.toLowerCase() === cleanId);
 }
 
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
   if (!id || typeof id !== 'string') return undefined;
-  const cleanId = id.trim();
-  return TEA_CATEGORIES.find((t) => t.id === cleanId);
+  const cleanId = id.trim().toLowerCase();
+  return TEA_CATEGORIES.find((t) => t.id.toLowerCase() === cleanId);
 }
 
 export function getKnowledgeDescription(id: string, lang: 'pl' | 'en' = 'pl'): string {
