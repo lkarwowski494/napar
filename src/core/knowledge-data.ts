@@ -709,10 +709,20 @@ export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
 
   return TEA_CATEGORIES.find((t) => {
     if (t.id && typeof t.id === 'string' && t.id.trim().toLowerCase() === cleanId) return true;
-    if (t.namePl && typeof t.namePl === 'string' && t.namePl.trim().toLowerCase() === cleanId) return true;
-    if (t.nameEn && typeof t.nameEn === 'string' && t.nameEn.trim().toLowerCase() === cleanId) return true;
-    if (t.namePl && typeof t.namePl === 'string' && t.namePl.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === normId) return true;
-    if (t.nameEn && typeof t.nameEn === 'string' && t.nameEn.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === normId) return true;
+    if (t.namePl && typeof t.namePl === 'string') {
+      const plClean = t.namePl.trim().toLowerCase();
+      const plNorm = t.namePl.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      if (plClean === cleanId || plNorm === normId) return true;
+      const tokens = plNorm.split(/[\s/(),-]+/).filter((tok) => tok && tok !== 'herbata');
+      if (tokens.some((tok) => tok === normId)) return true;
+    }
+    if (t.nameEn && typeof t.nameEn === 'string') {
+      const enClean = t.nameEn.trim().toLowerCase();
+      const enNorm = t.nameEn.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      if (enClean === cleanId || enNorm === normId) return true;
+      const tokens = enNorm.split(/[\s/(),-]+/).filter((tok) => tok && tok !== 'tea');
+      if (tokens.some((tok) => tok === normId)) return true;
+    }
     if (t.traditionalName && typeof t.traditionalName === 'string') {
       const tradClean = t.traditionalName.trim().toLowerCase();
       const tradNorm = t.traditionalName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();

@@ -578,4 +578,29 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeOriginById('   ')).toBeUndefined();
     expect(findCoffeeOriginById('Nieznany Kraj')).toBeUndefined();
   });
+
+  test('TASK-P33-06-TRE: findTeaCategoryById dopasowuje podciągi i tokeny nazw PL i EN', () => {
+    // Po słowie kluczowym "zielona"
+    const greenPl = findTeaCategoryById('zielona');
+    expect(greenPl).toBeDefined();
+    expect(greenPl?.id).toBe('tea-green');
+
+    // Po słowie "green"
+    const greenEn = findTeaCategoryById('green');
+    expect(greenEn).toBeDefined();
+    expect(greenEn?.id).toBe('tea-green');
+
+    // Po słowie "czarna"
+    const blackPl = findTeaCategoryById('czarna');
+    expect(blackPl).toBeDefined();
+    expect(blackPl?.id).toBe('tea-black');
+
+    // Po słowie "oolong"
+    const oolong = findTeaCategoryById('oolong');
+    expect(oolong).toBeDefined();
+    expect(oolong?.id).toBe('tea-oolong');
+
+    expect(findTeaCategoryById('   ')).toBeUndefined();
+    expect(findTeaCategoryById('nieznana herbata')).toBeUndefined();
+  });
 });
