@@ -488,4 +488,10 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Mielenie pod ekspres dźwigniowy Flair' })).toBe(350);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine grind for Cafelat Robot manual lever' })).toBe(350);
   });
+
+  test('TASK-P41-08-PRO: getRecipeMicrons rozpoznaje frazy cold drip, ice drip oraz cold brew w opisach przemiału (1150 µm)', () => {
+    expect(getRecipeMicrons({ method: 'DRIP', grindSettingDescriptionPl: 'Grubo pod macerację cold brew' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'TOWER', grindSettingDescriptionEn: 'Coarse grind for cold drip system' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'CUSTOM', grindSettingDescriptionPl: 'Ustawienie pod powolny ice drip' })).toBe(1150);
+  });
 });
