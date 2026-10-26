@@ -284,4 +284,19 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(ppmNegZero).toBe(0);
     expect(Object.is(ppmNegZero, -0)).toBe(false);
   });
+
+  test('TASK-P29-07-JAK: getWaterProfileName wyszukuje profile i wody butelkowane bez wzgledu na wielkosc liter', () => {
+    // Profil standardowy SCA
+    expect(getWaterProfileName('SCA_STANDARD', 'pl')).toBe('Standard SCA (Specialty Coffee)');
+    expect(getWaterProfileName('  sca_standard  ', 'pl')).toBe('Standard SCA (Specialty Coffee)');
+    expect(getWaterProfileName('sca_standard', 'en')).toBe('SCA Standard Water');
+
+    // Woda butelkowana (np. Żywiec Zdrój / Volvic)
+    expect(getWaterProfileName('VOLVIC')).toBe('Volvic');
+    expect(getWaterProfileName('volvic')).toBe('Volvic');
+
+    // Nieznane id zwraca wyczyszczony identyfikator
+    expect(getWaterProfileName('  my_custom_water  ')).toBe('my_custom_water');
+    expect(getWaterProfileName('')).toBe('');
+  });
 });
