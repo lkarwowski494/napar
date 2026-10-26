@@ -96,6 +96,12 @@ try {
     `app.json -> expo.name musi być równe 'Napar' (otrzymano '${appJson.name}')`
   );
 
+  // Weryfikacja semver wersji aplikacji w app.json (TASK-P22-10-WYD)
+  check(
+    typeof appJson.version === 'string' && /^\d+\.\d+\.\d+$/.test(appJson.version),
+    `app.json -> expo.version musi być w formacie semver X.Y.Z (otrzymano '${appJson.version}')`
+  );
+
   // Weryfikacja ścieżki ikony oraz numerycznego buildNumber (TASK-P12-10-WYD)
   check(
     appJson.icon === './assets/icon.png',
