@@ -155,10 +155,12 @@ export function recordBrewCompleted(): AppAccessState {
 }
 
 export function activateSubscription(tier: 'monthly' | 'annual' | 'lifetime'): AppAccessState {
+  const allowedTiers: readonly string[] = ['monthly', 'annual', 'lifetime'];
+  const safeTier = (allowedTiers.includes(tier) ? tier : 'annual') as 'monthly' | 'annual' | 'lifetime';
   setAppSetting('is_pro_active', 'true');
-  setAppSetting('subscription_tier', tier);
+  setAppSetting('subscription_tier', safeTier);
   setAppSetting('has_verified_purchase', 'true');
-  setAppSetting('verified_purchase_tier', tier);
+  setAppSetting('verified_purchase_tier', safeTier);
   const state = getAppAccessState();
   notifyAccessChanged();
   return state;
