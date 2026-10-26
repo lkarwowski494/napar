@@ -348,10 +348,12 @@ export function deleteInventoryItem(id: string): void {
 
 export function deductInventoryWeight(id: string, doseGrams: number): void {
   if (!id || typeof id !== 'string') return;
+  const safeId = id.trim();
+  if (!safeId) return;
   const safeDose = Number.isFinite(doseGrams) && doseGrams > 0 ? doseGrams : 0;
   if (safeDose <= 0) return;
   const db = getDatabase();
-  const item = getInventoryItemById(id);
+  const item = getInventoryItemById(safeId);
   if (!item) return;
   const currentRemaining =
     Number.isFinite(item.remainingWeightGrams) && item.remainingWeightGrams >= 0
@@ -360,7 +362,7 @@ export function deductInventoryWeight(id: string, doseGrams: number): void {
   const newRemaining = Math.max(0, Number((currentRemaining - safeDose).toFixed(1)));
   db.runSync(
     'UPDATE inventory_items SET remaining_weight_g = ?, updated_at = ? WHERE id = ?',
-    [newRemaining, new Date().toISOString(), id]
+    [newRemaining, new Date().toISOString(), safeId]
   );
 }
 
@@ -369,6 +371,20 @@ export function deductBeansForBrew(itemId: string, grams: number): void {
 }
 
 function mapRowToInventoryItem(row: InventoryRow): InventoryItem {
+  if (!row) {
+    return {
+      id: '',
+      name: '',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 0,
+      flavorNotes: [],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  }
   let flavorNotes: string[] = [];
   try {
     const parsed = row.flavor_notes_json ? JSON.parse(row.flavor_notes_json) : [];
@@ -377,8 +393,8 @@ function mapRowToInventoryItem(row: InventoryRow): InventoryItem {
     flavorNotes = [];
   }
   return {
-    id: row.id,
-    name: row.name,
+    id: row.id || '',
+    name: row.name || '',
     type: row.type === 'tea' ? 'tea' : 'coffee',
     roasterOrProducer: row.roaster_or_producer || undefined,
     origin: row.origin || undefined,
@@ -386,14 +402,14 @@ function mapRowToInventoryItem(row: InventoryRow): InventoryItem {
     roastProfile: row.roast_profile || undefined,
     process: row.process || undefined,
     variety: row.variety || undefined,
-    initialWeightGrams: Number.isFinite(row.initial_weight_g) && row.initial_weight_g >= 0 ? row.initial_weight_g : 250,
-    remainingWeightGrams: Number.isFinite(row.remaining_weight_g) && row.remaining_weight_g >= 0 ? row.remaining_weight_g : 0,
+    initialWeightGrams: (typeof row.initial_weight_g === 'number' && Number.isFinite(row.initial_weight_g) && row.initial_weight_g >= 0) ? row.initial_weight_g : 250,
+    remainingWeightGrams: (typeof row.remaining_weight_g === 'number' && Number.isFinite(row.remaining_weight_g) && row.remaining_weight_g >= 0) ? row.remaining_weight_g : 0,
     flavorNotes,
-    rating: (row.rating !== null && Number.isFinite(row.rating) && row.rating >= 0 && row.rating <= 5) ? row.rating : undefined,
+    rating: (row.rating !== null && row.rating !== undefined && Number.isFinite(row.rating) && row.rating >= 0 && row.rating <= 5) ? row.rating : undefined,
     isFavorite: Boolean(row.is_favorite),
     isArchived: Boolean(row.is_archived),
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    createdAt: row.created_at || new Date().toISOString(),
+    updatedAt: row.updated_at || new Date().toISOString(),
   };
 }
 
