@@ -575,6 +575,14 @@ export function getBrewSessionById(id: string): BrewSession | null {
 
 export function saveBrewSession(session: BrewSession): void {
   const db = getDatabase();
+  const dose = Number.isFinite(session.doseGrams) && session.doseGrams > 0 ? session.doseGrams : 15;
+  const water = Number.isFinite(session.waterGrams) && session.waterGrams > 0 ? session.waterGrams : 250;
+  const temp = Number.isFinite(session.waterTempCelsius) && session.waterTempCelsius > 0 ? session.waterTempCelsius : 92;
+  const totalTime = Number.isFinite(session.totalTimeSeconds) && session.totalTimeSeconds >= 0 ? session.totalTimeSeconds : 0;
+  const sanitizedRating = session.rating != null && Number.isFinite(session.rating) && session.rating >= 0 && session.rating <= 5
+    ? session.rating
+    : null;
+
   db.runSync(
     `INSERT OR REPLACE INTO brew_sessions (
       id, recipe_id, recipe_name, inventory_item_id, inventory_item_name,
@@ -591,13 +599,13 @@ export function saveBrewSession(session: BrewSession): void {
       session.inventoryItemName ?? null,
       session.beverageType,
       session.method,
-      session.doseGrams,
-      session.waterGrams,
-      session.waterTempCelsius,
+      dose,
+      water,
+      temp,
       session.waterProfile ?? null,
       session.grindSetting ?? null,
-      session.totalTimeSeconds,
-      session.rating ?? null,
+      totalTime,
+      sanitizedRating,
       JSON.stringify(session.flavorTags || []),
       session.tasteBalance ?? null,
       session.tdsPercentage ?? null,
@@ -685,13 +693,13 @@ function mapRowToBrewSession(row: BrewSessionRow): BrewSession {
     inventoryItemName: row.inventory_item_name || undefined,
     beverageType: row.beverage_type,
     method: row.method,
-    doseGrams: row.dose_g,
-    waterGrams: row.water_g,
-    waterTempCelsius: row.water_temp_c,
+    doseGrams: Number.isFinite(row.dose_g) && row.dose_g > 0 ? row.dose_g : 15,
+    waterGrams: Number.isFinite(row.water_g) && row.water_g > 0 ? row.water_g : 250,
+    waterTempCelsius: Number.isFinite(row.water_temp_c) && row.water_temp_c > 0 ? row.water_temp_c : 92,
     waterProfile: row.water_profile || undefined,
     grindSetting: row.grind_setting || undefined,
-    totalTimeSeconds: row.total_time_seconds,
-    rating: row.rating !== null ? row.rating : undefined,
+    totalTimeSeconds: Number.isFinite(row.total_time_seconds) && row.total_time_seconds >= 0 ? row.total_time_seconds : 0,
+    rating: (row.rating !== null && Number.isFinite(row.rating) && row.rating >= 0 && row.rating <= 5) ? row.rating : undefined,
     flavorTags,
     tasteBalance: row.taste_balance || undefined,
     tdsPercentage: row.tds_percentage !== null ? row.tds_percentage : undefined,

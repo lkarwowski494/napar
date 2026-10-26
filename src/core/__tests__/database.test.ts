@@ -1091,6 +1091,33 @@ describe('Napar SQLite Database & Repositories', () => {
     });
   });
 
+  test('TASK-P10-05-ARC: saveBrewSession oraz mapRowToBrewSession sanityzują liczby i ocenę', () => {
+    initDatabase(mockDb as any);
+    const brokenSession: any = {
+      id: 'session-invalid-boundary',
+      recipeId: 'rec-1',
+      recipeName: 'V60 Test',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: NaN,
+      waterGrams: -100,
+      waterTempCelsius: NaN,
+      totalTimeSeconds: -50,
+      rating: 99,
+      flavorTags: [],
+      brewedAt: '2026-10-26T00:00:00.000Z',
+    };
+
+    saveBrewSession(brokenSession);
+    const retrieved = getBrewSessionById('session-invalid-boundary');
+    expect(retrieved).not.toBeNull();
+    expect(retrieved!.doseGrams).toBe(15);
+    expect(retrieved!.waterGrams).toBe(250);
+    expect(retrieved!.waterTempCelsius).toBe(92);
+    expect(retrieved!.totalTimeSeconds).toBe(0);
+    expect(retrieved!.rating).toBeUndefined();
+  });
+
   test('TASK-P9-07-JAK: saveRecipe oraz mapRowToRecipe chronią dose, water, temp i ratio przed NaN i wartościami niedodatnimi', () => {
     initDatabase(mockDb as any);
     const brokenRecipe: any = {
