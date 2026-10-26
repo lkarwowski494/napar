@@ -9,11 +9,11 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | :--- | :---: | :---: | :---: | :---: |
 | **EKRAN** | 9 | 9 | **100.0%** | ✅ POKRYTE |
 | **UI** | 92 | 92 | **100.0%** | ✅ POKRYTE |
-| **TEKST** | 477 | 477 | **100.0%** | ✅ POKRYTE |
+| **TEKST** | 480 | 480 | **100.0%** | ✅ POKRYTE |
 | **LOGIKA** | 209 | 209 | **100.0%** | ✅ POKRYTE |
 | **WYMIAR** | 37 | 37 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **824** | Pokrytych: **824** | Brakujących: **0**
+Łącznie elementów: **827** | Pokrytych: **827** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -156,6 +156,9 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `brew.methodMoccamaster` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.methodGina` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.methodTrinityOne` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.methodWalkuere` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.methodBialetti` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.methodFlair` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.resetTimerAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.resetTimerHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.resumeBrewAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
@@ -316,8 +319,5 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `stash.favoriteAdd` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `TEKST` | `stash.favoriteRemove` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `TEKST` | `stash.emptyTitle` | `src/core/i18n.tsx` | ✅ | tests/interaction-guards.test.ts, tests/recipe-select-inline.test.tsx |
-| `TEKST` | `stash.emptyDesc` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `TEKST` | `stash.readOnlyNotice` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `TEKST` | `journal.title` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/i18n-no-polish-in-en.test.tsx |
 
-*(... i 524 kolejnych elementów w pełnym wykazie)*
+*(... i 527 kolejnych elementów w pełnym wykazie)*

@@ -403,4 +403,9 @@ describe('i18n System', () => {
     expect(translations.pl.brew.methodBialetti).toBe('Kawiarka (Bialetti / Moka)');
     expect(translations.en.brew.methodBialetti).toBe('Moka Pot (Bialetti)');
   });
+
+  test('TASK-P40-09-LOK: Klucz methodFlair jest zdefiniowany w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodFlair).toBe('Ekspres dźwigniowy (Flair / Robot)');
+    expect(translations.en.brew.methodFlair).toBe('Manual Lever (Flair / Robot)');
+  });
 });
