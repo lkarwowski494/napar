@@ -315,4 +315,10 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio drobno pod kawiarkę' })).toBe(450);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-fine for moka pot' })).toBe(450);
   });
+  test('TASK-P24-08-PRO: getRecipeMicrons rozpoznaje syfon (Siphon / Syfon) i zwraca 650 µm', () => {
+    expect(getRecipeMicrons({ method: 'SIPHON' })).toBe(650);
+    expect(getRecipeMicrons({ method: 'syfon' })).toBe(650);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio-drobno pod syfon próżniowy' })).toBe(650);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-fine for vacuum siphon' })).toBe(650);
+  });
 });

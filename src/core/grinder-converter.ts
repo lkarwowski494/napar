@@ -399,6 +399,9 @@ export function getRecipeMicrons(recipe?: {
   if (method === 'MOKA' || desc.includes('kawiark') || desc.includes('moka')) {
     return 450;
   }
+  if (method === 'SIPHON' || method === 'SYFON' || desc.includes('siphon') || desc.includes('syfon')) {
+    return 650;
+  }
   if (desc.includes('drobno') || desc.includes('fine') || method === 'AEROPRESS') {
     if (desc.includes('16') || desc.includes('18')) return 520;
     return 560;
