@@ -626,5 +626,10 @@
     "cationDominantMagnesium": "मैग्नीशियम प्रमुख (फल और अम्लता)",
     "cationDominantCalcium": "कैल्शियम प्रमुख (बॉडी और मलाईदारपन)",
     "cationDominantBalanced": "संतुलित धनायन (स्पष्ट स्वाद)"
-  }
+  },
+  "waterHardnessVerySoft": "Very soft water (<50 ppm CaCO₃)",
+  "waterHardnessSoft": "Soft water (51–100 ppm CaCO₃)",
+  "waterHardnessModeratelyHard": "Moderately hard water (101–175 ppm CaCO₃)",
+  "waterHardnessHard": "Hard water (176–300 ppm CaCO₃)",
+  "waterHardnessVeryHard": "Very hard water (>300 ppm CaCO₃)"
 }

@@ -626,5 +626,10 @@
     "cationDominantMagnesium": "Magnesium-dominant (Fruchtigkeit & Säure)",
     "cationDominantCalcium": "Calcium-dominant (Körper & Cremigkeit)",
     "cationDominantBalanced": "Ausgewogene Kationen (Klarheit des Profils)"
-  }
+  },
+  "waterHardnessVerySoft": "Sehr weiches Wasser (<50 ppm CaCO₃)",
+  "waterHardnessSoft": "Weiches Wasser (51–100 ppm CaCO₃)",
+  "waterHardnessModeratelyHard": "Mittelhartes Wasser (101–175 ppm CaCO₃)",
+  "waterHardnessHard": "Hartes Wasser (176–300 ppm CaCO₃)",
+  "waterHardnessVeryHard": "Sehr hartes Wasser (>300 ppm CaCO₃)"
 }

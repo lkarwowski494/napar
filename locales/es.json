@@ -626,5 +626,10 @@
     "cationDominantMagnesium": "Predominio de magnesio (Fruta y Acidez)",
     "cationDominantCalcium": "Predominio de calcio (Cuerpo y Cremosidad)",
     "cationDominantBalanced": "Cationes equilibrados (Claridad de perfil)"
-  }
+  },
+  "waterHardnessVerySoft": "Agua muy blanda (<50 ppm CaCO₃)",
+  "waterHardnessSoft": "Agua blanda (51–100 ppm CaCO₃)",
+  "waterHardnessModeratelyHard": "Agua moderadamente dura (101–175 ppm CaCO₃)",
+  "waterHardnessHard": "Agua dura (176–300 ppm CaCO₃)",
+  "waterHardnessVeryHard": "Agua muy dura (>300 ppm CaCO₃)"
 }

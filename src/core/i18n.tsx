@@ -478,6 +478,11 @@ export const translations = {
       cationDominantMagnesium: 'Dominacja magnezu (Owocowość i Kwasowość)',
       cationDominantCalcium: 'Dominacja wapnia (Body i Kremowość)',
       cationDominantBalanced: 'Zrównoważone kationy (Czystość profilu)',
+      waterHardnessVerySoft: 'Bardzo miękka woda (<50 ppm CaCO₃)',
+      waterHardnessSoft: 'Miękka woda (51–100 ppm CaCO₃)',
+      waterHardnessModeratelyHard: 'Średnio twarda woda (101–175 ppm CaCO₃)',
+      waterHardnessHard: 'Twarda woda (176–300 ppm CaCO₃)',
+      waterHardnessVeryHard: 'Bardzo twarda woda (>300 ppm CaCO₃)',
     },
     grinder: {
       title: 'Przelicznik Młynków (Grinder Dial-in)',
@@ -1106,6 +1111,11 @@ export const translations = {
       cationDominantMagnesium: 'Magnesium-dominant (Fruit & Acidity)',
       cationDominantCalcium: 'Calcium-dominant (Body & Creaminess)',
       cationDominantBalanced: 'Balanced cations (All-round clarity)',
+      waterHardnessVerySoft: 'Very soft water (<50 ppm CaCO₃)',
+      waterHardnessSoft: 'Soft water (51–100 ppm CaCO₃)',
+      waterHardnessModeratelyHard: 'Moderately hard water (101–175 ppm CaCO₃)',
+      waterHardnessHard: 'Hard water (176–300 ppm CaCO₃)',
+      waterHardnessVeryHard: 'Very hard water (>300 ppm CaCO₃)',
     },
     grinder: {
       title: 'Grinder Dial-in Converter',

@@ -626,5 +626,10 @@
     "cationDominantMagnesium": "마그네슘 우세 (과일향 및 산미)",
     "cationDominantCalcium": "칼슘 우세 (바디감 및 크리미함)",
     "cationDominantBalanced": "균형 잡힌 양이온 (깔끔한 풍미)"
-  }
+  },
+  "waterHardnessVerySoft": "Very soft water (<50 ppm CaCO₃)",
+  "waterHardnessSoft": "Soft water (51–100 ppm CaCO₃)",
+  "waterHardnessModeratelyHard": "Moderately hard water (101–175 ppm CaCO₃)",
+  "waterHardnessHard": "Hard water (176–300 ppm CaCO₃)",
+  "waterHardnessVeryHard": "Very hard water (>300 ppm CaCO₃)"
 }

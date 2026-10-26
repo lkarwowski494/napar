@@ -626,5 +626,10 @@
     "cationDominantMagnesium": "Dominance magnésium (Fruit & Acidité)",
     "cationDominantCalcium": "Dominance calcium (Corps & Onctuosité)",
     "cationDominantBalanced": "Cations équilibrés (Clarté globale)"
-  }
+  },
+  "waterHardnessVerySoft": "Eau très douce (<50 ppm CaCO₃)",
+  "waterHardnessSoft": "Eau douce (51–100 ppm CaCO₃)",
+  "waterHardnessModeratelyHard": "Eau moyennement dure (101–175 ppm CaCO₃)",
+  "waterHardnessHard": "Eau dure (176–300 ppm CaCO₃)",
+  "waterHardnessVeryHard": "Eau très dure (>300 ppm CaCO₃)"
 }

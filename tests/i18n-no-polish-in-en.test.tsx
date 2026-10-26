@@ -122,4 +122,20 @@ describe('No Polish in EN Guard (NFR-I18N-003)', () => {
     expect(JSON.stringify(grinderCard.toJSON())).not.toMatch(polishDiacriticsRegex);
     expect(JSON.stringify(safeMode.toJSON())).not.toMatch(polishDiacriticsRegex);
   });
+
+  test('TASK-P53-09-LOK: translations.en i translations.pl zawieraja klucze kategorii twardosci wody waterHardness*', () => {
+    // EN
+    expect((translations.en.water as any).waterHardnessVerySoft).toBe('Very soft water (<50 ppm CaCO₃)');
+    expect((translations.en.water as any).waterHardnessSoft).toBe('Soft water (51–100 ppm CaCO₃)');
+    expect((translations.en.water as any).waterHardnessModeratelyHard).toBe('Moderately hard water (101–175 ppm CaCO₃)');
+    expect((translations.en.water as any).waterHardnessHard).toBe('Hard water (176–300 ppm CaCO₃)');
+    expect((translations.en.water as any).waterHardnessVeryHard).toBe('Very hard water (>300 ppm CaCO₃)');
+
+    // PL
+    expect((translations.pl.water as any).waterHardnessVerySoft).toBe('Bardzo miękka woda (<50 ppm CaCO₃)');
+    expect((translations.pl.water as any).waterHardnessSoft).toBe('Miękka woda (51–100 ppm CaCO₃)');
+    expect((translations.pl.water as any).waterHardnessModeratelyHard).toBe('Średnio twarda woda (101–175 ppm CaCO₃)');
+    expect((translations.pl.water as any).waterHardnessHard).toBe('Twarda woda (176–300 ppm CaCO₃)');
+    expect((translations.pl.water as any).waterHardnessVeryHard).toBe('Bardzo twarda woda (>300 ppm CaCO₃)');
+  });
 });

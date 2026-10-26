@@ -626,5 +626,10 @@
     "cationDominantMagnesium": "镁离子主导（果香与酸度）",
     "cationDominantCalcium": "钙离子主导（醇厚与顺滑）",
     "cationDominantBalanced": "均衡阳离子（整体纯净风味）"
-  }
+  },
+  "waterHardnessVerySoft": "Very soft water (<50 ppm CaCO₃)",
+  "waterHardnessSoft": "Soft water (51–100 ppm CaCO₃)",
+  "waterHardnessModeratelyHard": "Moderately hard water (101–175 ppm CaCO₃)",
+  "waterHardnessHard": "Hard water (176–300 ppm CaCO₃)",
+  "waterHardnessVeryHard": "Very hard water (>300 ppm CaCO₃)"
 }
