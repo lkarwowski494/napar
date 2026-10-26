@@ -903,4 +903,20 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findTeaCategoryById('milk-oolong')?.id).toBe('tea-oolong');
     expect(findTeaCategoryById('jin xuan')?.id).toBe('tea-oolong');
   });
+
+  test('TASK-P50-06-TRE: findCoffeeProcessById wspiera thermal-shock, cryo-maceration, nitro oraz findTeaCategoryById wspiera yancha, keemun, dianhong', () => {
+    // 1. Procesy kawy
+    expect(findCoffeeProcessById('thermal-shock')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('szok termiczny')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('cryo-maceration')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('nitro-maceration')?.id).toBe('process-anaerobic');
+
+    // 2. Kategorie herbaty
+    expect(findTeaCategoryById('yancha')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('wuyi rock')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('keemun')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('qimen')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('dianhong')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('jin-jun-mei')?.id).toBe('tea-black');
+  });
 });
