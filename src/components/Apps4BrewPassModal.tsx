@@ -119,7 +119,7 @@ export function Apps4BrewPassModal({
             onPress={onClose}
             accessibilityRole="button"
             accessibilityLabel={t.paywall.close}
-            accessibilityHint={t?.common?.closeHint || (isEn ? 'Closes subscription window' : 'Zamyka okno subskrypcji')}
+            accessibilityHint={(t?.common as any)?.closeHint || (isEn ? 'Closes subscription window' : 'Zamyka okno subskrypcji')}
           >
             <Text style={styles.closeBtnText}>✕</Text>
           </Pressable>
@@ -187,7 +187,7 @@ export function Apps4BrewPassModal({
             onPress={() => handleSelectPlan('annual')}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planAnnualTitle} ${t.paywall.planAnnualPrice}`}
-            accessibilityHint={t?.paywall?.planAnnualHint || (isEn ? 'Purchases annual subscription via StoreKit' : 'Kupuje roczną subskrypcję przez StoreKit')}
+            accessibilityHint={(t?.paywall as any)?.planAnnualHint || (isEn ? 'Purchases annual subscription via StoreKit' : 'Kupuje roczną subskrypcję przez StoreKit')}
           >
             <View style={styles.featuredBadge}>
               <Text style={styles.featuredBadgeText}>{t.paywall.planAnnualBadge}</Text>
@@ -208,7 +208,7 @@ export function Apps4BrewPassModal({
             onPress={() => handleSelectPlan('lifetime')}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planLifetimeTitle} ${t.paywall.planLifetimePrice}`}
-            accessibilityHint={t?.paywall?.planLifetimeHint || (isEn ? 'Purchases lifetime access via StoreKit' : 'Kupuje dożywotni dostęp przez StoreKit')}
+            accessibilityHint={(t?.paywall as any)?.planLifetimeHint || (isEn ? 'Purchases lifetime access via StoreKit' : 'Kupuje dożywotni dostęp przez StoreKit')}
           >
             <View style={styles.planCardHeader}>
               <Text style={styles.planTitle}>{t.paywall.planLifetimeTitle}</Text>
@@ -226,7 +226,7 @@ export function Apps4BrewPassModal({
             onPress={() => handleSelectPlan('monthly')}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planMonthlyTitle} ${t.paywall.planMonthlyPrice}`}
-            accessibilityHint={t?.paywall?.planMonthlyHint || (isEn ? 'Purchases monthly subscription via StoreKit' : 'Kupuje miesięczną subskrypcję przez StoreKit')}
+            accessibilityHint={(t?.paywall as any)?.planMonthlyHint || (isEn ? 'Purchases monthly subscription via StoreKit' : 'Kupuje miesięczną subskrypcję przez StoreKit')}
           >
             <View style={styles.planCardHeader}>
               <Text style={styles.planTitle}>{t.paywall.planMonthlyTitle}</Text>
@@ -244,7 +244,7 @@ export function Apps4BrewPassModal({
             onPress={handleRestore}
             accessibilityRole="button"
             accessibilityLabel={t.paywall.restore}
-            accessibilityHint={t?.paywall?.restoreHint || (isEn ? 'Restores previous purchases from Apple ID' : 'Przywraca poprzednie zakupy powiązane z kontem Apple ID')}
+            accessibilityHint={(t?.paywall as any)?.restoreHint || (isEn ? 'Restores previous purchases from Apple ID' : 'Przywraca poprzednie zakupy powiązane z kontem Apple ID')}
           >
             <Text style={styles.restoreBtnText}>{t.paywall.restore}</Text>
           </Pressable>

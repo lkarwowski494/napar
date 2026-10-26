@@ -189,7 +189,8 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony",
     "editRecipe": "Editează rețeta",
-    "pourToWeightOnScale": "Turnați până la greutatea de pe cântar"
+    "pourToWeightOnScale": "Turnați până la greutatea de pe cântar",
+    "recipeSearchHint": "Introduceți numele rețetei, metoda sau autorul pentru a filtra lista"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

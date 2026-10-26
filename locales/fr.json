@@ -189,7 +189,8 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony",
     "editRecipe": "Modifier la recette",
-    "pourToWeightOnScale": "Verser jusqu'au poids sur la balance"
+    "pourToWeightOnScale": "Verser jusqu'au poids sur la balance",
+    "recipeSearchHint": "Entrez le nom de la recette, la méthode ou l'auteur pour filtrer la liste"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

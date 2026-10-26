@@ -189,7 +189,8 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony",
     "editRecipe": "Recept szerkesztése",
-    "pourToWeightOnScale": "Öntse a mérlegen lévő súlyig"
+    "pourToWeightOnScale": "Öntse a mérlegen lévő súlyig",
+    "recipeSearchHint": "Adja meg a recept nevét, módszerét vagy szerzőjét a lista szűréséhez"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

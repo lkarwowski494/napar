@@ -189,7 +189,8 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony",
     "editRecipe": "Uredi recept",
-    "pourToWeightOnScale": "Ulijte do težine na vagi"
+    "pourToWeightOnScale": "Ulijte do težine na vagi",
+    "recipeSearchHint": "Unesite naziv recepta, metodu ili autora za filtriranje popisa"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

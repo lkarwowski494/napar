@@ -189,7 +189,8 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony",
     "editRecipe": "ערוך מתכון",
-    "pourToWeightOnScale": "מזוג עד למשקל על המאזניים"
+    "pourToWeightOnScale": "מזוג עד למשקל על המאזניים",
+    "recipeSearchHint": "הזן שם מתכון, שיטה או מחבר כדי לסנן את הרשימה"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

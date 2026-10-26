@@ -189,7 +189,8 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony",
     "editRecipe": "विधि संपादित करें",
-    "pourToWeightOnScale": "तराजू पर वजन तक डालें"
+    "pourToWeightOnScale": "तराजू पर वजन तक डालें",
+    "recipeSearchHint": "सूची को फ़िल्टर करने के लिए नुस्खा का नाम, विधि या लेखक दर्ज करें"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -803,38 +803,38 @@ export function saveBrewSession(session: BrewSession): void {
   if (!session || typeof session !== 'object') return;
   const db = getDatabase();
 
-  const rawDose = typeof session.doseGrams === 'number' ? session.doseGrams : (typeof session.doseGrams === 'string' ? parseFloat(session.doseGrams.replace(',', '.')) : NaN);
+  const rawDose = typeof session.doseGrams === 'number' ? session.doseGrams : (typeof (session as any).doseGrams === 'string' ? parseFloat((session as any).doseGrams.replace(',', '.')) : NaN);
   const safeDoseVal = Number.isFinite(rawDose) && rawDose > 0 ? Number(Math.min(1000, Math.max(1, rawDose)).toFixed(1)) : 15;
   const dose = Object.is(safeDoseVal, -0) ? 15 : safeDoseVal;
 
-  const rawWater = typeof session.waterGrams === 'number' ? session.waterGrams : (typeof session.waterGrams === 'string' ? parseFloat(session.waterGrams.replace(',', '.')) : NaN);
+  const rawWater = typeof session.waterGrams === 'number' ? session.waterGrams : (typeof (session as any).waterGrams === 'string' ? parseFloat((session as any).waterGrams.replace(',', '.')) : NaN);
   const safeWaterVal = Number.isFinite(rawWater) && rawWater > 0 ? Number(Math.min(50000, Math.max(10, rawWater)).toFixed(1)) : 250;
   const water = Object.is(safeWaterVal, -0) ? 250 : safeWaterVal;
 
   const isColdBrew = (session.method && /cold|ice|zimn/i.test(session.method)) || (session.recipeName && /cold|ice|zimn/i.test(session.recipeName));
-  const rawTemp = typeof session.waterTempCelsius === 'number' ? session.waterTempCelsius : (typeof session.waterTempCelsius === 'string' ? parseFloat(session.waterTempCelsius.replace(',', '.')) : NaN);
+  const rawTemp = typeof session.waterTempCelsius === 'number' ? session.waterTempCelsius : (typeof (session as any).waterTempCelsius === 'string' ? parseFloat((session as any).waterTempCelsius.replace(',', '.')) : NaN);
   const safeTemp = Number.isFinite(rawTemp) && (rawTemp > 0 || (isColdBrew && rawTemp === 0))
     ? Math.min(100, Math.max(0, Math.round(rawTemp)))
     : 92;
   const temp = Object.is(safeTemp, -0) ? 0 : safeTemp;
 
-  const rawTotalTime = typeof session.totalTimeSeconds === 'number' ? session.totalTimeSeconds : (typeof session.totalTimeSeconds === 'string' ? parseFloat(session.totalTimeSeconds.replace(',', '.')) : NaN);
+  const rawTotalTime = typeof session.totalTimeSeconds === 'number' ? session.totalTimeSeconds : (typeof (session as any).totalTimeSeconds === 'string' ? parseFloat((session as any).totalTimeSeconds.replace(',', '.')) : NaN);
   const safeTotalTime = Number.isFinite(rawTotalTime) && rawTotalTime >= 0 ? Math.round(rawTotalTime) : 0;
   const totalTime = Object.is(safeTotalTime, -0) ? 0 : safeTotalTime;
 
-  const rawRating = typeof session.rating === 'number' ? session.rating : (typeof session.rating === 'string' ? parseFloat(session.rating.replace(',', '.')) : NaN);
+  const rawRating = typeof session.rating === 'number' ? session.rating : (typeof (session as any).rating === 'string' ? parseFloat((session as any).rating.replace(',', '.')) : NaN);
   const safeRating = Number.isFinite(rawRating) && rawRating >= 0 && rawRating <= 5 ? Number(rawRating.toFixed(1)) : null;
   const sanitizedRating = safeRating != null && Object.is(safeRating, -0) ? 0 : safeRating;
 
-  const rawTds = typeof session.tdsPercentage === 'number' ? session.tdsPercentage : (typeof session.tdsPercentage === 'string' ? parseFloat(session.tdsPercentage.replace(',', '.')) : NaN);
+  const rawTds = typeof session.tdsPercentage === 'number' ? session.tdsPercentage : (typeof (session as any).tdsPercentage === 'string' ? parseFloat((session as any).tdsPercentage.replace(',', '.')) : NaN);
   const safeTds = Number.isFinite(rawTds) && rawTds >= 0 ? Number(rawTds.toFixed(2)) : null;
   const sanitizedTds = safeTds != null && Object.is(safeTds, -0) ? 0 : safeTds;
 
-  const rawEy = typeof session.extractionYieldPercentage === 'number' ? session.extractionYieldPercentage : (typeof session.extractionYieldPercentage === 'string' ? parseFloat(session.extractionYieldPercentage.replace(',', '.')) : NaN);
+  const rawEy = typeof session.extractionYieldPercentage === 'number' ? session.extractionYieldPercentage : (typeof (session as any).extractionYieldPercentage === 'string' ? parseFloat((session as any).extractionYieldPercentage.replace(',', '.')) : NaN);
   const safeEy = Number.isFinite(rawEy) && rawEy >= 0 ? Number(rawEy.toFixed(2)) : null;
   const sanitizedEy = safeEy != null && Object.is(safeEy, -0) ? 0 : safeEy;
 
-  const rawCaffeine = typeof session.caffeineContentMg === 'number' ? session.caffeineContentMg : (typeof session.caffeineContentMg === 'string' ? parseFloat(session.caffeineContentMg.replace(',', '.')) : NaN);
+  const rawCaffeine = typeof session.caffeineContentMg === 'number' ? session.caffeineContentMg : (typeof (session as any).caffeineContentMg === 'string' ? parseFloat((session as any).caffeineContentMg.replace(',', '.')) : NaN);
   const safeCaffeine = Number.isFinite(rawCaffeine) && rawCaffeine >= 0 ? Number(rawCaffeine.toFixed(1)) : null;
   const sanitizedCaffeine = safeCaffeine != null && Object.is(safeCaffeine, -0) ? 0 : safeCaffeine;
 

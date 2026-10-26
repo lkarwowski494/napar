@@ -189,7 +189,8 @@
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony",
     "editRecipe": "Muokkaa reseptiä",
-    "pourToWeightOnScale": "Kaada vaa'an painoon asti"
+    "pourToWeightOnScale": "Kaada vaa'an painoon asti",
+    "recipeSearchHint": "Kirjoita reseptin nimi, menetelmä tai tekijä suodattaaksesi luetteloa"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
