@@ -72,7 +72,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
     if (categoryFilter !== 'ALL' && itemType !== categoryFilter) {
       return false;
     }
-    if (subsetFilter === 'FAVORITES' && !r.isFavorite && r.isCustom) {
+    if (subsetFilter === 'FAVORITES' && !r.isFavorite) {
       return false;
     }
     if (subsetFilter === 'CUSTOM' && !r.isCustom) {
@@ -142,6 +142,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
           </Text>
         </Pressable>
         <Pressable
+          testID={`duplicate-recipe-${r.id}`}
           style={styles.duplicateRecipeBtn}
           hitSlop={8}
           onPress={(e) => {
@@ -149,7 +150,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
             onDuplicateRecipe(r);
           }}
           accessibilityRole="button"
-          accessibilityLabel={`${t.brew.duplicateRecipe}: ${r.name}`}
+          accessibilityLabel={`${t?.brew?.duplicateRecipe || 'Duplikuj recepturę'}: ${r.name}`}
         >
           <CopyIcon size={16} color={theme.colors.textSecondary} />
         </Pressable>

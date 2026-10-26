@@ -90,4 +90,46 @@ describe('RecipeSelectModal Component', () => {
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  test('TASK-P43-04-STU: testID przycisku duplikacji oraz poprawne filtrowanie ulubionych (FAVORITES) bez nie-ulubionych receptur wbudowanych', () => {
+    const onDuplicateRecipe = jest.fn();
+    const testRecipes: any[] = [
+      { id: 'master-not-fav', name: 'Master Non Fav', beverageType: 'COFFEE', method: 'V60', isFavorite: false, isCustom: false },
+      { id: 'master-fav', name: 'Master Fav', beverageType: 'COFFEE', method: 'V60', isFavorite: true, isCustom: false },
+      { id: 'custom-not-fav', name: 'Custom Non Fav', beverageType: 'COFFEE', method: 'V60', isFavorite: false, isCustom: true },
+      { id: 'custom-fav', name: 'Custom Fav', beverageType: 'COFFEE', method: 'V60', isFavorite: true, isCustom: true },
+    ];
+
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(
+        <RecipeSelectModal
+          {...defaultProps}
+          recipes={testRecipes}
+          onDuplicateRecipe={onDuplicateRecipe}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    // Sprawdzenie testID przycisku duplikacji
+    const dupBtn = root.findByProps({ testID: 'duplicate-recipe-master-fav' });
+    expect(dupBtn).toBeDefined();
+    act(() => {
+      dupBtn.props.onPress();
+    });
+    expect(onDuplicateRecipe).toHaveBeenCalledWith(testRecipes[1]);
+
+    // Przełączenie filtrowania na FAVORITES
+    const favFilterTab = root.findByProps({ testID: 'subset-filter-favorites' });
+    act(() => {
+      favFilterTab.props.onPress();
+    });
+
+    // Powinny być obecne tylko ulubione (master-fav i custom-fav), a ukryte master-not-fav oraz custom-not-fav
+    expect(() => root.findByProps({ testID: 'recipe-option-master-not-fav' })).toThrow();
+    expect(() => root.findByProps({ testID: 'recipe-option-custom-not-fav' })).toThrow();
+    expect(root.findByProps({ testID: 'recipe-option-master-fav' })).toBeDefined();
+    expect(root.findByProps({ testID: 'recipe-option-custom-fav' })).toBeDefined();
+  });
 });
