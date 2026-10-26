@@ -36,6 +36,8 @@ export function Apps4BrewPassModal({
   onSubscribed,
 }: Apps4BrewPassModalProps) {
   const { t, language } = useTranslation();
+  const cleanLang = typeof language === 'string' ? language.trim().toLowerCase() : 'pl';
+  const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
   const { purchaseWithStoreKit, restore, status, brewsRemaining, daysRemaining } = useAppAccess();
   const [isProcessing, setIsProcessing] = React.useState(false);
   const safeBrewsRemaining = Math.max(0, Object.is(brewsRemaining, -0) ? 0 : (brewsRemaining || 0));
@@ -66,16 +68,16 @@ export function Apps4BrewPassModal({
         const errorCode = result ? result.errorCode : undefined;
         const errorMsg =
           errorCode === 'invalid_signature'
-            ? (language === 'en' ? 'Invalid StoreKit transaction signature' : 'Nieprawidłowy podpis transakcji StoreKit')
+            ? (isEn ? 'Invalid StoreKit transaction signature' : 'Nieprawidłowy podpis transakcji StoreKit')
             : errorCode === 'unknown_product'
-            ? (language === 'en' ? 'Unknown StoreKit product identifier' : 'Nieznany identyfikator produktu StoreKit')
-            : (language === 'en' ? 'StoreKit transaction authorization failed' : 'Błąd autoryzacji transakcji StoreKit');
+            ? (isEn ? 'Unknown StoreKit product identifier' : 'Nieznany identyfikator produktu StoreKit')
+            : (isEn ? 'StoreKit transaction authorization failed' : 'Błąd autoryzacji transakcji StoreKit');
         Alert.alert(t.settings.restoreNotFoundTitle, errorMsg);
       }
     } catch {
       Alert.alert(
         t.settings.restoreNotFoundTitle,
-        language === 'en' ? 'Could not complete StoreKit transaction' : 'Nie udało się zrealizować transakcji StoreKit'
+        isEn ? 'Could not complete StoreKit transaction' : 'Nie udało się zrealizować transakcji StoreKit'
       );
     } finally {
       setIsProcessing(false);
@@ -83,19 +85,25 @@ export function Apps4BrewPassModal({
   };
 
   const handleRestore = () => {
-    const res = restore();
-    const isRestored = typeof res === 'boolean' ? res : Boolean(res && res.restored);
-    if (isRestored) {
-      Alert.alert(t.settings.restoreSuccessTitle, t.settings.restoreSuccessMsg);
-      if (onPurchaseSuccess) {
-        onPurchaseSuccess();
+    if (isProcessing) return;
+    setIsProcessing(true);
+    try {
+      const res = restore();
+      const isRestored = typeof res === 'boolean' ? res : Boolean(res && res.restored);
+      if (isRestored) {
+        Alert.alert(t.settings.restoreSuccessTitle, t.settings.restoreSuccessMsg);
+        if (onPurchaseSuccess) {
+          onPurchaseSuccess();
+        }
+        if (onSubscribed) {
+          onSubscribed();
+        }
+        onClose();
+      } else {
+        Alert.alert(t.settings.restoreNotFoundTitle, t.settings.restoreNotFoundMsg);
       }
-      if (onSubscribed) {
-        onSubscribed();
-      }
-      onClose();
-    } else {
-      Alert.alert(t.settings.restoreNotFoundTitle, t.settings.restoreNotFoundMsg);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -172,7 +180,9 @@ export function Apps4BrewPassModal({
           {/* Plany subskrypcyjne: Roczny (Polecany) na samej górze */}
           <Pressable
             testID="plan-annual-btn"
-            style={[styles.planCard, styles.planCardFeatured]}
+            style={[styles.planCard, styles.planCardFeatured, isProcessing && styles.planCardDisabled]}
+            disabled={isProcessing}
+            accessibilityState={{ disabled: isProcessing }}
             onPress={() => handleSelectPlan('annual')}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planAnnualTitle} ${t.paywall.planAnnualPrice}`}
@@ -190,7 +200,9 @@ export function Apps4BrewPassModal({
           {/* Plan Lifetime */}
           <Pressable
             testID="plan-lifetime-btn"
-            style={styles.planCard}
+            style={[styles.planCard, isProcessing && styles.planCardDisabled]}
+            disabled={isProcessing}
+            accessibilityState={{ disabled: isProcessing }}
             onPress={() => handleSelectPlan('lifetime')}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planLifetimeTitle} ${t.paywall.planLifetimePrice}`}
@@ -205,7 +217,9 @@ export function Apps4BrewPassModal({
           {/* Plan Miesięczny */}
           <Pressable
             testID="plan-monthly-btn"
-            style={styles.planCard}
+            style={[styles.planCard, isProcessing && styles.planCardDisabled]}
+            disabled={isProcessing}
+            accessibilityState={{ disabled: isProcessing }}
             onPress={() => handleSelectPlan('monthly')}
             accessibilityRole="button"
             accessibilityLabel={`${t.paywall.planMonthlyTitle} ${t.paywall.planMonthlyPrice}`}
@@ -220,7 +234,9 @@ export function Apps4BrewPassModal({
           {/* Przywróć zakupy i polityka */}
           <Pressable
             testID="restore-purchases-btn"
-            style={styles.restoreBtn}
+            style={[styles.restoreBtn, isProcessing && styles.restoreBtnDisabled]}
+            disabled={isProcessing}
+            accessibilityState={{ disabled: isProcessing }}
             onPress={handleRestore}
             accessibilityRole="button"
             accessibilityLabel={t.paywall.restore}
@@ -466,11 +482,17 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontWeight: '600',
   },
+  planCardDisabled: {
+    opacity: 0.6,
+  },
   restoreBtn: {
     paddingVertical: 12,
     paddingHorizontal: 20,
     marginTop: 8,
     marginBottom: 12,
+  },
+  restoreBtnDisabled: {
+    opacity: 0.5,
   },
   restoreBtnText: {
     color: theme.colors.textSecondary,

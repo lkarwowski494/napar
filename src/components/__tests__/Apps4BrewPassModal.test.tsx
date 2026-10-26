@@ -202,4 +202,27 @@ describe('Apps4BrewPassModal Component', () => {
     const strPl1 = JSON.stringify(treePl1.toJSON());
     expect(strPl1).toContain('Pozostało Ci 1 parzenie w bezpłatnym okresie próbnym (14 dni).');
   });
+
+  test('TASK-P44-02-MON: przyciski subskrypcji i przywracania posiadają a11y disabled state i obsługują warianty en', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <Apps4BrewPassModal visible={true} onClose={jest.fn()} />
+      );
+    });
+
+    const annualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
+    const lifetimeBtn = tree.root.findByProps({ testID: 'plan-lifetime-btn' });
+    const monthlyBtn = tree.root.findByProps({ testID: 'plan-monthly-btn' });
+    const restoreBtn = tree.root.findByProps({ testID: 'restore-purchases-btn' });
+
+    expect(annualBtn.props.disabled).toBe(false);
+    expect(annualBtn.props.accessibilityState).toEqual({ disabled: false });
+    expect(lifetimeBtn.props.disabled).toBe(false);
+    expect(lifetimeBtn.props.accessibilityState).toEqual({ disabled: false });
+    expect(monthlyBtn.props.disabled).toBe(false);
+    expect(monthlyBtn.props.accessibilityState).toEqual({ disabled: false });
+    expect(restoreBtn.props.disabled).toBe(false);
+    expect(restoreBtn.props.accessibilityState).toEqual({ disabled: false });
+  });
 });
