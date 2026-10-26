@@ -156,6 +156,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
               <Pressable
                 testID="bean-type-coffee-btn"
                 accessibilityRole="button"
+                accessibilityLabel={t.stash?.typeCoffee || 'Kawa ziarnista'}
                 accessibilityState={{ selected: type === 'coffee' }}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={[styles.typeBtn, type === 'coffee' && styles.typeBtnActive]}
@@ -168,6 +169,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
               <Pressable
                 testID="bean-type-tea-btn"
                 accessibilityRole="button"
+                accessibilityLabel={t.stash?.typeTea || 'Herbata liściasta'}
                 accessibilityState={{ selected: type === 'tea' }}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={[styles.typeBtn, type === 'tea' && styles.typeBtnActive]}
@@ -183,6 +185,8 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           <Pressable
             testID="open-compendium-btn"
             accessibilityRole="button"
+            accessibilityLabel={t.stash?.compendiumPrompt || 'Szukasz inspiracji? Otwórz Bazę Wiedzy (odmiany, terroir, herbata)'}
+            accessibilityHint="Otwiera kompendium odmian botanicznych, terroir i obróbki kawy oraz herbaty"
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={styles.compendiumPromptBtn}
             onPress={onOpenCompendium}

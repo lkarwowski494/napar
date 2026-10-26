@@ -135,4 +135,30 @@ describe('BeanAddModal Component', () => {
     expect(savedItem.remainingWeightGrams).toBe(249);
     expect(mockOnSaved).toHaveBeenCalled();
   });
+  test('TASK-P22-01-ODK: Kontrolki typu kawy/herbaty oraz bazy wiedzy w BeanAddModal posiadają etykiety i wskazówki dostępności', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BeanAddModal
+          visible={true}
+          onClose={mockOnClose}
+          beveragePreference="both"
+          canCreate={true}
+          onRequirePaywall={mockOnRequirePaywall}
+          onOpenCompendium={mockOnOpenCompendium}
+          onSaved={mockOnSaved}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const coffeeBtn = root.findByProps({ testID: 'bean-type-coffee-btn' });
+    const teaBtn = root.findByProps({ testID: 'bean-type-tea-btn' });
+    const compendiumBtn = root.findByProps({ testID: 'open-compendium-btn' });
+
+    expect(coffeeBtn.props.accessibilityLabel).toBeTruthy();
+    expect(teaBtn.props.accessibilityLabel).toBeTruthy();
+    expect(compendiumBtn.props.accessibilityLabel).toBeTruthy();
+    expect(compendiumBtn.props.accessibilityHint).toBeTruthy();
+  });
 });
