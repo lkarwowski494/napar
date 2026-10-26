@@ -370,6 +370,11 @@ try {
       Boolean(devDeps['@types/jest']),
       "Krytyczny pakiet '@types/jest' musi znajdować się w devDependencies package.json"
     );
+    // TASK-P45-10-WYD: Weryfikacja pakietu testów właściwościowych fast-check w devDependencies
+    check(
+      Boolean(devDeps['fast-check']),
+      "Krytyczny pakiet testów właściwościowych (PBT) 'fast-check' musi znajdować się w devDependencies package.json"
+    );
   }
 
   const forbiddenPermissions = [
