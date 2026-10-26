@@ -230,6 +230,10 @@ export function encodeRecipeToShareUrl(
   recipe: SavedRecipe | MasterRecipe,
   useWebScheme = false
 ): string {
+  if (!recipe || typeof recipe !== 'object') {
+    const base = useWebScheme ? RECIPE_SHARE_WEB_URL : RECIPE_SHARE_PROTOCOL;
+    return `${base}?v=1&d=`;
+  }
   const payload = recipeToCompactPayload(recipe);
   const jsonStr = JSON.stringify(payload);
   const base64Str = utf8ToBase64(jsonStr);

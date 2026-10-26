@@ -951,4 +951,10 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     }));
     expect(decodeRecipeFromShareUrl(rawUnder)?.recipe.recommendedRatio).toBe(1);
   });
+
+  test('TASK-P39-11-WZR: encodeRecipeToShareUrl defensywnie obsluguje null i undefined recipe', () => {
+    expect(encodeRecipeToShareUrl(null as any)).toBe('napar://recipe?v=1&d=');
+    expect(encodeRecipeToShareUrl(undefined as any)).toBe('napar://recipe?v=1&d=');
+    expect(encodeRecipeToShareUrl(null as any, true)).toBe('https://napar.app/recipe?v=1&d=');
+  });
 });
