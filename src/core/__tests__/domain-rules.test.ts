@@ -495,4 +495,20 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(res.scaledWaterGrams).toBe(2500.0);
     });
   });
+
+  describe('TASK-P26-03-ZAK: scaleRecipeDose waliduje steps i clampuje wode do maxWaterGrams', () => {
+    it('rzuca blad dla nie-tablicy w parametrze steps', () => {
+      expect(() => scaleRecipeDose(null as any, 15, 30)).toThrow('Doza musi być większa od zera');
+    });
+
+    it('clampuje targetWaterGrams do zadanego maxWaterGrams', () => {
+      const steps = [
+        { id: '1', name: 'Zalanie 1', waterGrams: 100, durationSeconds: 30 },
+        { id: '2', name: 'Zalanie 2', waterGrams: 150, durationSeconds: 45 },
+      ];
+      const res = scaleRecipeDose(steps, 15, 300, 1000.0, 1000.0);
+      // 250g * (300/15) = 5000g -> clamp do 1000g
+      expect(res.targetWaterGrams).toBe(1000.0);
+    });
+  });
 });
