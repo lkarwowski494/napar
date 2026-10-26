@@ -331,4 +331,21 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(getKnowledgeSensoryProfile('')).toBe('');
     expect(getKnowledgeSensoryProfile(null as any)).toBe('');
   });
+
+  test('TASK-P15-06-TRE: searchTeaCategories uwzględnia healthAttributesPl oraz chroni przed wartościami niebędącymi stringiem', () => {
+    // Odporność na non-string query we wszystkich wyszukiwarkach
+    expect(searchTeaCategories(null as any)).toHaveLength(TEA_CATEGORIES.length);
+    expect(searchTeaCategories(123 as any)).toHaveLength(TEA_CATEGORIES.length);
+    expect(searchCoffeeVarieties(null as any)).toHaveLength(COFFEE_VARIETIES.length);
+    expect(searchCoffeeProcesses(undefined as any)).toHaveLength(COFFEE_PROCESSES.length);
+    expect(searchCoffeeOrigins({} as any)).toHaveLength(COFFEE_ORIGINS.length);
+
+    // Wyszukiwanie po atrybutach zdrowotnych (healthAttributesPl)
+    const byLTheanine = searchTeaCategories('L-teaninę');
+    expect(byLTheanine.length).toBeGreaterThanOrEqual(1);
+    expect(byLTheanine[0].id).toBe('tea-green');
+
+    const byPolifenole = searchTeaCategories('polifenole');
+    expect(byPolifenole.length).toBeGreaterThanOrEqual(1);
+  });
 });

@@ -566,7 +566,7 @@ export const TEA_CATEGORIES: TeaCategoryInfo[] = [
 ];
 
 export function searchCoffeeVarieties(query: string): CoffeeVarietyInfo[] {
-  if (!query || !query.trim()) return COFFEE_VARIETIES;
+  if (!query || typeof query !== 'string' || !query.trim()) return COFFEE_VARIETIES;
   const q = query.toLowerCase().trim();
   return COFFEE_VARIETIES.filter((v) =>
     v.name.toLowerCase().includes(q) ||
@@ -582,7 +582,7 @@ export function searchCoffeeVarieties(query: string): CoffeeVarietyInfo[] {
 }
 
 export function searchCoffeeProcesses(query: string): CoffeeProcessInfo[] {
-  if (!query || !query.trim()) return COFFEE_PROCESSES;
+  if (!query || typeof query !== 'string' || !query.trim()) return COFFEE_PROCESSES;
   const q = query.toLowerCase().trim();
   return COFFEE_PROCESSES.filter((p) =>
     p.name.toLowerCase().includes(q) ||
@@ -597,7 +597,7 @@ export function searchCoffeeProcesses(query: string): CoffeeProcessInfo[] {
 }
 
 export function searchCoffeeOrigins(query: string): CoffeeOriginInfo[] {
-  if (!query || !query.trim()) return COFFEE_ORIGINS;
+  if (!query || typeof query !== 'string' || !query.trim()) return COFFEE_ORIGINS;
   const q = query.toLowerCase().trim();
   return COFFEE_ORIGINS.filter((o) =>
     o.country.toLowerCase().includes(q) ||
@@ -614,7 +614,7 @@ export function searchCoffeeOrigins(query: string): CoffeeOriginInfo[] {
 }
 
 export function searchTeaCategories(query: string): TeaCategoryInfo[] {
-  if (!query || !query.trim()) return TEA_CATEGORIES;
+  if (!query || typeof query !== 'string' || !query.trim()) return TEA_CATEGORIES;
   const q = query.toLowerCase().trim();
   return TEA_CATEGORIES.filter((t) =>
     t.namePl.toLowerCase().includes(q) ||
@@ -625,6 +625,7 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
     t.famousRegions.some((r) => r.toLowerCase().includes(q)) ||
     t.sensoryProfilePl.toLowerCase().includes(q) ||
     t.sensoryProfileEn.toLowerCase().includes(q) ||
+    (t.healthAttributesPl && t.healthAttributesPl.toLowerCase().includes(q)) ||
     (t.descriptionPl && t.descriptionPl.toLowerCase().includes(q)) ||
     (t.descriptionEn && t.descriptionEn.toLowerCase().includes(q))
   );
