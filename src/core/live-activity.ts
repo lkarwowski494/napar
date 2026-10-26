@@ -142,7 +142,7 @@ export function buildDynamicIslandPayload(
       : NaN;
   let safeTargetWater =
     Number.isFinite(rawTargetWater) && rawTargetWater >= 0
-      ? Math.round(rawTargetWater)
+      ? Math.min(50000, Math.round(rawTargetWater))
       : 0;
   if (Object.is(safeTargetWater, -0)) safeTargetWater = 0;
 
@@ -154,7 +154,7 @@ export function buildDynamicIslandPayload(
       : NaN;
   let safeTotalWater =
     Number.isFinite(rawTotalWater) && rawTotalWater >= 0
-      ? Math.round(rawTotalWater)
+      ? Math.min(50000, Math.round(rawTotalWater))
       : 0;
   if (Object.is(safeTotalWater, -0)) safeTotalWater = 0;
 

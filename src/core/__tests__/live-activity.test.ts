@@ -651,4 +651,17 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(formatActivityTimer('-0' as any)).toBe('0:00');
     expect(formatActivityTimer(-0)).toBe('0:00');
   });
+
+  test('TASK-P39-12-NIE: buildDynamicIslandPayload clampuje safeTargetWater i safeTotalWater do 50000', () => {
+    const attrOver: any = {
+      ...mockAttributesCoffee,
+      totalWaterGrams: 80000,
+    };
+    const stateOver: any = {
+      ...mockState,
+      targetWaterGrams: 90000,
+    };
+    const payload = buildDynamicIslandPayload(attrOver, stateOver, 'pl');
+    expect(payload.expandedBottomTarget).toBe('Docelowo: 50000 g (z 50000 g)');
+  });
 });
