@@ -621,5 +621,10 @@
     "bothTitle": "Coffee & Tea",
     "bothDesc": "The full craft ecosystem: from light roast Ethiopia to Japanese Gyokuro.",
     "startBtn": "Begin Ritual"
+  },
+  "waterChemistry": {
+    "cationDominantMagnesium": "Dominance hořčíku (Ovocitost a Kyselost)",
+    "cationDominantCalcium": "Dominance vápníku (Tělo a Krémovost)",
+    "cationDominantBalanced": "Vyvážené kationty (Čistota profilu)"
   }
 }

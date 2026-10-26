@@ -621,5 +621,10 @@
     "bothTitle": "Coffee & Tea",
     "bothDesc": "The full craft ecosystem: from light roast Ethiopia to Japanese Gyokuro.",
     "startBtn": "Begin Ritual"
+  },
+  "waterChemistry": {
+    "cationDominantMagnesium": "แมกนีเซียมเด่น (รสผลไม้และความเปรี้ยว)",
+    "cationDominantCalcium": "แคลเซียมเด่น (บอดี้และความนุ่มนวล)",
+    "cationDominantBalanced": "แคตไอออนสมดุล (ความชัดเจนของโปรไฟล์)"
   }
 }

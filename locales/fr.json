@@ -621,5 +621,10 @@
     "bothTitle": "Coffee & Tea",
     "bothDesc": "The full craft ecosystem: from light roast Ethiopia to Japanese Gyokuro.",
     "startBtn": "Begin Ritual"
+  },
+  "waterChemistry": {
+    "cationDominantMagnesium": "Dominance magnésium (Fruit & Acidité)",
+    "cationDominantCalcium": "Dominance calcium (Corps & Onctuosité)",
+    "cationDominantBalanced": "Cations équilibrés (Clarté globale)"
   }
 }

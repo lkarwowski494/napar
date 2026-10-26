@@ -621,5 +621,10 @@
     "bothTitle": "Coffee & Tea",
     "bothDesc": "The full craft ecosystem: from light roast Ethiopia to Japanese Gyokuro.",
     "startBtn": "Begin Ritual"
+  },
+  "waterChemistry": {
+    "cationDominantMagnesium": "Magnezyum baskın (Meyvemsilik & Asidite)",
+    "cationDominantCalcium": "Kalsiyum baskın (Gövde & Kremamsılık)",
+    "cationDominantBalanced": "Dengeli katyonlar (Profil berraklığı)"
   }
 }

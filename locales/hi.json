@@ -621,5 +621,10 @@
     "bothTitle": "Coffee & Tea",
     "bothDesc": "The full craft ecosystem: from light roast Ethiopia to Japanese Gyokuro.",
     "startBtn": "Begin Ritual"
+  },
+  "waterChemistry": {
+    "cationDominantMagnesium": "मैग्नीशियम प्रमुख (फल और अम्लता)",
+    "cationDominantCalcium": "कैल्शियम प्रमुख (बॉडी और मलाईदारपन)",
+    "cationDominantBalanced": "संतुलित धनायन (स्पष्ट स्वाद)"
   }
 }

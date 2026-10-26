@@ -621,5 +621,10 @@
     "bothTitle": "Coffee & Tea",
     "bothDesc": "The full craft ecosystem: from light roast Ethiopia to Japanese Gyokuro.",
     "startBtn": "Begin Ritual"
+  },
+  "waterChemistry": {
+    "cationDominantMagnesium": "Ưu thế magiê (Hương trái cây & Độ chua)",
+    "cationDominantCalcium": "Ưu thế canxi (Thể chất & Độ béo ngậy)",
+    "cationDominantBalanced": "Cation cân bằng (Độ trong trẻo hồ sơ)"
   }
 }

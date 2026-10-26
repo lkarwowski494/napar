@@ -475,6 +475,9 @@ export const translations = {
       hardnessModeratelyHard: 'Średnio twarda',
       hardnessHard: 'Twarda',
       hardnessVeryHard: 'Bardzo twarda',
+      cationDominantMagnesium: 'Dominacja magnezu (Owocowość i Kwasowość)',
+      cationDominantCalcium: 'Dominacja wapnia (Body i Kremowość)',
+      cationDominantBalanced: 'Zrównoważone kationy (Czystość profilu)',
     },
     grinder: {
       title: 'Przelicznik Młynków (Grinder Dial-in)',
@@ -1100,6 +1103,9 @@ export const translations = {
       hardnessModeratelyHard: 'Moderately hard',
       hardnessHard: 'Hard',
       hardnessVeryHard: 'Very hard',
+      cationDominantMagnesium: 'Magnesium-dominant (Fruit & Acidity)',
+      cationDominantCalcium: 'Calcium-dominant (Body & Creaminess)',
+      cationDominantBalanced: 'Balanced cations (All-round clarity)',
     },
     grinder: {
       title: 'Grinder Dial-in Converter',

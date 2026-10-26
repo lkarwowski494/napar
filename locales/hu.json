@@ -621,5 +621,10 @@
     "bothTitle": "Coffee & Tea",
     "bothDesc": "The full craft ecosystem: from light roast Ethiopia to Japanese Gyokuro.",
     "startBtn": "Begin Ritual"
+  },
+  "waterChemistry": {
+    "cationDominantMagnesium": "Magnézium-domináns (Gyümölcsösség & Savasság)",
+    "cationDominantCalcium": "Kalcium-domináns (Test & Krémesség)",
+    "cationDominantBalanced": "Kiegyensúlyozott kationok (Profiltisztaság)"
   }
 }

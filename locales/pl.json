@@ -621,5 +621,10 @@
     "bothTitle": "Kawa i Herbata",
     "bothDesc": "Pełny ekosystem: od jasno palonych ziaren z Etiopii po japońskie Gyokuro.",
     "startBtn": "Rozpocznij Rytuał"
+  },
+  "waterChemistry": {
+    "cationDominantMagnesium": "Dominacja magnezu (Owocowość i Kwasowość)",
+    "cationDominantCalcium": "Dominacja wapnia (Body i Kremowość)",
+    "cationDominantBalanced": "Zrównoważone kationy (Czystość profilu)"
   }
 }

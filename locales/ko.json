@@ -621,5 +621,10 @@
     "bothTitle": "Coffee & Tea",
     "bothDesc": "The full craft ecosystem: from light roast Ethiopia to Japanese Gyokuro.",
     "startBtn": "Begin Ritual"
+  },
+  "waterChemistry": {
+    "cationDominantMagnesium": "마그네슘 우세 (과일향 및 산미)",
+    "cationDominantCalcium": "칼슘 우세 (바디감 및 크리미함)",
+    "cationDominantBalanced": "균형 잡힌 양이온 (깔끔한 풍미)"
   }
 }
