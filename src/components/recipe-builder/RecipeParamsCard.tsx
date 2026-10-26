@@ -45,6 +45,15 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
   const parsedTemp = typeof waterTempCelsius === 'number' ? waterTempCelsius : parseFloat(String(waterTempCelsius).replace(',', '.'));
   const tempNum = Number.isFinite(parsedTemp) && parsedTemp >= 0 ? Math.min(100, Math.max(0, parsedTemp)) : 93;
 
+  const parsedRatio = typeof currentRatio === 'number'
+    ? currentRatio
+    : (typeof (currentRatio as any) === 'string'
+      ? parseFloat(String(currentRatio).replace(',', '.'))
+      : NaN);
+  const safeRatio = Number.isFinite(parsedRatio) && parsedRatio > 0 && !Object.is(parsedRatio, -0)
+    ? parsedRatio
+    : 16.7;
+
   const isEn = typeof t?.brew?.recipe === 'string' && t?.brew?.recipe.toLowerCase() === 'recipe';
   const doseLabel = unitSystem === 'imperial'
     ? (t?.recipeBuilder?.doseLabelImperial || (isEn ? 'Dose (oz)' : 'Doza surowca (oz)'))
@@ -116,11 +125,11 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
       <View
         style={styles.ratioBadge}
         accessibilityRole="summary"
-        accessibilityLabel={`${calculatedRatio}: 1 do ${currentRatio}`}
+        accessibilityLabel={`${calculatedRatio}: 1 do ${safeRatio}`}
         testID="recipe-ratio-badge"
       >
         <Text style={styles.ratioBadgeText}>
-          {calculatedRatio}: <Text style={styles.ratioValue}>1 : {currentRatio}</Text>
+          {calculatedRatio}: <Text style={styles.ratioValue}>1 : {safeRatio}</Text>
         </Text>
       </View>
 

@@ -81,4 +81,32 @@ describe('RecipeParamsCard Component (TASK-P31-04-STU)', () => {
     const grindInput = root.findByProps({ placeholder: 'np. Średnio (22 kliki)' });
     expect(grindInput).toBeTruthy();
   });
+
+  test('TASK-P51-04-STU: bezpieczne ratio z ochrona przed NaN, -0 oraz stringami z przecinkiem w RecipeParamsCard', () => {
+    // 1. currentRatio jako NaN
+    let treeNaN: any;
+    act(() => {
+      treeNaN = renderer.create(<RecipeParamsCard {...defaultProps} currentRatio={NaN} />);
+    });
+    const badgeNaN = treeNaN.root.findByProps({ testID: 'recipe-ratio-badge' });
+    expect(badgeNaN.props.accessibilityLabel).toContain('1 do 16.7');
+    expect(JSON.stringify(treeNaN.toJSON())).not.toContain('NaN');
+
+    // 2. currentRatio jako string z przecinkiem dziesiętnym '15,5'
+    let treeComma: any;
+    act(() => {
+      treeComma = renderer.create(<RecipeParamsCard {...defaultProps} currentRatio={'15,5' as any} />);
+    });
+    const badgeComma = treeComma.root.findByProps({ testID: 'recipe-ratio-badge' });
+    expect(badgeComma.props.accessibilityLabel).toContain('1 do 15.5');
+
+    // 3. currentRatio jako -0
+    let treeNegZero: any;
+    act(() => {
+      treeNegZero = renderer.create(<RecipeParamsCard {...defaultProps} currentRatio={-0} />);
+    });
+    const badgeNegZero = treeNegZero.root.findByProps({ testID: 'recipe-ratio-badge' });
+    expect(badgeNegZero.props.accessibilityLabel).toContain('1 do 16.7');
+    expect(JSON.stringify(treeNegZero.toJSON())).not.toContain('-0');
+  });
 });
