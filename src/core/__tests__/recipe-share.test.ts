@@ -773,4 +773,31 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(Object.is(result!.recipe.doseGrams, -0)).toBe(false);
     expect(Object.is(result!.recipe.waterGrams, -0)).toBe(false);
   });
+
+  test('TASK-P33-11-WZR: recipeToCompactPayload parsuje numeryczne stringi w krokach durationSeconds i targetWaterGrams', () => {
+    const recipeWithStepStrings: any = {
+      id: 'step-strings-recipe',
+      name: 'Step String Recipe',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      recommendedRatio: 16.7,
+      isCustom: true,
+      isFavorite: false,
+      stepsJson: JSON.stringify([
+        {
+          namePl: 'Preinfuzja',
+          durationSeconds: '45.0',
+          targetWaterGrams: '50.0',
+        },
+      ]),
+      createdAt: '2026-10-26T12:00:00Z',
+    };
+    const payload = recipeToCompactPayload(recipeWithStepStrings);
+    expect(payload.s).toHaveLength(1);
+    expect(payload.s[0].d).toBe(45);
+    expect(payload.s[0].w).toBe(50);
+  });
 });

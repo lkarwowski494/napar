@@ -126,14 +126,18 @@ export function recipeToCompactPayload(
   const compactSteps: CompactRecipeStep[] = (rawSteps || [])
     .filter((st): st is RecipeStep => typeof st === 'object' && st !== null)
     .slice(0, 100)
-    .map((st) => ({
-      n: typeof st.namePl === 'string' && st.namePl.trim() ? st.namePl.trim().slice(0, 100) : 'Step',
-      ...(typeof st.nameEn === 'string' && st.nameEn.trim() ? { ne: st.nameEn.trim().slice(0, 100) } : {}),
-      d: Number.isFinite(st.durationSeconds) && st.durationSeconds > 0 ? Math.min(86400, Math.round(st.durationSeconds)) : 30,
-      w: Number.isFinite(st.targetWaterGrams) && st.targetWaterGrams >= 0 ? Math.min(50000, Math.round(st.targetWaterGrams)) : 0,
-      i: typeof st.instructionPl === 'string' ? st.instructionPl.trim().slice(0, 2000) : '',
-      ...(typeof st.instructionEn === 'string' && st.instructionEn.trim() ? { ie: st.instructionEn.trim().slice(0, 2000) } : {}),
-    }));
+    .map((st) => {
+      const rawDur = typeof st.durationSeconds === 'number' ? st.durationSeconds : (typeof st.durationSeconds === 'string' ? parseFloat(st.durationSeconds) : NaN);
+      const rawW = typeof st.targetWaterGrams === 'number' ? st.targetWaterGrams : (typeof st.targetWaterGrams === 'string' ? parseFloat(st.targetWaterGrams) : NaN);
+      return {
+        n: typeof st.namePl === 'string' && st.namePl.trim() ? st.namePl.trim().slice(0, 100) : 'Step',
+        ...(typeof st.nameEn === 'string' && st.nameEn.trim() ? { ne: st.nameEn.trim().slice(0, 100) } : {}),
+        d: Number.isFinite(rawDur) && rawDur > 0 ? Math.min(86400, Math.round(rawDur)) : 30,
+        w: Number.isFinite(rawW) && rawW >= 0 ? Math.min(50000, Math.round(rawW)) : 0,
+        i: typeof st.instructionPl === 'string' ? st.instructionPl.trim().slice(0, 2000) : '',
+        ...(typeof st.instructionEn === 'string' && st.instructionEn.trim() ? { ie: st.instructionEn.trim().slice(0, 2000) } : {}),
+      };
+    });
 
   const name =
     typeof recipe.name === 'string' && recipe.name.trim()
