@@ -490,13 +490,24 @@ export function saveRecipe(recipe: SavedRecipe): void {
   const safeId = typeof recipe.id === 'string' ? recipe.id.trim() : '';
   if (!safeId) return;
 
-  const dose = Number.isFinite(recipe.doseGrams) && recipe.doseGrams > 0 ? recipe.doseGrams : 15;
-  const water = Number.isFinite(recipe.waterGrams) && recipe.waterGrams > 0 ? recipe.waterGrams : 250;
+  const rawDose = typeof recipe.doseGrams === 'number' ? recipe.doseGrams : (typeof recipe.doseGrams === 'string' ? parseFloat(recipe.doseGrams) : NaN);
+  const safeDose = Number.isFinite(rawDose) && rawDose > 0 ? Number(rawDose.toFixed(1)) : 15;
+  const dose = Object.is(safeDose, -0) ? 15 : safeDose;
+
+  const rawWater = typeof recipe.waterGrams === 'number' ? recipe.waterGrams : (typeof recipe.waterGrams === 'string' ? parseFloat(recipe.waterGrams) : NaN);
+  const safeWater = Number.isFinite(rawWater) && rawWater > 0 ? Number(rawWater.toFixed(1)) : 250;
+  const water = Object.is(safeWater, -0) ? 250 : safeWater;
+
   const isColdBrew = (recipe.method && /cold|ice|zimn/i.test(recipe.method)) || (recipe.name && /cold|ice|zimn/i.test(recipe.name));
-  const temp = Number.isFinite(recipe.waterTempCelsius) && (recipe.waterTempCelsius > 0 || (isColdBrew && recipe.waterTempCelsius === 0))
-    ? Math.min(100, Math.max(0, recipe.waterTempCelsius))
+  const rawTemp = typeof recipe.waterTempCelsius === 'number' ? recipe.waterTempCelsius : (typeof recipe.waterTempCelsius === 'string' ? parseFloat(recipe.waterTempCelsius) : NaN);
+  const safeTemp = Number.isFinite(rawTemp) && (rawTemp > 0 || (isColdBrew && rawTemp === 0))
+    ? Math.min(100, Math.max(0, Math.round(rawTemp)))
     : 92;
-  const ratio = Number.isFinite(recipe.recommendedRatio) && recipe.recommendedRatio > 0 ? recipe.recommendedRatio : 16;
+  const temp = Object.is(safeTemp, -0) ? 0 : safeTemp;
+
+  const rawRatio = typeof recipe.recommendedRatio === 'number' ? recipe.recommendedRatio : (typeof recipe.recommendedRatio === 'string' ? parseFloat(recipe.recommendedRatio) : NaN);
+  const safeRatio = Number.isFinite(rawRatio) && rawRatio > 0 ? Number(rawRatio.toFixed(2)) : 16;
+  const ratio = Object.is(safeRatio, -0) ? 16 : safeRatio;
 
   let safeStepsJson = '[]';
   if (typeof recipe.stepsJson === 'string' && recipe.stepsJson.trim()) {

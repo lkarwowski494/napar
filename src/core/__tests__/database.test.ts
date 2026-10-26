@@ -1578,4 +1578,30 @@ describe('Napar SQLite Database & Repositories', () => {
     const unchanged = getInventoryItemById('bean-deduct-test');
     expect(unchanged?.remainingWeightGrams).toBe(0);
   });
+
+  test('TASK-P33-05-ARC: saveRecipe parsuje numeryczne stringi dla dozy, wody, temp i ratio oraz chroni przed -0', () => {
+    initDatabase(mockDb as any);
+    const stringParamRecipe: any = {
+      id: 'rec-string-params',
+      name: 'String Param Recipe',
+      beverageType: 'COFFEE',
+      method: 'Kalita',
+      doseGrams: '16.5',
+      waterGrams: '250.0',
+      waterTempCelsius: '92.4',
+      recommendedRatio: '15.15',
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+    };
+    saveRecipe(stringParamRecipe);
+
+    const saved = getRecipeById('rec-string-params');
+    expect(saved).not.toBeNull();
+    expect(saved?.doseGrams).toBe(16.5);
+    expect(saved?.waterGrams).toBe(250);
+    expect(saved?.waterTempCelsius).toBe(92);
+    expect(saved?.recommendedRatio).toBe(15.15);
+    expect(Object.is(saved?.doseGrams, -0)).toBe(false);
+  });
 });
