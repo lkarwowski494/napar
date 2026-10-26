@@ -1190,4 +1190,34 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(step?.instructionPl).toBe('Instrukcja 1');
     expect(step?.instructionEn).toBeUndefined();
   });
+
+  test('TASK-P48-11-WZR: decodeRecipeFromShareUrl poprawnie dekoduje stringified liczby oraz liczby z przecinkiem w d, w, t', () => {
+    const payloadWithStringNumbers = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'String Numbers Recipe',
+      b: 'COFFEE',
+      m: 'V60',
+      d: '16,5',
+      w: '250,5',
+      t: '93,5',
+      r: '15,2',
+      s: [
+        {
+          n: 'Bloom',
+          d: '35',
+          w: '50,5',
+          i: 'Pour slowly',
+        },
+      ],
+    }));
+
+    const decoded = decodeRecipeFromShareUrl(payloadWithStringNumbers);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.recipe.doseGrams).toBe(16.5);
+    expect(decoded?.recipe.waterGrams).toBe(250.5);
+    expect(decoded?.recipe.waterTempCelsius).toBe(94);
+    expect(decoded?.recipe.recommendedRatio).toBe(15.2);
+    expect(decoded?.originalSteps[0].durationSeconds).toBe(35);
+    expect(decoded?.originalSteps[0].targetWaterGrams).toBe(51);
+  });
 });

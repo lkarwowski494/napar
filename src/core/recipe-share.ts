@@ -284,6 +284,8 @@ export function decodeRecipeFromShareUrl(
     const parsed: CompactRecipePayload = JSON.parse(jsonStr.trim());
 
     const rawB = typeof parsed.b === 'string' ? parsed.b.trim().toUpperCase() : '';
+    const rawParsedD = typeof parsed.d === 'number' ? parsed.d : (typeof parsed.d === 'string' ? parseFloat(String(parsed.d).replace(',', '.')) : NaN);
+    const rawParsedW = typeof parsed.w === 'number' ? parsed.w : (typeof parsed.w === 'string' ? parseFloat(String(parsed.w).replace(',', '.')) : NaN);
     if (
       !parsed ||
       typeof parsed !== 'object' ||
@@ -299,14 +301,12 @@ export function decodeRecipeFromShareUrl(
       parsed.m.length > 50 ||
       (parsed.a !== undefined && (typeof parsed.a !== 'string' || parsed.a.length > 100)) ||
       (parsed.desc !== undefined && (typeof parsed.desc !== 'string' || parsed.desc.length > 1000)) ||
-      typeof parsed.d !== 'number' ||
-      !Number.isFinite(parsed.d) ||
-      parsed.d <= 0 ||
-      parsed.d > 1000 ||
-      typeof parsed.w !== 'number' ||
-      !Number.isFinite(parsed.w) ||
-      parsed.w <= 0 ||
-      parsed.w > 50000 ||
+      !Number.isFinite(rawParsedD) ||
+      rawParsedD <= 0 ||
+      rawParsedD > 1000 ||
+      !Number.isFinite(rawParsedW) ||
+      rawParsedW <= 0 ||
+      rawParsedW > 50000 ||
       (parsed.s !== undefined && (!Array.isArray(parsed.s) || parsed.s.length > 100))
     ) {
       return null;
@@ -349,8 +349,8 @@ export function decodeRecipeFromShareUrl(
       method: parsed.m.trim().slice(0, 50),
       author: typeof parsed.a === 'string' && parsed.a.trim() ? parsed.a.trim().slice(0, 100) : defaultAuthor,
       description: typeof parsed.desc === 'string' && parsed.desc.trim() ? parsed.desc.trim().slice(0, 1000) : defaultDesc,
-      doseGrams: Object.is(Number(parsed.d.toFixed(1)), -0) ? 0 : Number(parsed.d.toFixed(1)),
-      waterGrams: Object.is(Number(parsed.w.toFixed(1)), -0) ? 0 : Number(parsed.w.toFixed(1)),
+      doseGrams: Object.is(Number(rawParsedD.toFixed(1)), -0) ? 0 : Number(rawParsedD.toFixed(1)),
+      waterGrams: Object.is(Number(rawParsedW.toFixed(1)), -0) ? 0 : Number(rawParsedW.toFixed(1)),
       waterTempCelsius: (() => {
         const rawDecodedTemp = typeof parsed.t === 'number' ? parsed.t : (typeof parsed.t === 'string' ? parseFloat((parsed.t as any).replace(',', '.')) : NaN);
         return Number.isFinite(rawDecodedTemp) && rawDecodedTemp >= 0 && rawDecodedTemp <= 100 && !Object.is(rawDecodedTemp, -0) ? Math.max(0, Math.min(100, Math.round(rawDecodedTemp))) : 92;
@@ -363,7 +363,7 @@ export function decodeRecipeFromShareUrl(
         const rawDecodedRatio = typeof parsed.r === 'number' ? parsed.r : (typeof parsed.r === 'string' ? parseFloat(String(parsed.r).replace(',', '.')) : NaN);
         let ratioVal = Number.isFinite(rawDecodedRatio) && rawDecodedRatio > 0 && !Object.is(rawDecodedRatio, -0)
           ? Number(Math.min(100, Math.max(1, rawDecodedRatio)).toFixed(2))
-          : Number(Math.min(100, Math.max(1, parsed.w / (parsed.d || 1))).toFixed(1));
+          : Number(Math.min(100, Math.max(1, rawParsedW / (rawParsedD || 1))).toFixed(1));
         if (Object.is(ratioVal, -0) || !Number.isFinite(ratioVal) || ratioVal <= 0) ratioVal = 16.7;
         return ratioVal;
       })(),
