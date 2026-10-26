@@ -407,4 +407,26 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(scaledWithNanServings.scaledDoseGrams).toBe(15);
     });
   });
+
+  describe('TASK-P19-03-ZAK: scaleRecipeDose clamp maxDoseGrams i sanitizacja ujemnych kroków', () => {
+    it('clampuje dozę do maxDoseGrams gdy przekracza limit', () => {
+      const steps = [
+        { id: '1', name: 'Zalanie 1', waterGrams: 100, durationSeconds: 30 },
+        { id: '2', name: 'Zalanie 2', waterGrams: 150, durationSeconds: 60 },
+      ];
+      const res = scaleRecipeDose(steps, 15, 2000, 1000);
+      expect(res.newDoseGrams).toBe(1000);
+      expect(res.multiplier).toBeCloseTo(1000 / 15, 2);
+    });
+
+    it('zabezpiecza przed ujemnymi krokami wody', () => {
+      const steps = [
+        { id: '1', name: 'Zalanie 1', waterGrams: -50, durationSeconds: 30 },
+        { id: '2', name: 'Zalanie 2', waterGrams: 200, durationSeconds: 60 },
+      ];
+      const res = scaleRecipeDose(steps, 15, 30);
+      expect(res.steps[0].waterGrams).toBe(0);
+      expect(res.steps[1].waterGrams).toBeGreaterThan(0);
+    });
+  });
 });

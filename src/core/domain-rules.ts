@@ -535,7 +535,7 @@ export interface ScaledRecipeResult {
  */
 export function scaleRecipeDose<
   T extends { id: string; name: string; waterGrams: number; durationSeconds: number; instruction?: string }
->(steps: T[], originalDose: number, newDose: number): ScaledRecipeResult {
+>(steps: T[], originalDose: number, newDose: number, maxDoseGrams = 1000.0): ScaledRecipeResult {
   if (
     !Number.isFinite(originalDose) ||
     !Number.isFinite(newDose) ||
@@ -544,24 +544,26 @@ export function scaleRecipeDose<
   ) {
     throw new Error('Doza musi być większa od zera');
   }
-  const factor = newDose / originalDose;
-  const originalWater = steps.reduce((sum, s) => sum + s.waterGrams, 0);
+  const safeNewDose = Number.isFinite(maxDoseGrams) && maxDoseGrams > 0 ? Math.min(newDose, maxDoseGrams) : newDose;
+  const factor = safeNewDose / originalDose;
+  const originalWater = steps.reduce((sum, s) => sum + (Number.isFinite(s.waterGrams) && s.waterGrams > 0 ? s.waterGrams : 0), 0);
   const targetWater = Number((originalWater * factor).toFixed(1));
 
   let allocated = 0;
   const scaledSteps = steps.map((s, idx) => {
     if (idx === steps.length - 1) {
-      const remaining = Number((targetWater - allocated).toFixed(1));
+      const remaining = Math.max(0, Number((targetWater - allocated).toFixed(1)));
       return { ...s, waterGrams: remaining };
     }
-    const scaledWater = Number((s.waterGrams * factor).toFixed(1));
+    const safeStepWater = Number.isFinite(s.waterGrams) && s.waterGrams > 0 ? s.waterGrams : 0;
+    const scaledWater = Math.max(0, Number((safeStepWater * factor).toFixed(1)));
     allocated += scaledWater;
     return { ...s, waterGrams: scaledWater };
   });
 
   return {
     multiplier: factor,
-    newDoseGrams: newDose,
+    newDoseGrams: safeNewDose,
     targetWaterGrams: targetWater,
     steps: scaledSteps,
   };
