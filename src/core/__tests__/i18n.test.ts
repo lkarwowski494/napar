@@ -286,4 +286,9 @@ describe('i18n System', () => {
     expect(translations.pl.stash.useTemplate).toBe('+ Użyj jako szablon w spiżarni');
     expect(translations.en.stash.useTemplate).toBe('+ Use as template in stash');
   });
+
+  test('TASK-P11-09-LOK: Klucz finishAndSave jest zdefiniowany w słownikach pl i en', () => {
+    expect(translations.pl.brew.finishAndSave).toBe('Zakończ i zapisz');
+    expect(translations.en.brew.finishAndSave).toBe('Finish & Save');
+  });
 });

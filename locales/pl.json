@@ -144,7 +144,8 @@
     "craftCostPerCup": "Koszt tego naparu: {total} {curr} (ziarna: {beans} {curr}, woda: {water} {curr})",
     "craftSavingsLabel": "Oszczędność vs kawiarnia specialty: +{savings} {curr}",
     "skipBtn": "Pomiń",
-    "saveToJournalBtn": "Zapisz w Dzienniku"
+    "saveToJournalBtn": "Zapisz w Dzienniku",
+    "finishAndSave": "Zakończ i zapisz"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
