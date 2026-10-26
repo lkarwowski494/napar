@@ -117,4 +117,41 @@ describe('PassSettingsCard Component', () => {
     expect(openBtn.props.accessibilityHint).toBeDefined();
     expect(manageBtn.props.accessibilityHint).toBeDefined();
   });
+
+  test('TASK-P32-02-MON: PassSettingsCard stosuje prawidlowa slowianska odmiane dla 22 parzen oraz sanityzuje ujemne wartosci', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <PassSettingsCard
+          isSubscribed={false}
+          subscriptionTier="none"
+          accessStatus="trial_active"
+          brewsRemaining={22}
+          onOpenPassModal={jest.fn()}
+          t={t}
+        />
+      );
+    });
+
+    const str22 = JSON.stringify(tree!.toJSON());
+    expect(str22).toContain('"22"');
+    expect(str22).toContain('"parzenia"');
+
+    // Wartość ujemna lub NaN jest traktowana jako 0 parzeń
+    renderer.act(() => {
+      tree = renderer.create(
+        <PassSettingsCard
+          isSubscribed={false}
+          subscriptionTier="none"
+          accessStatus="trial_active"
+          brewsRemaining={-5}
+          onOpenPassModal={jest.fn()}
+          t={t}
+        />
+      );
+    });
+    const strNeg = JSON.stringify(tree!.toJSON());
+    expect(strNeg).toContain('"0"');
+    expect(strNeg).toContain('"parzeń"');
+  });
 });

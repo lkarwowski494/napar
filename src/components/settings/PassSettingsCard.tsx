@@ -2,6 +2,7 @@ import * as Linking from 'expo-linking';
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
+import { pluralPl } from '../../core/i18n';
 
 export interface PassSettingsCardProps {
   isSubscribed: boolean;
@@ -21,7 +22,8 @@ export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
   t,
 }) => {
   const safeTier = typeof subscriptionTier === 'string' && subscriptionTier.trim() ? subscriptionTier.trim() : 'PRO';
-  const remainingLabel = brewsRemaining === 1 ? 'parzenie' : (brewsRemaining >= 2 && brewsRemaining <= 4 ? 'parzenia' : 'parzeń');
+  const safeBrewsRemaining = Number.isFinite(brewsRemaining) && brewsRemaining >= 0 ? Math.floor(brewsRemaining) : 0;
+  const remainingLabel = pluralPl(safeBrewsRemaining, 'parzenie', 'parzenia', 'parzeń');
 
   return (
     <View>
@@ -38,7 +40,7 @@ export const PassSettingsCard: React.FC<PassSettingsCardProps> = ({
           ) : accessStatus === 'trial_active' ? (
             <View style={[styles.proActiveBadge, { backgroundColor: theme.colors.copperMuted }]}>
               <Text style={[styles.proActiveText, { color: theme.colors.copper }]}>
-                TRIAL ({brewsRemaining} {remainingLabel})
+                TRIAL ({safeBrewsRemaining} {remainingLabel})
               </Text>
             </View>
           ) : (
