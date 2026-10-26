@@ -424,7 +424,16 @@ export function calculateBatchScaling(
   baseWaterGrams: number,
   servings: number
 ): BatchScalingResult {
-  const count = Math.max(1, Math.min(4, Math.round(servings)));
+  if (
+    !Number.isFinite(baseDoseGrams) ||
+    baseDoseGrams <= 0 ||
+    !Number.isFinite(baseWaterGrams) ||
+    baseWaterGrams <= 0
+  ) {
+    throw new Error('Doza bazowa i woda muszą być liczbami większymi od zera');
+  }
+  const safeServings = Number.isFinite(servings) ? servings : 1;
+  const count = Math.max(1, Math.min(4, Math.round(safeServings)));
   const scaledDose = Number((baseDoseGrams * count).toFixed(1));
   const scaledWater = Number((baseWaterGrams * count).toFixed(1));
 
@@ -492,7 +501,12 @@ export interface ScaledRecipeResult {
 export function scaleRecipeDose<
   T extends { id: string; name: string; waterGrams: number; durationSeconds: number; instruction?: string }
 >(steps: T[], originalDose: number, newDose: number): ScaledRecipeResult {
-  if (originalDose <= 0 || newDose <= 0) {
+  if (
+    !Number.isFinite(originalDose) ||
+    !Number.isFinite(newDose) ||
+    originalDose <= 0 ||
+    newDose <= 0
+  ) {
     throw new Error('Doza musi być większa od zera');
   }
   const factor = newDose / originalDose;

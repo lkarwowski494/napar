@@ -14,6 +14,7 @@ import {
   diagnoseExtractionTaste,
   calculateBatchScaling,
   calculateCaffeineDecay,
+  scaleRecipeDose,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -366,6 +367,15 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(calculateHoursUntilSafeCaffeine(NaN)).toBe(0);
       expect(calculateHoursUntilSafeCaffeine(100, NaN)).toBe(0);
       expect(calculateHoursUntilSafeCaffeine(100, 25, Infinity)).toBe(0);
+
+      // TASK-P14-03-ZAK: scaleRecipeDose i calculateBatchScaling chronione przed NaN
+      expect(() => scaleRecipeDose([], NaN, 15)).toThrow();
+      expect(() => scaleRecipeDose([], 15, NaN)).toThrow();
+      expect(() => calculateBatchScaling(NaN, 250, 2)).toThrow();
+      expect(() => calculateBatchScaling(15, NaN, 2)).toThrow();
+      const scaledWithNanServings = calculateBatchScaling(15, 250, NaN);
+      expect(scaledWithNanServings.multiplier).toBe(1);
+      expect(scaledWithNanServings.scaledDoseGrams).toBe(15);
     });
   });
 });
