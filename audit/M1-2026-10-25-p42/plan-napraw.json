@@ -4,95 +4,95 @@
     "perspective": "01-ODK",
     "title": "Dostępność i sanityzacja wskaźnika DripperExtractionGauge w BrewActiveFocusTimer",
     "file": "src/components/brew/BrewActiveFocusTimer.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "336adca"
   },
   {
     "id": "TASK-P42-02-MON",
     "perspective": "02-MON",
     "title": "Odporność verifyAndActivateStoreKitPurchase na tablice i sanityzacja pól paragonu",
     "file": "src/core/app-access.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "f94c4ea"
   },
   {
     "id": "TASK-P42-03-ZAK",
     "perspective": "03-ZAK",
     "title": "Normalizacja wielkości liter i wariantów regionalnych języka w generateActionIcsContent",
     "file": "src/core/bpr-engine.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "c9d4aaf"
   },
   {
     "id": "TASK-P42-04-STU",
     "perspective": "04-STU",
     "title": "Identyfikatory testID i accessibilityState disabled na przycisku zapisu w BeanEditModal",
     "file": "src/components/beans/BeanEditModal.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "0710b47"
   },
   {
     "id": "TASK-P42-05-ARC",
     "perspective": "05-ARC",
     "title": "Normalizacja beverageType i limit długości nazwy klonu w duplicateRecipe",
     "file": "src/core/database.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "0866454"
   },
   {
     "id": "TASK-P42-06-TRE",
     "perspective": "06-TRE",
     "title": "Rozszerzenie PROCESS_ALIASES o co-fermentation, lactic, double-washed i drozdze",
     "file": "src/core/knowledge-data.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "826b711"
   },
   {
     "id": "TASK-P42-07-JAK",
     "perspective": "07-JAK",
     "title": "Ścisłe odrzucanie obiektów, tablic i symboli oraz obsługa stringów w diagnoseWaterSensoryImpact",
     "file": "src/core/water-chemistry.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "8357b88"
   },
   {
     "id": "TASK-P42-08-PRO",
     "perspective": "08-PRO",
     "title": "Rozpoznawanie Kyoto Drip, Dutch Coffee, Slow Drip i Ice Brew w getRecipeMicrons",
     "file": "src/core/grinder-converter.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "bcaa90e"
   },
   {
     "id": "TASK-P42-09-LOK",
     "perspective": "09-LOK",
     "title": "Dodanie klucza stash.markFinishedAndArchive w 35 językach i rozszerzenie matrycy testów do 829",
     "file": "locales/*",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "3addbff"
   },
   {
     "id": "TASK-P42-10-WYD",
     "perspective": "10-WYD",
     "title": "Statyczna weryfikacja obecności skryptów typecheck i test w package.json",
     "file": "scripts/verify-native.mjs",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "d46baa1"
   },
   {
     "id": "TASK-P42-11-WZR",
     "perspective": "11-WZR",
     "title": "Walidacja zakresu temperatury i proporcji r w decodeRecipeFromShareUrl",
     "file": "src/core/recipe-share.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "fc54dab"
   },
   {
     "id": "TASK-P42-12-NIE",
     "perspective": "12-NIE",
     "title": "Clampowanie totalElapsedSeconds do 86400 i targetWaterGrams do 50000 w buildLiveActivityPayload",
     "file": "src/core/live-activity.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "49f93a4"
   }
 ]
