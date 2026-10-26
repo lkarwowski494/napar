@@ -153,6 +153,10 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           {(!beveragePreference || beveragePreference === 'both') && (
             <View style={styles.typeSelectorRow}>
               <Pressable
+                testID="bean-type-coffee-btn"
+                accessibilityRole="button"
+                accessibilityState={{ selected: type === 'coffee' }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={[styles.typeBtn, type === 'coffee' && styles.typeBtnActive]}
                 onPress={() => setType('coffee')}
               >
@@ -161,6 +165,10 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
                 </Text>
               </Pressable>
               <Pressable
+                testID="bean-type-tea-btn"
+                accessibilityRole="button"
+                accessibilityState={{ selected: type === 'tea' }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={[styles.typeBtn, type === 'tea' && styles.typeBtnActive]}
                 onPress={() => setType('tea')}
               >
@@ -172,6 +180,9 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           )}
 
           <Pressable
+            testID="open-compendium-btn"
+            accessibilityRole="button"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={styles.compendiumPromptBtn}
             onPress={onOpenCompendium}
           >
@@ -264,7 +275,13 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             onChangeText={setNotesStr}
           />
 
-          <Pressable style={styles.saveSubmitBtn} onPress={handleAddItem}>
+          <Pressable
+            testID="save-bean-btn"
+            accessibilityRole="button"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            style={styles.saveSubmitBtn}
+            onPress={handleAddItem}
+          >
             <Text style={styles.saveSubmitText}>Zapisz w Spiżarni</Text>
           </Pressable>
         </ScrollView>
