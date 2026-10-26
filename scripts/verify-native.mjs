@@ -333,7 +333,7 @@ try {
       );
     }
 
-    // Weryfikacja obecności kluczowych skryptów audytowych w package.json (TASK-P40-10-WYD, TASK-P41-10-WYD, TASK-P42-10-WYD)
+    // Weryfikacja obecności kluczowych skryptów audytowych w package.json (TASK-P40-10-WYD, TASK-P41-10-WYD, TASK-P42-10-WYD, TASK-P43-10-WYD)
     const requiredAuditScripts = [
       'typecheck',
       'test',
@@ -343,6 +343,8 @@ try {
       'check:licenses',
       'check:native',
       'test:coverage',
+      'check',
+      'verify',
     ];
     for (const scriptName of requiredAuditScripts) {
       check(
@@ -350,6 +352,12 @@ try {
         `package.json -> scripts musi zawierać skrypt audytowy: '${scriptName}'`
       );
     }
+
+    const devDeps = pkgJson.devDependencies || {};
+    check(
+      Boolean(devDeps.typescript),
+      "Krytyczny pakiet 'typescript' musi znajdować się w devDependencies package.json"
+    );
   }
 
   const forbiddenPermissions = [
