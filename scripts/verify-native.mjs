@@ -99,6 +99,21 @@ try {
     'app.json -> expo.ios.infoPlist musi mieć UIRequiresFullScreen: true'
   );
 
+  // Weryfikacja CFBundleDisplayName, android.package i 35 języków CFBundleLocalizations (TASK-P14-10-WYD)
+  check(
+    appJson.ios?.infoPlist?.CFBundleDisplayName === 'Napar',
+    `app.json -> expo.ios.infoPlist.CFBundleDisplayName musi być równe 'Napar' (otrzymano '${appJson.ios?.infoPlist?.CFBundleDisplayName}')`
+  );
+  check(
+    appJson.android?.package === 'pl.lukasz.napar',
+    `app.json -> expo.android.package musi być równe 'pl.lukasz.napar' (otrzymano '${appJson.android?.package}')`
+  );
+  const localizations = appJson.ios?.infoPlist?.CFBundleLocalizations;
+  check(
+    Array.isArray(localizations) && localizations.length === 35 && localizations.includes('pl') && localizations.includes('en'),
+    `app.json -> expo.ios.infoPlist.CFBundleLocalizations musi zawierać dokładnie 35 języków, w tym 'pl' i 'en' (otrzymano ${localizations?.length})`
+  );
+
   // Weryfikacja braku uprawnień mikrofonowych w pluginie expo-camera (Zero Audio / Privacy)
   const cameraPlugin = appJson.plugins?.find(
     (p) => Array.isArray(p) && p[0] === 'expo-camera'
