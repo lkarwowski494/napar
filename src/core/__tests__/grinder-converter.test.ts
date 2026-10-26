@@ -269,4 +269,12 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(converted.microns).toBe(700);
     expect(converted.targetFormatted).toContain('23 klików');
   });
+
+  test('TASK-P18-08-PRO: getRecommendedGrindForRecipe wspiera język angielski i jest odporne na niepoprawny format metody', () => {
+    const enRec = getRecommendedGrindForRecipe({ method: 'espresso' }, 'comandante_c40', 'en');
+    expect(enRec.formatted).toContain('clicks');
+
+    const weirdMethod = getRecommendedGrindForRecipe({ method: 12345 as any }, 'comandante_c40');
+    expect(weirdMethod.microns).toBe(720);
+  });
 });

@@ -376,8 +376,13 @@ export function getRecipeMicrons(recipe?: {
   if (!recipe || typeof recipe !== 'object') {
     return 720;
   }
-  const method = (recipe.method || '').toUpperCase();
-  const desc = (recipe.grindSettingDescriptionPl || recipe.grind_size_description || '').toLowerCase();
+  const method = (typeof recipe.method === 'string' ? recipe.method : '').trim().toUpperCase();
+  const desc = (typeof recipe.grindSettingDescriptionPl === 'string'
+    ? recipe.grindSettingDescriptionPl
+    : typeof recipe.grind_size_description === 'string'
+    ? recipe.grind_size_description
+    : ''
+  ).toLowerCase();
 
   if (desc.includes('bardzo drobno') || method === 'ESPRESSO') {
     return 350;
@@ -405,10 +410,11 @@ export function getRecipeMicrons(recipe?: {
  */
 export function getRecommendedGrindForRecipe(
   recipe: { method?: string; grindSettingDescriptionPl?: string; grind_size_description?: string } | null | undefined,
-  grinderId: string
+  grinderId: string,
+  language = 'pl'
 ): { formatted: string; rawValue: number; grinderName: string; microns: number } {
   const microns = getRecipeMicrons(recipe);
-  const result = convertMicronsToGrinder(microns, grinderId);
+  const result = convertMicronsToGrinder(microns, grinderId, language);
   return {
     ...result,
     microns,
