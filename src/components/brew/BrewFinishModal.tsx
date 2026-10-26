@@ -73,15 +73,24 @@ export function BrewFinishModal({
   onSkip,
   onSave,
 }: BrewFinishModalProps) {
+  if (!visible) return null;
+
   const { t, language: contextLang } = useTranslation();
   const language = propLanguage || contextLang || 'pl';
   const curr = language === 'pl' ? 'PLN' : '$';
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const s = Math.max(0, Math.floor(Number(seconds) || 0));
+    const mins = Math.floor(s / 60);
+    const secs = s % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
+
+  const safeTotalHomeCost = (brewCost?.totalHomeCost ?? 0).toFixed(2);
+  const safeCoffeeCost = (brewCost?.coffeeCost ?? 0).toFixed(2);
+  const safeWaterCost = (brewCost?.waterCost ?? 0).toFixed(2);
+  const safeCafePrice = (brewCost?.cafePrice ?? 0).toFixed(0);
+  const safeSavingsPerCup = (brewCost?.savingsPerCup ?? 0).toFixed(2);
 
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
@@ -304,21 +313,21 @@ export function BrewFinishModal({
               <Text style={styles.finishCostTitle}>{t.brew?.craftEconomicsTitle || 'Ekonomia Rzemiosła'}</Text>
               <Text style={styles.finishCostSubtitle}>
                 {language === 'pl'
-                  ? `Koszt tego naparu: ${brewCost.totalHomeCost.toFixed(2)} PLN (ziarna: ${brewCost.coffeeCost.toFixed(2)} zł, woda: ${brewCost.waterCost.toFixed(2)} zł)`
+                  ? `Koszt tego naparu: ${safeTotalHomeCost} PLN (ziarna: ${safeCoffeeCost} zł, woda: ${safeWaterCost} zł)`
                   : (t.brew?.craftCostPerCup || 'Cost of this brew: {total} {curr} (beans: {beans} {curr}, water: {water} {curr})')
-                      .replace('{total}', brewCost.totalHomeCost.toFixed(2))
-                      .replace('{beans}', brewCost.coffeeCost.toFixed(2))
-                      .replace('{water}', brewCost.waterCost.toFixed(2))
+                      .replace('{total}', safeTotalHomeCost)
+                      .replace('{beans}', safeCoffeeCost)
+                      .replace('{water}', safeWaterCost)
                       .replace(/{curr}/g, curr)}
               </Text>
               <Text style={styles.finishCostSavings}>
                 {language === 'pl'
-                  ? `Oszczędność vs kawiarnia specialty (${brewCost.cafePrice.toFixed(0)} zł): `
-                  : (t.brew?.craftSavingsLabel || `Savings vs cafe cup (${curr}${brewCost.cafePrice.toFixed(0)}): `) + ' '}
+                  ? `Oszczędność vs kawiarnia specialty (${safeCafePrice} zł): `
+                  : (t.brew?.craftSavingsLabel || `Savings vs cafe cup (${curr}${safeCafePrice}): `) + ' '}
                 <Text style={styles.finishCostSavingsBold}>
                   {language === 'pl'
-                    ? `+${brewCost.savingsPerCup.toFixed(2)} PLN`
-                    : `+${curr}${brewCost.savingsPerCup.toFixed(2)}`}
+                    ? `+${safeSavingsPerCup} PLN`
+                    : `+${curr}${safeSavingsPerCup}`}
                 </Text>
               </Text>
             </View>

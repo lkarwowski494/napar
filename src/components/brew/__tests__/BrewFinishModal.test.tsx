@@ -119,4 +119,20 @@ describe('BrewFinishModal Component', () => {
     expect(str).toContain('+$14.70');
     expect(str).not.toContain('+14.70 PLN');
   });
+
+  test('TASK-P14-01-ODK: Zwraca null gdy visible=false oraz radzi sobie z ujemnym czasem i NaN', () => {
+    let treeHidden: any;
+    act(() => {
+      treeHidden = renderer.create(<BrewFinishModal {...defaultProps} visible={false} />);
+    });
+    expect(treeHidden.toJSON()).toBeNull();
+
+    let treeSafeTime: any;
+    act(() => {
+      treeSafeTime = renderer.create(
+        <BrewFinishModal {...defaultProps} totalElapsedSeconds={NaN as any} />
+      );
+    });
+    expect(JSON.stringify(treeSafeTime.toJSON())).toContain('00:00');
+  });
 });
