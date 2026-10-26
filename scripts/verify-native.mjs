@@ -216,6 +216,22 @@ try {
     `app.json -> expo.plugins expo-localization musi deklarować 35 języków, w tym 'pl' i 'en' (otrzymano ${supportedLocales?.length})`
   );
 
+  // Weryfikacja 1:1 spójności supportedLocales z CFBundleLocalizations i plikami locales/*.json (TASK-P27-10-WYD)
+  if (Array.isArray(supportedLocales) && Array.isArray(localizations)) {
+    const missingInPlugin = localizations.filter((l) => !supportedLocales.includes(l));
+    const missingInPlist = supportedLocales.filter((l) => !localizations.includes(l));
+    check(
+      missingInPlugin.length === 0 && missingInPlist.length === 0,
+      `app.json -> expo-localization supportedLocales musi być w 100% tożsame z CFBundleLocalizations (różnice: +${missingInPlugin.join(',')}/-${missingInPlist.join(',')})`
+    );
+    for (const loc of supportedLocales) {
+      check(
+        existsSync(join(root, `locales/${loc}.json`)),
+        `app.json -> expo-localization deklaruje język '${loc}', ale brak pliku locales/${loc}.json`
+      );
+    }
+  }
+
   const ver = appJson.version;
   check(/^\d+\.\d+(\.\d+)?$/.test(ver), `Wersja '${ver}' w app.json musi mieć format X.Y lub X.Y.Z`);
 
