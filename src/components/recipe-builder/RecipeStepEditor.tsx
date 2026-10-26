@@ -27,7 +27,9 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
   return (
     <View style={styles.card}>
       <View style={styles.stepsHeader}>
-        <Text style={styles.cardTitle}>{t.recipeBuilder.stepsTitle}</Text>
+        <Text style={styles.cardTitle} accessibilityRole="header">
+          {t.recipeBuilder.stepsTitle}
+        </Text>
         <Pressable
           style={styles.addStepBtn}
           onPress={onAddStep}
@@ -43,7 +45,9 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
       {steps.map((step, index) => (
         <View key={index} style={styles.stepItem}>
           <View style={styles.stepItemHeader}>
-            <Text style={styles.stepNumberBadge}>Krok {step.stepNumber}</Text>
+            <Text style={styles.stepNumberBadge} accessibilityRole="text">
+              Krok {step.stepNumber}
+            </Text>
             {steps.length > 0 && (
               <Pressable
                 onPress={() => onRemoveStep(index)}
@@ -61,14 +65,18 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
 
           <View style={styles.row}>
             <View style={styles.flex1}>
-              <Text style={styles.subFieldLabel}>Nazwa kroku</Text>
+              <Text style={styles.subFieldLabel}>
+                {t.recipeBuilder?.stepName || 'Nazwa kroku'}
+              </Text>
               <Field
                 value={step.namePl}
                 onChangeText={(val) => onUpdateStep(index, 'namePl', val)}
               />
             </View>
             <View style={[styles.flex1, { marginHorizontal: 8 }]}>
-              <Text style={styles.subFieldLabel}>Waga docelowa (g)</Text>
+              <Text style={styles.subFieldLabel}>
+                {t.recipeBuilder?.stepWaterGrams || 'Waga docelowa (g)'}
+              </Text>
               <NumInput
                 value={step.targetWaterGrams}
                 onChangeNumber={(val) => onUpdateStep(index, 'targetWaterGrams', val)}
@@ -76,7 +84,9 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
               />
             </View>
             <View style={styles.flex1}>
-              <Text style={styles.subFieldLabel}>Czas (sekundy)</Text>
+              <Text style={styles.subFieldLabel}>
+                {t.recipeBuilder?.stepDurationSec || 'Czas trwania kroku (s)'}
+              </Text>
               <NumInput
                 value={step.durationSeconds}
                 onChangeNumber={(val) =>

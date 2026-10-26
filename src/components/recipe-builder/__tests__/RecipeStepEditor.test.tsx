@@ -52,4 +52,28 @@ describe('RecipeStepEditor Component (TASK-P32-01-ODK)', () => {
     });
     expect(onRemoveStep).toHaveBeenCalledWith(1);
   });
+
+  test('TASK-P32-04-STU: tytul sekcji kroków posiada role header a etykiety pól sa zlokalizowane', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <RecipeStepEditor
+          steps={sampleSteps}
+          onAddStep={jest.fn()}
+          onRemoveStep={jest.fn()}
+          onUpdateStep={jest.fn()}
+          t={translations.pl}
+        />
+      );
+    });
+
+    const header = tree.root.findByProps({ accessibilityRole: 'header' });
+    expect(header.props.children).toBe('Kroki parzenia');
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('"Krok "');
+    expect(str).toContain('"1"');
+    expect(str).toContain('Docelowa waga zalań (g)');
+    expect(str).toContain('Czas trwania kroku (s)');
+  });
 });
