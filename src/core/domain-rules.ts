@@ -70,12 +70,15 @@ export function calculateBrewDose(waterGrams: number, ratio: number, maxDoseGram
  * Zabezpieczenie przed astronomicznymi wartościami poprzez clamp maxRatio (domyślnie 100.0)
  */
 export function calculateBrewRatio(doseGrams: number, waterGrams: number, maxRatio = 100.0): number {
-  if (!Number.isFinite(doseGrams) || !Number.isFinite(waterGrams) || doseGrams <= 0 || waterGrams <= 0) {
+  const parsedDose = typeof doseGrams === 'number' ? doseGrams : parseFloat(String(doseGrams));
+  const parsedWater = typeof waterGrams === 'number' ? waterGrams : parseFloat(String(waterGrams));
+  if (!Number.isFinite(parsedDose) || !Number.isFinite(parsedWater) || parsedDose <= 0 || parsedWater <= 0) {
     return 0;
   }
-  const ratio = waterGrams / doseGrams;
+  const ratio = parsedWater / parsedDose;
   const safeMaxRatio = Number.isFinite(maxRatio) && maxRatio > 0 ? maxRatio : 100.0;
-  const clamped = Math.min(ratio, safeMaxRatio);
+  let clamped = Math.min(ratio, safeMaxRatio);
+  if (Object.is(clamped, -0) || clamped <= 0) clamped = 0;
   return Number(clamped.toFixed(1));
 }
 
@@ -89,14 +92,17 @@ export function calculateLiquidYield(
   retentionFactor = 2.0,
   maxRetentionFactor = 10.0
 ): number {
-  if (!Number.isFinite(waterGrams) || !Number.isFinite(doseGrams) || !Number.isFinite(retentionFactor) || waterGrams <= 0 || doseGrams <= 0 || retentionFactor < 0) {
+  const parsedWater = typeof waterGrams === 'number' ? waterGrams : parseFloat(String(waterGrams));
+  const parsedDose = typeof doseGrams === 'number' ? doseGrams : parseFloat(String(doseGrams));
+  const parsedRetention = typeof retentionFactor === 'number' ? retentionFactor : parseFloat(String(retentionFactor));
+  if (!Number.isFinite(parsedWater) || !Number.isFinite(parsedDose) || !Number.isFinite(parsedRetention) || parsedWater <= 0 || parsedDose <= 0 || parsedRetention < 0) {
     throw new Error('Nieprawidłowe parametry wyliczania uzysku');
   }
   const safeRetention = Number.isFinite(maxRetentionFactor) && maxRetentionFactor > 0
-    ? Math.min(retentionFactor, maxRetentionFactor)
-    : retentionFactor;
-  const retained = doseGrams * safeRetention;
-  let yieldGrams = Math.max(0, waterGrams - retained);
+    ? Math.min(parsedRetention, maxRetentionFactor)
+    : parsedRetention;
+  const retained = parsedDose * safeRetention;
+  let yieldGrams = Math.max(0, parsedWater - retained);
   if (Object.is(yieldGrams, -0)) yieldGrams = 0;
   return Number(yieldGrams.toFixed(1));
 }
@@ -114,17 +120,21 @@ export function calculateExtractionYield(
   maxBeverageGrams = 50000.0,
   maxEyPercent?: number
 ): ExtractionYieldResult {
-  if (!Number.isFinite(beverageWeightGrams) || !Number.isFinite(tdsPercent) || !Number.isFinite(doseGrams) || beverageWeightGrams <= 0 || tdsPercent <= 0 || doseGrams <= 0) {
+  const parsedBev = typeof beverageWeightGrams === 'number' ? beverageWeightGrams : parseFloat(String(beverageWeightGrams));
+  const parsedTds = typeof tdsPercent === 'number' ? tdsPercent : parseFloat(String(tdsPercent));
+  const parsedDose = typeof doseGrams === 'number' ? doseGrams : parseFloat(String(doseGrams));
+  if (!Number.isFinite(parsedBev) || !Number.isFinite(parsedTds) || !Number.isFinite(parsedDose) || parsedBev <= 0 || parsedTds <= 0 || parsedDose <= 0) {
     throw new Error('Parametry ekstrakcji muszą być większe od zera');
   }
 
-  const safeTds = Number.isFinite(maxTdsPercent) && maxTdsPercent > 0 ? Math.min(tdsPercent, maxTdsPercent) : tdsPercent;
-  const safeBeverage = Number.isFinite(maxBeverageGrams) && maxBeverageGrams > 0 ? Math.min(beverageWeightGrams, maxBeverageGrams) : beverageWeightGrams;
-  let rawEy = (safeBeverage * safeTds) / doseGrams;
+  const safeTds = Number.isFinite(maxTdsPercent) && maxTdsPercent > 0 ? Math.min(parsedTds, maxTdsPercent) : parsedTds;
+  const safeBeverage = Number.isFinite(maxBeverageGrams) && maxBeverageGrams > 0 ? Math.min(parsedBev, maxBeverageGrams) : parsedBev;
+  let rawEy = (safeBeverage * safeTds) / parsedDose;
   if (Number.isFinite(maxEyPercent) && (maxEyPercent as number) > 0) {
     rawEy = Math.min(maxEyPercent as number, rawEy);
   }
-  const ey = Number(rawEy.toFixed(2));
+  let ey = Number(rawEy.toFixed(2));
+  if (Object.is(ey, -0)) ey = 0;
 
   let rating: 'under' | 'ideal' | 'over';
   let descriptionPl: string;

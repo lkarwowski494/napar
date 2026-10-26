@@ -578,4 +578,24 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(res.isSafeForSleep).toBe(false);
     });
   });
+
+  describe('TASK-P31-03-ZAK: calculateExtractionYield, calculateBrewRatio i calculateLiquidYield parsuja stringi i chronia przed -0', () => {
+    it('calculateExtractionYield parsuje numeryczne stringi i chroni przed -0', () => {
+      const res = calculateExtractionYield('250' as any, '1.4' as any, '15' as any);
+      expect(res.extractionYieldPercent).toBe(23.33);
+      expect(res.rating).toBe('over');
+      expect(Object.is(res.extractionYieldPercent, -0)).toBe(false);
+    });
+
+    it('calculateBrewRatio parsuje numeryczne stringi i chroni przed -0', () => {
+      expect(calculateBrewRatio('15' as any, '250' as any)).toBe(16.7);
+      expect(calculateBrewRatio(0, 0)).toBe(0);
+      expect(Object.is(calculateBrewRatio(0, 0), -0)).toBe(false);
+    });
+
+    it('calculateLiquidYield parsuje numeryczne stringi i chroni przed -0', () => {
+      expect(calculateLiquidYield('250' as any, '15' as any, '2.0' as any)).toBe(220.0);
+      expect(Object.is(calculateLiquidYield(250, 15), -0)).toBe(false);
+    });
+  });
 });
