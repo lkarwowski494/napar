@@ -4,95 +4,95 @@
     "perspective": "01-ODK",
     "title": "Semantyczne accessibilityRole i etykiety dostepnosci w BrewHeader",
     "file": "src/components/brew/BrewHeader.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "7a436eb"
   },
   {
     "id": "TASK-P37-02-MON",
     "perspective": "02-MON",
     "title": "Ścisła nieujemność i ochrona przed -0 dla effectiveElapsedDays i effectiveBrewsCount w getAppAccessState",
     "file": "src/core/app-access.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "49045fe"
   },
   {
     "id": "TASK-P37-03-ZAK",
     "perspective": "03-ZAK",
     "title": "Sanityzacja parametrow receptury sesji w buildProactiveActionSchedule",
     "file": "src/core/bpr-engine.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "4375a16"
   },
   {
     "id": "TASK-P37-04-STU",
     "perspective": "04-STU",
     "title": "Clampowanie wagi i sanacja dlugosci pol tekstowych w BeanAddModal",
     "file": "src/components/beans/BeanAddModal.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "fee061d"
   },
   {
     "id": "TASK-P37-05-ARC",
     "perspective": "05-ARC",
     "title": "Ochrona przed -0 i weryfikacja poprawnosci JSON dla stepsJson w duplicateRecipe",
     "file": "src/core/database.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "028c686"
   },
   {
     "id": "TASK-P37-06-TRE",
     "perspective": "06-TRE",
     "title": "Wsparcie dla popularnych aliasow kategorii herbaty w findTeaCategoryById",
     "file": "src/core/knowledge-data.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "c41d079"
   },
   {
     "id": "TASK-P37-07-JAK",
     "perspective": "07-JAK",
     "title": "Odrzucanie null i undefined w calculateWaterMinerals, ppmCaCO3ToDegreesDH i degreesDHToPpmCaCO3",
     "file": "src/core/water-chemistry.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "5e67954"
   },
   {
     "id": "TASK-P37-08-PRO",
     "perspective": "08-PRO",
     "title": "Rozpoznawanie metod Toddy oraz Karlsbad / Bayreuther w getRecipeMicrons",
     "file": "src/core/grinder-converter.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "5f9942e"
   },
   {
     "id": "TASK-P37-09-LOK",
     "perspective": "09-LOK",
     "title": "Dodanie klucza brew.methodTrinityOne w 35 jezykach i rozszerzenie matrycy testow do 824",
     "file": "locales/*",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "d08c650"
   },
   {
     "id": "TASK-P37-10-WYD",
     "perspective": "10-WYD",
     "title": "Statyczna weryfikacja spojnosci ios.bundleIdentifier z android.package oraz scheme ze slug",
     "file": "scripts/verify-native.mjs",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "26c936f"
   },
   {
     "id": "TASK-P37-11-WZR",
     "perspective": "11-WZR",
     "title": "Ochrona docelowej wody krokow przed -0 w recipeToCompactPayload i decodeRecipeFromShareUrl",
     "file": "src/core/recipe-share.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "ab968b0"
   },
   {
     "id": "TASK-P37-12-NIE",
     "perspective": "12-NIE",
     "title": "Parsowanie stringow numerycznych i ochrona przed -0 dla czasow w buildLiveActivityPayload",
     "file": "src/core/live-activity.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "6e96335"
   }
 ]

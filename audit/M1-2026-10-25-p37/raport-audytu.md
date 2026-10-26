@@ -29,15 +29,26 @@ Przebieg 37 (P37) koncentruje się na:
 
 | ID | Perspektywa | Status | Plik główny | Commit |
 |---|---|---|---|---|
-| TASK-P37-01-ODK | Odkrywanie | Pending | `src/components/brew/BrewHeader.tsx` | - |
-| TASK-P37-02-MON | Monetyzacja | Pending | `src/core/app-access.ts` | - |
-| TASK-P37-03-ZAK | Zaskoczenie | Pending | `src/core/bpr-engine.ts` | - |
-| TASK-P37-04-STU | Studiowanie | Pending | `src/components/beans/BeanAddModal.tsx` | - |
-| TASK-P37-05-ARC | Architektura | Pending | `src/core/database.ts` | - |
-| TASK-P37-06-TRE | Treść | Pending | `src/core/knowledge-data.ts` | - |
-| TASK-P37-07-JAK | Jakość | Pending | `src/core/water-chemistry.ts` | - |
-| TASK-P37-08-PRO | Prostota | Pending | `src/core/grinder-converter.ts` | - |
-| TASK-P37-09-LOK | Lokalizacja | Pending | `locales/*` | - |
-| TASK-P37-10-WYD | Wydajność | Pending | `scripts/verify-native.mjs` | - |
-| TASK-P37-11-WZR | Wzorce | Pending | `src/core/recipe-share.ts` | - |
-| TASK-P37-12-NIE | Niezawodność | Pending | `src/core/live-activity.ts` | - |
+| TASK-P37-01-ODK | Odkrywanie | Completed | `src/components/brew/BrewHeader.tsx` | `7a436eb` |
+| TASK-P37-02-MON | Monetyzacja | Completed | `src/core/app-access.ts` | `49045fe` |
+| TASK-P37-03-ZAK | Zaskoczenie | Completed | `src/core/bpr-engine.ts` | `4375a16` |
+| TASK-P37-04-STU | Studiowanie | Completed | `src/components/beans/BeanAddModal.tsx` | `fee061d` |
+| TASK-P37-05-ARC | Architektura | Completed | `src/core/database.ts` | `028c686` |
+| TASK-P37-06-TRE | Treść | Completed | `src/core/knowledge-data.ts` | `c41d079` |
+| TASK-P37-07-JAK | Jakość | Completed | `src/core/water-chemistry.ts` | `5e67954` |
+| TASK-P37-08-PRO | Prostota | Completed | `src/core/grinder-converter.ts` | `5f9942e` |
+| TASK-P37-09-LOK | Lokalizacja | Completed | `locales/*` | `d08c650` |
+| TASK-P37-10-WYD | Wydajność | Completed | `scripts/verify-native.mjs` | `26c936f` |
+| TASK-P37-11-WZR | Wzorce | Completed | `src/core/recipe-share.ts` | `ab968b0` |
+| TASK-P37-12-NIE | Niezawodność | Completed | `src/core/live-activity.ts` | `6e96335` |
+
+---
+
+## Wyniki Weryfikacji Końcowej
+
+- **Test Suites:** 103 passed, 103 total (100%)
+- **Tests:** 1039 passed, 1039 total (100%)
+- **Test Matrix:** 824/824 items (100% pokrycia w `docs/22-macierz-testow.md`)
+- **i18n:** 569 kluczy w 35 językach (100% symetrii parametrów)
+- **Quality Gates:** `check:i18n`, `check:matrix`, `check:corpus`, `check:licenses`, `check:native`, `typecheck` – wszystkie przeszły bezbłędnie (exit code 0).
+- **Architektura:** 100% offline-first, zero telemetrii, zero wycieków analitycznych.
