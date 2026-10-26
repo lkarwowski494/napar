@@ -463,4 +463,18 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio pod vacpot' })).toBe(650);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium grind for vac pot' })).toBe(650);
   });
+
+  test('TASK-P39-08-PRO: getRecipeMicrons rozpoznaje kawiarkę Bialetti oraz AeroPress Inverted', () => {
+    // Bialetti -> 450 µm
+    expect(getRecipeMicrons({ method: 'BIALETTI' })).toBe(450);
+    expect(getRecipeMicrons({ method: 'Bialetti Brikka' })).toBe(450);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Drobno pod kawiarkę bialetti' })).toBe(450);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine grind for Bialetti Venus' })).toBe(450);
+
+    // Inverted AeroPress -> 560 µm
+    expect(getRecipeMicrons({ method: 'AEROPRESS_INVERTED' })).toBe(560);
+    expect(getRecipeMicrons({ method: 'Inverted AeroPress' })).toBe(560);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Metoda odwrócona' })).toBe(560);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Inverted aeropress recipe' })).toBe(560);
+  });
 });

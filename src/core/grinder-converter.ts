@@ -434,7 +434,15 @@ export function getRecipeMicrons(recipe?: {
     }
     return 350;
   }
-  if (method === 'MOKA' || desc.includes('kawiark') || desc.includes('moka')) {
+  if (
+    method === 'MOKA' ||
+    method === 'BIALETTI' ||
+    method.includes('MOKA') ||
+    method.includes('BIALETTI') ||
+    desc.includes('kawiark') ||
+    desc.includes('moka') ||
+    desc.includes('bialetti')
+  ) {
     return 450;
   }
   if (
@@ -462,8 +470,12 @@ export function getRecipeMicrons(recipe?: {
     method === 'AEROPRESS' ||
     method.includes('AEROPRESS') ||
     method.includes('DELTER') ||
+    method.includes('INVERTED') ||
     desc.includes('aeropress') ||
-    desc.includes('delter')
+    desc.includes('delter') ||
+    desc.includes('inverted') ||
+    desc.includes('odwrócon') ||
+    desc.includes('odwrocon')
   ) {
     if (desc.includes('16') || desc.includes('18')) return 520;
     return 560;
