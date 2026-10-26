@@ -102,4 +102,17 @@ describe('GrinderSelectModal Component', () => {
     expect(scroll).toBeTruthy();
     expect(scroll.props.accessibilityLabel).toBe(t.brew.grinderModalTitle);
   });
+  test('TASK-P24-04-STU: przycisk zamknięcia oraz elementy młynków posiadają accessibilityHint', () => {
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(<GrinderSelectModal {...defaultProps} visible={true} grinderId="comandante_c40" />);
+    });
+
+    const root = tree!.root;
+    const closeBtn = root.findByProps({ testID: 'close-grinder-modal-btn' });
+    expect(closeBtn.props.accessibilityHint).toBeDefined();
+
+    const c40Item = root.findByProps({ testID: 'grinder-item-comandante_c40' });
+    expect(c40Item.props.accessibilityHint).toBeDefined();
+  });
 });

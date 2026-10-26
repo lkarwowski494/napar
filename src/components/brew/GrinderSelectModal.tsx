@@ -50,6 +50,7 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
             onPress={onClose}
             accessibilityRole="button"
             accessibilityLabel={t.common.close}
+            accessibilityHint={t?.common?.modalClose || 'Zamknij okno'}
           >
             <Text style={styles.modalCloseText}>{t.common.close}</Text>
           </Pressable>
@@ -78,6 +79,7 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
                 accessibilityRole="radio"
                 accessibilityState={{ selected: isSelected }}
                 accessibilityLabel={`${grinder.name}, ${rec.formatted}`}
+                accessibilityHint={isSelected ? (t?.common?.selected || 'Wybrany młynek') : (t?.common?.select || 'Wybierz ten młynek')}
               >
                 <View style={{ flex: 1 }}>
                   <Text
