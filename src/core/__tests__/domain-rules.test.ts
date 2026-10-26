@@ -169,10 +169,12 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       // 120mg consumed 10h before bed -> 30mg remaining (above 25mg threshold)
       const unsafe = evaluateBedtimeCaffeine([{ doseMg: 120, hoursUntilBedtime: 10 }], 25.0);
       expect(unsafe.isSafeForSleep).toBe(false);
+      expect(unsafe.messageEn).toContain('exceeds the 25 mg threshold');
 
       // 120mg consumed 15h before bed -> 15mg remaining (safe)
       const safe = evaluateBedtimeCaffeine([{ doseMg: 120, hoursUntilBedtime: 15 }], 25.0);
       expect(safe.isSafeForSleep).toBe(true);
+      expect(safe.messageEn).toContain('is within the low sleep disruption threshold');
 
       // TASK-P12-03-ZAK: Odporność na nullish intakes i elementy z NaN/ujemnymi wartościami
       const nullEval = evaluateBedtimeCaffeine(null as any);

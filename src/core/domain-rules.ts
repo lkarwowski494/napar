@@ -247,10 +247,13 @@ export function evaluateBedtimeCaffeine(
   const isSafeForSleep = totalRemaining <= safeThreshold;
 
   let messagePl: string;
+  let messageEn: string;
   if (isSafeForSleep) {
     messagePl = `Szacowany poziom kofeiny o porze snu (${totalRemaining} mg) mieści się w orientacyjnym progu niskiego wpływu na sen.`;
+    messageEn = `Estimated bedtime caffeine level (${totalRemaining} mg) is within the low sleep disruption threshold.`;
   } else {
     messagePl = `Poziom kofeiny (${totalRemaining} mg) przekracza próg ${safeThreshold} mg — ryzyko spłycenia snu.`;
+    messageEn = `Bedtime caffeine level (${totalRemaining} mg) exceeds the ${safeThreshold} mg threshold — risk of light sleep.`;
   }
 
   return {
@@ -258,6 +261,7 @@ export function evaluateBedtimeCaffeine(
     safeThresholdMg: safeThreshold,
     isSafeForSleep,
     messagePl,
+    messageEn,
   };
 }
 
