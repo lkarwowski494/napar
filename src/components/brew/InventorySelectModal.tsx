@@ -18,6 +18,7 @@ export interface InventorySelectModalProps {
   selectedItem: InventoryItem | null;
   onSelectItem: (item: InventoryItem | null) => void;
   inline?: boolean;
+  t?: any;
 }
 
 export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
@@ -27,14 +28,23 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
   selectedItem,
   onSelectItem,
   inline = false,
+  t,
 }) => {
   if (!inline && !visible) return null;
 
   const isUnassignedSelected = selectedItem === null;
+  const safeInventory = Array.isArray(inventory) ? inventory : [];
 
   const innerContent = (
-    <ScrollView style={inline ? styles.inlineScrollView : undefined} nestedScrollEnabled={inline}>
-      <Text style={styles.modalTitle}>Wybierz ze Spiżarni</Text>
+    <ScrollView
+      style={inline ? styles.inlineScrollView : undefined}
+      nestedScrollEnabled={inline}
+      accessibilityRole="radiogroup"
+      accessibilityLabel={t?.brew?.selectInventoryTitle || 'Wybierz ze Spiżarni'}
+    >
+      <Text style={styles.modalTitle}>
+        {t?.brew?.selectInventoryTitle || 'Wybierz ze Spiżarni'}
+      </Text>
       <Pressable
         testID="close-inventory-modal-btn"
         style={styles.modalCloseBtn}
@@ -59,39 +69,45 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
           onClose();
         }}
       >
-        <Text style={styles.recipeOptionName}>Brak przypisania (ogólne)</Text>
+        <Text style={styles.recipeOptionName}>
+          {t?.brew?.unassignedInventory || 'Brak przypisania (ogólne)'}
+        </Text>
         <Text style={styles.recipeOptionAuthor}>
           Nie odliczaj gramatury ze spiżarni
         </Text>
       </Pressable>
 
-      {inventory.map((item) => {
-        const isItemSelected = selectedItem?.id === item.id;
-        return (
-          <Pressable
-            key={item.id}
-            testID={`inventory-option-${item.id}`}
-            accessibilityRole="radio"
-            accessibilityState={{ selected: isItemSelected }}
-            style={[
-              styles.recipeOptionItem,
-              isItemSelected && styles.recipeOptionActive,
-            ]}
-            onPress={() => {
-              onSelectItem(item);
-              onClose();
-            }}
-          >
-          <Text style={styles.recipeOptionName}>{item.name}</Text>
-          <Text style={styles.recipeOptionAuthor}>
-            {item.roasterOrProducer || 'Palarnia'} · {item.origin || ''}
-          </Text>
-          <Text style={styles.recipeOptionDetails}>
-            Pozostało: {item.remainingWeightGrams}g z {item.initialWeightGrams}g
-          </Text>
-        </Pressable>
-        );
-      })}
+      {safeInventory.length === 0 ? (
+        <Text style={styles.emptyNote}>Brak innych pozycji w spiżarni</Text>
+      ) : (
+        safeInventory.map((item) => {
+          const isItemSelected = selectedItem?.id === item.id;
+          return (
+            <Pressable
+              key={item.id}
+              testID={`inventory-option-${item.id}`}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: isItemSelected }}
+              style={[
+                styles.recipeOptionItem,
+                isItemSelected && styles.recipeOptionActive,
+              ]}
+              onPress={() => {
+                onSelectItem(item);
+                onClose();
+              }}
+            >
+              <Text style={styles.recipeOptionName}>{item.name}</Text>
+              <Text style={styles.recipeOptionAuthor}>
+                {item.roasterOrProducer || 'Palarnia'} · {item.origin || ''}
+              </Text>
+              <Text style={styles.recipeOptionDetails}>
+                Pozostało: {item.remainingWeightGrams}g z {item.initialWeightGrams}g
+              </Text>
+            </Pressable>
+          );
+        })
+      )}
     </ScrollView>
   );
 
@@ -186,6 +202,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.copper,
     fontWeight: '600',
+  },
+  emptyNote: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginVertical: 12,
   },
 });
 

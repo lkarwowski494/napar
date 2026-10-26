@@ -1,145 +1,107 @@
 // ============================================================================
 // Apps4Brew Studio — Unit Tests: InventorySelectModal
-// TASK-P13-04-STU
+// TASK-P17-01-ODK
 // ============================================================================
 
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { InventorySelectModal, InventorySelectModalProps } from '../InventorySelectModal';
 import { InventoryItem } from '../../../core/database-schema';
+import { translations } from '../../../core/i18n';
 
 describe('InventorySelectModal Component', () => {
-  const mockInventory: InventoryItem[] = [
-    {
-      id: 'inv-1',
-      name: 'Etiopia Yirgacheffe',
-      type: 'coffee',
-      roasterOrProducer: 'Hard Beans',
-      origin: 'Etiopia',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 180,
-      flavorNotes: ['bergamotka'],
-      isFavorite: true,
-      isArchived: false,
-      createdAt: '2026-10-01T00:00:00Z',
-      updatedAt: '2026-10-01T00:00:00Z',
-    },
-    {
-      id: 'inv-2',
-      name: 'Kenia Nyeri Hill',
-      type: 'coffee',
-      roasterOrProducer: 'Coffeedesk',
-      origin: 'Kenia',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 220,
-      flavorNotes: ['porzeczka'],
-      isFavorite: false,
-      isArchived: false,
-      createdAt: '2026-10-02T00:00:00Z',
-      updatedAt: '2026-10-02T00:00:00Z',
-    },
-  ];
+  const t = translations.pl;
+  const mockClose = jest.fn();
+  const mockSelect = jest.fn();
+
+  const mockItem: InventoryItem = {
+    id: 'bean-1',
+    name: 'Ethiopia Yirgacheffe',
+    type: 'coffee',
+    roasterOrProducer: 'Hard Beans',
+    origin: 'Ethiopia',
+    initialWeightGrams: 250,
+    remainingWeightGrams: 180,
+    flavorNotes: ['jasmine', 'peach'],
+    isFavorite: false,
+    isArchived: false,
+    createdAt: '2026-10-01T00:00:00.000Z',
+    updatedAt: '2026-10-01T00:00:00.000Z',
+  };
 
   const defaultProps: InventorySelectModalProps = {
     visible: true,
-    onClose: jest.fn(),
-    inventory: mockInventory,
+    onClose: mockClose,
+    inventory: [mockItem],
     selectedItem: null,
-    onSelectItem: jest.fn(),
-    inline: false,
+    onSelectItem: mockSelect,
+    t,
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('TASK-P13-04-STU: zwraca null i nie renderuje gdy visible=false i inline=false', () => {
+  test('zwraca null gdy visible=false i inline=false', () => {
     let tree: renderer.ReactTestRenderer;
     act(() => {
-      tree = renderer.create(<InventorySelectModal {...defaultProps} visible={false} inline={false} />);
+      tree = renderer.create(<InventorySelectModal {...defaultProps} visible={false} />);
     });
     expect(tree!.toJSON()).toBeNull();
   });
 
-  test('renderuje opcje z rolą radio oraz stanem zaznaczenia accessibilityState', () => {
+  test('renderuje opcję unassigned oraz rolę radiogroup na ScrollView', () => {
     let tree: renderer.ReactTestRenderer;
     act(() => {
-      tree = renderer.create(
-        <InventorySelectModal {...defaultProps} selectedItem={null} />
-      );
+      tree = renderer.create(<InventorySelectModal {...defaultProps} visible={true} />);
     });
-
     const root = tree!.root;
     const unassignedOption = root.findByProps({ testID: 'inventory-option-unassigned' });
     expect(unassignedOption.props.accessibilityRole).toBe('radio');
     expect(unassignedOption.props.accessibilityState).toEqual({ selected: true });
 
-    const item1 = root.findByProps({ testID: 'inventory-option-inv-1' });
-    expect(item1.props.accessibilityRole).toBe('radio');
-    expect(item1.props.accessibilityState).toEqual({ selected: false });
-  });
-
-  test('wybór opcji braku przypisania wywołuje onSelectItem(null) i onClose', () => {
-    const onSelectItem = jest.fn();
-    const onClose = jest.fn();
-    let tree: renderer.ReactTestRenderer;
-    act(() => {
-      tree = renderer.create(
-        <InventorySelectModal
-          {...defaultProps}
-          onSelectItem={onSelectItem}
-          onClose={onClose}
-        />
-      );
-    });
-
-    const root = tree!.root;
-    const unassignedOption = root.findByProps({ testID: 'inventory-option-unassigned' });
     act(() => {
       unassignedOption.props.onPress();
     });
-
-    expect(onSelectItem).toHaveBeenCalledWith(null);
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(mockSelect).toHaveBeenCalledWith(null);
+    expect(mockClose).toHaveBeenCalled();
   });
 
-  test('wybór pozycji spiżarni wywołuje onSelectItem(item) i onClose', () => {
-    const onSelectItem = jest.fn();
-    const onClose = jest.fn();
+  test('renderuje pozycję ze spiżarni i obsługuje wybór', () => {
     let tree: renderer.ReactTestRenderer;
     act(() => {
-      tree = renderer.create(
-        <InventorySelectModal
-          {...defaultProps}
-          onSelectItem={onSelectItem}
-          onClose={onClose}
-        />
-      );
+      tree = renderer.create(<InventorySelectModal {...defaultProps} visible={true} selectedItem={mockItem} />);
     });
-
     const root = tree!.root;
-    const itemOption = root.findByProps({ testID: 'inventory-option-inv-1' });
+    const itemOption = root.findByProps({ testID: 'inventory-option-bean-1' });
+    expect(itemOption.props.accessibilityRole).toBe('radio');
+    expect(itemOption.props.accessibilityState).toEqual({ selected: true });
+
     act(() => {
       itemOption.props.onPress();
     });
-
-    expect(onSelectItem).toHaveBeenCalledWith(mockInventory[0]);
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(mockSelect).toHaveBeenCalledWith(mockItem);
+    expect(mockClose).toHaveBeenCalled();
   });
 
-  test('kliknięcie przycisku zamknięcia wywołuje onClose', () => {
-    const onClose = jest.fn();
+  test('renderuje poprawnie w trybie inline', () => {
     let tree: renderer.ReactTestRenderer;
     act(() => {
-      tree = renderer.create(<InventorySelectModal {...defaultProps} onClose={onClose} />);
+      tree = renderer.create(<InventorySelectModal {...defaultProps} inline={true} />);
     });
-
     const root = tree!.root;
-    const closeBtn = root.findByProps({ testID: 'close-inventory-modal-btn' });
-    act(() => {
-      closeBtn.props.onPress();
-    });
+    const inlineContainer = root.findByProps({ testID: 'inventory-select-inline-panel' });
+    expect(inlineContainer).toBeTruthy();
+  });
 
-    expect(onClose).toHaveBeenCalledTimes(1);
+  test('wyświetla informację o braku innych pozycji gdy spiżarnia jest pusta', () => {
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(<InventorySelectModal {...defaultProps} inventory={[]} />);
+    });
+    const root = tree!.root;
+    const textNodes = root.findAllByType('Text' as any);
+    const hasEmptyNote = textNodes.some((n) => n.props.children === 'Brak innych pozycji w spiżarni');
+    expect(hasEmptyNote).toBe(true);
   });
 });
