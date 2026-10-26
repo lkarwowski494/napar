@@ -2150,4 +2150,60 @@ describe('Napar SQLite Database & Repositories', () => {
     const afterDeduct = getInventoryItemById('tea-case-norm');
     expect(afterDeduct?.remainingWeightGrams).toBe(84.5);
   });
+
+  test('TASK-P51-05-ARC: saveRecipe i duplicateRecipe parsuja proporcje w formatach 1:X oraz 1/X i wspieraja przecinki dziesietne', () => {
+    initDatabase(mockDb as any);
+
+    // 1. saveRecipe ze stringiem ratio '1:16.5' i '1/15'
+    saveRecipe({
+      id: 'rec-p51-ratio-colon',
+      name: 'V60 Ratio Colon',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 92,
+      recommendedRatio: '1:16.5' as any,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-26T20:00:00Z',
+    });
+    const savedColon = getRecipeById('rec-p51-ratio-colon');
+    expect(savedColon?.recommendedRatio).toBe(16.5);
+
+    saveRecipe({
+      id: 'rec-p51-ratio-slash',
+      name: 'V60 Ratio Slash',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 92,
+      recommendedRatio: '1/15' as any,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-26T20:00:00Z',
+    });
+    const savedSlash = getRecipeById('rec-p51-ratio-slash');
+    expect(savedSlash?.recommendedRatio).toBe(15);
+
+    // 2. duplicateRecipe z ratio '1:17.5' i przecinkami dziesiętnymi
+    const duplicated = duplicateRecipe({
+      id: 'rec-orig',
+      name: 'Original Coffee',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: '18,5' as any,
+      waterGrams: '300,5' as any,
+      waterTempCelsius: '92,5' as any,
+      recommendedRatio: '1:17.5' as any,
+      steps: [],
+    } as any);
+
+    expect(duplicated.doseGrams).toBe(18.5);
+    expect(duplicated.waterGrams).toBe(300.5);
+    expect(duplicated.recommendedRatio).toBe(17.5);
+  });
 });

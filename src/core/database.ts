@@ -529,7 +529,20 @@ export function saveRecipe(recipe: SavedRecipe): void {
     : 92;
   const temp = Object.is(safeTemp, -0) ? 0 : safeTemp;
 
-  const rawRatio = typeof recipe.recommendedRatio === 'number' ? recipe.recommendedRatio : parseFloat(String(recipe.recommendedRatio).replace(',', '.'));
+  let rawRatio: number;
+  const rawRatioVal = (recipe as any).recommendedRatio;
+  if (typeof rawRatioVal === 'string' && (rawRatioVal.includes(':') || rawRatioVal.includes('/'))) {
+    const parts = rawRatioVal.split(/[:/]/).map((p: string) => parseFloat(p.trim().replace(',', '.')));
+    if (parts.length === 2 && Number.isFinite(parts[0]) && Number.isFinite(parts[1]) && parts[0] > 0 && parts[1] > 0) {
+      rawRatio = parts[1] / parts[0];
+    } else {
+      rawRatio = parseFloat(rawRatioVal.replace(',', '.'));
+    }
+  } else if (typeof rawRatioVal === 'number') {
+    rawRatio = rawRatioVal;
+  } else {
+    rawRatio = parseFloat(String(rawRatioVal).replace(',', '.'));
+  }
   const safeRatio = Number.isFinite(rawRatio) && rawRatio > 0 ? Number(Math.min(100, Math.max(1, rawRatio)).toFixed(2)) : 16;
   const ratio = Object.is(safeRatio, -0) ? 16 : safeRatio;
 
@@ -661,18 +674,18 @@ export function duplicateRecipe(
   const beverageType = typeof rawType === 'string' && rawType.trim().toUpperCase() === 'TEA' ? 'TEA' : 'COFFEE';
   const method = typeof recipe.method === 'string' && recipe.method.trim() ? recipe.method.trim() : 'V60';
 
-  const rawDose = recipe.doseGrams ?? recipe.coffeeOrTeaDoseGrams;
-  const numDose = typeof rawDose === 'number' ? rawDose : (typeof rawDose === 'string' ? parseFloat(rawDose) : NaN);
+  const rawDose = (recipe as any).doseGrams ?? (recipe as any).coffeeOrTeaDoseGrams;
+  const numDose = typeof rawDose === 'number' ? rawDose : parseFloat(String(rawDose).replace(',', '.'));
   const doseGramsVal = Number.isFinite(numDose) && numDose > 0 ? Number(Math.min(1000, numDose).toFixed(1)) : 15;
   const doseGrams = Object.is(doseGramsVal, -0) || doseGramsVal <= 0 ? 15 : doseGramsVal;
 
-  const rawWater = recipe.waterGrams ?? recipe.waterWeightGrams;
-  const numWater = typeof rawWater === 'number' ? rawWater : (typeof rawWater === 'string' ? parseFloat(rawWater) : NaN);
+  const rawWater = (recipe as any).waterGrams ?? (recipe as any).waterWeightGrams;
+  const numWater = typeof rawWater === 'number' ? rawWater : parseFloat(String(rawWater).replace(',', '.'));
   const waterGramsVal = Number.isFinite(numWater) && numWater > 0 ? Number(Math.min(50000, numWater).toFixed(1)) : 250;
   const waterGrams = Object.is(waterGramsVal, -0) || waterGramsVal <= 0 ? 250 : waterGramsVal;
 
   const rawTemp = recipe.waterTempCelsius ?? recipe.waterTemperatureCelsius;
-  const numTemp = typeof rawTemp === 'number' ? rawTemp : (typeof rawTemp === 'string' ? parseFloat(rawTemp) : NaN);
+  const numTemp = typeof rawTemp === 'number' ? rawTemp : (typeof rawTemp === 'string' ? parseFloat(String(rawTemp).replace(',', '.')) : NaN);
   const waterTempVal = Number.isFinite(numTemp) && numTemp >= 0 && numTemp <= 100 ? Math.round(numTemp) : 93;
   const waterTempCelsius = Object.is(waterTempVal, -0) ? 0 : waterTempVal;
 
@@ -694,8 +707,20 @@ export function duplicateRecipe(
     }
   }
 
-  const rawRatio = recipe.recommendedRatio;
-  const numRatio = typeof rawRatio === 'number' ? rawRatio : (typeof rawRatio === 'string' ? parseFloat(rawRatio) : NaN);
+  const rawRatio = (recipe as any).recommendedRatio;
+  let numRatio: number;
+  if (typeof rawRatio === 'string' && (rawRatio.includes(':') || rawRatio.includes('/'))) {
+    const parts = rawRatio.split(/[:/]/).map((p: string) => parseFloat(p.trim().replace(',', '.')));
+    if (parts.length === 2 && Number.isFinite(parts[0]) && Number.isFinite(parts[1]) && parts[0] > 0 && parts[1] > 0) {
+      numRatio = parts[1] / parts[0];
+    } else {
+      numRatio = parseFloat(rawRatio.replace(',', '.'));
+    }
+  } else if (typeof rawRatio === 'number') {
+    numRatio = rawRatio;
+  } else {
+    numRatio = typeof rawRatio === 'string' ? parseFloat(rawRatio.replace(',', '.')) : NaN;
+  }
   const calcRatio = Number.isFinite(numRatio) && numRatio > 0
     ? Number(numRatio.toFixed(2))
     : Number((waterGrams / doseGrams).toFixed(1));
