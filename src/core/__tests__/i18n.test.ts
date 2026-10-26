@@ -361,4 +361,11 @@ describe('i18n System', () => {
     expect(translations.pl.brew.coldBrewDesc).toContain('zimnej wodzie');
     expect(translations.en.brew.coldBrewDesc).toContain('cold water');
   });
+
+  test('TASK-P32-09-LOK: Klucze paramsAndRatio i stepName są zdefiniowane w recipeBuilder w PL i EN', () => {
+    expect(translations.pl.recipeBuilder.paramsAndRatio).toBe('Parametry & Proporcja');
+    expect(translations.en.recipeBuilder.paramsAndRatio).toBe('Parameters & Ratio');
+    expect(translations.pl.recipeBuilder.stepName).toBe('Nazwa kroku');
+    expect(translations.en.recipeBuilder.stepName).toBe('Step name');
+  });
 });

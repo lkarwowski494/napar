@@ -235,7 +235,9 @@
     "deleteRecipeConfirmTitle": "Delete Recipe?",
     "deleteRecipeConfirmMsg": "This action cannot be undone.",
     "fillRequired": "Please provide a recipe name and at least one pour step.",
-    "duplicateBtn": "Duplicate as New Recipe"
+    "duplicateBtn": "Duplicate as New Recipe",
+    "paramsAndRatio": "פרמטרים ויחס",
+    "stepName": "שם השלב"
   },
   "stash": {
     "title": "Coffee & Tea Stash",
