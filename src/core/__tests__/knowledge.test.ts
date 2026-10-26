@@ -386,4 +386,12 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     const byKillGreen = searchTeaCategories('parowanie');
     expect(byKillGreen.length).toBeGreaterThanOrEqual(1);
   });
+
+  test('TASK-P20-06-TRE: searchCoffeeOrigins przeszukuje harvestMonths oraz bezpiecznie obsługuje tablice regionów i odmian', () => {
+    const byHarvest = searchCoffeeOrigins('październik');
+    expect(byHarvest.length).toBeGreaterThanOrEqual(1);
+
+    const byRegion = searchCoffeeOrigins('Sidama');
+    expect(byRegion.length).toBeGreaterThanOrEqual(1);
+  });
 });
