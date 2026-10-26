@@ -472,5 +472,15 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(schedule[0].subtitlePl).not.toContain('-');
       expect(schedule[0].daysOffset).toBe(7); // 7 dni do otwarcia okna peak
     });
+
+    it('TASK-P47-03-ZAK: escapeIcsText filtruje niedozwolone znaki kontrolne RFC 5545', () => {
+      // Znaki kontrolne ASCII (np. \x00, \x08, \x0b, \x1f)
+      const inputWithControls = 'Cold\x00 Brew\x08 Special\x1F Session\r\nNotes';
+      const escaped = escapeIcsText(inputWithControls);
+      expect(escaped).toBe('Cold Brew Special Session\\nNotes');
+      expect(escaped).not.toContain('\x00');
+      expect(escaped).not.toContain('\x08');
+      expect(escaped).not.toContain('\x1F');
+    });
   });
 });

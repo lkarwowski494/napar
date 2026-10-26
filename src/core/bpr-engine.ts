@@ -448,6 +448,7 @@ export function buildFourteenDayCalendar(
 export function escapeIcsText(str: string): string {
   if (typeof str !== 'string' || !str) return '';
   return str
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
     .replace(/\\/g, '\\\\')
     .replace(/;/g, '\\;')
     .replace(/,/g, '\\,')
