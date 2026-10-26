@@ -100,23 +100,28 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
       Alert.alert(t.common?.error || 'Błąd', t.stash?.nameError || 'Podaj nazwę kawy lub herbaty.');
       return;
     }
-    const rawWeight = parseFloat(initialWeight) || (isImperial ? 8.8 : 250);
-    const weightNum = isImperial ? Math.round(ouncesToGrams(rawWeight)) : Math.round(rawWeight);
+    const parsedWeight = parseFloat(initialWeight);
+    const safeParsed = Number.isFinite(parsedWeight) && parsedWeight > 0 ? parsedWeight : (isImperial ? 8.8 : 250);
+    const convertedWeight = isImperial ? ouncesToGrams(safeParsed) : safeParsed;
+    const rawWeightClamped = Math.floor(Math.max(1, Math.min(100000, convertedWeight)));
+    const weightNum = Object.is(rawWeightClamped, -0) ? 250 : rawWeightClamped;
+
     const notesArray = notesStr
       .split(',')
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
+      .map((s) => s.trim().slice(0, 50))
+      .filter((s) => s.length > 0)
+      .slice(0, 20);
 
     const newItem: InventoryItem = {
       id: `item-${Date.now()}`,
-      name: name.trim(),
+      name: name.trim().slice(0, 200),
       type,
-      roasterOrProducer: roaster.trim() || undefined,
-      origin: origin.trim() || undefined,
-      variety: variety.trim() || undefined,
-      process: process.trim() || undefined,
-      roastOrHarvestDate: roastDate.trim() || undefined,
-      roastProfile: roastProfile.trim() || undefined,
+      roasterOrProducer: roaster.trim().slice(0, 100) || undefined,
+      origin: origin.trim().slice(0, 100) || undefined,
+      variety: variety.trim().slice(0, 100) || undefined,
+      process: process.trim().slice(0, 100) || undefined,
+      roastOrHarvestDate: roastDate.trim().slice(0, 50) || undefined,
+      roastProfile: roastProfile.trim().slice(0, 50) || undefined,
       initialWeightGrams: weightNum,
       remainingWeightGrams: weightNum,
       flavorNotes: notesArray,
@@ -205,6 +210,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             placeholderTextColor={theme.colors.textMuted}
             value={name}
             onChangeText={setName}
+            maxLength={200}
           />
 
           <Text style={styles.inputLabel}>{t.stash?.roaster || 'Palarnia / Producent'}</Text>
@@ -215,6 +221,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             placeholderTextColor={theme.colors.textMuted}
             value={roaster}
             onChangeText={setRoaster}
+            maxLength={100}
           />
 
           <Text style={styles.inputLabel}>{t.stash?.origin || 'Kraj / Pochodzenie'}</Text>
@@ -225,6 +232,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             placeholderTextColor={theme.colors.textMuted}
             value={origin}
             onChangeText={setOrigin}
+            maxLength={100}
           />
 
           <View style={styles.formRow}>
@@ -237,6 +245,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
                 placeholderTextColor={theme.colors.textMuted}
                 value={variety}
                 onChangeText={setVariety}
+                maxLength={100}
               />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
@@ -248,6 +257,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
                 placeholderTextColor={theme.colors.textMuted}
                 value={process}
                 onChangeText={setProcess}
+                maxLength={100}
               />
             </View>
           </View>
@@ -262,6 +272,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
                 placeholderTextColor={theme.colors.textMuted}
                 value={roastDate}
                 onChangeText={setRoastDate}
+                maxLength={20}
               />
             </View>
 
@@ -275,6 +286,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
                 keyboardType="numeric"
                 value={initialWeight}
                 onChangeText={setInitialWeight}
+                maxLength={10}
               />
             </View>
           </View>
@@ -287,6 +299,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             placeholderTextColor={theme.colors.textMuted}
             value={notesStr}
             onChangeText={setNotesStr}
+            maxLength={500}
           />
 
           <Pressable

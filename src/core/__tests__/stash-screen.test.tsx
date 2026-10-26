@@ -917,4 +917,46 @@ describe('BeansScreen (Stash & Inventory)', () => {
     expect(str).toContain('Archive');
     expect(str).not.toContain('Parz z tych ziaren');
   });
+
+  test('TASK-P37-04-STU: BeanAddModal clampuje wagę paczki i sanityzuje długości pól', () => {
+    let savedItem: any = null;
+    jest.spyOn(databaseModule, 'saveInventoryItem').mockImplementation((item: any) => {
+      savedItem = item;
+      return true;
+    });
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BeansScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Otwórz modal dodawania
+    renderer.act(() => {
+      findPressableWithText(tree.root, '+ Dodaj')?.props.onPress();
+    });
+
+    // Wypełnij ekstremalnymi wartościami
+    const nameInput = tree.root.findByProps({ placeholder: 'np. Etiopia Yirgacheffe Washed' });
+    const weightInput = tree.root.findByProps({ placeholder: '250' });
+
+    renderer.act(() => {
+      nameInput.props.onChangeText('  Super Rare Specialty Geisha Beans  '.repeat(10));
+      weightInput.props.onChangeText('9999999');
+    });
+
+    // Zapisz paczkę
+    const saveBtn = findPressableWithText(tree.root, 'Zapisz w Spiżarni');
+    renderer.act(() => {
+      saveBtn?.props.onPress();
+    });
+
+    expect(savedItem).toBeTruthy();
+    expect(savedItem.initialWeightGrams).toBe(100000);
+    expect(savedItem.remainingWeightGrams).toBe(100000);
+    expect(savedItem.name.length).toBeLessThanOrEqual(200);
+  });
 });
