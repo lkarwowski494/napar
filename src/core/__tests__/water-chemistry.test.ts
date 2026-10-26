@@ -588,5 +588,33 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(edgeRes.bufferConcentrateGrams).toBe(0);
     expect(edgeRes.dryBakingSodaGrams).toBe(0);
   });
+
+  test('TASK-P50-07-JAK: classifyWaterHardness klasyfikuje twardosc wody oraz findWaterRecipeById wspiera popularne aliasy receptur', () => {
+    // 1. findWaterRecipeById z aliasami (rao, bh, sca, melbourne, hendon)
+    expect(findWaterRecipeById('rao')?.id).toBe('scott_rao_wonder');
+    expect(findWaterRecipeById('scott rao')?.id).toBe('scott_rao_wonder');
+    expect(findWaterRecipeById('bh')?.id).toBe('barista_hustle_80_40');
+    expect(findWaterRecipeById('sca')?.id).toBe('sca_standard');
+    expect(findWaterRecipeById('melbourne')?.id).toBe('melbourne_soft');
+    expect(findWaterRecipeById('hendon')?.id).toBe('hendon_medium_dark');
+    expect(findWaterRecipeById('puerh')?.id).toBe('tea_gongfu_rock_puerh');
+
+    expect(getWaterProfileName('rao')).toBe('Scott Rao Wonder Water');
+    expect(getWaterProfileName('sca', 'pl')).toBe('Standard SCA (Specialty Coffee)');
+    expect(getWaterProfileName('bh', 'en')).toBe('Barista Hustle 80/40');
+
+    // 2. classifyWaterHardness
+    // @ts-ignore
+    const { classifyWaterHardness } = require('../water-chemistry');
+    expect(classifyWaterHardness(30)).toBe('VERY_SOFT');
+    expect(classifyWaterHardness('45,5')).toBe('VERY_SOFT');
+    expect(classifyWaterHardness(80)).toBe('SOFT');
+    expect(classifyWaterHardness(140)).toBe('MODERATELY_HARD');
+    expect(classifyWaterHardness(220)).toBe('HARD');
+    expect(classifyWaterHardness(450)).toBe('VERY_HARD');
+    expect(classifyWaterHardness(-10)).toBe('SOFT');
+    expect(classifyWaterHardness(NaN)).toBe('SOFT');
+    expect(classifyWaterHardness(null)).toBe('SOFT');
+  });
 });
 

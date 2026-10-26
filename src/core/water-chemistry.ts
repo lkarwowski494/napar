@@ -493,6 +493,61 @@ export function degreesDHToPpmCaCO3(dH: number | string): number {
   return result;
 }
 
+export type WaterHardnessCategory = 'VERY_SOFT' | 'SOFT' | 'MODERATELY_HARD' | 'HARD' | 'VERY_HARD';
+
+/**
+ * Klasyfikuje twardość ogólną wody (GH w ppm CaCO3) wg międzynarodowych norm SCA/WQA
+ */
+export function classifyWaterHardness(ghPpm: number | string): WaterHardnessCategory {
+  if (
+    ghPpm === null ||
+    ghPpm === undefined ||
+    typeof ghPpm === 'boolean' ||
+    typeof ghPpm === 'object' ||
+    typeof ghPpm === 'symbol'
+  ) {
+    return 'SOFT';
+  }
+  const raw = typeof ghPpm === 'string' ? parseFloat(ghPpm.trim().replace(/,/g, '.')) : Number(ghPpm);
+  if (!Number.isFinite(raw) || raw < 0 || Object.is(raw, -0)) {
+    return 'SOFT';
+  }
+  if (raw <= 50) return 'VERY_SOFT';
+  if (raw <= 100) return 'SOFT';
+  if (raw <= 175) return 'MODERATELY_HARD';
+  if (raw <= 300) return 'HARD';
+  return 'VERY_HARD';
+}
+
+const RECIPE_ALIASES: Record<string, string> = {
+  bh: 'barista_hustle_80_40',
+  'bh-80-40': 'barista_hustle_80_40',
+  'bh-80/40': 'barista_hustle_80_40',
+  'bh 80/40': 'barista_hustle_80_40',
+  'bh 80 40': 'barista_hustle_80_40',
+  'barista-hustle': 'barista_hustle_80_40',
+  'barista hustle': 'barista_hustle_80_40',
+  sca: 'sca_standard',
+  'sca-standard': 'sca_standard',
+  'sca standard': 'sca_standard',
+  melbourne: 'melbourne_soft',
+  'melbourne-soft': 'melbourne_soft',
+  'melbourne soft': 'melbourne_soft',
+  rao: 'scott_rao_wonder',
+  'scott-rao': 'scott_rao_wonder',
+  'scott rao': 'scott_rao_wonder',
+  scottrao: 'scott_rao_wonder',
+  hendon: 'hendon_medium_dark',
+  'hendon-hard': 'hendon_medium_dark',
+  'hendon hard': 'hendon_medium_dark',
+  'tea-delicate': 'tea_delicate',
+  'tea delicate': 'tea_delicate',
+  'rock-tea': 'tea_gongfu_rock_puerh',
+  'rock tea': 'tea_gongfu_rock_puerh',
+  puerh: 'tea_gongfu_rock_puerh',
+  'gongfu-rock': 'tea_gongfu_rock_puerh',
+};
+
 export function findWaterRecipeById(id: string): WaterRecipe | undefined {
   if (typeof id !== 'string') return undefined;
   const cleanId = id.trim().toLowerCase();
@@ -500,6 +555,13 @@ export function findWaterRecipeById(id: string): WaterRecipe | undefined {
   const underscoreId = cleanId.replace(/-/g, '_');
   const hyphenId = cleanId.replace(/_/g, '-');
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const aliasId = RECIPE_ALIASES[normId] || RECIPE_ALIASES[normId.replace(/[\s_-]+/g, '')];
+  if (aliasId) {
+    const directMatch = WATER_RECIPES.find((r) => r.id === aliasId);
+    if (directMatch) return directMatch;
+  }
+
   return WATER_RECIPES.find((r) => {
     if (!r || typeof r !== 'object') return false;
     if (typeof r.id === 'string') {
