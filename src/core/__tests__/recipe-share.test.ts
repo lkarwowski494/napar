@@ -901,4 +901,54 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded?.originalSteps[0].targetWaterGrams).toBe(0);
     expect(Object.is(decoded?.originalSteps[0].targetWaterGrams, -0)).toBe(false);
   });
+
+  test('TASK-P38-11-WZR: scisle clampowanie recommendedRatio do [1, 100] z ochrona przed -0', () => {
+    // recipeToCompactPayload: ratio > 100 or ratio < 1
+    const recipeOver: any = {
+      name: 'High Ratio',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: 10,
+      waterGrams: 200,
+      recommendedRatio: 150,
+      steps: [],
+    };
+    expect(recipeToCompactPayload(recipeOver).r).toBe(100);
+
+    const recipeUnder: any = {
+      name: 'Low Ratio',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: 10,
+      waterGrams: 200,
+      recommendedRatio: 0.2,
+      steps: [],
+    };
+    expect(recipeToCompactPayload(recipeUnder).r).toBe(1);
+
+    // decodeRecipeFromShareUrl: ratio clamping
+    const rawOver = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'High Ratio Decoded',
+      b: 'COFFEE',
+      m: 'v60',
+      d: 15,
+      w: 250,
+      r: 120,
+      s: [],
+    }));
+    expect(decodeRecipeFromShareUrl(rawOver)?.recipe.recommendedRatio).toBe(100);
+
+    const rawUnder = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Low Ratio Decoded',
+      b: 'COFFEE',
+      m: 'v60',
+      d: 15,
+      w: 250,
+      r: 0.1,
+      s: [],
+    }));
+    expect(decodeRecipeFromShareUrl(rawUnder)?.recipe.recommendedRatio).toBe(1);
+  });
 });

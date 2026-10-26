@@ -201,9 +201,11 @@ export function recipeToCompactPayload(
   const rawRatioNum = typeof rawRatio === 'number' ? rawRatio : (typeof rawRatio === 'string' ? parseFloat(rawRatio as any) : NaN);
   const ratioCandidate =
     Number.isFinite(rawRatioNum) && rawRatioNum > 0
-      ? Number(rawRatioNum.toFixed(2))
-      : (Number.isFinite(computedRatio) && computedRatio > 0 ? computedRatio : 16.7);
-  const ratio = Object.is(ratioCandidate, -0) ? 16.7 : ratioCandidate;
+      ? Number(Math.min(100, Math.max(1, rawRatioNum)).toFixed(2))
+      : (Number.isFinite(computedRatio) && computedRatio > 0 ? Number(Math.min(100, Math.max(1, computedRatio)).toFixed(2)) : 16.7);
+  let ratio = Object.is(ratioCandidate, -0) ? 16.7 : ratioCandidate;
+  if (ratio < 1) ratio = 1;
+  if (ratio > 100) ratio = 100;
 
   return {
     v: 1,
@@ -343,9 +345,9 @@ export function decodeRecipeFromShareUrl(
       recommendedRatio: (() => {
         const rawDecodedRatio = typeof parsed.r === 'number' ? parsed.r : (typeof parsed.r === 'string' ? parseFloat(parsed.r) : NaN);
         let ratioVal = Number.isFinite(rawDecodedRatio) && rawDecodedRatio > 0 && !Object.is(rawDecodedRatio, -0)
-          ? Number(rawDecodedRatio.toFixed(2))
-          : Number((parsed.w / (parsed.d || 1)).toFixed(1));
-        if (Object.is(ratioVal, -0)) ratioVal = 0;
+          ? Number(Math.min(100, Math.max(1, rawDecodedRatio)).toFixed(2))
+          : Number(Math.min(100, Math.max(1, parsed.w / (parsed.d || 1))).toFixed(1));
+        if (Object.is(ratioVal, -0) || !Number.isFinite(ratioVal) || ratioVal <= 0) ratioVal = 16.7;
         return ratioVal;
       })(),
       stepsJson: JSON.stringify(steps),
