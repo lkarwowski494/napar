@@ -106,7 +106,10 @@ export function buildDynamicIslandPayload(
   };
 
   const icon = safeAttr.beverageType === 'TEA' ? '🍵' : '☕';
-  const timeFormatted = formatActivityTimer(safeState.stepRemainingSeconds);
+  const rawDuration = Math.max(0, Number.isFinite(safeState.stepDurationSeconds) ? Math.round(safeState.stepDurationSeconds) : 0);
+  const rawRemaining = Math.max(0, Number.isFinite(safeState.stepRemainingSeconds) ? Math.round(safeState.stepRemainingSeconds) : 0);
+  const safeRemaining = rawDuration > 0 ? Math.min(rawDuration, rawRemaining) : rawRemaining;
+  const timeFormatted = formatActivityTimer(safeRemaining);
   const stepName =
     (language === 'en' ? safeState.stepNameEn : safeState.stepNamePl) ||
     safeState.stepNamePl ||
@@ -174,7 +177,11 @@ export function buildLiveActivityPayload(
         totalSteps: Math.max(1, Number.isFinite(state.totalSteps) ? state.totalSteps : 1),
         stepNamePl: state.stepNamePl || 'Parzenie',
         stepNameEn: state.stepNameEn || 'Brewing',
-        stepRemainingSeconds: Math.max(0, Number.isFinite(state.stepRemainingSeconds) ? Math.round(state.stepRemainingSeconds) : 0),
+        stepRemainingSeconds: (() => {
+          const rawDur = Math.max(0, Number.isFinite(state.stepDurationSeconds) ? Math.round(state.stepDurationSeconds) : 0);
+          const rawRem = Math.max(0, Number.isFinite(state.stepRemainingSeconds) ? Math.round(state.stepRemainingSeconds) : 0);
+          return rawDur > 0 ? Math.min(rawDur, rawRem) : rawRem;
+        })(),
         stepDurationSeconds: Math.max(0, Number.isFinite(state.stepDurationSeconds) ? Math.round(state.stepDurationSeconds) : 0),
         totalElapsedSeconds: Math.max(0, Number.isFinite(state.totalElapsedSeconds) ? Math.round(state.totalElapsedSeconds) : 0),
         targetWaterGrams: Math.max(0, Number.isFinite(state.targetWaterGrams) ? Math.round(state.targetWaterGrams) : 0),
