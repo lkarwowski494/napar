@@ -516,4 +516,24 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded).not.toBeNull();
     expect(decoded?.originalSteps[0].instructionPl.length).toBe(2000);
   });
+  test('TASK-P21-11-WZR: recipeToCompactPayload ogranicza pole desc do 1000 znaków', () => {
+    const hugeDesc = 'D'.repeat(5000);
+    const recipe: any = {
+      name: 'Long Desc Recipe',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 92,
+      description: hugeDesc,
+      stepsJson: '[]',
+    };
+    const payload = recipeToCompactPayload(recipe);
+    expect(payload.desc?.length).toBe(1000);
+
+    const shareUrl = encodeRecipeToShareUrl(recipe);
+    const decoded = decodeRecipeFromShareUrl(shareUrl);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.recipe.description?.length).toBe(1000);
+  });
 });

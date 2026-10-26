@@ -151,9 +151,10 @@ export function recipeToCompactPayload(
     typeof recipe.author === 'string' && recipe.author.trim()
       ? recipe.author.trim()
       : undefined;
-  const desc = isSaved
+  const rawDesc = isSaved
     ? (typeof recipe.description === 'string' ? recipe.description : undefined)
     : `${name} (${author || 'Master'})`;
+  const desc = typeof rawDesc === 'string' ? rawDesc.trim().slice(0, 1000) : undefined;
   const rawDose = isSaved
     ? recipe.doseGrams
     : (recipe as MasterRecipe).coffeeOrTeaDoseGrams;
