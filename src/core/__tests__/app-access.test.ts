@@ -610,4 +610,14 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(days).toBe(0);
     expect(brews).toBe(0);
   });
+
+  test('TASK-P35-02-MON: getAppAccessState parsuje numeryczne stringi dla trial_brews_count i chroni przed -0', () => {
+    resetTrialForTesting();
+    setAppSetting('trial_brews_count', '7');
+    const state = getAppAccessState();
+    expect(state.brewsCount).toBe(7);
+    expect(state.brewsRemaining).toBe(TRIAL_MAX_BREWS - 7);
+    expect(Object.is(state.brewsCount, -0)).toBe(false);
+    expect(Object.is(state.brewsRemaining, -0)).toBe(false);
+  });
 });

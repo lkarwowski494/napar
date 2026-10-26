@@ -97,7 +97,8 @@ export function getAppAccessState(): AppAccessState {
   const startTime = Number.isFinite(startDate.getTime()) ? startDate.getTime() : now.getTime();
   const elapsedMs = Math.max(0, now.getTime() - startTime);
   const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
-  const rawMaxDays = parseInt(getAppSetting('trial_max_days_seen', '0'), 10);
+  const rawMaxDaysSetting = getAppSetting('trial_max_days_seen', '0');
+  const rawMaxDays = typeof rawMaxDaysSetting === 'number' ? rawMaxDaysSetting : parseInt(String(rawMaxDaysSetting), 10);
   const maxDaysSeen = Number.isFinite(rawMaxDays) && rawMaxDays > 0 ? Math.floor(rawMaxDays) : 0;
   const effectiveElapsedDays = Math.floor(Math.max(elapsedDays, maxDaysSeen));
   if (elapsedDays > maxDaysSeen) {
@@ -106,9 +107,11 @@ export function getAppAccessState(): AppAccessState {
   const rawDaysRemaining = Math.floor(Math.max(0, Math.min(TRIAL_DURATION_DAYS, TRIAL_DURATION_DAYS - effectiveElapsedDays)));
   const daysRemaining = Object.is(rawDaysRemaining, -0) || rawDaysRemaining <= 0 ? 0 : rawDaysRemaining;
 
-  const rawBrews = parseInt(getAppSetting('trial_brews_count', '0'), 10);
+  const rawBrewsSetting = getAppSetting('trial_brews_count', '0');
+  const rawBrews = typeof rawBrewsSetting === 'number' ? rawBrewsSetting : parseInt(String(rawBrewsSetting), 10);
   const brewsCount = Number.isFinite(rawBrews) && rawBrews > 0 ? Math.floor(rawBrews) : 0;
-  const rawMaxBrews = parseInt(getAppSetting('trial_max_brews_seen', '0'), 10);
+  const rawMaxBrewsSetting = getAppSetting('trial_max_brews_seen', '0');
+  const rawMaxBrews = typeof rawMaxBrewsSetting === 'number' ? rawMaxBrewsSetting : parseInt(String(rawMaxBrewsSetting), 10);
   const maxBrewsSeen = Number.isFinite(rawMaxBrews) && rawMaxBrews > 0 ? Math.floor(rawMaxBrews) : 0;
   const effectiveBrewsCount = Math.floor(Math.max(brewsCount, maxBrewsSeen));
   if (brewsCount > maxBrewsSeen) {
