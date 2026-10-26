@@ -54,6 +54,8 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
   t,
   inline = false,
 }) => {
+  if (!inline && !visible) return null;
+
   const [searchQuery, setSearchQuery] = useState('');
   const [subsetFilter, setSubsetFilter] = useState<'ALL' | 'FAVORITES' | 'CUSTOM'>('ALL');
   const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
