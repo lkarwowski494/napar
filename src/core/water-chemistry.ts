@@ -194,9 +194,9 @@ export interface WaterCalculationResult {
  * @param targetKh Alkaliczność/bufor w ppm CaCO3 (wodorowęglan)
  */
 export function calculateWaterMinerals(
-  waterVolumeLiters: number,
-  targetGh: number,
-  targetKh: number
+  waterVolumeLiters: number | string,
+  targetGh: number | string,
+  targetKh: number | string
 ): WaterCalculationResult {
   const rawVol =
     typeof waterVolumeLiters !== 'number' && typeof waterVolumeLiters !== 'string'
