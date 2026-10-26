@@ -313,24 +313,32 @@ export function saveInventoryItem(item: InventoryItem): void {
   const sanitizedRating = safeRating != null && Object.is(safeRating, -0) ? 0 : safeRating;
   const sanitizedRoastDate =
     typeof item.roastOrHarvestDate === 'string' && item.roastOrHarvestDate.trim().length > 0
-      ? item.roastOrHarvestDate.trim()
+      ? item.roastOrHarvestDate.trim().slice(0, 50)
       : null;
   const sanitizedRoaster =
     typeof item.roasterOrProducer === 'string' && item.roasterOrProducer.trim().length > 0
-      ? item.roasterOrProducer.trim()
+      ? item.roasterOrProducer.trim().slice(0, 100)
       : null;
   const sanitizedOrigin =
     typeof item.origin === 'string' && item.origin.trim().length > 0
-      ? item.origin.trim()
+      ? item.origin.trim().slice(0, 100)
       : null;
   const sanitizedVariety =
     typeof item.variety === 'string' && item.variety.trim().length > 0
-      ? item.variety.trim()
+      ? item.variety.trim().slice(0, 100)
       : null;
   const sanitizedProcess =
     typeof item.process === 'string' && item.process.trim().length > 0
-      ? item.process.trim()
+      ? item.process.trim().slice(0, 100)
       : null;
+
+  const cleanId = typeof item.id === 'string' && item.id.trim() ? item.id.trim() : generateId();
+  const cleanName = typeof item.name === 'string' && item.name.trim() ? item.name.trim().slice(0, 200) : 'Bez nazwy';
+  const cleanType = item.type === 'tea' ? 'tea' : 'coffee';
+  const cleanRoastProfile = typeof item.roastProfile === 'string' && item.roastProfile.trim() ? item.roastProfile.trim().slice(0, 50) : null;
+  const sanitizedFlavorNotes = Array.isArray(item.flavorNotes)
+    ? item.flavorNotes.filter((t): t is string => typeof t === 'string' && t.trim().length > 0).map((t) => t.trim().slice(0, 50)).slice(0, 30)
+    : [];
 
   db.runSync(
     `INSERT OR REPLACE INTO inventory_items (
@@ -340,18 +348,18 @@ export function saveInventoryItem(item: InventoryItem): void {
       rating, is_favorite, is_archived, created_at, updated_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
-      item.id,
-      item.name,
-      item.type,
+      cleanId,
+      cleanName,
+      cleanType,
       sanitizedRoaster,
       sanitizedOrigin,
       sanitizedRoastDate,
-      item.roastProfile ?? null,
+      cleanRoastProfile,
       sanitizedProcess,
       sanitizedVariety,
       initWeight,
       remWeight,
-      JSON.stringify(item.flavorNotes || []),
+      JSON.stringify(sanitizedFlavorNotes),
       sanitizedRating,
       item.isFavorite ? 1 : 0,
       item.isArchived ? 1 : 0,

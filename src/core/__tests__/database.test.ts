@@ -1758,4 +1758,25 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(saved?.inventoryItemId).toBeUndefined();
     expect(saved?.flavorTags).toEqual(['jaśmin', 'cytrusy']);
   });
+
+  test('TASK-P39-05-ARC: saveInventoryItem defensywnie sanityzuje name, type, roastProfile i flavorNotes', () => {
+    initDatabase(mockDb as any);
+    const itemMessy: any = {
+      id: 'inv-messy-1',
+      name: '   ',
+      type: 'invalid_type',
+      roastProfile: '  medium-light  ',
+      flavorNotes: ['  czekolada  ', null, 123, '  karmel  ', '   '],
+      initialWeightGrams: 250,
+      remainingWeightGrams: 250,
+    };
+    saveInventoryItem(itemMessy);
+
+    const saved = getInventoryItemById('inv-messy-1');
+    expect(saved).not.toBeNull();
+    expect(saved?.name).toBe('Bez nazwy');
+    expect(saved?.type).toBe('coffee');
+    expect(saved?.roastProfile).toBe('medium-light');
+    expect(saved?.flavorNotes).toEqual(['czekolada', 'karmel']);
+  });
 });
