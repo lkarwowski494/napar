@@ -304,4 +304,9 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(cezveComandante.microns).toBe(200);
     expect(cezveComandante.rawValue).toBe(7); // 200 / 30 = 6.67 -> 7 clicks
   });
+  test('TASK-P22-08-PRO: getRecipeMicrons rozpoznaje Cold Drip i Ice Drip jako gruby przemiał 1150 µm', () => {
+    expect(getRecipeMicrons({ method: 'Cold Drip' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'ICE_DRIP' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Cold Brew 24h' })).toBe(1150);
+  });
 });
