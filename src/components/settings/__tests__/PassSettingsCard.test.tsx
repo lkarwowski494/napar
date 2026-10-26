@@ -95,4 +95,26 @@ describe('PassSettingsCard Component', () => {
     expect(str5).toContain('TRIAL');
     expect(str5).toContain('parzeń');
   });
+  test('TASK-P22-04-STU: Kontrolki subskrypcji w PassSettingsCard deklarują accessibilityHint', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <PassSettingsCard
+          isSubscribed={true}
+          subscriptionTier="annual"
+          accessStatus="subscribed"
+          brewsRemaining={0}
+          onOpenPassModal={jest.fn()}
+          t={t}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const openBtn = root.findByProps({ testID: 'open-apps4brew-pass-btn' });
+    const manageBtn = root.findByProps({ testID: 'manage-plan-btn' });
+
+    expect(openBtn.props.accessibilityHint).toBeDefined();
+    expect(manageBtn.props.accessibilityHint).toBeDefined();
+  });
 });
