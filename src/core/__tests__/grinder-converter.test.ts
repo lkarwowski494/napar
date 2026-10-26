@@ -522,4 +522,22 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Drobno pod nakładkę prismo' })).toBe(560);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine grind for aeropress flow control filter cap' })).toBe(560);
   });
+
+  test('TASK-P44-08-PRO: getRecipeMicrons rozpoznaje ekspresy La Pavoni i Cremina (350 µm) oraz drippery Kono i LilyDrip (720 µm)', () => {
+    // Manual Lever Espresso (350 µm)
+    expect(getRecipeMicrons({ method: 'LA_PAVONI' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'La Pavoni Europiccola' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'CREMINA' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'Olympia Cremina' })).toBe(350);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Drobno pod La Pavoni' })).toBe(350);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine grind for Olympia Cremina lever' })).toBe(350);
+
+    // Stożkowe drippery pour-over (720 µm)
+    expect(getRecipeMicrons({ method: 'KONO' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'Kono Meimon Dripper' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'LILYDRIP' })).toBe(720);
+    expect(getRecipeMicrons({ method: 'Lily Drip V60 insert' })).toBe(720);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio pod dripper Kono' })).toBe(720);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Pour-over grind for LilyDrip cone' })).toBe(720);
+  });
 });

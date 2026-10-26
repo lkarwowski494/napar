@@ -411,6 +411,10 @@ export function getRecipeMicrons(recipe?: {
     desc.includes('cafelat') ||
     desc.includes('robot') ||
     desc.includes('rok espresso') ||
+    desc.includes('la pavoni') ||
+    desc.includes('pavoni') ||
+    desc.includes('cremina') ||
+    desc.includes('olympia') ||
     desc.includes('dźwigni') ||
     desc.includes('dzwigni') ||
     desc.includes('lever espresso') ||
@@ -424,6 +428,9 @@ export function getRecipeMicrons(recipe?: {
     method.includes('CAFELAT') ||
     method === 'ROK' ||
     method.includes('ROK') ||
+    method.includes('PAVONI') ||
+    method.includes('CREMINA') ||
+    method.includes('OLYMPIA') ||
     method === 'LEVER' ||
     method.includes('LEVER_') ||
     method.includes('_LEVER') ||
@@ -536,7 +543,15 @@ export function getRecipeMicrons(recipe?: {
     desc.includes('melitta') ||
     method === 'BEEHOUSE' ||
     method.includes('BEEHOUSE') ||
-    desc.includes('beehouse')
+    desc.includes('beehouse') ||
+    method === 'KONO' ||
+    method.includes('KONO') ||
+    desc.includes('kono') ||
+    method === 'LILYDRIP' ||
+    method.includes('LILYDRIP') ||
+    method.includes('LILY DRIP') ||
+    desc.includes('lilydrip') ||
+    desc.includes('lily drip')
   ) {
     if (desc.includes('28') || desc.includes('30') || desc.includes('grubo') || desc.includes('coarse')) return 850;
     if (desc.includes('18') || desc.includes('20')) return 600;
