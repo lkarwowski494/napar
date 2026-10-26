@@ -24,6 +24,8 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
   onOpenCompendium,
   onOpenAdd,
 }) => {
+  const safeItems = Array.isArray(items) ? items : [];
+
   return (
     <View style={styles.topBar}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
@@ -31,40 +33,44 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
           style={[styles.filterChip, filter === 'all' && styles.filterChipActive]}
           onPress={() => onFilterChange('all')}
           accessibilityRole="button"
+          accessibilityState={{ selected: filter === 'all' }}
           accessibilityLabel="Filtr: Wszystkie pozycje"
         >
           <Text style={[styles.filterChipText, filter === 'all' && styles.filterChipTextActive]}>
-            Wszystkie ({items.filter((i) => !i.isArchived).length})
+            Wszystkie ({safeItems.filter((i) => !i?.isArchived).length})
           </Text>
         </Pressable>
         <Pressable
           style={[styles.filterChip, filter === 'coffee' && styles.filterChipActive]}
           onPress={() => onFilterChange('coffee')}
           accessibilityRole="button"
+          accessibilityState={{ selected: filter === 'coffee' }}
           accessibilityLabel="Filtr: Kawa"
         >
           <Text style={[styles.filterChipText, filter === 'coffee' && styles.filterChipTextActive]}>
-            Kawa ({items.filter((i) => !i.isArchived && i.type === 'coffee').length})
+            Kawa ({safeItems.filter((i) => !i?.isArchived && i?.type === 'coffee').length})
           </Text>
         </Pressable>
         <Pressable
           style={[styles.filterChip, filter === 'tea' && styles.filterChipActive]}
           onPress={() => onFilterChange('tea')}
           accessibilityRole="button"
+          accessibilityState={{ selected: filter === 'tea' }}
           accessibilityLabel="Filtr: Herbata"
         >
           <Text style={[styles.filterChipText, filter === 'tea' && styles.filterChipTextActive]}>
-            Herbata ({items.filter((i) => !i.isArchived && i.type === 'tea').length})
+            Herbata ({safeItems.filter((i) => !i?.isArchived && i?.type === 'tea').length})
           </Text>
         </Pressable>
         <Pressable
           style={[styles.filterChip, filter === 'archived' && styles.filterChipActive]}
           onPress={() => onFilterChange('archived')}
           accessibilityRole="button"
+          accessibilityState={{ selected: filter === 'archived' }}
           accessibilityLabel="Filtr: Archiwum"
         >
           <Text style={[styles.filterChipText, filter === 'archived' && styles.filterChipTextActive]}>
-            Archiwum ({items.filter((i) => i.isArchived).length})
+            Archiwum ({safeItems.filter((i) => Boolean(i?.isArchived)).length})
           </Text>
         </Pressable>
       </ScrollView>
@@ -87,7 +93,7 @@ export const BeanTopBar: React.FC<BeanTopBarProps> = ({
         style={styles.addButton}
         onPress={onOpenAdd}
         accessibilityRole="button"
-        accessibilityLabel="+ Dodaj"
+        accessibilityLabel="Dodaj nową kawę lub herbatę do spiżarni"
       >
         <Text style={styles.addButtonText}>+ Dodaj</Text>
       </Pressable>
