@@ -156,7 +156,8 @@
     "clearSearch": "Vymazať hľadanie",
     "noSearchResults": "Nenašli sa žiadne výsledky",
     "subsetAll": "All",
-    "subsetFavorites": "Classics & Favorites"
+    "subsetFavorites": "Classics & Favorites",
+    "subsetCustom": "Custom Recipes"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

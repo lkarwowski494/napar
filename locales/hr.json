@@ -156,7 +156,8 @@
     "clearSearch": "Očisti pretraživanje",
     "noSearchResults": "Nema rezultata pretraživanja",
     "subsetAll": "All",
-    "subsetFavorites": "Classics & Favorites"
+    "subsetFavorites": "Classics & Favorites",
+    "subsetCustom": "Custom Recipes"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

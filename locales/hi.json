@@ -156,7 +156,8 @@
     "clearSearch": "खोज साफ़ करें",
     "noSearchResults": "कोई खोज परिणाम नहीं मिला",
     "subsetAll": "All",
-    "subsetFavorites": "Classics & Favorites"
+    "subsetFavorites": "Classics & Favorites",
+    "subsetCustom": "Custom Recipes"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -156,7 +156,8 @@
     "clearSearch": "Xóa tìm kiếm",
     "noSearchResults": "Không tìm thấy kết quả",
     "subsetAll": "All",
-    "subsetFavorites": "Classics & Favorites"
+    "subsetFavorites": "Classics & Favorites",
+    "subsetCustom": "Custom Recipes"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

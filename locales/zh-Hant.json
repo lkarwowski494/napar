@@ -156,7 +156,8 @@
     "clearSearch": "清除搜尋",
     "noSearchResults": "未找到搜尋結果",
     "subsetAll": "全部",
-    "subsetFavorites": "經典與收藏"
+    "subsetFavorites": "經典與收藏",
+    "subsetCustom": "自定義食譜"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

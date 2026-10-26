@@ -156,7 +156,8 @@
     "clearSearch": "검색 지우기",
     "noSearchResults": "검색 결과가 없습니다",
     "subsetAll": "All",
-    "subsetFavorites": "Classics & Favorites"
+    "subsetFavorites": "Classics & Favorites",
+    "subsetCustom": "Custom Recipes"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

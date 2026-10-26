@@ -181,6 +181,7 @@ export const translations = {
       noSearchResults: 'Brak wyników wyszukiwania',
       subsetAll: 'Wszystkie',
       subsetFavorites: 'Klasyki / Ulubione',
+      subsetCustom: 'Własne receptury',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha',
@@ -756,6 +757,7 @@ export const translations = {
       noSearchResults: 'No search results found',
       subsetAll: 'All',
       subsetFavorites: 'Classics & Favorites',
+      subsetCustom: 'Custom Recipes',
     },
     gongfu: {
       modeTitle: 'Gongfu Cha',

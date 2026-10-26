@@ -156,7 +156,8 @@
     "clearSearch": "Εκκαθάριση αναζήτησης",
     "noSearchResults": "Δεν βρέθηκαν αποτελέσματα",
     "subsetAll": "All",
-    "subsetFavorites": "Classics & Favorites"
+    "subsetFavorites": "Classics & Favorites",
+    "subsetCustom": "Custom Recipes"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -156,7 +156,8 @@
     "clearSearch": "Neteja la cerca",
     "noSearchResults": "No s'han trobat resultats",
     "subsetAll": "All",
-    "subsetFavorites": "Classics & Favorites"
+    "subsetFavorites": "Classics & Favorites",
+    "subsetCustom": "Custom Recipes"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

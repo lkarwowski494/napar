@@ -156,7 +156,8 @@
     "clearSearch": "Wyczyść wyszukiwanie",
     "noSearchResults": "Brak wyników wyszukiwania",
     "subsetAll": "Wszystkie",
-    "subsetFavorites": "Klasyki / Ulubione"
+    "subsetFavorites": "Klasyki / Ulubione",
+    "subsetCustom": "Własne receptury"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

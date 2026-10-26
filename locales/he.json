@@ -156,7 +156,8 @@
     "clearSearch": "נקה חיפוש",
     "noSearchResults": "לא נמצאו תוצאות חיפוש",
     "subsetAll": "All",
-    "subsetFavorites": "Classics & Favorites"
+    "subsetFavorites": "Classics & Favorites",
+    "subsetCustom": "Custom Recipes"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -276,7 +276,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               onPress={() => setSubsetFilter('CUSTOM')}
               accessibilityRole="tab"
               accessibilityState={{ selected: subsetFilter === 'CUSTOM' }}
-              accessibilityLabel="Własne receptury"
+              accessibilityLabel={t?.brew?.subsetCustom || 'Własne receptury'}
             >
               <Text
                 style={[
@@ -284,7 +284,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                   subsetFilter === 'CUSTOM' && styles.subsetChipTextActive,
                 ]}
               >
-                Własne Presety
+                {t?.brew?.subsetCustom || 'Własne Presety'}
               </Text>
             </Pressable>
           </View>
