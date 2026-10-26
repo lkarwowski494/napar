@@ -176,8 +176,12 @@ export function buildProactiveActionSchedule(
       : (typeof item.remainingWeightGrams === 'string' ? parseFloat(item.remainingWeightGrams) : NaN);
     const safeRemainingWeight = Number.isFinite(rawW) && rawW > 0 ? (Object.is(rawW, -0) ? 0 : rawW) : 0;
 
-    if (item.type === 'coffee' && item.roastOrHarvestDate) {
-      const roastDate = new Date(item.roastOrHarvestDate);
+    if (item.type === 'coffee') {
+      const roastDate =
+        typeof item.roastOrHarvestDate === 'string' && item.roastOrHarvestDate.trim()
+          ? new Date(item.roastOrHarvestDate.trim())
+          : new Date(NaN);
+
       if (!Number.isNaN(roastDate.getTime())) {
         const roastDayStart = new Date(
           Date.UTC(
@@ -256,6 +260,25 @@ export function buildProactiveActionSchedule(
             waterTempCelsius: 95,
           });
         }
+      } else {
+        // Ziarna kawy bez sprecyzowanej daty wypału — zaplanuj sesję na DZIŚ
+        actions.push({
+          id: `action-coffee-stash-${item.id}`,
+          dateIso: toDateKey(refDayStart),
+          daysOffset: 0,
+          bucketLabelPl: 'DZIŚ',
+          bucketLabelEn: 'TODAY',
+          titlePl: `Rekomendacja parzenia: ${item.name}`,
+          titleEn: `Brew recommendation: ${item.name}`,
+          subtitlePl: `Kawa specialty ze spiżarni · Pozostało ${safeRemainingWeight}g`,
+          subtitleEn: `Specialty coffee from stash · ${safeRemainingWeight}g remaining`,
+          badgeColor: 'copper',
+          inventoryItemId: item.id,
+          recommendedMethod: 'V60',
+          doseGrams: Math.min(18, safeRemainingWeight),
+          waterGrams: 250,
+          waterTempCelsius: 93,
+        });
       }
     } else if (item.type === 'tea') {
       // Herbata liściasta w spiżarni — sesja degustacyjna
@@ -443,7 +466,10 @@ export function generateActionIcsContent(
   const rawDateStr = typeof action.dateIso === 'string' && action.dateIso.trim() ? action.dateIso.trim() : '';
   const dateMatch = rawDateStr.match(/^(\d{4}-\d{2}-\d{2})/);
   const todayIso = new Date().toISOString().slice(0, 10);
-  const rawDate = dateMatch ? dateMatch[1] : todayIso;
+  let rawDate = dateMatch ? dateMatch[1] : todayIso;
+  if (isNaN(new Date(rawDate).getTime())) {
+    rawDate = todayIso;
+  }
   const cleanDate = rawDate.replace(/-/g, '');
   const dtStart = `${cleanDate}T080000Z`;
   const dtEnd = `${cleanDate}T081500Z`;

@@ -429,5 +429,30 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(parseStepDurationSeconds('w 5 minutach zalej', 30)).toBe(300);
       expect(parseStepDurationSeconds('w 10 sekundach zakoncz', 30)).toBe(10);
     });
+
+    it('TASK-P45-03-ZAK: generateActionIcsContent weryfikuje poprawnosc daty kalendarzowej a buildProactiveActionSchedule obsluguje kawe bez daty wypalu', () => {
+      const invalidDateAction: any = {
+        id: 'action-invalid-cal',
+        titlePl: 'Sesja V60',
+        dateIso: '2026-99-99',
+      };
+      const ics = generateActionIcsContent(invalidDateAction, 'pl');
+      expect(ics).toMatch(/DTSTART:\d{8}T080000Z/);
+      expect(ics).not.toContain('20269999');
+
+      const noRoastInventory: any[] = [
+        {
+          id: 'coffee-no-roast-date',
+          name: 'Panama Geisha',
+          type: 'coffee',
+          remainingWeightGrams: 100,
+          isArchived: false,
+        },
+      ];
+      const schedule = buildProactiveActionSchedule('2026-10-26T08:00:00.000Z', noRoastInventory as any, []);
+      expect(schedule.length).toBe(1);
+      expect(schedule[0].titlePl).toContain('Panama Geisha');
+      expect(schedule[0].daysOffset).toBe(0);
+    });
   });
 });
