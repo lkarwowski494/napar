@@ -34,45 +34,53 @@ export const RecipeBasicInfoCard: React.FC<RecipeBasicInfoCardProps> = ({
   return (
     <View style={styles.card} testID="recipe-basic-info-card">
       <Text style={styles.fieldLabel} accessibilityRole="header">
-        {t.recipeBuilder.nameLabel} *
+        {t?.recipeBuilder?.nameLabel || 'Nazwa'} *
       </Text>
       <Field
-        value={name}
-        onChangeText={onChangeName}
-        placeholder={t.recipeBuilder.namePlaceholder}
-        accessibilityLabel={t.recipeBuilder.nameLabel}
+        value={name ?? ''}
+        onChangeText={(text) => onChangeName(typeof text === 'string' ? text.slice(0, 100) : '')}
+        maxLength={100}
+        placeholder={t?.recipeBuilder?.namePlaceholder || 'np. Etiopia V60'}
+        accessibilityLabel={t?.recipeBuilder?.nameLabel || 'Nazwa'}
+        accessibilityHint={t?.recipeBuilder?.namePlaceholder || 'Wprowadź nazwę przepisu'}
         testID="recipe-name-field"
       />
 
       <View style={styles.row}>
         <View style={styles.flex1}>
-          <Text style={styles.fieldLabel}>{t.recipeBuilder.methodLabel}</Text>
+          <Text style={styles.fieldLabel}>{t?.recipeBuilder?.methodLabel || 'Metoda'}</Text>
           <Field
-            value={method}
-            onChangeText={onChangeMethod}
-            placeholder={t.recipeBuilder.methodPlaceholder}
-            accessibilityLabel={t.recipeBuilder.methodLabel}
+            value={method ?? ''}
+            onChangeText={(text) => onChangeMethod(typeof text === 'string' ? text.slice(0, 50) : '')}
+            maxLength={50}
+            placeholder={t?.recipeBuilder?.methodPlaceholder || 'np. V60'}
+            accessibilityLabel={t?.recipeBuilder?.methodLabel || 'Metoda'}
+            accessibilityHint={t?.recipeBuilder?.methodPlaceholder || 'Wprowadź metodę parzenia'}
             testID="recipe-method-field"
           />
         </View>
         <View style={[styles.flex1, { marginLeft: 10 }]}>
-          <Text style={styles.fieldLabel}>{t.recipeBuilder.authorLabel}</Text>
+          <Text style={styles.fieldLabel}>{t?.recipeBuilder?.authorLabel || 'Autor'}</Text>
           <Field
-            value={author}
-            onChangeText={onChangeAuthor}
-            placeholder={t.recipeBuilder.authorPlaceholder}
-            accessibilityLabel={t.recipeBuilder.authorLabel}
+            value={author ?? ''}
+            onChangeText={(text) => onChangeAuthor(typeof text === 'string' ? text.slice(0, 50) : '')}
+            maxLength={50}
+            placeholder={t?.recipeBuilder?.authorPlaceholder || 'np. James Hoffmann'}
+            accessibilityLabel={t?.recipeBuilder?.authorLabel || 'Autor'}
+            accessibilityHint={t?.recipeBuilder?.authorPlaceholder || 'Wprowadź autora przepisu'}
             testID="recipe-author-field"
           />
         </View>
       </View>
 
-      <Text style={styles.fieldLabel}>{t.recipeBuilder.descriptionLabel}</Text>
+      <Text style={styles.fieldLabel}>{t?.recipeBuilder?.descriptionLabel || 'Opis'}</Text>
       <Field
-        value={description}
-        onChangeText={onChangeDescription}
-        placeholder={t.recipeBuilder.descriptionPlaceholder}
-        accessibilityLabel={t.recipeBuilder.descriptionLabel}
+        value={description ?? ''}
+        onChangeText={(text) => onChangeDescription(typeof text === 'string' ? text.slice(0, 1000) : '')}
+        maxLength={1000}
+        placeholder={t?.recipeBuilder?.descriptionPlaceholder || 'np. Przepis na słodki, owocowy przelew...'}
+        accessibilityLabel={t?.recipeBuilder?.descriptionLabel || 'Opis'}
+        accessibilityHint={t?.recipeBuilder?.descriptionPlaceholder || 'Wprowadź opis przepisu'}
         testID="recipe-description-field"
         multiline
         numberOfLines={2}
