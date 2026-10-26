@@ -141,4 +141,45 @@ describe('RecipeStepEditor Component (TASK-P32-01-ODK)', () => {
     });
     expect(onUpdateStep).toHaveBeenCalledWith(0, 'instructionPl', 'A'.repeat(2000));
   });
+
+  test('TASK-P49-04-STU: RecipeStepEditor jest odporny na null/undefined w steps oraz deklaruje etykiety i podpowiedzi a11y dla pol', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <RecipeStepEditor
+          steps={[null, undefined, sampleSteps[0]] as any}
+          onAddStep={jest.fn()}
+          onRemoveStep={jest.fn()}
+          onUpdateStep={jest.fn()}
+          t={translations.pl}
+        />
+      );
+    });
+
+    const stepName = tree.root.findByProps({ testID: 'step-name-1' });
+    expect(stepName.props.accessibilityHint).toBeDefined();
+
+    const stepWater = tree.root.findByProps({ testID: 'step-water-1' });
+    expect(stepWater.props.accessibilityHint).toBeDefined();
+
+    const stepDuration = tree.root.findByProps({ testID: 'step-duration-1' });
+    expect(stepDuration.props.accessibilityHint).toBeDefined();
+
+    const stepInstr = tree.root.findByProps({ testID: 'step-instruction-1' });
+    expect(stepInstr.props.accessibilityHint).toBeDefined();
+
+    expect(() => {
+      act(() => {
+        renderer.create(
+          <RecipeStepEditor
+            steps={null as any}
+            onAddStep={jest.fn()}
+            onRemoveStep={jest.fn()}
+            onUpdateStep={jest.fn()}
+            t={translations.pl}
+          />
+        );
+      });
+    }).not.toThrow();
+  });
 });
