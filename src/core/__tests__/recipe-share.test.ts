@@ -698,4 +698,38 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(payload.m.length).toBe(50);
     expect(payload.a?.length).toBe(100);
   });
+
+  test('TASK-P30-11-WZR: decodeRecipeFromShareUrl parsuje numeryczne stringi i clampuje targetWaterGrams i durationSeconds w krokach', () => {
+    const compactWithStrings = {
+      v: 1,
+      n: 'Clamped Step Test',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 250,
+      s: [
+        {
+          n: 'Pour 1',
+          d: '45.8',
+          w: '999999',
+        },
+        {
+          n: 'Pour 2',
+          d: -10,
+          w: -50,
+        },
+      ],
+    };
+    const b64 = Buffer.from(JSON.stringify(compactWithStrings), 'utf8').toString('base64');
+    const result = decodeRecipeFromShareUrl(b64);
+    expect(result).not.toBeNull();
+    const steps = result!.originalSteps;
+    expect(steps.length).toBe(2);
+    // step 1: d coerced to 46 (bounded by 86400), w clamped to 50000
+    expect(steps[0].durationSeconds).toBe(46);
+    expect(steps[0].targetWaterGrams).toBe(50000);
+    // step 2: d fallback to 30, w fallback to 0
+    expect(steps[1].durationSeconds).toBe(30);
+    expect(steps[1].targetWaterGrams).toBe(0);
+  });
 });
