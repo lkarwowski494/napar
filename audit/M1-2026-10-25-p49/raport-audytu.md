@@ -39,5 +39,5 @@
 | TASK-P49-08-PRO | Prostota | Completed | `src/core/grinder-converter.ts` | `d077279` |
 | TASK-P49-09-LOK | Lokalizacja | Completed | `locales/*` | `d5d5cf6` |
 | TASK-P49-10-WYD | Wydajność | Completed | `scripts/verify-native.mjs` | `4372557` |
-| TASK-P49-11-WZR | Wzorce | Planned | `src/core/recipe-share.ts` | - |
-| TASK-P49-12-NIE | Niezawodność | Planned | `src/core/live-activity.ts` | - |
+| TASK-P49-11-WZR | Wzorce | Completed | `src/core/recipe-share.ts` | `b39c2f5` |
+| TASK-P49-12-NIE | Niezawodność | Completed | `src/core/live-activity.ts` | `c13ba53` |
