@@ -433,6 +433,24 @@ describe('Napar SQLite Database & Repositories', () => {
     const filtered = getCaffeineLogs('2026-10-10T00:00:00Z');
     expect(filtered.length).toBe(1);
     expect(filtered[0].id).toBe('caff-iso-2');
+
+    // TASK-P15-05-ARC: Bezpieczne traktowanie pustego lub whitespace sinceIso oraz NaN w logCaffeine
+    const emptyFiltered = getCaffeineLogs('   ');
+    expect(emptyFiltered.length).toBeGreaterThanOrEqual(2);
+
+    logCaffeine({
+      id: 'caff-nan-1',
+      beverageName: '',
+      beverageType: 'coffee',
+      consumedAt: '',
+      doseGrams: NaN,
+      caffeineMg: NaN,
+    });
+    const retrieved = getCaffeineLogs().find((l) => l.id === 'caff-nan-1');
+    expect(retrieved).toBeDefined();
+    expect(retrieved?.doseGrams).toBe(0);
+    expect(retrieved?.caffeineMg).toBe(0);
+    expect(retrieved?.beverageName).toBe('Napar');
   });
 
   test('Zapis sesji parzenia i rejestru kofeiny z profilem sensorycznym', () => {

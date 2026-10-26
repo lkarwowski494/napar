@@ -746,10 +746,11 @@ function mapRowToBrewSession(row: BrewSessionRow): BrewSession {
 
 export function getCaffeineLogs(sinceIso?: string): CaffeineLog[] {
   const db = getDatabase();
-  const query = sinceIso
+  const safeSince = typeof sinceIso === 'string' && sinceIso.trim().length > 0 ? sinceIso.trim() : undefined;
+  const query = safeSince
     ? 'SELECT * FROM caffeine_logs WHERE consumed_at >= ? ORDER BY consumed_at ASC'
     : 'SELECT * FROM caffeine_logs ORDER BY consumed_at DESC LIMIT 200';
-  const params = sinceIso ? [sinceIso] : [];
+  const params = safeSince ? [safeSince] : [];
   const rows = db.getAllSync<CaffeineLogRow>(query, params);
   return rows.map((r) => ({
     id: r.id,
@@ -764,6 +765,8 @@ export function getCaffeineLogs(sinceIso?: string): CaffeineLog[] {
 
 export function logCaffeine(log: CaffeineLog): void {
   const db = getDatabase();
+  const safeDose = Number.isFinite(log.doseGrams) && log.doseGrams >= 0 ? log.doseGrams : 0;
+  const safeCaffeine = Number.isFinite(log.caffeineMg) && log.caffeineMg >= 0 ? log.caffeineMg : 0;
   db.runSync(
     `INSERT OR REPLACE INTO caffeine_logs (
       id, brew_session_id, beverage_name, beverage_type, consumed_at, dose_g, caffeine_mg
@@ -771,11 +774,11 @@ export function logCaffeine(log: CaffeineLog): void {
     [
       log.id,
       log.brewSessionId ?? null,
-      log.beverageName,
-      log.beverageType,
-      log.consumedAt,
-      log.doseGrams,
-      log.caffeineMg,
+      log.beverageName || 'Napar',
+      log.beverageType || 'COFFEE',
+      log.consumedAt || new Date().toISOString(),
+      safeDose,
+      safeCaffeine,
     ]
   );
 }
