@@ -337,4 +337,14 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(formatActivityTimer(null as any)).toBe('0:00');
     expect(formatActivityTimer(undefined as any)).toBe('0:00');
   });
+  test('TASK-P24-12-NIE: buildLiveActivityPayload ogranicza stepIndex ponizej totalSteps', () => {
+    const overflowState: any = {
+      stepIndex: 10,
+      totalSteps: 3,
+      stepNamePl: 'Zalewanie',
+    };
+    const payload = buildLiveActivityPayload(mockAttributesCoffee, overflowState);
+    expect(payload.contentState.stepIndex).toBe(2);
+    expect(payload.contentState.totalSteps).toBe(3);
+  });
 });

@@ -183,10 +183,14 @@ export function buildLiveActivityPayload(
         totalWaterGrams: 0,
       };
 
+  const safeTotalSteps = state ? Math.max(1, Number.isFinite(state.totalSteps) ? Math.round(state.totalSteps) : 1) : 1;
+  const rawStepIdx = state ? Math.max(0, Number.isFinite(state.stepIndex) ? Math.round(state.stepIndex) : 0) : 0;
+  const safeStepIdx = Math.min(safeTotalSteps - 1, rawStepIdx);
+
   const safeState: BrewActivityContentState = state
     ? {
-        stepIndex: Math.max(0, Number.isFinite(state.stepIndex) ? state.stepIndex : 0),
-        totalSteps: Math.max(1, Number.isFinite(state.totalSteps) ? state.totalSteps : 1),
+        stepIndex: safeStepIdx,
+        totalSteps: safeTotalSteps,
         stepNamePl: state.stepNamePl || 'Parzenie',
         stepNameEn: state.stepNameEn || 'Brewing',
         stepRemainingSeconds: (() => {
