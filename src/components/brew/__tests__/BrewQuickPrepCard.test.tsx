@@ -143,4 +143,20 @@ describe('BrewQuickPrepCard Component', () => {
     expect(chip2.props.accessibilityRole).toBe('radio');
     expect(chip2.props.accessibilityState).toEqual({ selected: true });
   });
+
+  test('TASK-P26-01-ODK: chipsy porcji deklarują accessibilityHint w języku polskim i angielskim', () => {
+    let treePl: any;
+    act(() => {
+      treePl = renderer.create(<BrewQuickPrepCard {...defaultProps} language="pl" servings={2} />);
+    });
+    const chipPl = treePl.root.findByProps({ testID: 'batch-chip-2' });
+    expect(chipPl.props.accessibilityHint).toBe('Skaluje przepis dla 2 porcji');
+
+    let treeEn: any;
+    act(() => {
+      treeEn = renderer.create(<BrewQuickPrepCard {...defaultProps} language="en" servings={3} />);
+    });
+    const chipEn = treeEn.root.findByProps({ testID: 'batch-chip-3' });
+    expect(chipEn.props.accessibilityHint).toBe('Scales recipe for 3 servings');
+  });
 });

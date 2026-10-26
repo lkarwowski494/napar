@@ -80,6 +80,7 @@ export function BrewQuickPrepCard({
                 accessibilityRole="radio"
                 accessibilityState={{ selected: servings === n }}
                 accessibilityLabel={label}
+                accessibilityHint={language === 'en' ? `Scales recipe for ${n} servings` : `Skaluje przepis dla ${n} porcji`}
                 style={[
                   styles.batchChip,
                   servings === n && styles.batchChipActive,
