@@ -224,4 +224,9 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(hugeMinerals.targetGhPpm).toBe(5000);
     expect(hugeMinerals.targetKhPpm).toBe(5000);
   });
+  test('TASK-P23-07-JAK: calculateWaterMinerals gwarantuje ściśle 0 dla baseWaterGrams przy skrajnych dawkach soli (ochrona przed -0)', () => {
+    const extreme = calculateWaterMinerals(0.1, 5000, 5000);
+    expect(extreme.baseWaterGrams).toBe(0);
+    expect(Object.is(extreme.baseWaterGrams, -0)).toBe(false);
+  });
 });

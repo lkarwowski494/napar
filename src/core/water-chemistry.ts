@@ -215,7 +215,8 @@ export function calculateWaterMinerals(
   const dryCaCl2 = Number((gh * 0.00147 * vol).toFixed(3));
 
   const totalWaterGrams = vol * 1000;
-  const baseWater = Number(Math.max(0, totalWaterGrams - concentrateBuffer - concentrateHardness).toFixed(1));
+  const rawBaseWater = totalWaterGrams - concentrateBuffer - concentrateHardness;
+  const baseWater = rawBaseWater <= 0 ? 0 : Number(rawBaseWater.toFixed(1));
 
   return {
     waterVolumeLiters: vol,
