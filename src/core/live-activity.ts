@@ -116,10 +116,13 @@ export function buildDynamicIslandPayload(
 
   const icon = safeAttr.beverageType === 'TEA' ? '🍵' : '☕';
   const rawDurVal = typeof safeState.stepDurationSeconds === 'number' ? safeState.stepDurationSeconds : (typeof safeState.stepDurationSeconds === 'string' ? parseFloat(safeState.stepDurationSeconds) : NaN);
-  const rawDuration = Math.max(0, Number.isFinite(rawDurVal) ? Math.round(rawDurVal) : 0);
+  let rawDuration = Math.max(0, Number.isFinite(rawDurVal) ? Math.round(rawDurVal) : 0);
+  if (Object.is(rawDuration, -0)) rawDuration = 0;
   const rawRemVal = typeof safeState.stepRemainingSeconds === 'number' ? safeState.stepRemainingSeconds : (typeof safeState.stepRemainingSeconds === 'string' ? parseFloat(safeState.stepRemainingSeconds) : NaN);
-  const rawRemaining = Math.max(0, Number.isFinite(rawRemVal) ? Math.round(rawRemVal) : 0);
-  const safeRemaining = safeState.isFinished ? 0 : (rawDuration > 0 ? Math.min(rawDuration, rawRemaining) : rawRemaining);
+  let rawRemaining = Math.max(0, Number.isFinite(rawRemVal) ? Math.round(rawRemVal) : 0);
+  if (Object.is(rawRemaining, -0)) rawRemaining = 0;
+  let safeRemaining = safeState.isFinished ? 0 : (rawDuration > 0 ? Math.min(rawDuration, rawRemaining) : rawRemaining);
+  if (Object.is(safeRemaining, -0)) safeRemaining = 0;
   const timeFormatted = formatActivityTimer(safeRemaining);
   const rawStepName =
     (language === 'en' ? safeState.stepNameEn : safeState.stepNamePl) ||

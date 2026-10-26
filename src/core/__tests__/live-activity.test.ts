@@ -673,4 +673,15 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     const payload = buildLiveActivityPayload(attrOver, mockState, 'pl');
     expect(payload.attributes.totalWaterGrams).toBe(50000);
   });
+
+  test('TASK-P41-12-NIE: buildDynamicIslandPayload chroni stepDurationSeconds i stepRemainingSeconds przed -0 i stringiem -0', () => {
+    const stateNegZero: any = {
+      ...mockState,
+      stepDurationSeconds: -0,
+      stepRemainingSeconds: '-0',
+    };
+    const payload = buildDynamicIslandPayload(mockAttributesCoffee, stateNegZero, 'pl');
+    expect(payload.compactTrailing).toBe('0:00');
+    expect(payload.expandedTrailingTime).toBe('0:00');
+  });
 });
