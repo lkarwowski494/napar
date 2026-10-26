@@ -299,4 +299,22 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(getWaterProfileName('  my_custom_water  ')).toBe('my_custom_water');
     expect(getWaterProfileName('')).toBe('');
   });
+
+  test('TASK-P30-07-JAK: calculateWaterMinerals chroni przed ujemnymi targetGh i targetKh oraz NaN', () => {
+    const resNegative = calculateWaterMinerals(1, -50, -20);
+    expect(resNegative.targetGhPpm).toBe(0);
+    expect(resNegative.targetKhPpm).toBe(0);
+    expect(resNegative.concentrateBufferGrams).toBe(0);
+    expect(resNegative.concentrateHardnessGrams).toBe(0);
+    expect(resNegative.dryBakingSodaNaHCO3Grams).toBe(0);
+    expect(resNegative.dryEpsomSaltMgSO4Grams).toBe(0);
+    expect(resNegative.dryCalciumChlorideCaCl2Grams).toBe(0);
+    expect(resNegative.baseWaterGrams).toBe(1000);
+
+    const resNaN = calculateWaterMinerals(NaN, NaN, NaN);
+    expect(resNaN.waterVolumeLiters).toBe(1.0);
+    expect(resNaN.targetGhPpm).toBe(0);
+    expect(resNaN.targetKhPpm).toBe(0);
+    expect(resNaN.baseWaterGrams).toBe(1000);
+  });
 });
