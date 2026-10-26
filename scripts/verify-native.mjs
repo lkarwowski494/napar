@@ -63,6 +63,21 @@ try {
     'app.json -> expo.ios.infoPlist musi mieć LSSupportsOpeningDocumentsInPlace: true (wymóg DEC-09)'
   );
 
+  // Schemat deep-linkingu URL napar:// (TASK-P10-10-WYD)
+  check(
+    appJson.scheme === 'napar',
+    `app.json -> expo.scheme musi być równe 'napar' (otrzymano '${appJson.scheme}')`
+  );
+
+  // Weryfikacja braku uprawnień mikrofonowych w pluginie expo-camera (Zero Audio / Privacy)
+  const cameraPlugin = appJson.plugins?.find(
+    (p) => Array.isArray(p) && p[0] === 'expo-camera'
+  );
+  check(
+    Boolean(cameraPlugin && cameraPlugin[1]?.microphonePermission === false),
+    'app.json -> expo.plugins expo-camera musi mieć jawnie microphonePermission: false'
+  );
+
   const ver = appJson.version;
   check(/^\d+\.\d+(\.\d+)?$/.test(ver), `Wersja '${ver}' w app.json musi mieć format X.Y lub X.Y.Z`);
 
