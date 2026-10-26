@@ -226,7 +226,8 @@ export function verifyAndActivateStoreKitPurchase(
     typeof receipt.signature !== 'string' ||
     !receipt.signature.trim() ||
     typeof receipt.purchaseDate !== 'string' ||
-    !receipt.purchaseDate.trim()
+    !receipt.purchaseDate.trim() ||
+    isNaN(new Date(receipt.purchaseDate.trim()).getTime())
   ) {
     return {
       success: false,

@@ -431,4 +431,15 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(res.success).toBe(false);
     expect(res.errorCode).toBe('invalid_signature');
   });
+
+  test('TASK-P19-02-MON: verifyAndActivateStoreKitPurchase odrzuca niepoprawny ciąg daty purchaseDate (nie-ISO)', () => {
+    const res = verifyAndActivateStoreKitPurchase({
+      productId: STORE_PRODUCT_IDS.annual,
+      transactionId: 'tx-123',
+      signature: 'sig-123',
+      purchaseDate: 'not-a-valid-date-string',
+    });
+    expect(res.success).toBe(false);
+    expect(res.errorCode).toBe('invalid_signature');
+  });
 });
