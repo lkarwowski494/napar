@@ -273,4 +273,12 @@ describe('i18n System', () => {
     expect(translations.pl.grinder.particleRangeDesc).toContain('{min}');
     expect(translations.en.grinder.particleRangeDesc).toContain('{min}');
   });
+
+  test('TASK-P9-09-LOK: Klucz saveToStash jest zdefiniowany we wszystkich językach', () => {
+    for (const [lang, dict] of Object.entries(translations)) {
+      expect((dict as any).stash?.saveToStash).toBeDefined();
+      expect(typeof (dict as any).stash?.saveToStash).toBe('string');
+      expect((dict as any).stash?.saveToStash.length).toBeGreaterThan(0);
+    }
+  });
 });
