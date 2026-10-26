@@ -361,4 +361,18 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(compact.d).toBe(15);
     expect(compact.w).toBe(250);
   });
+
+  test('TASK-P13-11-WZR: normalizeBase64, utf8ToBase64 oraz base64ToUtf8 chronią przed null/undefined/empty string', () => {
+    expect(normalizeBase64('')).toBe('');
+    expect(normalizeBase64(null as any)).toBe('');
+    expect(normalizeBase64(undefined as any)).toBe('');
+
+    expect(utf8ToBase64('')).toBe('');
+    expect(utf8ToBase64(null as any)).toBe('');
+    expect(utf8ToBase64(undefined as any)).toBe('');
+
+    expect(base64ToUtf8('')).toBe('');
+    expect(base64ToUtf8(null as any)).toBe('');
+    expect(base64ToUtf8(undefined as any)).toBe('');
+  });
 });

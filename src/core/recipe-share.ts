@@ -37,6 +37,7 @@ export interface CompactRecipePayload {
  * Bezpieczne kodowanie UTF-8 do Base64 działające zarówno w Node, Hermes jak i przeglądarce
  */
 export function utf8ToBase64(str: string): string {
+  if (!str || typeof str !== 'string') return '';
   if (typeof Buffer !== 'undefined') {
     return Buffer.from(str, 'utf-8').toString('base64');
   }
@@ -55,6 +56,7 @@ export function utf8ToBase64(str: string): string {
  * 3. Uzupełnia brakujący padding '='
  */
 export function normalizeBase64(b64: string): string {
+  if (!b64 || typeof b64 !== 'string') return '';
   let normalized = b64.trim().replace(/\s+/g, '+').replace(/-/g, '+').replace(/_/g, '/');
   const mod = normalized.length % 4;
   if (mod === 2) {
@@ -71,7 +73,9 @@ export function normalizeBase64(b64: string): string {
  * Bezpieczne dekodowanie Base64 do UTF-8
  */
 export function base64ToUtf8(b64: string): string {
+  if (!b64 || typeof b64 !== 'string') return '';
   const normalized = normalizeBase64(b64);
+  if (!normalized) return '';
   if (typeof Buffer !== 'undefined') {
     return Buffer.from(normalized, 'base64').toString('utf-8');
   }
