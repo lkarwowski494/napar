@@ -565,6 +565,32 @@ export function degreesDHToPpmCaCO3(dH: number | string): number {
   return result;
 }
 
+/**
+ * Konwertuje twardość ze stopni francuskich °fH na ppm CaCO3 (1 °fH = 10 ppm CaCO3)
+ */
+export function degreesFHToPpmCaCO3(fH: number | string): number {
+  if (typeof fH !== 'number' && typeof fH !== 'string') return 0;
+  const numFH = typeof fH === 'string' ? parseFloat(fH.trim().replace(/,/g, '.')) : fH;
+  if (!Number.isFinite(numFH) || numFH <= 0 || Object.is(numFH, -0)) return 0;
+  const safeFH = Math.min(1000, numFH);
+  let result = Number((safeFH * 10).toFixed(2));
+  if (Object.is(result, -0)) result = 0;
+  return result;
+}
+
+/**
+ * Konwertuje twardość z ppm CaCO3 na stopnie francuskie °fH (1 °fH = 10 ppm CaCO3)
+ */
+export function ppmCaCO3ToDegreesFH(ppm: number | string): number {
+  if (typeof ppm !== 'number' && typeof ppm !== 'string') return 0;
+  const numPpm = typeof ppm === 'string' ? parseFloat(ppm.trim().replace(/,/g, '.')) : ppm;
+  if (!Number.isFinite(numPpm) || numPpm <= 0 || Object.is(numPpm, -0)) return 0;
+  const safePpm = Math.min(10000, numPpm);
+  let result = Number((safePpm / 10).toFixed(4));
+  if (Object.is(result, -0)) result = 0;
+  return result;
+}
+
 export type WaterHardnessCategory = 'VERY_SOFT' | 'SOFT' | 'MODERATELY_HARD' | 'HARD' | 'VERY_HARD';
 
 /**
@@ -581,14 +607,33 @@ export function classifyWaterHardness(ghPpm: number | string): WaterHardnessCate
     return 'SOFT';
   }
   const raw = typeof ghPpm === 'string' ? parseFloat(ghPpm.trim().replace(/,/g, '.')) : Number(ghPpm);
-  if (!Number.isFinite(raw) || raw < 0 || Object.is(raw, -0)) {
+  if (!Number.isFinite(raw) || raw < 0) {
     return 'SOFT';
   }
-  if (raw <= 50) return 'VERY_SOFT';
-  if (raw <= 100) return 'SOFT';
-  if (raw <= 175) return 'MODERATELY_HARD';
-  if (raw <= 300) return 'HARD';
+  const safe = Object.is(raw, -0) ? 0 : raw;
+  if (safe <= 50) return 'VERY_SOFT';
+  if (safe <= 100) return 'SOFT';
+  if (safe <= 175) return 'MODERATELY_HARD';
+  if (safe <= 300) return 'HARD';
   return 'VERY_HARD';
+}
+
+/**
+ * Klasyfikuje twardość wody bezpośrednio ze stopni niemieckich dH
+ */
+export function classifyWaterHardnessFromDH(dH: number | string): WaterHardnessCategory {
+  if (typeof dH === 'number' && Object.is(dH, -0)) {
+    return 'VERY_SOFT';
+  }
+  if (dH === '0' || dH === 0) {
+    return 'VERY_SOFT';
+  }
+  const rawNum = typeof dH === 'string' ? parseFloat(dH.trim().replace(/,/g, '.')) : dH;
+  if (!Number.isFinite(rawNum) || rawNum < 0) {
+    return 'SOFT';
+  }
+  const ppm = degreesDHToPpmCaCO3(dH);
+  return classifyWaterHardness(ppm);
 }
 
 /**

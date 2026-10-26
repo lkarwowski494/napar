@@ -663,5 +663,37 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(edgeRes.totalGhPpm).toBe(0);
     expect(edgeRes.dominantCation).toBe('balanced');
   });
+
+  test('TASK-P53-07-JAK: konwersja dH/fH/CaCO3 i klasyfikacja z ochrona przed -0 w classifyWaterHardness i classifyWaterHardnessFromDH', () => {
+    // @ts-ignore
+    const {
+      classifyWaterHardness,
+      classifyWaterHardnessFromDH,
+      ppmCaCO3ToDegreesFH,
+      degreesFHToPpmCaCO3,
+    } = require('../water-chemistry');
+
+    // 1. classifyWaterHardness z -0 i 0
+    expect(classifyWaterHardness(0)).toBe('VERY_SOFT');
+    expect(classifyWaterHardness(-0)).toBe('VERY_SOFT');
+    expect(classifyWaterHardness('0')).toBe('VERY_SOFT');
+
+    // 2. classifyWaterHardnessFromDH (bezpośrednia klasyfikacja ze stopni niemieckich dH)
+    expect(classifyWaterHardnessFromDH(2)).toBe('VERY_SOFT'); // ~35.7 ppm
+    expect(classifyWaterHardnessFromDH('4,5')).toBe('SOFT'); // ~80.3 ppm
+    expect(classifyWaterHardnessFromDH(8)).toBe('MODERATELY_HARD'); // ~142.8 ppm
+    expect(classifyWaterHardnessFromDH(12)).toBe('HARD'); // ~214.2 ppm
+    expect(classifyWaterHardnessFromDH(22)).toBe('VERY_HARD'); // ~392.7 ppm
+    expect(classifyWaterHardnessFromDH(-0)).toBe('VERY_SOFT');
+    expect(classifyWaterHardnessFromDH(NaN)).toBe('SOFT');
+
+    // 3. Konwersje ze stopni francuskich (°fH)
+    expect(ppmCaCO3ToDegreesFH(100)).toBe(10);
+    expect(ppmCaCO3ToDegreesFH('155,5')).toBe(15.55);
+    expect(ppmCaCO3ToDegreesFH(-0)).toBe(0);
+    expect(degreesFHToPpmCaCO3(12)).toBe(120);
+    expect(degreesFHToPpmCaCO3('18,5')).toBe(185);
+    expect(degreesFHToPpmCaCO3(-0)).toBe(0);
+  });
 });
 
