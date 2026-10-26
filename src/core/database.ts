@@ -373,7 +373,8 @@ export function deductInventoryWeight(id: string, doseGrams: number): void {
   if (!id || typeof id !== 'string') return;
   const safeId = id.trim();
   if (!safeId) return;
-  const safeDose = Number.isFinite(doseGrams) && doseGrams > 0 ? doseGrams : 0;
+  const parsedDose = typeof doseGrams === 'number' ? doseGrams : (typeof doseGrams === 'string' ? parseFloat(doseGrams) : NaN);
+  const safeDose = Number.isFinite(parsedDose) && parsedDose > 0 ? parsedDose : 0;
   if (safeDose <= 0) return;
   const db = getDatabase();
   const item = getInventoryItemById(safeId);
@@ -382,7 +383,8 @@ export function deductInventoryWeight(id: string, doseGrams: number): void {
     Number.isFinite(item.remainingWeightGrams) && item.remainingWeightGrams >= 0
       ? item.remainingWeightGrams
       : 0;
-  const newRemaining = Math.max(0, Number((currentRemaining - safeDose).toFixed(1)));
+  let newRemaining = Math.max(0, Number((currentRemaining - safeDose).toFixed(1)));
+  if (Object.is(newRemaining, -0) || newRemaining <= 0) newRemaining = 0;
   db.runSync(
     'UPDATE inventory_items SET remaining_weight_g = ?, updated_at = ? WHERE id = ?',
     [newRemaining, new Date().toISOString(), safeId]

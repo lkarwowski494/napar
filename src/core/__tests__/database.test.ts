@@ -1551,4 +1551,31 @@ describe('Napar SQLite Database & Repositories', () => {
     const clonedEmpty = duplicateRecipe(emptyNameRecipe);
     expect(clonedEmpty.name).toBe('Receptura (Kopia)');
   });
+
+  test('TASK-P32-05-ARC: deductInventoryWeight parsuje numeryczne stringi dla dozy i chroni remainingWeight przed -0', () => {
+    initDatabase(mockDb as any);
+    const item: any = {
+      id: 'bean-deduct-test',
+      name: 'Deduct Beans',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 20,
+      flavorNotes: [],
+      isFavorite: false,
+      isArchived: false,
+    };
+    saveInventoryItem(item);
+
+    // Odejmij dokładnie 20g przekazane jako string
+    deductInventoryWeight('bean-deduct-test', '20' as any);
+    const updated = getInventoryItemById('bean-deduct-test');
+    expect(updated?.remainingWeightGrams).toBe(0);
+    expect(Object.is(updated?.remainingWeightGrams, -0)).toBe(false);
+
+    // Odjęcie wartości ujemnej lub nienumerycznej nic nie zmienia
+    deductInventoryWeight('bean-deduct-test', 'invalid' as any);
+    deductInventoryWeight('bean-deduct-test', -5);
+    const unchanged = getInventoryItemById('bean-deduct-test');
+    expect(unchanged?.remainingWeightGrams).toBe(0);
+  });
 });
