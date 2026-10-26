@@ -395,6 +395,16 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
       expect(content).toContain('android.permission.MANAGE_EXTERNAL_STORAGE');
     });
 
+    test('TASK-P52-10-WYD: verify-native.mjs rygorystycznie blokuje uprawnienia do galerii, interakcji zblizeniowych i mediow Androida', () => {
+      const verifyScript = join(root, 'scripts', 'verify-native.mjs');
+      expect(existsSync(verifyScript)).toBe(true);
+      const content = readFileSync(verifyScript, 'utf8');
+      expect(content).toContain('NSPhotoLibraryUsageDescription');
+      expect(content).toContain('NSNearbyInteractionUsageDescription');
+      expect(content).toContain('android.permission.READ_MEDIA_IMAGES');
+      expect(content).toContain('android.permission.READ_MEDIA_VIDEO');
+    });
+
     test('SEC-03: Publiczne repozytorium nie zawiera nieautoryzowanych wywołań sieciowych', () => {
       const publicRepoTest = join(root, 'tests', 'public-repo.test.ts');
       expect(existsSync(publicRepoTest)).toBe(true);

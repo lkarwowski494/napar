@@ -193,8 +193,11 @@ try {
     'com.google.android.gms.permission.AD_ID',
     'android.permission.USE_BIOMETRIC',
     'android.permission.NEARBY_WIFI_DEVICES',
-    'android.permission.ACCESS_BACKGROUND_LOCATION',
     'android.permission.MANAGE_EXTERNAL_STORAGE',
+    'android.permission.READ_MEDIA_IMAGES',
+    'android.permission.READ_MEDIA_VIDEO',
+    'android.permission.READ_MEDIA_AUDIO',
+    'android.permission.POST_NOTIFICATIONS',
   ];
   for (const forbidden of forbiddenPerms) {
     check(
@@ -423,6 +426,10 @@ try {
     'NSSiriUsageDescription',
     'NSHomeKitUsageDescription',
     'NFCReaderUsageDescription',
+    'NSPhotoLibraryUsageDescription',
+    'NSPhotoLibraryAddUsageDescription',
+    'NSNearbyInteractionUsageDescription',
+    'NSIdentityUsageDescription',
   ];
   for (const perm of forbiddenPermissions) {
     check(!appJson.ios?.infoPlist?.[perm], `app.json zawiera niedozwolone uprawnienie: ${perm}`);
@@ -527,8 +534,11 @@ try {
     'com.google.android.gms.permission.AD_ID',
     'android.permission.USE_BIOMETRIC',
     'android.permission.NEARBY_WIFI_DEVICES',
-    'android.permission.ACCESS_BACKGROUND_LOCATION',
     'android.permission.MANAGE_EXTERNAL_STORAGE',
+    'android.permission.READ_MEDIA_IMAGES',
+    'android.permission.READ_MEDIA_VIDEO',
+    'android.permission.READ_MEDIA_AUDIO',
+    'android.permission.POST_NOTIFICATIONS',
   ];
   for (const forbidden of forbiddenAndroidPermissions) {
     check(
