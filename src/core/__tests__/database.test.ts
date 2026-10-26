@@ -1635,4 +1635,26 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(saved?.caffeineContentMg).toBe(125);
     expect(Object.is(saved?.doseGrams, -0)).toBe(false);
   });
+
+  test('TASK-P35-05-ARC: saveInventoryItem parsuje numeryczne stringi dla wag oraz oceny i chroni przed -0', () => {
+    initDatabase(mockDb as any);
+    const itemWithStringParams: any = {
+      id: 'inv-string-params',
+      name: 'String Weights Bean',
+      type: 'coffee',
+      initialWeightGrams: '300.0',
+      remainingWeightGrams: '150.5',
+      rating: '4.8',
+      isFavorite: false,
+      isArchived: false,
+    };
+    saveInventoryItem(itemWithStringParams);
+
+    const saved = getInventoryItemById('inv-string-params');
+    expect(saved).not.toBeNull();
+    expect(saved?.initialWeightGrams).toBe(300);
+    expect(saved?.remainingWeightGrams).toBe(150.5);
+    expect(saved?.rating).toBe(4.8);
+    expect(Object.is(saved?.remainingWeightGrams, -0)).toBe(false);
+  });
 });
