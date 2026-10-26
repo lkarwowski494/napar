@@ -373,4 +373,9 @@ describe('i18n System', () => {
     expect(translations.pl.recipeBuilder.calculatedRatio).toBe('Wyliczona proporcja');
     expect(translations.en.recipeBuilder.calculatedRatio).toBe('Calculated ratio');
   });
+
+  test('TASK-P34-09-LOK: Klucz methodBatchBrew jest zdefiniowany w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodBatchBrew).toBe('Ekspres przelewowy (Batch Brew)');
+    expect(translations.en.brew.methodBatchBrew).toBe('Batch Brew / Filter Machine');
+  });
 });
