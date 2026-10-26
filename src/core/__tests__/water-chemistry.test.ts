@@ -391,4 +391,14 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(degreesDHToPpmCaCO3(-0)).toBe(0);
     expect(degreesDHToPpmCaCO3('-0' as any)).toBe(0);
   });
+
+  test('TASK-P36-07-JAK: diagnoseWaterSensoryImpact ściśle odrzuca null i undefined', () => {
+    const resNullGh = diagnoseWaterSensoryImpact(null as any, 40);
+    expect(resNullGh.problemPl).toContain('Nieprawidłowe dane wejściowe');
+    expect(resNullGh.causePl).toContain('nie mogą być puste');
+
+    const resUndefKh = diagnoseWaterSensoryImpact(80, undefined as any);
+    expect(resUndefKh.problemPl).toContain('Nieprawidłowe dane wejściowe');
+    expect(resUndefKh.causePl).toContain('nie mogą być puste');
+  });
 });

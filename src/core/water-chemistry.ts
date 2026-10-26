@@ -261,12 +261,19 @@ export function diagnoseWaterSensoryImpact(
   ghPpm: number,
   khPpm: number
 ): WaterDiagnosticResult {
-  if (typeof ghPpm === 'boolean' || typeof khPpm === 'boolean') {
+  if (
+    ghPpm === null ||
+    ghPpm === undefined ||
+    khPpm === null ||
+    khPpm === undefined ||
+    typeof ghPpm === 'boolean' ||
+    typeof khPpm === 'boolean'
+  ) {
     return {
       problemPl: 'Nieprawidłowe dane wejściowe parametrów wody.',
       problemEn: 'Invalid input data for water chemistry parameters.',
-      causePl: 'Wartości GH lub KH nie mogą być typu logicznego (boolean).',
-      causeEn: 'GH or KH values cannot be of boolean type.',
+      causePl: 'Wartości GH lub KH nie mogą być puste, niezdefiniowane ani typu logicznego (boolean).',
+      causeEn: 'GH or KH values cannot be null, undefined, or of boolean type.',
       recommendationPl: 'Wprowadź poprawne, dodatnie wartości liczbowe dla twardości GH i buforu KH.',
       recommendationEn: 'Enter valid positive numerical values for GH hardness and KH buffer.',
     };
