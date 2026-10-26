@@ -80,8 +80,9 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
   const handleAdjustRemainingWeight = (delta: number) => {
     const cur = parseFloat(editRemainingWeight) || 0;
-    const next = Math.max(0, cur + delta);
-    setEditRemainingWeight(next.toString());
+    const next = Math.max(0, Math.min(100000, cur + delta));
+    const safeNext = Object.is(next, -0) ? 0 : next;
+    setEditRemainingWeight(safeNext.toString());
   };
 
   const handleSaveEdit = () => {
@@ -95,28 +96,36 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
       Alert.alert(t.common?.error || 'Błąd', t.stash?.nameError || 'Podaj nazwę kawy lub herbaty.');
       return;
     }
-    const rawInitW = parseFloat(editInitialWeight) || (isImperial ? 8.8 : 250);
-    const initW = isImperial ? Math.round(ouncesToGrams(rawInitW)) : Math.round(rawInitW);
-    const rawRemW = parseFloat(editRemainingWeight);
-    let remW = isNaN(rawRemW) || rawRemW < 0 ? 0 : (isImperial ? Math.round(ouncesToGrams(rawRemW)) : Math.round(rawRemW));
+    const parsedInit = parseFloat(editInitialWeight);
+    const safeParsedInit = Number.isFinite(parsedInit) && parsedInit > 0 ? parsedInit : (isImperial ? 8.8 : 250);
+    const convertedInit = isImperial ? ouncesToGrams(safeParsedInit) : safeParsedInit;
+    const clampedInit = Math.floor(Math.max(1, Math.min(100000, convertedInit)));
+    const initW = Object.is(clampedInit, -0) ? 250 : clampedInit;
+
+    const parsedRem = parseFloat(editRemainingWeight);
+    const safeParsedRem = Number.isFinite(parsedRem) && parsedRem >= 0 ? parsedRem : 0;
+    const convertedRem = isImperial ? ouncesToGrams(safeParsedRem) : safeParsedRem;
+    const clampedRem = Math.floor(Math.max(0, Math.min(100000, convertedRem)));
+    const remW = Object.is(clampedRem, -0) ? 0 : clampedRem;
 
     const notesArray = editNotesStr
       .split(',')
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
+      .map((s) => s.trim().slice(0, 50))
+      .filter((s) => s.length > 0)
+      .slice(0, 20);
 
     const isAutoArchived = remW === 0 ? true : editIsArchived;
 
     const updatedItem: InventoryItem = {
       ...item,
-      name: editName.trim(),
+      name: editName.trim().slice(0, 200),
       type: editType,
-      roasterOrProducer: editRoaster.trim() || undefined,
-      origin: editOrigin.trim() || undefined,
-      variety: editVariety.trim() || undefined,
-      process: editProcess.trim() || undefined,
-      roastOrHarvestDate: editRoastDate.trim() || undefined,
-      roastProfile: editRoastProfile.trim() || undefined,
+      roasterOrProducer: editRoaster.trim().slice(0, 100) || undefined,
+      origin: editOrigin.trim().slice(0, 100) || undefined,
+      variety: editVariety.trim().slice(0, 100) || undefined,
+      process: editProcess.trim().slice(0, 100) || undefined,
+      roastOrHarvestDate: editRoastDate.trim().slice(0, 50) || undefined,
+      roastProfile: editRoastProfile.trim().slice(0, 50) || undefined,
       initialWeightGrams: initW,
       remainingWeightGrams: remW,
       flavorNotes: notesArray,
@@ -219,6 +228,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             placeholderTextColor={theme.colors.textMuted}
             value={editName}
             onChangeText={setEditName}
+            maxLength={200}
           />
 
           <Text style={styles.inputLabel}>{t.stash?.roaster || 'Palarnia / Producent'}</Text>
@@ -228,6 +238,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             placeholderTextColor={theme.colors.textMuted}
             value={editRoaster}
             onChangeText={setEditRoaster}
+            maxLength={100}
           />
 
           <Text style={styles.inputLabel}>{t.stash?.origin || 'Kraj / Pochodzenie'}</Text>
@@ -237,6 +248,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             placeholderTextColor={theme.colors.textMuted}
             value={editOrigin}
             onChangeText={setEditOrigin}
+            maxLength={100}
           />
 
           <View style={styles.formRow}>
@@ -248,6 +260,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 placeholderTextColor={theme.colors.textMuted}
                 value={editVariety}
                 onChangeText={setEditVariety}
+                maxLength={100}
               />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
@@ -258,6 +271,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 placeholderTextColor={theme.colors.textMuted}
                 value={editProcess}
                 onChangeText={setEditProcess}
+                maxLength={100}
               />
             </View>
           </View>
@@ -271,6 +285,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 placeholderTextColor={theme.colors.textMuted}
                 value={editRoastDate}
                 onChangeText={setEditRoastDate}
+                maxLength={20}
               />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
@@ -282,6 +297,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 keyboardType="numeric"
                 value={editInitialWeight}
                 onChangeText={setEditInitialWeight}
+                maxLength={10}
               />
             </View>
           </View>
@@ -296,6 +312,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
               keyboardType="numeric"
               value={editRemainingWeight}
               onChangeText={setEditRemainingWeight}
+              maxLength={10}
             />
             <View style={styles.weightQuickButtonsRow}>
               <Pressable

@@ -265,4 +265,47 @@ describe('BeanEditModal Component', () => {
     expect(savedItem.remainingWeightGrams).toBeLessThan(210);
     expect(mockOnSaved).toHaveBeenCalled();
   });
+
+  test('TASK-P38-04-STU: BeanEditModal clampuje wagi do [0, 100000] i chroni przed -0', () => {
+    (database.getUnitSystem as jest.Mock).mockReturnValue('metric');
+    (database.saveInventoryItem as jest.Mock).mockClear();
+
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BeanEditModal
+          visible={true}
+          item={mockItem}
+          onClose={mockOnClose}
+          canCreate={true}
+          onRequirePaywall={mockOnRequirePaywall}
+          onSaved={mockOnSaved}
+          onDeleted={mockOnDeleted}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const nameInput = root.findByProps({ placeholder: 'np. Etiopia Yirgacheffe Washed' });
+    const remInput = root.findByProps({ placeholder: 'np. 180' });
+    const initInput = root.findByProps({ placeholder: '250' });
+
+    renderer.act(() => {
+      nameInput.props.onChangeText('A'.repeat(500));
+      initInput.props.onChangeText('9999999');
+      remInput.props.onChangeText('-0');
+    });
+
+    const saveBtn = root.findByProps({ accessibilityLabel: 'Zapisz zmiany' });
+    renderer.act(() => {
+      saveBtn.props.onPress();
+    });
+
+    expect(database.saveInventoryItem).toHaveBeenCalled();
+    const saved = (database.saveInventoryItem as jest.Mock).mock.calls[0][0];
+    expect(saved.initialWeightGrams).toBe(100000);
+    expect(saved.remainingWeightGrams).toBe(0);
+    expect(Object.is(saved.remainingWeightGrams, -0)).toBe(false);
+    expect(saved.name.length).toBeLessThanOrEqual(200);
+  });
 });
