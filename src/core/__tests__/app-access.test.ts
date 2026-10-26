@@ -15,6 +15,8 @@ import {
   TRIAL_MAX_BREWS,
   TRIAL_DURATION_DAYS,
   STORE_PRODUCT_IDS,
+  purchaseWithStoreKit,
+  verifyAndActivateStoreKitPurchase,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -336,5 +338,21 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(validResult.restored).toBe(true);
     expect(validResult.isSubscribed).toBe(true);
     expect(validResult.subscriptionTier).toBe('annual');
+  });
+
+  test('TASK-P11-02-MON: purchaseWithStoreKit zwraca zwalidowany tier, a verifyAndActivateStoreKitPurchase odrzuca puste lub whitespace podpisy', () => {
+    resetTrialForTesting();
+    const purchaseResult = purchaseWithStoreKit('unsupported_hack' as any);
+    expect(purchaseResult.success).toBe(true);
+    expect(purchaseResult.tier).toBe('annual');
+
+    const emptySignatureRes = verifyAndActivateStoreKitPurchase({
+      productId: STORE_PRODUCT_IDS.annual,
+      transactionId: '   ',
+      purchaseDate: new Date().toISOString(),
+      signature: '   ',
+    });
+    expect(emptySignatureRes.success).toBe(false);
+    expect(emptySignatureRes.errorCode).toBe('invalid_signature');
   });
 });

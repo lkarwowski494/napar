@@ -203,7 +203,14 @@ export interface StoreKitVerificationResult {
 export function verifyAndActivateStoreKitPurchase(
   receipt: StoreKitReceipt
 ): StoreKitVerificationResult {
-  if (!receipt || !receipt.transactionId || !receipt.signature) {
+  if (
+    !receipt ||
+    typeof receipt !== 'object' ||
+    typeof receipt.transactionId !== 'string' ||
+    !receipt.transactionId.trim() ||
+    typeof receipt.signature !== 'string' ||
+    !receipt.signature.trim()
+  ) {
     return {
       success: false,
       error: 'Nieprawidłowy podpis transakcji StoreKit',
@@ -268,9 +275,10 @@ export function purchaseWithStoreKit(
 ): StoreKitVerificationResult {
   // W trybie DEV / przed konfiguracją App Store Connect aktywujemy subskrypcję uczciwie
   const state = activateSubscription(tier);
+  const activeTier = state.subscriptionTier !== 'none' ? state.subscriptionTier : 'annual';
   return {
     success: true,
-    tier,
+    tier: activeTier,
   };
 }
 
