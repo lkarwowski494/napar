@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Tasapohjainen suodatinsuppilo kolmella reiällä tasaiseen ja varmaan uuttoon.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Japanilainen 20-urainen keraaminen suodatinsuppilo kartio- ja aaltosuodattimille."
+    "origamiDesc": "Japanilainen 20-urainen keraaminen suodatinsuppilo kartio- ja aaltosuodattimille.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Monipuolinen mäntäuuttolaite, joka tuottaa täyteläisen uuton lyhyellä uuttoajalla."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

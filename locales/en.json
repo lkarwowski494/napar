@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Flat-bottom dripper with three restriction holes providing consistent and even extraction.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Japanese 20-rib ceramic dripper compatible with both conical and wave filters."
+    "origamiDesc": "Japanese 20-rib ceramic dripper compatible with both conical and wave filters.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Versatile piston immersion brewer offering rich extraction with short steep time."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

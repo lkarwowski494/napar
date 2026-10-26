@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Üç delikli ve düz tabanlı tasarımıyla dengeli ve tutarlı demleme sağlayan damlatıcı.",
     "methodOrigami": "Origami Damlatıcı",
-    "origamiDesc": "Koni ve dalga tipi filtrelerle uyumlu 20 kanallı Japon seramik damlatıcı."
+    "origamiDesc": "Koni ve dalga tipi filtrelerle uyumlu 20 kanallı Japon seramik damlatıcı.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Kısa demleme süresiyle zengin ekstraksiyon sunan çok yönlü pistonlu daldırma demleyici."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

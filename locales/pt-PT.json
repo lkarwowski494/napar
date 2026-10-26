@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Dripper de fundo plano com três orifícios garantindo extração uniforme e equilibrada.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Dripper japonês em cerâmica com 20 nervuras, compatível com filtros cónicos e wave."
+    "origamiDesc": "Dripper japonês em cerâmica com 20 nervuras, compatível com filtros cónicos e wave.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Cafeteira de imersão por êmbolo versátil que proporciona extração rica com tempo curto de infusão."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

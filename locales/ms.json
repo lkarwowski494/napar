@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Dripper dasar rata dengan tiga lubang untuk pengekstrakan sekata dan konsisten.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Dripper seramik Jepun dengan 20 alur tulang serasi untuk penapis kon dan wave."
+    "origamiDesc": "Dripper seramik Jepun dengan 20 alur tulang serasi untuk penapis kon dan wave.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Pembancuh rendaman omboh serba boleh yang memberikan pengekstrakan kaya dengan masa rendaman singkat."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

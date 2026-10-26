@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Flatbunnet kaffetrakt med tre hull som sikrer en jevn og konsistent ekstraksjon.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Japansk keramisk kaffetrakt med 20 riller, kompatibel med kjegle- og bølgefiltre."
+    "origamiDesc": "Japansk keramisk kaffetrakt med 20 riller, kompatibel med kjegle- og bølgefiltre.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Allsidig stempel-immersjonsbrygger som gir rik ekstraksjon med kort trekketid."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

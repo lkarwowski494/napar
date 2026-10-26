@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Dripper dasar datar dengan tiga lubang aliran untuk ekstraksi merata dan konsisten.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Dripper keramik Jepang dengan 20 lekukan rusuk yang kompatibel dengan filter kerucut dan wave."
+    "origamiDesc": "Dripper keramik Jepang dengan 20 lekukan rusuk yang kompatibel dengan filter kerucut dan wave.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Alat seduh imersi piston serbaguna yang menghasilkan ekstraksi kaya dengan waktu seduh singkat."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

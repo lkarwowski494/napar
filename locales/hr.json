@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Dripper ravnog dna s tri otvora za ravnomjernu i postojanu ekstrakciju.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Japanski keramički dripper s 20 rebara kompatibilan s konusnim i valovitim filtrima."
+    "origamiDesc": "Japanski keramički dripper s 20 rebara kompatibilan s konusnim i valovitim filtrima.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Svestrani klipni uranjajući aparat za kavu za bogatu ekstrakciju uz kratko vrijeme pripreme."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

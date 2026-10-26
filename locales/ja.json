@@ -173,7 +173,9 @@
     "methodKalitaWave": "カリタウェーブ",
     "kalitaWaveDesc": "3つ穴の平底構造とウェーブフィルターにより均一で安定した抽出を実現。",
     "methodOrigami": "オリガミドリッパー",
-    "origamiDesc": "20本の美しいリブ構造で円すい形とウェーブ形両方のフィルターに対応する美濃焼ドリッパー。"
+    "origamiDesc": "20本の美しいリブ構造で円すい形とウェーブ形両方のフィルターに対応する美濃焼ドリッパー。",
+    "methodAeropress": "エアロプレス",
+    "aeropressDesc": "短い抽出時間で豊かなコクと風味を引き出すピストン浸漬式コーヒー抽出器具。"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

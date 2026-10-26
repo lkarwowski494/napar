@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Plochý dripper se třemi otvory zajišťující rovnoměrnou a konzistentní extrakci.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Japonský keramický dripper s 20 žebry kompatibilní s kuželovými i plochými filtry."
+    "origamiDesc": "Japonský keramický dripper s 20 žebry kompatibilní s kuželovými i plochými filtry.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Všestranný pístový kávovar kombinující imerzi s krátkou dobou louhování."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

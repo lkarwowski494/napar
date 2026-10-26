@@ -173,7 +173,9 @@
     "methodKalitaWave": "칼리타 웨이브",
     "kalitaWaveDesc": "3개 추출구의 평평한 바닥 구조로 균일하고 안정적인 추출을 제공하는 드리퍼.",
     "methodOrigami": "오리가미 드리퍼",
-    "origamiDesc": "20개의 세로 리브로 원추형 및 웨이브 필터를 모두 지원하는 세라믹 드리퍼."
+    "origamiDesc": "20개의 세로 리브로 원추형 및 웨이브 필터를 모두 지원하는 세라믹 드리퍼.",
+    "methodAeropress": "에어로프레스",
+    "aeropressDesc": "짧은 추출 시간으로 풍부한 바디감과 향미를 추출하는 다목적 피스톤 침출식 브루어."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

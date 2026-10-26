@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "平底三孔濾杯設計，導流均勻萃取更加穩定純淨。",
     "methodOrigami": "Origami摺紙濾杯",
-    "origamiDesc": "20道縱向導流肋骨設計，完美兼顧錐形濾紙與蛋糕波浪濾紙。"
+    "origamiDesc": "20道縱向導流肋骨設計，完美兼顧錐形濾紙與蛋糕波浪濾紙。",
+    "methodAeropress": "愛樂壓",
+    "aeropressDesc": "多功能活塞浸泡式萃取器具，萃取時間短且風味濃郁醇厚。"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

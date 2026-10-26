@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Lapos aljú csepegtető három lyukkal az egyenletes és kiegyensúlyozott extrakcióért.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Japán kerámia csepegtető 20 bordával kónikus és hullámos szűrőkhöz."
+    "origamiDesc": "Japán kerámia csepegtető 20 bordával kónikus és hullámos szűrőkhöz.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Sokoldalú dugattyús áztatós kávékészítő gazdag kivonatolással és rövid áztatási idővel."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Flachboden-Filter mit drei Löchern für besonders gleichmäßige und konsistente Extraktion.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Japanischer Keramikfilter mit 20 Rillen, kompatibel mit Kegel- und Wellenfiltern."
+    "origamiDesc": "Japanischer Keramikfilter mit 20 Rillen, kompatibel mit Kegel- und Wellenfiltern.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Vielseitiger Kolben-Immersionszubereiter für reichhaltige Extraktion bei kurzer Brühzeit."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

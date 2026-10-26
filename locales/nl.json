@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Filterhouder met platte bodem en drie gaatjes voor een gelijkmatige en consistente extractie.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Japanse keramische filterhouder met 20 ribben, geschikt voor kegel- en golfpapieren."
+    "origamiDesc": "Japanse keramische filterhouder met 20 ribben, geschikt voor kegel- en golfpapieren.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Veelzijdige zuiger-immersiebrouwer voor een rijke extractie met korte zettijd."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

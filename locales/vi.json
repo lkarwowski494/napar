@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Phễu lọc đáy phẳng với ba lỗ thoát giúp chiết xuất đều đặn và ổn định.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Phễu sứ Nhật Bản với 20 rãnh gấp tương thích cả giấy lọc hình nón và giấy gợn sóng."
+    "origamiDesc": "Phễu sứ Nhật Bản với 20 rãnh gấp tương thích cả giấy lọc hình nón và giấy gợn sóng.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Dụng cụ pha cà phê ngâm piston đa năng mang lại chiết xuất đậm đà với thời gian ủ ngắn."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

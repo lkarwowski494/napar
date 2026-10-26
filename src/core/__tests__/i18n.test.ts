@@ -340,4 +340,11 @@ describe('i18n System', () => {
     expect(translations.pl.brew.origamiDesc).toContain('20 żebrach');
     expect(translations.en.brew.origamiDesc).toContain('20-rib');
   });
+
+  test('TASK-P29-09-LOK: Klucze methodAeropress i aeropressDesc są zdefiniowane w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodAeropress).toBe('AeroPress');
+    expect(translations.en.brew.methodAeropress).toBe('AeroPress');
+    expect(translations.pl.brew.aeropressDesc).toContain('tłokowy');
+    expect(translations.en.brew.aeropressDesc).toContain('piston');
+  });
 });

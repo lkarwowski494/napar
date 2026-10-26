@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Dripper επίπεδου πυθμένα με τρεις οπές για ομοιόμορφη και σταθερή εκχύλιση.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Ιαπωνικό κεραμικό dripper 20 πτυχώσεων συμβατό με κωνικά φίλτρα και φίλτρα wave."
+    "origamiDesc": "Ιαπωνικό κεραμικό dripper 20 πτυχώσεων συμβατό με κωνικά φίλτρα και φίλτρα wave.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Ευέλικτη συσκευή εμβάπτισης με έμβολο που προσφέρει πλούσια εκχύλιση σε σύντομο χρόνο εκχύλισης."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

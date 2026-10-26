@@ -173,7 +173,9 @@
     "methodKalitaWave": "Kalita Wave",
     "kalitaWaveDesc": "Дрипер с плоско дъно и три отвора за равномерна и постоянна екстракция.",
     "methodOrigami": "Origami Dripper",
-    "origamiDesc": "Японски керамичен дрипер с 20 ребра съвместим с конусни и вълнообразни филтри."
+    "origamiDesc": "Японски керамичен дрипер с 20 ребра съвместим с конусни и вълнообразни филтри.",
+    "methodAeropress": "AeroPress",
+    "aeropressDesc": "Гъвкава бутална имерсионна кафеварка за богата екстракция с кратко време за запарване."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
