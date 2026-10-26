@@ -249,7 +249,8 @@
     "deleteRecipeConfirmMsg": "This action cannot be undone.",
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
-    "stepNumberPrefix": "Langkah"
+    "stepNumberPrefix": "Langkah",
+    "addStepHint": "Menambah langkah baru pada resipi bancuhan"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

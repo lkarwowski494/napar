@@ -249,7 +249,8 @@
     "deleteRecipeConfirmMsg": "This action cannot be undone.",
     "fillRequired": "Please provide a recipe name and at least one pour step.",
     "duplicateBtn": "Duplicate as New Recipe",
-    "stepNumberPrefix": "ステップ"
+    "stepNumberPrefix": "ステップ",
+    "addStepHint": "抽出レシピに新しいステップを追加します"
   },
   "stash": {
     "title": "Coffee & Tea Stash",

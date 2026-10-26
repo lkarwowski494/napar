@@ -249,7 +249,8 @@
     "deleteRecipeConfirmMsg": "Ta operacja jest nieodwracalna.",
     "fillRequired": "Wypełnij nazwę i dodaj przynajmniej jeden krok parzenia.",
     "duplicateBtn": "Duplikuj jako nową recepturę",
-    "stepNumberPrefix": "Krok"
+    "stepNumberPrefix": "Krok",
+    "addStepHint": "Dodaje nowy krok do receptury parzenia"
   },
   "stash": {
     "title": "Spiżarnia Ziaren & Herbat",
