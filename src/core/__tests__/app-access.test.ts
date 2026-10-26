@@ -511,4 +511,17 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(result.success).toBe(true);
     expect(result.tier).toBe('lifetime');
   });
+
+  test('TASK-P26-02-MON: activateSubscription normalizuje wielkość liter i spacje w parametrze tier', () => {
+    resetTrialForTesting();
+    const stateLifetime = activateSubscription('   LIFETIME   ' as any);
+    expect(stateLifetime.isSubscribed).toBe(true);
+    expect(stateLifetime.subscriptionTier).toBe('lifetime');
+
+    const stateMonthly = activateSubscription('  Monthly ' as any);
+    expect(stateMonthly.subscriptionTier).toBe('monthly');
+
+    const stateFallback = activateSubscription(' nieznany ' as any);
+    expect(stateFallback.subscriptionTier).toBe('annual');
+  });
 });
