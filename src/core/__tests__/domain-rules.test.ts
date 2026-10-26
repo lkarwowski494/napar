@@ -511,4 +511,15 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(res.targetWaterGrams).toBe(1000.0);
     });
   });
+
+  describe('TASK-P27-03-ZAK: calculateBrewDose, calculateBrewWater oraz calculateBrewRatio odporne na NaN w clampach', () => {
+    it('stosuje domyslne bezpieczne clampy przy przekazaniu NaN', () => {
+      // 50000g / 1:1 = 50000g -> clamp do domyslnego 1000g
+      expect(calculateBrewDose(50000, 1, NaN as any)).toBe(1000.0);
+      // 10000g * 10 = 100000g -> clamp do domyslnego 50000g
+      expect(calculateBrewWater(10000, 10, NaN as any)).toBe(50000.0);
+      // 500g / 1g = 500.0 -> clamp do domyslnego 100.0
+      expect(calculateBrewRatio(1, 500, NaN as any)).toBe(100.0);
+    });
+  });
 });

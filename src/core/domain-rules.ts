@@ -46,7 +46,8 @@ export function calculateBrewWater(doseGrams: number, ratio: number, maxWaterGra
     throw new Error('Doza i ratio muszą być większe od zera');
   }
   const rawWater = doseGrams * ratio;
-  const clamped = Number.isFinite(maxWaterGrams) && maxWaterGrams > 0 ? Math.min(rawWater, maxWaterGrams) : rawWater;
+  const safeMaxWater = Number.isFinite(maxWaterGrams) && maxWaterGrams > 0 ? maxWaterGrams : 50000.0;
+  const clamped = Math.min(rawWater, safeMaxWater);
   return Number(clamped.toFixed(1));
 }
 
@@ -59,7 +60,8 @@ export function calculateBrewDose(waterGrams: number, ratio: number, maxDoseGram
     throw new Error('Woda i ratio muszą być większe od zera');
   }
   const rawDose = waterGrams / ratio;
-  const clamped = Number.isFinite(maxDoseGrams) && maxDoseGrams > 0 ? Math.min(rawDose, maxDoseGrams) : rawDose;
+  const safeMaxDose = Number.isFinite(maxDoseGrams) && maxDoseGrams > 0 ? maxDoseGrams : 1000.0;
+  const clamped = Math.min(rawDose, safeMaxDose);
   return Number(clamped.toFixed(1));
 }
 
@@ -72,7 +74,8 @@ export function calculateBrewRatio(doseGrams: number, waterGrams: number, maxRat
     return 0;
   }
   const ratio = waterGrams / doseGrams;
-  const clamped = Number.isFinite(maxRatio) && maxRatio > 0 ? Math.min(ratio, maxRatio) : ratio;
+  const safeMaxRatio = Number.isFinite(maxRatio) && maxRatio > 0 ? maxRatio : 100.0;
+  const clamped = Math.min(ratio, safeMaxRatio);
   return Number(clamped.toFixed(1));
 }
 
