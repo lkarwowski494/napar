@@ -372,4 +372,12 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(betweenString.microns).toBeGreaterThan(0);
     expect(Object.is(betweenString.microns, -0)).toBe(false);
   });
+
+  test('TASK-P30-08-PRO: getRecipeMicrons rozpoznaje Espresso Tonic, Americano i Lungo i zwraca 350 µm', () => {
+    expect(getRecipeMicrons({ method: 'ESPRESSO_TONIC' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'Americano' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'Lungo' })).toBe(350);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Drobny przemiał pod espresso tonic' })).toBe(350);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine grind for lungo extraction' })).toBe(350);
+  });
 });

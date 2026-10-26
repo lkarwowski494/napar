@@ -394,7 +394,22 @@ export function getRecipeMicrons(recipe?: {
       : ''
   ).toLowerCase();
 
-  if (desc.includes('bardzo drobno') || desc.includes('extra fine') || desc.includes('turkish') || desc.includes('tygielek') || desc.includes('cezve') || method === 'ESPRESSO' || method === 'TURKISH' || method === 'CEZVE') {
+  if (
+    desc.includes('bardzo drobno') ||
+    desc.includes('extra fine') ||
+    desc.includes('turkish') ||
+    desc.includes('tygielek') ||
+    desc.includes('cezve') ||
+    desc.includes('espresso') ||
+    desc.includes('americano') ||
+    desc.includes('lungo') ||
+    method === 'ESPRESSO' ||
+    method.includes('ESPRESSO') ||
+    method.includes('AMERICANO') ||
+    method.includes('LUNGO') ||
+    method === 'TURKISH' ||
+    method === 'CEZVE'
+  ) {
     if (desc.includes('turkish') || desc.includes('tygielek') || desc.includes('cezve') || method === 'TURKISH' || method === 'CEZVE') {
       return 200;
     }
