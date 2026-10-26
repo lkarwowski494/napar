@@ -1,0 +1,105 @@
+{
+  "run": "P53",
+  "date": "2026-10-26",
+  "status": "in_progress",
+  "total_tasks": 12,
+  "completed_tasks": 5,
+  "tasks": [
+    {
+      "id": "TASK-P53-01-ODK",
+      "perspective": "01-ODK",
+      "title": "Lokalizacja, podpowiedzi i etykiety dostepnosci a11y w RecipeSelectModal",
+      "target_file": "src/components/brew/RecipeSelectModal.tsx",
+      "test_file": "src/components/brew/__tests__/RecipeSelectModal.test.tsx",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P53-02-MON",
+      "perspective": "02-MON",
+      "title": "Bezpieczna obsługa pustych i uszkodzonych identyfikatorow StoreKit w app-access",
+      "target_file": "src/core/app-access.ts",
+      "test_file": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P53-03-ZAK",
+      "perspective": "03-ZAK",
+      "title": "Wyliczanie interwalow odgazowania CO2 w Proactive Action Schedule w bpr-engine",
+      "target_file": "src/core/bpr-engine.ts",
+      "test_file": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P53-04-STU",
+      "perspective": "04-STU",
+      "title": "Precyzyjna kontrola proporcji i ochrona przed -0 w RecipeParamsCard",
+      "target_file": "src/components/recipe-builder/RecipeParamsCard.tsx",
+      "test_file": "src/components/recipe-builder/__tests__/RecipeParamsCard.test.tsx",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P53-05-ARC",
+      "perspective": "05-ARC",
+      "title": "Walidacja i odpornosc na uszkodzone ciagi JSON w operacjach bazy SQLite",
+      "target_file": "src/core/database.ts",
+      "test_file": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P53-06-TRE",
+      "perspective": "06-TRE",
+      "title": "Rozbudowa klasyfikacji odmian botanicznych kawy i terroir w knowledge-data",
+      "target_file": "src/core/knowledge-data.ts",
+      "test_file": "src/core/__tests__/knowledge.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P53-07-JAK",
+      "perspective": "07-JAK",
+      "title": "Konwersja jednostek twardosci dH/CaCO3 i klasyfikacja z ochrona przed -0",
+      "target_file": "src/core/water-chemistry.ts",
+      "test_file": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P53-08-PRO",
+      "perspective": "08-PRO",
+      "title": "Formatowanie nastaw i rozszerzenie aliasow modeli mlynkow w grinder-converter",
+      "target_file": "src/core/grinder-converter.ts",
+      "test_file": "src/core/__tests__/grinder-converter.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P53-09-LOK",
+      "perspective": "09-LOK",
+      "title": "Pelna symetria i brakujace klucze terminologii sensorycznej w 35 jezykach",
+      "target_file": "src/core/i18n.tsx",
+      "test_file": "tests/i18n-no-polish-in-en.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P53-10-WYD",
+      "perspective": "10-WYD",
+      "title": "Weryfikacja integralnosci naglowkow ikon i deklaracji uprawnien w verify-native",
+      "target_file": "scripts/verify-native.mjs",
+      "test_file": "tests/audit-fixes.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P53-11-WZR",
+      "perspective": "11-WZR",
+      "title": "Ochrona przed ekstremalnymi wartosciami i bialymi znakami w recipe-share",
+      "target_file": "src/core/recipe-share.ts",
+      "test_file": "src/core/__tests__/recipe-share.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P53-12-NIE",
+      "perspective": "12-NIE",
+      "title": "Ochrona przed wartosciami ujemnymi i formatowanie licznikow w live-activity",
+      "target_file": "src/core/live-activity.ts",
+      "test_file": "src/core/__tests__/live-activity.test.ts",
+      "status": "pending"
+    }
+  ]
+}
