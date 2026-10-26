@@ -1700,6 +1700,7 @@ describe('Napar SQLite Database & Repositories', () => {
       waterTempCelsius: 93,
       totalTimeSeconds: 180,
       rating: 5,
+      flavorTags: [],
       brewedAt: '2026-10-26T12:00:00Z',
     };
     recordBrewSessionTransaction(session, { itemId: 'bean-tx-str', doseGrams: '18.5' as any });
