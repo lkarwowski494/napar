@@ -974,4 +974,29 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeVarietyById('arusha')?.id).toBe('variety-typica');
     expect(findCoffeeVarietyById('tekisic')?.id).toBe('variety-bourbon');
   });
+
+  test('TASK-P53-06-TRE: rozbudowa klasyfikacji odmian (batian, ruiru 11, chiroso, ombligon), terroir (kochere, urrao, quindio) i herbat (hojicha, assam, darjeeling)', () => {
+    // 1. Kultywary botaniczne kawy
+    expect(findCoffeeVarietyById('batian')?.id).toBe('variety-sl28-sl34');
+    expect(findCoffeeVarietyById('ruiru 11')?.id).toBe('variety-sl28-sl34');
+    expect(findCoffeeVarietyById('ruiru-11')?.id).toBe('variety-sl28-sl34');
+    expect(findCoffeeVarietyById('chiroso')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('ombligon')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('bourbon aji')?.id).toBe('variety-bourbon');
+
+    // 2. Terroir i mikro-regiony pochodzenia kawy
+    expect(findCoffeeOriginById('kochere')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('chelchele')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('hambela')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('urrao')?.id).toBe('origin-colombia');
+    expect(findCoffeeOriginById('quindio')?.id).toBe('origin-colombia');
+    expect(findCoffeeOriginById('acatenango')?.id).toBe('origin-guatemala');
+
+    // 3. Klasyfikacja herbat
+    expect(findTeaCategoryById('hojicha')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('kukicha')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('assam')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('darjeeling')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('ceylon')?.id).toBe('tea-black');
+  });
 });

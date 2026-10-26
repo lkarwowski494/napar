@@ -722,6 +722,15 @@ const VARIETY_ALIASES: Record<string, string> = {
   mejorado: 'variety-typica',
   arusha: 'variety-typica',
   tekisic: 'variety-bourbon',
+  batian: 'variety-sl28-sl34',
+  'ruiru 11': 'variety-sl28-sl34',
+  'ruiru-11': 'variety-sl28-sl34',
+  ruiru11: 'variety-sl28-sl34',
+  chiroso: 'variety-ethiopian-landraces',
+  ombligon: 'variety-ethiopian-landraces',
+  'bourbon aji': 'variety-bourbon',
+  'bourbon-aji': 'variety-bourbon',
+  bourbonaji: 'variety-bourbon',
 };
 
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
@@ -881,6 +890,11 @@ const ORIGIN_ALIASES: Record<string, string> = {
   harrar: 'origin-ethiopia',
   limu: 'origin-ethiopia',
   jimma: 'origin-ethiopia',
+  kochere: 'origin-ethiopia',
+  chelchele: 'origin-ethiopia',
+  hambela: 'origin-ethiopia',
+  worka: 'origin-ethiopia',
+  aricha: 'origin-ethiopia',
   // Kenya
   ken: 'origin-kenya',
   kenya: 'origin-kenya',
@@ -906,6 +920,10 @@ const ORIGIN_ALIASES: Record<string, string> = {
   'san agustin': 'origin-colombia',
   'san-agustin': 'origin-colombia',
   sanagustin: 'origin-colombia',
+  urrao: 'origin-colombia',
+  quindio: 'origin-colombia',
+  quindío: 'origin-colombia',
+  santander: 'origin-colombia',
   // Guatemala
   gtm: 'origin-guatemala',
   guatemala: 'origin-guatemala',
@@ -916,6 +934,8 @@ const ORIGIN_ALIASES: Record<string, string> = {
   coban: 'origin-guatemala',
   fraijanes: 'origin-guatemala',
   atitlan: 'origin-guatemala',
+  acatenango: 'origin-guatemala',
+  oriente: 'origin-guatemala',
   // Costa Rica
   cri: 'origin-costa-rica',
   'costa-rica': 'origin-costa-rica',
@@ -945,6 +965,10 @@ const ORIGIN_ALIASES: Record<string, string> = {
   'sul de minas': 'origin-brazil',
   'sul-de-minas': 'origin-brazil',
   mogiana: 'origin-brazil',
+  'espirito santo': 'origin-brazil',
+  'espirito-santo': 'origin-brazil',
+  espiritosanto: 'origin-brazil',
+  'chapada diamantina': 'origin-brazil',
   // Panama
   pan: 'origin-panama',
   panama: 'origin-panama',
