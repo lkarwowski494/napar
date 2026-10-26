@@ -218,4 +218,33 @@ describe('BrewFinishModal Component', () => {
     expect(str).toContain('Woda: 251g');
     expect(str).toContain('Czas: 1440:00');
   });
+
+  test('TASK-P48-01-ODK: Semantyka radiogroup selektora wody, accessibilityHint dla TDS i notatek oraz odpornosc na undefined w notes i selectedTags', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewFinishModal
+          {...defaultProps}
+          notes={undefined as any}
+          selectedTags={undefined as any}
+          waterProfile="sca_standard"
+        />
+      );
+    });
+
+    const waterRow = tree.root.findByProps({ testID: 'water-chips-row' });
+    expect(waterRow.props.accessibilityRole).toBe('radiogroup');
+
+    const scaChip = tree.root.findByProps({ testID: 'water-chip-sca_standard' });
+    expect(scaChip.props.accessibilityRole).toBe('radio');
+    expect(scaChip.props.accessibilityState).toEqual({ selected: true });
+
+    const tdsInput = tree.root.findByProps({ testID: 'tds-input' });
+    expect(tdsInput.props.accessibilityHint).toBeDefined();
+    expect(tdsInput.props.accessibilityHint).toContain('TDS');
+
+    const notesInput = tree.root.findByProps({ testID: 'finish-notes-input' });
+    expect(notesInput.props.accessibilityHint).toBeDefined();
+    expect(notesInput.props.value).toBe('');
+  });
 });

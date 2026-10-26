@@ -253,14 +253,20 @@ export function BrewFinishModal({
             {/* Hierarchiczne Koło Smaków SCA */}
             <Text style={[styles.sectionLabel, { marginTop: 14 }]}>{t.brew?.flavorWheelTitle || 'Koło Smaków SCA'}</Text>
             <FlavorWheelPicker
-              selectedDescriptors={selectedTags}
+              selectedDescriptors={Array.isArray(selectedTags) ? selectedTags : []}
               onToggleDescriptor={onToggleTag}
               language={language}
             />
 
             {/* Profil wody użytej do parzenia */}
             <Text style={[styles.sectionLabel, { marginTop: 14 }]}>{t.brew?.waterUsedTitle || 'Woda użyta do parzenia'}</Text>
-            <View style={styles.waterChipsRow}>
+            <View
+              testID="water-chips-row"
+              style={styles.waterChipsRow}
+              accessible={true}
+              accessibilityRole="radiogroup"
+              accessibilityLabel={t.brew?.waterUsedTitle || 'Woda użyta do parzenia'}
+            >
               {WATER_RECIPES.map((w) => {
                 const active = waterProfile === w.id;
                 const waterName = language === 'pl' ? w.namePl : w.nameEn;
@@ -268,7 +274,7 @@ export function BrewFinishModal({
                   <Pressable
                     key={w.id}
                     testID={`water-chip-${w.id}`}
-                    accessibilityRole="button"
+                    accessibilityRole="radio"
                     accessibilityState={{ selected: active }}
                     accessibilityLabel={`${language === 'pl' ? 'Woda' : 'Water'} ${waterName}, GH ${w.targetGhPpm}, KH ${w.targetKhPpm}`}
                     style={[styles.waterChip, active && styles.waterChipActive]}
@@ -293,7 +299,8 @@ export function BrewFinishModal({
                 keyboardType="numeric"
                 maxLength={6}
                 accessibilityLabel={t.brew?.tdsLabel || 'Odczyt TDS refractometru (%)'}
-                value={tdsInput}
+                accessibilityHint={language === 'en' ? 'Enter refractometer TDS reading in percent' : 'Wprowadź odczyt TDS refractometru w procentach'}
+                value={tdsInput ?? ''}
                 onChangeText={onChangeTdsInput}
               />
             </View>
@@ -305,10 +312,11 @@ export function BrewFinishModal({
               style={styles.notesInput}
               placeholder={t.brew?.baristaNotesPlaceholder || 'np. słodka brzoskwinia, delikatna jaśminowa kwasowość...'}
               placeholderTextColor={theme.colors.textMuted}
-              value={notes}
+              value={notes ?? ''}
               onChangeText={onChangeNotes}
               maxLength={1000}
               accessibilityLabel={t.brew?.baristaNotesTitle || 'Notatki Baristy'}
+              accessibilityHint={language === 'en' ? 'Enter tasting notes and sensory feedback' : 'Wprowadź notatki sensoryczne z zaparzonego naparu'}
               multiline
             />
 
