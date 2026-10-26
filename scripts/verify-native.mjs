@@ -127,6 +127,18 @@ try {
     'app.json -> expo.plugins expo-camera musi mieć jawnie microphonePermission: false'
   );
 
+  // Weryfikacja spójności uprawnień kamery iOS infoPlist oraz expo-camera plugin (TASK-P19-10-WYD)
+  const cameraDesc = appJson.ios?.infoPlist?.NSCameraUsageDescription;
+  const pluginCameraPermission = cameraPlugin && cameraPlugin[1]?.cameraPermission;
+  check(
+    typeof cameraDesc === 'string' && cameraDesc.trim().length > 0,
+    'app.json -> expo.ios.infoPlist.NSCameraUsageDescription musi być niepustym ciągiem tekstowym'
+  );
+  check(
+    cameraDesc === pluginCameraPermission,
+    `app.json -> expo.ios.infoPlist.NSCameraUsageDescription musi być identyczne jak expo-camera plugin cameraPermission (otrzymano '${cameraDesc}' vs '${pluginCameraPermission}')`
+  );
+
   // Weryfikacja konfiguracji zasobów wizualnych i pluginu lokalizacji (TASK-P17-10-WYD)
   check(
     appJson.android?.adaptiveIcon?.foregroundImage === './assets/adaptive-icon.png' &&
