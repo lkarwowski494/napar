@@ -53,6 +53,16 @@ try {
     'app.json -> expo.ios.infoPlist musi mieć ITSAppUsesNonExemptEncryption: false'
   );
 
+  // Dostęp do plików kopii zapasowej w aplikacji Pliki iOS (DEC-09, TASK-P9-10-WYD)
+  check(
+    appJson.ios?.infoPlist?.UIFileSharingEnabled === true,
+    'app.json -> expo.ios.infoPlist musi mieć UIFileSharingEnabled: true (wymóg DEC-09)'
+  );
+  check(
+    appJson.ios?.infoPlist?.LSSupportsOpeningDocumentsInPlace === true,
+    'app.json -> expo.ios.infoPlist musi mieć LSSupportsOpeningDocumentsInPlace: true (wymóg DEC-09)'
+  );
+
   const ver = appJson.version;
   check(/^\d+\.\d+(\.\d+)?$/.test(ver), `Wersja '${ver}' w app.json musi mieć format X.Y lub X.Y.Z`);
 
