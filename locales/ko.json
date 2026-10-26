@@ -150,7 +150,9 @@
     "craftCostPerCup": "Cost of this brew: {total} {curr} (beans: {beans} {curr}, water: {water} {curr})",
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
-    "saveToJournalBtn": "Save to Journal"
+    "saveToJournalBtn": "Save to Journal",
+    "selectInventoryTitle": "팬트리에서 선택",
+    "unassignedInventory": "미할당 (일반)"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

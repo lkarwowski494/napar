@@ -150,7 +150,9 @@
     "craftCostPerCup": "Cost of this brew: {total} {curr} (beans: {beans} {curr}, water: {water} {curr})",
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
-    "saveToJournalBtn": "Save to Journal"
+    "saveToJournalBtn": "Save to Journal",
+    "selectInventoryTitle": "Pilih dari Dapur",
+    "unassignedInventory": "Belum Ditetapkan (Umum)"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

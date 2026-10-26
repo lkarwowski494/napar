@@ -9,6 +9,7 @@ import { BrewFinishModal } from './BrewFinishModal';
 import { GrinderSelectModal } from './GrinderSelectModal';
 import { ShareRecipeModal } from './ShareRecipeModal';
 import { ImportRecipeModal } from './ImportRecipeModal';
+import { InventorySelectModal } from './InventorySelectModal';
 import { QrScannerModal } from '../../core/QrScannerModal';
 import { Apps4BrewPassModal } from '../Apps4BrewPassModal';
 import { OnboardingModal } from '../OnboardingModal';
@@ -49,6 +50,11 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     setShowQrScanner,
     showPaywallModal,
     setShowPaywallModal,
+    showInventoryModal,
+    setShowInventoryModal,
+    allInventory,
+    selectedInventoryItem,
+    selectInventoryItem,
     showOnboarding,
     handleCompleteOnboarding,
     waterGrams,
@@ -200,6 +206,16 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         onScanRecipe={handleScanQrRecipe}
         t={t}
         language={language}
+      />
+
+      {/* Modal Wyboru Pozycji ze Spiżarni */}
+      <InventorySelectModal
+        visible={showInventoryModal}
+        onClose={() => setShowInventoryModal(false)}
+        inventory={allInventory}
+        selectedItem={selectedInventoryItem}
+        onSelectItem={(item) => selectInventoryItem(item)}
+        t={t}
       />
 
       {/* Apps4Brew Pass Paywall Modal */}
