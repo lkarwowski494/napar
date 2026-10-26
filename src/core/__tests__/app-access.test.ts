@@ -827,4 +827,51 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(state.isSubscribed).toBe(true);
     expect(state.subscriptionTier).toBe('annual');
   });
+
+  test('TASK-P48-02-MON: Odrzucanie transakcji StoreKit z przyszlosci, sanityzacja transactionId i formatTrialStatusSummary', () => {
+    resetTrialForTesting();
+    const { formatTrialStatusSummary } = require('../app-access');
+
+    // 1. Data transakcji w dalekiej przyszłości (> 24h)
+    const farFutureDate = new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString();
+    const futureReceipt = {
+      productId: 'annual',
+      transactionId: 'TX-FUTURE-1',
+      purchaseDate: farFutureDate,
+      signature: 'SIG-FUTURE-1',
+    };
+    const futureRes = verifyAndActivateStoreKitPurchase(futureReceipt as any);
+    expect(futureRes.success).toBe(false);
+    expect(futureRes.errorCode).toBe('invalid_signature');
+
+    // 2. TransactionId ze znakami kontrolnymi i nadmierną długością
+    const longDirtyId = 'TX-VALID\x00\x08' + 'A'.repeat(300);
+    const dirtyReceipt = {
+      productId: 'annual',
+      transactionId: longDirtyId,
+      purchaseDate: new Date().toISOString(),
+      signature: 'SIG-CLEAN',
+    };
+    const dirtyRes = verifyAndActivateStoreKitPurchase(dirtyReceipt as any);
+    expect(dirtyRes.success).toBe(true);
+    expect(dirtyRes.receipt?.transactionId.length).toBeLessThanOrEqual(256);
+    expect(dirtyRes.receipt?.transactionId).not.toContain('\x00');
+    expect(dirtyRes.receipt?.transactionId).not.toContain('\x08');
+
+    // 3. formatTrialStatusSummary
+    resetTrialForTesting();
+    const activeState = getAppAccessState();
+    expect(formatTrialStatusSummary(activeState, 'pl')).toContain('Okres próbny:');
+    expect(formatTrialStatusSummary(activeState, 'en')).toContain('Trial:');
+
+    // Dla subskrypcji
+    const subState = { ...activeState, isSubscribed: true };
+    expect(formatTrialStatusSummary(subState, 'pl')).toBe('Apps4Brew Pass Aktywny');
+    expect(formatTrialStatusSummary(subState, 'en')).toBe('Apps4Brew Pass Active');
+
+    // Dla wygasłego trialu
+    const expState = { ...activeState, status: 'trial_expired' as const, isSubscribed: false };
+    expect(formatTrialStatusSummary(expState, 'pl')).toBe('Okres próbny zakończony');
+    expect(formatTrialStatusSummary(expState, 'en')).toBe('Trial expired');
+  });
 });

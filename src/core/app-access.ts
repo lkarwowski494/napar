@@ -185,6 +185,34 @@ export function getTrialBrewsRemaining(): number {
   return Object.is(brews, -0) ? 0 : brews;
 }
 
+/**
+ * Zwraca spójne tekstowe podsumowanie stanu okresu próbnego / subskrypcji.
+ */
+export function formatTrialStatusSummary(
+  state: AppAccessState,
+  language: 'pl' | 'en' | string = 'pl'
+): string {
+  const isEn = typeof language === 'string' && (language.trim().toLowerCase() === 'en' || language.trim().toLowerCase().startsWith('en'));
+  if (state.isSubscribed) {
+    return isEn ? 'Apps4Brew Pass Active' : 'Apps4Brew Pass Aktywny';
+  }
+  if (state.status === 'trial_expired') {
+    return isEn ? 'Trial expired' : 'Okres próbny zakończony';
+  }
+  const brews = Number.isFinite(state.brewsRemaining) && state.brewsRemaining >= 0
+    ? Math.floor(state.brewsRemaining)
+    : 0;
+  const days = Number.isFinite(state.daysRemaining) && state.daysRemaining >= 0
+    ? Math.floor(state.daysRemaining)
+    : 0;
+  if (isEn) {
+    return `Trial: ${brews} brews · ${days} days remaining`;
+  }
+  const brewUnit = brews === 1 ? 'parzenie' : (brews >= 2 && brews <= 4 ? 'parzenia' : 'parzeń');
+  const dayUnit = days === 1 ? 'dzień' : 'dni';
+  return `Okres próbny: ${brews} ${brewUnit} · ${days} ${dayUnit}`;
+}
+
 export function recordBrewCompleted(): AppAccessState {
   const current = getAppAccessState();
   if (current.isSubscribed) {
@@ -323,7 +351,21 @@ export function verifyAndActivateStoreKitPurchase(
   }
 
   const purchaseTime = new Date(receipt.purchaseDate.trim()).getTime();
-  if (isNaN(purchaseTime) || purchaseTime <= 0) {
+  const maxAllowedFutureTime = Date.now() + 86400000; // max 24h w przyszłość (ochrona przed manipulacją datami)
+  if (isNaN(purchaseTime) || purchaseTime <= 0 || purchaseTime > maxAllowedFutureTime) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy podpis transakcji StoreKit',
+      errorCode: 'invalid_signature',
+    };
+  }
+
+  const cleanTransactionId = receipt.transactionId
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    .trim()
+    .slice(0, 256);
+
+  if (!cleanTransactionId) {
     return {
       success: false,
       error: 'Nieprawidłowy podpis transakcji StoreKit',
@@ -333,7 +375,7 @@ export function verifyAndActivateStoreKitPurchase(
 
   const sanitizedReceipt: StoreKitReceipt = {
     productId: STORE_PRODUCT_IDS[tier],
-    transactionId: receipt.transactionId.trim(),
+    transactionId: cleanTransactionId,
     purchaseDate: receipt.purchaseDate.trim(),
     signature: receipt.signature.trim(),
   };
