@@ -376,6 +376,22 @@ try {
     );
   }
 
+  // Weryfikacja kodów powodów Apple Required Reason API (TASK-P39-10-WYD)
+  const expectedReasons = {
+    NSPrivacyAccessedAPICategoryUserDefaults: 'CA92.1',
+    NSPrivacyAccessedAPICategoryFileTimestamp: 'C617.1',
+    NSPrivacyAccessedAPICategorySystemBootTime: '35F9.1',
+    NSPrivacyAccessedAPICategoryDiskSpace: 'E174.1',
+  };
+  const apiTypes = manifests?.NSPrivacyAccessedAPITypes || [];
+  for (const [category, reason] of Object.entries(expectedReasons)) {
+    const entry = apiTypes.find((t) => t.NSPrivacyAccessedAPIType === category);
+    check(
+      Boolean(entry && Array.isArray(entry.NSPrivacyAccessedAPITypeReasons) && entry.NSPrivacyAccessedAPITypeReasons.includes(reason)),
+      `app.json privacyManifests dla ${category} musi deklarować powód '${reason}' (TASK-P39-10-WYD)`
+    );
+  }
+
   // Statyczna walidacja Android (RD-ENG-11 / BRD-QA-REL 1.0)
   const androidPackage = appJson.android?.package;
   check(
