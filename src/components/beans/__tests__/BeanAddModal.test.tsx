@@ -161,4 +161,24 @@ describe('BeanAddModal Component', () => {
     expect(compendiumBtn.props.accessibilityLabel).toBeTruthy();
     expect(compendiumBtn.props.accessibilityHint).toBeTruthy();
   });
+  test('TASK-P25-04-STU: przycisk zapisu posiada accessibilityHint w BeanAddModal', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BeanAddModal
+          visible={true}
+          onClose={mockOnClose}
+          beveragePreference="both"
+          canCreate={true}
+          onRequirePaywall={mockOnRequirePaywall}
+          onOpenCompendium={mockOnOpenCompendium}
+          onSaved={mockOnSaved}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const saveBtn = root.findByProps({ testID: 'save-bean-btn' });
+    expect(saveBtn.props.accessibilityHint).toBeTruthy();
+  });
 });

@@ -144,6 +144,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             onPress={onClose}
             accessibilityRole="button"
             accessibilityLabel={t.common?.cancel || 'Anuluj'}
+            accessibilityHint={t.common?.modalClose || 'Zamknij okno'}
           >
             <Text style={styles.modalCloseText}>{t.common?.cancel || 'Anuluj'}</Text>
           </Pressable>
@@ -292,6 +293,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             testID="save-bean-btn"
             accessibilityRole="button"
             accessibilityLabel={t.stash?.saveToStash || 'Zapisz w Spiżarni'}
+            accessibilityHint={t.common?.saveSuccess || 'Zapisuje nową paczkę w spiżarni'}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={styles.saveSubmitBtn}
             onPress={handleAddItem}
