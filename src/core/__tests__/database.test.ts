@@ -1272,4 +1272,16 @@ describe('Napar SQLite Database & Repositories', () => {
     deductInventoryWeight('bean-deduct-test', 300);
     expect(getInventoryItemById('bean-deduct-test')?.remainingWeightGrams).toBe(0);
   });
+
+  test('TASK-P14-05-ARC: deleteInventoryItem i getRecipeById ignorują puste, whitespace i niepoprawne identyfikatory', () => {
+    initDatabase(mockDb as any);
+    expect(getRecipeById('')).toBeNull();
+    expect(getRecipeById('   ')).toBeNull();
+    expect(getRecipeById(null as any)).toBeNull();
+
+    // deleteInventoryItem nie rzuca błędów i wychodzi wcześnie
+    expect(() => deleteInventoryItem('')).not.toThrow();
+    expect(() => deleteInventoryItem('   ')).not.toThrow();
+    expect(() => deleteInventoryItem(null as any)).not.toThrow();
+  });
 });

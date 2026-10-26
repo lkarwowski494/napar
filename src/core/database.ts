@@ -337,10 +337,12 @@ export function saveInventoryItem(item: InventoryItem): void {
 }
 
 export function deleteInventoryItem(id: string): void {
+  if (!id || typeof id !== 'string' || !id.trim()) return;
+  const safeId = id.trim();
   const db = getDatabase();
   runInTransactionSync(db, () => {
-    db.runSync('UPDATE brew_sessions SET inventory_item_id = NULL WHERE inventory_item_id = ?', [id]);
-    db.runSync('DELETE FROM inventory_items WHERE id = ?', [id]);
+    db.runSync('UPDATE brew_sessions SET inventory_item_id = NULL WHERE inventory_item_id = ?', [safeId]);
+    db.runSync('DELETE FROM inventory_items WHERE id = ?', [safeId]);
   });
 }
 
@@ -410,8 +412,10 @@ export function getRecipes(beverageType?: 'COFFEE' | 'TEA'): SavedRecipe[] {
 }
 
 export function getRecipeById(id: string): SavedRecipe | null {
+  if (!id || typeof id !== 'string' || !id.trim()) return null;
+  const safeId = id.trim();
   const db = getDatabase();
-  const row = db.getFirstSync<RecipeRow>('SELECT * FROM recipes WHERE id = ?', [id]);
+  const row = db.getFirstSync<RecipeRow>('SELECT * FROM recipes WHERE id = ?', [safeId]);
   return row ? mapRowToRecipe(row) : null;
 }
 
