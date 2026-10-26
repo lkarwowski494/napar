@@ -80,8 +80,9 @@ export function Apps4BrewPassModal({
   };
 
   const handleRestore = () => {
-    const success = restore();
-    if (success) {
+    const res = restore();
+    const isRestored = typeof res === 'boolean' ? res : Boolean(res && res.restored);
+    if (isRestored) {
       Alert.alert(t.settings.restoreSuccessTitle, t.settings.restoreSuccessMsg);
       if (onPurchaseSuccess) {
         onPurchaseSuccess();
