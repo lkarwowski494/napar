@@ -88,12 +88,20 @@ export function ProcedureModal({
   );
 
   const [localRemaining, setLocalRemaining] = useState<number>(
-    stepRemainingSeconds > 0 ? stepRemainingSeconds : parsedDurationSec
+    Number.isFinite(stepRemainingSeconds) && stepRemainingSeconds > 0
+      ? stepRemainingSeconds
+      : Number.isFinite(parsedDurationSec) && parsedDurationSec > 0
+      ? parsedDurationSec
+      : 0
   );
 
   useEffect(() => {
     setLocalRemaining(
-      stepRemainingSeconds >= 0 ? stepRemainingSeconds : parsedDurationSec
+      Number.isFinite(stepRemainingSeconds) && stepRemainingSeconds >= 0
+        ? stepRemainingSeconds
+        : Number.isFinite(parsedDurationSec) && parsedDurationSec >= 0
+        ? parsedDurationSec
+        : 0
     );
   }, [stepRemainingSeconds, boundedIdx, parsedDurationSec]);
 
@@ -102,6 +110,7 @@ export function ProcedureModal({
   }
 
   const formatClock = (sec: number) => {
+    if (!Number.isFinite(sec) || sec < 0) return '00:00';
     const clamped = Math.max(0, Math.round(sec));
     const m = Math.floor(clamped / 60);
     const s = clamped % 60;

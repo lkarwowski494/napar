@@ -180,4 +180,20 @@ describe('ProcedureModal Component', () => {
     expect(counter.props.children).toBe('STEP 1 OF 1');
     expect(name.props.children).toBe('Main Extraction');
   });
+
+  it('TASK-P16-01-ODK: formatClock bezpiecznie radzi sobie z NaN i ujemnymi sekundami', async () => {
+    let tree: any;
+    await act(async () => {
+      tree = renderer.create(
+        <ProcedureModal
+          {...defaultProps}
+          totalElapsedSeconds={NaN}
+        />
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Całkowity czas parzenia: 00:00');
+    expect(str).not.toContain('NaN');
+  });
 });
