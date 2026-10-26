@@ -85,18 +85,18 @@ export function AppGuideModal({
 
   const tabsInfo = isEn
     ? [
-        { Icon: BrewIcon, name: 'Brew', desc: 'Causal 1 → 2 → 3 → 4 brewing flow & Procedure Assistant.' },
-        { Icon: BeansIcon, name: 'Stash', desc: 'Coffee & tea freshness tracker (Resting & Peak Window).' },
-        { Icon: JournalIcon, name: 'Journal', desc: '14-day Proactive Calendar, 1-Tap Action Feed & tasting history.' },
-        { Icon: LabIcon, name: 'Dial-in', desc: 'Taste defect compass, Ratio, TDS/EY% & SCA Water Chemistry.' },
-        { Icon: SettingsIcon, name: 'Settings', desc: 'Units, grinder model, language, and 100% offline JSON/CSV backup.' },
+        { key: 'brew', Icon: BrewIcon, name: 'Brew', desc: 'Causal 1 → 2 → 3 → 4 brewing flow & Procedure Assistant.' },
+        { key: 'stash', Icon: BeansIcon, name: 'Stash', desc: 'Coffee & tea freshness tracker (Resting & Peak Window).' },
+        { key: 'journal', Icon: JournalIcon, name: 'Journal', desc: '14-day Proactive Calendar, 1-Tap Action Feed & tasting history.' },
+        { key: 'dialin', Icon: LabIcon, name: 'Dial-in', desc: 'Taste defect compass, Ratio, TDS/EY% & SCA Water Chemistry.' },
+        { key: 'settings', Icon: SettingsIcon, name: 'Settings', desc: 'Units, grinder model, language, and 100% offline JSON/CSV backup.' },
       ]
     : [
-        { Icon: BrewIcon, name: 'Parzenie', desc: 'Główny proces przyczynowo-skutkowy 1 → 2 → 3 → 4 i Asystent Procedury.' },
-        { Icon: BeansIcon, name: 'Spiżarnia', desc: 'Śledzenie świeżości ziaren po wypale (Resting & Peak Window) oraz herbat.' },
-        { Icon: JournalIcon, name: 'Dziennik', desc: '14-dniowy Kalendarz, Harmonogram Akcji 1-Tap oraz historia i analityka.' },
-        { Icon: LabIcon, name: 'Warsztat', desc: 'Kompas korekty smaku Dial-in Doctor, Ratio, TDS/EY% i Woda SCA.' },
-        { Icon: SettingsIcon, name: 'Ustawienia', desc: 'Jednostki, młynek domowy, język oraz lokalna kopia zapasowa JSON/CSV.' },
+        { key: 'brew', Icon: BrewIcon, name: 'Parzenie', desc: 'Główny proces przyczynowo-skutkowy 1 → 2 → 3 → 4 i Asystent Procedury.' },
+        { key: 'stash', Icon: BeansIcon, name: 'Spiżarnia', desc: 'Śledzenie świeżości ziaren po wypale (Resting & Peak Window) oraz herbat.' },
+        { key: 'journal', Icon: JournalIcon, name: 'Dziennik', desc: '14-dniowy Kalendarz, Harmonogram Akcji 1-Tap oraz historia i analityka.' },
+        { key: 'dialin', Icon: LabIcon, name: 'Warsztat', desc: 'Kompas korekty smaku Dial-in Doctor, Ratio, TDS/EY% i Woda SCA.' },
+        { key: 'settings', Icon: SettingsIcon, name: 'Ustawienia', desc: 'Jednostki, młynek domowy, język oraz lokalna kopia zapasowa JSON/CSV.' },
       ];
 
   if (!visible) {
@@ -147,7 +147,7 @@ export function AppGuideModal({
               {isEn ? 'MAIN PROCESS (1 → 2 → 3 → 4)' : 'PROCES GŁÓWNY (1 → 2 → 3 → 4)'}
             </Text>
             {steps.map((s) => (
-              <View key={s.num} style={styles.stepCard}>
+              <View key={s.num} style={styles.stepCard} testID={`app-guide-step-${s.num}`}>
                 <View style={styles.stepBadge}>
                   <Text style={styles.stepBadgeText}>{s.num}</Text>
                 </View>
@@ -162,7 +162,7 @@ export function AppGuideModal({
               {isEn ? 'BOTTOM NAVIGATION TABS' : 'EKRANY DOLNEGO PASKA NAWIGACJI'}
             </Text>
             {tabsInfo.map((tab) => (
-              <View key={tab.name} style={styles.tabRow}>
+              <View key={tab.name} style={styles.tabRow} testID={`app-guide-tab-${tab.key}`}>
                 <View style={styles.tabIconBox}><tab.Icon size={20} color={theme.colors.copper} /></View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.tabName}>{tab.name}</Text>
@@ -176,6 +176,7 @@ export function AppGuideModal({
             testID="app-guide-got-it-btn"
             style={styles.primaryBtn}
             onPress={onClose}
+            hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel={isEn ? 'Got it' : 'Rozumiem, zaczynamy'}
           >
