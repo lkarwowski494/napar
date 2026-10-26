@@ -571,10 +571,13 @@ export function searchCoffeeVarieties(query: string): CoffeeVarietyInfo[] {
   return COFFEE_VARIETIES.filter((v) =>
     v.name.toLowerCase().includes(q) ||
     v.nativeRegion.toLowerCase().includes(q) ||
+    (v.geneticLineage && v.geneticLineage.toLowerCase().includes(q)) ||
     v.keyNotesPl.some((k) => k.toLowerCase().includes(q)) ||
     v.keyNotesEn.some((k) => k.toLowerCase().includes(q)) ||
     v.sensoryProfilePl.toLowerCase().includes(q) ||
-    v.sensoryProfileEn.toLowerCase().includes(q)
+    v.sensoryProfileEn.toLowerCase().includes(q) ||
+    (v.descriptionPl && v.descriptionPl.toLowerCase().includes(q)) ||
+    (v.descriptionEn && v.descriptionEn.toLowerCase().includes(q))
   );
 }
 

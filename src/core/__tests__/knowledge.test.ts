@@ -61,6 +61,11 @@ describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
 
     expect(findCoffeeVarietyById('variety-geisha')).toBeDefined();
     expect(findCoffeeVarietyById('non-existent-id')).toBeUndefined();
+
+    // TASK-P12-06-TRE: Wyszukiwanie odmian po geneticLineage oraz opisach
+    const lineageResults = searchCoffeeVarieties('Tanganyika');
+    expect(lineageResults.length).toBeGreaterThanOrEqual(1);
+    expect(lineageResults.some((v) => v.id === 'variety-sl28-sl34')).toBe(true);
   });
 });
 
