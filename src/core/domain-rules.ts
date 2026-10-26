@@ -229,12 +229,13 @@ export function evaluateRestingWindow(roastDateInput: Date | string, currentDate
  * Robusta = 18.7 mg/g
  */
 export function estimateCoffeeCaffeineMg(
-  doseGrams: number,
+  doseGrams: number | string,
   beanType: 'arabica' | 'robusta' = 'arabica',
   method: 'filter' | 'espresso' | 'immersion' | 'cold_brew' = 'filter'
 ): number {
-  if (!Number.isFinite(doseGrams) || doseGrams <= 0) return 0;
-  const safeDose = Math.min(1000, doseGrams);
+  const parsedDose = typeof doseGrams === 'string' ? parseFloat(doseGrams) : Number(doseGrams);
+  if (!Number.isFinite(parsedDose) || parsedDose <= 0) return 0;
+  const safeDose = Math.min(1000, parsedDose);
 
   const normalizedBean = typeof beanType === 'string' && beanType.toLowerCase().trim() === 'robusta' ? 'robusta' : 'arabica';
   const normalizedMethod = typeof method === 'string' ? method.toLowerCase().trim() : 'filter';
@@ -247,25 +248,32 @@ export function estimateCoffeeCaffeineMg(
   if (normalizedMethod === 'cold_brew') extractionEfficiency = 0.92;
 
   const totalMg = safeDose * baseRatePerGram * extractionEfficiency;
-  return Number(totalMg.toFixed(1));
+  const result = Number(totalMg.toFixed(1));
+  return Object.is(result, -0) ? 0 : result;
 }
 
 /**
  * Szacuje całkowity ładunek kofeiny w suchych liściach herbaty (3.0% wagi suchej)
  */
-export function estimateTotalLeafCaffeineMg(leafDoseGrams: number): number {
-  if (!Number.isFinite(leafDoseGrams) || leafDoseGrams <= 0) return 0;
-  return Number((leafDoseGrams * 1000 * 0.03).toFixed(1));
+export function estimateTotalLeafCaffeineMg(leafDoseGrams: number | string): number {
+  const parsedDose = typeof leafDoseGrams === 'string' ? parseFloat(leafDoseGrams) : Number(leafDoseGrams);
+  if (!Number.isFinite(parsedDose) || parsedDose <= 0) return 0;
+  const safeDose = Math.min(1000, parsedDose);
+  const result = Number((safeDose * 1000 * 0.03).toFixed(1));
+  return Object.is(result, -0) ? 0 : result;
 }
 
 /**
  * RD-19: Uwalnianie kofeiny w wielokrotnych zalaniach herbaty Gongfu Cha
  * 1 zalanie: 45%, 2 zalanie: 30%, 3 zalanie: 15%, kolejne: 10% łącznie
  */
-export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number, infusionNumber: number): number {
-  if (!Number.isFinite(totalLeafCaffeineMg) || !Number.isFinite(infusionNumber) || totalLeafCaffeineMg <= 0 || infusionNumber <= 0) return 0;
-  const fraction = 0.40 * Math.pow(0.55, infusionNumber - 1);
-  return Number((totalLeafCaffeineMg * fraction).toFixed(1));
+export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number | string, infusionNumber: number | string): number {
+  const parsedTotal = typeof totalLeafCaffeineMg === 'string' ? parseFloat(totalLeafCaffeineMg) : Number(totalLeafCaffeineMg);
+  const parsedInfusion = typeof infusionNumber === 'string' ? parseInt(infusionNumber, 10) : Number(infusionNumber);
+  if (!Number.isFinite(parsedTotal) || !Number.isFinite(parsedInfusion) || parsedTotal <= 0 || parsedInfusion <= 0) return 0;
+  const fraction = 0.40 * Math.pow(0.55, parsedInfusion - 1);
+  const result = Number((parsedTotal * fraction).toFixed(1));
+  return Object.is(result, -0) ? 0 : result;
 }
 
 /**
@@ -275,7 +283,8 @@ export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number, infus
 export function calculateRemainingCaffeineMg(initialDoseMg: number, hoursPassed: number, halfLifeHours = 5.0): number {
   if (!Number.isFinite(initialDoseMg) || !Number.isFinite(hoursPassed) || !Number.isFinite(halfLifeHours) || initialDoseMg <= 0 || hoursPassed < 0 || halfLifeHours <= 0) return 0;
   const remaining = initialDoseMg * Math.pow(0.5, hoursPassed / halfLifeHours);
-  return Number(remaining.toFixed(1));
+  const result = Number(remaining.toFixed(1));
+  return Object.is(result, -0) ? 0 : result;
 }
 
 /**

@@ -538,4 +538,21 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(Object.is(yieldGrams, -0)).toBe(false);
     });
   });
+
+  describe('TASK-P29-03-ZAK: estimateCoffeeCaffeineMg i estimateTotalLeafCaffeineMg parsuja stringi i chronia przed -0', () => {
+    it('parsuje stringi jako dozy i oblicza prawidlowa kofeine dla kawy', () => {
+      // 15g * 12 * 0.88 = 158.4 mg
+      expect(estimateCoffeeCaffeineMg('15' as any, 'arabica', 'filter')).toBe(158.4);
+      expect(estimateCoffeeCaffeineMg('15.0', 'arabica', 'filter')).toBe(158.4);
+      expect(estimateCoffeeCaffeineMg('invalid' as any)).toBe(0);
+    });
+
+    it('parsuje stringi dla herbaty i chroni przed -0', () => {
+      // 5g liści * 1000 * 0.03 = 150.0 mg
+      expect(estimateTotalLeafCaffeineMg('5' as any)).toBe(150.0);
+      expect(estimateTotalLeafCaffeineMg('0')).toBe(0);
+      expect(Object.is(estimateTotalLeafCaffeineMg('0'), -0)).toBe(false);
+      expect(Object.is(estimateCoffeeCaffeineMg(0), -0)).toBe(false);
+    });
+  });
 });
