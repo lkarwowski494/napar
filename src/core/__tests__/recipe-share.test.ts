@@ -9,6 +9,8 @@ import {
   recipeToCompactPayload,
   encodeRecipeToShareUrl,
   decodeRecipeFromShareUrl,
+  stripControlChars,
+  parseNumberWithUnit,
   RECIPE_SHARE_PROTOCOL,
   RECIPE_SHARE_WEB_URL,
 } from '../recipe-share';
@@ -1391,5 +1393,92 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     }));
     const decodedZero = decodeRecipeFromShareUrl(payloadZero);
     expect(decodedZero?.recipe.recommendedRatio).toBe(16);
+  });
+
+  test('TASK-P53-11-WZR: recipe-share chroni przed bialymi znakami/nowymi liniami w base64, znakami kontrolnymi, jednostkami w polach numerycznych i payloadami > 64KB', () => {
+    // 1. normalizeBase64 z nowymi liniami, tabulatorami i BOM/zero-width space nie korumpuje base64
+    const validJson = JSON.stringify({
+      v: 1,
+      n: 'Czysty Napar \x00\x07☕',
+      b: 'COFFEE',
+      m: 'Aeropress\x1F',
+      a: 'Barista\x08 Master',
+      desc: 'Super opis\x0C z kontrolkami',
+      d: ' 18,5 g ',
+      w: ' 250 ml ',
+      t: ' 93 °C ',
+      r: '16.5',
+      s: [
+        {
+          n: 'Bloom\x00',
+          d: ' 45 s ',
+          w: ' 60 g ',
+          i: 'Zalej 60g\x1B i zamieszaj',
+        },
+      ],
+    });
+    const cleanB64 = utf8ToBase64(validJson);
+    // Symulacja bazy z wklejonymi nowymi liniami, tabulatorami i zero-width space
+    const dirtyB64 = `\uFEFF\n  ${cleanB64.slice(0, 10)}\r\n\t${cleanB64.slice(10, 20)}\n\u200B${cleanB64.slice(20)}  \r\n`;
+
+    const decoded = decodeRecipeFromShareUrl(dirtyB64);
+    expect(decoded).not.toBeNull();
+    // Sprawdzenie oczyszczenia znakow kontrolnych przy zachowaniu emoji ☕
+    expect(decoded!.recipe.name).toBe('Czysty Napar ☕');
+    expect(decoded!.recipe.method).toBe('Aeropress');
+    expect(decoded!.recipe.author).toBe('Barista Master');
+    expect(decoded!.recipe.description).toBe('Super opis z kontrolkami');
+    // Sprawdzenie parsowania jednostek i przecinkow
+    expect(decoded!.recipe.doseGrams).toBe(18.5);
+    expect(decoded!.recipe.waterGrams).toBe(250);
+    expect(decoded!.recipe.waterTempCelsius).toBe(93);
+    expect(decoded!.originalSteps[0].namePl).toBe('Bloom');
+    expect(decoded!.originalSteps[0].durationSeconds).toBe(45);
+    expect(decoded!.originalSteps[0].targetWaterGrams).toBe(60);
+    expect(decoded!.originalSteps[0].instructionPl).toBe('Zalej 60g i zamieszaj');
+
+    // 2. recipeToCompactPayload oczyszcza znaki kontrolne
+    const sampleDirtyRecipe: any = {
+      name: 'Dirty\x00 V60\x07',
+      beverageType: 'COFFEE',
+      method: 'V60\x1F',
+      author: 'Author\x08',
+      description: 'Desc\x0C',
+      doseGrams: ' 20,5 g ',
+      waterGrams: ' 320 ml ',
+      waterTempCelsius: ' 91 °C ',
+      grindSizeDescription: 'Medium\x00',
+      stepsJson: JSON.stringify([
+        {
+          namePl: 'Pour\x01',
+          durationSeconds: ' 30 s ',
+          targetWaterGrams: ' 50 g ',
+          instructionPl: 'Swirl\x02',
+        },
+      ]),
+    };
+    const compact = recipeToCompactPayload(sampleDirtyRecipe);
+    expect(compact.n).toBe('Dirty V60');
+    expect(compact.m).toBe('V60');
+    expect(compact.a).toBe('Author');
+    expect(compact.desc).toBe('Desc');
+    expect(compact.d).toBe(20.5);
+    expect(compact.w).toBe(320);
+    expect(compact.t).toBe(91);
+    expect(compact.s[0].n).toBe('Pour');
+    expect(compact.s[0].d).toBe(30);
+    expect(compact.s[0].w).toBe(50);
+    expect(compact.s[0].i).toBe('Swirl');
+
+    // 3. stripControlChars oraz parseNumberWithUnit
+    expect(stripControlChars('Hello\x00 World\x1F')).toBe('Hello World');
+    expect(stripControlChars(123 as any)).toBe('');
+    expect(parseNumberWithUnit('  18,7 g  ')).toBe(18.7);
+    expect(parseNumberWithUnit(250)).toBe(250);
+    expect(parseNumberWithUnit(null)).toBeNaN();
+
+    // 4. Odrzucenie payloadu > 64KB (65536 znakow)
+    const giantPayload = 'a'.repeat(70000);
+    expect(decodeRecipeFromShareUrl(giantPayload)).toBeNull();
   });
 });
