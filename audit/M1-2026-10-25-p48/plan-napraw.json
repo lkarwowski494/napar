@@ -9,7 +9,7 @@
       "title": "Dostępność i defensywność BrewFinishModal (radiogroup i a11y hints)",
       "target_file": "src/components/brew/BrewFinishModal.tsx",
       "test_file": "src/components/brew/__tests__/BrewFinishModal.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P48-02-MON",
@@ -17,7 +17,7 @@
       "title": "Sanityzacja StoreKit i formatowanie stanu okresu próbnego w app-access",
       "target_file": "src/core/app-access.ts",
       "test_file": "tests/audit-fixes.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P48-03-ZAK",
@@ -25,7 +25,7 @@
       "title": "Ignorowanie pustych paczek i parsowanie złożonych czasów w bpr-engine",
       "target_file": "src/core/bpr-engine.ts",
       "test_file": "src/core/__tests__/bpr-engine.test.ts",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P48-04-STU",
@@ -33,7 +33,7 @@
       "title": "Limity długości pól i defensywność w RecipeBasicInfoCard",
       "target_file": "src/components/recipe-builder/RecipeBasicInfoCard.tsx",
       "test_file": "tests/audit-fixes.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P48-05-ARC",
@@ -41,7 +41,7 @@
       "title": "Obsługa przecinka dziesiętnego i clampowanie w saveInventoryItem",
       "target_file": "src/core/database.ts",
       "test_file": "tests/audit-fixes.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P48-06-TRE",

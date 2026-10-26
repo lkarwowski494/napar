@@ -29,12 +29,12 @@
 
 | ID | Perspektywa | Status | Plik główny | Commit |
 |---|---|---|---|---|
-| TASK-P48-01-ODK | Odkrywanie | In Progress | `src/components/brew/BrewFinishModal.tsx` | - |
-| TASK-P48-02-MON | Monetyzacja | Planned | `src/core/app-access.ts` | - |
-| TASK-P48-03-ZAK | Zaskoczenie | Planned | `src/core/bpr-engine.ts` | - |
-| TASK-P48-04-STU | Studiowanie | Planned | `src/components/recipe-builder/RecipeBasicInfoCard.tsx` | - |
-| TASK-P48-05-ARC | Architektura | Planned | `src/core/database.ts` | - |
-| TASK-P48-06-TRE | Treść | Planned | `src/core/knowledge-data.ts` | - |
+| TASK-P48-01-ODK | Odkrywanie | Completed | `src/components/brew/BrewFinishModal.tsx` | `d6743d7` |
+| TASK-P48-02-MON | Monetyzacja | Completed | `src/core/app-access.ts` | `d3bf4d1` |
+| TASK-P48-03-ZAK | Zaskoczenie | Completed | `src/core/bpr-engine.ts` | `bde3cb2` |
+| TASK-P48-04-STU | Studiowanie | Completed | `src/components/recipe-builder/RecipeBasicInfoCard.tsx` | `d6e57d1` |
+| TASK-P48-05-ARC | Architektura | Completed | `src/core/database.ts` | `f0b3502` |
+| TASK-P48-06-TRE | Treść | In Progress | `src/core/knowledge-data.ts` | - |
 | TASK-P48-07-JAK | Jakość | Planned | `src/core/water-chemistry.ts` | - |
 | TASK-P48-08-PRO | Prostota | Planned | `src/core/grinder-converter.ts` | - |
 | TASK-P48-09-LOK | Lokalizacja | Planned | `locales/*` | - |
