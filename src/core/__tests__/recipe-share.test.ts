@@ -632,4 +632,22 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded?.recipe.author).toBe('Udostępniona receptura');
     expect(decoded?.recipe.description).toContain('Zaimportowano');
   });
+
+  test('TASK-P27-11-WZR: recipeToCompactPayload pomija pusty lub whitespace desc w payloadzie', () => {
+    const recEmptyDesc: any = {
+      name: 'Clean Recipe',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      description: '   ',
+      stepsJson: '[]',
+    };
+    const payload = recipeToCompactPayload(recEmptyDesc);
+    expect(payload.desc).toBeUndefined();
+
+    recEmptyDesc.description = '';
+    const payload2 = recipeToCompactPayload(recEmptyDesc);
+    expect(payload2.desc).toBeUndefined();
+  });
 });
