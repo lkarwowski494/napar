@@ -213,12 +213,21 @@ export function restorePurchases(): RestorePurchasesResult {
   const hasVerifiedPurchase = verifiedVal === 'true' || verifiedVal === '1';
   const rawTier = getAppSetting('verified_purchase_tier', '');
   const cleanTier = typeof rawTier === 'string' ? rawTier.trim().toLowerCase() : '';
+  const rawSubTier = getAppSetting('subscription_tier', '');
+  const cleanSubTier = typeof rawSubTier === 'string' ? rawSubTier.trim().toLowerCase() : '';
 
   const allowedTiers: readonly string[] = ['monthly', 'annual', 'lifetime'];
-  if (hasVerifiedPurchase && allowedTiers.includes(cleanTier)) {
-    const verifiedTier = cleanTier as 'monthly' | 'annual' | 'lifetime';
+  let effectiveTier: 'monthly' | 'annual' | 'lifetime' | null = null;
+  if (allowedTiers.includes(cleanTier)) {
+    effectiveTier = cleanTier as 'monthly' | 'annual' | 'lifetime';
+  } else if (!cleanTier && allowedTiers.includes(cleanSubTier)) {
+    effectiveTier = cleanSubTier as 'monthly' | 'annual' | 'lifetime';
+  }
+
+  if (hasVerifiedPurchase && effectiveTier) {
     setAppSetting('is_pro_active', 'true');
-    setAppSetting('subscription_tier', verifiedTier);
+    setAppSetting('subscription_tier', effectiveTier);
+    setAppSetting('verified_purchase_tier', effectiveTier);
     let receipt: StoreKitReceipt | undefined;
     const receiptJson = getAppSetting('verified_receipt_json', '');
     if (receiptJson) {

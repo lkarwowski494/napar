@@ -665,4 +665,17 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const stateMonthly = getAppAccessState();
     expect(stateMonthly.subscriptionTier).toBe('monthly');
   });
+
+  test('TASK-P39-02-MON: restorePurchases uzywa subscription_tier jako fallbacku gdy verified_purchase_tier jest puste', () => {
+    resetTrialForTesting();
+    setAppSetting('has_verified_purchase', 'true');
+    setAppSetting('verified_purchase_tier', '');
+    setAppSetting('subscription_tier', 'lifetime');
+
+    const res = restorePurchases();
+    expect(res.restored).toBe(true);
+    expect(res.isSubscribed).toBe(true);
+    expect(res.subscriptionTier).toBe('lifetime');
+    expect(getAppSetting('verified_purchase_tier', '')).toBe('lifetime');
+  });
 });
