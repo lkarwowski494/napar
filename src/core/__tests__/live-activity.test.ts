@@ -436,4 +436,15 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resValid.success).toBe(false);
     expect(resValid.error).toContain('DEC-01');
   });
+
+  test('TASK-P30-12-NIE: formatActivityTimer zaokragla w dol ulamkowe sekundy i zabezpiecza -0 oraz stringi', () => {
+    expect(formatActivityTimer(-0)).toBe('0:00');
+    expect(formatActivityTimer(0.9)).toBe('0:00');
+    expect(formatActivityTimer(65.8)).toBe('1:05');
+    expect(formatActivityTimer('125.7' as any)).toBe('2:05');
+    expect(formatActivityTimer(3665.3)).toBe('1:01:05');
+    expect(formatActivityTimer('invalid' as any)).toBe('0:00');
+    expect(formatActivityTimer(false as any)).toBe('0:00');
+    expect(formatActivityTimer(true as any)).toBe('0:00');
+  });
 });

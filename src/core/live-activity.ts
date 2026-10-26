@@ -69,7 +69,7 @@ export function formatActivityTimer(seconds: number): string {
     return '0:00';
   }
   const numSeconds = typeof seconds === 'number' ? seconds : Number(seconds);
-  if (!Number.isFinite(numSeconds) || numSeconds <= 0) {
+  if (!Number.isFinite(numSeconds) || numSeconds <= 0 || Object.is(numSeconds, -0)) {
     return '0:00';
   }
   const safeSec = Math.max(0, Math.min(86400, Math.floor(numSeconds)));
