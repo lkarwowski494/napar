@@ -587,7 +587,9 @@ export function searchCoffeeProcesses(query: string): CoffeeProcessInfo[] {
     p.keyNotesPl.some((k) => k.toLowerCase().includes(q)) ||
     p.keyNotesEn.some((k) => k.toLowerCase().includes(q)) ||
     p.sensoryImpactPl.toLowerCase().includes(q) ||
-    p.sensoryImpactEn.toLowerCase().includes(q)
+    p.sensoryImpactEn.toLowerCase().includes(q) ||
+    p.descriptionPl.toLowerCase().includes(q) ||
+    p.descriptionEn.toLowerCase().includes(q)
   );
 }
 

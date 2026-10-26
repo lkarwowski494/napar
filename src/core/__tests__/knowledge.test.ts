@@ -97,6 +97,15 @@ describe('Baza Wiedzy: Metody Obróbki Kawy (COFFEE_PROCESSES)', () => {
     const honey = searchCoffeeProcesses('miód');
     expect(honey.length).toBeGreaterThanOrEqual(1);
 
+    // TASK-P10-06-TRE: Wyszukiwanie w polskim i angielskim opisie technologicznym
+    const descPlSearch = searchCoffeeProcesses('XIX wieku');
+    expect(descPlSearch.length).toBeGreaterThanOrEqual(1);
+    expect(descPlSearch[0].id).toBe('process-washed');
+
+    const descEnSearch = searchCoffeeProcesses('19th century');
+    expect(descEnSearch.length).toBeGreaterThanOrEqual(1);
+    expect(descEnSearch[0].id).toBe('process-washed');
+
     expect(findCoffeeProcessById('process-washed')).toBeDefined();
     expect(findCoffeeProcessById('non-existent-process')).toBeUndefined();
   });
