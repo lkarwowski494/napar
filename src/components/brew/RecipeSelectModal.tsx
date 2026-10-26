@@ -225,7 +225,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
           </View>
 
           {/* Filtr pierwszego rzędu: Klasyki i Ulubione / Wszystkie / Własne Presety (BPR Pillar 1) */}
-          <View style={styles.subsetFilterRow}>
+          <View style={styles.subsetFilterRow} accessibilityRole="tablist">
             <Pressable
               testID="subset-filter-all"
               style={[
@@ -233,7 +233,8 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 subsetFilter === 'ALL' && styles.subsetChipActive,
               ]}
               onPress={() => setSubsetFilter('ALL')}
-              accessibilityRole="button"
+              accessibilityRole="tab"
+              accessibilityState={{ selected: subsetFilter === 'ALL' }}
               accessibilityLabel="Wszystkie presety i klasyki"
             >
               <Text
@@ -252,7 +253,8 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 subsetFilter === 'FAVORITES' && styles.subsetChipActive,
               ]}
               onPress={() => setSubsetFilter('FAVORITES')}
-              accessibilityRole="button"
+              accessibilityRole="tab"
+              accessibilityState={{ selected: subsetFilter === 'FAVORITES' }}
               accessibilityLabel="Klasyki i Ulubione"
             >
               <Text
@@ -271,7 +273,8 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 subsetFilter === 'CUSTOM' && styles.subsetChipActive,
               ]}
               onPress={() => setSubsetFilter('CUSTOM')}
-              accessibilityRole="button"
+              accessibilityRole="tab"
+              accessibilityState={{ selected: subsetFilter === 'CUSTOM' }}
               accessibilityLabel="Własne receptury"
             >
               <Text

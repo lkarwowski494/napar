@@ -132,4 +132,46 @@ describe('TASK-R07-01: Lean BPR P16 Inline Selection (De-Modalization)', () => {
     // Kluczowa cecha P16: Stoper NIE zniknął z ekranu, nadal jest w drzewie i dostępny pod palcem
     expect(tree.root.findByProps({ testID: 'active-focus-timer' })).toBeDefined();
   });
+
+  test('TASK-P19-01-ODK: RecipeSelectModal subset filter chips posiadają accessibilityRole="tab" i poprawne accessibilityState', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <RecipeSelectModal
+          inline={true}
+          visible={true}
+          onClose={() => {}}
+          recipes={MASTER_RECIPES}
+          activeRecipeId="v60-kasuya-4-6"
+          beveragePreference="both"
+          categoryFilter="ALL"
+          onCategoryFilterChange={() => {}}
+          onSelectRecipe={() => {}}
+          onToggleFavorite={() => {}}
+          onDuplicateRecipe={() => {}}
+          onEditRecipe={() => {}}
+          onAddCustomRecipe={() => {}}
+          onOpenGongfu={() => {}}
+          onOpenImport={() => {}}
+          onOpenQrScanner={() => {}}
+          unitSystem="metric"
+          t={{
+            brew: { chooseRecipe: 'Wybierz recepturę' },
+            common: { close: 'Zamknij' },
+          }}
+        />
+      );
+    });
+
+    const allTab = tree.root.findByProps({ testID: 'subset-filter-all' });
+    const favTab = tree.root.findByProps({ testID: 'subset-filter-favorites' });
+    const customTab = tree.root.findByProps({ testID: 'subset-filter-custom' });
+
+    expect(allTab.props.accessibilityRole).toBe('tab');
+    expect(allTab.props.accessibilityState).toEqual({ selected: true });
+    expect(favTab.props.accessibilityRole).toBe('tab');
+    expect(favTab.props.accessibilityState).toEqual({ selected: false });
+    expect(customTab.props.accessibilityRole).toBe('tab');
+    expect(customTab.props.accessibilityState).toEqual({ selected: false });
+  });
 });
