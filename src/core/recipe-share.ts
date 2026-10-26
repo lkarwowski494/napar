@@ -203,10 +203,10 @@ export function recipeToCompactPayload(
   let rawRatioNum = NaN;
   if (typeof rawRatio === 'number') {
     rawRatioNum = rawRatio;
-  } else if (typeof rawRatio === 'string') {
-    const cleanRatio = rawRatio.trim().replace(',', '.');
+  } else if (typeof (rawRatio as any) === 'string') {
+    const cleanRatio = (rawRatio as any).trim().replace(',', '.');
     if (cleanRatio.includes(':') || cleanRatio.includes('/')) {
-      const parts = cleanRatio.split(/[:/]/).map((p) => parseFloat(p.trim())).filter(Number.isFinite);
+      const parts = cleanRatio.split(/[:/]/).map((p: string) => parseFloat(p.trim())).filter(Number.isFinite);
       if (parts.length === 2 && parts[0] > 0 && parts[1] > 0) {
         rawRatioNum = parts[1] / parts[0];
       }
@@ -379,7 +379,7 @@ export function decodeRecipeFromShareUrl(
         } else if (typeof parsed.r === 'string') {
           const clean = String(parsed.r).trim().replace(',', '.');
           if (clean.includes(':') || clean.includes('/')) {
-            const parts = clean.split(/[:/]/).map((p) => parseFloat(p.trim())).filter(Number.isFinite);
+            const parts = clean.split(/[:/]/).map((p: string) => parseFloat(p.trim())).filter(Number.isFinite);
             if (parts.length === 2 && parts[0] > 0 && parts[1] > 0) {
               rawDecodedRatio = parts[1] / parts[0];
             }

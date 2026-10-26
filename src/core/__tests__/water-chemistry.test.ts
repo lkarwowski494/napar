@@ -606,7 +606,8 @@ describe('Water Chemistry & Mineralization Module', () => {
     // 2. classifyWaterHardness
     // @ts-ignore
     const { classifyWaterHardness } = require('../water-chemistry');
-    expect(classifyWaterHardness(30)).toBe('VERY_SOFT');
+    const sampleCategory: import('../water-chemistry').WaterHardnessCategory = classifyWaterHardness(30);
+    expect(sampleCategory).toBe('VERY_SOFT');
     expect(classifyWaterHardness('45,5')).toBe('VERY_SOFT');
     expect(classifyWaterHardness(80)).toBe('SOFT');
     expect(classifyWaterHardness(140)).toBe('MODERATELY_HARD');
