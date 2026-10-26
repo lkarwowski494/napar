@@ -23,6 +23,7 @@ export interface QrScannerModalProps {
   onClose: () => void;
   onScanRecipe: (data: string) => void;
   language?: 'pl' | 'en';
+  t?: any;
 }
 
 export const QrScannerModal: React.FC<QrScannerModalProps> = ({
@@ -30,8 +31,11 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
   onClose,
   onScanRecipe,
   language = 'pl',
+  t,
 }) => {
   const isEn = language === 'en';
+  const qrTitle = t?.brew?.qrScannerTitle || (isEn ? "QR Recipe Scanner" : "Skaner Receptur QR");
+  const scanHint = t?.brew?.scanHint || (isEn ? "Point camera at recipe QR code in Napar app" : "Skieruj aparat na kod QR receptury w aplikacji Napar");
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const timeoutRef = React.useRef<any>(null);
@@ -70,7 +74,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
           >
             <Text style={styles.closeBtnText}>{isEn ? "Cancel" : "Anuluj"}</Text>
           </Pressable>
-          <Text style={styles.headerTitle}>{isEn ? "QR Recipe Scanner" : "Skaner Receptur QR"}</Text>
+          <Text style={styles.headerTitle}>{qrTitle}</Text>
           <View style={{ width: 60 }} />
         </View>
 
@@ -124,7 +128,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
                 <View style={[styles.corner, styles.bottomRight]} />
               </View>
               <Text style={styles.hintText}>
-                {isEn ? "Point camera at recipe QR code in Napar app" : "Skieruj aparat na kod QR receptury w aplikacji Napar"}
+                {scanHint}
               </Text>
             </View>
           </View>

@@ -197,6 +197,7 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         visible={showQrScanner}
         onClose={() => setShowQrScanner(false)}
         onScanRecipe={handleScanQrRecipe}
+        t={t}
         language={language}
       />
 

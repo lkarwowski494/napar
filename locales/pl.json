@@ -68,6 +68,8 @@
     "qrCopyLink": "Kopiuj link napar://",
     "qrShareLink": "Udostępnij...",
     "qrCopied": "Link receptury skopiowany do schowka!",
+    "qrScannerTitle": "Skaner Receptur QR",
+    "scanHint": "Skieruj aparat na kod QR receptury w aplikacji Napar",
     "importModalTitle": "Importuj Recepturę",
     "importModalDesc": "Wklej link napar:// lub https://napar.app otrzymany od baristy lub z kodu QR.",
     "importInputPlaceholder": "Wklej link napar://recipe?v=1&d=...",
@@ -100,6 +102,8 @@
     "finishBrewAccessibility": "Zakończ parzenie",
     "finishBrewHint": "Kończy parzenie i otwiera arkusz oceny",
     "finishBrewBtn": "Zakończ ▶",
+    "finishAndSave": "Zakończ i zapisz",
+    "recipeSearchPlaceholder": "Szukaj receptury, metody (V60, AeroPress, Gaiwan)...",
     "resetTimerAccessibility": "Zresetuj stoper",
     "resetTimerHint": "Zeruje czas i wraca do stanu początkowego",
     "resumeBrewAccessibility": "Wznów parzenie",
@@ -144,9 +148,7 @@
     "craftCostPerCup": "Koszt tego naparu: {total} {curr} (ziarna: {beans} {curr}, woda: {water} {curr})",
     "craftSavingsLabel": "Oszczędność vs kawiarnia specialty: +{savings} {curr}",
     "skipBtn": "Pomiń",
-    "saveToJournalBtn": "Zapisz w Dzienniku",
-    "finishAndSave": "Zakończ i zapisz",
-    "recipeSearchPlaceholder": "Szukaj receptury, metody (V60, AeroPress, Gaiwan)..."
+    "saveToJournalBtn": "Zapisz w Dzienniku"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
@@ -254,12 +256,12 @@
     "archivedSuccessTitle": "Zarchiwizowano",
     "archivedSuccess": "Paczka została oznaczona jako zużyta (0 g) i przeniesiona do archiwum.",
     "saveToStash": "Zapisz w Spiżarni",
+    "useTemplate": "+ Użyj jako szablon w spiżarni",
     "favoriteAdd": "Dodaj do ulubionych",
     "favoriteRemove": "Usuń z ulubionych",
     "emptyTitle": "Twoja spiżarnia jest pusta",
     "emptyDesc": "Dodaj swoją pierwszą kawę ziarnistą lub herbatę liściastą, aby śledzić świeżość, odmiany botaniczne i wagę.",
-    "readOnlyNotice": "Tryb tylko do odczytu (wygasła subskrypcja)",
-    "useTemplate": "+ Użyj jako szablon w spiżarni"
+    "readOnlyNotice": "Tryb tylko do odczytu (wygasła subskrypcja)"
   },
   "journal": {
     "title": "Dziennik Degustacji",
@@ -460,6 +462,10 @@
     "caffeineHalfLifeDesc": "Wskaźnik klirensu wątrobowego (3.0h–8.0h, domyślnie 5.0h wg EFSA).",
     "bedtimeHourTitle": "Docelowa Godzina Snu",
     "bedtimeHourDesc": "Używana do kalkulacji nocnego curfew i progu 25 mg dla fazy NREM.",
+    "decreaseHalfLife": "Zmniejsz czas półtrwania",
+    "increaseHalfLife": "Zwiększ czas półtrwania",
+    "earlierBedtime": "Wcześniejsza godzina snu",
+    "laterBedtime": "Późniejsza godzina snu",
     "healthKitSection": "Apple Health (BR-KOF-002)",
     "healthKitTitle": "Synchronizuj Kofeinę z Apple Health",
     "healthKitSubtitle": "Automatycznie zapisuj spożytą kofeinę (Dietary Caffeine) w aplikacji Zdrowie bez wysyłania danych na zewnątrz.",
@@ -516,11 +522,7 @@
     "privacyBullet4": "Pełna wolność: darmowy eksport i import bazy w formacie JSON.",
     "exportBtn": "Eksportuj Kopię JSON",
     "importBtn": "Przywróć z Kopii JSON",
-    "backupSuccess": "Kopia zapasowa wyeksportowana pomyślnie.",
-    "decreaseHalfLife": "Zmniejsz czas półtrwania",
-    "increaseHalfLife": "Zwiększ czas półtrwania",
-    "earlierBedtime": "Wcześniejsza godzina snu",
-    "laterBedtime": "Późniejsza godzina snu"
+    "backupSuccess": "Kopia zapasowa wyeksportowana pomyślnie."
   },
   "paywall": {
     "title": "Taniej niż jedno espresso",

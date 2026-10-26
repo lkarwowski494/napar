@@ -68,6 +68,8 @@
     "qrCopyLink": "Copy napar:// link",
     "qrShareLink": "Share link...",
     "qrCopied": "Recipe link copied to clipboard!",
+    "qrScannerTitle": "QR Recipe Scanner",
+    "scanHint": "Point camera at recipe QR code in Napar app",
     "importModalTitle": "Import Recipe",
     "importModalDesc": "Paste a napar:// or https://napar.app link received from a friend or QR code.",
     "importInputPlaceholder": "Paste link napar://recipe?v=1&d=...",
@@ -100,6 +102,8 @@
     "finishBrewAccessibility": "Finish brewing",
     "finishBrewHint": "Finishes brewing and opens rating sheet",
     "finishBrewBtn": "Finish ▶",
+    "finishAndSave": "Finish & Save",
+    "recipeSearchPlaceholder": "Search recipes, methods (V60, AeroPress, Gaiwan)...",
     "resetTimerAccessibility": "Reset timer",
     "resetTimerHint": "Resets time and returns to initial state",
     "resumeBrewAccessibility": "Resume brewing",
@@ -144,9 +148,7 @@
     "craftCostPerCup": "Cost of this brew: {total} {curr} (beans: {beans} {curr}, water: {water} {curr})",
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
-    "saveToJournalBtn": "Save to Journal",
-    "finishAndSave": "Finalizează și salvează",
-    "recipeSearchPlaceholder": "Căutare rețete, metode (V60, AeroPress, Gaiwan)..."
+    "saveToJournalBtn": "Save to Journal"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
@@ -254,12 +256,12 @@
     "archivedSuccessTitle": "Archived",
     "archivedSuccess": "Pack marked as finished (0 g) and archived.",
     "saveToStash": "Save to Stash",
+    "useTemplate": "+ Use as template in stash",
     "favoriteAdd": "Add to favorites",
     "favoriteRemove": "Remove from favorites",
     "emptyTitle": "Your stash is empty",
     "emptyDesc": "Add your first coffee beans or tea leaves to track freshness, botanical varieties and weight.",
-    "readOnlyNotice": "Read-only mode (trial expired)",
-    "useTemplate": "+ Folosește ca șablon în cămară"
+    "readOnlyNotice": "Read-only mode (trial expired)"
   },
   "journal": {
     "title": "Tasting Journal",
@@ -399,9 +401,9 @@
     "categorySelect": "Method & Grind Size",
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
-    "methodsLabel": "Metode:",
-    "particleRangeDesc": "Dimensiunea particulelor: {min} – {max} µm (referință: {default} µm)",
-    "recommendationLabel": "Recomandare:"
+    "methodsLabel": "Methods:",
+    "particleRangeDesc": "Particle size: {min} – {max} µm (benchmark: {default} µm)",
+    "recommendationLabel": "Recommendation:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",
@@ -460,6 +462,10 @@
     "caffeineHalfLifeDesc": "Hepatic clearance indicator (3.0h–8.0h, default 5.0h per EFSA).",
     "bedtimeHourTitle": "Target Bedtime",
     "bedtimeHourDesc": "Used for bedtime curfew calculations and the 25 mg NREM sleep threshold.",
+    "decreaseHalfLife": "Decrease half-life",
+    "increaseHalfLife": "Increase half-life",
+    "earlierBedtime": "Earlier bedtime",
+    "laterBedtime": "Later bedtime",
     "healthKitSection": "Apple Health (BR-KOF-002)",
     "healthKitTitle": "Sync Caffeine to Apple Health",
     "healthKitSubtitle": "Automatically log consumed caffeine (Dietary Caffeine) into Apple Health with zero external data collection.",
@@ -516,11 +522,7 @@
     "privacyBullet4": "Total freedom: free full backup and restore in open JSON format.",
     "exportBtn": "Export JSON Backup",
     "importBtn": "Restore from JSON Backup",
-    "backupSuccess": "Backup exported successfully.",
-    "decreaseHalfLife": "Decrease half-life",
-    "increaseHalfLife": "Increase half-life",
-    "earlierBedtime": "Earlier bedtime",
-    "laterBedtime": "Later bedtime"
+    "backupSuccess": "Backup exported successfully."
   },
   "paywall": {
     "title": "Cheaper than Espresso",

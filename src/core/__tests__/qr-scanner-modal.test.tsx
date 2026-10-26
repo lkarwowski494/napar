@@ -119,4 +119,39 @@ describe('QrScannerModal Component (Zadanie N6)', () => {
       tree.unmount();
     });
   });
+
+  test('TASK-P15-09-LOK: QrScannerModal używa zlokalizowanych tekstów ze słownika t', () => {
+    (ExpoCamera.useCameraPermissions as jest.Mock).mockReturnValue([
+      { granted: true, canAskAgain: true, status: 'granted' },
+      jest.fn(),
+      jest.fn(),
+    ]);
+
+    const mockT = {
+      brew: {
+        qrScannerTitle: 'Skaner Receptur Specjalistycznych',
+        scanHint: 'Wyceluj obiektyw w kod QR receptury',
+      },
+    };
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <QrScannerModal
+          visible={true}
+          onClose={jest.fn()}
+          onScanRecipe={jest.fn()}
+          t={mockT}
+        />
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Skaner Receptur Specjalistycznych');
+    expect(str).toContain('Wyceluj obiektyw w kod QR receptury');
+
+    renderer.act(() => {
+      tree.unmount();
+    });
+  });
 });
