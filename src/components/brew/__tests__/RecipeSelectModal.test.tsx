@@ -283,4 +283,53 @@ describe('RecipeSelectModal Component', () => {
     expect(renderedText).not.toContain('Autorska');
     expect(renderedText).toContain('Custom');
   });
+
+  test('TASK-P53-01-ODK: RecipeSelectModal w trybie EN lokalizuje zakladki kategorii, naglowki akordeonu i skaner QR', () => {
+    const mixedRecipes = [
+      { id: 'coffee-rec-1', name: 'Kenya Chemex', type: 'COFFEE', method: 'Chemex', isCustom: false, isFavorite: false },
+      { id: 'tea-rec-1', name: 'Sencha First Flush', type: 'TEA', method: 'Kyusu', isCustom: false, isFavorite: false },
+    ];
+
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(
+        <RecipeSelectModal
+          {...defaultProps}
+          t={translations.en}
+          recipes={mixedRecipes}
+          categoryFilter="ALL"
+          beveragePreference="both"
+        />
+      );
+    });
+
+    const root = tree!.root;
+
+    // Zakładki kategorii ALL / COFFEE / TEA oraz nagłówki
+    const fullRenderedText = JSON.stringify(tree!.toJSON());
+
+    expect(fullRenderedText).toContain('All (2)');
+    expect(fullRenderedText).toContain('Coffee (1)');
+    expect(fullRenderedText).toContain('Tea (1)');
+    expect(fullRenderedText).toContain('Specialty Coffee — Filter & Immersion');
+    expect(fullRenderedText).toContain('Artisan Tea & Gongfu');
+
+    // Nagłówki akordeonów
+    const coffeeAccordionToggle = root.findByProps({ testID: 'recipe-cat-toggle-COFFEE' });
+    const teaAccordionToggle = root.findByProps({ testID: 'recipe-cat-toggle-TEA' });
+
+    expect(coffeeAccordionToggle.props.accessibilityLabel).toBe('Collapse or expand Specialty Coffee category');
+    expect(teaAccordionToggle.props.accessibilityLabel).toBe('Collapse or expand Artisan Tea category');
+
+    const scanQrBtn = root.findByProps({ testID: 'scan-qr-btn' });
+    expect(scanQrBtn.props.accessibilityLabel).toBe('Scan recipe QR code with camera');
+
+    // Brak wycieków polskich tekstów w całym drzewie
+    expect(fullRenderedText).not.toContain('Kawa Specialty');
+    expect(fullRenderedText).not.toContain('Herbata Rzemieślnicza');
+    expect(fullRenderedText).not.toContain('Skanuj kod QR receptury aparatem');
+    expect(fullRenderedText).not.toContain('Wszystkie (2)');
+    expect(fullRenderedText).not.toContain('Kawa (1)');
+    expect(fullRenderedText).not.toContain('Herbata (1)');
+  });
 });

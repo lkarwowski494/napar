@@ -339,7 +339,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                     categoryFilter === 'ALL' && styles.recipeFilterTabTextActive,
                   ]}
                 >
-                  Wszystkie ({safeRecipes.filter((r) => r && typeof r === 'object').length})
+                  {`${t?.brew?.all || (isEn ? 'All' : 'Wszystkie')} (${safeRecipes.filter((r) => r && typeof r === 'object').length})`}
                 </Text>
               </Pressable>
               <Pressable
@@ -359,7 +359,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                     categoryFilter === 'COFFEE' && styles.recipeFilterTabTextActive,
                   ]}
                 >
-                  Kawa ({safeRecipes.filter((r) => r && typeof r === 'object' && ('beverageType' in r ? r.beverageType === 'COFFEE' : r.type === 'COFFEE')).length})
+                  {`${t?.brew?.coffee || (isEn ? 'Coffee' : 'Kawa')} (${safeRecipes.filter((r) => r && typeof r === 'object' && ('beverageType' in r ? r.beverageType === 'COFFEE' : r.type === 'COFFEE')).length})`}
                 </Text>
               </Pressable>
               <Pressable
@@ -379,7 +379,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                     categoryFilter === 'TEA' && styles.recipeFilterTabTextActive,
                   ]}
                 >
-                  Herbata ({safeRecipes.filter((r) => r && typeof r === 'object' && ('beverageType' in r ? r.beverageType === 'TEA' : r.type === 'TEA')).length})
+                  {`${t?.brew?.tea || (isEn ? 'Tea' : 'Herbata')} (${safeRecipes.filter((r) => r && typeof r === 'object' && ('beverageType' in r ? r.beverageType === 'TEA' : r.type === 'TEA')).length})`}
                 </Text>
               </Pressable>
             </View>
@@ -392,7 +392,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               onPress={onAddCustomRecipe}
             >
               <Text style={styles.addCustomRecipeBtnText}>
-                {t?.brew?.customRecipe || 'Receptura autorska'}
+                {t?.brew?.customRecipe || (isEn ? 'Custom recipe' : 'Receptura autorska')}
               </Text>
             </Pressable>
 
@@ -403,7 +403,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 onPress={onOpenGongfu}
                 accessibilityRole="button"
                 accessibilityLabel={t?.brew?.gongfuModeBtn || 'Gongfu Cha'}
-                accessibilityHint={t?.brew?.gongfuModeHint || 'Uruchamia tradycyjną ceremonię parzenia herbaty Gongfu Cha z wielokrotnymi infuzjami'}
+                accessibilityHint={t?.brew?.gongfuModeHint || (isEn ? 'Launches traditional Gongfu Cha tea brewing with multi-infusions' : 'Uruchamia tradycyjną ceremonię parzenia herbaty Gongfu Cha z wielokrotnymi infuzjami')}
               >
                 <Text style={styles.gongfuModalBtnText}>{t?.brew?.gongfuModeBtn || 'Gongfu Cha'}</Text>
               </Pressable>
@@ -415,7 +415,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               testID="import-recipe-btn"
             >
               <Text style={styles.importRecipeModalBtnText}>
-                {t?.brew?.importRecipe || 'Importuj'}
+                {t?.brew?.importRecipe || (isEn ? 'Import' : 'Importuj')}
               </Text>
             </Pressable>
 
@@ -424,7 +424,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               onPress={onOpenQrScanner}
               testID="scan-qr-btn"
               accessibilityRole="button"
-              accessibilityLabel="Skanuj kod QR receptury aparatem"
+              accessibilityLabel={t?.brew?.scanQrA11y || (isEn ? 'Scan recipe QR code with camera' : 'Skanuj kod QR receptury aparatem')}
             >
               <Text style={styles.scanQrModalBtnText}>QR</Text>
             </Pressable>
@@ -438,10 +438,10 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 style={styles.categoryAccordionHeader}
                 onPress={() => toggleCategoryCollapse('COFFEE')}
                 accessibilityRole="button"
-                accessibilityLabel="Zwiń lub rozwiń kategorię Kawa Specialty"
+                accessibilityLabel={isEn ? 'Collapse or expand Specialty Coffee category' : 'Zwiń lub rozwiń kategorię Kawa Specialty'}
               >
                 <Text style={styles.categoryAccordionTitle}>
-                  Kawa Specialty — Przelew i Immersion ({coffeeGroup.length})
+                  {isEn ? 'Specialty Coffee — Filter & Immersion' : 'Kawa Specialty — Przelew i Immersion'} ({coffeeGroup.length})
                 </Text>
                 <Text style={styles.categoryAccordionArrow}>
                   {collapsedCategories['COFFEE'] ? '▸' : '▾'}
@@ -459,10 +459,10 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 style={styles.categoryAccordionHeader}
                 onPress={() => toggleCategoryCollapse('TEA')}
                 accessibilityRole="button"
-                accessibilityLabel="Zwiń lub rozwiń kategorię Herbata Rzemieślnicza"
+                accessibilityLabel={isEn ? 'Collapse or expand Artisan Tea category' : 'Zwiń lub rozwiń kategorię Herbata Rzemieślnicza'}
               >
                 <Text style={styles.categoryAccordionTitle}>
-                  Herbata Rzemieślnicza & Gongfu ({teaGroup.length})
+                  {isEn ? 'Artisan Tea & Gongfu' : 'Herbata Rzemieślnicza & Gongfu'} ({teaGroup.length})
                 </Text>
                 <Text style={styles.categoryAccordionArrow}>
                   {collapsedCategories['TEA'] ? '▸' : '▾'}
