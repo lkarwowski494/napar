@@ -215,5 +215,15 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(fallbackIcs).toContain('UID:action-');
       expect(fallbackIcs).toContain('SUMMARY:Sesja parzenia Napar');
     });
+
+    it('TASK-P14-07-JAK: buildProactiveActionSchedule i buildFourteenDayCalendar chronią przed null w tablicach sessions i inventory', () => {
+      const scheduleWithNulls = buildProactiveActionSchedule('2026-10-26T08:00:00Z', [null as any], [null as any]);
+      expect(scheduleWithNulls.length).toBeGreaterThan(0);
+      expect(scheduleWithNulls[0].id).toBe('action-default-calibration');
+
+      const calendarWithNulls = buildFourteenDayCalendar('2026-10-26T08:00:00Z', [null as any], [null as any]);
+      expect(calendarWithNulls).toHaveLength(14);
+      expect(calendarWithNulls[0].sessionCount).toBe(0);
+    });
   });
 });

@@ -144,7 +144,8 @@ export function buildProactiveActionSchedule(
 
   const actions: ProactiveActionItem[] = [];
   const activeItems = (inventory || []).filter(
-    (item) => !item.isArchived && item.remainingWeightGrams > 0
+    (item): item is InventoryItem =>
+      Boolean(item && typeof item === 'object' && !item.isArchived && item.remainingWeightGrams > 0)
   );
 
   for (const item of activeItems) {
@@ -251,7 +252,10 @@ export function buildProactiveActionSchedule(
 
   // Jeśli brak aktywnych paczek lub jako uzupełnienie harmonogramu: dodaj kalibrację / powtórkę z najlepszej sesji
   if (actions.length === 0) {
-    const topSession = (sessions || []).find((s) => (s.rating || 0) >= 4) || (sessions || [])[0];
+    const validSessions = (sessions || []).filter(
+      (s): s is BrewSession => Boolean(s && typeof s === 'object')
+    );
+    const topSession = validSessions.find((s) => (s.rating || 0) >= 4) || validSessions[0];
     if (topSession) {
       actions.push({
         id: `action-repeat-${topSession.id}`,
@@ -320,7 +324,7 @@ export function buildFourteenDayCalendar(
 
   const sessionCountsByDate: Record<string, number> = {};
   for (const s of sessions || []) {
-    if (s.brewedAt) {
+    if (s && typeof s === 'object' && s.brewedAt) {
       const d = new Date(s.brewedAt);
       if (!Number.isNaN(d.getTime())) {
         const key = toDateKey(d);
