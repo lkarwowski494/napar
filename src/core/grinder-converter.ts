@@ -411,7 +411,16 @@ export function getRecipeMicrons(recipe?: {
     if (desc.includes('18') || desc.includes('20')) return 600;
     return 720;
   }
-  if (method === 'CHEMEX' || method === 'CLEVER_DRIPPER' || method === 'CUPPING') {
+  if (
+    method === 'CHEMEX' ||
+    method === 'CLEVER_DRIPPER' ||
+    method === 'CLEVER' ||
+    method === 'CLEVER DRIPPER' ||
+    method.includes('CLEVER') ||
+    desc.includes('clever') ||
+    method === 'CUPPING' ||
+    desc.includes('cupping')
+  ) {
     return 880;
   }
   if (

@@ -329,4 +329,11 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod praskę francuską' })).toBe(1150);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse for french press immersion' })).toBe(1150);
   });
+
+  test('TASK-P26-08-PRO: getRecipeMicrons rozpoznaje Clever Dripper i Cupping i zwraca 880 µm', () => {
+    expect(getRecipeMicrons({ method: 'CLEVER' })).toBe(880);
+    expect(getRecipeMicrons({ method: 'Clever Dripper' })).toBe(880);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio-grubo pod dripper clever' })).toBe(880);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-coarse for cupping protocol' })).toBe(880);
+  });
 });
