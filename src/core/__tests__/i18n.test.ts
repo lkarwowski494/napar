@@ -281,4 +281,9 @@ describe('i18n System', () => {
       expect((dict as any).stash?.saveToStash.length).toBeGreaterThan(0);
     }
   });
+
+  test('TASK-P10-09-LOK: Klucz useTemplate jest zdefiniowany we wszystkich 35 językach', () => {
+    expect(translations.pl.stash.useTemplate).toBe('+ Użyj jako szablon w spiżarni');
+    expect(translations.en.stash.useTemplate).toBe('+ Use as template in stash');
+  });
 });

@@ -256,7 +256,8 @@
     "favoriteRemove": "Remove from favorites",
     "emptyTitle": "Your stash is empty",
     "emptyDesc": "Add your first coffee beans or tea leaves to track freshness, botanical varieties and weight.",
-    "readOnlyNotice": "Read-only mode (trial expired)"
+    "readOnlyNotice": "Read-only mode (trial expired)",
+    "useTemplate": "+ Usar como modelo na despensa"
   },
   "journal": {
     "title": "Tasting Journal",

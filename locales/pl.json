@@ -256,7 +256,8 @@
     "favoriteRemove": "Usuń z ulubionych",
     "emptyTitle": "Twoja spiżarnia jest pusta",
     "emptyDesc": "Dodaj swoją pierwszą kawę ziarnistą lub herbatę liściastą, aby śledzić świeżość, odmiany botaniczne i wagę.",
-    "readOnlyNotice": "Tryb tylko do odczytu (wygasła subskrypcja)"
+    "readOnlyNotice": "Tryb tylko do odczytu (wygasła subskrypcja)",
+    "useTemplate": "+ Użyj jako szablon w spiżarni"
   },
   "journal": {
     "title": "Dziennik Degustacji",

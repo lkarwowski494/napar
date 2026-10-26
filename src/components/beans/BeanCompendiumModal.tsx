@@ -190,7 +190,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                     })
                   }
                 >
-                  <Text style={styles.compUseBtnText}>{(t as any).stash?.useTemplate || (isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni')}</Text>
+                  <Text style={styles.compUseBtnText}>{t.stash?.useTemplate || (isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni')}</Text>
                 </Pressable>
               </View>
             ))}
@@ -241,7 +241,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                     })
                   }
                 >
-                  <Text style={styles.compUseBtnText}>{(t as any).stash?.useTemplate || (isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni')}</Text>
+                  <Text style={styles.compUseBtnText}>{t.stash?.useTemplate || (isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni')}</Text>
                 </Pressable>
               </View>
             ))}
@@ -274,7 +274,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                     })
                   }
                 >
-                  <Text style={styles.compUseBtnText}>{(t as any).stash?.useTemplate || (isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni')}</Text>
+                  <Text style={styles.compUseBtnText}>{t.stash?.useTemplate || (isEn ? '+ Use as template in stash' : '+ Użyj jako szablon w spiżarni')}</Text>
                 </Pressable>
               </View>
             ))}
