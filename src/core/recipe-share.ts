@@ -180,7 +180,7 @@ export function recipeToCompactPayload(
       ? Math.round(parsedTemp)
       : 92;
   const grind =
-    typeof rawGrind === 'string' && rawGrind.trim() ? rawGrind.trim() : undefined;
+    typeof rawGrind === 'string' && rawGrind.trim() ? rawGrind.trim().slice(0, 200) : undefined;
   const computedRatio = Number((water / (dose || 1)).toFixed(1));
   const ratio =
     Number.isFinite(rawRatio) && rawRatio > 0
@@ -311,7 +311,7 @@ export function decodeRecipeFromShareUrl(
         const rawDecodedTemp = typeof parsed.t === 'number' ? parsed.t : (typeof parsed.t === 'string' ? parseFloat(parsed.t) : NaN);
         return Number.isFinite(rawDecodedTemp) && rawDecodedTemp >= 0 && rawDecodedTemp <= 100 ? Math.round(rawDecodedTemp) : 92;
       })(),
-      grindSizeDescription: typeof parsed.g === 'string' ? parsed.g : '',
+      grindSizeDescription: typeof parsed.g === 'string' ? parsed.g.trim().slice(0, 200) : '',
       recommendedRatio: typeof parsed.r === 'number' && Number.isFinite(parsed.r) && parsed.r > 0 ? Number(parsed.r.toFixed(2)) : Number((parsed.w / (parsed.d || 1)).toFixed(1)),
       stepsJson: JSON.stringify(steps),
       isCustom: true,

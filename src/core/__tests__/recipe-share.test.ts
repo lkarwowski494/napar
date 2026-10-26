@@ -591,4 +591,24 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(payload.d).toBe(1000);
     expect(payload.w).toBe(50000);
   });
+  test('TASK-P25-11-WZR: recipeToCompactPayload i decodeRecipeFromShareUrl ograniczają grindSizeDescription do 200 znaków', () => {
+    const longGrind = 'g'.repeat(300);
+    const recipe: any = {
+      name: 'Test Grind Cap',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      grindSizeDescription: '   ' + longGrind + '   ',
+      stepsJson: '[]',
+    };
+    const payload = recipeToCompactPayload(recipe);
+    expect(payload.g).toBeDefined();
+    expect(payload.g?.length).toBe(200);
+
+    const rawUrl = encodeRecipeToShareUrl(recipe);
+    const decoded = decodeRecipeFromShareUrl(rawUrl);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.recipe.grindSizeDescription?.length).toBe(200);
+  });
 });
