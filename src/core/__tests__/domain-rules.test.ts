@@ -485,4 +485,14 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(res.rating).toBe('over');
     });
   });
+
+  describe('TASK-P25-03-ZAK: calculateBatchScaling clampuje doze i wode do limitow', () => {
+    it('clampuje przeskalowana doze i wode przy niestandardowych limitach', () => {
+      const res = calculateBatchScaling(50, 800, 4, 150.0, 2500.0);
+      // 50 * 4 = 200g -> clamp do 150.0g
+      // 800 * 4 = 3200g -> clamp do 2500.0g
+      expect(res.scaledDoseGrams).toBe(150.0);
+      expect(res.scaledWaterGrams).toBe(2500.0);
+    });
+  });
 });

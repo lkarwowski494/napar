@@ -477,7 +477,9 @@ export interface BatchScalingResult {
 export function calculateBatchScaling(
   baseDoseGrams: number,
   baseWaterGrams: number,
-  servings: number
+  servings: number,
+  maxDoseGrams = 1000.0,
+  maxWaterGrams = 50000.0
 ): BatchScalingResult {
   if (
     !Number.isFinite(baseDoseGrams) ||
@@ -489,8 +491,10 @@ export function calculateBatchScaling(
   }
   const safeServings = Number.isFinite(servings) ? servings : 1;
   const count = Math.max(1, Math.min(4, Math.round(safeServings)));
-  const scaledDose = Number((baseDoseGrams * count).toFixed(1));
-  const scaledWater = Number((baseWaterGrams * count).toFixed(1));
+  const rawScaledDose = baseDoseGrams * count;
+  const rawScaledWater = baseWaterGrams * count;
+  const scaledDose = Number((Number.isFinite(maxDoseGrams) && maxDoseGrams > 0 ? Math.min(rawScaledDose, maxDoseGrams) : rawScaledDose).toFixed(1));
+  const scaledWater = Number((Number.isFinite(maxWaterGrams) && maxWaterGrams > 0 ? Math.min(rawScaledWater, maxWaterGrams) : rawScaledWater).toFixed(1));
 
   let clicks = 0;
   let recPl = 'Domyślne mielenie dla pojedynczej porcji.';
