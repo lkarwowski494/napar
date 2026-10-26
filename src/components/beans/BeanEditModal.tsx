@@ -64,8 +64,14 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
       setEditProcess(item.process || '');
       setEditRoastDate(item.roastOrHarvestDate || '');
       setEditRoastProfile(item.roastProfile || 'light');
-      setEditInitialWeight(item.initialWeightGrams.toString());
-      setEditRemainingWeight(item.remainingWeightGrams.toString());
+      const displayInitWeight = isImperial
+        ? roundTo(gramsToOunces(item.initialWeightGrams), 1).toString()
+        : item.initialWeightGrams.toString();
+      const displayRemWeight = isImperial
+        ? roundTo(gramsToOunces(item.remainingWeightGrams), 1).toString()
+        : item.remainingWeightGrams.toString();
+      setEditInitialWeight(displayInitWeight);
+      setEditRemainingWeight(displayRemWeight);
       setEditNotesStr((item.flavorNotes || []).join(', '));
       setEditRating(item.rating);
       setEditIsArchived(item.isArchived);
@@ -89,9 +95,10 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
       Alert.alert(t.common?.error || 'Błąd', t.stash?.nameError || 'Podaj nazwę kawy lub herbaty.');
       return;
     }
-    const initW = parseFloat(editInitialWeight) || 250;
-    let remW = parseFloat(editRemainingWeight);
-    if (isNaN(remW) || remW < 0) remW = 0;
+    const rawInitW = parseFloat(editInitialWeight) || (isImperial ? 8.8 : 250);
+    const initW = isImperial ? Math.round(ouncesToGrams(rawInitW)) : Math.round(rawInitW);
+    const rawRemW = parseFloat(editRemainingWeight);
+    let remW = isNaN(rawRemW) || rawRemW < 0 ? 0 : (isImperial ? Math.round(ouncesToGrams(rawRemW)) : Math.round(rawRemW));
 
     const notesArray = editNotesStr
       .split(',')
@@ -270,7 +277,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
               <Text style={styles.inputLabel}>{isImperial ? 'Waga początkowa (oz)' : 'Waga początkowa (g)'}</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="250"
+                placeholder={isImperial ? '8.8' : '250'}
                 placeholderTextColor={theme.colors.textMuted}
                 keyboardType="numeric"
                 value={editInitialWeight}
@@ -284,7 +291,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             <Text style={styles.inputLabel}>{isImperial ? 'Pozostała waga w paczce (oz) *' : 'Pozostała waga w paczce (g) *'}</Text>
             <TextInput
               style={styles.textInput}
-              placeholder="np. 180"
+              placeholder={isImperial ? '6.3' : 'np. 180'}
               placeholderTextColor={theme.colors.textMuted}
               keyboardType="numeric"
               value={editRemainingWeight}

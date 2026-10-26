@@ -21,6 +21,7 @@ describe('BeanAddModal Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (database.getUnitSystem as jest.Mock).mockReturnValue('metric');
     jest.spyOn(Alert, 'alert').mockImplementation(() => {});
   });
 
@@ -95,5 +96,43 @@ describe('BeanAddModal Component', () => {
     expect(teaBtn.props.accessibilityState).toEqual({ selected: true });
     const coffeeBtn = root.findByProps({ testID: 'bean-type-coffee-btn' });
     expect(coffeeBtn.props.accessibilityState).toEqual({ selected: false });
+  });
+
+  test('TASK-P9-03-ZAK: W trybie imperialnym przelicza wagę z uncji na gramy przy dodawaniu paczki', () => {
+    (database.getUnitSystem as jest.Mock).mockReturnValue('imperial');
+
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BeanAddModal
+          visible={true}
+          onClose={mockOnClose}
+          beveragePreference="coffee"
+          canCreate={true}
+          onRequirePaywall={mockOnRequirePaywall}
+          onOpenCompendium={mockOnOpenCompendium}
+          onSaved={mockOnSaved}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const textInputs = root.findAllByType('TextInput' as any);
+    // Pierwszy TextInput to nazwa (placeholder np. Etiopia...)
+    renderer.act(() => {
+      textInputs[0].props.onChangeText('Imperial Roast');
+    });
+
+    const saveBtn = root.findByProps({ testID: 'save-bean-btn' });
+    renderer.act(() => {
+      saveBtn.props.onPress();
+    });
+
+    expect(database.saveInventoryItem).toHaveBeenCalled();
+    const savedItem = (database.saveInventoryItem as jest.Mock).mock.calls[0][0];
+    // 8.8 oz * 28.349523125 ≈ 249.47 -> 249g
+    expect(savedItem.initialWeightGrams).toBe(249);
+    expect(savedItem.remainingWeightGrams).toBe(249);
+    expect(mockOnSaved).toHaveBeenCalled();
   });
 });

@@ -51,7 +51,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
   const [process, setProcess] = useState('');
   const [roastDate, setRoastDate] = useState(new Date().toISOString().slice(0, 10));
   const [roastProfile, setRoastProfile] = useState('light');
-  const [initialWeight, setInitialWeight] = useState('250');
+  const [initialWeight, setInitialWeight] = useState(isImperial ? '8.8' : '250');
   const [notesStr, setNotesStr] = useState('');
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
       setProcess(presetTemplate.process || '');
       setRoastDate(new Date().toISOString().slice(0, 10));
       setRoastProfile('light');
-      setInitialWeight('250');
+      setInitialWeight(isImperial ? '8.8' : '250');
       setNotesStr((presetTemplate.notes || []).join(', '));
     }
   }, [presetTemplate]);
@@ -100,7 +100,8 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
       Alert.alert(t.common?.error || 'Błąd', t.stash?.nameError || 'Podaj nazwę kawy lub herbaty.');
       return;
     }
-    const weightNum = parseFloat(initialWeight) || 250;
+    const rawWeight = parseFloat(initialWeight) || (isImperial ? 8.8 : 250);
+    const weightNum = isImperial ? Math.round(ouncesToGrams(rawWeight)) : Math.round(rawWeight);
     const notesArray = notesStr
       .split(',')
       .map((s) => s.trim())

@@ -43,6 +43,7 @@ describe('BeanEditModal Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (database.getUnitSystem as jest.Mock).mockReturnValue('metric');
     jest.spyOn(Alert, 'alert').mockImplementation(() => {});
   });
 
@@ -228,5 +229,40 @@ describe('BeanEditModal Component', () => {
     expect(mockOnClose).toHaveBeenCalled();
     expect(database.saveInventoryItem).not.toHaveBeenCalled();
     expect(mockOnSaved).not.toHaveBeenCalled();
+  });
+
+  test('TASK-P9-03-ZAK: W trybie imperialnym przelicza uncje na gramy przy zapisie i gramy na uncje w formularzu', () => {
+    (database.getUnitSystem as jest.Mock).mockReturnValue('imperial');
+
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BeanEditModal
+          visible={true}
+          item={mockItem}
+          onClose={mockOnClose}
+          canCreate={true}
+          onRequirePaywall={mockOnRequirePaywall}
+          onSaved={mockOnSaved}
+          onDeleted={mockOnDeleted}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const saveBtn = root.findByProps({ accessibilityLabel: 'Zapisz zmiany' });
+    renderer.act(() => {
+      saveBtn.props.onPress();
+    });
+
+    expect(database.saveInventoryItem).toHaveBeenCalled();
+    const savedItem = (database.saveInventoryItem as jest.Mock).mock.calls[0][0];
+    // 250g -> 8.8 oz -> 249g
+    // 200g -> 7.1 oz -> 201g
+    expect(savedItem.initialWeightGrams).toBeGreaterThan(240);
+    expect(savedItem.initialWeightGrams).toBeLessThan(260);
+    expect(savedItem.remainingWeightGrams).toBeGreaterThan(190);
+    expect(savedItem.remainingWeightGrams).toBeLessThan(210);
+    expect(mockOnSaved).toHaveBeenCalled();
   });
 });
