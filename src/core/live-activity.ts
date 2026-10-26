@@ -294,6 +294,12 @@ export async function updateLiveActivity(
       error: 'Nieprawidłowy indeks kroku w stanie Live Activity.',
     };
   }
+  if (!Number.isFinite(_state.totalSteps) || _state.totalSteps <= 0) {
+    return {
+      success: false,
+      error: 'Nieprawidłowa łączna liczba kroków w stanie Live Activity.',
+    };
+  }
   return {
     success: false,
     error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',

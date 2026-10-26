@@ -465,4 +465,30 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resBadTotal.success).toBe(false);
     expect(resBadTotal.error).toContain('Nieprawidłowa łączna liczba kroków');
   });
+
+  test('TASK-P32-12-NIE: updateLiveActivity waliduje totalSteps w parametrze _state', async () => {
+    const badTotalZero: any = {
+      ...mockState,
+      totalSteps: 0,
+    };
+    const resZero = await updateLiveActivity('valid-act-id', badTotalZero);
+    expect(resZero.success).toBe(false);
+    expect(resZero.error).toContain('Nieprawidłowa łączna liczba kroków');
+
+    const badTotalNegative: any = {
+      ...mockState,
+      totalSteps: -3,
+    };
+    const resNeg = await updateLiveActivity('valid-act-id', badTotalNegative);
+    expect(resNeg.success).toBe(false);
+    expect(resNeg.error).toContain('Nieprawidłowa łączna liczba kroków');
+
+    const badTotalNaN: any = {
+      ...mockState,
+      totalSteps: NaN,
+    };
+    const resNaN = await updateLiveActivity('valid-act-id', badTotalNaN);
+    expect(resNaN.success).toBe(false);
+    expect(resNaN.error).toContain('Nieprawidłowa łączna liczba kroków');
+  });
 });
