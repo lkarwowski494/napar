@@ -525,6 +525,12 @@ export function getRecipeMicrons(recipe?: {
     method.includes('DUTCH') ||
     desc.includes('dutch') ||
     desc.includes('kyoto') ||
+    method.includes('TODDY') ||
+    desc.includes('toddy') ||
+    method.includes('KARLSBAD') ||
+    desc.includes('karlsbad') ||
+    method.includes('BAYREUTH') ||
+    desc.includes('bayreuth') ||
     desc.includes('coarse')
   ) {
     return 1150;

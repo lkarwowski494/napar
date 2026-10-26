@@ -437,4 +437,16 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod kyoto drip cold brew' })).toBe(1150);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse grind for mizudashi slow brew' })).toBe(1150);
   });
+
+  test('TASK-P37-08-PRO: getRecipeMicrons rozpoznaje metody Toddy oraz Karlsbad / Bayreuther zwracajac 1150 µm', () => {
+    expect(getRecipeMicrons({ method: 'TODDY' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Toddy Cold Brew System' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'KARLSBAD' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Karlsbader Kanne' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'BAYREUTH' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Bayreuther Kanne' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Bardzo grubo pod dzbanek Karlsbad' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Very coarse grind for Toddy immersion' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse porcelain filter bayreuth pot' })).toBe(1150);
+  });
 });
