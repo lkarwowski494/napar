@@ -1,0 +1,98 @@
+[
+  {
+    "id": "TASK-P46-01-ODK",
+    "perspective": "01-ODK",
+    "title": "Dostępność, etykiety accessibilityValue dla suwaków sensorycznych i sanityzacja w BrewFinishModal",
+    "file": "src/components/brew/BrewFinishModal.tsx",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P46-02-MON",
+    "perspective": "02-MON",
+    "title": "Odporność getAppAccessState na uszkodzone formaty ISO daty okresu próbnego w bazie danych",
+    "file": "src/core/app-access.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P46-03-ZAK",
+    "perspective": "03-ZAK",
+    "title": "Ochrona calculateDegassingProgress przed ujemnymi wartościami przy dacie wypału z przyszłości (strefy czasowe)",
+    "file": "src/core/bpr-engine.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P46-04-STU",
+    "perspective": "04-STU",
+    "title": "Sanityzacja danych wejściowych w edytorze kroków RecipeStepEditor (zamiana przecinków na kropki)",
+    "file": "src/components/recipe-builder/RecipeStepEditor.tsx",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P46-05-ARC",
+    "perspective": "05-ARC",
+    "title": "Sanityzacja i clampowanie pól recipeName, method i rating w saveBrewSession",
+    "file": "src/core/database.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P46-06-TRE",
+    "perspective": "06-TRE",
+    "title": "Rozszerzenie PROCESS_ALIASES o warianty obróbki honey (black-honey, red-honey, yellow-honey)",
+    "file": "src/core/knowledge-data.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P46-07-JAK",
+    "perspective": "07-JAK",
+    "title": "Rozszerzenie findBottledWaterById o alternatywne aliasy marek butelkowanych",
+    "file": "src/core/water-chemistry.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P46-08-PRO",
+    "perspective": "08-PRO",
+    "title": "Rozpoznawanie metod cold drip i cold immersion dripperów w getRecipeMicrons",
+    "file": "src/core/grinder-converter.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P46-09-LOK",
+    "perspective": "09-LOK",
+    "title": "Weryfikacja spójności lingwistycznej i braków w 35 językach oraz utrzymanie 100% matrycy testów",
+    "file": "locales/*",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P46-10-WYD",
+    "perspective": "10-WYD",
+    "title": "Weryfikacja spójności uprawnień i skryptów audytowych w verify-native.mjs",
+    "file": "scripts/verify-native.mjs",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P46-11-WZR",
+    "perspective": "11-WZR",
+    "title": "Defensywna obsługa pustej tablicy kroków w recipeToCompactPayload i decodeRecipeFromShareUrl",
+    "file": "src/core/recipe-share.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P46-12-NIE",
+    "perspective": "12-NIE",
+    "title": "Ścisła walidacja całkowitych liczb kroków w updateLiveActivity i startLiveActivity",
+    "file": "src/core/live-activity.ts",
+    "status": "pending",
+    "commit": null
+  }
+]
