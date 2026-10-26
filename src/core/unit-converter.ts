@@ -76,7 +76,7 @@ export function formatDoseWeight(grams: number, unitSystem: UnitSystem = 'metric
   if (unitSystem === 'imperial') {
     return `${gramsToOunces(grams)} oz`;
   }
-  return `${grams}g`;
+  return `${Number(grams.toFixed(1))}g`;
 }
 
 /**
@@ -89,7 +89,7 @@ export function formatWaterWeight(grams: number, unitSystem: UnitSystem = 'metri
   if (unitSystem === 'imperial') {
     return `${mlToFluidOunces(grams)} fl oz`;
   }
-  return `${grams}g`;
+  return `${Number(grams.toFixed(1))}g`;
 }
 
 /**

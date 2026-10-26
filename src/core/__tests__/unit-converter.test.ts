@@ -55,6 +55,8 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
   test('formatWaterWeight formatuje wagę/objętość wody', () => {
     expect(formatWaterWeight(300, 'metric')).toBe('300g');
     expect(formatWaterWeight(300, 'imperial')).toBe('10.14 fl oz');
+    expect(formatDoseWeight(15.33333333, 'metric')).toBe('15.3g');
+    expect(formatWaterWeight(249.9999999, 'metric')).toBe('250g');
   });
 
   test('Formatters używają metrycznych jednostek jako domyślnych parametrów', () => {
