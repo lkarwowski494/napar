@@ -578,8 +578,8 @@ export function searchCoffeeVarieties(query: string): CoffeeVarietyInfo[] {
       v.cupCharacteristics.body.toLowerCase().includes(q) ||
       v.cupCharacteristics.sweetness.toLowerCase().includes(q)
     )) ||
-    v.keyNotesPl.some((k) => k.toLowerCase().includes(q)) ||
-    v.keyNotesEn.some((k) => k.toLowerCase().includes(q)) ||
+    (Array.isArray(v.keyNotesPl) && v.keyNotesPl.some((k) => typeof k === "string" && k.toLowerCase().includes(q))) ||
+    (Array.isArray(v.keyNotesEn) && v.keyNotesEn.some((k) => typeof k === "string" && k.toLowerCase().includes(q))) ||
     v.sensoryProfilePl.toLowerCase().includes(q) ||
     v.sensoryProfileEn.toLowerCase().includes(q) ||
     (v.descriptionPl && v.descriptionPl.toLowerCase().includes(q)) ||
@@ -617,8 +617,8 @@ export function searchCoffeeOrigins(query: string): CoffeeOriginInfo[] {
     (Array.isArray(o.mainVarieties) && o.mainVarieties.some((v) => typeof v === 'string' && v.toLowerCase().includes(q))) ||
     o.flavorProfilePl.toLowerCase().includes(q) ||
     o.flavorProfileEn.toLowerCase().includes(q) ||
-    o.keyNotesPl.some((k) => k.toLowerCase().includes(q)) ||
-    o.keyNotesEn.some((k) => k.toLowerCase().includes(q)) ||
+    (Array.isArray(o.keyNotesPl) && o.keyNotesPl.some((k) => typeof k === "string" && k.toLowerCase().includes(q))) ||
+    (Array.isArray(o.keyNotesEn) && o.keyNotesEn.some((k) => typeof k === "string" && k.toLowerCase().includes(q))) ||
     (o.descriptionPl && o.descriptionPl.toLowerCase().includes(q)) ||
     (o.descriptionEn && o.descriptionEn.toLowerCase().includes(q))
   );

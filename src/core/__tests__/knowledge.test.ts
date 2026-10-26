@@ -426,4 +426,12 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     const emptyRes = searchTeaCategories(null as any);
     expect(emptyRes).toHaveLength(TEA_CATEGORIES.length);
   });
+  test('TASK-P24-06-TRE: searchCoffeeVarieties i searchCoffeeOrigins defensywnie przeszukują keyNotes', () => {
+    const varietyRes = searchCoffeeVarieties('jaśmin');
+    expect(varietyRes.length).toBeGreaterThanOrEqual(1);
+
+    const originRes = searchCoffeeOrigins('bergamotka');
+    expect(originRes.length).toBeGreaterThanOrEqual(1);
+    expect(originRes.some((o) => o.id === 'origin-ethiopia')).toBe(true);
+  });
 });
