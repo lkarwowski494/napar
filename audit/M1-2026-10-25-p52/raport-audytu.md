@@ -13,10 +13,10 @@
 | TASK-P52-03-ZAK | Zaskoczenie | Completed | `src/core/bpr-engine.ts` | `434406b` |
 | TASK-P52-04-STU | Studiowanie | Completed | `src/components/recipe-builder/RecipeStepEditor.tsx` | `c498fce` |
 | TASK-P52-05-ARC | Architektura | Completed | `src/core/database.ts` | `79eb2c8` |
-| TASK-P52-06-TRE | Treść | Pending | `src/core/knowledge-data.ts` | - |
-| TASK-P52-07-JAK | Jakość | Pending | `src/core/water-chemistry.ts` | - |
-| TASK-P52-08-PRO | Prostota | Pending | `src/core/grinder-converter.ts` | - |
-| TASK-P52-09-LOK | Lokalizacja | Pending | `locales/*` | - |
-| TASK-P52-10-WYD | Wydajność | Pending | `scripts/verify-native.mjs` | - |
+| TASK-P52-06-TRE | Treść | Completed | `src/core/knowledge-data.ts` | `44dd283` |
+| TASK-P52-07-JAK | Jakość | Completed | `src/core/water-chemistry.ts` | `91e712d` |
+| TASK-P52-08-PRO | Prostota | Completed | `src/core/grinder-converter.ts` | `2e014dc` |
+| TASK-P52-09-LOK | Lokalizacja | Completed | `locales/*` | `512d177` |
+| TASK-P52-10-WYD | Wydajność | Completed | `scripts/verify-native.mjs` | `0323226` |
 | TASK-P52-11-WZR | Wzorce | Pending | `src/core/recipe-share.ts` | - |
 | TASK-P52-12-NIE | Niezawodność | Pending | `src/core/live-activity.ts` | - |

@@ -3,7 +3,7 @@
   "date": "2026-10-26",
   "status": "in_progress",
   "total_tasks": 12,
-  "completed_tasks": 5,
+  "completed_tasks": 10,
   "tasks": [
     {
       "id": "TASK-P52-01-ODK",
@@ -53,42 +53,47 @@
     {
       "id": "TASK-P52-06-TRE",
       "perspective": "06-TRE",
-      "title": "Rozszerzenie taksonomii procesow obrobki herbaty (sha qing, rou nian) w knowledge-data",
+      "title": "Rozszerzenie taksonomii procesow obrobki herbaty i mikrolotow kawy w knowledge-data",
       "target_file": "src/core/knowledge-data.ts",
       "test_file": "src/core/__tests__/knowledge.test.ts",
-      "status": "pending"
+      "status": "completed",
+      "commit": "44dd283"
     },
     {
       "id": "TASK-P52-07-JAK",
       "perspective": "07-JAK",
-      "title": "Walidacja granic mineralizacji i ochrony przed NaN w kalkulatorze chemii wody",
+      "title": "Walidacja granic mineralizacji i kalkulator bilansu kationow w water-chemistry",
       "target_file": "src/core/water-chemistry.ts",
       "test_file": "src/core/__tests__/water-chemistry.test.ts",
-      "status": "pending"
+      "status": "completed",
+      "commit": "91e712d"
     },
     {
       "id": "TASK-P52-08-PRO",
       "perspective": "08-PRO",
-      "title": "Precyzyjne rozpoznawanie metod dzwigniowych i nastaw w grinder-converter",
+      "title": "Wsparcie modeli Timemore C2/C3, Wilfa i metod Tricolate/Phin w grinder-converter",
       "target_file": "src/core/grinder-converter.ts",
       "test_file": "src/core/__tests__/grinder-converter.test.ts",
-      "status": "pending"
+      "status": "completed",
+      "commit": "2e014dc"
     },
     {
       "id": "TASK-P52-09-LOK",
       "perspective": "09-LOK",
-      "title": "Symetria komunikatow walidacji kreatora receptur w 35 jezykach",
+      "title": "Dodanie kluczy bilansu kationow w 35 jezykach z zachowaniem 100% symetrii",
       "target_file": "src/core/i18n.tsx",
       "test_file": "tests/i18n-no-polish-in-en.test.tsx",
-      "status": "pending"
+      "status": "completed",
+      "commit": "512d177"
     },
     {
       "id": "TASK-P52-10-WYD",
       "perspective": "10-WYD",
-      "title": "Weryfikacja braku auto-inicjalizacji telemetrii w skryptach natywnych",
+      "title": "Rygorystyczna blokada uprawnien do galerii, interakcji zblizeniowych i mediow w verify-native",
       "target_file": "scripts/verify-native.mjs",
       "test_file": "tests/audit-fixes.test.tsx",
-      "status": "pending"
+      "status": "completed",
+      "commit": "0323226"
     },
     {
       "id": "TASK-P52-11-WZR",
