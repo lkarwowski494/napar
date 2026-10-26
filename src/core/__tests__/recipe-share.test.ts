@@ -399,4 +399,41 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decodedFromData).not.toBeNull();
     expect(decodedFromData?.recipe.name).toBe('Hash Fragment Recipe');
   });
+
+  test('TASK-P15-11-WZR: recipeToCompactPayload oczyszcza whitespace i nie dodaje pustych ne/ie, a decodeRecipeFromShareUrl jest odporny na spacje', () => {
+    const recipe: any = {
+      id: 'test-trim',
+      name: '  Trim Recipe  ',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      stepsJson: JSON.stringify([
+        {
+          id: 's1',
+          stepNumber: 1,
+          namePl: '  Pre-infusion  ',
+          nameEn: '   ',
+          durationSeconds: 45,
+          targetWaterGrams: 50,
+          instructionPl: '  Zalej spokojnie  ',
+          instructionEn: '',
+        },
+      ]),
+    };
+
+    const payload = recipeToCompactPayload(recipe);
+    expect(payload.n).toBe('Trim Recipe');
+    expect(payload.s[0].n).toBe('Pre-infusion');
+    expect(payload.s[0].ne).toBeUndefined();
+    expect(payload.s[0].i).toBe('Zalej spokojnie');
+    expect(payload.s[0].ie).toBeUndefined();
+
+    // Sprawdzenie decode z payloadem posiadającym spacje w json
+    const jsonWithSpaces = `   ${JSON.stringify(payload)}   `;
+    const encoded = utf8ToBase64(jsonWithSpaces);
+    const decoded = decodeRecipeFromShareUrl(`napar://recipe?d=${encodeURIComponent(encoded)}`);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.recipe.name).toBe('Trim Recipe');
+  });
 });

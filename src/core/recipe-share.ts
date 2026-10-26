@@ -126,12 +126,12 @@ export function recipeToCompactPayload(
   const compactSteps: CompactRecipeStep[] = (rawSteps || [])
     .filter((st): st is RecipeStep => typeof st === 'object' && st !== null)
     .map((st) => ({
-      n: typeof st.namePl === 'string' && st.namePl ? st.namePl : 'Step',
-      ...(st.nameEn ? { ne: st.nameEn } : {}),
+      n: typeof st.namePl === 'string' && st.namePl.trim() ? st.namePl.trim() : 'Step',
+      ...(typeof st.nameEn === 'string' && st.nameEn.trim() ? { ne: st.nameEn.trim() } : {}),
       d: Number.isFinite(st.durationSeconds) && st.durationSeconds > 0 ? st.durationSeconds : 30,
       w: Number.isFinite(st.targetWaterGrams) && st.targetWaterGrams >= 0 ? st.targetWaterGrams : 0,
-      i: typeof st.instructionPl === 'string' ? st.instructionPl : '',
-      ...(st.instructionEn ? { ie: st.instructionEn } : {}),
+      i: typeof st.instructionPl === 'string' ? st.instructionPl.trim() : '',
+      ...(typeof st.instructionEn === 'string' && st.instructionEn.trim() ? { ie: st.instructionEn.trim() } : {}),
     }));
 
   const name =
@@ -243,7 +243,8 @@ export function decodeRecipeFromShareUrl(
 
   try {
     const jsonStr = base64ToUtf8(base64Data);
-    const parsed: CompactRecipePayload = JSON.parse(jsonStr);
+    if (!jsonStr || typeof jsonStr !== 'string' || !jsonStr.trim()) return null;
+    const parsed: CompactRecipePayload = JSON.parse(jsonStr.trim());
 
     if (
       !parsed ||
