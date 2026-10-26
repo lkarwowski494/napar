@@ -176,8 +176,10 @@ export function recordBrewCompleted(): AppAccessState {
   if (current.isSubscribed) {
     return current;
   }
-  const currentCount = Number.isFinite(current.brewsCount) && current.brewsCount >= 0 ? current.brewsCount : 0;
-  const newCount = Math.min(TRIAL_MAX_BREWS + 10, currentCount + 1);
+  const rawBrews = current.brewsCount;
+  const currentCount = Number.isFinite(rawBrews) && rawBrews >= 0 && !Object.is(rawBrews, -0) ? Math.floor(rawBrews) : 0;
+  let newCount = Math.min(TRIAL_MAX_BREWS + 10, currentCount + 1);
+  if (Object.is(newCount, -0) || newCount < 0) newCount = 0;
   setAppSetting('trial_brews_count', String(newCount));
   setAppSetting('trial_max_brews_seen', String(newCount));
   const state = getAppAccessState();
@@ -207,14 +209,11 @@ export function restorePurchases(): RestorePurchasesResult {
   const verifiedVal = getAppSetting('has_verified_purchase', 'false');
   const hasVerifiedPurchase = verifiedVal === 'true' || verifiedVal === '1';
   const rawTier = getAppSetting('verified_purchase_tier', '');
-  const verifiedTier = (typeof rawTier === 'string' ? rawTier.trim() : '') as
-    | 'monthly'
-    | 'annual'
-    | 'lifetime'
-    | '';
+  const cleanTier = typeof rawTier === 'string' ? rawTier.trim().toLowerCase() : '';
 
   const allowedTiers: readonly string[] = ['monthly', 'annual', 'lifetime'];
-  if (hasVerifiedPurchase && allowedTiers.includes(verifiedTier)) {
+  if (hasVerifiedPurchase && allowedTiers.includes(cleanTier)) {
+    const verifiedTier = cleanTier as 'monthly' | 'annual' | 'lifetime';
     setAppSetting('is_pro_active', 'true');
     setAppSetting('subscription_tier', verifiedTier);
     let receipt: StoreKitReceipt | undefined;

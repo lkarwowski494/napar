@@ -620,4 +620,22 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(Object.is(state.brewsCount, -0)).toBe(false);
     expect(Object.is(state.brewsRemaining, -0)).toBe(false);
   });
+
+  test('TASK-P36-02-MON: restorePurchases normalizuje wielkość liter tieru a recordBrewCompleted chroni przed -0', () => {
+    resetTrialForTesting();
+    // Ustaw legalny zakup z mieszaną wielkością liter (np. 'Annual')
+    setAppSetting('has_verified_purchase', 'true');
+    setAppSetting('verified_purchase_tier', 'Annual');
+    const res = restorePurchases();
+    expect(res.restored).toBe(true);
+    expect(res.isSubscribed).toBe(true);
+    expect(res.subscriptionTier).toBe('annual');
+
+    // Test ochrony recordBrewCompleted przed -0
+    resetTrialForTesting();
+    setAppSetting('trial_brews_count', '-0');
+    const afterBrew = recordBrewCompleted();
+    expect(afterBrew.brewsCount).toBe(1);
+    expect(Object.is(afterBrew.brewsCount, -0)).toBe(false);
+  });
 });
