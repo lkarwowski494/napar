@@ -13,6 +13,7 @@ import {
   degreesDHToPpmCaCO3,
   findWaterRecipeById,
   findBottledWaterById,
+  formatWaterHardnessCategory,
 } from '../water-chemistry';
 
 describe('Water Chemistry & Mineralization Module', () => {
@@ -616,6 +617,27 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(classifyWaterHardness(-10)).toBe('SOFT');
     expect(classifyWaterHardness(NaN)).toBe('SOFT');
     expect(classifyWaterHardness(null)).toBe('SOFT');
+  });
+
+  test('TASK-P51-07-JAK: formatWaterHardnessCategory lokalizuje kategorie twardosci oraz findBottledWaterById wspiera nowe warianty', () => {
+    // 1. formatWaterHardnessCategory PL i EN
+    expect(formatWaterHardnessCategory('VERY_SOFT', 'pl')).toBe('Bardzo miękka');
+    expect(formatWaterHardnessCategory('VERY_SOFT', 'en')).toBe('Very Soft');
+    expect(formatWaterHardnessCategory('SOFT', 'pl')).toBe('Miękka');
+    expect(formatWaterHardnessCategory('SOFT', 'en')).toBe('Soft');
+    expect(formatWaterHardnessCategory('MODERATELY_HARD', 'pl')).toBe('Średnio twarda');
+    expect(formatWaterHardnessCategory('MODERATELY_HARD', 'en')).toBe('Moderately Hard');
+    expect(formatWaterHardnessCategory('HARD', 'pl')).toBe('Twarda');
+    expect(formatWaterHardnessCategory('HARD', 'en')).toBe('Hard');
+    expect(formatWaterHardnessCategory('VERY_HARD', 'pl')).toBe('Bardzo twarda');
+    expect(formatWaterHardnessCategory('VERY_HARD', 'en')).toBe('Very Hard');
+    expect(formatWaterHardnessCategory('unknown', 'en')).toBe('Unknown');
+    expect(formatWaterHardnessCategory('', 'pl')).toBe('Nieznana');
+
+    // 2. findBottledWaterById z aliasami i spacjami
+    expect(findBottledWaterById('zywiec zdrój')?.id).toBe('zywiec_zdroj');
+    expect(findBottledWaterById('cechini muszyna')?.id).toBe('muszynianka');
+    expect(findBottledWaterById('tesco')?.id).toBe('ashbeck');
   });
 });
 

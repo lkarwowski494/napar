@@ -519,6 +519,31 @@ export function classifyWaterHardness(ghPpm: number | string): WaterHardnessCate
   return 'VERY_HARD';
 }
 
+/**
+ * Formatuje nazwę kategorii twardości wody w języku polskim lub angielskim.
+ */
+export function formatWaterHardnessCategory(
+  category: WaterHardnessCategory | string,
+  language: 'pl' | 'en' | string = 'pl'
+): string {
+  const cleanCat = typeof category === 'string' ? category.trim().toUpperCase() : '';
+  const isEn = typeof language === 'string' && (language.toLowerCase() === 'en' || language.toLowerCase().startsWith('en'));
+  switch (cleanCat) {
+    case 'VERY_SOFT':
+      return isEn ? 'Very Soft' : 'Bardzo miękka';
+    case 'SOFT':
+      return isEn ? 'Soft' : 'Miękka';
+    case 'MODERATELY_HARD':
+      return isEn ? 'Moderately Hard' : 'Średnio twarda';
+    case 'HARD':
+      return isEn ? 'Hard' : 'Twarda';
+    case 'VERY_HARD':
+      return isEn ? 'Very Hard' : 'Bardzo twarda';
+    default:
+      return isEn ? 'Unknown' : 'Nieznana';
+  }
+}
+
 const RECIPE_ALIASES: Record<string, string> = {
   bh: 'barista_hustle_80_40',
   'bh-80-40': 'barista_hustle_80_40',
@@ -586,16 +611,21 @@ const BOTTLED_ALIASES: Record<string, string> = {
   volvic: 'volvic',
   zywiec: 'zywiec_zdroj',
   'zywiec-zdroj': 'zywiec_zdroj',
+  'zywiec zdroj': 'zywiec_zdroj',
   'zywiec-zdroj-niegazowany': 'zywiec_zdroj',
+  'zywiec zdroj niegazowany': 'zywiec_zdroj',
   zywiecki: 'zywiecki_krysztal',
   'zywiecki-krysztal': 'zywiecki_krysztal',
   muszyna: 'muszynianka',
   muszynianka: 'muszynianka',
   cechini: 'muszynianka',
+  'cechini muszyna': 'muszynianka',
+  'cechini-muszyna': 'muszynianka',
   spa: 'spa_reine',
   spareine: 'spa_reine',
   'spa-reine': 'spa_reine',
   evian: 'evian',
+  tesco: 'ashbeck',
   ashbeck: 'ashbeck',
   'tesco-ashbeck': 'ashbeck',
   'tesco ashbeck': 'ashbeck',
