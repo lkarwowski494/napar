@@ -2126,4 +2126,28 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(savedRecipe).toBeDefined();
     expect(savedRecipe?.beverageType).toBe('TEA');
   });
+
+  test('TASK-P50-05-ARC: saveInventoryItem normalizuje wielkosc liter type (TEA -> tea) a deductInventoryWeight wspiera przecinek dziesietny', () => {
+    initDatabase(mockDb as any);
+
+    // 1. Normalizacja type: 'TEA' -> 'tea'
+    const teaItem: any = {
+      id: 'tea-case-norm',
+      name: 'Sencha Fukamushi',
+      type: 'TEA',
+      initialWeightGrams: 100,
+      remainingWeightGrams: 100,
+      flavorNotes: [],
+      isFavorite: false,
+      isArchived: false,
+    };
+    saveInventoryItem(teaItem);
+    const savedTea = getInventoryItemById('tea-case-norm');
+    expect(savedTea?.type).toBe('tea');
+
+    // 2. Obsługa przecinka dziesiętnego w deductInventoryWeight
+    deductInventoryWeight('tea-case-norm', '15,5' as any);
+    const afterDeduct = getInventoryItemById('tea-case-norm');
+    expect(afterDeduct?.remainingWeightGrams).toBe(84.5);
+  });
 });

@@ -346,7 +346,7 @@ export function saveInventoryItem(item: InventoryItem): void {
 
   const cleanId = typeof item.id === 'string' && item.id.trim() ? item.id.trim() : `item-${Date.now()}`;
   const cleanName = typeof item.name === 'string' && item.name.trim() ? item.name.trim().slice(0, 200) : 'Bez nazwy';
-  const cleanType = item.type === 'tea' ? 'tea' : 'coffee';
+  const cleanType = typeof item.type === 'string' && item.type.trim().toLowerCase() === 'tea' ? 'tea' : 'coffee';
   const cleanRoastProfile = typeof item.roastProfile === 'string' && item.roastProfile.trim() ? item.roastProfile.trim().slice(0, 50) : null;
   const sanitizedFlavorNotes = Array.isArray(item.flavorNotes)
     ? item.flavorNotes.filter((t): t is string => typeof t === 'string' && t.trim().length > 0).map((t) => t.trim().slice(0, 50)).slice(0, 30)
@@ -395,7 +395,7 @@ export function deductInventoryWeight(id: string, doseGrams: number): void {
   if (!id || typeof id !== 'string') return;
   const safeId = id.trim();
   if (!safeId) return;
-  const parsedDose = typeof doseGrams === 'number' ? doseGrams : (typeof doseGrams === 'string' ? parseFloat(doseGrams) : NaN);
+  const parsedDose = typeof doseGrams === 'number' ? doseGrams : (typeof (doseGrams as any) === 'string' ? parseFloat((doseGrams as any).replace(',', '.')) : NaN);
   const safeDose = Number.isFinite(parsedDose) && parsedDose > 0 ? parsedDose : 0;
   if (safeDose <= 0) return;
   const db = getDatabase();
