@@ -150,4 +150,28 @@ describe('CaffeineSettingsCard Component', () => {
     expect(root.findByProps({ accessibilityLabel: 'Earlier bedtime' })).toBeDefined();
     expect(root.findByProps({ accessibilityLabel: 'Later bedtime' })).toBeDefined();
   });
+  test('TASK-P21-04-STU: Kontenery stepperów posiadają accessibilityHint dla czytników ekranu', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <CaffeineSettingsCard
+          halfLifeHours={5.0}
+          onHalfLifeChange={mockOnHalfLifeChange}
+          bedtimeHour={23}
+          onBedtimeChange={mockOnBedtimeChange}
+          healthKitSync={true}
+          onToggleHealthKit={mockOnToggleHealthKit}
+          t={t}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const halfLifeStepper = root.findByProps({ testID: 'caffeine-half-life-stepper' });
+    const bedtimeStepper = root.findByProps({ testID: 'caffeine-bedtime-stepper' });
+    expect(halfLifeStepper.props.accessibilityRole).toBe('adjustable');
+    expect(halfLifeStepper.props.accessibilityHint).toBe(t.settings.caffeineHalfLifeDesc);
+    expect(bedtimeStepper.props.accessibilityRole).toBe('adjustable');
+    expect(bedtimeStepper.props.accessibilityHint).toBe(t.settings.bedtimeHourDesc);
+  });
 });

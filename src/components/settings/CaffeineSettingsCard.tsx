@@ -37,10 +37,12 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
             </Text>
           </View>
           <View
+            testID="caffeine-half-life-stepper"
             style={styles.stepperContainer}
             accessibilityRole="adjustable"
             accessibilityLabel={t.settings.caffeineHalfLifeTitle || 'Czas Półtrwania Kofeiny'}
             accessibilityValue={{ min: 3.0, max: 8.0, now: halfLifeHours, text: `${halfLifeHours.toFixed(1)} h` }}
+            accessibilityHint={t.settings.caffeineHalfLifeDesc || 'Dostosuj czas półtrwania kofeiny'}
           >
             <Pressable
               style={styles.stepperBtn}
@@ -76,10 +78,12 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
             </Text>
           </View>
           <View
+            testID="caffeine-bedtime-stepper"
             style={styles.stepperContainer}
             accessibilityRole="adjustable"
             accessibilityLabel={t.settings.bedtimeHourTitle || 'Docelowa Godzina Snu'}
             accessibilityValue={{ min: 18, max: 28, now: bedtimeHour, text: `${bedtimeHour}:00` }}
+            accessibilityHint={t.settings.bedtimeHourDesc || 'Dostosuj docelową godzinę snu'}
           >
             <Pressable
               style={styles.stepperBtn}
