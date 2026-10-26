@@ -462,7 +462,7 @@ export async function updateLiveActivity(
 export async function endLiveActivity(
   activityId: string,
   dismissalPolicy: 'immediate' | 'after_delay' | string = 'immediate',
-  finalContentState?: BrewLiveActivityState
+  finalContentState?: BrewActivityContentState
 ): Promise<{ success: boolean; error?: string }> {
   if (!activityId || typeof activityId !== 'string') {
     return {
