@@ -246,4 +246,12 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(negZero.targetGhPpm).toBe(0);
     expect(negZero.targetKhPpm).toBe(0);
   });
+
+  test('TASK-P26-07-JAK: diagnoseWaterSensoryImpact parsuje wejścia stringowe i chroni przed -0', () => {
+    const fromStrings = diagnoseWaterSensoryImpact('60' as any, '30' as any);
+    expect(fromStrings.problemPl).toContain('Golden Zone');
+
+    const negZero = diagnoseWaterSensoryImpact(-0, -0);
+    expect(negZero.problemPl).toContain('Agresywny');
+  });
 });

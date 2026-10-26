@@ -252,7 +252,14 @@ export function diagnoseWaterSensoryImpact(
   ghPpm: number,
   khPpm: number
 ): WaterDiagnosticResult {
-  if (!Number.isFinite(ghPpm) || !Number.isFinite(khPpm) || ghPpm < 0 || khPpm < 0) {
+  const rawGh = typeof ghPpm === 'string' ? parseFloat(ghPpm) : Number(ghPpm);
+  const rawKh = typeof khPpm === 'string' ? parseFloat(khPpm) : Number(khPpm);
+  let safeGh = Number.isFinite(rawGh) ? rawGh : NaN;
+  let safeKh = Number.isFinite(rawKh) ? rawKh : NaN;
+  if (Object.is(safeGh, -0)) safeGh = 0;
+  if (Object.is(safeKh, -0)) safeKh = 0;
+
+  if (!Number.isFinite(safeGh) || !Number.isFinite(safeKh) || safeGh < 0 || safeKh < 0) {
     return {
       problemPl: 'Nieprawidłowe dane wejściowe parametrów wody.',
       problemEn: 'Invalid input data for water chemistry parameters.',
@@ -263,7 +270,7 @@ export function diagnoseWaterSensoryImpact(
     };
   }
 
-  if (ghPpm > 1000 || khPpm > 1000) {
+  if (safeGh > 1000 || safeKh > 1000) {
     return {
       problemPl: 'Woda niezdatna do parzenia speciality (skrajne zasolenie/mineralizacja).',
       problemEn: 'Water unsuitable for specialty brewing (extreme salinity/mineralization).',
@@ -274,7 +281,7 @@ export function diagnoseWaterSensoryImpact(
     };
   }
 
-  if (khPpm > 75) {
+  if (safeKh > 75) {
     return {
       problemPl: 'Płaski napar, brak żywej kwasowości owocowej, posmak kredowy.',
       problemEn: 'Flat brew, lack of vibrant fruit acidity, chalky mouthfeel.',
@@ -285,7 +292,7 @@ export function diagnoseWaterSensoryImpact(
     };
   }
 
-  if (khPpm < 20) {
+  if (safeKh < 20) {
     return {
       problemPl: 'Agresywny, ostry, chemiczny kwas, brak słodkiego balansu.',
       problemEn: 'Sharp, vinegar-like, unbuffered harsh acid, lack of sweetness.',
@@ -296,7 +303,7 @@ export function diagnoseWaterSensoryImpact(
     };
   }
 
-  if (ghPpm < 35) {
+  if (safeGh < 35) {
     return {
       problemPl: 'Cienkie body, niska intensywność aromatów, wodnisty finisz.',
       problemEn: 'Thin body, weak aroma intensity, watery hollow finish.',
@@ -307,7 +314,7 @@ export function diagnoseWaterSensoryImpact(
     };
   }
 
-  if (ghPpm > 150) {
+  if (safeGh > 150) {
     return {
       problemPl: 'Ciężka, sucha gorycz, szybkie osadzanie kamienia w czajniku.',
       problemEn: 'Heavy dry bitterness, rapid kettle scale accumulation.',
