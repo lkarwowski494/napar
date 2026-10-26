@@ -127,15 +127,17 @@ export function recipeToCompactPayload(
     .filter((st): st is RecipeStep => typeof st === 'object' && st !== null)
     .slice(0, 100)
     .map((st) => {
-      const rawDur = typeof st.durationSeconds === 'number' ? st.durationSeconds : (typeof st.durationSeconds === 'string' ? parseFloat(st.durationSeconds) : NaN);
-      const rawW = typeof st.targetWaterGrams === 'number' ? st.targetWaterGrams : (typeof st.targetWaterGrams === 'string' ? parseFloat(st.targetWaterGrams) : NaN);
+      const rawDur = typeof st.durationSeconds === 'number' ? st.durationSeconds : (typeof st.durationSeconds === 'string' ? parseFloat(st.durationSeconds.replace(',', '.')) : NaN);
+      const rawW = typeof st.targetWaterGrams === 'number' ? st.targetWaterGrams : (typeof st.targetWaterGrams === 'string' ? parseFloat(st.targetWaterGrams.replace(',', '.')) : NaN);
       const safeW = Number.isFinite(rawW) && rawW >= 0 ? Math.min(50000, Math.round(rawW)) : 0;
+      const fallbackName = typeof st.nameEn === 'string' && st.nameEn.trim() ? st.nameEn.trim().slice(0, 100) : 'Step';
+      const fallbackInstr = typeof st.instructionEn === 'string' ? st.instructionEn.trim().slice(0, 2000) : '';
       return {
-        n: typeof st.namePl === 'string' && st.namePl.trim() ? st.namePl.trim().slice(0, 100) : 'Step',
+        n: typeof st.namePl === 'string' && st.namePl.trim() ? st.namePl.trim().slice(0, 100) : fallbackName,
         ...(typeof st.nameEn === 'string' && st.nameEn.trim() ? { ne: st.nameEn.trim().slice(0, 100) } : {}),
         d: Number.isFinite(rawDur) && rawDur > 0 ? Math.min(86400, Math.round(rawDur)) : 30,
         w: Object.is(safeW, -0) || safeW <= 0 ? 0 : safeW,
-        i: typeof st.instructionPl === 'string' ? st.instructionPl.trim().slice(0, 2000) : '',
+        i: typeof st.instructionPl === 'string' && st.instructionPl.trim() ? st.instructionPl.trim().slice(0, 2000) : fallbackInstr,
         ...(typeof st.instructionEn === 'string' && st.instructionEn.trim() ? { ie: st.instructionEn.trim().slice(0, 2000) } : {}),
       };
     });
@@ -176,8 +178,8 @@ export function recipeToCompactPayload(
     : (recipe as MasterRecipe).grindSettingDescriptionPl;
   const rawRatio = recipe.recommendedRatio;
 
-  const parsedDose = typeof rawDose === 'number' ? rawDose : (typeof rawDose === 'string' ? parseFloat(rawDose) : NaN);
-  const parsedWater = typeof rawWater === 'number' ? rawWater : (typeof rawWater === 'string' ? parseFloat(rawWater) : NaN);
+  const parsedDose = typeof rawDose === 'number' ? rawDose : (typeof rawDose === 'string' ? parseFloat(rawDose.replace(',', '.')) : NaN);
+  const parsedWater = typeof rawWater === 'number' ? rawWater : (typeof rawWater === 'string' ? parseFloat(rawWater.replace(',', '.')) : NaN);
   const rawDoseVal =
     Number.isFinite(parsedDose) && parsedDose > 0 ? Number(Math.min(1000, Math.max(1, parsedDose)).toFixed(1)) : 15;
   const dose = Object.is(rawDoseVal, -0) ? 15 : rawDoseVal;
@@ -186,7 +188,7 @@ export function recipeToCompactPayload(
     Number.isFinite(parsedWater) && parsedWater > 0 ? Number(Math.min(50000, Math.max(10, parsedWater)).toFixed(1)) : 250;
   const water = Object.is(rawWaterVal, -0) ? 250 : rawWaterVal;
 
-  const parsedTemp = typeof rawTemp === 'number' ? rawTemp : (typeof rawTemp === 'string' ? parseFloat(rawTemp) : NaN);
+  const parsedTemp = typeof rawTemp === 'number' ? rawTemp : (typeof rawTemp === 'string' ? parseFloat(rawTemp.replace(',', '.')) : NaN);
   const rawTempVal =
     Number.isFinite(parsedTemp) && parsedTemp >= 0 && parsedTemp <= 100
       ? Math.round(parsedTemp)
@@ -198,7 +200,7 @@ export function recipeToCompactPayload(
       ? rawGrind.trim().slice(0, 200)
       : (typeof rawGrind === 'number' && Number.isFinite(rawGrind) ? String(rawGrind) : undefined);
   const computedRatio = Number((water / (dose || 1)).toFixed(1));
-  const rawRatioNum = typeof rawRatio === 'number' ? rawRatio : (typeof rawRatio === 'string' ? parseFloat(rawRatio as any) : NaN);
+  const rawRatioNum = typeof rawRatio === 'number' ? rawRatio : (typeof rawRatio === 'string' ? parseFloat((rawRatio as any).replace(',', '.')) : NaN);
   const ratioCandidate =
     Number.isFinite(rawRatioNum) && rawRatioNum > 0
       ? Number(Math.min(100, Math.max(1, rawRatioNum)).toFixed(2))
@@ -321,16 +323,18 @@ export function decodeRecipeFromShareUrl(
     const steps: RecipeStep[] = (parsed.s || [])
       .filter((st): st is CompactRecipeStep => typeof st === 'object' && st !== null)
       .map((st, idx) => {
-        const rawSec = typeof st.d === 'number' ? st.d : (typeof st.d === 'string' ? parseFloat(st.d) : NaN);
-        const rawWater = typeof st.w === 'number' ? st.w : (typeof st.w === 'string' ? parseFloat(st.w) : NaN);
+        const rawSec = typeof st.d === 'number' ? st.d : (typeof st.d === 'string' ? parseFloat(st.d.replace(',', '.')) : NaN);
+        const rawWater = typeof st.w === 'number' ? st.w : (typeof st.w === 'string' ? parseFloat(st.w.replace(',', '.')) : NaN);
         const safeStepWater = Number.isFinite(rawWater) && rawWater >= 0 ? Math.max(0, Math.min(50000, Math.round(rawWater))) : 0;
+        const fallbackStepPlName = typeof st.ne === 'string' && st.ne.trim() ? st.ne.trim().slice(0, 100) : defaultStepName(idx + 1);
+        const fallbackStepInstrPl = typeof st.ie === 'string' ? st.ie.slice(0, 2000) : '';
         return {
           stepNumber: idx + 1,
-          namePl: typeof st.n === 'string' && st.n.trim() ? st.n.trim().slice(0, 100) : defaultStepName(idx + 1),
+          namePl: typeof st.n === 'string' && st.n.trim() ? st.n.trim().slice(0, 100) : fallbackStepPlName,
           ...(st.ne && typeof st.ne === 'string' ? { nameEn: st.ne.trim().slice(0, 100) } : (isEn && typeof st.n === 'string' && st.n ? { nameEn: st.n.trim().slice(0, 100) } : {})),
           durationSeconds: Number.isFinite(rawSec) && rawSec > 0 ? Math.max(1, Math.min(86400, Math.round(rawSec))) : 30,
           targetWaterGrams: Object.is(safeStepWater, -0) || safeStepWater <= 0 ? 0 : safeStepWater,
-          instructionPl: typeof st.i === 'string' ? st.i.slice(0, 2000) : '',
+          instructionPl: typeof st.i === 'string' && st.i.trim() ? st.i.slice(0, 2000) : fallbackStepInstrPl,
           ...(st.ie && typeof st.ie === 'string' ? { instructionEn: st.ie.slice(0, 2000) } : (isEn && typeof st.i === 'string' && st.i ? { instructionEn: st.i.slice(0, 2000) } : {})),
         };
       });
@@ -348,7 +352,7 @@ export function decodeRecipeFromShareUrl(
       doseGrams: Object.is(Number(parsed.d.toFixed(1)), -0) ? 0 : Number(parsed.d.toFixed(1)),
       waterGrams: Object.is(Number(parsed.w.toFixed(1)), -0) ? 0 : Number(parsed.w.toFixed(1)),
       waterTempCelsius: (() => {
-        const rawDecodedTemp = typeof parsed.t === 'number' ? parsed.t : (typeof parsed.t === 'string' ? parseFloat(parsed.t) : NaN);
+        const rawDecodedTemp = typeof parsed.t === 'number' ? parsed.t : (typeof parsed.t === 'string' ? parseFloat((parsed.t as any).replace(',', '.')) : NaN);
         return Number.isFinite(rawDecodedTemp) && rawDecodedTemp >= 0 && rawDecodedTemp <= 100 && !Object.is(rawDecodedTemp, -0) ? Math.max(0, Math.min(100, Math.round(rawDecodedTemp))) : 92;
       })(),
       grindSizeDescription:
@@ -356,7 +360,7 @@ export function decodeRecipeFromShareUrl(
           ? parsed.g.trim().slice(0, 200)
           : (typeof parsed.g === 'number' && Number.isFinite(parsed.g) ? String(parsed.g) : ''),
       recommendedRatio: (() => {
-        const rawDecodedRatio = typeof parsed.r === 'number' ? parsed.r : (typeof parsed.r === 'string' ? parseFloat(parsed.r) : NaN);
+        const rawDecodedRatio = typeof parsed.r === 'number' ? parsed.r : (typeof parsed.r === 'string' ? parseFloat(String(parsed.r).replace(',', '.')) : NaN);
         let ratioVal = Number.isFinite(rawDecodedRatio) && rawDecodedRatio > 0 && !Object.is(rawDecodedRatio, -0)
           ? Number(Math.min(100, Math.max(1, rawDecodedRatio)).toFixed(2))
           : Number(Math.min(100, Math.max(1, parsed.w / (parsed.d || 1))).toFixed(1));

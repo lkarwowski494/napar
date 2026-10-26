@@ -1096,4 +1096,69 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decodedUpperData).not.toBeNull();
     expect(decodedUpperData?.recipe.name).toBe('Uppercase Query Test');
   });
+
+  test('TASK-P46-11-WZR: recipeToCompactPayload i decodeRecipeFromShareUrl obslugują przecinki dziesiętne i fallbacki językowe kroków', () => {
+    // 1. Obsługa przecinków dziesiętnych w stringach dozy, wody, temp, ratio
+    const recipeWithCommas: any = {
+      id: 'comma-recipe',
+      name: 'Comma Recipe',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: '15,5',
+      waterGrams: '250,5',
+      waterTempCelsius: '92,5',
+      recommendedRatio: '16,2',
+      stepsJson: JSON.stringify([
+        {
+          namePl: '',
+          nameEn: 'Bloom Pour',
+          durationSeconds: '45,5',
+          targetWaterGrams: '60,5',
+          instructionPl: '',
+          instructionEn: 'Pour water gently in circles',
+        },
+      ]),
+    };
+
+    const compact = recipeToCompactPayload(recipeWithCommas);
+    expect(compact.d).toBe(15.5);
+    expect(compact.w).toBe(250.5);
+    expect(compact.t).toBe(93); // rounded
+    expect(compact.r).toBe(16.2);
+    expect(compact.s[0].n).toBe('Bloom Pour'); // fallback to nameEn
+    expect(compact.s[0].i).toBe('Pour water gently in circles'); // fallback to instructionEn
+    expect(compact.s[0].d).toBe(46); // rounded duration
+    expect(compact.s[0].w).toBe(61); // rounded water
+
+    // 2. decodeRecipeFromShareUrl z przecinkami w payloadzie
+    const payloadWithCommas = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Decoded Comma',
+      b: 'COFFEE',
+      m: 'Aeropress',
+      d: 14,
+      w: 200,
+      t: '94,5',
+      r: '14,3',
+      s: [
+        {
+          n: '',
+          ne: 'Inverted Bloom',
+          d: '30,2',
+          w: '50,4',
+          i: '',
+          ie: 'Stir 5 times',
+        },
+      ],
+    }));
+
+    const decoded = decodeRecipeFromShareUrl(payloadWithCommas);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.recipe.waterTempCelsius).toBe(95);
+    expect(decoded?.recipe.recommendedRatio).toBe(14.3);
+    expect(decoded?.originalSteps[0].namePl).toBe('Inverted Bloom');
+    expect(decoded?.originalSteps[0].instructionPl).toBe('Stir 5 times');
+    expect(decoded?.originalSteps[0].durationSeconds).toBe(30);
+    expect(decoded?.originalSteps[0].targetWaterGrams).toBe(50);
+  });
 });
