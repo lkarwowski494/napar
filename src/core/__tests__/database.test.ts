@@ -2062,6 +2062,7 @@ describe('Napar SQLite Database & Repositories', () => {
       type: 'coffee',
       initialWeightGrams: 5000000,
       remainingWeightGrams: 5000000,
+      flavorNotes: [],
       isFavorite: false,
       isArchived: false,
       createdAt: '2026-10-26T18:00:00Z',
