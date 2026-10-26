@@ -669,7 +669,23 @@ export function findCoffeeOriginById(id: string): CoffeeOriginInfo | undefined {
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return TEA_CATEGORIES.find((t) => t.id && t.id.trim().toLowerCase() === cleanId);
+  const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  return TEA_CATEGORIES.find((t) => {
+    if (t.id && typeof t.id === 'string' && t.id.trim().toLowerCase() === cleanId) return true;
+    if (t.namePl && typeof t.namePl === 'string' && t.namePl.trim().toLowerCase() === cleanId) return true;
+    if (t.nameEn && typeof t.nameEn === 'string' && t.nameEn.trim().toLowerCase() === cleanId) return true;
+    if (t.namePl && typeof t.namePl === 'string' && t.namePl.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === normId) return true;
+    if (t.nameEn && typeof t.nameEn === 'string' && t.nameEn.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === normId) return true;
+    if (t.traditionalName && typeof t.traditionalName === 'string') {
+      const tradClean = t.traditionalName.trim().toLowerCase();
+      const tradNorm = t.traditionalName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      if (tradClean === cleanId || tradClean.includes(cleanId) || tradNorm === normId || tradNorm.includes(normId)) {
+        return true;
+      }
+    }
+    return false;
+  });
 }
 
 export function getKnowledgeDescription(id: string, lang: 'pl' | 'en' = 'pl'): string {
