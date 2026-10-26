@@ -169,4 +169,20 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(getWaterProfileName(null as any, 'pl')).toBe('');
     expect(getWaterProfileName(undefined as any, 'pl')).toBe('');
   });
+
+  test('TASK-P15-08-PRO: getWaterProfileName domyślnie używa języka polskiego, a findWaterRecipeById/findBottledWaterById sanityzują id', () => {
+    // Domyślny język 'pl'
+    expect(getWaterProfileName('sca_standard')).toBe('Standard SCA (Specialty Coffee)');
+
+    // Sanityzacja whitespace i nullish w helperach wyszukiwania
+    expect(findWaterRecipeById('  sca_standard  ')?.id).toBe('sca_standard');
+    expect(findWaterRecipeById('')).toBeUndefined();
+    expect(findWaterRecipeById('   ')).toBeUndefined();
+    expect(findWaterRecipeById(null as any)).toBeUndefined();
+
+    expect(findBottledWaterById('  volvic  ')?.id).toBe('volvic');
+    expect(findBottledWaterById('')).toBeUndefined();
+    expect(findBottledWaterById('   ')).toBeUndefined();
+    expect(findBottledWaterById(null as any)).toBeUndefined();
+  });
 });
