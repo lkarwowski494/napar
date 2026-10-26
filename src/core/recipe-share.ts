@@ -128,8 +128,8 @@ export function recipeToCompactPayload(
     .map((st) => ({
       n: typeof st.namePl === 'string' && st.namePl.trim() ? st.namePl.trim() : 'Step',
       ...(typeof st.nameEn === 'string' && st.nameEn.trim() ? { ne: st.nameEn.trim() } : {}),
-      d: Number.isFinite(st.durationSeconds) && st.durationSeconds > 0 ? st.durationSeconds : 30,
-      w: Number.isFinite(st.targetWaterGrams) && st.targetWaterGrams >= 0 ? st.targetWaterGrams : 0,
+      d: Number.isFinite(st.durationSeconds) && st.durationSeconds > 0 ? Math.min(86400, Math.round(st.durationSeconds)) : 30,
+      w: Number.isFinite(st.targetWaterGrams) && st.targetWaterGrams >= 0 ? Math.min(50000, Math.round(st.targetWaterGrams)) : 0,
       i: typeof st.instructionPl === 'string' ? st.instructionPl.trim() : '',
       ...(typeof st.instructionEn === 'string' && st.instructionEn.trim() ? { ie: st.instructionEn.trim() } : {}),
     }));
@@ -286,8 +286,8 @@ export function decodeRecipeFromShareUrl(
         stepNumber: idx + 1,
         namePl: typeof st.n === 'string' && st.n.trim() ? st.n : defaultStepName(idx + 1),
         ...(st.ne && typeof st.ne === 'string' ? { nameEn: st.ne } : (isEn && typeof st.n === 'string' && st.n ? { nameEn: st.n } : {})),
-        durationSeconds: typeof st.d === 'number' && Number.isFinite(st.d) && st.d > 0 ? Math.round(st.d) : 30,
-        targetWaterGrams: typeof st.w === 'number' && Number.isFinite(st.w) && st.w >= 0 ? Math.round(st.w) : 0,
+        durationSeconds: typeof st.d === 'number' && Number.isFinite(st.d) && st.d > 0 ? Math.min(86400, Math.round(st.d)) : 30,
+        targetWaterGrams: typeof st.w === 'number' && Number.isFinite(st.w) && st.w >= 0 ? Math.min(50000, Math.round(st.w)) : 0,
         instructionPl: typeof st.i === 'string' ? st.i : '',
         ...(st.ie && typeof st.ie === 'string' ? { instructionEn: st.ie } : (isEn && typeof st.i === 'string' && st.i ? { instructionEn: st.i } : {})),
       }));

@@ -484,4 +484,20 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(payload.t).toBe(0);
     expect(payload.r).toBe(15);
   });
+
+  test('TASK-P19-11-WZR: recipeToCompactPayload i decodeRecipeFromShareUrl ograniczają czas kroku i wodę', () => {
+    const raw = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Extreme Step Clamping',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 250,
+      s: [{ n: 'Huge Step', d: 999999, w: 999999 }],
+    }));
+    const decoded = decodeRecipeFromShareUrl(raw);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.originalSteps[0].durationSeconds).toBe(86400);
+    expect(decoded?.originalSteps[0].targetWaterGrams).toBe(50000);
+  });
 });
