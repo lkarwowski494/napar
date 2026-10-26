@@ -103,7 +103,8 @@ export function getAppAccessState(): AppAccessState {
   if (elapsedDays > maxDaysSeen) {
     setAppSetting('trial_max_days_seen', String(elapsedDays));
   }
-  const daysRemaining = Math.floor(Math.max(0, Math.min(TRIAL_DURATION_DAYS, TRIAL_DURATION_DAYS - effectiveElapsedDays)));
+  const rawDaysRemaining = Math.floor(Math.max(0, Math.min(TRIAL_DURATION_DAYS, TRIAL_DURATION_DAYS - effectiveElapsedDays)));
+  const daysRemaining = Object.is(rawDaysRemaining, -0) || rawDaysRemaining <= 0 ? 0 : rawDaysRemaining;
 
   const rawBrews = parseInt(getAppSetting('trial_brews_count', '0'), 10);
   const brewsCount = Number.isFinite(rawBrews) && rawBrews > 0 ? Math.floor(rawBrews) : 0;
@@ -113,7 +114,8 @@ export function getAppAccessState(): AppAccessState {
   if (brewsCount > maxBrewsSeen) {
     setAppSetting('trial_max_brews_seen', String(brewsCount));
   }
-  const brewsRemaining = Math.floor(Math.max(0, Math.min(TRIAL_MAX_BREWS, TRIAL_MAX_BREWS - effectiveBrewsCount)));
+  const rawBrewsRemaining = Math.floor(Math.max(0, Math.min(TRIAL_MAX_BREWS, TRIAL_MAX_BREWS - effectiveBrewsCount)));
+  const brewsRemaining = Object.is(rawBrewsRemaining, -0) || rawBrewsRemaining <= 0 ? 0 : rawBrewsRemaining;
 
   const isExpired = effectiveBrewsCount >= TRIAL_MAX_BREWS || effectiveElapsedDays >= TRIAL_DURATION_DAYS;
 
@@ -148,9 +150,10 @@ export function getAppAccessState(): AppAccessState {
 export function getTrialDaysRemaining(): number {
   const state = getAppAccessState();
   if (state.isSubscribed) return Infinity;
-  return Number.isFinite(state.daysRemaining) && state.daysRemaining >= 0
+  const days = Number.isFinite(state.daysRemaining) && state.daysRemaining >= 0
     ? Math.floor(Math.min(TRIAL_DURATION_DAYS, state.daysRemaining))
     : 0;
+  return Object.is(days, -0) ? 0 : days;
 }
 
 /**
@@ -159,9 +162,10 @@ export function getTrialDaysRemaining(): number {
 export function getTrialBrewsRemaining(): number {
   const state = getAppAccessState();
   if (state.isSubscribed) return Infinity;
-  return Number.isFinite(state.brewsRemaining) && state.brewsRemaining >= 0
+  const brews = Number.isFinite(state.brewsRemaining) && state.brewsRemaining >= 0
     ? Math.floor(Math.min(TRIAL_MAX_BREWS, state.brewsRemaining))
     : 0;
+  return Object.is(brews, -0) ? 0 : brews;
 }
 
 export function recordBrewCompleted(): AppAccessState {

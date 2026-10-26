@@ -599,4 +599,15 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     setTrialExpiredForTesting();
     expect(getTrialBrewsRemaining()).toBe(0);
   });
+
+  test('TASK-P33-02-MON: getTrialDaysRemaining i getTrialBrewsRemaining chronią przed wartościami -0', () => {
+    resetTrialForTesting();
+    setTrialExpiredForTesting();
+    const days = getTrialDaysRemaining();
+    const brews = getTrialBrewsRemaining();
+    expect(Object.is(days, -0)).toBe(false);
+    expect(Object.is(brews, -0)).toBe(false);
+    expect(days).toBe(0);
+    expect(brews).toBe(0);
+  });
 });
