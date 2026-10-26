@@ -500,4 +500,20 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded?.originalSteps[0].durationSeconds).toBe(86400);
     expect(decoded?.originalSteps[0].targetWaterGrams).toBe(50000);
   });
+
+  test('TASK-P20-11-WZR: decodeRecipeFromShareUrl i recipeToCompactPayload ograniczają instrukcje kroku do 2000 znaków', () => {
+    const hugeInstruction = 'A'.repeat(5000);
+    const raw = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Long Instruction Test',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 250,
+      s: [{ n: 'Step 1', d: 30, w: 100, i: hugeInstruction }],
+    }));
+    const decoded = decodeRecipeFromShareUrl(raw);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.originalSteps[0].instructionPl.length).toBe(2000);
+  });
 });
