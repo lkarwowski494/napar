@@ -145,4 +145,33 @@ describe('BrewActiveFocusTimer Component', () => {
     act(() => finishBtn.props.onPress());
     expect(defaultProps.onFinish).toHaveBeenCalled();
   });
+
+  test('TASK-P35-01-ODK: timer-display, step-countdown i hero-target-text posiadają accessibilityRole text oraz zlokalizowane etykiety a11y', () => {
+    let treePl: any;
+    const runningSnapshot = {
+      ...defaultSnapshot,
+      status: 'running',
+      totalElapsedSeconds: 65,
+      stepRemainingSeconds: 25,
+      targetWaterGrams: 120,
+    };
+
+    act(() => {
+      treePl = renderer.create(
+        <BrewActiveFocusTimer {...defaultProps} snapshot={runningSnapshot} />
+      );
+    });
+
+    const timerDisplayPl = treePl.root.findByProps({ testID: 'timer-display' });
+    expect(timerDisplayPl.props.accessibilityRole).toBe('text');
+    expect(timerDisplayPl.props.accessibilityLabel).toBe('Czas parzenia: 01:05');
+
+    const countdownPl = treePl.root.findByProps({ testID: 'step-countdown' });
+    expect(countdownPl.props.accessibilityRole).toBe('text');
+    expect(countdownPl.props.accessibilityLabel).toBe('Pozostały czas kroku: 25s');
+
+    const targetPl = treePl.root.findByProps({ testID: 'hero-target-text' });
+    expect(targetPl.props.accessibilityRole).toBe('text');
+    expect(targetPl.props.accessibilityLabel).toBe('Zalej do: 120 g');
+  });
 });

@@ -61,8 +61,10 @@ export function BrewActiveFocusTimer({
   const isEn = language === 'en';
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const rawSec = typeof seconds === 'number' ? seconds : (typeof seconds === 'string' ? parseFloat(seconds) : 0);
+    const safeSec = Number.isFinite(rawSec) && rawSec >= 0 ? Math.floor(rawSec) : 0;
+    const mins = Math.floor(safeSec / 60);
+    const secs = safeSec % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
@@ -83,7 +85,12 @@ export function BrewActiveFocusTimer({
         accessibilityLabel={`${t.brew.totalTimeAccessibility || 'Całkowity czas'}: ${formatTime(snapshot.totalElapsedSeconds)}`}
       >
         <Text style={styles.timerTotalLabel}>{t.brew.totalTimeLabel || 'CAŁKOWITY CZAS'}</Text>
-        <Text style={styles.timerDisplay}>
+        <Text
+          testID="timer-display"
+          style={styles.timerDisplay}
+          accessibilityRole="text"
+          accessibilityLabel={`${isEn ? 'Elapsed time' : 'Czas parzenia'}: ${formatTime(snapshot.totalElapsedSeconds)}`}
+        >
           {formatTime(snapshot.totalElapsedSeconds)}
         </Text>
 
@@ -132,7 +139,12 @@ export function BrewActiveFocusTimer({
                     <Text style={styles.timeAdjustPillText}>{t.brew.subTime10}</Text>
                   </Pressable>
                 )}
-                <Text style={styles.stepCountdown}>
+                <Text
+                  testID="step-countdown"
+                  style={styles.stepCountdown}
+                  accessibilityRole="text"
+                  accessibilityLabel={`${isEn ? 'Remaining step time' : 'Pozostały czas kroku'}: ${snapshot.stepRemainingSeconds}s`}
+                >
                   {snapshot.stepRemainingSeconds}s
                 </Text>
                 {(isRunning || isPaused) && (
@@ -150,7 +162,12 @@ export function BrewActiveFocusTimer({
             </View>
 
             <View style={styles.heroTargetContainer}>
-              <Text style={styles.heroTargetText}>
+              <Text
+                testID="hero-target-text"
+                style={styles.heroTargetText}
+                accessibilityRole="text"
+                accessibilityLabel={`${t.brew.pourUpTo || 'Zalej do'}: ${snapshot.targetWaterGrams} g`}
+              >
                 {`${t.brew.pourUpTo || "Zalej do"}: ${snapshot.targetWaterGrams} g`}
               </Text>
               <View style={styles.heroTargetSubRow}>
