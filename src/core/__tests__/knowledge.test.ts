@@ -797,4 +797,22 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findTeaCategoryById('silver-needle')?.id).toBe('tea-white');
     expect(findTeaCategoryById('baimudan')?.id).toBe('tea-white');
   });
+
+  test('TASK-P44-06-TRE: findCoffeeOriginById wspiera mikroregiony kawowe (yirgacheffe, guji, nyeri, huila, narino, antigua, tarrazu, cerrado, boquete)', () => {
+    expect(findCoffeeOriginById('yirgacheffe')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('sidama')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('guji')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('harrar')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('nyeri')?.id).toBe('origin-kenya');
+    expect(findCoffeeOriginById('kirinyaga')?.id).toBe('origin-kenya');
+    expect(findCoffeeOriginById('huila')?.id).toBe('origin-colombia');
+    expect(findCoffeeOriginById('narino')?.id).toBe('origin-colombia');
+    expect(findCoffeeOriginById('antigua')?.id).toBe('origin-guatemala');
+    expect(findCoffeeOriginById('huehuetenango')?.id).toBe('origin-guatemala');
+    expect(findCoffeeOriginById('tarrazu')?.id).toBe('origin-costa-rica');
+    expect(findCoffeeOriginById('cerrado')?.id).toBe('origin-brazil');
+    expect(findCoffeeOriginById('minas gerais')?.id).toBe('origin-brazil');
+    expect(findCoffeeOriginById('boquete')?.id).toBe('origin-panama');
+    expect(findCoffeeOriginById('volcan')?.id).toBe('origin-panama');
+  });
 });
