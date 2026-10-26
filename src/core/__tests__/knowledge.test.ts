@@ -919,4 +919,36 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findTeaCategoryById('dianhong')?.id).toBe('tea-black');
     expect(findTeaCategoryById('jin-jun-mei')?.id).toBe('tea-black');
   });
+
+  test('TASK-P51-06-TRE: findTeaCategoryById wspiera herbaty biale/zielone/oolong, findCoffeeOriginById i findCoffeeVarietyById wspieraja nowe regiony i kultywary', () => {
+    // 1. Herbaty białe, zielone, oolong
+    expect(findTeaCategoryById('silver needle')?.id).toBe('tea-white');
+    expect(findTeaCategoryById('silver-needle')?.id).toBe('tea-white');
+    expect(findTeaCategoryById('white peony')?.id).toBe('tea-white');
+    expect(findTeaCategoryById('pai mu tan')?.id).toBe('tea-white');
+    expect(findTeaCategoryById('longjing')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('dragonwell')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('bancha')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('tieguanyin')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('iron goddess')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('da hong pao')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('big red robe')?.id).toBe('tea-oolong');
+
+    // 2. Regiony pochodzenia kawy
+    expect(findCoffeeOriginById('limu')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('jimma')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('embu')?.id).toBe('origin-kenya');
+    expect(findCoffeeOriginById('muranga')?.id).toBe('origin-kenya');
+    expect(findCoffeeOriginById('coban')?.id).toBe('origin-guatemala');
+    expect(findCoffeeOriginById('atitlan')?.id).toBe('origin-guatemala');
+    expect(findCoffeeOriginById('mogiana')?.id).toBe('origin-brazil');
+    expect(findCoffeeOriginById('renacimiento')?.id).toBe('origin-panama');
+
+    // 3. Kultywary kawy
+    expect(findCoffeeVarietyById('gesha 1931')?.id).toBe('variety-geisha');
+    expect(findCoffeeVarietyById('panama geisha')?.id).toBe('variety-geisha');
+    expect(findCoffeeVarietyById('villalobos')?.id).toBe('variety-typica');
+    expect(findCoffeeVarietyById('san ramon')?.id).toBe('variety-typica');
+    expect(findCoffeeVarietyById('marsellesa')?.id).toBe('variety-castillo-colombia');
+  });
 });

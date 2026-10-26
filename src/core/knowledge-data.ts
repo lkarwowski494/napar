@@ -708,6 +708,17 @@ const VARIETY_ALIASES: Record<string, string> = {
   'bourbon-pointu': 'variety-bourbon',
   bourbonpointu: 'variety-bourbon',
   papayo: 'variety-bourbon',
+  'gesha 1931': 'variety-geisha',
+  'gesha-1931': 'variety-geisha',
+  gesha1931: 'variety-geisha',
+  'panama geisha': 'variety-geisha',
+  'panama-geisha': 'variety-geisha',
+  panamageisha: 'variety-geisha',
+  villalobos: 'variety-typica',
+  'san ramon': 'variety-typica',
+  'san-ramon': 'variety-typica',
+  sanramon: 'variety-typica',
+  marsellesa: 'variety-castillo-colombia',
 };
 
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
@@ -865,6 +876,8 @@ const ORIGIN_ALIASES: Record<string, string> = {
   sidama: 'origin-ethiopia',
   guji: 'origin-ethiopia',
   harrar: 'origin-ethiopia',
+  limu: 'origin-ethiopia',
+  jimma: 'origin-ethiopia',
   // Kenya
   ken: 'origin-kenya',
   kenya: 'origin-kenya',
@@ -873,6 +886,9 @@ const ORIGIN_ALIASES: Record<string, string> = {
   nyeri: 'origin-kenya',
   kirinyaga: 'origin-kenya',
   kiambu: 'origin-kenya',
+  embu: 'origin-kenya',
+  muranga: 'origin-kenya',
+  "murang'a": 'origin-kenya',
   // Colombia
   col: 'origin-colombia',
   colombia: 'origin-colombia',
@@ -890,6 +906,9 @@ const ORIGIN_ALIASES: Record<string, string> = {
   gt: 'origin-guatemala',
   antigua: 'origin-guatemala',
   huehuetenango: 'origin-guatemala',
+  coban: 'origin-guatemala',
+  fraijanes: 'origin-guatemala',
+  atitlan: 'origin-guatemala',
   // Costa Rica
   cri: 'origin-costa-rica',
   'costa-rica': 'origin-costa-rica',
@@ -909,12 +928,14 @@ const ORIGIN_ALIASES: Record<string, string> = {
   'minas-gerais': 'origin-brazil',
   'sul de minas': 'origin-brazil',
   'sul-de-minas': 'origin-brazil',
+  mogiana: 'origin-brazil',
   // Panama
   pan: 'origin-panama',
   panama: 'origin-panama',
   pa: 'origin-panama',
   boquete: 'origin-panama',
   volcan: 'origin-panama',
+  renacimiento: 'origin-panama',
 };
 
 export function findCoffeeOriginById(id: string): CoffeeOriginInfo | undefined {
@@ -1019,6 +1040,32 @@ const TEA_ALIASES: Record<string, string> = {
   'jin-jun-mei': 'tea-black',
   'jin jun mei': 'tea-black',
   jinjunmei: 'tea-black',
+  'silver-needle': 'tea-white',
+  'silver needle': 'tea-white',
+  silverneedle: 'tea-white',
+  'bai-hao-yin-zhen': 'tea-white',
+  'bai hao yin zhen': 'tea-white',
+  baihaoyinzhen: 'tea-white',
+  'white-peony': 'tea-white',
+  'white peony': 'tea-white',
+  whitepeony: 'tea-white',
+  'pai-mu-tan': 'tea-white',
+  'pai mu tan': 'tea-white',
+  paimutan: 'tea-white',
+  bancha: 'tea-green',
+  longjing: 'tea-green',
+  dragonwell: 'tea-green',
+  'dragon well': 'tea-green',
+  tieguanyin: 'tea-oolong',
+  'tie guan yin': 'tea-oolong',
+  'iron goddess': 'tea-oolong',
+  'iron-goddess': 'tea-oolong',
+  irongoddess: 'tea-oolong',
+  'da hong pao': 'tea-oolong',
+  'da-hong-pao': 'tea-oolong',
+  dahongpao: 'tea-oolong',
+  'big red robe': 'tea-oolong',
+  'big-red-robe': 'tea-oolong',
 };
 
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
