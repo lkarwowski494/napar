@@ -265,6 +265,7 @@ export function verifyAndActivateStoreKitPurchase(
   if (
     !receipt ||
     typeof receipt !== 'object' ||
+    Array.isArray(receipt) ||
     typeof receipt.transactionId !== 'string' ||
     !receipt.transactionId.trim() ||
     typeof receipt.signature !== 'string' ||
@@ -293,16 +294,23 @@ export function verifyAndActivateStoreKitPurchase(
     };
   }
 
+  const sanitizedReceipt: StoreKitReceipt = {
+    productId: cleanProductId,
+    transactionId: receipt.transactionId.trim(),
+    purchaseDate: receipt.purchaseDate.trim(),
+    signature: receipt.signature.trim(),
+  };
+
   setAppSetting('is_pro_active', 'true');
   setAppSetting('subscription_tier', tier);
   setAppSetting('has_verified_purchase', 'true');
   setAppSetting('verified_purchase_tier', tier);
-  setAppSetting('verified_receipt_json', JSON.stringify(receipt));
+  setAppSetting('verified_receipt_json', JSON.stringify(sanitizedReceipt));
 
   const state = getAppAccessState();
   notifyAccessChanged();
 
-  return { success: true, tier, receipt };
+  return { success: true, tier, receipt: sanitizedReceipt };
 }
 
 export function resetTrialForTesting(): void {

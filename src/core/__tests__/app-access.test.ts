@@ -715,4 +715,31 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const nullSub = activateSubscription(null as any);
     expect(nullSub.subscriptionTier).toBe('annual');
   });
+
+  test('TASK-P42-02-MON: verifyAndActivateStoreKitPurchase odrzuca tablice i sanityzuje pola paragonu', () => {
+    resetTrialForTesting();
+    // Przekazanie tablicy jako paragon
+    const arrayResult = verifyAndActivateStoreKitPurchase([] as any);
+    expect(arrayResult.success).toBe(false);
+    expect(arrayResult.errorCode).toBe('invalid_signature');
+
+    // Poprawny paragon z whitespace w polach
+    const validReceipt = {
+      productId: '  pl.lukasz.napar.annual  ',
+      transactionId: '  tx-12345  ',
+      purchaseDate: '  2026-10-26T12:00:00.000Z  ',
+      signature: '  sig-abcde-12345  ',
+    };
+    const res = verifyAndActivateStoreKitPurchase(validReceipt as any);
+    expect(res.success).toBe(true);
+    expect(res.tier).toBe('annual');
+    expect(res.receipt?.productId).toBe('pl.lukasz.napar.annual');
+    expect(res.receipt?.transactionId).toBe('tx-12345');
+    expect(res.receipt?.signature).toBe('sig-abcde-12345');
+
+    const storedJson = getAppSetting('verified_receipt_json', '');
+    const parsed = JSON.parse(storedJson);
+    expect(parsed.productId).toBe('pl.lukasz.napar.annual');
+    expect(parsed.transactionId).toBe('tx-12345');
+  });
 });
