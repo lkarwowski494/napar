@@ -368,8 +368,12 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
 
             {beveragePreference !== 'coffee' && (
               <Pressable
+                testID="gongfu-mode-btn"
                 style={styles.gongfuModalBtn}
                 onPress={onOpenGongfu}
+                accessibilityRole="button"
+                accessibilityLabel="Gongfu Cha"
+                accessibilityHint="Uruchamia tradycyjną ceremonię parzenia herbaty Gongfu Cha z wielokrotnymi infuzjami"
               >
                 <Text style={styles.gongfuModalBtnText}>Gongfu Cha</Text>
               </Pressable>
