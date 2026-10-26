@@ -394,4 +394,12 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     const byRegion = searchCoffeeOrigins('Sidama');
     expect(byRegion.length).toBeGreaterThanOrEqual(1);
   });
+  test('TASK-P21-06-TRE: searchCoffeeProcesses defensywnie chroni przed brakującymi polami i spacjami w zapytaniu', () => {
+    const res = searchCoffeeProcesses('   beztlenowa   ');
+    expect(res.length).toBeGreaterThanOrEqual(1);
+    expect(res.some((p) => p.id === 'process-anaerobic')).toBe(true);
+
+    const emptyRes = searchCoffeeProcesses('   ');
+    expect(emptyRes).toHaveLength(COFFEE_PROCESSES.length);
+  });
 });

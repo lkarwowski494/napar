@@ -591,16 +591,16 @@ export function searchCoffeeProcesses(query: string): CoffeeProcessInfo[] {
   if (!query || typeof query !== 'string' || !query.trim()) return COFFEE_PROCESSES;
   const q = query.toLowerCase().trim();
   return COFFEE_PROCESSES.filter((p) =>
-    p.name.toLowerCase().includes(q) ||
-    p.processType.toLowerCase().includes(q) ||
+    (p.name && p.name.toLowerCase().includes(q)) ||
+    (p.processType && p.processType.toLowerCase().includes(q)) ||
     (Array.isArray(p.keyNotesPl) && p.keyNotesPl.some((k) => typeof k === 'string' && k.toLowerCase().includes(q))) ||
     (Array.isArray(p.keyNotesEn) && p.keyNotesEn.some((k) => typeof k === 'string' && k.toLowerCase().includes(q))) ||
     (p.dryingDurationDays && p.dryingDurationDays.toLowerCase().includes(q)) ||
     (p.waterConsumption && p.waterConsumption.toLowerCase().includes(q)) ||
-    p.sensoryImpactPl.toLowerCase().includes(q) ||
-    p.sensoryImpactEn.toLowerCase().includes(q) ||
-    p.descriptionPl.toLowerCase().includes(q) ||
-    p.descriptionEn.toLowerCase().includes(q)
+    (p.sensoryImpactPl && p.sensoryImpactPl.toLowerCase().includes(q)) ||
+    (p.sensoryImpactEn && p.sensoryImpactEn.toLowerCase().includes(q)) ||
+    (p.descriptionPl && p.descriptionPl.toLowerCase().includes(q)) ||
+    (p.descriptionEn && p.descriptionEn.toLowerCase().includes(q))
   );
 }
 
