@@ -13,6 +13,7 @@ import {
   calculateHoursUntilSafeCaffeine,
   diagnoseExtractionTaste,
   calculateBatchScaling,
+  calculateCaffeineDecay,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -152,6 +153,15 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(calculateRemainingCaffeineMg(initial, 5.0)).toBe(60.0);
       expect(calculateRemainingCaffeineMg(initial, 10.0)).toBe(30.0);
       expect(calculateRemainingCaffeineMg(initial, 15.0)).toBe(15.0);
+    });
+
+    it('TASK-P13-03-ZAK: calculateCaffeineDecay wylicza spadek stężenia i chroni przed NaN, ujemnymi godzinami oraz zerowym t_half', () => {
+      expect(calculateCaffeineDecay(100.0, 5.0, 5.0)).toBe(50.0);
+      expect(calculateCaffeineDecay(100.0, 10.0, 5.0)).toBe(25.0);
+      expect(calculateCaffeineDecay(NaN, 5.0)).toBe(0);
+      expect(calculateCaffeineDecay(100.0, -1.0)).toBe(0);
+      expect(calculateCaffeineDecay(100.0, 5.0, 0)).toBe(0);
+      expect(calculateCaffeineDecay(100.0, 5.0, -5.0)).toBe(0);
     });
 
     it('evaluates bedtime safety accurately', () => {

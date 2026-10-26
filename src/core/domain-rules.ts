@@ -460,6 +460,16 @@ export function calculateCaffeineDecay(
   elapsedHours: number,
   halfLifeHours = 5.0
 ): number {
+  if (
+    !Number.isFinite(initialMg) ||
+    !Number.isFinite(elapsedHours) ||
+    !Number.isFinite(halfLifeHours) ||
+    initialMg <= 0 ||
+    elapsedHours < 0 ||
+    halfLifeHours <= 0
+  ) {
+    return 0;
+  }
   return Number((initialMg * Math.pow(0.5, elapsedHours / halfLifeHours)).toFixed(4));
 }
 
