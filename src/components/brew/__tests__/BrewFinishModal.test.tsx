@@ -135,4 +135,29 @@ describe('BrewFinishModal Component', () => {
     });
     expect(JSON.stringify(treeSafeTime.toJSON())).toContain('00:00');
   });
+
+  test('TASK-P40-01-ODK: Semantyczne accessibilityState dla ocen i balansu smaku oraz limity wejść TDS i notatek', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<BrewFinishModal {...defaultProps} rating={3} tasteBalance="sour" />);
+    });
+
+    const star3 = tree.root.findByProps({ testID: 'star-rating-3' });
+    const star4 = tree.root.findByProps({ testID: 'star-rating-4' });
+    expect(star3.props.accessibilityState).toEqual({ selected: true });
+    expect(star4.props.accessibilityState).toEqual({ selected: false });
+
+    const chipSour = tree.root.findByProps({ testID: 'taste-chip-sour' });
+    const chipBitter = tree.root.findByProps({ testID: 'taste-chip-bitter' });
+    expect(chipSour.props.accessibilityRole).toBe('radio');
+    expect(chipSour.props.accessibilityState).toEqual({ selected: true });
+    expect(chipBitter.props.accessibilityRole).toBe('radio');
+    expect(chipBitter.props.accessibilityState).toEqual({ selected: false });
+
+    const tdsInput = tree.root.findByProps({ testID: 'tds-input' });
+    expect(tdsInput.props.maxLength).toBe(6);
+
+    const notesInput = tree.root.findByProps({ testID: 'finish-notes-input' });
+    expect(notesInput.props.maxLength).toBe(1000);
+  });
 });

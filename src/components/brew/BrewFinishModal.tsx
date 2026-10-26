@@ -116,6 +116,7 @@ export function BrewFinishModal({
                   testID={`star-rating-${s}`}
                   onPress={() => onChangeRating(s)}
                   accessibilityRole="button"
+                  accessibilityState={{ selected: rating >= s }}
                   accessibilityLabel={(t.brew?.starRatingLabel || (language === 'pl' ? 'Ocena {rating} z 5' : 'Rating {rating} of 5')).replace('{rating}', String(s))}
                 >
                   <Text style={[styles.starIcon, rating >= s && styles.starActive]}>
@@ -127,7 +128,7 @@ export function BrewFinishModal({
 
             {/* Balans smaku */}
             <Text style={styles.sectionLabel}>{t.brew?.tasteProfileLabel || 'Profil Balansu'}</Text>
-            <View style={styles.balanceRow}>
+            <View style={styles.balanceRow} accessibilityRole="radiogroup">
               {[
                 { key: 'balanced', label: t.brew?.tasteBalanced || 'Zbalansowana' },
                 { key: 'sour', label: t.brew?.tasteSour || 'Za kwaśna' },
@@ -142,7 +143,8 @@ export function BrewFinishModal({
                     tasteBalance === b.key && styles.balanceChipActive,
                   ]}
                   onPress={() => onChangeTasteBalance(b.key)}
-                  accessibilityRole="button"
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: tasteBalance === b.key }}
                   accessibilityLabel={b.label}
                 >
                   <Text
@@ -264,10 +266,13 @@ export function BrewFinishModal({
             <View style={styles.tdsInputRow}>
               <Text style={styles.tdsInputLabel}>{t.brew?.tdsLabel || 'Odczyt TDS refractometru (%):'}</Text>
               <TextInput
+                testID="tds-input"
                 style={styles.tdsTextInput}
                 placeholder={t.brew?.tdsPlaceholder || 'np. 1.35'}
                 placeholderTextColor={theme.colors.textMuted}
                 keyboardType="numeric"
+                maxLength={6}
+                accessibilityLabel={t.brew?.tdsLabel || 'Odczyt TDS refractometru (%)'}
                 value={tdsInput}
                 onChangeText={onChangeTdsInput}
               />
@@ -282,6 +287,8 @@ export function BrewFinishModal({
               placeholderTextColor={theme.colors.textMuted}
               value={notes}
               onChangeText={onChangeNotes}
+              maxLength={1000}
+              accessibilityLabel={t.brew?.baristaNotesTitle || 'Notatki Baristy'}
               multiline
             />
 
