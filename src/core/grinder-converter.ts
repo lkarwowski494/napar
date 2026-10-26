@@ -407,8 +407,28 @@ export function getRecipeMicrons(recipe?: {
     desc.includes('flat white') ||
     desc.includes('cortado') ||
     desc.includes('macchiato') ||
+    desc.includes('flair') ||
+    desc.includes('cafelat') ||
+    desc.includes('robot') ||
+    desc.includes('rok espresso') ||
+    desc.includes('dźwigni') ||
+    desc.includes('dzwigni') ||
+    desc.includes('lever espresso') ||
+    desc.includes('manual lever') ||
     method === 'ESPRESSO' ||
     method.includes('ESPRESSO') ||
+    method === 'FLAIR' ||
+    method.includes('FLAIR') ||
+    method === 'ROBOT' ||
+    method.includes('ROBOT') ||
+    method.includes('CAFELAT') ||
+    method === 'ROK' ||
+    method.includes('ROK') ||
+    method === 'LEVER' ||
+    method.includes('LEVER_') ||
+    method.includes('_LEVER') ||
+    method.includes('MANUAL LEVER') ||
+    method.includes('DZWIGNI') ||
     method.includes('AMERICANO') ||
     method.includes('LUNGO') ||
     method.includes('FLAT_WHITE') ||

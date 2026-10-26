@@ -477,4 +477,15 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Metoda odwrócona' })).toBe(560);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Inverted aeropress recipe' })).toBe(560);
   });
+
+  test('TASK-P40-08-PRO: getRecipeMicrons rozpoznaje ekspresy dzwigniowe Flair, Robot, ROK jako espresso (350 µm)', () => {
+    expect(getRecipeMicrons({ method: 'FLAIR' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'Flair 58' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'ROBOT' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'Cafelat Robot' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'ROK' })).toBe(350);
+    expect(getRecipeMicrons({ method: 'LEVER_ESPRESSO' })).toBe(350);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Mielenie pod ekspres dźwigniowy Flair' })).toBe(350);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine grind for Cafelat Robot manual lever' })).toBe(350);
+  });
 });
