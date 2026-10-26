@@ -89,13 +89,22 @@ export function getAppAccessState(): AppAccessState {
   const rawStarted = getAppSetting('trial_started_at', '');
   let trialStartedAt = typeof rawStarted === 'string' ? rawStarted.trim() : '';
   const now = new Date();
-  if (!trialStartedAt || isNaN(new Date(trialStartedAt).getTime())) {
+  let parsedStartTime = NaN;
+  if (trialStartedAt) {
+    try {
+      const d = new Date(trialStartedAt);
+      parsedStartTime = d.getTime();
+    } catch {
+      parsedStartTime = NaN;
+    }
+  }
+  if (!trialStartedAt || !Number.isFinite(parsedStartTime) || parsedStartTime <= 0) {
     trialStartedAt = now.toISOString();
+    parsedStartTime = now.getTime();
     setAppSetting('trial_started_at', trialStartedAt);
   }
 
-  const startDate = new Date(trialStartedAt);
-  const startTime = Number.isFinite(startDate.getTime()) ? startDate.getTime() : now.getTime();
+  const startTime = Number.isFinite(parsedStartTime) ? parsedStartTime : now.getTime();
   const elapsedMs = Math.max(0, now.getTime() - startTime);
   const elapsedDays = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
   const rawMaxDaysSetting = getAppSetting('trial_max_days_seen', '0');

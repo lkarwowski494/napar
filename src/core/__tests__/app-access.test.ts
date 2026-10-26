@@ -797,4 +797,15 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(getTrialDaysRemaining()).toBe(0);
     expect(getTrialBrewsRemaining()).toBe(0);
   });
+
+  test('TASK-P46-02-MON: getAppAccessState odporny na niemozliwe lub uszkodzone daty ISO w trial_started_at', () => {
+    resetTrialForTesting();
+    const { setAppSetting } = require('../database');
+    setAppSetting('trial_started_at', '2026-99-99T99:99:99Z');
+
+    const state = getAppAccessState();
+    expect(state.status).toBe('trial_active');
+    expect(state.daysRemaining).toBe(14);
+    expect(Number.isFinite(state.daysRemaining)).toBe(true);
+  });
 });
