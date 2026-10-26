@@ -108,15 +108,16 @@ export function roundTo(val: number, decimals: number): number {
  * zgadza się po zaokrągleniu do 0.1 z liczbą wpisaną przez użytkownika.
  */
 export function wInKeep(txt: string, unit: string, prevBase?: number): number {
-  if (typeof txt !== 'string') return prevBase ?? 0;
+  const safePrev = typeof prevBase === 'number' && Number.isFinite(prevBase) ? prevBase : 0;
+  if (typeof txt !== 'string') return safePrev;
   const normalized = txt.replace(',', '.').trim();
   const xIn = parseFloat(normalized);
   if (isNaN(xIn) || !isFinite(xIn)) {
-    return prevBase ?? 0;
+    return safePrev;
   }
 
   // Współczynniki konwersji jednostek
-  const u = unit.toLowerCase();
+  const u = typeof unit === 'string' ? unit.toLowerCase() : '';
   let cu = 1;
   const isFahrenheit = u === '°f' || u === 'f';
 
@@ -130,7 +131,7 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
     cu = 1;
   }
 
-  if (prevBase !== undefined && prevBase > 0) {
+  if (prevBase !== undefined && Number.isFinite(prevBase) && prevBase > 0) {
     if (isFahrenheit) {
       const fPrev = roundTo((prevBase * 9) / 5 + 32, 1);
       if (roundTo(xIn, 1) === fPrev) {

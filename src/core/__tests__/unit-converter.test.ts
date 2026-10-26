@@ -176,5 +176,13 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(roundTo(NaN, 2)).toBe(0);
       expect(roundTo(Infinity, 2)).toBe(0);
     });
+
+    test('TASK-P11-03-ZAK: wInKeep jest odporne na brakujący unit oraz NaN w prevBase', () => {
+      expect(wInKeep('15', undefined as any)).toBe(15);
+      expect(wInKeep('15', null as any)).toBe(15);
+      expect(wInKeep('invalid', 'g', NaN)).toBe(0);
+      expect(wInKeep('invalid', 'g', Infinity)).toBe(0);
+      expect(wInKeep('0.7', 'oz', 20)).toBe(20);
+    });
   });
 });
