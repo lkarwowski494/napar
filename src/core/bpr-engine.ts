@@ -308,6 +308,7 @@ export function buildFourteenDayCalendar(
 ): CalendarDayItem[] {
   const parsedDate = referenceDateIso ? new Date(referenceDateIso) : new Date();
   const baseDate = Number.isFinite(parsedDate.getTime()) ? parsedDate : new Date();
+  const safeDateIso = baseDate.toISOString();
   const todayStart = new Date(
     Date.UTC(
       baseDate.getUTCFullYear(),
@@ -317,7 +318,7 @@ export function buildFourteenDayCalendar(
   );
 
   const schedule = buildProactiveActionSchedule(
-    referenceDateIso,
+    safeDateIso,
     inventory,
     sessions
   );
@@ -391,7 +392,8 @@ export function generateActionIcsContent(
     throw new Error('Nieprawidłowy obiekt akcji kalendarza');
   }
   const isEn = language === 'en';
-  const rawDate = typeof action.dateIso === 'string' && action.dateIso.trim() ? action.dateIso.trim() : '2026-10-17';
+  const rawDateStr = typeof action.dateIso === 'string' && action.dateIso.trim() ? action.dateIso.trim() : '';
+  const rawDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDateStr) ? rawDateStr : '2026-10-17';
   const cleanDate = rawDate.replace(/-/g, '');
   const dtStart = `${cleanDate}T080000Z`;
   const dtEnd = `${cleanDate}T081500Z`;
