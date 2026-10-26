@@ -636,4 +636,29 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(zp6?.formatSetting(45, 'en')).toContain('clicks');
     expect(findGrinderById('zp6')?.id).toBe('1zpresso_zp6');
   });
+
+  test('TASK-P51-08-PRO: convertMicronsToGrinder i convertBetweenGrinders wspieraja aliasy mlynkow oraz przecinki dziesietne', () => {
+    // 1. convertMicronsToGrinder z aliasami c40, ode, zp6 i przecinkiem
+    const resC40 = convertMicronsToGrinder('750,5', 'c40');
+    expect(resC40.grinderName).toContain('Comandante');
+    expect(resC40.rawValue).toBe(25);
+
+    const resOde = convertMicronsToGrinder(800, 'ode');
+    expect(resOde.grinderName).toContain('Fellow Ode');
+
+    const resZP6 = convertMicronsToGrinder(750, 'zp6');
+    expect(resZP6.grinderName).toContain('1Zpresso ZP6');
+
+    // 2. convertBetweenGrinders z aliasami
+    const conv = convertBetweenGrinders('c40', 25, 'zp6');
+    expect(conv.microns).toBe(750);
+    expect(conv.targetFormatted).toContain('klików');
+
+    // 3. findGrinderById z nowymi aliasami
+    expect(findGrinderById('c40')?.id).toBe('comandante_c40');
+    expect(findGrinderById('ode')?.id).toBe('fellow_ode_gen2');
+    expect(findGrinderById('k-ultra')?.id).toBe('1zpresso_k_ultra');
+    expect(findGrinderById('encore')?.id).toBe('baratza_encore');
+    expect(findGrinderById('k6')?.id).toBe('kingrinder_k6');
+  });
 });

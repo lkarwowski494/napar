@@ -345,12 +345,40 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
 ];
 
 const GRINDER_ALIASES: Record<string, string> = {
+  c40: 'comandante_c40',
+  comandante: 'comandante_c40',
+  'c40-mk3': 'comandante_c40',
+  'c40-mk4': 'comandante_c40',
+  c2: 'timemore_c2',
+  c3: 'timemore_c2',
+  timemore: 'timemore_c2',
+  'timemore-c2': 'timemore_c2',
+  'timemore-c3': 'timemore_c2',
+  kultra: '1zpresso_k_ultra',
+  'k-ultra': '1zpresso_k_ultra',
+  '1zpresso-k-ultra': '1zpresso_k_ultra',
+  ode: 'fellow_ode_gen2',
+  'ode-gen2': 'fellow_ode_gen2',
+  'fellow-ode': 'fellow_ode_gen2',
+  encore: 'baratza_encore',
+  baratza: 'baratza_encore',
+  'baratza-encore': 'baratza_encore',
+  k6: 'kingrinder_k6',
+  kingrinder: 'kingrinder_k6',
+  'kingrinder-k6': 'kingrinder_k6',
+  kinu: 'kinu_m47',
+  m47: 'kinu_m47',
+  'kinu-m47': 'kinu_m47',
+  mignon: 'eureka_mignon',
+  eureka: 'eureka_mignon',
+  'eureka-mignon': 'eureka_mignon',
   zp6: '1zpresso_zp6',
   'zp6-special': '1zpresso_zp6',
   'zp-6': '1zpresso_zp6',
   '1zpresso-zp6': '1zpresso_zp6',
   jmax: '1zpresso_j_max',
   'j-max': '1zpresso_j_max',
+  '1zpresso-j-max': '1zpresso_j_max',
 };
 
 export function findGrinderById(id: string): GrinderModel | undefined {
@@ -373,10 +401,9 @@ export function convertMicronsToGrinder(
   language = 'pl'
 ): { formatted: string; rawValue: number; grinderName: string } {
   const cleanId = typeof grinderId === 'string' ? grinderId.trim().toLowerCase() : '';
-  const grinder =
-    SUPPORTED_GRINDERS.find((g) => g.id.toLowerCase() === cleanId) || SUPPORTED_GRINDERS[0];
+  const grinder = findGrinderById(cleanId) || SUPPORTED_GRINDERS[0];
 
-  const parsedMicrons = typeof microns === 'string' ? parseFloat(microns) : Number(microns);
+  const parsedMicrons = typeof microns === 'string' ? parseFloat(microns.trim().replace(',', '.')) : Number(microns);
   const safeMicrons = Number.isFinite(parsedMicrons) && parsedMicrons > 0 && !Object.is(parsedMicrons, -0) ? parsedMicrons : 720;
   const targetMicrons = Math.max(150, Math.min(1500, safeMicrons));
   const effectiveMicrons = Math.max(0, targetMicrons - grinder.micronsPerSettingOffset);
@@ -403,10 +430,8 @@ export function convertBetweenGrinders(
 ): { targetFormatted: string; microns: number } {
   const cleanSourceId = typeof sourceGrinderId === 'string' ? sourceGrinderId.trim().toLowerCase() : '';
   const cleanTargetId = typeof targetGrinderId === 'string' ? targetGrinderId.trim().toLowerCase() : '';
-  const sourceGrinder =
-    SUPPORTED_GRINDERS.find((g) => g.id.toLowerCase() === cleanSourceId) || SUPPORTED_GRINDERS[0];
-  const targetGrinder =
-    SUPPORTED_GRINDERS.find((g) => g.id.toLowerCase() === cleanTargetId) || SUPPORTED_GRINDERS[1];
+  const sourceGrinder = findGrinderById(cleanSourceId) || SUPPORTED_GRINDERS[0];
+  const targetGrinder = findGrinderById(cleanTargetId) || SUPPORTED_GRINDERS[1];
 
   let microns = 720;
   if (typeof sourceValue === 'number') {
