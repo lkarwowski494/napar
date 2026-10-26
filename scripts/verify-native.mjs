@@ -264,6 +264,14 @@ try {
       pkgJson.name === appJson.slug,
       `Nazwa w package.json (${pkgJson.name}) musi odpowiadać slug w app.json (${appJson.slug})`
     );
+    check(
+      pkgJson.private === true,
+      'package.json musi mieć flagę private: true (ochrona przed przypadkową publikacją do publicznego rejestru npm)'
+    );
+    check(
+      pkgJson.main === 'expo-router/entry',
+      `package.json main musi wskazywać na 'expo-router/entry' (otrzymano '${pkgJson.main}')`
+    );
     const deps = pkgJson.dependencies || {};
     const criticalPlugins = ['expo-router', 'expo-sqlite', 'expo-camera', 'expo-localization'];
     for (const plugin of criticalPlugins) {
