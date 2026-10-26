@@ -204,6 +204,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
 
           <Text style={styles.inputLabel}>{t.stash?.nameLabel || 'Nazwa ziaren / herbaty *'}</Text>
           <TextInput
+            testID="bean-name-input"
             style={styles.textInput}
             accessibilityLabel={t.stash?.nameLabel || 'Nazwa ziaren / herbaty'}
             placeholder={t.stash?.namePlaceholder || 'np. Etiopia Yirgacheffe Washed'}
@@ -215,6 +216,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
 
           <Text style={styles.inputLabel}>{t.stash?.roaster || 'Palarnia / Producent'}</Text>
           <TextInput
+            testID="bean-roaster-input"
             style={styles.textInput}
             accessibilityLabel={t.stash?.roaster || 'Palarnia / Producent'}
             placeholder={t.stash?.roasterPlaceholder || 'np. Hard Beans, Coffeedesk, Wuyi Star'}
@@ -226,6 +228,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
 
           <Text style={styles.inputLabel}>{t.stash?.origin || 'Kraj / Pochodzenie'}</Text>
           <TextInput
+            testID="bean-origin-input"
             style={styles.textInput}
             accessibilityLabel={t.stash?.origin || 'Kraj / Pochodzenie'}
             placeholder={t.stash?.originPlaceholder || 'np. Yirgacheffe, Etiopia'}
@@ -239,6 +242,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             <View style={{ flex: 1 }}>
               <Text style={styles.inputLabel}>{t.stash?.variety || 'Botaniczna odmiana'}</Text>
               <TextInput
+                testID="bean-variety-input"
                 style={styles.textInput}
                 accessibilityLabel={t.stash?.variety || 'Botaniczna odmiana'}
                 placeholder={t.stash?.varietyPlaceholder || 'np. Geisha, SL28, Bourbon'}
@@ -251,6 +255,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             <View style={{ flex: 1, marginLeft: 12 }}>
               <Text style={styles.inputLabel}>{t.stash?.process || 'Obróbka'}</Text>
               <TextInput
+                testID="bean-process-input"
                 style={styles.textInput}
                 accessibilityLabel={t.stash?.process || 'Obróbka'}
                 placeholder={t.stash?.processPlaceholder || 'np. Washed, Natural, Honey'}
@@ -266,6 +271,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             <View style={{ flex: 1 }}>
               <Text style={styles.inputLabel}>{t.stash?.roastDate || 'Data palenia / Zbioru'}</Text>
               <TextInput
+                testID="bean-roast-date-input"
                 style={styles.textInput}
                 accessibilityLabel={t.stash?.roastDate || 'Data palenia / Zbioru'}
                 placeholder="YYYY-MM-DD"
@@ -279,6 +285,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             <View style={{ flex: 1, marginLeft: 12 }}>
               <Text style={styles.inputLabel}>{isImperial ? (t.stash?.weightLabelImperial || 'Waga paczki (oz)') : (t.stash?.weightLabelMetric || 'Waga paczki (g)')}</Text>
               <TextInput
+                testID="bean-weight-input"
                 style={styles.textInput}
                 accessibilityLabel={isImperial ? (t.stash?.weightLabelImperial || 'Waga paczki (oz)') : (t.stash?.weightLabelMetric || 'Waga paczki (g)')}
                 placeholder={isImperial ? '8.8' : '250'}
@@ -293,6 +300,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
 
           <Text style={styles.inputLabel}>{t.stash?.notesLabel || 'Nuty smakowe (po przecinku)'}</Text>
           <TextInput
+            testID="bean-notes-input"
             style={styles.textInput}
             accessibilityLabel={t.stash?.notesLabel || 'Nuty smakowe (po przecinku)'}
             placeholder={t.stash?.notesPlaceholder || 'np. jaśmin, brzoskwinia, bergamotka'}
@@ -305,6 +313,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           <Pressable
             testID="save-bean-btn"
             accessibilityRole="button"
+            accessibilityState={{ disabled: !name.trim() }}
             accessibilityLabel={t.stash?.saveToStash || 'Zapisz w Spiżarni'}
             accessibilityHint={t.common?.saveSuccess || 'Zapisuje nową paczkę w spiżarni'}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}

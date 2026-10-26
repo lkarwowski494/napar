@@ -181,4 +181,41 @@ describe('BeanAddModal Component', () => {
     const saveBtn = root.findByProps({ testID: 'save-bean-btn' });
     expect(saveBtn.props.accessibilityHint).toBeTruthy();
   });
+
+  test('TASK-P41-04-STU: BeanAddModal posiada testID na polach wejściowych oraz accessibilityState disabled dla pustej nazwy', () => {
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(
+        <BeanAddModal
+          visible={true}
+          onClose={mockOnClose}
+          beveragePreference="both"
+          canCreate={true}
+          onRequirePaywall={mockOnRequirePaywall}
+          onOpenCompendium={mockOnOpenCompendium}
+          onSaved={mockOnSaved}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const nameInput = root.findByProps({ testID: 'bean-name-input' });
+    const roasterInput = root.findByProps({ testID: 'bean-roaster-input' });
+    const originInput = root.findByProps({ testID: 'bean-origin-input' });
+    const varietyInput = root.findByProps({ testID: 'bean-variety-input' });
+    const processInput = root.findByProps({ testID: 'bean-process-input' });
+    const weightInput = root.findByProps({ testID: 'bean-weight-input' });
+    const notesInput = root.findByProps({ testID: 'bean-notes-input' });
+
+    expect(nameInput.props.maxLength).toBe(200);
+    expect(roasterInput.props.maxLength).toBe(100);
+    expect(originInput.props.maxLength).toBe(100);
+    expect(varietyInput.props.maxLength).toBe(100);
+    expect(processInput.props.maxLength).toBe(100);
+    expect(weightInput.props.maxLength).toBe(10);
+    expect(notesInput.props.maxLength).toBe(500);
+
+    const saveBtn = root.findByProps({ testID: 'save-bean-btn' });
+    expect(saveBtn.props.accessibilityState).toEqual({ disabled: true });
+  });
 });
