@@ -481,4 +481,12 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(varRes.length).toBeGreaterThanOrEqual(1);
     expect(varRes.some((v) => v.id.toLowerCase().includes('geisha'))).toBe(true);
   });
+
+  test('TASK-P28-06-TRE: searchTeaCategories defensywnie chroni przed brakującymi polami i spacjami', () => {
+    const res = searchTeaCategories('   matcha   ');
+    expect(res.length).toBeGreaterThanOrEqual(1);
+
+    const emptyRes = searchTeaCategories(null as any);
+    expect(emptyRes.length).toBe(TEA_CATEGORIES.length);
+  });
 });

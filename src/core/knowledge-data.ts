@@ -628,19 +628,19 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
   if (!query || typeof query !== 'string' || !query.trim()) return TEA_CATEGORIES;
   const q = query.toLowerCase().trim();
   return TEA_CATEGORIES.filter((t) =>
-    (t.namePl && t.namePl.toLowerCase().includes(q)) ||
-    (t.nameEn && t.nameEn.toLowerCase().includes(q)) ||
-    (t.traditionalName && t.traditionalName.toLowerCase().includes(q)) ||
-    (t.oxidationRangePercent && t.oxidationRangePercent.toLowerCase().includes(q)) ||
-    (t.killGreenMethod && t.killGreenMethod.toLowerCase().includes(q)) ||
+    (t.namePl && typeof t.namePl === 'string' && t.namePl.toLowerCase().includes(q)) ||
+    (t.nameEn && typeof t.nameEn === 'string' && t.nameEn.toLowerCase().includes(q)) ||
+    (t.traditionalName && typeof t.traditionalName === 'string' && t.traditionalName.toLowerCase().includes(q)) ||
+    (t.oxidationRangePercent && typeof t.oxidationRangePercent === 'string' && t.oxidationRangePercent.toLowerCase().includes(q)) ||
+    (t.killGreenMethod && typeof t.killGreenMethod === 'string' && t.killGreenMethod.toLowerCase().includes(q)) ||
     (Array.isArray(t.famousVarietiesPl) && t.famousVarietiesPl.some((v) => typeof v === 'string' && v.toLowerCase().includes(q))) ||
     (Array.isArray(t.famousVarietiesEn) && t.famousVarietiesEn.some((v) => typeof v === 'string' && v.toLowerCase().includes(q))) ||
     (Array.isArray(t.famousRegions) && t.famousRegions.some((r) => typeof r === 'string' && r.toLowerCase().includes(q))) ||
-    (t.sensoryProfilePl && t.sensoryProfilePl.toLowerCase().includes(q)) ||
-    (t.sensoryProfileEn && t.sensoryProfileEn.toLowerCase().includes(q)) ||
-    (t.healthAttributesPl && t.healthAttributesPl.toLowerCase().includes(q)) ||
-    (t.descriptionPl && t.descriptionPl.toLowerCase().includes(q)) ||
-    (t.descriptionEn && t.descriptionEn.toLowerCase().includes(q))
+    (t.sensoryProfilePl && typeof t.sensoryProfilePl === 'string' && t.sensoryProfilePl.toLowerCase().includes(q)) ||
+    (t.sensoryProfileEn && typeof t.sensoryProfileEn === 'string' && t.sensoryProfileEn.toLowerCase().includes(q)) ||
+    (t.healthAttributesPl && typeof t.healthAttributesPl === 'string' && t.healthAttributesPl.toLowerCase().includes(q)) ||
+    (t.descriptionPl && typeof t.descriptionPl === 'string' && t.descriptionPl.toLowerCase().includes(q)) ||
+    (t.descriptionEn && typeof t.descriptionEn === 'string' && t.descriptionEn.toLowerCase().includes(q))
   );
 }
 
