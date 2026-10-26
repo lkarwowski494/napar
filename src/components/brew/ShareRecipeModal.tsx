@@ -79,6 +79,8 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
             <Pressable
               testID="share-link-btn"
               style={styles.shareActionBtn}
+              accessibilityRole="button"
+              accessibilityLabel={t.brew.qrShareLink}
               onPress={() => {
                 Share.share({
                   title: recipe.name,
@@ -97,6 +99,8 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
             <Pressable
               testID="copy-link-btn"
               style={[styles.shareActionBtn, styles.shareActionBtnSecondary]}
+              accessibilityRole="button"
+              accessibilityLabel={t.brew.qrCopyLink}
               onPress={() => {
                 Alert.alert(t.brew?.qrCopied || 'Link receptury', shareUrl);
               }}
