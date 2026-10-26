@@ -63,12 +63,15 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
       {/* Świeżość (Resting Window) */}
       {resting && (
         <View
+          testID={`resting-badge-${item.id}`}
           style={[
             styles.restingBadge,
             resting.stage === 'peak' && styles.restingOptimal,
             resting.stage === 'degassing' && styles.restingFresh,
             resting.stage === 'aging' && styles.restingPast,
           ]}
+          accessibilityRole="text"
+          accessibilityLabel={`${isEn ? 'Resting stage' : 'Etap świeżości'}: ${isEn ? (resting.messageEn || resting.messagePl) : resting.messagePl}`}
         >
           <Text
             style={[
@@ -121,7 +124,12 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
       <View style={styles.itemFooter}>
         <View>
           <Text style={styles.weightLabel}>{t.stash?.remainingGrams || 'Pozostało'}</Text>
-          <Text style={styles.weightValue}>
+          <Text
+            testID={`bean-weight-${item.id}`}
+            style={styles.weightValue}
+            accessibilityRole="text"
+            accessibilityLabel={`${isEn ? 'Remaining weight' : 'Pozostała waga'}: ${formatDoseWeight(item.remainingWeightGrams, unitSystem)}, ${isEn ? 'Initial weight' : 'Waga początkowa'}: ${formatDoseWeight(item.initialWeightGrams, unitSystem)}`}
+          >
             {formatDoseWeight(item.remainingWeightGrams, unitSystem)} /{' '}
             {formatDoseWeight(item.initialWeightGrams, unitSystem)}
           </Text>
