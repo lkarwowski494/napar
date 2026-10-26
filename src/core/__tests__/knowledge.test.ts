@@ -452,4 +452,13 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(sensoryEn.length).toBeGreaterThan(0);
     expect(sensoryEn).toContain('phosphoric acidity');
   });
+
+  test('TASK-P26-06-TRE: searchCoffeeOrigins defensywnie chroni przed brakującymi polami profilu', () => {
+    const res = searchCoffeeOrigins('   Etiopia   ');
+    expect(res.length).toBeGreaterThanOrEqual(1);
+    expect(res[0].countryCode).toBe('ET');
+
+    const emptyRes = searchCoffeeOrigins(null as any);
+    expect(emptyRes.length).toBe(COFFEE_ORIGINS.length);
+  });
 });

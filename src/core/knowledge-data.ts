@@ -608,19 +608,19 @@ export function searchCoffeeOrigins(query: string): CoffeeOriginInfo[] {
   if (!query || typeof query !== 'string' || !query.trim()) return COFFEE_ORIGINS;
   const q = query.toLowerCase().trim();
   return COFFEE_ORIGINS.filter((o) =>
-    o.country.toLowerCase().includes(q) ||
-    (o.countryEn && o.countryEn.toLowerCase().includes(q)) ||
-    (o.countryCode && o.countryCode.toLowerCase().includes(q)) ||
-    (o.typicalAltitudeMeters && o.typicalAltitudeMeters.toLowerCase().includes(q)) ||
-    (o.harvestMonths && o.harvestMonths.toLowerCase().includes(q)) ||
+    (o.country && typeof o.country === 'string' && o.country.toLowerCase().includes(q)) ||
+    (o.countryEn && typeof o.countryEn === 'string' && o.countryEn.toLowerCase().includes(q)) ||
+    (o.countryCode && typeof o.countryCode === 'string' && o.countryCode.toLowerCase().includes(q)) ||
+    (o.typicalAltitudeMeters && typeof o.typicalAltitudeMeters === 'string' && o.typicalAltitudeMeters.toLowerCase().includes(q)) ||
+    (o.harvestMonths && typeof o.harvestMonths === 'string' && o.harvestMonths.toLowerCase().includes(q)) ||
     (Array.isArray(o.primaryRegions) && o.primaryRegions.some((r) => typeof r === 'string' && r.toLowerCase().includes(q))) ||
     (Array.isArray(o.mainVarieties) && o.mainVarieties.some((v) => typeof v === 'string' && v.toLowerCase().includes(q))) ||
-    o.flavorProfilePl.toLowerCase().includes(q) ||
-    o.flavorProfileEn.toLowerCase().includes(q) ||
+    (o.flavorProfilePl && typeof o.flavorProfilePl === 'string' && o.flavorProfilePl.toLowerCase().includes(q)) ||
+    (o.flavorProfileEn && typeof o.flavorProfileEn === 'string' && o.flavorProfileEn.toLowerCase().includes(q)) ||
     (Array.isArray(o.keyNotesPl) && o.keyNotesPl.some((k) => typeof k === "string" && k.toLowerCase().includes(q))) ||
     (Array.isArray(o.keyNotesEn) && o.keyNotesEn.some((k) => typeof k === "string" && k.toLowerCase().includes(q))) ||
-    (o.descriptionPl && o.descriptionPl.toLowerCase().includes(q)) ||
-    (o.descriptionEn && o.descriptionEn.toLowerCase().includes(q))
+    (o.descriptionPl && typeof o.descriptionPl === 'string' && o.descriptionPl.toLowerCase().includes(q)) ||
+    (o.descriptionEn && typeof o.descriptionEn === 'string' && o.descriptionEn.toLowerCase().includes(q))
   );
 }
 
