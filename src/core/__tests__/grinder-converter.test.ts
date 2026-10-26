@@ -428,4 +428,13 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Filter grind for Gina immersion drip' })).toBe(720);
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod Kalita Tsubame (coarse)' })).toBe(850);
   });
+
+  test('TASK-P36-08-PRO: getRecipeMicrons rozpoznaje Mizudashi, Dutch Coffee i Kyoto Cold Brew zwracajac 1150 µm', () => {
+    expect(getRecipeMicrons({ method: 'MIZUDASHI' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Hario Mizudashi' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'DUTCH_COFFEE' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Dutch Coffee Maker' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod kyoto drip cold brew' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse grind for mizudashi slow brew' })).toBe(1150);
+  });
 });
