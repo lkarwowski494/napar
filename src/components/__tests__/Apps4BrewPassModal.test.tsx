@@ -171,4 +171,35 @@ describe('Apps4BrewPassModal Component', () => {
     });
     expect(treeHidden.toJSON()).toBeNull();
   });
+
+  test('TASK-P34-02-MON: słownikowa odmiana słowiańska i angielska dla pozostałych dni i parzeń w trialu', () => {
+    // 5 parzeń wykonanych: 15 - 5 = 10 parzeń (wcześniejsza implementacja pisała '10 parzenia')
+    act(() => {
+      resetTrialForTesting();
+      mockDb.app_settings.set('trial_brews_count', '5');
+    });
+
+    let treePl: any;
+    act(() => {
+      treePl = renderer.create(
+        <Apps4BrewPassModal visible={true} onClose={jest.fn()} />
+      );
+    });
+    const strPl = JSON.stringify(treePl.toJSON());
+    expect(strPl).toContain('Pozostało Ci 10 parzeń w bezpłatnym okresie próbnym (14 dni).');
+
+    // 14 parzeń wykonanych: 15 - 14 = 1 parzenie pozostałe
+    act(() => {
+      resetTrialForTesting();
+      mockDb.app_settings.set('trial_brews_count', '14');
+    });
+    let treePl1: any;
+    act(() => {
+      treePl1 = renderer.create(
+        <Apps4BrewPassModal visible={true} onClose={jest.fn()} />
+      );
+    });
+    const strPl1 = JSON.stringify(treePl1.toJSON());
+    expect(strPl1).toContain('Pozostało Ci 1 parzenie w bezpłatnym okresie próbnym (14 dni).');
+  });
 });

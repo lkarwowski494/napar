@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../core/theme';
-import { useTranslation } from '../core/i18n';
+import { useTranslation, pluralPl } from '../core/i18n';
 import { useAppAccess } from '../core/app-access';
 import { ShieldIcon } from './icons/CraftIcons';
 
@@ -38,6 +38,8 @@ export function Apps4BrewPassModal({
   const { t, language } = useTranslation();
   const { purchaseWithStoreKit, restore, status, brewsRemaining, daysRemaining } = useAppAccess();
   const [isProcessing, setIsProcessing] = React.useState(false);
+  const safeBrewsRemaining = Math.max(0, Object.is(brewsRemaining, -0) ? 0 : (brewsRemaining || 0));
+  const safeDaysRemaining = Math.max(0, Object.is(daysRemaining, -0) ? 0 : (daysRemaining || 0));
 
   const handleSelectPlan = (tier: 'monthly' | 'annual' | 'lifetime') => {
     if (isProcessing) return;
@@ -134,8 +136,8 @@ export function Apps4BrewPassModal({
             <View style={styles.trialStatusCard}>
               <Text style={styles.trialStatusText}>
                 {language === 'en'
-                  ? `You have ${brewsRemaining} brew${brewsRemaining === 1 ? '' : 's'} remaining in your free trial (${daysRemaining} days).`
-                  : `Pozostało Ci ${brewsRemaining} ${brewsRemaining === 1 ? 'parzenie' : 'parzenia'} w bezpłatnym okresie próbnym (${daysRemaining} dni).`}
+                  ? `You have ${safeBrewsRemaining} brew${safeBrewsRemaining === 1 ? '' : 's'} remaining in your free trial (${safeDaysRemaining} day${safeDaysRemaining === 1 ? '' : 's'}).`
+                  : `Pozostało Ci ${safeBrewsRemaining} ${pluralPl(safeBrewsRemaining, 'parzenie', 'parzenia', 'parzeń')} w bezpłatnym okresie próbnym (${safeDaysRemaining} ${pluralPl(safeDaysRemaining, 'dzień', 'dni', 'dni')}).`}
               </Text>
             </View>
           ) : (
