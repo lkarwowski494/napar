@@ -492,6 +492,18 @@ export function getRecipeMicrons(recipe?: {
     return 650;
   }
   if (
+    method.includes('FLASH') ||
+    method.includes('ICED_V60') ||
+    method.includes('ICED V60') ||
+    method.includes('ICE V60') ||
+    method.includes('JAPANESE ICED') ||
+    desc.includes('flash brew') ||
+    desc.includes('iced v60') ||
+    desc.includes('japanese iced')
+  ) {
+    return 600;
+  }
+  if (
     desc.includes('drobno') ||
     desc.includes('fine') ||
     method === 'AEROPRESS' ||

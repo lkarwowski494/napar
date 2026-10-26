@@ -560,4 +560,15 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Mielenie pod Cafec Deep27' })).toBe(720);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Pour over for Cafec Flower dripper' })).toBe(720);
   });
+
+  test('TASK-P46-08-PRO: getRecipeMicrons rozpoznaje metody Flash Brew i Iced V60 jako 600 µm (zamiast 1150 µm cold brew)', () => {
+    expect(getRecipeMicrons({ method: 'FLASH_BREW' })).toBe(600);
+    expect(getRecipeMicrons({ method: 'Flash Brew' })).toBe(600);
+    expect(getRecipeMicrons({ method: 'ICED_V60' })).toBe(600);
+    expect(getRecipeMicrons({ method: 'Iced V60' })).toBe(600);
+    expect(getRecipeMicrons({ method: 'Ice V60' })).toBe(600);
+    expect(getRecipeMicrons({ method: 'Japanese Iced Coffee' })).toBe(600);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Zmiel drobniej pod flash brew' })).toBe(600);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine-medium for iced v60 dripper' })).toBe(600);
+  });
 });
