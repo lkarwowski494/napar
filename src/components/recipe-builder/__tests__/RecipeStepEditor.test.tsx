@@ -71,9 +71,40 @@ describe('RecipeStepEditor Component (TASK-P32-01-ODK)', () => {
     expect(header.props.children).toBe('Kroki parzenia');
 
     const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('"Krok "');
-    expect(str).toContain('"1"');
+    expect(str).toContain('Krok 1');
     expect(str).toContain('Docelowa waga zalań (g)');
     expect(str).toContain('Czas trwania kroku (s)');
+  });
+
+  test('TASK-P45-04-STU: add-step-btn posiada testID i callback a brak t.recipeBuilder nie rzuca TypeError', () => {
+    const onAddStep = jest.fn();
+    const minimalT: any = {
+      recipeBuilder: {
+        stepNumberPrefix: 'Step',
+      },
+    };
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <RecipeStepEditor
+          steps={sampleSteps}
+          onAddStep={onAddStep}
+          onRemoveStep={jest.fn()}
+          onUpdateStep={jest.fn()}
+          t={minimalT}
+        />
+      );
+    });
+
+    const addBtn = tree.root.findByProps({ testID: 'add-step-btn' });
+    expect(addBtn).toBeDefined();
+    act(() => {
+      addBtn.props.onPress();
+    });
+    expect(onAddStep).toHaveBeenCalledTimes(1);
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Step 1');
   });
 });

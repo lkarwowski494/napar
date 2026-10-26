@@ -24,21 +24,24 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
   onUpdateStep,
   t,
 }) => {
+  const stepPrefix = t?.recipeBuilder?.stepNumberPrefix || 'Krok';
+
   return (
     <View style={styles.card}>
       <View style={styles.stepsHeader}>
         <Text style={styles.cardTitle} accessibilityRole="header">
-          {t.recipeBuilder.stepsTitle}
+          {t?.recipeBuilder?.stepsTitle || 'Kroki parzenia'}
         </Text>
         <Pressable
+          testID="add-step-btn"
           style={styles.addStepBtn}
           onPress={onAddStep}
           hitSlop={8}
           accessibilityRole="button"
-          accessibilityLabel={t.recipeBuilder.addStep}
-          accessibilityHint="Dodaje nowy krok do receptury parzenia"
+          accessibilityLabel={t?.recipeBuilder?.addStep || '+ Dodaj krok'}
+          accessibilityHint={t?.recipeBuilder?.addStepHint || 'Dodaje nowy krok do receptury parzenia'}
         >
-          <Text style={styles.addStepBtnText}>{t.recipeBuilder.addStep}</Text>
+          <Text style={styles.addStepBtnText}>{t?.recipeBuilder?.addStep || '+ Dodaj krok'}</Text>
         </Pressable>
       </View>
 
@@ -46,7 +49,7 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
         <View key={index} style={styles.stepItem}>
           <View style={styles.stepItemHeader}>
             <Text style={styles.stepNumberBadge} accessibilityRole="text">
-              Krok {step.stepNumber}
+              {`${stepPrefix} ${step.stepNumber || index + 1}`}
             </Text>
             {steps.length > 0 && (
               <Pressable
@@ -54,9 +57,9 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={styles.removeStepBtn}
                 accessibilityRole="button"
-                accessibilityLabel={`${t.recipeBuilder?.removeStep || 'Usuń krok'} ${step.stepNumber}`}
-                accessibilityHint={`Usuwa krok ${step.stepNumber} z receptury`}
-                testID={`remove-step-${step.stepNumber}`}
+                accessibilityLabel={`${t?.recipeBuilder?.removeStep || 'Usuń krok'} ${step.stepNumber || index + 1}`}
+                accessibilityHint={`Usuwa krok ${step.stepNumber || index + 1} z receptury`}
+                testID={`remove-step-${step.stepNumber || index + 1}`}
               >
                 <Text style={styles.removeStepBtnText}>✕</Text>
               </Pressable>
@@ -66,7 +69,7 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
           <View style={styles.row}>
             <View style={styles.flex1}>
               <Text style={styles.subFieldLabel}>
-                {t.recipeBuilder?.stepName || 'Nazwa kroku'}
+                {t?.recipeBuilder?.stepName || 'Nazwa kroku'}
               </Text>
               <Field
                 value={step.namePl}
@@ -75,7 +78,7 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
             </View>
             <View style={[styles.flex1, { marginHorizontal: 8 }]}>
               <Text style={styles.subFieldLabel}>
-                {t.recipeBuilder?.stepWaterGrams || 'Waga docelowa (g)'}
+                {t?.recipeBuilder?.stepWaterGrams || 'Waga docelowa (g)'}
               </Text>
               <NumInput
                 value={step.targetWaterGrams}
@@ -85,7 +88,7 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
             </View>
             <View style={styles.flex1}>
               <Text style={styles.subFieldLabel}>
-                {t.recipeBuilder?.stepDurationSec || 'Czas trwania kroku (s)'}
+                {t?.recipeBuilder?.stepDurationSec || 'Czas trwania kroku (s)'}
               </Text>
               <NumInput
                 value={step.durationSeconds}
@@ -98,12 +101,12 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
           </View>
 
           <Text style={[styles.subFieldLabel, { marginTop: 6 }]}>
-            {t.recipeBuilder.stepInstruction}
+            {t?.recipeBuilder?.stepInstruction || 'Instrukcja kroku'}
           </Text>
           <Field
             value={step.instructionPl}
             onChangeText={(val) => onUpdateStep(index, 'instructionPl', val)}
-            placeholder={t.recipeBuilder.stepInstructionPlaceholder}
+            placeholder={t?.recipeBuilder?.stepInstructionPlaceholder || 'np. Wlej 50g wody'}
           />
         </View>
       ))}
