@@ -94,13 +94,15 @@ export function calculateLiquidYield(waterGrams: number, doseGrams: number, rete
 export function calculateExtractionYield(
   beverageWeightGrams: number,
   tdsPercent: number,
-  doseGrams: number
+  doseGrams: number,
+  maxTdsPercent = 30.0
 ): ExtractionYieldResult {
   if (!Number.isFinite(beverageWeightGrams) || !Number.isFinite(tdsPercent) || !Number.isFinite(doseGrams) || beverageWeightGrams <= 0 || tdsPercent <= 0 || doseGrams <= 0) {
     throw new Error('Parametry ekstrakcji muszą być większe od zera');
   }
 
-  const ey = Number(((beverageWeightGrams * tdsPercent) / doseGrams).toFixed(2));
+  const safeTds = Number.isFinite(maxTdsPercent) && maxTdsPercent > 0 ? Math.min(tdsPercent, maxTdsPercent) : tdsPercent;
+  const ey = Number(((beverageWeightGrams * safeTds) / doseGrams).toFixed(2));
 
   let rating: 'under' | 'ideal' | 'over';
   let descriptionPl: string;

@@ -429,4 +429,13 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(res.steps[1].waterGrams).toBeGreaterThan(0);
     });
   });
+
+  describe('TASK-P20-03-ZAK: calculateExtractionYield clampuje skrajny TDS do maxTdsPercent', () => {
+    it('clampuje TDS do 30% przy nierealistycznie wysokich wartościach', () => {
+      const res = calculateExtractionYield(200, 85, 15);
+      // TDS 85 zclampowane do 30% -> (200 * 30) / 15 = 400.0%
+      expect(res.extractionYieldPercent).toBe(400);
+      expect(res.rating).toBe('over');
+    });
+  });
 });
