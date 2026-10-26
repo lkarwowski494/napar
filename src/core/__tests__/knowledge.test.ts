@@ -348,4 +348,12 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     const byPolifenole = searchTeaCategories('polifenole');
     expect(byPolifenole.length).toBeGreaterThanOrEqual(1);
   });
+
+  test('TASK-P16-06-TRE: searchCoffeeOrigins przeszukuje countryCode oraz typicalAltitudeMeters', () => {
+    const byCode = searchCoffeeOrigins('ET');
+    expect(byCode.some((o) => o.countryCode === 'ET')).toBe(true);
+
+    const byAltitude = searchCoffeeOrigins('2200');
+    expect(byAltitude.length).toBeGreaterThanOrEqual(1);
+  });
 });

@@ -602,6 +602,8 @@ export function searchCoffeeOrigins(query: string): CoffeeOriginInfo[] {
   return COFFEE_ORIGINS.filter((o) =>
     o.country.toLowerCase().includes(q) ||
     (o.countryEn && o.countryEn.toLowerCase().includes(q)) ||
+    (o.countryCode && o.countryCode.toLowerCase().includes(q)) ||
+    (o.typicalAltitudeMeters && o.typicalAltitudeMeters.toLowerCase().includes(q)) ||
     o.primaryRegions.some((r) => r.toLowerCase().includes(q)) ||
     o.mainVarieties.some((v) => v.toLowerCase().includes(q)) ||
     o.flavorProfilePl.toLowerCase().includes(q) ||
