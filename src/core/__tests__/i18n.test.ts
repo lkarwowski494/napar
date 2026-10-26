@@ -413,4 +413,9 @@ describe('i18n System', () => {
     expect(translations.pl.brew.methodColdDrip).toBe('Cold Drip / Ice Drip');
     expect(translations.en.brew.methodColdDrip).toBe('Cold Drip / Ice Drip');
   });
+
+  test('TASK-P42-09-LOK: Klucz markFinishedAndArchive jest zdefiniowany w stash w PL i EN', () => {
+    expect(translations.pl.stash.markFinishedAndArchive).toBe('Oznacz jako zużytą i zarchiwizuj');
+    expect(translations.en.stash.markFinishedAndArchive).toBe('Mark as Finished & Archive');
+  });
 });

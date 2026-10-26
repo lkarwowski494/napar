@@ -18,7 +18,7 @@
 6. **06-TRE:** `knowledge-data.ts`: Rozszerzenie `PROCESS_ALIASES` o odmiany procesów: `co-fermentation`, `lactic`, `double-washed`, `yeast-fermentation`.
 7. **07-JAK:** `water-chemistry.ts`: Ścisłe odrzucanie obiektów, tablic i symboli oraz obsługa stringów w `diagnoseWaterSensoryImpact`.
 8. **08-PRO:** `grinder-converter.ts`: Rozpoznawanie `Kyoto Drip`, `Dutch Coffee`, `Slow Drip` i `Ice Brew` jako grubego przemiału (1150 µm) w `getRecipeMicrons`.
-9. **09-LOK:** `locales/*` & `src/core/i18n.tsx`: Dodanie klucza `stash.saveChanges` ("Zapisz zmiany" / "Save Changes") w 35 językach i rozszerzenie matrycy testów do 829.
+9. **09-LOK:** `locales/*` & `src/core/i18n.tsx`: Dodanie klucza `stash.markFinishedAndArchive` ("Oznacz jako zużytą i zarchiwizuj" / "Mark as Finished & Archive") w 35 językach i rozszerzenie matrycy testów do 829.
 10. **10-WYD:** `scripts/verify-native.mjs`: Statyczna weryfikacja obecności skryptów `typecheck` i `test` w `package.json`.
 11. **11-WZR:** `recipe-share.ts`: Walidacja zakresu numerycznego temperatury wody `t` `[0, 100]` i proporcji `r` `[1, 100]` w `decodeRecipeFromShareUrl`.
 12. **12-NIE:** `live-activity.ts`: Clampowanie `totalElapsedSeconds` do `86400` i `targetWaterGrams` do `50000` w `buildLiveActivityPayload`.

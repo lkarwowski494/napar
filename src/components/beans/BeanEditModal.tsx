@@ -388,9 +388,9 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             disabled={!editName.trim()}
             accessibilityRole="button"
             accessibilityState={{ disabled: !editName.trim() }}
-            accessibilityLabel="Zapisz zmiany"
+            accessibilityLabel={t.stash?.saveChanges || 'Zapisz zmiany'}
           >
-            <Text style={styles.saveSubmitText}>Zapisz zmiany</Text>
+            <Text style={styles.saveSubmitText}>{t.stash?.saveChanges || 'Zapisz zmiany'}</Text>
           </Pressable>
 
           <Pressable
@@ -398,9 +398,9 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             style={styles.markFinishedBtn}
             onPress={handleMarkAsFinished}
             accessibilityRole="button"
-            accessibilityLabel="Oznacz jako zużytą i zarchiwizuj"
+            accessibilityLabel={t.stash?.markFinishedAndArchive || 'Oznacz jako zużytą i zarchiwizuj'}
           >
-            <Text style={styles.markFinishedText}>Oznacz jako zużytą i zarchiwizuj</Text>
+            <Text style={styles.markFinishedText}>{t.stash?.markFinishedAndArchive || 'Oznacz jako zużytą i zarchiwizuj'}</Text>
           </Pressable>
 
           <Pressable

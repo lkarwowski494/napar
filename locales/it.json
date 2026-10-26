@@ -268,7 +268,7 @@
     "compendiumSubtitle": "Botanical varieties, processing, terroir & tea traditions",
     "edit": "Edit",
     "editTitle": "Edit Stash Item",
-    "saveChanges": "Save Changes",
+    "saveChanges": "Salva modifiche",
     "archivePrompt": "Pack finished (0 g). Move to archive?",
     "archiveNow": "Archive now",
     "markFinished": "Mark as Finished (Archive)",
@@ -303,7 +303,8 @@
     "favoriteRemove": "Remove from favorites",
     "emptyTitle": "Your stash is empty",
     "emptyDesc": "Add your first coffee beans or tea leaves to track freshness, botanical varieties and weight.",
-    "readOnlyNotice": "Read-only mode (trial expired)"
+    "readOnlyNotice": "Read-only mode (trial expired)",
+    "markFinishedAndArchive": "Contrassegna come terminato e archivia"
   },
   "journal": {
     "title": "Tasting Journal",
