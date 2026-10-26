@@ -69,6 +69,10 @@ try {
     `app.json -> expo.ios.appleTeamId musi być 10-znakowym identyfikatorem zespołu Apple (otrzymano '${appJson.ios?.appleTeamId}')`
   );
   check(
+    typeof appJson.ios?.buildNumber === 'string' && /^\d+$/.test(appJson.ios.buildNumber),
+    `app.json -> expo.ios.buildNumber musi być numerycznym ciągiem znaków (otrzymano '${appJson.ios?.buildNumber}')`
+  );
+  check(
     appJson.ios?.infoPlist?.ITSAppUsesNonExemptEncryption === false,
     'app.json -> expo.ios.infoPlist musi mieć ITSAppUsesNonExemptEncryption: false'
   );
@@ -357,6 +361,14 @@ try {
     check(
       Boolean(devDeps.typescript),
       "Krytyczny pakiet 'typescript' musi znajdować się w devDependencies package.json"
+    );
+    check(
+      Boolean(devDeps['@types/react']),
+      "Krytyczny pakiet '@types/react' musi znajdować się w devDependencies package.json"
+    );
+    check(
+      Boolean(devDeps['@types/jest']),
+      "Krytyczny pakiet '@types/jest' musi znajdować się w devDependencies package.json"
     );
   }
 
