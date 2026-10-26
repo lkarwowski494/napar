@@ -363,4 +363,20 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(degreesDHToPpmCaCO3(true as any)).toBe(0);
     expect(degreesDHToPpmCaCO3(false as any)).toBe(0);
   });
+
+  test('TASK-P34-07-JAK: calculateWaterMinerals odrzuca koercję typów boolean dla objętości, GH oraz KH', () => {
+    // waterVolumeLiters jako boolean
+    const resVolBool = calculateWaterMinerals(true as any, 80, 40);
+    expect(resVolBool.waterVolumeLiters).toBe(1.0);
+
+    // targetGh jako boolean
+    const resGhBool = calculateWaterMinerals(1.0, true as any, 40);
+    expect(resGhBool.targetGhPpm).toBe(0);
+    expect(resGhBool.concentrateHardnessGrams).toBe(0);
+
+    // targetKh jako boolean
+    const resKhBool = calculateWaterMinerals(1.0, 80, false as any);
+    expect(resKhBool.targetKhPpm).toBe(0);
+    expect(resKhBool.concentrateBufferGrams).toBe(0);
+  });
 });

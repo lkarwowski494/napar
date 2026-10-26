@@ -197,9 +197,9 @@ export function calculateWaterMinerals(
   targetGh: number,
   targetKh: number
 ): WaterCalculationResult {
-  const rawVol = typeof waterVolumeLiters === 'string' ? parseFloat(waterVolumeLiters) : Number(waterVolumeLiters);
-  const rawGh = typeof targetGh === 'string' ? parseFloat(targetGh) : Number(targetGh);
-  const rawKh = typeof targetKh === 'string' ? parseFloat(targetKh) : Number(targetKh);
+  const rawVol = typeof waterVolumeLiters === 'boolean' ? NaN : (typeof waterVolumeLiters === 'string' ? parseFloat(waterVolumeLiters) : Number(waterVolumeLiters));
+  const rawGh = typeof targetGh === 'boolean' ? NaN : (typeof targetGh === 'string' ? parseFloat(targetGh) : Number(targetGh));
+  const rawKh = typeof targetKh === 'boolean' ? NaN : (typeof targetKh === 'string' ? parseFloat(targetKh) : Number(targetKh));
   const vol = Number.isFinite(rawVol) && rawVol > 0 ? Math.max(0.1, Math.min(1000.0, rawVol)) : 1.0;
   let gh = Number.isFinite(rawGh) && rawGh >= 0 ? Math.max(0, Math.min(5000, rawGh)) : 0;
   let kh = Number.isFinite(rawKh) && rawKh >= 0 ? Math.max(0, Math.min(5000, rawKh)) : 0;
