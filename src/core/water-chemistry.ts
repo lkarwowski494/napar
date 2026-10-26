@@ -174,6 +174,28 @@ export const BOTTLED_WATER_BENCHMARKS: BottledWaterProfile[] = [
     verdictPl: 'Zbyt wysoki bufor wodorowęglanowy gasi kwasowość i spłaszcza profil smakowy filtrów.',
     verdictEn: 'Very high bicarbonate buffer dulls acidity and flattens filter flavor profiles.',
   },
+  {
+    id: 'ashbeck',
+    brandName: 'Ashbeck',
+    originCountry: 'Wielka Brytania',
+    tdsPpm: 85,
+    estimatedGhPpm: 45,
+    estimatedKhPpm: 25,
+    suitability: 'EXCELLENT',
+    verdictPl: 'Popularna woda baristów w UK o niskiej zawartości minerałów. Idealna do dripa V60 i aeropressu.',
+    verdictEn: 'Popular UK barista staple with low mineral content. Excellent for V60 drip and AeroPress.',
+  },
+  {
+    id: 'highland_spring',
+    brandName: 'Highland Spring',
+    originCountry: 'Szkocja',
+    tdsPpm: 140,
+    estimatedGhPpm: 70,
+    estimatedKhPpm: 60,
+    suitability: 'GOOD',
+    verdictPl: 'Zrównoważona woda źródlana o umiarkowanym buforze, dobra do parzenia przelewowego i herbat.',
+    verdictEn: 'Balanced Scottish spring water with moderate buffer, good for pour-overs and teas.',
+  },
 ];
 
 /**
@@ -462,6 +484,14 @@ const BOTTLED_ALIASES: Record<string, string> = {
   spareine: 'spa_reine',
   'spa-reine': 'spa_reine',
   evian: 'evian',
+  ashbeck: 'ashbeck',
+  'tesco-ashbeck': 'ashbeck',
+  'tesco ashbeck': 'ashbeck',
+  tescoashbeck: 'ashbeck',
+  'highland-spring': 'highland_spring',
+  'highland spring': 'highland_spring',
+  highlandspring: 'highland_spring',
+  highland: 'highland_spring',
 };
 
 export function findBottledWaterById(id: string): BottledWaterProfile | undefined {

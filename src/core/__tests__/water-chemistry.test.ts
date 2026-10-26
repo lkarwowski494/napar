@@ -547,5 +547,18 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(findBottledWaterById('evian')?.brandName).toBe('Evian');
     expect(findBottledWaterById('Evian')?.id).toBe('evian');
   });
+
+  test('TASK-P48-07-JAK: findBottledWaterById wspiera benchmarki ashbeck oraz highland_spring wraz z aliasami i getWaterProfileName', () => {
+    expect(findBottledWaterById('ashbeck')?.brandName).toBe('Ashbeck');
+    expect(findBottledWaterById('tesco ashbeck')?.id).toBe('ashbeck');
+    expect(findBottledWaterById('tesco-ashbeck')?.id).toBe('ashbeck');
+    expect(findBottledWaterById('highland_spring')?.brandName).toBe('Highland Spring');
+    expect(findBottledWaterById('highland spring')?.id).toBe('highland_spring');
+    expect(findBottledWaterById('highland-spring')?.id).toBe('highland_spring');
+    expect(findBottledWaterById('highland')?.id).toBe('highland_spring');
+
+    expect(getWaterProfileName('ashbeck')).toBe('Ashbeck');
+    expect(getWaterProfileName('highland_spring')).toBe('Highland Spring');
+  });
 });
 
