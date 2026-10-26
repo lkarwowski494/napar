@@ -753,4 +753,24 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(payload.w).toBe(220);
     expect(payload.t).toBe(88);
   });
+
+  test('TASK-P32-11-WZR: decodeRecipeFromShareUrl parsuje ratio w formacie string oraz chroni przed -0', () => {
+    const compact: any = {
+      v: 1,
+      n: 'Ratio String Recipe',
+      b: 'COFFEE',
+      m: 'v60',
+      d: 15,
+      w: 250,
+      t: 93,
+      r: '16.67',
+      s: [],
+    };
+    const b64 = Buffer.from(JSON.stringify(compact), 'utf8').toString('base64');
+    const result = decodeRecipeFromShareUrl(b64);
+    expect(result).not.toBeNull();
+    expect(result!.recipe.recommendedRatio).toBe(16.67);
+    expect(Object.is(result!.recipe.doseGrams, -0)).toBe(false);
+    expect(Object.is(result!.recipe.waterGrams, -0)).toBe(false);
+  });
 });
