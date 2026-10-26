@@ -31,7 +31,7 @@ export interface ProcedureModalProps {
   stepRemainingSeconds: number;
   totalElapsedSeconds: number;
   unitSystem: 'metric' | 'imperial';
-  language?: 'pl' | 'en';
+  language?: 'pl' | 'en' | string;
   onPauseResume: () => void;
   onAdjustTimeSeconds: (deltaSeconds: number) => void;
   onResetCurrentStep: (parsedDurationSeconds: number) => void;
