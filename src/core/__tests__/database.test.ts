@@ -1418,4 +1418,22 @@ describe('Napar SQLite Database & Repositories', () => {
     setUnitSystem('niepoprawny' as any);
     expect(getUnitSystem()).toBe('metric');
   });
+
+  test('TASK-P28-05-ARC: setVoiceAnnounceEnabled, setHapticsEnabled oraz setHasCompletedOnboarding rygorystycznie koercują do boolean', () => {
+    initDatabase(mockDb as any);
+    setVoiceAnnounceEnabled(null as any);
+    expect(getVoiceAnnounceEnabled()).toBe(false);
+    setVoiceAnnounceEnabled(1 as any);
+    expect(getVoiceAnnounceEnabled()).toBe(true);
+
+    setHapticsEnabled(undefined as any);
+    expect(getHapticsEnabled()).toBe(false);
+    setHapticsEnabled('true' as any);
+    expect(getHapticsEnabled()).toBe(true);
+
+    setHasCompletedOnboarding(null as any);
+    expect(getHasCompletedOnboarding()).toBe(false);
+    setHasCompletedOnboarding(true);
+    expect(getHasCompletedOnboarding()).toBe(true);
+  });
 });

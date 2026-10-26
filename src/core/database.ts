@@ -1096,7 +1096,7 @@ export function getVoiceAnnounceEnabled(): boolean {
 }
 
 export function setVoiceAnnounceEnabled(enabled: boolean): void {
-  setAppSetting('voice_announce_enabled', enabled ? 'true' : 'false');
+  setAppSetting('voice_announce_enabled', Boolean(enabled) ? 'true' : 'false');
 }
 
 export function getHapticsEnabled(): boolean {
@@ -1105,7 +1105,7 @@ export function getHapticsEnabled(): boolean {
 }
 
 export function setHapticsEnabled(enabled: boolean): void {
-  setAppSetting('haptics_enabled', enabled ? 'true' : 'false');
+  setAppSetting('haptics_enabled', Boolean(enabled) ? 'true' : 'false');
 }
 
 export function getIsProUser(): boolean {
@@ -1114,7 +1114,7 @@ export function getIsProUser(): boolean {
 }
 
 export function setIsProUser(enabled: boolean): void {
-  setAppSetting('is_pro_active', enabled ? 'true' : 'false');
+  setAppSetting('is_pro_active', Boolean(enabled) ? 'true' : 'false');
 }
 
 export function getCaffeineHalfLife(): number {
@@ -1151,7 +1151,7 @@ export function getHealthKitSyncEnabled(): boolean {
 }
 
 export function setHealthKitSyncEnabled(enabled: boolean): void {
-  setAppSetting('healthkit_sync_enabled', enabled ? 'true' : 'false');
+  setAppSetting('healthkit_sync_enabled', Boolean(enabled) ? 'true' : 'false');
 }
 
 export type BeveragePreference = 'both' | 'coffee' | 'tea';
@@ -1170,9 +1170,9 @@ export function setBeveragePreference(pref: BeveragePreference): void {
 }
 
 export function getHasCompletedOnboarding(): boolean {
-  return getAppSetting('onboarding_completed') === 'true';
+  return getAppSetting('onboarding_completed', 'false') === 'true';
 }
 
 export function setHasCompletedOnboarding(completed: boolean): void {
-  setAppSetting('onboarding_completed', completed ? 'true' : 'false');
+  setAppSetting('onboarding_completed', Boolean(completed) ? 'true' : 'false');
 }
