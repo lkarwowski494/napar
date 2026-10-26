@@ -75,31 +75,51 @@ export function formatActivityTimer(seconds: number): string {
 }
 
 export function buildDynamicIslandPayload(
-  attributes: BrewActivityAttributes,
-  state: BrewActivityContentState,
+  attributes?: BrewActivityAttributes | null,
+  state?: BrewActivityContentState | null,
   language: 'pl' | 'en' = 'pl'
 ): DynamicIslandPayload {
-  const icon = attributes.beverageType === 'COFFEE' ? '☕' : '🍵';
-  const timeFormatted = formatActivityTimer(state.stepRemainingSeconds);
+  const safeAttr: BrewActivityAttributes = attributes || {
+    sessionId: '',
+    recipeName: 'Napar',
+    method: '',
+    beverageType: 'COFFEE',
+    totalWaterGrams: 0,
+  };
+  const safeState: BrewActivityContentState = state || {
+    stepIndex: 0,
+    totalSteps: 1,
+    stepNamePl: 'Parzenie',
+    stepNameEn: 'Brewing',
+    stepRemainingSeconds: 0,
+    stepDurationSeconds: 0,
+    totalElapsedSeconds: 0,
+    targetWaterGrams: 0,
+    isPaused: false,
+    isFinished: false,
+  };
+
+  const icon = safeAttr.beverageType === 'TEA' ? '🍵' : '☕';
+  const timeFormatted = formatActivityTimer(safeState.stepRemainingSeconds);
   const stepName =
-    (language === 'en' ? state.stepNameEn : state.stepNamePl) ||
-    state.stepNamePl ||
-    state.stepNameEn ||
+    (language === 'en' ? safeState.stepNameEn : safeState.stepNamePl) ||
+    safeState.stepNamePl ||
+    safeState.stepNameEn ||
     (language === 'en' ? 'Step' : 'Krok');
-  const safeStepIdx = Math.max(0, state.stepIndex);
-  const safeTotalSteps = Math.max(1, state.totalSteps);
+  const safeStepIdx = Math.max(0, safeState.stepIndex || 0);
+  const safeTotalSteps = Math.max(1, safeState.totalSteps || 1);
   const subtitle =
     language === 'en'
       ? `${stepName} · Step ${safeStepIdx + 1} of ${safeTotalSteps}`
       : `${stepName} · Krok ${safeStepIdx + 1} z ${safeTotalSteps}`;
 
   const safeTargetWater =
-    Number.isFinite(state.targetWaterGrams) && state.targetWaterGrams >= 0
-      ? Math.round(state.targetWaterGrams)
+    Number.isFinite(safeState.targetWaterGrams) && safeState.targetWaterGrams >= 0
+      ? Math.round(safeState.targetWaterGrams)
       : 0;
   const safeTotalWater =
-    Number.isFinite(attributes.totalWaterGrams) && attributes.totalWaterGrams >= 0
-      ? Math.round(attributes.totalWaterGrams)
+    Number.isFinite(safeAttr.totalWaterGrams) && safeAttr.totalWaterGrams >= 0
+      ? Math.round(safeAttr.totalWaterGrams)
       : 0;
 
   const targetWater =
@@ -112,23 +132,44 @@ export function buildDynamicIslandPayload(
     compactTrailing: timeFormatted,
     expandedLeadingIcon: icon,
     expandedTrailingTime: timeFormatted,
-    expandedCenterTitle: attributes.recipeName,
+    expandedCenterTitle: safeAttr.recipeName || 'Napar',
     expandedCenterSubtitle: subtitle,
     expandedBottomTarget: targetWater,
-    isPaused: state.isPaused,
-    isFinished: state.isFinished,
+    isPaused: Boolean(safeState.isPaused),
+    isFinished: Boolean(safeState.isFinished),
   };
 }
 
 export function buildLiveActivityPayload(
-  attributes: BrewActivityAttributes,
-  state: BrewActivityContentState,
+  attributes?: BrewActivityAttributes | null,
+  state?: BrewActivityContentState | null,
   language: 'pl' | 'en' = 'pl'
 ): LiveActivityPayload {
+  const dynamicIsland = buildDynamicIslandPayload(attributes, state, language);
+  const safeAttr: BrewActivityAttributes = attributes || {
+    sessionId: '',
+    recipeName: 'Napar',
+    method: '',
+    beverageType: 'COFFEE',
+    totalWaterGrams: 0,
+  };
+  const safeState: BrewActivityContentState = state || {
+    stepIndex: 0,
+    totalSteps: 1,
+    stepNamePl: 'Parzenie',
+    stepNameEn: 'Brewing',
+    stepRemainingSeconds: 0,
+    stepDurationSeconds: 0,
+    totalElapsedSeconds: 0,
+    targetWaterGrams: 0,
+    isPaused: false,
+    isFinished: false,
+  };
+
   return {
-    attributes,
-    contentState: state,
-    dynamicIsland: buildDynamicIslandPayload(attributes, state, language),
+    attributes: safeAttr,
+    contentState: safeState,
+    dynamicIsland,
   };
 }
 

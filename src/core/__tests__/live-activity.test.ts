@@ -166,4 +166,20 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(payload.expandedBottomTarget).toBe('Target: 0 g (of 0 g)');
     expect(payload.expandedCenterSubtitle).toContain('Step · Step 1 of 1');
   });
+
+  test('TASK-P9-12-NIE: buildDynamicIslandPayload i buildLiveActivityPayload są odporne na null/undefined', () => {
+    const payloadDiNull = buildDynamicIslandPayload(null, null, 'pl');
+    expect(payloadDiNull).toBeDefined();
+    expect(payloadDiNull.compactLeading).toBe('☕');
+    expect(payloadDiNull.expandedCenterTitle).toBe('Napar');
+    expect(payloadDiNull.expandedCenterSubtitle).toContain('Parzenie · Krok 1 z 1');
+    expect(payloadDiNull.expandedBottomTarget).toContain('Docelowo: 0 g (z 0 g)');
+
+    const payloadLiveUndefined = buildLiveActivityPayload(undefined, undefined, 'en');
+    expect(payloadLiveUndefined).toBeDefined();
+    expect(payloadLiveUndefined.attributes.recipeName).toBe('Napar');
+    expect(payloadLiveUndefined.contentState.stepNameEn).toBe('Brewing');
+    expect(payloadLiveUndefined.dynamicIsland.compactLeading).toBe('☕');
+    expect(payloadLiveUndefined.dynamicIsland.expandedCenterSubtitle).toContain('Brewing · Step 1 of 1');
+  });
 });
