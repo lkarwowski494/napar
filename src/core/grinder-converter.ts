@@ -373,35 +373,39 @@ export function convertBetweenGrinders(
 export function getRecipeMicrons(recipe?: {
   method?: string;
   grindSettingDescriptionPl?: string;
+  grindSettingDescriptionEn?: string;
   grind_size_description?: string;
 } | null): number {
   if (!recipe || typeof recipe !== 'object') {
     return 720;
   }
   const method = (typeof recipe.method === 'string' ? recipe.method : '').trim().toUpperCase();
-  const desc = (typeof recipe.grindSettingDescriptionPl === 'string'
-    ? recipe.grindSettingDescriptionPl
-    : typeof recipe.grind_size_description === 'string'
-    ? recipe.grind_size_description
-    : ''
+  const desc = (
+    typeof (recipe as any).grindSettingDescriptionPl === 'string'
+      ? (recipe as any).grindSettingDescriptionPl
+      : typeof (recipe as any).grindSettingDescriptionEn === 'string'
+      ? (recipe as any).grindSettingDescriptionEn
+      : typeof (recipe as any).grind_size_description === 'string'
+      ? (recipe as any).grind_size_description
+      : ''
   ).toLowerCase();
 
-  if (desc.includes('bardzo drobno') || method === 'ESPRESSO') {
+  if (desc.includes('bardzo drobno') || desc.includes('extra fine') || method === 'ESPRESSO') {
     return 350;
   }
-  if (desc.includes('drobno') || method === 'AEROPRESS') {
+  if (desc.includes('drobno') || desc.includes('fine') || method === 'AEROPRESS') {
     if (desc.includes('16') || desc.includes('18')) return 520;
     return 560;
   }
   if (method === 'V60' || method === 'ORIGAMI' || method === 'KALITA' || method === 'SWITCH') {
-    if (desc.includes('28') || desc.includes('30') || desc.includes('grubo')) return 850;
+    if (desc.includes('28') || desc.includes('30') || desc.includes('grubo') || desc.includes('coarse')) return 850;
     if (desc.includes('18') || desc.includes('20')) return 600;
     return 720;
   }
   if (method === 'CHEMEX' || method === 'CLEVER_DRIPPER' || method === 'CUPPING') {
     return 880;
   }
-  if (method === 'FRENCH_PRESS' || method === 'COLD_BREW') {
+  if (method === 'FRENCH_PRESS' || method === 'COLD_BREW' || desc.includes('coarse')) {
     return 1150;
   }
   return 720;
@@ -411,7 +415,7 @@ export function getRecipeMicrons(recipe?: {
  * Zwraca rekomendację nastawy dla konkretnego młynka i receptury
  */
 export function getRecommendedGrindForRecipe(
-  recipe: { method?: string; grindSettingDescriptionPl?: string; grind_size_description?: string } | null | undefined,
+  recipe: { method?: string; grindSettingDescriptionPl?: string; grindSettingDescriptionEn?: string; grind_size_description?: string } | null | undefined,
   grinderId: string,
   language = 'pl'
 ): { formatted: string; rawValue: number; grinderName: string; microns: number } {

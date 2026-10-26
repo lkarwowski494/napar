@@ -286,4 +286,12 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(converted.microns).toBe(720);
     expect(converted.targetFormatted).toContain('#16');
   });
+
+  test('TASK-P20-08-PRO: getRecipeMicrons wspiera angielskie opisy mielenia (grindSettingDescriptionEn)', () => {
+    const enCoarse = getRecipeMicrons({ method: 'V60', grindSettingDescriptionEn: 'coarse grind (28-30 clicks)' });
+    expect(enCoarse).toBe(850);
+
+    const enFine = getRecipeMicrons({ method: 'Aeropress', grindSettingDescriptionEn: 'fine grind' });
+    expect(enFine).toBe(560);
+  });
 });
