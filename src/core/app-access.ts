@@ -66,9 +66,10 @@ export function notifyAccessChanged(): void {
 export function getAppAccessState(): AppAccessState {
   const isPro = getAppSetting('is_pro_active', 'false') === 'true';
   const rawTier = getAppSetting('subscription_tier', isPro ? 'lifetime' : 'none');
+  const normalizedTierStr = typeof rawTier === 'string' ? rawTier.trim().toLowerCase() : '';
   const tier: 'none' | 'monthly' | 'annual' | 'lifetime' =
-    rawTier === 'monthly' || rawTier === 'annual' || rawTier === 'lifetime'
-      ? rawTier
+    normalizedTierStr === 'monthly' || normalizedTierStr === 'annual' || normalizedTierStr === 'lifetime'
+      ? (normalizedTierStr as 'monthly' | 'annual' | 'lifetime')
       : 'none';
 
   if (isPro) {
