@@ -341,4 +341,15 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(findBottledWaterById('   ')).toBeUndefined();
     expect(findWaterRecipeById('   ')).toBeUndefined();
   });
+
+  test('TASK-P32-07-JAK: getWaterProfileName rozwiazuje profile zarowno po ID jak i po zlokalizowanej nazwie lub marce', () => {
+    // Po marce w butelce
+    expect(getWaterProfileName('Żywiec Zdrój (Niegazowany)')).toBe('Żywiec Zdrój (Niegazowany)');
+    expect(getWaterProfileName('zywiec_zdroj')).toBe('Żywiec Zdrój (Niegazowany)');
+
+    // Po nazwie receptury w języku EN
+    expect(getWaterProfileName('Standard SCA (Specialty Coffee)', 'en')).toBe('SCA Standard Water');
+    expect(getWaterProfileName('sca_standard', 'pl')).toBe('Standard SCA (Specialty Coffee)');
+    expect(getWaterProfileName('  ')).toBe('');
+  });
 });

@@ -160,14 +160,16 @@ export const BOTTLED_WATER_BENCHMARKS: BottledWaterProfile[] = [
 export function getWaterProfileName(id: string, language: 'pl' | 'en' | string = 'pl'): string {
   if (!id || typeof id !== 'string') return '';
   const cleanId = id.trim();
-  const lowerId = cleanId.toLowerCase();
-  const recipe = WATER_RECIPES.find((r) => r.id.toLowerCase() === lowerId);
-  if (!recipe) {
-    const bottled = BOTTLED_WATER_BENCHMARKS.find((b) => b.id.toLowerCase() === lowerId);
-    if (bottled) return bottled.brandName;
-    return cleanId;
+  if (!cleanId) return '';
+  const recipe = findWaterRecipeById(cleanId);
+  if (recipe) {
+    return language === 'en' ? recipe.nameEn : recipe.namePl;
   }
-  return language === 'pl' ? recipe.namePl : recipe.nameEn;
+  const bottled = findBottledWaterById(cleanId);
+  if (bottled) {
+    return bottled.brandName;
+  }
+  return cleanId;
 }
 
 export interface WaterCalculationResult {
