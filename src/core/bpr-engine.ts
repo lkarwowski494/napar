@@ -55,7 +55,7 @@ export function parseStepDurationSeconds(
     typeof fallbackSeconds === 'number'
       ? fallbackSeconds
       : typeof fallbackSeconds === 'string'
-      ? parseFloat(fallbackSeconds)
+      ? parseFloat(fallbackSeconds.replace(',', '.'))
       : NaN;
   let safeFallback =
     Number.isFinite(parsedFallback) && parsedFallback > 0
@@ -494,8 +494,14 @@ export function generateActionIcsContent(
   const nowUtc = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   const dtStamp = nowUtc.length >= 15 ? nowUtc.slice(0, 15) + 'Z' : dtStart;
   const actionId = typeof action.id === 'string' && action.id.trim() ? action.id.trim().replace(/[^a-zA-Z0-9_-]/g, '_') : `action-${Date.now()}`;
-  const rawSummary = (isEn ? action.titleEn || action.titlePl : action.titlePl) || 'Sesja parzenia Napar';
-  const rawDescription = (isEn ? action.subtitleEn || action.subtitlePl : action.subtitlePl) || '';
+  const rawSummary =
+    (isEn
+      ? (typeof action.titleEn === 'string' && action.titleEn.trim() ? action.titleEn.trim() : (typeof action.titlePl === 'string' ? action.titlePl.trim() : ''))
+      : (typeof action.titlePl === 'string' && action.titlePl.trim() ? action.titlePl.trim() : '')) || (isEn ? 'Napar Brew Session' : 'Sesja parzenia Napar');
+  const rawDescription =
+    (isEn
+      ? (typeof action.subtitleEn === 'string' && action.subtitleEn.trim() ? action.subtitleEn.trim() : (typeof action.subtitlePl === 'string' ? action.subtitlePl.trim() : ''))
+      : (typeof action.subtitlePl === 'string' && action.subtitlePl.trim() ? action.subtitlePl.trim() : '')) || '';
 
   const summary = escapeIcsText(rawSummary);
   const description = escapeIcsText(rawDescription);

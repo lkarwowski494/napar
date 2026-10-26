@@ -528,5 +528,30 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(schedule.some((act) => act.inventoryItemId === 'coffee-upper')).toBe(true);
       expect(schedule.some((act) => act.inventoryItemId === 'tea-mixed')).toBe(true);
     });
+
+    it('TASK-P50-03-ZAK: parseStepDurationSeconds wspiera przecinek w fallbackSeconds a generateActionIcsContent bezpiecznie obsluguje nie-stringowe tytuly', () => {
+      // 1. Przecinek dziesiętny w fallbackSeconds
+      expect(parseStepDurationSeconds('brak czasu w opisie', '45,5')).toBe(46);
+
+      // 2. Nie-stringowe tytuły w generateActionIcsContent
+      const nonStringAction: any = {
+        id: 'action-non-string',
+        titlePl: 12345,
+        subtitlePl: null,
+        dateIso: '2026-11-15',
+      };
+      const ics = generateActionIcsContent(nonStringAction, 'pl');
+      expect(ics).toContain('SUMMARY:Sesja parzenia Napar');
+      expect(ics).toContain('DTSTART:20261115T080000Z');
+
+      const nonStringActionEn: any = {
+        id: 'action-non-string-en',
+        titleEn: undefined,
+        titlePl: null,
+        dateIso: '2026-11-15',
+      };
+      const icsEn = generateActionIcsContent(nonStringActionEn, 'en');
+      expect(icsEn).toContain('SUMMARY:Napar Brew Session');
+    });
   });
 });
