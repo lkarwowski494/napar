@@ -107,7 +107,8 @@ export function calculateExtractionYield(
   tdsPercent: number,
   doseGrams: number,
   maxTdsPercent = 30.0,
-  maxBeverageGrams = 50000.0
+  maxBeverageGrams = 50000.0,
+  maxEyPercent?: number
 ): ExtractionYieldResult {
   if (!Number.isFinite(beverageWeightGrams) || !Number.isFinite(tdsPercent) || !Number.isFinite(doseGrams) || beverageWeightGrams <= 0 || tdsPercent <= 0 || doseGrams <= 0) {
     throw new Error('Parametry ekstrakcji muszą być większe od zera');
@@ -115,7 +116,11 @@ export function calculateExtractionYield(
 
   const safeTds = Number.isFinite(maxTdsPercent) && maxTdsPercent > 0 ? Math.min(tdsPercent, maxTdsPercent) : tdsPercent;
   const safeBeverage = Number.isFinite(maxBeverageGrams) && maxBeverageGrams > 0 ? Math.min(beverageWeightGrams, maxBeverageGrams) : beverageWeightGrams;
-  const ey = Number(((safeBeverage * safeTds) / doseGrams).toFixed(2));
+  let rawEy = (safeBeverage * safeTds) / doseGrams;
+  if (Number.isFinite(maxEyPercent) && (maxEyPercent as number) > 0) {
+    rawEy = Math.min(maxEyPercent as number, rawEy);
+  }
+  const ey = Number(rawEy.toFixed(2));
 
   let rating: 'under' | 'ideal' | 'over';
   let descriptionPl: string;

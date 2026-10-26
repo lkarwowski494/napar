@@ -476,4 +476,13 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(yieldGrams).toBe(50.0);
     });
   });
+
+  describe('TASK-P24-03-ZAK: calculateExtractionYield wspiera parametr maxEyPercent', () => {
+    it('clampuje obliczony EY do zadanego fizycznego limitu (np. 100%)', () => {
+      const res = calculateExtractionYield(1000, 2.0, 10, 30.0, 50000.0, 100.0);
+      // (1000 * 2.0) / 10 = 200.0% -> clamp do 100.0%
+      expect(res.extractionYieldPercent).toBe(100.0);
+      expect(res.rating).toBe('over');
+    });
+  });
 });
