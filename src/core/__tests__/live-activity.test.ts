@@ -747,4 +747,38 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     const payloadIsland = buildDynamicIslandPayload(corruptAttrs, mockState, 'pl');
     expect(payloadIsland.expandedCenterTitle).toBe('Napar');
   });
+
+  test('TASK-P45-12-NIE: startLiveActivity waliduje beverageType (musi byc COFFEE lub TEA) oraz method (string <= 50 znakow)', async () => {
+    // Nieprawidłowy beverageType
+    const badBevRes = await startLiveActivity(
+      { ...mockAttributesCoffee, beverageType: 'SODA' as any },
+      mockState
+    );
+    expect(badBevRes.success).toBe(false);
+    expect(badBevRes.error).toContain('Nieprawidłowy typ naparu');
+
+    // Nieprawidłowy method (pusty / whitespace)
+    const emptyMethodRes = await startLiveActivity(
+      { ...mockAttributesCoffee, method: '   ' },
+      mockState
+    );
+    expect(emptyMethodRes.success).toBe(false);
+    expect(emptyMethodRes.error).toContain('Nieprawidłowa metoda parzenia');
+
+    // Nieprawidłowy method (za długi > 50)
+    const longMethodRes = await startLiveActivity(
+      { ...mockAttributesCoffee, method: 'M'.repeat(55) },
+      mockState
+    );
+    expect(longMethodRes.success).toBe(false);
+    expect(longMethodRes.error).toContain('Nieprawidłowa metoda parzenia');
+
+    // Poprawne beverageType 'TEA' i method
+    const validTeaRes = await startLiveActivity(
+      { ...mockAttributesCoffee, beverageType: 'TEA', method: 'Gaiwan' },
+      mockState
+    );
+    expect(validTeaRes.success).toBe(false); // v1.0 DEC-01 stub
+    expect(validTeaRes.error).toBe('ActivityKit Live Activity niedostępne w v1.0 (DEC-01).');
+  });
 });

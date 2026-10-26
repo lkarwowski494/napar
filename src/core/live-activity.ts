@@ -306,6 +306,22 @@ export async function startLiveActivity(
       error: 'Nieprawidłowa nazwa receptury w atrybutach Live Activity.',
     };
   }
+  const rawBev = typeof attributes.beverageType === 'string' ? attributes.beverageType.trim().toUpperCase() : attributes.beverageType;
+  if (rawBev !== undefined && rawBev !== 'COFFEE' && rawBev !== 'TEA') {
+    return {
+      success: false,
+      error: 'Nieprawidłowy typ naparu w atrybutach Live Activity (musi być COFFEE lub TEA).',
+    };
+  }
+  if (
+    attributes.method !== undefined &&
+    (typeof attributes.method !== 'string' || !attributes.method.trim() || attributes.method.trim().length > 50)
+  ) {
+    return {
+      success: false,
+      error: 'Nieprawidłowa metoda parzenia w atrybutach Live Activity.',
+    };
+  }
   const rawWater = typeof attributes.totalWaterGrams === 'number' ? attributes.totalWaterGrams : (typeof attributes.totalWaterGrams === 'string' ? parseFloat(attributes.totalWaterGrams) : NaN);
   if (!Number.isFinite(rawWater) || rawWater <= 0 || rawWater > 50000 || Object.is(rawWater, -0)) {
     return {
