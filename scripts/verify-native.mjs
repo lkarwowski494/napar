@@ -49,6 +49,10 @@ try {
   const expectedBundleId = appJson.ios?.bundleIdentifier;
   check(Boolean(expectedBundleId), 'Brak bundleIdentifier w app.json -> expo.ios');
   check(
+    typeof appJson.ios?.appleTeamId === 'string' && /^[A-Z0-9]{10}$/.test(appJson.ios.appleTeamId),
+    `app.json -> expo.ios.appleTeamId musi być 10-znakowym identyfikatorem zespołu Apple (otrzymano '${appJson.ios?.appleTeamId}')`
+  );
+  check(
     appJson.ios?.infoPlist?.ITSAppUsesNonExemptEncryption === false,
     'app.json -> expo.ios.infoPlist musi mieć ITSAppUsesNonExemptEncryption: false'
   );
