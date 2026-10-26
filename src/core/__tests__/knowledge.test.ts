@@ -778,4 +778,23 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeProcessById('yeast-fermentation')?.id).toBe('process-anaerobic');
     expect(findCoffeeProcessById('drozdze')?.id).toBe('process-anaerobic');
   });
+
+  test('TASK-P43-06-TRE: findTeaCategoryById wspiera aliasy popularnych odmian (sencha, matcha, darjeeling, oolong, baimudan)', () => {
+    expect(findTeaCategoryById('sencha')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('gyokuro')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('matcha')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('genmaicha')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('longjing')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('darjeeling')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('assam')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('ceylon')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('earlgrey')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('earl-grey')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('lapsang')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('tieguanyin')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('dahongpao')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('dancong')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('silver-needle')?.id).toBe('tea-white');
+    expect(findTeaCategoryById('baimudan')?.id).toBe('tea-white');
+  });
 });
