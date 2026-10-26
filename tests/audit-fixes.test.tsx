@@ -373,6 +373,18 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
       expect(content).toContain('NSLocationTemporaryUsageDescriptionDictionary');
     });
 
+    test('TASK-P50-10-WYD: verify-native.mjs rygorystycznie blokuje uprawnienia biometryczne, zdrowotne oraz skanowanie WiFi', () => {
+      const verifyScript = join(root, 'scripts', 'verify-native.mjs');
+      expect(existsSync(verifyScript)).toBe(true);
+      const content = readFileSync(verifyScript, 'utf8');
+      expect(content).toContain('NSFaceIDUsageDescription');
+      expect(content).toContain('NSHealthShareUsageDescription');
+      expect(content).toContain('NSHealthUpdateUsageDescription');
+      expect(content).toContain('NSSiriUsageDescription');
+      expect(content).toContain('android.permission.USE_BIOMETRIC');
+      expect(content).toContain('android.permission.NEARBY_WIFI_DEVICES');
+    });
+
     test('SEC-03: Publiczne repozytorium nie zawiera nieautoryzowanych wywołań sieciowych', () => {
       const publicRepoTest = join(root, 'tests', 'public-repo.test.ts');
       expect(existsSync(publicRepoTest)).toBe(true);

@@ -191,6 +191,8 @@ try {
     'android.permission.BLUETOOTH_CONNECT',
     'android.permission.BLUETOOTH_ADVERTISE',
     'com.google.android.gms.permission.AD_ID',
+    'android.permission.USE_BIOMETRIC',
+    'android.permission.NEARBY_WIFI_DEVICES',
   ];
   for (const forbidden of forbiddenPerms) {
     check(
@@ -413,6 +415,10 @@ try {
     'NSBluetoothPeripheralUsageDescription',
     'NSUserTrackingUsageDescription',
     'NSAppleMusicUsageDescription',
+    'NSFaceIDUsageDescription',
+    'NSHealthShareUsageDescription',
+    'NSHealthUpdateUsageDescription',
+    'NSSiriUsageDescription',
   ];
   for (const perm of forbiddenPermissions) {
     check(!appJson.ios?.infoPlist?.[perm], `app.json zawiera niedozwolone uprawnienie: ${perm}`);
@@ -515,6 +521,8 @@ try {
     'android.permission.BLUETOOTH_CONNECT',
     'android.permission.BLUETOOTH_ADVERTISE',
     'com.google.android.gms.permission.AD_ID',
+    'android.permission.USE_BIOMETRIC',
+    'android.permission.NEARBY_WIFI_DEVICES',
   ];
   for (const forbidden of forbiddenAndroidPermissions) {
     check(
