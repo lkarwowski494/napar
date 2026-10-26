@@ -602,4 +602,43 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resValid.success).toBe(false);
     expect(resValid.error).toContain('DEC-01');
   });
+
+  test('TASK-P37-12-NIE: buildLiveActivityPayload parsuje stringi dla czasów i chroni przed -0', () => {
+    const stateWithStringTimes: any = {
+      stepIndex: '1',
+      totalSteps: '4',
+      stepNamePl: 'Zalanie 2',
+      stepNameEn: 'Pour 2',
+      stepRemainingSeconds: '25.0',
+      stepDurationSeconds: '45.0',
+      totalElapsedSeconds: '60.0',
+      targetWaterGrams: '150.0',
+      isPaused: false,
+      isFinished: false,
+    };
+
+    const payload = buildLiveActivityPayload(mockAttributesCoffee, stateWithStringTimes, 'pl');
+    expect(payload.contentState.stepRemainingSeconds).toBe(25);
+    expect(payload.contentState.stepDurationSeconds).toBe(45);
+    expect(payload.contentState.totalElapsedSeconds).toBe(60);
+    expect(payload.contentState.targetWaterGrams).toBe(150);
+    expect(Object.is(payload.contentState.stepRemainingSeconds, -0)).toBe(false);
+    expect(Object.is(payload.contentState.stepDurationSeconds, -0)).toBe(false);
+    expect(Object.is(payload.contentState.totalElapsedSeconds, -0)).toBe(false);
+
+    // Test z ujemnym zerem
+    const stateWithNegativeZero: any = {
+      ...mockState,
+      stepRemainingSeconds: -0,
+      stepDurationSeconds: -0,
+      totalElapsedSeconds: -0,
+    };
+    const payloadNegZero = buildLiveActivityPayload(mockAttributesCoffee, stateWithNegativeZero, 'pl');
+    expect(payloadNegZero.contentState.stepRemainingSeconds).toBe(0);
+    expect(payloadNegZero.contentState.stepDurationSeconds).toBe(0);
+    expect(payloadNegZero.contentState.totalElapsedSeconds).toBe(0);
+    expect(Object.is(payloadNegZero.contentState.stepRemainingSeconds, -0)).toBe(false);
+    expect(Object.is(payloadNegZero.contentState.stepDurationSeconds, -0)).toBe(false);
+    expect(Object.is(payloadNegZero.contentState.totalElapsedSeconds, -0)).toBe(false);
+  });
 });

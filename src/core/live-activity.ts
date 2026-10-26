@@ -109,8 +109,10 @@ export function buildDynamicIslandPayload(
   };
 
   const icon = safeAttr.beverageType === 'TEA' ? '🍵' : '☕';
-  const rawDuration = Math.max(0, Number.isFinite(safeState.stepDurationSeconds) ? Math.round(safeState.stepDurationSeconds) : 0);
-  const rawRemaining = Math.max(0, Number.isFinite(safeState.stepRemainingSeconds) ? Math.round(safeState.stepRemainingSeconds) : 0);
+  const rawDurVal = typeof safeState.stepDurationSeconds === 'number' ? safeState.stepDurationSeconds : (typeof safeState.stepDurationSeconds === 'string' ? parseFloat(safeState.stepDurationSeconds) : NaN);
+  const rawDuration = Math.max(0, Number.isFinite(rawDurVal) ? Math.round(rawDurVal) : 0);
+  const rawRemVal = typeof safeState.stepRemainingSeconds === 'number' ? safeState.stepRemainingSeconds : (typeof safeState.stepRemainingSeconds === 'string' ? parseFloat(safeState.stepRemainingSeconds) : NaN);
+  const rawRemaining = Math.max(0, Number.isFinite(rawRemVal) ? Math.round(rawRemVal) : 0);
   const safeRemaining = safeState.isFinished ? 0 : (rawDuration > 0 ? Math.min(rawDuration, rawRemaining) : rawRemaining);
   const timeFormatted = formatActivityTimer(safeRemaining);
   const rawStepName =
@@ -214,12 +216,23 @@ export function buildLiveActivityPayload(
         stepNameEn: state.stepNameEn || 'Brewing',
         stepRemainingSeconds: (() => {
           if (state.isFinished) return 0;
-          const rawDur = Math.max(0, Number.isFinite(state.stepDurationSeconds) ? Math.round(state.stepDurationSeconds) : 0);
-          const rawRem = Math.max(0, Number.isFinite(state.stepRemainingSeconds) ? Math.round(state.stepRemainingSeconds) : 0);
-          return rawDur > 0 ? Math.min(rawDur, rawRem) : rawRem;
+          const rawDurVal = typeof state.stepDurationSeconds === 'number' ? state.stepDurationSeconds : (typeof state.stepDurationSeconds === 'string' ? parseFloat(state.stepDurationSeconds) : NaN);
+          const rawDur = Math.max(0, Number.isFinite(rawDurVal) ? Math.round(rawDurVal) : 0);
+          const rawRemVal = typeof state.stepRemainingSeconds === 'number' ? state.stepRemainingSeconds : (typeof state.stepRemainingSeconds === 'string' ? parseFloat(state.stepRemainingSeconds) : NaN);
+          const rawRem = Math.max(0, Number.isFinite(rawRemVal) ? Math.round(rawRemVal) : 0);
+          const res = rawDur > 0 ? Math.min(rawDur, rawRem) : rawRem;
+          return Object.is(res, -0) ? 0 : res;
         })(),
-        stepDurationSeconds: Math.max(0, Number.isFinite(state.stepDurationSeconds) ? Math.round(state.stepDurationSeconds) : 0),
-        totalElapsedSeconds: Math.max(0, Number.isFinite(state.totalElapsedSeconds) ? Math.round(state.totalElapsedSeconds) : 0),
+        stepDurationSeconds: (() => {
+          const rawVal = typeof state.stepDurationSeconds === 'number' ? state.stepDurationSeconds : (typeof state.stepDurationSeconds === 'string' ? parseFloat(state.stepDurationSeconds) : NaN);
+          const res = Math.max(0, Number.isFinite(rawVal) ? Math.round(rawVal) : 0);
+          return Object.is(res, -0) ? 0 : res;
+        })(),
+        totalElapsedSeconds: (() => {
+          const rawVal = typeof state.totalElapsedSeconds === 'number' ? state.totalElapsedSeconds : (typeof state.totalElapsedSeconds === 'string' ? parseFloat(state.totalElapsedSeconds) : NaN);
+          const res = Math.max(0, Number.isFinite(rawVal) ? Math.round(rawVal) : 0);
+          return Object.is(res, -0) ? 0 : res;
+        })(),
         targetWaterGrams: (() => {
           const rawW = typeof state.targetWaterGrams === 'number' ? state.targetWaterGrams : (typeof state.targetWaterGrams === 'string' ? parseFloat(state.targetWaterGrams) : NaN);
           const res = Math.max(0, Number.isFinite(rawW) ? Math.round(rawW) : 0);
