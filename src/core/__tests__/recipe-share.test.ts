@@ -1078,4 +1078,22 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(encodeRecipeToShareUrl(null as any, 'true')).toBe('https://napar.app/recipe?v=1&d=');
     expect(encodeRecipeToShareUrl(null as any, 'false')).toBe('napar://recipe?v=1&d=');
   });
+
+  test('TASK-P45-11-WZR: decodeRecipeFromShareUrl parsuje URL z wielkimi literami w parametrach query (?D=, ?DATA=)', () => {
+    const validPayload = utf8ToBase64(JSON.stringify({
+      v: 1, n: 'Uppercase Query Test', b: 'COFFEE', m: 'Kalita', d: 18, w: 300,
+    }));
+
+    // Test z ?D= (duże D)
+    const urlUpperD = `napar://recipe?D=${encodeURIComponent(validPayload)}`;
+    const decodedUpperD = decodeRecipeFromShareUrl(urlUpperD);
+    expect(decodedUpperD).not.toBeNull();
+    expect(decodedUpperD?.recipe.name).toBe('Uppercase Query Test');
+
+    // Test z ?DATA= (duże DATA)
+    const urlUpperData = `https://napar.app/recipe?DATA=${encodeURIComponent(validPayload)}`;
+    const decodedUpperData = decodeRecipeFromShareUrl(urlUpperData);
+    expect(decodedUpperData).not.toBeNull();
+    expect(decodedUpperData?.recipe.name).toBe('Uppercase Query Test');
+  });
 });
