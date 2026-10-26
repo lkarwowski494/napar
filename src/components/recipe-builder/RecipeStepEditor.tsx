@@ -72,8 +72,9 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
                 {t?.recipeBuilder?.stepName || 'Nazwa kroku'}
               </Text>
               <Field
+                testID={`step-name-${index + 1}`}
                 value={step.namePl}
-                onChangeText={(val) => onUpdateStep(index, 'namePl', val)}
+                onChangeText={(val) => onUpdateStep(index, 'namePl', typeof val === 'string' ? val.slice(0, 100) : '')}
               />
             </View>
             <View style={[styles.flex1, { marginHorizontal: 8 }]}>
@@ -81,8 +82,13 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
                 {t?.recipeBuilder?.stepWaterGrams || 'Waga docelowa (g)'}
               </Text>
               <NumInput
+                testID={`step-water-${index + 1}`}
                 value={step.targetWaterGrams}
-                onChangeNumber={(val) => onUpdateStep(index, 'targetWaterGrams', val)}
+                onChangeNumber={(val) => {
+                  const rawVal = Number.isFinite(val) ? val : 0;
+                  const safeVal = Math.max(0, Math.min(50000, Math.round(rawVal)));
+                  onUpdateStep(index, 'targetWaterGrams', Object.is(safeVal, -0) ? 0 : safeVal);
+                }}
                 unit="g"
               />
             </View>
@@ -91,10 +97,13 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
                 {t?.recipeBuilder?.stepDurationSec || 'Czas trwania kroku (s)'}
               </Text>
               <NumInput
+                testID={`step-duration-${index + 1}`}
                 value={step.durationSeconds}
-                onChangeNumber={(val) =>
-                  onUpdateStep(index, 'durationSeconds', Math.round(val))
-                }
+                onChangeNumber={(val) => {
+                  const rawVal = Number.isFinite(val) ? val : 0;
+                  const safeVal = Math.max(0, Math.min(86400, Math.round(rawVal)));
+                  onUpdateStep(index, 'durationSeconds', Object.is(safeVal, -0) ? 0 : safeVal);
+                }}
                 unit="s"
               />
             </View>
@@ -104,8 +113,9 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
             {t?.recipeBuilder?.stepInstruction || 'Instrukcja kroku'}
           </Text>
           <Field
+            testID={`step-instruction-${index + 1}`}
             value={step.instructionPl}
-            onChangeText={(val) => onUpdateStep(index, 'instructionPl', val)}
+            onChangeText={(val) => onUpdateStep(index, 'instructionPl', typeof val === 'string' ? val.slice(0, 2000) : '')}
             placeholder={t?.recipeBuilder?.stepInstructionPlaceholder || 'np. Wlej 50g wody'}
           />
         </View>

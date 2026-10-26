@@ -107,4 +107,38 @@ describe('RecipeStepEditor Component (TASK-P32-01-ODK)', () => {
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Step 1');
   });
+
+  test('TASK-P46-04-STU: sanityzacja wprowadzania wody i czasu kroków oraz limity długości instrukcji', () => {
+    const onUpdateStep = jest.fn();
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <RecipeStepEditor
+          steps={sampleSteps}
+          onAddStep={jest.fn()}
+          onRemoveStep={jest.fn()}
+          onUpdateStep={onUpdateStep}
+          t={translations.pl}
+        />
+      );
+    });
+
+    const waterInput = tree.root.findByProps({ testID: 'step-water-1' });
+    act(() => {
+      waterInput.props.onChangeNumber(-10);
+    });
+    expect(onUpdateStep).toHaveBeenCalledWith(0, 'targetWaterGrams', 0);
+
+    const durInput = tree.root.findByProps({ testID: 'step-duration-1' });
+    act(() => {
+      durInput.props.onChangeNumber(999999);
+    });
+    expect(onUpdateStep).toHaveBeenCalledWith(0, 'durationSeconds', 86400);
+
+    const instrInput = tree.root.findByProps({ testID: 'step-instruction-1' });
+    act(() => {
+      instrInput.props.onChangeText('A'.repeat(2500));
+    });
+    expect(onUpdateStep).toHaveBeenCalledWith(0, 'instructionPl', 'A'.repeat(2000));
+  });
 });
