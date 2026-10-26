@@ -143,9 +143,9 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             onPress={onClose}
             accessibilityRole="button"
-            accessibilityLabel="Anuluj"
+            accessibilityLabel={t.common?.cancel || 'Anuluj'}
           >
-            <Text style={styles.modalCloseText}>Anuluj</Text>
+            <Text style={styles.modalCloseText}>{t.common?.cancel || 'Anuluj'}</Text>
           </Pressable>
         </View>
 
@@ -279,11 +279,12 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           <Pressable
             testID="save-bean-btn"
             accessibilityRole="button"
+            accessibilityLabel={t.stash?.saveToStash || 'Zapisz w Spiżarni'}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={styles.saveSubmitBtn}
             onPress={handleAddItem}
           >
-            <Text style={styles.saveSubmitText}>Zapisz w Spiżarni</Text>
+            <Text style={styles.saveSubmitText}>{t.stash?.saveToStash || 'Zapisz w Spiżarni'}</Text>
           </Pressable>
         </ScrollView>
       </SafeAreaView>
