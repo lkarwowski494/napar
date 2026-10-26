@@ -507,7 +507,8 @@ export function updateRecipeFavorite(id: string, isFavorite: boolean): void {
   if (!id || typeof id !== 'string' || !id.trim()) return;
   const safeId = id.trim();
   const db = getDatabase();
-  db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [isFavorite ? 1 : 0, safeId]);
+  const favVal = Boolean(isFavorite) ? 1 : 0;
+  db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [favVal, safeId]);
 }
 
 export function duplicateRecipe(
