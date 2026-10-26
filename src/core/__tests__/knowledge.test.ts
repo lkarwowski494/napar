@@ -621,4 +621,22 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(teaById.length).toBeGreaterThanOrEqual(1);
     expect(teaById[0].id).toBe('tea-white');
   });
+
+  test('TASK-P35-06-TRE: findCoffeeVarietyById wspiera popularne aliasy i warianty pisowni (gesha, sl-28, bourbon, typica)', () => {
+    const gesha = findCoffeeVarietyById('gesha');
+    expect(gesha).toBeDefined();
+    expect(gesha?.id).toBe('variety-geisha');
+
+    const sl28 = findCoffeeVarietyById('sl-28');
+    expect(sl28).toBeDefined();
+    expect(sl28?.id).toBe('variety-sl28-sl34');
+
+    const bourbon = findCoffeeVarietyById('bourbon');
+    expect(bourbon).toBeDefined();
+    expect(bourbon?.id).toBe('variety-bourbon');
+
+    const typica = findCoffeeVarietyById('typica');
+    expect(typica).toBeDefined();
+    expect(typica?.id).toBe('variety-typica');
+  });
 });

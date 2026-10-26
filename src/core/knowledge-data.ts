@@ -648,10 +648,33 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
   );
 }
 
+const VARIETY_ALIASES: Record<string, string> = {
+  gesha: 'variety-geisha',
+  geisha: 'variety-geisha',
+  'sl-28': 'variety-sl28-sl34',
+  'sl-34': 'variety-sl28-sl34',
+  sl28: 'variety-sl28-sl34',
+  sl34: 'variety-sl28-sl34',
+  bourbon: 'variety-bourbon',
+  typica: 'variety-typica',
+  caturra: 'variety-caturra',
+  catuai: 'variety-catuai',
+  pacamara: 'variety-pacamara',
+  maragogype: 'variety-maragogype',
+  castillo: 'variety-castillo',
+  colombia: 'variety-colombia',
+};
+
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const aliasMatchId = VARIETY_ALIASES[normId] || VARIETY_ALIASES[normId.replace(/[\s_-]+/g, '')];
+  if (aliasMatchId) {
+    const found = COFFEE_VARIETIES.find((v) => v.id === aliasMatchId);
+    if (found) return found;
+  }
   return COFFEE_VARIETIES.find((v) => {
     if (v.id && v.id.trim().toLowerCase() === cleanId) return true;
     if (v.name) {
