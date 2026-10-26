@@ -333,13 +333,14 @@ try {
       );
     }
 
-    // Weryfikacja obecności kluczowych skryptów audytowych w package.json (TASK-P40-10-WYD)
+    // Weryfikacja obecności kluczowych skryptów audytowych w package.json (TASK-P40-10-WYD, TASK-P41-10-WYD)
     const requiredAuditScripts = [
       'check:i18n',
       'check:matrix',
       'check:corpus',
       'check:licenses',
       'check:native',
+      'test:coverage',
     ];
     for (const scriptName of requiredAuditScripts) {
       check(
