@@ -130,6 +130,7 @@
     "coldBrewDesc": "Długotrwała maceracja w zimnej wodzie dająca gładki, naturalnie słodki napar o niskiej kwasowości",
     "methodBatchBrew": "Ekspres przelewowy (Batch Brew)",
     "methodMoccamaster": "Moccamaster",
+    "methodGina": "Gina (Goat Story)",
     "resetTimerAccessibility": "Zresetuj stoper",
     "resetTimerHint": "Zeruje czas i wraca do stanu początkowego",
     "resumeBrewAccessibility": "Wznów parzenie",

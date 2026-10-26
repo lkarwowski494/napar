@@ -383,4 +383,9 @@ describe('i18n System', () => {
     expect(translations.pl.brew.methodMoccamaster).toBe('Moccamaster');
     expect(translations.en.brew.methodMoccamaster).toBe('Moccamaster');
   });
+
+  test('TASK-P36-09-LOK: Klucz methodGina jest zdefiniowany w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodGina).toBe('Gina (Goat Story)');
+    expect(translations.en.brew.methodGina).toBe('Gina (Goat Story)');
+  });
 });
