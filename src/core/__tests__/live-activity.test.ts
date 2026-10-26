@@ -296,4 +296,10 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     const island = buildDynamicIslandPayload(mockAttributesCoffee, overflowRemState);
     expect(island.compactTrailing).toBe('0:45');
   });
+
+  test('TASK-P20-12-NIE: formatActivityTimer ściśle zwraca 0:00 dla ujemnych i zerowych czasów', () => {
+    expect(formatActivityTimer(-0)).toBe('0:00');
+    expect(formatActivityTimer(0)).toBe('0:00');
+    expect(formatActivityTimer(-15)).toBe('0:00');
+  });
 });
