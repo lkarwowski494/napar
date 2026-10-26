@@ -372,4 +372,18 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeOriginById('ORIGIN-ETHIOPIA')?.id).toBe('origin-ethiopia');
     expect(findTeaCategoryById('TEA-GREEN')?.id).toBe('tea-green');
   });
+
+  test('TASK-P19-06-TRE: searchCoffeeVarieties przeszukuje recommendedRoast i cupCharacteristics, a searchTeaCategories oxidation i killGreenMethod', () => {
+    const byRoast = searchCoffeeVarieties('Omniroast');
+    expect(byRoast.length).toBeGreaterThanOrEqual(1);
+
+    const byBody = searchCoffeeVarieties('Jedwabiste');
+    expect(byBody.length).toBeGreaterThanOrEqual(1);
+
+    const byOxidation = searchTeaCategories('0%');
+    expect(byOxidation.length).toBeGreaterThanOrEqual(1);
+
+    const byKillGreen = searchTeaCategories('parowanie');
+    expect(byKillGreen.length).toBeGreaterThanOrEqual(1);
+  });
 });

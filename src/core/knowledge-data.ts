@@ -572,6 +572,12 @@ export function searchCoffeeVarieties(query: string): CoffeeVarietyInfo[] {
     v.name.toLowerCase().includes(q) ||
     v.nativeRegion.toLowerCase().includes(q) ||
     (v.geneticLineage && v.geneticLineage.toLowerCase().includes(q)) ||
+    (v.recommendedRoast && v.recommendedRoast.toLowerCase().includes(q)) ||
+    (v.cupCharacteristics && (
+      v.cupCharacteristics.acidity.toLowerCase().includes(q) ||
+      v.cupCharacteristics.body.toLowerCase().includes(q) ||
+      v.cupCharacteristics.sweetness.toLowerCase().includes(q)
+    )) ||
     v.keyNotesPl.some((k) => k.toLowerCase().includes(q)) ||
     v.keyNotesEn.some((k) => k.toLowerCase().includes(q)) ||
     v.sensoryProfilePl.toLowerCase().includes(q) ||
@@ -624,6 +630,8 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
     t.namePl.toLowerCase().includes(q) ||
     t.nameEn.toLowerCase().includes(q) ||
     t.traditionalName.toLowerCase().includes(q) ||
+    (t.oxidationRangePercent && t.oxidationRangePercent.toLowerCase().includes(q)) ||
+    (t.killGreenMethod && t.killGreenMethod.toLowerCase().includes(q)) ||
     t.famousVarietiesPl.some((v) => v.toLowerCase().includes(q)) ||
     (t.famousVarietiesEn && t.famousVarietiesEn.some((v) => v.toLowerCase().includes(q))) ||
     t.famousRegions.some((r) => r.toLowerCase().includes(q)) ||
