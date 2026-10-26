@@ -445,7 +445,12 @@
     "suitabilityGOOD": "Good",
     "suitabilityACCEPTABLE": "Acceptable",
     "suitabilityNOT_RECOMMENDED": "Not recommended",
-    "sessionWaterLabel": "WATER"
+    "sessionWaterLabel": "WATER",
+    "hardnessVerySoft": "Rất mềm",
+    "hardnessSoft": "Mềm",
+    "hardnessModeratelyHard": "Độ cứng vừa",
+    "hardnessHard": "Cứng",
+    "hardnessVeryHard": "Rất cứng"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

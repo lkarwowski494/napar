@@ -445,7 +445,12 @@
     "suitabilityGOOD": "Dobra",
     "suitabilityACCEPTABLE": "Akceptowalna",
     "suitabilityNOT_RECOMMENDED": "Niezalecana",
-    "sessionWaterLabel": "WODA"
+    "sessionWaterLabel": "WODA",
+    "hardnessVerySoft": "Bardzo miękka",
+    "hardnessSoft": "Miękka",
+    "hardnessModeratelyHard": "Średnio twarda",
+    "hardnessHard": "Twarda",
+    "hardnessVeryHard": "Bardzo twarda"
   },
   "grinder": {
     "title": "Przelicznik Młynków (Grinder Dial-in)",

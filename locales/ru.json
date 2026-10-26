@@ -445,7 +445,12 @@
     "suitabilityGOOD": "Good",
     "suitabilityACCEPTABLE": "Acceptable",
     "suitabilityNOT_RECOMMENDED": "Not recommended",
-    "sessionWaterLabel": "WATER"
+    "sessionWaterLabel": "WATER",
+    "hardnessVerySoft": "Очень мягкая",
+    "hardnessSoft": "Мягкая",
+    "hardnessModeratelyHard": "Средней жесткости",
+    "hardnessHard": "Жесткая",
+    "hardnessVeryHard": "Очень жесткая"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

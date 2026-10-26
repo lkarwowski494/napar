@@ -470,6 +470,11 @@ export const translations = {
       suitabilityACCEPTABLE: 'Akceptowalna',
       suitabilityNOT_RECOMMENDED: 'Niezalecana',
       sessionWaterLabel: 'WODA',
+      hardnessVerySoft: 'Bardzo miękka',
+      hardnessSoft: 'Miękka',
+      hardnessModeratelyHard: 'Średnio twarda',
+      hardnessHard: 'Twarda',
+      hardnessVeryHard: 'Bardzo twarda',
     },
     grinder: {
       title: 'Przelicznik Młynków (Grinder Dial-in)',
@@ -1090,6 +1095,11 @@ export const translations = {
       suitabilityACCEPTABLE: 'Acceptable',
       suitabilityNOT_RECOMMENDED: 'Not recommended',
       sessionWaterLabel: 'WATER',
+      hardnessVerySoft: 'Very soft',
+      hardnessSoft: 'Soft',
+      hardnessModeratelyHard: 'Moderately hard',
+      hardnessHard: 'Hard',
+      hardnessVeryHard: 'Very hard',
     },
     grinder: {
       title: 'Grinder Dial-in Converter',
