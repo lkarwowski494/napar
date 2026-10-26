@@ -1091,6 +1091,32 @@ describe('Napar SQLite Database & Repositories', () => {
     });
   });
 
+  test('TASK-P9-07-JAK: saveRecipe oraz mapRowToRecipe chronią dose, water, temp i ratio przed NaN i wartościami niedodatnimi', () => {
+    initDatabase(mockDb as any);
+    const brokenRecipe: any = {
+      id: 'test-broken-recipe-numerics',
+      name: 'Broken Recipe',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: NaN,
+      waterGrams: -100,
+      waterTempCelsius: 0,
+      recommendedRatio: NaN,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-26T00:00:00.000Z',
+    };
+
+    saveRecipe(brokenRecipe);
+    const retrieved = getRecipeById('test-broken-recipe-numerics');
+    expect(retrieved).not.toBeNull();
+    expect(retrieved!.doseGrams).toBe(15);
+    expect(retrieved!.waterGrams).toBe(250);
+    expect(retrieved!.waterTempCelsius).toBe(92);
+    expect(retrieved!.recommendedRatio).toBe(16);
+  });
+
   test('TASK-P9-05-ARC: saveInventoryItem oraz mapRowToInventoryItem sanityzują wagi i ocenę (boundary/finite check)', () => {
     initDatabase(mockDb as any);
     const invalidItem: InventoryItem = {

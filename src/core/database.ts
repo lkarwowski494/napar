@@ -408,6 +408,11 @@ export function getRecipeById(id: string): SavedRecipe | null {
 
 export function saveRecipe(recipe: SavedRecipe): void {
   const db = getDatabase();
+  const dose = Number.isFinite(recipe.doseGrams) && recipe.doseGrams > 0 ? recipe.doseGrams : 15;
+  const water = Number.isFinite(recipe.waterGrams) && recipe.waterGrams > 0 ? recipe.waterGrams : 250;
+  const temp = Number.isFinite(recipe.waterTempCelsius) && recipe.waterTempCelsius > 0 ? recipe.waterTempCelsius : 92;
+  const ratio = Number.isFinite(recipe.recommendedRatio) && recipe.recommendedRatio > 0 ? recipe.recommendedRatio : 16;
+
   db.runSync(
     `INSERT INTO recipes (
       id, name, beverage_type, method, author, description,
@@ -435,11 +440,11 @@ export function saveRecipe(recipe: SavedRecipe): void {
       recipe.method,
       recipe.author ?? null,
       recipe.description ?? null,
-      recipe.doseGrams,
-      recipe.waterGrams,
-      recipe.waterTempCelsius,
+      dose,
+      water,
+      temp,
       recipe.grindSizeDescription ?? null,
-      recipe.recommendedRatio,
+      ratio,
       recipe.stepsJson,
       recipe.isCustom ? 1 : 0,
       recipe.isFavorite ? 1 : 0,
@@ -533,11 +538,11 @@ function mapRowToRecipe(row: RecipeRow): SavedRecipe {
     method: row.method,
     author: row.author || undefined,
     description: row.description || undefined,
-    doseGrams: row.dose_g,
-    waterGrams: row.water_g,
-    waterTempCelsius: row.water_temp_c,
+    doseGrams: Number.isFinite(row.dose_g) && row.dose_g > 0 ? row.dose_g : 15,
+    waterGrams: Number.isFinite(row.water_g) && row.water_g > 0 ? row.water_g : 250,
+    waterTempCelsius: Number.isFinite(row.water_temp_c) && row.water_temp_c > 0 ? row.water_temp_c : 92,
     grindSizeDescription: row.grind_size_description || undefined,
-    recommendedRatio: row.recommended_ratio,
+    recommendedRatio: Number.isFinite(row.recommended_ratio) && row.recommended_ratio > 0 ? row.recommended_ratio : 16,
     stepsJson: row.steps_json,
     isCustom: Boolean(row.is_custom),
     isFavorite: Boolean(row.is_favorite),
