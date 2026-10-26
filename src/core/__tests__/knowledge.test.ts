@@ -815,4 +815,21 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeOriginById('boquete')?.id).toBe('origin-panama');
     expect(findCoffeeOriginById('volcan')?.id).toBe('origin-panama');
   });
+
+  test('TASK-P45-06-TRE: findCoffeeVarietyById wspiera aliasy mokka, java, laurina, pacas, mundo novo, parainema oraz warianty bourbona', () => {
+    expect(findCoffeeVarietyById('mokka')?.id).toBe('variety-typica');
+    expect(findCoffeeVarietyById('mocha')?.id).toBe('variety-typica');
+    expect(findCoffeeVarietyById('java')?.id).toBe('variety-typica');
+    expect(findCoffeeVarietyById('laurina')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('pacas')?.id).toBe('variety-pacamara-maragogype');
+    expect(findCoffeeVarietyById('mundo novo')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('mundonovo')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('mundo-novo')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('parainema')?.id).toBe('variety-castillo-colombia');
+    expect(findCoffeeVarietyById('yellow bourbon')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('yellowbourbon')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('red bourbon')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('redbourbon')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('orange bourbon')?.id).toBe('variety-bourbon');
+  });
 });
