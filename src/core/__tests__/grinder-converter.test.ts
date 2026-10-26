@@ -571,4 +571,17 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Zmiel drobniej pod flash brew' })).toBe(600);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine-medium for iced v60 dripper' })).toBe(600);
   });
+
+  test('TASK-P47-08-PRO: getRecipeMicrons rozpoznaje syfony Technica (650 µm) oraz warianty Cupping/Kapping (880 µm)', () => {
+    // Siphon / Technica (650 µm)
+    expect(getRecipeMicrons({ method: 'Hario Technica Siphon' })).toBe(650);
+    expect(getRecipeMicrons({ method: 'TECHNICA' })).toBe(650);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Mielenie pod syfon Technica' })).toBe(650);
+
+    // Cupping / Kapping (880 µm)
+    expect(getRecipeMicrons({ method: 'SCA Cupping Session' })).toBe(880);
+    expect(getRecipeMicrons({ method: 'KAPPING' })).toBe(880);
+    expect(getRecipeMicrons({ method: 'Brazylijski Kapping' })).toBe(880);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Grubo pod kapping sensoryczny' })).toBe(880);
+  });
 });

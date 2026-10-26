@@ -487,7 +487,9 @@ export function getRecipeMicrons(recipe?: {
     method.includes('VAC POT') ||
     method.includes('VAC_POT') ||
     desc.includes('vacpot') ||
-    desc.includes('vac pot')
+    desc.includes('vac pot') ||
+    method.includes('TECHNICA') ||
+    desc.includes('technica')
   ) {
     return 650;
   }
@@ -601,7 +603,10 @@ export function getRecipeMicrons(recipe?: {
     method.includes('CLEVER') ||
     desc.includes('clever') ||
     method === 'CUPPING' ||
-    desc.includes('cupping')
+    method.includes('CUPPING') ||
+    method.includes('KAPPING') ||
+    desc.includes('cupping') ||
+    desc.includes('kapping')
   ) {
     return 880;
   }
