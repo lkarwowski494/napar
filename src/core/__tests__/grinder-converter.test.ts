@@ -277,4 +277,13 @@ describe('Grinder Dial-in Converter Module', () => {
     const weirdMethod = getRecommendedGrindForRecipe({ method: 12345 as any }, 'comandante_c40');
     expect(weirdMethod.microns).toBe(720);
   });
+
+  test('TASK-P19-08-PRO: convertBetweenGrinders i findGrinderById wspierają wielkość liter i białe znaki w ID młynków', () => {
+    expect(findGrinderById('COMANDANTE_C40')?.id).toBe('comandante_c40');
+    expect(findGrinderById('  Timemore_C2_C3  ')?.id).toBe('timemore_c2_c3');
+
+    const converted = convertBetweenGrinders('  COMANDANTE_C40  ', 24, '  BARATZA_ENCORE  ');
+    expect(converted.microns).toBe(720);
+    expect(converted.targetFormatted).toContain('#16');
+  });
 });

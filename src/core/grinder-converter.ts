@@ -300,8 +300,8 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
 
 export function findGrinderById(id: string): GrinderModel | undefined {
   if (!id || typeof id !== 'string') return undefined;
-  const cleanId = id.trim();
-  return SUPPORTED_GRINDERS.find((g) => g.id === cleanId);
+  const cleanId = id.trim().toLowerCase();
+  return SUPPORTED_GRINDERS.find((g) => g.id.toLowerCase() === cleanId);
 }
 
 /**
@@ -312,9 +312,9 @@ export function convertMicronsToGrinder(
   grinderId: string,
   language = 'pl'
 ): { formatted: string; rawValue: number; grinderName: string } {
-  const cleanId = typeof grinderId === 'string' ? grinderId.trim() : '';
+  const cleanId = typeof grinderId === 'string' ? grinderId.trim().toLowerCase() : '';
   const grinder =
-    SUPPORTED_GRINDERS.find((g) => g.id === cleanId) || SUPPORTED_GRINDERS[0];
+    SUPPORTED_GRINDERS.find((g) => g.id.toLowerCase() === cleanId) || SUPPORTED_GRINDERS[0];
 
   const safeMicrons = Number.isFinite(microns) && microns > 0 ? microns : 720;
   const targetMicrons = Math.max(150, Math.min(1500, safeMicrons));
@@ -340,10 +340,12 @@ export function convertBetweenGrinders(
   targetGrinderId: string,
   language = 'pl'
 ): { targetFormatted: string; microns: number } {
+  const cleanSourceId = typeof sourceGrinderId === 'string' ? sourceGrinderId.trim().toLowerCase() : '';
+  const cleanTargetId = typeof targetGrinderId === 'string' ? targetGrinderId.trim().toLowerCase() : '';
   const sourceGrinder =
-    SUPPORTED_GRINDERS.find((g) => g.id === sourceGrinderId) || SUPPORTED_GRINDERS[0];
+    SUPPORTED_GRINDERS.find((g) => g.id.toLowerCase() === cleanSourceId) || SUPPORTED_GRINDERS[0];
   const targetGrinder =
-    SUPPORTED_GRINDERS.find((g) => g.id === targetGrinderId) || SUPPORTED_GRINDERS[1];
+    SUPPORTED_GRINDERS.find((g) => g.id.toLowerCase() === cleanTargetId) || SUPPORTED_GRINDERS[1];
 
   let microns = 720;
   if (typeof sourceValue === 'number') {
