@@ -34,6 +34,7 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
           hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel={t.recipeBuilder.addStep}
+          accessibilityHint="Dodaje nowy krok do receptury parzenia"
         >
           <Text style={styles.addStepBtnText}>{t.recipeBuilder.addStep}</Text>
         </Pressable>
@@ -46,10 +47,12 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
             {steps.length > 0 && (
               <Pressable
                 onPress={() => onRemoveStep(index)}
-                hitSlop={6}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={styles.removeStepBtn}
                 accessibilityRole="button"
-                accessibilityLabel="Usuń krok"
+                accessibilityLabel={`${t.recipeBuilder?.removeStep || 'Usuń krok'} ${step.stepNumber}`}
+                accessibilityHint={`Usuwa krok ${step.stepNumber} z receptury`}
+                testID={`remove-step-${step.stepNumber}`}
               >
                 <Text style={styles.removeStepBtnText}>✕</Text>
               </Pressable>
