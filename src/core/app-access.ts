@@ -166,7 +166,10 @@ export function activateSubscription(tier: 'monthly' | 'annual' | 'lifetime'): A
   return state;
 }
 
-export type RestorePurchasesResult = AppAccessState & { restored: boolean };
+export type RestorePurchasesResult = AppAccessState & {
+  restored: boolean;
+  receipt?: StoreKitReceipt;
+};
 
 export function restorePurchases(): RestorePurchasesResult {
   const verifiedVal = getAppSetting('has_verified_purchase', 'false');
@@ -181,9 +184,21 @@ export function restorePurchases(): RestorePurchasesResult {
   if (hasVerifiedPurchase && allowedTiers.includes(verifiedTier)) {
     setAppSetting('is_pro_active', 'true');
     setAppSetting('subscription_tier', verifiedTier);
+    let receipt: StoreKitReceipt | undefined;
+    const receiptJson = getAppSetting('verified_receipt_json', '');
+    if (receiptJson) {
+      try {
+        const parsed = JSON.parse(receiptJson);
+        if (parsed && typeof parsed === 'object' && parsed.signature) {
+          receipt = parsed as StoreKitReceipt;
+        }
+      } catch {
+        // Ignoruj błąd parsowania
+      }
+    }
     const state = getAppAccessState();
     notifyAccessChanged();
-    return { ...state, restored: true };
+    return { ...state, restored: true, receipt };
   }
 
   // Brak legalnego dowodu zakupu — nie rozdajemy darmowego Lifetime

@@ -360,4 +360,23 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(emptySignatureRes.success).toBe(false);
     expect(emptySignatureRes.errorCode).toBe('invalid_signature');
   });
+
+  test('TASK-P14-02-MON: restorePurchases zwraca receipt odzyskany z verified_receipt_json', () => {
+    resetTrialForTesting();
+    const testReceipt = {
+      productId: STORE_PRODUCT_IDS.annual,
+      transactionId: 'TX-VERIFIED-RESTORE-1',
+      purchaseDate: '2026-10-26T00:00:00.000Z',
+      signature: 'RESTORE_SIG_123',
+    };
+    setAppSetting('has_verified_purchase', 'true');
+    setAppSetting('verified_purchase_tier', 'annual');
+    setAppSetting('verified_receipt_json', JSON.stringify(testReceipt));
+
+    const result = restorePurchases();
+    expect(result.restored).toBe(true);
+    expect(result.receipt).toBeDefined();
+    expect(result.receipt?.transactionId).toBe('TX-VERIFIED-RESTORE-1');
+    expect(result.receipt?.signature).toBe('RESTORE_SIG_123');
+  });
 });
