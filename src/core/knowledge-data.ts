@@ -569,6 +569,7 @@ export function searchCoffeeVarieties(query: string): CoffeeVarietyInfo[] {
   if (!query || typeof query !== 'string' || !query.trim()) return COFFEE_VARIETIES;
   const q = query.toLowerCase().trim();
   return COFFEE_VARIETIES.filter((v) =>
+    (v.id && typeof v.id === 'string' && v.id.toLowerCase().includes(q)) ||
     (v.name && typeof v.name === 'string' && v.name.toLowerCase().includes(q)) ||
     (v.nativeRegion && typeof v.nativeRegion === 'string' && v.nativeRegion.toLowerCase().includes(q)) ||
     (v.geneticLineage && typeof v.geneticLineage === 'string' && v.geneticLineage.toLowerCase().includes(q)) ||
@@ -591,6 +592,7 @@ export function searchCoffeeProcesses(query: string): CoffeeProcessInfo[] {
   if (!query || typeof query !== 'string' || !query.trim()) return COFFEE_PROCESSES;
   const q = query.toLowerCase().trim();
   return COFFEE_PROCESSES.filter((p) =>
+    (p.id && typeof p.id === 'string' && p.id.toLowerCase().includes(q)) ||
     (p.name && typeof p.name === 'string' && p.name.toLowerCase().includes(q)) ||
     (p.processType && typeof p.processType === 'string' && p.processType.toLowerCase().includes(q)) ||
     (Array.isArray(p.keyNotesPl) && p.keyNotesPl.some((k) => typeof k === 'string' && k.toLowerCase().includes(q))) ||
@@ -608,6 +610,7 @@ export function searchCoffeeOrigins(query: string): CoffeeOriginInfo[] {
   if (!query || typeof query !== 'string' || !query.trim()) return COFFEE_ORIGINS;
   const q = query.toLowerCase().trim();
   return COFFEE_ORIGINS.filter((o) =>
+    (o.id && typeof o.id === 'string' && o.id.toLowerCase().includes(q)) ||
     (o.country && typeof o.country === 'string' && o.country.toLowerCase().includes(q)) ||
     (o.countryEn && typeof o.countryEn === 'string' && o.countryEn.toLowerCase().includes(q)) ||
     (o.countryCode && typeof o.countryCode === 'string' && o.countryCode.toLowerCase().includes(q)) ||
@@ -628,6 +631,7 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
   if (!query || typeof query !== 'string' || !query.trim()) return TEA_CATEGORIES;
   const q = query.toLowerCase().trim();
   return TEA_CATEGORIES.filter((t) =>
+    (t.id && typeof t.id === 'string' && t.id.toLowerCase().includes(q)) ||
     (t.namePl && typeof t.namePl === 'string' && t.namePl.toLowerCase().includes(q)) ||
     (t.nameEn && typeof t.nameEn === 'string' && t.nameEn.toLowerCase().includes(q)) ||
     (t.traditionalName && typeof t.traditionalName === 'string' && t.traditionalName.toLowerCase().includes(q)) ||

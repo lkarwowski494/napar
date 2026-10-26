@@ -603,4 +603,22 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findTeaCategoryById('   ')).toBeUndefined();
     expect(findTeaCategoryById('nieznana herbata')).toBeUndefined();
   });
+
+  test('TASK-P34-06-TRE: searchCoffeeVarieties, searchCoffeeProcesses, searchCoffeeOrigins i searchTeaCategories wspierają wyszukiwanie po identyfikatorze ID', () => {
+    const varById = searchCoffeeVarieties('variety-geisha');
+    expect(varById.length).toBeGreaterThanOrEqual(1);
+    expect(varById[0].id).toBe('variety-geisha');
+
+    const procById = searchCoffeeProcesses('process-washed');
+    expect(procById.length).toBeGreaterThanOrEqual(1);
+    expect(procById[0].id).toBe('process-washed');
+
+    const origById = searchCoffeeOrigins('origin-kenya');
+    expect(origById.length).toBeGreaterThanOrEqual(1);
+    expect(origById[0].id).toBe('origin-kenya');
+
+    const teaById = searchTeaCategories('tea-white');
+    expect(teaById.length).toBeGreaterThanOrEqual(1);
+    expect(teaById[0].id).toBe('tea-white');
+  });
 });
