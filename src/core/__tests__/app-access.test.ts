@@ -472,4 +472,14 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(state.daysRemaining).toBeLessThanOrEqual(TRIAL_DURATION_DAYS);
     expect(state.daysRemaining).toBeGreaterThanOrEqual(0);
   });
+  test('TASK-P22-02-MON: brewsCount i brewsRemaining są zawsze liczbami całkowitymi (Math.floor)', () => {
+    resetTrialForTesting();
+    setAppSetting('trial_brews_count', '3.7');
+    setAppSetting('trial_max_brews_seen', '3.7');
+    const state = getAppAccessState();
+    expect(Number.isInteger(state.brewsCount)).toBe(true);
+    expect(state.brewsCount).toBe(3);
+    expect(Number.isInteger(state.brewsRemaining)).toBe(true);
+    expect(state.brewsRemaining).toBe(TRIAL_MAX_BREWS - 3);
+  });
 });

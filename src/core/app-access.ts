@@ -107,14 +107,14 @@ export function getAppAccessState(): AppAccessState {
   const daysRemaining = Math.max(0, Math.min(TRIAL_DURATION_DAYS, TRIAL_DURATION_DAYS - effectiveElapsedDays));
 
   const rawBrews = parseInt(getAppSetting('trial_brews_count', '0'), 10);
-  const brewsCount = Number.isFinite(rawBrews) && rawBrews > 0 ? rawBrews : 0;
+  const brewsCount = Number.isFinite(rawBrews) && rawBrews > 0 ? Math.floor(rawBrews) : 0;
   const rawMaxBrews = parseInt(getAppSetting('trial_max_brews_seen', '0'), 10);
-  const maxBrewsSeen = Number.isFinite(rawMaxBrews) && rawMaxBrews > 0 ? rawMaxBrews : 0;
-  const effectiveBrewsCount = Math.max(brewsCount, maxBrewsSeen);
+  const maxBrewsSeen = Number.isFinite(rawMaxBrews) && rawMaxBrews > 0 ? Math.floor(rawMaxBrews) : 0;
+  const effectiveBrewsCount = Math.floor(Math.max(brewsCount, maxBrewsSeen));
   if (brewsCount > maxBrewsSeen) {
     setAppSetting('trial_max_brews_seen', String(brewsCount));
   }
-  const brewsRemaining = Math.max(0, Math.min(TRIAL_MAX_BREWS, TRIAL_MAX_BREWS - effectiveBrewsCount));
+  const brewsRemaining = Math.floor(Math.max(0, Math.min(TRIAL_MAX_BREWS, TRIAL_MAX_BREWS - effectiveBrewsCount)));
 
   const isExpired = effectiveBrewsCount >= TRIAL_MAX_BREWS || effectiveElapsedDays >= TRIAL_DURATION_DAYS;
 
