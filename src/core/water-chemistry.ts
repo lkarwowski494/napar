@@ -301,6 +301,56 @@ export function calculateWaterMinerals(
   };
 }
 
+/**
+ * Oblicza ilość buforu (NaHCO3 w gramach oraz koncentratu BH w gramach/ml)
+ * potrzebną do podniesienia zasadowości z poziomu currentKh do targetKh w zadanej objętości wody.
+ * Jeśli currentKh >= targetKh, zwraca 0 (brak konieczności buforowania).
+ */
+export function calculateBufferAddition(
+  waterVolumeLiters: number | string,
+  currentKhPpm: number | string,
+  targetKhPpm: number | string
+): {
+  bufferConcentrateGrams: number;
+  dryBakingSodaGrams: number;
+  khDeficitPpm: number;
+} {
+  const rawVol =
+    typeof waterVolumeLiters !== 'number' && typeof waterVolumeLiters !== 'string'
+      ? NaN
+      : (typeof waterVolumeLiters === 'string' ? parseFloat(waterVolumeLiters.trim().replace(/,/g, '.')) : waterVolumeLiters);
+  const rawCurrentKh =
+    typeof currentKhPpm !== 'number' && typeof currentKhPpm !== 'string'
+      ? NaN
+      : (typeof currentKhPpm === 'string' ? parseFloat(currentKhPpm.trim().replace(/,/g, '.')) : currentKhPpm);
+  const rawTargetKh =
+    typeof targetKhPpm !== 'number' && typeof targetKhPpm !== 'string'
+      ? NaN
+      : (typeof targetKhPpm === 'string' ? parseFloat(targetKhPpm.trim().replace(/,/g, '.')) : targetKhPpm);
+
+  let vol = Number.isFinite(rawVol) && rawVol > 0 && !Object.is(rawVol, -0) ? Math.max(0.1, Math.min(1000.0, rawVol)) : 1.0;
+  if (Object.is(vol, -0)) vol = 1.0;
+  let currentKh = Number.isFinite(rawCurrentKh) && rawCurrentKh >= 0 && !Object.is(rawCurrentKh, -0) ? Math.max(0, Math.min(5000, rawCurrentKh)) : 0;
+  let targetKh = Number.isFinite(rawTargetKh) && rawTargetKh >= 0 && !Object.is(rawTargetKh, -0) ? Math.max(0, Math.min(5000, rawTargetKh)) : 0;
+  if (Object.is(currentKh, -0)) currentKh = 0;
+  if (Object.is(targetKh, -0)) targetKh = 0;
+
+  const rawDeficit = targetKh > currentKh ? targetKh - currentKh : 0;
+  const khDeficit = Number(rawDeficit.toFixed(2));
+
+  let concentrateBuffer = Number(((khDeficit / 2.0) * vol).toFixed(1));
+  if (Object.is(concentrateBuffer, -0) || concentrateBuffer < 0 || !Number.isFinite(concentrateBuffer)) concentrateBuffer = 0;
+
+  let dryNaHCO3 = Number((khDeficit * 0.00168 * vol).toFixed(3));
+  if (Object.is(dryNaHCO3, -0) || dryNaHCO3 < 0 || !Number.isFinite(dryNaHCO3)) dryNaHCO3 = 0;
+
+  return {
+    bufferConcentrateGrams: concentrateBuffer,
+    dryBakingSodaGrams: dryNaHCO3,
+    khDeficitPpm: khDeficit,
+  };
+}
+
 export interface WaterDiagnosticResult {
   problemPl: string;
   problemEn: string;

@@ -6,6 +6,7 @@ import {
   WATER_RECIPES,
   BOTTLED_WATER_BENCHMARKS,
   calculateWaterMinerals,
+  calculateBufferAddition,
   diagnoseWaterSensoryImpact,
   getWaterProfileName,
   ppmCaCO3ToDegreesDH,
@@ -559,6 +560,33 @@ describe('Water Chemistry & Mineralization Module', () => {
 
     expect(getWaterProfileName('ashbeck')).toBe('Ashbeck');
     expect(getWaterProfileName('highland_spring')).toBe('Highland Spring');
+  });
+
+  test('TASK-P49-07-JAK: calculateBufferAddition wylicza zapotrzebowanie na bufor i chroni przed dzieleniem przez zero oraz wartosciami ujemnymi', () => {
+    // 1. Zwykłe wyliczenie: 5L wody, currentKh 10 ppm, targetKh 40 ppm -> deficyt 30 ppm
+    // BH concentrate: (30 / 2) * 5 = 75g
+    // NaHCO3: 30 * 0.00168 * 5 = 0.252g
+    const res = calculateBufferAddition(5.0, 10, 40);
+    expect(res.khDeficitPpm).toBe(30);
+    expect(res.bufferConcentrateGrams).toBe(75.0);
+    expect(res.dryBakingSodaGrams).toBe(0.252);
+
+    // 2. Brak deficytu: currentKh >= targetKh -> 0g
+    const noDeficit = calculateBufferAddition(1.0, 50, 40);
+    expect(noDeficit.khDeficitPpm).toBe(0);
+    expect(noDeficit.bufferConcentrateGrams).toBe(0);
+    expect(noDeficit.dryBakingSodaGrams).toBe(0);
+
+    // 3. Stringi z przecinkami i niepoprawne dane
+    const commaRes = calculateBufferAddition('2,5', '15,5', '45,5');
+    expect(commaRes.khDeficitPpm).toBe(30);
+    expect(commaRes.bufferConcentrateGrams).toBe(37.5);
+
+    // 4. Odporność na NaN, ujemne i -0
+    const edgeRes = calculateBufferAddition(-5, 'invalid', -10);
+    expect(edgeRes.khDeficitPpm).toBe(0);
+    expect(edgeRes.bufferConcentrateGrams).toBe(0);
+    expect(edgeRes.dryBakingSodaGrams).toBe(0);
   });
 });
 
