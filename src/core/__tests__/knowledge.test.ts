@@ -461,4 +461,24 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     const emptyRes = searchCoffeeOrigins(null as any);
     expect(emptyRes.length).toBe(COFFEE_ORIGINS.length);
   });
+
+  test('TASK-P27-06-TRE: findCoffeeProcessById oraz searchCoffeeProcesses i searchCoffeeVarieties są odporne na wielkość liter i spacje', () => {
+    const washed = findCoffeeProcessById('  PROCESS-WASHED  ');
+    expect(washed).toBeDefined();
+    expect(washed?.id).toBe('process-washed');
+
+    const natural = findCoffeeProcessById('\tprocess-natural\n');
+    expect(natural).toBeDefined();
+    expect(natural?.id).toBe('process-natural');
+
+    const invalid = findCoffeeProcessById('   ');
+    expect(invalid).toBeUndefined();
+
+    const procRes = searchCoffeeProcesses('   fermentacja   ');
+    expect(procRes.length).toBeGreaterThanOrEqual(1);
+
+    const varRes = searchCoffeeVarieties('   geisha   ');
+    expect(varRes.length).toBeGreaterThanOrEqual(1);
+    expect(varRes.some((v) => v.id.toLowerCase().includes('geisha'))).toBe(true);
+  });
 });

@@ -569,21 +569,21 @@ export function searchCoffeeVarieties(query: string): CoffeeVarietyInfo[] {
   if (!query || typeof query !== 'string' || !query.trim()) return COFFEE_VARIETIES;
   const q = query.toLowerCase().trim();
   return COFFEE_VARIETIES.filter((v) =>
-    v.name.toLowerCase().includes(q) ||
-    v.nativeRegion.toLowerCase().includes(q) ||
-    (v.geneticLineage && v.geneticLineage.toLowerCase().includes(q)) ||
-    (v.recommendedRoast && v.recommendedRoast.toLowerCase().includes(q)) ||
+    (v.name && typeof v.name === 'string' && v.name.toLowerCase().includes(q)) ||
+    (v.nativeRegion && typeof v.nativeRegion === 'string' && v.nativeRegion.toLowerCase().includes(q)) ||
+    (v.geneticLineage && typeof v.geneticLineage === 'string' && v.geneticLineage.toLowerCase().includes(q)) ||
+    (v.recommendedRoast && typeof v.recommendedRoast === 'string' && v.recommendedRoast.toLowerCase().includes(q)) ||
     (v.cupCharacteristics && (
-      v.cupCharacteristics.acidity.toLowerCase().includes(q) ||
-      v.cupCharacteristics.body.toLowerCase().includes(q) ||
-      v.cupCharacteristics.sweetness.toLowerCase().includes(q)
+      (v.cupCharacteristics.acidity && typeof v.cupCharacteristics.acidity === 'string' && v.cupCharacteristics.acidity.toLowerCase().includes(q)) ||
+      (v.cupCharacteristics.body && typeof v.cupCharacteristics.body === 'string' && v.cupCharacteristics.body.toLowerCase().includes(q)) ||
+      (v.cupCharacteristics.sweetness && typeof v.cupCharacteristics.sweetness === 'string' && v.cupCharacteristics.sweetness.toLowerCase().includes(q))
     )) ||
-    (Array.isArray(v.keyNotesPl) && v.keyNotesPl.some((k) => typeof k === "string" && k.toLowerCase().includes(q))) ||
-    (Array.isArray(v.keyNotesEn) && v.keyNotesEn.some((k) => typeof k === "string" && k.toLowerCase().includes(q))) ||
-    v.sensoryProfilePl.toLowerCase().includes(q) ||
-    v.sensoryProfileEn.toLowerCase().includes(q) ||
-    (v.descriptionPl && v.descriptionPl.toLowerCase().includes(q)) ||
-    (v.descriptionEn && v.descriptionEn.toLowerCase().includes(q))
+    (Array.isArray(v.keyNotesPl) && v.keyNotesPl.some((k) => typeof k === 'string' && k.toLowerCase().includes(q))) ||
+    (Array.isArray(v.keyNotesEn) && v.keyNotesEn.some((k) => typeof k === 'string' && k.toLowerCase().includes(q))) ||
+    (v.sensoryProfilePl && typeof v.sensoryProfilePl === 'string' && v.sensoryProfilePl.toLowerCase().includes(q)) ||
+    (v.sensoryProfileEn && typeof v.sensoryProfileEn === 'string' && v.sensoryProfileEn.toLowerCase().includes(q)) ||
+    (v.descriptionPl && typeof v.descriptionPl === 'string' && v.descriptionPl.toLowerCase().includes(q)) ||
+    (v.descriptionEn && typeof v.descriptionEn === 'string' && v.descriptionEn.toLowerCase().includes(q))
   );
 }
 
@@ -591,16 +591,16 @@ export function searchCoffeeProcesses(query: string): CoffeeProcessInfo[] {
   if (!query || typeof query !== 'string' || !query.trim()) return COFFEE_PROCESSES;
   const q = query.toLowerCase().trim();
   return COFFEE_PROCESSES.filter((p) =>
-    (p.name && p.name.toLowerCase().includes(q)) ||
-    (p.processType && p.processType.toLowerCase().includes(q)) ||
+    (p.name && typeof p.name === 'string' && p.name.toLowerCase().includes(q)) ||
+    (p.processType && typeof p.processType === 'string' && p.processType.toLowerCase().includes(q)) ||
     (Array.isArray(p.keyNotesPl) && p.keyNotesPl.some((k) => typeof k === 'string' && k.toLowerCase().includes(q))) ||
     (Array.isArray(p.keyNotesEn) && p.keyNotesEn.some((k) => typeof k === 'string' && k.toLowerCase().includes(q))) ||
-    (p.dryingDurationDays && p.dryingDurationDays.toLowerCase().includes(q)) ||
-    (p.waterConsumption && p.waterConsumption.toLowerCase().includes(q)) ||
-    (p.sensoryImpactPl && p.sensoryImpactPl.toLowerCase().includes(q)) ||
-    (p.sensoryImpactEn && p.sensoryImpactEn.toLowerCase().includes(q)) ||
-    (p.descriptionPl && p.descriptionPl.toLowerCase().includes(q)) ||
-    (p.descriptionEn && p.descriptionEn.toLowerCase().includes(q))
+    (p.dryingDurationDays && typeof p.dryingDurationDays === 'string' && p.dryingDurationDays.toLowerCase().includes(q)) ||
+    (p.waterConsumption && typeof p.waterConsumption === 'string' && p.waterConsumption.toLowerCase().includes(q)) ||
+    (p.sensoryImpactPl && typeof p.sensoryImpactPl === 'string' && p.sensoryImpactPl.toLowerCase().includes(q)) ||
+    (p.sensoryImpactEn && typeof p.sensoryImpactEn === 'string' && p.sensoryImpactEn.toLowerCase().includes(q)) ||
+    (p.descriptionPl && typeof p.descriptionPl === 'string' && p.descriptionPl.toLowerCase().includes(q)) ||
+    (p.descriptionEn && typeof p.descriptionEn === 'string' && p.descriptionEn.toLowerCase().includes(q))
   );
 }
 
@@ -647,25 +647,25 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return COFFEE_VARIETIES.find((v) => v.id && v.id.toLowerCase() === cleanId);
+  return COFFEE_VARIETIES.find((v) => v.id && v.id.trim().toLowerCase() === cleanId);
 }
 
 export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return COFFEE_PROCESSES.find((p) => p.id && p.id.toLowerCase() === cleanId);
+  return COFFEE_PROCESSES.find((p) => p.id && p.id.trim().toLowerCase() === cleanId);
 }
 
 export function findCoffeeOriginById(id: string): CoffeeOriginInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return COFFEE_ORIGINS.find((o) => o.id && o.id.toLowerCase() === cleanId);
+  return COFFEE_ORIGINS.find((o) => o.id && o.id.trim().toLowerCase() === cleanId);
 }
 
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return TEA_CATEGORIES.find((t) => t.id && t.id.toLowerCase() === cleanId);
+  return TEA_CATEGORIES.find((t) => t.id && t.id.trim().toLowerCase() === cleanId);
 }
 
 export function getKnowledgeDescription(id: string, lang: 'pl' | 'en' = 'pl'): string {
