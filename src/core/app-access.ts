@@ -238,10 +238,11 @@ export function verifyAndActivateStoreKitPurchase(
       errorCode: 'invalid_signature',
     };
   }
+  const cleanProductId = typeof receipt.productId === 'string' ? receipt.productId.trim() : '';
   let tier: 'monthly' | 'annual' | 'lifetime' | null = null;
-  if (receipt.productId === STORE_PRODUCT_IDS.monthly) tier = 'monthly';
-  else if (receipt.productId === STORE_PRODUCT_IDS.annual) tier = 'annual';
-  else if (receipt.productId === STORE_PRODUCT_IDS.lifetime) tier = 'lifetime';
+  if (cleanProductId === STORE_PRODUCT_IDS.monthly) tier = 'monthly';
+  else if (cleanProductId === STORE_PRODUCT_IDS.annual) tier = 'annual';
+  else if (cleanProductId === STORE_PRODUCT_IDS.lifetime) tier = 'lifetime';
 
   if (!tier) {
     return {

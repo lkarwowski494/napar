@@ -491,4 +491,17 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(res.subscriptionTier).toBe('annual');
     expect(res.isSubscribed).toBe(true);
   });
+
+  test('TASK-P24-02-MON: verifyAndActivateStoreKitPurchase poprawnie trimuje spacje w receipt.productId', () => {
+    resetTrialForTesting();
+    const fakeReceipt = {
+      productId: '  pl.lukasz.napar.monthly  ',
+      transactionId: 'TX-WHITESPACE-123',
+      purchaseDate: new Date().toISOString(),
+      signature: 'VALID_SIG_WS',
+    };
+    const result = verifyAndActivateStoreKitPurchase(fakeReceipt);
+    expect(result.success).toBe(true);
+    expect(result.tier).toBe('monthly');
+  });
 });
