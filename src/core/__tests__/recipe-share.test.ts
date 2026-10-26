@@ -1302,4 +1302,36 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded?.originalSteps[0].durationSeconds).toBe(30);
     expect(decoded?.originalSteps[0].targetWaterGrams).toBe(0);
   });
+
+  test('TASK-P51-11-WZR: recipeToCompactPayload i decodeRecipeFromShareUrl parsuja ratio naturalne (1 do 16.5, 1 to 15) oraz ze spacjami i przecinkami', () => {
+    // 1. recipeToCompactPayload z ratio '1 do 16,5' oraz '1 to 15.5'
+    const recipeWithDoRatio: any = {
+      id: 'test-ratio-do',
+      name: 'V60 Ratio Do',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 92,
+      recommendedRatio: '1 do 16,5',
+      stepsJson: '[]',
+    };
+    const compact = recipeToCompactPayload(recipeWithDoRatio);
+    expect(compact.r).toBe(16.5);
+
+    // 2. decodeRecipeFromShareUrl z ratio '1 to 15,5'
+    const payload = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Natural Ratio Recipe',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 250,
+      r: '1 to 15,5',
+      s: [],
+    }));
+    const decoded = decodeRecipeFromShareUrl(payload);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.recipe.recommendedRatio).toBe(15.5);
+  });
 });
