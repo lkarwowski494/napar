@@ -1386,4 +1386,9 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(() => saveRecipe(undefined as any)).not.toThrow();
     expect(() => saveRecipe({} as any)).not.toThrow();
   });
+  test('TASK-P24-05-ARC: saveInventoryItem rzuca kontrolowany błąd dla null/undefined item', () => {
+    initDatabase(mockDb as any);
+    expect(() => saveInventoryItem(null as any)).toThrow('Nieprawidłowy obiekt pozycji spiżarni');
+    expect(() => saveInventoryItem(undefined as any)).toThrow('Nieprawidłowy obiekt pozycji spiżarni');
+  });
 });

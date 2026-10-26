@@ -295,6 +295,9 @@ export function getInventoryItemById(id: string): InventoryItem | null {
 }
 
 export function saveInventoryItem(item: InventoryItem): void {
+  if (!item || typeof item !== 'object') {
+    throw new Error('Nieprawidłowy obiekt pozycji spiżarni (null lub undefined)');
+  }
   const db = getDatabase();
   const now = new Date().toISOString();
   const initWeight = Number.isFinite(item.initialWeightGrams) && item.initialWeightGrams >= 0
