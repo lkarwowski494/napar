@@ -1,0 +1,105 @@
+{
+  "run": "P51",
+  "date": "2026-10-26",
+  "status": "in_progress",
+  "total_tasks": 12,
+  "completed_tasks": 5,
+  "tasks": [
+    {
+      "id": "TASK-P51-01-ODK",
+      "perspective": "01-ODK",
+      "title": "Lokalizacja etykiet dostepnosci i wariantow autorskich w RecipeSelectModal",
+      "target_file": "src/components/brew/RecipeSelectModal.tsx",
+      "test_file": "src/components/brew/__tests__/RecipeSelectModal.test.tsx",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P51-02-MON",
+      "perspective": "02-MON",
+      "title": "Sanityzacja sygnatury StoreKit i formatowanie poziomow subskrypcji w app-access",
+      "target_file": "src/core/app-access.ts",
+      "test_file": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P51-03-ZAK",
+      "perspective": "03-ZAK",
+      "title": "Naturalne ułamkowe wyrażenia czasu (pół minuty, 1/2 min) w bpr-engine",
+      "target_file": "src/core/bpr-engine.ts",
+      "test_file": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P51-04-STU",
+      "perspective": "04-STU",
+      "title": "Lokalizacja podgladu jednostek i ratio w RecipeParamsCard",
+      "target_file": "src/components/recipe-builder/RecipeParamsCard.tsx",
+      "test_file": "src/components/recipe-builder/__tests__/RecipeParamsCard.test.tsx",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P51-05-ARC",
+      "perspective": "05-ARC",
+      "title": "Wsparcie formatow ratio 1:X oraz 1/X w saveRecipe i duplicateRecipe bazy SQLite",
+      "target_file": "src/core/database.ts",
+      "test_file": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P51-06-TRE",
+      "perspective": "06-TRE",
+      "title": "Rozszerzenie taksonomii kompendium wiedzy o nowe podgatunki i kultywary",
+      "target_file": "src/core/knowledge-data.ts",
+      "test_file": "src/core/__tests__/knowledge.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P51-07-JAK",
+      "perspective": "07-JAK",
+      "title": "Formatowanie opisow jakosciowych wody i ochrona przed NaN w water-chemistry",
+      "target_file": "src/core/water-chemistry.ts",
+      "test_file": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P51-08-PRO",
+      "perspective": "08-PRO",
+      "title": "Rozszerzenie obslugi modeli mlynkow specialty i formatowania nastaw",
+      "target_file": "src/core/grinder-converter.ts",
+      "test_file": "src/core/__tests__/grinder-converter.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P51-09-LOK",
+      "perspective": "09-LOK",
+      "title": "Pelna symetria parametrow i brak wyciekow diakrytykow w slownikach 35 jezykow",
+      "target_file": "src/core/i18n.tsx",
+      "test_file": "tests/i18n-no-polish-in-en.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P51-10-WYD",
+      "perspective": "10-WYD",
+      "title": "Weryfikacja natywnych regul bezpieczenstwa projektu w skryptach audytowych",
+      "target_file": "scripts/verify-native.mjs",
+      "test_file": "tests/audit-fixes.test.tsx",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P51-11-WZR",
+      "perspective": "11-WZR",
+      "title": "Odpornosc na uszkodzone ciagi transferowe w recipe-share",
+      "target_file": "src/core/recipe-share.ts",
+      "test_file": "src/core/__tests__/recipe-share.test.ts",
+      "status": "pending"
+    },
+    {
+      "id": "TASK-P51-12-NIE",
+      "perspective": "12-NIE",
+      "title": "Odpornosc na binarne i specjalne wartosci w live-activity",
+      "target_file": "src/core/live-activity.ts",
+      "test_file": "src/core/__tests__/live-activity.test.ts",
+      "status": "pending"
+    }
+  ]
+}
