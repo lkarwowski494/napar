@@ -9,11 +9,11 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | :--- | :---: | :---: | :---: | :---: |
 | **EKRAN** | 9 | 9 | **100.0%** | ✅ POKRYTE |
 | **UI** | 92 | 92 | **100.0%** | ✅ POKRYTE |
-| **TEKST** | 474 | 474 | **100.0%** | ✅ POKRYTE |
+| **TEKST** | 475 | 475 | **100.0%** | ✅ POKRYTE |
 | **LOGIKA** | 209 | 209 | **100.0%** | ✅ POKRYTE |
 | **WYMIAR** | 37 | 37 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **821** | Pokrytych: **821** | Brakujących: **0**
+Łącznie elementów: **822** | Pokrytych: **822** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -153,6 +153,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `brew.methodColdBrew` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.coldBrewDesc` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.methodBatchBrew` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.methodMoccamaster` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.resetTimerAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.resetTimerHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.resumeBrewAccessibility` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
@@ -318,6 +319,5 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `journal.title` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/i18n-no-polish-in-en.test.tsx |
 | `TEKST` | `journal.emptyTitle` | `src/core/i18n.tsx` | ✅ | tests/interaction-guards.test.ts, src/components/icons/__tests__/CraftIcons.test.tsx |
 | `TEKST` | `journal.emptySub` | `src/core/i18n.tsx` | ✅ | tests/interaction-guards.test.ts, src/components/icons/__tests__/CraftIcons.test.tsx |
-| `TEKST` | `journal.avgRating` | `src/core/i18n.tsx` | ✅ | tests/interaction-guards.test.ts, tests/workflow-hooks-matrix.test.tsx |
 
-*(... i 521 kolejnych elementów w pełnym wykazie)*
+*(... i 522 kolejnych elementów w pełnym wykazie)*

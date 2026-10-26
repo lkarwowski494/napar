@@ -378,4 +378,9 @@ describe('i18n System', () => {
     expect(translations.pl.brew.methodBatchBrew).toBe('Ekspres przelewowy (Batch Brew)');
     expect(translations.en.brew.methodBatchBrew).toBe('Batch Brew / Filter Machine');
   });
+
+  test('TASK-P35-09-LOK: Klucz methodMoccamaster jest zdefiniowany w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodMoccamaster).toBe('Moccamaster');
+    expect(translations.en.brew.methodMoccamaster).toBe('Moccamaster');
+  });
 });

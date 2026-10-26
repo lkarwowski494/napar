@@ -129,6 +129,7 @@
     "methodColdBrew": "Cold Brew",
     "coldBrewDesc": "Slow cold water immersion extraction delivering a smooth, naturally sweet low-acid beverage",
     "methodBatchBrew": "Batch Brew / Filter Machine",
+    "methodMoccamaster": "Moccamaster",
     "resetTimerAccessibility": "Reset timer",
     "resetTimerHint": "Resets time and returns to initial state",
     "resumeBrewAccessibility": "Resume brewing",
