@@ -1,0 +1,98 @@
+[
+  {
+    "id": "TASK-P34-01-ODK",
+    "perspective": "01-ODK",
+    "title": "Etykiety dostepnosci i a11y role dla badge proporcji oraz ochrona przed <=0 doseGrams w BrewQuickPrepCard",
+    "file": "src/components/brew/BrewQuickPrepCard.tsx",
+    "status": "completed",
+    "commit": "b043535"
+  },
+  {
+    "id": "TASK-P34-02-MON",
+    "perspective": "02-MON",
+    "title": "Slownikowa deklinacja slowianska i angielska dla pozostalych dni i parzen w Apps4BrewPassModal",
+    "file": "src/components/Apps4BrewPassModal.tsx",
+    "status": "completed",
+    "commit": "471da1a"
+  },
+  {
+    "id": "TASK-P34-03-ZAK",
+    "perspective": "03-ZAK",
+    "title": "Poprawna gramatyka interwalow po wypale (post-roast) w buildProactiveActionSchedule",
+    "file": "src/core/bpr-engine.ts",
+    "status": "completed",
+    "commit": "301c274"
+  },
+  {
+    "id": "TASK-P34-04-STU",
+    "perspective": "04-STU",
+    "title": "Semantyczne accessibilityRole i etykiety dla ocen i ekstrakcji w JournalSessionCard",
+    "file": "src/components/journal/JournalSessionCard.tsx",
+    "status": "completed",
+    "commit": "3255e3e"
+  },
+  {
+    "id": "TASK-P34-05-ARC",
+    "perspective": "05-ARC",
+    "title": "Parsowanie numerycznych stringow i ochrona przed -0 dla parametrow sesji w saveBrewSession",
+    "file": "src/core/database.ts",
+    "status": "completed",
+    "commit": "4985dfe"
+  },
+  {
+    "id": "TASK-P34-06-TRE",
+    "perspective": "06-TRE",
+    "title": "Wyszukiwanie w bazie wiedzy po unikalnych identyfikatorach ID dla odmian, procesow, regionow i herbat",
+    "file": "src/core/knowledge-data.ts",
+    "status": "completed",
+    "commit": "390a5de"
+  },
+  {
+    "id": "TASK-P34-07-JAK",
+    "perspective": "07-JAK",
+    "title": "Odrzucanie koercji typow boolean w kalkulatorze minerałów wody calculateWaterMinerals",
+    "file": "src/core/water-chemistry.ts",
+    "status": "completed",
+    "commit": "cb8884b"
+  },
+  {
+    "id": "TASK-P34-08-PRO",
+    "perspective": "08-PRO",
+    "title": "Wsparcie dla Batch Brew, Moccamaster i ekspresu przelewowego (820 mikronow) w getRecipeMicrons",
+    "file": "src/core/grinder-converter.ts",
+    "status": "completed",
+    "commit": "1a62aa7"
+  },
+  {
+    "id": "TASK-P34-09-LOK",
+    "perspective": "09-LOK",
+    "title": "Dodanie klucza brew.methodBatchBrew w 35 jezykach i rozszerzenie matrycy testow do 821",
+    "file": "locales/*",
+    "status": "completed",
+    "commit": "9124e00"
+  },
+  {
+    "id": "TASK-P34-10-WYD",
+    "perspective": "10-WYD",
+    "title": "Statyczna weryfikacja konfiguracji portrait i dark userInterfaceStyle w scripts/verify-native.mjs",
+    "file": "scripts/verify-native.mjs",
+    "status": "completed",
+    "commit": "36f5d06"
+  },
+  {
+    "id": "TASK-P34-11-WZR",
+    "perspective": "11-WZR",
+    "title": "Scisle klamrowanie dozy i wody oraz ochrona przed -0 w wyliczaniu ratio w recipeToCompactPayload",
+    "file": "src/core/recipe-share.ts",
+    "status": "completed",
+    "commit": "1889000"
+  },
+  {
+    "id": "TASK-P34-12-NIE",
+    "perspective": "12-NIE",
+    "title": "Walidacja dlugosci nazwy i maksymalnej wagi wody w startLiveActivity",
+    "file": "src/core/live-activity.ts",
+    "status": "completed",
+    "commit": "3974b0a"
+  }
+]
