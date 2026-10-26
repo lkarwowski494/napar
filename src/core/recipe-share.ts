@@ -130,18 +130,54 @@ export function recipeToCompactPayload(
       ...(st.instructionEn ? { ie: st.instructionEn } : {}),
     }));
 
-  const name = recipe.name;
-  const beverageType = isSaved
+  const name =
+    typeof recipe.name === 'string' && recipe.name.trim()
+      ? recipe.name.trim()
+      : 'Recipe';
+  const rawBeverageType = isSaved
     ? recipe.beverageType
     : (recipe as MasterRecipe).type;
-  const method = recipe.method;
-  const author = recipe.author;
-  const desc = isSaved ? recipe.description : `${recipe.name} (${recipe.author})`;
-  const dose = isSaved ? recipe.doseGrams : (recipe as MasterRecipe).coffeeOrTeaDoseGrams;
-  const water = isSaved ? recipe.waterGrams : (recipe as MasterRecipe).waterWeightGrams;
-  const temp = isSaved ? recipe.waterTempCelsius : (recipe as MasterRecipe).waterTemperatureCelsius;
-  const grind = isSaved ? recipe.grindSizeDescription : (recipe as MasterRecipe).grindSettingDescriptionPl;
-  const ratio = recipe.recommendedRatio;
+  const beverageType: 'COFFEE' | 'TEA' =
+    rawBeverageType === 'TEA' ? 'TEA' : 'COFFEE';
+  const method =
+    typeof recipe.method === 'string' && recipe.method.trim()
+      ? recipe.method.trim()
+      : 'v60';
+  const author =
+    typeof recipe.author === 'string' && recipe.author.trim()
+      ? recipe.author.trim()
+      : undefined;
+  const desc = isSaved
+    ? (typeof recipe.description === 'string' ? recipe.description : undefined)
+    : `${name} (${author || 'Master'})`;
+  const rawDose = isSaved
+    ? recipe.doseGrams
+    : (recipe as MasterRecipe).coffeeOrTeaDoseGrams;
+  const rawWater = isSaved
+    ? recipe.waterGrams
+    : (recipe as MasterRecipe).waterWeightGrams;
+  const rawTemp = isSaved
+    ? recipe.waterTempCelsius
+    : (recipe as MasterRecipe).waterTemperatureCelsius;
+  const rawGrind = isSaved
+    ? recipe.grindSizeDescription
+    : (recipe as MasterRecipe).grindSettingDescriptionPl;
+  const rawRatio = recipe.recommendedRatio;
+
+  const dose =
+    Number.isFinite(rawDose) && rawDose > 0 ? Number(rawDose.toFixed(1)) : 15;
+  const water =
+    Number.isFinite(rawWater) && rawWater > 0 ? Number(rawWater.toFixed(1)) : 250;
+  const temp =
+    Number.isFinite(rawTemp) && rawTemp > 0 && rawTemp <= 100
+      ? Math.round(rawTemp)
+      : 92;
+  const grind =
+    typeof rawGrind === 'string' && rawGrind.trim() ? rawGrind.trim() : undefined;
+  const ratio =
+    Number.isFinite(rawRatio) && rawRatio > 0
+      ? Number(rawRatio.toFixed(2))
+      : Number((water / (dose || 1)).toFixed(1));
 
   return {
     v: 1,
@@ -206,10 +242,13 @@ export function decodeRecipeFromShareUrl(
     const parsed: CompactRecipePayload = JSON.parse(jsonStr);
 
     if (
+      !parsed ||
+      typeof parsed !== 'object' ||
       parsed.v !== 1 ||
       !parsed.n ||
       typeof parsed.n !== 'string' ||
       parsed.n.length > 200 ||
+      (parsed.b !== 'COFFEE' && parsed.b !== 'TEA') ||
       !parsed.m ||
       typeof parsed.m !== 'string' ||
       parsed.m.length > 50 ||

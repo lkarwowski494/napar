@@ -330,4 +330,35 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(result?.recipe.waterTempCelsius).toBe(92);
     expect(result?.recipe.recommendedRatio).toBe(16.7);
   });
+
+  test('TASK-P11-11-WZR: decodeRecipeFromShareUrl odrzuca nieznany beverageType oraz non-object, a recipeToCompactPayload sanityzuje pola', () => {
+    // Nieprawidłowy beverageType
+    const invalidBeverage = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Invalid Beverage',
+      b: 'UNKNOWN_DRINK',
+      m: 'V60',
+      d: 15,
+      w: 250,
+      s: []
+    }));
+    expect(decodeRecipeFromShareUrl(invalidBeverage)).toBeNull();
+
+    // Parsed niebędący obiektem
+    expect(decodeRecipeFromShareUrl(utf8ToBase64('12345'))).toBeNull();
+
+    // recipeToCompactPayload sanacja pustych lub NaN
+    const corruptNumerics: any = {
+      name: '',
+      method: '',
+      doseGrams: NaN,
+      waterGrams: -100,
+      stepsJson: '[]',
+    };
+    const compact = recipeToCompactPayload(corruptNumerics);
+    expect(compact.n).toBe('Recipe');
+    expect(compact.m).toBe('v60');
+    expect(compact.d).toBe(15);
+    expect(compact.w).toBe(250);
+  });
 });
