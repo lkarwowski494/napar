@@ -34,10 +34,10 @@
 | TASK-P46-03-ZAK | Zaskoczenie | Completed | `src/core/bpr-engine.ts` | `2e216b1` |
 | TASK-P46-04-STU | Studiowanie | Completed | `src/components/recipe-builder/RecipeStepEditor.tsx` | `48c97bb` |
 | TASK-P46-05-ARC | Architektura | Completed | `src/core/database.ts` | `887810b` |
-| TASK-P46-06-TRE | Treść | Pending | `src/core/knowledge-data.ts` | - |
-| TASK-P46-07-JAK | Jakość | Pending | `src/core/water-chemistry.ts` | - |
-| TASK-P46-08-PRO | Prostota | Pending | `src/core/grinder-converter.ts` | - |
-| TASK-P46-09-LOK | Lokalizacja | Pending | `locales/*` | - |
-| TASK-P46-10-WYD | Wydajność | Pending | `scripts/verify-native.mjs` | - |
+| TASK-P46-06-TRE | Treść | Completed | `src/core/knowledge-data.ts` | `192d47b` |
+| TASK-P46-07-JAK | Jakość | Completed | `src/core/water-chemistry.ts` | `4bf91d4` |
+| TASK-P46-08-PRO | Prostota | Completed | `src/core/grinder-converter.ts` | `6e5f11d` |
+| TASK-P46-09-LOK | Lokalizacja | Completed | `locales/*` | `33d179a` |
+| TASK-P46-10-WYD | Wydajność | Completed | `scripts/verify-native.mjs` | `003c38e` |
 | TASK-P46-11-WZR | Wzorce | Pending | `src/core/recipe-share.ts` | - |
 | TASK-P46-12-NIE | Niezawodność | Pending | `src/core/live-activity.ts` | - |

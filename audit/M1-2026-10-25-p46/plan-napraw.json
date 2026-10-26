@@ -44,40 +44,40 @@
     "perspective": "06-TRE",
     "title": "Rozszerzenie PROCESS_ALIASES o warianty obróbki honey (black-honey, red-honey, yellow-honey)",
     "file": "src/core/knowledge-data.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "192d47b"
   },
   {
     "id": "TASK-P46-07-JAK",
     "perspective": "07-JAK",
     "title": "Rozszerzenie findBottledWaterById o alternatywne aliasy marek butelkowanych",
     "file": "src/core/water-chemistry.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "4bf91d4"
   },
   {
     "id": "TASK-P46-08-PRO",
     "perspective": "08-PRO",
     "title": "Rozpoznawanie metod cold drip i cold immersion dripperów w getRecipeMicrons",
     "file": "src/core/grinder-converter.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "6e5f11d"
   },
   {
     "id": "TASK-P46-09-LOK",
     "perspective": "09-LOK",
-    "title": "Weryfikacja spójności lingwistycznej i braków w 35 językach oraz utrzymanie 100% matrycy testów",
+    "title": "Weryfikacja spójności lingwistycznej i braków w 35 językach oraz dodanie klucza recipeBuilder.addStepHint",
     "file": "locales/*",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "33d179a"
   },
   {
     "id": "TASK-P46-10-WYD",
     "perspective": "10-WYD",
     "title": "Weryfikacja spójności uprawnień i skryptów audytowych w verify-native.mjs",
     "file": "scripts/verify-native.mjs",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "003c38e"
   },
   {
     "id": "TASK-P46-11-WZR",
