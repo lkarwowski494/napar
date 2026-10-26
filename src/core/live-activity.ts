@@ -371,6 +371,15 @@ export async function startLiveActivity(
       error: 'Nieprawidłowa docelowa waga wody w stanie Live Activity (wymagany zakres [0, 50000]).',
     };
   }
+  const rawElapsed = typeof initialState.totalElapsedSeconds === 'number'
+    ? initialState.totalElapsedSeconds
+    : (typeof initialState.totalElapsedSeconds === 'string' ? parseFloat(initialState.totalElapsedSeconds) : NaN);
+  if (!Number.isFinite(rawElapsed) || rawElapsed < 0 || Object.is(rawElapsed, -0) || rawElapsed > 86400) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy łączny czas parzenia w stanie Live Activity (wymagany zakres [0, 86400]).',
+    };
+  }
   return {
     success: false,
     error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',
@@ -427,6 +436,15 @@ export async function updateLiveActivity(
     return {
       success: false,
       error: 'Nieprawidłowa docelowa waga wody w stanie Live Activity (wymagany zakres [0, 50000]).',
+    };
+  }
+  const rawElapsed = typeof _state.totalElapsedSeconds === 'number'
+    ? _state.totalElapsedSeconds
+    : (typeof _state.totalElapsedSeconds === 'string' ? parseFloat(_state.totalElapsedSeconds) : NaN);
+  if (!Number.isFinite(rawElapsed) || rawElapsed < 0 || Object.is(rawElapsed, -0) || rawElapsed > 86400) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy łączny czas parzenia w stanie Live Activity (wymagany zakres [0, 86400]).',
     };
   }
   return {

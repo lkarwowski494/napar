@@ -815,4 +815,28 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resStrStart.success).toBe(false); // stub DEC-01
     expect(resStrStart.error).toBe('ActivityKit Live Activity niedostępne w v1.0 (DEC-01).');
   });
+
+  test('TASK-P47-12-NIE: startLiveActivity i updateLiveActivity walidują zakres totalElapsedSeconds [0, 86400]', async () => {
+    // 1. Ujemny totalElapsedSeconds
+    const negElapsedState: any = { ...mockState, totalElapsedSeconds: -5 };
+    const resNegStart = await startLiveActivity(mockAttributesCoffee, negElapsedState);
+    expect(resNegStart.success).toBe(false);
+    expect(resNegStart.error).toContain('Nieprawidłowy łączny czas parzenia');
+
+    const resNegUpdate = await updateLiveActivity('act-123', negElapsedState);
+    expect(resNegUpdate.success).toBe(false);
+    expect(resNegUpdate.error).toContain('Nieprawidłowy łączny czas parzenia');
+
+    // 2. Zbyt duży totalElapsedSeconds (> 86400)
+    const hugeElapsedState: any = { ...mockState, totalElapsedSeconds: 90000 };
+    const resHugeStart = await startLiveActivity(mockAttributesCoffee, hugeElapsedState);
+    expect(resHugeStart.success).toBe(false);
+    expect(resHugeStart.error).toContain('Nieprawidłowy łączny czas parzenia');
+
+    // 3. NaN w totalElapsedSeconds
+    const nanElapsedState: any = { ...mockState, totalElapsedSeconds: NaN };
+    const resNanUpdate = await updateLiveActivity('act-123', nanElapsedState);
+    expect(resNanUpdate.success).toBe(false);
+    expect(resNanUpdate.error).toContain('Nieprawidłowy łączny czas parzenia');
+  });
 });
