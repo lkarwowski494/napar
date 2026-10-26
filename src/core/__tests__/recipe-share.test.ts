@@ -650,4 +650,30 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     const payload2 = recipeToCompactPayload(recEmptyDesc);
     expect(payload2.desc).toBeUndefined();
   });
+
+  test('TASK-P28-11-WZR: decodeRecipeFromShareUrl odrzuca whitespace-only name oraz method', () => {
+    const compactWhitespaceName = {
+      v: 1,
+      n: '    ',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 250,
+      s: [],
+    };
+    const b64Name = Buffer.from(JSON.stringify(compactWhitespaceName), 'utf8').toString('base64');
+    expect(decodeRecipeFromShareUrl(b64Name)).toBeNull();
+
+    const compactWhitespaceMethod = {
+      v: 1,
+      n: 'Valid Name',
+      b: 'COFFEE',
+      m: '    ',
+      d: 15,
+      w: 250,
+      s: [],
+    };
+    const b64Method = Buffer.from(JSON.stringify(compactWhitespaceMethod), 'utf8').toString('base64');
+    expect(decodeRecipeFromShareUrl(b64Method)).toBeNull();
+  });
 });

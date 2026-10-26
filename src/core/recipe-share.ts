@@ -257,10 +257,12 @@ export function decodeRecipeFromShareUrl(
       parsed.v !== 1 ||
       !parsed.n ||
       typeof parsed.n !== 'string' ||
+      !parsed.n.trim() ||
       parsed.n.length > 200 ||
       (parsed.b !== 'COFFEE' && parsed.b !== 'TEA') ||
       !parsed.m ||
       typeof parsed.m !== 'string' ||
+      !parsed.m.trim() ||
       parsed.m.length > 50 ||
       (parsed.a !== undefined && (typeof parsed.a !== 'string' || parsed.a.length > 100)) ||
       (parsed.desc !== undefined && (typeof parsed.desc !== 'string' || parsed.desc.length > 1000)) ||
