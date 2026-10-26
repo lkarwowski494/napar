@@ -1207,4 +1207,37 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(mockDb.inventory.has('bean-fk-test')).toBe(false);
     expect(getBrewSessions().find((s) => s.id === 'sess-fk-test')?.inventoryItemId).toBeUndefined();
   });
+
+  test('TASK-P11-05-ARC: deductInventoryWeight ignoruje błędny id, NaN, ujemne dozy i bezpiecznie odlicza wagę', () => {
+    initDatabase(mockDb as any);
+    const item: InventoryItem = {
+      id: 'bean-deduct-test',
+      name: 'Kenya Nyeri',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 250,
+      flavorNotes: [],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-10-25T10:00:00.000Z',
+      updatedAt: '2026-10-25T10:00:00.000Z',
+    };
+    saveInventoryItem(item);
+
+    // Próby z niepoprawnym ID oraz błędnymi wartościami
+    deductInventoryWeight('', 15);
+    deductInventoryWeight(null as any, 15);
+    deductInventoryWeight('bean-deduct-test', NaN);
+    deductInventoryWeight('bean-deduct-test', -50);
+    deductInventoryWeight('bean-deduct-test', 0);
+    expect(getInventoryItemById('bean-deduct-test')?.remainingWeightGrams).toBe(250);
+
+    // Prawidłowe odliczenie 18.5g
+    deductInventoryWeight('bean-deduct-test', 18.5);
+    expect(getInventoryItemById('bean-deduct-test')?.remainingWeightGrams).toBe(231.5);
+
+    // Odliczenie większe niż stan zeruje stan bez ujemnych liczb
+    deductInventoryWeight('bean-deduct-test', 300);
+    expect(getInventoryItemById('bean-deduct-test')?.remainingWeightGrams).toBe(0);
+  });
 });

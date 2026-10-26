@@ -343,10 +343,17 @@ export function deleteInventoryItem(id: string): void {
 }
 
 export function deductInventoryWeight(id: string, doseGrams: number): void {
+  if (!id || typeof id !== 'string') return;
+  const safeDose = Number.isFinite(doseGrams) && doseGrams > 0 ? doseGrams : 0;
+  if (safeDose <= 0) return;
   const db = getDatabase();
   const item = getInventoryItemById(id);
   if (!item) return;
-  const newRemaining = Math.max(0, Number((item.remainingWeightGrams - doseGrams).toFixed(1)));
+  const currentRemaining =
+    Number.isFinite(item.remainingWeightGrams) && item.remainingWeightGrams >= 0
+      ? item.remainingWeightGrams
+      : 0;
+  const newRemaining = Math.max(0, Number((currentRemaining - safeDose).toFixed(1)));
   db.runSync(
     'UPDATE inventory_items SET remaining_weight_g = ?, updated_at = ? WHERE id = ?',
     [newRemaining, new Date().toISOString(), id]
