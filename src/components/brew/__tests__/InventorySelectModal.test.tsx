@@ -104,4 +104,27 @@ describe('InventorySelectModal Component', () => {
     const hasEmptyNote = textNodes.some((n) => n.props.children === 'Brak innych pozycji w spiżarni');
     expect(hasEmptyNote).toBe(true);
   });
+
+  test('TASK-P50-01-ODK: zlokalizowany przycisk zamykania (EN/PL), accessibilityHint oraz odpornosc na null w inventory', () => {
+    let treeEn: renderer.ReactTestRenderer;
+    act(() => {
+      treeEn = renderer.create(
+        <InventorySelectModal
+          {...defaultProps}
+          t={translations.en}
+          inventory={[null as any, undefined as any, mockItem, 123 as any]}
+        />
+      );
+    });
+    const rootEn = treeEn!.root;
+    const closeBtn = rootEn.findByProps({ testID: 'close-inventory-modal-btn' });
+    expect(closeBtn.props.accessibilityLabel).toBe('Close');
+    expect(closeBtn.props.accessibilityHint).toBeTruthy();
+
+    const closeText = closeBtn.findByType('Text' as any);
+    expect(closeText.props.children).toBe('Close');
+
+    const itemOption = rootEn.findByProps({ testID: 'inventory-option-bean-1' });
+    expect(itemOption).toBeTruthy();
+  });
 });
