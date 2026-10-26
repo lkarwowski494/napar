@@ -357,9 +357,18 @@ try {
     'android.permission.RECORD_AUDIO',
     'android.permission.ACCESS_FINE_LOCATION',
     'android.permission.ACCESS_COARSE_LOCATION',
+    'android.permission.ACCESS_BACKGROUND_LOCATION',
     'android.permission.READ_CONTACTS',
+    'android.permission.WRITE_CONTACTS',
     'android.permission.READ_CALENDAR',
+    'android.permission.WRITE_CALENDAR',
     'android.permission.READ_SMS',
+    'android.permission.SEND_SMS',
+    'android.permission.RECEIVE_SMS',
+    'android.permission.READ_PHONE_STATE',
+    'android.permission.READ_CALL_LOG',
+    'android.permission.BODY_SENSORS',
+    'android.permission.ACTIVITY_RECOGNITION',
   ];
   for (const forbidden of forbiddenAndroidPermissions) {
     check(
