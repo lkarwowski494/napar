@@ -981,4 +981,27 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decodedEn).not.toBeNull();
     expect(decodedEn?.originalSteps[0].nameEn).toBe('Bloom');
   });
+
+  test('TASK-P41-11-WZR: recipeToCompactPayload normalizuje wielkosc liter beverageType (tea -> TEA)', () => {
+    const teaRecipeLowercase: any = {
+      name: 'Sencha Green Tea',
+      beverageType: 'tea',
+      method: 'Kyusu',
+      doseGrams: 4,
+      waterGrams: 120,
+      stepsJson: '[]',
+    };
+    const payload = recipeToCompactPayload(teaRecipeLowercase);
+    expect(payload.b).toBe('TEA');
+
+    const teaRecipeWhitespace: any = {
+      name: 'Matcha Bowl',
+      beverageType: '  TEA  ',
+      method: 'Chasen',
+      doseGrams: 2,
+      waterGrams: 80,
+      stepsJson: '[]',
+    };
+    expect(recipeToCompactPayload(teaRecipeWhitespace).b).toBe('TEA');
+  });
 });

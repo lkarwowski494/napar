@@ -148,7 +148,7 @@ export function recipeToCompactPayload(
     ? recipe.beverageType
     : (recipe as MasterRecipe).type;
   const beverageType: 'COFFEE' | 'TEA' =
-    rawBeverageType === 'TEA' ? 'TEA' : 'COFFEE';
+    typeof rawBeverageType === 'string' && rawBeverageType.trim().toUpperCase() === 'TEA' ? 'TEA' : 'COFFEE';
   const method =
     typeof recipe.method === 'string' && recipe.method.trim()
       ? recipe.method.trim().slice(0, 50)
