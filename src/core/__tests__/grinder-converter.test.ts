@@ -615,4 +615,25 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ method: 'AeroPress Inverted', grindSettingDescriptionPl: 'Grubo pod długą macerację' })).toBe(850);
     expect(getRecipeMicrons({ method: 'AeroPress', grindSettingDescriptionEn: 'Coarse grind for 3-minute steep' })).toBe(850);
   });
+
+  test('TASK-P50-08-PRO: getRecipeMicrons dla metod maceracji na zimno (1150 µm) oraz młynek 1Zpresso ZP6 Special w SUPPORTED_GRINDERS', () => {
+    // 1. Maceracja na zimno, nitro brew i ekstrakcja cold steep (1150 µm)
+    expect(getRecipeMicrons({ method: 'MACERATION' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Maceracja na zimno' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Cold Maceration' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'NITRO_COLD_BREW' })).toBe(1150);
+    expect(getRecipeMicrons({ method: 'Nitro Brew' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Maceracja na zimno przez 18h w lodówce' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Coarse cold steep infusion for 24h' })).toBe(1150);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Ekstrakcja na zimno' })).toBe(1150);
+
+    // 2. Model 1Zpresso ZP6 Special w SUPPORTED_GRINDERS
+    const zp6 = findGrinderById('1zpresso_zp6');
+    expect(zp6).toBeDefined();
+    expect(zp6?.name).toContain('1Zpresso ZP6');
+    expect(zp6?.stepMicrons).toBeCloseTo(12.2, 1);
+    expect(zp6?.formatSetting(45, 'pl')).toContain('klików');
+    expect(zp6?.formatSetting(45, 'en')).toContain('clicks');
+    expect(findGrinderById('zp6')?.id).toBe('1zpresso_zp6');
+  });
 });

@@ -292,6 +292,29 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     },
   },
   {
+    id: '1zpresso_zp6',
+    name: '1Zpresso ZP6 Special',
+    burrType: 'Żarna sześciokątne 48mm (Pour-Over Focus)',
+    burrTypePl: 'Żarna sześciokątne 48mm (Pour-Over Focus)',
+    burrTypeEn: 'Hexagonal 48mm burrs (Pour-Over Focus)',
+    stepMicrons: 12.2,
+    minSetting: 10,
+    maxSetting: 90,
+    micronsPerSettingOffset: 0,
+    formatSetting: (clicks: number, lang = 'pl') => {
+      const rot = Math.floor(clicks / 60);
+      const sub = Math.floor((clicks % 60) / 10);
+      const click = Math.round(clicks % 10);
+      const unit = lang === 'en' ? 'clicks' : 'klików';
+      return `${rot}.${sub}.${click} (${clicks} ${unit})`;
+    },
+    parseSetting: (text: string) => {
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
+      const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 45;
+      return num * 12.2;
+    },
+  },
+  {
     id: 'generic_grinder',
     name: 'Inny młynek (Skala uniwersalna µm)',
     namePl: 'Inny młynek (Skala uniwersalna µm)',
@@ -321,9 +344,23 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
   },
 ];
 
+const GRINDER_ALIASES: Record<string, string> = {
+  zp6: '1zpresso_zp6',
+  'zp6-special': '1zpresso_zp6',
+  'zp-6': '1zpresso_zp6',
+  '1zpresso-zp6': '1zpresso_zp6',
+  jmax: '1zpresso_j_max',
+  'j-max': '1zpresso_j_max',
+};
+
 export function findGrinderById(id: string): GrinderModel | undefined {
   if (!id || typeof id !== 'string') return undefined;
   const cleanId = id.trim().toLowerCase();
+  const mappedId = GRINDER_ALIASES[cleanId];
+  if (mappedId) {
+    const found = SUPPORTED_GRINDERS.find((g) => g.id.toLowerCase() === mappedId);
+    if (found) return found;
+  }
   return SUPPORTED_GRINDERS.find((g) => g.id.toLowerCase() === cleanId);
 }
 
@@ -703,7 +740,16 @@ export function getRecipeMicrons(recipe?: {
     desc.includes('walküre') ||
     desc.includes('walkuere') ||
     desc.includes('walkure') ||
-    desc.includes('coarse')
+    desc.includes('coarse') ||
+    method.includes('MACERAT') ||
+    method.includes('MACERACJ') ||
+    method.includes('NITRO') ||
+    desc.includes('maceracj') ||
+    desc.includes('macerat') ||
+    desc.includes('na zimno') ||
+    desc.includes('cold steep') ||
+    desc.includes('cold infusion') ||
+    desc.includes('nitro')
   ) {
     return 1150;
   }
