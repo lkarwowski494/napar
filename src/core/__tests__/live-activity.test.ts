@@ -364,4 +364,14 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(livePayload.contentState.stepRemainingSeconds).toBe(0);
     expect(livePayload.contentState.isFinished).toBe(true);
   });
+
+  test('TASK-P26-12-NIE: updateLiveActivity waliduje obecność obiektu _state', async () => {
+    const resNull = await updateLiveActivity('valid-activity-id', null as any);
+    expect(resNull.success).toBe(false);
+    expect(resNull.error).toBe('Nieprawidłowy stan aktywności Live Activity.');
+
+    const resUndefined = await updateLiveActivity('valid-activity-id', undefined as any);
+    expect(resUndefined.success).toBe(false);
+    expect(resUndefined.error).toBe('Nieprawidłowy stan aktywności Live Activity.');
+  });
 });

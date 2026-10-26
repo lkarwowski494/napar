@@ -258,6 +258,12 @@ export async function updateLiveActivity(
       error: 'Nieprawidłowy identyfikator aktywności Live Activity.',
     };
   }
+  if (!_state || typeof _state !== 'object') {
+    return {
+      success: false,
+      error: 'Nieprawidłowy stan aktywności Live Activity.',
+    };
+  }
   return {
     success: false,
     error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',
