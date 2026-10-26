@@ -102,7 +102,9 @@ export function BrewFinishModal({
           >
             <Text style={styles.modalTitle}>{t.brew?.finishModalTitle || 'Zakończono Parzenie!'}</Text>
             <Text style={styles.modalSub}>
-              {`${language === 'pl' ? 'Czas' : 'Time'}: ${formatTime(totalElapsedSeconds)} · ${language === 'pl' ? 'Woda' : 'Water'}: ${Math.round(waterGrams)}g`}
+              {(t.brew?.finishTimeWater || (language === 'pl' ? 'Czas: {time} · Woda: {water}g' : 'Time: {time} · Water: {water}g'))
+                .replace('{time}', formatTime(totalElapsedSeconds))
+                .replace('{water}', String(Math.round(waterGrams)))}
             </Text>
 
             {/* Ocena w gwiazdkach */}
@@ -163,19 +165,10 @@ export function BrewFinishModal({
                   <Text style={styles.doctorTitle}>{t.brew?.doctorRecipeTitle || 'Recepta Dial-in Doctor:'}</Text>
                 </View>
                 <Text style={styles.doctorText}>
-                  {language === 'en' ? (
-                    <>
-                      Too sour (under-extracted)? Next time:{' '}
-                      <Text style={styles.doctorBold}>grind finer by 2 clicks</Text> or raise water temperature by{' '}
-                      <Text style={styles.doctorBold}>+2°C</Text>.
-                    </>
-                  ) : (
-                    <>
-                      Za kwaśna (niedoparzenie)? Następnym razem:{' '}
-                      <Text style={styles.doctorBold}>zmiel drobniej o 2 kliki</Text> lub podnieś temperaturę wody o{' '}
-                      <Text style={styles.doctorBold}>+2°C</Text>.
-                    </>
-                  )}
+                  {t.brew?.doctorSourAdvice ||
+                    (language === 'en'
+                      ? 'Too sour (under-extracted)? Next time: grind finer by 2 clicks or raise water temperature by +2°C.'
+                      : 'Za kwaśna (niedoparzenie)? Następnym razem: zmiel drobniej o 2 kliki lub podnieś temperaturę wody o +2°C.')}
                 </Text>
               </View>
             )}
@@ -187,19 +180,10 @@ export function BrewFinishModal({
                   <Text style={styles.doctorTitle}>{t.brew?.doctorRecipeTitle || 'Recepta Dial-in Doctor:'}</Text>
                 </View>
                 <Text style={styles.doctorText}>
-                  {language === 'en' ? (
-                    <>
-                      Too bitter / astringent (over-extracted)? Next time:{' '}
-                      <Text style={styles.doctorBold}>grind coarser by 2 clicks</Text> or lower water temperature by{' '}
-                      <Text style={styles.doctorBold}>-2°C</Text>.
-                    </>
-                  ) : (
-                    <>
-                      Za gorzka / ściągająca (przeparzenie)? Następnym razem:{' '}
-                      <Text style={styles.doctorBold}>zmiel grubiej o 2 kliki</Text> lub obniż temperaturę wody o{' '}
-                      <Text style={styles.doctorBold}>-2°C</Text>.
-                    </>
-                  )}
+                  {t.brew?.doctorBitterAdvice ||
+                    (language === 'en'
+                      ? 'Too bitter / astringent (over-extracted)? Next time: grind coarser by 2 clicks or lower water temperature by -2°C.'
+                      : 'Za gorzka / ściągająca (przeparzenie)? Następnym razem: zmiel grubiej o 2 kliki lub obniż temperaturę wody o -2°C.')}
                 </Text>
               </View>
             )}
@@ -211,17 +195,10 @@ export function BrewFinishModal({
                   <Text style={styles.doctorTitle}>{t.brew?.doctorRecipeTitle || 'Recepta Dial-in Doctor:'}</Text>
                 </View>
                 <Text style={styles.doctorText}>
-                  {language === 'en' ? (
-                    <>
-                      Too watery (low extraction)? Increase dose by{' '}
-                      <Text style={styles.doctorBold}>+1.5g</Text> or extend water contact time.
-                    </>
-                  ) : (
-                    <>
-                      Zbyt wodnista (niska ekstrakcja)? Zwiększ dozę o{' '}
-                      <Text style={styles.doctorBold}>+1.5g</Text> lub wydłuż czas kontaktu z wodą.
-                    </>
-                  )}
+                  {t.brew?.doctorWeakAdvice ||
+                    (language === 'en'
+                      ? 'Too watery (low extraction)? Increase dose by +1.5g or extend water contact time.'
+                      : 'Zbyt wodnista (niska ekstrakcja)? Zwiększ dozę o +1.5g lub wydłuż czas kontaktu z wodą.')}
                 </Text>
               </View>
             )}
