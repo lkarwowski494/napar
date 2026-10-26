@@ -89,7 +89,11 @@ const mockDb: any = {
       return Array.from(mockDb.inventory.values());
     }
     if (query.includes('FROM recipes')) {
-      return Array.from(mockDb.recipes.values());
+      let rows = Array.from(mockDb.recipes.values());
+      if (query.includes('WHERE beverage_type = ?') && params && params[0]) {
+        rows = rows.filter((r: any) => r.beverage_type === params[0]);
+      }
+      return rows;
     }
     if (query.includes('FROM brew_sessions')) {
       return Array.from(mockDb.sessions.values());
@@ -1778,5 +1782,19 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(saved?.type).toBe('coffee');
     expect(saved?.roastProfile).toBe('medium-light');
     expect(saved?.flavorNotes).toEqual(['czekolada', 'karmel']);
+  });
+
+  test('TASK-P40-05-ARC: getRecipes normalizuje wielkosc liter beverageType (coffee -> COFFEE)', () => {
+    initDatabase(mockDb as any);
+    const coffeeRecipes = getRecipes('coffee' as any);
+    expect(Array.isArray(coffeeRecipes)).toBe(true);
+    expect(coffeeRecipes.every((r) => r.beverageType === 'COFFEE')).toBe(true);
+
+    const teaRecipes = getRecipes('  tea  ' as any);
+    expect(Array.isArray(teaRecipes)).toBe(true);
+    expect(teaRecipes.every((r) => r.beverageType === 'TEA')).toBe(true);
+
+    const allRecipes = getRecipes('unknown' as any);
+    expect(allRecipes.length).toBeGreaterThanOrEqual(coffeeRecipes.length + teaRecipes.length);
   });
 });

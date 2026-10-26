@@ -476,12 +476,14 @@ function mapRowToInventoryItem(row: InventoryRow): InventoryItem {
 // Repozytorium: Przepisy (Recipes)
 // ----------------------------------------------------------------------------
 
-export function getRecipes(beverageType?: 'COFFEE' | 'TEA'): SavedRecipe[] {
+export function getRecipes(beverageType?: 'COFFEE' | 'TEA' | string): SavedRecipe[] {
   const db = getDatabase();
-  const query = beverageType
+  const cleanType = typeof beverageType === 'string' ? beverageType.trim().toUpperCase() : undefined;
+  const isFiltered = cleanType === 'COFFEE' || cleanType === 'TEA';
+  const query = isFiltered
     ? 'SELECT * FROM recipes WHERE beverage_type = ? ORDER BY is_favorite DESC, name ASC'
     : 'SELECT * FROM recipes ORDER BY is_favorite DESC, beverage_type ASC, name ASC';
-  const params = beverageType ? [beverageType] : [];
+  const params = isFiltered ? [cleanType] : [];
   const rows = db.getAllSync<RecipeRow>(query, params);
   return rows.map(mapRowToRecipe);
 }
