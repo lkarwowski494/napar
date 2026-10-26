@@ -469,5 +469,19 @@ describe('Water Chemistry & Mineralization Module', () => {
     const resFromArray = calculateWaterMinerals([] as any, 80, 40);
     expect(resFromArray.waterVolumeLiters).toBe(1.0);
   });
+
+  test('TASK-P42-07-JAK: diagnoseWaterSensoryImpact odrzuca obiekty, tablice, symbole i obsluguje stringi z whitespace', () => {
+    const resFromObj = diagnoseWaterSensoryImpact({} as any, 50);
+    expect(resFromObj.problemPl).toBe('Nieprawidłowe dane wejściowe parametrów wody.');
+
+    const resFromArray = diagnoseWaterSensoryImpact(60, [] as any);
+    expect(resFromArray.problemPl).toBe('Nieprawidłowe dane wejściowe parametrów wody.');
+
+    const resFromSymbol = diagnoseWaterSensoryImpact(Symbol('s') as any, 50);
+    expect(resFromSymbol.problemPl).toBe('Nieprawidłowe dane wejściowe parametrów wody.');
+
+    const resFromString = diagnoseWaterSensoryImpact('  60  ', '  30  ');
+    expect(resFromString.problemPl).toContain('Golden Zone');
+  });
 });
 

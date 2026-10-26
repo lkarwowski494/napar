@@ -269,17 +269,17 @@ export interface WaterDiagnosticResult {
  * Diagnozuje wpływ parametrów chemicznych wody na sensorykę naparu
  */
 export function diagnoseWaterSensoryImpact(
-  ghPpm: number,
-  khPpm: number
+  ghPpm: number | string,
+  khPpm: number | string
 ): WaterDiagnosticResult {
-  if (
-    ghPpm === null ||
-    ghPpm === undefined ||
-    khPpm === null ||
-    khPpm === undefined ||
-    typeof ghPpm === 'boolean' ||
-    typeof khPpm === 'boolean'
-  ) {
+  const isInvalidType = (val: any) =>
+    val === null ||
+    val === undefined ||
+    typeof val === 'boolean' ||
+    typeof val === 'object' ||
+    typeof val === 'symbol';
+
+  if (isInvalidType(ghPpm) || isInvalidType(khPpm)) {
     return {
       problemPl: 'Nieprawidłowe dane wejściowe parametrów wody.',
       problemEn: 'Invalid input data for water chemistry parameters.',
@@ -289,8 +289,8 @@ export function diagnoseWaterSensoryImpact(
       recommendationEn: 'Enter valid positive numerical values for GH hardness and KH buffer.',
     };
   }
-  const rawGh = typeof ghPpm === 'string' ? parseFloat(ghPpm) : Number(ghPpm);
-  const rawKh = typeof khPpm === 'string' ? parseFloat(khPpm) : Number(khPpm);
+  const rawGh = typeof ghPpm === 'string' ? parseFloat(ghPpm.trim()) : Number(ghPpm);
+  const rawKh = typeof khPpm === 'string' ? parseFloat(khPpm.trim()) : Number(khPpm);
   let safeGh = Number.isFinite(rawGh) ? rawGh : NaN;
   let safeKh = Number.isFinite(rawKh) ? rawKh : NaN;
   if (Object.is(safeGh, -0)) safeGh = 0;
