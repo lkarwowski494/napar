@@ -34,10 +34,10 @@
 | TASK-P50-03-ZAK | Zaskoczenie | Completed | `src/core/bpr-engine.ts` | `03c2b7f` |
 | TASK-P50-04-STU | Studiowanie | Completed | `src/components/recipe-builder/RecipeParamsCard.tsx` | `ea48308` |
 | TASK-P50-05-ARC | Architektura | Completed | `src/core/database.ts` | `f2fc627` |
-| TASK-P50-06-TRE | Treść | Planned | `src/core/knowledge-data.ts` | - |
-| TASK-P50-07-JAK | Jakość | Planned | `src/core/water-chemistry.ts` | - |
-| TASK-P50-08-PRO | Prostota | Planned | `src/core/grinder-converter.ts` | - |
-| TASK-P50-09-LOK | Lokalizacja | Planned | `locales/*` | - |
-| TASK-P50-10-WYD | Wydajność | Planned | `scripts/verify-native.mjs` | - |
+| TASK-P50-06-TRE | Treść | Completed | `src/core/knowledge-data.ts` | `34197fa` |
+| TASK-P50-07-JAK | Jakość | Completed | `src/core/water-chemistry.ts` | `efe0344` |
+| TASK-P50-08-PRO | Prostota | Completed | `src/core/grinder-converter.ts` | `d7b3d9b` |
+| TASK-P50-09-LOK | Lokalizacja | Completed | `locales/*` | `e084c7f` |
+| TASK-P50-10-WYD | Wydajność | Completed | `scripts/verify-native.mjs` | `ec82696` |
 | TASK-P50-11-WZR | Wzorce | Planned | `src/core/recipe-share.ts` | - |
 | TASK-P50-12-NIE | Niezawodność | Planned | `src/core/live-activity.ts` | - |

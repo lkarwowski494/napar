@@ -50,7 +50,7 @@
       "title": "Rozszerzenie profili minerałów wody i opisów buforów w knowledge-data",
       "target_file": "src/core/knowledge-data.ts",
       "test_file": "src/core/__tests__/knowledge.test.ts",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P50-07-JAK",
@@ -58,7 +58,7 @@
       "title": "Walidacja granic dozowania minerałów wody i ochrona przed NaN w water-chemistry",
       "target_file": "src/core/water-chemistry.ts",
       "test_file": "src/core/__tests__/water-chemistry.test.ts",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P50-08-PRO",
@@ -66,7 +66,7 @@
       "title": "Kalibracja zakresów mikronów dla metod maceracji na zimno w grinder-converter",
       "target_file": "src/core/grinder-converter.ts",
       "test_file": "src/core/__tests__/grinder-converter.test.ts",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P50-09-LOK",
@@ -74,7 +74,7 @@
       "title": "Symetria kluczy wyboru spiżarni i podpowiedzi w 35 językach",
       "target_file": "src/core/i18n.tsx",
       "test_file": "tests/i18n-no-polish-in-en.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P50-10-WYD",
@@ -82,7 +82,7 @@
       "title": "Weryfikacja braku uprawnień telemetrycznych i lokalizacyjnych w skryptach audytowych",
       "target_file": "scripts/verify-native.mjs",
       "test_file": "tests/audit-fixes.test.tsx",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "TASK-P50-11-WZR",
