@@ -678,4 +678,21 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(res.subscriptionTier).toBe('lifetime');
     expect(getAppSetting('verified_purchase_tier', '')).toBe('lifetime');
   });
+
+  test('TASK-P40-02-MON: setTrialExpiredForTesting resetuje has_verified_purchase, verified_purchase_tier i verified_receipt_json', () => {
+    activateSubscription('lifetime');
+    expect(getAppSetting('has_verified_purchase', '')).toBe('true');
+    expect(getAppSetting('verified_purchase_tier', '')).toBe('lifetime');
+
+    setTrialExpiredForTesting();
+    expect(getAppSetting('has_verified_purchase', '')).toBe('false');
+    expect(getAppSetting('verified_purchase_tier', '')).toBe('');
+    expect(getAppSetting('verified_receipt_json', '')).toBe('');
+    expect(getAppAccessState().status).toBe('trial_expired');
+
+    // restorePurchases nie moze przywrocic zakupu bez flag
+    const res = restorePurchases();
+    expect(res.restored).toBe(false);
+    expect(res.isSubscribed).toBe(false);
+  });
 });
