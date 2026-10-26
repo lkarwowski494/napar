@@ -145,7 +145,8 @@
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
-    "finishAndSave": "完成并保存"
+    "finishAndSave": "完成并保存",
+    "recipeSearchPlaceholder": "搜尋配方、沖煮方法 (V60、愛樂壓、蓋碗)..."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

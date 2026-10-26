@@ -145,7 +145,8 @@
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
-    "finishAndSave": "Befejezés és mentés"
+    "finishAndSave": "Befejezés és mentés",
+    "recipeSearchPlaceholder": "Receptek, módszerek keresése (V60, AeroPress, Gaiwan)..."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -145,7 +145,8 @@
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
-    "finishAndSave": "완료 및 저장"
+    "finishAndSave": "완료 및 저장",
+    "recipeSearchPlaceholder": "레시피, 추출 방식 검색 (V60, 에어로프레스, 개완)..."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

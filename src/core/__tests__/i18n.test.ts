@@ -296,4 +296,9 @@ describe('i18n System', () => {
     expect(translations.pl.grinder.recommendationLabel).toBe('Rekomendacja:');
     expect(translations.en.grinder.recommendationLabel).toBe('Recommendation:');
   });
+
+  test('TASK-P13-09-LOK: Klucz recipeSearchPlaceholder jest zdefiniowany w słownikach pl i en', () => {
+    expect(translations.pl.brew.recipeSearchPlaceholder).toContain('Szukaj receptury');
+    expect(translations.en.brew.recipeSearchPlaceholder).toContain('Search recipes');
+  });
 });

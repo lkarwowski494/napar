@@ -145,7 +145,8 @@
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
-    "finishAndSave": "Finalitza i desa"
+    "finishAndSave": "Finalitza i desa",
+    "recipeSearchPlaceholder": "Cerca receptes, mètodes (V60, AeroPress, Gaiwan)..."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

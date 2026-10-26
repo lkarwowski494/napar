@@ -145,7 +145,8 @@
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
-    "finishAndSave": "Lopeta ja tallenna"
+    "finishAndSave": "Lopeta ja tallenna",
+    "recipeSearchPlaceholder": "Etsi reseptejä, menetelmiä (V60, AeroPress, Gaiwan)..."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

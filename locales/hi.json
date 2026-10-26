@@ -145,7 +145,8 @@
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
-    "finishAndSave": "समाप्त करें और सहेजें"
+    "finishAndSave": "समाप्त करें और सहेजें",
+    "recipeSearchPlaceholder": "व्यंजनों, विधियों की खोज करें (V60, एरोप्रेस, गैवान)..."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

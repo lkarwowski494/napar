@@ -145,7 +145,8 @@
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
-    "finishAndSave": "Završi i spremi"
+    "finishAndSave": "Završi i spremi",
+    "recipeSearchPlaceholder": "Traži recepte, metode (V60, AeroPress, Gaiwan)..."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

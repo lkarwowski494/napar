@@ -204,7 +204,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
             <TextInput
               testID="recipe-search-input"
               style={styles.searchInput}
-              placeholder="Szukaj receptury, metody (V60, AeroPress, Gaiwan)..."
+              placeholder={t?.brew?.recipeSearchPlaceholder || 'Szukaj receptury, metody (V60, AeroPress, Gaiwan)...'}
               placeholderTextColor={theme.colors.textMuted}
               value={searchQuery}
               onChangeText={setSearchQuery}

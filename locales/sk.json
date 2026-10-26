@@ -145,7 +145,8 @@
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
-    "finishAndSave": "Dokončiť a uložiť"
+    "finishAndSave": "Dokončiť a uložiť",
+    "recipeSearchPlaceholder": "Hľadať recepty, metódy (V60, AeroPress, Gaiwan)..."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

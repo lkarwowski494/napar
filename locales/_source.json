@@ -152,7 +152,8 @@
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
-    "finishAndSave": "Finish & Save"
+    "finishAndSave": "Finish & Save",
+    "recipeSearchPlaceholder": "Search recipes, methods (V60, AeroPress, Gaiwan)..."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

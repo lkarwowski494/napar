@@ -145,7 +145,8 @@
     "craftSavingsLabel": "Oszczędność vs kawiarnia specialty: +{savings} {curr}",
     "skipBtn": "Pomiń",
     "saveToJournalBtn": "Zapisz w Dzienniku",
-    "finishAndSave": "Zakończ i zapisz"
+    "finishAndSave": "Zakończ i zapisz",
+    "recipeSearchPlaceholder": "Szukaj receptury, metody (V60, AeroPress, Gaiwan)..."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

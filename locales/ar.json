@@ -145,7 +145,8 @@
     "craftSavingsLabel": "Savings vs cafe cup: +{savings} {curr}",
     "skipBtn": "Skip",
     "saveToJournalBtn": "Save to Journal",
-    "finishAndSave": "إنهاء وحفظ"
+    "finishAndSave": "إنهاء وحفظ",
+    "recipeSearchPlaceholder": "ابحث عن الوصفات والطرق (V60، إيروبريس، غايوان)..."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
