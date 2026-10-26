@@ -65,10 +65,10 @@ export function setLiveActivityEnabled(enabled: boolean): void {
 }
 
 export function formatActivityTimer(seconds: number): string {
-  if (typeof seconds !== 'number' && typeof seconds !== 'string') {
+  if (typeof seconds !== 'number' && typeof (seconds as any) !== 'string') {
     return '0:00';
   }
-  if (typeof seconds === 'string' && !seconds.trim()) {
+  if (typeof (seconds as any) === 'string' && !(seconds as any).trim()) {
     return '0:00';
   }
   const numSeconds = typeof seconds === 'number' ? seconds : Number(seconds);
