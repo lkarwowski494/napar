@@ -196,7 +196,7 @@ export function formatSubscriptionTierName(
   language: 'pl' | 'en' | string = 'pl'
 ): string {
   const isEn = typeof language === 'string' && (language.trim().toLowerCase() === 'en' || language.trim().toLowerCase().startsWith('en'));
-  let cleanTier = typeof tier === 'string' ? tier.trim().toLowerCase() : '';
+  let cleanTier = typeof tier === 'string' ? tier.replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase() : '';
   if (cleanTier === STORE_PRODUCT_IDS.monthly.toLowerCase() || cleanTier.includes('monthly')) cleanTier = 'monthly';
   else if (cleanTier === STORE_PRODUCT_IDS.annual.toLowerCase() || cleanTier.includes('annual')) cleanTier = 'annual';
   else if (cleanTier === STORE_PRODUCT_IDS.lifetime.toLowerCase() || cleanTier.includes('lifetime')) cleanTier = 'lifetime';
@@ -386,7 +386,9 @@ export function verifyAndActivateStoreKitPurchase(
       errorCode: 'invalid_signature',
     };
   }
-  const cleanProductId = typeof receipt.productId === 'string' ? receipt.productId.trim().toLowerCase() : '';
+  const cleanProductId = typeof receipt.productId === 'string'
+    ? receipt.productId.replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase()
+    : '';
   let tier: 'monthly' | 'annual' | 'lifetime' | null = null;
   if (cleanProductId === STORE_PRODUCT_IDS.monthly.toLowerCase() || cleanProductId === 'monthly') tier = 'monthly';
   else if (cleanProductId === STORE_PRODUCT_IDS.annual.toLowerCase() || cleanProductId === 'annual') tier = 'annual';

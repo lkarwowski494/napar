@@ -959,4 +959,44 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(formatTrialStatusSummary(commaState, 'pl')).toBe('Okres próbny: 12 parzeń · 7 dni');
     expect(formatTrialStatusSummary(commaState, 'en')).toBe('Trial: 12 brews · 7 days remaining');
   });
+
+  test('TASK-P53-02-MON: bezpieczna obsługa pustych, uszkodzonych i zanieczyszczonych identyfikatorów StoreKit', () => {
+    // 1. Pusty lub whitespace-only productId w verifyAndActivateStoreKitPurchase
+    const emptyProductReceipt: any = {
+      productId: '   \t  ',
+      transactionId: 'tx-valid-999',
+      purchaseDate: new Date().toISOString(),
+      signature: 'valid-signature-123',
+    };
+    const resEmpty = verifyAndActivateStoreKitPurchase(emptyProductReceipt);
+    expect(resEmpty.success).toBe(false);
+    expect(resEmpty.errorCode).toBe('unknown_product');
+
+    // 2. Nie-string productId (np. null, number)
+    const nullProductReceipt: any = {
+      productId: null,
+      transactionId: 'tx-valid-999',
+      purchaseDate: new Date().toISOString(),
+      signature: 'valid-signature-123',
+    };
+    const resNull = verifyAndActivateStoreKitPurchase(nullProductReceipt);
+    expect(resNull.success).toBe(false);
+    expect(resNull.errorCode).toBe('unknown_product');
+
+    // 3. ProductId z ukrytymi znakami sterującymi i spacjami oczyszczany przed dopasowaniem
+    const dirtyProductReceipt: any = {
+      productId: '  pl.lukasz.napar.lifetime\x00\r\n  ',
+      transactionId: 'tx-valid-lifetime-1',
+      purchaseDate: new Date().toISOString(),
+      signature: 'valid-signature-lifetime',
+    };
+    const resDirty = verifyAndActivateStoreKitPurchase(dirtyProductReceipt);
+    expect(resDirty.success).toBe(true);
+    expect(resDirty.tier).toBe('lifetime');
+    expect(resDirty.receipt?.productId).toBe(STORE_PRODUCT_IDS.lifetime);
+
+    // 4. formatSubscriptionTierName ze znakami sterującymi
+    expect(formatSubscriptionTierName(' \x00pl.lukasz.napar.monthly\x1F ', 'pl')).toBe('Subskrypcja Miesięczna');
+    expect(formatSubscriptionTierName(' \tannual\r\n ', 'en')).toBe('Annual Pass');
+  });
 });
