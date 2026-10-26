@@ -393,4 +393,9 @@ describe('i18n System', () => {
     expect(translations.pl.brew.methodTrinityOne).toBe('Trinity ONE');
     expect(translations.en.brew.methodTrinityOne).toBe('Trinity ONE');
   });
+
+  test('TASK-P38-09-LOK: Klucz methodWalkuere jest zdefiniowany w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodWalkuere).toBe('Walküre / Bayreuth');
+    expect(translations.en.brew.methodWalkuere).toBe('Walküre / Bayreuth');
+  });
 });
