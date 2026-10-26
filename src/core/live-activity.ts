@@ -101,11 +101,11 @@ export function buildDynamicIslandPayload(
       : 'sess_unknown';
   const safeRecipeName =
     attributes && typeof attributes.recipeName === 'string' && attributes.recipeName.trim()
-      ? attributes.recipeName.trim().slice(0, 40)
+      ? attributes.recipeName.replace(/[\r\n\t]+/g, ' ').trim().slice(0, 40)
       : 'Napar';
   const safeMethod =
     attributes && typeof attributes.method === 'string' && attributes.method.trim()
-      ? attributes.method.trim()
+      ? attributes.method.replace(/[\r\n\t]+/g, ' ').trim()
       : 'Drip';
   const safeBevType =
     attributes && attributes.beverageType === 'TEA' ? 'TEA' : 'COFFEE';
@@ -161,7 +161,7 @@ export function buildDynamicIslandPayload(
     safeState.stepNamePl ||
     safeState.stepNameEn ||
     (isEn ? 'Step' : 'Krok');
-  const stepName = typeof rawStepName === 'string' ? rawStepName.trim().slice(0, 30) : (isEn ? 'Step' : 'Krok');
+  const stepName = typeof rawStepName === 'string' ? rawStepName.replace(/[\r\n\t]+/g, ' ').trim().slice(0, 30) : (isEn ? 'Step' : 'Krok');
   const safeTotalSteps = Math.max(1, Number.isFinite(safeState.totalSteps) ? Math.round(safeState.totalSteps) : 1);
   const rawStepIdx = Number.isFinite(safeState.stepIndex) ? Math.round(safeState.stepIndex) : 0;
   const safeStepIdx = Math.min(safeTotalSteps - 1, Math.max(0, rawStepIdx));
@@ -213,11 +213,11 @@ export function buildLiveActivityPayload(
         : 'sess_unknown',
     recipeName:
       attributes && typeof attributes.recipeName === 'string' && attributes.recipeName.trim()
-        ? attributes.recipeName.trim().slice(0, 40)
+        ? attributes.recipeName.replace(/[\r\n\t]+/g, ' ').trim().slice(0, 40)
         : 'Napar',
     method:
       attributes && typeof attributes.method === 'string' && attributes.method.trim()
-        ? attributes.method.trim()
+        ? attributes.method.replace(/[\r\n\t]+/g, ' ').trim()
         : 'Drip',
     beverageType: attributes && attributes.beverageType === 'TEA' ? 'TEA' : 'COFFEE',
     totalWaterGrams: (() => {

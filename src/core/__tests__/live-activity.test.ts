@@ -949,4 +949,26 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resInvalidUpdate.success).toBe(false);
     expect(resInvalidUpdate.error).toContain('Nieprawidłowa docelowa waga wody');
   });
+
+  test('TASK-P51-12-NIE: buildDynamicIslandPayload oczyszcza nowe linie i tabulatory w tytule i nazwie kroku oraz formatActivityTimer obsluguje biale znaki', () => {
+    // 1. Czyszczenie \r, \n, \t w buildDynamicIslandPayload
+    const multilineAttr: any = {
+      ...mockAttributesCoffee,
+      recipeName: 'V60\nChampion\tEdition\r\nSpecial',
+    };
+    const multilineState: any = {
+      ...mockState,
+      stepNamePl: 'Zalanie\nDrugie\tPreinfuzja',
+    };
+
+    const payload = buildDynamicIslandPayload(multilineAttr, multilineState, 'pl');
+    expect(payload.expandedCenterTitle).toBe('V60 Champion Edition Special');
+    expect(payload.expandedCenterTitle).not.toContain('\n');
+    expect(payload.expandedCenterSubtitle).toContain('Zalanie Drugie Preinfuzja');
+    expect(payload.expandedCenterSubtitle).not.toContain('\n');
+
+    // 2. formatActivityTimer z białymi znakami i przecinkiem
+    expect(formatActivityTimer(' 90,5 ' as any)).toBe('1:30');
+    expect(formatActivityTimer(' 125,8 ' as any)).toBe('2:05');
+  });
 });
