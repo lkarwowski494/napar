@@ -332,7 +332,7 @@ export function saveInventoryItem(item: InventoryItem): void {
       ? item.process.trim().slice(0, 100)
       : null;
 
-  const cleanId = typeof item.id === 'string' && item.id.trim() ? item.id.trim() : generateId();
+  const cleanId = typeof item.id === 'string' && item.id.trim() ? item.id.trim() : `item-${Date.now()}`;
   const cleanName = typeof item.name === 'string' && item.name.trim() ? item.name.trim().slice(0, 200) : 'Bez nazwy';
   const cleanType = item.type === 'tea' ? 'tea' : 'coffee';
   const cleanRoastProfile = typeof item.roastProfile === 'string' && item.roastProfile.trim() ? item.roastProfile.trim().slice(0, 50) : null;
