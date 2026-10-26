@@ -534,6 +534,9 @@ export function saveRecipe(recipe: SavedRecipe): void {
   const safeName = typeof recipe.name === 'string' && recipe.name.trim() ? recipe.name.trim().slice(0, 200) : 'Recipe';
   const safeBeverage = recipe.beverageType === 'TEA' ? 'TEA' : 'COFFEE';
   const safeMethod = typeof recipe.method === 'string' && recipe.method.trim() ? recipe.method.trim().slice(0, 50) : 'v60';
+  const safeAuthor = typeof recipe.author === 'string' && recipe.author.trim() ? recipe.author.trim().slice(0, 100) : null;
+  const safeDescription = typeof recipe.description === 'string' && recipe.description.trim() ? recipe.description.trim().slice(0, 1000) : null;
+  const safeGrindDesc = typeof recipe.grindSizeDescription === 'string' && recipe.grindSizeDescription.trim() ? recipe.grindSizeDescription.trim().slice(0, 200) : null;
 
   db.runSync(
     `INSERT INTO recipes (
@@ -560,12 +563,12 @@ export function saveRecipe(recipe: SavedRecipe): void {
       safeName,
       safeBeverage,
       safeMethod,
-      recipe.author ?? null,
-      recipe.description ?? null,
+      safeAuthor,
+      safeDescription,
       dose,
       water,
       temp,
-      recipe.grindSizeDescription ?? null,
+      safeGrindDesc,
       ratio,
       safeStepsJson,
       recipe.isCustom ? 1 : 0,
@@ -596,11 +599,11 @@ export function toggleRecipeFavorite(id: string): boolean {
   return newFav;
 }
 
-export function updateRecipeFavorite(id: string, isFavorite: boolean): void {
+export function updateRecipeFavorite(id: string, isFavorite: boolean | string | number): void {
   if (!id || typeof id !== 'string' || !id.trim()) return;
   const safeId = id.trim();
   const db = getDatabase();
-  const favVal = Boolean(isFavorite) ? 1 : 0;
+  const favVal = isFavorite === true || isFavorite === 1 || isFavorite === 'true' || isFavorite === '1' ? 1 : 0;
   db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [favVal, safeId]);
 }
 

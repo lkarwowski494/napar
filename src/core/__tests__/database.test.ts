@@ -1908,4 +1908,45 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(Object.is(added?.caffeineMg, -0)).toBe(false);
     expect(added?.beverageType).toBe('tea');
   });
+
+  test('TASK-P45-05-ARC: updateRecipeFavorite rygorystycznie koercuje wartosci i saveRecipe obcina author, description oraz grindSizeDescription', () => {
+    initDatabase(mockDb as any);
+    const testRecipeId = 'rec-p45-arc';
+    saveRecipe({
+      id: testRecipeId,
+      name: 'P45 Chemex Recipe',
+      beverageType: 'COFFEE',
+      method: 'Chemex',
+      author: '   ' + 'A'.repeat(150) + '   ',
+      description: '   ' + 'D'.repeat(1200) + '   ',
+      grindSizeDescription: '   ' + 'G'.repeat(250) + '   ',
+      doseGrams: 20,
+      waterGrams: 300,
+      waterTempCelsius: 93,
+      recommendedRatio: 15,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+    });
+
+    const saved = getRecipeById(testRecipeId);
+    expect(saved).toBeDefined();
+    expect(saved?.author).toBe('A'.repeat(100));
+    expect(saved?.description).toBe('D'.repeat(1000));
+    expect(saved?.grindSizeDescription).toBe('G'.repeat(200));
+
+    // Test updateRecipeFavorite with string 'false' -> must be 0 (false), NOT 1 (truthy)
+    updateRecipeFavorite(testRecipeId, 'false' as any);
+    expect(getRecipeById(testRecipeId)?.isFavorite).toBe(false);
+
+    // String 'true' or 1 -> true
+    updateRecipeFavorite(testRecipeId, 'true' as any);
+    expect(getRecipeById(testRecipeId)?.isFavorite).toBe(true);
+
+    updateRecipeFavorite(testRecipeId, 0 as any);
+    expect(getRecipeById(testRecipeId)?.isFavorite).toBe(false);
+
+    updateRecipeFavorite(testRecipeId, 1 as any);
+    expect(getRecipeById(testRecipeId)?.isFavorite).toBe(true);
+  });
 });
