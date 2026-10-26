@@ -434,5 +434,12 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(findWaterRecipeById(456 as any)).toBeUndefined();
     expect(findWaterRecipeById([] as any)).toBeUndefined();
   });
+
+  test('TASK-P39-07-JAK: getWaterProfileName sanityzuje wielkość liter parametru language i spacje', () => {
+    expect(getWaterProfileName('sca_standard', '  EN  ')).toBe('SCA Standard Water');
+    expect(getWaterProfileName('sca_standard', '  PL  ')).toBe('Standard SCA (Specialty Coffee)');
+    expect(getWaterProfileName('sca_standard', null as any)).toBe('Standard SCA (Specialty Coffee)');
+    expect(getWaterProfileName(null as any, 'en')).toBe('');
+  });
 });
 
