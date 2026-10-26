@@ -661,4 +661,25 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(findGrinderById('encore')?.id).toBe('baratza_encore');
     expect(findGrinderById('k6')?.id).toBe('kingrinder_k6');
   });
+
+  test('TASK-P52-08-PRO: findGrinderById wspiera timemore_c2_c3, wilfa_svart oraz getRecipeMicrons rozpoznaje metody Tricolate, Sibarist i Phin', () => {
+    // 1. Aliasy Timemore i Wilfa w findGrinderById
+    expect(findGrinderById('c2')?.id).toBe('timemore_c2_c3');
+    expect(findGrinderById('c3')?.id).toBe('timemore_c2_c3');
+    expect(findGrinderById('timemore')?.id).toBe('timemore_c2_c3');
+    expect(findGrinderById('svart')?.id).toBe('wilfa_svart');
+    expect(findGrinderById('wilfa')?.id).toBe('wilfa_svart');
+
+    // 2. Metody Tricolate / Sibarist (zero bypass 500 µm)
+    expect(getRecipeMicrons({ method: 'TRICOLATE' })).toBe(500);
+    expect(getRecipeMicrons({ method: 'Tricolate Brewer' })).toBe(500);
+    expect(getRecipeMicrons({ method: 'SIBARIST' })).toBe(500);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Drobno pod zaparzacz Tricolate zero bypass' })).toBe(500);
+
+    // 3. Metoda Phin (wietnamski filtr 480 µm)
+    expect(getRecipeMicrons({ method: 'PHIN' })).toBe(480);
+    expect(getRecipeMicrons({ method: 'Wietnamski Phin' })).toBe(480);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Drobno pod wietnamski phin' })).toBe(480);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Fine grind for Vietnamese phin filter' })).toBe(480);
+  });
 });

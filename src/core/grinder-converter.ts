@@ -349,11 +349,16 @@ const GRINDER_ALIASES: Record<string, string> = {
   comandante: 'comandante_c40',
   'c40-mk3': 'comandante_c40',
   'c40-mk4': 'comandante_c40',
-  c2: 'timemore_c2',
-  c3: 'timemore_c2',
-  timemore: 'timemore_c2',
-  'timemore-c2': 'timemore_c2',
-  'timemore-c3': 'timemore_c2',
+  c2: 'timemore_c2_c3',
+  c3: 'timemore_c2_c3',
+  timemore: 'timemore_c2_c3',
+  'timemore-c2': 'timemore_c2_c3',
+  'timemore-c3': 'timemore_c2_c3',
+  'timemore-c2-c3': 'timemore_c2_c3',
+  svart: 'wilfa_svart',
+  wilfa: 'wilfa_svart',
+  'wilfa-svart': 'wilfa_svart',
+  wilfasvart: 'wilfa_svart',
   kultra: '1zpresso_k_ultra',
   'k-ultra': '1zpresso_k_ultra',
   '1zpresso-k-ultra': '1zpresso_k_ultra',
@@ -556,6 +561,24 @@ export function getRecipeMicrons(recipe?: {
     desc.includes('bialetti')
   ) {
     return 450;
+  }
+  if (
+    method === 'PHIN' ||
+    method.includes('PHIN') ||
+    desc.includes('phin')
+  ) {
+    return 480;
+  }
+  if (
+    method === 'TRICOLATE' ||
+    method.includes('TRICOLATE') ||
+    method === 'SIBARIST' ||
+    method.includes('SIBARIST') ||
+    desc.includes('tricolate') ||
+    desc.includes('sibarist') ||
+    desc.includes('zero bypass')
+  ) {
+    return 500;
   }
   if (
     method === 'SIPHON' ||
