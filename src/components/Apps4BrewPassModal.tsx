@@ -35,6 +35,8 @@ export function Apps4BrewPassModal({
   onPurchaseSuccess,
   onSubscribed,
 }: Apps4BrewPassModalProps) {
+  if (!visible) return null;
+
   const { t, language } = useTranslation();
   const { purchaseWithStoreKit, restore, status, brewsRemaining, daysRemaining } = useAppAccess();
   const [isProcessing, setIsProcessing] = React.useState(false);

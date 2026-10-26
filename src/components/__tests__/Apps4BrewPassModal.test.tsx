@@ -161,4 +161,14 @@ describe('Apps4BrewPassModal Component', () => {
     act(() => closeBtn.props.onPress());
     expect(handleCloseOnly).toHaveBeenCalled();
   });
+
+  test('TASK-P14-04-STU: Zwraca null gdy visible=false', () => {
+    let treeHidden: any;
+    act(() => {
+      treeHidden = renderer.create(
+        <Apps4BrewPassModal visible={false} onClose={jest.fn()} />
+      );
+    });
+    expect(treeHidden.toJSON()).toBeNull();
+  });
 });

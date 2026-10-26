@@ -114,4 +114,16 @@ describe('OnboardingModal Component', () => {
 
     expect(mockComplete).toHaveBeenCalledWith('both');
   });
+
+  it('TASK-P14-04-STU: Zwraca null gdy visible=false', async () => {
+    let treeHidden: any;
+    await act(async () => {
+      treeHidden = renderer.create(
+        <LanguageProvider>
+          <OnboardingModal visible={false} onComplete={jest.fn()} />
+        </LanguageProvider>
+      );
+    });
+    expect(treeHidden.toJSON()).toBeNull();
+  });
 });
