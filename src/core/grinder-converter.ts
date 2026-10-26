@@ -413,6 +413,8 @@ export function getRecipeMicrons(recipe?: {
   }
   if (
     method === 'CHEMEX' ||
+    method.includes('CHEMEX') ||
+    desc.includes('chemex') ||
     method === 'CLEVER_DRIPPER' ||
     method === 'CLEVER' ||
     method === 'CLEVER DRIPPER' ||

@@ -336,4 +336,12 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio-grubo pod dripper clever' })).toBe(880);
     expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-coarse for cupping protocol' })).toBe(880);
   });
+
+  test('TASK-P27-08-PRO: getRecipeMicrons rozpoznaje Chemex w opisach przemiału i metodzie zwracając 880 µm', () => {
+    expect(getRecipeMicrons({ method: 'CHEMEX' })).toBe(880);
+    expect(getRecipeMicrons({ method: 'Chemex 6 cups' })).toBe(880);
+    expect(getRecipeMicrons({ grindSettingDescriptionPl: 'Średnio-grubo pod filtr Chemex' })).toBe(880);
+    expect(getRecipeMicrons({ grindSettingDescriptionEn: 'Medium-coarse for chemex paper filter' })).toBe(880);
+    expect(getRecipeMicrons({ grind_size_description: 'Chemex grind' })).toBe(880);
+  });
 });
