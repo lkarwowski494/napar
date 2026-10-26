@@ -1,0 +1,98 @@
+[
+  {
+    "id": "TASK-P39-01-ODK",
+    "perspective": "01-ODK",
+    "title": "Semantyczne accessibilityState i identyfikatory testID w stepperach BrewQuickPrepCard",
+    "file": "src/components/brew/BrewQuickPrepCard.tsx",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P39-02-MON",
+    "perspective": "02-MON",
+    "title": "Defensywne przywracanie subskrypcji w restorePurchases z fallbackiem do subscription_tier",
+    "file": "src/core/app-access.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P39-03-ZAK",
+    "perspective": "03-ZAK",
+    "title": "Ochrona przed typami nienumerycznymi i nienapisowymi w escapeIcsText",
+    "file": "src/core/bpr-engine.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P39-04-STU",
+    "perspective": "04-STU",
+    "title": "Semantyczne accessibilityState dla ulubionych, ochrona przed -0 dla wag i testID w BeanItemCard",
+    "file": "src/components/beans/BeanItemCard.tsx",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P39-05-ARC",
+    "perspective": "05-ARC",
+    "title": "Defensywna sanacja name, type, roastProfile i flavorNotes w saveInventoryItem",
+    "file": "src/core/database.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P39-06-TRE",
+    "perspective": "06-TRE",
+    "title": "Rozszerzenie PROCESS_ALIASES o semi-washed, pulped-natural i szok termiczny w bazie wiedzy",
+    "file": "src/core/knowledge-data.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P39-07-JAK",
+    "perspective": "07-JAK",
+    "title": "Sanityzacja jezyka i bezpieczne fallbacki zlokalizowanych nazw w getWaterProfileName",
+    "file": "src/core/water-chemistry.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P39-08-PRO",
+    "perspective": "08-PRO",
+    "title": "Rozpoznawanie kawiarki Bialetti oraz AeroPress Inverted w getRecipeMicrons",
+    "file": "src/core/grinder-converter.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P39-09-LOK",
+    "perspective": "09-LOK",
+    "title": "Dodanie klucza brew.methodBialetti w 35 jezykach i rozszerzenie matrycy testow do 826",
+    "file": "locales/*",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P39-10-WYD",
+    "perspective": "10-WYD",
+    "title": "Statyczna weryfikacja uprawnien Androida ograniczona do scisle offline i braku telemetrii",
+    "file": "scripts/verify-native.mjs",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P39-11-WZR",
+    "perspective": "11-WZR",
+    "title": "Defensywna obsluga null i undefined recipe w encodeRecipeToShareUrl",
+    "file": "src/core/recipe-share.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P39-12-NIE",
+    "perspective": "12-NIE",
+    "title": "Clampowanie safeTargetWater i safeTotalWater do 50000 w buildDynamicIslandPayload",
+    "file": "src/core/live-activity.ts",
+    "status": "pending",
+    "commit": null
+  }
+]
