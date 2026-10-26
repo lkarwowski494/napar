@@ -1975,4 +1975,60 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(saved?.beverageType).toBe('TEA');
     expect(saved?.inventoryItemName).toBe('I'.repeat(200));
   });
+
+  test('TASK-P47-05-ARC: saveRecipe obsluguje przecinki dziesietne, clampuje parametry i serializuje obiektowy stepsJson', () => {
+    initDatabase(mockDb as any);
+    const testRecipeId = 'rec-p47-arc';
+    saveRecipe({
+      id: testRecipeId,
+      name: 'Test Comma & Steps',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: '18,5' as any,
+      waterGrams: '280,5' as any,
+      waterTempCelsius: '94,5' as any,
+      recommendedRatio: '15,2' as any,
+      stepsJson: [
+        {
+          namePl: 'Zalanie 1',
+          nameEn: 'Pour 1',
+          durationSeconds: 45,
+          targetWaterGrams: 100,
+        },
+      ] as any,
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-26T18:00:00Z',
+    });
+
+    const saved = getRecipeById(testRecipeId);
+    expect(saved).toBeDefined();
+    expect(saved?.doseGrams).toBe(18.5);
+    expect(saved?.waterGrams).toBe(280.5);
+    expect(saved?.waterTempCelsius).toBe(95); // rounded
+    expect(saved?.recommendedRatio).toBe(15.2);
+    expect(saved?.stepsJson).toContain('Zalanie 1');
+
+    // Test clampowania wielkich liczb
+    saveRecipe({
+      id: 'rec-p47-clamp',
+      name: 'Huge Recipe',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 5000,
+      waterGrams: 999999,
+      waterTempCelsius: 150,
+      recommendedRatio: 250,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-26T18:00:00Z',
+    });
+
+    const clamped = getRecipeById('rec-p47-clamp');
+    expect(clamped?.doseGrams).toBe(1000);
+    expect(clamped?.waterGrams).toBe(50000);
+    expect(clamped?.waterTempCelsius).toBe(100);
+    expect(clamped?.recommendedRatio).toBe(100);
+  });
 });
