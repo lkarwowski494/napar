@@ -333,4 +333,11 @@ describe('i18n System', () => {
     expect(translations.pl.brew.kalitaWaveDesc).toContain('płaskim dnem');
     expect(translations.en.brew.kalitaWaveDesc).toContain('Flat-bottom dripper');
   });
+
+  test('TASK-P28-09-LOK: Klucze methodOrigami i origamiDesc są zdefiniowane w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodOrigami).toBe('Dripper Origami');
+    expect(translations.en.brew.methodOrigami).toBe('Origami Dripper');
+    expect(translations.pl.brew.origamiDesc).toContain('20 żebrach');
+    expect(translations.en.brew.origamiDesc).toContain('20-rib');
+  });
 });

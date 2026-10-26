@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Kaedah hibrid rendaman dan penapisan dengan injap pelepas bawah.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Dripper dasar rata dengan tiga lubang untuk pengekstrakan sekata dan konsisten."
+    "kalitaWaveDesc": "Dripper dasar rata dengan tiga lubang untuk pengekstrakan sekata dan konsisten.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Dripper seramik Jepun dengan 20 alur tulang serasi untuk penapis kon dan wave."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

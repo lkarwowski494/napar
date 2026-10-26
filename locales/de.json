@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Hybrid aus Immersion und Handfilter mit praktischem Bodenventil.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Flachboden-Filter mit drei Löchern für besonders gleichmäßige und konsistente Extraktion."
+    "kalitaWaveDesc": "Flachboden-Filter mit drei Löchern für besonders gleichmäßige und konsistente Extraktion.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Japanischer Keramikfilter mit 20 Rillen, kompatibel mit Kegel- und Wellenfiltern."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

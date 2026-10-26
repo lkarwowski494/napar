@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Fusão de infusão e filtragem com válvula de extração por pressão.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Dripper de fundo plano com três orifícios garantindo extração uniforme e equilibrada."
+    "kalitaWaveDesc": "Dripper de fundo plano com três orifícios garantindo extração uniforme e equilibrada.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Dripper japonês em cerâmica com 20 nervuras, compatível com filtros cónicos e wave."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Híbrid d'immersió i degoteig amb vàlvula d'alliberament inferior.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Dripper de fons pla amb tres orificis que proporciona una extracció uniforme i constant."
+    "kalitaWaveDesc": "Dripper de fons pla amb tres orificis que proporciona una extracció uniforme i constant.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Dripper japonès de ceràmica amb 20 ranures compatible amb filtres cònics i wave."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

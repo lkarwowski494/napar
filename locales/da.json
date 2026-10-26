@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Hybrid mellem nedsænkning og filterbryg med udløbsventil.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Fladbundet kaffetragt med tre huller for en jævn og ensartet ekstraktion."
+    "kalitaWaveDesc": "Fladbundet kaffetragt med tre huller for en jævn og ensartet ekstraktion.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Japansk keramisk kaffetragt med 20 riller, kompatibel med koniske og bølgefiltre."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

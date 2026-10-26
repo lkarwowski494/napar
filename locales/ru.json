@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Гибридный метод настаивания и пролива с клапаном слива.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Дриппер с плоским дном и тремя отверстиями для равномерной и стабильной экстракции."
+    "kalitaWaveDesc": "Дриппер с плоским дном и тремя отверстиями для равномерной и стабильной экстракции.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Японский керамический дриппер с 20 ребрами совместим с конусными и волнистыми фильтрами."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

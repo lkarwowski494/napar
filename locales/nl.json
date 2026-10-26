@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Hybride tussen immersie en filterkoffie met handig afsluitventiel.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Filterhouder met platte bodem en drie gaatjes voor een gelijkmatige en consistente extractie."
+    "kalitaWaveDesc": "Filterhouder met platte bodem en drie gaatjes voor een gelijkmatige en consistente extractie.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Japanse keramische filterhouder met 20 ribben, geschikt voor kegel- en golfpapieren."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

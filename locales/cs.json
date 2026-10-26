@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Hybridní metoda louhování a filtrace s mechanickým ventilem.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Plochý dripper se třemi otvory zajišťující rovnoměrnou a konzistentní extrakci."
+    "kalitaWaveDesc": "Plochý dripper se třemi otvory zajišťující rovnoměrnou a konzistentní extrakci.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Japonský keramický dripper s 20 žebry kompatibilní s kuželovými i plochými filtry."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

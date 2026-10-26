@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Immersion and paper drip hybrid brewing with release drawdown valve.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Flat-bottom dripper with three restriction holes providing consistent and even extraction."
+    "kalitaWaveDesc": "Flat-bottom dripper with three restriction holes providing consistent and even extraction.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Japanese 20-rib ceramic dripper compatible with both conical and wave filters."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

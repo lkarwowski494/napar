@@ -171,7 +171,9 @@
     "methodClever": "Dripper Clever",
     "cleverDesc": "Połączenie immersji i filtracji z zaworem spustowym dające czysty i pełny napar.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Dripper z płaskim dnem i trzema otworami zapewniający równomierną ekstrakcję."
+    "kalitaWaveDesc": "Dripper z płaskim dnem i trzema otworami zapewniający równomierną ekstrakcję.",
+    "methodOrigami": "Dripper Origami",
+    "origamiDesc": "Japoński ceramiczny dripper o 20 żebrach umożliwiający użycie filtrów stożkowych i falistych."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

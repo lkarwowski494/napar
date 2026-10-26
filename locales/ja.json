@@ -171,7 +171,9 @@
     "methodClever": "クレバードリッパー",
     "cleverDesc": "浸漬抽出とペーパードリップの良さを兼ね備えたバルブ式ドリッパー。",
     "methodKalitaWave": "カリタウェーブ",
-    "kalitaWaveDesc": "3つ穴の平底構造とウェーブフィルターにより均一で安定した抽出を実現。"
+    "kalitaWaveDesc": "3つ穴の平底構造とウェーブフィルターにより均一で安定した抽出を実現。",
+    "methodOrigami": "オリガミドリッパー",
+    "origamiDesc": "20本の美しいリブ構造で円すい形とウェーブ形両方のフィルターに対応する美濃焼ドリッパー。"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

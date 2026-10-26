@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Áztatási és csepegtetős hibrid kávékészítő alsó zárószeleppel.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Lapos aljú csepegtető három lyukkal az egyenletes és kiegyensúlyozott extrakcióért."
+    "kalitaWaveDesc": "Lapos aljú csepegtető három lyukkal az egyenletes és kiegyensúlyozott extrakcióért.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Japán kerámia csepegtető 20 bordával kónikus és hullámos szűrőkhöz."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

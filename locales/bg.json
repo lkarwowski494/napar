@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Хибриден метод между имерсия и филтрация с контролиран клапан.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Дрипер с плоско дъно и три отвора за равномерна и постоянна екстракция."
+    "kalitaWaveDesc": "Дрипер с плоско дъно и три отвора за равномерна и постоянна екстракция.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Японски керамичен дрипер с 20 ребра съвместим с конусни и вълнообразни филтри."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

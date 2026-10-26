@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Híbrido de imersão e filtro de papel com válvula de fluxo controlada.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Dripper de fundo plano com três furos proporcionando extração uniforme e consistente."
+    "kalitaWaveDesc": "Dripper de fundo plano com três furos proporcionando extração uniforme e consistente.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Dripper japonês de cerâmica com 20 vincos, compatível com filtros cônicos e wave."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Hybrid mellan infusion och droppbryggning med bottenventil.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Flatbottnad kaffebryggare med tre hål som ger en jämn och konsekvent extraktion."
+    "kalitaWaveDesc": "Flatbottnad kaffebryggare med tre hål som ger en jämn och konsekvent extraktion.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Japansk keramisk kaffebryggare med 20 fåror, kompatibel med koniska och wave-filter."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Metode hibrida seduh rendam dan saring dengan katup pembuangan.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Dripper dasar datar dengan tiga lubang aliran untuk ekstraksi merata dan konsisten."
+    "kalitaWaveDesc": "Dripper dasar datar dengan tiga lubang aliran untuk ekstraksi merata dan konsisten.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Dripper keramik Jepang dengan 20 lekukan rusuk yang kompatibel dengan filter kerucut dan wave."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

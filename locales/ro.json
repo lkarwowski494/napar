@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Hibrid între infuzare prin imersie și filtrare cu supapă de scurgere.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Dripper cu fund plat și trei orificii pentru o extracție uniformă și constantă."
+    "kalitaWaveDesc": "Dripper cu fund plat și trei orificii pentru o extracție uniformă și constantă.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Dripper japonez din ceramică cu 20 de nervuri compatibil cu filtre conice și wave."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Υβριδική μέθοδος εμβάπτισης και φίλτρου με βαλβίδα απελευθέρωσης.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Dripper επίπεδου πυθμένα με τρεις οπές για ομοιόμορφη και σταθερή εκχύλιση."
+    "kalitaWaveDesc": "Dripper επίπεδου πυθμένα με τρεις οπές για ομοιόμορφη και σταθερή εκχύλιση.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Ιαπωνικό κεραμικό dripper 20 πτυχώσεων συμβατό με κωνικά φίλτρα και φίλτρα wave."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Hybride immersion et filtration avec valve d'écoulement contrôlée.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Dripper à fond plat avec trois trous assurant une extraction homogène et régulière."
+    "kalitaWaveDesc": "Dripper à fond plat avec trois trous assurant une extraction homogène et régulière.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Dripper japonais en céramique à 20 cannelures, compatible avec filtres coniques et wave."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

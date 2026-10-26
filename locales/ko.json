@@ -171,7 +171,9 @@
     "methodClever": "클레버 드리퍼",
     "cleverDesc": "침출과 여과의 장점을 결합한 밸브 제어 방식의 하이브리드 드리퍼.",
     "methodKalitaWave": "칼리타 웨이브",
-    "kalitaWaveDesc": "3개 추출구의 평평한 바닥 구조로 균일하고 안정적인 추출을 제공하는 드리퍼."
+    "kalitaWaveDesc": "3개 추출구의 평평한 바닥 구조로 균일하고 안정적인 추출을 제공하는 드리퍼.",
+    "methodOrigami": "오리가미 드리퍼",
+    "origamiDesc": "20개의 세로 리브로 원추형 및 웨이브 필터를 모두 지원하는 세라믹 드리퍼."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

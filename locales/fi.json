@@ -171,7 +171,9 @@
     "methodClever": "Clever Dripper",
     "cleverDesc": "Uutto- ja suodatushybridi pohjaventtiilillä puhtaaseen lopputulokseen.",
     "methodKalitaWave": "Kalita Wave",
-    "kalitaWaveDesc": "Tasapohjainen suodatinsuppilo kolmella reiällä tasaiseen ja varmaan uuttoon."
+    "kalitaWaveDesc": "Tasapohjainen suodatinsuppilo kolmella reiällä tasaiseen ja varmaan uuttoon.",
+    "methodOrigami": "Origami Dripper",
+    "origamiDesc": "Japanilainen 20-urainen keraaminen suodatinsuppilo kartio- ja aaltosuodattimille."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
