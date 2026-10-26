@@ -332,6 +332,21 @@ try {
         `Krytyczny pakiet '${plugin}' musi znajdować się w dependencies package.json`
       );
     }
+
+    // Weryfikacja obecności kluczowych skryptów audytowych w package.json (TASK-P40-10-WYD)
+    const requiredAuditScripts = [
+      'check:i18n',
+      'check:matrix',
+      'check:corpus',
+      'check:licenses',
+      'check:native',
+    ];
+    for (const scriptName of requiredAuditScripts) {
+      check(
+        typeof pkgJson.scripts?.[scriptName] === 'string' && pkgJson.scripts[scriptName].trim().length > 0,
+        `package.json -> scripts musi zawierać skrypt audytowy: '${scriptName}'`
+      );
+    }
   }
 
   const forbiddenPermissions = [
