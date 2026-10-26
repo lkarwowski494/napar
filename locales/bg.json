@@ -169,7 +169,9 @@
     "methodFrenchPress": "Френска преса",
     "frenchPressDesc": "Класически метод на имерсия с бутало за плътно и наситено тяло.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Хибриден метод между имерсия и филтрация с контролиран клапан."
+    "cleverDesc": "Хибриден метод между имерсия и филтрация с контролиран клапан.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Дрипер с плоско дъно и три отвора за равномерна и постоянна екстракция."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

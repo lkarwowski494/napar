@@ -176,7 +176,9 @@
     "methodFrenchPress": "French Press",
     "frenchPressDesc": "Classic immersion plunger brew producing a heavy, full-bodied cup.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Immersion and paper drip hybrid brewing with release drawdown valve."
+    "cleverDesc": "Immersion and paper drip hybrid brewing with release drawdown valve.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Flat-bottom dripper with three restriction holes providing consistent and even extraction."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

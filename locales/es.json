@@ -169,7 +169,9 @@
     "methodFrenchPress": "Prensa francesa",
     "frenchPressDesc": "Extracción clásica por inmersión con émbolo que brinda cuerpo denso y completo.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Híbrido de inmersión y goteo con válvula de liberación de flujo."
+    "cleverDesc": "Híbrido de inmersión y goteo con válvula de liberación de flujo.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper de fondo plano con tres orificios que garantiza una extracción uniforme y constante."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

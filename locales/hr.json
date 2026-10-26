@@ -169,7 +169,9 @@
     "methodFrenchPress": "French press",
     "frenchPressDesc": "Klasična imerzijska metoda s klipom za puno i bogato tijelo.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Hibridna metoda uranjanja i filtracije s kontrolnim ventilom."
+    "cleverDesc": "Hibridna metoda uranjanja i filtracije s kontrolnim ventilom.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper ravnog dna s tri otvora za ravnomjernu i postojanu ekstrakciju."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

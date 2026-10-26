@@ -169,7 +169,9 @@
     "methodFrenchPress": "Cafetière à piston",
     "frenchPressDesc": "Infusion classique par immersion produisant un corps riche et dense.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Hybride immersion et filtration avec valve d'écoulement contrôlée."
+    "cleverDesc": "Hybride immersion et filtration avec valve d'écoulement contrôlée.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper à fond plat avec trois trous assurant une extraction homogène et régulière."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

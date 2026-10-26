@@ -169,7 +169,9 @@
     "methodFrenchPress": "Praska francuska",
     "frenchPressDesc": "Klasyczna metoda immersyjna z tłokiem siatkowym dająca pełne ciało.",
     "methodClever": "Dripper Clever",
-    "cleverDesc": "Połączenie immersji i filtracji z zaworem spustowym dające czysty i pełny napar."
+    "cleverDesc": "Połączenie immersji i filtracji z zaworem spustowym dające czysty i pełny napar.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper z płaskim dnem i trzema otworami zapewniający równomierną ekstrakcję."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

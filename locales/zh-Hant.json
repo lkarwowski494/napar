@@ -169,7 +169,9 @@
     "methodFrenchPress": "法式濾壓壺",
     "frenchPressDesc": "經典的浸泡式濾壓萃取，賦予咖啡醇厚濃郁的風味與口感。",
     "methodClever": "聰明濾杯",
-    "cleverDesc": "結合浸泡與滴濾優勢的止水閥控流濾杯。"
+    "cleverDesc": "結合浸泡與滴濾優勢的止水閥控流濾杯。",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "平底三孔濾杯設計，導流均勻萃取更加穩定純淨。"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

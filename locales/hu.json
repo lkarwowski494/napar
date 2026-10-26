@@ -169,7 +169,9 @@
     "methodFrenchPress": "Dugattyús kávéfőző",
     "frenchPressDesc": "Klasszikus áztatási módszer dugattyúval a telt, testes ízélményért.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Áztatási és csepegtetős hibrid kávékészítő alsó zárószeleppel."
+    "cleverDesc": "Áztatási és csepegtetős hibrid kávékészítő alsó zárószeleppel.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Lapos aljú csepegtető három lyukkal az egyenletes és kiegyensúlyozott extrakcióért."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

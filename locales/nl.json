@@ -169,7 +169,9 @@
     "methodFrenchPress": "Doordrukkan",
     "frenchPressDesc": "Klassieke immersiemethode met zuiger voor een volle, rijke body.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Hybride tussen immersie en filterkoffie met handig afsluitventiel."
+    "cleverDesc": "Hybride tussen immersie en filterkoffie met handig afsluitventiel.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Filterhouder met platte bodem en drie gaatjes voor een gelijkmatige en consistente extractie."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

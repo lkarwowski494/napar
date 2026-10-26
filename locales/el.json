@@ -169,7 +169,9 @@
     "methodFrenchPress": "Γαλλική πρέσα",
     "frenchPressDesc": "Κλασική μέθοδος εμβάπτισης με έμβολο που προσφέρει γεμάτο σώμα.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Υβριδική μέθοδος εμβάπτισης και φίλτρου με βαλβίδα απελευθέρωσης."
+    "cleverDesc": "Υβριδική μέθοδος εμβάπτισης και φίλτρου με βαλβίδα απελευθέρωσης.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper επίπεδου πυθμένα με τρεις οπές για ομοιόμορφη και σταθερή εκχύλιση."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

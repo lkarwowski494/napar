@@ -169,7 +169,9 @@
     "methodFrenchPress": "Prensa francesa",
     "frenchPressDesc": "Método clássico de imersão com êmbolo proporcionando corpo denso e aveludado.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Híbrido de imersão e filtro de papel com válvula de fluxo controlada."
+    "cleverDesc": "Híbrido de imersão e filtro de papel com válvula de fluxo controlada.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper de fundo plano com três furos proporcionando extração uniforme e consistente."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -169,7 +169,9 @@
     "methodFrenchPress": "French Press",
     "frenchPressDesc": "Klassische Immersionsbrühung mit Stempel für einen kräftigen, vollen Körper.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Hybrid aus Immersion und Handfilter mit praktischem Bodenventil."
+    "cleverDesc": "Hybrid aus Immersion und Handfilter mit praktischem Bodenventil.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Flachboden-Filter mit drei Löchern für besonders gleichmäßige und konsistente Extraktion."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

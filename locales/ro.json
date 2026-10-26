@@ -169,7 +169,9 @@
     "methodFrenchPress": "Presă franceză",
     "frenchPressDesc": "Metodă clasică de infuzare prin imersie cu piston pentru un corp plin și dens.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Hibrid între infuzare prin imersie și filtrare cu supapă de scurgere."
+    "cleverDesc": "Hibrid între infuzare prin imersie și filtrare cu supapă de scurgere.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper cu fund plat și trei orificii pentru o extracție uniformă și constantă."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -169,7 +169,9 @@
     "methodFrenchPress": "French Press",
     "frenchPressDesc": "Kaedah rendaman klasik dengan pelocok untuk rasa kopi yang padat dan berisi.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Kaedah hibrid rendaman dan penapisan dengan injap pelepas bawah."
+    "cleverDesc": "Kaedah hibrid rendaman dan penapisan dengan injap pelepas bawah.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper dasar rata dengan tiga lubang untuk pengekstrakan sekata dan konsisten."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

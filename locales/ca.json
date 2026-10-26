@@ -169,7 +169,9 @@
     "methodFrenchPress": "Premsa francesa",
     "frenchPressDesc": "Mètode clàssic d'immersió amb èmbol que produeix un cos ric i dens.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Híbrid d'immersió i degoteig amb vàlvula d'alliberament inferior."
+    "cleverDesc": "Híbrid d'immersió i degoteig amb vàlvula d'alliberament inferior.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper de fons pla amb tres orificis que proporciona una extracció uniforme i constant."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

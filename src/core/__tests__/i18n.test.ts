@@ -326,4 +326,11 @@ describe('i18n System', () => {
     expect(translations.pl.brew.cleverDesc).toContain('zaworem');
     expect(translations.en.brew.cleverDesc).toContain('valve');
   });
+
+  test('TASK-P27-09-LOK: Klucze methodKalitaWave i kalitaWaveDesc są zdefiniowane w brew w PL i EN', () => {
+    expect(translations.pl.brew.methodKalitaWave).toBe('Kalita Wave');
+    expect(translations.en.brew.methodKalitaWave).toBe('Kalita Wave');
+    expect(translations.pl.brew.kalitaWaveDesc).toContain('płaskim dnem');
+    expect(translations.en.brew.kalitaWaveDesc).toContain('Flat-bottom dripper');
+  });
 });

@@ -169,7 +169,9 @@
     "methodFrenchPress": "Prensa francesa",
     "frenchPressDesc": "Método clássico de infusão por êmbolo conferindo um corpo rico e aveludado.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Fusão de infusão e filtragem com válvula de extração por pressão."
+    "cleverDesc": "Fusão de infusão e filtragem com válvula de extração por pressão.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper de fundo plano com três orifícios garantindo extração uniforme e equilibrada."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

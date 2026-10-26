@@ -169,7 +169,9 @@
     "methodFrenchPress": "Stempelkande",
     "frenchPressDesc": "Klassisk nedsænkningsbrygning med stempel, der giver en fyldig krop.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Hybrid mellem nedsænkning og filterbryg med udløbsventil."
+    "cleverDesc": "Hybrid mellem nedsænkning og filterbryg med udløbsventil.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Fladbundet kaffetragt med tre huller for en jævn og ensartet ekstraktion."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

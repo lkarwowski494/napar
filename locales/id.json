@@ -169,7 +169,9 @@
     "methodFrenchPress": "French Press",
     "frenchPressDesc": "Metode seduh imersif klasik dengan penekan untuk rasa penuh dan kental.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Metode hibrida seduh rendam dan saring dengan katup pembuangan."
+    "cleverDesc": "Metode hibrida seduh rendam dan saring dengan katup pembuangan.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper dasar datar dengan tiga lubang aliran untuk ekstraksi merata dan konsisten."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -169,7 +169,9 @@
     "methodFrenchPress": "Presskanna",
     "frenchPressDesc": "Klassisk infusionsbryggning med pressfilter som ger en fyllig kopp.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Hybrid mellan infusion och droppbryggning med bottenventil."
+    "cleverDesc": "Hybrid mellan infusion och droppbryggning med bottenventil.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Flatbottnad kaffebryggare med tre hål som ger en jämn och konsekvent extraktion."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -169,7 +169,9 @@
     "methodFrenchPress": "Bình ép kiểu Pháp",
     "frenchPressDesc": "Phương pháp ngâm chiết cổ điển với pít-tông mang lại thể chất đậm đà.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Phương pháp kết hợp giữa ngâm và lọc nhỏ giọt với van xả đáy."
+    "cleverDesc": "Phương pháp kết hợp giữa ngâm và lọc nhỏ giọt với van xả đáy.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Phễu lọc đáy phẳng với ba lỗ thoát giúp chiết xuất đều đặn và ổn định."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

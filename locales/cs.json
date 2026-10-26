@@ -169,7 +169,9 @@
     "methodFrenchPress": "French press",
     "frenchPressDesc": "Klasická imerzní metoda s pístovým filtrem pro plné, bohaté tělo.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Hybridní metoda louhování a filtrace s mechanickým ventilem."
+    "cleverDesc": "Hybridní metoda louhování a filtrace s mechanickým ventilem.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Plochý dripper se třemi otvory zajišťující rovnoměrnou a konzistentní extrakci."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

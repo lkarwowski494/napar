@@ -169,7 +169,9 @@
     "methodFrenchPress": "Caffettiera a stantuffo",
     "frenchPressDesc": "Estrazione classica a immersione per una bevanda dal corpo ricco e vellutato.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Ibrido tra immersione e filtro con valvola di rilascio sul fondo."
+    "cleverDesc": "Ibrido tra immersione e filtro con valvola di rilascio sul fondo.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Dripper a fondo piatto con tre fori per un'estrazione uniforme e costante."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

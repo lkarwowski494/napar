@@ -169,7 +169,9 @@
     "methodFrenchPress": "法压壶",
     "frenchPressDesc": "经典的滤压浸泡萃取方式，带来醇厚饱满的口感。",
     "methodClever": "聪明杯",
-    "cleverDesc": "结合浸泡与滴滤优点的阀门控流滤杯。"
+    "cleverDesc": "结合浸泡与滴滤优点的阀门控流滤杯。",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "平底三孔滤杯设计，水流均匀萃取更加稳定均衡。"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

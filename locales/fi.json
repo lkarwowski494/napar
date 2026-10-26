@@ -169,7 +169,9 @@
     "methodFrenchPress": "Pressopannu",
     "frenchPressDesc": "Perinteinen uuttomenetelmä männällä, joka tuottaa täyteläisen suutuntuman.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Uutto- ja suodatushybridi pohjaventtiilillä puhtaaseen lopputulokseen."
+    "cleverDesc": "Uutto- ja suodatushybridi pohjaventtiilillä puhtaaseen lopputulokseen.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Tasapohjainen suodatinsuppilo kolmella reiällä tasaiseen ja varmaan uuttoon."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

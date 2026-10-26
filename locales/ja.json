@@ -169,7 +169,9 @@
     "methodFrenchPress": "フレンチプレス",
     "frenchPressDesc": "プランジャーを用いた浸漬抽出で、重厚で豊かなコクをもたらします。",
     "methodClever": "クレバードリッパー",
-    "cleverDesc": "浸漬抽出とペーパードリップの良さを兼ね備えたバルブ式ドリッパー。"
+    "cleverDesc": "浸漬抽出とペーパードリップの良さを兼ね備えたバルブ式ドリッパー。",
+    "methodKalitaWave": "カリタウェーブ",
+    "kalitaWaveDesc": "3つ穴の平底構造とウェーブフィルターにより均一で安定した抽出を実現。"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

@@ -169,7 +169,9 @@
     "methodFrenchPress": "Френч-пресс",
     "frenchPressDesc": "Классический иммерсионный метод с поршнем для плотного и насыщенного вкуса.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Гибридный метод настаивания и пролива с клапаном слива."
+    "cleverDesc": "Гибридный метод настаивания и пролива с клапаном слива.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Дриппер с плоским дном и тремя отверстиями для равномерной и стабильной экстракции."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

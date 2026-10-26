@@ -169,7 +169,9 @@
     "methodFrenchPress": "French Press",
     "frenchPressDesc": "Yoğun gövdeli ve zengin aromalı klasik daldırma pistonlu demleme yöntemi.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Daldırma ve filtre demlemeyi birleştiren alt vanalı hibrit yöntem."
+    "cleverDesc": "Daldırma ve filtre demlemeyi birleştiren alt vanalı hibrit yöntem.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Üç delikli ve düz tabanlı tasarımıyla dengeli ve tutarlı demleme sağlayan damlatıcı."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

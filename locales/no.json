@@ -169,7 +169,9 @@
     "methodFrenchPress": "Presskanne",
     "frenchPressDesc": "Klassisk nedsenkingsbrygging med stempel som gir en fyldig munnfølelse.",
     "methodClever": "Clever Dripper",
-    "cleverDesc": "Hybrid mellom nedsenking og dryppfiltrering med bunnventil."
+    "cleverDesc": "Hybrid mellom nedsenking og dryppfiltrering med bunnventil.",
+    "methodKalitaWave": "Kalita Wave",
+    "kalitaWaveDesc": "Flatbunnet kaffetrakt med tre hull som sikrer en jevn og konsistent ekstraksjon."
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
