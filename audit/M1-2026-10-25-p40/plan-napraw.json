@@ -4,95 +4,95 @@
     "perspective": "01-ODK",
     "title": "Semantyczne accessibilityState dla ocen i balansu smaku, radiogroup i limity wejść w BrewFinishModal",
     "file": "src/components/brew/BrewFinishModal.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "7d98ca2"
   },
   {
     "id": "TASK-P40-02-MON",
     "perspective": "02-MON",
     "title": "Resetowanie flag weryfikacji zakupu w setTrialExpiredForTesting",
     "file": "src/core/app-access.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "9b83ae3"
   },
   {
     "id": "TASK-P40-03-ZAK",
     "perspective": "03-ZAK",
     "title": "Dynamiczny fallback do biezacej daty UTC ISO w generateActionIcsContent",
     "file": "src/core/bpr-engine.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "c7d73b4"
   },
   {
     "id": "TASK-P40-04-STU",
     "perspective": "04-STU",
     "title": "Lokalizacja i identyfikatory testID w pasku filtrowania BeanTopBar",
     "file": "src/components/beans/BeanTopBar.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "b0ac1ce"
   },
   {
     "id": "TASK-P40-05-ARC",
     "perspective": "05-ARC",
     "title": "Normalizacja wielkosci liter beverageType w getRecipes",
     "file": "src/core/database.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "08f9ed1"
   },
   {
     "id": "TASK-P40-06-TRE",
     "perspective": "06-TRE",
     "title": "Dodanie ORIGIN_ALIASES dla kodow ISO i wariantow pisowni w findCoffeeOriginById",
     "file": "src/core/knowledge-data.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "31ede75"
   },
   {
     "id": "TASK-P40-07-JAK",
     "perspective": "07-JAK",
     "title": "Rygorystyczne odrzucanie obiektow i tablic w konwerterach twardosci dH i ppm",
     "file": "src/core/water-chemistry.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "3f228ae"
   },
   {
     "id": "TASK-P40-08-PRO",
     "perspective": "08-PRO",
     "title": "Rozpoznawanie ekspresow dzwigniowych Flair, Robot i ROK w getRecipeMicrons",
     "file": "src/core/grinder-converter.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "ff4e136"
   },
   {
     "id": "TASK-P40-09-LOK",
     "perspective": "09-LOK",
     "title": "Dodanie klucza brew.methodFlair w 35 jezykach i rozszerzenie matrycy testow do 827",
     "file": "locales/*",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "9444c8d"
   },
   {
     "id": "TASK-P40-10-WYD",
     "perspective": "10-WYD",
     "title": "Statyczna weryfikacja obecnosci skryptow audytowych w package.json",
     "file": "scripts/verify-native.mjs",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "9c65e9d"
   },
   {
     "id": "TASK-P40-11-WZR",
     "perspective": "11-WZR",
     "title": "Wczesne wyjscie dla nienapisowych wejsc w decodeRecipeFromShareUrl",
     "file": "src/core/recipe-share.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "2273bd2"
   },
   {
     "id": "TASK-P40-12-NIE",
     "perspective": "12-NIE",
     "title": "Clampowanie totalWaterGrams do 50000 w buildLiveActivityPayload",
     "file": "src/core/live-activity.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "1bb5b65"
   }
 ]
