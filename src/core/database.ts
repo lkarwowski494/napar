@@ -631,24 +631,43 @@ export function duplicateRecipe(
 
   const rawDose = recipe.doseGrams ?? recipe.coffeeOrTeaDoseGrams;
   const numDose = typeof rawDose === 'number' ? rawDose : (typeof rawDose === 'string' ? parseFloat(rawDose) : NaN);
-  const doseGrams = Number.isFinite(numDose) && numDose > 0 ? Number(Math.min(1000, numDose).toFixed(1)) : 15;
+  const doseGramsVal = Number.isFinite(numDose) && numDose > 0 ? Number(Math.min(1000, numDose).toFixed(1)) : 15;
+  const doseGrams = Object.is(doseGramsVal, -0) || doseGramsVal <= 0 ? 15 : doseGramsVal;
 
   const rawWater = recipe.waterGrams ?? recipe.waterWeightGrams;
   const numWater = typeof rawWater === 'number' ? rawWater : (typeof rawWater === 'string' ? parseFloat(rawWater) : NaN);
-  const waterGrams = Number.isFinite(numWater) && numWater > 0 ? Number(Math.min(50000, numWater).toFixed(1)) : 250;
+  const waterGramsVal = Number.isFinite(numWater) && numWater > 0 ? Number(Math.min(50000, numWater).toFixed(1)) : 250;
+  const waterGrams = Object.is(waterGramsVal, -0) || waterGramsVal <= 0 ? 250 : waterGramsVal;
 
   const rawTemp = recipe.waterTempCelsius ?? recipe.waterTemperatureCelsius;
   const numTemp = typeof rawTemp === 'number' ? rawTemp : (typeof rawTemp === 'string' ? parseFloat(rawTemp) : NaN);
-  const waterTempCelsius = Number.isFinite(numTemp) && numTemp >= 0 && numTemp <= 100 ? Math.round(numTemp) : 93;
+  const waterTempVal = Number.isFinite(numTemp) && numTemp >= 0 && numTemp <= 100 ? Math.round(numTemp) : 93;
+  const waterTempCelsius = Object.is(waterTempVal, -0) ? 0 : waterTempVal;
 
   const grindSizeDescription = recipe.grindSizeDescription || recipe.grindSettingDescriptionPl || '';
-  const stepsJson = recipe.stepsJson || (recipe.steps ? JSON.stringify(recipe.steps) : '[]');
+
+  let stepsJson = '[]';
+  if (typeof recipe.stepsJson === 'string' && recipe.stepsJson.trim()) {
+    try {
+      JSON.parse(recipe.stepsJson);
+      stepsJson = recipe.stepsJson.trim();
+    } catch {
+      stepsJson = '[]';
+    }
+  } else if (Array.isArray(recipe.steps)) {
+    try {
+      stepsJson = JSON.stringify(recipe.steps);
+    } catch {
+      stepsJson = '[]';
+    }
+  }
 
   const rawRatio = recipe.recommendedRatio;
   const numRatio = typeof rawRatio === 'number' ? rawRatio : (typeof rawRatio === 'string' ? parseFloat(rawRatio) : NaN);
-  const recommendedRatio = Number.isFinite(numRatio) && numRatio > 0
+  const calcRatio = Number.isFinite(numRatio) && numRatio > 0
     ? Number(numRatio.toFixed(2))
     : Number((waterGrams / doseGrams).toFixed(1));
+  const recommendedRatio = Object.is(calcRatio, -0) || calcRatio <= 0 ? 15 : calcRatio;
 
   const author = typeof recipe.author === 'string' && recipe.author.trim()
     ? `${recipe.author.trim()} (Modyfikacja)`

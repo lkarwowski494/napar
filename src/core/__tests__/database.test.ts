@@ -1707,4 +1707,31 @@ describe('Napar SQLite Database & Repositories', () => {
     const updatedBean = getInventoryItemById('bean-tx-str');
     expect(updatedBean?.remainingWeightGrams).toBe(181.5);
   });
+
+  test('TASK-P37-05-ARC: ochrona przed -0 i weryfikacja poprawności JSON dla stepsJson w duplicateRecipe', () => {
+    initDatabase(mockDb as any);
+    const sourceRecipe: any = {
+      id: 'rec-duplicate-test',
+      name: 'Batch Brew',
+      beverageType: 'COFFEE',
+      method: 'Batch Brew',
+      doseGrams: -0,
+      waterGrams: -0,
+      waterTempCelsius: -0,
+      recommendedRatio: -0,
+      stepsJson: 'broken-json-{{{',
+    };
+
+    const cloned = duplicateRecipe(sourceRecipe);
+    expect(cloned.name).toBe('Batch Brew (Kopia)');
+    expect(cloned.doseGrams).toBe(15);
+    expect(cloned.waterGrams).toBe(250);
+    expect(cloned.waterTempCelsius).toBe(0);
+    expect(cloned.recommendedRatio).toBe(16.7);
+    expect(cloned.stepsJson).toBe('[]');
+    expect(Object.is(cloned.doseGrams, -0)).toBe(false);
+    expect(Object.is(cloned.waterGrams, -0)).toBe(false);
+    expect(Object.is(cloned.waterTempCelsius, -0)).toBe(false);
+    expect(Object.is(cloned.recommendedRatio, -0)).toBe(false);
+  });
 });
