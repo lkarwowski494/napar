@@ -239,6 +239,7 @@ export function ProcedureModal({
                 hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel="-1 min"
+                accessibilityHint={isEn ? "Subtracts 60 seconds from current step" : "Odejmuje 60 sekund od bieżącego kroku"}
               >
                 <Text style={styles.adjustChipText}>-1 min</Text>
               </Pressable>
@@ -250,6 +251,7 @@ export function ProcedureModal({
                 hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel="-10 s"
+                accessibilityHint={isEn ? "Subtracts 10 seconds from current step" : "Odejmuje 10 sekund od bieżącego kroku"}
               >
                 <Text style={styles.adjustChipText}>-10 s</Text>
               </Pressable>
@@ -283,6 +285,7 @@ export function ProcedureModal({
                 hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel="+10 s"
+                accessibilityHint={isEn ? "Adds 10 seconds to current step" : "Dodaje 10 sekund do bieżącego kroku"}
               >
                 <Text style={styles.adjustChipText}>+10 s</Text>
               </Pressable>
@@ -294,6 +297,7 @@ export function ProcedureModal({
                 hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel="+1 min"
+                accessibilityHint={isEn ? "Adds 60 seconds to current step" : "Dodaje 60 sekund do bieżącego kroku"}
               >
                 <Text style={styles.adjustChipText}>+1 min</Text>
               </Pressable>

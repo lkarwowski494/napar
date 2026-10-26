@@ -220,4 +220,21 @@ describe('ProcedureModal Component', () => {
     expect(str).toContain('PRZEWODNIK KROK PO KROKU');
     expect(str).toContain('Czas łączny ekstrakcji: 02:05');
   });
+  it('TASK-P25-01-ODK: przyciski korekty czasu posiadają zdefiniowane accessibilityHint', async () => {
+    let tree: any;
+    await act(async () => {
+      tree = renderer.create(<ProcedureModal {...defaultProps} />);
+    });
+
+    const root = tree.root;
+    const sub60 = root.findByProps({ testID: 'procedure-sub-60-btn' });
+    const sub10 = root.findByProps({ testID: 'procedure-sub-10-btn' });
+    const add10 = root.findByProps({ testID: 'procedure-add-10-btn' });
+    const add60 = root.findByProps({ testID: 'procedure-add-60-btn' });
+
+    expect(sub60.props.accessibilityHint).toBeDefined();
+    expect(sub10.props.accessibilityHint).toBeDefined();
+    expect(add10.props.accessibilityHint).toBeDefined();
+    expect(add60.props.accessibilityHint).toBeDefined();
+  });
 });
