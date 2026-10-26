@@ -141,6 +141,14 @@ try {
 
   const manifests = appJson.ios?.privacyManifests;
   check(manifests?.NSPrivacyTracking === false, 'app.json privacyManifests musi mieć NSPrivacyTracking: false');
+  check(
+    Array.isArray(manifests?.NSPrivacyCollectedDataTypes) && manifests.NSPrivacyCollectedDataTypes.length === 0,
+    'app.json privacyManifests.NSPrivacyCollectedDataTypes musi być pustą tablicą (100% Zero Data Collected / Privacy nutrition labels)'
+  );
+  check(
+    Array.isArray(manifests?.NSPrivacyTrackingDomains) && manifests.NSPrivacyTrackingDomains.length === 0,
+    'app.json privacyManifests.NSPrivacyTrackingDomains musi być pustą tablicą (Zero Tracking Domains)'
+  );
   const declaredCategories = manifests?.NSPrivacyAccessedAPITypes?.map((t) => t.NSPrivacyAccessedAPIType) || [];
   for (const cat of [
     'NSPrivacyAccessedAPICategoryUserDefaults',
