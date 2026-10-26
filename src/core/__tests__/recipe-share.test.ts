@@ -1038,4 +1038,20 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decodedRegional?.recipe.waterTempCelsius).toBe(93);
     expect(decodedRegional?.recipe.recommendedRatio).toBe(16.67);
   });
+
+  test('TASK-P43-11-WZR: decodeRecipeFromShareUrl case-insensitively akceptuje coffee i tea w polu b', () => {
+    const lowerCoffeePayload = utf8ToBase64(JSON.stringify({
+      v: 1, n: 'Lower Coffee', b: 'coffee', m: 'V60', d: 15, w: 250,
+    }));
+    const decodedCoffee = decodeRecipeFromShareUrl(lowerCoffeePayload);
+    expect(decodedCoffee).not.toBeNull();
+    expect(decodedCoffee?.recipe.beverageType).toBe('COFFEE');
+
+    const lowerTeaPayload = utf8ToBase64(JSON.stringify({
+      v: 1, n: 'Lower Tea', b: 'tea', m: 'Gaiwan', d: 5, w: 100,
+    }));
+    const decodedTea = decodeRecipeFromShareUrl(lowerTeaPayload);
+    expect(decodedTea).not.toBeNull();
+    expect(decodedTea?.recipe.beverageType).toBe('TEA');
+  });
 });

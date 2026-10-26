@@ -277,6 +277,7 @@ export function decodeRecipeFromShareUrl(
     if (!jsonStr || typeof jsonStr !== 'string' || !jsonStr.trim()) return null;
     const parsed: CompactRecipePayload = JSON.parse(jsonStr.trim());
 
+    const rawB = typeof parsed.b === 'string' ? parsed.b.trim().toUpperCase() : '';
     if (
       !parsed ||
       typeof parsed !== 'object' ||
@@ -285,7 +286,7 @@ export function decodeRecipeFromShareUrl(
       typeof parsed.n !== 'string' ||
       !parsed.n.trim() ||
       parsed.n.length > 200 ||
-      (parsed.b !== 'COFFEE' && parsed.b !== 'TEA') ||
+      (rawB !== 'COFFEE' && rawB !== 'TEA') ||
       !parsed.m ||
       typeof parsed.m !== 'string' ||
       !parsed.m.trim() ||
@@ -336,7 +337,7 @@ export function decodeRecipeFromShareUrl(
     const recipe: SavedRecipe = {
       id: recipeId,
       name: parsed.n.trim().slice(0, 200),
-      beverageType: parsed.b === 'TEA' ? 'TEA' : 'COFFEE',
+      beverageType: rawB === 'TEA' ? 'TEA' : 'COFFEE',
       method: parsed.m.trim().slice(0, 50),
       author: typeof parsed.a === 'string' && parsed.a.trim() ? parsed.a.trim().slice(0, 100) : defaultAuthor,
       description: typeof parsed.desc === 'string' && parsed.desc.trim() ? parsed.desc.trim().slice(0, 1000) : defaultDesc,
