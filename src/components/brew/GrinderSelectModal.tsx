@@ -34,6 +34,10 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
   recipe,
   t,
 }) => {
+  if (!visible) return null;
+
+  const recLabel = t?.grinder?.recommendationLabel || (t?.common?.save ? 'Rekomendacja:' : 'Recommendation:');
+
   return (
     <Modal visible={visible} animationType="slide">
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
@@ -67,7 +71,8 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
                   onSelectGrinder(grinder.id);
                   onClose();
                 }}
-                accessibilityRole="button"
+                accessibilityRole="radio"
+                accessibilityState={{ selected: isSelected }}
                 accessibilityLabel={`${grinder.name}, ${rec.formatted}`}
               >
                 <View style={{ flex: 1 }}>
@@ -83,7 +88,7 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
                     {grinder.name}
                   </Text>
                   <Text style={styles.grinderItemRecommendation}>
-                    Rekomendacja: {rec.formatted} ({rec.microns} µm)
+                    {recLabel} {rec.formatted} ({rec.microns} µm)
                   </Text>
                 </View>
                 {isSelected ? (
