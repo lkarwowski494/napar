@@ -283,4 +283,22 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(getKnowledgeSensoryProfile('origin-ethiopia', 'pl')).toContain('jaśmin');
     expect(getKnowledgeSensoryProfile('origin-ethiopia', 'en')).toContain('jasmine');
   });
+
+  test('TASK-P11-06-TRE: searchCoffeeOrigins i searchTeaCategories przeszukują pola opisowe descriptionPl i descriptionEn', () => {
+    // Terroir - wyszukiwanie po słowach obecnych w descriptionPl / descriptionEn
+    const byOriginDescPl = searchCoffeeOrigins('kolebka');
+    expect(byOriginDescPl.length).toBeGreaterThanOrEqual(1);
+    expect(byOriginDescPl[0].id).toBe('origin-ethiopia');
+
+    const byOriginDescEn = searchCoffeeOrigins('birthplace');
+    expect(byOriginDescEn.length).toBeGreaterThanOrEqual(1);
+    expect(byOriginDescEn[0].id).toBe('origin-ethiopia');
+
+    // Herbata - wyszukiwanie po słowach obecnych w descriptionPl / descriptionEn
+    const byTeaDescPl = searchTeaCategories('liści');
+    expect(byTeaDescPl.length).toBeGreaterThanOrEqual(1);
+
+    const byTeaDescEn = searchTeaCategories('leaves');
+    expect(byTeaDescEn.length).toBeGreaterThanOrEqual(1);
+  });
 });

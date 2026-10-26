@@ -604,7 +604,9 @@ export function searchCoffeeOrigins(query: string): CoffeeOriginInfo[] {
     o.flavorProfilePl.toLowerCase().includes(q) ||
     o.flavorProfileEn.toLowerCase().includes(q) ||
     o.keyNotesPl.some((k) => k.toLowerCase().includes(q)) ||
-    o.keyNotesEn.some((k) => k.toLowerCase().includes(q))
+    o.keyNotesEn.some((k) => k.toLowerCase().includes(q)) ||
+    (o.descriptionPl && o.descriptionPl.toLowerCase().includes(q)) ||
+    (o.descriptionEn && o.descriptionEn.toLowerCase().includes(q))
   );
 }
 
@@ -619,7 +621,9 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
     (t.famousVarietiesEn && t.famousVarietiesEn.some((v) => v.toLowerCase().includes(q))) ||
     t.famousRegions.some((r) => r.toLowerCase().includes(q)) ||
     t.sensoryProfilePl.toLowerCase().includes(q) ||
-    t.sensoryProfileEn.toLowerCase().includes(q)
+    t.sensoryProfileEn.toLowerCase().includes(q) ||
+    (t.descriptionPl && t.descriptionPl.toLowerCase().includes(q)) ||
+    (t.descriptionEn && t.descriptionEn.toLowerCase().includes(q))
   );
 }
 
