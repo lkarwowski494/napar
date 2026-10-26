@@ -402,4 +402,15 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     const emptyRes = searchCoffeeProcesses('   ');
     expect(emptyRes).toHaveLength(COFFEE_PROCESSES.length);
   });
+  test('TASK-P22-06-TRE: findCoffeeOriginById i findTeaCategoryById bezpiecznie zwracają undefined dla nie-stringów i whitespace', () => {
+    expect(findCoffeeOriginById(null as any)).toBeUndefined();
+    expect(findCoffeeOriginById(undefined as any)).toBeUndefined();
+    expect(findCoffeeOriginById(12345 as any)).toBeUndefined();
+    expect(findCoffeeOriginById('   ')).toBeUndefined();
+
+    expect(findTeaCategoryById(null as any)).toBeUndefined();
+    expect(findTeaCategoryById(undefined as any)).toBeUndefined();
+    expect(findTeaCategoryById({} as any)).toBeUndefined();
+    expect(findTeaCategoryById('   ')).toBeUndefined();
+  });
 });

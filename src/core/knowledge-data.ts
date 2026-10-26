@@ -645,27 +645,27 @@ export function searchTeaCategories(query: string): TeaCategoryInfo[] {
 }
 
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
-  if (!id || typeof id !== 'string') return undefined;
+  if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return COFFEE_VARIETIES.find((v) => v.id.toLowerCase() === cleanId);
+  return COFFEE_VARIETIES.find((v) => v.id && v.id.toLowerCase() === cleanId);
 }
 
 export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined {
-  if (!id || typeof id !== 'string') return undefined;
+  if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return COFFEE_PROCESSES.find((p) => p.id.toLowerCase() === cleanId);
+  return COFFEE_PROCESSES.find((p) => p.id && p.id.toLowerCase() === cleanId);
 }
 
 export function findCoffeeOriginById(id: string): CoffeeOriginInfo | undefined {
-  if (!id || typeof id !== 'string') return undefined;
+  if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return COFFEE_ORIGINS.find((o) => o.id.toLowerCase() === cleanId);
+  return COFFEE_ORIGINS.find((o) => o.id && o.id.toLowerCase() === cleanId);
 }
 
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
-  if (!id || typeof id !== 'string') return undefined;
+  if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
-  return TEA_CATEGORIES.find((t) => t.id.toLowerCase() === cleanId);
+  return TEA_CATEGORIES.find((t) => t.id && t.id.toLowerCase() === cleanId);
 }
 
 export function getKnowledgeDescription(id: string, lang: 'pl' | 'en' = 'pl'): string {
