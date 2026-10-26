@@ -742,4 +742,45 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(parsed.productId).toBe('pl.lukasz.napar.annual');
     expect(parsed.transactionId).toBe('tx-12345');
   });
+
+  test('TASK-P43-02-MON: restorePurchases sanityzuje pola paragonu a verifyAndActivateStoreKitPurchase dopasowuje case-insensitively', () => {
+    resetTrialForTesting();
+    // Test case-insensitivity w verifyAndActivateStoreKitPurchase
+    const upperReceipt = {
+      productId: 'PL.LUKASZ.NAPAR.MONTHLY',
+      transactionId: 'TX-UPPER-123',
+      purchaseDate: '2026-10-26T12:00:00.000Z',
+      signature: 'SIG-UPPER-123',
+    };
+    const resUpper = verifyAndActivateStoreKitPurchase(upperReceipt as any);
+    expect(resUpper.success).toBe(true);
+    expect(resUpper.tier).toBe('monthly');
+    expect(resUpper.receipt?.productId).toBe('pl.lukasz.napar.monthly');
+
+    // Test odporności restorePurchases na uszkodzony receipt JSON (np. tablica lub brakujące pola)
+    const { setAppSetting } = require('../database');
+    setAppSetting('has_verified_purchase', 'true');
+    setAppSetting('verified_purchase_tier', 'lifetime');
+    setAppSetting('verified_receipt_json', JSON.stringify([1, 2, 3]));
+
+    const restoredWithBadJson = restorePurchases();
+    expect(restoredWithBadJson.restored).toBe(true);
+    expect(restoredWithBadJson.receipt).toBeUndefined();
+
+    // Poprawny obiekt paragonu
+    setAppSetting(
+      'verified_receipt_json',
+      JSON.stringify({
+        productId: '  pl.lukasz.napar.lifetime  ',
+        transactionId: '  tx-restored-99  ',
+        purchaseDate: '  2026-10-26T14:00:00.000Z  ',
+        signature: '  sig-restored-99  ',
+      })
+    );
+    const restoredGood = restorePurchases();
+    expect(restoredGood.restored).toBe(true);
+    expect(restoredGood.receipt?.productId).toBe('pl.lukasz.napar.lifetime');
+    expect(restoredGood.receipt?.transactionId).toBe('tx-restored-99');
+    expect(restoredGood.receipt?.signature).toBe('sig-restored-99');
+  });
 });

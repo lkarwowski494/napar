@@ -233,8 +233,25 @@ export function restorePurchases(): RestorePurchasesResult {
     if (receiptJson) {
       try {
         const parsed = JSON.parse(receiptJson);
-        if (parsed && typeof parsed === 'object' && parsed.signature) {
-          receipt = parsed as StoreKitReceipt;
+        if (
+          parsed &&
+          typeof parsed === 'object' &&
+          !Array.isArray(parsed) &&
+          typeof parsed.productId === 'string' &&
+          parsed.productId.trim() &&
+          typeof parsed.transactionId === 'string' &&
+          parsed.transactionId.trim() &&
+          typeof parsed.purchaseDate === 'string' &&
+          parsed.purchaseDate.trim() &&
+          typeof parsed.signature === 'string' &&
+          parsed.signature.trim()
+        ) {
+          receipt = {
+            productId: parsed.productId.trim(),
+            transactionId: parsed.transactionId.trim(),
+            purchaseDate: parsed.purchaseDate.trim(),
+            signature: parsed.signature.trim(),
+          };
         }
       } catch {
         // Ignoruj błąd parsowania
@@ -280,11 +297,11 @@ export function verifyAndActivateStoreKitPurchase(
       errorCode: 'invalid_signature',
     };
   }
-  const cleanProductId = typeof receipt.productId === 'string' ? receipt.productId.trim() : '';
+  const cleanProductId = typeof receipt.productId === 'string' ? receipt.productId.trim().toLowerCase() : '';
   let tier: 'monthly' | 'annual' | 'lifetime' | null = null;
-  if (cleanProductId === STORE_PRODUCT_IDS.monthly) tier = 'monthly';
-  else if (cleanProductId === STORE_PRODUCT_IDS.annual) tier = 'annual';
-  else if (cleanProductId === STORE_PRODUCT_IDS.lifetime) tier = 'lifetime';
+  if (cleanProductId === STORE_PRODUCT_IDS.monthly.toLowerCase()) tier = 'monthly';
+  else if (cleanProductId === STORE_PRODUCT_IDS.annual.toLowerCase()) tier = 'annual';
+  else if (cleanProductId === STORE_PRODUCT_IDS.lifetime.toLowerCase()) tier = 'lifetime';
 
   if (!tier) {
     return {
