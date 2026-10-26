@@ -9,12 +9,26 @@ export function DripperExtractionGauge({
   currentStepIndex: number;
   totalSteps: number;
 }) {
-  const percent = Math.min(100, Math.max(0, Math.round(stepProgress * 100)));
+  const rawProgress = typeof stepProgress === 'number' ? stepProgress : (typeof stepProgress === 'string' ? parseFloat(stepProgress) : 0);
+  const safeProgress = Number.isFinite(rawProgress) && !Object.is(rawProgress, -0) ? rawProgress : 0;
+  const rawPercent = Math.min(100, Math.max(0, Math.round(safeProgress * 100)));
+  const percent = Object.is(rawPercent, -0) ? 0 : rawPercent;
+
+  const rawWater = typeof targetWaterGrams === 'number' ? targetWaterGrams : (typeof targetWaterGrams === 'string' ? parseFloat(targetWaterGrams) : 0);
+  const safeWater = Number.isFinite(rawWater) && rawWater >= 0 && !Object.is(rawWater, -0) ? Math.round(rawWater) : 0;
+
   return (
-    <View style={styles.gaugeContainer} testID="dripper-extraction-gauge">
+    <View
+      style={styles.gaugeContainer}
+      testID="dripper-extraction-gauge"
+      accessible={true}
+      accessibilityRole="progressbar"
+      accessibilityValue={{ min: 0, max: 100, now: percent }}
+      accessibilityLabel={`Postęp ekstrakcji: ${percent}%, docelowo ${safeWater} g`}
+    >
       <View style={styles.gaugeHeader}>
         <Text style={styles.gaugeLabel}>EKSTRAKCJA & PRZEPŁYW</Text>
-        <Text style={styles.gaugePercent}>{percent}% ({targetWaterGrams}g)</Text>
+        <Text style={styles.gaugePercent}>{percent}% ({safeWater}g)</Text>
       </View>
       <View style={styles.stepProgressContainer}>
         <View style={[styles.stepProgressBar, { width: `${percent}%` }]} />

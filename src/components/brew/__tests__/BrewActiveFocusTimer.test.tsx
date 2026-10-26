@@ -4,7 +4,7 @@
 
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { BrewActiveFocusTimer } from '../BrewActiveFocusTimer';
+import { BrewActiveFocusTimer, DripperExtractionGauge } from '../BrewActiveFocusTimer';
 
 describe('BrewActiveFocusTimer Component', () => {
   const defaultSnapshot = {
@@ -204,5 +204,42 @@ describe('BrewActiveFocusTimer Component', () => {
 
     const add10Btn = tree.root.findByProps({ testID: 'adjust-time-add10-btn' });
     expect(add10Btn.props.accessibilityHint).toContain('10');
+  });
+
+  test('TASK-P42-01-ODK: DripperExtractionGauge posiada accessibilityRole progressbar i chroni przed NaN oraz -0', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <DripperExtractionGauge
+          stepProgress={0.45}
+          targetWaterGrams={150}
+          currentStepIndex={1}
+          totalSteps={3}
+        />
+      );
+    });
+
+    const gauge = tree.root.findByProps({ testID: 'dripper-extraction-gauge' });
+    expect(gauge.props.accessible).toBe(true);
+    expect(gauge.props.accessibilityRole).toBe('progressbar');
+    expect(gauge.props.accessibilityValue).toEqual({ min: 0, max: 100, now: 45 });
+    expect(gauge.props.accessibilityLabel).toBe('Postęp ekstrakcji: 45%, docelowo 150 g');
+
+    // Edge case: NaN / -0
+    let treeEdge: any;
+    act(() => {
+      treeEdge = renderer.create(
+        <DripperExtractionGauge
+          stepProgress={-0 as any}
+          targetWaterGrams={-0 as any}
+          currentStepIndex={0}
+          totalSteps={1}
+        />
+      );
+    });
+
+    const gaugeEdge = treeEdge.root.findByProps({ testID: 'dripper-extraction-gauge' });
+    expect(gaugeEdge.props.accessibilityValue).toEqual({ min: 0, max: 100, now: 0 });
+    expect(gaugeEdge.props.accessibilityLabel).toBe('Postęp ekstrakcji: 0%, docelowo 0 g');
   });
 });
