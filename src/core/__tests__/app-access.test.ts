@@ -379,4 +379,23 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(result.receipt?.transactionId).toBe('TX-VERIFIED-RESTORE-1');
     expect(result.receipt?.signature).toBe('RESTORE_SIG_123');
   });
+
+  test('TASK-P15-02-MON: useAppAccess().purchaseWithStoreKit synchronizuje stan hooka', () => {
+    resetTrialForTesting();
+    let hookData: any;
+    function TestComponent() {
+      hookData = useAppAccess();
+      return null;
+    }
+    act(() => {
+      renderer.create(React.createElement(TestComponent));
+    });
+    expect(hookData.status).toBe('trial_active');
+
+    act(() => {
+      hookData.purchaseWithStoreKit('monthly');
+    });
+    expect(hookData.status).toBe('subscribed');
+    expect(hookData.isSubscribed).toBe(true);
+  });
 });

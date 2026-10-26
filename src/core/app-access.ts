@@ -331,6 +331,14 @@ export function useAppAccess() {
     return res.restored;
   };
 
+  const purchase = (tier: 'monthly' | 'annual' | 'lifetime' = 'annual'): StoreKitVerificationResult => {
+    const res = purchaseWithStoreKit(tier);
+    if (res.success) {
+      setAccess(getAppAccessState());
+    }
+    return res;
+  };
+
   const recordBrew = () => {
     const updated = recordBrewCompleted();
     setAccess(updated);
@@ -340,7 +348,8 @@ export function useAppAccess() {
     ...access,
     refresh,
     subscribe,
-    purchaseWithStoreKit,
+    purchaseWithStoreKit: purchase,
+    purchase,
     restore,
     recordBrew,
   };
