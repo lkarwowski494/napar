@@ -754,4 +754,15 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeOriginById('brazylia')?.id).toBe('origin-brazil');
     expect(findCoffeeOriginById('pan')?.id).toBe('origin-panama');
   });
+
+  test('TASK-P41-06-TRE: findCoffeeVarietyById wspiera odmiany batian, ruiru-11, sidra, wush-wush, chiroso oraz tabi', () => {
+    expect(findCoffeeVarietyById('batian')?.id).toBe('variety-sl28-sl34');
+    expect(findCoffeeVarietyById('ruiru-11')?.id).toBe('variety-sl28-sl34');
+    expect(findCoffeeVarietyById('ruiru 11')?.id).toBe('variety-sl28-sl34');
+    expect(findCoffeeVarietyById('sidra')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('wush-wush')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('wushwush')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('chiroso')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('tabi')?.id).toBe('variety-castillo-colombia');
+  });
 });

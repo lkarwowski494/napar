@@ -671,6 +671,16 @@ const VARIETY_ALIASES: Record<string, string> = {
   eugenioides: 'variety-eugenioides',
   pinkbourbon: 'variety-pink-bourbon',
   'pink-bourbon': 'variety-pink-bourbon',
+  batian: 'variety-sl28-sl34',
+  ruiru11: 'variety-sl28-sl34',
+  'ruiru-11': 'variety-sl28-sl34',
+  'ruiru 11': 'variety-sl28-sl34',
+  sidra: 'variety-bourbon',
+  wushwush: 'variety-ethiopian-landraces',
+  'wush-wush': 'variety-ethiopian-landraces',
+  'wush wush': 'variety-ethiopian-landraces',
+  chiroso: 'variety-ethiopian-landraces',
+  tabi: 'variety-castillo-colombia',
 };
 
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
