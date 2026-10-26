@@ -21,7 +21,9 @@
     "seconds": "sn",
     "celsius": "°C",
     "modalClose": "Pencereyi kapat",
-    "saveSuccess": "Başarıyla kaydedildi"
+    "saveSuccess": "Başarıyla kaydedildi",
+    "coffeeBeans": "Çekirdek kahve",
+    "looseLeafTea": "Açık yaprak çay"
   },
   "tabs": {
     "brew": "Demle",

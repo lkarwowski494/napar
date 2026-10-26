@@ -21,7 +21,9 @@
     "seconds": "วินาที",
     "celsius": "°C",
     "modalClose": "ปิดหน้าต่าง",
-    "saveSuccess": "บันทึกสำเร็จ"
+    "saveSuccess": "บันทึกสำเร็จ",
+    "coffeeBeans": "เมล็ดกาแฟเต็มเมล็ด",
+    "looseLeafTea": "ชาใบชง"
   },
   "tabs": {
     "brew": "ชง",

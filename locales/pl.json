@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Zamknij okno",
-    "saveSuccess": "Zapisano pomyślnie"
+    "saveSuccess": "Zapisano pomyślnie",
+    "coffeeBeans": "Kawa ziarnista",
+    "looseLeafTea": "Herbata liściasta"
   },
   "tabs": {
     "brew": "Parzenie",

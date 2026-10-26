@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Chiudi finestra",
-    "saveSuccess": "Salvato con successo"
+    "saveSuccess": "Salvato con successo",
+    "coffeeBeans": "Caffè in grani",
+    "looseLeafTea": "Tè in foglie"
   },
   "tabs": {
     "brew": "Estrazione",

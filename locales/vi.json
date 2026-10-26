@@ -21,7 +21,9 @@
     "seconds": "giây",
     "celsius": "°C",
     "modalClose": "Đóng cửa sổ",
-    "saveSuccess": "Đã lưu thành công"
+    "saveSuccess": "Đã lưu thành công",
+    "coffeeBeans": "Cà phê nguyên hạt",
+    "looseLeafTea": "Trà rời"
   },
   "tabs": {
     "brew": "Pha chế",

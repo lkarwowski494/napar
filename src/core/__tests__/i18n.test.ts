@@ -301,4 +301,11 @@ describe('i18n System', () => {
     expect(translations.pl.brew.recipeSearchPlaceholder).toContain('Szukaj receptury');
     expect(translations.en.brew.recipeSearchPlaceholder).toContain('Search recipes');
   });
+
+  test('TASK-P23-09-LOK: Klucze coffeeBeans i looseLeafTea są zdefiniowane w common w PL i EN', () => {
+    expect(translations.pl.common.coffeeBeans).toBe('Kawa ziarnista');
+    expect(translations.en.common.coffeeBeans).toBe('Whole bean coffee');
+    expect(translations.pl.common.looseLeafTea).toBe('Herbata liściasta');
+    expect(translations.en.common.looseLeafTea).toBe('Loose leaf tea');
+  });
 });

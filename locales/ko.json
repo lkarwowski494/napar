@@ -21,7 +21,9 @@
     "seconds": "초",
     "celsius": "°C",
     "modalClose": "창 닫기",
-    "saveSuccess": "성공적으로 저장되었습니다"
+    "saveSuccess": "성공적으로 저장되었습니다",
+    "coffeeBeans": "홀빈 원두커피",
+    "looseLeafTea": "잎차"
   },
   "tabs": {
     "brew": "추출",

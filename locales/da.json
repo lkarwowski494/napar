@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Luk vindue",
-    "saveSuccess": "Gemt"
+    "saveSuccess": "Gemt",
+    "coffeeBeans": "Hele kaffebønner",
+    "looseLeafTea": "Løs te"
   },
   "tabs": {
     "brew": "Bryg",

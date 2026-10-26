@@ -21,7 +21,9 @@
     "seconds": "秒",
     "celsius": "°C",
     "modalClose": "ウィンドウを閉じる",
-    "saveSuccess": "正常に保存されました"
+    "saveSuccess": "正常に保存されました",
+    "coffeeBeans": "ホールビーンコーヒー",
+    "looseLeafTea": "リーフティー"
   },
   "tabs": {
     "brew": "抽出",

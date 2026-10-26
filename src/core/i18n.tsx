@@ -46,6 +46,8 @@ export const translations = {
       celsius: '°C',
       modalClose: 'Zamknij okno',
       saveSuccess: 'Zapisano pomyślnie',
+      coffeeBeans: 'Kawa ziarnista',
+      looseLeafTea: 'Herbata liściasta',
     },
     tabs: {
       brew: 'Parzenie',
@@ -626,6 +628,8 @@ export const translations = {
       celsius: '°C',
       modalClose: 'Close window',
       saveSuccess: 'Saved successfully',
+      coffeeBeans: 'Whole bean coffee',
+      looseLeafTea: 'Loose leaf tea',
     },
     tabs: {
       brew: 'Brew',

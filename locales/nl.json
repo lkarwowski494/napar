@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Venster sluiten",
-    "saveSuccess": "Succesvol opgeslagen"
+    "saveSuccess": "Succesvol opgeslagen",
+    "coffeeBeans": "Koffiebonen",
+    "looseLeafTea": "Losse thee"
   },
   "tabs": {
     "brew": "Zetten",

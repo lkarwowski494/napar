@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Închide fereastra",
-    "saveSuccess": "Salvat cu succes"
+    "saveSuccess": "Salvat cu succes",
+    "coffeeBeans": "Cafea boabe",
+    "looseLeafTea": "Ceai vrac"
   },
   "tabs": {
     "brew": "Preparare",

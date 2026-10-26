@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Close window",
-    "saveSuccess": "Saved successfully"
+    "saveSuccess": "Saved successfully",
+    "coffeeBeans": "Whole bean coffee",
+    "looseLeafTea": "Loose leaf tea"
   },
   "tabs": {
     "brew": "Brew",

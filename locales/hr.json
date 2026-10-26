@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Zatvori prozor",
-    "saveSuccess": "Uspješno spremljeno"
+    "saveSuccess": "Uspješno spremljeno",
+    "coffeeBeans": "Kava u zrnu",
+    "looseLeafTea": "Čaj u rinfuzi"
   },
   "tabs": {
     "brew": "Priprema",

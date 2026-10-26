@@ -21,7 +21,9 @@
     "seconds": "שניות",
     "celsius": "°C",
     "modalClose": "סגור חלון",
-    "saveSuccess": "נשמר בהצלחה"
+    "saveSuccess": "נשמר בהצלחה",
+    "coffeeBeans": "פולי קפה שלמים",
+    "looseLeafTea": "תה בתפזורת"
   },
   "tabs": {
     "brew": "חליטה",

@@ -21,7 +21,9 @@
     "seconds": "сек",
     "celsius": "°C",
     "modalClose": "Затвори прозореца",
-    "saveSuccess": "Успешно запазено"
+    "saveSuccess": "Успешно запазено",
+    "coffeeBeans": "Кафе на зърна",
+    "looseLeafTea": "Насипен чай"
   },
   "tabs": {
     "brew": "Приготвяне",

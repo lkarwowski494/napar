@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "विंडो बंद करें",
-    "saveSuccess": "सफलतापूर्वक सहेजा गया"
+    "saveSuccess": "सफलतापूर्वक सहेजा गया",
+    "coffeeBeans": "साबुत कॉफी बीन्स",
+    "looseLeafTea": "खुली चाय पत्ती"
   },
   "tabs": {
     "brew": "ब्रू",

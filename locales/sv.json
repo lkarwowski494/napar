@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Stäng fönster",
-    "saveSuccess": "Sparat"
+    "saveSuccess": "Sparat",
+    "coffeeBeans": "Hela kaffebönor",
+    "looseLeafTea": "Löst te"
   },
   "tabs": {
     "brew": "Brygg",

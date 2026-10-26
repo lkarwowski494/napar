@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Tutup tetingkap",
-    "saveSuccess": "Berjaya disimpan"
+    "saveSuccess": "Berjaya disimpan",
+    "coffeeBeans": "Kopi biji penuh",
+    "looseLeafTea": "Teh daun longgar"
   },
   "tabs": {
     "brew": "Bancuh",

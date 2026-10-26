@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Fermer la fenêtre",
-    "saveSuccess": "Enregistré avec succès"
+    "saveSuccess": "Enregistré avec succès",
+    "coffeeBeans": "Café en grains",
+    "looseLeafTea": "Thé en vrac"
   },
   "tabs": {
     "brew": "Infusion",

@@ -21,7 +21,9 @@
     "seconds": "сек",
     "celsius": "°C",
     "modalClose": "Закрити вікно",
-    "saveSuccess": "Успішно збережено"
+    "saveSuccess": "Успішно збережено",
+    "coffeeBeans": "Зернова кава",
+    "looseLeafTea": "Листовий чай"
   },
   "tabs": {
     "brew": "Заварювання",

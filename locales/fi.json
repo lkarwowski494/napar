@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Sulje ikkuna",
-    "saveSuccess": "Tallennettu onnistuneesti"
+    "saveSuccess": "Tallennettu onnistuneesti",
+    "coffeeBeans": "Kokonaiset kahvipavut",
+    "looseLeafTea": "Irtotee"
   },
   "tabs": {
     "brew": "Uutto",

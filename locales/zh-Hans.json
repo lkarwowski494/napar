@@ -21,7 +21,9 @@
     "seconds": "秒",
     "celsius": "°C",
     "modalClose": "关闭窗口",
-    "saveSuccess": "保存成功"
+    "saveSuccess": "保存成功",
+    "coffeeBeans": "全豆咖啡",
+    "looseLeafTea": "散装原叶茶"
   },
   "tabs": {
     "brew": "冲煮",

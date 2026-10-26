@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Zavrieť okno",
-    "saveSuccess": "Úspešne uložené"
+    "saveSuccess": "Úspešne uložené",
+    "coffeeBeans": "Zrnková káva",
+    "looseLeafTea": "Sypaný čaj"
   },
   "tabs": {
     "brew": "Príprava",

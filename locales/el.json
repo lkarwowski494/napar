@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Κλείσιμο παραθύρου",
-    "saveSuccess": "Αποθηκεύτηκε επιτυχώς"
+    "saveSuccess": "Αποθηκεύτηκε επιτυχώς",
+    "coffeeBeans": "Κόκκοι καφέ",
+    "looseLeafTea": "Τσάι χύμα"
   },
   "tabs": {
     "brew": "Εκχύλιση",

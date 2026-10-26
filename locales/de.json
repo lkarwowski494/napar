@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Fenster schließen",
-    "saveSuccess": "Erfolgreich gespeichert"
+    "saveSuccess": "Erfolgreich gespeichert",
+    "coffeeBeans": "Ganze Kaffeebohnen",
+    "looseLeafTea": "Loser Tee"
   },
   "tabs": {
     "brew": "Brühen",

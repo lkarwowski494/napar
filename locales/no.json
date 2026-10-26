@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Lukk vindu",
-    "saveSuccess": "Lagret"
+    "saveSuccess": "Lagret",
+    "coffeeBeans": "Hele kaffebønner",
+    "looseLeafTea": "Løs te"
   },
   "tabs": {
     "brew": "Brygg",

@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Ablak bezárása",
-    "saveSuccess": "Sikeresen mentve"
+    "saveSuccess": "Sikeresen mentve",
+    "coffeeBeans": "Szemes kávé",
+    "looseLeafTea": "Szálas tea"
   },
   "tabs": {
     "brew": "Készítés",

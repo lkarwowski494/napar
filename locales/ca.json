@@ -21,7 +21,9 @@
     "seconds": "s",
     "celsius": "°C",
     "modalClose": "Tancar finestra",
-    "saveSuccess": "Desat amb èxit"
+    "saveSuccess": "Desat amb èxit",
+    "coffeeBeans": "Cafè en gra",
+    "looseLeafTea": "Té a granel"
   },
   "tabs": {
     "brew": "Infusió",

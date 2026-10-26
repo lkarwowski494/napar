@@ -21,7 +21,9 @@
     "seconds": "ث",
     "celsius": "°C",
     "modalClose": "إغلاق النافذة",
-    "saveSuccess": "تم الحفظ بنجاح"
+    "saveSuccess": "تم الحفظ بنجاح",
+    "coffeeBeans": "حبوب البن الكاملة",
+    "looseLeafTea": "شاي أوراق مفردة"
   },
   "tabs": {
     "brew": "تحضير",
