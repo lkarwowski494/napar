@@ -194,4 +194,28 @@ describe('BrewFinishModal Component', () => {
     expect(str).toContain('Koszt tego naparu: 0.00 PLN');
     expect(str).toContain('+0.00 PLN');
   });
+
+  test('TASK-P46-01-ODK: accessibilityValue dla ocen gwiazdkowych oraz obsluga przecinka dziesietnego w waterGrams i clampowanie formatTime', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewFinishModal
+          {...defaultProps}
+          waterGrams={'250,5' as any}
+          rating={'4' as any}
+          totalElapsedSeconds={90000} // clamp to 86400 -> 1440:00
+        />
+      );
+    });
+
+    const starRow = tree.root.findByProps({ testID: 'star-rating-row' });
+    expect(starRow.props.accessibilityValue).toEqual({ min: 1, max: 5, now: 4 });
+
+    const star4 = tree.root.findByProps({ testID: 'star-rating-4' });
+    expect(star4.props.accessibilityValue).toEqual({ min: 1, max: 5, now: 4 });
+
+    const str = JSON.stringify(tree.toJSON());
+    expect(str).toContain('Woda: 251g');
+    expect(str).toContain('Czas: 1440:00');
+  });
 });

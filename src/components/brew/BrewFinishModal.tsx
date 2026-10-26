@@ -81,17 +81,17 @@ export function BrewFinishModal({
 
   const formatTime = (seconds: number) => {
     const rawS = typeof seconds === 'number' ? seconds : (typeof seconds === 'string' ? parseFloat(seconds) : 0);
-    const s = Number.isFinite(rawS) && rawS > 0 ? Math.floor(rawS) : 0;
+    const s = Number.isFinite(rawS) && rawS > 0 && !Object.is(rawS, -0) ? Math.min(86400, Math.floor(rawS)) : 0;
     const mins = Math.floor(s / 60);
     const secs = s % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const rawWater = typeof waterGrams === 'number' ? waterGrams : (typeof waterGrams === 'string' ? parseFloat(waterGrams) : 0);
-  const safeWater = Number.isFinite(rawWater) && rawWater > 0 ? Math.round(rawWater) : 0;
+  const rawWater = typeof waterGrams === 'number' ? waterGrams : (typeof waterGrams === 'string' ? parseFloat(waterGrams.replace(/,/g, '.')) : 0);
+  const safeWater = Number.isFinite(rawWater) && rawWater > 0 && !Object.is(rawWater, -0) ? Math.min(50000, Math.round(rawWater)) : 0;
 
   const rawRating = typeof rating === 'number' ? rating : (typeof rating === 'string' ? parseFloat(rating) : 0);
-  const safeRating = Number.isFinite(rawRating) && rawRating > 0 ? Math.max(0, Math.min(5, Math.floor(rawRating))) : 0;
+  const safeRating = Number.isFinite(rawRating) && rawRating > 0 && !Object.is(rawRating, -0) ? Math.max(0, Math.min(5, Math.floor(rawRating))) : 0;
 
   const getSafeNum = (val: unknown, fallback = 0) => {
     const n = typeof val === 'number' ? val : (typeof val === 'string' ? parseFloat(val) : fallback);
@@ -127,6 +127,7 @@ export function BrewFinishModal({
               accessible={true}
               accessibilityRole="radiogroup"
               accessibilityLabel={t.brew?.yourRating || 'Twoja Ocena'}
+              accessibilityValue={{ min: 1, max: 5, now: safeRating }}
             >
               {[1, 2, 3, 4, 5].map((s) => (
                 <Pressable
@@ -135,6 +136,7 @@ export function BrewFinishModal({
                   onPress={() => onChangeRating(s)}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: safeRating >= s }}
+                  accessibilityValue={{ min: 1, max: 5, now: s }}
                   accessibilityLabel={(t.brew?.starRatingLabel || (language === 'pl' ? 'Ocena {rating} z 5' : 'Rating {rating} of 5')).replace('{rating}', String(s))}
                 >
                   <Text style={[styles.starIcon, safeRating >= s && styles.starActive]}>
