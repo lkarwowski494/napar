@@ -732,4 +732,25 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(steps[1].durationSeconds).toBe(30);
     expect(steps[1].targetWaterGrams).toBe(0);
   });
+
+  test('TASK-P31-11-WZR: recipeToCompactPayload parsuje numeryczne stringi dozy i wody', () => {
+    const recipeWithStrings: any = {
+      id: 'string-dose-recipe',
+      name: 'String Test',
+      beverageType: 'COFFEE',
+      method: 'Aeropress',
+      doseGrams: '16.5',
+      waterGrams: '220.0',
+      waterTempCelsius: '88',
+      recommendedRatio: '13.3',
+      isFavorite: false,
+      stepsJson: '[]',
+      isCustom: true,
+      createdAt: '2026-10-26T12:00:00Z',
+    };
+    const payload = recipeToCompactPayload(recipeWithStrings);
+    expect(payload.d).toBe(16.5);
+    expect(payload.w).toBe(220);
+    expect(payload.t).toBe(88);
+  });
 });

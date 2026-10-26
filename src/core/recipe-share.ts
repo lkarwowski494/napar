@@ -171,10 +171,12 @@ export function recipeToCompactPayload(
     : (recipe as MasterRecipe).grindSettingDescriptionPl;
   const rawRatio = recipe.recommendedRatio;
 
+  const parsedDose = typeof rawDose === 'number' ? rawDose : (typeof rawDose === 'string' ? parseFloat(rawDose) : NaN);
+  const parsedWater = typeof rawWater === 'number' ? rawWater : (typeof rawWater === 'string' ? parseFloat(rawWater) : NaN);
   const dose =
-    Number.isFinite(rawDose) && rawDose > 0 ? Number(Math.min(1000, rawDose).toFixed(1)) : 15;
+    Number.isFinite(parsedDose) && parsedDose > 0 ? Number(Math.min(1000, parsedDose).toFixed(1)) : 15;
   const water =
-    Number.isFinite(rawWater) && rawWater > 0 ? Number(Math.min(50000, rawWater).toFixed(1)) : 250;
+    Number.isFinite(parsedWater) && parsedWater > 0 ? Number(Math.min(50000, parsedWater).toFixed(1)) : 250;
   const parsedTemp = typeof rawTemp === 'number' ? rawTemp : (typeof rawTemp === 'string' ? parseFloat(rawTemp) : NaN);
   const temp =
     Number.isFinite(parsedTemp) && parsedTemp >= 0 && parsedTemp <= 100
