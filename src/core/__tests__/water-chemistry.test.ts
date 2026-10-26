@@ -453,5 +453,21 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(degreesDHToPpmCaCO3(Symbol('sym') as any)).toBe(0);
     expect(degreesDHToPpmCaCO3('  1  ' as any)).toBe(17.85);
   });
+
+  test('TASK-P41-07-JAK: calculateWaterMinerals odrzuca obiekty, tablice, symbole i chroni waterVolumeLiters przed -0', () => {
+    const resFromNegZero = calculateWaterMinerals(-0, 80, 40);
+    expect(resFromNegZero.waterVolumeLiters).toBe(1.0);
+    expect(Object.is(resFromNegZero.waterVolumeLiters, -0)).toBe(false);
+
+    const resFromStringNegZero = calculateWaterMinerals('-0' as any, 80, 40);
+    expect(resFromStringNegZero.waterVolumeLiters).toBe(1.0);
+    expect(Object.is(resFromStringNegZero.waterVolumeLiters, -0)).toBe(false);
+
+    const resFromObj = calculateWaterMinerals({} as any, 80, 40);
+    expect(resFromObj.waterVolumeLiters).toBe(1.0);
+
+    const resFromArray = calculateWaterMinerals([] as any, 80, 40);
+    expect(resFromArray.waterVolumeLiters).toBe(1.0);
+  });
 });
 

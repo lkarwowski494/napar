@@ -199,20 +199,21 @@ export function calculateWaterMinerals(
   targetKh: number
 ): WaterCalculationResult {
   const rawVol =
-    waterVolumeLiters === null || waterVolumeLiters === undefined || typeof waterVolumeLiters === 'boolean'
+    typeof waterVolumeLiters !== 'number' && typeof waterVolumeLiters !== 'string'
       ? NaN
-      : (typeof waterVolumeLiters === 'string' ? parseFloat(waterVolumeLiters) : Number(waterVolumeLiters));
+      : (typeof waterVolumeLiters === 'string' ? parseFloat(waterVolumeLiters.trim()) : waterVolumeLiters);
   const rawGh =
-    targetGh === null || targetGh === undefined || typeof targetGh === 'boolean'
+    typeof targetGh !== 'number' && typeof targetGh !== 'string'
       ? NaN
-      : (typeof targetGh === 'string' ? parseFloat(targetGh) : Number(targetGh));
+      : (typeof targetGh === 'string' ? parseFloat(targetGh.trim()) : targetGh);
   const rawKh =
-    targetKh === null || targetKh === undefined || typeof targetKh === 'boolean'
+    typeof targetKh !== 'number' && typeof targetKh !== 'string'
       ? NaN
-      : (typeof targetKh === 'string' ? parseFloat(targetKh) : Number(targetKh));
-  const vol = Number.isFinite(rawVol) && rawVol > 0 ? Math.max(0.1, Math.min(1000.0, rawVol)) : 1.0;
-  let gh = Number.isFinite(rawGh) && rawGh >= 0 ? Math.max(0, Math.min(5000, rawGh)) : 0;
-  let kh = Number.isFinite(rawKh) && rawKh >= 0 ? Math.max(0, Math.min(5000, rawKh)) : 0;
+      : (typeof targetKh === 'string' ? parseFloat(targetKh.trim()) : targetKh);
+  let vol = Number.isFinite(rawVol) && rawVol > 0 && !Object.is(rawVol, -0) ? Math.max(0.1, Math.min(1000.0, rawVol)) : 1.0;
+  if (Object.is(vol, -0)) vol = 1.0;
+  let gh = Number.isFinite(rawGh) && rawGh >= 0 && !Object.is(rawGh, -0) ? Math.max(0, Math.min(5000, rawGh)) : 0;
+  let kh = Number.isFinite(rawKh) && rawKh >= 0 && !Object.is(rawKh, -0) ? Math.max(0, Math.min(5000, rawKh)) : 0;
   if (Object.is(gh, -0)) gh = 0;
   if (Object.is(kh, -0)) kh = 0;
 
