@@ -85,6 +85,13 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       // Day 6 boundary
       const day6Roast = new Date('2026-10-09T12:00:00Z'); // 6 days
       expect(evaluateRestingWindow(day6Roast, baseDate).stage).toBe('degassing');
+
+      // Data z przyszłości (strefy czasowe / błąd) -> daysSinceRoast = 0, degassing
+      const futureRoast = new Date('2026-10-20T12:00:00Z');
+      const resFuture = evaluateRestingWindow(futureRoast, baseDate);
+      expect(resFuture.stage).toBe('degassing');
+      expect(resFuture.daysSinceRoast).toBe(0);
+      expect(Object.is(resFuture.daysSinceRoast, -0)).toBe(false);
     });
 
     it('detects peak flavor phase (7-35 days)', () => {

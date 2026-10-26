@@ -454,5 +454,23 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(schedule[0].titlePl).toContain('Panama Geisha');
       expect(schedule[0].daysOffset).toBe(0);
     });
+
+    it('TASK-P46-03-ZAK: buildProactiveActionSchedule odporne na date wypalu z przyszlosci (brak ujemnych dni)', () => {
+      const futureRoastInventory: any[] = [
+        {
+          id: 'coffee-future-roast',
+          name: 'Future Roast Coffee',
+          type: 'coffee',
+          roastOrHarvestDate: '2026-10-30', // 4 dni w przyszłości względem 2026-10-26
+          remainingWeightGrams: 200,
+          isArchived: false,
+        },
+      ];
+      const schedule = buildProactiveActionSchedule('2026-10-26T08:00:00.000Z', futureRoastInventory as any, []);
+      expect(schedule.length).toBe(1);
+      expect(schedule[0].subtitlePl).toContain('Koniec odgazowania CO₂');
+      expect(schedule[0].subtitlePl).not.toContain('-');
+      expect(schedule[0].daysOffset).toBe(7); // 7 dni do otwarcia okna peak
+    });
   });
 });

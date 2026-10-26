@@ -195,8 +195,9 @@ export function evaluateRestingWindow(roastDateInput: Date | string, currentDate
     };
   }
 
-  const diffTime = nowTime - roastTime;
-  const daysSinceRoast = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+  const diffTime = Math.max(0, nowTime - roastTime);
+  const rawDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const daysSinceRoast = Object.is(rawDays, -0) || rawDays <= 0 ? 0 : rawDays;
 
   if (daysSinceRoast <= 6) {
     return {

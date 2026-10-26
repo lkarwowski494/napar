@@ -193,14 +193,14 @@ export function buildProactiveActionSchedule(
         const rawDays = Math.floor(
           (refDayStart.getTime() - roastDayStart.getTime()) / (1000 * 3600 * 24)
         );
-        const daysSinceRoast = Object.is(rawDays, -0) ? 0 : rawDays;
-        const safeDaysRoast = Math.max(0, daysSinceRoast);
+        const safeDaysRoast = Math.max(0, Object.is(rawDays, -0) || rawDays <= 0 ? 0 : rawDays);
+        const daysSinceRoast = safeDaysRoast;
         const daysRoastPl = `${safeDaysRoast} ${pluralPl(safeDaysRoast, 'dzień', 'dni', 'dni')} po wypale`;
         const daysRoastEn = `${safeDaysRoast} day${safeDaysRoast === 1 ? '' : 's'} post-roast`;
 
-        if (daysSinceRoast < 7) {
+        if (safeDaysRoast < 7) {
           // Ziarna jeszcze odgazowują — zaplanuj otwarcie okna Peak w 7. dniu po wypale
-          const daysUntilPeak = Math.min(13, Math.max(1, 7 - daysSinceRoast));
+          const daysUntilPeak = Math.min(13, Math.max(1, 7 - safeDaysRoast));
           const targetDate = addDays(refDayStart, daysUntilPeak);
           actions.push({
             id: `action-peak-start-${item.id}`,
