@@ -734,6 +734,19 @@ const PROCESS_ALIASES: Record<string, string> = {
   'thermal-shock': 'process-anaerobic',
   szoktermiczny: 'process-anaerobic',
   'szok-termiczny': 'process-anaerobic',
+  cofermentation: 'process-anaerobic',
+  'co-fermentation': 'process-anaerobic',
+  kofermentacja: 'process-anaerobic',
+  lactic: 'process-anaerobic',
+  'lactic-anaerobic': 'process-anaerobic',
+  mleczna: 'process-anaerobic',
+  doublewashed: 'process-washed',
+  'double-washed': 'process-washed',
+  podwojniemyta: 'process-washed',
+  'podwojnie-myta': 'process-washed',
+  yeast: 'process-anaerobic',
+  'yeast-fermentation': 'process-anaerobic',
+  drozdze: 'process-anaerobic',
 };
 
 export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined {

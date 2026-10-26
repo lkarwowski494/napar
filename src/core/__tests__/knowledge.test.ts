@@ -765,4 +765,17 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findCoffeeVarietyById('chiroso')?.id).toBe('variety-ethiopian-landraces');
     expect(findCoffeeVarietyById('tabi')?.id).toBe('variety-castillo-colombia');
   });
+
+  test('TASK-P42-06-TRE: findCoffeeProcessById wspiera aliasy co-fermentation, lactic, double-washed i drozdze', () => {
+    expect(findCoffeeProcessById('co-fermentation')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('cofermentation')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('kofermentacja')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('lactic')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('mleczna')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('double-washed')?.id).toBe('process-washed');
+    expect(findCoffeeProcessById('doublewashed')?.id).toBe('process-washed');
+    expect(findCoffeeProcessById('podwojnie-myta')?.id).toBe('process-washed');
+    expect(findCoffeeProcessById('yeast-fermentation')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('drozdze')?.id).toBe('process-anaerobic');
+  });
 });
