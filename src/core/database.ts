@@ -300,16 +300,28 @@ export function saveInventoryItem(item: InventoryItem): void {
   }
   const db = getDatabase();
   const now = new Date().toISOString();
-  const rawInit = typeof item.initialWeightGrams === 'number' ? item.initialWeightGrams : (typeof item.initialWeightGrams === 'string' ? parseFloat(item.initialWeightGrams) : NaN);
-  const safeInit = Number.isFinite(rawInit) && rawInit >= 0 ? Number(rawInit.toFixed(1)) : 250;
+  const rawInit = typeof item.initialWeightGrams === 'number'
+    ? item.initialWeightGrams
+    : parseFloat(String(item.initialWeightGrams ?? '').replace(',', '.'));
+  const safeInit = Number.isFinite(rawInit) && rawInit >= 0
+    ? Number(Math.min(100000, rawInit).toFixed(1))
+    : 250;
   const initWeight = Object.is(safeInit, -0) ? 0 : safeInit;
 
-  const rawRem = typeof item.remainingWeightGrams === 'number' ? item.remainingWeightGrams : (typeof item.remainingWeightGrams === 'string' ? parseFloat(item.remainingWeightGrams) : NaN);
-  const safeRem = Number.isFinite(rawRem) && rawRem >= 0 ? Number(rawRem.toFixed(1)) : 0;
+  const rawRem = typeof item.remainingWeightGrams === 'number'
+    ? item.remainingWeightGrams
+    : parseFloat(String(item.remainingWeightGrams ?? '').replace(',', '.'));
+  const safeRem = Number.isFinite(rawRem) && rawRem >= 0
+    ? Number(Math.min(100000, rawRem).toFixed(1))
+    : 0;
   const remWeight = Object.is(safeRem, -0) ? 0 : safeRem;
 
-  const rawRating = typeof item.rating === 'number' ? item.rating : (typeof item.rating === 'string' ? parseFloat(item.rating) : NaN);
-  const safeRating = Number.isFinite(rawRating) && rawRating >= 0 && rawRating <= 5 ? Number(rawRating.toFixed(1)) : null;
+  const rawRating = typeof item.rating === 'number'
+    ? item.rating
+    : parseFloat(String(item.rating ?? '').replace(',', '.'));
+  const safeRating = Number.isFinite(rawRating) && rawRating >= 0 && rawRating <= 5
+    ? Number(rawRating.toFixed(1))
+    : null;
   const sanitizedRating = safeRating != null && Object.is(safeRating, -0) ? 0 : safeRating;
   const sanitizedRoastDate =
     typeof item.roastOrHarvestDate === 'string' && item.roastOrHarvestDate.trim().length > 0

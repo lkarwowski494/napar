@@ -2031,4 +2031,45 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(clamped?.waterTempCelsius).toBe(100);
     expect(clamped?.recommendedRatio).toBe(100);
   });
+
+  test('TASK-P48-05-ARC: saveInventoryItem obsluguje przecinki dziesietne w wagach i ocenie oraz clampuje zakres wag do [0, 100000]', () => {
+    initDatabase(mockDb as any);
+    const testItemId = 'item-p48-arc';
+    saveInventoryItem({
+      id: testItemId,
+      name: 'Kenya Nyeri AA',
+      type: 'coffee',
+      initialWeightGrams: '250,5' as any,
+      remainingWeightGrams: '125,5' as any,
+      rating: '4,5' as any,
+      flavorNotes: ['porzeczka', 'rabarbar'],
+      isFavorite: true,
+      isArchived: false,
+      createdAt: '2026-10-26T18:00:00Z',
+      updatedAt: '2026-10-26T18:00:00Z',
+    });
+
+    const saved = getInventoryItemById(testItemId);
+    expect(saved).toBeDefined();
+    expect(saved?.initialWeightGrams).toBe(250.5);
+    expect(saved?.remainingWeightGrams).toBe(125.5);
+    expect(saved?.rating).toBe(4.5);
+
+    // Test clampowania ekstremalnych wag w spiżarni
+    saveInventoryItem({
+      id: 'item-p48-clamp',
+      name: 'Gigantic Coffee',
+      type: 'coffee',
+      initialWeightGrams: 5000000,
+      remainingWeightGrams: 5000000,
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-10-26T18:00:00Z',
+      updatedAt: '2026-10-26T18:00:00Z',
+    });
+
+    const clamped = getInventoryItemById('item-p48-clamp');
+    expect(clamped?.initialWeightGrams).toBe(100000);
+    expect(clamped?.remainingWeightGrams).toBe(100000);
+  });
 });
