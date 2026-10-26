@@ -1657,4 +1657,53 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(saved?.rating).toBe(4.8);
     expect(Object.is(saved?.remainingWeightGrams, -0)).toBe(false);
   });
+
+  test('TASK-P36-05-ARC: saveRecipe sanityzuje name, beverageType i method, a recordBrewSessionTransaction parsuje string dozy', () => {
+    initDatabase(mockDb as any);
+    const recipeWithLooseFields: any = {
+      id: 'rec-loose-fields',
+      name: '   ',
+      beverageType: 'UNKNOWN_TYPE',
+      method: '',
+      doseGrams: 15,
+      waterGrams: 250,
+      stepsJson: '[]',
+    };
+    saveRecipe(recipeWithLooseFields);
+    const savedRec = getRecipeById('rec-loose-fields');
+    expect(savedRec?.name).toBe('Recipe');
+    expect(savedRec?.beverageType).toBe('COFFEE');
+    expect(savedRec?.method).toBe('v60');
+
+    // recordBrewSessionTransaction z dozą stringową
+    const itemForTx: InventoryItem = {
+      id: 'bean-tx-str',
+      name: 'Bean Tx String',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 200,
+      flavorNotes: [],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-10-26T10:00:00Z',
+      updatedAt: '2026-10-26T10:00:00Z',
+    };
+    saveInventoryItem(itemForTx);
+
+    const session: BrewSession = {
+      id: 'sess-tx-str',
+      recipeName: 'V60 Tx',
+      beverageType: 'COFFEE',
+      method: 'v60',
+      doseGrams: 18,
+      waterGrams: 300,
+      waterTempCelsius: 93,
+      totalTimeSeconds: 180,
+      rating: 5,
+      brewedAt: '2026-10-26T12:00:00Z',
+    };
+    recordBrewSessionTransaction(session, { itemId: 'bean-tx-str', doseGrams: '18.5' as any });
+    const updatedBean = getInventoryItemById('bean-tx-str');
+    expect(updatedBean?.remainingWeightGrams).toBe(181.5);
+  });
 });

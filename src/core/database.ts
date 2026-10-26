@@ -521,6 +521,10 @@ export function saveRecipe(recipe: SavedRecipe): void {
     }
   }
 
+  const safeName = typeof recipe.name === 'string' && recipe.name.trim() ? recipe.name.trim().slice(0, 200) : 'Recipe';
+  const safeBeverage = recipe.beverageType === 'TEA' ? 'TEA' : 'COFFEE';
+  const safeMethod = typeof recipe.method === 'string' && recipe.method.trim() ? recipe.method.trim().slice(0, 50) : 'v60';
+
   db.runSync(
     `INSERT INTO recipes (
       id, name, beverage_type, method, author, description,
@@ -543,9 +547,9 @@ export function saveRecipe(recipe: SavedRecipe): void {
       is_favorite = excluded.is_favorite`,
     [
       safeId,
-      recipe.name,
-      recipe.beverageType,
-      recipe.method,
+      safeName,
+      safeBeverage,
+      safeMethod,
       recipe.author ?? null,
       recipe.description ?? null,
       dose,
@@ -832,8 +836,13 @@ export function recordBrewSessionTransaction(
   const db = getDatabase();
   runInTransactionSync(db, () => {
     saveBrewSession(session);
-    if (inventoryDeduction && inventoryDeduction.itemId && inventoryDeduction.doseGrams > 0) {
-      deductInventoryWeight(inventoryDeduction.itemId, inventoryDeduction.doseGrams);
+    if (inventoryDeduction && inventoryDeduction.itemId) {
+      const rawDose = typeof inventoryDeduction.doseGrams === 'number'
+        ? inventoryDeduction.doseGrams
+        : (typeof inventoryDeduction.doseGrams === 'string' ? parseFloat(inventoryDeduction.doseGrams) : NaN);
+      if (Number.isFinite(rawDose) && rawDose > 0 && !Object.is(rawDose, -0)) {
+        deductInventoryWeight(inventoryDeduction.itemId, rawDose);
+      }
     }
     if (caffeineLog) {
       logCaffeine(caffeineLog);
