@@ -211,7 +211,11 @@ export function ProcedureModal({
 
             <View style={styles.targetWaterBanner}>
               <Text style={styles.targetWaterLabel}>
-                {isEn ? 'POUR TO WEIGHT ON SCALE:' : 'ZALEJ DO WAGI NA WADZE:'}
+                {t?.brew?.pourToWeightOnScale
+                  ? `${t.brew.pourToWeightOnScale.toUpperCase()}:`
+                  : isEn
+                  ? 'POUR TO WEIGHT ON SCALE:'
+                  : 'ZALEJ DO WAGI NA WADZE:'}
               </Text>
               <Text style={styles.targetWaterValue} testID="procedure-target-water">
                 {formatWaterWeight(currentStep.targetWaterGrams, unitSystem)}

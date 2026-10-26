@@ -202,6 +202,7 @@ describe('ProcedureModal Component', () => {
       brew: {
         procedureAssistantTitle: 'PRZEWODNIK KROK PO KROKU',
         totalBrewTime: 'Czas łączny ekstrakcji: {time}',
+        pourToWeightOnScale: 'Zalej do wagi docelowej na wadze',
       },
     };
 
@@ -219,6 +220,7 @@ describe('ProcedureModal Component', () => {
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('PRZEWODNIK KROK PO KROKU');
     expect(str).toContain('Czas łączny ekstrakcji: 02:05');
+    expect(str).toContain('ZALEJ DO WAGI DOCELOWEJ NA WADZE:');
   });
   it('TASK-P25-01-ODK: przyciski korekty czasu posiadają zdefiniowane accessibilityHint', async () => {
     let tree: any;

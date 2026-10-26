@@ -188,7 +188,8 @@
     "subsetCustom": "Własne receptury",
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Uruchamia tradycyjną ceremonię parzenia herbaty Gongfu Cha z wielokrotnymi infuzjami",
-    "editRecipe": "Edytuj recepturę"
+    "editRecipe": "Edytuj recepturę",
+    "pourToWeightOnScale": "Zalej do wagi na wadze"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",

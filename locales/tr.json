@@ -188,7 +188,8 @@
     "subsetCustom": "Custom Recipes",
     "gongfuModeBtn": "Gongfu Cha",
     "gongfuModeHint": "Starts the traditional Gongfu Cha multi-infusion tea brewing ceremony",
-    "editRecipe": "Tarifi Düzenle"
+    "editRecipe": "Tarifi Düzenle",
+    "pourToWeightOnScale": "Tartıdaki ağırlığa kadar dökün"
   },
   "gongfu": {
     "modeTitle": "Gongfu Cha",
