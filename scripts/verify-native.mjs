@@ -116,6 +116,12 @@ try {
     `app.json -> expo.scheme ('${appJson.scheme}') musi być tożsame z expo.slug ('${appJson.slug}')`
   );
 
+  // Weryfikacja versionCode na Androidzie (TASK-P38-10-WYD)
+  check(
+    Number.isInteger(appJson.android?.versionCode) && appJson.android.versionCode >= 1,
+    `app.json -> expo.android.versionCode musi być dodatnią liczbą całkowitą >= 1 (otrzymano '${appJson.android?.versionCode}')`
+  );
+
   // Weryfikacja nazwy aplikacji w app.json (TASK-P21-10-WYD)
   check(
     appJson.name === 'Napar',
