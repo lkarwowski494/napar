@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "Metódy:",
-    "particleRangeDesc": "Veľkosť častíc: {min} – {max} µm (referenčná hodnota: {default} µm)"
+    "particleRangeDesc": "Veľkosť častíc: {min} – {max} µm (referenčná hodnota: {default} µm)",
+    "recommendationLabel": "Odporúčanie:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

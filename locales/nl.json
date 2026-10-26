@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "Methoden:",
-    "particleRangeDesc": "Deeltjesgrootte: {min} – {max} µm (referentie: {default} µm)"
+    "particleRangeDesc": "Deeltjesgrootte: {min} – {max} µm (referentie: {default} µm)",
+    "recommendationLabel": "Aanbeveling:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

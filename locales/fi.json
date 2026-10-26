@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "Menetelmät:",
-    "particleRangeDesc": "Hiukkaskoko: {min} – {max} µm (vertailuarvo: {default} µm)"
+    "particleRangeDesc": "Hiukkaskoko: {min} – {max} µm (vertailuarvo: {default} µm)",
+    "recommendationLabel": "Suositus:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

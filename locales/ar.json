@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "الطرق:",
-    "particleRangeDesc": "حجم الجسيمات: {min} – {max} ميكرومتر (المعيار: {default} ميكرومتر)"
+    "particleRangeDesc": "حجم الجسيمات: {min} – {max} ميكرومتر (المعيار: {default} ميكرومتر)",
+    "recommendationLabel": "توصية:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "抽出器具:",
-    "particleRangeDesc": "粒度範囲: {min} – {max} µm (基準値: {default} µm)"
+    "particleRangeDesc": "粒度範囲: {min} – {max} µm (基準値: {default} µm)",
+    "recommendationLabel": "おすすめ:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

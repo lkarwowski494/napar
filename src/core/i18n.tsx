@@ -424,6 +424,7 @@ export const translations = {
       micronsLabel: 'Szacowana grubość cząstek',
       methodsLabel: 'Metody:',
       particleRangeDesc: 'Średnia cząstek: {min} – {max} µm (punkt odniesienia: {default} µm)',
+      recommendationLabel: 'Rekomendacja:',
     },
     caffeine: {
       title: 'Kinetyka Kofeiny',
@@ -987,6 +988,7 @@ export const translations = {
       micronsLabel: 'Estimated particle size',
       methodsLabel: 'Methods:',
       particleRangeDesc: 'Particle size: {min} – {max} µm (benchmark: {default} µm)',
+      recommendationLabel: 'Recommendation:',
     },
     caffeine: {
       title: 'Caffeine Kinetics',

@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "冲煮器具：",
-    "particleRangeDesc": "颗粒粒径：{min} – {max} µm（基准值：{default} µm）"
+    "particleRangeDesc": "颗粒粒径：{min} – {max} µm（基准值：{default} µm）",
+    "recommendationLabel": "建议:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "विधियाँ:",
-    "particleRangeDesc": "कण आकार: {min} – {max} µm (मानक: {default} µm)"
+    "particleRangeDesc": "कण आकार: {min} – {max} µm (मानक: {default} µm)",
+    "recommendationLabel": "सिफ़ारिश:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

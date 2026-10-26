@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "Phương pháp:",
-    "particleRangeDesc": "Kích thước hạt: {min} – {max} µm (chuẩn: {default} µm)"
+    "particleRangeDesc": "Kích thước hạt: {min} – {max} µm (chuẩn: {default} µm)",
+    "recommendationLabel": "Khuyến nghị:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

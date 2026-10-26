@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "Métodos:",
-    "particleRangeDesc": "Tamaño de partícula: {min} – {max} µm (referencia: {default} µm)"
+    "particleRangeDesc": "Tamaño de partícula: {min} – {max} µm (referencia: {default} µm)",
+    "recommendationLabel": "Recomendación:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "Módszerek:",
-    "particleRangeDesc": "Szemcseméret: {min} – {max} µm (viszonyítási alap: {default} µm)"
+    "particleRangeDesc": "Szemcseméret: {min} – {max} µm (viszonyítási alap: {default} µm)",
+    "recommendationLabel": "Ajánlás:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

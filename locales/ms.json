@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "Kaedah:",
-    "particleRangeDesc": "Saiz zarah: {min} – {max} µm (penanda aras: {default} µm)"
+    "particleRangeDesc": "Saiz zarah: {min} – {max} µm (penanda aras: {default} µm)",
+    "recommendationLabel": "Syor:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

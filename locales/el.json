@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "Μέθοδοι:",
-    "particleRangeDesc": "Μέγεθος κόκκων: {min} – {max} µm (σημείο αναφοράς: {default} µm)"
+    "particleRangeDesc": "Μέγεθος κόκκων: {min} – {max} µm (σημείο αναφοράς: {default} µm)",
+    "recommendationLabel": "Σύσταση:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

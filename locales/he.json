@@ -399,7 +399,8 @@
     "allGrindersHeader": "Target Settings by Grinder Model",
     "micronsLabel": "Estimated particle size",
     "methodsLabel": "שיטות:",
-    "particleRangeDesc": "גודל חלקיקים: {min} – {max} µm (מדד ייחוס: {default} µm)"
+    "particleRangeDesc": "גודל חלקיקים: {min} – {max} µm (מדד ייחוס: {default} µm)",
+    "recommendationLabel": "המלצה:"
   },
   "caffeine": {
     "title": "Caffeine Kinetics",

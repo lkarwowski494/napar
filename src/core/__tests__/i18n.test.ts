@@ -291,4 +291,9 @@ describe('i18n System', () => {
     expect(translations.pl.brew.finishAndSave).toBe('Zakończ i zapisz');
     expect(translations.en.brew.finishAndSave).toBe('Finish & Save');
   });
+
+  test('TASK-P12-09-LOK: Klucz recommendationLabel jest zdefiniowany w słownikach pl i en oraz w grinderze', () => {
+    expect(translations.pl.grinder.recommendationLabel).toBe('Rekomendacja:');
+    expect(translations.en.grinder.recommendationLabel).toBe('Recommendation:');
+  });
 });
