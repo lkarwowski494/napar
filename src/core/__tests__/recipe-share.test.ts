@@ -1260,4 +1260,46 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     const compact = recipeToCompactPayload(dummyWithInvalidStepsJson);
     expect(compact.s).toEqual([]);
   });
+
+  test('TASK-P50-11-WZR: odporność na formaty ratio 1:X oraz 1/X i ochrona przed ujemnym czasem trwania kroku w recipe-share', () => {
+    // 1. Format ratio 1:16.5 w obiekcie SavedRecipe
+    const recipeWithRatioString: any = {
+      id: 'test-ratio-colon',
+      name: 'V60 Ratio Test',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 92,
+      recommendedRatio: '1:16.5',
+      stepsJson: JSON.stringify([
+        { stepNumber: 1, namePl: 'Zalanie', durationSeconds: -15, targetWaterGrams: -50 },
+      ]),
+    };
+
+    const compact = recipeToCompactPayload(recipeWithRatioString);
+    expect(compact.r).toBe(16.5);
+    expect(compact.s[0].d).toBe(30); // fallback na 30 przy ujemnym czasie
+    expect(compact.s[0].w).toBe(0); // ochrona przed ujemną wagą wody
+
+    // 2. Format ratio 1:15 i ujemny czas trwania kroku w decodeRecipeFromShareUrl
+    const payloadWithColonRatio = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Colon Ratio Recipe',
+      b: 'COFFEE',
+      m: 'Aeropress',
+      d: 14,
+      w: 210,
+      r: '1:15',
+      s: [
+        { n: 'Infusion', d: -45, w: -20 },
+      ],
+    }));
+
+    const decoded = decodeRecipeFromShareUrl(payloadWithColonRatio);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.recipe.recommendedRatio).toBe(15);
+    expect(decoded?.originalSteps[0].durationSeconds).toBe(30);
+    expect(decoded?.originalSteps[0].targetWaterGrams).toBe(0);
+  });
 });

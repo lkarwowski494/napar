@@ -200,7 +200,20 @@ export function recipeToCompactPayload(
       ? rawGrind.trim().slice(0, 200)
       : (typeof rawGrind === 'number' && Number.isFinite(rawGrind) ? String(rawGrind) : undefined);
   const computedRatio = Number((water / (dose || 1)).toFixed(1));
-  const rawRatioNum = typeof rawRatio === 'number' ? rawRatio : parseFloat(String(rawRatio).replace(',', '.'));
+  let rawRatioNum = NaN;
+  if (typeof rawRatio === 'number') {
+    rawRatioNum = rawRatio;
+  } else if (typeof rawRatio === 'string') {
+    const cleanRatio = rawRatio.trim().replace(',', '.');
+    if (cleanRatio.includes(':') || cleanRatio.includes('/')) {
+      const parts = cleanRatio.split(/[:/]/).map((p) => parseFloat(p.trim())).filter(Number.isFinite);
+      if (parts.length === 2 && parts[0] > 0 && parts[1] > 0) {
+        rawRatioNum = parts[1] / parts[0];
+      }
+    } else {
+      rawRatioNum = parseFloat(cleanRatio);
+    }
+  }
   const ratioCandidate =
     Number.isFinite(rawRatioNum) && rawRatioNum > 0
       ? Number(Math.min(100, Math.max(1, rawRatioNum)).toFixed(2))
@@ -360,7 +373,20 @@ export function decodeRecipeFromShareUrl(
           ? parsed.g.trim().slice(0, 200)
           : (typeof parsed.g === 'number' && Number.isFinite(parsed.g) ? String(parsed.g) : (isEn ? 'Medium' : 'Średnio')),
       recommendedRatio: (() => {
-        const rawDecodedRatio = typeof parsed.r === 'number' ? parsed.r : (typeof parsed.r === 'string' ? parseFloat(String(parsed.r).replace(',', '.')) : NaN);
+        let rawDecodedRatio = NaN;
+        if (typeof parsed.r === 'number') {
+          rawDecodedRatio = parsed.r;
+        } else if (typeof parsed.r === 'string') {
+          const clean = String(parsed.r).trim().replace(',', '.');
+          if (clean.includes(':') || clean.includes('/')) {
+            const parts = clean.split(/[:/]/).map((p) => parseFloat(p.trim())).filter(Number.isFinite);
+            if (parts.length === 2 && parts[0] > 0 && parts[1] > 0) {
+              rawDecodedRatio = parts[1] / parts[0];
+            }
+          } else {
+            rawDecodedRatio = parseFloat(clean);
+          }
+        }
         let ratioVal = Number.isFinite(rawDecodedRatio) && rawDecodedRatio > 0 && !Object.is(rawDecodedRatio, -0)
           ? Number(Math.min(100, Math.max(1, rawDecodedRatio)).toFixed(2))
           : Number(Math.min(100, Math.max(1, rawParsedW / (rawParsedD || 1))).toFixed(1));
