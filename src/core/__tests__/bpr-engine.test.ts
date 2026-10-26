@@ -582,5 +582,59 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(calculateNextSteepDuration({ baseDurationSeconds: '20,5' as any, infusionNumber: 3, incrementSeconds: '5,5' as any })).toBe(32);
       expect(calculateNextSteepDuration({ baseDurationSeconds: 10, infusionNumber: 0 })).toBe(10);
     });
+
+    it('TASK-P53-03-ZAK: calculateRoastDegassingWindow i buildProactiveActionSchedule uwzgledniaja profil palenia (dark vs light vs medium)', () => {
+      // @ts-ignore
+      const { calculateRoastDegassingWindow } = require('../bpr-engine');
+
+      // 1. Sprawdzenie okien odgazowania wg profilu palenia
+      expect(calculateRoastDegassingWindow('dark')).toEqual({ degassingDays: 5, peakEndDays: 25 });
+      expect(calculateRoastDegassingWindow('ciemny')).toEqual({ degassingDays: 5, peakEndDays: 25 });
+      expect(calculateRoastDegassingWindow('espresso')).toEqual({ degassingDays: 5, peakEndDays: 25 });
+
+      expect(calculateRoastDegassingWindow('light')).toEqual({ degassingDays: 10, peakEndDays: 45 });
+      expect(calculateRoastDegassingWindow('nordic')).toEqual({ degassingDays: 10, peakEndDays: 45 });
+      expect(calculateRoastDegassingWindow('jasny')).toEqual({ degassingDays: 10, peakEndDays: 45 });
+
+      expect(calculateRoastDegassingWindow('medium')).toEqual({ degassingDays: 7, peakEndDays: 35 });
+      expect(calculateRoastDegassingWindow(undefined)).toEqual({ degassingDays: 7, peakEndDays: 35 });
+
+      // 2. Weryfikacja harmonogramu dla ziaren light roast (wypalonych 6 dni temu - wciąz odgazowują!)
+      const testInventory: any[] = [
+        {
+          id: 'coffee-light',
+          name: 'Panama Geisha Light',
+          type: 'coffee',
+          roastProfile: 'light',
+          roastOrHarvestDate: '2026-10-20', // 6 dni temu w stosunku do 2026-10-26
+          remainingWeightGrams: 200,
+          isArchived: false,
+        },
+        {
+          id: 'coffee-dark',
+          name: 'Brazil Santos Espresso',
+          type: 'coffee',
+          roastProfile: 'dark',
+          roastOrHarvestDate: '2026-10-20', // 6 dni temu -> dla dark to już Peak (dzień 5 był końcem odgazowania)!
+          remainingWeightGrams: 250,
+          isArchived: false,
+        },
+      ];
+
+      const schedule = buildProactiveActionSchedule('2026-10-26T08:00:00.000Z', testInventory, []);
+
+      // coffee-light powinien mieć akcję oczekiwania na Peak (10 - 6 = za 4 dni)
+      const lightAction = schedule.find((a) => a.inventoryItemId === 'coffee-light');
+      expect(lightAction).toBeDefined();
+      expect(lightAction?.id).toBe('action-peak-start-coffee-light');
+      expect(lightAction?.daysOffset).toBe(4);
+      expect(lightAction?.subtitlePl).toContain('10. dzień po wypale');
+
+      // coffee-dark powinien mieć akcję szczytu Peak na DZIŚ (ponieważ 6 dni >= 5 dni odgazowania)
+      const darkAction = schedule.find((a) => a.inventoryItemId === 'coffee-dark');
+      expect(darkAction).toBeDefined();
+      expect(darkAction?.id).toBe('action-peak-now-coffee-dark');
+      expect(darkAction?.daysOffset).toBe(0);
+    });
   });
 });

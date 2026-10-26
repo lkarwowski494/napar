@@ -213,6 +213,45 @@ export function calculateNextSteepDuration(params: {
   return Object.is(res, -0) ? Math.round(safeBase) : res;
 }
 
+/**
+ * Oblicza rekomendowane okno odgazowania CO2 oraz koniec szczytu swiezosci (Peak Window)
+ * na podstawie stopnia wypalenia ziaren kawy (roast profile).
+ */
+export function calculateRoastDegassingWindow(roastProfile?: string | null): {
+  degassingDays: number;
+  peakEndDays: number;
+} {
+  if (!roastProfile || typeof roastProfile !== 'string') {
+    return { degassingDays: 7, peakEndDays: 35 };
+  }
+
+  const clean = roastProfile.trim().toLowerCase();
+
+  // Ciemny wypał / espresso / dark: odgazowuje szybciej, starzeje się szybciej
+  if (
+    clean.includes('dark') ||
+    clean.includes('ciemn') ||
+    clean.includes('espresso') ||
+    clean.includes('french') ||
+    clean.includes('italian')
+  ) {
+    return { degassingDays: 5, peakEndDays: 25 };
+  }
+
+  // Jasny wypał / light / nordic / filter / cinnamon: gęste ziarna odgazowują wolniej, peak trwa dłużej
+  if (
+    clean.includes('light') ||
+    clean.includes('jasn') ||
+    clean.includes('nordic') ||
+    clean.includes('cinnamon')
+  ) {
+    return { degassingDays: 10, peakEndDays: 45 };
+  }
+
+  // Średni wypał / medium / omni / omniroast / standard
+  return { degassingDays: 7, peakEndDays: 35 };
+}
+
 function toDateKey(d: Date): string {
   const year = d.getUTCFullYear();
   const month = String(d.getUTCMonth() + 1).padStart(2, '0');
@@ -292,9 +331,11 @@ export function buildProactiveActionSchedule(
         const daysRoastPl = `${safeDaysRoast} ${pluralPl(safeDaysRoast, 'dzień', 'dni', 'dni')} po wypale`;
         const daysRoastEn = `${safeDaysRoast} day${safeDaysRoast === 1 ? '' : 's'} post-roast`;
 
-        if (safeDaysRoast < 7) {
-          // Ziarna jeszcze odgazowują — zaplanuj otwarcie okna Peak w 7. dniu po wypale
-          const daysUntilPeak = Math.min(13, Math.max(1, 7 - safeDaysRoast));
+        const { degassingDays, peakEndDays } = calculateRoastDegassingWindow(item.roastProfile);
+
+        if (safeDaysRoast < degassingDays) {
+          // Ziarna jeszcze odgazowują — zaplanuj otwarcie okna Peak po zakończeniu odgazowania
+          const daysUntilPeak = Math.min(13, Math.max(1, degassingDays - safeDaysRoast));
           const targetDate = addDays(refDayStart, daysUntilPeak);
           actions.push({
             id: `action-peak-start-${item.id}`,
@@ -306,8 +347,8 @@ export function buildProactiveActionSchedule(
               daysUntilPeak === 1 ? 'TOMORROW' : `In ${daysUntilPeak} days`,
             titlePl: `Początek okna Peak: ${item.name}`,
             titleEn: `Peak window opens: ${item.name}`,
-            subtitlePl: `Koniec odgazowania CO₂ (7. dzień po wypale) · ${safeRemainingWeight}g w spiżarni`,
-            subtitleEn: `CO₂ degassing complete (Day 7 post-roast) · ${safeRemainingWeight}g left`,
+            subtitlePl: `Koniec odgazowania CO₂ (${degassingDays}. dzień po wypale) · ${safeRemainingWeight}g w spiżarni`,
+            subtitleEn: `CO₂ degassing complete (Day ${degassingDays} post-roast) · ${safeRemainingWeight}g left`,
             badgeColor: 'copper',
             inventoryItemId: item.id,
             recommendedMethod: 'V60',
@@ -315,7 +356,7 @@ export function buildProactiveActionSchedule(
             waterGrams: 250,
             waterTempCelsius: 93,
           });
-        } else if (daysSinceRoast <= 35) {
+        } else if (daysSinceRoast <= peakEndDays) {
           // Ziarna są w szczycie smaku (Peak Window) — akcja na DZIŚ
           actions.push({
             id: `action-peak-now-${item.id}`,
