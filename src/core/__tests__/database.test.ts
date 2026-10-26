@@ -1340,4 +1340,23 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(getBrewSessions(-5)).toEqual([]);
     expect(getBrewSessions(NaN)).toEqual([]);
   });
+  test('TASK-P21-05-ARC: getCaffeineLogs waliduje format sinceIso i odrzuca niepoprawne daty', () => {
+    initDatabase(mockDb as any);
+    mockDb.getAllSync.mockClear();
+
+    // Prawidłowa data ISO powinna użyć parametru zapytania WHERE consumed_at >= ?
+    getCaffeineLogs('2026-10-26T10:00:00Z');
+    expect(mockDb.getAllSync).toHaveBeenCalledWith(
+      expect.stringContaining('WHERE consumed_at >='),
+      ['2026-10-26T10:00:00Z']
+    );
+
+    mockDb.getAllSync.mockClear();
+    // Niepoprawna data (nie-ISO / garbage) powinna spaść do zapytania bez WHERE
+    getCaffeineLogs('invalid-date-string');
+    expect(mockDb.getAllSync).toHaveBeenCalledWith(
+      expect.stringContaining('ORDER BY consumed_at DESC LIMIT 200'),
+      []
+    );
+  });
 });

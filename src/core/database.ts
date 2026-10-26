@@ -790,7 +790,12 @@ function mapRowToBrewSession(row: BrewSessionRow): BrewSession {
 
 export function getCaffeineLogs(sinceIso?: string): CaffeineLog[] {
   const db = getDatabase();
-  const safeSince = typeof sinceIso === 'string' && sinceIso.trim().length > 0 ? sinceIso.trim() : undefined;
+  const safeSince =
+    typeof sinceIso === 'string' &&
+    sinceIso.trim().length > 0 &&
+    !isNaN(new Date(sinceIso.trim()).getTime())
+      ? sinceIso.trim()
+      : undefined;
   const query = safeSince
     ? 'SELECT * FROM caffeine_logs WHERE consumed_at >= ? ORDER BY consumed_at ASC'
     : 'SELECT * FROM caffeine_logs ORDER BY consumed_at DESC LIMIT 200';
