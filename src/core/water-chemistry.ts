@@ -202,15 +202,15 @@ export function calculateWaterMinerals(
   const rawVol =
     typeof waterVolumeLiters !== 'number' && typeof waterVolumeLiters !== 'string'
       ? NaN
-      : (typeof waterVolumeLiters === 'string' ? parseFloat(waterVolumeLiters.trim()) : waterVolumeLiters);
+      : (typeof waterVolumeLiters === 'string' ? parseFloat(waterVolumeLiters.trim().replace(/,/g, '.')) : waterVolumeLiters);
   const rawGh =
     typeof targetGh !== 'number' && typeof targetGh !== 'string'
       ? NaN
-      : (typeof targetGh === 'string' ? parseFloat(targetGh.trim()) : targetGh);
+      : (typeof targetGh === 'string' ? parseFloat(targetGh.trim().replace(/,/g, '.')) : targetGh);
   const rawKh =
     typeof targetKh !== 'number' && typeof targetKh !== 'string'
       ? NaN
-      : (typeof targetKh === 'string' ? parseFloat(targetKh.trim()) : targetKh);
+      : (typeof targetKh === 'string' ? parseFloat(targetKh.trim().replace(/,/g, '.')) : targetKh);
   let vol = Number.isFinite(rawVol) && rawVol > 0 && !Object.is(rawVol, -0) ? Math.max(0.1, Math.min(1000.0, rawVol)) : 1.0;
   if (Object.is(vol, -0)) vol = 1.0;
   let gh = Number.isFinite(rawGh) && rawGh >= 0 && !Object.is(rawGh, -0) ? Math.max(0, Math.min(5000, rawGh)) : 0;
@@ -290,8 +290,8 @@ export function diagnoseWaterSensoryImpact(
       recommendationEn: 'Enter valid positive numerical values for GH hardness and KH buffer.',
     };
   }
-  const rawGh = typeof ghPpm === 'string' ? parseFloat(ghPpm.trim()) : Number(ghPpm);
-  const rawKh = typeof khPpm === 'string' ? parseFloat(khPpm.trim()) : Number(khPpm);
+  const rawGh = typeof ghPpm === 'string' ? parseFloat(ghPpm.trim().replace(/,/g, '.')) : Number(ghPpm);
+  const rawKh = typeof khPpm === 'string' ? parseFloat(khPpm.trim().replace(/,/g, '.')) : Number(khPpm);
   let safeGh = Number.isFinite(rawGh) ? rawGh : NaN;
   let safeKh = Number.isFinite(rawKh) ? rawKh : NaN;
   if (Object.is(safeGh, -0)) safeGh = 0;
@@ -378,7 +378,7 @@ export function diagnoseWaterSensoryImpact(
  */
 export function ppmCaCO3ToDegreesDH(ppm: number | string): number {
   if (typeof ppm !== 'number' && typeof ppm !== 'string') return 0;
-  const numPpm = typeof ppm === 'string' ? parseFloat(ppm.trim()) : ppm;
+  const numPpm = typeof ppm === 'string' ? parseFloat(ppm.trim().replace(/,/g, '.')) : ppm;
   if (!Number.isFinite(numPpm) || numPpm <= 0 || Object.is(numPpm, -0)) return 0;
   const safePpm = Math.min(10000, numPpm);
   let result = Number((safePpm / 17.848).toFixed(4));
@@ -391,7 +391,7 @@ export function ppmCaCO3ToDegreesDH(ppm: number | string): number {
  */
 export function degreesDHToPpmCaCO3(dH: number | string): number {
   if (typeof dH !== 'number' && typeof dH !== 'string') return 0;
-  const numDH = typeof dH === 'string' ? parseFloat(dH.trim()) : dH;
+  const numDH = typeof dH === 'string' ? parseFloat(dH.trim().replace(/,/g, '.')) : dH;
   if (!Number.isFinite(numDH) || numDH <= 0 || Object.is(numDH, -0)) return 0;
   const safeDH = Math.min(500, numDH);
   let result = Number((safeDH * 17.848).toFixed(2));

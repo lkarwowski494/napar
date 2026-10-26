@@ -509,5 +509,25 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(findBottledWaterById('zywiecki-krysztal')?.id).toBe('zywiecki_krysztal');
     expect(findBottledWaterById('zywiec-zdroj')?.id).toBe('zywiec_zdroj');
   });
+
+  test('TASK-P45-07-JAK: calculateWaterMinerals, diagnoseWaterSensoryImpact, ppmCaCO3ToDegreesDH i degreesDHToPpmCaCO3 parsuja stringi z przecinkami dziesietnymi', () => {
+    // ppmCaCO3ToDegreesDH z przecinkiem dziesietnym
+    const dh1 = ppmCaCO3ToDegreesDH('35,696');
+    expect(dh1).toBeCloseTo(2.0, 3);
+
+    // degreesDHToPpmCaCO3 z przecinkiem dziesietnym
+    const ppm1 = degreesDHToPpmCaCO3('2,5');
+    expect(ppm1).toBeCloseTo(44.62, 1);
+
+    // calculateWaterMinerals z objętością i twardościami z przecinkiem
+    const res = calculateWaterMinerals('2,5', '80,5', '40,2');
+    expect(res.waterVolumeLiters).toBe(2.5);
+    expect(res.targetGhPpm).toBe(80.5);
+    expect(res.targetKhPpm).toBe(40.2);
+
+    // diagnoseWaterSensoryImpact z przecinkiem
+    const diag = diagnoseWaterSensoryImpact('60,5', '30,5');
+    expect(diag.problemPl).toContain('Golden Zone');
+  });
 });
 
