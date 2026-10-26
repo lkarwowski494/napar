@@ -125,9 +125,10 @@ export function recipeToCompactPayload(
 
   const compactSteps: CompactRecipeStep[] = (rawSteps || [])
     .filter((st): st is RecipeStep => typeof st === 'object' && st !== null)
+    .slice(0, 100)
     .map((st) => ({
-      n: typeof st.namePl === 'string' && st.namePl.trim() ? st.namePl.trim() : 'Step',
-      ...(typeof st.nameEn === 'string' && st.nameEn.trim() ? { ne: st.nameEn.trim() } : {}),
+      n: typeof st.namePl === 'string' && st.namePl.trim() ? st.namePl.trim().slice(0, 100) : 'Step',
+      ...(typeof st.nameEn === 'string' && st.nameEn.trim() ? { ne: st.nameEn.trim().slice(0, 100) } : {}),
       d: Number.isFinite(st.durationSeconds) && st.durationSeconds > 0 ? Math.min(86400, Math.round(st.durationSeconds)) : 30,
       w: Number.isFinite(st.targetWaterGrams) && st.targetWaterGrams >= 0 ? Math.min(50000, Math.round(st.targetWaterGrams)) : 0,
       i: typeof st.instructionPl === 'string' ? st.instructionPl.trim().slice(0, 2000) : '',
@@ -285,8 +286,8 @@ export function decodeRecipeFromShareUrl(
       .filter((st): st is CompactRecipeStep => typeof st === 'object' && st !== null)
       .map((st, idx) => ({
         stepNumber: idx + 1,
-        namePl: typeof st.n === 'string' && st.n.trim() ? st.n : defaultStepName(idx + 1),
-        ...(st.ne && typeof st.ne === 'string' ? { nameEn: st.ne } : (isEn && typeof st.n === 'string' && st.n ? { nameEn: st.n } : {})),
+        namePl: typeof st.n === 'string' && st.n.trim() ? st.n.trim().slice(0, 100) : defaultStepName(idx + 1),
+        ...(st.ne && typeof st.ne === 'string' ? { nameEn: st.ne.trim().slice(0, 100) } : (isEn && typeof st.n === 'string' && st.n ? { nameEn: st.n.trim().slice(0, 100) } : {})),
         durationSeconds: typeof st.d === 'number' && Number.isFinite(st.d) && st.d > 0 ? Math.min(86400, Math.round(st.d)) : 30,
         targetWaterGrams: typeof st.w === 'number' && Number.isFinite(st.w) && st.w >= 0 ? Math.min(50000, Math.round(st.w)) : 0,
         instructionPl: typeof st.i === 'string' ? st.i.slice(0, 2000) : '',

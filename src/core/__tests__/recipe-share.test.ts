@@ -536,4 +536,19 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded).not.toBeNull();
     expect(decoded?.recipe.description?.length).toBe(1000);
   });
+  test('TASK-P22-11-WZR: recipeToCompactPayload i decodeRecipeFromShareUrl ograniczają długość nazw kroków do 100 znaków', () => {
+    const longName = 'S'.repeat(300);
+    const raw = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Long Step Name Test',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15,
+      w: 250,
+      s: [{ n: longName, d: 30, w: 100 }],
+    }));
+    const decoded = decodeRecipeFromShareUrl(raw);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.originalSteps[0].namePl.length).toBe(100);
+  });
 });
