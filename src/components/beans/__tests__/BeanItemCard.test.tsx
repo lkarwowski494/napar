@@ -99,4 +99,33 @@ describe('BeanItemCard Component', () => {
     act(() => archiveBtn.props.onPress());
     expect(defaultProps.onToggleArchive).toHaveBeenCalledWith(mockItem);
   });
+
+  test('TASK-P39-04-STU: przyciski akcji posiadają unikalne testID, ulubione maja accessibilityState, a wagi chronione sa przed -0', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BeanItemCard
+          {...defaultProps}
+          item={{
+            ...mockItem,
+            isFavorite: true,
+            remainingWeightGrams: -0,
+            initialWeightGrams: -0,
+          }}
+        />
+      );
+    });
+
+    const favBtn = tree.root.findByProps({ testID: 'bean-fav-btn-bean-101' });
+    expect(favBtn.props.accessibilityState).toEqual({ selected: true });
+
+    const editBtn = tree.root.findByProps({ testID: 'bean-edit-btn-bean-101' });
+    expect(editBtn).toBeDefined();
+
+    const archiveBtn = tree.root.findByProps({ testID: 'bean-archive-btn-bean-101' });
+    expect(archiveBtn).toBeDefined();
+
+    const weightText = tree.root.findByProps({ testID: 'bean-weight-bean-101' });
+    expect(weightText.props.children).toEqual(['0g', ' /', ' ', '0g']);
+  });
 });

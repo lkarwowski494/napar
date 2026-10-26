@@ -33,6 +33,10 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
   const { t, language: contextLang } = useTranslation();
   const language = propLanguage || contextLang || 'pl';
   const isEn = language === 'en';
+  const rawRem = typeof item.remainingWeightGrams === 'number' ? item.remainingWeightGrams : 0;
+  const safeRemainingGrams = Object.is(rawRem, -0) || rawRem < 0 ? 0 : rawRem;
+  const rawInit = typeof item.initialWeightGrams === 'number' ? item.initialWeightGrams : 0;
+  const safeInitialGrams = Object.is(rawInit, -0) || rawInit < 0 ? 0 : rawInit;
   const resting =
     item.type === 'coffee' && item.roastOrHarvestDate
       ? evaluateRestingWindow(item.roastOrHarvestDate)
@@ -48,10 +52,12 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
           ) : null}
         </View>
         <Pressable
+          testID={`bean-fav-btn-${item.id}`}
           onPress={() => onToggleFavorite(item)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={{ padding: 4 }}
           accessibilityRole="button"
+          accessibilityState={{ selected: Boolean(item.isFavorite) }}
           accessibilityLabel={item.isFavorite ? (t.stash?.favoriteRemove || 'Usuń z ulubionych') : (t.stash?.favoriteAdd || 'Dodaj do ulubionych')}
         >
           <Text style={[styles.favIcon, item.isFavorite && styles.favIconActive]}>
@@ -105,7 +111,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
       )}
 
       {/* Baner dla wyczerpanej paczki */}
-      {item.remainingWeightGrams === 0 && !item.isArchived && (
+      {safeRemainingGrams === 0 && !item.isArchived && (
         <View style={styles.emptyStashBanner}>
           <Text style={styles.emptyStashText}>
             {t.stash?.archivePrompt || 'Paczka skończona (0 g). Przenieść do archiwum?'}
@@ -128,16 +134,17 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             testID={`bean-weight-${item.id}`}
             style={styles.weightValue}
             accessibilityRole="text"
-            accessibilityLabel={`${isEn ? 'Remaining weight' : 'Pozostała waga'}: ${formatDoseWeight(item.remainingWeightGrams, unitSystem)}, ${isEn ? 'Initial weight' : 'Waga początkowa'}: ${formatDoseWeight(item.initialWeightGrams, unitSystem)}`}
+            accessibilityLabel={`${isEn ? 'Remaining weight' : 'Pozostała waga'}: ${formatDoseWeight(safeRemainingGrams, unitSystem)}, ${isEn ? 'Initial weight' : 'Waga początkowa'}: ${formatDoseWeight(safeInitialGrams, unitSystem)}`}
           >
-            {formatDoseWeight(item.remainingWeightGrams, unitSystem)} /{' '}
-            {formatDoseWeight(item.initialWeightGrams, unitSystem)}
+            {formatDoseWeight(safeRemainingGrams, unitSystem)} /{' '}
+            {formatDoseWeight(safeInitialGrams, unitSystem)}
           </Text>
         </View>
 
         <View style={styles.actionsRow}>
-          {!item.isArchived && item.remainingWeightGrams > 0 && (
+          {!item.isArchived && safeRemainingGrams > 0 && (
             <Pressable
+              testID={`bean-brew-btn-${item.id}`}
               style={styles.brewActionBtn}
               onPress={() => onSelectForBrew(item)}
               hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
@@ -148,6 +155,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             </Pressable>
           )}
           <Pressable
+            testID={`bean-edit-btn-${item.id}`}
             style={styles.editActionBtn}
             onPress={() => onOpenEdit(item)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -156,6 +164,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             <Text style={styles.editActionText}>{isEn ? "Edit" : "Edytuj"}</Text>
           </Pressable>
           <Pressable
+            testID={`bean-archive-btn-${item.id}`}
             style={styles.archiveActionBtn}
             onPress={() => onToggleArchive(item)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
