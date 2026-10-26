@@ -223,4 +223,34 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resNullState.success).toBe(false);
     expect(resNullState.error).toContain('Nieprawidłowy stan początkowy');
   });
+
+  test('TASK-P15-12-NIE: buildLiveActivityPayload sanityzuje i ogranicza (clamp/round) ujemne i niefinansowe wartości liczbowe', () => {
+    const corruptedState: any = {
+      stepIndex: -5,
+      totalSteps: 0,
+      stepRemainingSeconds: -45,
+      stepDurationSeconds: NaN,
+      totalElapsedSeconds: -12.7,
+      targetWaterGrams: -100,
+    };
+    const corruptedAttr: any = {
+      sessionId: 'sess-bad',
+      recipeName: '   Corrupted Brew   ',
+      method: 'Aeropress',
+      beverageType: 'UNKNOWN',
+      totalWaterGrams: -500,
+    };
+
+    const payload = buildLiveActivityPayload(corruptedAttr, corruptedState, 'pl');
+    expect(payload.contentState.stepIndex).toBe(0);
+    expect(payload.contentState.totalSteps).toBe(1);
+    expect(payload.contentState.stepRemainingSeconds).toBe(0);
+    expect(payload.contentState.stepDurationSeconds).toBe(0);
+    expect(payload.contentState.totalElapsedSeconds).toBe(0);
+    expect(payload.contentState.targetWaterGrams).toBe(0);
+
+    expect(payload.attributes.recipeName).toBe('Corrupted Brew');
+    expect(payload.attributes.beverageType).toBe('COFFEE');
+    expect(payload.attributes.totalWaterGrams).toBe(0);
+  });
 });

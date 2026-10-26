@@ -152,25 +152,47 @@ export function buildLiveActivityPayload(
   language: 'pl' | 'en' = 'pl'
 ): LiveActivityPayload {
   const dynamicIsland = buildDynamicIslandPayload(attributes, state, language);
-  const safeAttr: BrewActivityAttributes = attributes || {
-    sessionId: '',
-    recipeName: 'Napar',
-    method: '',
-    beverageType: 'COFFEE',
-    totalWaterGrams: 0,
-  };
-  const safeState: BrewActivityContentState = state || {
-    stepIndex: 0,
-    totalSteps: 1,
-    stepNamePl: 'Parzenie',
-    stepNameEn: 'Brewing',
-    stepRemainingSeconds: 0,
-    stepDurationSeconds: 0,
-    totalElapsedSeconds: 0,
-    targetWaterGrams: 0,
-    isPaused: false,
-    isFinished: false,
-  };
+  const safeAttr: BrewActivityAttributes = attributes
+    ? {
+        sessionId: attributes.sessionId || '',
+        recipeName: attributes.recipeName && attributes.recipeName.trim() ? attributes.recipeName.trim() : 'Napar',
+        method: attributes.method || '',
+        beverageType: attributes.beverageType === 'TEA' ? 'TEA' : 'COFFEE',
+        totalWaterGrams: Math.max(0, Number.isFinite(attributes.totalWaterGrams) ? Math.round(attributes.totalWaterGrams) : 0),
+      }
+    : {
+        sessionId: '',
+        recipeName: 'Napar',
+        method: '',
+        beverageType: 'COFFEE',
+        totalWaterGrams: 0,
+      };
+
+  const safeState: BrewActivityContentState = state
+    ? {
+        stepIndex: Math.max(0, Number.isFinite(state.stepIndex) ? state.stepIndex : 0),
+        totalSteps: Math.max(1, Number.isFinite(state.totalSteps) ? state.totalSteps : 1),
+        stepNamePl: state.stepNamePl || 'Parzenie',
+        stepNameEn: state.stepNameEn || 'Brewing',
+        stepRemainingSeconds: Math.max(0, Number.isFinite(state.stepRemainingSeconds) ? Math.round(state.stepRemainingSeconds) : 0),
+        stepDurationSeconds: Math.max(0, Number.isFinite(state.stepDurationSeconds) ? Math.round(state.stepDurationSeconds) : 0),
+        totalElapsedSeconds: Math.max(0, Number.isFinite(state.totalElapsedSeconds) ? Math.round(state.totalElapsedSeconds) : 0),
+        targetWaterGrams: Math.max(0, Number.isFinite(state.targetWaterGrams) ? Math.round(state.targetWaterGrams) : 0),
+        isPaused: Boolean(state.isPaused),
+        isFinished: Boolean(state.isFinished),
+      }
+    : {
+        stepIndex: 0,
+        totalSteps: 1,
+        stepNamePl: 'Parzenie',
+        stepNameEn: 'Brewing',
+        stepRemainingSeconds: 0,
+        stepDurationSeconds: 0,
+        totalElapsedSeconds: 0,
+        targetWaterGrams: 0,
+        isPaused: false,
+        isFinished: false,
+      };
 
   return {
     attributes: safeAttr,
