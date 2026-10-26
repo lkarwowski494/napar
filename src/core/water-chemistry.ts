@@ -313,3 +313,11 @@ export function ppmCaCO3ToDegreesDH(ppm: number): number {
   return Number((ppm / 17.848).toFixed(4));
 }
 
+/**
+ * Konwertuje twardość ze stopni niemieckich dH na ppm CaCO3 (1 dH = 17.848 ppm CaCO3)
+ */
+export function degreesDHToPpmCaCO3(dH: number): number {
+  if (!Number.isFinite(dH) || dH < 0) return 0;
+  return Number((dH * 17.848).toFixed(2));
+}
+

@@ -9,6 +9,7 @@ import {
   diagnoseWaterSensoryImpact,
   getWaterProfileName,
   ppmCaCO3ToDegreesDH,
+  degreesDHToPpmCaCO3,
 } from '../water-chemistry';
 
 describe('Water Chemistry & Mineralization Module', () => {
@@ -125,5 +126,19 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(ppmCaCO3ToDegreesDH(-10)).toBe(0);
     expect(ppmCaCO3ToDegreesDH(Infinity)).toBe(0);
     expect(ppmCaCO3ToDegreesDH(17.848)).toBe(1);
+  });
+
+  test('TASK-P10-08-PRO: degreesDHToPpmCaCO3 konwertuje stopnie dH na ppm CaCO3 z zachowaniem odporności na NaN', () => {
+    expect(degreesDHToPpmCaCO3(1)).toBe(17.85);
+    expect(degreesDHToPpmCaCO3(10)).toBe(178.48);
+    expect(degreesDHToPpmCaCO3(0)).toBe(0);
+    expect(degreesDHToPpmCaCO3(-5)).toBe(0);
+    expect(degreesDHToPpmCaCO3(NaN)).toBe(0);
+    expect(degreesDHToPpmCaCO3(Infinity)).toBe(0);
+
+    // Spójność dwustronna: 10 dH -> ppm -> dH powraca do 10 dH
+    const ppm = degreesDHToPpmCaCO3(10);
+    const dHBack = Math.round(ppmCaCO3ToDegreesDH(ppm));
+    expect(dHBack).toBe(10);
   });
 });
