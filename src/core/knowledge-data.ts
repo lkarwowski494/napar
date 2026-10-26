@@ -689,10 +689,34 @@ export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined
   });
 }
 
+const PROCESS_ALIASES: Record<string, string> = {
+  washed: 'process-washed',
+  mokra: 'process-washed',
+  myta: 'process-washed',
+  natural: 'process-natural',
+  sucha: 'process-natural',
+  honey: 'process-honey',
+  miodowa: 'process-honey',
+  pulpednatural: 'process-honey',
+  anaerobic: 'process-anaerobic',
+  beztlenowa: 'process-anaerobic',
+  carbonic: 'process-carbonic-maceration',
+  carbonicmaceration: 'process-carbonic-maceration',
+  maceracjaweglowa: 'process-carbonic-maceration',
+  wethulled: 'process-wet-hulled',
+  gilingbasah: 'process-wet-hulled',
+};
+
 export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
   const cleanId = id.trim().toLowerCase();
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  const aliasMatchId = PROCESS_ALIASES[normId] || PROCESS_ALIASES[normId.replace(/[\s_-]+/g, '')];
+  if (aliasMatchId) {
+    const found = COFFEE_PROCESSES.find((p) => p.id === aliasMatchId);
+    if (found) return found;
+  }
   return COFFEE_PROCESSES.find((p) => {
     if (p.id && p.id.trim().toLowerCase() === cleanId) return true;
     if (p.processType && p.processType.trim().toLowerCase() === cleanId) return true;

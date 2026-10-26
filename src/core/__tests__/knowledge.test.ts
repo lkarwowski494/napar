@@ -639,4 +639,34 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(typica).toBeDefined();
     expect(typica?.id).toBe('variety-typica');
   });
+
+  test('TASK-P36-06-TRE: findCoffeeProcessById wspiera popularne aliasy (washed, mokra, natural, honey, anaerobic, carbonic, giling-basah)', () => {
+    const washed = findCoffeeProcessById('washed');
+    expect(washed).toBeDefined();
+    expect(washed?.id).toBe('process-washed');
+
+    const mokra = findCoffeeProcessById('mokra');
+    expect(mokra).toBeDefined();
+    expect(mokra?.id).toBe('process-washed');
+
+    const natural = findCoffeeProcessById('natural');
+    expect(natural).toBeDefined();
+    expect(natural?.id).toBe('process-natural');
+
+    const honey = findCoffeeProcessById('honey');
+    expect(honey).toBeDefined();
+    expect(honey?.id).toBe('process-honey');
+
+    const anaerobic = findCoffeeProcessById('anaerobic');
+    expect(anaerobic).toBeDefined();
+    expect(anaerobic?.id).toBe('process-anaerobic');
+
+    const carbonic = findCoffeeProcessById('carbonic');
+    expect(carbonic).toBeDefined();
+    expect(carbonic?.id).toBe('process-carbonic-maceration');
+
+    const wetHulled = findCoffeeProcessById('giling-basah');
+    expect(wetHulled).toBeDefined();
+    expect(wetHulled?.id).toBe('process-wet-hulled');
+  });
 });
