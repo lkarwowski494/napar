@@ -225,4 +225,39 @@ describe('Apps4BrewPassModal Component', () => {
     expect(restoreBtn.props.disabled).toBe(false);
     expect(restoreBtn.props.accessibilityState).toEqual({ disabled: false });
   });
+
+  test('TASK-P49-02-MON: przyciski planów posiadają accessibilityHint a handleRestore wywołuje onClose', () => {
+    const handleClose = jest.fn();
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <Apps4BrewPassModal visible={true} onClose={handleClose} />
+      );
+    });
+
+    const annualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
+    expect(annualBtn.props.accessibilityHint).toBeDefined();
+    expect(annualBtn.props.accessibilityHint.length).toBeGreaterThan(0);
+
+    const lifetimeBtn = tree.root.findByProps({ testID: 'plan-lifetime-btn' });
+    expect(lifetimeBtn.props.accessibilityHint).toBeDefined();
+
+    const monthlyBtn = tree.root.findByProps({ testID: 'plan-monthly-btn' });
+    expect(monthlyBtn.props.accessibilityHint).toBeDefined();
+
+    const restoreBtn = tree.root.findByProps({ testID: 'restore-purchases-btn' });
+    expect(restoreBtn.props.accessibilityHint).toBeDefined();
+
+    const closeBtn = tree.root.findByProps({ testID: 'close-paywall-btn' });
+    expect(closeBtn.props.accessibilityHint).toBeDefined();
+
+    mockDb.app_settings.set('has_verified_purchase', '1');
+    mockDb.app_settings.set('verified_purchase_tier', 'lifetime');
+
+    act(() => {
+      restoreBtn.props.onPress();
+    });
+
+    expect(handleClose).toHaveBeenCalled();
+  });
 });
