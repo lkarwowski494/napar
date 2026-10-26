@@ -108,6 +108,12 @@ try {
     `app.json -> expo.android.package musi być równe 'pl.lukasz.napar' (otrzymano '${appJson.android?.package}')`
   );
 
+  // Weryfikacja formatu expo.android.versionCode w app.json (TASK-P24-10-WYD)
+  check(
+    typeof appJson.android?.versionCode === 'number' && Number.isInteger(appJson.android.versionCode) && appJson.android.versionCode >= 1,
+    `app.json -> expo.android.versionCode musi być dodatnią liczbą całkowitą (otrzymano '${appJson.android?.versionCode}')`
+  );
+
   // Weryfikacja ścieżki ikony oraz numerycznego buildNumber (TASK-P12-10-WYD)
   check(
     appJson.icon === './assets/icon.png',
