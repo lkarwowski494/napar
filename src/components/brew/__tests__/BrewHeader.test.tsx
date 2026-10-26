@@ -183,4 +183,27 @@ describe('BrewHeader Component', () => {
     expect(gongfuBtn.props.accessibilityRole).toBe('button');
     expect(gongfuBtn.props.accessibilityLabel).toBe('Przejdź do trybu wieloetapowego parzenia Gongfu Cha');
   });
+
+  test('TASK-P41-01-ODK: BrewHeader definiuje testID dla chipów ulubionych oraz accessibilityState disabled gdy isRunning=true', () => {
+    let treeIdle: any;
+    act(() => {
+      treeIdle = renderer.create(<BrewHeader {...defaultProps} isRunning={false} />);
+    });
+    const favChip = treeIdle.root.findByProps({ testID: 'favorite-recipe-chip-fav-1' });
+    expect(favChip).toBeDefined();
+    expect(favChip.props.accessibilityState).toEqual({ selected: false });
+
+    let treeRunning: any;
+    act(() => {
+      treeRunning = renderer.create(<BrewHeader {...defaultProps} isRunning={true} />);
+    });
+    const recipeCard = treeRunning.root.findByProps({ testID: 'change-recipe-btn' });
+    expect(recipeCard.props.accessibilityState).toEqual({ disabled: true });
+
+    const stashCard = treeRunning.root.findByProps({ testID: 'open-inventory-modal-btn' });
+    expect(stashCard.props.accessibilityState).toEqual({ disabled: true });
+
+    const shareBtn = treeRunning.root.findByProps({ testID: 'share-recipe-btn' });
+    expect(shareBtn.props.accessibilityState).toEqual({ disabled: true });
+  });
 });

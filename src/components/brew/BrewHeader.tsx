@@ -139,13 +139,17 @@ export function BrewHeader({
               return (
                 <Pressable
                   key={fav.id}
+                  testID={`favorite-recipe-chip-${fav.id}`}
                   style={[
                     styles.favoriteChip,
                     isSelected && styles.favoriteChipActive,
                   ]}
                   onPress={() => onSelectRecipe(fav)}
                   accessibilityRole="button"
-                  accessibilityState={{ selected: isSelected }}
+                  accessibilityState={{
+                    selected: isSelected,
+                    ...(isRunning ? { disabled: true } : {}),
+                  }}
                   accessibilityLabel={`Ulubiony przepis: ${fav.name}, metoda ${fav.method}, doza ${favDose}g`}
                 >
                   <Text
@@ -174,6 +178,7 @@ export function BrewHeader({
           style={styles.grinderPillCard}
           onPress={onOpenGrinderModal}
           accessibilityRole="button"
+          accessibilityState={{ disabled: isRunning }}
           accessibilityLabel={`Młynek: ${grinderRecommendation.grinderName}, nastawa ${grinderRecommendation.formatted}`}
         >
         <View style={styles.pillIconBox}>
@@ -199,6 +204,7 @@ export function BrewHeader({
           style={styles.selectorCard}
           onPress={onOpenRecipeModal}
           accessibilityRole="button"
+          accessibilityState={{ disabled: isRunning }}
           accessibilityLabel={`Wybrany przepis: ${recipe.name}`}
         >
           <Text style={styles.selectorEyebrow}>RECEPTURA</Text>
@@ -218,6 +224,7 @@ export function BrewHeader({
           ]}
           onPress={onOpenInventoryModal}
           accessibilityRole="button"
+          accessibilityState={{ disabled: isRunning }}
           accessibilityLabel="Wybierz ziarna ze spiżarni"
           accessibilityHint={
             selectedInventoryItem
@@ -243,6 +250,7 @@ export function BrewHeader({
           style={styles.actionPillCard}
           onPress={onOpenShareModal}
           accessibilityRole="button"
+          accessibilityState={{ disabled: isRunning }}
           accessibilityLabel="Udostępnij recepturę przez kod QR"
           testID="share-recipe-btn"
         >
