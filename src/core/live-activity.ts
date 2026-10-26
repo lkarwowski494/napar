@@ -291,6 +291,16 @@ export function buildLiveActivityPayload(
   };
 }
 
+const parseLiveNumber = (val: any): number => {
+  if (typeof val === 'number') return val;
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (!trimmed) return NaN;
+    return parseFloat(trimmed.replace(',', '.'));
+  }
+  return NaN;
+};
+
 export async function startLiveActivity(
   attributes: BrewActivityAttributes,
   initialState: BrewActivityContentState,
@@ -324,7 +334,7 @@ export async function startLiveActivity(
       error: 'Nieprawidłowa metoda parzenia w atrybutach Live Activity.',
     };
   }
-  const rawWater = typeof attributes.totalWaterGrams === 'number' ? attributes.totalWaterGrams : (typeof attributes.totalWaterGrams === 'string' ? parseFloat(attributes.totalWaterGrams) : NaN);
+  const rawWater = parseLiveNumber(attributes.totalWaterGrams);
   if (!Number.isFinite(rawWater) || rawWater <= 0 || rawWater > 50000 || Object.is(rawWater, -0)) {
     return {
       success: false,
@@ -337,54 +347,42 @@ export async function startLiveActivity(
       error: 'Nieprawidłowy stan początkowy aktywności Live Activity.',
     };
   }
-  const rawStepIdx = typeof initialState.stepIndex === 'number'
-    ? initialState.stepIndex
-    : (typeof initialState.stepIndex === 'string' ? parseFloat(initialState.stepIndex) : NaN);
+  const rawStepIdx = parseLiveNumber(initialState.stepIndex);
   if (!Number.isFinite(rawStepIdx) || !Number.isInteger(rawStepIdx) || rawStepIdx < 0 || Object.is(rawStepIdx, -0)) {
     return {
       success: false,
       error: 'Nieprawidłowy indeks kroku w stanie Live Activity.',
     };
   }
-  const rawTotSteps = typeof initialState.totalSteps === 'number'
-    ? initialState.totalSteps
-    : (typeof initialState.totalSteps === 'string' ? parseFloat(initialState.totalSteps) : NaN);
+  const rawTotSteps = parseLiveNumber(initialState.totalSteps);
   if (!Number.isFinite(rawTotSteps) || !Number.isInteger(rawTotSteps) || rawTotSteps <= 0 || Object.is(rawTotSteps, -0)) {
     return {
       success: false,
       error: 'Nieprawidłowa łączna liczba kroków w stanie Live Activity.',
     };
   }
-  const rawDuration = typeof initialState.stepDurationSeconds === 'number'
-    ? initialState.stepDurationSeconds
-    : (typeof initialState.stepDurationSeconds === 'string' ? parseFloat(initialState.stepDurationSeconds) : NaN);
+  const rawDuration = parseLiveNumber(initialState.stepDurationSeconds);
   if (!Number.isFinite(rawDuration) || rawDuration < 0 || Object.is(rawDuration, -0) || rawDuration > 86400) {
     return {
       success: false,
       error: 'Nieprawidłowy czas trwania kroku w stanie Live Activity (wymagany zakres [0, 86400]).',
     };
   }
-  const rawRemaining = typeof initialState.stepRemainingSeconds === 'number'
-    ? initialState.stepRemainingSeconds
-    : (typeof initialState.stepRemainingSeconds === 'string' ? parseFloat(initialState.stepRemainingSeconds) : NaN);
+  const rawRemaining = parseLiveNumber(initialState.stepRemainingSeconds);
   if (!Number.isFinite(rawRemaining) || rawRemaining < 0 || Object.is(rawRemaining, -0) || rawRemaining > 86400) {
     return {
       success: false,
       error: 'Nieprawidłowy pozostały czas kroku w stanie Live Activity (wymagany zakres [0, 86400]).',
     };
   }
-  const rawTargetWater = typeof initialState.targetWaterGrams === 'number'
-    ? initialState.targetWaterGrams
-    : (typeof initialState.targetWaterGrams === 'string' ? parseFloat(initialState.targetWaterGrams) : NaN);
+  const rawTargetWater = parseLiveNumber(initialState.targetWaterGrams);
   if (!Number.isFinite(rawTargetWater) || rawTargetWater < 0 || Object.is(rawTargetWater, -0) || rawTargetWater > 50000) {
     return {
       success: false,
       error: 'Nieprawidłowa docelowa waga wody w stanie Live Activity (wymagany zakres [0, 50000]).',
     };
   }
-  const rawElapsed = typeof initialState.totalElapsedSeconds === 'number'
-    ? initialState.totalElapsedSeconds
-    : (typeof initialState.totalElapsedSeconds === 'string' ? parseFloat(initialState.totalElapsedSeconds) : NaN);
+  const rawElapsed = parseLiveNumber(initialState.totalElapsedSeconds);
   if (!Number.isFinite(rawElapsed) || rawElapsed < 0 || Object.is(rawElapsed, -0) || rawElapsed > 86400) {
     return {
       success: false,
@@ -413,54 +411,42 @@ export async function updateLiveActivity(
       error: 'Nieprawidłowy stan aktywności Live Activity.',
     };
   }
-  const rawStepIdx = typeof _state.stepIndex === 'number'
-    ? _state.stepIndex
-    : (typeof _state.stepIndex === 'string' ? parseFloat(_state.stepIndex) : NaN);
+  const rawStepIdx = parseLiveNumber(_state.stepIndex);
   if (!Number.isFinite(rawStepIdx) || !Number.isInteger(rawStepIdx) || rawStepIdx < 0 || Object.is(rawStepIdx, -0)) {
     return {
       success: false,
       error: 'Nieprawidłowy indeks kroku w stanie Live Activity.',
     };
   }
-  const rawTotSteps = typeof _state.totalSteps === 'number'
-    ? _state.totalSteps
-    : (typeof _state.totalSteps === 'string' ? parseFloat(_state.totalSteps) : NaN);
+  const rawTotSteps = parseLiveNumber(_state.totalSteps);
   if (!Number.isFinite(rawTotSteps) || !Number.isInteger(rawTotSteps) || rawTotSteps <= 0 || Object.is(rawTotSteps, -0)) {
     return {
       success: false,
       error: 'Nieprawidłowa łączna liczba kroków w stanie Live Activity.',
     };
   }
-  const rawDuration = typeof _state.stepDurationSeconds === 'number'
-    ? _state.stepDurationSeconds
-    : (typeof _state.stepDurationSeconds === 'string' ? parseFloat(_state.stepDurationSeconds) : NaN);
+  const rawDuration = parseLiveNumber(_state.stepDurationSeconds);
   if (!Number.isFinite(rawDuration) || rawDuration < 0 || Object.is(rawDuration, -0) || rawDuration > 86400) {
     return {
       success: false,
       error: 'Nieprawidłowy czas trwania kroku w stanie Live Activity (wymagany zakres [0, 86400]).',
     };
   }
-  const rawRemaining = typeof _state.stepRemainingSeconds === 'number'
-    ? _state.stepRemainingSeconds
-    : (typeof _state.stepRemainingSeconds === 'string' ? parseFloat(_state.stepRemainingSeconds) : NaN);
+  const rawRemaining = parseLiveNumber(_state.stepRemainingSeconds);
   if (!Number.isFinite(rawRemaining) || rawRemaining < 0 || Object.is(rawRemaining, -0) || rawRemaining > 86400) {
     return {
       success: false,
       error: 'Nieprawidłowy pozostały czas kroku w stanie Live Activity (wymagany zakres [0, 86400]).',
     };
   }
-  const rawTargetWater = typeof _state.targetWaterGrams === 'number'
-    ? _state.targetWaterGrams
-    : (typeof _state.targetWaterGrams === 'string' ? parseFloat(_state.targetWaterGrams) : NaN);
+  const rawTargetWater = parseLiveNumber(_state.targetWaterGrams);
   if (!Number.isFinite(rawTargetWater) || rawTargetWater < 0 || Object.is(rawTargetWater, -0) || rawTargetWater > 50000) {
     return {
       success: false,
       error: 'Nieprawidłowa docelowa waga wody w stanie Live Activity (wymagany zakres [0, 50000]).',
     };
   }
-  const rawElapsed = typeof _state.totalElapsedSeconds === 'number'
-    ? _state.totalElapsedSeconds
-    : (typeof _state.totalElapsedSeconds === 'string' ? parseFloat(_state.totalElapsedSeconds) : NaN);
+  const rawElapsed = parseLiveNumber(_state.totalElapsedSeconds);
   if (!Number.isFinite(rawElapsed) || rawElapsed < 0 || Object.is(rawElapsed, -0) || rawElapsed > 86400) {
     return {
       success: false,

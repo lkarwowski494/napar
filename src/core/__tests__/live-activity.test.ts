@@ -908,4 +908,45 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(payload.contentState.targetWaterGrams).toBe(61);
     expect(payload.contentState.totalElapsedSeconds).toBe(16);
   });
+
+  test('TASK-P50-12-NIE: obsluga przecinkow dziesietnych i walidacja stringow w startLiveActivity oraz updateLiveActivity', async () => {
+    const commaAttributes: any = {
+      ...mockAttributesCoffee,
+      totalWaterGrams: '250,5',
+    };
+    const commaState: any = {
+      ...mockState,
+      totalSteps: 2,
+      stepIndex: 0,
+      stepDurationSeconds: '45,5',
+      stepRemainingSeconds: '30,5',
+      targetWaterGrams: '60,5',
+      totalElapsedSeconds: '15,5',
+    };
+
+    // 1. startLiveActivity z przecinkami dziesiętnymi przechodzi walidację i dociera do błędu platformowego DEC-01
+    const resStart = await startLiveActivity(commaAttributes, commaState);
+    expect(resStart.error).toBe('ActivityKit Live Activity niedostępne w v1.0 (DEC-01).');
+
+    // 2. updateLiveActivity z przecinkami dziesiętnymi przechodzi walidację
+    const resUpdate = await updateLiveActivity('act-test-1', commaState);
+    expect(resUpdate.error).toBe('ActivityKit Live Activity niedostępne w v1.0 (DEC-01).');
+
+    // 3. Odrzucanie ujemnych wartości z przecinkiem dziesiętnym
+    const invalidNegativeState: any = {
+      ...mockState,
+      stepDurationSeconds: '-5,5',
+    };
+    const resInvalidStart = await startLiveActivity(mockAttributesCoffee, invalidNegativeState);
+    expect(resInvalidStart.success).toBe(false);
+    expect(resInvalidStart.error).toContain('Nieprawidłowy czas trwania kroku');
+
+    const invalidNegativeTargetWater: any = {
+      ...mockState,
+      targetWaterGrams: '-10,5',
+    };
+    const resInvalidUpdate = await updateLiveActivity('act-test-2', invalidNegativeTargetWater);
+    expect(resInvalidUpdate.success).toBe(false);
+    expect(resInvalidUpdate.error).toContain('Nieprawidłowa docelowa waga wody');
+  });
 });
