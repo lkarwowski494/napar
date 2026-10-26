@@ -1,0 +1,98 @@
+[
+  {
+    "id": "TASK-P38-01-ODK",
+    "perspective": "01-ODK",
+    "title": "Semantyczne accessibilityState i etykiety dostepnosci w BrewActiveFocusTimer",
+    "file": "src/components/brew/BrewActiveFocusTimer.tsx",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P38-02-MON",
+    "perspective": "02-MON",
+    "title": "Normalizacja wielkosci liter i trimowanie subscription_tier w getAppAccessState",
+    "file": "src/core/app-access.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P38-03-ZAK",
+    "perspective": "03-ZAK",
+    "title": "Wczesne wyjscie dla pustych ciagow i ochrona przed -0 w parseStepDurationSeconds",
+    "file": "src/core/bpr-engine.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P38-04-STU",
+    "perspective": "04-STU",
+    "title": "Clampowanie wag, ochrona przed -0 i sanacja dlugosci pol tekstowych w BeanEditModal",
+    "file": "src/components/beans/BeanEditModal.tsx",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P38-05-ARC",
+    "perspective": "05-ARC",
+    "title": "Defensywna sanacja flavorTags, recipeId i inventoryItemId w saveBrewSession",
+    "file": "src/core/database.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P38-06-TRE",
+    "perspective": "06-TRE",
+    "title": "Naprawa mapowania aliasow odmian caturra, catuai, pacamara i heirloom w VARIETY_ALIASES",
+    "file": "src/core/knowledge-data.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P38-07-JAK",
+    "perspective": "07-JAK",
+    "title": "Odrzucanie wartosci boolean i bezpieczne pobieranie w findBottledWaterById",
+    "file": "src/core/water-chemistry.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P38-08-PRO",
+    "perspective": "08-PRO",
+    "title": "Rozpoznawanie metod Walkuere oraz Vacpot w getRecipeMicrons",
+    "file": "src/core/grinder-converter.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P38-09-LOK",
+    "perspective": "09-LOK",
+    "title": "Dodanie klucza brew.methodWalkuere w 35 jezykach i rozszerzenie matrycy testow do 825",
+    "file": "locales/*",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P38-10-WYD",
+    "perspective": "10-WYD",
+    "title": "Statyczna weryfikacja expo.android.versionCode jako dodatniej liczby calkowitej",
+    "file": "scripts/verify-native.mjs",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P38-11-WZR",
+    "perspective": "11-WZR",
+    "title": "Scisle clampowanie recommendedRatio do [1, 100] w recipeToCompactPayload i decodeRecipeFromShareUrl",
+    "file": "src/core/recipe-share.ts",
+    "status": "pending",
+    "commit": null
+  },
+  {
+    "id": "TASK-P38-12-NIE",
+    "perspective": "12-NIE",
+    "title": "Ochrona przed -0 i wartosciami nienumerycznymi w formatActivityTimer",
+    "file": "src/core/live-activity.ts",
+    "status": "pending",
+    "commit": null
+  }
+]
