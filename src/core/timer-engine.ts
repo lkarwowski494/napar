@@ -350,14 +350,21 @@ export class BrewTimerEngine {
 
   public getSnapshot(): TimerSnapshot {
     const currentStep = this.getCurrentStep();
+    const prevStep = this.currentStepIndex > 0 ? this.steps[this.currentStepIndex - 1] : null;
     const prevWater =
-      this.currentStepIndex > 0
-        ? this.steps[this.currentStepIndex - 1].targetWaterGrams
+      prevStep && Number.isFinite(prevStep.targetWaterGrams) && prevStep.targetWaterGrams >= 0
+        ? prevStep.targetWaterGrams
         : 0;
-    const targetWater = currentStep ? currentStep.targetWaterGrams : 0;
-    const duration = currentStep ? currentStep.durationSeconds : 1;
+    const targetWater =
+      currentStep && Number.isFinite(currentStep.targetWaterGrams) && currentStep.targetWaterGrams >= 0
+        ? currentStep.targetWaterGrams
+        : 0;
+    const duration =
+      currentStep && Number.isFinite(currentStep.durationSeconds) && currentStep.durationSeconds > 0
+        ? currentStep.durationSeconds
+        : 1;
     const remaining = Math.max(0, duration - this.stepElapsedSeconds);
-    const progress = Math.min(1.0, this.stepElapsedSeconds / Math.max(1, duration));
+    const progress = Math.min(1.0, Math.max(0, this.stepElapsedSeconds / Math.max(1, duration)));
 
     // Dynamiczne obliczanie zalecanego tempa nalewania (g/s)
     const deltaWater = Math.max(0, targetWater - prevWater);
@@ -367,8 +374,7 @@ export class BrewTimerEngine {
         : 0;
 
     // Szacowana woda w danej sekundzie
-    const currentEstimatedWater =
-      prevWater + deltaWater * progress;
+    const currentEstimatedWater = Math.round(prevWater + deltaWater * progress);
 
     return {
       status: this.status,

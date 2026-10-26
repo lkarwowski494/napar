@@ -358,5 +358,22 @@ describe('BrewTimerEngine', () => {
       expect((engine as any).callbacks).toEqual({});
       expect((engine as any).steps).toEqual([]);
     });
+
+    test('TASK-P10-12-NIE: getSnapshot zabezpiecza duration i targetWater przed NaN/Infinity w krokach', () => {
+      const corruptSteps: any[] = [
+        { stepNumber: 1, namePl: 'Step 1', durationSeconds: NaN, targetWaterGrams: Infinity },
+        { stepNumber: 2, namePl: 'Step 2', durationSeconds: -10, targetWaterGrams: NaN },
+      ];
+      const engine = new BrewTimerEngine(corruptSteps);
+      const snap = engine.getSnapshot();
+
+      expect(Number.isFinite(snap.stepRemainingSeconds)).toBe(true);
+      expect(Number.isFinite(snap.stepProgress)).toBe(true);
+      expect(Number.isFinite(snap.recommendedPourRate)).toBe(true);
+      expect(Number.isFinite(snap.currentWaterGrams)).toBe(true);
+      expect(snap.stepProgress).toBe(0);
+      expect(snap.recommendedPourRate).toBe(0);
+      engine.destroy();
+    });
   });
 });
