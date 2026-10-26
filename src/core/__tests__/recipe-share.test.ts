@@ -436,4 +436,20 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decoded).not.toBeNull();
     expect(decoded?.recipe.name).toBe('Trim Recipe');
   });
+
+  test('TASK-P16-11-WZR: decodeRecipeFromShareUrl ogranicza precyzję zmiennoprzecinkową dozy i wody do 1 miejsca po przecinku', () => {
+    const raw = utf8ToBase64(JSON.stringify({
+      v: 1,
+      n: 'Float Precision Recipe',
+      b: 'COFFEE',
+      m: 'V60',
+      d: 15.3333333333,
+      w: 249.999999999,
+      s: [{ n: 'Pour', d: 60, w: 250 }],
+    }));
+    const decoded = decodeRecipeFromShareUrl(`napar://recipe?d=${encodeURIComponent(raw)}`);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.recipe.doseGrams).toBe(15.3);
+    expect(decoded?.recipe.waterGrams).toBe(250);
+  });
 });
