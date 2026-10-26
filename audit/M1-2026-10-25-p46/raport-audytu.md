@@ -29,11 +29,11 @@
 
 | ID | Perspektywa | Status | Plik główny | Commit |
 |---|---|---|---|---|
-| TASK-P46-01-ODK | Odkrywanie | Pending | `src/components/brew/BrewFinishModal.tsx` | - |
-| TASK-P46-02-MON | Monetyzacja | Pending | `src/core/app-access.ts` | - |
-| TASK-P46-03-ZAK | Zaskoczenie | Pending | `src/core/bpr-engine.ts` | - |
-| TASK-P46-04-STU | Studiowanie | Pending | `src/components/recipe-builder/RecipeStepEditor.tsx` | - |
-| TASK-P46-05-ARC | Architektura | Pending | `src/core/database.ts` | - |
+| TASK-P46-01-ODK | Odkrywanie | Completed | `src/components/brew/BrewFinishModal.tsx` | `965d8b0` |
+| TASK-P46-02-MON | Monetyzacja | Completed | `src/core/app-access.ts` | `3c3adee` |
+| TASK-P46-03-ZAK | Zaskoczenie | Completed | `src/core/bpr-engine.ts` | `2e216b1` |
+| TASK-P46-04-STU | Studiowanie | Completed | `src/components/recipe-builder/RecipeStepEditor.tsx` | `48c97bb` |
+| TASK-P46-05-ARC | Architektura | Completed | `src/core/database.ts` | `887810b` |
 | TASK-P46-06-TRE | Treść | Pending | `src/core/knowledge-data.ts` | - |
 | TASK-P46-07-JAK | Jakość | Pending | `src/core/water-chemistry.ts` | - |
 | TASK-P46-08-PRO | Prostota | Pending | `src/core/grinder-converter.ts` | - |

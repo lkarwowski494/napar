@@ -4,40 +4,40 @@
     "perspective": "01-ODK",
     "title": "Dostępność, etykiety accessibilityValue dla suwaków sensorycznych i sanityzacja w BrewFinishModal",
     "file": "src/components/brew/BrewFinishModal.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "965d8b0"
   },
   {
     "id": "TASK-P46-02-MON",
     "perspective": "02-MON",
     "title": "Odporność getAppAccessState na uszkodzone formaty ISO daty okresu próbnego w bazie danych",
     "file": "src/core/app-access.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "3c3adee"
   },
   {
     "id": "TASK-P46-03-ZAK",
     "perspective": "03-ZAK",
     "title": "Ochrona calculateDegassingProgress przed ujemnymi wartościami przy dacie wypału z przyszłości (strefy czasowe)",
     "file": "src/core/bpr-engine.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "2e216b1"
   },
   {
     "id": "TASK-P46-04-STU",
     "perspective": "04-STU",
     "title": "Sanityzacja danych wejściowych w edytorze kroków RecipeStepEditor (zamiana przecinków na kropki)",
     "file": "src/components/recipe-builder/RecipeStepEditor.tsx",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "48c97bb"
   },
   {
     "id": "TASK-P46-05-ARC",
     "perspective": "05-ARC",
     "title": "Sanityzacja i clampowanie pól recipeName, method i rating w saveBrewSession",
     "file": "src/core/database.ts",
-    "status": "pending",
-    "commit": null
+    "status": "completed",
+    "commit": "887810b"
   },
   {
     "id": "TASK-P46-06-TRE",
