@@ -162,6 +162,14 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       // 120mg consumed 15h before bed -> 15mg remaining (safe)
       const safe = evaluateBedtimeCaffeine([{ doseMg: 120, hoursUntilBedtime: 15 }], 25.0);
       expect(safe.isSafeForSleep).toBe(true);
+
+      // TASK-P12-03-ZAK: Odporność na nullish intakes i elementy z NaN/ujemnymi wartościami
+      const nullEval = evaluateBedtimeCaffeine(null as any);
+      expect(nullEval.isSafeForSleep).toBe(true);
+      expect(nullEval.totalRemainingMg).toBe(0);
+
+      const invalidEval = evaluateBedtimeCaffeine([null as any, { doseMg: 100, hoursUntilBedtime: NaN }] as any);
+      expect(invalidEval.totalRemainingMg).toBe(0);
     });
 
     it('calculates hours until safe threshold (100mg to 25mg = exactly 2 half-lives = 10h)', () => {

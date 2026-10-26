@@ -231,27 +231,31 @@ export function evaluateBedtimeCaffeine(
   safeThresholdMg = 25.0,
   halfLifeHours = 5.0
 ): BedtimeCaffeineEvaluation {
+  const safeIntakes = Array.isArray(intakes) ? intakes.filter(Boolean) : [];
+  const safeThreshold = Number.isFinite(safeThresholdMg) && safeThresholdMg >= 0 ? safeThresholdMg : 25.0;
+  const safeHalfLife = Number.isFinite(halfLifeHours) && halfLifeHours > 0 ? halfLifeHours : 5.0;
+
   let totalRemaining = 0;
 
-  for (const intake of intakes) {
-    if (intake.hoursUntilBedtime >= 0) {
-      totalRemaining += calculateRemainingCaffeineMg(intake.doseMg, intake.hoursUntilBedtime, halfLifeHours);
+  for (const intake of safeIntakes) {
+    if (intake && Number.isFinite(intake.hoursUntilBedtime) && intake.hoursUntilBedtime >= 0) {
+      totalRemaining += calculateRemainingCaffeineMg(intake.doseMg, intake.hoursUntilBedtime, safeHalfLife);
     }
   }
 
   totalRemaining = Number(totalRemaining.toFixed(1));
-  const isSafeForSleep = totalRemaining <= safeThresholdMg;
+  const isSafeForSleep = totalRemaining <= safeThreshold;
 
   let messagePl: string;
   if (isSafeForSleep) {
     messagePl = `Szacowany poziom kofeiny o porze snu (${totalRemaining} mg) mieści się w orientacyjnym progu niskiego wpływu na sen.`;
   } else {
-    messagePl = `Poziom kofeiny (${totalRemaining} mg) przekracza próg ${safeThresholdMg} mg — ryzyko spłycenia snu.`;
+    messagePl = `Poziom kofeiny (${totalRemaining} mg) przekracza próg ${safeThreshold} mg — ryzyko spłycenia snu.`;
   }
 
   return {
     totalRemainingMg: totalRemaining,
-    safeThresholdMg,
+    safeThresholdMg: safeThreshold,
     isSafeForSleep,
     messagePl,
   };
