@@ -259,13 +259,14 @@ export async function startLiveActivity(
       error: 'Nieprawidłowe atrybuty aktywności Live Activity.',
     };
   }
-  if (!attributes.recipeName || typeof attributes.recipeName !== 'string' || !attributes.recipeName.trim()) {
+  if (!attributes.recipeName || typeof attributes.recipeName !== 'string' || !attributes.recipeName.trim() || attributes.recipeName.trim().length > 100) {
     return {
       success: false,
       error: 'Nieprawidłowa nazwa receptury w atrybutach Live Activity.',
     };
   }
-  if (typeof attributes.totalWaterGrams !== 'number' || !Number.isFinite(attributes.totalWaterGrams) || attributes.totalWaterGrams <= 0) {
+  const rawWater = typeof attributes.totalWaterGrams === 'number' ? attributes.totalWaterGrams : (typeof attributes.totalWaterGrams === 'string' ? parseFloat(attributes.totalWaterGrams) : NaN);
+  if (!Number.isFinite(rawWater) || rawWater <= 0 || rawWater > 50000 || Object.is(rawWater, -0)) {
     return {
       success: false,
       error: 'Nieprawidłowa gramatura wody w atrybutach Live Activity.',

@@ -508,4 +508,30 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(Object.is(payload.attributes.totalWaterGrams, -0)).toBe(false);
     expect(Object.is(payload.contentState.targetWaterGrams, -0)).toBe(false);
   });
+
+  test('TASK-P34-12-NIE: startLiveActivity waliduje maksymalną długość nazwy receptury (100) i maksymalną wagę wody (50000)', async () => {
+    const longNameAttr: any = {
+      ...mockAttributesCoffee,
+      recipeName: 'A'.repeat(105),
+    };
+    const resLongName = await startLiveActivity(longNameAttr, mockState);
+    expect(resLongName.success).toBe(false);
+    expect(resLongName.error).toContain('Nieprawidłowa nazwa receptury');
+
+    const hugeWaterAttr: any = {
+      ...mockAttributesCoffee,
+      totalWaterGrams: 999999,
+    };
+    const resHugeWater = await startLiveActivity(hugeWaterAttr, mockState);
+    expect(resHugeWater.success).toBe(false);
+    expect(resHugeWater.error).toContain('Nieprawidłowa gramatura wody');
+
+    const minusZeroWaterAttr: any = {
+      ...mockAttributesCoffee,
+      totalWaterGrams: -0,
+    };
+    const resMinusZero = await startLiveActivity(minusZeroWaterAttr, mockState);
+    expect(resMinusZero.success).toBe(false);
+    expect(resMinusZero.error).toContain('Nieprawidłowa gramatura wody');
+  });
 });
