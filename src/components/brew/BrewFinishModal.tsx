@@ -73,11 +73,11 @@ export function BrewFinishModal({
   onSkip,
   onSave,
 }: BrewFinishModalProps) {
-  if (!visible) return null;
-
   const { t, language: contextLang } = useTranslation();
   const language = propLanguage || contextLang || 'pl';
   const curr = language === 'pl' ? 'PLN' : '$';
+
+  if (!visible) return null;
 
   const formatTime = (seconds: number) => {
     const s = Math.max(0, Math.floor(Number(seconds) || 0));

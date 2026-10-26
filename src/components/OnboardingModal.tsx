@@ -33,8 +33,6 @@ interface OnboardingModalProps {
 }
 
 export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
-  if (!visible) return null;
-
   const { t, language } = useTranslation();
   const [selectedPref, setSelectedPref] = useState<BeveragePreference>('both');
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -54,6 +52,8 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
   const handleStart = () => {
     onComplete(selectedPref);
   };
+
+  if (!visible) return null;
 
   return (
     <Modal visible={visible} animationType={reduceMotion ? "none" : "fade"} transparent={false}>

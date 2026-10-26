@@ -35,8 +35,6 @@ export function Apps4BrewPassModal({
   onPurchaseSuccess,
   onSubscribed,
 }: Apps4BrewPassModalProps) {
-  if (!visible) return null;
-
   const { t, language } = useTranslation();
   const { purchaseWithStoreKit, restore, status, brewsRemaining, daysRemaining } = useAppAccess();
   const [isProcessing, setIsProcessing] = React.useState(false);
@@ -96,6 +94,8 @@ export function Apps4BrewPassModal({
       Alert.alert(t.settings.restoreNotFoundTitle, t.settings.restoreNotFoundMsg);
     }
   };
+
+  if (!visible) return null;
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
