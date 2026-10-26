@@ -160,4 +160,64 @@ describe('RecipeSelectModal Component', () => {
     const closeBtn = root.findByProps({ testID: 'close-recipe-modal-btn' });
     expect(closeBtn.props.accessibilityLabel).toBe('Zamknij');
   });
+
+  test('TASK-P47-01-ODK: wyszukiwarka normalizuje polskie diakrytyki i przeszukuje opis receptury', () => {
+    const specialRecipes = [
+      {
+        id: 'rec-pl',
+        name: 'Przelewowa Łagodna',
+        method: 'V60',
+        author: 'Barista',
+        description: 'Soczysta brzoskwinia i jaśmin',
+        type: 'COFFEE',
+        doseGrams: 15,
+        waterGrams: 250,
+        waterTempCelsius: 93,
+        isCustom: true,
+        isFavorite: false,
+      },
+      {
+        id: 'rec-en',
+        name: 'Aeropress Light',
+        method: 'Aeropress',
+        author: 'World Champ',
+        description: 'Floral notes with citrus',
+        type: 'COFFEE',
+        doseGrams: 14,
+        waterGrams: 200,
+        waterTempCelsius: 85,
+        isCustom: false,
+        isFavorite: false,
+      },
+    ];
+
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(
+        <RecipeSelectModal
+          {...defaultProps}
+          recipes={specialRecipes}
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const searchInput = root.findByProps({ testID: 'recipe-search-input' });
+
+    // Wyszukanie bez polskich znaków: "lagodna" powinno znaleźć "Łagodna"
+    act(() => {
+      searchInput.props.onChangeText('lagodna');
+    });
+
+    expect(root.findByProps({ testID: 'recipe-option-rec-pl' })).toBeDefined();
+    expect(() => root.findByProps({ testID: 'recipe-option-rec-en' })).toThrow();
+
+    // Wyszukanie po opisie: "brzoskwinia"
+    act(() => {
+      searchInput.props.onChangeText('brzoskwinia');
+    });
+
+    expect(root.findByProps({ testID: 'recipe-option-rec-pl' })).toBeDefined();
+    expect(() => root.findByProps({ testID: 'recipe-option-rec-en' })).toThrow();
+  });
 });

@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
 import { CopyIcon, EditIcon } from '../icons/CraftIcons';
 import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../core/unit-converter';
+import { normSearch } from '../../core/search-utils';
 
 export interface RecipeSelectModalProps {
   visible: boolean;
@@ -79,11 +80,12 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
       return false;
     }
     if (searchQuery.trim()) {
-      const q = searchQuery.trim().toLowerCase();
-      const matchName = (r.name || '').toLowerCase().includes(q);
-      const matchMethod = (r.method || '').toLowerCase().includes(q);
-      const matchAuthor = (r.author || '').toLowerCase().includes(q);
-      if (!matchName && !matchMethod && !matchAuthor) return false;
+      const q = normSearch(searchQuery);
+      const matchName = normSearch(r.name || '').includes(q);
+      const matchMethod = normSearch(r.method || '').includes(q);
+      const matchAuthor = normSearch(r.author || '').includes(q);
+      const matchDesc = normSearch(r.description || '').includes(q);
+      if (!matchName && !matchMethod && !matchAuthor && !matchDesc) return false;
     }
     return true;
   });
@@ -216,7 +218,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               placeholder={t?.brew?.recipeSearchPlaceholder || 'Szukaj receptury, metody (V60, AeroPress, Gaiwan)...'}
               placeholderTextColor={theme.colors.textMuted}
               value={searchQuery}
-              onChangeText={setSearchQuery}
+              onChangeText={(txt) => setSearchQuery(typeof txt === 'string' ? txt.slice(0, 100) : '')}
               accessibilityLabel={t?.brew?.recipeSearchPlaceholder || 'Szukaj receptury, metody'}
             />
             {searchQuery.length > 0 && (
