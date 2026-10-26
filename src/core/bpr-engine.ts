@@ -425,7 +425,8 @@ export function generateActionIcsContent(
   const isEn = language === 'en';
   const rawDateStr = typeof action.dateIso === 'string' && action.dateIso.trim() ? action.dateIso.trim() : '';
   const dateMatch = rawDateStr.match(/^(\d{4}-\d{2}-\d{2})/);
-  const rawDate = dateMatch ? dateMatch[1] : '2026-10-17';
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const rawDate = dateMatch ? dateMatch[1] : todayIso;
   const cleanDate = rawDate.replace(/-/g, '');
   const dtStart = `${cleanDate}T080000Z`;
   const dtEnd = `${cleanDate}T081500Z`;

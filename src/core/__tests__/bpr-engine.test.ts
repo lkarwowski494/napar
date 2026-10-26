@@ -335,5 +335,17 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(escapeIcsText([] as any)).toBe('');
       expect(escapeIcsText(true as any)).toBe('');
     });
+
+    it('TASK-P40-03-ZAK: generateActionIcsContent uzywa biezacej daty UTC ISO jako dynamicznego fallbacku', () => {
+      const todayIso = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      const actionWithoutDate: any = {
+        id: 'action-fallback-date',
+        titlePl: 'Sesja dzisiejsza',
+        dateIso: '',
+      };
+      const ics = generateActionIcsContent(actionWithoutDate, 'pl');
+      expect(ics).toContain(`DTSTART:${todayIso}T080000Z`);
+      expect(ics).toContain(`DTEND:${todayIso}T081500Z`);
+    });
   });
 });
