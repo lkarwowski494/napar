@@ -90,4 +90,16 @@ describe('GrinderSelectModal Component', () => {
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  test('TASK-P16-04-STU: ScrollView z listą młynków posiada rolę radiogroup i etykietę dostępności', () => {
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(<GrinderSelectModal {...defaultProps} visible={true} />);
+    });
+
+    const root = tree!.root;
+    const scroll = root.findByProps({ accessibilityRole: 'radiogroup' });
+    expect(scroll).toBeTruthy();
+    expect(scroll.props.accessibilityLabel).toBe(t.brew.grinderModalTitle);
+  });
 });

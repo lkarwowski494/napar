@@ -54,7 +54,11 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
             <Text style={styles.modalCloseText}>{t.common.close}</Text>
           </Pressable>
         </View>
-        <ScrollView contentContainerStyle={{ padding: 16 }}>
+        <ScrollView
+          contentContainerStyle={{ padding: 16 }}
+          accessibilityRole="radiogroup"
+          accessibilityLabel={t.brew.grinderModalTitle}
+        >
           <Text style={styles.modalSub}>{t.brew.grinderModalDesc}</Text>
           {SUPPORTED_GRINDERS.map((grinder) => {
             const isSelected = grinderId === grinder.id;
