@@ -1,5 +1,7 @@
 import {
   parseStepDurationSeconds,
+  parseSteepIncrementSeconds,
+  calculateNextSteepDuration,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -563,6 +565,22 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(parseStepDurationSeconds('parz poltorej minuty')).toBe(90);
       expect(parseStepDurationSeconds('infuse for 1.5 min')).toBe(90);
       expect(parseStepDurationSeconds('odczekaj kwadrans na ostygnięcie')).toBe(900);
+    });
+
+    it('TASK-P52-03-ZAK: parseSteepIncrementSeconds i calculateNextSteepDuration obsluguja inkrementacje wielokrotnych parzen', () => {
+      // 1. Ekstrakcja inkrementu z tekstu
+      expect(parseSteepIncrementSeconds('Dodaj 5s do każdego kolejnego zalania')).toBe(5);
+      expect(parseSteepIncrementSeconds('+10s per steep')).toBe(10);
+      expect(parseSteepIncrementSeconds('Zwiększ o 15 sekund przy każdym parzeniu')).toBe(15);
+      expect(parseSteepIncrementSeconds('kolejne parzenie + 20 s')).toBe(20);
+      expect(parseSteepIncrementSeconds('brak informacji', 5)).toBe(5);
+
+      // 2. Kalkulacja kolejnego czasu parzenia
+      expect(calculateNextSteepDuration({ baseDurationSeconds: 15, infusionNumber: 1, incrementSeconds: 5 })).toBe(15);
+      expect(calculateNextSteepDuration({ baseDurationSeconds: 15, infusionNumber: 2, incrementSeconds: 5 })).toBe(20);
+      expect(calculateNextSteepDuration({ baseDurationSeconds: 15, infusionNumber: 4, incrementSeconds: 5 })).toBe(30);
+      expect(calculateNextSteepDuration({ baseDurationSeconds: '20,5' as any, infusionNumber: 3, incrementSeconds: '5,5' as any })).toBe(32);
+      expect(calculateNextSteepDuration({ baseDurationSeconds: 10, infusionNumber: 0 })).toBe(10);
     });
   });
 });

@@ -153,6 +153,66 @@ export function parseStepDurationSeconds(
   return safeFallback;
 }
 
+/**
+ * Wykrywa inkrement czasu parzenia dla wielokrotnych ekstrakcji (np. gongfu / wieloetapowe zalania herbaty)
+ * z tekstu instrukcji ("dodaj 5s do każdego zalania", "+10s per steep", "zwiększ o 15 sekund", itp.).
+ */
+export function parseSteepIncrementSeconds(
+  text: string | undefined | null,
+  fallbackIncrement = 5
+): number {
+  const safeFallback = Number.isFinite(fallbackIncrement) && fallbackIncrement >= 0
+    ? Math.max(0, Math.min(300, Math.round(fallbackIncrement)))
+    : 5;
+
+  if (!text || typeof text !== 'string' || !text.trim()) {
+    return safeFallback;
+  }
+
+  const clean = text.trim().toLowerCase().replace(/,/g, '.');
+
+  // Wzorce typu: "+10s", "+ 5 s", "dodaj 5s", "dodaj 10 sekund", "zwiększ o 15 sekund", "increase by 10s", "10s per steep", "+5s per steep"
+  const match = clean.match(
+    /(?:\+|dodaj|zwi[eę]ksz\s*o|increase\s*by)\s*(\d+(?:\.\d+)?)\s*(?:sekund(?:[a-ząęółśżźćń]+)?|sek\b|secs?\b|sec(?:onds?)?\b|s\b)?/i
+  ) || clean.match(
+    /(\d+(?:\.\d+)?)\s*(?:sekund(?:[a-ząęółśżźćń]+)?|sek\b|secs?\b|sec(?:onds?)?\b|s\b)\s*(?:per\s*steep|na\s*zalanie|do\s*ka[zż]dego)/i
+  );
+
+  if (match) {
+    const val = parseFloat(match[1]);
+    if (Number.isFinite(val) && val >= 0) {
+      const res = Math.max(0, Math.min(300, Math.round(val)));
+      return Object.is(res, -0) ? 0 : res;
+    }
+  }
+
+  return safeFallback;
+}
+
+/**
+ * Oblicza czas kolejnego parzenia na podstawie czasu bazowego, numeru infuzji i przyrostu czasu na parzenie.
+ */
+export function calculateNextSteepDuration(params: {
+  baseDurationSeconds: number | string;
+  infusionNumber: number;
+  incrementSeconds?: number | string;
+}): number {
+  const rawBase = typeof params.baseDurationSeconds === 'number'
+    ? params.baseDurationSeconds
+    : (typeof params.baseDurationSeconds === 'string' ? parseFloat(params.baseDurationSeconds.replace(',', '.')) : 15);
+  const safeBase = Number.isFinite(rawBase) && rawBase > 0 ? rawBase : 15;
+
+  const rawInc = typeof params.incrementSeconds === 'number'
+    ? params.incrementSeconds
+    : (typeof params.incrementSeconds === 'string' ? parseFloat(params.incrementSeconds.replace(',', '.')) : 0);
+  const safeInc = Number.isFinite(rawInc) && rawInc >= 0 ? rawInc : 0;
+
+  const infNum = Number.isFinite(params.infusionNumber) ? Math.max(1, Math.floor(params.infusionNumber)) : 1;
+  const total = Math.round(safeBase + safeInc * (infNum - 1));
+  const res = Math.max(1, Math.min(86400, total));
+  return Object.is(res, -0) ? Math.round(safeBase) : res;
+}
+
 function toDateKey(d: Date): string {
   const year = d.getUTCFullYear();
   const month = String(d.getUTCMonth() + 1).padStart(2, '0');
