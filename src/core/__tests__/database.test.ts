@@ -1091,6 +1091,30 @@ describe('Napar SQLite Database & Repositories', () => {
     });
   });
 
+  test('TASK-P9-05-ARC: saveInventoryItem oraz mapRowToInventoryItem sanityzują wagi i ocenę (boundary/finite check)', () => {
+    initDatabase(mockDb as any);
+    const invalidItem: InventoryItem = {
+      id: 'test-invalid-boundary',
+      name: 'Invalid Test Coffee',
+      type: 'coffee',
+      initialWeightGrams: NaN,
+      remainingWeightGrams: -99,
+      flavorNotes: ['nut'],
+      rating: 12,
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-10-26T00:00:00.000Z',
+      updatedAt: '2026-10-26T00:00:00.000Z',
+    };
+
+    saveInventoryItem(invalidItem);
+    const retrieved = getInventoryItemById('test-invalid-boundary');
+    expect(retrieved).not.toBeNull();
+    expect(retrieved!.initialWeightGrams).toBe(250);
+    expect(retrieved!.remainingWeightGrams).toBe(0);
+    expect(retrieved!.rating).toBeUndefined();
+  });
+
   test('TASK-P5-05-ARC: deleteInventoryItem unieważnia referencje w brew_sessions (SET NULL) i usuwa pozycję', () => {
     initDatabase(mockDb as any);
     const item: InventoryItem = {

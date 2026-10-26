@@ -295,6 +295,16 @@ export function getInventoryItemById(id: string): InventoryItem | null {
 export function saveInventoryItem(item: InventoryItem): void {
   const db = getDatabase();
   const now = new Date().toISOString();
+  const initWeight = Number.isFinite(item.initialWeightGrams) && item.initialWeightGrams >= 0
+    ? item.initialWeightGrams
+    : 250;
+  const remWeight = Number.isFinite(item.remainingWeightGrams) && item.remainingWeightGrams >= 0
+    ? item.remainingWeightGrams
+    : 0;
+  const sanitizedRating = item.rating != null && Number.isFinite(item.rating) && item.rating >= 0 && item.rating <= 5
+    ? item.rating
+    : null;
+
   db.runSync(
     `INSERT OR REPLACE INTO inventory_items (
       id, name, type, roaster_or_producer, origin,
@@ -312,10 +322,10 @@ export function saveInventoryItem(item: InventoryItem): void {
       item.roastProfile ?? null,
       item.process ?? null,
       item.variety ?? null,
-      item.initialWeightGrams,
-      item.remainingWeightGrams,
+      initWeight,
+      remWeight,
       JSON.stringify(item.flavorNotes || []),
-      item.rating ?? null,
+      sanitizedRating,
       item.isFavorite ? 1 : 0,
       item.isArchived ? 1 : 0,
       item.createdAt || now,
@@ -365,10 +375,10 @@ function mapRowToInventoryItem(row: InventoryRow): InventoryItem {
     roastProfile: row.roast_profile || undefined,
     process: row.process || undefined,
     variety: row.variety || undefined,
-    initialWeightGrams: row.initial_weight_g,
-    remainingWeightGrams: row.remaining_weight_g,
+    initialWeightGrams: Number.isFinite(row.initial_weight_g) && row.initial_weight_g >= 0 ? row.initial_weight_g : 250,
+    remainingWeightGrams: Number.isFinite(row.remaining_weight_g) && row.remaining_weight_g >= 0 ? row.remaining_weight_g : 0,
     flavorNotes,
-    rating: row.rating !== null ? row.rating : undefined,
+    rating: (row.rating !== null && Number.isFinite(row.rating) && row.rating >= 0 && row.rating <= 5) ? row.rating : undefined,
     isFavorite: Boolean(row.is_favorite),
     isArchived: Boolean(row.is_archived),
     createdAt: row.created_at,
