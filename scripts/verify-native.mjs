@@ -157,6 +157,16 @@ try {
     `app.json -> expo.ios.infoPlist.CFBundleLocalizations musi zawierać dokładnie 35 języków, w tym 'pl' i 'en' (otrzymano ${localizations?.length})`
   );
 
+  // Weryfikacja obecności krytycznych pluginów bazodanowych i nawigacyjnych (TASK-P26-10-WYD)
+  check(
+    Array.isArray(appJson.plugins) && appJson.plugins.includes('expo-router'),
+    "app.json -> expo.plugins musi zawierać 'expo-router'"
+  );
+  check(
+    Array.isArray(appJson.plugins) && appJson.plugins.includes('expo-sqlite'),
+    "app.json -> expo.plugins musi zawierać 'expo-sqlite'"
+  );
+
   // Weryfikacja braku uprawnień mikrofonowych w pluginie expo-camera (Zero Audio / Privacy)
   const cameraPlugin = appJson.plugins?.find(
     (p) => Array.isArray(p) && p[0] === 'expo-camera'
