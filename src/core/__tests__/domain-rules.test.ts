@@ -27,8 +27,10 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(calculateBrewWater(18.0, 16.67)).toBe(300.1);
     });
 
-    it('calculates dose correctly for 500g water at 1:16.67', () => {
+    it('calculates dose correctly for 500g water at 1:16.67 and clamps to maxDoseGrams', () => {
       expect(calculateBrewDose(500.0, 16.67)).toBe(30.0);
+      expect(calculateBrewDose(10000.0, 5.0)).toBe(1000.0);
+      expect(calculateBrewDose(10000.0, 5.0, 500.0)).toBe(500.0);
     });
 
     it('throws when parameters are zero or negative', () => {

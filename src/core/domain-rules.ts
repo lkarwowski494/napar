@@ -49,12 +49,15 @@ export function calculateBrewWater(doseGrams: number, ratio: number): number {
 
 /**
  * RD-01b: Oblicza dozę kawy/herbaty dla zadanej objętości wody
+ * Zabezpieczenie przed przepełnieniem dozy poprzez clamp maxDoseGrams (domyślnie 1000g)
  */
-export function calculateBrewDose(waterGrams: number, ratio: number): number {
+export function calculateBrewDose(waterGrams: number, ratio: number, maxDoseGrams = 1000.0): number {
   if (!Number.isFinite(waterGrams) || !Number.isFinite(ratio) || waterGrams <= 0 || ratio <= 0) {
     throw new Error('Woda i ratio muszą być większe od zera');
   }
-  return Number((waterGrams / ratio).toFixed(1));
+  const rawDose = waterGrams / ratio;
+  const clamped = Number.isFinite(maxDoseGrams) && maxDoseGrams > 0 ? Math.min(rawDose, maxDoseGrams) : rawDose;
+  return Number(clamped.toFixed(1));
 }
 
 /**
