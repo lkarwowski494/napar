@@ -206,22 +206,28 @@ export function calculateWaterMinerals(
   // W systemie koncentratów Barista Hustle:
   // 1g Buffer Concentrate dodany do 1L wody = 2 ppm KH
   // 1g Hardness Concentrate dodany do 1L wody = 2 ppm GH
-  const concentrateBuffer = Number(((kh / 2.0) * vol).toFixed(1));
-  const concentrateHardness = Number(((gh / 2.0) * vol).toFixed(1));
+  let concentrateBuffer = Number(((kh / 2.0) * vol).toFixed(1));
+  let concentrateHardness = Number(((gh / 2.0) * vol).toFixed(1));
+  if (Object.is(concentrateBuffer, -0) || concentrateBuffer < 0) concentrateBuffer = 0;
+  if (Object.is(concentrateHardness, -0) || concentrateHardness < 0) concentrateHardness = 0;
 
   // Waga suchych soli do bezpośredniego rozpuszczenia:
   // NaHCO3: 1 ppm KH = 0.00168 g NaHCO3 na 1L
-  const dryNaHCO3 = Number((kh * 0.00168 * vol).toFixed(3));
+  let dryNaHCO3 = Number((kh * 0.00168 * vol).toFixed(3));
+  if (Object.is(dryNaHCO3, -0) || dryNaHCO3 < 0) dryNaHCO3 = 0;
 
   // MgSO4*7H2O: 1 ppm GH = 0.002465 g soli Epsom na 1L
-  const dryMgSO4 = Number((gh * 0.002465 * vol).toFixed(3));
+  let dryMgSO4 = Number((gh * 0.002465 * vol).toFixed(3));
+  if (Object.is(dryMgSO4, -0) || dryMgSO4 < 0) dryMgSO4 = 0;
 
   // CaCl2*2H2O (wapń): 1 ppm GH = 0.00147 g na 1L
-  const dryCaCl2 = Number((gh * 0.00147 * vol).toFixed(3));
+  let dryCaCl2 = Number((gh * 0.00147 * vol).toFixed(3));
+  if (Object.is(dryCaCl2, -0) || dryCaCl2 < 0) dryCaCl2 = 0;
 
   const totalWaterGrams = vol * 1000;
   const rawBaseWater = totalWaterGrams - concentrateBuffer - concentrateHardness;
-  const baseWater = rawBaseWater <= 0 ? 0 : Number(rawBaseWater.toFixed(1));
+  let baseWater = rawBaseWater <= 0 ? 0 : Number(rawBaseWater.toFixed(1));
+  if (Object.is(baseWater, -0)) baseWater = 0;
 
   return {
     waterVolumeLiters: vol,

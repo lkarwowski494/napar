@@ -254,4 +254,18 @@ describe('Water Chemistry & Mineralization Module', () => {
     const negZero = diagnoseWaterSensoryImpact(-0, -0);
     expect(negZero.problemPl).toContain('Agresywny');
   });
+
+  test('TASK-P27-07-JAK: calculateWaterMinerals chroni concentrateBufferGrams i concentrateHardnessGrams przed -0', () => {
+    const res = calculateWaterMinerals(1, -0, -0);
+    expect(res.concentrateBufferGrams).toBe(0);
+    expect(res.concentrateHardnessGrams).toBe(0);
+    expect(res.dryBakingSodaNaHCO3Grams).toBe(0);
+    expect(res.dryEpsomSaltMgSO4Grams).toBe(0);
+    expect(res.dryCalciumChlorideCaCl2Grams).toBe(0);
+    expect(Object.is(res.concentrateBufferGrams, -0)).toBe(false);
+    expect(Object.is(res.concentrateHardnessGrams, -0)).toBe(false);
+    expect(Object.is(res.dryBakingSodaNaHCO3Grams, -0)).toBe(false);
+    expect(Object.is(res.dryEpsomSaltMgSO4Grams, -0)).toBe(false);
+    expect(Object.is(res.dryCalciumChlorideCaCl2Grams, -0)).toBe(false);
+  });
 });
