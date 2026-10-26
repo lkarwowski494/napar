@@ -106,6 +106,16 @@ try {
     `app.json -> expo.ios.bundleIdentifier musi być równe 'pl.lukasz.napar' (otrzymano '${iosBundleId}')`
   );
 
+  // Spójność międzyplatformowych identyfikatorów pakietu i schematu URL (TASK-P37-10-WYD)
+  check(
+    appJson.ios?.bundleIdentifier === appJson.android?.package,
+    `app.json -> expo.ios.bundleIdentifier ('${appJson.ios?.bundleIdentifier}') musi być tożsame z expo.android.package ('${appJson.android?.package}')`
+  );
+  check(
+    appJson.scheme === appJson.slug,
+    `app.json -> expo.scheme ('${appJson.scheme}') musi być tożsame z expo.slug ('${appJson.slug}')`
+  );
+
   // Weryfikacja nazwy aplikacji w app.json (TASK-P21-10-WYD)
   check(
     appJson.name === 'Napar',
