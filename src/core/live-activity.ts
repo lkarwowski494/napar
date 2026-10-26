@@ -69,9 +69,14 @@ export function formatActivityTimer(seconds: number): string {
     return '0:00';
   }
   const safeSec = Math.floor(seconds);
-  const mins = Math.floor(safeSec / 60);
+  const totalMins = Math.floor(safeSec / 60);
   const remSec = safeSec % 60;
-  return `${mins}:${remSec.toString().padStart(2, '0')}`;
+  if (totalMins >= 60) {
+    const hrs = Math.floor(totalMins / 60);
+    const remMins = totalMins % 60;
+    return `${hrs}:${remMins.toString().padStart(2, '0')}:${remSec.toString().padStart(2, '0')}`;
+  }
+  return `${totalMins}:${remSec.toString().padStart(2, '0')}`;
 }
 
 export function buildDynamicIslandPayload(
@@ -132,7 +137,7 @@ export function buildDynamicIslandPayload(
     compactTrailing: timeFormatted,
     expandedLeadingIcon: icon,
     expandedTrailingTime: timeFormatted,
-    expandedCenterTitle: safeAttr.recipeName || 'Napar',
+    expandedCenterTitle: (safeAttr.recipeName && safeAttr.recipeName.trim()) || 'Napar',
     expandedCenterSubtitle: subtitle,
     expandedBottomTarget: targetWater,
     isPaused: Boolean(safeState.isPaused),

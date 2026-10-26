@@ -182,4 +182,19 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(payloadLiveUndefined.dynamicIsland.compactLeading).toBe('☕');
     expect(payloadLiveUndefined.dynamicIsland.expandedCenterSubtitle).toContain('Brewing · Step 1 of 1');
   });
+
+  test('TASK-P11-12-NIE: formatActivityTimer formatuje czasy wielogodzinne H:MM:SS, a buildDynamicIslandPayload zabezpiecza pusty recipeName', () => {
+    // Wielogodzinne infuzje (cold brew)
+    expect(formatActivityTimer(3600)).toBe('1:00:00');
+    expect(formatActivityTimer(3665)).toBe('1:01:05');
+    expect(formatActivityTimer(43200)).toBe('12:00:00');
+
+    // Pusty lub biało-znakowy recipeName
+    const payloadBlankTitle = buildDynamicIslandPayload(
+      { ...mockAttributesCoffee, recipeName: '   ' },
+      mockState,
+      'pl'
+    );
+    expect(payloadBlankTitle.expandedCenterTitle).toBe('Napar');
+  });
 });
