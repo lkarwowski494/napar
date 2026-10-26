@@ -333,6 +333,15 @@ export async function updateLiveActivity(
       error: 'Nieprawidłowy pozostały czas kroku w stanie Live Activity (wymagany zakres [0, 86400]).',
     };
   }
+  const rawTargetWater = typeof _state.targetWaterGrams === 'number'
+    ? _state.targetWaterGrams
+    : (typeof _state.targetWaterGrams === 'string' ? parseFloat(_state.targetWaterGrams) : NaN);
+  if (!Number.isFinite(rawTargetWater) || rawTargetWater < 0 || Object.is(rawTargetWater, -0) || rawTargetWater > 50000) {
+    return {
+      success: false,
+      error: 'Nieprawidłowa docelowa waga wody w stanie Live Activity (wymagany zakres [0, 50000]).',
+    };
+  }
   return {
     success: false,
     error: 'ActivityKit Live Activity niedostępne w v1.0 (DEC-01).',

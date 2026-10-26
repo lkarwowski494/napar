@@ -568,4 +568,38 @@ describe('ActivityKit Live Activity & Dynamic Island Bridge (BR-ZEG-003, BR-ZEG-
     expect(resValid.success).toBe(false);
     expect(resValid.error).toContain('DEC-01');
   });
+
+  test('TASK-P36-12-NIE: updateLiveActivity waliduje targetWaterGrams w zakresie [0, 50000] i chroni przed -0', async () => {
+    const badWaterNegative: any = {
+      ...mockState,
+      targetWaterGrams: -10,
+    };
+    const resNegative = await updateLiveActivity('valid-act-id', badWaterNegative);
+    expect(resNegative.success).toBe(false);
+    expect(resNegative.error).toContain('Nieprawidłowa docelowa waga wody');
+
+    const badWaterMinusZero: any = {
+      ...mockState,
+      targetWaterGrams: -0,
+    };
+    const resMinusZero = await updateLiveActivity('valid-act-id', badWaterMinusZero);
+    expect(resMinusZero.success).toBe(false);
+    expect(resMinusZero.error).toContain('Nieprawidłowa docelowa waga wody');
+
+    const badWaterHuge: any = {
+      ...mockState,
+      targetWaterGrams: 999999,
+    };
+    const resHuge = await updateLiveActivity('valid-act-id', badWaterHuge);
+    expect(resHuge.success).toBe(false);
+    expect(resHuge.error).toContain('Nieprawidłowa docelowa waga wody');
+
+    const validWater: any = {
+      ...mockState,
+      targetWaterGrams: 250,
+    };
+    const resValid = await updateLiveActivity('valid-act-id', validWater);
+    expect(resValid.success).toBe(false);
+    expect(resValid.error).toContain('DEC-01');
+  });
 });
