@@ -329,7 +329,8 @@ try {
       `package.json main musi wskazywać na 'expo-router/entry' (otrzymano '${pkgJson.main}')`
     );
     const deps = pkgJson.dependencies || {};
-    const criticalPlugins = ['expo', 'react-native', 'react', 'expo-router', 'expo-sqlite', 'expo-camera', 'expo-localization'];
+    // TASK-P46-10-WYD: Rozszerzenie krytycznych pakietów natywnych o expo-haptics, expo-keep-awake, expo-file-system
+    const criticalPlugins = ['expo', 'react-native', 'react', 'expo-router', 'expo-sqlite', 'expo-camera', 'expo-localization', 'expo-haptics', 'expo-keep-awake', 'expo-file-system'];
     for (const plugin of criticalPlugins) {
       check(
         Boolean(deps[plugin]),
@@ -374,6 +375,11 @@ try {
     check(
       Boolean(devDeps['fast-check']),
       "Krytyczny pakiet testów właściwościowych (PBT) 'fast-check' musi znajdować się w devDependencies package.json"
+    );
+    // TASK-P46-10-WYD: Weryfikacja pakietu typów @types/qrcode w devDependencies
+    check(
+      Boolean(devDeps['@types/qrcode']),
+      "Krytyczny pakiet typów '@types/qrcode' musi znajdować się w devDependencies package.json"
     );
   }
 

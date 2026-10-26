@@ -351,6 +351,11 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
     test('SEC-02: Skrypt verify-native.mjs weryfikuje 20 niezmienników projektu iOS', () => {
       const verifyScript = join(root, 'scripts', 'verify-native.mjs');
       expect(existsSync(verifyScript)).toBe(true);
+      const content = readFileSync(verifyScript, 'utf8');
+      expect(content).toContain('expo-haptics');
+      expect(content).toContain('expo-keep-awake');
+      expect(content).toContain('expo-file-system');
+      expect(content).toContain('@types/qrcode');
     });
 
     test('SEC-03: Publiczne repozytorium nie zawiera nieautoryzowanych wywołań sieciowych', () => {
