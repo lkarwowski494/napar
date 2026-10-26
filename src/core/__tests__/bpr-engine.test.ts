@@ -393,5 +393,32 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(icsFallback).toContain('SUMMARY:Parzenie V60');
       expect(icsFallback).toContain('//PL');
     });
+
+    it('TASK-P43-03-ZAK: generateActionIcsContent generuje RFC 5545 DTSTAMP z biezacym czasem UTC oraz sanityzuje wagi string w inventory', () => {
+      const action: any = {
+        id: 'action-dtstamp-test',
+        titlePl: 'Parzenie V60',
+        dateIso: '2026-12-01',
+      };
+      const ics = generateActionIcsContent(action, 'pl');
+      expect(ics).toMatch(/DTSTAMP:\d{8}T\d{6}Z/);
+      expect(ics).toContain('DTSTART:20261201T080000Z');
+
+      // Sanityzacja wag string w inventory
+      const stringWeightInventory: any[] = [
+        {
+          id: 'bean-str-weight',
+          name: 'Kenya Nyeri',
+          type: 'coffee',
+          roastOrHarvestDate: '2026-10-15',
+          remainingWeightGrams: '250',
+          isArchived: false,
+        },
+      ];
+      const schedule = buildProactiveActionSchedule('2026-10-26T08:00:00.000Z', stringWeightInventory as any, []);
+      expect(schedule.length).toBeGreaterThan(0);
+      expect(schedule[0].subtitlePl).toContain('250g');
+      expect(schedule[0].doseGrams).toBe(18);
+    });
   });
 });

@@ -161,11 +161,21 @@ export function buildProactiveActionSchedule(
   const safeSessions = Array.isArray(sessions) ? sessions : [];
 
   const activeItems = safeInventory.filter(
-    (item): item is InventoryItem =>
-      Boolean(item && typeof item === 'object' && !item.isArchived && item.remainingWeightGrams > 0)
+    (item): item is InventoryItem => {
+      if (!item || typeof item !== 'object' || item.isArchived) return false;
+      const rawW = typeof item.remainingWeightGrams === 'number'
+        ? item.remainingWeightGrams
+        : (typeof item.remainingWeightGrams === 'string' ? parseFloat(item.remainingWeightGrams) : NaN);
+      return Number.isFinite(rawW) && rawW > 0 && !Object.is(rawW, -0);
+    }
   );
 
   for (const item of activeItems) {
+    const rawW = typeof item.remainingWeightGrams === 'number'
+      ? item.remainingWeightGrams
+      : (typeof item.remainingWeightGrams === 'string' ? parseFloat(item.remainingWeightGrams) : NaN);
+    const safeRemainingWeight = Number.isFinite(rawW) && rawW > 0 ? (Object.is(rawW, -0) ? 0 : rawW) : 0;
+
     if (item.type === 'coffee' && item.roastOrHarvestDate) {
       const roastDate = new Date(item.roastOrHarvestDate);
       if (!Number.isNaN(roastDate.getTime())) {
@@ -198,8 +208,8 @@ export function buildProactiveActionSchedule(
               daysUntilPeak === 1 ? 'TOMORROW' : `In ${daysUntilPeak} days`,
             titlePl: `Początek okna Peak: ${item.name}`,
             titleEn: `Peak window opens: ${item.name}`,
-            subtitlePl: `Koniec odgazowania CO₂ (7. dzień po wypale) · ${item.remainingWeightGrams}g w spiżarni`,
-            subtitleEn: `CO₂ degassing complete (Day 7 post-roast) · ${item.remainingWeightGrams}g left`,
+            subtitlePl: `Koniec odgazowania CO₂ (7. dzień po wypale) · ${safeRemainingWeight}g w spiżarni`,
+            subtitleEn: `CO₂ degassing complete (Day 7 post-roast) · ${safeRemainingWeight}g left`,
             badgeColor: 'copper',
             inventoryItemId: item.id,
             recommendedMethod: 'V60',
@@ -217,12 +227,12 @@ export function buildProactiveActionSchedule(
             bucketLabelEn: 'TODAY',
             titlePl: `Szczyt świeżości (Peak): ${item.name}`,
             titleEn: `Peak freshness window: ${item.name}`,
-            subtitlePl: `${daysRoastPl} · Pozostało ${item.remainingWeightGrams}g — zaparz teraz`,
-            subtitleEn: `${daysRoastEn} · ${item.remainingWeightGrams}g left — brew now`,
+            subtitlePl: `${daysRoastPl} · Pozostało ${safeRemainingWeight}g — zaparz teraz`,
+            subtitleEn: `${daysRoastEn} · ${safeRemainingWeight}g left — brew now`,
             badgeColor: 'success',
             inventoryItemId: item.id,
             recommendedMethod: 'V60',
-            doseGrams: Math.min(18, item.remainingWeightGrams),
+            doseGrams: Math.min(18, safeRemainingWeight),
             waterGrams: 250,
             waterTempCelsius: 93,
           });
@@ -236,12 +246,12 @@ export function buildProactiveActionSchedule(
             bucketLabelEn: 'TOMORROW',
             titlePl: `Końcówka świeżości: ${item.name}`,
             titleEn: `Use aging beans: ${item.name}`,
-            subtitlePl: `${daysRoastPl} · Zwiększ dozę lub zmiel drobniej (${item.remainingWeightGrams}g)`,
-            subtitleEn: `${daysRoastEn} · Up-dose or grind finer (${item.remainingWeightGrams}g)`,
+            subtitlePl: `${daysRoastPl} · Zwiększ dozę lub zmiel drobniej (${safeRemainingWeight}g)`,
+            subtitleEn: `${daysRoastEn} · Up-dose or grind finer (${safeRemainingWeight}g)`,
             badgeColor: 'warning',
             inventoryItemId: item.id,
             recommendedMethod: 'AeroPress',
-            doseGrams: Math.min(18, item.remainingWeightGrams),
+            doseGrams: Math.min(18, safeRemainingWeight),
             waterGrams: 240,
             waterTempCelsius: 95,
           });
@@ -259,12 +269,12 @@ export function buildProactiveActionSchedule(
         bucketLabelEn: offset === 0 ? 'TODAY' : `In ${offset} days`,
         titlePl: `Rytuał liści: ${item.name}`,
         titleEn: `Leaf session: ${item.name}`,
-        subtitlePl: `Herbata rzemieślnicza · Pozostało ${item.remainingWeightGrams}g w spiżarni`,
-        subtitleEn: `Artisan tea · ${item.remainingWeightGrams}g remaining in stash`,
+        subtitlePl: `Herbata rzemieślnicza · Pozostało ${safeRemainingWeight}g w spiżarni`,
+        subtitleEn: `Artisan tea · ${safeRemainingWeight}g remaining in stash`,
         badgeColor: 'success',
         inventoryItemId: item.id,
         recommendedMethod: 'Gaiwan',
-        doseGrams: Math.min(5, item.remainingWeightGrams),
+        doseGrams: Math.min(5, safeRemainingWeight),
         waterGrams: 150,
         waterTempCelsius: 85,
       });
@@ -437,6 +447,8 @@ export function generateActionIcsContent(
   const cleanDate = rawDate.replace(/-/g, '');
   const dtStart = `${cleanDate}T080000Z`;
   const dtEnd = `${cleanDate}T081500Z`;
+  const nowUtc = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const dtStamp = nowUtc.length >= 15 ? nowUtc.slice(0, 15) + 'Z' : dtStart;
   const actionId = typeof action.id === 'string' && action.id.trim() ? action.id.trim().replace(/[^a-zA-Z0-9_-]/g, '_') : `action-${Date.now()}`;
   const rawSummary = (isEn ? action.titleEn || action.titlePl : action.titlePl) || 'Sesja parzenia Napar';
   const rawDescription = (isEn ? action.subtitleEn || action.subtitlePl : action.subtitlePl) || '';
@@ -450,7 +462,7 @@ export function generateActionIcsContent(
     `PRODID:-//Apps4Brew Studio//Napar Steepwise//${isEn ? 'EN' : 'PL'}`,
     'BEGIN:VEVENT',
     `UID:${actionId}@napar.apps4brew.studio`,
-    `DTSTAMP:${dtStart}`,
+    `DTSTAMP:${dtStamp}`,
     `DTSTART:${dtStart}`,
     `DTEND:${dtEnd}`,
     `SUMMARY:${summary}`,
