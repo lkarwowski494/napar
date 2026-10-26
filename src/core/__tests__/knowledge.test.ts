@@ -711,4 +711,20 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(ciemna).toBeDefined();
     expect(ciemna?.id).toBe('tea-puerh');
   });
+
+  test('TASK-P38-06-TRE: findCoffeeVarietyById wspiera odmiany caturra, catuai, pacamara, maragogype, castillo, colombia, heirloom', () => {
+    expect(findCoffeeVarietyById('caturra')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('catuai')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('pacamara')?.id).toBe('variety-pacamara-maragogype');
+    expect(findCoffeeVarietyById('maragogype')?.id).toBe('variety-pacamara-maragogype');
+    expect(findCoffeeVarietyById('maragogipe')?.id).toBe('variety-pacamara-maragogype');
+    expect(findCoffeeVarietyById('castillo')?.id).toBe('variety-castillo-colombia');
+    expect(findCoffeeVarietyById('colombia')?.id).toBe('variety-castillo-colombia');
+    expect(findCoffeeVarietyById('heirloom')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('ethiopian-heirloom')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('landraces')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('eugenioides')?.id).toBe('variety-eugenioides');
+    expect(findCoffeeVarietyById('pink-bourbon')?.id).toBe('variety-pink-bourbon');
+    expect(findCoffeeVarietyById('pinkbourbon')?.id).toBe('variety-pink-bourbon');
+  });
 });
