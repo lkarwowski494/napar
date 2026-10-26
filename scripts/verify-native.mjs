@@ -183,6 +183,29 @@ try {
     );
   }
 
+  // Weryfikacja obecności wszystkich wymaganych uprawnień Android (TASK-P15-10-WYD)
+  for (const reqPerm of allowedAndroidPermissions) {
+    check(
+      declaredAndroidPermissions.includes(reqPerm),
+      `app.json -> expo.android.permissions musi zawierać wymagane uprawnienie: ${reqPerm}`
+    );
+  }
+
+  const forbiddenAndroidPermissions = [
+    'android.permission.RECORD_AUDIO',
+    'android.permission.ACCESS_FINE_LOCATION',
+    'android.permission.ACCESS_COARSE_LOCATION',
+    'android.permission.READ_CONTACTS',
+    'android.permission.READ_CALENDAR',
+    'android.permission.READ_SMS',
+  ];
+  for (const forbidden of forbiddenAndroidPermissions) {
+    check(
+      !declaredAndroidPermissions.includes(forbidden),
+      `app.json zawiera zabronione uprawnienie Android (Zero Telemetry/Privacy): ${forbidden}`
+    );
+  }
+
   // 1. Weryfikacja binarnego nagłówka PNG ikony App Store (RD-ENG-11)
   const iconPath = join(root, 'assets', 'icon.png');
   check(existsSync(iconPath), 'Brak pliku assets/icon.png');
