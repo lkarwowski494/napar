@@ -122,6 +122,22 @@ try {
       'app.json -> expo.android.permissions musi zawierać ' + requiredPerm
     );
   }
+
+  // Weryfikacja braku inwazyjnych uprawnień Androida (Zero Telemetry & Privacy, TASK-P29-10-WYD)
+  const forbiddenPerms = [
+    'android.permission.RECORD_AUDIO',
+    'android.permission.ACCESS_FINE_LOCATION',
+    'android.permission.ACCESS_COARSE_LOCATION',
+    'android.permission.READ_CONTACTS',
+    'android.permission.READ_CALENDAR',
+    'android.permission.SEND_SMS',
+  ];
+  for (const forbidden of forbiddenPerms) {
+    check(
+      !androidPerms.includes(forbidden),
+      `app.json -> expo.android.permissions nie może zawierać inwazyjnego uprawnienia '${forbidden}' (wymóg Zero Telemetry)`
+    );
+  }
   // Weryfikacja ścieżki ikony oraz numerycznego buildNumber (TASK-P12-10-WYD)
   check(
     appJson.icon === './assets/icon.png',
