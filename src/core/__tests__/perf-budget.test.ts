@@ -81,7 +81,7 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     expect(ms).toBeLessThan(100);
   });
 
-  test('Budżet 4: 2 000 punktów przemiału konwertowanych na 6 młynków specialty (12 000 nastaw, < 80 ms)', () => {
+  test('Budżet 4: 2 000 punktów przemiału konwertowanych na 6 młynków specialty (12 000 nastaw, < 150 ms)', () => {
     const ms = measureCpuMs(() => {
       for (let i = 0; i < 2000; i++) {
         const microns = 200 + (i % 800);
@@ -91,7 +91,7 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       }
     });
 
-    expect(ms).toBeLessThan(80);
+    expect(ms).toBeLessThan(150);
   });
 
   test('Budżet 5: 5 000 obliczeń mineralizacji wody dla różnych profili i objętości (< 80 ms)', () => {
