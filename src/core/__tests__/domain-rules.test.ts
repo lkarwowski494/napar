@@ -29,6 +29,9 @@ import {
   evaluateEspressoRatio,
   EspressoRatioEvaluation,
   EspressoRatioStyle,
+  evaluateColdBrewRatio,
+  ColdBrewRatioEvaluation,
+  ColdBrewStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -870,6 +873,40 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(fallback.style).toBe('ristretto');
       expect(fallback.doseGrams).toBe(0);
       expect(fallback.yieldGrams).toBe(0);
+    });
+  });
+
+  describe('TASK-P77-11-WZR: evaluateColdBrewRatio (Maceracja Cold Brew Ratio)', () => {
+    it('klasyfikuje proporcje cold brew i zwraca zalecenia rozcieńczenia', () => {
+      // 1. Koncentrat Cold Brew (1:3.5 - 1:7.5)
+      const concentrate: ColdBrewRatioEvaluation = evaluateColdBrewRatio(100, 500);
+      expect(concentrate.style).toBe('concentrate');
+      const styleTest: ColdBrewStyle = concentrate.style;
+      expect(styleTest).toBe('concentrate');
+      expect(concentrate.ratio).toBe(5);
+      expect(concentrate.ratioFormatted).toBe('1:5.0');
+      expect(concentrate.styleLabelPl).toBe('Koncentrat Cold Brew');
+      expect(concentrate.recommendedDilutionPl).toContain('1:1');
+
+      // 2. Gotowe do picia (1:7.5 - 1:15.0)
+      const rtd: ColdBrewRatioEvaluation = evaluateColdBrewRatio(50, 600);
+      expect(rtd.style).toBe('ready_to_drink');
+      expect(rtd.ratio).toBe(12);
+      expect(rtd.styleLabelPl).toBe('Gotowe do picia (RTD)');
+      expect(rtd.recommendedDilutionPl).toContain('Bez rozcieńczania');
+
+      // 3. Za gęsty ekstrakt / zawiesina (< 1:3.5)
+      const dense = evaluateColdBrewRatio(100, 200);
+      expect(dense.style).toBe('overly_dense');
+
+      // 4. Rozwodnione (> 1:15.0)
+      const weak = evaluateColdBrewRatio(20, 400);
+      expect(weak.style).toBe('underextracted_weak');
+
+      // 5. Odporność na zera, wartości ujemne, stringi i null
+      const fallback = evaluateColdBrewRatio(null as any, undefined as any);
+      expect(fallback.ratio).toBe(0);
+      expect(fallback.style).toBe('overly_dense');
     });
   });
 });
