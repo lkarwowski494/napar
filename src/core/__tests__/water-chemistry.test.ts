@@ -38,6 +38,9 @@ import {
   calculateMagnesiumCalciumRatio,
   MineralCationRatioAnalysis,
   CationRatioCategory,
+  calculateResidualAlkalinity,
+  ResidualAlkalinityAnalysis,
+  ResidualAlkalinityCategory,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -1082,6 +1085,41 @@ describe('Water Chemistry & Mineralization Module', () => {
     const fallback = calculateMagnesiumCalciumRatio(null as any, undefined as any);
     expect(fallback.category).toBe('pure_soft');
     expect(fallback.ratioMgToCa).toBe(0);
+  });
+
+  test('TASK-P84-07-JAK: calculateResidualAlkalinity wylicza zasadowość resztkową i wpływ na buforowanie kwasów', () => {
+    // 1. Optymalna zasadowość resztkowa Specialty (np. Alk 40, CaHardness 70, MgHardness 35 -> RA = 40 - (20 + 5) = 15.0 ppm)
+    const optimal: ResidualAlkalinityAnalysis = calculateResidualAlkalinity(40, 70, 35);
+    const catCheck: ResidualAlkalinityCategory = optimal.category;
+    expect(catCheck).toBe('optimal_specialty');
+    expect(optimal.residualAlkalinityPpm).toBe(15.0);
+    expect(optimal.phBufferingCapacityPl).toContain('Optymalna');
+    expect(optimal.sensoryAcidityImpactPl).toContain('Złoty standard');
+    expect(optimal.sensoryAcidityImpactEn).toContain('Golden standard');
+
+    // 2. Bardzo niska / ujemna zasadowość resztkowa (np. Alk 10, CaHardness 70, MgHardness 35 -> RA = 10 - 25 = -15.0 ppm)
+    const veryLow = calculateResidualAlkalinity('10,0', '70,0', '35,0');
+    expect(veryLow.category).toBe('negative_or_very_low');
+    expect(veryLow.residualAlkalinityPpm).toBe(-15.0);
+    expect(veryLow.phBufferingCapacityPl).toContain('Bardzo niska');
+    expect(veryLow.sensoryAcidityImpactPl).toContain('Maksymalna jasność');
+
+    // 3. Umiarkowanie podwyższony bufor (np. Alk 60, CaHardness 70, MgHardness 35 -> RA = 60 - 25 = 35.0 ppm)
+    const moderate = calculateResidualAlkalinity(60, 70, 35);
+    expect(moderate.category).toBe('moderate_buffer');
+    expect(moderate.residualAlkalinityPpm).toBe(35.0);
+    expect(moderate.sensoryAcidityImpactPl).toContain('wygładzona');
+
+    // 4. Nadmierny bufor (np. Alk 90, CaHardness 70, MgHardness 35 -> RA = 90 - 25 = 65.0 ppm)
+    const excessive = calculateResidualAlkalinity(90, 70, 35);
+    expect(excessive.category).toBe('excessive_dulling');
+    expect(excessive.residualAlkalinityPpm).toBe(65.0);
+    expect(excessive.sensoryAcidityImpactPl).toContain('Silne stłumienie');
+
+    // 5. Odporność na null, ujemne wartości i NaN
+    const fallback = calculateResidualAlkalinity(null as any);
+    expect(fallback.residualAlkalinityPpm).toBeLessThanOrEqual(0);
+    expect(fallback.category).toBe('negative_or_very_low');
   });
 });
 

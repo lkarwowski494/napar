@@ -1539,3 +1539,94 @@ export function calculateMagnesiumCalciumRatio(
     recommendedUsageEn,
   };
 }
+
+export type ResidualAlkalinityCategory =
+  | 'negative_or_very_low'
+  | 'optimal_specialty'
+  | 'moderate_buffer'
+  | 'excessive_dulling';
+
+export interface ResidualAlkalinityAnalysis {
+  alkalinityPpm: number;
+  calciumHardnessPpm: number;
+  magnesiumHardnessPpm: number;
+  residualAlkalinityPpm: number;
+  category: ResidualAlkalinityCategory;
+  phBufferingCapacityPl: string;
+  phBufferingCapacityEn: string;
+  sensoryAcidityImpactPl: string;
+  sensoryAcidityImpactEn: string;
+}
+
+/**
+ * Wylicza zasadowość resztkową (Residual Alkalinity - RA wg Kolbacha w ppm CaCO3)
+ * i ocenia zdolność wody do neutralizacji kwasów kawowych oraz zachowania kwasowości owocowej.
+ * RA = Alkalinity - (CaHardness / 3.5 + MgHardness / 7.0)
+ */
+export function calculateResidualAlkalinity(
+  alkalinityPpm: number | string,
+  calciumHardnessPpm: number | string = 60,
+  magnesiumHardnessPpm: number | string = 30
+): ResidualAlkalinityAnalysis {
+  const parseNum = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, Math.min(1000, v)) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, Math.min(1000, parsed)) : 0;
+    }
+    return 0;
+  };
+
+  const alk = Number(parseNum(alkalinityPpm).toFixed(1));
+  const ca = Number(parseNum(calciumHardnessPpm).toFixed(1));
+  const mg = Number(parseNum(magnesiumHardnessPpm).toFixed(1));
+
+  const raRaw = alk - (ca / 3.5 + mg / 7.0);
+  const ra = Number(raRaw.toFixed(1));
+  const safeRa = Object.is(ra, -0) ? 0 : ra;
+
+  let category: ResidualAlkalinityCategory;
+  let phBufferingCapacityPl: string;
+  let phBufferingCapacityEn: string;
+  let sensoryAcidityImpactPl: string;
+  let sensoryAcidityImpactEn: string;
+
+  if (safeRa < 5) {
+    category = 'negative_or_very_low';
+    phBufferingCapacityPl = 'Bardzo niska / Ujemna zasadowość resztkowa';
+    phBufferingCapacityEn = 'Very Low / Negative Residual Alkalinity';
+    sensoryAcidityImpactPl = 'Maksymalna jasność kwasowości owocowej (cytrynowa, jabłkowa), ryzyko nadmiernej ostrości przy jasnych paleniach.';
+    sensoryAcidityImpactEn = 'Maximum fruit acidity brightness (citric, malic), potential sharpness with light roasts.';
+  } else if (safeRa <= 25) {
+    category = 'optimal_specialty';
+    phBufferingCapacityPl = 'Optymalna zasadowość resztkowa Specialty';
+    phBufferingCapacityEn = 'Optimal Specialty Residual Alkalinity';
+    sensoryAcidityImpactPl = 'Złoty standard — idealna równowaga między żywą kwasowością a pełną słodyczą i czystym finiszem.';
+    sensoryAcidityImpactEn = 'Golden standard — perfect balance between lively acidity, sweetness, and clean finish.';
+  } else if (safeRa <= 50) {
+    category = 'moderate_buffer';
+    phBufferingCapacityPl = 'Umiarkowanie podwyższony bufor';
+    phBufferingCapacityEn = 'Moderate Buffering Capacity';
+    sensoryAcidityImpactPl = 'Kwasowość owocowa zauważalnie wygładzona, dominacja nut czekoladowych i orzechowych.';
+    sensoryAcidityImpactEn = 'Fruit acidity noticeably rounded, emphasis on chocolate and nutty notes.';
+  } else {
+    category = 'excessive_dulling';
+    phBufferingCapacityPl = 'Nadmierny bufor (Zasadowość tłumiąca)';
+    phBufferingCapacityEn = 'Excessive Buffering (Acidity Dulling)';
+    sensoryAcidityImpactPl = 'Silne stłumienie kwasowości, napar może sprawiać wrażenie płaskiego, kredowego i mdłego.';
+    sensoryAcidityImpactEn = 'Heavy acidity suppression, brew may taste flat, chalky, and dull.';
+  }
+
+  return {
+    alkalinityPpm: alk,
+    calciumHardnessPpm: ca,
+    magnesiumHardnessPpm: mg,
+    residualAlkalinityPpm: safeRa,
+    category,
+    phBufferingCapacityPl,
+    phBufferingCapacityEn,
+    sensoryAcidityImpactPl,
+    sensoryAcidityImpactEn,
+  };
+}
+
