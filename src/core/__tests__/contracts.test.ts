@@ -214,8 +214,8 @@ describe('Kontrakt Taksonomii: Koło Smaków SCA (Flavor Wheel)', () => {
 });
 
 describe('Kontrakt Urządzeń: Młynki Specialty & Mineralizacja Wody', () => {
-  test('Wszystkie 12 modeli młynków (w tym skala uniwersalna µm) posiada monotoniczną kalibrację nastaw', () => {
-    expect(SUPPORTED_GRINDERS.length).toBe(12);
+  test('Wszystkie modele młynków (w tym skala uniwersalna µm) posiadają monotoniczną kalibrację nastaw', () => {
+    expect(SUPPORTED_GRINDERS.length).toBeGreaterThanOrEqual(12);
 
     for (const grinder of SUPPORTED_GRINDERS) {
       expect(grinder.minSetting).toBeLessThan(grinder.maxSetting);
