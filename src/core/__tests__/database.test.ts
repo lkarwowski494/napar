@@ -17,6 +17,8 @@ import {
   InventoryFilterCriteria,
   filterBrewSessions,
   BrewSessionFilterCriteria,
+  calculateInventorySummary,
+  InventorySummary,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -2823,5 +2825,59 @@ describe('Napar SQLite Database & Repositories', () => {
     // 6. Odporność na null/undefined
     expect(filterBrewSessions(null as any)).toEqual([]);
     expect(filterBrewSessions([null as any, ses1])).toHaveLength(1);
+  });
+
+  test('TASK-P76-03-ZAK: calculateInventorySummary agreguje stan spiżarni i chroni przed -0/NaN', () => {
+    const items = [
+      {
+        id: '1',
+        name: 'Ethiopia Washed',
+        type: 'coffee' as const,
+        remainingWeightGrams: 200,
+        initialWeightGrams: 250,
+        isFavorite: true,
+      },
+      {
+        id: '2',
+        name: 'Panama Geisha',
+        type: 'coffee' as const,
+        remainingWeightGrams: 0,
+        initialWeightGrams: 100,
+        isFavorite: false,
+      },
+      {
+        id: '3',
+        name: 'Sencha Green Tea',
+        type: 'tea' as const,
+        remainingWeightGrams: 50.5,
+        initialWeightGrams: 100,
+        isFavorite: true,
+      },
+      {
+        id: '4',
+        name: 'Corrupt Item',
+        type: 'coffee' as const,
+        remainingWeightGrams: -10,
+        initialWeightGrams: 100,
+        isFavorite: false,
+      },
+    ] as any[];
+
+    const summary: InventorySummary = calculateInventorySummary(items);
+    expect(summary.totalItems).toBe(4);
+    expect(summary.totalWeightGrams).toBe(250.5);
+    expect(summary.coffeeItemsCount).toBe(3);
+    expect(summary.teaItemsCount).toBe(1);
+    expect(summary.coffeeWeightGrams).toBe(200);
+    expect(summary.teaWeightGrams).toBe(50.5);
+    expect(summary.inStockCount).toBe(2);
+    expect(summary.outOfStockCount).toBe(2);
+    expect(summary.favoritesCount).toBe(2);
+
+    // Odporność na null/undefined/pustą tablicę
+    const emptySummary = calculateInventorySummary(null);
+    expect(emptySummary.totalItems).toBe(0);
+    expect(emptySummary.totalWeightGrams).toBe(0);
+    expect(emptySummary.inStockCount).toBe(0);
   });
 });

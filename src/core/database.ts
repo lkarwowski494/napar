@@ -507,6 +507,93 @@ export function filterInventoryItems(
   });
 }
 
+export interface InventorySummary {
+  totalItems: number;
+  totalWeightGrams: number;
+  coffeeItemsCount: number;
+  teaItemsCount: number;
+  coffeeWeightGrams: number;
+  teaWeightGrams: number;
+  inStockCount: number;
+  outOfStockCount: number;
+  favoritesCount: number;
+}
+
+/**
+ * Agreguje stan spiżarni (całkowitą masę, rozbicie na kawę/herbatę, liczbę pozycji dostępnych i ulubionych).
+ */
+export function calculateInventorySummary(items?: InventoryItem[] | null): InventorySummary {
+  if (!Array.isArray(items) || items.length === 0) {
+    return {
+      totalItems: 0,
+      totalWeightGrams: 0,
+      coffeeItemsCount: 0,
+      teaItemsCount: 0,
+      coffeeWeightGrams: 0,
+      teaWeightGrams: 0,
+      inStockCount: 0,
+      outOfStockCount: 0,
+      favoritesCount: 0,
+    };
+  }
+
+  let totalItems = 0;
+  let totalWeight = 0;
+  let coffeeItems = 0;
+  let teaItems = 0;
+  let coffeeWeight = 0;
+  let teaWeight = 0;
+  let inStock = 0;
+  let outOfStock = 0;
+  let favorites = 0;
+
+  for (const item of items) {
+    if (!item || typeof item !== 'object') continue;
+    totalItems++;
+
+    const rawWeight =
+      typeof item.remainingWeightGrams === 'number'
+        ? item.remainingWeightGrams
+        : typeof item.remainingWeightGrams === 'string'
+        ? parseFloat((item.remainingWeightGrams as string).replace(/\uFEFF/g, '').replace(',', '.').trim())
+        : 0;
+
+    const safeWeight = Number.isFinite(rawWeight) && rawWeight > 0 && !Object.is(rawWeight, -0) ? rawWeight : 0;
+
+    if (safeWeight > 0) {
+      inStock++;
+      totalWeight += safeWeight;
+    } else {
+      outOfStock++;
+    }
+
+    const type = typeof item.type === 'string' ? item.type.trim().toLowerCase() : '';
+    if (type === 'tea') {
+      teaItems++;
+      teaWeight += safeWeight;
+    } else {
+      coffeeItems++;
+      coffeeWeight += safeWeight;
+    }
+
+    if (item.isFavorite) {
+      favorites++;
+    }
+  }
+
+  return {
+    totalItems,
+    totalWeightGrams: Number(totalWeight.toFixed(1)),
+    coffeeItemsCount: coffeeItems,
+    teaItemsCount: teaItems,
+    coffeeWeightGrams: Number(coffeeWeight.toFixed(1)),
+    teaWeightGrams: Number(teaWeight.toFixed(1)),
+    inStockCount: inStock,
+    outOfStockCount: outOfStock,
+    favoritesCount: favorites,
+  };
+}
+
 export function getInventoryItemById(id: string): InventoryItem | null {
   if (!id || typeof id !== 'string' || !id.trim()) return null;
   const safeId = id.trim();
