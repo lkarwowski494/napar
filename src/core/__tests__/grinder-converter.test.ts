@@ -36,6 +36,9 @@ import {
   estimateGrinderRetention,
   GrinderRetentionEstimate,
   GrinderRetentionClass,
+  estimateBurrSeasoningProgress,
+  BurrSeasoningEstimate,
+  BurrSeasoningStage,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -1169,6 +1172,49 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(generic.grinderId).toBe('generic_grinder');
     expect(generic.typicalRetentionGrams).toBeDefined();
     expect(generic.advicePl).toBeDefined();
+  });
+
+  test('TASK-P93-08-PRO: estimateBurrSeasoningProgress szacuje stopień dotarcia i wygrzania żaren', () => {
+    // 1. Nowe żarna płaskie 64mm (0.5 kg zmielone z 8 kg zalecanych) -> raw
+    const newFlat: BurrSeasoningEstimate = estimateBurrSeasoningProgress({
+      burrType: 'flat',
+      burrDiameterMm: 64,
+      kilogramsGround: 0.5,
+    });
+    const stageCheck: BurrSeasoningStage = newFlat.stage;
+    expect(stageCheck).toBe('raw');
+    expect(newFlat.isSeasoned).toBe(false);
+    expect(newFlat.progressPercent).toBeLessThan(25);
+    expect(newFlat.recommendedSeasoningKg).toBe(8);
+    expect(newFlat.statusPl).toContain('Nowe żarna');
+    expect(newFlat.statusEn).toBeDefined();
+
+    // 2. Żarna stożkowe 40mm w połowie dotarte (2 kg z 4 kg zalecanych) -> breaking_in
+    const conicalHalf = estimateBurrSeasoningProgress({
+      burrType: 'conical',
+      burrDiameterMm: 40,
+      kilogramsGround: '2,0',
+    });
+    expect(conicalHalf.stage).toBe('breaking_in');
+    expect(conicalHalf.progressPercent).toBe(50);
+    expect(conicalHalf.isSeasoned).toBe(false);
+
+    // 3. Żarna w pełni wygrzane (10 kg na żarnach 64mm) -> fully_stabilized
+    const fullFlat = estimateBurrSeasoningProgress({
+      burrType: 'flat',
+      burrDiameterMm: 64,
+      kilogramsGround: 10,
+    });
+    expect(fullFlat.stage).toBe('fully_stabilized');
+    expect(fullFlat.isSeasoned).toBe(true);
+    expect(fullFlat.progressPercent).toBe(100);
+    expect(fullFlat.statusPl).toContain('ustabilizowane');
+
+    // 4. Odporność na null i puste opcje
+    const fallback = estimateBurrSeasoningProgress(null);
+    expect(fallback.burrType).toBe('conical');
+    expect(fallback.kilogramsGround).toBe(0);
+    expect(fallback.progressPercent).toBe(0);
   });
 });
 

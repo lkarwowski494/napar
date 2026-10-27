@@ -1928,3 +1928,130 @@ export function estimateGrinderRetention(
 
 
 
+
+
+export type BurrSeasoningStage = 'raw' | 'breaking_in' | 'seasoned' | 'fully_stabilized';
+
+export interface BurrSeasoningEstimate {
+  burrType: 'conical' | 'flat';
+  burrDiameterMm: number;
+  kilogramsGround: number;
+  recommendedSeasoningKg: number;
+  progressPercent: number;
+  stage: BurrSeasoningStage;
+  isSeasoned: boolean;
+  statusPl: string;
+  statusEn: string;
+  impactNotesPl: string;
+  impactNotesEn: string;
+}
+
+/**
+ * Szacuje stopień dotarcia i wygrzania (seasoning) nowych żaren młynka
+ * na podstawie geometrii (żarna stożkowe vs płaskie), średnicy oraz łącznej zmielonej masy kawy.
+ */
+export function estimateBurrSeasoningProgress(
+  params?: {
+    burrType?: 'conical' | 'flat' | string | null;
+    burrDiameterMm?: number | string | null;
+    kilogramsGround?: number | string | null;
+  } | null
+): BurrSeasoningEstimate {
+  const parseNum = (v: unknown, fallback = 0, min = 0, max = 1000): number => {
+    if (typeof v === 'number') {
+      return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(min, Math.min(max, v)) : fallback;
+    }
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0)
+        ? Math.max(min, Math.min(max, parsed))
+        : fallback;
+    }
+    return fallback;
+  };
+
+  const rawType =
+    typeof params?.burrType === 'string' ? params.burrType.trim().toLowerCase() : '';
+  const burrType: 'conical' | 'flat' = rawType.includes('flat') ? 'flat' : 'conical';
+
+  const defaultDiameter = burrType === 'flat' ? 64 : 40;
+  const burrDiameterMm = Number(
+    parseNum(params?.burrDiameterMm, defaultDiameter, 20, 150).toFixed(0)
+  );
+  const kilogramsGround = Number(parseNum(params?.kilogramsGround, 0, 0, 1000).toFixed(2));
+
+  let recommendedSeasoningKg = 4;
+  if (burrType === 'flat') {
+    if (burrDiameterMm <= 54) {
+      recommendedSeasoningKg = 5;
+    } else if (burrDiameterMm <= 64) {
+      recommendedSeasoningKg = 8;
+    } else if (burrDiameterMm <= 83) {
+      recommendedSeasoningKg = 12;
+    } else {
+      recommendedSeasoningKg = 15;
+    }
+  } else {
+    if (burrDiameterMm <= 38) {
+      recommendedSeasoningKg = 3;
+    } else if (burrDiameterMm <= 48) {
+      recommendedSeasoningKg = 4;
+    } else {
+      recommendedSeasoningKg = 6;
+    }
+  }
+
+  const progressPercent = Math.min(
+    100,
+    Math.round((kilogramsGround / recommendedSeasoningKg) * 100)
+  );
+  const isSeasoned = progressPercent >= 100;
+
+  let stage: BurrSeasoningStage = 'raw';
+  let statusPl = 'Nowe żarna — podwyższona produkcja pyłu (fines) i niestabilny czas ekstrakcji.';
+  let statusEn = 'Brand new burrs — elevated fines production and inconsistent flow rate.';
+  let impactNotesPl =
+    'Zaleca się przemiał taniej kawy lub nieco grubsze mielenie w pierwszych tygodniach.';
+  let impactNotesEn =
+    'Recommended to grind cheaper beans or dial slightly coarser during first weeks.';
+
+  if (progressPercent >= 100) {
+    stage = 'fully_stabilized';
+    statusPl =
+      'Żarna w pełni wygrzane i ustabilizowane (optymalna powtarzalność i minimalny pył).';
+    statusEn =
+      'Burrs fully seasoned and stabilized (optimal consistency and minimal fines).';
+    impactNotesPl =
+      'Żarna osiągnęły pełną dojrzałość geometryczną. Perfekcyjny rozkład cząstek.';
+    impactNotesEn = 'Burrs reached full geometric maturity. Perfect particle size distribution.';
+  } else if (progressPercent >= 75) {
+    stage = 'seasoned';
+    statusPl = 'Żarna wygrzane — rozkład cząstek ustabilizowany.';
+    statusEn = 'Burrs seasoned — particle distribution stabilized.';
+    impactNotesPl =
+      'Ekstrakcja jest wysoce powtarzalna; mikroskopijne zadziory zostały wygładzone.';
+    impactNotesEn =
+      'Extraction is highly repeatable; microscopic burr imperfections smoothed out.';
+  } else if (progressPercent >= 25) {
+    stage = 'breaking_in';
+    statusPl = 'Etap dotarcia żaren — powolna stabilizacja frakcji pyłowej.';
+    statusEn = 'Breaking-in stage — gradual fines stabilization.';
+    impactNotesPl =
+      'Wydajność ekstrakcji rośnie. Nastawy mielenia stają się bardziej przewidywalne.';
+    impactNotesEn = 'Extraction yield increasing. Grind settings becoming more predictable.';
+  }
+
+  return {
+    burrType,
+    burrDiameterMm,
+    kilogramsGround,
+    recommendedSeasoningKg,
+    progressPercent,
+    stage,
+    isSeasoned,
+    statusPl,
+    statusEn,
+    impactNotesPl,
+    impactNotesEn,
+  };
+}
