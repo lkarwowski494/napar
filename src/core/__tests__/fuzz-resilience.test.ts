@@ -18,6 +18,7 @@ import {
   calculateEspressoFlowRate,
   classifyEspressoFlowRate,
   evaluateBrewMatrix,
+  evaluateEspressoRatio,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
@@ -26,6 +27,7 @@ import {
   evaluateWaterSuitability,
   calculateWaterBlend,
   calculateHardnessRatio,
+  calculateWaterDilution,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -35,6 +37,7 @@ import {
   getGrinderSettingForMethod,
   getGrindSettingsOverview,
   filterGrinders,
+  estimateGrindFinesRisk,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -47,11 +50,17 @@ import {
   formatPressure,
   formatFlowRate,
   formatExtractionYield,
+  formatTdsPercentage,
   wInKeep,
 } from '../unit-converter';
-import { searchKnowledgeBase, findKnowledgeItemById, getKnowledgeSummaryCounts } from '../knowledge-data';
+import {
+  searchKnowledgeBase,
+  findKnowledgeItemById,
+  getKnowledgeSummaryCounts,
+  getTeaBrewingGuide,
+} from '../knowledge-data';
 import { groupActionsByDate, getActionScheduleCounts } from '../bpr-engine';
-import { filterBackupEnvelope, diffBackupEnvelopes } from '../backup';
+import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes } from '../backup';
 import { getSubscriptionBadgeInfo } from '../app-access';
 import { importDataJson, filterInventoryItems } from '../database';
 
@@ -612,6 +621,73 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof brewMatrix.quadrant).toBe('string');
       expect(typeof brewMatrix.labelPl).toBe('string');
       expect(typeof brewMatrix.recommendationPl).toBe('string');
+    }
+  });
+
+  test('Chaos 15: Fuzzing evaluateEspressoRatio, calculateWaterDilution, estimateGrindFinesRisk, formatTdsPercentage, getTeaBrewingGuide, mergeBackupEnvelopes, BrewTimerEngine.calculateTotalTargetWater (TASK-P75-12-NIE)', () => {
+    const corruptInputs = [
+      -100000, -1, -0, 0, 0.0001, 1.35, 18.0, 36.0, 250, 10000, NaN, Infinity, -Infinity,
+      '', '   ', '\uFEFFtest', '1,35%', '18,5', 'invalid', null, undefined,
+      true, false, {}, [], () => {},
+    ];
+
+    for (const val of corruptInputs) {
+      // 1. evaluateEspressoRatio
+      const espressoEval = evaluateEspressoRatio(val as any, val as any);
+      expect(typeof espressoEval).toBe('object');
+      expect(typeof espressoEval.ratio).toBe('number');
+      expect(typeof espressoEval.ratioFormatted).toBe('string');
+      expect(typeof espressoEval.style).toBe('string');
+      expect(typeof espressoEval.styleLabelPl).toBe('string');
+
+      // 2. calculateWaterDilution
+      const dilution = calculateWaterDilution(val as any, val as any, val as any, val as any);
+      expect(typeof dilution).toBe('object');
+      expect(typeof dilution.sourceVolumeMl).toBe('number');
+      expect(typeof dilution.diluentVolumeMl).toBe('number');
+      expect(typeof dilution.totalVolumeMl).toBe('number');
+      expect(typeof dilution.isDilutionNeeded).toBe('boolean');
+
+      // 3. estimateGrindFinesRisk
+      const finesRisk = estimateGrindFinesRisk(val as any, val as any, val as any);
+      expect(typeof finesRisk).toBe('object');
+      expect(typeof finesRisk.finesRiskScore).toBe('number');
+      expect(typeof finesRisk.riskLevel).toBe('string');
+      expect(typeof finesRisk.cloggingRiskDescriptionPl).toBe('string');
+
+      // 4. formatTdsPercentage
+      const tdsStr = formatTdsPercentage(val as any);
+      expect(typeof tdsStr).toBe('string');
+      expect(tdsStr).toContain('%');
+      expect(tdsStr).not.toContain('NaN');
+      expect(tdsStr).not.toContain('-0');
+
+      // 5. getTeaBrewingGuide
+      const teaGuide = getTeaBrewingGuide(val as any, val as any);
+      expect(teaGuide === null || typeof teaGuide === 'object').toBe(true);
+
+      // 6. mergeBackupEnvelopes
+      try {
+        const mergedBackup = mergeBackupEnvelopes(val as any, val as any, val as any);
+        expect(typeof mergedBackup).toBe('object');
+        expect(typeof mergedBackup.state).toBe('object');
+      } catch (err: any) {
+        expect(err).toBeInstanceOf(Error);
+      }
+
+      // bezpieczne łączenie z zmutowaną zawartością wewnątrz obiektu
+      const objMerged = mergeBackupEnvelopes(
+        { state: { inventory: [val as any] } } as any,
+        { state: { inventory: [val as any] } } as any
+      );
+      expect(typeof objMerged).toBe('object');
+      expect(typeof objMerged.state).toBe('object');
+
+      // 7. BrewTimerEngine.calculateTotalTargetWater
+      const totalWater = BrewTimerEngine.calculateTotalTargetWater(val as any);
+      expect(typeof totalWater).toBe('number');
+      expect(totalWater).toBeGreaterThanOrEqual(0);
+      expect(Number.isFinite(totalWater)).toBe(true);
     }
   });
 });
