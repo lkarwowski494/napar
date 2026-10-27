@@ -1702,5 +1702,102 @@ export function formatGrinderDialSetting(
   return res.formatted;
 }
 
+export type GrindAdjustmentDirection = 'finer' | 'coarser' | 'unchanged';
+
+export interface GrinderStepDeltaAnalysis {
+  grinderId: string;
+  grinderName: string;
+  fromMicrons: number;
+  toMicrons: number;
+  deltaMicrons: number;
+  direction: GrindAdjustmentDirection;
+  stepClicks: number;
+  micronsPerStep: number;
+  fromDialFormatted: string;
+  toDialFormatted: string;
+  advicePl: string;
+  adviceEn: string;
+}
+
+/**
+ * Oblicza liczbę klików/kroków oraz kierunek regulacji młynka przy zmianie docelowej grubości mielenia.
+ */
+export function calculateGrinderStepDelta(
+  grinderId: string | undefined | null,
+  fromMicrons: number | string | undefined | null,
+  toMicrons: number | string | undefined | null,
+  language = 'pl'
+): GrinderStepDeltaAnalysis {
+  const cleanId = typeof grinderId === 'string' ? grinderId.trim().toLowerCase() : '';
+  const grinder =
+    (cleanId && findGrinderById(cleanId)) ||
+    SUPPORTED_GRINDERS.find((g) => g.id === 'generic_grinder') ||
+    SUPPORTED_GRINDERS[0];
+
+  const parseMicrons = (val: unknown): number => {
+    if (typeof val === 'number') {
+      return Number.isFinite(val) && val > 0 && !Object.is(val, -0) ? val : 0;
+    }
+    if (typeof val === 'string') {
+      const clean = val.replace(/\uFEFF/g, '').replace(/[^\d.,-]/g, '').replace(',', '.').trim();
+      const num = parseFloat(clean);
+      return Number.isFinite(num) && num > 0 && !Object.is(num, -0) ? num : 0;
+    }
+    return 0;
+  };
+
+  const from = parseMicrons(fromMicrons);
+  const to = parseMicrons(toMicrons);
+
+  const safeFrom = from > 0 ? Math.round(from) : 720;
+  const safeTo = to > 0 ? Math.round(to) : (from > 0 ? safeFrom : 720);
+  const deltaMicrons = from === 0 && to === 0 ? 0 : safeTo - safeFrom;
+
+  const fromSetting = convertMicronsToGrinder(safeFrom, grinder.id, language);
+  const toSetting = convertMicronsToGrinder(safeTo, grinder.id, language);
+
+  const stepMicrons = grinder.stepMicrons > 0 ? grinder.stepMicrons : 30;
+  let direction: GrindAdjustmentDirection = 'unchanged';
+  let stepClicks = 0;
+
+  if (deltaMicrons < 0) {
+    direction = 'finer';
+    stepClicks = Math.round(Math.abs(deltaMicrons) / stepMicrons);
+  } else if (deltaMicrons > 0) {
+    direction = 'coarser';
+    stepClicks = Math.round(deltaMicrons / stepMicrons);
+  }
+
+  let advicePl = `Nastawa młynka ${grinder.name} pozostaje bez zmian (${fromSetting.formatted}).`;
+  let adviceEn = `Grinder setting for ${grinder.name} remains unchanged (${fromSetting.formatted}).`;
+
+  if (direction === 'finer') {
+    const clicksPl = stepClicks === 1 ? '1 klik' : stepClicks < 5 ? `${stepClicks} kliki` : `${stepClicks} klików`;
+    const clicksEn = stepClicks === 1 ? '1 click' : `${stepClicks} clicks`;
+    advicePl = `Przestaw młynek ${grinder.name} o ${clicksPl} drobniej (${fromSetting.formatted} ➔ ${toSetting.formatted}).`;
+    adviceEn = `Adjust ${grinder.name} ${clicksEn} finer (${fromSetting.formatted} ➔ ${toSetting.formatted}).`;
+  } else if (direction === 'coarser') {
+    const clicksPl = stepClicks === 1 ? '1 klik' : stepClicks < 5 ? `${stepClicks} kliki` : `${stepClicks} klików`;
+    const clicksEn = stepClicks === 1 ? '1 click' : `${stepClicks} clicks`;
+    advicePl = `Przestaw młynek ${grinder.name} o ${clicksPl} grubiej (${fromSetting.formatted} ➔ ${toSetting.formatted}).`;
+    adviceEn = `Adjust ${grinder.name} ${clicksEn} coarser (${fromSetting.formatted} ➔ ${toSetting.formatted}).`;
+  }
+
+  return {
+    grinderId: grinder.id,
+    grinderName: grinder.name,
+    fromMicrons: safeFrom,
+    toMicrons: safeTo,
+    deltaMicrons,
+    direction,
+    stepClicks,
+    micronsPerStep: stepMicrons,
+    fromDialFormatted: fromSetting.formatted,
+    toDialFormatted: toSetting.formatted,
+    advicePl,
+    adviceEn,
+  };
+}
+
 
 

@@ -30,6 +30,9 @@ import {
   estimateGrindDuration,
   GrindTimeEstimate,
   formatGrinderDialSetting,
+  calculateGrinderStepDelta,
+  GrinderStepDeltaAnalysis,
+  GrindAdjustmentDirection,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -1082,6 +1085,46 @@ describe('Grinder Dial-in Converter Module', () => {
     // 6. Odporność na null, undefined, nieznany młynek
     expect(formatGrinderDialSetting(null as any, 720)).toContain('klik');
     expect(formatGrinderDialSetting('unknown_grinder', 720)).toContain('klik');
+  });
+
+  test('TASK-P89-08-PRO: calculateGrinderStepDelta oblicza liczbę klików/kroków i kierunek regulacji młynka', () => {
+    // 1. Comandante C40: przejście z 810 µm na 720 µm (zmielenie drobniej o 90 µm -> 3 kliki drobniej)
+    const finerDelta: GrinderStepDeltaAnalysis = calculateGrinderStepDelta('comandante_c40', 810, 720);
+    const dirCheck: GrindAdjustmentDirection = finerDelta.direction;
+    expect(dirCheck).toBe('finer');
+    expect(finerDelta.grinderId).toBe('comandante_c40');
+    expect(finerDelta.fromMicrons).toBe(810);
+    expect(finerDelta.toMicrons).toBe(720);
+    expect(finerDelta.deltaMicrons).toBe(-90);
+    expect(finerDelta.stepClicks).toBe(3);
+    expect(finerDelta.micronsPerStep).toBe(30);
+    expect(finerDelta.fromDialFormatted).toContain('27');
+    expect(finerDelta.toDialFormatted).toContain('24');
+    expect(finerDelta.advicePl).toContain('drobniej');
+
+    // 2. Comandante C40 po angielsku: przejście z 720 µm na 810 µm (coarser)
+    const coarserEn = calculateGrinderStepDelta('c40', 720, 810, 'en');
+    expect(coarserEn.direction).toBe('coarser');
+    expect(coarserEn.stepClicks).toBe(3);
+    expect(coarserEn.adviceEn).toContain('coarser');
+
+    // 3. Brak zmiany (unchanged: 720 µm -> 720 µm)
+    const same = calculateGrinderStepDelta('comandante_c40', 720, 720);
+    expect(same.direction).toBe('unchanged');
+    expect(same.stepClicks).toBe(0);
+    expect(same.advicePl).toContain('bez zmian');
+
+    // 4. Inny młynek: 1Zpresso K-Ultra (20 µm / klik), Fellow Ode Gen 2
+    const kUltra = calculateGrinderStepDelta('1zpresso_k_ultra', '700', '600');
+    expect(kUltra.direction).toBe('finer');
+    expect(kUltra.stepClicks).toBe(5); // 100 / 20 = 5 clicks
+    expect(kUltra.micronsPerStep).toBe(20);
+
+    // 5. Odporność na null, wartości ujemne, nieznany młynek
+    const fallback = calculateGrinderStepDelta(null as any, null as any, undefined as any);
+    expect(fallback.grinderId).toBe('generic_grinder');
+    expect(fallback.direction).toBe('unchanged');
+    expect(fallback.stepClicks).toBe(0);
   });
 });
 
