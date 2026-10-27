@@ -9,6 +9,7 @@ import {
   buildBackup,
   getBackupStats,
   formatBackupSummary,
+  validateBackupEnvelope,
   localISODate,
   stampOf,
   parseAndValidateBackup,
@@ -468,6 +469,34 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       // Obsługa pustego obiektu i null
       expect(formatBackupSummary(null, 'pl')).toBe('Brak danych kopii zapasowej');
       expect(formatBackupSummary(null, 'en')).toBe('No backup data available');
+    });
+
+    test('TASK-P66-05-ARC: validateBackupEnvelope bezpiecznie weryfikuje koperty bez rzucania wyjątków', () => {
+      const validEnvelope = buildBackup({
+        inventory: [{ id: 'inv-1' } as any],
+        customRecipes: [],
+        sessions: [],
+        caffeineLogs: [],
+      });
+
+      // 1. Poprawny obiekt koperty
+      const resObj = validateBackupEnvelope(validEnvelope);
+      expect(resObj.isValid).toBe(true);
+      expect(resObj.envelope).toBeDefined();
+      expect(resObj.error).toBeUndefined();
+
+      // 2. Poprawny string JSON z kopertą
+      const resJson = validateBackupEnvelope(JSON.stringify(validEnvelope));
+      expect(resJson.isValid).toBe(true);
+      expect(resJson.envelope).toBeDefined();
+
+      // 3. Niepoprawny format lub schemat
+      expect(validateBackupEnvelope(null).isValid).toBe(false);
+      expect(validateBackupEnvelope(undefined).isValid).toBe(false);
+      expect(validateBackupEnvelope('invalid-json').isValid).toBe(false);
+      expect(validateBackupEnvelope({ format: 'other-format' }).isValid).toBe(false);
+      expect(validateBackupEnvelope({ format: 'napar-backup', schemaVersion: 999 }).isValid).toBe(false);
+      expect(validateBackupEnvelope({ format: 'napar-backup', schemaVersion: 1, state: 'not-an-object' }).isValid).toBe(false);
     });
   });
 });

@@ -462,3 +462,37 @@ export function parseAndValidateBackup(rawJson: string): NaparBackupEnvelope {
 
   return envelope as NaparBackupEnvelope;
 }
+
+export interface BackupValidationResult {
+  isValid: boolean;
+  error?: string;
+  envelope?: NaparBackupEnvelope;
+}
+
+/**
+ * Bezpiecznie waliduje strukturę koperty kopii zapasowej (jako obiekt lub JSON string),
+ * zwracając wynik walidacji bez rzucania wyjątków.
+ */
+export function validateBackupEnvelope(candidate: unknown): BackupValidationResult {
+  if (!candidate) {
+    return { isValid: false, error: 'Brak danych do walidacji' };
+  }
+
+  let envelope: NaparBackupEnvelope;
+  try {
+    if (typeof candidate === 'string') {
+      envelope = parseAndValidateBackup(candidate);
+    } else if (typeof candidate === 'object' && candidate !== null) {
+      envelope = parseAndValidateBackup(JSON.stringify(candidate));
+    } else {
+      return { isValid: false, error: 'Nieprawidłowy typ danych koperty' };
+    }
+  } catch (err: any) {
+    return {
+      isValid: false,
+      error: err && typeof err.message === 'string' ? err.message : 'Nieprawidłowa koperta kopii',
+    };
+  }
+
+  return { isValid: true, envelope };
+}
