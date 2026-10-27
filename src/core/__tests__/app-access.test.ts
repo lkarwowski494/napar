@@ -24,6 +24,8 @@ import {
   formatTrialBadgeText,
   isProAccessGranted,
   getSubscriptionTierFromProductId,
+  isFeatureGated,
+  getGatedFeatureNotice,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1108,6 +1110,43 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(getSubscriptionTierFromProductId('\uFEFFannual')).toBe('annual');
     expect(getSubscriptionTierFromProductId('unknown.product')).toBe('none');
     expect(getSubscriptionTierFromProductId(null)).toBe('none');
+  });
+
+  test('TASK-P63-02-MON: isFeatureGated i getGatedFeatureNotice centralizuja reguly dostepu do funkcji Pro', () => {
+    // 1. Gdy trial jest aktywny lub uzytkownik jest subskrybowany -> nic nie jest zablokowane
+    const activeTrialState = { status: 'trial_active', isSubscribed: false } as any;
+    expect(isFeatureGated('custom_recipes', activeTrialState)).toBe(false);
+    expect(isFeatureGated('water_chemistry', activeTrialState)).toBe(false);
+    expect(isFeatureGated('unlimited_beans', activeTrialState)).toBe(false);
+    expect(isFeatureGated('dialin_doctor', activeTrialState)).toBe(false);
+
+    const subscribedState = { status: 'subscribed', isSubscribed: true } as any;
+    expect(isFeatureGated('custom_recipes', subscribedState)).toBe(false);
+    expect(isFeatureGated('dialin_doctor', subscribedState)).toBe(false);
+
+    // 2. Gdy trial wygasł i brak subskrypcji
+    const expiredState = { status: 'trial_expired', isSubscribed: false } as any;
+    // Funkcje darmowe (Free Core WTP-0) nigdy nie są blokowane
+    expect(isFeatureGated('timer', expiredState)).toBe(false);
+    expect(isFeatureGated('ratio', expiredState)).toBe(false);
+    expect(isFeatureGated('history', expiredState)).toBe(false);
+
+    // Funkcje Pro (WTP-1) są blokowane
+    expect(isFeatureGated('custom_recipes', expiredState)).toBe(true);
+    expect(isFeatureGated('water_chemistry', expiredState)).toBe(true);
+    expect(isFeatureGated('unlimited_beans', expiredState)).toBe(true);
+    expect(isFeatureGated('dialin_doctor', expiredState)).toBe(true);
+
+    // 3. getGatedFeatureNotice zwraca zlokalizowany tytul i komunikat
+    const noticePl = getGatedFeatureNotice('custom_recipes', 'pl');
+    expect(noticePl.title).toBeDefined();
+    expect(noticePl.message).toBeDefined();
+    expect(noticePl.title.length).toBeGreaterThan(0);
+
+    const noticeEn = getGatedFeatureNotice('water_chemistry', 'en');
+    expect(noticeEn.title).toBeDefined();
+    expect(noticeEn.message).toBeDefined();
+    expect(noticeEn.title.length).toBeGreaterThan(0);
   });
 });
 

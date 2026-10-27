@@ -293,6 +293,84 @@ export function isProAccessGranted(state?: AppAccessState | null): boolean {
   return Boolean(current.isSubscribed || current.status === 'trial_active');
 }
 
+const FREE_CORE_FEATURES = new Set([
+  'timer',
+  'ratio',
+  'history',
+  'journal_read',
+  'browse_recipes',
+  'basic_calc',
+]);
+
+/**
+ * Sprawdza czy dana funkcja wymaga aktywnego pakietu Napar Pro / Apps4Brew Pass.
+ * Zgodnie z filozofią WTP-0: podstawowy stoper, proporcje i historia są darmowe na zawsze.
+ * W trakcie trialu (trial_active) 100% funkcji jest dostępnych.
+ */
+export function isFeatureGated(
+  feature: string,
+  state?: AppAccessState | null
+): boolean {
+  if (isProAccessGranted(state)) {
+    return false;
+  }
+  const cleanFeature = (typeof feature === 'string' ? feature : '').trim().toLowerCase();
+  if (FREE_CORE_FEATURES.has(cleanFeature)) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Zwraca zlokalizowany komunikat informujący o wymaganiu licencji Pro dla zablokowanej funkcji.
+ */
+export function getGatedFeatureNotice(
+  feature: string,
+  language: 'pl' | 'en' | string = 'pl'
+): { title: string; message: string } {
+  const isEn = typeof language === 'string' && (language.toLowerCase() === 'en' || language.toLowerCase().startsWith('en'));
+  const clean = (typeof feature === 'string' ? feature : '').trim().toLowerCase();
+
+  switch (clean) {
+    case 'custom_recipes':
+      return {
+        title: isEn ? 'Custom Recipes (Pro)' : 'Własne receptury (Pro)',
+        message: isEn
+          ? 'Creating and tweaking custom brewing profiles requires Napar Pro / Apps4Brew Pass.'
+          : 'Tworzenie i edycja własnych profili parzenia wymaga licencji Napar Pro / Apps4Brew Pass.',
+      };
+    case 'water_chemistry':
+      return {
+        title: isEn ? 'Water Chemistry (Pro)' : 'Chemia i minerały wody (Pro)',
+        message: isEn
+          ? 'Mineral water calculator and bottled benchmarks require Napar Pro.'
+          : 'Kalkulator mineralizacji wody i benchmarki wód butelkowanych wymagają licencji Napar Pro.',
+      };
+    case 'unlimited_beans':
+      return {
+        title: isEn ? 'Unlimited Coffee Stash (Pro)' : 'Nielimitowana spiżarnia kawy (Pro)',
+        message: isEn
+          ? 'Tracking more than 3 specialty coffees requires Napar Pro.'
+          : 'Zarządzanie więcej niż 3 paczkami specialty w spiżarni wymaga licencji Napar Pro.',
+      };
+    case 'dialin_doctor':
+      return {
+        title: isEn ? 'Dial-in Doctor (Pro)' : 'Dial-in Doctor (Pro)',
+        message: isEn
+          ? 'Sensory extraction diagnostics and grind optimization require Napar Pro.'
+          : 'Sensoryczna diagnostyka ekstrakcji i optymalizacja przemiału wymagają licencji Napar Pro.',
+      };
+    default:
+      return {
+        title: isEn ? 'Napar Pro Feature' : 'Funkcja Napar Pro',
+        message: isEn
+          ? 'Upgrade to Napar Pro or Apps4Brew Pass to unlock this specialty feature.'
+          : 'Aktywuj licencję Napar Pro lub Apps4Brew Pass, aby odblokować tę funkcję specialty.',
+      };
+  }
+}
+
+
 /**
  * Mapuje identyfikator produktu StoreKit na wewnętrzny poziom subskrypcji.
  */
