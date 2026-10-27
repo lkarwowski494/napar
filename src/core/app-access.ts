@@ -1267,3 +1267,88 @@ export function calculateSubscriptionSavings(
   };
 }
 
+export interface TrialStatusAnalysis {
+  status: 'active' | 'expired' | 'unknown';
+  daysElapsed: number;
+  daysRemaining: number;
+  progressPercent: number;
+  isExpired: boolean;
+  statusLabelPl: string;
+  statusLabelEn: string;
+}
+
+/**
+ * Analizuje status i postęp okresu próbnego na podstawie daty rozpoczęcia trialu (ISO)
+ * oraz zadanego czasu trwania w dniach.
+ */
+export function evaluateTrialStatus(
+  trialStartDateIso?: string | null,
+  trialDurationDays: number | string = 14,
+  currentDate?: string | Date | null
+): TrialStatusAnalysis {
+  const parseNum = (v: unknown, fallback: number): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) && v > 0 ? v : fallback;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) && parsed > 0 ? parsed : fallback;
+    }
+    return fallback;
+  };
+
+  const duration = Math.max(1, Math.min(365, Math.round(parseNum(trialDurationDays, 14))));
+
+  const parseDate = (d: string | Date | undefined | null): number => {
+    if (!d) return NaN;
+    if (d instanceof Date) return d.getTime();
+    if (typeof d === 'string') {
+      const parsed = Date.parse(d.replace(/\uFEFF/g, '').trim());
+      return Number.isFinite(parsed) ? parsed : NaN;
+    }
+    return NaN;
+  };
+
+  const startMs = parseDate(trialStartDateIso);
+  const nowMs = currentDate ? parseDate(currentDate) : Date.now();
+
+  if (Number.isNaN(startMs) || Number.isNaN(nowMs)) {
+    return {
+      status: 'unknown',
+      daysElapsed: 0,
+      daysRemaining: duration,
+      progressPercent: 0,
+      isExpired: false,
+      statusLabelPl: 'Nieznany stan okresu próbnego',
+      statusLabelEn: 'Trial status unknown',
+    };
+  }
+
+  const diffMs = Math.max(0, nowMs - startMs);
+  const daysElapsed = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const isExpired = daysElapsed >= duration;
+  const daysRemaining = Math.max(0, duration - daysElapsed);
+  const progressPercent = Math.min(100, Math.round((daysElapsed / duration) * 100));
+
+  const status: 'active' | 'expired' | 'unknown' = isExpired ? 'expired' : 'active';
+  let statusLabelPl: string;
+  let statusLabelEn: string;
+
+  if (isExpired) {
+    statusLabelPl = 'Okres próbny zakończony';
+    statusLabelEn = 'Trial expired';
+  } else {
+    statusLabelPl = `Aktywny okres próbny (pozostało ${daysRemaining} dni)`;
+    statusLabelEn = `Active trial (${daysRemaining} days remaining)`;
+  }
+
+  return {
+    status,
+    daysElapsed,
+    daysRemaining,
+    progressPercent,
+    isExpired,
+    statusLabelPl,
+    statusLabelEn,
+  };
+}
+
+

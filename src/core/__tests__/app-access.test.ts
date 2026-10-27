@@ -42,6 +42,8 @@ import {
   SubscriptionDiscountInfo,
   calculateSubscriptionSavings,
   SubscriptionSavingsAnalysis,
+  evaluateTrialStatus,
+  TrialStatusAnalysis,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1516,6 +1518,43 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(fallbackRes.tier).toBe('annual');
     expect(fallbackRes.yearlyCostMonthlyBilling).toBeGreaterThan(0);
     expect(fallbackRes.tierCost).toBeGreaterThan(0);
+  });
+
+  test('TASK-P85-02-MON: evaluateTrialStatus analizuje upływ czasu i stan okresu próbnego', () => {
+    const fixedNow = new Date('2026-10-27T12:00:00Z');
+
+    // 1. Aktywny okres próbny w połowie (7 dni z 14)
+    const midTrial: TrialStatusAnalysis = evaluateTrialStatus('2026-10-20T12:00:00Z', 14, fixedNow);
+    expect(midTrial.status).toBe('active');
+    expect(midTrial.isExpired).toBe(false);
+    expect(midTrial.daysElapsed).toBe(7);
+    expect(midTrial.daysRemaining).toBe(7);
+    expect(midTrial.progressPercent).toBe(50);
+    expect(midTrial.statusLabelPl).toContain('7 dni');
+    expect(midTrial.statusLabelEn).toContain('7 days');
+
+    // 2. Wygaśnięty okres próbny (15 dni z 14)
+    const expiredTrial = evaluateTrialStatus('2026-10-12T12:00:00Z', 14, fixedNow);
+    expect(expiredTrial.status).toBe('expired');
+    expect(expiredTrial.isExpired).toBe(true);
+    expect(expiredTrial.daysRemaining).toBe(0);
+    expect(expiredTrial.progressPercent).toBe(100);
+    expect(expiredTrial.statusLabelPl).toBe('Okres próbny zakończony');
+    expect(expiredTrial.statusLabelEn).toBe('Trial expired');
+
+    // 3. Własny czas trwania (np. 30 dni)
+    const customTrial = evaluateTrialStatus('2026-10-22T12:00:00Z', '30', fixedNow);
+    expect(customTrial.status).toBe('active');
+    expect(customTrial.daysElapsed).toBe(5);
+    expect(customTrial.daysRemaining).toBe(25);
+
+    // 4. Odporność na brak daty, nieprawidłowy format i wartości ujemne
+    const unknownTrial = evaluateTrialStatus(null, 14, fixedNow);
+    expect(unknownTrial.status).toBe('unknown');
+    expect(unknownTrial.isExpired).toBe(false);
+
+    const invalidDate = evaluateTrialStatus('not-a-date', -5, fixedNow);
+    expect(invalidDate.status).toBe('unknown');
   });
 });
 
