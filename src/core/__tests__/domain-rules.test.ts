@@ -17,6 +17,9 @@ import {
   scaleRecipeDose,
   calculateDoseForBeverageYield,
   BeverageYieldResult,
+  calculateBypassBrew,
+  BypassBrewParams,
+  BypassBrewResult,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -684,6 +687,59 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(nanRes.doseGrams).toBe(0);
       expect(nanRes.waterGrams).toBe(0);
       expect(nanRes.beverageGrams).toBe(0);
+    });
+  });
+
+  describe('TASK-P68-11-WZR: calculateBypassBrew kalkulator rozcieńczania', () => {
+    it('oblicza bypass water i uzysk dla zadanego targetRatio', () => {
+      const params: BypassBrewParams = {
+        concentrateDoseGrams: 20,
+        concentrateWaterGrams: 100, // zaparzone 1:5
+        targetRatio: 15,            // docelowo 1:15 -> łączna woda 300g
+        absorptionRatio: 2.0,       // 20g * 2 = 40g zatrzymane
+      };
+      const res: BypassBrewResult = calculateBypassBrew(params);
+      expect(res.concentrateDoseGrams).toBe(20);
+      expect(res.concentrateWaterGrams).toBe(100);
+      expect(res.bypassWaterGrams).toBe(200);
+      expect(res.totalWaterGrams).toBe(300);
+      expect(res.effectiveRatio).toBe(15);
+      expect(res.estimatedBeverageYieldGrams).toBe(260); // 300 - 40
+    });
+
+    it('oblicza bypass water dla zadanego targetTotalWaterGrams (np. Americano)', () => {
+      const res = calculateBypassBrew({
+        concentrateDoseGrams: 18,
+        concentrateWaterGrams: 36, // espresso 1:2
+        targetTotalWaterGrams: 180, // 36g brew + 144g bypass
+      });
+      expect(res.concentrateDoseGrams).toBe(18);
+      expect(res.concentrateWaterGrams).toBe(36);
+      expect(res.bypassWaterGrams).toBe(144);
+      expect(res.totalWaterGrams).toBe(180);
+      expect(res.effectiveRatio).toBe(10);
+      // domyślna retencja espresso/filtr 2.0x -> 180 - (18*2) = 144g napoju
+      expect(res.estimatedBeverageYieldGrams).toBe(144);
+    });
+
+    it('zwraca zerowy bypass gdy totalWater równa się concentrateWater', () => {
+      const res = calculateBypassBrew({
+        concentrateDoseGrams: 15,
+        concentrateWaterGrams: 240,
+        targetTotalWaterGrams: 240,
+      });
+      expect(res.bypassWaterGrams).toBe(0);
+      expect(res.totalWaterGrams).toBe(240);
+      expect(res.effectiveRatio).toBe(16);
+    });
+
+    it('rzuca błąd przy niepoprawnych danych wejściowych', () => {
+      expect(() => calculateBypassBrew(null as any)).toThrow();
+      expect(() => calculateBypassBrew({ concentrateDoseGrams: 0, concentrateWaterGrams: 100, targetRatio: 15 })).toThrow();
+      expect(() => calculateBypassBrew({ concentrateDoseGrams: 20, concentrateWaterGrams: -10, targetRatio: 15 })).toThrow();
+      expect(() => calculateBypassBrew({ concentrateDoseGrams: 20, concentrateWaterGrams: 100 })).toThrow();
+      expect(() => calculateBypassBrew({ concentrateDoseGrams: 20, concentrateWaterGrams: 200, targetTotalWaterGrams: 100 })).toThrow();
+      expect(() => calculateBypassBrew({ concentrateDoseGrams: 20, concentrateWaterGrams: 200, targetRatio: 5 })).toThrow();
     });
   });
 });

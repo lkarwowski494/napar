@@ -747,4 +747,87 @@ export function scaleRecipeDose<
   };
 }
 
+export interface BypassBrewParams {
+  concentrateDoseGrams: number;
+  concentrateWaterGrams: number;
+  targetRatio?: number;
+  targetTotalWaterGrams?: number;
+  absorptionRatio?: number;
+}
+
+export interface BypassBrewResult {
+  concentrateDoseGrams: number;
+  concentrateWaterGrams: number;
+  bypassWaterGrams: number;
+  totalWaterGrams: number;
+  effectiveRatio: number;
+  estimatedBeverageYieldGrams: number;
+}
+
+/**
+ * RD-25: Oblicza parametry rozcieńczania (Bypass Brewing)
+ * np. dla Americano, Iced Filter, batch brew concentrate.
+ */
+export function calculateBypassBrew(params: BypassBrewParams): BypassBrewResult {
+  if (!params || typeof params !== 'object') {
+    throw new Error('Parametry bypass brew są wymagane');
+  }
+
+  const dose = Number(params.concentrateDoseGrams);
+  const brewWater = Number(params.concentrateWaterGrams);
+
+  if (!Number.isFinite(dose) || dose <= 0) {
+    throw new Error('Doza koncentratu musi być większa od zera');
+  }
+  if (!Number.isFinite(brewWater) || brewWater <= 0) {
+    throw new Error('Woda do zaparzenia koncentratu musi być większa od zera');
+  }
+
+  const absorption =
+    params.absorptionRatio != null &&
+    Number.isFinite(Number(params.absorptionRatio)) &&
+    Number(params.absorptionRatio) >= 0
+      ? Number(params.absorptionRatio)
+      : 2.0;
+
+  let totalWater = 0;
+
+  if (params.targetTotalWaterGrams != null) {
+    const targetWater = Number(params.targetTotalWaterGrams);
+    if (!Number.isFinite(targetWater) || targetWater < brewWater) {
+      throw new Error('Docelowa łączna ilość wody nie może być mniejsza niż woda do zaparzenia');
+    }
+    totalWater = targetWater;
+  } else if (params.targetRatio != null) {
+    const ratio = Number(params.targetRatio);
+    if (!Number.isFinite(ratio) || ratio <= 0) {
+      throw new Error('Docelowe ratio musi być większe od zera');
+    }
+    totalWater = dose * ratio;
+    if (totalWater < brewWater) {
+      throw new Error('Docelowe ratio dałoby mniej wody niż zaparzono w koncentracie');
+    }
+  } else {
+    throw new Error('Wymagane jest targetRatio lub targetTotalWaterGrams');
+  }
+
+  const bypassWater = Math.max(0, totalWater - brewWater);
+  const effectiveRatio = dose > 0 ? Number((totalWater / dose).toFixed(2)) : 0;
+  const retainedWater = dose * absorption;
+  const rawBeverageYield = totalWater - retainedWater;
+  const beverageYield = Object.is(rawBeverageYield, -0) || rawBeverageYield <= 0
+    ? 0
+    : Number(rawBeverageYield.toFixed(1));
+
+  return {
+    concentrateDoseGrams: Number(dose.toFixed(1)),
+    concentrateWaterGrams: Number(brewWater.toFixed(1)),
+    bypassWaterGrams: Number(bypassWater.toFixed(1)),
+    totalWaterGrams: Number(totalWater.toFixed(1)),
+    effectiveRatio,
+    estimatedBeverageYieldGrams: beverageYield,
+  };
+}
+
+
 
