@@ -1,0 +1,52 @@
+{
+  "cycle": "P67",
+  "status": "completed",
+  "auditDate": "2026-10-27",
+  "tasks": [
+    {
+      "id": "TASK-P67-06-TRE",
+      "perspective": "06-TRE",
+      "title": "Zintegrowane przeszukiwanie bazy wiedzy searchKnowledgeBase w knowledge-data",
+      "targetFile": "src/core/knowledge-data.ts",
+      "testFile": "src/core/__tests__/knowledge.test.ts",
+      "status": "completed",
+      "commit": "5b4091e"
+    },
+    {
+      "id": "TASK-P67-07-JAK",
+      "perspective": "07-JAK",
+      "title": "Dynamiczna ocena zdatności wody evaluateWaterSuitability w water-chemistry",
+      "targetFile": "src/core/water-chemistry.ts",
+      "testFile": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "completed",
+      "commit": "8adf2a8"
+    },
+    {
+      "id": "TASK-P67-08-PRO",
+      "perspective": "08-PRO",
+      "title": "Kalkulacja nastawy młynka dla metody getGrinderSettingForMethod w grinder-converter",
+      "targetFile": "src/core/grinder-converter.ts",
+      "testFile": "src/core/__tests__/grinder-converter.test.ts",
+      "status": "completed",
+      "commit": "2d7b17c"
+    },
+    {
+      "id": "TASK-P67-09-LOK",
+      "perspective": "09-LOK",
+      "title": "Formatowanie proporcji formatRatio i cisnienia formatPressure w unit-converter",
+      "targetFile": "src/core/unit-converter.ts",
+      "testFile": "src/core/__tests__/unit-converter.test.ts",
+      "status": "completed",
+      "commit": "69077fe"
+    },
+    {
+      "id": "TASK-P67-10-WYD",
+      "perspective": "10-WYD",
+      "title": "Optymalizacja fast-path w normSearch i Budzet 8 w perf-budget",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/perf-budget.test.ts",
+      "status": "completed",
+      "commit": "782a058"
+    }
+  ]
+}
