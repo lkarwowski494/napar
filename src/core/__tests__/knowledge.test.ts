@@ -1028,4 +1028,40 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findTeaCategoryById('shui xian')?.id).toBe('tea-oolong');
     expect(findTeaCategoryById('dan cong')?.id).toBe('tea-oolong');
   });
+
+  test('TASK-P57-06-TRE: nowoczesne procesy fermentacyjne (thermal shock, yeast, koji), odmiany specialty (wush wush, sidra, chiroso, laurina), mikroterroir (tarrazu, boquete, cerrado) i herbaty gongfu (longjing, silver needle, da hong pao)', () => {
+    // 1. Procesy eksperymentalne
+    expect(findCoffeeProcessById('thermal shock')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('szok termiczny')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('yeast fermentation')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('koji')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('double anaerobic')?.id).toBe('process-anaerobic');
+    expect(findCoffeeProcessById('monsooned malabar')?.id).toBe('process-wet-hulled');
+
+    // 2. Nowe odmiany specialty
+    expect(findCoffeeVarietyById('wush wush')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('sidra')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('chiroso')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('laurina')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('maracaturra')?.id).toBe('variety-pacamara-maragogype');
+    expect(findCoffeeVarietyById('batian')?.id).toBe('variety-sl28-sl34');
+
+    // 3. Mikroterroir
+    expect(findCoffeeOriginById('tarrazu')?.id).toBe('origin-costa-rica');
+    expect(findCoffeeOriginById('cerrado')?.id).toBe('origin-brazil');
+    expect(findCoffeeOriginById('sul de minas')?.id).toBe('origin-brazil');
+    expect(findCoffeeOriginById('boquete')?.id).toBe('origin-panama');
+    expect(findCoffeeOriginById('volcan')?.id).toBe('origin-panama');
+
+    // 4. Herbaty mistrzowskie Gongfu
+    expect(findTeaCategoryById('longjing')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('dragon well')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('silver needle')?.id).toBe('tea-white');
+    expect(findTeaCategoryById('bai hao yin zhen')?.id).toBe('tea-white');
+    expect(findTeaCategoryById('da hong pao')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('tie guan yin')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('jin jun mei')?.id).toBe('tea-black');
+    expect(findTeaCategoryById('lapsang souchong')?.id).toBe('tea-black');
+  });
 });
+

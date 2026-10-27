@@ -753,6 +753,8 @@ const VARIETY_ALIASES: Record<string, string> = {
   dega: 'variety-ethiopian-landraces',
   kurume: 'variety-ethiopian-landraces',
   wolisho: 'variety-ethiopian-landraces',
+  'mara-caturra': 'variety-pacamara-maragogype',
+  'mara caturra': 'variety-pacamara-maragogype',
 };
 
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
@@ -873,6 +875,14 @@ const PROCESS_ALIASES: Record<string, string> = {
   'yeast inoculated': 'process-anaerobic',
   'extended-fermentation': 'process-anaerobic',
   'extended fermentation': 'process-anaerobic',
+  'yeast fermentation': 'process-anaerobic',
+  yeastfermentation: 'process-anaerobic',
+  'double anaerobic': 'process-anaerobic',
+  'double-anaerobic': 'process-anaerobic',
+  doubleanaerobic: 'process-anaerobic',
+  'monsooned malabar': 'process-wet-hulled',
+  'monsooned-malabar': 'process-wet-hulled',
+  monsoonedmalabar: 'process-wet-hulled',
 };
 
 export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined {
@@ -1164,6 +1174,8 @@ const TEA_ALIASES: Record<string, string> = {
   shuixian: 'tea-oolong',
   'dan cong': 'tea-oolong',
   'dan-cong': 'tea-oolong',
+  'dragon-well': 'tea-green',
+  'lapsang souchong': 'tea-black',
 };
 
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
