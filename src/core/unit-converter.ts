@@ -340,3 +340,66 @@ export function formatTdsPercentage(
 
   return `${safeVal.toFixed(decimals)}%`;
 }
+
+/**
+ * Formatuje twardość wody w wybranej jednostce ('ppm', 'dH' / '°dH', 'gpg', 'mg/l')
+ * z bezpieczną konwersją z ppm CaCO3:
+ * - 1 °dH = 17.848 ppm CaCO3
+ * - 1 gpg = 17.118 ppm CaCO3
+ * - 1 ppm = 1 mg/L
+ */
+export function formatWaterHardness(
+  ppmCaCO3: number | string | undefined | null,
+  unit: 'ppm' | 'dH' | '°dH' | 'gpg' | 'mg/l' | string = 'ppm',
+  decimals = 1
+): string {
+  if (ppmCaCO3 === undefined || ppmCaCO3 === null) {
+    return renderHardness(0, unit, decimals);
+  }
+
+  let val: number;
+  if (typeof ppmCaCO3 === 'number') {
+    val = ppmCaCO3;
+  } else if (typeof ppmCaCO3 === 'string') {
+    const clean = ppmCaCO3
+      .replace(/\uFEFF/g, '')
+      .replace(/[^\d.,-]/g, '')
+      .replace(',', '.')
+      .trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  const safePpm =
+    !Number.isNaN(val) && val >= 0 && !Object.is(val, -0)
+      ? Math.min(2000, val)
+      : 0;
+
+  return renderHardness(safePpm, unit, decimals);
+}
+
+function renderHardness(ppm: number, unit: string, decimals: number): string {
+  const normUnit = typeof unit === 'string' ? unit.trim().toLowerCase() : 'ppm';
+  if (normUnit === 'dh' || normUnit === '°dh') {
+    const dh = ppm / 17.848;
+    const rounded = Number(dh.toFixed(decimals));
+    const safeNum = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeNum.toFixed(decimals)} °dH`;
+  }
+  if (normUnit === 'gpg') {
+    const gpg = ppm / 17.118;
+    const rounded = Number(gpg.toFixed(decimals));
+    const safeNum = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeNum.toFixed(decimals)} gpg`;
+  }
+  if (normUnit === 'mg/l') {
+    const rounded = Number(ppm.toFixed(decimals));
+    const safeNum = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeNum.toFixed(decimals)} mg/L`;
+  }
+  // Domyślnie ppm
+  const rounded = Number(ppm.toFixed(decimals));
+  const safeNum = Object.is(rounded, -0) ? 0 : rounded;
+  return `${safeNum.toFixed(decimals)} ppm`;
+}

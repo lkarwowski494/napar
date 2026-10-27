@@ -18,6 +18,7 @@ import {
   formatFlowRate,
   formatExtractionYield,
   formatTdsPercentage,
+  formatWaterHardness,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -319,6 +320,32 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatTdsPercentage(Infinity)).toBe('30.00%');
       expect(formatTdsPercentage(null)).toBe('0.00%');
       expect(formatTdsPercentage(undefined)).toBe('0.00%');
+    });
+
+    test('TASK-P77-09-LOK: formatWaterHardness formatuje twardość w ppm, °dH i gpg z pełną sanityzacją', () => {
+      // 1. ppm
+      expect(formatWaterHardness(150)).toBe('150.0 ppm');
+      expect(formatWaterHardness(150.25, 'ppm', 2)).toBe('150.25 ppm');
+      expect(formatWaterHardness('120 ppm')).toBe('120.0 ppm');
+
+      // 2. °dH (1 °dH = 17.848 ppm) -> 178.48 ppm = 10.0 °dH
+      expect(formatWaterHardness(178.48, 'dH')).toBe('10.0 °dH');
+      expect(formatWaterHardness(178.48, '°dH', 0)).toBe('10 °dH');
+
+      // 3. gpg (1 gpg = 17.118 ppm) -> 171.18 ppm = 10.0 gpg
+      expect(formatWaterHardness(171.18, 'gpg')).toBe('10.0 gpg');
+
+      // 4. mg/L
+      expect(formatWaterHardness(75, 'mg/l')).toBe('75.0 mg/L');
+
+      // 5. Zabezpieczenia brzegowe
+      expect(formatWaterHardness(0)).toBe('0.0 ppm');
+      expect(formatWaterHardness(-0)).toBe('0.0 ppm');
+      expect(formatWaterHardness(-15)).toBe('0.0 ppm');
+      expect(formatWaterHardness(NaN)).toBe('0.0 ppm');
+      expect(formatWaterHardness(Infinity)).toBe('2000.0 ppm');
+      expect(formatWaterHardness(null)).toBe('0.0 ppm');
+      expect(formatWaterHardness(undefined)).toBe('0.0 ppm');
     });
   });
 });
