@@ -10,8 +10,11 @@ import {
   calculateBrewWater,
   estimateCoffeeCaffeineMg,
   estimateTeaInfusionCaffeineMg,
+  calculateRemainingCaffeineMg,
+  calculateHoursUntilSafeCaffeine,
+  calculateCaffeineDecay,
 } from '../domain-rules';
-import { calculateWaterMinerals } from '../water-chemistry';
+import { calculateWaterMinerals, classifyWaterHardness, classifyWaterHardnessFromFH } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import { convertMicronsToGrinder } from '../grinder-converter';
 
@@ -190,6 +193,51 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
         // Import musi bezpiecznie odrzucić błędem z komunikatem, bez niekontrolowanego unhandled crasha
         expect(err).toBeInstanceOf(Error);
       }
+    }
+  });
+
+  test('Chaos 7: Fuzzing kinetyki kofeiny z mutacjami, NaN, Infinity i skrajnymi okresami poltrwania (TASK-P58-12-NIE)', () => {
+    const extremeMg = [-1000, -0, 0, 0.0001, 100, 5000, 1e8, NaN, Infinity, -Infinity, '150mg', '200,5 mg', 'invalid'];
+    const extremeHours = [-24, -0, 0, 1, 5, 24, 72, 1000, NaN, Infinity, -Infinity, '5,5h', '12 hours'];
+    const extremeHalfLives = [-10, -0, 0, 0.001, 3, 5, 12, 100, NaN, Infinity, -Infinity, '5,0'];
+
+    for (const mg of extremeMg) {
+      for (const hrs of extremeHours) {
+        for (const hl of extremeHalfLives) {
+          const rem = calculateRemainingCaffeineMg(mg as any, hrs as any, hl as any);
+          expect(typeof rem).toBe('number');
+          expect(!Number.isNaN(rem)).toBe(true);
+          expect(rem).toBeGreaterThanOrEqual(0);
+          expect(Object.is(rem, -0)).toBe(false);
+
+          const decay = calculateCaffeineDecay(mg as any, hrs as any, hl as any);
+          expect(typeof decay).toBe('number');
+          expect(!Number.isNaN(decay)).toBe(true);
+          expect(decay).toBeGreaterThanOrEqual(0);
+          expect(Object.is(decay, -0)).toBe(false);
+        }
+      }
+    }
+
+    // calculateHoursUntilSafeCaffeine
+    for (const mg of extremeMg) {
+      const hours = calculateHoursUntilSafeCaffeine(mg as any);
+      expect(typeof hours).toBe('number');
+      expect(!Number.isNaN(hours)).toBe(true);
+      expect(hours).toBeGreaterThanOrEqual(0);
+      expect(Object.is(hours, -0)).toBe(false);
+    }
+  });
+
+  test('Chaos 8: Fuzzing klasyfikacji twardosci wody z ekstremalnymi wartosciami, jednostkami i przecinkami (TASK-P58-12-NIE)', () => {
+    const extremeHardness = [-500, -0, 0, 15, 75, 150, 250, 600, 1e6, NaN, Infinity, -Infinity, '50 ppm', '150,5 ppm', '25,5 °fH', 'invalid'];
+
+    for (const h of extremeHardness) {
+      const ppmClass = classifyWaterHardness(h as any);
+      expect(['VERY_SOFT', 'SOFT', 'MODERATELY_HARD', 'HARD', 'VERY_HARD']).toContain(ppmClass);
+
+      const fhClass = classifyWaterHardnessFromFH(h as any);
+      expect(['VERY_SOFT', 'SOFT', 'MODERATELY_HARD', 'HARD', 'VERY_HARD']).toContain(fhClass);
     }
   });
 });
