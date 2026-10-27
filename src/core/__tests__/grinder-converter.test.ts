@@ -711,4 +711,39 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(getRecipeMicrons({ method: 'Dżezwa turecka' })).toBe(200);
     expect(getRecipeMicrons({ method: 'IBRIK' })).toBe(200);
   });
+
+  test('TASK-P55-08-PRO: wsparcie dla Clever Dripper i Hario Switch immersion oraz rozszerzone aliasy mlynkow', () => {
+    // 1. Clever Dripper z wariantami przemiału
+    expect(getRecipeMicrons({ method: 'CLEVER_COFFEE_DRIPPER' })).toBe(880);
+    expect(getRecipeMicrons({ method: 'CLEVER', grindSettingDescriptionPl: 'Grubo pod długą immersję' })).toBe(950);
+    expect(getRecipeMicrons({ method: 'Clever Dripper', grindSettingDescriptionEn: 'Coarse grind for long steep' })).toBe(950);
+    expect(getRecipeMicrons({ method: 'CLEVER', grindSettingDescriptionPl: 'Drobniej pod szybki przepływ' })).toBe(650);
+    expect(getRecipeMicrons({ method: 'Clever Dripper', grindSettingDescriptionEn: 'Fine grind for quick brew' })).toBe(650);
+
+    // 2. Hario Switch immersion / hybryda
+    expect(getRecipeMicrons({ method: 'SWITCH_IMMERSION' })).toBe(800);
+    expect(getRecipeMicrons({ method: 'HARIO_SWITCH', grindSettingDescriptionPl: 'Immersja w Switchu' })).toBe(800);
+    expect(getRecipeMicrons({ method: 'SWITCH', grindSettingDescriptionEn: 'Immersion switch recipe' })).toBe(800);
+    expect(getRecipeMicrons({ method: 'HARIO_SWITCH', grindSettingDescriptionPl: 'Grubo pod immersję w Switchu' })).toBe(900);
+    expect(getRecipeMicrons({ method: 'HARIO_SWITCH', grindSettingDescriptionPl: 'Drobno pod Switcha' })).toBe(600);
+
+    // 3. Rozszerzone aliasy młynków
+    expect(findGrinderById('df64')?.id).toBe('eureka_mignon');
+    expect(findGrinderById('df-64')?.id).toBe('eureka_mignon');
+    expect(findGrinderById('turin df64')?.id).toBe('eureka_mignon');
+    expect(findGrinderById('g-iota')?.id).toBe('eureka_mignon');
+    expect(findGrinderById('ode-gen1')?.id).toBe('fellow_ode_gen2');
+    expect(findGrinderById('ode 1')?.id).toBe('fellow_ode_gen2');
+    expect(findGrinderById('fellow ode 1')?.id).toBe('fellow_ode_gen2');
+    expect(findGrinderById('baratza encore esp')?.id).toBe('baratza_encore');
+    expect(findGrinderById('k4')?.id).toBe('kingrinder_k6');
+    expect(findGrinderById('kingrinder k4')?.id).toBe('kingrinder_k6');
+    expect(findGrinderById('jx-pro')?.id).toBe('1zpresso_j_max');
+    expect(findGrinderById('1zpresso jx-pro')?.id).toBe('1zpresso_j_max');
+    expect(findGrinderById('q2')?.id).toBe('timemore_c2_c3');
+    expect(findGrinderById('1zpresso q2')?.id).toBe('timemore_c2_c3');
+    expect(findGrinderById('c3 pro')?.id).toBe('timemore_c2_c3');
+    expect(findGrinderById('comandante mk3')?.id).toBe('comandante_c40');
+    expect(findGrinderById('mignon filtro')?.id).toBe('eureka_mignon');
+  });
 });

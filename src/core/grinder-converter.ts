@@ -424,6 +424,42 @@ const GRINDER_ALIASES: Record<string, string> = {
   'j-max': '1zpresso_j_max',
   '1zpresso-j-max': '1zpresso_j_max',
   '1zpresso j-max': '1zpresso_j_max',
+  df64: 'eureka_mignon',
+  'df-64': 'eureka_mignon',
+  'turin df64': 'eureka_mignon',
+  'turin-df64': 'eureka_mignon',
+  'g-iota': 'eureka_mignon',
+  giota: 'eureka_mignon',
+  'ode-gen1': 'fellow_ode_gen2',
+  'ode gen 1': 'fellow_ode_gen2',
+  'ode-1': 'fellow_ode_gen2',
+  'ode 1': 'fellow_ode_gen2',
+  ode1: 'fellow_ode_gen2',
+  'fellow ode 1': 'fellow_ode_gen2',
+  'baratza encore esp': 'baratza_encore',
+  'baratza-encore-esp': 'baratza_encore',
+  k4: 'kingrinder_k6',
+  'kingrinder k4': 'kingrinder_k6',
+  'kingrinder-k4': 'kingrinder_k6',
+  'jx-pro': '1zpresso_j_max',
+  'jx pro': '1zpresso_j_max',
+  '1zpresso jx-pro': '1zpresso_j_max',
+  '1zpresso jx pro': '1zpresso_j_max',
+  '1zpresso-jx-pro': '1zpresso_j_max',
+  q2: 'timemore_c2_c3',
+  '1zpresso q2': 'timemore_c2_c3',
+  '1zpresso-q2': 'timemore_c2_c3',
+  'c3 pro': 'timemore_c2_c3',
+  'c3-pro': 'timemore_c2_c3',
+  c3pro: 'timemore_c2_c3',
+  'timemore c3 pro': 'timemore_c2_c3',
+  'comandante mk3': 'comandante_c40',
+  'comandante mk4': 'comandante_c40',
+  'mignon filtro': 'eureka_mignon',
+  'mignon-filtro': 'eureka_mignon',
+  'mignon crono': 'eureka_mignon',
+  'mignon manuale': 'eureka_mignon',
+  'mignon silenzio': 'eureka_mignon',
 };
 
 export function findGrinderById(id: string): GrinderModel | undefined {
@@ -564,10 +600,7 @@ export function getRecipeMicrons(recipe?: {
     method.includes('CREMINA') ||
     method.includes('OLYMPIA') ||
     method === 'LEVER' ||
-    method.includes('LEVER_') ||
-    method.includes('_LEVER') ||
-    method.includes('MANUAL LEVER') ||
-    method.includes('DZWIGNI') ||
+    (!method.includes('CLEVER') && (method.includes('LEVER_') || method.includes('_LEVER') || method.includes('MANUAL LEVER') || method.includes('DZWIGNI'))) ||
     method.includes('AMERICANO') ||
     method.includes('LUNGO') ||
     method.includes('FLAT_WHITE') ||
@@ -662,6 +695,56 @@ export function getRecipeMicrons(recipe?: {
     return 600;
   }
   if (
+    method === 'CLEVER_DRIPPER' ||
+    method === 'CLEVER' ||
+    method === 'CLEVER DRIPPER' ||
+    method === 'CLEVER_COFFEE_DRIPPER' ||
+    method.includes('CLEVER') ||
+    desc.includes('clever')
+  ) {
+    if (
+      !desc.includes('średnio-grubo') &&
+      !desc.includes('srednio-grubo') &&
+      !desc.includes('medium-coarse') &&
+      (desc.includes('grubo') || desc.includes('coarse'))
+    ) {
+      return 950;
+    }
+    if (desc.includes('drobno') || desc.includes('drobniej') || desc.includes('fine')) {
+      return 650;
+    }
+    return 880;
+  }
+  if (
+    method === 'SWITCH_IMMERSION' ||
+    method === 'SWITCH' ||
+    method === 'HARIO_SWITCH' ||
+    method.includes('SWITCH') ||
+    desc.includes('switch')
+  ) {
+    if (
+      method.includes('IMMERS') ||
+      method.includes('ZANURZEN') ||
+      desc.includes('immers') ||
+      desc.includes('zanurzen')
+    ) {
+      if (
+        !desc.includes('średnio') &&
+        !desc.includes('medium') &&
+        (desc.includes('grubo') || desc.includes('coarse'))
+      ) {
+        return 900;
+      }
+      if (desc.includes('drobno') || desc.includes('drobniej') || desc.includes('fine')) {
+        return 600;
+      }
+      return 800;
+    }
+    if (desc.includes('28') || desc.includes('30') || desc.includes('grubo') || desc.includes('coarse')) return 850;
+    if (desc.includes('18') || desc.includes('20') || desc.includes('drobno') || desc.includes('drobniej') || desc.includes('fine')) return 600;
+    return 720;
+  }
+  if (
     desc.includes('drobno') ||
     desc.includes('fine') ||
     method === 'AEROPRESS' ||
@@ -719,9 +802,6 @@ export function getRecipeMicrons(recipe?: {
     method === 'KALITA' ||
     method.includes('KALITA') ||
     desc.includes('kalita') ||
-    method === 'SWITCH' ||
-    method.includes('SWITCH') ||
-    desc.includes('switch') ||
     method === 'MUGEN' ||
     method.includes('MUGEN') ||
     desc.includes('mugen') ||
@@ -770,11 +850,6 @@ export function getRecipeMicrons(recipe?: {
     method === 'CHEMEX' ||
     method.includes('CHEMEX') ||
     desc.includes('chemex') ||
-    method === 'CLEVER_DRIPPER' ||
-    method === 'CLEVER' ||
-    method === 'CLEVER DRIPPER' ||
-    method.includes('CLEVER') ||
-    desc.includes('clever') ||
     method === 'CUPPING' ||
     method.includes('CUPPING') ||
     method.includes('KAPPING') ||
