@@ -1,0 +1,53 @@
+{
+  "cycle": "P88",
+  "status": "completed",
+  "perspectives": [
+    "03-ZAK",
+    "04-SZT",
+    "05-ARC",
+    "06-TRE",
+    "07-JAK"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P88-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja zaawansowanej oceny gotowości ziaren po paleniu calculateBeanRestingReadiness z uwzględnieniem metody obróbki i typu naparu w src/core/database.ts i src/core/__tests__/database.test.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P88-04-SZT",
+      "perspective": "04-SZT",
+      "description": "Implementacja detekcji dryfu parametrów parzenia detectBrewingHabitDrift w silniku BPR w src/core/bpr-engine.ts i src/core/__tests__/bpr-engine.test.ts",
+      "targetFile": "src/core/bpr-engine.ts",
+      "testFile": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P88-05-ARC",
+      "perspective": "05-ARC",
+      "description": "Implementacja porównywania wersji kopii zapasowych compareBackupVersions z typem BackupVersionComparison w src/core/backup.ts i src/core/__tests__/backup.test.ts",
+      "targetFile": "src/core/backup.ts",
+      "testFile": "src/core/__tests__/backup.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P88-06-TRE",
+      "perspective": "06-TRE",
+      "description": "Implementacja przewodnika po kategoriach herbaty getTeaCategoryGuide z typem TeaCategoryGuide w src/core/knowledge-data.ts i src/core/__tests__/knowledge.test.ts",
+      "targetFile": "src/core/knowledge-data.ts",
+      "testFile": "src/core/__tests__/knowledge.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P88-07-JAK",
+      "perspective": "07-JAK",
+      "description": "Implementacja przeliczania twardości ogólnej z jonów pierwiastkowych calculateTotalHardnessFromIons z typem TotalHardnessIonAnalysis w src/core/water-chemistry.ts i src/core/__tests__/water-chemistry.test.ts",
+      "targetFile": "src/core/water-chemistry.ts",
+      "testFile": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "completed"
+    }
+  ]
+}
