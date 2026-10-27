@@ -15,6 +15,7 @@ import {
   formatWaterVolume,
   formatRatio,
   formatPressure,
+  formatFlowRate,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -276,6 +277,19 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatPressure(NaN)).toBe('0.0 bar');
       expect(formatPressure(null)).toBe('0.0 bar');
       expect(formatPressure(undefined)).toBe('0.0 bar');
+    });
+
+    test('TASK-P70-09-LOK: formatFlowRate formatuje przepływ w g/s z pełną sanityzacją', () => {
+      expect(formatFlowRate(2.4)).toBe('2.4 g/s');
+      expect(formatFlowRate('2,35 g/s')).toBe('2.4 g/s');
+      expect(formatFlowRate(1.85, 2)).toBe('1.85 g/s');
+      expect(formatFlowRate(0)).toBe('0.0 g/s');
+      expect(formatFlowRate(-0)).toBe('0.0 g/s');
+      expect(formatFlowRate(-1.5)).toBe('0.0 g/s');
+      expect(formatFlowRate(NaN)).toBe('0.0 g/s');
+      expect(formatFlowRate(Infinity)).toBe('100.0 g/s');
+      expect(formatFlowRate(null)).toBe('0.0 g/s');
+      expect(formatFlowRate(undefined)).toBe('0.0 g/s');
     });
   });
 });

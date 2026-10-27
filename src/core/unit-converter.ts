@@ -255,3 +255,32 @@ export function formatPressure(bars: number | string | undefined | null, decimal
 
   return `${safeVal.toFixed(decimals)} bar`;
 }
+
+
+/**
+ * Formatuje prędkość przepływu w gramach na sekundę (np. 2.4 -> '2.4 g/s').
+ */
+export function formatFlowRate(
+  gramsPerSecond: number | string | undefined | null,
+  decimals = 1
+): string {
+  if (gramsPerSecond === undefined || gramsPerSecond === null) return `0.0 g/s`;
+  let val: number;
+  if (typeof gramsPerSecond === 'number') {
+    val = gramsPerSecond;
+  } else if (typeof gramsPerSecond === 'string') {
+    const clean = gramsPerSecond
+      .replace(/\uFEFF/g, '')
+      .replace(/[^\d.,]/g, '')
+      .replace(',', '.')
+      .trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  const safeVal =
+    !Number.isNaN(val) && val >= 0 && !Object.is(val, -0) ? Math.min(100, val) : 0;
+
+  return `${safeVal.toFixed(decimals)} g/s`;
+}
