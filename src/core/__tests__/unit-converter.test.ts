@@ -20,6 +20,7 @@ import {
   formatTdsPercentage,
   formatWaterHardness,
   formatParticleSize,
+  formatAltitude,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -369,6 +370,30 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatParticleSize(Infinity)).toBe('5000 µm');
       expect(formatParticleSize(null)).toBe('0 µm');
       expect(formatParticleSize(undefined)).toBe('0 µm');
+    });
+
+    test('TASK-P82-09-LOK: formatAltitude formatuje wysokość upraw w metrach i stopach z lokalizacją', () => {
+      // 1. Domyślnie metry (m n.p.m.) w języku polskim
+      expect(formatAltitude(1850)).toBe('1850 m n.p.m.');
+      expect(formatAltitude('1850 m')).toBe('1850 m n.p.m.');
+      expect(formatAltitude('2100,5')).toBe('2101 m n.p.m.');
+
+      // 2. Metry w języku angielskim (m a.s.l.)
+      expect(formatAltitude(1850, 'm', 'en')).toBe('1850 m a.s.l.');
+
+      // 3. Stopy (ft) — 1850 m * 3.28084 ≈ 6070 ft
+      expect(formatAltitude(1850, 'ft', 'pl')).toBe('6070 ft n.p.m.');
+      expect(formatAltitude(1850, 'ft', 'en')).toBe('6070 ft a.s.l.');
+
+      // 4. Wartości brzegowe i defensywne
+      expect(formatAltitude(0)).toBe('0 m n.p.m.');
+      expect(formatAltitude(-0)).toBe('0 m n.p.m.');
+      expect(formatAltitude(-100)).toBe('0 m n.p.m.');
+      expect(formatAltitude(NaN)).toBe('0 m n.p.m.');
+      expect(formatAltitude(Infinity)).toBe('9000 m n.p.m.');
+      expect(formatAltitude(null)).toBe('0 m n.p.m.');
+      expect(formatAltitude(undefined)).toBe('0 m n.p.m.');
+      expect(formatAltitude(null, 'ft', 'en')).toBe('0 ft a.s.l.');
     });
   });
 });

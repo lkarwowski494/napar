@@ -454,3 +454,52 @@ export function formatParticleSize(
   const safeNum = Object.is(rounded, -0) ? 0 : rounded;
   return `${safeNum.toFixed(dec)} µm`;
 }
+
+/**
+ * Formatuje wysokość upraw kawy (w metrach n.p.m. lub stopach a.s.l.)
+ * z uwzględnieniem lokalizacji językowej (np. '1850 m n.p.m.', '1850 m a.s.l.', '6070 ft a.s.l.')
+ * oraz odpornością na ciągi tekstowe, wartości ujemne, -0 i NaN.
+ */
+export function formatAltitude(
+  altitudeMeters: number | string | undefined | null,
+  targetUnit: 'm' | 'ft' | string = 'm',
+  locale: string = 'pl'
+): string {
+  const isFt = typeof targetUnit === 'string' && targetUnit.trim().toLowerCase() === 'ft';
+  const isEn = typeof locale === 'string' && locale.trim().toLowerCase().startsWith('en');
+
+  if (altitudeMeters === undefined || altitudeMeters === null) {
+    const suffix = isEn ? (isFt ? 'ft a.s.l.' : 'm a.s.l.') : (isFt ? 'ft n.p.m.' : 'm n.p.m.');
+    return `0 ${suffix}`;
+  }
+
+  let val: number;
+  if (typeof altitudeMeters === 'number') {
+    val = altitudeMeters;
+  } else if (typeof altitudeMeters === 'string') {
+    const clean = altitudeMeters
+      .replace(/\uFEFF/g, '')
+      .replace(/[^\d.,-]/g, '')
+      .replace(',', '.')
+      .trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  const safeMeters =
+    !Number.isNaN(val) && val >= 0 && !Object.is(val, -0)
+      ? Math.min(9000, val)
+      : 0;
+
+  if (isFt) {
+    const feet = Math.round(safeMeters * 3.28084);
+    const suffix = isEn ? 'ft a.s.l.' : 'ft n.p.m.';
+    return `${feet} ${suffix}`;
+  }
+
+  const meters = Math.round(safeMeters);
+  const suffix = isEn ? 'm a.s.l.' : 'm n.p.m.';
+  return `${meters} ${suffix}`;
+}
+
