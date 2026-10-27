@@ -1370,10 +1370,13 @@ export function exportInventoryCsv(): string {
 
 export function getAppSetting(key: string, defaultValue = ''): string {
   try {
+    if (!key || typeof key !== 'string') return defaultValue;
+    const safeKey = key.replace(/[\x00-\x1F\x7F]/g, '').trim();
+    if (!safeKey) return defaultValue;
     const db = getDatabase();
     const row = db.getFirstSync<{ value: string }>(
       'SELECT value FROM app_settings WHERE key = ?',
-      [key]
+      [safeKey]
     );
     return row ? row.value : defaultValue;
   } catch {
@@ -1381,12 +1384,18 @@ export function getAppSetting(key: string, defaultValue = ''): string {
   }
 }
 
-export function setAppSetting(key: string, value: string): void {
+export function setAppSetting(key: string, value: string): void;
+export function setAppSetting(key: string, value: any): void;
+export function setAppSetting(key: string, value: any): void {
   try {
+    if (!key || typeof key !== 'string') return;
+    const safeKey = key.replace(/[\x00-\x1F\x7F]/g, '').trim();
+    if (!safeKey) return;
+    const safeValue = value === null || value === undefined ? '' : String(value);
     const db = getDatabase();
     db.runSync(
       'INSERT OR REPLACE INTO app_settings (key, value) VALUES (?, ?)',
-      [key, value]
+      [safeKey, safeValue]
     );
   } catch {
     // ignoruj błąd w środowisku testowym

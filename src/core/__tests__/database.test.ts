@@ -2320,4 +2320,40 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(saved?.id).toBe('777');
     expect(saved?.stepsJson).toContain('Bloom');
   });
+
+  test('TASK-P54-05-ARC: getAppSetting i setAppSetting sanityzują klucze i przyjmują wartości różnego typu, a duplicateRecipe zachowuje steps: RecipeStep[]', () => {
+    // 1. getAppSetting i setAppSetting z kluczami ze znakami kontrolnymi
+    setAppSetting(' \x00theme_preference\x1F ', 'dark');
+    expect(getAppSetting('theme_preference')).toBe('dark');
+    expect(getAppSetting(' \t\x00theme_preference\r\n ')).toBe('dark');
+
+    // 2. setAppSetting przyjmuje boolean i number
+    setAppSetting('is_active_flag', true as any);
+    expect(getAppSetting('is_active_flag')).toBe('true');
+    setAppSetting('active_count_val', 42 as any);
+    expect(getAppSetting('active_count_val')).toBe('42');
+
+    // Pusty klucz zwraca defaultValue
+    expect(getAppSetting('   \x00\x1F  ', 'default_val')).toBe('default_val');
+
+    // 3. duplicateRecipe z obiektem steps: RecipeStep[] (np. z MasterRecipe)
+    const masterLikeRecipe: any = {
+      id: 'master-aeropress',
+      name: 'Aeropress Inverted Championship',
+      beverageType: 'COFFEE',
+      method: 'Aeropress',
+      doseGrams: 16,
+      waterGrams: 200,
+      waterTempCelsius: 85,
+      recommendedRatio: 12.5,
+      steps: [
+        { namePl: 'Preinfuzja', durationSeconds: 30, targetWaterGrams: 50 },
+        { namePl: 'Wycisk', durationSeconds: 30, targetWaterGrams: 200 },
+      ],
+    };
+    const cloned = duplicateRecipe(masterLikeRecipe);
+    expect(cloned.name).toContain('(Kopia)');
+    expect(cloned.stepsJson).toContain('Preinfuzja');
+    expect(cloned.stepsJson).toContain('Wycisk');
+  });
 });
