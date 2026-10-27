@@ -347,3 +347,56 @@ export function filterByFuzzySearch<T>(
     }
   });
 }
+
+
+/**
+ * Wyodrębnia skrót tekstu (snippet) wokół pasującego zapytania wyszukiwania,
+ * dodając wielokropek (...) na początku lub na końcu, jeśli tekst został obcięty.
+ */
+export function extractSearchSnippet(
+  text: string | undefined | null,
+  query: string | undefined | null,
+  maxLength = 80
+): string {
+  if (typeof text !== 'string' || !text.trim()) return '';
+  const safeText = text.trim();
+  const safeMax =
+    typeof maxLength === 'number' && Number.isFinite(maxLength) && maxLength > 0 && !Object.is(maxLength, -0)
+      ? Math.floor(maxLength)
+      : 80;
+
+  if (safeText.length <= safeMax) {
+    return safeText;
+  }
+
+  const cleanQuery = typeof query === 'string' ? query.trim().toLowerCase() : '';
+  if (!cleanQuery) {
+    return `${safeText.slice(0, safeMax).trimEnd()}...`;
+  }
+
+  const lowerText = safeText.toLowerCase();
+  const matchIndex = lowerText.indexOf(cleanQuery);
+
+  if (matchIndex === -1) {
+    return `${safeText.slice(0, safeMax).trimEnd()}...`;
+  }
+
+  // Obliczamy okno wokół dopasowania
+  const halfWindow = Math.floor((safeMax - cleanQuery.length) / 2);
+  let startIndex = Math.max(0, matchIndex - halfWindow);
+  let endIndex = Math.min(safeText.length, startIndex + safeMax);
+
+  if (endIndex - startIndex < safeMax) {
+    startIndex = Math.max(0, endIndex - safeMax);
+  }
+
+  let snippet = safeText.slice(startIndex, endIndex).trim();
+  if (startIndex > 0) {
+    snippet = `...${snippet}`;
+  }
+  if (endIndex < safeText.length) {
+    snippet = `${snippet}...`;
+  }
+
+  return snippet;
+}

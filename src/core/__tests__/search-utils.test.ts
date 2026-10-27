@@ -16,6 +16,7 @@ import {
   isFuzzyMatch,
   filterByFuzzySearch,
   FuzzySearchOptions,
+  extractSearchSnippet,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -247,5 +248,28 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     // 4. Odporność na nullish i błędy ekstraktora
     expect(filterByFuzzySearch(null, 'test', () => [])).toEqual([]);
     expect(filterByFuzzySearch(items, 'test', () => { throw new Error('fail'); })).toEqual([]);
+  });
+
+  test('TASK-P78-01-ODK: extractSearchSnippet wyodrębnia fragment kontekstowy z wielokropkiem', () => {
+    const longText = 'Kawa specialty z regionu Yirgacheffe w Etiopii cechuje się wyraźną cytrusową kwasowością, nutami jaśminu i herbaty bergamotki oraz czystym, lekkim finiszem.';
+
+    // 1. Dopasowanie w środku zdania
+    const snippetMid = extractSearchSnippet(longText, 'jaśminu', 50);
+    expect(snippetMid).toContain('jaśminu');
+    expect(snippetMid.startsWith('...')).toBe(true);
+    expect(snippetMid.endsWith('...')).toBe(true);
+    expect(snippetMid.length).toBeLessThanOrEqual(60);
+
+    // 2. Krótki tekst nie wymaga obcinania
+    expect(extractSearchSnippet('Krótki tekst', 'tekst', 50)).toBe('Krótki tekst');
+
+    // 3. Brak zapytania obcina od początku
+    const noQuery = extractSearchSnippet(longText, '', 40);
+    expect(noQuery.endsWith('...')).toBe(true);
+    expect(noQuery.startsWith('Kawa')).toBe(true);
+
+    // 4. Odporność na null, undefined, liczby ujemne i -0
+    expect(extractSearchSnippet(null, 'test')).toBe('');
+    expect(extractSearchSnippet(longText, null, -10)).toBeDefined();
   });
 });
