@@ -2028,5 +2028,86 @@ export function compareCoffeeProcesses(
   };
 }
 
+export interface CoffeeVarietyComparisonItem {
+  id: string;
+  name: string;
+  geneticLineage: string;
+  acidity: string;
+  body: string;
+  sweetness: string;
+  sensoryProfile: string;
+  keyNotes: string[];
+}
+
+export interface CoffeeVarietyComparison {
+  varietyA: CoffeeVarietyComparisonItem;
+  varietyB: CoffeeVarietyComparisonItem;
+  sharedNotes: string[];
+  distinctNotesA: string[];
+  distinctNotesB: string[];
+  comparisonSummaryPl: string;
+  comparisonSummaryEn: string;
+}
+
+/**
+ * Porównuje dwie odmiany botaniczne kawy (np. Geisha vs Bourbon, Typica vs SL28)
+ * zestawiając ich linie genetyczne, kwasowość, słodycz i profile sensoryczne.
+ */
+export function compareCoffeeVarieties(
+  varietyAIdOrQuery: string | undefined | null,
+  varietyBIdOrQuery: string | undefined | null,
+  lang: 'pl' | 'en' | string = 'pl'
+): CoffeeVarietyComparison | null {
+  if (!varietyAIdOrQuery || !varietyBIdOrQuery) return null;
+  const guideA = getCoffeeVarietyGuide(varietyAIdOrQuery, lang);
+  const guideB = getCoffeeVarietyGuide(varietyBIdOrQuery, lang);
+  if (!guideA || !guideB) return null;
+
+  const notesA = Array.isArray(guideA.keyNotes) ? guideA.keyNotes : [];
+  const notesB = Array.isArray(guideB.keyNotes) ? guideB.keyNotes : [];
+
+  const lowerB = new Set(notesB.map((n) => n.toLowerCase().trim()));
+  const lowerA = new Set(notesA.map((n) => n.toLowerCase().trim()));
+
+  const sharedNotes = notesA.filter((n) => lowerB.has(n.toLowerCase().trim()));
+  const distinctNotesA = notesA.filter((n) => !lowerB.has(n.toLowerCase().trim()));
+  const distinctNotesB = notesB.filter((n) => !lowerA.has(n.toLowerCase().trim()));
+
+  const varietyA: CoffeeVarietyComparisonItem = {
+    id: guideA.id,
+    name: guideA.name,
+    geneticLineage: guideA.geneticLineage,
+    acidity: guideA.acidity,
+    body: guideA.body,
+    sweetness: guideA.sweetness,
+    sensoryProfile: guideA.sensoryProfile,
+    keyNotes: notesA,
+  };
+
+  const varietyB: CoffeeVarietyComparisonItem = {
+    id: guideB.id,
+    name: guideB.name,
+    geneticLineage: guideB.geneticLineage,
+    acidity: guideB.acidity,
+    body: guideB.body,
+    sweetness: guideB.sweetness,
+    sensoryProfile: guideB.sensoryProfile,
+    keyNotes: notesB,
+  };
+
+  const comparisonSummaryPl = `Porównanie odmian ${guideA.name} i ${guideB.name}: ${guideA.name} (${guideA.acidity} kwasowość, ${guideA.sweetness} słodycz) vs ${guideB.name} (${guideB.acidity} kwasowość, ${guideB.sweetness} słodycz).`;
+  const comparisonSummaryEn = `Comparison between ${guideA.name} and ${guideB.name}: ${guideA.name} (${guideA.acidity} acidity, ${guideA.sweetness} sweetness) vs ${guideB.name} (${guideB.acidity} acidity, ${guideB.sweetness} sweetness).`;
+
+  return {
+    varietyA,
+    varietyB,
+    sharedNotes,
+    distinctNotesA,
+    distinctNotesB,
+    comparisonSummaryPl,
+    comparisonSummaryEn,
+  };
+}
+
 
 

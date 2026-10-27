@@ -47,6 +47,9 @@ import {
   compareCoffeeProcesses,
   CoffeeProcessComparison,
   CoffeeProcessComparisonItem,
+  compareCoffeeVarieties,
+  CoffeeVarietyComparison,
+  CoffeeVarietyComparisonItem,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1459,6 +1462,38 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(compareCoffeeProcesses('unknown-process', 'natural')).toBeNull();
     expect(compareCoffeeProcesses('washed', 'unknown-process')).toBeNull();
     expect(compareCoffeeProcesses('', '')).toBeNull();
+  });
+
+  test('TASK-P93-06-TRE: compareCoffeeVarieties zestawia dwie odmiany botaniczne kawy', () => {
+    // 1. Geisha vs Bourbon (język polski)
+    const compPl: CoffeeVarietyComparison | null = compareCoffeeVarieties('geisha', 'bourbon', 'pl');
+    expect(compPl).not.toBeNull();
+    expect(compPl?.varietyA.id).toBe('variety-geisha');
+    expect(compPl?.varietyB.id).toBe('variety-bourbon');
+    expect(compPl?.varietyA.geneticLineage).toBeDefined();
+    expect(compPl?.varietyB.sweetness).toBeDefined();
+    expect(compPl?.comparisonSummaryPl).toContain('Geisha');
+    expect(compPl?.comparisonSummaryPl).toContain('Bourbon');
+    expect(Array.isArray(compPl?.distinctNotesA)).toBe(true);
+    expect(Array.isArray(compPl?.distinctNotesB)).toBe(true);
+    expect(Array.isArray(compPl?.sharedNotes)).toBe(true);
+
+    const sampleItem: CoffeeVarietyComparisonItem = compPl!.varietyA;
+    expect(sampleItem.id).toBe('variety-geisha');
+
+    // 2. Wersja angielska i aliasy (typica vs sl28)
+    const compEn = compareCoffeeVarieties('typica', 'sl28', 'en');
+    expect(compEn).not.toBeNull();
+    expect(compEn?.varietyA.id).toBe('variety-typica');
+    expect(compEn?.varietyB.id).toBe('variety-sl28-sl34');
+    expect(compEn?.comparisonSummaryEn).toContain('Typica');
+
+    // 3. Odporność na błędy
+    expect(compareCoffeeVarieties('geisha', null)).toBeNull();
+    expect(compareCoffeeVarieties(null, 'bourbon')).toBeNull();
+    expect(compareCoffeeVarieties('unknown-var', 'bourbon')).toBeNull();
+    expect(compareCoffeeVarieties('geisha', 'unknown-var')).toBeNull();
+    expect(compareCoffeeVarieties('', '')).toBeNull();
   });
 });
 
