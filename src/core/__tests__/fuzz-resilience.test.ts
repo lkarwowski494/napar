@@ -15,12 +15,15 @@ import {
   calculateCaffeineDecay,
   calculateDoseForBeverageYield,
   calculateBypassBrew,
+  calculateEspressoFlowRate,
+  classifyEspressoFlowRate,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
   classifyWaterHardness,
   classifyWaterHardnessFromFH,
   evaluateWaterSuitability,
+  calculateWaterBlend,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -28,6 +31,7 @@ import {
   findGrindCategoryForMicrons,
   findGrindCategoryById,
   getGrinderSettingForMethod,
+  getGrindSettingsOverview,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -38,9 +42,12 @@ import {
   formatWaterWeight,
   formatRatio,
   formatPressure,
+  formatFlowRate,
   wInKeep,
 } from '../unit-converter';
-import { searchKnowledgeBase } from '../knowledge-data';
+import { searchKnowledgeBase, findKnowledgeItemById } from '../knowledge-data';
+import { groupActionsByDate } from '../bpr-engine';
+import { filterBackupEnvelope } from '../backup';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -464,6 +471,77 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       } catch (err: any) {
         expect(err instanceof Error).toBe(true);
       }
+    }
+  });
+
+  test('Chaos 13: Fuzzing groupActionsByDate, filterBackupEnvelope, findKnowledgeItemById, calculateWaterBlend, getGrindSettingsOverview, formatFlowRate, calculateRemainingRecipeTime, calculateEspressoFlowRate (TASK-P70-12-NIE)', () => {
+    const corruptInputs = [
+      -100000, -1, -0, 0, 0.0001, 1.33, 15.5, 250, 10000, NaN, Infinity, -Infinity,
+      '', '   ', '\uFEFFtest', '36,0', '1.33 g/s', 'invalid', null, undefined,
+      true, false, {}, [], () => {},
+    ];
+
+    for (const val of corruptInputs) {
+      // 1. groupActionsByDate
+      const grouped = groupActionsByDate(val as any);
+      expect(typeof grouped).toBe('object');
+      expect(grouped).not.toBeNull();
+
+      // 2. filterBackupEnvelope
+      try {
+        const filtered = filterBackupEnvelope(val as any);
+        expect(typeof filtered).toBe('object');
+      } catch (err: any) {
+        expect(err instanceof Error).toBe(true);
+      }
+
+      // 3. findKnowledgeItemById
+      const match = findKnowledgeItemById(val as any);
+      if (match) {
+        expect(typeof match.id).toBe('string');
+        expect(typeof match.category).toBe('string');
+      } else {
+        expect(match).toBeNull();
+      }
+
+      // 4. calculateWaterBlend
+      try {
+        const blend = calculateWaterBlend(val as any);
+        expect(typeof blend).toBe('object');
+        expect(typeof blend.effectiveHardnessPpm).toBe('number');
+      } catch (err: any) {
+        expect(err instanceof Error).toBe(true);
+      }
+
+      // 5. getGrindSettingsOverview
+      const overview = getGrindSettingsOverview(val as any);
+      expect(Array.isArray(overview)).toBe(true);
+      expect(overview.length).toBeGreaterThan(0);
+
+      // 6. formatFlowRate
+      const flowStr = formatFlowRate(val as any);
+      expect(typeof flowStr).toBe('string');
+      expect(flowStr).toContain('g/s');
+      expect(flowStr).not.toContain('NaN');
+      expect(flowStr).not.toContain('-0');
+
+      // 7. calculateRemainingRecipeTime
+      const remTime = BrewTimerEngine.calculateRemainingRecipeTime(val as any, val as any, val as any);
+      expect(typeof remTime).toBe('number');
+      expect(remTime).toBeGreaterThanOrEqual(0);
+      expect(Number.isFinite(remTime)).toBe(true);
+
+      // 8. calculateEspressoFlowRate & classifyEspressoFlowRate
+      const flowRate = calculateEspressoFlowRate(val as any, val as any);
+      expect(typeof flowRate).toBe('number');
+      expect(flowRate).toBeGreaterThanOrEqual(0);
+      expect(Number.isFinite(flowRate)).toBe(true);
+
+      const flowClass = classifyEspressoFlowRate(val as any);
+      expect(typeof flowClass.status).toBe('string');
+      expect(typeof flowClass.labelPl).toBe('string');
+      expect(typeof flowClass.labelEn).toBe('string');
+      expect(typeof flowClass.flowRateGps).toBe('number');
     }
   });
 });
