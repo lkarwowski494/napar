@@ -7,6 +7,7 @@ import {
   createPreMigrationBackup,
   getInventoryItems,
   getInventoryItemById,
+  getInventoryTotalWeight,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -87,7 +88,11 @@ const mockDb: any = {
   }),
   getAllSync: jest.fn((query: string, params?: any[]) => {
     if (query.includes('FROM inventory_items')) {
-      return Array.from(mockDb.inventory.values());
+      let rows = Array.from(mockDb.inventory.values());
+      if (query.includes('is_archived = 0')) {
+        rows = rows.filter((r: any) => !r.is_archived);
+      }
+      return rows;
     }
     if (query.includes('FROM recipes')) {
       let rows = Array.from(mockDb.recipes.values());
@@ -2416,5 +2421,62 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(csv).toContain('rec-csv-test-1');
     expect(csv).toContain('Barista Champion');
     expect(csv).toContain('"\'=cmd|V60 3-Pour Artisan"'); // Formula injection neutralization
+  });
+
+  test('TASK-P64-03-ZAK: getInventoryTotalWeight zlicza mase kawy i herbaty z zabezpieczeniem przed ujemnymi i nieprawidlowymi wartosciami', () => {
+    initDatabase(mockDb as any);
+    mockDb.inventory.clear();
+
+    // Pusta spiżarnia -> same zera
+    expect(getInventoryTotalWeight()).toEqual({ coffeeGrams: 0, teaGrams: 0, totalGrams: 0 });
+
+    // Dodanie kawy (250g) i herbaty (100g)
+    const coffee: InventoryItem = {
+      id: 'bean-total-1',
+      name: 'Kenya Nyeri',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 200,
+      isArchived: false,
+      isFavorite: false,
+      createdAt: '2026-10-27T08:00:00Z',
+      updatedAt: '2026-10-27T08:00:00Z',
+    };
+    const tea: InventoryItem = {
+      id: 'tea-total-1',
+      name: 'Gyokuro',
+      type: 'tea',
+      initialWeightGrams: 100,
+      remainingWeightGrams: 80,
+      isArchived: false,
+      isFavorite: false,
+      createdAt: '2026-10-27T08:00:00Z',
+      updatedAt: '2026-10-27T08:00:00Z',
+    };
+    saveInventoryItem(coffee);
+    saveInventoryItem(tea);
+
+    const stats = getInventoryTotalWeight();
+    expect(stats.coffeeGrams).toBe(200);
+    expect(stats.teaGrams).toBe(80);
+    expect(stats.totalGrams).toBe(280);
+
+    // Pozycja zarchiwizowana
+    const archivedCoffee: InventoryItem = {
+      id: 'bean-archived-1',
+      name: 'Old Blend',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 50,
+      isArchived: true,
+      isFavorite: false,
+      createdAt: '2026-10-27T08:00:00Z',
+      updatedAt: '2026-10-27T08:00:00Z',
+    };
+    saveInventoryItem(archivedCoffee);
+
+    expect(getInventoryTotalWeight(false).totalGrams).toBe(280);
+    expect(getInventoryTotalWeight(true).totalGrams).toBe(330);
+    expect(getInventoryTotalWeight(true).coffeeGrams).toBe(250);
   });
 });

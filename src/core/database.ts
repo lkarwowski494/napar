@@ -283,6 +283,44 @@ export function getInventoryItems(includeArchived = false): InventoryItem[] {
   return rows.map(mapRowToInventoryItem);
 }
 
+/**
+ * Oblicza łączną masę pozostałą w spiżarni z podziałem na kawę i herbatę.
+ */
+export function getInventoryTotalWeight(includeArchived = false): {
+  coffeeGrams: number;
+  teaGrams: number;
+  totalGrams: number;
+} {
+  const items = getInventoryItems(includeArchived);
+  let coffeeGrams = 0;
+  let teaGrams = 0;
+
+  for (const item of items) {
+    if (!item) continue;
+    const rawWeight = Number(item.remainingWeightGrams);
+    const weight = Number.isFinite(rawWeight) && rawWeight > 0 && !Object.is(rawWeight, -0)
+      ? rawWeight
+      : 0;
+
+    const itemType = (typeof item.type === 'string' ? item.type : '').trim().toLowerCase();
+    if (itemType === 'tea') {
+      teaGrams += weight;
+    } else {
+      coffeeGrams += weight;
+    }
+  }
+
+  const safeCoffee = Object.is(coffeeGrams, -0) ? 0 : Number(coffeeGrams.toFixed(2));
+  const safeTea = Object.is(teaGrams, -0) ? 0 : Number(teaGrams.toFixed(2));
+  const safeTotal = Object.is(safeCoffee + safeTea, -0) ? 0 : Number((safeCoffee + safeTea).toFixed(2));
+
+  return {
+    coffeeGrams: safeCoffee,
+    teaGrams: safeTea,
+    totalGrams: safeTotal,
+  };
+}
+
 export function getInventoryItemById(id: string): InventoryItem | null {
   if (!id || typeof id !== 'string' || !id.trim()) return null;
   const safeId = id.trim();
