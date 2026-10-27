@@ -41,6 +41,9 @@ import {
   evaluateAeroPressRatio,
   AeroPressRatioEvaluation,
   AeroPressRatioStyle,
+  evaluateMokaPotRatio,
+  MokaPotRatioEvaluation,
+  MokaPotRatioStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -1028,6 +1031,43 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       const fallback = evaluateAeroPressRatio(null as any, undefined as any);
       expect(fallback.ratio).toBe(0);
       expect(fallback.style).toBe('concentrate_espresso_style');
+    });
+
+    it('TASK-P87-11-WZR: evaluateMokaPotRatio ocenia proporcję kawiarki i styl naparu', () => {
+      // 1. Klasyczna włoska kawiarka (1:6.5 - 1:9 = 15g kawy na 120g wody = 1:8.0)
+      const classic: MokaPotRatioEvaluation = evaluateMokaPotRatio(15, 120);
+      const styleCheck: MokaPotRatioStyle = classic.style;
+      expect(styleCheck).toBe('classic_italian');
+      expect(classic.ratio).toBe(8.0);
+      expect(classic.ratioFormatted).toBe('1:8.0');
+      expect(classic.styleLabelPl).toContain('Klasyczna włoska');
+      expect(classic.sensoryProfilePl).toContain('Wzorcowy włoski');
+      expect(classic.sensoryProfileEn).toContain('Benchmark Italian');
+      expect(classic.brewingRecommendationPl).toContain('Złoty standard');
+
+      // 2. Skoncentrowana moka / ristretto (< 1:6.5 = 20g kawy na 100g wody = 1:5.0)
+      const ristretto = evaluateMokaPotRatio('20,0', '100');
+      expect(ristretto.style).toBe('ristretto_concentrated');
+      expect(ristretto.styleLabelPl).toContain('Ristretto');
+      expect(ristretto.sensoryProfilePl).toContain('czekolady');
+      expect(ristretto.brewingRecommendationPl).toContain('flat white');
+
+      // 3. Wydłużona moka / lungo (1:9.1 - 1:12 = 14g kawy na 150g wody ≈ 1:10.7)
+      const lungo = evaluateMokaPotRatio(14, 150);
+      expect(lungo.style).toBe('lungo_delicate');
+      expect(lungo.styleLabelPl).toContain('Lungo');
+      expect(lungo.sensoryProfilePl).toContain('karmelu');
+
+      // 4. Zbyt rozwodniona (> 1:12 = 10g kawy na 150g wody = 1:15.0)
+      const dilute = evaluateMokaPotRatio(10, 150);
+      expect(dilute.style).toBe('overly_dilute');
+      expect(dilute.styleLabelPl).toContain('Zbyt rozwodniona');
+      expect(dilute.brewingRecommendationPl).toContain('Zwiększ dozę');
+
+      // 5. Odporność na zera, wartości ujemne, stringi i null
+      const fallback = evaluateMokaPotRatio(null as any, -50);
+      expect(fallback.ratio).toBe(0);
+      expect(fallback.style).toBe('ristretto_concentrated');
     });
   });
 });

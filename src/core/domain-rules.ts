@@ -1530,3 +1530,111 @@ export function evaluateAeroPressRatio(
   };
 }
 
+export type MokaPotRatioStyle =
+  | 'ristretto_concentrated'
+  | 'classic_italian'
+  | 'lungo_delicate'
+  | 'overly_dilute';
+
+export interface MokaPotRatioEvaluation {
+  doseGrams: number;
+  waterGrams: number;
+  ratio: number;
+  ratioFormatted: string;
+  style: MokaPotRatioStyle;
+  styleLabelPl: string;
+  styleLabelEn: string;
+  sensoryProfilePl: string;
+  sensoryProfileEn: string;
+  brewingRecommendationPl: string;
+  brewingRecommendationEn: string;
+}
+
+/**
+ * Klasyfikuje proporcję parzenia kawiarki (Moka Pot / Bialetti)
+ * i ocenia profil sensoryczny naparu oraz zalecenia techniczne ekstrakcji.
+ */
+export function evaluateMokaPotRatio(
+  doseGrams: number | string,
+  waterGrams: number | string
+): MokaPotRatioEvaluation {
+  const parseVal = (v: unknown): number => {
+    if (typeof v === 'number') {
+      return Number.isFinite(v) && v > 0 && !Object.is(v, -0) ? v : 0;
+    }
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && parsed > 0 && !Object.is(parsed, -0) ? parsed : 0;
+    }
+    return 0;
+  };
+
+  const dose = parseVal(doseGrams);
+  const water = parseVal(waterGrams);
+
+  let rawRatio = 0;
+  if (dose > 0 && water > 0) {
+    rawRatio = water / dose;
+  }
+
+  const ratio = Math.round(rawRatio * 100) / 100;
+  const ratioFormatted = `1:${ratio.toFixed(1)}`;
+
+  let style: MokaPotRatioStyle;
+  let styleLabelPl: string;
+  let styleLabelEn: string;
+  let sensoryProfilePl: string;
+  let sensoryProfileEn: string;
+  let brewingRecommendationPl: string;
+  let brewingRecommendationEn: string;
+
+  if (ratio <= 0 || ratio < 6.5) {
+    style = 'ristretto_concentrated';
+    styleLabelPl = 'Skoncentrowana Moka / Styl Ristretto';
+    styleLabelEn = 'Concentrated Moka / Ristretto-style';
+    sensoryProfilePl = 'Maksymalna gęstość i syropowata tekstura, dominacja nut ciemnej czekolady i orzechów, niska gorycz termiczna.';
+    sensoryProfileEn = 'Maximum density and syrupy body, dominant dark chocolate and nutty notes, low thermal bitterness.';
+    brewingRecommendationPl = 'Zdejmij kawiarkę z ognia natychmiast po pojawieniu się pierwszych bąbelków; idealne pod flat white lub cortado.';
+    brewingRecommendationEn = 'Remove moka pot from heat immediately when bubbling starts; ideal for flat white or cortado.';
+  } else if (ratio <= 9.0) {
+    style = 'classic_italian';
+    styleLabelPl = 'Klasyczna włoska kawiarka (Złoty standard)';
+    styleLabelEn = 'Classic Italian Moka (Golden Standard)';
+    sensoryProfilePl = 'Wzorcowy włoski profil — wyrazista słodycz, aksamitne body, głęboki finisz bez przypalonych posmaków.';
+    sensoryProfileEn = 'Benchmark Italian profile — rich sweetness, velvety mouthfeel, deep finish without scorched notes.';
+    brewingRecommendationPl = 'Złoty standard proporcji kawiarki (ok. 1:7 - 1:8). Zalej dolny zbiornik gorącą wodą, aby skrócić kontakt z palnikiem.';
+    brewingRecommendationEn = 'Golden standard moka ratio (~1:7 - 1:8). Fill boiler with pre-heated water to minimize heat exposure.';
+  } else if (ratio <= 12.0) {
+    style = 'lungo_delicate';
+    styleLabelPl = 'Wydłużona Moka / Styl Lungo';
+    styleLabelEn = 'Extended Moka / Lungo-style';
+    sensoryProfilePl = 'Lżejsza tekstura i wyższa klarowność, zwiększona ekstrakcja z nutami karmelu i prażonych migdałów.';
+    sensoryProfileEn = 'Lighter texture and cup clarity, higher extraction with caramel and toasted almond notes.';
+    brewingRecommendationPl = 'Dobre dla ziaren średnio palonych; schłodź dolny zbiornik zimną wodą pod kranem przy pierwszych oznakach pryskania.';
+    brewingRecommendationEn = 'Good for medium roasts; cool base under cold tap water at first signs of sputtering.';
+  } else {
+    style = 'overly_dilute';
+    styleLabelPl = 'Zbyt rozwodniona / Przegrzana';
+    styleLabelEn = 'Overly Dilute / Scorched';
+    sensoryProfilePl = 'Płaski napar o podwyższonej cierpkości i goryczce wynikającej z nadmiernego przepływu pary przez zmieloną kawę.';
+    sensoryProfileEn = 'Thin cup with increased astringency and bitterness caused by excess steam channeling through grounds.';
+    brewingRecommendationPl = 'Zwiększ dozę kawy lub nie napełniaj zbiornika powyżej zaworu bezpieczeństwa.';
+    brewingRecommendationEn = 'Increase coffee dose or avoid filling boiler above safety valve.';
+  }
+
+  return {
+    doseGrams: dose,
+    waterGrams: water,
+    ratio,
+    ratioFormatted,
+    style,
+    styleLabelPl,
+    styleLabelEn,
+    sensoryProfilePl,
+    sensoryProfileEn,
+    brewingRecommendationPl,
+    brewingRecommendationEn,
+  };
+}
+
+
