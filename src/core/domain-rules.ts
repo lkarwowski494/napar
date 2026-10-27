@@ -1637,4 +1637,109 @@ export function evaluateMokaPotRatio(
   };
 }
 
+export type TurkishCoffeeRatioStyle =
+  | 'concentrated_dense'
+  | 'traditional_ibrik'
+  | 'light_ibrik'
+  | 'overly_dilute';
+
+export interface TurkishCoffeeRatioEvaluation {
+  doseGrams: number;
+  waterGrams: number;
+  ratio: number;
+  ratioFormatted: string;
+  style: TurkishCoffeeRatioStyle;
+  styleLabelPl: string;
+  styleLabelEn: string;
+  sensoryProfilePl: string;
+  sensoryProfileEn: string;
+  brewingRecommendationPl: string;
+  brewingRecommendationEn: string;
+}
+
+/**
+ * Ocenia proporcję parzenia kawy po turecku (Cezve / Ibrik / Dżezwa) oraz profil sensoryczny naparu
+ * (< 1:8 skoncentrowany, 1:8 - 1:11 tradycyjny złoty standard, 1:11.1 - 1:14 nowoczesny specialty cezve, > 1:14 zbyt rozwodniony).
+ */
+export function evaluateTurkishCoffeeRatio(
+  doseGrams: number | string | undefined | null,
+  waterGrams: number | string | undefined | null
+): TurkishCoffeeRatioEvaluation {
+  const parseVal = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const dose = parseVal(doseGrams);
+  const water = parseVal(waterGrams);
+
+  let rawRatio = 0;
+  if (dose > 0 && water > 0) {
+    rawRatio = water / dose;
+  }
+
+  const ratio = Math.round(rawRatio * 10) / 10;
+  const ratioFormatted = `1:${ratio.toFixed(1)}`;
+
+  let style: TurkishCoffeeRatioStyle;
+  let styleLabelPl: string;
+  let styleLabelEn: string;
+  let sensoryProfilePl: string;
+  let sensoryProfileEn: string;
+  let brewingRecommendationPl: string;
+  let brewingRecommendationEn: string;
+
+  if (ratio <= 0 || ratio < 8.0) {
+    style = 'concentrated_dense';
+    styleLabelPl = 'Styl skoncentrowany / Syropowata kawa';
+    styleLabelEn = 'Concentrated style / Syrupy coffee';
+    sensoryProfilePl = 'Bardzo gęste, syropowate body z mocno zaakcentowaną nutą gorzkiej czekolady i przypraw korzennych.';
+    sensoryProfileEn = 'Very dense, syrupy body with pronounced dark chocolate and warming spice notes.';
+    brewingRecommendationPl = 'Podawaj w małych filiżankach (demitasse) z odrobiną kardamonu i szklanką zimnej wody.';
+    brewingRecommendationEn = 'Serve in small demitasse cups with optional cardamom and a glass of cold water.';
+  } else if (ratio <= 11.0) {
+    style = 'traditional_ibrik';
+    styleLabelPl = 'Klasyczna kawa po turecku (Złoty standard)';
+    styleLabelEn = 'Classic Turkish Coffee (Golden Standard)';
+    sensoryProfilePl = 'Wzorcowy profil tradycyjny — obfita, aksamitna pianka (köpük), głęboka słodycz, harmonijne body bez nadmiernej goryczy.';
+    sensoryProfileEn = 'Benchmark traditional profile — abundant velvety foam (köpük), deep sweetness, and harmonious body without harsh bitterness.';
+    brewingRecommendationPl = 'Złoty standard proporcji tygielka (ok. 1:10, np. 7-8g kawy na 70-80g wody). Gotuj na małym ogniu i zdejmij przy pierwszym uniesieniu piany.';
+    brewingRecommendationEn = 'Golden standard Cezve ratio (~1:10, e.g. 7-8g coffee to 70-80g water). Brew over low heat and remove at the first foam rise.';
+  } else if (ratio <= 14.0) {
+    style = 'light_ibrik';
+    styleLabelPl = 'Nowoczesna lekka kawa po turecku / Styl specialty';
+    styleLabelEn = 'Modern light Turkish coffee / Specialty style';
+    sensoryProfilePl = 'Lżejsza, bardziej klarowna tekstura naparu z uwypukloną owocową kwasowością i nutami kwiatowymi (styl specialty Cezve/Ibrik).';
+    sensoryProfileEn = 'Lighter, clearer cup texture with highlighted fruit acidity and floral notes (modern specialty Cezve/Ibrik style).';
+    brewingRecommendationPl = 'Idealne do jasno palonych ziaren jednorodnych (Single Origin); używaj precyzyjnego tygielka miedzianego lub ze stali nierdzewnej.';
+    brewingRecommendationEn = 'Ideal for light roast single-origin coffees; use a high-precision copper or stainless steel Cezve.';
+  } else {
+    style = 'overly_dilute';
+    styleLabelPl = 'Zbyt rozwodniona / Słaba pianka';
+    styleLabelEn = 'Overly dilute / Weak foam';
+    sensoryProfilePl = 'Wodnisty napar o słabej, szybko opadającej piance i rozmytych nutach sensorycznych.';
+    sensoryProfileEn = 'Watery brew with unstable foam that collapses quickly and washed-out flavors.';
+    brewingRecommendationPl = 'Zwiększ ilość bardzo drobno zmielonej kawy (puder) do uzyskania proporcji 1:10.';
+    brewingRecommendationEn = 'Increase ultra-fine powder coffee dose to achieve a 1:10 ratio.';
+  }
+
+  return {
+    doseGrams: dose,
+    waterGrams: water,
+    ratio,
+    ratioFormatted,
+    style,
+    styleLabelPl,
+    styleLabelEn,
+    sensoryProfilePl,
+    sensoryProfileEn,
+    brewingRecommendationPl,
+    brewingRecommendationEn,
+  };
+}
+
 

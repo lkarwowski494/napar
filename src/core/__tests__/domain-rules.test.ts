@@ -44,6 +44,9 @@ import {
   evaluateMokaPotRatio,
   MokaPotRatioEvaluation,
   MokaPotRatioStyle,
+  evaluateTurkishCoffeeRatio,
+  TurkishCoffeeRatioEvaluation,
+  TurkishCoffeeRatioStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -1068,6 +1071,42 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       const fallback = evaluateMokaPotRatio(null as any, -50);
       expect(fallback.ratio).toBe(0);
       expect(fallback.style).toBe('ristretto_concentrated');
+    });
+
+    it('TASK-P89-11-WZR: evaluateTurkishCoffeeRatio ocenia proporcję kawy po turecku (Cezve / Ibrik) i styl naparu', () => {
+      // 1. Tradycyjny złoty standard tygielka (1:8 - 1:11 = 7g kawy na 70g wody = 1:10.0)
+      const classic: TurkishCoffeeRatioEvaluation = evaluateTurkishCoffeeRatio(7, 70);
+      const styleCheck: TurkishCoffeeRatioStyle = classic.style;
+      expect(styleCheck).toBe('traditional_ibrik');
+      expect(classic.ratio).toBe(10.0);
+      expect(classic.ratioFormatted).toBe('1:10.0');
+      expect(classic.styleLabelPl).toContain('Klasyczna');
+      expect(classic.sensoryProfilePl).toContain('köpük');
+      expect(classic.sensoryProfileEn).toContain('köpük');
+      expect(classic.brewingRecommendationPl).toContain('Złoty standard');
+
+      // 2. Skoncentrowany styl (< 1:8 = 10g kawy na 60g wody = 1:6.0)
+      const dense = evaluateTurkishCoffeeRatio('10,0', '60');
+      expect(dense.style).toBe('concentrated_dense');
+      expect(dense.styleLabelPl).toContain('skoncentrowany');
+      expect(dense.sensoryProfilePl).toContain('syropowate');
+      expect(dense.brewingRecommendationPl).toContain('demitasse');
+
+      // 3. Nowoczesny lekki styl specialty (1:11.1 - 1:14 = 7g kawy na 90g wody ≈ 1:12.9)
+      const light = evaluateTurkishCoffeeRatio(7, 90);
+      expect(light.style).toBe('light_ibrik');
+      expect(light.styleLabelPl).toContain('lekka');
+      expect(light.sensoryProfilePl).toContain('klarowna');
+
+      // 4. Zbyt rozwodniona (> 1:14 = 5g kawy na 80g wody = 1:16.0)
+      const dilute = evaluateTurkishCoffeeRatio(5, 80);
+      expect(dilute.style).toBe('overly_dilute');
+      expect(dilute.styleLabelPl).toContain('Zbyt rozwodniona');
+
+      // 5. Odporność na zera, wartości ujemne, stringi i null
+      const fallback = evaluateTurkishCoffeeRatio(null as any, -10);
+      expect(fallback.ratio).toBe(0);
+      expect(fallback.style).toBe('concentrated_dense');
     });
   });
 });
