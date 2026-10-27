@@ -1,0 +1,53 @@
+{
+  "cycle": "P84",
+  "status": "completed",
+  "perspectives": [
+    "07-JAK",
+    "08-PRO",
+    "09-LOK",
+    "10-WYD",
+    "11-WZR"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P84-07-JAK",
+      "perspective": "07-JAK",
+      "description": "Implementacja analizy zasadowości resztkowej calculateResidualAlkalinity z typami ResidualAlkalinityAnalysis i ResidualAlkalinityCategory w src/core/water-chemistry.ts",
+      "targetFile": "src/core/water-chemistry.ts",
+      "testFile": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P84-08-PRO",
+      "perspective": "08-PRO",
+      "description": "Implementacja estymatora czasu mielenia ziaren estimateGrindDuration z typem GrindTimeEstimate w src/core/grinder-converter.ts",
+      "targetFile": "src/core/grinder-converter.ts",
+      "testFile": "src/core/__tests__/grinder-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P84-09-LOK",
+      "perspective": "09-LOK",
+      "description": "Implementacja formatowania ciśnienia w barach i psi formatPressureWithUnit w src/core/unit-converter.ts",
+      "targetFile": "src/core/unit-converter.ts",
+      "testFile": "src/core/__tests__/unit-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P84-10-WYD",
+      "perspective": "10-WYD",
+      "description": "Implementacja wyznaczania harmonogramu narastania wody BrewTimerEngine.calculateCumulativeWaterSchedule z typem CumulativeWaterPoint i Budżetem 15 w src/core/timer-engine.ts i src/core/__tests__/perf-budget.test.ts",
+      "targetFile": "src/core/timer-engine.ts",
+      "testFile": "src/core/__tests__/perf-budget.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P84-11-WZR",
+      "perspective": "11-WZR",
+      "description": "Implementacja ewaluacji proporcji AeroPress evaluateAeroPressRatio z typami AeroPressRatioEvaluation i AeroPressRatioStyle w src/core/domain-rules.ts",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed"
+    }
+  ]
+}
