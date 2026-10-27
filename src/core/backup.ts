@@ -125,8 +125,8 @@ export function formatBackupSummary(
   const isEn = typeof language === 'string' && language.toLowerCase().startsWith('en');
   const stats = getBackupStats(envelope);
   const dateStr =
-    typeof envelope.createdAt === 'string' && envelope.createdAt.length >= 10
-      ? envelope.createdAt.slice(0, 10)
+    typeof envelope.exportedAt === 'string' && envelope.exportedAt.length >= 10
+      ? envelope.exportedAt.slice(0, 10)
       : localISODate();
 
   if (isEn) {
