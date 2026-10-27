@@ -450,7 +450,10 @@
     "hardnessSoft": "Lágy",
     "hardnessModeratelyHard": "Közepesen kemény",
     "hardnessHard": "Kemény",
-    "hardnessVeryHard": "Nagyon kemény"
+    "hardnessVeryHard": "Nagyon kemény",
+    "degreesDH": "Német keménységi fok (°dH)",
+    "degreesFH": "Francia keménységi fok (°fH)",
+    "degreesClark": "Angol keménységi fok / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

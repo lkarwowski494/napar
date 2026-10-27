@@ -450,7 +450,10 @@
     "hardnessSoft": "רכים",
     "hardnessModeratelyHard": "קשים למחצה",
     "hardnessHard": "קשים",
-    "hardnessVeryHard": "קשים מאוד"
+    "hardnessVeryHard": "קשים מאוד",
+    "degreesDH": "מעלות גרמניות (°dH)",
+    "degreesFH": "מעלות צרפתיות (°fH)",
+    "degreesClark": "מעלות אנגליות / קלארק (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

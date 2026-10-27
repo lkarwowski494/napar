@@ -450,7 +450,10 @@
     "hardnessSoft": "Blødt",
     "hardnessModeratelyHard": "Middelhårdt",
     "hardnessHard": "Hårdt",
-    "hardnessVeryHard": "Meget hårdt"
+    "hardnessVeryHard": "Meget hårdt",
+    "degreesDH": "Tyske hårdhedsgrader (°dH)",
+    "degreesFH": "Franske hårdhedsgrader (°fH)",
+    "degreesClark": "Engelske hårdhedsgrader / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

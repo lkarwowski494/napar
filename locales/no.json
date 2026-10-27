@@ -450,7 +450,10 @@
     "hardnessSoft": "Mykt",
     "hardnessModeratelyHard": "Middels hardt",
     "hardnessHard": "Hardt",
-    "hardnessVeryHard": "Veldig hardt"
+    "hardnessVeryHard": "Veldig hardt",
+    "degreesDH": "Tyske hardhetsgrader (°dH)",
+    "degreesFH": "Franske hardhetsgrader (°fH)",
+    "degreesClark": "Engelske hardhetsgrader / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

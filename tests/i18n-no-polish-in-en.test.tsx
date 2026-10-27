@@ -138,4 +138,16 @@ describe('No Polish in EN Guard (NFR-I18N-003)', () => {
     expect((translations.pl.water as any).waterHardnessHard).toBe('Twarda woda (176–300 ppm CaCO₃)');
     expect((translations.pl.water as any).waterHardnessVeryHard).toBe('Bardzo twarda woda (>300 ppm CaCO₃)');
   });
+
+  test('TASK-P55-09-LOK: translations.en i translations.pl zawieraja klucze stopni twardosci degreesDH, degreesFH i degreesClark', () => {
+    // EN
+    expect((translations.en.water as any).degreesDH).toBe('German degrees (°dH)');
+    expect((translations.en.water as any).degreesFH).toBe('French degrees (°fH)');
+    expect((translations.en.water as any).degreesClark).toBe('Clark degrees (°e)');
+
+    // PL
+    expect((translations.pl.water as any).degreesDH).toBe('Stopnie niemieckie (°dH)');
+    expect((translations.pl.water as any).degreesFH).toBe('Stopnie francuskie (°fH)');
+    expect((translations.pl.water as any).degreesClark).toBe('Stopnie angielskie / Clarka (°e)');
+  });
 });

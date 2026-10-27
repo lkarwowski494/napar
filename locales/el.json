@@ -450,7 +450,10 @@
     "hardnessSoft": "Μαλακό",
     "hardnessModeratelyHard": "Μέτρια σκληρό",
     "hardnessHard": "Σκληρό",
-    "hardnessVeryHard": "Πολύ σκληρό"
+    "hardnessVeryHard": "Πολύ σκληρό",
+    "degreesDH": "Γερμανικοί βαθμοί (°dH)",
+    "degreesFH": "Γαλλικοί βαθμοί (°fH)",
+    "degreesClark": "Αγγλικοί βαθμοί / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

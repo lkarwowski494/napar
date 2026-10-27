@@ -450,7 +450,10 @@
     "hardnessSoft": "Mole",
     "hardnessModeratelyHard": "Moderadamente dura",
     "hardnessHard": "Dura",
-    "hardnessVeryHard": "Muito dura"
+    "hardnessVeryHard": "Muito dura",
+    "degreesDH": "Graus alemães (°dH)",
+    "degreesFH": "Graus franceses (°fH)",
+    "degreesClark": "Graus ingleses / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

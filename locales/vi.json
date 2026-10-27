@@ -450,7 +450,10 @@
     "hardnessSoft": "Mềm",
     "hardnessModeratelyHard": "Độ cứng vừa",
     "hardnessHard": "Cứng",
-    "hardnessVeryHard": "Rất cứng"
+    "hardnessVeryHard": "Rất cứng",
+    "degreesDH": "Độ Đức (°dH)",
+    "degreesFH": "Độ Pháp (°fH)",
+    "degreesClark": "Độ Anh / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

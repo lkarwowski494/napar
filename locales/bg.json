@@ -450,7 +450,10 @@
     "hardnessSoft": "Мека",
     "hardnessModeratelyHard": "Умерено твърда",
     "hardnessHard": "Твърда",
-    "hardnessVeryHard": "Много твърда"
+    "hardnessVeryHard": "Много твърда",
+    "degreesDH": "Германски градуси (°dH)",
+    "degreesFH": "Френски градуси (°fH)",
+    "degreesClark": "Английски градуси / Кларк (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

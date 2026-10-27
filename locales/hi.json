@@ -450,7 +450,10 @@
     "hardnessSoft": "नरम",
     "hardnessModeratelyHard": "मध्यम कठोर",
     "hardnessHard": "कठोर",
-    "hardnessVeryHard": "अत्यधिक कठोर"
+    "hardnessVeryHard": "अत्यधिक कठोर",
+    "degreesDH": "जर्मन डिग्री (°dH)",
+    "degreesFH": "फ़्रेंच डिग्री (°fH)",
+    "degreesClark": "अंग्रेजी डिग्री / क्लार्क (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

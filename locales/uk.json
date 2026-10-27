@@ -450,7 +450,10 @@
     "hardnessSoft": "М'яка",
     "hardnessModeratelyHard": "Середньої жорсткості",
     "hardnessHard": "Жорстка",
-    "hardnessVeryHard": "Дуже жорстка"
+    "hardnessVeryHard": "Дуже жорстка",
+    "degreesDH": "Німецькі градуси жорсткості (°dH)",
+    "degreesFH": "Французькі градуси жорсткості (°fH)",
+    "degreesClark": "Англійські градуси / Кларка (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

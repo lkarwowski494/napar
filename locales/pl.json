@@ -450,7 +450,10 @@
     "hardnessSoft": "Miękka",
     "hardnessModeratelyHard": "Średnio twarda",
     "hardnessHard": "Twarda",
-    "hardnessVeryHard": "Bardzo twarda"
+    "hardnessVeryHard": "Bardzo twarda",
+    "degreesDH": "Stopnie niemieckie (°dH)",
+    "degreesFH": "Stopnie francuskie (°fH)",
+    "degreesClark": "Stopnie angielskie / Clarka (°e)"
   },
   "grinder": {
     "title": "Przelicznik Młynków (Grinder Dial-in)",

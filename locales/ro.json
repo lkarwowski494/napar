@@ -450,7 +450,10 @@
     "hardnessSoft": "Moale",
     "hardnessModeratelyHard": "Moderat dură",
     "hardnessHard": "Dură",
-    "hardnessVeryHard": "Foarte dură"
+    "hardnessVeryHard": "Foarte dură",
+    "degreesDH": "Grade germane (°dH)",
+    "degreesFH": "Grade franceze (°fH)",
+    "degreesClark": "Grade englezești / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

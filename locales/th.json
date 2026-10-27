@@ -450,7 +450,10 @@
     "hardnessSoft": "น้ำอ่อน",
     "hardnessModeratelyHard": "กระด้างปานกลาง",
     "hardnessHard": "น้ำกระด้าง",
-    "hardnessVeryHard": "กระด้างมาก"
+    "hardnessVeryHard": "กระด้างมาก",
+    "degreesDH": "องศาเยอรมัน (°dH)",
+    "degreesFH": "องศาฝรั่งเศส (°fH)",
+    "degreesClark": "องศาอังกฤษ / คลาร์ก (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

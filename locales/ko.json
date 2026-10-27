@@ -450,7 +450,10 @@
     "hardnessSoft": "부드러움",
     "hardnessModeratelyHard": "중간 경도",
     "hardnessHard": "경수",
-    "hardnessVeryHard": "매우 단단함"
+    "hardnessVeryHard": "매우 단단함",
+    "degreesDH": "독일 경도 (°dH)",
+    "degreesFH": "프랑스 경도 (°fH)",
+    "degreesClark": "영국 경도 / 클라크 (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

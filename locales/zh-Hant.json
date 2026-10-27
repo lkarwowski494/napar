@@ -450,7 +450,10 @@
     "hardnessSoft": "軟水",
     "hardnessModeratelyHard": "中度硬水",
     "hardnessHard": "硬水",
-    "hardnessVeryHard": "極硬水"
+    "hardnessVeryHard": "極硬水",
+    "degreesDH": "德國硬度 (°dH)",
+    "degreesFH": "法國硬度 (°fH)",
+    "degreesClark": "英國硬度 / 克拉克 (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

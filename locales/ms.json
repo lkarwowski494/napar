@@ -450,7 +450,10 @@
     "hardnessSoft": "Lembut",
     "hardnessModeratelyHard": "Sederhana keras",
     "hardnessHard": "Keras",
-    "hardnessVeryHard": "Sangat keras"
+    "hardnessVeryHard": "Sangat keras",
+    "degreesDH": "Darjah Jerman (°dH)",
+    "degreesFH": "Darjah Perancis (°fH)",
+    "degreesClark": "Darjah Inggeris / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

@@ -450,7 +450,10 @@
     "hardnessSoft": "Yumuşak",
     "hardnessModeratelyHard": "Orta sert",
     "hardnessHard": "Sert",
-    "hardnessVeryHard": "Çok sert"
+    "hardnessVeryHard": "Çok sert",
+    "degreesDH": "Alman sertlik derecesi (°dH)",
+    "degreesFH": "Fransız sertlik derecesi (°fH)",
+    "degreesClark": "İngiliz sertlik derecesi / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

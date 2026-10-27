@@ -450,7 +450,10 @@
     "hardnessSoft": "Mäkká",
     "hardnessModeratelyHard": "Stredne tvrdá",
     "hardnessHard": "Tvrdá",
-    "hardnessVeryHard": "Veľmi tvrdá"
+    "hardnessVeryHard": "Veľmi tvrdá",
+    "degreesDH": "Nemecké stupne (°dH)",
+    "degreesFH": "Francúzske stupne (°fH)",
+    "degreesClark": "Anglické stupne / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

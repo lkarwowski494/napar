@@ -450,7 +450,10 @@
     "hardnessSoft": "Pehmeä",
     "hardnessModeratelyHard": "Keskikova",
     "hardnessHard": "Kova",
-    "hardnessVeryHard": "Erittäin kova"
+    "hardnessVeryHard": "Erittäin kova",
+    "degreesDH": "Saksalaiset kovuusasteet (°dH)",
+    "degreesFH": "Ranskalaiset kovuusasteet (°fH)",
+    "degreesClark": "Englantilaiset kovuusasteet / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

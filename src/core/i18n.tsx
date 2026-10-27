@@ -483,6 +483,9 @@ export const translations = {
       waterHardnessModeratelyHard: 'Średnio twarda woda (101–175 ppm CaCO₃)',
       waterHardnessHard: 'Twarda woda (176–300 ppm CaCO₃)',
       waterHardnessVeryHard: 'Bardzo twarda woda (>300 ppm CaCO₃)',
+      degreesDH: 'Stopnie niemieckie (°dH)',
+      degreesFH: 'Stopnie francuskie (°fH)',
+      degreesClark: 'Stopnie angielskie / Clarka (°e)',
     },
     grinder: {
       title: 'Przelicznik Młynków (Grinder Dial-in)',
@@ -1116,6 +1119,9 @@ export const translations = {
       waterHardnessModeratelyHard: 'Moderately hard water (101–175 ppm CaCO₃)',
       waterHardnessHard: 'Hard water (176–300 ppm CaCO₃)',
       waterHardnessVeryHard: 'Very hard water (>300 ppm CaCO₃)',
+      degreesDH: 'German degrees (°dH)',
+      degreesFH: 'French degrees (°fH)',
+      degreesClark: 'Clark degrees (°e)',
     },
     grinder: {
       title: 'Grinder Dial-in Converter',

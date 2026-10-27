@@ -450,7 +450,10 @@
     "hardnessSoft": "Weich",
     "hardnessModeratelyHard": "Mittelhart",
     "hardnessHard": "Hart",
-    "hardnessVeryHard": "Sehr hart"
+    "hardnessVeryHard": "Sehr hart",
+    "degreesDH": "Deutsche Härtegrade (°dH)",
+    "degreesFH": "Französische Härtegrade (°fH)",
+    "degreesClark": "Englische Härtegrade / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",

@@ -450,7 +450,10 @@
     "hardnessSoft": "Zacht",
     "hardnessModeratelyHard": "Middelhard",
     "hardnessHard": "Hard",
-    "hardnessVeryHard": "Zeer hard"
+    "hardnessVeryHard": "Zeer hard",
+    "degreesDH": "Duitse hardheidsgraden (°dH)",
+    "degreesFH": "Franse hardheidsgraden (°fH)",
+    "degreesClark": "Engelse graden / Clark (°e)"
   },
   "grinder": {
     "title": "Grinder Dial-in Converter",
