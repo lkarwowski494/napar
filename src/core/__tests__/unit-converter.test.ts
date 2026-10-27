@@ -186,5 +186,47 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(wInKeep('invalid', 'g', Infinity)).toBe(0);
       expect(wInKeep('0.7', 'oz', 20)).toBe(20);
     });
+
+    test('TASK-P56-11-WZR: funkcje konwersji jednostek parsuja stringi z jednostkami i przecinkami oraz chronia przed -0', () => {
+      // 1. celsiusToFahrenheit i fahrenheitToCelsius ze stringami
+      expect(celsiusToFahrenheit('93')).toBe(199);
+      expect(celsiusToFahrenheit('93,5')).toBe(200);
+      expect(celsiusToFahrenheit('100 °C')).toBe(212);
+      expect(celsiusToFahrenheit(-0)).toBe(32);
+      expect(fahrenheitToCelsius('212 °F')).toBe(100);
+      expect(fahrenheitToCelsius('199,4')).toBe(93);
+      expect(fahrenheitToCelsius(32)).toBe(0);
+      expect(Object.is(fahrenheitToCelsius(32), -0)).toBe(false);
+
+      // 2. gramsToOunces i ouncesToGrams
+      expect(gramsToOunces('15,0 g')).toBe(0.53);
+      expect(gramsToOunces('28,35')).toBe(1.0);
+      expect(gramsToOunces(-0)).toBe(0);
+      expect(Object.is(gramsToOunces(-0), -0)).toBe(false);
+      expect(ouncesToGrams('0,53 oz')).toBe(15);
+      expect(ouncesToGrams('1.0')).toBe(28);
+      expect(ouncesToGrams(-0)).toBe(0);
+      expect(Object.is(ouncesToGrams(-0), -0)).toBe(false);
+
+      // 3. mlToFluidOunces i fluidOuncesToMl
+      expect(mlToFluidOunces('250 ml')).toBe(8.45);
+      expect(mlToFluidOunces('250,5')).toBe(8.47);
+      expect(mlToFluidOunces(-0)).toBe(0);
+      expect(Object.is(mlToFluidOunces(-0), -0)).toBe(false);
+      expect(fluidOuncesToMl('8,45 fl oz')).toBe(250);
+      expect(fluidOuncesToMl(-0)).toBe(0);
+      expect(Object.is(fluidOuncesToMl(-0), -0)).toBe(false);
+
+      // 4. roundTo ochrona przed -0
+      expect(roundTo(-0, 2)).toBe(0);
+      expect(Object.is(roundTo(-0, 2), -0)).toBe(false);
+      expect(roundTo(-0.0001, 1)).toBe(0);
+      expect(Object.is(roundTo(-0.0001, 1), -0)).toBe(false);
+
+      // 5. wInKeep ze stringami z jednostkami
+      expect(wInKeep(' 250,5 g ', 'g')).toBe(250.5);
+      expect(wInKeep('-0', 'g')).toBe(0);
+      expect(Object.is(wInKeep('-0', 'g'), -0)).toBe(false);
+    });
   });
 });
