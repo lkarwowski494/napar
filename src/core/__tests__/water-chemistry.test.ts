@@ -28,6 +28,8 @@ import {
   WaterBlendResult,
   calculateHardnessRatio,
   HardnessRatioAnalysis,
+  calculateWaterDilution,
+  WaterDilutionResult,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -929,6 +931,46 @@ describe('Water Chemistry & Mineralization Module', () => {
     const empty = calculateHardnessRatio(null as any, undefined as any);
     expect(empty.ratio).toBe(0);
     expect(empty.category).toBe('chalky_buffered');
+  });
+
+  test('TASK-P74-07-JAK: calculateWaterDilution poprawnie oblicza proporcje rozcieńczania wody', () => {
+    // 1. Standardowe rozcieńczanie wody źródlanej (np. 300 ppm -> 150 ppm dla 1000 ml wody zerowej)
+    const res1: WaterDilutionResult = calculateWaterDilution(300, 150, 1000);
+    expect(res1.sourceVolumeMl).toBe(500);
+    expect(res1.diluentVolumeMl).toBe(500);
+    expect(res1.totalVolumeMl).toBe(1000);
+    expect(res1.dilutionFactor).toBe(2);
+    expect(res1.achievedPpm).toBe(150);
+    expect(res1.isDilutionNeeded).toBe(true);
+
+    // 2. Rozcieńczanie z diluentem o niezerowej mineralizacji (np. woda źródlana 200 ppm, woda filtrowana 20 ppm, cel 110 ppm, 1000 ml)
+    const res2 = calculateWaterDilution(200, 110, 1000, 20);
+    expect(res2.sourceVolumeMl).toBe(500);
+    expect(res2.diluentVolumeMl).toBe(500);
+    expect(res2.achievedPpm).toBe(110);
+    expect(res2.isDilutionNeeded).toBe(true);
+
+    // 3. Woda źródlana ma już niższą mineralizację niż cel -> brak rozcieńczania
+    const res3 = calculateWaterDilution(100, 150, 500);
+    expect(res3.sourceVolumeMl).toBe(500);
+    expect(res3.diluentVolumeMl).toBe(0);
+    expect(res3.dilutionFactor).toBe(1);
+    expect(res3.achievedPpm).toBe(100);
+    expect(res3.isDilutionNeeded).toBe(false);
+
+    // 4. Odporność na stringi z przecinkami i spacjami
+    const res4 = calculateWaterDilution(' 240,0 ', ' 120,0 ', ' 800 ');
+    expect(res4.sourceVolumeMl).toBe(400);
+    expect(res4.diluentVolumeMl).toBe(400);
+    expect(res4.totalVolumeMl).toBe(800);
+    expect(res4.dilutionFactor).toBe(2);
+
+    // 5. Odporność na niepoprawne dane i wartości skrajne (null, undefined, 0)
+    const resInvalid = calculateWaterDilution(null as any, undefined as any, null as any);
+    expect(resInvalid.totalVolumeMl).toBe(0);
+    expect(resInvalid.sourceVolumeMl).toBe(0);
+    expect(resInvalid.diluentVolumeMl).toBe(0);
+    expect(resInvalid.isDilutionNeeded).toBe(false);
   });
 });
 

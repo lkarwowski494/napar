@@ -1208,3 +1208,92 @@ export function calculateHardnessRatio(
     descriptionEn,
   };
 }
+
+export interface WaterDilutionResult {
+  sourceVolumeMl: number;
+  diluentVolumeMl: number;
+  totalVolumeMl: number;
+  dilutionFactor: number;
+  achievedPpm: number;
+  isDilutionNeeded: boolean;
+}
+
+/**
+ * Oblicza proporcje rozcieńczania wody źródlanej/kranowej wodą czystą (RO/destylowaną),
+ * aby obniżyć stężenie minerałów (TDS/GH/KH) do pożądanego poziomu.
+ */
+export function calculateWaterDilution(
+  sourcePpm: number | string,
+  targetPpm: number | string,
+  targetVolumeMl: number | string,
+  diluentPpm: number | string = 0
+): WaterDilutionResult {
+  const parseNum = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const src = parseNum(sourcePpm);
+  const tgt = parseNum(targetPpm);
+  const totVol = parseNum(targetVolumeMl);
+  const dil = parseNum(diluentPpm);
+
+  if (totVol <= 0) {
+    return {
+      sourceVolumeMl: 0,
+      diluentVolumeMl: 0,
+      totalVolumeMl: 0,
+      dilutionFactor: 1,
+      achievedPpm: 0,
+      isDilutionNeeded: false,
+    };
+  }
+
+  if (src <= tgt || src <= dil) {
+    return {
+      sourceVolumeMl: Number(totVol.toFixed(1)),
+      diluentVolumeMl: 0,
+      totalVolumeMl: Number(totVol.toFixed(1)),
+      dilutionFactor: 1,
+      achievedPpm: Number(src.toFixed(1)),
+      isDilutionNeeded: false,
+    };
+  }
+
+  let rawSourceVol: number;
+  if (tgt <= dil) {
+    rawSourceVol = 0;
+  } else {
+    rawSourceVol = totVol * ((tgt - dil) / (src - dil));
+  }
+
+  const safeSourceVol = Math.max(0, Math.min(totVol, rawSourceVol));
+  const safeDiluentVol = Math.max(0, totVol - safeSourceVol);
+
+  const sourceVolumeMl = Number(safeSourceVol.toFixed(1));
+  const diluentVolumeMl = Number(safeDiluentVol.toFixed(1));
+  const totalVolumeMl = Number(totVol.toFixed(1));
+
+  const dilutionFactor =
+    sourceVolumeMl > 0
+      ? Number((totalVolumeMl / sourceVolumeMl).toFixed(2))
+      : 1;
+
+  const achievedPpm =
+    totalVolumeMl > 0
+      ? Number(((sourceVolumeMl * src + diluentVolumeMl * dil) / totalVolumeMl).toFixed(1))
+      : 0;
+
+  return {
+    sourceVolumeMl,
+    diluentVolumeMl,
+    totalVolumeMl,
+    dilutionFactor,
+    achievedPpm,
+    isDilutionNeeded: true,
+  };
+}
