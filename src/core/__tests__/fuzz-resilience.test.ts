@@ -683,11 +683,16 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof objMerged).toBe('object');
       expect(typeof objMerged.state).toBe('object');
 
-      // 7. BrewTimerEngine.calculateTotalTargetWater
+      // 7. BrewTimerEngine.calculateTotalTargetWater & calculateRemainingWaterToPour
       const totalWater = BrewTimerEngine.calculateTotalTargetWater(val as any);
       expect(typeof totalWater).toBe('number');
       expect(totalWater).toBeGreaterThanOrEqual(0);
       expect(Number.isFinite(totalWater)).toBe(true);
+
+      const remWater = BrewTimerEngine.calculateRemainingWaterToPour(val as any, val as any);
+      expect(typeof remWater).toBe('number');
+      expect(remWater).toBeGreaterThanOrEqual(0);
+      expect(Number.isFinite(remWater)).toBe(true);
     }
   });
 });

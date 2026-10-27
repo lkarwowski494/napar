@@ -176,23 +176,18 @@ export class BrewTimerEngine {
   }
 
   /**
-   * Oblicza całkowitą docelową objętość wody (g) dla danej receptury na podstawie kroków.
+   * Oblicza pozostałą do dolania objętość wody (g) w stosunku do docelowej całkowitej objętości receptury.
    */
-  public static calculateTotalTargetWater(steps?: RecipeStep[] | null): number {
-    if (!Array.isArray(steps) || steps.length === 0) return 0;
-    let maxWater = 0;
-    for (let i = 0; i < steps.length; i++) {
-      const step = steps[i];
-      if (
-        step &&
-        typeof step === 'object' &&
-        Number.isFinite(step.targetWaterGrams) &&
-        (step.targetWaterGrams as number) > maxWater
-      ) {
-        maxWater = step.targetWaterGrams as number;
-      }
-    }
-    return Number(maxWater.toFixed(1));
+  public static calculateRemainingWaterToPour(
+    steps?: RecipeStep[] | null,
+    currentWaterGrams: number = 0
+  ): number {
+    const total = BrewTimerEngine.calculateTotalTargetWater(steps);
+    const poured =
+      Number.isFinite(currentWaterGrams) && currentWaterGrams > 0 && !Object.is(currentWaterGrams, -0)
+        ? currentWaterGrams
+        : 0;
+    return Number(Math.max(0, total - poured).toFixed(1));
   }
 
   constructor(steps: RecipeStep[], callbacks: TimerCallbacks = {}) {

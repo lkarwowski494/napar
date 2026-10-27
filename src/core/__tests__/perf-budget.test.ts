@@ -213,7 +213,7 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     expect(ms).toBeLessThan(50);
   });
 
-  test('Budżet 11: calculateTotalTargetWater wykonuje 10 000 kalkulacji w czasie poniżej 50 ms (TASK-P75-10-WYD)', () => {
+  test('Budżet 11: calculateRemainingWaterToPour wykonuje 10 000 kalkulacji w czasie poniżej 50 ms (TASK-P75-10-WYD)', () => {
     const steps = [
       { id: '1', name: 'Bloom', targetWaterGrams: 50 },
       { id: '2', name: 'Pour 1', targetWaterGrams: 150 },
@@ -222,15 +222,18 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     ] as any[];
 
     // 1. Poprawność biznesowa
-    expect(BrewTimerEngine.calculateTotalTargetWater(steps)).toBe(250);
-    expect(BrewTimerEngine.calculateTotalTargetWater(null)).toBe(0);
-    expect(BrewTimerEngine.calculateTotalTargetWater([])).toBe(0);
-    expect(BrewTimerEngine.calculateTotalTargetWater([{ targetWaterGrams: 300 }] as any)).toBe(300);
+    expect(BrewTimerEngine.calculateRemainingWaterToPour(steps, 0)).toBe(250);
+    expect(BrewTimerEngine.calculateRemainingWaterToPour(steps, 100)).toBe(150);
+    expect(BrewTimerEngine.calculateRemainingWaterToPour(steps, 250)).toBe(0);
+    expect(BrewTimerEngine.calculateRemainingWaterToPour(steps, 300)).toBe(0);
+    expect(BrewTimerEngine.calculateRemainingWaterToPour(null, 100)).toBe(0);
+    expect(BrewTimerEngine.calculateRemainingWaterToPour(steps, -50)).toBe(250);
 
     // 2. Budżet wydajnościowy
     const ms = measureCpuMs(() => {
       for (let i = 0; i < 10000; i++) {
-        BrewTimerEngine.calculateTotalTargetWater(steps);
+        const poured = (i * 7) % 350;
+        BrewTimerEngine.calculateRemainingWaterToPour(steps, poured);
       }
     });
 
