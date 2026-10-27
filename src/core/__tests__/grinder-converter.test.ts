@@ -10,6 +10,8 @@ import {
   getRecipeMicrons,
   getRecommendedGrindForRecipe,
   findGrinderById,
+  findGrindCategoryForMicrons,
+  findGrindCategoryById,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -779,5 +781,32 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(crossRes.targetFormatted).toBeDefined();
     expect(crossRes.microns).toBeGreaterThan(0);
   });
+
+  test('TASK-P62-08-PRO: findGrindCategoryForMicrons oraz findGrindCategoryById precyzyjnie kategoryzuja przemial', () => {
+    // 1. findGrindCategoryById
+    expect(findGrindCategoryById('espresso')?.id).toBe('espresso');
+    expect(findGrindCategoryById('pourover_v60')?.id).toBe('pourover_v60');
+    expect(findGrindCategoryById('v60')?.id).toBe('pourover_v60');
+    expect(findGrindCategoryById('chemex')?.id).toBe('chemex_cupping');
+    expect(findGrindCategoryById('coldbrew')?.id).toBe('frenchpress_coldbrew');
+    expect(findGrindCategoryById('nonexistent')).toBeUndefined();
+    expect(findGrindCategoryById('' as any)).toBeUndefined();
+    expect(findGrindCategoryById(null as any)).toBeUndefined();
+
+    // 2. findGrindCategoryForMicrons
+    expect(findGrindCategoryForMicrons(300).id).toBe('espresso');
+    expect(findGrindCategoryForMicrons('500').id).toBe('aeropress');
+    expect(findGrindCategoryForMicrons('720,5').id).toBe('pourover_v60');
+    expect(findGrindCategoryForMicrons(900).id).toBe('chemex_cupping');
+    expect(findGrindCategoryForMicrons(1200).id).toBe('frenchpress_coldbrew');
+
+    // 3. Granice i wartości skrajne / odporność
+    expect(findGrindCategoryForMicrons(50).id).toBe('espresso');
+    expect(findGrindCategoryForMicrons(2500).id).toBe('frenchpress_coldbrew');
+    expect(findGrindCategoryForMicrons(NaN).id).toBe('pourover_v60');
+    expect(findGrindCategoryForMicrons(-100).id).toBe('pourover_v60');
+    expect(findGrindCategoryForMicrons('invalid').id).toBe('pourover_v60');
+  });
 });
+
 

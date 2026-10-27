@@ -84,6 +84,82 @@ export const GRIND_CATEGORIES: GrindCategory[] = [
   },
 ];
 
+const CATEGORY_ALIASES: Record<string, string> = {
+  espresso: 'espresso',
+  moka: 'espresso',
+  aeropress: 'aeropress',
+  phin: 'aeropress',
+  ibrik: 'aeropress',
+  cezve: 'aeropress',
+  pourover_v60: 'pourover_v60',
+  v60: 'pourover_v60',
+  drip: 'pourover_v60',
+  kalita: 'pourover_v60',
+  chemex_cupping: 'chemex_cupping',
+  chemex: 'chemex_cupping',
+  cupping: 'chemex_cupping',
+  frenchpress_coldbrew: 'frenchpress_coldbrew',
+  frenchpress: 'frenchpress_coldbrew',
+  coldbrew: 'frenchpress_coldbrew',
+  'french-press': 'frenchpress_coldbrew',
+  'cold-brew': 'frenchpress_coldbrew',
+};
+
+/**
+ * Wyszukuje kategorię grubości mielenia po identyfikatorze lub aliasie
+ */
+export function findGrindCategoryById(id: string): GrindCategory | undefined {
+  if (!id || typeof id !== 'string') return undefined;
+  const clean = id.trim().toLowerCase();
+  if (!clean) return undefined;
+  const mapped = CATEGORY_ALIASES[clean] || CATEGORY_ALIASES[clean.replace(/[\s_-]+/g, '')];
+  if (mapped) {
+    const direct = GRIND_CATEGORIES.find((c) => c.id === mapped);
+    if (direct) return direct;
+  }
+  return GRIND_CATEGORIES.find((c) => c.id.toLowerCase() === clean);
+}
+
+/**
+ * Dobiera optymalną kategorię przemiału dla zadanego rozmiaru cząstek w mikronach
+ */
+export function findGrindCategoryForMicrons(microns: number | string): GrindCategory {
+  const isInvalid =
+    microns === null ||
+    microns === undefined ||
+    typeof microns === 'boolean' ||
+    typeof microns === 'object' ||
+    typeof microns === 'symbol';
+
+  if (isInvalid) {
+    return GRIND_CATEGORIES.find((c) => c.id === 'pourover_v60') || GRIND_CATEGORIES[2];
+  }
+
+  const raw =
+    typeof microns === 'string'
+      ? parseFloat(microns.trim().replace(/,/g, '.'))
+      : Number(microns);
+
+  if (!Number.isFinite(raw) || raw <= 0 || Object.is(raw, -0)) {
+    return GRIND_CATEGORIES.find((c) => c.id === 'pourover_v60') || GRIND_CATEGORIES[2];
+  }
+
+  if (raw <= 455) {
+    return GRIND_CATEGORIES.find((c) => c.id === 'espresso') || GRIND_CATEGORIES[0];
+  }
+  if (raw <= 605) {
+    return GRIND_CATEGORIES.find((c) => c.id === 'aeropress') || GRIND_CATEGORIES[1];
+  }
+  if (raw <= 805) {
+    return GRIND_CATEGORIES.find((c) => c.id === 'pourover_v60') || GRIND_CATEGORIES[2];
+  }
+  if (raw <= 1005) {
+    return GRIND_CATEGORIES.find((c) => c.id === 'chemex_cupping') || GRIND_CATEGORIES[3];
+  }
+  return GRIND_CATEGORIES.find((c) => c.id === 'frenchpress_coldbrew') || GRIND_CATEGORIES[4];
+}
+
+
 export const SUPPORTED_GRINDERS: GrinderModel[] = [
   {
     id: 'comandante_c40',
