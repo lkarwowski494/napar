@@ -23,6 +23,8 @@ import {
   getKnowledgeTitle,
   searchKnowledgeBase,
   KnowledgeSearchResult,
+  findKnowledgeItemById,
+  KnowledgeItemMatch,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1159,6 +1161,41 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(searchKnowledgeBase('   ')).toEqual([]);
     expect(searchKnowledgeBase(null as any)).toEqual([]);
     expect(searchKnowledgeBase('nieistniejacy_termin_xyz')).toEqual([]);
+  });
+
+  test('TASK-P69-06-TRE: findKnowledgeItemById pobiera wpis z bazy wiedzy po unikalnym ID', () => {
+    // 1. Odmiana kawy (obsługuje ID i aliasy)
+    const vMatch: KnowledgeItemMatch | null = findKnowledgeItemById('variety-geisha');
+    expect(vMatch).not.toBeNull();
+    expect(vMatch?.category).toBe('variety');
+    expect(vMatch?.id).toBe('variety-geisha');
+    expect(vMatch?.data).toBeDefined();
+
+    const vAlias = findKnowledgeItemById('geisha');
+    expect(vAlias?.id).toBe('variety-geisha');
+
+    // 2. Metoda obróbki
+    const pMatch = findKnowledgeItemById('process-washed');
+    expect(pMatch).not.toBeNull();
+    expect(pMatch?.category).toBe('process');
+    expect(pMatch?.id).toBe('process-washed');
+
+    // 3. Pochodzenie
+    const oMatch = findKnowledgeItemById('origin-ethiopia');
+    expect(oMatch).not.toBeNull();
+    expect(oMatch?.category).toBe('origin');
+    expect(oMatch?.id).toBe('origin-ethiopia');
+
+    // 4. Herbata
+    const tMatch = findKnowledgeItemById('tea-oolong');
+    expect(tMatch).not.toBeNull();
+    expect(tMatch?.category).toBe('tea');
+    expect(tMatch?.id).toBe('tea-oolong');
+
+    // 5. Nieistniejący identyfikator i null
+    expect(findKnowledgeItemById('nieistniejace_id')).toBeNull();
+    expect(findKnowledgeItemById('')).toBeNull();
+    expect(findKnowledgeItemById(null as any)).toBeNull();
   });
 });
 

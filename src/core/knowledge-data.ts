@@ -1360,3 +1360,41 @@ export function searchKnowledgeBase(
   return results;
 }
 
+
+
+export interface KnowledgeItemMatch {
+  id: string;
+  category: 'variety' | 'process' | 'origin' | 'tea';
+  data: CoffeeVarietyInfo | CoffeeProcessInfo | CoffeeOriginInfo | TeaCategoryInfo;
+}
+
+/**
+ * Przeszukuje wszystkie kolekcje kompendium wiedzy po zadanym identyfikatorze ID.
+ */
+export function findKnowledgeItemById(id: string | undefined | null): KnowledgeItemMatch | null {
+  if (!id || typeof id !== 'string' || !id.trim()) return null;
+  const cleanId = id.replace(/\uFEFF/g, '').trim();
+  if (!cleanId) return null;
+
+  const variety = findCoffeeVarietyById(cleanId);
+  if (variety) {
+    return { id: variety.id, category: 'variety', data: variety };
+  }
+
+  const process = findCoffeeProcessById(cleanId);
+  if (process) {
+    return { id: process.id, category: 'process', data: process };
+  }
+
+  const origin = findCoffeeOriginById(cleanId);
+  if (origin) {
+    return { id: origin.id, category: 'origin', data: origin };
+  }
+
+  const tea = findTeaCategoryById(cleanId);
+  if (tea) {
+    return { id: tea.id, category: 'tea', data: tea };
+  }
+
+  return null;
+}
