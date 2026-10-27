@@ -1334,3 +1334,97 @@ export function evaluatePourOverRatio(
     sensoryExpectationEn,
   };
 }
+
+
+export type FrenchPressRatioStyle =
+  | 'rich_heavy'
+  | 'balanced_immersion'
+  | 'light_clean'
+  | 'overly_thin';
+
+export interface FrenchPressRatioEvaluation {
+  doseGrams: number;
+  waterGrams: number;
+  ratio: number;
+  ratioFormatted: string;
+  style: FrenchPressRatioStyle;
+  styleLabelPl: string;
+  styleLabelEn: string;
+  sensoryExpectationPl: string;
+  sensoryExpectationEn: string;
+}
+
+/**
+ * Ocenia proporcję parzenia dla metody immersyjnej French Press (praska francuska),
+ * kategoryzując styl naparu oraz dostarczając precyzyjne deskryptory sensoryczne.
+ */
+export function evaluateFrenchPressRatio(
+  doseGrams: number | string,
+  waterGrams: number | string
+): FrenchPressRatioEvaluation {
+  const parseVal = (v: unknown): number => {
+    if (typeof v === 'number') {
+      return Number.isFinite(v) && v > 0 && !Object.is(v, -0) ? v : 0;
+    }
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && parsed > 0 && !Object.is(parsed, -0) ? parsed : 0;
+    }
+    return 0;
+  };
+
+  const dose = parseVal(doseGrams);
+  const water = parseVal(waterGrams);
+
+  let rawRatio = 0;
+  if (dose > 0 && water > 0) {
+    rawRatio = water / dose;
+  }
+
+  const ratio = Number(rawRatio.toFixed(2));
+  const ratioFormatted = `1:${ratio.toFixed(1)}`;
+
+  let style: FrenchPressRatioStyle;
+  let styleLabelPl: string;
+  let styleLabelEn: string;
+  let sensoryExpectationPl: string;
+  let sensoryExpectationEn: string;
+
+  if (ratio <= 0 || ratio < 14.0) {
+    style = 'rich_heavy';
+    styleLabelPl = 'Gęsty / Bardzo intensywny';
+    styleLabelEn = 'Rich / Very Heavy';
+    sensoryExpectationPl = 'Bardzo gęste, oleiste body, niska klarowność, mocna słodycz i akcenty gorzkiej czekolady.';
+    sensoryExpectationEn = 'Very rich, oily heavy body, low clarity, intense sweetness and dark chocolate notes.';
+  } else if (ratio <= 16.5) {
+    style = 'balanced_immersion';
+    styleLabelPl = 'Zrównoważona immersja';
+    styleLabelEn = 'Balanced Immersion';
+    sensoryExpectationPl = 'Klasyczny złoty standard praski francuskiej — pełne, kremowe body, wysoka słodycz karmelowa i gładki finisz.';
+    sensoryExpectationEn = 'Classic golden standard for French Press — full creamy body, rich caramel sweetness and smooth finish.';
+  } else if (ratio <= 18.0) {
+    style = 'light_clean';
+    styleLabelPl = 'Lekki / Czysty';
+    styleLabelEn = 'Light / Clean';
+    sensoryExpectationPl = 'Większa przejrzystość nut owocowych i kwiatowych, lżejsze body o delikatniejszym finiszu.';
+    sensoryExpectationEn = 'Enhanced clarity of floral and fruity notes, lighter body with delicate finish.';
+  } else {
+    style = 'overly_thin';
+    styleLabelPl = 'Zbyt wodnisty';
+    styleLabelEn = 'Overly Thin / Watery';
+    sensoryExpectationPl = 'Płaski napar o zbyt niskim stężeniu rozpuszczonych związków, pozbawiony charakterystycznego body immersji.';
+    sensoryExpectationEn = 'Flat cup with weak dissolved solids concentration, lacking characteristic immersion body.';
+  }
+
+  return {
+    doseGrams: dose,
+    waterGrams: water,
+    ratio,
+    ratioFormatted,
+    style,
+    styleLabelPl,
+    styleLabelEn,
+    sensoryExpectationPl,
+    sensoryExpectationEn,
+  };
+}

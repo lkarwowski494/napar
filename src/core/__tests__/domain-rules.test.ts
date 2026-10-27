@@ -35,6 +35,9 @@ import {
   evaluatePourOverRatio,
   PourOverRatioEvaluation,
   PourOverRatioStyle,
+  evaluateFrenchPressRatio,
+  FrenchPressRatioEvaluation,
+  FrenchPressRatioStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -945,6 +948,41 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       const fallback = evaluatePourOverRatio(null as any, undefined as any);
       expect(fallback.ratio).toBe(0);
       expect(fallback.style).toBe('strong_dense');
+    });
+  });
+
+  describe('TASK-P82-11-WZR: evaluateFrenchPressRatio (Ocena proporcji praski francuskiej / French Press)', () => {
+    it('klasyfikuje proporcje immersyjne French Press i określa profil sensoryczny naparu', () => {
+      // 1. Zrównoważona immersja (1:15 = 20g kawy na 300g wody)
+      const balanced: FrenchPressRatioEvaluation = evaluateFrenchPressRatio(20, 300);
+      expect(balanced.style).toBe('balanced_immersion');
+      const styleCheck: FrenchPressRatioStyle = balanced.style;
+      expect(styleCheck).toBe('balanced_immersion');
+      expect(balanced.ratio).toBe(15);
+      expect(balanced.ratioFormatted).toBe('1:15.0');
+      expect(balanced.styleLabelPl).toBe('Zrównoważona immersja');
+      expect(balanced.sensoryExpectationPl).toContain('Klasyczny złoty standard');
+      expect(balanced.sensoryExpectationEn).toContain('Classic golden standard');
+
+      // 2. Bardzo gęsty / ciężki ekstrakt (< 1:14 = 25g kawy na 300g wody = 1:12)
+      const heavy = evaluateFrenchPressRatio(25, 300);
+      expect(heavy.style).toBe('rich_heavy');
+      expect(heavy.styleLabelPl).toBe('Gęsty / Bardzo intensywny');
+
+      // 3. Lekki i czysty (1:16.6 - 1:18 = 15g kawy na 260g wody ≈ 1:17.3)
+      const light = evaluateFrenchPressRatio(15, 260);
+      expect(light.style).toBe('light_clean');
+      expect(light.styleLabelPl).toBe('Lekki / Czysty');
+
+      // 4. Nadmiernie rozwodniony (> 1:18 = 10g kawy na 250g wody = 1:25)
+      const thin = evaluateFrenchPressRatio(10, 250);
+      expect(thin.style).toBe('overly_thin');
+      expect(thin.styleLabelPl).toBe('Zbyt wodnisty');
+
+      // 5. Odporność na zera, wartości ujemne, stringi i null
+      const fallback = evaluateFrenchPressRatio(null as any, undefined as any);
+      expect(fallback.ratio).toBe(0);
+      expect(fallback.style).toBe('rich_heavy');
     });
   });
 });
