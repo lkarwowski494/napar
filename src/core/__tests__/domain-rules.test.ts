@@ -38,6 +38,9 @@ import {
   evaluateFrenchPressRatio,
   FrenchPressRatioEvaluation,
   FrenchPressRatioStyle,
+  evaluateAeroPressRatio,
+  AeroPressRatioEvaluation,
+  AeroPressRatioStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -983,6 +986,48 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       const fallback = evaluateFrenchPressRatio(null as any, undefined as any);
       expect(fallback.ratio).toBe(0);
       expect(fallback.style).toBe('rich_heavy');
+    });
+  });
+
+  describe('TASK-P84-11-WZR: evaluateAeroPressRatio (Ocena proporcji parzenia AeroPress)', () => {
+    it('klasyfikuje proporcje AeroPress i określa profil sensoryczny naparu', () => {
+      // 1. Zrównoważony standard (1:14 = 15g kawy na 210g wody)
+      const balanced: AeroPressRatioEvaluation = evaluateAeroPressRatio(15, 210);
+      expect(balanced.style).toBe('balanced_standard');
+      const styleCheck: AeroPressRatioStyle = balanced.style;
+      expect(styleCheck).toBe('balanced_standard');
+      expect(balanced.ratio).toBe(14);
+      expect(balanced.ratioFormatted).toBe('1:14.0');
+      expect(balanced.styleLabelPl).toBe('Zrównoważony Standard');
+      expect(balanced.sensoryExpectationPl).toContain('Nowoczesny złoty standard');
+      expect(balanced.sensoryExpectationEn).toContain('Modern AeroPress golden standard');
+
+      // 2. Koncentrat / styl espresso (< 1:7 = 20g kawy na 100g wody = 1:5)
+      const concentrate = evaluateAeroPressRatio('20,0', '100');
+      expect(concentrate.style).toBe('concentrate_espresso_style');
+      expect(concentrate.styleLabelPl).toBe('Koncentrat / Styl espresso');
+      expect(concentrate.sensoryExpectationPl).toContain('bypass');
+
+      // 3. Krótki / intensywny short brew (1:7.1 - 1:11 = 18g kawy na 180g wody = 1:10)
+      const shortBrew = evaluateAeroPressRatio(18, 180);
+      expect(shortBrew.style).toBe('rich_short');
+      expect(shortBrew.styleLabelPl).toBe('Krótki / Intensywny (Short Brew)');
+      expect(shortBrew.sensoryExpectationPl).toContain('World AeroPress Championship');
+
+      // 4. Lekki / Drip-style (1:16.1 - 1:18 = 12g kawy na 200g wody ≈ 1:16.7)
+      const dripStyle = evaluateAeroPressRatio(12, 200);
+      expect(dripStyle.style).toBe('light_extended');
+      expect(dripStyle.styleLabelPl).toBe('Lekki / Drip-style');
+
+      // 5. Rozwodniony (> 1:18 = 10g kawy na 220g wody = 1:22)
+      const dilute = evaluateAeroPressRatio(10, 220);
+      expect(dilute.style).toBe('overly_dilute');
+      expect(dilute.styleLabelPl).toBe('Zbyt rozwodniony');
+
+      // 6. Odporność na zera, wartości ujemne, stringi i null
+      const fallback = evaluateAeroPressRatio(null as any, undefined as any);
+      expect(fallback.ratio).toBe(0);
+      expect(fallback.style).toBe('concentrate_espresso_style');
     });
   });
 });

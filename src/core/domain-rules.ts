@@ -1428,3 +1428,105 @@ export function evaluateFrenchPressRatio(
     sensoryExpectationEn,
   };
 }
+
+export type AeroPressRatioStyle =
+  | 'concentrate_espresso_style'
+  | 'rich_short'
+  | 'balanced_standard'
+  | 'light_extended'
+  | 'overly_dilute';
+
+export interface AeroPressRatioEvaluation {
+  doseGrams: number;
+  waterGrams: number;
+  ratio: number;
+  ratioFormatted: string;
+  style: AeroPressRatioStyle;
+  styleLabelPl: string;
+  styleLabelEn: string;
+  sensoryExpectationPl: string;
+  sensoryExpectationEn: string;
+}
+
+/**
+ * Ocenia proporcję parzenia dla AeroPressa (metoda hybrydowa ciśnieniowo-immersyjna),
+ * kategoryzując styl naparu (od intensywnego koncentratu po lekki przelew)
+ * oraz dostarczając deskryptory sensoryczne.
+ */
+export function evaluateAeroPressRatio(
+  doseGrams: number | string,
+  waterGrams: number | string
+): AeroPressRatioEvaluation {
+  const parseVal = (v: unknown): number => {
+    if (typeof v === 'number') {
+      return Number.isFinite(v) && v > 0 && !Object.is(v, -0) ? v : 0;
+    }
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && parsed > 0 && !Object.is(parsed, -0) ? parsed : 0;
+    }
+    return 0;
+  };
+
+  const dose = parseVal(doseGrams);
+  const water = parseVal(waterGrams);
+
+  let rawRatio = 0;
+  if (dose > 0 && water > 0) {
+    rawRatio = water / dose;
+  }
+
+  const ratio = Number(rawRatio.toFixed(2));
+  const ratioFormatted = `1:${ratio.toFixed(1)}`;
+
+  let style: AeroPressRatioStyle;
+  let styleLabelPl: string;
+  let styleLabelEn: string;
+  let sensoryExpectationPl: string;
+  let sensoryExpectationEn: string;
+
+  if (ratio <= 0 || ratio < 7.0) {
+    style = 'concentrate_espresso_style';
+    styleLabelPl = 'Koncentrat / Styl espresso';
+    styleLabelEn = 'Concentrate / Espresso-style';
+    sensoryExpectationPl = 'Gęsty, intensywny ekstrakt idealny pod rozcieńczenie (bypass / Americano) lub z mlekiem.';
+    sensoryExpectationEn = 'Dense, intense concentrate ideal for dilution (bypass / Americano) or with milk.';
+  } else if (ratio <= 11.0) {
+    style = 'rich_short';
+    styleLabelPl = 'Krótki / Intensywny (Short Brew)';
+    styleLabelEn = 'Rich / Short Brew';
+    sensoryExpectationPl = 'Wyraziste body, skondensowana słodycz i soczysta kwasowość — profil popularny w mistrzostwach World AeroPress Championship.';
+    sensoryExpectationEn = 'Pronounced body, condensed sweetness and juicy acidity — popular profile in World AeroPress Championship recipes.';
+  } else if (ratio <= 16.0) {
+    style = 'balanced_standard';
+    styleLabelPl = 'Zrównoważony Standard';
+    styleLabelEn = 'Balanced Standard';
+    sensoryExpectationPl = 'Nowoczesny złoty standard AeroPressa — doskonały balans słodyczy, kwasowości i czystości naparu.';
+    sensoryExpectationEn = 'Modern AeroPress golden standard — excellent harmony of sweetness, acidity and cup clarity.';
+  } else if (ratio <= 18.0) {
+    style = 'light_extended';
+    styleLabelPl = 'Lekki / Drip-style';
+    styleLabelEn = 'Light / Drip-style';
+    sensoryExpectationPl = 'Zwiewny, herbaciany napar przypominający delikatny przelew z drippera o wysokiej przejrzystości nut smakowych.';
+    sensoryExpectationEn = 'Airy, tea-like cup reminiscent of delicate pour-over drip with high flavor transparency.';
+  } else {
+    style = 'overly_dilute';
+    styleLabelPl = 'Zbyt rozwodniony';
+    styleLabelEn = 'Overly Dilute';
+    sensoryExpectationPl = 'Płaski napar o zbyt niskim stężeniu rozpuszczonych związków i braku wyrazistej struktury.';
+    sensoryExpectationEn = 'Flat cup with weak dissolved solids concentration and lacking flavor structure.';
+  }
+
+  return {
+    doseGrams: dose,
+    waterGrams: water,
+    ratio,
+    ratioFormatted,
+    style,
+    styleLabelPl,
+    styleLabelEn,
+    sensoryExpectationPl,
+    sensoryExpectationEn,
+  };
+}
+
