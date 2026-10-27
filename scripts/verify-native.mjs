@@ -206,6 +206,10 @@ try {
     'android.permission.WRITE_SYNC_SETTINGS',
     'android.permission.CHANGE_NETWORK_STATE',
     'android.permission.CHANGE_WIFI_STATE',
+    'android.permission.RECEIVE_BOOT_COMPLETED',
+    'android.permission.FOREGROUND_SERVICE',
+    'android.permission.READ_PHONE_NUMBERS',
+    'android.permission.ANSWER_PHONE_CALLS',
   ];
   for (const forbidden of forbiddenPerms) {
     check(
@@ -439,6 +443,8 @@ try {
     'NSPhotoLibraryAddUsageDescription',
     'NSNearbyInteractionUsageDescription',
     'NSIdentityUsageDescription',
+    'NSCameraUseContinuityCameraDeviceType',
+    'NSHealthClinicalHealthRecordsShareUsageDescription',
   ];
   for (const perm of forbiddenPermissions) {
     check(!appJson.ios?.infoPlist?.[perm], `app.json zawiera niedozwolone uprawnienie: ${perm}`);
@@ -556,6 +562,10 @@ try {
     'android.permission.WRITE_SYNC_SETTINGS',
     'android.permission.CHANGE_NETWORK_STATE',
     'android.permission.CHANGE_WIFI_STATE',
+    'android.permission.RECEIVE_BOOT_COMPLETED',
+    'android.permission.FOREGROUND_SERVICE',
+    'android.permission.READ_PHONE_NUMBERS',
+    'android.permission.ANSWER_PHONE_CALLS',
   ];
   for (const forbidden of forbiddenAndroidPermissions) {
     check(

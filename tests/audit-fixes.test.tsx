@@ -435,6 +435,19 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
       expect(content).toContain('NSNFCReaderUsageDescription');
     });
 
+    test('TASK-P58-10-WYD: verify-native.mjs weryfikuje brak mikrofonu w pluginie kamery oraz blokuje uprawnienia rozruchowe, uslug tla i telefonii', () => {
+      const verifyScript = join(root, 'scripts', 'verify-native.mjs');
+      expect(existsSync(verifyScript)).toBe(true);
+      const content = readFileSync(verifyScript, 'utf8');
+      expect(content).toContain('microphonePermission === false');
+      expect(content).toContain('android.permission.RECEIVE_BOOT_COMPLETED');
+      expect(content).toContain('android.permission.FOREGROUND_SERVICE');
+      expect(content).toContain('android.permission.READ_PHONE_NUMBERS');
+      expect(content).toContain('android.permission.ANSWER_PHONE_CALLS');
+      expect(content).toContain('NSCameraUseContinuityCameraDeviceType');
+      expect(content).toContain('NSHealthClinicalHealthRecordsShareUsageDescription');
+    });
+
     test('SEC-03: Publiczne repozytorium nie zawiera nieautoryzowanych wywołań sieciowych', () => {
       const publicRepoTest = join(root, 'tests', 'public-repo.test.ts');
       expect(existsSync(publicRepoTest)).toBe(true);
