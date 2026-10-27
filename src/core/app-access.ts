@@ -1195,3 +1195,75 @@ export function formatSubscriptionDiscount(
     hasDiscount: true,
   };
 }
+
+export interface SubscriptionSavingsAnalysis {
+  tier: 'annual' | 'lifetime';
+  yearlyCostMonthlyBilling: number;
+  tierCost: number;
+  savedAmountPln: number;
+  savingsPercent: number;
+  breakEvenMonths: number;
+  badgeLabelPl: string;
+  badgeLabelEn: string;
+}
+
+/**
+ * Szacuje korzyści finansowe i oszczędności przy wyborze planu rocznego lub dożywotniego
+ * w odniesieniu do rozliczenia miesięcznego (12x cena miesięczna).
+ */
+export function calculateSubscriptionSavings(
+  tier: 'annual' | 'lifetime' | string,
+  monthlyPricePln: number | string = 19.99,
+  tierPricePln?: number | string
+): SubscriptionSavingsAnalysis {
+  const parseNum = (v: unknown, fallback: number): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) && v > 0 ? v : fallback;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) && parsed > 0 ? parsed : fallback;
+    }
+    return fallback;
+  };
+
+  const isLifetime = typeof tier === 'string' && tier.trim().toLowerCase() === 'lifetime';
+  const resolvedTier: 'annual' | 'lifetime' = isLifetime ? 'lifetime' : 'annual';
+
+  const monthly = parseNum(monthlyPricePln, 19.99);
+  const defaultTierCost = resolvedTier === 'lifetime' ? 299.99 : 149.99;
+  const cost = parseNum(tierPricePln, defaultTierCost);
+
+  const yearlyMonthlyBilling = Number((monthly * 12).toFixed(2));
+  const breakEven = Number((cost / monthly).toFixed(1));
+
+  let savedAmountPln: number;
+  let savingsPercent: number;
+  let badgeLabelPl: string;
+  let badgeLabelEn: string;
+
+  if (resolvedTier === 'annual') {
+    const rawSaved = Math.max(0, yearlyMonthlyBilling - cost);
+    savedAmountPln = Number(rawSaved.toFixed(2));
+    savingsPercent = yearlyMonthlyBilling > 0 ? Math.round((savedAmountPln / yearlyMonthlyBilling) * 100) : 0;
+    badgeLabelPl = `Oszczędzasz ${savingsPercent}% (${savedAmountPln.toFixed(2)} zł / rok)`;
+    badgeLabelEn = `Save ${savingsPercent}% (${savedAmountPln.toFixed(2)} zł / yr)`;
+  } else {
+    // Lifetime
+    const rawSaved = Math.max(0, yearlyMonthlyBilling * 2 - cost);
+    savedAmountPln = Number(rawSaved.toFixed(2));
+    savingsPercent = Math.round((1 - cost / (yearlyMonthlyBilling * 2)) * 100);
+    badgeLabelPl = `Jednorazowy zakup — zwrot po ${breakEven} mies.`;
+    badgeLabelEn = `One-time purchase — pays off in ${breakEven} mos.`;
+  }
+
+  return {
+    tier: resolvedTier,
+    yearlyCostMonthlyBilling: yearlyMonthlyBilling,
+    tierCost: cost,
+    savedAmountPln,
+    savingsPercent: Math.max(0, savingsPercent),
+    breakEvenMonths: breakEven,
+    badgeLabelPl,
+    badgeLabelEn,
+  };
+}
+

@@ -40,6 +40,8 @@ import {
   PaywallCallToAction,
   formatSubscriptionDiscount,
   SubscriptionDiscountInfo,
+  calculateSubscriptionSavings,
+  SubscriptionSavingsAnalysis,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1483,6 +1485,37 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const fallback = formatSubscriptionDiscount(null as any, -50);
     expect(fallback.hasDiscount).toBe(false);
     expect(fallback.discountPercent).toBe(0);
+  });
+
+  test('TASK-P83-02-MON: calculateSubscriptionSavings szacuje oszczędności i zwrot planów rocznych/dożywotnich', () => {
+    // 1. Plan roczny (149.99 zł vs 12 * 19.99 = 239.88 zł -> oszczędność ~90 zł, ~37%)
+    const annual: SubscriptionSavingsAnalysis = calculateSubscriptionSavings('annual', 19.99, 149.99);
+    expect(annual.tier).toBe('annual');
+    expect(annual.yearlyCostMonthlyBilling).toBe(239.88);
+    expect(annual.tierCost).toBe(149.99);
+    expect(annual.savedAmountPln).toBeCloseTo(89.89, 1);
+    expect(annual.savingsPercent).toBe(37);
+    expect(annual.badgeLabelPl).toContain('Oszczędzasz 37%');
+    expect(annual.badgeLabelEn).toContain('Save 37%');
+
+    // 2. Plan dożywotni (lifetime: 299.99 zł przy 19.99 zł/mies. -> zwrot po 15.0 mies.)
+    const lifetime = calculateSubscriptionSavings('lifetime', 19.99, 299.99);
+    expect(lifetime.tier).toBe('lifetime');
+    expect(lifetime.breakEvenMonths).toBe(15.0);
+    expect(lifetime.badgeLabelPl).toContain('zwrot po 15 mies.');
+    expect(lifetime.badgeLabelEn).toContain('pays off in 15 mos.');
+
+    // 3. Stringi z przecinkami i domyślne fallbacki
+    const strRes = calculateSubscriptionSavings('annual', '15,00', '120,00');
+    expect(strRes.yearlyCostMonthlyBilling).toBe(180);
+    expect(strRes.savedAmountPln).toBe(60);
+    expect(strRes.savingsPercent).toBe(33);
+
+    // 4. Odporność na null, wartości ujemne i nieznany tier
+    const fallbackRes = calculateSubscriptionSavings(null as any, -10, -50);
+    expect(fallbackRes.tier).toBe('annual');
+    expect(fallbackRes.yearlyCostMonthlyBilling).toBeGreaterThan(0);
+    expect(fallbackRes.tierCost).toBeGreaterThan(0);
   });
 });
 
