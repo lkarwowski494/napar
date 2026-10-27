@@ -47,6 +47,9 @@ import {
   calculateTotalHardnessFromIons,
   TotalHardnessIonAnalysis,
   HardnessDominance,
+  evaluateLimescaleRisk,
+  LimescaleRiskAssessment,
+  LimescaleRiskLevel,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -1219,6 +1222,44 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(invalidInput.calciumPpm).toBe(0);
     expect(invalidInput.magnesiumPpm).toBe(0);
     expect(invalidInput.totalHardnessPpmCaCO3).toBe(0);
+  });
+
+  test('TASK-P91-07-JAK: evaluateLimescaleRisk ocenia ryzyko osadzania kamienia w bojlerach i czajnikach', () => {
+    // 1. Zerowe ryzyko (brak wapnia lub buforu)
+    const zeroRisk: LimescaleRiskAssessment = evaluateLimescaleRisk(0, 0);
+    const zeroLevel: LimescaleRiskLevel = zeroRisk.riskLevel;
+    expect(zeroLevel).toBe('none');
+    expect(zeroRisk.scalingIndexScore).toBe(0);
+    expect(zeroRisk.descaleFrequencyRecommendationPl).toContain('Brak konieczności');
+    expect(zeroRisk.descaleFrequencyRecommendationEn.toLowerCase()).toContain('no descaling');
+
+    // 2. Niskie ryzyko (Ca 30 ppm, KH 25 ppm, woda 93°C -> score ~25 < 30)
+    const lowRisk = evaluateLimescaleRisk(30, 25, 93);
+    expect(lowRisk.riskLevel).toBe('low');
+    expect(lowRisk.scalingIndexScore).toBeLessThan(30);
+    expect(lowRisk.descaleFrequencyRecommendationPl).toContain('6–12');
+    expect(lowRisk.summaryPl).toContain('Niskie ryzyko');
+
+    // 3. Umiarkowane ryzyko (Ca 60 ppm, KH 50 ppm -> score 50 < 75)
+    const modRisk = evaluateLimescaleRisk('60,0', '50,0');
+    expect(modRisk.riskLevel).toBe('moderate');
+    expect(modRisk.descaleFrequencyRecommendationPl).toContain('2–3');
+
+    // 4. Wysokie ryzyko (Ca 120 ppm, KH 100 ppm -> score 100 < 140)
+    const highRisk = evaluateLimescaleRisk(120, 100);
+    expect(highRisk.riskLevel).toBe('high');
+    expect(highRisk.descaleFrequencyRecommendationPl).toContain('raz w miesiącu');
+
+    // 5. Krytyczne ryzyko (woda twarda Muszynianka / kranówa: Ca 250, KH 200 -> score 200 >= 140)
+    const severeRisk = evaluateLimescaleRisk(250, 200, 120);
+    expect(severeRisk.riskLevel).toBe('severe');
+    expect(severeRisk.descaleFrequencyRecommendationPl).toContain('1–2 tygodnie');
+    expect(severeRisk.summaryPl).toContain('Krytyczna');
+
+    // 6. Odporność na null, stringi z przecinkiem i błędną temperaturę
+    const fallback = evaluateLimescaleRisk(null as any, undefined);
+    expect(fallback.riskLevel).toBe('none');
+    expect(fallback.waterTempCelsius).toBe(93);
   });
 });
 

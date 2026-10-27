@@ -1815,3 +1815,101 @@ export function calculateTotalHardnessFromIons(
   };
 }
 
+export type LimescaleRiskLevel = 'none' | 'low' | 'moderate' | 'high' | 'severe';
+
+export interface LimescaleRiskAssessment {
+  riskLevel: LimescaleRiskLevel;
+  calciumHardnessPpm: number;
+  alkalinityKhPpm: number;
+  waterTempCelsius: number;
+  scalingIndexScore: number;
+  descaleFrequencyRecommendationPl: string;
+  descaleFrequencyRecommendationEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Ocenia ryzyko wytrącania kamienia kotłowego (CaCO3) w bojlerach ekspresów i czajnikach
+ * na podstawie twardości wapniowej, zasadowości (buforu KH) i temperatury wody.
+ */
+export function evaluateLimescaleRisk(
+  calciumHardnessPpmCaCO3: number | string | undefined | null,
+  alkalinityKhPpm: number | string | undefined | null,
+  waterTempCelsius: number | string = 93
+): LimescaleRiskAssessment {
+  const parseNum = (v: unknown, fallback = 0): number => {
+    if (typeof v === 'number') {
+      return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, Math.min(1000, v)) : fallback;
+    }
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, Math.min(1000, parsed)) : fallback;
+    }
+    return fallback;
+  };
+
+  const ca = Number(parseNum(calciumHardnessPpmCaCO3, 0).toFixed(1));
+  const kh = Number(parseNum(alkalinityKhPpm, 0).toFixed(1));
+
+  let temp = 93;
+  if (typeof waterTempCelsius === 'number') {
+    temp = Number.isFinite(waterTempCelsius) ? Math.max(10, Math.min(140, waterTempCelsius)) : 93;
+  } else if (typeof waterTempCelsius === 'string') {
+    const parsed = parseFloat(waterTempCelsius.replace(/\uFEFF/g, '').replace(',', '.').trim());
+    temp = Number.isFinite(parsed) ? Math.max(10, Math.min(140, parsed)) : 93;
+  }
+
+  // Wodorowęglan wapnia wytrąca się jako CaCO3; czynnikiem ograniczającym jest min(Ca, KH)
+  const precipitationPotential = Math.min(ca, kh);
+  const tempFactor = Math.max(0.3, Math.min(2.0, temp / 93));
+  const scalingIndexScore = Math.round(precipitationPotential * tempFactor);
+
+  let riskLevel: LimescaleRiskLevel = 'none';
+  let descaleFrequencyRecommendationPl = 'Brak konieczności odkamieniania (woda bezwapniowa / zerowy bufor).';
+  let descaleFrequencyRecommendationEn = 'No descaling needed (calcium-free water / zero buffer).';
+  let summaryPl = 'Brak ryzyka osadzania kamienia. Zwróć uwagę na ryzyko korozji przy zerowym buforze.';
+  let summaryEn = 'No limescale risk. Watch for corrosion risk with zero buffer.';
+
+  if (scalingIndexScore > 0) {
+    if (scalingIndexScore < 30) {
+      riskLevel = 'low';
+      descaleFrequencyRecommendationPl = 'Odkamienianie profilaktyczne raz na 6–12 miesięcy.';
+      descaleFrequencyRecommendationEn = 'Preventative descaling every 6–12 months.';
+      summaryPl = 'Niskie ryzyko powstawania kamienia kotłowego. Bezpieczne dla czajników i ekspresów.';
+      summaryEn = 'Low limescale risk. Safe for kettles and espresso machines.';
+    } else if (scalingIndexScore < 75) {
+      riskLevel = 'moderate';
+      descaleFrequencyRecommendationPl = 'Zalecane odkamienianie co 2–3 miesiące.';
+      descaleFrequencyRecommendationEn = 'Descaling recommended every 2–3 months.';
+      summaryPl = 'Umiarkowane ryzyko osadzania kamienia. Wymaga regularnej inspekcji bojlera.';
+      summaryEn = 'Moderate limescale risk. Requires periodic boiler inspection.';
+    } else if (scalingIndexScore < 140) {
+      riskLevel = 'high';
+      descaleFrequencyRecommendationPl = 'Wymagane odkamienianie raz w miesiącu lub zmiękczenie wody.';
+      descaleFrequencyRecommendationEn = 'Monthly descaling or water softening required.';
+      summaryPl = 'Wysokie ryzyko zarastania grzałek i zaworów ekspresu. Zalecane zmiękczenie kationowe lub RO.';
+      summaryEn = 'High risk of scale buildup on heating elements and valves. Cation exchange or RO recommended.';
+    } else {
+      riskLevel = 'severe';
+      descaleFrequencyRecommendationPl = 'Krytyczne ryzyko awarii: odkamienianie co 1–2 tygodnie lub bezwzględna filtracja.';
+      descaleFrequencyRecommendationEn = 'Critical risk of failure: descaling every 1–2 weeks or mandatory filtration.';
+      summaryPl = 'Krytyczna twardość węglanowa. Woda szybko uszkodzi ekspres ciśnieniowy i zakamieni czajnik.';
+      summaryEn = 'Critical carbonate hardness. Water will rapidly scale equipment and damage espresso boilers.';
+    }
+  }
+
+  return {
+    riskLevel,
+    calciumHardnessPpm: ca,
+    alkalinityKhPpm: kh,
+    waterTempCelsius: temp,
+    scalingIndexScore,
+    descaleFrequencyRecommendationPl,
+    descaleFrequencyRecommendationEn,
+    summaryPl,
+    summaryEn,
+  };
+}
+
+
