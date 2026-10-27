@@ -13,11 +13,13 @@ import {
   calculateRemainingCaffeineMg,
   calculateHoursUntilSafeCaffeine,
   calculateCaffeineDecay,
+  calculateDoseForBeverageYield,
 } from '../domain-rules';
 import { calculateWaterMinerals, classifyWaterHardness, classifyWaterHardnessFromFH } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import { convertMicronsToGrinder, findGrindCategoryForMicrons, findGrindCategoryById } from '../grinder-converter';
-import { calculateBrewCost, calculateTeaCost, formatPlnCost } from '../cost-calculator';
+import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
+import { formatRelativeDays } from '../i18n';
 import {
   formatTemperature,
   formatWaterVolume,
@@ -337,6 +339,58 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof keepVal).toBe('number');
       expect(Number.isFinite(keepVal)).toBe(true);
       expect(Object.is(keepVal, -0)).toBe(false);
+    }
+  });
+
+  test('Chaos 11: Fuzzing formatCost, formatRelativeDays, calculateDoseForBeverageYield i metod BrewTimerEngine (TASK-P65-12-NIE)', () => {
+    const corruptInputs = [
+      -100000, -1, -0, 0, 0.0001, 15.5, 250, 10000, NaN, Infinity, -Infinity,
+      '', '   ', '\uFEFF15.5', '185,5', '3.50 zł', 'invalid', null, undefined,
+      true, false, {}, [], () => {},
+    ];
+
+    for (const val of corruptInputs) {
+      // 1. formatCost
+      for (const cur of ['PLN', 'EUR', 'USD', 'GBP', val]) {
+        const costStr = formatCost(val as any, cur as any);
+        expect(typeof costStr).toBe('string');
+        expect(costStr).not.toContain('NaN');
+        expect(costStr).not.toContain('-0');
+      }
+
+      // 2. formatRelativeDays
+      for (const lang of ['pl', 'en', val]) {
+        const relStr = formatRelativeDays(val as any, lang as any);
+        expect(typeof relStr).toBe('string');
+        expect(relStr).not.toContain('NaN');
+        expect(relStr).not.toContain('-0');
+      }
+
+      // 3. calculateDoseForBeverageYield
+      const yieldRes = calculateDoseForBeverageYield(val as any, 16.0, 2.0);
+      expect(yieldRes).toBeDefined();
+      expect(typeof yieldRes.doseGrams).toBe('number');
+      expect(typeof yieldRes.waterGrams).toBe('number');
+      expect(typeof yieldRes.beverageGrams).toBe('number');
+      expect(Number.isFinite(yieldRes.doseGrams)).toBe(true);
+      expect(Number.isFinite(yieldRes.waterGrams)).toBe(true);
+      expect(Number.isFinite(yieldRes.beverageGrams)).toBe(true);
+      expect(Object.is(yieldRes.doseGrams, -0)).toBe(false);
+      expect(Object.is(yieldRes.waterGrams, -0)).toBe(false);
+      expect(Object.is(yieldRes.beverageGrams, -0)).toBe(false);
+
+      // 4. BrewTimerEngine static methods
+      const dur = BrewTimerEngine.calculateTotalRecipeDuration(val as any);
+      expect(typeof dur).toBe('number');
+      expect(Number.isFinite(dur)).toBe(true);
+      expect(dur).toBeGreaterThanOrEqual(0);
+      expect(Object.is(dur, -0)).toBe(false);
+
+      const water = BrewTimerEngine.calculateTotalTargetWater(val as any);
+      expect(typeof water).toBe('number');
+      expect(Number.isFinite(water)).toBe(true);
+      expect(water).toBeGreaterThanOrEqual(0);
+      expect(Object.is(water, -0)).toBe(false);
     }
   });
 });
