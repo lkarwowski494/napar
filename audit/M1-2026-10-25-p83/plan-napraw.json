@@ -1,0 +1,53 @@
+{
+  "cycle": "P83",
+  "status": "completed",
+  "perspectives": [
+    "02-MON",
+    "03-ZAK",
+    "04-SZT",
+    "05-ARC",
+    "06-TRE"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P83-02-MON",
+      "perspective": "02-MON",
+      "description": "Implementacja kalkulatora oszczędności subskrypcji calculateSubscriptionSavings z typem SubscriptionSavingsAnalysis w src/core/app-access.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P83-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja analizatora świeżości ziaren calculateBeanFreshness z typami BeanFreshnessAnalysis i BeanFreshnessPhase w src/core/database.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P83-04-SZT",
+      "perspective": "04-SZT",
+      "description": "Implementacja rankingu akcji wg priorytetu rankActionsByPriority w src/core/bpr-engine.ts",
+      "targetFile": "src/core/bpr-engine.ts",
+      "testFile": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P83-05-ARC",
+      "perspective": "05-ARC",
+      "description": "Implementacja bezpiecznej sanityzacji i naprawy koperty kopii zapasowej sanitizeBackupEnvelope w src/core/backup.ts",
+      "targetFile": "src/core/backup.ts",
+      "testFile": "src/core/__tests__/backup.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P83-06-TRE",
+      "perspective": "06-TRE",
+      "description": "Implementacja przewodnika po stopniach palenia getCoffeeRoastLevelGuide z typami CoffeeRoastLevelGuide i CoffeeRoastLevelKey w src/core/knowledge-data.ts",
+      "targetFile": "src/core/knowledge-data.ts",
+      "testFile": "src/core/__tests__/knowledge.test.ts",
+      "status": "completed"
+    }
+  ]
+}
