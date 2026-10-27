@@ -20,6 +20,7 @@ import {
   findBottledWaterById,
   getBottledWatersBySuitability,
   searchBottledWaters,
+  searchWaterRecipes,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -794,6 +795,26 @@ describe('Water Chemistry & Mineralization Module', () => {
 
     const nonExistent = searchBottledWaters('mars-spring-water');
     expect(nonExistent).toEqual([]);
+  });
+
+  test('TASK-P64-07-JAK: searchWaterRecipes umozliwia wyszukiwanie receptur remineralizacji wody specialty', () => {
+    // 1. Wyszukiwanie po nazwie
+    const bh = searchWaterRecipes('Barista Hustle');
+    expect(bh.length).toBeGreaterThanOrEqual(1);
+    expect(bh[0].id).toBe('barista_hustle_80_40');
+
+    // 2. Wyszukiwanie po przeznaczeniu (bestFor)
+    const cupping = searchWaterRecipes('cupping');
+    expect(cupping.length).toBeGreaterThanOrEqual(1);
+
+    // 3. Puste zapytanie i null/undefined
+    const all = searchWaterRecipes('');
+    expect(all.length).toBeGreaterThanOrEqual(5);
+    expect(searchWaterRecipes(null as any).length).toBe(all.length);
+    expect(searchWaterRecipes(undefined as any).length).toBe(all.length);
+
+    // 4. Brak dopasowania
+    expect(searchWaterRecipes('pluton-recipe')).toEqual([]);
   });
 });
 

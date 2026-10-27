@@ -929,3 +929,43 @@ export function searchBottledWaters(query?: string): BottledWaterProfile[] {
   });
 }
 
+/**
+ * Wyszukuje receptury wody specialty wg zapytania tekstowego (nazwa, przeznaczenie, opis, id).
+ */
+export function searchWaterRecipes(query?: string): WaterRecipe[] {
+  if (typeof query !== 'string') {
+    return [...WATER_RECIPES];
+  }
+  const clean = query.trim().toLowerCase();
+  if (!clean) {
+    return [...WATER_RECIPES];
+  }
+  const normQuery = clean.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  return WATER_RECIPES.filter((r) => {
+    if (!r) return false;
+    const namePlLower = (r.namePl || '').toLowerCase();
+    const namePlNorm = namePlLower.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const nameEnLower = (r.nameEn || '').toLowerCase();
+    const nameEnNorm = nameEnLower.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const descPlLower = (r.descriptionPl || '').toLowerCase();
+    const descEnLower = (r.descriptionEn || '').toLowerCase();
+    const bestForPlLower = (r.bestForPl || '').toLowerCase();
+    const bestForEnLower = (r.bestForEn || '').toLowerCase();
+    const idLower = (r.id || '').toLowerCase();
+
+    return (
+      namePlLower.includes(clean) ||
+      namePlNorm.includes(normQuery) ||
+      nameEnLower.includes(clean) ||
+      nameEnNorm.includes(normQuery) ||
+      descPlLower.includes(clean) ||
+      descEnLower.includes(clean) ||
+      bestForPlLower.includes(clean) ||
+      bestForEnLower.includes(clean) ||
+      idLower.includes(clean)
+    );
+  });
+}
+
+
