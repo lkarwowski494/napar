@@ -2,6 +2,7 @@ import {
   parseStepDurationSeconds,
   parseSteepIncrementSeconds,
   calculateNextSteepDuration,
+  calculateCoffeeFreshness,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -709,6 +710,41 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       const calendar = buildFourteenDayCalendar('invalid-date', null as any, {} as any);
       expect(Array.isArray(calendar)).toBe(true);
       expect(calendar.length).toBe(14);
+    });
+
+    it('TASK-P63-11-WZR: calculateCoffeeFreshness poprawnie wyznacza status swiezosci kawy', () => {
+      const refDate = new Date('2026-10-27T12:00:00.000Z');
+
+      // 1. Brak daty lub nieprawidłowa data -> 'unknown'
+      expect(calculateCoffeeFreshness(null).status).toBe('unknown');
+      expect(calculateCoffeeFreshness(undefined).status).toBe('unknown');
+      expect(calculateCoffeeFreshness('invalid-date').status).toBe('unknown');
+      expect(calculateCoffeeFreshness('').status).toBe('unknown');
+
+      // 2. Data w przyszłości lub zbyt świeża (odpoczynek: np. 2 dni po paleniu dla filtra 10 dni) -> 'too_fresh'
+      const fresh2Days = calculateCoffeeFreshness('2026-10-25T12:00:00.000Z', 'light filter', refDate);
+      expect(fresh2Days.status).toBe('too_fresh');
+      expect(fresh2Days.daysSinceRoast).toBe(2);
+      expect(fresh2Days.degassingDays).toBe(10);
+      expect(fresh2Days.messagePl).toContain('odpoczywa');
+
+      // 3. W oknie szczytowym (np. 15 dni po paleniu dla filtra, okno 10-45 dni) -> 'peak'
+      const peak = calculateCoffeeFreshness('2026-10-12T12:00:00.000Z', 'light filter', refDate);
+      expect(peak.status).toBe('peak');
+      expect(peak.daysSinceRoast).toBe(15);
+      expect(peak.messagePl).toContain('Szczyt');
+      expect(peak.messageEn).toContain('Peak');
+
+      // 4. Po szczycie (np. 50 dni po paleniu dla filtra, peakEndDays 45, do 75 dni) -> 'past_peak'
+      const pastPeak = calculateCoffeeFreshness('2026-09-07T12:00:00.000Z', 'light filter', refDate);
+      expect(pastPeak.status).toBe('past_peak');
+      expect(pastPeak.daysSinceRoast).toBe(50);
+
+      // 5. Zestarzała (np. 90 dni po paleniu) -> 'expired'
+      const expired = calculateCoffeeFreshness('2026-07-20T12:00:00.000Z', 'light filter', refDate);
+      expect(expired.status).toBe('expired');
+      expect(expired.messagePl).toContain('Zestarzała');
+      expect(expired.messageEn).toContain('Aged');
     });
   });
 });

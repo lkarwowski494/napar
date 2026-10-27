@@ -332,6 +332,110 @@ export function calculateRoastDegassingWindow(roastProfile?: string | null): {
   return { degassingDays: 7, peakEndDays: 35 };
 }
 
+export type CoffeeFreshnessStatus = 'too_fresh' | 'peak' | 'past_peak' | 'expired' | 'unknown';
+
+export interface CoffeeFreshnessResult {
+  status: CoffeeFreshnessStatus;
+  daysSinceRoast: number;
+  degassingDays: number;
+  peakEndDays: number;
+  messagePl: string;
+  messageEn: string;
+}
+
+/**
+ * Precyzyjnie wyznacza status świeżości kawy i rekomendację parzenia
+ * na podstawie daty palenia i profilu wypału (okno odgazowania SCA).
+ */
+export function calculateCoffeeFreshness(
+  roastDate: string | Date | null | undefined,
+  roastProfile?: string | null,
+  referenceDate?: string | Date
+): CoffeeFreshnessResult {
+  const window = calculateRoastDegassingWindow(roastProfile);
+  const fallbackResult: CoffeeFreshnessResult = {
+    status: 'unknown',
+    daysSinceRoast: 0,
+    degassingDays: window.degassingDays,
+    peakEndDays: window.peakEndDays,
+    messagePl: 'Brak daty palenia',
+    messageEn: 'No roast date',
+  };
+
+  if (!roastDate) return fallbackResult;
+
+  let rDate: Date;
+  if (roastDate instanceof Date) {
+    rDate = roastDate;
+  } else if (typeof roastDate === 'string') {
+    const clean = roastDate.trim();
+    if (!clean) return fallbackResult;
+    rDate = new Date(clean);
+  } else {
+    return fallbackResult;
+  }
+
+  if (isNaN(rDate.getTime())) return fallbackResult;
+
+  let ref: Date;
+  if (referenceDate instanceof Date) {
+    ref = referenceDate;
+  } else if (typeof referenceDate === 'string') {
+    ref = new Date(referenceDate);
+    if (isNaN(ref.getTime())) ref = new Date();
+  } else {
+    ref = new Date();
+  }
+
+  const diffMs = ref.getTime() - rDate.getTime();
+  const rawDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const daysSinceRoast = Math.max(0, rawDays);
+
+  if (rawDays < 0 || daysSinceRoast < window.degassingDays) {
+    const daysLeft = Math.max(1, window.degassingDays - daysSinceRoast);
+    return {
+      status: 'too_fresh',
+      daysSinceRoast,
+      degassingDays: window.degassingDays,
+      peakEndDays: window.peakEndDays,
+      messagePl: `Świeżo palona (odpoczywa jeszcze ${daysLeft} ${daysLeft === 1 ? 'dzień' : 'dni'})`,
+      messageEn: `Freshly roasted (resting for ${daysLeft} more ${daysLeft === 1 ? 'day' : 'days'})`,
+    };
+  }
+
+  if (daysSinceRoast <= window.peakEndDays) {
+    return {
+      status: 'peak',
+      daysSinceRoast,
+      degassingDays: window.degassingDays,
+      peakEndDays: window.peakEndDays,
+      messagePl: 'Szczyt smaku i aromatu (optymalne okno parzenia)',
+      messageEn: 'Peak flavor and aroma (optimal brewing window)',
+    };
+  }
+
+  if (daysSinceRoast <= window.peakEndDays + 30) {
+    return {
+      status: 'past_peak',
+      daysSinceRoast,
+      degassingDays: window.degassingDays,
+      peakEndDays: window.peakEndDays,
+      messagePl: 'Po optymalnym oknie (nadal dobra do parzenia)',
+      messageEn: 'Past optimal peak (still good for brewing)',
+    };
+  }
+
+  return {
+    status: 'expired',
+    daysSinceRoast,
+    degassingDays: window.degassingDays,
+    peakEndDays: window.peakEndDays,
+    messagePl: 'Zestarzała kawa (rekomendowany cold brew)',
+    messageEn: 'Aged coffee (cold brew recommended)',
+  };
+}
+
+
 function toDateKey(d: Date): string {
   const year = d.getUTCFullYear();
   const month = String(d.getUTCMonth() + 1).padStart(2, '0');
