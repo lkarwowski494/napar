@@ -1,0 +1,53 @@
+{
+  "cycle": "P76",
+  "status": "completed",
+  "perspectives": [
+    "03-ZAK",
+    "04-SZT",
+    "05-ARC",
+    "06-TRE",
+    "07-JAK"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P76-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja kalkulatora statystyk spiżarni calculateInventorySummary z typem InventorySummary w src/core/database.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P76-04-SZT",
+      "perspective": "04-SZT",
+      "description": "Wdrożenie wyszukiwania akcji proaktywnych searchProactiveActions z typem ActionSearchCriteria w src/core/bpr-engine.ts",
+      "targetFile": "src/core/bpr-engine.ts",
+      "testFile": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P76-05-ARC",
+      "perspective": "05-ARC",
+      "description": "Implementacja zliczania wpisów kopii getBackupRecordCounts z typem BackupRecordCounts w src/core/backup.ts",
+      "targetFile": "src/core/backup.ts",
+      "testFile": "src/core/__tests__/backup.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P76-06-TRE",
+      "perspective": "06-TRE",
+      "description": "Implementacja przewodnika kultywarów kawy getCoffeeVarietyGuide z typem CoffeeVarietyGuide w src/core/knowledge-data.ts",
+      "targetFile": "src/core/knowledge-data.ts",
+      "testFile": "src/core/__tests__/knowledge.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P76-07-JAK",
+      "perspective": "07-JAK",
+      "description": "Implementacja estymacji TDS z twardości estimateWaterTdsFromHardness z typem WaterTdsEstimate w src/core/water-chemistry.ts",
+      "targetFile": "src/core/water-chemistry.ts",
+      "testFile": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "completed"
+    }
+  ]
+}
