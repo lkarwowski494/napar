@@ -34,6 +34,8 @@ import {
   SubscriptionBadgeInfo,
   getFeatureAccessLevel,
   FeatureAccessLevel,
+  getTrialProgressInfo,
+  TrialProgressInfo,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1324,6 +1326,68 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const defaultLevel = getFeatureAccessLevel(null as any);
     expect(defaultLevel).toBeDefined();
     expect(defaultLevel.featureId).toBe('');
+  });
+
+  test('TASK-P75-02-MON: getTrialProgressInfo wylicza procentowe zużycie okresu próbnego', () => {
+    // 1. Aktywna subskrypcja Pro -> 100% odblokowane, brak wygasania
+    const proState = {
+      status: 'subscribed' as const,
+      brewsCount: 0,
+      brewsRemaining: Infinity,
+      daysRemaining: Infinity,
+      isSubscribed: true,
+      canCreate: true,
+      isHistoryReadOnly: false,
+      subscriptionTier: 'lifetime' as const,
+    };
+    const proProgress: TrialProgressInfo = getTrialProgressInfo(proState);
+    expect(proProgress.percentUsed).toBe(0);
+    expect(proProgress.percentRemaining).toBe(100);
+    expect(proProgress.isExpiringSoon).toBe(false);
+
+    // 2. Wygasły trial -> 100% zużycia
+    const expiredState = {
+      status: 'trial_expired' as const,
+      brewsCount: TRIAL_MAX_BREWS,
+      brewsRemaining: 0,
+      daysRemaining: 0,
+      isSubscribed: false,
+      canCreate: false,
+      isHistoryReadOnly: true,
+      subscriptionTier: 'none' as const,
+    };
+    const expiredProgress = getTrialProgressInfo(expiredState);
+    expect(expiredProgress.percentUsed).toBe(100);
+    expect(expiredProgress.percentRemaining).toBe(0);
+    expect(expiredProgress.isExpiringSoon).toBe(true);
+
+    // 3. Połowa okresu próbnego (np. 7 dni z 14 pozostało, 7 parzeń pozostało)
+    const midState = {
+      ...expiredState,
+      status: 'trial_active' as const,
+      daysRemaining: 7,
+      brewsRemaining: 7,
+      brewsCount: 8,
+    };
+    const midProgress = getTrialProgressInfo(midState);
+    expect(midProgress.percentUsed).toBeGreaterThan(0);
+    expect(midProgress.percentUsed).toBeLessThan(100);
+    expect(midProgress.isExpiringSoon).toBe(false);
+
+    // 4. Kończący się trial (<= 3 dni) -> isExpiringSoon = true
+    const soonState = {
+      ...expiredState,
+      status: 'trial_active' as const,
+      daysRemaining: 2,
+      brewsRemaining: 5,
+    };
+    const soonProgress = getTrialProgressInfo(soonState);
+    expect(soonProgress.isExpiringSoon).toBe(true);
+
+    // 5. Odporność na null/undefined -> domyślny stan
+    const defaultProgress = getTrialProgressInfo(null);
+    expect(defaultProgress).toBeDefined();
+    expect(typeof defaultProgress.percentUsed).toBe('number');
   });
 });
 

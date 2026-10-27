@@ -991,3 +991,67 @@ export function getFeatureAccessLevel(
   };
 }
 
+export interface TrialProgressInfo {
+  percentUsed: number;
+  percentRemaining: number;
+  isExpiringSoon: boolean;
+  daysRemaining: number;
+  brewsRemaining: number;
+}
+
+/**
+ * Zwraca informacje o postępie i procentowym zużyciu limitów okresu próbnego (czas oraz liczba zaparzonych kaw).
+ */
+export function getTrialProgressInfo(state?: AppAccessState | null): TrialProgressInfo {
+  const current = state && typeof state === 'object' && 'status' in state ? state : getAppAccessState();
+
+  if (current.isSubscribed) {
+    return {
+      percentUsed: 0,
+      percentRemaining: 100,
+      isExpiringSoon: false,
+      daysRemaining: Infinity,
+      brewsRemaining: Infinity,
+    };
+  }
+
+  if (current.status === 'trial_expired') {
+    return {
+      percentUsed: 100,
+      percentRemaining: 0,
+      isExpiringSoon: true,
+      daysRemaining: 0,
+      brewsRemaining: 0,
+    };
+  }
+
+  const safeDaysRemaining =
+    Number.isFinite(current.daysRemaining) && current.daysRemaining >= 0
+      ? Math.min(TRIAL_DURATION_DAYS, current.daysRemaining)
+      : 0;
+  const safeBrewsRemaining =
+    Number.isFinite(current.brewsRemaining) && current.brewsRemaining >= 0
+      ? Math.min(TRIAL_MAX_BREWS, current.brewsRemaining)
+      : 0;
+
+  const daysUsed = Math.max(0, TRIAL_DURATION_DAYS - safeDaysRemaining);
+  const brewsUsed = Math.max(0, TRIAL_MAX_BREWS - safeBrewsRemaining);
+
+  const daysPercentUsed = (daysUsed / TRIAL_DURATION_DAYS) * 100;
+  const brewsPercentUsed = (brewsUsed / TRIAL_MAX_BREWS) * 100;
+
+  const rawPercentUsed = Math.max(daysPercentUsed, brewsPercentUsed);
+  const percentUsed = Number(Math.max(0, Math.min(100, rawPercentUsed)).toFixed(1));
+  const percentRemaining = Number((100 - percentUsed).toFixed(1));
+
+  const isExpiringSoon = safeDaysRemaining <= 3 || safeBrewsRemaining <= 3;
+
+  return {
+    percentUsed,
+    percentRemaining,
+    isExpiringSoon,
+    daysRemaining: safeDaysRemaining,
+    brewsRemaining: safeBrewsRemaining,
+  };
+}
+
