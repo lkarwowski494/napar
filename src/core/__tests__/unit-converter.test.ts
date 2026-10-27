@@ -13,6 +13,8 @@ import {
   formatDoseWeight,
   formatWaterWeight,
   formatWaterVolume,
+  formatRatio,
+  formatPressure,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -249,6 +251,31 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       // 3. formatDoseWeight i formatWaterWeight ze stringami
       expect(formatDoseWeight('18,5 g', 'metric')).toBe('18.5g');
       expect(formatWaterWeight('300,5 g', 'metric')).toBe('300.5g');
+    });
+
+    test('TASK-P67-09-LOK: formatRatio i formatPressure formatuja proporcje i cisnienie z pelna ochrona przed anomaliami', () => {
+      // 1. formatRatio
+      expect(formatRatio(16)).toBe('1:16');
+      expect(formatRatio(16.666)).toBe('1:16.7');
+      expect(formatRatio('1:15')).toBe('1:15');
+      expect(formatRatio('15,5')).toBe('1:15.5');
+      expect(formatRatio('1/17')).toBe('1:17');
+      expect(formatRatio(null)).toBe('1:16');
+      expect(formatRatio(undefined)).toBe('1:16');
+      expect(formatRatio(NaN)).toBe('1:16');
+      expect(formatRatio(-5)).toBe('1:16');
+      expect(formatRatio(-0)).toBe('1:16');
+
+      // 2. formatPressure
+      expect(formatPressure(9)).toBe('9.0 bar');
+      expect(formatPressure('9,25 bar')).toBe('9.3 bar');
+      expect(formatPressure(15)).toBe('15.0 bar');
+      expect(formatPressure(0)).toBe('0.0 bar');
+      expect(formatPressure(-0)).toBe('0.0 bar');
+      expect(formatPressure(-5)).toBe('0.0 bar');
+      expect(formatPressure(NaN)).toBe('0.0 bar');
+      expect(formatPressure(null)).toBe('0.0 bar');
+      expect(formatPressure(undefined)).toBe('0.0 bar');
     });
   });
 });

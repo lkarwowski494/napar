@@ -207,3 +207,51 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
   }
   return roundTo(xIn / cu, 2);
 }
+
+/**
+ * Formatuje proporcję parzenia do standardu baristycznego (np. '1:16', '1:16.7').
+ * Zabezpiecza przed ujemnymi wartościami, -0, NaN, pustymi ciągami i formatami 1/X.
+ */
+export function formatRatio(ratio: number | string | undefined | null, prefix = '1:'): string {
+  if (ratio === undefined || ratio === null) return `${prefix}16`;
+  let val: number;
+  if (typeof ratio === 'number') {
+    val = ratio;
+  } else if (typeof ratio === 'string') {
+    const clean = ratio.replace(/\uFEFF/g, '').replace(/1[:/]/, '').replace(',', '.').trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  if (!Number.isFinite(val) || val <= 0 || Object.is(val, -0)) {
+    return `${prefix}16`;
+  }
+
+  const safeVal = Math.min(100, Math.max(1, val));
+  const rounded = Number(safeVal.toFixed(1));
+  const displayVal = rounded % 1 === 0 ? String(Math.floor(rounded)) : String(rounded);
+  return `${prefix}${displayVal}`;
+}
+
+/**
+ * Formatuje ciśnienie parzenia w barach (np. 9 -> '9.0 bar').
+ */
+export function formatPressure(bars: number | string | undefined | null, decimals = 1): string {
+  if (bars === undefined || bars === null) return `0.0 bar`;
+  let val: number;
+  if (typeof bars === 'number') {
+    val = bars;
+  } else if (typeof bars === 'string') {
+    const clean = bars.replace(/\uFEFF/g, '').replace(/[^\d.,]/g, '').replace(',', '.').trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  const safeVal = Number.isFinite(val) && val >= 0 && !Object.is(val, -0)
+    ? Math.min(30, val)
+    : 0;
+
+  return `${safeVal.toFixed(decimals)} bar`;
+}
