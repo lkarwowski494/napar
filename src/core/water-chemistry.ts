@@ -1577,12 +1577,12 @@ export function calculateResidualAlkalinity(
     return 0;
   };
 
-  const alk = Number(parseNum(alkalinityPpm).toFixed(1));
-  const ca = Number(parseNum(calciumHardnessPpm).toFixed(1));
-  const mg = Number(parseNum(magnesiumHardnessPpm).toFixed(1));
+  const alk = Math.round(parseNum(alkalinityPpm) * 10) / 10;
+  const ca = Math.round(parseNum(calciumHardnessPpm) * 10) / 10;
+  const mg = Math.round(parseNum(magnesiumHardnessPpm) * 10) / 10;
 
   const raRaw = alk - (ca / 3.5 + mg / 7.0);
-  const ra = Number(raRaw.toFixed(1));
+  const ra = Math.round(raRaw * 10) / 10;
   const safeRa = Object.is(ra, -0) ? 0 : ra;
 
   let category: ResidualAlkalinityCategory;
@@ -1665,16 +1665,16 @@ export function calculateSulfateToChlorideRatio(
     return 0;
   };
 
-  const so4 = Number(parseNum(sulfatePpm).toFixed(1));
-  const cl = Number(parseNum(chloridePpm).toFixed(1));
+  const so4 = Math.round(parseNum(sulfatePpm) * 10) / 10;
+  const cl = Math.round(parseNum(chloridePpm) * 10) / 10;
 
   let ratio: number;
   if (cl === 0 && so4 === 0) {
     ratio = 1.0;
   } else if (cl === 0) {
-    ratio = Math.min(20.0, Number((so4 / 0.1).toFixed(2)));
+    ratio = Math.min(20.0, Math.round((so4 / 0.1) * 100) / 100);
   } else {
-    ratio = Number((so4 / cl).toFixed(2));
+    ratio = Math.round((so4 / cl) * 100) / 100;
   }
 
   let category: SulfateToChlorideCategory;

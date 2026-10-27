@@ -12,7 +12,12 @@ import {
 } from '../domain-rules';
 import { createGongfuSession, recordGongfuInfusion } from '../gongfu-session';
 import { convertMicronsToGrinder, SUPPORTED_GRINDERS } from '../grinder-converter';
-import { calculateWaterMinerals, WATER_RECIPES } from '../water-chemistry';
+import {
+  calculateWaterMinerals,
+  WATER_RECIPES,
+  calculateSulfateToChlorideRatio,
+  calculateResidualAlkalinity,
+} from '../water-chemistry';
 import { normSearch, rankSearchResults } from '../search-utils';
 import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot, CumulativeWaterPoint } from '../timer-engine';
 
@@ -401,6 +406,27 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     const ms = measureCpuMs(() => {
       for (let i = 0; i < 10000; i++) {
         BrewTimerEngine.calculateCumulativeWaterSchedule(steps);
+      }
+    });
+
+    expect(ms).toBeLessThan(80);
+  });
+
+  test('Budżet 16: 10 000 obliczeń chemii wody (SulfateToChloride i ResidualAlkalinity) (< 80 ms)', () => {
+    // 1. Poprawność biznesowa
+    const scRes = calculateSulfateToChlorideRatio(75, 50);
+    expect(scRes.ratio).toBe(1.5);
+    expect(scRes.category).toBe('crisp_accentuated');
+
+    const raRes = calculateResidualAlkalinity(40, 70, 35);
+    expect(raRes.residualAlkalinityPpm).toBe(15.0);
+    expect(raRes.category).toBe('optimal_specialty');
+
+    // 2. Budżet wydajnościowy: 10 000 wywołań w pętli < 80 ms
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        calculateSulfateToChlorideRatio(50 + (i % 20), 40 + (i % 10));
+        calculateResidualAlkalinity(35 + (i % 15), 60 + (i % 20), 30 + (i % 10));
       }
     });
 
