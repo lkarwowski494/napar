@@ -17,7 +17,9 @@ import {
   WATER_RECIPES,
   calculateSulfateToChlorideRatio,
   calculateResidualAlkalinity,
+  calculateTotalHardnessFromIons,
 } from '../water-chemistry';
+import { formatBrewTimeMinutesSeconds } from '../unit-converter';
 import { normSearch, rankSearchResults } from '../search-utils';
 import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot, CumulativeWaterPoint } from '../timer-engine';
 
@@ -427,6 +429,26 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       for (let i = 0; i < 10000; i++) {
         calculateSulfateToChlorideRatio(50 + (i % 20), 40 + (i % 10));
         calculateResidualAlkalinity(35 + (i % 15), 60 + (i % 20), 30 + (i % 10));
+      }
+    });
+
+    expect(ms).toBeLessThan(80);
+  });
+
+  test('Budżet 17: 10 000 obliczeń chemii jonowej (calculateTotalHardnessFromIons) i formatowania czasu (formatBrewTimeMinutesSeconds) (< 80 ms)', () => {
+    // 1. Poprawność biznesowa
+    const hardnessRes = calculateTotalHardnessFromIons(20, 10);
+    expect(hardnessRes.dominance).toBe('balanced');
+    expect(hardnessRes.totalHardnessPpmCaCO3).toBeCloseTo(91.1, 1);
+
+    const timeFormatted = formatBrewTimeMinutesSeconds(150, true);
+    expect(timeFormatted).toBe('02:30');
+
+    // 2. Budżet wydajnościowy: 10 000 wywołań w pętli < 80 ms
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        calculateTotalHardnessFromIons(15 + (i % 25), 8 + (i % 15));
+        formatBrewTimeMinutesSeconds(60 + (i % 300), (i % 2) === 0);
       }
     });
 
