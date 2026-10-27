@@ -30,6 +30,8 @@ import {
   HardnessRatioAnalysis,
   calculateWaterDilution,
   WaterDilutionResult,
+  estimateWaterTdsFromHardness,
+  WaterTdsEstimate,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -971,6 +973,33 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(resInvalid.sourceVolumeMl).toBe(0);
     expect(resInvalid.diluentVolumeMl).toBe(0);
     expect(resInvalid.isDilutionNeeded).toBe(false);
+  });
+
+  test('TASK-P76-07-JAK: estimateWaterTdsFromHardness szacuje TDS i przewodność EC z parametrów twardości', () => {
+    // 1. Wzorcowa woda Barista Hustle (GH 80, KH 40 + 15 soli -> 135 ppm TDS)
+    const bhEst: WaterTdsEstimate = estimateWaterTdsFromHardness(80, 40);
+    expect(bhEst.estimatedTdsPpm).toBe(135);
+    expect(bhEst.estimatedEcMicroSiemens).toBe(208); // 135 / 0.65 rounded
+    expect(bhEst.category).toBe('optimal_specialty');
+    expect(bhEst.descriptionPl).toContain('Optymalna');
+    expect(bhEst.descriptionEn).toContain('Optimal');
+
+    // 2. Miękka woda o niskiej mineralizacji (np. GH 30, KH 15 + 0 soli -> 45 ppm TDS)
+    const softEst = estimateWaterTdsFromHardness('30,0', '15,0', 0);
+    expect(softEst.estimatedTdsPpm).toBe(45);
+    expect(softEst.category).toBe('low_mineral');
+    expect(softEst.descriptionPl).toContain('Niska mineralizacja');
+
+    // 3. Twarda woda kranowa (np. GH 200, KH 100 -> 315 ppm TDS)
+    const hardEst = estimateWaterTdsFromHardness(200, 100);
+    expect(hardEst.estimatedTdsPpm).toBe(315);
+    expect(hardEst.category).toBe('high_mineral');
+    expect(hardEst.descriptionPl).toContain('Wysoka mineralizacja');
+
+    // 4. Odporność na null, ujemne i anomalie
+    const fallbackEst = estimateWaterTdsFromHardness(null as any, undefined as any);
+    expect(fallbackEst.estimatedTdsPpm).toBe(15); // tylko domyślne dodatkowe sole 15 ppm
+    expect(fallbackEst.category).toBe('low_mineral');
   });
 });
 

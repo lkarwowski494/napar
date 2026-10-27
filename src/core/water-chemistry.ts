@@ -1297,3 +1297,67 @@ export function calculateWaterDilution(
     isDilutionNeeded: true,
   };
 }
+
+export interface WaterTdsEstimate {
+  estimatedTdsPpm: number;
+  estimatedEcMicroSiemens: number;
+  category: 'low_mineral' | 'optimal_specialty' | 'high_mineral';
+  descriptionPl: string;
+  descriptionEn: string;
+}
+
+/**
+ * Szacuje całkowite stężenie rozpuszczonych substancji mineralnych (TDS w ppm)
+ * oraz przewodność elektrolityczną (EC w µS/cm) na podstawie twardości ogólnej (GH)
+ * i węglanowej (KH).
+ */
+export function estimateWaterTdsFromHardness(
+  ghPpm: number | string,
+  khPpm: number | string,
+  additionalSaltsPpm: number | string = 15
+): WaterTdsEstimate {
+  const parseNum = (v: unknown, fallback = 0): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : fallback;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : fallback;
+    }
+    return fallback;
+  };
+
+  const gh = parseNum(ghPpm, 0);
+  const kh = parseNum(khPpm, 0);
+  const salts = parseNum(additionalSaltsPpm, 0);
+
+  const rawTds = gh + kh + salts;
+  const estimatedTdsPpm = Number(Math.max(0, Math.min(5000, rawTds)).toFixed(1));
+
+  const rawEc = estimatedTdsPpm > 0 ? estimatedTdsPpm / 0.65 : 0;
+  const estimatedEcMicroSiemens = Math.round(rawEc);
+
+  let category: 'low_mineral' | 'optimal_specialty' | 'high_mineral';
+  let descriptionPl: string;
+  let descriptionEn: string;
+
+  if (estimatedTdsPpm < 75) {
+    category = 'low_mineral';
+    descriptionPl = 'Niska mineralizacja (< 75 ppm TDS) — woda bardzo miękka, sprzyja herbatom zielonym i delikatnym, lecz w kawie może brakować ciała.';
+    descriptionEn = 'Low mineralization (< 75 ppm TDS) — very soft water, ideal for delicate and green teas, but coffee may lack sweetness and body.';
+  } else if (estimatedTdsPpm > 175) {
+    category = 'high_mineral';
+    descriptionPl = 'Wysoka mineralizacja (> 175 ppm TDS) — ryzyko nadmiernej ekstrakcji goryczy, płaskiego profilu i powstawania kamienia w bojlerze.';
+    descriptionEn = 'High mineralization (> 175 ppm TDS) — risk of extracting harsh bitterness, chalky cup, and scale accumulation.';
+  } else {
+    category = 'optimal_specialty';
+    descriptionPl = 'Optymalna mineralizacja specialty (75 - 175 ppm TDS) — zrównoważona ekstrakcja według standardów SCA.';
+    descriptionEn = 'Optimal specialty mineralization (75 - 175 ppm TDS) — balanced extraction per SCA water guidelines.';
+  }
+
+  return {
+    estimatedTdsPpm,
+    estimatedEcMicroSiemens,
+    category,
+    descriptionPl,
+    descriptionEn,
+  };
+}
