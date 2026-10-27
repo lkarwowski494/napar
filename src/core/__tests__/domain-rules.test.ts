@@ -47,6 +47,9 @@ import {
   evaluateTurkishCoffeeRatio,
   TurkishCoffeeRatioEvaluation,
   TurkishCoffeeRatioStyle,
+  evaluateCuppingRatio,
+  CuppingRatioEvaluation,
+  CuppingRatioStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -1107,6 +1110,37 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       const fallback = evaluateTurkishCoffeeRatio(null as any, -10);
       expect(fallback.ratio).toBe(0);
       expect(fallback.style).toBe('concentrated_dense');
+    });
+
+    it('TASK-P92-11-WZR: evaluateCuppingRatio ocenia zgodność z protokołem cuppingowym SCA (55g/L, 1:18.18)', () => {
+      // 1. Złoty standard protokołu SCA (8.25g kawy na 150g wody = 1:18.2)
+      const standard: CuppingRatioEvaluation = evaluateCuppingRatio(8.25, 150);
+      const styleCheck: CuppingRatioStyle = standard.style;
+      expect(styleCheck).toBe('standard_sca');
+      expect(standard.isScaCompliant).toBe(true);
+      expect(standard.ratio).toBe(18.2);
+      expect(standard.ratioFormatted).toBe('1:18.2');
+      expect(standard.styleLabelPl).toContain('SCA');
+      expect(standard.brewingRecommendationPl).toContain('protokołem');
+
+      // 2. Skoncentrowany napar (< 1:17 = np. 10g na 150g = 1:15.0)
+      const dense = evaluateCuppingRatio('10,0', '150');
+      expect(dense.style).toBe('concentrated');
+      expect(dense.isScaCompliant).toBe(false);
+      expect(dense.styleLabelPl).toContain('Skoncentrowany');
+      expect(dense.sensoryProfilePl).toContain('kwasowości');
+
+      // 3. Rozwodniony napar (> 1:19 = np. 7g na 150g ≈ 1:21.4)
+      const diluted = evaluateCuppingRatio(7, 150);
+      expect(diluted.style).toBe('diluted');
+      expect(diluted.isScaCompliant).toBe(false);
+      expect(diluted.styleLabelPl).toContain('Rozwodniony');
+
+      // 4. Odporność na zera, wartości ujemne, stringi i null
+      const fallback = evaluateCuppingRatio(null as any, -50);
+      expect(fallback.ratio).toBe(0);
+      expect(fallback.style).toBe('concentrated');
+      expect(fallback.isScaCompliant).toBe(false);
     });
   });
 });

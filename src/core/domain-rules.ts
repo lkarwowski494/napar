@@ -1742,4 +1742,107 @@ export function evaluateTurkishCoffeeRatio(
   };
 }
 
+export type CuppingRatioStyle =
+  | 'concentrated'
+  | 'standard_sca'
+  | 'diluted';
+
+export interface CuppingRatioEvaluation {
+  doseGrams: number;
+  waterGrams: number;
+  ratio: number;
+  ratioFormatted: string;
+  style: CuppingRatioStyle;
+  isScaCompliant: boolean;
+  styleLabelPl: string;
+  styleLabelEn: string;
+  sensoryProfilePl: string;
+  sensoryProfileEn: string;
+  brewingRecommendationPl: string;
+  brewingRecommendationEn: string;
+}
+
+/**
+ * Ocenia zgodność proporcji cuppingu z protokołem Specialty Coffee Association (SCA).
+ * Standard SCA to 55g kawy na 1000ml wody (ok. 8.25g na 150ml czarki cuppingowej, czyli proporcja 1:18.18).
+ */
+export function evaluateCuppingRatio(
+  doseGrams: number | string | undefined | null,
+  waterGrams: number | string | undefined | null
+): CuppingRatioEvaluation {
+  const parseNum = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const dose = parseNum(doseGrams);
+  const water = parseNum(waterGrams);
+
+  let rawRatio = 0;
+  if (dose > 0 && water > 0) {
+    rawRatio = water / dose;
+  }
+
+  const ratio = Math.round(rawRatio * 10) / 10;
+  const ratioFormatted = `1:${ratio.toFixed(1)}`;
+
+  let style: CuppingRatioStyle;
+  let isScaCompliant = false;
+  let styleLabelPl: string;
+  let styleLabelEn: string;
+  let sensoryProfilePl: string;
+  let sensoryProfileEn: string;
+  let brewingRecommendationPl: string;
+  let brewingRecommendationEn: string;
+
+  if (ratio <= 0 || ratio < 17.0) {
+    style = 'concentrated';
+    isScaCompliant = false;
+    styleLabelPl = 'Skoncentrowany / Poniżej standardu SCA';
+    styleLabelEn = 'Concentrated / Below SCA Standard';
+    sensoryProfilePl = 'Zbyt gęsty i intensywny napar, który może maskować subtelne wady lub uwypuklać nadmierną gorycz kosztem oceny czystości kwasowości.';
+    sensoryProfileEn = 'Too dense and intense brew that can mask subtle defects or overstate bitterness at the expense of evaluating acidity clarity.';
+    brewingRecommendationPl = 'Dla 150ml czarki cuppingowej użyj wzorcowej dozy 8.25g zmielonej kawy (proporcja 1:18.18).';
+    brewingRecommendationEn = 'For a 150ml cupping bowl, use the benchmark dose of 8.25g ground coffee (1:18.18 ratio).';
+  } else if (ratio <= 19.0) {
+    style = 'standard_sca';
+    isScaCompliant = true;
+    styleLabelPl = 'Wzorcowy standard SCA (55g / 1000ml)';
+    styleLabelEn = 'Benchmark SCA Standard (55g / 1000ml)';
+    sensoryProfilePl = 'Optymalne stężenie do oceny sensorycznej — zbalansowana klarowność nut kwasowych, słodyczy i posmaku zgodna z protokołem oceny cuppingowej.';
+    sensoryProfileEn = 'Optimal concentration for sensory scoring — balanced clarity of acidity, sweetness, and aftertaste aligned with the cupping protocol.';
+    brewingRecommendationPl = 'Zgodne z oficjalnym protokołem cuppingowym SCA. Zalej wodą o temp. 93°C, odczekaj 4 minuty i przełam skorupę.';
+    brewingRecommendationEn = 'Complies with official SCA cupping protocol. Pour water at 93°C, wait 4 minutes and break the crust.';
+  } else {
+    style = 'diluted';
+    isScaCompliant = false;
+    styleLabelPl = 'Rozwodniony / Za niska koncentracja';
+    styleLabelEn = 'Diluted / Under-concentrated';
+    sensoryProfilePl = 'Zbyt wodnisty napar, utrudniający prawidłową ocenę body i nut smakowych ziaren.';
+    sensoryProfileEn = 'Watery brew, hindering proper evaluation of body, sweetness, and flavor notes.';
+    brewingRecommendationPl = 'Zwiększ dozę kawy do 8.25g na 150ml wody, aby spełnić wytyczne protokołu oceny ziaren.';
+    brewingRecommendationEn = 'Increase coffee dose to 8.25g per 150ml water to meet bean evaluation standards.';
+  }
+
+  return {
+    doseGrams: dose,
+    waterGrams: water,
+    ratio,
+    ratioFormatted,
+    style,
+    isScaCompliant,
+    styleLabelPl,
+    styleLabelEn,
+    sensoryProfilePl,
+    sensoryProfileEn,
+    brewingRecommendationPl,
+    brewingRecommendationEn,
+  };
+}
+
+
 
