@@ -14,6 +14,8 @@ import {
   BackupFilterOptions,
   diffBackupEnvelopes,
   BackupDiffResult,
+  mergeBackupEnvelopes,
+  BackupMergeOptions,
   localISODate,
   stampOf,
   parseAndValidateBackup,
@@ -567,6 +569,40 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(fallbackDiff.isIdentical).toBe(true);
       expect(fallbackDiff.inventory.source).toBe(0);
       expect(fallbackDiff.inventory.target).toBe(0);
+    });
+
+    test('TASK-P74-05-ARC: mergeBackupEnvelopes scala dwie koperty z deduplikacja ID i strategiami konfliktow', () => {
+      const primary = buildBackup({
+        inventory: [{ id: 'i1', name: 'Original I1' }, { id: 'i2', name: 'Original I2' }] as any,
+        customRecipes: [{ id: 'r1', name: 'V60 Original' }] as any,
+        sessions: [{ id: 's1' }] as any,
+        caffeineLogs: [] as any,
+      });
+
+      const incoming = buildBackup({
+        inventory: [{ id: 'i2', name: 'Updated I2' }, { id: 'i3', name: 'New I3' }] as any,
+        customRecipes: [{ id: 'r2', name: 'AeroPress New' }] as any,
+        sessions: [{ id: 's2' }] as any,
+        caffeineLogs: [{ id: 'c1' }] as any,
+      });
+
+      // 1. Domyślna strategia: keep_primary (nie nadpisuje istniejących ID)
+      const mergedKeep = mergeBackupEnvelopes(primary, incoming);
+      expect(mergedKeep.state.inventory.length).toBe(3);
+      expect(mergedKeep.state.inventory.find((i) => i.id === 'i2')?.name).toBe('Original I2');
+      expect(mergedKeep.state.customRecipes.length).toBe(2);
+      expect(mergedKeep.state.sessions.length).toBe(2);
+      expect(mergedKeep.state.caffeineLogs.length).toBe(1);
+
+      // 2. Strategia overwrite_primary (nadpisuje istniejące ID nowymi danymi z incoming)
+      const opts: BackupMergeOptions = { conflictStrategy: 'overwrite_primary' };
+      const mergedOverwrite = mergeBackupEnvelopes(primary, incoming, opts);
+      expect(mergedOverwrite.state.inventory.length).toBe(3);
+      expect(mergedOverwrite.state.inventory.find((i) => i.id === 'i2')?.name).toBe('Updated I2');
+
+      // 3. Odporność na błędy (brak parametrów)
+      expect(() => mergeBackupEnvelopes(null as any, incoming)).toThrow();
+      expect(() => mergeBackupEnvelopes(primary, null as any)).toThrow();
     });
   });
 });

@@ -582,3 +582,89 @@ export function diffBackupEnvelopes(
     isIdentical,
   };
 }
+
+export interface BackupMergeOptions {
+  conflictStrategy?: 'keep_primary' | 'overwrite_primary';
+}
+
+/**
+ * Scala dwie koperty kopii zapasowych, deduplikując encje według ich identyfikatorów ID.
+ */
+export function mergeBackupEnvelopes(
+  primary: NaparBackupEnvelope,
+  incoming: NaparBackupEnvelope,
+  options?: BackupMergeOptions
+): NaparBackupEnvelope {
+  if (!primary || typeof primary !== 'object') {
+    throw new Error('Nieprawidłowa koperta podstawowa (primary)');
+  }
+  if (!incoming || typeof incoming !== 'object') {
+    throw new Error('Nieprawidłowa koperta wejściowa (incoming)');
+  }
+
+  const strategy =
+    options && options.conflictStrategy === 'overwrite_primary'
+      ? 'overwrite_primary'
+      : 'keep_primary';
+
+  const mergeCollection = <T extends { id?: string }>(
+    primList?: T[] | null,
+    inList?: T[] | null
+  ): T[] => {
+    const pArr = Array.isArray(primList) ? primList : [];
+    const iArr = Array.isArray(inList) ? inList : [];
+
+    const map = new Map<string, T>();
+    const withoutId: T[] = [];
+
+    for (const item of pArr) {
+      if (!item || typeof item !== 'object') continue;
+      if (item.id && typeof item.id === 'string' && item.id.trim()) {
+        map.set(item.id.trim(), item);
+      } else {
+        withoutId.push(item);
+      }
+    }
+
+    for (const item of iArr) {
+      if (!item || typeof item !== 'object') continue;
+      if (item.id && typeof item.id === 'string' && item.id.trim()) {
+        const id = item.id.trim();
+        if (map.has(id)) {
+          if (strategy === 'overwrite_primary') {
+            map.set(id, item);
+          }
+        } else {
+          map.set(id, item);
+        }
+      } else {
+        withoutId.push(item);
+      }
+    }
+
+    return [...Array.from(map.values()), ...withoutId];
+  };
+
+  const pState = primary.state && typeof primary.state === 'object' ? primary.state : ({} as any);
+  const iState = incoming.state && typeof incoming.state === 'object' ? incoming.state : ({} as any);
+
+  const mergedInventory = mergeCollection(pState.inventory, iState.inventory);
+  const mergedRecipes = mergeCollection(pState.customRecipes, iState.customRecipes);
+  const mergedSessions = mergeCollection(pState.sessions, iState.sessions);
+  const mergedCaffeine = mergeCollection(pState.caffeineLogs, iState.caffeineLogs);
+
+  return {
+    ...primary,
+    exportedAt: new Date().toISOString(),
+    state: {
+      inventory: mergedInventory,
+      customRecipes: mergedRecipes,
+      sessions: mergedSessions,
+      caffeineLogs: mergedCaffeine,
+      settings: {
+        ...(iState.settings || {}),
+        ...(pState.settings || {}),
+      },
+    },
+  };
+}
