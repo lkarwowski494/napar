@@ -429,6 +429,84 @@ export function getSortedInventoryItems(
   return sortInventoryItems(items, sortBy);
 }
 
+export interface InventoryFilterCriteria {
+  query?: string;
+  type?: 'coffee' | 'tea' | 'all';
+  roastProfile?: string;
+  origin?: string;
+  onlyFavorites?: boolean;
+  inStockOnly?: boolean;
+  minRating?: number;
+}
+
+/**
+ * Filtruje pozycje spiżarni według zadanych kryteriów.
+ */
+export function filterInventoryItems(
+  items: InventoryItem[],
+  criteria: InventoryFilterCriteria = {}
+): InventoryItem[] {
+  if (!Array.isArray(items)) return [];
+  const query = criteria && typeof criteria.query === 'string' ? criteria.query.trim().toLowerCase() : '';
+  const filterType = criteria && criteria.type && criteria.type !== 'all' ? criteria.type : null;
+  const filterRoast = criteria && typeof criteria.roastProfile === 'string' ? criteria.roastProfile.trim().toLowerCase() : '';
+  const filterOrigin = criteria && typeof criteria.origin === 'string' ? criteria.origin.trim().toLowerCase() : '';
+  const onlyFavorites = Boolean(criteria && criteria.onlyFavorites);
+  const inStockOnly = Boolean(criteria && criteria.inStockOnly);
+  const minRating = criteria && typeof criteria.minRating === 'number' && !Number.isNaN(criteria.minRating)
+    ? criteria.minRating
+    : null;
+
+  return items.filter((item) => {
+    if (!item || typeof item !== 'object') return false;
+
+    if (filterType && item.type !== filterType) {
+      return false;
+    }
+
+    if (onlyFavorites && !item.isFavorite) {
+      return false;
+    }
+
+    if (inStockOnly && !(Number(item.remainingWeightGrams) > 0)) {
+      return false;
+    }
+
+    if (minRating !== null && (!(Number(item.rating) >= minRating))) {
+      return false;
+    }
+
+    if (filterRoast) {
+      const itemRoast = (item.roastProfile || '').toLowerCase();
+      if (!itemRoast.includes(filterRoast)) return false;
+    }
+
+    if (filterOrigin) {
+      const itemOrigin = (item.origin || '').toLowerCase();
+      if (!itemOrigin.includes(filterOrigin)) return false;
+    }
+
+    if (query) {
+      const name = (item.name || '').toLowerCase();
+      const roaster = (item.roasterOrProducer || '').toLowerCase();
+      const origin = (item.origin || '').toLowerCase();
+      const variety = (item.variety || '').toLowerCase();
+      const notes = Array.isArray(item.flavorNotes) ? item.flavorNotes.join(' ').toLowerCase() : '';
+
+      const match =
+        name.includes(query) ||
+        roaster.includes(query) ||
+        origin.includes(query) ||
+        variety.includes(query) ||
+        notes.includes(query);
+
+      if (!match) return false;
+    }
+
+    return true;
+  });
+}
+
 export function getInventoryItemById(id: string): InventoryItem | null {
   if (!id || typeof id !== 'string' || !id.trim()) return null;
   const safeId = id.trim();

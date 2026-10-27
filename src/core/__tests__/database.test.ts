@@ -13,6 +13,8 @@ import {
   sortInventoryItems,
   getSortedInventoryItems,
   InventorySortOption,
+  filterInventoryItems,
+  InventoryFilterCriteria,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -2641,5 +2643,100 @@ describe('Napar SQLite Database & Repositories', () => {
     // 7. Bezpieczeństwo null/undefined
     expect(sortInventoryItems(null as any)).toEqual([]);
     expect(sortInventoryItems([null as any, bFresh])).toBeDefined();
+  });
+
+  test('TASK-P71-03-ZAK: filterInventoryItems filtruje i wyszukuje pozycje magazynowe', () => {
+    const item1: InventoryItem = {
+      id: 'inv-1',
+      name: 'Ethiopia Yirgacheffe Washed',
+      type: 'coffee',
+      roasterOrProducer: 'Hard Beans',
+      origin: 'Ethiopia',
+      roastOrHarvestDate: '2026-10-01',
+      roastProfile: 'light',
+      process: 'washed',
+      variety: 'Heirloom',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 180,
+      flavorNotes: ['jasmine', 'bergamot', 'peach'],
+      rating: 4.8,
+      isFavorite: true,
+      isArchived: false,
+      createdAt: '2026-10-01T10:00:00Z',
+      updatedAt: '2026-10-01T10:00:00Z',
+    };
+
+    const item2: InventoryItem = {
+      id: 'inv-2',
+      name: 'Brazil Cerrado Natural',
+      type: 'coffee',
+      roasterOrProducer: 'Coffeedesk',
+      origin: 'Brazil',
+      roastOrHarvestDate: '2026-09-15',
+      roastProfile: 'medium-dark',
+      process: 'natural',
+      variety: 'Bourbon',
+      initialWeightGrams: 1000,
+      remainingWeightGrams: 0,
+      flavorNotes: ['chocolate', 'nuts', 'caramel'],
+      rating: 4.0,
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-09-15T10:00:00Z',
+      updatedAt: '2026-09-15T10:00:00Z',
+    };
+
+    const item3: InventoryItem = {
+      id: 'inv-3',
+      name: 'Gyokuro Saemidori',
+      type: 'tea',
+      roasterOrProducer: 'Uji Producer',
+      origin: 'Japan',
+      roastOrHarvestDate: '2026-05-10',
+      initialWeightGrams: 50,
+      remainingWeightGrams: 35,
+      flavorNotes: ['umami', 'sweetness', 'spinach'],
+      rating: 4.9,
+      isFavorite: true,
+      isArchived: false,
+      createdAt: '2026-05-10T10:00:00Z',
+      updatedAt: '2026-05-10T10:00:00Z',
+    };
+
+    const allItems = [item1, item2, item3];
+
+    // 1. Filtrowanie po typie
+    const criteriaType: InventoryFilterCriteria = { type: 'coffee' };
+    const onlyCoffee = filterInventoryItems(allItems, criteriaType);
+    expect(onlyCoffee.length).toBe(2);
+    expect(onlyCoffee.every((i) => i.type === 'coffee')).toBe(true);
+
+    // 2. Filtrowanie po zapytaniu tekstowym (query)
+    const criteriaQuery: InventoryFilterCriteria = { query: 'yirgacheffe' };
+    const matchQuery = filterInventoryItems(allItems, criteriaQuery);
+    expect(matchQuery.length).toBe(1);
+    expect(matchQuery[0].id).toBe('inv-1');
+
+    // 3. Filtrowanie ulubionych (onlyFavorites)
+    const criteriaFav: InventoryFilterCriteria = { onlyFavorites: true };
+    const favItems = filterInventoryItems(allItems, criteriaFav);
+    expect(favItems.length).toBe(2);
+    expect(favItems.every((i) => i.isFavorite)).toBe(true);
+
+    // 4. Filtrowanie na stanie (inStockOnly)
+    const criteriaStock: InventoryFilterCriteria = { inStockOnly: true };
+    const inStock = filterInventoryItems(allItems, criteriaStock);
+    expect(inStock.length).toBe(2);
+    expect(inStock.some((i) => i.id === 'inv-2')).toBe(false);
+
+    // 5. Minimalna ocena (minRating)
+    const criteriaRating: InventoryFilterCriteria = { minRating: 4.5 };
+    const highRated = filterInventoryItems(allItems, criteriaRating);
+    expect(highRated.length).toBe(2);
+    expect(highRated.some((i) => i.id === 'inv-2')).toBe(false);
+
+    // 6. Odporność na null/undefined
+    expect(filterInventoryItems(null as any)).toEqual([]);
+    expect(filterInventoryItems([null as any, item1])).toHaveLength(1);
   });
 });
