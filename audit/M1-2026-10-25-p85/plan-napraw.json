@@ -1,0 +1,53 @@
+{
+  "cycle": "P85",
+  "status": "completed",
+  "perspectives": [
+    "12-NIE",
+    "01-ODK",
+    "02-MON",
+    "03-ZAK",
+    "04-SZT"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P85-12-NIE",
+      "perspective": "12-NIE",
+      "description": "Implementacja testu odpornościowego Chaos 19 weryfikującego odporność na fuzzing i anomalie danych w src/core/__tests__/fuzz-resilience.test.ts",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P85-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Implementacja filtrowania encji po tagach filterSearchEntriesByTags w src/core/search-utils.ts i src/core/__tests__/search-utils.test.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P85-02-MON",
+      "perspective": "02-MON",
+      "description": "Implementacja oceny okresu próbnego evaluateTrialStatus z typem TrialStatusAnalysis w src/core/app-access.ts i src/core/__tests__/app-access.test.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P85-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja analizy tempa zużycia kawy calculateInventoryUsageRate z typem InventoryUsageRateAnalysis w src/core/database.ts i src/core/__tests__/database.test.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P85-04-SZT",
+      "perspective": "04-SZT",
+      "description": "Implementacja podsumowania kanału rekomendacji BPR summarizeBprActionFeed z typem BprActionFeedSummary w src/core/bpr-engine.ts i src/core/__tests__/bpr-engine.test.ts",
+      "targetFile": "src/core/bpr-engine.ts",
+      "testFile": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    }
+  ]
+}
