@@ -1219,27 +1219,39 @@ export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
   });
 }
 
-export function getKnowledgeDescription(id: string, lang: 'pl' | 'en' = 'pl'): string {
+export function getKnowledgeDescription(id: string, lang: 'pl' | 'en' | string = 'pl'): string {
   if (!id || typeof id !== 'string') return '';
-  const cleanId = id.trim().toLowerCase();
+  const cleanId = id.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
   const loc = KNOWLEDGE_LOCALES[cleanId];
   if (!loc) return '';
-  return lang === 'en' ? loc.descriptionEn : loc.descriptionPl;
+  const isEn = typeof lang === 'string' && (lang.trim().toLowerCase() === 'en' || lang.trim().toLowerCase().startsWith('en'));
+  return isEn ? loc.descriptionEn : loc.descriptionPl;
 }
 
-export function getKnowledgeSensoryProfile(id: string, lang: 'pl' | 'en' = 'pl'): string {
+export function getKnowledgeSensoryProfile(id: string, lang: 'pl' | 'en' | string = 'pl'): string {
   if (!id || typeof id !== 'string') return '';
-  const cleanId = id.trim().toLowerCase();
+  const cleanId = id.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
   const loc = KNOWLEDGE_LOCALES[cleanId];
   if (!loc) return '';
+  const isEn = typeof lang === 'string' && (lang.trim().toLowerCase() === 'en' || lang.trim().toLowerCase().startsWith('en'));
   if (loc.sensoryProfilePl || loc.sensoryProfileEn) {
-    return (lang === 'en' ? loc.sensoryProfileEn : loc.sensoryProfilePl) || '';
+    return (isEn ? loc.sensoryProfileEn : loc.sensoryProfilePl) || '';
   }
   if (loc.sensoryImpactPl || loc.sensoryImpactEn) {
-    return (lang === 'en' ? loc.sensoryImpactEn : loc.sensoryImpactPl) || '';
+    return (isEn ? loc.sensoryImpactEn : loc.sensoryImpactPl) || '';
   }
   if (loc.flavorProfilePl || loc.flavorProfileEn) {
-    return (lang === 'en' ? loc.flavorProfileEn : loc.flavorProfilePl) || '';
+    return (isEn ? loc.flavorProfileEn : loc.flavorProfilePl) || '';
   }
   return '';
+}
+
+export function getKnowledgeKeyNotes(id: string, lang: 'pl' | 'en' | string = 'pl'): string[] {
+  if (!id || typeof id !== 'string') return [];
+  const cleanId = id.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
+  const loc = KNOWLEDGE_LOCALES[cleanId];
+  if (!loc) return [];
+  const isEn = typeof lang === 'string' && (lang.trim().toLowerCase() === 'en' || lang.trim().toLowerCase().startsWith('en'));
+  const notes = isEn ? loc.keyNotesEn : loc.keyNotesPl;
+  return Array.isArray(notes) ? notes : [];
 }

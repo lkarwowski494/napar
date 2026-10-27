@@ -19,6 +19,7 @@ import {
   findTeaCategoryById,
   getKnowledgeDescription,
   getKnowledgeSensoryProfile,
+  getKnowledgeKeyNotes,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1080,6 +1081,28 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findTeaCategoryById('bancha')?.id).toBe('tea-green');
     expect(findTeaCategoryById('oriental beauty')?.id).toBe('tea-oolong');
     expect(findTeaCategoryById('dongfang meiren')?.id).toBe('tea-oolong');
+  });
+
+  test('TASK-P62-06-TRE: getKnowledgeKeyNotes pobiera kluczowe nuty sensoryczne a getKnowledgeDescription/SensoryProfile wspieraja BOM i wielkosc liter', () => {
+    // 1. getKnowledgeKeyNotes
+    const geishaPl = getKnowledgeKeyNotes('variety-geisha', 'pl');
+    expect(Array.isArray(geishaPl)).toBe(true);
+    expect(geishaPl.length).toBeGreaterThan(0);
+    expect(geishaPl).toContain('jaśmin');
+
+    const geishaEn = getKnowledgeKeyNotes('\uFEFFvariety-geisha', 'en');
+    expect(geishaEn).toContain('jasmine');
+
+    expect(getKnowledgeKeyNotes('non-existent', 'pl')).toEqual([]);
+    expect(getKnowledgeKeyNotes(null as any, 'pl')).toEqual([]);
+
+    // 2. getKnowledgeDescription z BOM i case-insensitivity
+    const desc = getKnowledgeDescription('\uFEFFvariety-geisha', 'EN' as any);
+    expect(desc).toContain('Panama');
+
+    // 3. getKnowledgeSensoryProfile z BOM
+    const sensory = getKnowledgeSensoryProfile('\uFEFFprocess-washed', 'EN' as any);
+    expect(sensory.length).toBeGreaterThan(0);
   });
 });
 
