@@ -28,6 +28,8 @@ import {
   getGatedFeatureNotice,
   getTierPricingInfo,
   TierPricingInfo,
+  getPaywallFeatureHighlights,
+  PaywallFeatureHighlight,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1178,6 +1180,29 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const fallbackInfo = getTierPricingInfo(null as any, undefined as any);
     expect(fallbackInfo.tier).toBe('annual');
     expect(fallbackInfo.priceFormatted).toContain('zł');
+  });
+
+  test('TASK-P68-02-MON: getPaywallFeatureHighlights zwraca zlokalizowaną listę korzyści subskrypcji', () => {
+    // 1. Domyślny język polski
+    const plHighlights: PaywallFeatureHighlight[] = getPaywallFeatureHighlights('pl');
+    expect(Array.isArray(plHighlights)).toBe(true);
+    expect(plHighlights.length).toBeGreaterThanOrEqual(5);
+
+    const stashItem = plHighlights.find((h) => h.id === 'stash_unlimited');
+    expect(stashItem).toBeDefined();
+    expect(stashItem?.title).toContain('spiżarnia');
+    expect(stashItem?.icon).toBeDefined();
+
+    // 2. Język angielski
+    const enHighlights = getPaywallFeatureHighlights('en');
+    expect(enHighlights.length).toBe(plHighlights.length);
+    const stashItemEn = enHighlights.find((h) => h.id === 'stash_unlimited');
+    expect(stashItemEn?.title).toContain('Unlimited');
+
+    // 3. Odporność na niepoprawne dane i fallback
+    const fallbackHighlights = getPaywallFeatureHighlights(null as any);
+    expect(Array.isArray(fallbackHighlights)).toBe(true);
+    expect(fallbackHighlights.length).toBe(plHighlights.length);
   });
 });
 

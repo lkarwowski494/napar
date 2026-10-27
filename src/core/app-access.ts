@@ -802,3 +802,71 @@ export function getTierPricingInfo(
     anchorComparison: isEn ? 'Less than 1 specialty coffee per month' : 'Mniej niż 1 kawa specialty miesięcznie',
   };
 }
+
+
+export interface PaywallFeatureHighlight {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+}
+
+/**
+ * Zwraca listę kluczowych funkcji i korzyści wersji Pro dla paywalla ("Cheaper than Espresso").
+ */
+export function getPaywallFeatureHighlights(
+  language: 'pl' | 'en' | string = 'pl'
+): PaywallFeatureHighlight[] {
+  const isEn = typeof language === 'string' && language.trim().toLowerCase().startsWith('en');
+
+  return [
+    {
+      id: 'stash_unlimited',
+      title: isEn ? 'Unlimited Coffee & Tea Stash' : 'Nielimitowana spiżarnia kawy i herbaty',
+      description: isEn
+        ? 'Track all your bags, roast dates, resting windows, and freezer stash.'
+        : 'Śledź wszystkie paczki, daty palenia, okna odpoczynku (resting) i mrożenie.',
+      icon: 'cube-outline',
+    },
+    {
+      id: 'water_chemistry',
+      title: isEn ? 'Water Chemistry & Minerals' : 'Chemia i mineralizacja wody',
+      description: isEn
+        ? 'GH/KH calculators, Lotus / Barista Hustle mineral recipes, and SCA suitability.'
+        : 'Kalkulator GH/KH, mineralizacja Lotus / Barista Hustle i ocena wody SCA.',
+      icon: 'water-outline',
+    },
+    {
+      id: 'dial_in_doctor',
+      title: isEn ? 'Dial-in Doctor & Diagnostics' : 'Dial-in Doctor i diagnostyka smaku',
+      description: isEn
+        ? 'Smart sensory troubleshooting for sourness, bitterness, astringency, and channeling.'
+        : 'Inteligentna analiza sensoryczna: kwasowość, gorycz, ściąganie i channeling.',
+      icon: 'medkit-outline',
+    },
+    {
+      id: 'extraction_profiler',
+      title: isEn ? 'Extraction Profiling & TDS' : 'Profilowanie ekstrakcji i TDS',
+      description: isEn
+        ? 'Refractometer TDS/EY logs, brew chart mapping, and sensory radar charts.'
+        : 'Rejestracja TDS i EY% z refraktometru, wykres Golden Cup i radar sensoryczny.',
+      icon: 'analytics-outline',
+    },
+    {
+      id: 'custom_recipes',
+      title: isEn ? 'Custom Recipe Builder' : 'Kreator własnych receptur',
+      description: isEn
+        ? 'Multi-stage pulse pouring, bypass brew ratios, and seamless recipe export.'
+        : 'Wieloetapowe zalewanie pulsacyjne, kalkulator bypass i bezstratny eksport receptur.',
+      icon: 'flask-outline',
+    },
+    {
+      id: 'offline_privacy',
+      title: isEn ? '100% Offline & Private' : '100% Offline i prywatność',
+      description: isEn
+        ? 'Zero accounts, zero trackers, zero cloud lock-in. Your data belongs to you.'
+        : 'Zero kont, zero trackerów, zero chmury. Twoje dane należą wyłącznie do Ciebie.',
+      icon: 'shield-checkmark-outline',
+    },
+  ];
+}
