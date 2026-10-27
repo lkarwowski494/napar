@@ -15,6 +15,8 @@ import {
   searchProactiveActions,
   ActionSearchCriteria,
   getProactiveActionById,
+  calculateActionPriorityScore,
+  ActionPriorityEvaluation,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -953,6 +955,48 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(getProactiveActionById(null, 'act-v60-kenya')).toBeUndefined();
       expect(getProactiveActionById(actions, null)).toBeUndefined();
       expect(getProactiveActionById(actions, '')).toBeUndefined();
+    });
+
+    it('TASK-P81-04-SZT: calculateActionPriorityScore wylicza priorytet i pilność wykonania akcji BPR', () => {
+      // 1. Akcja o wysokim priorytecie na dziś (daysOffset = 0) -> krytyczna pilność
+      const actionToday = {
+        id: '1',
+        titlePl: 'Odegazowanie: Etiopia',
+        priority: 'high' as const,
+        daysOffset: 0,
+      } as any;
+      const evalToday: ActionPriorityEvaluation = calculateActionPriorityScore(actionToday);
+      expect(evalToday.urgency).toBe('critical');
+      expect(evalToday.score).toBeGreaterThanOrEqual(90);
+      expect(evalToday.urgencyLabelPl).toBe('Krytyczny (Dzisiaj)');
+      expect(evalToday.recommendedTimingPl).toContain('dzisiaj');
+
+      // 2. Akcja o wysokim priorytecie w przyszłości (daysOffset = 2) -> wysoka pilność
+      const actionSoon = {
+        id: '2',
+        titlePl: 'Szczyt smaku za 2 dni',
+        priority: 'high' as const,
+        daysOffset: 2,
+      } as any;
+      const evalSoon = calculateActionPriorityScore(actionSoon);
+      expect(evalSoon.urgency).toBe('high');
+      expect(evalSoon.score).toBeGreaterThanOrEqual(70);
+
+      // 3. Akcja o niskim priorytecie w dalszej przyszłości (daysOffset = 7)
+      const actionLater = {
+        id: '3',
+        titlePl: 'Rutynowe czyszczenie',
+        priority: 'low' as const,
+        daysOffset: 7,
+      } as any;
+      const evalLater = calculateActionPriorityScore(actionLater);
+      expect(evalLater.urgency).toBe('low');
+      expect(evalLater.score).toBeLessThanOrEqual(40);
+
+      // 4. Odporność na null i brakujące atrybuty
+      const evalNull = calculateActionPriorityScore(null);
+      expect(evalNull.score).toBe(0);
+      expect(evalNull.urgency).toBe('low');
     });
   });
 });

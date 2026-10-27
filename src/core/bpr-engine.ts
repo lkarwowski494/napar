@@ -1103,3 +1103,89 @@ export function getProactiveActionById(
     return act.id.trim().toLowerCase() === targetId;
   });
 }
+
+
+export interface ActionPriorityEvaluation {
+  score: number;
+  urgency: 'critical' | 'high' | 'medium' | 'low';
+  urgencyLabelPl: string;
+  urgencyLabelEn: string;
+  recommendedTimingPl: string;
+  recommendedTimingEn: string;
+}
+
+/**
+ * Szacuje punktowy priorytet (0-100) oraz pilność wykonania rekomendacji proaktywnej BPR,
+ * uwzględniając deklarowany priorytet akcji oraz dystans czasowy (daysOffset).
+ */
+export function calculateActionPriorityScore(
+  action?: ProactiveActionItem | null
+): ActionPriorityEvaluation {
+  if (!action || typeof action !== 'object') {
+    return {
+      score: 0,
+      urgency: 'low',
+      urgencyLabelPl: 'Niski',
+      urgencyLabelEn: 'Low',
+      recommendedTimingPl: 'W wolnej chwili',
+      recommendedTimingEn: 'Whenever convenient',
+    };
+  }
+
+  const prio = typeof action.priority === 'string' ? action.priority.trim().toLowerCase() : 'low';
+  const offset = typeof action.daysOffset === 'number' && Number.isFinite(action.daysOffset) ? Math.max(0, action.daysOffset) : 0;
+
+  let baseScore = 30;
+  if (prio === 'high') {
+    baseScore = 80;
+  } else if (prio === 'medium') {
+    baseScore = 55;
+  }
+
+  const timeDecay = Math.min(35, offset * 5);
+  const todayBonus = offset === 0 ? 15 : 0;
+
+  const rawScore = baseScore + todayBonus - timeDecay;
+  const score = Math.min(100, Math.max(10, Math.round(rawScore)));
+
+  let urgency: 'critical' | 'high' | 'medium' | 'low';
+  let urgencyLabelPl: string;
+  let urgencyLabelEn: string;
+  let recommendedTimingPl: string;
+  let recommendedTimingEn: string;
+
+  if (score >= 90 || (prio === 'high' && offset === 0)) {
+    urgency = 'critical';
+    urgencyLabelPl = 'Krytyczny (Dzisiaj)';
+    urgencyLabelEn = 'Critical (Today)';
+    recommendedTimingPl = 'Wykonaj dzisiaj, aby nie przegapić optymalnego okna';
+    recommendedTimingEn = 'Perform today to capture the optimal flavor window';
+  } else if (score >= 70) {
+    urgency = 'high';
+    urgencyLabelPl = 'Wysoki';
+    urgencyLabelEn = 'High';
+    recommendedTimingPl = 'Zaplanuj w ciągu najbliższych 2 dni';
+    recommendedTimingEn = 'Schedule within the next 2 days';
+  } else if (score >= 50) {
+    urgency = 'medium';
+    urgencyLabelPl = 'Średni';
+    urgencyLabelEn = 'Medium';
+    recommendedTimingPl = 'Zaplanuj w tym tygodniu';
+    recommendedTimingEn = 'Schedule this week';
+  } else {
+    urgency = 'low';
+    urgencyLabelPl = 'Niski';
+    urgencyLabelEn = 'Low';
+    recommendedTimingPl = 'W wolnej chwili';
+    recommendedTimingEn = 'Whenever convenient';
+  }
+
+  return {
+    score,
+    urgency,
+    urgencyLabelPl,
+    urgencyLabelEn,
+    recommendedTimingPl,
+    recommendedTimingEn,
+  };
+}
