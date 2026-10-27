@@ -1,0 +1,54 @@
+{
+  "run": "P58",
+  "date": "2026-10-27",
+  "status": "completed",
+  "total_tasks": 5,
+  "completed_tasks": 5,
+  "tasks": [
+    {
+      "id": "TASK-P58-09-LOK",
+      "perspective": "09-LOK",
+      "title": "Wzmocnienie formatTemplate, pluralizacji i dodanie formatWcagRating w i18n.tsx",
+      "target_file": "src/core/i18n.tsx",
+      "test_file": "src/core/__tests__/i18n.test.ts",
+      "status": "completed",
+      "commit": "8efcd0e"
+    },
+    {
+      "id": "TASK-P58-10-WYD",
+      "perspective": "10-WYD",
+      "title": "Weryfikacja wyłączenia uprawnień mikrofonu expo-camera oraz rozszerzenie zakazanych uprawnień w verify-native.mjs",
+      "target_file": "scripts/verify-native.mjs",
+      "test_file": "tests/audit-fixes.test.tsx",
+      "status": "completed",
+      "commit": "66d59ff"
+    },
+    {
+      "id": "TASK-P58-11-WZR",
+      "perspective": "11-WZR",
+      "title": "Uodpornienie bpr-engine.ts na notację m, sanityzacja BOM i bezpieczna obsługa parametrów calculateNextSteepDuration",
+      "target_file": "src/core/bpr-engine.ts",
+      "test_file": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed",
+      "commit": "e94d9fa"
+    },
+    {
+      "id": "TASK-P58-12-NIE",
+      "perspective": "12-NIE",
+      "title": "Rozbudowa testów chaosu i uodpornienie kalkulatorów kofeiny i wody w fuzz-resilience.test.ts",
+      "target_file": "src/core/__tests__/fuzz-resilience.test.ts",
+      "test_file": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed",
+      "commit": "1998038"
+    },
+    {
+      "id": "TASK-P58-01-ODK",
+      "perspective": "01-ODK",
+      "title": "Wdrożenie wielotokenowego wyszukiwania receptur w RecipeSelectModal.tsx z użyciem search-utils.ts",
+      "target_file": "src/components/brew/RecipeSelectModal.tsx",
+      "test_file": "src/components/brew/__tests__/RecipeSelectModal.test.tsx",
+      "status": "completed",
+      "commit": "4dc9605"
+    }
+  ]
+}
