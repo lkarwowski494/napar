@@ -14,7 +14,7 @@ import { createGongfuSession, recordGongfuInfusion } from '../gongfu-session';
 import { convertMicronsToGrinder, SUPPORTED_GRINDERS } from '../grinder-converter';
 import { calculateWaterMinerals, WATER_RECIPES } from '../water-chemistry';
 import { normSearch, rankSearchResults } from '../search-utils';
-import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot } from '../timer-engine';
+import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot, CumulativeWaterPoint } from '../timer-engine';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => ({
@@ -354,6 +354,57 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     });
 
     expect(ms).toBeLessThan(50);
+  });
+
+  test('Budżet 15: calculateCumulativeWaterSchedule generuje harmonogram narastania wody w czasie poniżej 50 ms (TASK-P84-10-WYD)', () => {
+    const steps = [
+      { stepNumber: 1, namePl: 'Preinfuzja', durationSeconds: 30, targetWaterGrams: 50 },
+      { stepNumber: 2, namePl: 'Oczekiwanie / pauza', durationSeconds: 15, targetWaterGrams: 50 },
+      { stepNumber: 3, namePl: 'Główne zalanie', durationSeconds: 45, targetWaterGrams: 250 },
+    ] as any[];
+
+    // 1. Poprawność biznesowa
+    const schedule: CumulativeWaterPoint[] = BrewTimerEngine.calculateCumulativeWaterSchedule(steps);
+    expect(schedule.length).toBe(3);
+
+    // Krok 1 (Preinfuzja): czas 30s, woda 50g, pourRate = 50 / 30 ≈ 1.7 g/s, isPourStep = true
+    expect(schedule[0].stepIndex).toBe(0);
+    expect(schedule[0].stepNumber).toBe(1);
+    expect(schedule[0].timeSecond).toBe(30);
+    expect(schedule[0].waterGrams).toBe(50);
+    expect(schedule[0].pourRateGramsPerSecond).toBe(1.7);
+    expect(schedule[0].isPourStep).toBe(true);
+
+    // Krok 2 (Pauza): czas 45s (30+15), woda 50g, pourRate = 0 g/s, isPourStep = false
+    expect(schedule[1].stepIndex).toBe(1);
+    expect(schedule[1].timeSecond).toBe(45);
+    expect(schedule[1].waterGrams).toBe(50);
+    expect(schedule[1].pourRateGramsPerSecond).toBe(0);
+    expect(schedule[1].isPourStep).toBe(false);
+
+    // Krok 3 (Główne zalanie): czas 90s (45+45), woda 250g, delta 200g / 45s ≈ 4.4 g/s, isPourStep = true
+    expect(schedule[2].stepIndex).toBe(2);
+    expect(schedule[2].timeSecond).toBe(90);
+    expect(schedule[2].waterGrams).toBe(250);
+    expect(schedule[2].pourRateGramsPerSecond).toBe(4.4);
+    expect(schedule[2].isPourStep).toBe(true);
+
+    // Wartości brzegowe i null
+    const schedNull = BrewTimerEngine.calculateCumulativeWaterSchedule(null);
+    expect(Array.isArray(schedNull)).toBe(true);
+    expect(schedNull.length).toBe(0);
+
+    const schedEmpty = BrewTimerEngine.calculateCumulativeWaterSchedule([]);
+    expect(schedEmpty.length).toBe(0);
+
+    // 2. Budżet wydajnościowy: 10 000 wywołań < 80 ms
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        BrewTimerEngine.calculateCumulativeWaterSchedule(steps);
+      }
+    });
+
+    expect(ms).toBeLessThan(80);
   });
 });
 

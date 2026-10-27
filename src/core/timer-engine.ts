@@ -51,6 +51,15 @@ export interface ActiveStepSnapshot {
   isFinished: boolean;
 }
 
+export interface CumulativeWaterPoint {
+  stepIndex: number;
+  stepNumber: number;
+  timeSecond: number;
+  waterGrams: number;
+  pourRateGramsPerSecond: number;
+  isPourStep: boolean;
+}
+
 /**
  * RD-ENG-06 & NFR-PERF-004: Wyliczanie czasu timera odporne na uśpienie w tle
  * r = max(0, ceil((endAtMs - nowMs) / 1000))
@@ -334,6 +343,60 @@ export class BrewTimerEngine {
       isFinished: true,
     };
   }
+
+  /**
+   * Generuje harmonogram narastania wody w osi czasu całego parzenia.
+   * Dla każdego kroku wyznacza bezwzględny czas zakończenia, skumulowaną wodę,
+   * zalecaną prędkość nalewania (g/s) oraz informację, czy krok wymaga dolania wody.
+   */
+  public static calculateCumulativeWaterSchedule(
+    steps?: RecipeStep[] | null
+  ): CumulativeWaterPoint[] {
+    if (!Array.isArray(steps) || steps.length === 0) {
+      return [];
+    }
+
+    const schedule: CumulativeWaterPoint[] = [];
+    let accumulatedTime = 0;
+    let prevWater = 0;
+
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i];
+      const durRaw = step?.durationSeconds;
+      const duration =
+        typeof durRaw === 'number' && durRaw > 0 && Number.isFinite(durRaw)
+          ? Math.floor(durRaw)
+          : 0;
+
+      const waterRaw = step?.targetWaterGrams;
+      const rawWater =
+        typeof waterRaw === 'number' && waterRaw >= 0 && Number.isFinite(waterRaw) && !Object.is(waterRaw, -0)
+          ? Math.round(waterRaw * 10) / 10
+          : prevWater;
+
+      const waterGrams = Math.max(prevWater, rawWater);
+      accumulatedTime += duration;
+
+      const deltaWater = Math.max(0, waterGrams - prevWater);
+      const isPourStep = deltaWater > 0;
+      const pourRateGramsPerSecond =
+        duration > 0 && isPourStep ? Math.round((deltaWater / duration) * 10) / 10 : 0;
+
+      schedule.push({
+        stepIndex: i,
+        stepNumber: typeof step?.stepNumber === 'number' ? step.stepNumber : i + 1,
+        timeSecond: accumulatedTime,
+        waterGrams,
+        pourRateGramsPerSecond,
+        isPourStep,
+      });
+
+      prevWater = waterGrams;
+    }
+
+    return schedule;
+  }
+
 
   constructor(steps: RecipeStep[], callbacks: TimerCallbacks = {}) {
     this.steps = steps.map((s) => ({ ...s }));
