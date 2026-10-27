@@ -1029,13 +1029,13 @@ export function sortProactiveActions(
 export interface ActionSearchCriteria {
   query?: string;
   badgeColor?: 'warning' | 'copper' | 'info' | 'success' | string;
-  itemType?: 'coffee' | 'tea' | string;
+  recommendedMethod?: string;
   maxDaysOffset?: number;
 }
 
 /**
  * Przeszukuje i filtruje listę akcji proaktywnego kalendarza wg zapytania tekstowego,
- * koloru odznaki, typu surowca (kawa/herbata) lub maksymalnego horyzontu dni.
+ * koloru odznaki, metody parzenia lub maksymalnego horyzontu dni.
  */
 export function searchProactiveActions(
   actions?: ProactiveActionItem[] | null,
@@ -1044,7 +1044,7 @@ export function searchProactiveActions(
   if (!Array.isArray(actions) || actions.length === 0) return [];
   const query = criteria && typeof criteria.query === 'string' ? criteria.query.trim().toLowerCase() : '';
   const badgeColor = criteria && typeof criteria.badgeColor === 'string' ? criteria.badgeColor.trim().toLowerCase() : '';
-  const itemType = criteria && typeof criteria.itemType === 'string' ? criteria.itemType.trim().toLowerCase() : '';
+  const method = criteria && typeof criteria.recommendedMethod === 'string' ? criteria.recommendedMethod.trim().toLowerCase() : '';
   const maxOffset = criteria && typeof criteria.maxDaysOffset === 'number' && Number.isFinite(criteria.maxDaysOffset)
     ? criteria.maxDaysOffset
     : null;
@@ -1057,16 +1057,14 @@ export function searchProactiveActions(
       const titleEn = (act.titleEn || '').toLowerCase();
       const subPl = (act.subtitlePl || '').toLowerCase();
       const subEn = (act.subtitleEn || '').toLowerCase();
-      const recipe = (act.recipeName || '').toLowerCase();
-      const bean = (act.inventoryItemName || '').toLowerCase();
+      const recMethod = (act.recommendedMethod || '').toLowerCase();
 
       const match =
         titlePl.includes(query) ||
         titleEn.includes(query) ||
         subPl.includes(query) ||
         subEn.includes(query) ||
-        recipe.includes(query) ||
-        bean.includes(query);
+        recMethod.includes(query);
 
       if (!match) return false;
     }
@@ -1075,7 +1073,7 @@ export function searchProactiveActions(
       return false;
     }
 
-    if (itemType && (act.itemType || '').toLowerCase() !== itemType) {
+    if (method && (act.recommendedMethod || '').toLowerCase() !== method) {
       return false;
     }
 

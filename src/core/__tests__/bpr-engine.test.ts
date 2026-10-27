@@ -881,27 +881,24 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
         id: 'act-1',
         titlePl: 'Parzenie V60: Ethiopia Yirgacheffe',
         titleEn: 'Brew V60: Ethiopia Yirgacheffe',
-        recipeName: 'V60 Standard',
+        recommendedMethod: 'v60',
         badgeColor: 'copper' as const,
-        itemType: 'coffee' as const,
         daysOffset: 0,
       } as any;
       const a2 = {
         id: 'act-2',
         titlePl: 'Szczyt smaku: Sencha Asahi',
         titleEn: 'Peak Window: Sencha Asahi',
-        recipeName: 'Sencha Kyusu',
+        recommendedMethod: 'kyusu',
         badgeColor: 'success' as const,
-        itemType: 'tea' as const,
         daysOffset: 2,
       } as any;
       const a3 = {
         id: 'act-3',
         titlePl: 'Kończący się zapas: Colombia Pink Bourbon',
         titleEn: 'Low Stock: Colombia Pink Bourbon',
-        recipeName: 'AeroPress Inverted',
+        recommendedMethod: 'aeropress',
         badgeColor: 'warning' as const,
-        itemType: 'coffee' as const,
         daysOffset: 1,
       } as any;
 
@@ -919,11 +916,11 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(byColor.length).toBe(1);
       expect(byColor[0].id).toBe('act-3');
 
-      // 3. Filtrowanie po typie surowca (tea)
-      const criteriaType: ActionSearchCriteria = { itemType: 'tea' };
-      const byType = searchProactiveActions(all, criteriaType);
-      expect(byType.length).toBe(1);
-      expect(byType[0].id).toBe('act-2');
+      // 3. Filtrowanie po metodzie (kyusu)
+      const criteriaMethod: ActionSearchCriteria = { recommendedMethod: 'kyusu' };
+      const byMethod = searchProactiveActions(all, criteriaMethod);
+      expect(byMethod.length).toBe(1);
+      expect(byMethod[0].id).toBe('act-2');
 
       // 4. Filtrowanie po maxDaysOffset
       const criteriaOffset: ActionSearchCriteria = { maxDaysOffset: 1 };
