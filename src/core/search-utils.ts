@@ -10,6 +10,13 @@
  */
 export function normSearch(s: string): string {
   if (typeof s !== 'string') return '';
+  if (!s) return '';
+
+  // Szybka ścieżka dla typowych fraz ASCII bez znaków diakrytycznych i kontrolnych
+  if (/^[a-z0-9 ]+$/.test(s)) {
+    return s.includes('  ') ? s.replace(/\s+/g, ' ').trim() : s.trim();
+  }
+
   return s
     .replace(/\uFEFF/g, '')
     .replace(/[\x00-\x1F\x7F-\x9F]/g, ' ')

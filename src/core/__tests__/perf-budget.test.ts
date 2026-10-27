@@ -13,6 +13,7 @@ import {
 import { createGongfuSession, recordGongfuInfusion } from '../gongfu-session';
 import { convertMicronsToGrinder, SUPPORTED_GRINDERS } from '../grinder-converter';
 import { calculateWaterMinerals, WATER_RECIPES } from '../water-chemistry';
+import { normSearch, rankSearchResults } from '../search-utils';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => ({
@@ -140,6 +141,26 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       const serialized = JSON.stringify(largeDataset);
       const parsed = JSON.parse(serialized);
       expect(parsed.length).toBe(1000);
+    });
+
+    expect(ms).toBeLessThan(80);
+  });
+
+  test('Budżet 8: 5 000 normalizacji tekstu i rankingów wyszukiwania (< 80 ms)', () => {
+    const sampleItems = [
+      { id: '1', name: 'V60 3-Pour', desc: 'Klasyczna metoda pour-over z drippera V60' },
+      { id: '2', name: 'AeroPress Inverted', desc: 'Parzenie odwrócone dające gęsty napar' },
+      { id: '3', name: 'Chemex Classic', desc: 'Czysty napar filtrowany przez gruby filtr' },
+    ];
+
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 5000; i++) {
+        normSearch('v60 3-pour');
+        normSearch('Żółty liść Ćma 2000');
+        if (i % 50 === 0) {
+          rankSearchResults(sampleItems, 'v60', (s) => s.name, (s) => [s.desc]);
+        }
+      }
     });
 
     expect(ms).toBeLessThan(80);
