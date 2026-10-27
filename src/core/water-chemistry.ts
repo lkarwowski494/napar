@@ -968,4 +968,108 @@ export function searchWaterRecipes(query?: string): WaterRecipe[] {
   });
 }
 
+export interface WaterSuitabilityEvaluation {
+  suitability: 'EXCELLENT' | 'GOOD' | 'ACCEPTABLE' | 'NOT_RECOMMENDED';
+  ratingPl: string;
+  ratingEn: string;
+  verdictPl: string;
+  verdictEn: string;
+}
+
+/**
+ * Dynamicznie ocenia przydatność parametrów mineralnych wody (GH i KH w ppm CaCO3)
+ * do parzenia kawy specialty lub herbaty rzemieślniczej.
+ */
+export function evaluateWaterSuitability(
+  ghPpm: number | string,
+  khPpm: number | string,
+  beverage: 'coffee' | 'tea' | string = 'coffee'
+): WaterSuitabilityEvaluation {
+  const parseVal = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, Math.min(5000, v)) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, Math.min(5000, parsed)) : 0;
+    }
+    return 0;
+  };
+
+  const gh = parseVal(ghPpm);
+  const kh = parseVal(khPpm);
+  const isTea = typeof beverage === 'string' && beverage.trim().toLowerCase() === 'tea';
+
+  if (isTea) {
+    if (kh > 70 || gh > 150) {
+      return {
+        suitability: 'NOT_RECOMMENDED',
+        ratingPl: 'Niezalecana',
+        ratingEn: 'Not Recommended',
+        verdictPl: 'Zbyt twarda woda do herbaty; gasi delikatne aromaty i powoduje mętność naparu.',
+        verdictEn: 'Too hard for tea; suppresses delicate florals and creates murky brew.',
+      };
+    }
+    if (gh <= 50 && kh <= 35) {
+      return {
+        suitability: 'EXCELLENT',
+        ratingPl: 'Znakomita',
+        ratingEn: 'Excellent',
+        verdictPl: 'Idealna, miękka woda źródlana; pełna czystość i słodycz herbaty.',
+        verdictEn: 'Ideal soft spring water; optimal clarity and tea sweetness.',
+      };
+    }
+    if (gh <= 80 && kh <= 50) {
+      return {
+        suitability: 'GOOD',
+        ratingPl: 'Dobra',
+        ratingEn: 'Good',
+        verdictPl: 'Dobra woda do herbaty; zbalansowany profil dla oolongów i herbat czarnych.',
+        verdictEn: 'Good tea water; balanced profile for wulong and black teas.',
+      };
+    }
+    return {
+      suitability: 'ACCEPTABLE',
+      ratingPl: 'Akceptowalna',
+      ratingEn: 'Acceptable',
+      verdictPl: 'Akceptowalne parametry dla mocniejszych herbat.',
+      verdictEn: 'Acceptable parameters for robust teas.',
+    };
+  }
+
+  // Coffee
+  if (kh > 120 || gh > 300) {
+    return {
+      suitability: 'NOT_RECOMMENDED',
+      ratingPl: 'Niezalecana',
+      ratingEn: 'Not Recommended',
+      verdictPl: 'Zbyt twarda woda; gasi kwasowość i tworzy kamień kotłowy w czajniku.',
+      verdictEn: 'Water is too hard; mutes acidity and scales kettle.',
+    };
+  }
+  if (gh >= 50 && gh <= 150 && kh >= 35 && kh <= 65) {
+    return {
+      suitability: 'EXCELLENT',
+      ratingPl: 'Znakomita',
+      ratingEn: 'Excellent',
+      verdictPl: 'Idealne parametry SCA Golden Cup; czysta ekstrakcja i pełna słodycz kawy.',
+      verdictEn: 'Ideal SCA Golden Cup parameters; clean extraction and high sweetness.',
+    };
+  }
+  if (gh >= 30 && gh <= 200 && kh >= 20 && kh <= 85) {
+    return {
+      suitability: 'GOOD',
+      ratingPl: 'Dobra',
+      ratingEn: 'Good',
+      verdictPl: 'Dobra woda do kawy; powtarzalna i zbalansowana ekstrakcja.',
+      verdictEn: 'Good water for coffee; consistent and balanced extraction.',
+    };
+  }
+  return {
+    suitability: 'ACCEPTABLE',
+    ratingPl: 'Akceptowalna',
+    ratingEn: 'Acceptable',
+    verdictPl: 'Akceptowalne parametry; możliwe lekkie przesunięcie balansu kwasowo-goryczkowego.',
+    verdictEn: 'Acceptable parameters; minor balance shift possible.',
+  };
+}
+
 

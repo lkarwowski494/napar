@@ -21,6 +21,8 @@ import {
   getBottledWatersBySuitability,
   searchBottledWaters,
   searchWaterRecipes,
+  evaluateWaterSuitability,
+  WaterSuitabilityEvaluation,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -815,6 +817,34 @@ describe('Water Chemistry & Mineralization Module', () => {
 
     // 4. Brak dopasowania
     expect(searchWaterRecipes('pluton-recipe')).toEqual([]);
+  });
+
+  test('TASK-P67-07-JAK: evaluateWaterSuitability dynamicznie ocenia przydatnosc wody dla kawy i herbaty', () => {
+    // 1. Znakomita woda dla kawy (SCA Golden Cup: GH 80, KH 40)
+    const coffeeSca: WaterSuitabilityEvaluation = evaluateWaterSuitability(80, 40, 'coffee');
+    expect(coffeeSca.suitability).toBe('EXCELLENT');
+    expect(coffeeSca.ratingPl).toBe('Znakomita');
+    expect(coffeeSca.ratingEn).toBe('Excellent');
+    expect(coffeeSca.verdictPl).toContain('SCA');
+
+    // 2. Bardzo twarda woda (GH 350, KH 180) -> NOT_RECOMMENDED
+    const hardWater = evaluateWaterSuitability(350, 180, 'coffee');
+    expect(hardWater.suitability).toBe('NOT_RECOMMENDED');
+    expect(hardWater.verdictPl).toContain('twarda');
+
+    // 3. Woda dla herbaty (bardzo miękka: GH 30, KH 20) -> EXCELLENT
+    const teaSoft = evaluateWaterSuitability('30,0', '20,0', 'tea');
+    expect(teaSoft.suitability).toBe('EXCELLENT');
+    expect(teaSoft.verdictEn).toBeDefined();
+
+    // 4. Herbata z twardą wodą (GH 160, KH 90) -> NOT_RECOMMENDED
+    const teaHard = evaluateWaterSuitability(160, 90, 'tea');
+    expect(teaHard.suitability).toBe('NOT_RECOMMENDED');
+
+    // 5. Obsługa wartości brzegowych, stringów i NaN
+    const fallback = evaluateWaterSuitability(NaN, -10);
+    expect(fallback.suitability).toBeDefined();
+    expect(fallback.ratingPl).toBeDefined();
   });
 });
 
