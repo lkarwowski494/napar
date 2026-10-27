@@ -50,6 +50,9 @@ import {
   evaluateLimescaleRisk,
   LimescaleRiskAssessment,
   LimescaleRiskLevel,
+  evaluateBoilerCorrosionRisk,
+  BoilerCorrosionRiskAssessment,
+  BoilerCorrosionRiskLevel,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -1260,6 +1263,47 @@ describe('Water Chemistry & Mineralization Module', () => {
     const fallback = evaluateLimescaleRisk(null as any, undefined);
     expect(fallback.riskLevel).toBe('none');
     expect(fallback.waterTempCelsius).toBe(93);
+  });
+
+  test('TASK-P93-07-JAK: evaluateBoilerCorrosionRisk ocenia ryzyko wżerów chlorkowych i korozji kwasowej bojlera', () => {
+    // 1. Bezpieczna woda specialty (niski chlorek 5 ppm, KH 45 ppm, pH 7.2)
+    const safeWater: BoilerCorrosionRiskAssessment = evaluateBoilerCorrosionRisk({
+      chloridePpm: 5,
+      sulfatePpm: 15,
+      ph: 7.2,
+      alkalinityKh: 45,
+    });
+    const testLevel: BoilerCorrosionRiskLevel = safeWater.riskLevel;
+    expect(testLevel).toBe('safe');
+    expect(safeWater.isPittingRisk).toBe(false);
+    expect(safeWater.chloridePpm).toBe(5);
+    expect(safeWater.recommendationPl).toContain('Bezpieczna');
+    expect(safeWater.recommendationEn).toBeDefined();
+
+    // 2. Wysokie ryzyko wżerów korozyjnych (chlorki 45 ppm > 30 SCA limit)
+    const pittingWater = evaluateBoilerCorrosionRisk({
+      chloridePpm: '45,0',
+      alkalinityKh: 40,
+      ph: 7.0,
+    });
+    expect(pittingWater.isPittingRisk).toBe(true);
+    expect(['high', 'critical']).toContain(pittingWater.riskLevel);
+    expect(pittingWater.recommendationPl).toContain('chlork');
+
+    // 3. Krytyczne ryzyko kwaśnej korozji (pH 5.5, KH 5 ppm, chlorki 60 ppm)
+    const criticalWater = evaluateBoilerCorrosionRisk({
+      chloridePpm: 60,
+      ph: 5.5,
+      alkalinityKh: 5,
+    });
+    expect(criticalWater.riskLevel).toBe('critical');
+    expect(criticalWater.isPittingRisk).toBe(true);
+    expect(criticalWater.summaryPl).toContain('Krytyczne');
+
+    // 4. Odporność na null i puste parametry
+    const fallback = evaluateBoilerCorrosionRisk(null);
+    expect(fallback.riskLevel).toBe('safe');
+    expect(fallback.chloridePpm).toBe(0);
   });
 });
 

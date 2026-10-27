@@ -1912,4 +1912,109 @@ export function evaluateLimescaleRisk(
   };
 }
 
+export type BoilerCorrosionRiskLevel = 'safe' | 'low' | 'moderate' | 'high' | 'critical';
+
+export interface BoilerCorrosionRiskAssessment {
+  riskLevel: BoilerCorrosionRiskLevel;
+  chloridePpm: number;
+  sulfatePpm: number;
+  ph: number;
+  alkalinityKh: number;
+  isPittingRisk: boolean;
+  recommendationPl: string;
+  recommendationEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Ocenia ryzyko korozji wżerowej (pitting) i kwasowej bojlera ekspresu ciśnieniowego
+ * na podstawie stężenia agresywnych chlorków (norma SCA < 30 ppm), siarczanów, pH i buforu KH.
+ */
+export function evaluateBoilerCorrosionRisk(
+  params?: {
+    chloridePpm?: number | string | null;
+    sulfatePpm?: number | string | null;
+    ph?: number | string | null;
+    alkalinityKh?: number | string | null;
+  } | null
+): BoilerCorrosionRiskAssessment {
+  const parseNum = (v: unknown, fallback = 0, min = 0, max = 1000): number => {
+    if (typeof v === 'number') {
+      return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(min, Math.min(max, v)) : fallback;
+    }
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0)
+        ? Math.max(min, Math.min(max, parsed))
+        : fallback;
+    }
+    return fallback;
+  };
+
+  const chloride = Number(parseNum(params?.chloridePpm, 0, 0, 1000).toFixed(1));
+  const sulfate = Number(parseNum(params?.sulfatePpm, 0, 0, 1000).toFixed(1));
+  const alkalinity = Number(
+    parseNum(params?.alkalinityKh != null ? params.alkalinityKh : 40, 40, 0, 500).toFixed(1)
+  );
+  const phVal = Number(parseNum(params?.ph != null ? params.ph : 7.2, 7.2, 3, 11).toFixed(2));
+
+  const isPittingRisk = chloride > 30;
+
+  let riskLevel: BoilerCorrosionRiskLevel = 'safe';
+  let recommendationPl =
+    'Bezpieczna woda dla miedzianych i stalowych bojlerów ekspresów ciśnieniowych.';
+  let recommendationEn =
+    'Water is safe for copper and stainless steel espresso machine boilers.';
+  let summaryPl = 'Optymalny bilans: niskie stężenie chlorków i stabilny bufor kwasowości.';
+  let summaryEn = 'Optimal balance: low chloride levels and stable acidity buffering.';
+
+  if (phVal < 6.0 || (chloride > 50 && phVal < 6.8) || (chloride > 30 && alkalinity < 10)) {
+    riskLevel = 'critical';
+    recommendationPl =
+      'Krytyczne ryzyko wżerów korozyjnych i korozji kwasowej bojlera! Bezwzględnie wyeliminuj chlorki (filtr RO z remineralizacją) i podnieś bufor KH.';
+    recommendationEn =
+      'Critical risk of boiler pitting and acid corrosion! Eliminate chlorides immediately (RO filter with remineralization) and raise KH buffer.';
+    summaryPl =
+      'Krytyczne zagrożenie korozją: kwaśne środowisko lub niebezpieczne stężenie agresywnych jonów chlorkowych.';
+    summaryEn =
+      'Critical corrosion hazard: acidic environment or dangerous aggressive chloride concentration.';
+  } else if (chloride > 30 || alkalinity < 15 || phVal < 6.5) {
+    riskLevel = 'high';
+    recommendationPl =
+      'Wysokie ryzyko korozji bojlera. Stężenie chlorków przekracza normę SCA (maks. 30 ppm) lub bufor KH jest zbyt niski.';
+    recommendationEn =
+      'High boiler corrosion risk. Chloride exceeds SCA standard (max 30 ppm) or KH buffer is too low.';
+    summaryPl = 'Wysokie ryzyko wżerów i korozji metali w wysokiej temperaturze bojlera.';
+    summaryEn = 'High risk of pitting and metal corrosion at boiler operating temperatures.';
+  } else if (chloride >= 15 || alkalinity < 30 || phVal < 6.8) {
+    riskLevel = 'moderate';
+    recommendationPl =
+      'Umiarkowane ryzyko korozyjne. Zalecane monitorowanie chlorków i utrzymywanie buforu KH na poziomie 40–50 ppm.';
+    recommendationEn =
+      'Moderate corrosion risk. Monitor chloride and maintain KH buffer at 40–50 ppm.';
+    summaryPl = 'Dopuszczalne parametry, jednak zalecana ostrożność w bojlerach parowych.';
+    summaryEn = 'Acceptable parameters, but caution advised in steam boilers.';
+  } else if (chloride > 10 || alkalinity > 80 || phVal > 8.0) {
+    riskLevel = 'low';
+    recommendationPl = 'Niskie ryzyko korozji bojlera. Woda w granicach bezpieczeństwa.';
+    recommendationEn = 'Low boiler corrosion risk. Water within safety margins.';
+    summaryPl = 'Bezpieczne parametry dla aparatury ciśnieniowej.';
+    summaryEn = 'Safe parameters for pressure brewing equipment.';
+  }
+
+  return {
+    riskLevel,
+    chloridePpm: chloride,
+    sulfatePpm: sulfate,
+    ph: phVal,
+    alkalinityKh: alkalinity,
+    isPittingRisk,
+    recommendationPl,
+    recommendationEn,
+    summaryPl,
+    summaryEn,
+  };
+}
+
 
