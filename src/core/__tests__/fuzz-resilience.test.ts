@@ -16,8 +16,15 @@ import {
 } from '../domain-rules';
 import { calculateWaterMinerals, classifyWaterHardness, classifyWaterHardnessFromFH } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
-import { convertMicronsToGrinder } from '../grinder-converter';
+import { convertMicronsToGrinder, findGrindCategoryForMicrons, findGrindCategoryById } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost } from '../cost-calculator';
+import {
+  formatTemperature,
+  formatWaterVolume,
+  formatDoseWeight,
+  formatWaterWeight,
+  wInKeep,
+} from '../unit-converter';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -278,6 +285,58 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(formatted).toContain('zł');
       expect(formatted).not.toContain('NaN');
       expect(formatted).not.toContain('-0');
+    }
+  });
+
+  test('Chaos 10: Fuzzing modułów konwersji jednostek i przemiału z mutacjami brzegowymi (TASK-P63-12-NIE)', () => {
+    const corruptInputs = [
+      -1000, -0, 0, 0.0001, 15.5, 93.3, 500, 1500, 100000, NaN, Infinity, -Infinity,
+      '', '   ', '\uFEFF93.5', '100°C', '212°F', '15,5 g', '250,0 ml', 'invalid',
+      null, undefined, true, false, {}, [], () => {},
+    ];
+
+    for (const val of corruptInputs) {
+      // 1. formatTemperature
+      const tempMetric = formatTemperature(val as any, 'metric');
+      expect(typeof tempMetric).toBe('string');
+      expect(tempMetric.endsWith('°C')).toBe(true);
+      expect(tempMetric).not.toContain('NaN');
+      expect(tempMetric).not.toContain('-0');
+
+      const tempImp = formatTemperature(val as any, 'imperial');
+      expect(typeof tempImp).toBe('string');
+      expect(tempImp.endsWith('°F')).toBe(true);
+      expect(tempImp).not.toContain('NaN');
+      expect(tempImp).not.toContain('-0');
+
+      // 2. formatWaterVolume
+      const volMetric = formatWaterVolume(val as any, 'metric');
+      expect(typeof volMetric).toBe('string');
+      expect(volMetric.endsWith('ml')).toBe(true);
+      expect(volMetric).not.toContain('NaN');
+      expect(volMetric).not.toContain('-0');
+
+      // 3. formatDoseWeight & formatWaterWeight
+      const dose = formatDoseWeight(val as any, 'metric');
+      expect(typeof dose).toBe('string');
+      expect(dose.endsWith('g')).toBe(true);
+
+      const water = formatWaterWeight(val as any, 'metric');
+      expect(typeof water).toBe('string');
+      expect(water.endsWith('g')).toBe(true);
+
+      // 4. findGrindCategoryForMicrons
+      const cat = findGrindCategoryForMicrons(val as any);
+      expect(cat).toBeDefined();
+      expect(typeof cat.id).toBe('string');
+      expect(cat.micronMin).toBeGreaterThan(0);
+      expect(cat.micronMax).toBeGreaterThan(cat.micronMin);
+
+      // 5. wInKeep
+      const keepVal = wInKeep(val as any, 'g', 15.0);
+      expect(typeof keepVal).toBe('number');
+      expect(Number.isFinite(keepVal)).toBe(true);
+      expect(Object.is(keepVal, -0)).toBe(false);
     }
   });
 });
