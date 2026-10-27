@@ -12,6 +12,8 @@ import {
   rankSearchResults,
   highlightSearchMatch,
   SearchHighlightSegment,
+  calculateLevenshteinDistance,
+  isFuzzyMatch,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -191,5 +193,28 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     expect(highlightSearchMatch(null, 'test')).toEqual([]);
     expect(highlightSearchMatch('Kawa', '')).toEqual([{ text: 'Kawa', isMatch: false }]);
     expect(highlightSearchMatch('Kawa', null)).toEqual([{ text: 'Kawa', isMatch: false }]);
+  });
+
+  test('TASK-P73-01-ODK: calculateLevenshteinDistance i isFuzzyMatch wspierają wyszukiwanie rozmyte', () => {
+    // 1. Odległość Levenshteina
+    expect(calculateLevenshteinDistance('v60', 'v60')).toBe(0);
+    expect(calculateLevenshteinDistance('aeropress', 'aeropres')).toBe(1);
+    expect(calculateLevenshteinDistance('geisha', 'gesha')).toBe(1);
+    expect(calculateLevenshteinDistance('yirgacheffe', 'yirgahefe')).toBe(2);
+    expect(calculateLevenshteinDistance('', 'v60')).toBe(3);
+    expect(calculateLevenshteinDistance(null as any, 'v60')).toBe(3);
+
+    // 2. isFuzzyMatch
+    expect(isFuzzyMatch('Hario V60 Dripper', 'v60')).toBe(true);
+    expect(isFuzzyMatch('AeroPress Inverted', 'aeropres')).toBe(true);
+    expect(isFuzzyMatch('Ethiopia Yirgacheffe Washed', 'yirgahefe')).toBe(true);
+    expect(isFuzzyMatch('Geisha Panama', 'gesha')).toBe(true);
+
+    // 3. Brak dopasowania przy dużej różnicy
+    expect(isFuzzyMatch('Chemex Classic', 'aeropress')).toBe(false);
+
+    // 4. Odporność na null i puste stringi
+    expect(isFuzzyMatch(null, 'v60')).toBe(false);
+    expect(isFuzzyMatch('v60', null)).toBe(false);
   });
 });

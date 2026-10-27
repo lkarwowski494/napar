@@ -229,3 +229,81 @@ export function highlightSearchMatch(
 
   return segments.length > 0 ? segments : [{ text: rawText, isMatch: false }];
 }
+
+/**
+ * Oblicza odległość edycyjną Levenshteina między dwoma ciągami znaków.
+ */
+export function calculateLevenshteinDistance(
+  a: string | undefined | null,
+  b: string | undefined | null
+): number {
+  const s1 = typeof a === 'string' ? normSearch(a) : '';
+  const s2 = typeof b === 'string' ? normSearch(b) : '';
+
+  if (s1 === s2) return 0;
+  if (s1.length === 0) return s2.length;
+  if (s2.length === 0) return s1.length;
+
+  const m = s1.length;
+  const n = s2.length;
+  let prevRow = new Array(n + 1);
+  let currRow = new Array(n + 1);
+
+  for (let j = 0; j <= n; j++) {
+    prevRow[j] = j;
+  }
+
+  for (let i = 1; i <= m; i++) {
+    currRow[0] = i;
+    const char1 = s1.charCodeAt(i - 1);
+    for (let j = 1; j <= n; j++) {
+      const cost = char1 === s2.charCodeAt(j - 1) ? 0 : 1;
+      currRow[j] = Math.min(
+        prevRow[j] + 1,       // deletion
+        currRow[j - 1] + 1,   // insertion
+        prevRow[j - 1] + cost // substitution
+      );
+    }
+    const temp = prevRow;
+    prevRow = currRow;
+    currRow = temp;
+  }
+
+  return prevRow[n];
+}
+
+/**
+ * Sprawdza, czy zapytanie pasuje rozmycie (fuzzy) do tekstu docelowego
+ * w ramach dopuszczalnej odległości edycyjnej.
+ */
+export function isFuzzyMatch(
+  target: string | undefined | null,
+  query: string | undefined | null,
+  maxDistance?: number
+): boolean {
+  if (!target || !query) return false;
+  const sTarget = normSearch(target);
+  const sQuery = normSearch(query);
+  if (!sTarget || !sQuery) return false;
+
+  if (sTarget.includes(sQuery)) return true;
+
+  const allowedDist =
+    typeof maxDistance === 'number' && Number.isFinite(maxDistance) && maxDistance >= 0
+      ? Math.floor(maxDistance)
+      : sQuery.length > 5
+      ? 2
+      : 1;
+
+  const tokens = tokenizeSearch(target);
+  for (const token of tokens) {
+    if (token === sQuery) return true;
+    if (Math.abs(token.length - sQuery.length) <= allowedDist) {
+      if (calculateLevenshteinDistance(token, sQuery) <= allowedDist) {
+        return true;
+      }
+    }
+  }
+
+  return calculateLevenshteinDistance(sTarget, sQuery) <= allowedDist;
+}
