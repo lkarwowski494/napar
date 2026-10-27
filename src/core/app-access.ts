@@ -66,7 +66,9 @@ export function notifyAccessChanged(): void {
 export function getAppAccessState(): AppAccessState {
   const isPro = getAppSetting('is_pro_active', 'false') === 'true';
   const rawTier = getAppSetting('subscription_tier', isPro ? 'lifetime' : 'none');
-  const normalizedTierStr = typeof rawTier === 'string' ? rawTier.trim().toLowerCase() : '';
+  const normalizedTierStr = typeof rawTier === 'string'
+    ? rawTier.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase()
+    : '';
   const tier: 'none' | 'monthly' | 'annual' | 'lifetime' =
     normalizedTierStr === 'monthly' || normalizedTierStr === 'annual' || normalizedTierStr === 'lifetime'
       ? (normalizedTierStr as 'monthly' | 'annual' | 'lifetime')
@@ -196,7 +198,9 @@ export function formatSubscriptionTierName(
   language: 'pl' | 'en' | string = 'pl'
 ): string {
   const isEn = typeof language === 'string' && (language.trim().toLowerCase() === 'en' || language.trim().toLowerCase().startsWith('en'));
-  let cleanTier = typeof tier === 'string' ? tier.replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase() : '';
+  let cleanTier = typeof tier === 'string'
+    ? tier.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase()
+    : '';
   if (cleanTier === STORE_PRODUCT_IDS.monthly.toLowerCase() || cleanTier.includes('monthly')) cleanTier = 'monthly';
   else if (cleanTier === STORE_PRODUCT_IDS.annual.toLowerCase() || cleanTier.includes('annual')) cleanTier = 'annual';
   else if (cleanTier === STORE_PRODUCT_IDS.lifetime.toLowerCase() || cleanTier.includes('lifetime')) cleanTier = 'lifetime';
@@ -290,7 +294,13 @@ export function recordBrewCompleted(): AppAccessState {
 
 export function activateSubscription(tier: 'monthly' | 'annual' | 'lifetime'): AppAccessState {
   const allowedTiers: readonly string[] = ['monthly', 'annual', 'lifetime'];
-  const cleanTier = typeof tier === 'string' ? tier.trim().toLowerCase() : '';
+  let cleanTier = typeof tier === 'string'
+    ? tier.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase()
+    : '';
+  if (cleanTier === STORE_PRODUCT_IDS.monthly.toLowerCase() || cleanTier.includes('monthly')) cleanTier = 'monthly';
+  else if (cleanTier === STORE_PRODUCT_IDS.annual.toLowerCase() || cleanTier.includes('annual')) cleanTier = 'annual';
+  else if (cleanTier === STORE_PRODUCT_IDS.lifetime.toLowerCase() || cleanTier.includes('lifetime')) cleanTier = 'lifetime';
+
   const safeTier = (allowedTiers.includes(cleanTier) ? cleanTier : 'annual') as 'monthly' | 'annual' | 'lifetime';
   setAppSetting('is_pro_active', 'true');
   setAppSetting('subscription_tier', safeTier);
@@ -385,11 +395,7 @@ export function verifyAndActivateStoreKitPurchase(
     typeof receipt.transactionId !== 'string' ||
     !receipt.transactionId.trim() ||
     typeof receipt.signature !== 'string' ||
-    !receipt.signature.trim() ||
-    receipt.signature.trim().length < 8 ||
-    typeof receipt.purchaseDate !== 'string' ||
-    !receipt.purchaseDate.trim() ||
-    isNaN(new Date(receipt.purchaseDate.trim()).getTime())
+    typeof receipt.purchaseDate !== 'string'
   ) {
     return {
       success: false,
@@ -397,8 +403,35 @@ export function verifyAndActivateStoreKitPurchase(
       errorCode: 'invalid_signature',
     };
   }
+
+  const cleanSignature = receipt.signature
+    .replace(/\uFEFF/g, '')
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    .trim();
+
+  if (!cleanSignature || cleanSignature.length < 8) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy podpis transakcji StoreKit',
+      errorCode: 'invalid_signature',
+    };
+  }
+
+  const cleanPurchaseDate = receipt.purchaseDate
+    .replace(/\uFEFF/g, '')
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    .trim();
+
+  if (!cleanPurchaseDate || isNaN(new Date(cleanPurchaseDate).getTime())) {
+    return {
+      success: false,
+      error: 'Nieprawidłowy podpis transakcji StoreKit',
+      errorCode: 'invalid_signature',
+    };
+  }
+
   const cleanProductId = typeof receipt.productId === 'string'
-    ? receipt.productId.replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase()
+    ? receipt.productId.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase()
     : '';
   let tier: 'monthly' | 'annual' | 'lifetime' | null = null;
   if (cleanProductId === STORE_PRODUCT_IDS.monthly.toLowerCase() || cleanProductId === 'monthly') tier = 'monthly';
@@ -413,7 +446,7 @@ export function verifyAndActivateStoreKitPurchase(
     };
   }
 
-  const purchaseTime = new Date(receipt.purchaseDate.trim()).getTime();
+  const purchaseTime = new Date(cleanPurchaseDate).getTime();
   const maxAllowedFutureTime = Date.now() + 86400000; // max 24h w przyszłość (ochrona przed manipulacją datami)
   if (isNaN(purchaseTime) || purchaseTime <= 0 || purchaseTime > maxAllowedFutureTime) {
     return {
@@ -424,6 +457,7 @@ export function verifyAndActivateStoreKitPurchase(
   }
 
   const cleanTransactionId = receipt.transactionId
+    .replace(/\uFEFF/g, '')
     .replace(/[\x00-\x1F\x7F]/g, '')
     .trim()
     .slice(0, 256);
@@ -439,8 +473,8 @@ export function verifyAndActivateStoreKitPurchase(
   const sanitizedReceipt: StoreKitReceipt = {
     productId: STORE_PRODUCT_IDS[tier],
     transactionId: cleanTransactionId,
-    purchaseDate: receipt.purchaseDate.trim(),
-    signature: receipt.signature.trim(),
+    purchaseDate: cleanPurchaseDate,
+    signature: cleanSignature,
   };
 
   setAppSetting('is_pro_active', 'true');

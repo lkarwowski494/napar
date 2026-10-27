@@ -1030,4 +1030,28 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(formatTrialStatusSummary(stateWithUnits, 'pl')).toBe('Okres próbny: 10 parzeń · 5 dni');
     expect(formatTrialStatusSummary(stateWithUnits, 'en')).toBe('Trial: 10 brews · 5 days remaining');
   });
+
+  test('TASK-P56-02-MON: sanityzacja BOM i znakow kontrolnych w sygnaturze i dacie StoreKit oraz aktywacja produktami StoreKit', () => {
+    resetTrialForTesting();
+    // 1. verifyAndActivateStoreKitPurchase oczyszcza sygnaturę i datę z BOM oraz znaków kontrolnych
+    const dirtySigReceipt = {
+      productId: 'pl.lukasz.napar.lifetime',
+      transactionId: 'TX-CLEAN-123\x00',
+      purchaseDate: '\uFEFF2026-10-26T12:00:00.000Z\r\n',
+      signature: '\uFEFFVALID_SIG_WITH_BOM_12345\x00\x08',
+    };
+    const res = verifyAndActivateStoreKitPurchase(dirtySigReceipt as any);
+    expect(res.success).toBe(true);
+    expect(res.tier).toBe('lifetime');
+    expect(res.receipt?.signature).toBe('VALID_SIG_WITH_BOM_12345');
+    expect(res.receipt?.purchaseDate).toBe('2026-10-26T12:00:00.000Z');
+    expect(res.receipt?.signature).not.toContain('\uFEFF');
+    expect(res.receipt?.purchaseDate).not.toContain('\uFEFF');
+
+    // 2. activateSubscription akceptuje pełny identyfikator produktu ze StoreKit oraz BOM
+    const subRes = activateSubscription(' \uFEFFpl.lukasz.napar.monthly\x00 ' as any);
+    expect(subRes.isSubscribed).toBe(true);
+    expect(subRes.subscriptionTier).toBe('monthly');
+  });
 });
+
