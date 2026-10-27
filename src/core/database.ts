@@ -987,7 +987,7 @@ export interface BeanRestingReadinessAnalysis {
 export function calculateBeanRestingReadiness(
   roastDate?: string | Date | null,
   processType?: string | null,
-  brewMethodCategory: 'filter' | 'espresso' | string = 'filter',
+  brewMethodCategory?: 'filter' | 'espresso' | string | null,
   currentDate?: string | Date | null
 ): BeanRestingReadinessAnalysis {
   const normProcess = typeof processType === 'string'
