@@ -10,6 +10,8 @@ import {
   getBackupStats,
   formatBackupSummary,
   validateBackupEnvelope,
+  filterBackupEnvelope,
+  BackupFilterOptions,
   localISODate,
   stampOf,
   parseAndValidateBackup,
@@ -497,6 +499,38 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(validateBackupEnvelope({ format: 'other-format' }).isValid).toBe(false);
       expect(validateBackupEnvelope({ format: 'napar-backup', schemaVersion: 999 }).isValid).toBe(false);
       expect(validateBackupEnvelope({ format: 'napar-backup', schemaVersion: 1, state: 'not-an-object' }).isValid).toBe(false);
+    });
+
+    test('TASK-P69-05-ARC: filterBackupEnvelope umozliwia selektywne filtrowanie danych koperty', () => {
+      const envelope = buildBackup({
+        inventory: [{ id: 'i1' }, { id: 'i2' }] as any,
+        customRecipes: [{ id: 'r1' }] as any,
+        sessions: [{ id: 's1' }, { id: 's2' }, { id: 's3' }] as any,
+        caffeineLogs: [{ id: 'c1' }] as any,
+      });
+
+      // 1. Filtrowanie tylko receptur (np. udostępnienie przepisów)
+      const recipesOnly = filterBackupEnvelope(envelope, {
+        includeInventory: false,
+        includeSessions: false,
+        includeCaffeine: false,
+      });
+      expect(recipesOnly.state.customRecipes.length).toBe(1);
+      expect(recipesOnly.state.inventory.length).toBe(0);
+      expect(recipesOnly.state.sessions.length).toBe(0);
+      expect(recipesOnly.state.caffeineLogs.length).toBe(0);
+
+      // 2. Domyślnie zachowuje wszystkie tablice
+      const fullCopy = filterBackupEnvelope(envelope, {});
+      expect(fullCopy.state.inventory.length).toBe(2);
+      expect(fullCopy.state.customRecipes.length).toBe(1);
+      expect(fullCopy.state.sessions.length).toBe(3);
+      expect(fullCopy.state.caffeineLogs.length).toBe(1);
+
+      // 3. Typy i odporność na null
+      const filterOpts: BackupFilterOptions = { includeRecipes: true };
+      expect(filterOpts.includeRecipes).toBe(true);
+      expect(() => filterBackupEnvelope(null as any)).toThrow();
     });
   });
 });

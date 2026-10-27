@@ -496,3 +496,43 @@ export function validateBackupEnvelope(candidate: unknown): BackupValidationResu
 
   return { isValid: true, envelope };
 }
+
+
+export interface BackupFilterOptions {
+  includeInventory?: boolean;
+  includeRecipes?: boolean;
+  includeSessions?: boolean;
+  includeCaffeine?: boolean;
+}
+
+/**
+ * Selektywnie filtruje zawartość koperty kopii zapasowej według wybranych kolekcji danych.
+ */
+export function filterBackupEnvelope(
+  envelope: NaparBackupEnvelope,
+  options?: BackupFilterOptions
+): NaparBackupEnvelope {
+  if (!envelope || typeof envelope !== 'object') {
+    throw new Error('Nieprawidłowa koperta kopii zapasowej');
+  }
+
+  const opts = options || {};
+  const incInv = opts.includeInventory !== false;
+  const incRec = opts.includeRecipes !== false;
+  const incSes = opts.includeSessions !== false;
+  const incCaf = opts.includeCaffeine !== false;
+
+  const rawState =
+    envelope.state && typeof envelope.state === 'object' ? envelope.state : ({} as any);
+
+  return {
+    ...envelope,
+    state: {
+      inventory: incInv && Array.isArray(rawState.inventory) ? [...rawState.inventory] : [],
+      customRecipes: incRec && Array.isArray(rawState.customRecipes) ? [...rawState.customRecipes] : [],
+      sessions: incSes && Array.isArray(rawState.sessions) ? [...rawState.sessions] : [],
+      caffeineLogs: incCaf && Array.isArray(rawState.caffeineLogs) ? [...rawState.caffeineLogs] : [],
+      settings: rawState.settings ? { ...rawState.settings } : undefined,
+    },
+  };
+}
