@@ -163,3 +163,32 @@ export function isValidCraftAppId(id: unknown): id is CraftAppId {
   const cleanId = id.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
   return cleanId in CRAFT_APPS;
 }
+
+/**
+ * Zwraca kolor akcentu dla wybranej aplikacji rodziny Apps4Craft.
+ */
+export function getCraftAppAccentColor(
+  appId: CraftAppId | string = 'napar',
+  variant: 'primary' | 'light' | 'muted' | 'secondary' = 'primary'
+): string {
+  const theme = getCraftTheme(appId);
+  switch (variant) {
+    case 'light':
+      return theme.accentLight;
+    case 'muted':
+      return theme.accentMuted;
+    case 'secondary':
+      return theme.secondaryAccent;
+    case 'primary':
+    default:
+      return theme.accent;
+  }
+}
+
+/**
+ * Zwraca domenę kulinarną przypisaną do wybranej aplikacji rodziny Apps4Craft.
+ */
+export function getCraftAppDomain(appId: CraftAppId | string = 'napar'): string {
+  return getCraftTheme(appId).domain;
+}
+

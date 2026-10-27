@@ -8,6 +8,8 @@ import {
   getCraftTheme,
   getAllCraftApps,
   isValidCraftAppId,
+  getCraftAppAccentColor,
+  getCraftAppDomain,
 } from '../craft-suite-theme';
 
 describe('Apps4Craft Suite Theme Tokens', () => {
@@ -85,5 +87,30 @@ describe('Apps4Craft Suite Theme Tokens', () => {
     expect(isValidCraftAppId(null)).toBe(false);
     expect(isValidCraftAppId(undefined)).toBe(false);
     expect(isValidCraftAppId(123)).toBe(false);
+  });
+
+  test('TASK-P64-04-SZT: getCraftAppAccentColor oraz getCraftAppDomain zwracaja precyzyjne tokeny kolorow i domen', () => {
+    // 1. getCraftAppAccentColor
+    expect(getCraftAppAccentColor('napar', 'primary')).toBe('#D97736');
+    expect(getCraftAppAccentColor('napar', 'light')).toBe('#E5A96A');
+    expect(getCraftAppAccentColor('napar', 'muted')).toBe('rgba(217, 119, 54, 0.15)');
+    expect(getCraftAppAccentColor('napar', 'secondary')).toBe('#2A7B62');
+
+    expect(getCraftAppAccentColor('piekarz')).toBe('#D49B42');
+    expect(getCraftAppAccentColor('sloik')).toBe('#5B8A61');
+    expect(getCraftAppAccentColor('masaz')).toBe('#A43E38');
+    expect(getCraftAppAccentColor('ferment')).toBe('#E0A838');
+
+    // Fallback dla nieznanych id i null
+    expect(getCraftAppAccentColor('unknown')).toBe('#D97736');
+    expect(getCraftAppAccentColor(null as any)).toBe('#D97736');
+
+    // 2. getCraftAppDomain
+    expect(getCraftAppDomain('napar')).toContain('Kawa & Herbata');
+    expect(getCraftAppDomain('piekarz')).toContain('Chleb');
+    expect(getCraftAppDomain('sloik')).toContain('Kiszonki');
+    expect(getCraftAppDomain('masaz')).toContain('Wędliny');
+    expect(getCraftAppDomain('ferment')).toContain('Sery');
+    expect(getCraftAppDomain('unknown')).toContain('Kawa & Herbata');
   });
 });
