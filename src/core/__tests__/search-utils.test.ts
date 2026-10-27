@@ -24,6 +24,8 @@ import {
   filterSearchEntriesByTags,
   filterSearchEntriesByNumericRange,
   NumericRangeFilterOptions,
+  aggregateSearchFacets,
+  SearchFacetItem,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -415,5 +417,46 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     // 6. Odporność na błędy ekstraktora i pustą listę
     expect(filterSearchEntriesByNumericRange(null, (c: any) => c.dose)).toEqual([]);
     expect(filterSearchEntriesByNumericRange(coffees, () => { throw new Error('fail'); }, { min: 10 })).toEqual([]);
+  });
+
+  test('TASK-P90-01-ODK: aggregateSearchFacets agreguje fasety zliczania kategorii i tagów', () => {
+    const items = [
+      { id: '1', method: 'V60', origin: 'Ethiopia', tags: ['floral', 'fruity'] },
+      { id: '2', method: 'V60', origin: 'Colombia', tags: ['chocolate', 'fruity'] },
+      { id: '3', method: 'AeroPress', origin: 'Ethiopia', tags: ['floral'] },
+      { id: '4', method: 'Chemex', origin: null, tags: [] },
+      { id: '5', method: 'V60', origin: 'Ethiopia', tags: null },
+    ];
+
+    // 1. Agregacja z wieloma ekstraktorami (wartości pojedyncze oraz tablice)
+    const facets: Record<string, SearchFacetItem[]> = aggregateSearchFacets(items, {
+      method: (it) => it.method,
+      origin: (it) => it.origin,
+      tags: (it) => it.tags,
+    });
+
+    // Weryfikacja fasety 'method': V60 (3), AeroPress (1), Chemex (1)
+    expect(facets.method).toHaveLength(3);
+    expect(facets.method[0]).toEqual({ value: 'V60', count: 3 });
+
+    // Weryfikacja fasety 'origin': Ethiopia (3), Colombia (1)
+    expect(facets.origin).toHaveLength(2);
+    expect(facets.origin[0]).toEqual({ value: 'Ethiopia', count: 3 });
+    expect(facets.origin[1]).toEqual({ value: 'Colombia', count: 1 });
+
+    // Weryfikacja fasety 'tags': fruity (2), floral (2), chocolate (1)
+    expect(facets.tags).toHaveLength(3);
+    const floralFacet = facets.tags.find((t) => t.value === 'floral');
+    const fruityFacet = facets.tags.find((t) => t.value === 'fruity');
+    expect(floralFacet?.count).toBe(2);
+    expect(fruityFacet?.count).toBe(2);
+
+    // 2. Odporność na pustą tablicę, null, undefined i błędy ekstraktora
+    expect(aggregateSearchFacets(null, { method: (it: any) => it.method })).toEqual({ method: [] });
+    expect(aggregateSearchFacets([], { method: (it) => it.method })).toEqual({ method: [] });
+    expect(aggregateSearchFacets(items, null as any)).toEqual({});
+    expect(aggregateSearchFacets(items, {
+      broken: () => { throw new Error('boom'); },
+    })).toEqual({ broken: [] });
   });
 });

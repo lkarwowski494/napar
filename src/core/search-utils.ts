@@ -686,5 +686,91 @@ export function filterSearchEntriesByNumericRange<T>(
   });
 }
 
+export interface SearchFacetItem {
+  value: string;
+  count: number;
+}
+
+/**
+ * Agreguje fasety (wartości i liczbę ich wystąpień) dla kolekcji obiektów na podstawie mapy ekstraktorów.
+ * Obsługuje wartości pojedyncze (string/number) oraz tablice (np. tagi).
+ * Wyniki dla każdej fasety są posortowane malejąco według liczby wystąpień, a następnie alfabetycznie.
+ */
+export function aggregateSearchFacets<T>(
+  entries: T[] | undefined | null,
+  facetKeyExtractors: Record<string, (item: T) => string | string[] | undefined | null> | undefined | null
+): Record<string, SearchFacetItem[]> {
+  if (!facetKeyExtractors || typeof facetKeyExtractors !== 'object') {
+    return {};
+  }
+
+  const result: Record<string, SearchFacetItem[]> = {};
+  const facetKeys = Object.keys(facetKeyExtractors);
+
+  for (const key of facetKeys) {
+    result[key] = [];
+  }
+
+  if (!Array.isArray(entries) || entries.length === 0) {
+    return result;
+  }
+
+  for (const facetName of facetKeys) {
+    const extractor = facetKeyExtractors[facetName];
+    if (typeof extractor !== 'function') {
+      result[facetName] = [];
+      continue;
+    }
+
+    const counts = new Map<string, number>();
+
+    for (const item of entries) {
+      if (!item) continue;
+      let rawVal: unknown;
+      try {
+        rawVal = extractor(item);
+      } catch {
+        continue;
+      }
+
+      if (rawVal === undefined || rawVal === null) continue;
+
+      if (Array.isArray(rawVal)) {
+        for (const v of rawVal) {
+          if (typeof v === 'string' && v.trim()) {
+            const clean = v.trim();
+            counts.set(clean, (counts.get(clean) || 0) + 1);
+          } else if (typeof v === 'number' && Number.isFinite(v)) {
+            const clean = String(v);
+            counts.set(clean, (counts.get(clean) || 0) + 1);
+          }
+        }
+      } else if (typeof rawVal === 'string' && rawVal.trim()) {
+        const clean = rawVal.trim();
+        counts.set(clean, (counts.get(clean) || 0) + 1);
+      } else if (typeof rawVal === 'number' && Number.isFinite(rawVal)) {
+        const clean = String(rawVal);
+        counts.set(clean, (counts.get(clean) || 0) + 1);
+      }
+    }
+
+    const facetItems: SearchFacetItem[] = Array.from(counts.entries()).map(([value, count]) => ({
+      value,
+      count,
+    }));
+
+    facetItems.sort((a, b) => {
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+      return a.value.localeCompare(b.value);
+    });
+
+    result[facetName] = facetItems;
+  }
+
+  return result;
+}
+
 
 
