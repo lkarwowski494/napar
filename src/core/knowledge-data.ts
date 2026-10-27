@@ -1425,3 +1425,93 @@ export function getKnowledgeSummaryCounts(): KnowledgeSummaryCounts {
     totalEntries,
   };
 }
+
+export interface TeaBrewingGuide {
+  id: string;
+  name: string;
+  traditionalName: string;
+  waterTemperatureCelsius: number;
+  recommendedGongfuSteepSeconds: number;
+  recommendedWesternSteepSeconds: number;
+  recommendedRatioGongfu: number;
+  recommendedRatioWestern: number;
+  sensoryProfile: string;
+}
+
+/**
+ * Zwraca zoptymalizowany przewodnik i parametry parzenia (temperatura, czasy infuzji, proporcje)
+ * dla wybranej kategorii herbaty.
+ */
+export function getTeaBrewingGuide(
+  idOrQuery: string | undefined | null,
+  lang: 'pl' | 'en' | string = 'pl'
+): TeaBrewingGuide | null {
+  if (!idOrQuery || typeof idOrQuery !== 'string') return null;
+  const tea = findTeaCategoryById(idOrQuery);
+  if (!tea) return null;
+
+  const isEn =
+    typeof lang === 'string' &&
+    (lang.trim().toLowerCase() === 'en' || lang.trim().toLowerCase().startsWith('en'));
+
+  let gongfuSec = 20;
+  let westernSec = 180;
+  let ratioGf = 20;
+  let ratioWest = 50;
+
+  switch (tea.id) {
+    case 'tea-green':
+      gongfuSec = 15;
+      westernSec = 120;
+      ratioGf = 25;
+      ratioWest = 50;
+      break;
+    case 'tea-white':
+      gongfuSec = 20;
+      westernSec = 240;
+      ratioGf = 20;
+      ratioWest = 40;
+      break;
+    case 'tea-yellow':
+      gongfuSec = 20;
+      westernSec = 150;
+      ratioGf = 22;
+      ratioWest = 45;
+      break;
+    case 'tea-oolong':
+      gongfuSec = 25;
+      westernSec = 210;
+      ratioGf = 15;
+      ratioWest = 50;
+      break;
+    case 'tea-black':
+      gongfuSec = 15;
+      westernSec = 180;
+      ratioGf = 20;
+      ratioWest = 50;
+      break;
+    case 'tea-dark-puerh':
+      gongfuSec = 15;
+      westernSec = 240;
+      ratioGf = 15;
+      ratioWest = 50;
+      break;
+    default:
+      gongfuSec = 20;
+      westernSec = 180;
+      ratioGf = 20;
+      ratioWest = 50;
+  }
+
+  return {
+    id: tea.id,
+    name: isEn ? tea.nameEn : tea.namePl,
+    traditionalName: tea.traditionalName,
+    waterTemperatureCelsius: tea.waterTemperatureCelsius,
+    recommendedGongfuSteepSeconds: gongfuSec,
+    recommendedWesternSteepSeconds: westernSec,
+    recommendedRatioGongfu: ratioGf,
+    recommendedRatioWestern: ratioWest,
+    sensoryProfile: isEn ? tea.sensoryProfileEn : tea.sensoryProfilePl,
+  };
+}

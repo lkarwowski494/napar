@@ -27,6 +27,8 @@ import {
   KnowledgeItemMatch,
   getKnowledgeSummaryCounts,
   KnowledgeSummaryCounts,
+  getTeaBrewingGuide,
+  TeaBrewingGuide,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1211,6 +1213,25 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
       counts.varietiesCount + counts.processesCount + counts.originsCount + counts.teaCategoriesCount
     );
     expect(counts.totalEntries).toBeGreaterThan(0);
+  });
+
+  test('TASK-P74-06-TRE: getTeaBrewingGuide zwraca zalecenia parzenia dla herbaty', () => {
+    // 1. Zielona herbata (np. Sencha / Long Jing)
+    const greenGuide: TeaBrewingGuide | null = getTeaBrewingGuide('tea-green', 'pl');
+    expect(greenGuide).not.toBeNull();
+    expect(greenGuide?.waterTemperatureCelsius).toBe(75);
+    expect(greenGuide?.recommendedGongfuSteepSeconds).toBe(15);
+    expect(greenGuide?.traditionalName).toContain('Lǜ Chá');
+
+    // 2. Wersja angielska dla Oolonga
+    const oolongGuide = getTeaBrewingGuide('oolong', 'en');
+    expect(oolongGuide).not.toBeNull();
+    expect(oolongGuide?.waterTemperatureCelsius).toBe(95);
+    expect(oolongGuide?.name).toBe('Oolong Tea');
+
+    // 3. Odporność na nieistniejące ID i null
+    expect(getTeaBrewingGuide('unknown-tea')).toBeNull();
+    expect(getTeaBrewingGuide(null as any)).toBeNull();
   });
 });
 
