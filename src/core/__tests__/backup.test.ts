@@ -19,6 +19,8 @@ import {
   getBackupRecordCounts,
   BackupRecordCounts,
   isBackupEmpty,
+  validateBackupEnvelopeIntegrity,
+  BackupIntegrityReport,
   localISODate,
   stampOf,
   parseAndValidateBackup,
@@ -664,6 +666,44 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(isBackupEmpty(undefined)).toBe(true);
       expect(isBackupEmpty({} as any)).toBe(true);
       expect(isBackupEmpty({ state: {} } as any)).toBe(true);
+    });
+
+    test('TASK-P81-05-ARC: validateBackupEnvelopeIntegrity szczegółowo weryfikuje poprawność i integralność kopii', () => {
+      // 1. Poprawna koperta
+      const validEnvelope = buildBackup({
+        inventory: [{ id: 'bean-1' }, { id: 'bean-2' }] as any,
+        customRecipes: [{ id: 'rec-1' }] as any,
+        sessions: [{ id: 'sess-1' }, { id: 'sess-2' }] as any,
+        caffeineLogs: [{ id: 'caff-1' }] as any,
+      });
+
+      const report: BackupIntegrityReport = validateBackupEnvelopeIntegrity(validEnvelope);
+      expect(report.isValid).toBe(true);
+      expect(report.totalRecords).toBe(6);
+      expect(report.inventoryCount).toBe(2);
+      expect(report.recipesCount).toBe(1);
+      expect(report.sessionsCount).toBe(2);
+      expect(report.caffeineLogsCount).toBe(1);
+      expect(report.issues).toHaveLength(0);
+
+      // 2. Uszkodzona koperta (brak app, nieprawidłowy schemat)
+      const corrupted = {
+        format: 'wrong-format',
+        version: 99,
+        data: { inventory: 'not-an-array' },
+      };
+      const badReport = validateBackupEnvelopeIntegrity(corrupted);
+      expect(badReport.isValid).toBe(false);
+      expect(badReport.issues.length).toBeGreaterThan(0);
+
+      // 3. Odporność na null, undefined i ciągi niebędące JSON
+      const nullReport = validateBackupEnvelopeIntegrity(null);
+      expect(nullReport.isValid).toBe(false);
+      expect(nullReport.totalRecords).toBe(0);
+
+      const invalidJsonReport = validateBackupEnvelopeIntegrity('not a json');
+      expect(invalidJsonReport.isValid).toBe(false);
+      expect(invalidJsonReport.issues.length).toBeGreaterThan(0);
     });
   });
 });

@@ -733,3 +733,126 @@ export function isBackupEmpty(envelope?: NaparBackupEnvelope | null): boolean {
 
   return inv + rec + ses + caf === 0;
 }
+
+
+export interface BackupIntegrityReport {
+  isValid: boolean;
+  schemaVersion: number;
+  totalRecords: number;
+  inventoryCount: number;
+  recipesCount: number;
+  sessionsCount: number;
+  caffeineLogsCount: number;
+  issues: string[];
+  exportedAtIso: string;
+}
+
+/**
+ * Dokonuje szczegółowego audytu integralności struktury kopii zapasowej,
+ * weryfikując wersję schematu, zgodność aplikacji, typy kolekcji oraz poprawność rekordów.
+ */
+export function validateBackupEnvelopeIntegrity(candidate: unknown): BackupIntegrityReport {
+  const issues: string[] = [];
+
+  if (!candidate) {
+    return {
+      isValid: false,
+      schemaVersion: 0,
+      totalRecords: 0,
+      inventoryCount: 0,
+      recipesCount: 0,
+      sessionsCount: 0,
+      caffeineLogsCount: 0,
+      issues: ['Brak danych koperty kopii zapasowej'],
+      exportedAtIso: '',
+    };
+  }
+
+  let obj: any;
+  if (typeof candidate === 'string') {
+    try {
+      obj = JSON.parse(candidate);
+    } catch {
+      return {
+        isValid: false,
+        schemaVersion: 0,
+        totalRecords: 0,
+        inventoryCount: 0,
+        recipesCount: 0,
+        sessionsCount: 0,
+        caffeineLogsCount: 0,
+        issues: ['Błąd parsowania JSON: niepoprawna składnia'],
+        exportedAtIso: '',
+      };
+    }
+  } else if (typeof candidate === 'object' && candidate !== null) {
+    obj = candidate;
+  } else {
+    return {
+      isValid: false,
+      schemaVersion: 0,
+      totalRecords: 0,
+      inventoryCount: 0,
+      recipesCount: 0,
+      sessionsCount: 0,
+      caffeineLogsCount: 0,
+      issues: ['Nieprawidłowy typ wejściowy koperty (oczekiwano obiektu lub JSON string)'],
+      exportedAtIso: '',
+    };
+  }
+
+  if (obj.format !== 'napar-backup') {
+    issues.push(`Niepoprawny format pliku: oczekiwano "napar-backup", otrzymano "${obj.format}"`);
+  }
+
+  const ver = typeof obj.schemaVersion === 'number' ? obj.schemaVersion : typeof obj.version === 'number' ? obj.version : 0;
+  if (ver !== SCHEMA_VERSION) {
+    issues.push(`Nieobsługiwana wersja schematu: oczekiwano ${SCHEMA_VERSION}, otrzymano ${ver}`);
+  }
+
+  const exportedAtIso = typeof obj.exportedAt === 'string' ? obj.exportedAt : '';
+
+  const state = obj.state || obj.data;
+  if (!state || typeof state !== 'object') {
+    issues.push('Brak kontenera danych ("state" lub "data")');
+    return {
+      isValid: false,
+      schemaVersion: ver,
+      totalRecords: 0,
+      inventoryCount: 0,
+      recipesCount: 0,
+      sessionsCount: 0,
+      caffeineLogsCount: 0,
+      issues,
+      exportedAtIso,
+    };
+  }
+
+  const checkCollection = (name: string, arr: any): number => {
+    if (!Array.isArray(arr)) {
+      issues.push(`Kolekcja "${name}" nie jest poprawną tablicą`);
+      return 0;
+    }
+    return arr.length;
+  };
+
+  const inventoryCount = checkCollection('inventory', state.inventory);
+  const recipesCount = checkCollection('customRecipes', state.customRecipes || state.recipes);
+  const sessionsCount = checkCollection('sessions', state.sessions);
+  const caffeineLogsCount = checkCollection('caffeineLogs', state.caffeineLogs || state.caffeine);
+
+  const totalRecords = inventoryCount + recipesCount + sessionsCount + caffeineLogsCount;
+  const isValid = issues.length === 0;
+
+  return {
+    isValid,
+    schemaVersion: ver,
+    totalRecords,
+    inventoryCount,
+    recipesCount,
+    sessionsCount,
+    caffeineLogsCount,
+    issues,
+    exportedAtIso,
+  };
+}
