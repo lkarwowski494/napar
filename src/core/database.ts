@@ -1373,6 +1373,46 @@ export function exportInventoryCsv(): string {
   return [headers.join(','), ...rows].join('\n');
 }
 
+export function exportCustomRecipesCsv(): string {
+  const allRecipes = getRecipes();
+  const customRecipes = allRecipes.filter((r) => r.isCustom);
+  const headers = [
+    'id',
+    'name',
+    'type',
+    'method',
+    'author',
+    'description',
+    'dose_g',
+    'water_g',
+    'water_temp_c',
+    'grind_setting',
+    'steps_count',
+    'is_favorite',
+    'created_at',
+  ];
+
+  const rows = customRecipes.map((r) =>
+    [
+      escapeCsvValue(r.id),
+      escapeCsvValue(r.name),
+      escapeCsvValue(r.type || r.beverageType?.toLowerCase() || 'coffee'),
+      escapeCsvValue(r.method || ''),
+      escapeCsvValue(r.author || ''),
+      escapeCsvValue(r.description || ''),
+      escapeCsvValue(r.doseGrams),
+      escapeCsvValue(r.waterGrams),
+      escapeCsvValue(r.waterTempCelsius),
+      escapeCsvValue(r.grindSetting || r.grindSizeDescription || ''),
+      escapeCsvValue(Array.isArray(r.steps) ? r.steps.length : 0),
+      escapeCsvValue(r.isFavorite ? '1' : '0'),
+      escapeCsvValue(r.createdAt || ''),
+    ].join(',')
+  );
+
+  return [headers.join(','), ...rows].join('\n');
+}
+
 // ----------------------------------------------------------------------------
 // Ustawienia Aplikacji (Key-Value App Settings)
 // ----------------------------------------------------------------------------

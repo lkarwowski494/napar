@@ -30,6 +30,7 @@ import {
   importDataJson,
   exportSessionsCsv,
   exportInventoryCsv,
+  exportCustomRecipesCsv,
   escapeCsvValue,
   escapeCsvCell,
   getAppSetting,
@@ -2384,5 +2385,36 @@ describe('Napar SQLite Database & Repositories', () => {
     setAppSetting('\uFEFFapp_theme_mode', 'dark');
     expect(getAppSetting('\uFEFFapp_theme_mode')).toBe('dark');
     expect(getAppSetting('app_theme_mode')).toBe('dark');
+  });
+
+  test('TASK-P61-03-ZAK: exportCustomRecipesCsv generuje plik CSV z autorskimi recepturami i zabezpiecza przed Formula Injection', () => {
+    const customRecipe = {
+      id: 'rec-csv-test-1',
+      name: '=cmd|V60 3-Pour Artisan',
+      type: 'coffee' as const,
+      isCustom: true,
+      method: 'V60',
+      author: 'Barista Champion',
+      description: 'Zbalansowany przelew, 3 równe zalania',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      grindSetting: '22 kliki Comandante',
+      steps: [
+        { name: 'Preinfuzja', durationSeconds: 45, waterGrams: 50 },
+        { name: 'Główne zalanie', durationSeconds: 60, waterGrams: 150 },
+        { name: 'Dobicie', durationSeconds: 45, waterGrams: 250 },
+      ],
+      isFavorite: true,
+      createdAt: '2026-10-27T07:00:00Z',
+      updatedAt: '2026-10-27T07:00:00Z',
+    };
+    saveRecipe(customRecipe);
+
+    const csv = exportCustomRecipesCsv();
+    expect(csv).toContain('id,name,type,method,author');
+    expect(csv).toContain('rec-csv-test-1');
+    expect(csv).toContain('Barista Champion');
+    expect(csv).toContain('"\'=cmd|V60 3-Pour Artisan"'); // Formula injection neutralization
   });
 });
