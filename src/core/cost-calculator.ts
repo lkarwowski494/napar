@@ -83,14 +83,49 @@ function roundGrosze(val: number): number {
   return Object.is(res, -0) ? 0 : res;
 }
 
+export type SupportedCurrency = 'PLN' | 'EUR' | 'USD' | 'GBP';
+
 /**
  * Bezpiecznie formatuje wartość w PLN (np. 3.5 -> '3.50 zł'), neutralizując NaN, -0 i liczby z przecinkiem.
  */
 export function formatPlnCost(val: number | string | undefined | null): string {
-  if (val === undefined || val === null) return '0.00 zł';
-  const raw = typeof val === 'number' ? val : (typeof val === 'string' ? parseFloat(val.replace(',', '.')) : NaN);
+  return formatCost(val, 'PLN');
+}
+
+/**
+ * Bezpiecznie formatuje wartość w wybranej walucie (PLN, EUR, USD, GBP),
+ * neutralizując NaN, -0, wartości ujemne oraz stringi z przecinkiem.
+ */
+export function formatCost(
+  val: number | string | undefined | null,
+  currency: SupportedCurrency | string = 'PLN'
+): string {
+  if (val === undefined || val === null) {
+    return formatCurrencySymbol(0, currency);
+  }
+  const raw =
+    typeof val === 'number'
+      ? val
+      : typeof val === 'string'
+      ? parseFloat(val.replace(',', '.'))
+      : NaN;
   const safe = Number.isFinite(raw) && !Object.is(raw, -0) ? Math.max(0, raw) : 0;
-  return `${safe.toFixed(2)} zł`;
+  return formatCurrencySymbol(safe, currency);
+}
+
+function formatCurrencySymbol(amount: number, currency: SupportedCurrency | string): string {
+  const formatted = amount.toFixed(2);
+  switch (currency) {
+    case 'EUR':
+      return `€${formatted}`;
+    case 'USD':
+      return `$${formatted}`;
+    case 'GBP':
+      return `£${formatted}`;
+    case 'PLN':
+    default:
+      return `${formatted} zł`;
+  }
 }
 
 /**
