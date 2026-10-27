@@ -1441,5 +1441,132 @@ export function generateBackupMigrationPlan(envelope?: unknown): BackupMigration
   };
 }
 
+export type BackupHealthGrade = 'excellent' | 'good' | 'fair' | 'poor' | 'invalid';
+
+export interface BackupHealthScore {
+  score: number;
+  grade: BackupHealthGrade;
+  issues: string[];
+  totalRecords: number;
+  hasInventory: boolean;
+  hasCustomRecipes: boolean;
+  hasSessions: boolean;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function calculateBackupHealthScore(envelope?: unknown): BackupHealthScore {
+  if (!envelope || typeof envelope !== 'object') {
+    return {
+      score: 0,
+      grade: 'invalid',
+      issues: ['Kopia zapasowa jest pusta lub uszkodzona (brak obiektu JSON)'],
+      totalRecords: 0,
+      hasInventory: false,
+      hasCustomRecipes: false,
+      hasSessions: false,
+      summaryPl: 'Kopia jest uszkodzona lub ma nieprawidłowy format.',
+      summaryEn: 'Backup is corrupted or has an invalid format.',
+    };
+  }
+
+  const env = envelope as Record<string, unknown>;
+  const issues: string[] = [];
+  let score = 100;
+
+  if (env.format !== 'napar-backup') {
+    issues.push('Nieprawidłowy nagłówek formatu (oczekiwano napar-backup)');
+    score -= 40;
+  }
+
+  if (
+    typeof env.schemaVersion !== 'number' ||
+    !Number.isInteger(env.schemaVersion) ||
+    env.schemaVersion <= 0
+  ) {
+    issues.push('Nieprawidłowa lub brakująca wersja schematu (schemaVersion)');
+    score -= 20;
+  }
+
+  if (typeof env.exportedAt !== 'string' || isNaN(Date.parse(env.exportedAt))) {
+    issues.push('Nieprawidłowy znacznik czasu eksportu (exportedAt)');
+    score -= 15;
+  }
+
+  if (!env.state || typeof env.state !== 'object' || Array.isArray(env.state)) {
+    issues.push('Brakujący lub uszkodzony stan danych (pole state)');
+    score -= 50;
+    const finalScore = Math.max(0, score);
+    return {
+      score: finalScore,
+      grade: finalScore === 0 ? 'invalid' : 'poor',
+      issues,
+      totalRecords: 0,
+      hasInventory: false,
+      hasCustomRecipes: false,
+      hasSessions: false,
+      summaryPl: 'Kopia zapasowa zawiera uszkodzoną strukturę danych.',
+      summaryEn: 'Backup contains a corrupted data structure.',
+    };
+  }
+
+  const state = env.state as Record<string, unknown>;
+  const inventory = Array.isArray(state.inventory) ? state.inventory : [];
+  const customRecipes = Array.isArray(state.customRecipes) ? state.customRecipes : [];
+  const sessions = Array.isArray(state.sessions) ? state.sessions : [];
+  const caffeineLogs = Array.isArray(state.caffeineLogs) ? state.caffeineLogs : [];
+
+  const hasInventory = inventory.length > 0;
+  const hasCustomRecipes = customRecipes.length > 0;
+  const hasSessions = sessions.length > 0;
+  const totalRecords =
+    inventory.length + customRecipes.length + sessions.length + caffeineLogs.length;
+
+  if (totalRecords === 0) {
+    issues.push('Kopia zapasowa jest pusta (brak jakichkolwiek rekordów)');
+    score = Math.min(score, 60);
+  }
+
+  score = Math.max(0, Math.min(100, score));
+
+  let grade: BackupHealthGrade = 'invalid';
+  let summaryPl = '';
+  let summaryEn = '';
+
+  if (score >= 90) {
+    grade = 'excellent';
+    summaryPl = `Stan doskonały (${score}/100) — kopia jest w pełni spójna, zawiera ${totalRecords} rekordów.`;
+    summaryEn = `Excellent health (${score}/100) — backup is fully consistent with ${totalRecords} records.`;
+  } else if (score >= 75) {
+    grade = 'good';
+    summaryPl = `Stan dobry (${score}/100) — kopia jest poprawna, z drobnymi uwagami.`;
+    summaryEn = `Good health (${score}/100) — backup is valid with minor remarks.`;
+  } else if (score >= 50) {
+    grade = 'fair';
+    summaryPl = `Stan zadowalający (${score}/100) — kopia zawiera ostrzeżenia lub brak rekordów.`;
+    summaryEn = `Fair health (${score}/100) — backup has warnings or contains no records.`;
+  } else if (score > 0) {
+    grade = 'poor';
+    summaryPl = `Słaba kondycja (${score}/100) — wykryto istotne problemy ze strukturą.`;
+    summaryEn = `Poor health (${score}/100) — significant structural problems detected.`;
+  } else {
+    grade = 'invalid';
+    summaryPl = 'Kopia jest uszkodzona lub ma nieprawidłowy format.';
+    summaryEn = 'Backup is corrupted or has an invalid format.';
+  }
+
+  return {
+    score,
+    grade,
+    issues,
+    totalRecords,
+    hasInventory,
+    hasCustomRecipes,
+    hasSessions,
+    summaryPl,
+    summaryEn,
+  };
+}
+
 
 

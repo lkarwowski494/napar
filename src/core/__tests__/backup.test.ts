@@ -30,6 +30,9 @@ import {
   generateBackupMigrationPlan,
   BackupMigrationPlan,
   BackupMigrationStep,
+  calculateBackupHealthScore,
+  BackupHealthScore,
+  BackupHealthGrade,
   NaparBackupEnvelope,
   localISODate,
   stampOf,
@@ -911,6 +914,47 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(corruptPlan.canSafelyMigrate).toBe(false);
       expect(corruptPlan.isMigrationRequired).toBe(false);
       expect(corruptPlan.summaryPl).toContain('uszkodzona');
+    });
+
+    test('TASK-P93-05-ARC: calculateBackupHealthScore ocenia integralność i jakość kopii zapasowej', () => {
+      // 1. Doskonała kopia (healthy backup)
+      const healthyEnv = buildBackup({
+        inventory: [{ id: 'i1', name: 'Ethiopia Yirgacheffe', remainingWeightGrams: 250 }] as any,
+        customRecipes: [{ id: 'r1', name: 'V60 Sweet Brew' }] as any,
+        sessions: [{ id: 's1', recipeName: 'V60', createdAt: '2026-01-01T10:00:00Z' }] as any,
+        caffeineLogs: [],
+      });
+
+      const health: BackupHealthScore = calculateBackupHealthScore(healthyEnv);
+      const testGrade: BackupHealthGrade = health.grade;
+      expect(testGrade).toBe('excellent');
+      expect(health.score).toBeGreaterThanOrEqual(90);
+      expect(health.issues.length).toBe(0);
+      expect(health.hasInventory).toBe(true);
+      expect(health.hasCustomRecipes).toBe(true);
+      expect(health.hasSessions).toBe(true);
+      expect(health.totalRecords).toBe(3);
+      expect(health.summaryPl).toContain('Stan doskonały');
+      expect(health.summaryEn).toBeDefined();
+
+      // 2. Pusta kopia (brak rekordów)
+      const emptyEnv = buildBackup({
+        inventory: [],
+        customRecipes: [],
+        sessions: [],
+        caffeineLogs: [],
+      });
+      const emptyHealth = calculateBackupHealthScore(emptyEnv);
+      expect(emptyHealth.grade).toBe('fair');
+      expect(emptyHealth.totalRecords).toBe(0);
+      expect(emptyHealth.issues.some((i) => i.includes('pusta'))).toBe(true);
+
+      // 3. Kopia uszkodzona / null
+      const invalidHealth = calculateBackupHealthScore(null);
+      expect(invalidHealth.grade).toBe('invalid');
+      expect(invalidHealth.score).toBe(0);
+      expect(invalidHealth.totalRecords).toBe(0);
+      expect(invalidHealth.summaryPl).toContain('uszkodzona');
     });
   });
 });
