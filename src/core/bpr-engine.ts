@@ -1542,4 +1542,103 @@ export function detectBrewingHabitDrift(
   };
 }
 
+export interface AdaptiveRecipeAdjustment {
+  method: string;
+  recommendedTempOffsetCelsius: number;
+  recommendedGrindDeltaClicks: number;
+  recommendedTimeOffsetSeconds: number;
+  recommendedRatioDelta: number;
+  reasonPl: string;
+  reasonEn: string;
+}
+
+/**
+ * Generuje adaptacyjne korekty receptury (Adaptive Recipe Adjustment) na podstawie
+ * subiektywnych uwag smakowych użytkownika z ostatnich sesji.
+ */
+export function generateAdaptiveRecipeAdjustment(
+  method?: string | null,
+  recentFeedback?: {
+    isTooSour?: boolean;
+    isTooBitter?: boolean;
+    isTooWeak?: boolean;
+    isTooStrong?: boolean;
+    averageRating?: number;
+  } | null
+): AdaptiveRecipeAdjustment {
+  const safeMethod = method && typeof method === 'string' && method.trim() ? method.trim() : 'V60';
+
+  let recommendedTempOffsetCelsius = 0;
+  let recommendedGrindDeltaClicks = 0;
+  let recommendedTimeOffsetSeconds = 0;
+  let recommendedRatioDelta = 0;
+
+  const isTooSour = Boolean(recentFeedback?.isTooSour);
+  const isTooBitter = Boolean(recentFeedback?.isTooBitter);
+  const isTooWeak = Boolean(recentFeedback?.isTooWeak);
+  const isTooStrong = Boolean(recentFeedback?.isTooStrong);
+
+  let reasonPl = '';
+  let reasonEn = '';
+
+  if (isTooSour && isTooBitter) {
+    recommendedTempOffsetCelsius = 0;
+    recommendedGrindDeltaClicks = 1;
+    recommendedTimeOffsetSeconds = 0;
+    reasonPl = 'Jednoczesna kwasowość i gorycz sugerują nierównomierną ekstrakcję (channeling). Zmiel odrobinę grubiej (+1 klik) i zadbaj o równy strumień wody.';
+    reasonEn = 'Simultaneous sourness and bitterness suggest uneven extraction (channeling). Grind slightly coarser (+1 click) and ensure even water flow.';
+  } else if (isTooSour) {
+    recommendedTempOffsetCelsius = 2;
+    recommendedGrindDeltaClicks = -2;
+    recommendedTimeOffsetSeconds = 15;
+    reasonPl = 'Wyczuwalna kwasowość wskazuje na niedoekstrakcję. Zmiel drobniej (-2 kliki), podnieś temperaturę (+2°C) lub wydłuż czas parzenia.';
+    reasonEn = 'Sourness indicates underextraction. Grind finer (-2 clicks), raise water temperature (+2°C), or extend brew time.';
+  } else if (isTooBitter) {
+    recommendedTempOffsetCelsius = -2;
+    recommendedGrindDeltaClicks = 2;
+    recommendedTimeOffsetSeconds = -15;
+    reasonPl = 'Nadmierna gorycz wskazuje na przeekstrakcję. Zmiel grubiej (+2 kliki), obniż temperaturę (-2°C) lub skróć kontakt z wodą.';
+    reasonEn = 'Bitterness indicates overextraction. Grind coarser (+2 clicks), lower water temperature (-2°C), or reduce brew time.';
+  }
+
+  if (isTooWeak) {
+    recommendedRatioDelta = -1;
+    const weakPl = 'Napar jest zbyt wodnisty. Zwiększ dozę kawy lub zmniejsz ilość wody (obniżenie proporcji o 1).';
+    const weakEn = 'Brew is too watery. Increase coffee dose or reduce water amount (ratio -1).';
+    if (!reasonPl) {
+      reasonPl = weakPl;
+      reasonEn = weakEn;
+    } else {
+      reasonPl += ' Dodatkowo napar jest zbyt wodnisty — zwiększ dozę kawy.';
+      reasonEn += ' Additionally the brew is too watery — increase coffee dose.';
+    }
+  } else if (isTooStrong) {
+    recommendedRatioDelta = 1;
+    const strongPl = 'Napar jest zbyt intensywny. Zmniejsz dozę kawy lub dodaj więcej wody (podwyższenie proporcji o 1).';
+    const strongEn = 'Brew is too intense. Decrease coffee dose or add more water (ratio +1).';
+    if (!reasonPl) {
+      reasonPl = strongPl;
+      reasonEn = strongEn;
+    } else {
+      reasonPl += ' Dodatkowo napar jest zbyt mocny — użyj nieco więcej wody.';
+      reasonEn += ' Additionally the brew is too strong — use slightly more water.';
+    }
+  }
+
+  if (!reasonPl) {
+    reasonPl = 'Brak uwag smakowych — parametry zrównoważone.';
+    reasonEn = 'No taste issues reported — parameters are balanced.';
+  }
+
+  return {
+    method: safeMethod,
+    recommendedTempOffsetCelsius,
+    recommendedGrindDeltaClicks,
+    recommendedTimeOffsetSeconds,
+    recommendedRatioDelta,
+    reasonPl,
+    reasonEn,
+  };
+}
+
 

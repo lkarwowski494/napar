@@ -24,6 +24,8 @@ import {
   HabitDriftAnalysis,
   HabitDriftCategory,
   HabitDriftMetrics,
+  generateAdaptiveRecipeAdjustment,
+  AdaptiveRecipeAdjustment,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -1139,6 +1141,68 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       const emptyDrift = detectBrewingHabitDrift(null);
       expect(emptyDrift.sessionCount).toBe(0);
       expect(emptyDrift.category).toBe('stable');
+    });
+  });
+
+  describe('TASK-P90-04-SZT: generateAdaptiveRecipeAdjustment & AdaptiveRecipeAdjustment', () => {
+    it('zwraca zrównoważone parametry (0 offsetów) przy braku uwag smakowych', () => {
+      const balanced = generateAdaptiveRecipeAdjustment('Aeropress', null);
+      expect(balanced.method).toBe('Aeropress');
+      expect(balanced.recommendedTempOffsetCelsius).toBe(0);
+      expect(balanced.recommendedGrindDeltaClicks).toBe(0);
+      expect(balanced.recommendedTimeOffsetSeconds).toBe(0);
+      expect(balanced.recommendedRatioDelta).toBe(0);
+      expect(balanced.reasonPl).toContain('zrównoważone');
+      expect(balanced.reasonEn).toContain('balanced');
+
+      const undefinedFeedback = generateAdaptiveRecipeAdjustment(undefined, {});
+      expect(undefinedFeedback.method).toBe('V60');
+      expect(undefinedFeedback.recommendedGrindDeltaClicks).toBe(0);
+    });
+
+    it('koryguje niedoekstrakcję przy isTooSour (drobniejszy przemiał, wyższa temp, dłuższy czas)', () => {
+      const sourAdj = generateAdaptiveRecipeAdjustment('V60', { isTooSour: true });
+      expect(sourAdj.recommendedTempOffsetCelsius).toBe(2);
+      expect(sourAdj.recommendedGrindDeltaClicks).toBe(-2);
+      expect(sourAdj.recommendedTimeOffsetSeconds).toBe(15);
+      expect(sourAdj.recommendedRatioDelta).toBe(0);
+      expect(sourAdj.reasonPl.toLowerCase()).toContain('niedoekstrakcj');
+      expect(sourAdj.reasonEn.toLowerCase()).toContain('underextraction');
+    });
+
+    it('koryguje przeekstrakcję przy isTooBitter (grubszy przemiał, niższa temp, krótszy czas)', () => {
+      const bitterAdj = generateAdaptiveRecipeAdjustment('Chemex', { isTooBitter: true });
+      expect(bitterAdj.recommendedTempOffsetCelsius).toBe(-2);
+      expect(bitterAdj.recommendedGrindDeltaClicks).toBe(2);
+      expect(bitterAdj.recommendedTimeOffsetSeconds).toBe(-15);
+      expect(bitterAdj.recommendedRatioDelta).toBe(0);
+      expect(bitterAdj.reasonPl.toLowerCase()).toContain('przeekstrakcj');
+      expect(bitterAdj.reasonEn.toLowerCase()).toContain('overextraction');
+    });
+
+    it('diagnozuje kanałowanie (channeling) gdy występują jednocześnie isTooSour i isTooBitter', () => {
+      const channelingAdj = generateAdaptiveRecipeAdjustment('Espresso', { isTooSour: true, isTooBitter: true });
+      expect(channelingAdj.recommendedTempOffsetCelsius).toBe(0);
+      expect(channelingAdj.recommendedGrindDeltaClicks).toBe(1);
+      expect(channelingAdj.recommendedTimeOffsetSeconds).toBe(0);
+      expect(channelingAdj.reasonPl.toLowerCase()).toContain('channeling');
+      expect(channelingAdj.reasonEn.toLowerCase()).toContain('channeling');
+    });
+
+    it('koryguje proporcję przy isTooWeak oraz isTooStrong oraz obsługuje kombinacje', () => {
+      const weakAdj = generateAdaptiveRecipeAdjustment('Kalita Wave', { isTooWeak: true });
+      expect(weakAdj.recommendedRatioDelta).toBe(-1);
+      expect(weakAdj.reasonPl).toContain('zbyt wodnisty');
+
+      const strongAdj = generateAdaptiveRecipeAdjustment('French Press', { isTooStrong: true });
+      expect(strongAdj.recommendedRatioDelta).toBe(1);
+      expect(strongAdj.reasonPl).toContain('zbyt intensywny');
+
+      const combined = generateAdaptiveRecipeAdjustment('V60', { isTooSour: true, isTooWeak: true });
+      expect(combined.recommendedGrindDeltaClicks).toBe(-2);
+      expect(combined.recommendedRatioDelta).toBe(-1);
+      expect(combined.reasonPl).toContain('niedoekstrakcj');
+      expect(combined.reasonPl).toContain('wodnisty');
     });
   });
 });
