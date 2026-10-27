@@ -560,3 +560,64 @@ export function calculateSearchRelevanceScore(
   };
 }
 
+/**
+ * Filtruje kolekcję encji według listy tagów zapytania (np. nuty smakowe, metody parzenia).
+ * Obsługuje tryb koniunkcji ('all' - wszystkie tagi muszą pasować)
+ * lub alternatywy ('any' - przynajmniej jeden tag musi pasować).
+ * Tagi są znormalizowane i odporne na wielkość liter oraz diakrytyki.
+ */
+export function filterSearchEntriesByTags<T>(
+  entries: T[] | undefined | null,
+  tagExtractor: (entry: T) => string[] | undefined | null,
+  queryTags?: string[] | string | null,
+  matchMode: 'all' | 'any' = 'all'
+): T[] {
+  if (!Array.isArray(entries)) return [];
+  if (typeof tagExtractor !== 'function') return [];
+
+  let rawTags: string[] = [];
+  if (Array.isArray(queryTags)) {
+    rawTags = queryTags.filter((t): t is string => typeof t === 'string');
+  } else if (typeof queryTags === 'string') {
+    rawTags = queryTags.split(/[,\n;]/).map((t) => t.trim());
+  }
+
+  const normalizedQueryTags = rawTags
+    .map((t) => normSearch(t))
+    .filter((t) => t.length > 0);
+
+  if (normalizedQueryTags.length === 0) {
+    return entries.slice();
+  }
+
+  const mode = matchMode === 'any' ? 'any' : 'all';
+
+  return entries.filter((entry) => {
+    let entryTags: (string | undefined | null)[] = [];
+    try {
+      const extracted = tagExtractor(entry);
+      if (Array.isArray(extracted)) {
+        entryTags = extracted;
+      }
+    } catch {
+      return false;
+    }
+
+    const normalizedEntryTags = entryTags
+      .filter((t): t is string => typeof t === 'string')
+      .map((t) => normSearch(t))
+      .filter((t) => t.length > 0);
+
+    if (mode === 'any') {
+      return normalizedQueryTags.some((qt) =>
+        normalizedEntryTags.some((et) => et === qt || et.includes(qt))
+      );
+    } else {
+      return normalizedQueryTags.every((qt) =>
+        normalizedEntryTags.some((et) => et === qt || et.includes(qt))
+      );
+    }
+  });
+}
+
+

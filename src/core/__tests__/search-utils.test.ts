@@ -21,6 +21,7 @@ import {
   SearchCorrectionSuggestion,
   calculateSearchRelevanceScore,
   SearchRelevanceScore,
+  filterSearchEntriesByTags,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -338,5 +339,41 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     const empty = calculateSearchRelevanceScore(null, 'test');
     expect(empty.score).toBe(0);
     expect(empty.tokenCoverage).toBe(0);
+  });
+
+  test('TASK-P85-01-ODK: filterSearchEntriesByTags filtruje elementy po tagach w trybach all oraz any', () => {
+    const coffees = [
+      { id: '1', name: 'Ethiopia Yirgacheffe', tags: ['floral', 'citrus', 'tea-like'] },
+      { id: '2', name: 'Kenya Nyeri', tags: ['citrus', 'blackcurrant', 'juicy'] },
+      { id: '3', name: 'Colombia Geisha', tags: ['floral', 'jasmine', 'bergamot'] },
+      { id: '4', name: 'Brazil Cerrado', tags: ['chocolate', 'nutty', 'caramel'] },
+    ];
+
+    // 1. Tryb 'all' (koniunkcja) — floral ORAZ citrus -> tylko Ethiopia
+    const allMatch = filterSearchEntriesByTags(coffees, (c) => c.tags, ['floral', 'citrus'], 'all');
+    expect(allMatch.length).toBe(1);
+    expect(allMatch[0].id).toBe('1');
+
+    // 2. Tryb 'any' (alternatywa) — floral LUB citrus -> Ethiopia, Kenya, Colombia
+    const anyMatch = filterSearchEntriesByTags(coffees, (c) => c.tags, ['floral', 'citrus'], 'any');
+    expect(anyMatch.length).toBe(3);
+    const anyIds = anyMatch.map((c) => c.id);
+    expect(anyIds).toContain('1');
+    expect(anyIds).toContain('2');
+    expect(anyIds).toContain('3');
+
+    // 3. Obsługa stringa rozdzielanego przecinkami
+    const fromString = filterSearchEntriesByTags(coffees, (c) => c.tags, 'chocolate, nutty');
+    expect(fromString.length).toBe(1);
+    expect(fromString[0].id).toBe('4');
+
+    // 4. Puste zapytanie lub brak tagów zwraca wszystkie elementy
+    expect(filterSearchEntriesByTags(coffees, (c) => c.tags, []).length).toBe(4);
+    expect(filterSearchEntriesByTags(coffees, (c) => c.tags, null).length).toBe(4);
+    expect(filterSearchEntriesByTags(coffees, (c) => c.tags, '').length).toBe(4);
+
+    // 5. Odporność na nullish kolekcję, uszkodzone tagi i błędy ekstraktora
+    expect(filterSearchEntriesByTags(null, (c: any) => c.tags, ['floral'])).toEqual([]);
+    expect(filterSearchEntriesByTags(coffees, () => { throw new Error('fail'); }, ['floral'])).toEqual([]);
   });
 });
