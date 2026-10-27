@@ -1594,3 +1594,46 @@ export function getCoffeeProcessGuide(
     description: isEn ? process.descriptionEn : process.descriptionPl,
   };
 }
+
+
+export interface CoffeeOriginGuide {
+  id: string;
+  country: string;
+  countryCode: string;
+  primaryRegions: string[];
+  typicalAltitudeMeters: string;
+  harvestMonths: string;
+  mainVarieties: string[];
+  flavorProfile: string;
+  keyNotes: string[];
+  description: string;
+}
+
+/**
+ * Zwraca zoptymalizowany przewodnik terroir i profil sensoryczny dla wybranego kraju/regionu pochodzenia kawy.
+ */
+export function getCoffeeOriginGuide(
+  countryOrCode: string | undefined | null,
+  lang: 'pl' | 'en' | string = 'pl'
+): CoffeeOriginGuide | null {
+  if (!countryOrCode || typeof countryOrCode !== 'string') return null;
+  const origin = findCoffeeOriginById(countryOrCode);
+  if (!origin) return null;
+
+  const isEn =
+    typeof lang === 'string' &&
+    (lang.trim().toLowerCase() === 'en' || lang.trim().toLowerCase().startsWith('en'));
+
+  return {
+    id: origin.id,
+    country: isEn ? (origin.countryEn || origin.country) : origin.country,
+    countryCode: origin.countryCode,
+    primaryRegions: origin.primaryRegions,
+    typicalAltitudeMeters: origin.typicalAltitudeMeters,
+    harvestMonths: origin.harvestMonths,
+    mainVarieties: origin.mainVarieties,
+    flavorProfile: isEn ? origin.flavorProfileEn : origin.flavorProfilePl,
+    keyNotes: isEn ? origin.keyNotesEn : origin.keyNotesPl,
+    description: isEn ? origin.descriptionEn : origin.descriptionPl,
+  };
+}

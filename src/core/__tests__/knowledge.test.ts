@@ -33,6 +33,8 @@ import {
   CoffeeVarietyGuide,
   getCoffeeProcessGuide,
   CoffeeProcessGuide,
+  getCoffeeOriginGuide,
+  CoffeeOriginGuide,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1282,6 +1284,31 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(getCoffeeProcessGuide('unknown-process')).toBeNull();
     expect(getCoffeeProcessGuide(null as any)).toBeNull();
     expect(getCoffeeProcessGuide('')).toBeNull();
+  });
+
+  test('TASK-P81-06-TRE: getCoffeeOriginGuide zwraca przewodnik terroir i profil sensoryczny kraju pochodzenia', () => {
+    // 1. Etiopia w języku polskim
+    const ethGuide: CoffeeOriginGuide | null = getCoffeeOriginGuide('ethiopia', 'pl');
+    expect(ethGuide).not.toBeNull();
+    expect(ethGuide?.country).toBe('Etiopia');
+    expect(ethGuide?.countryCode).toBe('ET');
+    expect(ethGuide?.primaryRegions).toContain('Yirgacheffe');
+    expect(ethGuide?.typicalAltitudeMeters).toBeDefined();
+    expect(ethGuide?.harvestMonths).toBeDefined();
+    expect(ethGuide?.flavorProfile).toContain('jaśmin');
+    expect(ethGuide?.keyNotes.length).toBeGreaterThan(0);
+
+    // 2. Kolumbia w języku angielskim
+    const colGuide = getCoffeeOriginGuide('colombia', 'en');
+    expect(colGuide).not.toBeNull();
+    expect(colGuide?.country).toBe('Colombia');
+    expect(colGuide?.countryCode).toBe('CO');
+    expect(colGuide?.primaryRegions).toContain('Huila');
+
+    // 3. Odporność na nieznane kraje, puste stringi i null
+    expect(getCoffeeOriginGuide('unknown-country')).toBeNull();
+    expect(getCoffeeOriginGuide(null as any)).toBeNull();
+    expect(getCoffeeOriginGuide('')).toBeNull();
   });
 });
 
