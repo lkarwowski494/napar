@@ -17,6 +17,7 @@ import {
 import { calculateWaterMinerals, classifyWaterHardness, classifyWaterHardnessFromFH } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import { convertMicronsToGrinder } from '../grinder-converter';
+import { calculateBrewCost, calculateTeaCost, formatPlnCost } from '../cost-calculator';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -238,6 +239,45 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
 
       const fhClass = classifyWaterHardnessFromFH(h as any);
       expect(['VERY_SOFT', 'SOFT', 'MODERATELY_HARD', 'HARD', 'VERY_HARD']).toContain(fhClass);
+    }
+  });
+
+  test('Chaos 9: Fuzzing kalkulatora kosztów (kawa, herbata, formatowanie PLN) z mutacjami brzegowymi (TASK-P61-12-NIE)', () => {
+    const extremeNumbers = [-5000, -0, 0, 0.001, 15, 250, 1e6, NaN, Infinity, -Infinity];
+
+    for (const dose of extremeNumbers) {
+      for (const price of extremeNumbers) {
+        const brew = calculateBrewCost({
+          doseGrams: dose,
+          beanPricePerKg: price,
+        });
+        expect(Number.isFinite(brew.totalHomeCost)).toBe(true);
+        expect(brew.totalHomeCost).toBeGreaterThanOrEqual(0);
+        expect(Object.is(brew.totalHomeCost, -0)).toBe(false);
+        expect(brew.savingsPercent).toBeLessThanOrEqual(100);
+        expect(brew.savingsPercent).toBeGreaterThanOrEqual(0);
+
+        const tea = calculateTeaCost({
+          leafGrams: dose,
+          teaPricePer100g: price,
+          infusionsCount: dose > 0 && dose < 20 ? dose : undefined,
+        });
+        expect(Number.isFinite(tea.totalSessionCost)).toBe(true);
+        expect(tea.totalSessionCost).toBeGreaterThanOrEqual(0);
+        expect(Object.is(tea.totalSessionCost, -0)).toBe(false);
+        expect(tea.costPerInfusion).toBeGreaterThanOrEqual(0);
+        expect(tea.savingsPercent).toBeLessThanOrEqual(100);
+        expect(tea.savingsPercent).toBeGreaterThanOrEqual(0);
+      }
+    }
+
+    const extremeFormatInputs = [-100, -0, 0, 0.05, 123.456, NaN, Infinity, -Infinity, null, undefined, '4,50 zł', 'invalid'];
+    for (const val of extremeFormatInputs) {
+      const formatted = formatPlnCost(val as any);
+      expect(typeof formatted).toBe('string');
+      expect(formatted).toContain('zł');
+      expect(formatted).not.toContain('NaN');
+      expect(formatted).not.toContain('-0');
     }
   });
 });
