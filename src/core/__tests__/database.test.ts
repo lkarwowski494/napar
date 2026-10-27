@@ -2388,10 +2388,10 @@ describe('Napar SQLite Database & Repositories', () => {
   });
 
   test('TASK-P61-03-ZAK: exportCustomRecipesCsv generuje plik CSV z autorskimi recepturami i zabezpiecza przed Formula Injection', () => {
-    const customRecipe = {
+    const customRecipe: SavedRecipe = {
       id: 'rec-csv-test-1',
       name: '=cmd|V60 3-Pour Artisan',
-      type: 'coffee' as const,
+      beverageType: 'COFFEE',
       isCustom: true,
       method: 'V60',
       author: 'Barista Champion',
@@ -2399,20 +2399,20 @@ describe('Napar SQLite Database & Repositories', () => {
       doseGrams: 15,
       waterGrams: 250,
       waterTempCelsius: 93,
-      grindSetting: '22 kliki Comandante',
-      steps: [
+      recommendedRatio: 16.67,
+      grindSizeDescription: '22 kliki Comandante',
+      stepsJson: JSON.stringify([
         { name: 'Preinfuzja', durationSeconds: 45, waterGrams: 50 },
         { name: 'Główne zalanie', durationSeconds: 60, waterGrams: 150 },
         { name: 'Dobicie', durationSeconds: 45, waterGrams: 250 },
-      ],
+      ]),
       isFavorite: true,
       createdAt: '2026-10-27T07:00:00Z',
-      updatedAt: '2026-10-27T07:00:00Z',
     };
     saveRecipe(customRecipe);
 
     const csv = exportCustomRecipesCsv();
-    expect(csv).toContain('id,name,type,method,author');
+    expect(csv).toContain('id,name,beverage_type,method,author');
     expect(csv).toContain('rec-csv-test-1');
     expect(csv).toContain('Barista Champion');
     expect(csv).toContain('"\'=cmd|V60 3-Pour Artisan"'); // Formula injection neutralization

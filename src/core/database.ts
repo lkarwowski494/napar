@@ -1379,36 +1379,46 @@ export function exportCustomRecipesCsv(): string {
   const headers = [
     'id',
     'name',
-    'type',
+    'beverage_type',
     'method',
     'author',
     'description',
     'dose_g',
     'water_g',
     'water_temp_c',
-    'grind_setting',
+    'recommended_ratio',
+    'grind_size_description',
     'steps_count',
     'is_favorite',
     'created_at',
   ];
 
-  const rows = customRecipes.map((r) =>
-    [
+  const rows = customRecipes.map((r) => {
+    let stepsCount = 0;
+    try {
+      const parsed = JSON.parse(r.stepsJson || '[]');
+      if (Array.isArray(parsed)) stepsCount = parsed.length;
+    } catch {
+      stepsCount = 0;
+    }
+
+    return [
       escapeCsvValue(r.id),
       escapeCsvValue(r.name),
-      escapeCsvValue(r.type || r.beverageType?.toLowerCase() || 'coffee'),
+      escapeCsvValue(r.beverageType || 'COFFEE'),
       escapeCsvValue(r.method || ''),
       escapeCsvValue(r.author || ''),
       escapeCsvValue(r.description || ''),
       escapeCsvValue(r.doseGrams),
       escapeCsvValue(r.waterGrams),
       escapeCsvValue(r.waterTempCelsius),
-      escapeCsvValue(r.grindSetting || r.grindSizeDescription || ''),
-      escapeCsvValue(Array.isArray(r.steps) ? r.steps.length : 0),
+      escapeCsvValue(r.recommendedRatio),
+      escapeCsvValue(r.grindSizeDescription || ''),
+      escapeCsvValue(stepsCount),
       escapeCsvValue(r.isFavorite ? '1' : '0'),
       escapeCsvValue(r.createdAt || ''),
-    ].join(',')
-  );
+    ].join(',');
+  });
 
   return [headers.join(','), ...rows].join('\n');
 }
