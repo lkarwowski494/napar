@@ -25,6 +25,8 @@ import {
   formatBrewTimeMinutesSeconds,
   formatCaffeineDose,
   CaffeineUnit,
+  formatStashWeight,
+  WeightDisplayFormat,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -478,6 +480,37 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatCaffeineDose(NaN)).toBe('0 mg');
       expect(formatCaffeineDose(null, 'g')).toBe('0.00 g');
       expect(formatCaffeineDose(null, 'percent_daily_limit')).toBe('0% RDA');
+    });
+
+    test('TASK-P91-09-LOK: formatStashWeight formatuje wagę paczki i spiżarni w g, kg, oz, lbs z trybem auto', () => {
+      // 1. Tryb automatyczny metryczny (< 1000g -> g, >= 1000g -> kg)
+      const autoFmt: WeightDisplayFormat = 'auto';
+      expect(formatStashWeight(250, autoFmt, 'metric')).toBe('250 g');
+      expect(formatStashWeight('250,0 g')).toBe('250 g');
+      expect(formatStashWeight(1250, 'auto', 'metric')).toBe('1.25 kg');
+      expect(formatStashWeight(1000, 'auto', 'metric')).toBe('1.00 kg');
+
+      // 2. Tryb automatyczny imperialny (< 16 oz -> oz, >= 16 oz -> lbs)
+      // 250g / 28.3495 = 8.8 oz
+      expect(formatStashWeight(250, 'auto', 'imperial')).toBe('8.8 oz');
+      // 1000g / 453.59 = 2.20 lbs
+      expect(formatStashWeight(1000, 'auto', 'imperial')).toBe('2.20 lbs');
+
+      // 3. Wymuszone formaty
+      expect(formatStashWeight(1500, 'grams')).toBe('1500 g');
+      expect(formatStashWeight(500, 'kilograms')).toBe('0.50 kg');
+      expect(formatStashWeight(250, 'ounces')).toBe('8.8 oz');
+      expect(formatStashWeight(1000, 'pounds')).toBe('2.20 lbs');
+
+      // 4. Odporność na null, undefined, NaN, ujemne i -0
+      expect(formatStashWeight(0)).toBe('0 g');
+      expect(formatStashWeight(-0)).toBe('0 g');
+      expect(formatStashWeight(-50)).toBe('0 g');
+      expect(formatStashWeight(null)).toBe('0 g');
+      expect(formatStashWeight(undefined)).toBe('0 g');
+      expect(formatStashWeight(NaN)).toBe('0 g');
+      expect(formatStashWeight(null, 'kilograms')).toBe('0.00 kg');
+      expect(formatStashWeight(null, 'auto', 'imperial')).toBe('0.0 oz');
     });
   });
 });

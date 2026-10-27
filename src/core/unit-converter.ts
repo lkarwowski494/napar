@@ -654,5 +654,93 @@ export function formatCaffeineDose(
   return `${safeRounded} mg`;
 }
 
+export type WeightDisplayFormat = 'auto' | 'grams' | 'kilograms' | 'ounces' | 'pounds';
+
+/**
+ * Formatuje wagę paczki kawy lub całego inwentarza spiżarni z obsługą trybu auto (g/kg lub oz/lbs)
+ * oraz wymuszonych formatów ('grams', 'kilograms', 'ounces', 'pounds').
+ */
+export function formatStashWeight(
+  grams: number | string | undefined | null,
+  format: WeightDisplayFormat | string = 'auto',
+  unitSystem: UnitSystem = 'metric'
+): string {
+  const normFormat = typeof format === 'string' ? format.trim().toLowerCase() : 'auto';
+  const isImperial = unitSystem === 'imperial';
+
+  let val: number;
+  if (typeof grams === 'number') {
+    val = grams;
+  } else if (typeof grams === 'string') {
+    const clean = grams
+      .replace(/\uFEFF/g, '')
+      .replace(/[^\d.,-]/g, '')
+      .replace(',', '.')
+      .trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  const safeGrams =
+    !Number.isNaN(val) && val >= 0 && !Object.is(val, -0)
+      ? Math.min(1000000, val)
+      : 0;
+
+  if (normFormat === 'grams') {
+    const rounded = Math.round(safeGrams);
+    const safeRounded = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeRounded} g`;
+  }
+
+  if (normFormat === 'kilograms') {
+    const kg = safeGrams / 1000;
+    const rounded = Number(kg.toFixed(2));
+    const safeKg = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeKg.toFixed(2)} kg`;
+  }
+
+  if (normFormat === 'ounces') {
+    const oz = safeGrams / 28.349523125;
+    const rounded = Number(oz.toFixed(1));
+    const safeOz = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeOz.toFixed(1)} oz`;
+  }
+
+  if (normFormat === 'pounds') {
+    const lbs = safeGrams / 453.59237;
+    const rounded = Number(lbs.toFixed(2));
+    const safeLbs = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeLbs.toFixed(2)} lbs`;
+  }
+
+  // format === 'auto'
+  if (isImperial) {
+    const oz = safeGrams / 28.349523125;
+    if (oz < 16) {
+      const rounded = Number(oz.toFixed(1));
+      const safeOz = Object.is(rounded, -0) ? 0 : rounded;
+      return `${safeOz.toFixed(1)} oz`;
+    }
+    const lbs = safeGrams / 453.59237;
+    const rounded = Number(lbs.toFixed(2));
+    const safeLbs = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeLbs.toFixed(2)} lbs`;
+  }
+
+  // Metric auto
+  if (safeGrams < 1000) {
+    const rounded = Math.round(safeGrams);
+    const safeRounded = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeRounded} g`;
+  }
+
+  const kg = safeGrams / 1000;
+  const rounded = Number(kg.toFixed(2));
+  const safeKg = Object.is(rounded, -0) ? 0 : rounded;
+  return `${safeKg.toFixed(2)} kg`;
+}
+
+
 
 
