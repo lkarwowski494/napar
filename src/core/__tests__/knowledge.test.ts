@@ -29,6 +29,8 @@ import {
   KnowledgeSummaryCounts,
   getTeaBrewingGuide,
   TeaBrewingGuide,
+  getCoffeeVarietyGuide,
+  CoffeeVarietyGuide,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1232,6 +1234,27 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     // 3. Odporność na nieistniejące ID i null
     expect(getTeaBrewingGuide('unknown-tea')).toBeNull();
     expect(getTeaBrewingGuide(null as any)).toBeNull();
+  });
+
+  test('TASK-P76-06-TRE: getCoffeeVarietyGuide zwraca przewodnik odmiany botanicznej kawy', () => {
+    // 1. Geisha w języku polskim
+    const geishaGuide: CoffeeVarietyGuide | null = getCoffeeVarietyGuide('geisha', 'pl');
+    expect(geishaGuide).not.toBeNull();
+    expect(geishaGuide?.name).toBe('Geisha (Gesha)');
+    expect(geishaGuide?.geneticLineage).toContain('Gori Gesha');
+    expect(geishaGuide?.sensoryProfile).toContain('jaśmin');
+    expect(geishaGuide?.keyNotes.length).toBeGreaterThan(0);
+
+    // 2. Wersja angielska dla SL-28
+    const sl28Guide = getCoffeeVarietyGuide('sl-28', 'en');
+    expect(sl28Guide).not.toBeNull();
+    expect(sl28Guide?.name).toBe('SL28 & SL34');
+    expect(sl28Guide?.sensoryProfile).toContain('blackcurrant');
+
+    // 3. Odporność na nieistniejące ID, puste stringi i null
+    expect(getCoffeeVarietyGuide('unknown-variety')).toBeNull();
+    expect(getCoffeeVarietyGuide(null as any)).toBeNull();
+    expect(getCoffeeVarietyGuide('')).toBeNull();
   });
 });
 

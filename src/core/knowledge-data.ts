@@ -1515,3 +1515,43 @@ export function getTeaBrewingGuide(
     sensoryProfile: isEn ? tea.sensoryProfileEn : tea.sensoryProfilePl,
   };
 }
+
+export interface CoffeeVarietyGuide {
+  id: string;
+  name: string;
+  geneticLineage: string;
+  acidity: string;
+  body: string;
+  sweetness: string;
+  sensoryProfile: string;
+  keyNotes: string[];
+  recommendedRoast: string;
+}
+
+/**
+ * Zwraca zoptymalizowany przewodnik i profil sensoryczny dla wybranej odmiany botanicznej kawy.
+ */
+export function getCoffeeVarietyGuide(
+  idOrQuery: string | undefined | null,
+  lang: 'pl' | 'en' | string = 'pl'
+): CoffeeVarietyGuide | null {
+  if (!idOrQuery || typeof idOrQuery !== 'string') return null;
+  const variety = findCoffeeVarietyById(idOrQuery);
+  if (!variety) return null;
+
+  const isEn =
+    typeof lang === 'string' &&
+    (lang.trim().toLowerCase() === 'en' || lang.trim().toLowerCase().startsWith('en'));
+
+  return {
+    id: variety.id,
+    name: variety.name,
+    geneticLineage: variety.geneticLineage,
+    acidity: variety.cupCharacteristics.acidity,
+    body: variety.cupCharacteristics.body,
+    sweetness: variety.cupCharacteristics.sweetness,
+    sensoryProfile: isEn ? variety.sensoryProfileEn : variety.sensoryProfilePl,
+    keyNotes: isEn ? variety.keyNotesEn : variety.keyNotesPl,
+    recommendedRoast: variety.recommendedRoast,
+  };
+}
