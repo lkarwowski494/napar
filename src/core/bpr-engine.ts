@@ -282,6 +282,19 @@ export function calculateRoastDegassingWindow(roastProfile?: string | null): {
     .trim()
     .toLowerCase();
 
+  // Bardzo ciemny / wiedeński / neapolitański / spanish roast / extra dark: szybkie odgazowanie (3 dni), krótki peak (18 dni)
+  if (
+    clean.includes('extra dark') ||
+    clean.includes('bardzo ciemn') ||
+    clean.includes('neapolitan') ||
+    clean.includes('spanish') ||
+    clean.includes('vienna') ||
+    clean.includes('wiedeń') ||
+    clean.includes('wieden')
+  ) {
+    return { degassingDays: 3, peakEndDays: 18 };
+  }
+
   // Ciemny wypał / espresso / dark: odgazowuje szybciej, starzeje się szybciej
   if (
     clean.includes('dark') ||
@@ -293,12 +306,24 @@ export function calculateRoastDegassingWindow(roastProfile?: string | null): {
     return { degassingDays: 5, peakEndDays: 25 };
   }
 
-  // Jasny wypał / light / nordic / filter / cinnamon: gęste ziarna odgazowują wolniej, peak trwa dłużej
+  // Bardzo jasny / cinnamon / ultra light / white: b. powolne odgazowywanie
+  if (
+    clean.includes('cinnamon') ||
+    clean.includes('ultra light') ||
+    clean.includes('ultra-light') ||
+    clean.includes('white roast')
+  ) {
+    return { degassingDays: 14, peakEndDays: 55 };
+  }
+
+  // Jasny wypał / light / nordic / filter / city / new england: gęste ziarna odgazowują wolniej, peak trwa dłużej
   if (
     clean.includes('light') ||
     clean.includes('jasn') ||
     clean.includes('nordic') ||
-    clean.includes('cinnamon')
+    clean.includes('filter') ||
+    clean.includes('city') ||
+    clean.includes('new england')
   ) {
     return { degassingDays: 10, peakEndDays: 45 };
   }

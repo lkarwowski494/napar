@@ -685,5 +685,30 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       // 4. escapeIcsText z BOM
       expect(escapeIcsText('\uFEFFTest\\;,\n')).toBe('Test\\\\\\;\\,\\n');
     });
+
+    it('TASK-P60-11-WZR: calculateRoastDegassingWindow obsluguje profile vienna/spanish, cinnamon/ultra-light oraz city', () => {
+      const { calculateRoastDegassingWindow } = require('../bpr-engine');
+      // Bardzo ciemny / vienna
+      expect(calculateRoastDegassingWindow('vienna roast')).toEqual({ degassingDays: 3, peakEndDays: 18 });
+      expect(calculateRoastDegassingWindow('wiedeński')).toEqual({ degassingDays: 3, peakEndDays: 18 });
+      expect(calculateRoastDegassingWindow('extra dark')).toEqual({ degassingDays: 3, peakEndDays: 18 });
+
+      // Bardzo jasny / cinnamon / ultra-light
+      expect(calculateRoastDegassingWindow('cinnamon')).toEqual({ degassingDays: 14, peakEndDays: 55 });
+      expect(calculateRoastDegassingWindow('ultra light')).toEqual({ degassingDays: 14, peakEndDays: 55 });
+
+      // City / Filter / Nordic
+      expect(calculateRoastDegassingWindow('city roast')).toEqual({ degassingDays: 10, peakEndDays: 45 });
+    });
+
+    it('TASK-P60-11-WZR: buildProactiveActionSchedule i buildFourteenDayCalendar chronia przed obiektami niebedacymi tablicami', () => {
+      const schedule = buildProactiveActionSchedule('invalid-date', {} as any, null as any);
+      expect(Array.isArray(schedule)).toBe(true);
+      expect(schedule.length).toBeGreaterThan(0);
+
+      const calendar = buildFourteenDayCalendar('invalid-date', null as any, {} as any);
+      expect(Array.isArray(calendar)).toBe(true);
+      expect(calendar.length).toBe(14);
+    });
   });
 });
