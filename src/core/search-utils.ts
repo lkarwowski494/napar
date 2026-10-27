@@ -772,5 +772,84 @@ export function aggregateSearchFacets<T>(
   return result;
 }
 
+/**
+ * Filtruje kolekcję elementów na podstawie zaznaczonych wartości faset (faceted search).
+ * Stosuje logikę AND pomiędzy fasetami (kategorią, pochodzeniem, tagami) oraz OR wewnątrz wartości danej fasety.
+ */
+export function filterBySearchFacets<T>(
+  items: T[] | undefined | null,
+  selectedFacets: Record<string, (string | number)[]> | undefined | null,
+  extractors: Record<string, (item: T) => unknown> | undefined | null
+): T[] {
+  if (!Array.isArray(items)) return [];
+  if (
+    !selectedFacets ||
+    typeof selectedFacets !== 'object' ||
+    !extractors ||
+    typeof extractors !== 'object'
+  ) {
+    return [...items];
+  }
+
+  // Wyodrębnij tylko te fasety, które mają niepuste zaznaczone wartości
+  const activeFacets = Object.entries(selectedFacets).filter(([_, values]) => {
+    return Array.isArray(values) && values.length > 0;
+  });
+
+  if (activeFacets.length === 0) {
+    return [...items];
+  }
+
+  return items.filter((item) => {
+    if (!item) return false;
+
+    for (const [facetName, selectedValues] of activeFacets) {
+      const extractor = extractors[facetName];
+      if (typeof extractor !== 'function') continue;
+
+      let extracted: unknown;
+      try {
+        extracted = extractor(item);
+      } catch {
+        return false;
+      }
+
+      if (extracted === undefined || extracted === null) return false;
+
+      const matchFound = selectedValues.some((selectedVal) => {
+        if (typeof selectedVal === 'string') {
+          const normSelected = selectedVal.trim().toLowerCase();
+          if (Array.isArray(extracted)) {
+            return extracted.some(
+              (v) => typeof v === 'string' && v.trim().toLowerCase() === normSelected
+            );
+          }
+          if (typeof extracted === 'string') {
+            return extracted.trim().toLowerCase() === normSelected;
+          }
+          return false;
+        }
+
+        if (typeof selectedVal === 'number' && Number.isFinite(selectedVal)) {
+          if (Array.isArray(extracted)) {
+            return extracted.some((v) => typeof v === 'number' && v === selectedVal);
+          }
+          if (typeof extracted === 'number') {
+            return extracted === selectedVal;
+          }
+          return false;
+        }
+
+        return false;
+      });
+
+      if (!matchFound) return false;
+    }
+
+    return true;
+  });
+}
+
+
 
 

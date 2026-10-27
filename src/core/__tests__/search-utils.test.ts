@@ -26,6 +26,7 @@ import {
   NumericRangeFilterOptions,
   aggregateSearchFacets,
   SearchFacetItem,
+  filterBySearchFacets,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -458,5 +459,53 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     expect(aggregateSearchFacets(items, {
       broken: () => { throw new Error('boom'); },
     })).toEqual({ broken: [] });
+  });
+
+  test('TASK-P92-01-ODK: filterBySearchFacets filtruje elementy według wybranych wartości faset', () => {
+    const items = [
+      { id: '1', method: 'V60', origin: 'Ethiopia', tags: ['fruity', 'floral'] },
+      { id: '2', method: 'V60', origin: 'Colombia', tags: ['chocolate', 'caramel'] },
+      { id: '3', method: 'AeroPress', origin: 'Ethiopia', tags: ['fruity'] },
+      { id: '4', method: 'Chemex', origin: 'Ethiopia', tags: ['floral', 'citrus'] },
+    ];
+
+    const extractors = {
+      method: (it: typeof items[0]) => it.method,
+      origin: (it: typeof items[0]) => it.origin,
+      tags: (it: typeof items[0]) => it.tags,
+    };
+
+    // 1. Filtrowanie pojedynczej fasety: method = ['V60'] -> items 1, 2
+    const v60Only = filterBySearchFacets(items, { method: ['V60'] }, extractors);
+    expect(v60Only.map((i) => i.id)).toEqual(['1', '2']);
+
+    // 2. Filtrowanie wielu faset (AND między fasetami, OR wewnątrz wartości):
+    // origin = ['Ethiopia'] AND tags = ['floral'] -> items 1, 4
+    const ethiopiaFloral = filterBySearchFacets(items, {
+      origin: ['Ethiopia'],
+      tags: ['floral'],
+    }, extractors);
+    expect(ethiopiaFloral.map((i) => i.id)).toEqual(['1', '4']);
+
+    // 3. Case-insensitive dopasowanie wartości fasety
+    const caseInsensitive = filterBySearchFacets(items, {
+      origin: ['ethiopia'],
+      method: ['v60'],
+    }, extractors);
+    expect(caseInsensitive.map((i) => i.id)).toEqual(['1']);
+
+    // 4. Puste wybrane fasety zwracają wszystkie elementy
+    expect(filterBySearchFacets(items, {}, extractors)).toHaveLength(4);
+    expect(filterBySearchFacets(items, { method: [] }, extractors)).toHaveLength(4);
+
+    // 5. Odporność na null, undefined i błędy ekstraktora
+    expect(filterBySearchFacets(null, { method: ['V60'] }, extractors)).toEqual([]);
+    expect(filterBySearchFacets(items, null, extractors)).toHaveLength(4);
+    expect(filterBySearchFacets(items, { method: ['V60'] }, null)).toHaveLength(4);
+    expect(filterBySearchFacets(items, {
+      broken: ['val'],
+    }, {
+      broken: () => { throw new Error('fail'); },
+    })).toEqual([]);
   });
 });
