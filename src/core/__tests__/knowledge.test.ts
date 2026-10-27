@@ -1063,5 +1063,23 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findTeaCategoryById('jin jun mei')?.id).toBe('tea-black');
     expect(findTeaCategoryById('lapsang souchong')?.id).toBe('tea-black');
   });
+
+  test('TASK-P59-06-TRE: sanityzacja BOM w findById oraz nowe odmiany i herbaty (paraiso, bernardina, bancha, oriental beauty)', () => {
+    // 1. Sanityzacja BOM w wyszukiwarkach encji
+    expect(findCoffeeVarietyById('\uFEFFvariety-geisha')?.id).toBe('variety-geisha');
+    expect(findCoffeeProcessById('\uFEFFwashed')?.id).toBe('process-washed');
+    expect(findCoffeeOriginById('\uFEFFethiopia')?.id).toBe('origin-ethiopia');
+    expect(findTeaCategoryById('\uFEFFtea-green')?.id).toBe('tea-green');
+
+    // 2. Nowe odmiany kawy
+    expect(findCoffeeVarietyById('paraiso')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('bernardina')?.id).toBe('variety-pacamara-maragogype');
+    expect(findCoffeeVarietyById('purpurascens')?.id).toBe('variety-bourbon');
+
+    // 3. Nowe tradycyjne herbaty
+    expect(findTeaCategoryById('bancha')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('oriental beauty')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('dongfang meiren')?.id).toBe('tea-oolong');
+  });
 });
 

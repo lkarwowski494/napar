@@ -755,11 +755,14 @@ const VARIETY_ALIASES: Record<string, string> = {
   wolisho: 'variety-ethiopian-landraces',
   'mara-caturra': 'variety-pacamara-maragogype',
   'mara caturra': 'variety-pacamara-maragogype',
+  paraiso: 'variety-caturra-catuai',
+  bernardina: 'variety-pacamara-maragogype',
+  purpurascens: 'variety-bourbon',
 };
 
 export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
-  const cleanId = id.trim().toLowerCase();
+  const cleanId = id.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
   const aliasMatchId = VARIETY_ALIASES[normId] || VARIETY_ALIASES[normId.replace(/[\s_-]+/g, '')];
@@ -887,7 +890,7 @@ const PROCESS_ALIASES: Record<string, string> = {
 
 export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
-  const cleanId = id.trim().toLowerCase();
+  const cleanId = id.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
   const aliasMatchId = PROCESS_ALIASES[normId] || PROCESS_ALIASES[normId.replace(/[\s_-]+/g, '')];
@@ -1018,7 +1021,7 @@ const ORIGIN_ALIASES: Record<string, string> = {
 
 export function findCoffeeOriginById(id: string): CoffeeOriginInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
-  const cleanId = id.trim().toLowerCase();
+  const cleanId = id.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
   const mappedId = ORIGIN_ALIASES[cleanId] || ORIGIN_ALIASES[normId];
@@ -1180,7 +1183,7 @@ const TEA_ALIASES: Record<string, string> = {
 
 export function findTeaCategoryById(id: string): TeaCategoryInfo | undefined {
   if (!id || typeof id !== 'string' || !id.trim()) return undefined;
-  const cleanId = id.trim().toLowerCase();
+  const cleanId = id.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
   const aliasMatchId = TEA_ALIASES[normId] || TEA_ALIASES[normId.replace(/[\s_-]+/g, '')];
