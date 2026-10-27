@@ -20,6 +20,7 @@ import {
   getKnowledgeDescription,
   getKnowledgeSensoryProfile,
   getKnowledgeKeyNotes,
+  getKnowledgeTitle,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1103,6 +1104,29 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     // 3. getKnowledgeSensoryProfile z BOM
     const sensory = getKnowledgeSensoryProfile('\uFEFFprocess-washed', 'EN' as any);
     expect(sensory.length).toBeGreaterThan(0);
+  });
+
+  test('TASK-P64-06-TRE: getKnowledgeTitle pobiera zlokalizowany tytul dowolnej encji wiedzy', () => {
+    // 1. Odmiana botaniczna
+    expect(getKnowledgeTitle('variety-geisha', 'pl')).toBe('Geisha (Gesha)');
+    expect(getKnowledgeTitle('\uFEFFvariety-geisha', 'en')).toBe('Geisha (Gesha)');
+
+    // 2. Metoda obróbki
+    expect(getKnowledgeTitle('process-washed', 'pl')).toBe('Washed (Mokra / Myta)');
+    expect(getKnowledgeTitle('process-washed', 'en')).toBe('Washed (Mokra / Myta)');
+
+    // 3. Kraj pochodzenia
+    expect(getKnowledgeTitle('origin-ethiopia', 'pl')).toBe('Etiopia');
+    expect(getKnowledgeTitle('origin-ethiopia', 'en')).toBe('Ethiopia');
+
+    // 4. Herbata
+    expect(getKnowledgeTitle('tea-puerh', 'pl')).toBe('Ciemna Herbata / Puerh');
+    expect(getKnowledgeTitle('tea-puerh', 'en')).toBe('Dark Tea / Puerh (Heicha)');
+
+    // 5. Nieznane id i null
+    expect(getKnowledgeTitle('unknown', 'pl')).toBe('');
+    expect(getKnowledgeTitle(null as any, 'pl')).toBe('');
+    expect(getKnowledgeTitle('', 'en')).toBe('');
   });
 });
 

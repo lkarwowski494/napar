@@ -778,7 +778,7 @@ export function findCoffeeVarietyById(id: string): CoffeeVarietyInfo | undefined
       if (vNameClean === cleanId || vNameNorm === normId) return true;
       if (vNameClean.includes(cleanId) || cleanId.includes(vNameClean)) return true;
       const tokens = vNameNorm.split(/[\s/(),-]+/).filter(Boolean);
-      if (tokens.some((tok) => tok === normId || cleanId.includes(tok))) return true;
+      if (tokens.some((tok) => tok === normId || (tok.length >= 3 && cleanId.includes(tok)))) return true;
     }
     return false;
   });
@@ -907,7 +907,7 @@ export function findCoffeeProcessById(id: string): CoffeeProcessInfo | undefined
       if (pNameClean === cleanId || pNameNorm === normId) return true;
       if (pNameClean.includes(cleanId) || cleanId.includes(pNameClean)) return true;
       const tokens = pNameNorm.split(/[\s/(),-]+/).filter(Boolean);
-      if (tokens.some((tok) => tok === normId || cleanId.includes(tok))) return true;
+      if (tokens.some((tok) => tok === normId || (tok.length >= 3 && cleanId.includes(tok)))) return true;
     }
     return false;
   });
@@ -1255,3 +1255,34 @@ export function getKnowledgeKeyNotes(id: string, lang: 'pl' | 'en' | string = 'p
   const notes = isEn ? loc.keyNotesEn : loc.keyNotesPl;
   return Array.isArray(notes) ? notes : [];
 }
+
+/**
+ * Zwraca zlokalizowany tytuł encji wiedzy (odmiany, obróbki, regionu, herbaty).
+ */
+export function getKnowledgeTitle(id: string, lang: 'pl' | 'en' | string = 'pl'): string {
+  if (!id || typeof id !== 'string') return '';
+  const cleanId = id.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
+  if (!cleanId) return '';
+  const isEn = typeof lang === 'string' && (lang.trim().toLowerCase() === 'en' || lang.trim().toLowerCase().startsWith('en'));
+
+  const loc = KNOWLEDGE_LOCALES[cleanId];
+  if (loc && (loc.namePl || loc.nameEn)) {
+    const locName = isEn ? (loc.nameEn || loc.namePl) : (loc.namePl || loc.nameEn);
+    if (locName) return locName;
+  }
+
+  const tea = findTeaCategoryById(cleanId);
+  if (tea) return isEn ? (tea.nameEn || tea.namePl) : (tea.namePl || tea.nameEn);
+
+  const origin = findCoffeeOriginById(cleanId);
+  if (origin) return isEn ? (origin.countryEn || origin.country) : origin.country;
+
+  const variety = findCoffeeVarietyById(cleanId);
+  if (variety) return variety.name || '';
+
+  const process = findCoffeeProcessById(cleanId);
+  if (process) return process.name || '';
+
+  return '';
+}
+

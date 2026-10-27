@@ -874,7 +874,7 @@ export function findBottledWaterById(id: string): BottledWaterProfile | undefine
       const brandNorm = w.brandName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
       if (brandClean === cleanId || brandNorm === normId || brandClean.includes(cleanId) || cleanId.includes(brandClean)) return true;
       const tokens = brandNorm.split(/[\s/(),-]+/).filter(Boolean);
-      if (tokens.some((tok) => tok === normId || cleanId.includes(tok))) return true;
+      if (tokens.some((tok) => tok === normId || (tok.length >= 3 && cleanId.includes(tok)))) return true;
     }
     return false;
   });
