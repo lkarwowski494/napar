@@ -1128,3 +1128,33 @@ export function getGrinderSettingForMethod(
     grinderName: grinder.name,
   };
 }
+
+
+export interface GrinderSettingOverviewItem {
+  grinderId: string;
+  grinderName: string;
+  formatted: string;
+  clicks: number;
+  microns: number;
+}
+
+/**
+ * Zwraca zestawienie nastaw dla wszystkich wspieranych młynków dla wskazanej metody parzenia.
+ */
+export function getGrindSettingsOverview(
+  method: string,
+  language = 'pl'
+): GrinderSettingOverviewItem[] {
+  const safeMethod = typeof method === 'string' ? method.trim() : '';
+
+  return SUPPORTED_GRINDERS.map((grinder) => {
+    const setting = getGrinderSettingForMethod(grinder.id, safeMethod, language);
+    return {
+      grinderId: grinder.id,
+      grinderName: setting.grinderName,
+      formatted: setting.formatted,
+      clicks: setting.clicks,
+      microns: setting.microns,
+    };
+  });
+}

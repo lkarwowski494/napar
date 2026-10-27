@@ -14,6 +14,8 @@ import {
   findGrindCategoryById,
   getGrinderSettingForMethod,
   MethodGrindSettingResult,
+  getGrindSettingsOverview,
+  GrinderSettingOverviewItem,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -834,6 +836,29 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(fallbackRes.clicks).toBeGreaterThan(0);
     expect(fallbackRes.formatted).toBeDefined();
     expect(fallbackRes.category).toBeDefined();
+  });
+
+  test('TASK-P69-08-PRO: getGrindSettingsOverview generuje zestawienie nastaw dla wszystkich wspieranych młynków', () => {
+    // 1. Zestawienie dla V60
+    const overview: GrinderSettingOverviewItem[] = getGrindSettingsOverview('V60', 'pl');
+    expect(Array.isArray(overview)).toBe(true);
+    expect(overview.length).toBe(SUPPORTED_GRINDERS.length);
+
+    const c40Item = overview.find((g) => g.grinderId === 'comandante_c40');
+    expect(c40Item).toBeDefined();
+    expect(c40Item?.clicks).toBe(24);
+    expect(c40Item?.microns).toBe(720);
+    expect(c40Item?.formatted).toContain('24');
+
+    // 2. Wersja językowa EN
+    const overviewEn = getGrindSettingsOverview('Espresso', 'en');
+    expect(overviewEn.length).toBe(SUPPORTED_GRINDERS.length);
+    const c40En = overviewEn.find((g) => g.grinderId === 'comandante_c40');
+    expect(c40En?.formatted).toContain('clicks');
+
+    // 3. Fallback dla nieznanej metody i pustego wejścia
+    const fallbackOverview = getGrindSettingsOverview(null as any);
+    expect(fallbackOverview.length).toBe(SUPPORTED_GRINDERS.length);
   });
 });
 
