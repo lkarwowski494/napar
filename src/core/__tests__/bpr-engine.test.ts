@@ -12,6 +12,8 @@ import {
   ActionScheduleCounts,
   sortProactiveActions,
   ActionSortOption,
+  searchProactiveActions,
+  ActionSearchCriteria,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -872,6 +874,66 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       // 4. Odporność na null/undefined
       expect(sortProactiveActions(null as any)).toEqual([]);
       expect(sortProactiveActions([null as any, aTodayWarn])).toHaveLength(2);
+    });
+
+    it('TASK-P76-04-SZT: searchProactiveActions wyszukuje i filtruje akcje według kryteriów', () => {
+      const a1 = {
+        id: 'act-1',
+        titlePl: 'Parzenie V60: Ethiopia Yirgacheffe',
+        titleEn: 'Brew V60: Ethiopia Yirgacheffe',
+        recipeName: 'V60 Standard',
+        badgeColor: 'copper' as const,
+        itemType: 'coffee' as const,
+        daysOffset: 0,
+      } as any;
+      const a2 = {
+        id: 'act-2',
+        titlePl: 'Szczyt smaku: Sencha Asahi',
+        titleEn: 'Peak Window: Sencha Asahi',
+        recipeName: 'Sencha Kyusu',
+        badgeColor: 'success' as const,
+        itemType: 'tea' as const,
+        daysOffset: 2,
+      } as any;
+      const a3 = {
+        id: 'act-3',
+        titlePl: 'Kończący się zapas: Colombia Pink Bourbon',
+        titleEn: 'Low Stock: Colombia Pink Bourbon',
+        recipeName: 'AeroPress Inverted',
+        badgeColor: 'warning' as const,
+        itemType: 'coffee' as const,
+        daysOffset: 1,
+      } as any;
+
+      const all = [a1, a2, a3];
+
+      // 1. Wyszukiwanie po frazie tekstowej
+      const criteriaQuery: ActionSearchCriteria = { query: 'yirgacheffe' };
+      const byQuery = searchProactiveActions(all, criteriaQuery);
+      expect(byQuery.length).toBe(1);
+      expect(byQuery[0].id).toBe('act-1');
+
+      // 2. Filtrowanie po kolorze odznaki
+      const criteriaColor: ActionSearchCriteria = { badgeColor: 'warning' };
+      const byColor = searchProactiveActions(all, criteriaColor);
+      expect(byColor.length).toBe(1);
+      expect(byColor[0].id).toBe('act-3');
+
+      // 3. Filtrowanie po typie surowca (tea)
+      const criteriaType: ActionSearchCriteria = { itemType: 'tea' };
+      const byType = searchProactiveActions(all, criteriaType);
+      expect(byType.length).toBe(1);
+      expect(byType[0].id).toBe('act-2');
+
+      // 4. Filtrowanie po maxDaysOffset
+      const criteriaOffset: ActionSearchCriteria = { maxDaysOffset: 1 };
+      const byOffset = searchProactiveActions(all, criteriaOffset);
+      expect(byOffset.length).toBe(2);
+      expect(byOffset.some((a) => a.id === 'act-2')).toBe(false);
+
+      // 5. Puste wejście i odporność na null
+      expect(searchProactiveActions(null as any)).toEqual([]);
+      expect(searchProactiveActions(all, {})).toHaveLength(3);
     });
   });
 });

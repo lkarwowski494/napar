@@ -1025,3 +1025,64 @@ export function sortProactiveActions(
     }
   });
 }
+
+export interface ActionSearchCriteria {
+  query?: string;
+  badgeColor?: 'warning' | 'copper' | 'info' | 'success' | string;
+  itemType?: 'coffee' | 'tea' | string;
+  maxDaysOffset?: number;
+}
+
+/**
+ * Przeszukuje i filtruje listę akcji proaktywnego kalendarza wg zapytania tekstowego,
+ * koloru odznaki, typu surowca (kawa/herbata) lub maksymalnego horyzontu dni.
+ */
+export function searchProactiveActions(
+  actions?: ProactiveActionItem[] | null,
+  criteria: ActionSearchCriteria = {}
+): ProactiveActionItem[] {
+  if (!Array.isArray(actions) || actions.length === 0) return [];
+  const query = criteria && typeof criteria.query === 'string' ? criteria.query.trim().toLowerCase() : '';
+  const badgeColor = criteria && typeof criteria.badgeColor === 'string' ? criteria.badgeColor.trim().toLowerCase() : '';
+  const itemType = criteria && typeof criteria.itemType === 'string' ? criteria.itemType.trim().toLowerCase() : '';
+  const maxOffset = criteria && typeof criteria.maxDaysOffset === 'number' && Number.isFinite(criteria.maxDaysOffset)
+    ? criteria.maxDaysOffset
+    : null;
+
+  return actions.filter((act) => {
+    if (!act || typeof act !== 'object') return false;
+
+    if (query) {
+      const titlePl = (act.titlePl || '').toLowerCase();
+      const titleEn = (act.titleEn || '').toLowerCase();
+      const subPl = (act.subtitlePl || '').toLowerCase();
+      const subEn = (act.subtitleEn || '').toLowerCase();
+      const recipe = (act.recipeName || '').toLowerCase();
+      const bean = (act.inventoryItemName || '').toLowerCase();
+
+      const match =
+        titlePl.includes(query) ||
+        titleEn.includes(query) ||
+        subPl.includes(query) ||
+        subEn.includes(query) ||
+        recipe.includes(query) ||
+        bean.includes(query);
+
+      if (!match) return false;
+    }
+
+    if (badgeColor && (act.badgeColor || '').toLowerCase() !== badgeColor) {
+      return false;
+    }
+
+    if (itemType && (act.itemType || '').toLowerCase() !== itemType) {
+      return false;
+    }
+
+    if (maxOffset !== null && typeof act.daysOffset === 'number') {
+      if (act.daysOffset > maxOffset) return false;
+    }
+
+    return true;
+  });
+}
