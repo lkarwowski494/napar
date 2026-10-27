@@ -1,0 +1,53 @@
+{
+  "cycle": "P78",
+  "status": "completed",
+  "perspectives": [
+    "01-ODK",
+    "02-MON",
+    "03-ZAK",
+    "04-SZT",
+    "05-ARC"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P78-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Implementacja ekstraktora fragmentów wyszukiwania extractSearchSnippet w src/core/search-utils.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P78-02-MON",
+      "perspective": "02-MON",
+      "description": "Wdrożenie resolwera wezwania do działania paywalla getPaywallCallToAction z typem PaywallCallToAction w src/core/app-access.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P78-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja filtra niskiego stanu magazynowego getLowStockInventoryItems w src/core/database.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P78-04-SZT",
+      "perspective": "04-SZT",
+      "description": "Implementacja wyszukiwania akcji proaktywnej po ID getProactiveActionById w src/core/bpr-engine.ts",
+      "targetFile": "src/core/bpr-engine.ts",
+      "testFile": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P78-05-ARC",
+      "perspective": "05-ARC",
+      "description": "Wdrożenie walidatora pustej kopii zapasowej isBackupEmpty w src/core/backup.ts",
+      "targetFile": "src/core/backup.ts",
+      "testFile": "src/core/__tests__/backup.test.ts",
+      "status": "completed"
+    }
+  ]
+}
