@@ -284,3 +284,31 @@ export function formatFlowRate(
 
   return `${safeVal.toFixed(decimals)} g/s`;
 }
+
+/**
+ * Formatuje uzysk ekstrakcji w procentach (np. 20.15 -> '20.1%').
+ */
+export function formatExtractionYield(
+  yieldPercent: number | string | undefined | null,
+  decimals = 1
+): string {
+  if (yieldPercent === undefined || yieldPercent === null) return `0.0%`;
+  let val: number;
+  if (typeof yieldPercent === 'number') {
+    val = yieldPercent;
+  } else if (typeof yieldPercent === 'string') {
+    const clean = yieldPercent
+      .replace(/\uFEFF/g, '')
+      .replace(/[^\d.,]/g, '')
+      .replace(',', '.')
+      .trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  const safeVal =
+    !Number.isNaN(val) && val >= 0 && !Object.is(val, -0) ? Math.min(50, val) : 0;
+
+  return `${safeVal.toFixed(decimals)}%`;
+}

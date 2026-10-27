@@ -16,6 +16,7 @@ import {
   formatRatio,
   formatPressure,
   formatFlowRate,
+  formatExtractionYield,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -290,6 +291,19 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatFlowRate(Infinity)).toBe('100.0 g/s');
       expect(formatFlowRate(null)).toBe('0.0 g/s');
       expect(formatFlowRate(undefined)).toBe('0.0 g/s');
+    });
+
+    test('TASK-P72-09-LOK: formatExtractionYield formatuje EY w procentach z zabezpieczeniami', () => {
+      expect(formatExtractionYield(20.15)).toBe('20.1%');
+      expect(formatExtractionYield(20.15, 2)).toBe('20.15%');
+      expect(formatExtractionYield('19,85%')).toBe('19.9%');
+      expect(formatExtractionYield(0)).toBe('0.0%');
+      expect(formatExtractionYield(-0)).toBe('0.0%');
+      expect(formatExtractionYield(-5)).toBe('0.0%');
+      expect(formatExtractionYield(NaN)).toBe('0.0%');
+      expect(formatExtractionYield(Infinity)).toBe('50.0%');
+      expect(formatExtractionYield(null)).toBe('0.0%');
+      expect(formatExtractionYield(undefined)).toBe('0.0%');
     });
   });
 });
