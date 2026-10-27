@@ -38,4 +38,24 @@ describe('Apps4Craft Suite Theme Tokens', () => {
     const fallback = getCraftTheme('unknown_app');
     expect(fallback.id).toBe('napar');
   });
+
+  test('TASK-P59-04-SZT: getCraftTheme normalizuje wielkosc liter, spacje oraz BOM uFEFF', () => {
+    // 1. Wielkie litery
+    const piekarzUpper = getCraftTheme('PIEKARZ' as any);
+    expect(piekarzUpper.id).toBe('piekarz');
+    expect(piekarzUpper.name).toBe('Piekarz');
+
+    // 2. BOM i spacje
+    const sloikBom = getCraftTheme('\uFEFFsloik' as any);
+    expect(sloikBom.id).toBe('sloik');
+    expect(sloikBom.name).toBe('Słoik');
+
+    const fermentSpaced = getCraftTheme('  ferment  ' as any);
+    expect(fermentSpaced.id).toBe('ferment');
+
+    // 3. Bezpieczny fallback przy null/undefined
+    expect(getCraftTheme(null as any).id).toBe('napar');
+    expect(getCraftTheme(undefined as any).id).toBe('napar');
+    expect(getCraftTheme('' as any).id).toBe('napar');
+  });
 });

@@ -142,6 +142,8 @@ export const sharedCraftTokens = {
   },
 };
 
-export function getCraftTheme(appId: CraftAppId = 'napar'): CraftAppTheme {
-  return CRAFT_APPS[appId] ?? CRAFT_APPS.napar;
+export function getCraftTheme(appId: CraftAppId | string = 'napar'): CraftAppTheme {
+  if (!appId || typeof appId !== 'string') return CRAFT_APPS.napar;
+  const cleanId = appId.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
+  return (CRAFT_APPS as Record<string, CraftAppTheme>)[cleanId] ?? CRAFT_APPS.napar;
 }
