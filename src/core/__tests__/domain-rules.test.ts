@@ -621,4 +621,34 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(Object.is(calculateHoursUntilSafeCaffeine(20, 25), -0)).toBe(false);
     });
   });
+
+  describe('TASK-P56-12-NIE: odpornosc kalkulatora kofeiny i metabolizmu na przecinki dziesietne, jednostki i -0', () => {
+    it('estimateCoffeeCaffeineMg parsuje stringi z przecinkami i jednostkami', () => {
+      // 15,5g * 12 * 0.88 = 163.68 -> 163.7 mg
+      expect(estimateCoffeeCaffeineMg('15,5 g', 'arabica', 'filter')).toBe(163.7);
+      expect(estimateCoffeeCaffeineMg(' 18,0 g ', 'arabica', 'espresso')).toBe(162.0);
+      expect(estimateCoffeeCaffeineMg('-0')).toBe(0);
+      expect(Object.is(estimateCoffeeCaffeineMg('-0'), -0)).toBe(false);
+    });
+
+    it('estimateTotalLeafCaffeineMg parsuje stringi z przecinkami i jednostkami', () => {
+      // 5,5g * 1000 * 0.03 = 165.0 mg
+      expect(estimateTotalLeafCaffeineMg('5,5 g')).toBe(165.0);
+      expect(estimateTotalLeafCaffeineMg('-0')).toBe(0);
+      expect(Object.is(estimateTotalLeafCaffeineMg('-0'), -0)).toBe(false);
+    });
+
+    it('calculateRemainingCaffeineMg i calculateHoursUntilSafeCaffeine obsluguja jednostki i przecinki', () => {
+      // 100,0 mg po 5,0 h przy t1/2 = 5,0 h -> 50.0 mg
+      expect(calculateRemainingCaffeineMg('100,0 mg', '5,0 h', '5,0 h')).toBe(50.0);
+      // 100,0 mg do progu 25,0 mg przy t1/2 = 5,0 h -> 10.0 h
+      expect(calculateHoursUntilSafeCaffeine('100,0 mg', '25,0 mg', '5,0 h')).toBe(10.0);
+    });
+
+    it('calculateCaffeineDecay parsuje stringi z przecinkami i chroni przed -0', () => {
+      expect(calculateCaffeineDecay('100,0 mg' as any, '5,0 h' as any, '5,0 h' as any)).toBe(50.0);
+      expect(calculateCaffeineDecay(0, 5)).toBe(0);
+      expect(Object.is(calculateCaffeineDecay(0, 5), -0)).toBe(false);
+    });
+  });
 });

@@ -234,6 +234,22 @@ export function evaluateRestingWindow(roastDateInput: Date | string, currentDate
   }
 }
 
+function parseNumeric(val: unknown): number {
+  if (typeof val === 'number') {
+    if (!Number.isFinite(val)) return NaN;
+    return Object.is(val, -0) ? 0 : val;
+  }
+  if (typeof val === 'string') {
+    const clean = val.replace(/[\x00-\x1F\x7F\uFEFF]/g, '').trim().replace(/,/g, '.');
+    const m = clean.match(/^[+-]?\d+(?:\.\d+)?/);
+    if (!m) return NaN;
+    const num = parseFloat(m[0]);
+    if (!Number.isFinite(num)) return NaN;
+    return Object.is(num, -0) ? 0 : num;
+  }
+  return NaN;
+}
+
 /**
  * RD-17 & RD-18: Estymacja dawki kofeiny w filiżance kawy
  * Średnio 1g suchej Arabiki = 10.5 mg wyekstrahowanej kofeiny w przelewie
@@ -244,8 +260,8 @@ export function estimateCoffeeCaffeineMg(
   beanType: 'arabica' | 'robusta' = 'arabica',
   method: 'filter' | 'espresso' | 'immersion' | 'cold_brew' = 'filter'
 ): number {
-  const parsedDose = typeof doseGrams === 'string' ? parseFloat(doseGrams) : Number(doseGrams);
-  if (!Number.isFinite(parsedDose) || parsedDose <= 0) return 0;
+  const parsedDose = parseNumeric(doseGrams);
+  if (isNaN(parsedDose) || parsedDose <= 0) return 0;
   const safeDose = Math.min(1000, parsedDose);
 
   const normalizedBean = typeof beanType === 'string' && beanType.toLowerCase().trim() === 'robusta' ? 'robusta' : 'arabica';
@@ -267,8 +283,8 @@ export function estimateCoffeeCaffeineMg(
  * Szacuje całkowity ładunek kofeiny w suchych liściach herbaty (3.0% wagi suchej)
  */
 export function estimateTotalLeafCaffeineMg(leafDoseGrams: number | string): number {
-  const parsedDose = typeof leafDoseGrams === 'string' ? parseFloat(leafDoseGrams) : Number(leafDoseGrams);
-  if (!Number.isFinite(parsedDose) || parsedDose <= 0) return 0;
+  const parsedDose = parseNumeric(leafDoseGrams);
+  if (isNaN(parsedDose) || parsedDose <= 0) return 0;
   const safeDose = Math.min(1000, parsedDose);
   const result = Number((safeDose * 1000 * 0.03).toFixed(1));
   return Object.is(result, -0) ? 0 : result;
@@ -279,9 +295,9 @@ export function estimateTotalLeafCaffeineMg(leafDoseGrams: number | string): num
  * 1 zalanie: 45%, 2 zalanie: 30%, 3 zalanie: 15%, kolejne: 10% łącznie
  */
 export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number | string, infusionNumber: number | string): number {
-  const parsedTotal = typeof totalLeafCaffeineMg === 'string' ? parseFloat(totalLeafCaffeineMg) : Number(totalLeafCaffeineMg);
-  const parsedInfusion = typeof infusionNumber === 'string' ? parseInt(infusionNumber, 10) : Number(infusionNumber);
-  if (!Number.isFinite(parsedTotal) || !Number.isFinite(parsedInfusion) || parsedTotal <= 0 || parsedInfusion <= 0) return 0;
+  const parsedTotal = parseNumeric(totalLeafCaffeineMg);
+  const parsedInfusion = parseNumeric(infusionNumber);
+  if (isNaN(parsedTotal) || isNaN(parsedInfusion) || parsedTotal <= 0 || parsedInfusion <= 0) return 0;
   const fraction = 0.40 * Math.pow(0.55, parsedInfusion - 1);
   const result = Number((parsedTotal * fraction).toFixed(1));
   return Object.is(result, -0) ? 0 : result;
@@ -296,14 +312,14 @@ export function calculateRemainingCaffeineMg(
   hoursPassed: number | string,
   halfLifeHours: number | string = 5.0
 ): number {
-  const parsedDose = typeof initialDoseMg === 'string' ? parseFloat(initialDoseMg) : Number(initialDoseMg);
-  const parsedHours = typeof hoursPassed === 'string' ? parseFloat(hoursPassed) : Number(hoursPassed);
-  const parsedHalfLife = typeof halfLifeHours === 'string' ? parseFloat(halfLifeHours) : Number(halfLifeHours);
+  const parsedDose = parseNumeric(initialDoseMg);
+  const parsedHours = parseNumeric(hoursPassed);
+  const parsedHalfLife = parseNumeric(halfLifeHours);
 
   if (
-    !Number.isFinite(parsedDose) ||
-    !Number.isFinite(parsedHours) ||
-    !Number.isFinite(parsedHalfLife) ||
+    isNaN(parsedDose) ||
+    isNaN(parsedHours) ||
+    isNaN(parsedHalfLife) ||
     parsedDose <= 0 ||
     parsedHours < 0 ||
     parsedHalfLife <= 0
@@ -332,9 +348,9 @@ export function evaluateBedtimeCaffeine(
 
   for (const intake of safeIntakes) {
     if (intake && typeof intake === 'object') {
-      const parsedHours = typeof intake.hoursUntilBedtime === 'string' ? parseFloat(intake.hoursUntilBedtime) : Number(intake.hoursUntilBedtime);
-      const parsedDose = typeof intake.doseMg === 'string' ? parseFloat(intake.doseMg) : Number(intake.doseMg);
-      if (Number.isFinite(parsedHours) && parsedHours >= 0 && Number.isFinite(parsedDose) && parsedDose > 0) {
+      const parsedHours = parseNumeric(intake.hoursUntilBedtime);
+      const parsedDose = parseNumeric(intake.doseMg);
+      if (!isNaN(parsedHours) && parsedHours >= 0 && !isNaN(parsedDose) && parsedDose > 0) {
         totalRemaining += calculateRemainingCaffeineMg(parsedDose, parsedHours, safeHalfLife);
       }
     }
@@ -371,22 +387,21 @@ export function calculateHoursUntilSafeCaffeine(
   safeThresholdMg: number | string = 25.0,
   halfLifeHours: number | string = 5.0
 ): number {
-  const parsedDose = typeof doseMg === 'string' ? parseFloat(doseMg) : Number(doseMg);
-  const parsedThreshold = typeof safeThresholdMg === 'string' ? parseFloat(safeThresholdMg) : Number(safeThresholdMg);
-  const parsedHalfLife = typeof halfLifeHours === 'string' ? parseFloat(halfLifeHours) : Number(halfLifeHours);
+  const parsedDose = parseNumeric(doseMg);
+  const parsedThreshold = parseNumeric(safeThresholdMg);
+  const parsedHalfLife = parseNumeric(halfLifeHours);
 
   if (
-    !Number.isFinite(parsedDose) ||
-    !Number.isFinite(parsedThreshold) ||
-    !Number.isFinite(parsedHalfLife) ||
+    isNaN(parsedDose) ||
+    isNaN(parsedThreshold) ||
+    isNaN(parsedHalfLife) ||
     parsedDose <= parsedThreshold ||
     parsedThreshold <= 0 ||
     parsedHalfLife <= 0
   ) {
     return 0;
   }
-  const ratio = parsedDose / parsedThreshold;
-  const hours = parsedHalfLife * (Math.log(ratio) / Math.LN2);
+  const hours = parsedHalfLife * (Math.log(parsedDose / parsedThreshold) / Math.log(2));
   let result = Number(hours.toFixed(1));
   if (Object.is(result, -0) || result <= 0) result = 0;
   return result;
@@ -581,21 +596,26 @@ export function calculateBatchScaling(
  * Farmakokinetyka eliminacji kofeiny: C(t) = C0 * 0.5^(t / t_half)
  */
 export function calculateCaffeineDecay(
-  initialMg: number,
-  elapsedHours: number,
-  halfLifeHours = 5.0
+  initialMg: number | string,
+  elapsedHours: number | string,
+  halfLifeHours: number | string = 5.0
 ): number {
+  const pInitial = parseNumeric(initialMg);
+  const pElapsed = parseNumeric(elapsedHours);
+  const pHalfLife = parseNumeric(halfLifeHours);
   if (
-    !Number.isFinite(initialMg) ||
-    !Number.isFinite(elapsedHours) ||
-    !Number.isFinite(halfLifeHours) ||
-    initialMg <= 0 ||
-    elapsedHours < 0 ||
-    halfLifeHours <= 0
+    isNaN(pInitial) ||
+    isNaN(pElapsed) ||
+    isNaN(pHalfLife) ||
+    pInitial <= 0 ||
+    pElapsed < 0 ||
+    pHalfLife <= 0
   ) {
     return 0;
   }
-  return Number((initialMg * Math.pow(0.5, elapsedHours / halfLifeHours)).toFixed(4));
+  let res = Number((pInitial * Math.pow(0.5, pElapsed / pHalfLife)).toFixed(4));
+  if (Object.is(res, -0) || res < 0) res = 0;
+  return res;
 }
 
 export interface ScaledRecipeResult {
