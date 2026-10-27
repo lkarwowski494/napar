@@ -190,6 +190,25 @@ export class BrewTimerEngine {
     return Number(Math.max(0, total - poured).toFixed(1));
   }
 
+  /**
+   * Oblicza postęp nalewania wody w procentach (0 - 100%) z zaokrągleniem do 1 miejsca po przecinku.
+   * W przypadku braku kroków lub zerowej objętości docelowej zwraca 0.
+   */
+  public static calculateWaterPourProgress(
+    steps?: RecipeStep[] | null,
+    currentWaterGrams: number = 0
+  ): number {
+    const total = BrewTimerEngine.calculateTotalTargetWater(steps);
+    if (total <= 0) return 0;
+    const poured =
+      Number.isFinite(currentWaterGrams) && currentWaterGrams > 0 && !Object.is(currentWaterGrams, -0)
+        ? currentWaterGrams
+        : 0;
+    const progress = Math.min(100, (poured / total) * 100);
+    const rounded = Number(progress.toFixed(1));
+    return Object.is(rounded, -0) ? 0 : rounded;
+  }
+
   constructor(steps: RecipeStep[], callbacks: TimerCallbacks = {}) {
     this.steps = steps.map((s) => ({ ...s }));
     this.callbacks = callbacks;
