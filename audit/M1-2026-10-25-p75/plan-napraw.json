@@ -1,0 +1,53 @@
+{
+  "cycle": "P75",
+  "status": "completed",
+  "perspectives": [
+    "10-WYD",
+    "11-WZR",
+    "12-NIE",
+    "01-ODK",
+    "02-MON"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P75-10-WYD",
+      "perspective": "10-WYD",
+      "description": "Implementacja BrewTimerEngine.calculateRemainingWaterToPour i benchmark Budget 11 w src/core/timer-engine.ts",
+      "targetFile": "src/core/timer-engine.ts",
+      "testFile": "src/core/__tests__/perf-budget.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P75-11-WZR",
+      "perspective": "11-WZR",
+      "description": "Implementacja ewaluacji proporcji espresso evaluateEspressoRatio z typem EspressoRatioEvaluation w src/core/domain-rules.ts",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P75-12-NIE",
+      "perspective": "12-NIE",
+      "description": "Rozbudowa zestawu testów odpornościowych o pakiet Chaos 15 w src/core/__tests__/fuzz-resilience.test.ts",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P75-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Wdrożenie rozmytego filtrowania filterByFuzzySearch z typem FuzzySearchOptions w src/core/search-utils.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P75-02-MON",
+      "perspective": "02-MON",
+      "description": "Implementacja wskaźnika postępu okresu próbnego getTrialProgressInfo z typem TrialProgressInfo w src/core/app-access.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    }
+  ]
+}
