@@ -744,6 +744,131 @@ export function calculateInventoryTotalValue(
   };
 }
 
+export type BeanFreshnessPhase =
+  | 'degassing'
+  | 'peak'
+  | 'optimal'
+  | 'aging'
+  | 'past_peak'
+  | 'unknown';
+
+export interface BeanFreshnessAnalysis {
+  daysSinceRoast: number | null;
+  phase: BeanFreshnessPhase;
+  freshnessScore: number;
+  phaseLabelPl: string;
+  phaseLabelEn: string;
+  recommendationPl: string;
+  recommendationEn: string;
+}
+
+/**
+ * Analizuje stopień świeżości i fazę odgazowania kawy na podstawie daty palenia (roastDate),
+ * zwracając punktowy wskaźnik świeżości (0-100) oraz zlokalizowane rekomendacje parzenia.
+ */
+export function calculateBeanFreshness(
+  roastDate?: string | Date | null,
+  currentDate?: string | Date | null
+): BeanFreshnessAnalysis {
+  if (!roastDate) {
+    return {
+      daysSinceRoast: null,
+      phase: 'unknown',
+      freshnessScore: 70,
+      phaseLabelPl: 'Brak daty palenia',
+      phaseLabelEn: 'No roast date',
+      recommendationPl: 'Brak daty palenia — oceń aromat i gazowanie podczas preinfuzji (blooming).',
+      recommendationEn: 'No roast date — evaluate aroma and degassing during pre-infusion (bloom).',
+    };
+  }
+
+  const parseDate = (d: string | Date): number => {
+    if (d instanceof Date) return d.getTime();
+    if (typeof d === 'string') {
+      const parsed = Date.parse(d.replace(/\uFEFF/g, '').trim());
+      return Number.isFinite(parsed) ? parsed : NaN;
+    }
+    return NaN;
+  };
+
+  const roastMs = parseDate(roastDate);
+  const nowMs = currentDate ? parseDate(currentDate) : Date.now();
+
+  if (Number.isNaN(roastMs) || Number.isNaN(nowMs)) {
+    return {
+      daysSinceRoast: null,
+      phase: 'unknown',
+      freshnessScore: 70,
+      phaseLabelPl: 'Nieprawidłowa data',
+      phaseLabelEn: 'Invalid date',
+      recommendationPl: 'Nieprawidłowy format daty palenia.',
+      recommendationEn: 'Invalid roast date format.',
+    };
+  }
+
+  const diffMs = nowMs - roastMs;
+  const days = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+
+  if (days <= 7) {
+    return {
+      daysSinceRoast: days,
+      phase: 'degassing',
+      freshnessScore: Math.round(70 + (days / 7) * 20),
+      phaseLabelPl: 'Odgazowywanie (Degassing)',
+      phaseLabelEn: 'Degassing',
+      recommendationPl: 'Świeżo palone ziarna — intensywna emisja CO2; wydłuż czas preinfuzji do 45–60 s.',
+      recommendationEn: 'Freshly roasted — heavy CO2 release; extend bloom time to 45-60s.',
+    };
+  }
+
+  if (days <= 30) {
+    return {
+      daysSinceRoast: days,
+      phase: 'peak',
+      freshnessScore: 100,
+      phaseLabelPl: 'Szczyt smaku (Peak Flavor)',
+      phaseLabelEn: 'Peak Flavor',
+      recommendationPl: 'Optymalne okno sensoryczne — maksymalna ekspresja nut terroir, słodyczy i balansu.',
+      recommendationEn: 'Optimal sensory window — peak flavor clarity, sweetness, and complexity.',
+    };
+  }
+
+  if (days <= 60) {
+    return {
+      daysSinceRoast: days,
+      phase: 'optimal',
+      freshnessScore: Math.round(95 - ((days - 30) / 30) * 15),
+      phaseLabelPl: 'Stabilna jakość',
+      phaseLabelEn: 'Stable Quality',
+      recommendationPl: 'Bardzo dobra jakość — stabilna ekstrakcja bez nadmiernego pienienia.',
+      recommendationEn: 'Very good quality — stable extraction with minimal channel agitation.',
+    };
+  }
+
+  if (days <= 90) {
+    return {
+      daysSinceRoast: days,
+      phase: 'aging',
+      freshnessScore: Math.round(75 - ((days - 60) / 30) * 25),
+      phaseLabelPl: 'Starzenie ziaren',
+      phaseLabelEn: 'Aging',
+      recommendationPl: 'Początek utraty lotnych aromatów — zmiel odrobinę drobniej i zużyj w pierwszej kolejności.',
+      recommendationEn: 'Loss of delicate volatiles begins — grind slightly finer and prioritize usage.',
+    };
+  }
+
+  return {
+    daysSinceRoast: days,
+    phase: 'past_peak',
+    freshnessScore: Math.max(10, Math.round(50 - ((days - 90) / 90) * 40)),
+    phaseLabelPl: 'Przeleżała kawa',
+    phaseLabelEn: 'Past Peak',
+    recommendationPl: 'Ziarna zwietrzałe — zalecane metody ciśnieniowe z mlekiem lub cold brew.',
+    recommendationEn: 'Volatiles oxidized — recommend milk drinks, immersion, or cold brew.',
+  };
+}
+
+
 export function getInventoryItemById(id: string): InventoryItem | null {
   if (!id || typeof id !== 'string' || !id.trim()) return null;
   const safeId = id.trim();

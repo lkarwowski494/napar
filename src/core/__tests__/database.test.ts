@@ -22,6 +22,9 @@ import {
   getLowStockInventoryItems,
   calculateInventoryTotalValue,
   InventoryTotalValueResult,
+  calculateBeanFreshness,
+  BeanFreshnessAnalysis,
+  BeanFreshnessPhase,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -2939,5 +2942,48 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(emptyResult.inStockItemsCount).toBe(0);
     expect(emptyResult.estimatedTotalValuePln).toBe(0);
     expect(emptyResult.formattedTotalValuePln).toBe('0,00 zł');
+  });
+
+  test('TASK-P83-03-ZAK: calculateBeanFreshness analizuje fazy świeżości i odgazowania kawy', () => {
+    const fixedNow = new Date('2026-10-27T12:00:00Z');
+
+    // 1. Faza odgazowywania (degassing) - 3 dni po paleniu
+    const degassing: BeanFreshnessAnalysis = calculateBeanFreshness('2026-10-24T12:00:00Z', fixedNow);
+    const phaseCheck: BeanFreshnessPhase = degassing.phase;
+    expect(phaseCheck).toBe('degassing');
+    expect(degassing.daysSinceRoast).toBe(3);
+    expect(degassing.phaseLabelPl).toContain('Odgazowywanie');
+    expect(degassing.recommendationPl).toContain('preinfuzji');
+    expect(degassing.recommendationEn).toContain('bloom');
+
+    // 2. Szczyt smaku (peak flavor) - 14 dni po paleniu
+    const peak = calculateBeanFreshness('2026-10-13T12:00:00Z', fixedNow);
+    expect(peak.phase).toBe('peak');
+    expect(peak.freshnessScore).toBe(100);
+    expect(peak.phaseLabelPl).toContain('Szczyt smaku');
+
+    // 3. Stabilna jakość (optimal) - 45 dni po paleniu
+    const optimal = calculateBeanFreshness('2026-09-12T12:00:00Z', fixedNow);
+    expect(optimal.phase).toBe('optimal');
+    expect(optimal.freshnessScore).toBeGreaterThanOrEqual(80);
+
+    // 4. Starzenie ziaren (aging) - 75 dni po paleniu
+    const aging = calculateBeanFreshness('2026-08-13T12:00:00Z', fixedNow);
+    expect(aging.phase).toBe('aging');
+
+    // 5. Przeleżała kawa (past_peak) - 120 dni po paleniu
+    const pastPeak = calculateBeanFreshness('2026-06-29T12:00:00Z', fixedNow);
+    expect(pastPeak.phase).toBe('past_peak');
+    expect(pastPeak.recommendationPl).toContain('cold brew');
+
+    // 6. Odporność na brak daty, null, stringi niepoprawne
+    const missing = calculateBeanFreshness(null);
+    expect(missing.phase).toBe('unknown');
+    expect(missing.daysSinceRoast).toBeNull();
+    expect(missing.phaseLabelPl).toBe('Brak daty palenia');
+
+    const invalid = calculateBeanFreshness('not-a-date');
+    expect(invalid.phase).toBe('unknown');
+    expect(invalid.phaseLabelPl).toBe('Nieprawidłowa data');
   });
 });
