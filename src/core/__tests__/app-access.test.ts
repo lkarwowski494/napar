@@ -21,6 +21,7 @@ import {
   getTrialBrewsRemaining,
   formatSubscriptionTierName,
   formatTrialStatusSummary,
+  formatTrialBadgeText,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1052,6 +1053,40 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const subRes = activateSubscription(' \uFEFFpl.lukasz.napar.monthly\x00 ' as any);
     expect(subRes.isSubscribed).toBe(true);
     expect(subRes.subscriptionTier).toBe('monthly');
+  });
+
+  test('TASK-P59-02-MON: formatTrialBadgeText bezpiecznie obsluguje null, undefined, -0 oraz NaN w parametrze stanu', () => {
+    resetTrialForTesting();
+    // 1. null jako state nie rzuca błędu
+    expect(() => formatTrialBadgeText(null as any, 'pl')).not.toThrow();
+    const nullPl = formatTrialBadgeText(null as any, 'pl');
+    expect(nullPl).toContain('Okres próbny');
+
+    const nullEn = formatTrialBadgeText(undefined, 'en');
+    expect(nullEn).toContain('Trial');
+
+    // 2. -0 i NaN w liczbie parzeń lub dni
+    const edgeState = {
+      status: 'trial_active',
+      isSubscribed: false,
+      brewsRemaining: -0,
+      daysRemaining: NaN,
+      brewsCount: 0,
+      daysElapsed: 0,
+      canCreate: true,
+      isHistoryReadOnly: false,
+      subscriptionTier: 'none',
+    } as any;
+
+    const edgePl = formatTrialBadgeText(edgeState, 'pl');
+    expect(edgePl).toBe('Okres próbny: 0 parzeń · 0 dni');
+    expect(edgePl).not.toContain('-0');
+    expect(edgePl).not.toContain('NaN');
+
+    const edgeEn = formatTrialBadgeText(edgeState, 'en');
+    expect(edgeEn).toBe('Trial: 0 brews · 0 days remaining');
+    expect(edgeEn).not.toContain('-0');
+    expect(edgeEn).not.toContain('NaN');
   });
 });
 

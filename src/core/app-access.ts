@@ -242,7 +242,7 @@ export function formatTrialStatusSummary(
   const rawBrews = Number.isFinite(rawBrewsVal) && rawBrewsVal >= 0
     ? Math.floor(rawBrewsVal)
     : 0;
-  const brews = Object.is(rawBrews, -0) ? 0 : rawBrews;
+  const brews = Object.is(rawBrews, -0) || isNaN(rawBrews) ? 0 : rawBrews;
 
   const rawDaysVal = typeof state.daysRemaining === 'number'
     ? state.daysRemaining
@@ -255,7 +255,7 @@ export function formatTrialStatusSummary(
   const rawDays = Number.isFinite(rawDaysVal) && rawDaysVal >= 0
     ? Math.floor(rawDaysVal)
     : 0;
-  const days = Object.is(rawDays, -0) ? 0 : rawDays;
+  const days = Object.is(rawDays, -0) || isNaN(rawDays) ? 0 : rawDays;
 
   if (isEn) {
     const brewWord = brews === 1 ? 'brew' : 'brews';
@@ -274,6 +274,14 @@ export function formatTrialStatusSummary(
   }
   const dayUnit = days === 1 ? 'dzień' : 'dni';
   return `Okres próbny: ${brews} ${brewUnit} · ${days} ${dayUnit}`;
+}
+
+export function formatTrialBadgeText(
+  state?: AppAccessState | null,
+  language: 'pl' | 'en' | string = 'pl'
+): string {
+  const safeState = state && typeof state === 'object' ? state : getAppAccessState();
+  return formatTrialStatusSummary(safeState, language);
 }
 
 export function recordBrewCompleted(): AppAccessState {
