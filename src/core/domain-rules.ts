@@ -1141,3 +1141,104 @@ export function evaluateEspressoRatio(
     sensoryExpectationEn,
   };
 }
+
+export type ColdBrewStyle = 'concentrate' | 'ready_to_drink' | 'underextracted_weak' | 'overly_dense';
+
+export interface ColdBrewRatioEvaluation {
+  doseGrams: number;
+  waterGrams: number;
+  ratio: number;
+  ratioFormatted: string;
+  style: ColdBrewStyle;
+  styleLabelPl: string;
+  styleLabelEn: string;
+  recommendedDilutionPl: string;
+  recommendedDilutionEn: string;
+  sensoryDescriptionPl: string;
+  sensoryDescriptionEn: string;
+}
+
+/**
+ * Klasyfikuje proporcję maceracji Cold Brew (woda:kawa) i określa profil naparu
+ * (overly_dense < 1:3.5, concentrate 1:3.5 - 1:7.5, ready_to_drink 1:7.5 - 1:15, underextracted_weak > 1:15).
+ */
+export function evaluateColdBrewRatio(
+  doseGrams: number | string,
+  waterGrams: number | string
+): ColdBrewRatioEvaluation {
+  const parseVal = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const dose = parseVal(doseGrams);
+  const water = parseVal(waterGrams);
+
+  let rawRatio = 0;
+  if (dose > 0 && water > 0) {
+    rawRatio = water / dose;
+  }
+
+  const ratio = Number(rawRatio.toFixed(2));
+  const ratioFormatted = `1:${ratio.toFixed(1)}`;
+
+  let style: ColdBrewStyle;
+  let styleLabelPl: string;
+  let styleLabelEn: string;
+  let recommendedDilutionPl: string;
+  let recommendedDilutionEn: string;
+  let sensoryDescriptionPl: string;
+  let sensoryDescriptionEn: string;
+
+  if (ratio <= 0 || ratio < 3.5) {
+    style = 'overly_dense';
+    styleLabelPl = 'Zbyt gęsty ekstrakt / zawiesina';
+    styleLabelEn = 'Overly dense / muddy slurry';
+    recommendedDilutionPl = 'Wymaga znacznego rozcieńczenia (1:2 lub więcej) i odfiltrowania drobinek.';
+    recommendedDilutionEn = 'Requires heavy dilution (1:2 or higher) and fine filtration.';
+    sensoryDescriptionPl = 'Skrajnie intensywny, lepki ekstrakt o wysokim stężeniu pyłu i olejków.';
+    sensoryDescriptionEn = 'Extremely intense, viscous extract with high suspended solids and oils.';
+  } else if (ratio <= 7.5) {
+    style = 'concentrate';
+    styleLabelPl = 'Koncentrat Cold Brew';
+    styleLabelEn = 'Cold Brew Concentrate';
+    recommendedDilutionPl = 'Rozcieńcz 1:1 z wodą, mlekiem, napojem owsianym lub tonikiem z lodem.';
+    recommendedDilutionEn = 'Dilute 1:1 with fresh water, milk, oat drink, or tonic with ice.';
+    sensoryDescriptionPl = 'Mocny, głęboki napar o czekoladowo-orzechowym profilu, doskonały jako baza do napojów.';
+    sensoryDescriptionEn = 'Rich, deep infusion with chocolate and nutty profile, ideal beverage base.';
+  } else if (ratio <= 15.0) {
+    style = 'ready_to_drink';
+    styleLabelPl = 'Gotowe do picia (RTD)';
+    styleLabelEn = 'Ready-to-drink (RTD)';
+    recommendedDilutionPl = 'Bez rozcieńczania; podawaj bezpośrednio z kostkami lodu.';
+    recommendedDilutionEn = 'No dilution needed; serve chilled straight over ice.';
+    sensoryDescriptionPl = 'Aksamitna, gładka kawa o naturalnej słodyczy, zbalansowanej kwasowości i orzeźwiającym finiszu.';
+    sensoryDescriptionEn = 'Velvety smooth coffee with natural sweetness, mellow acidity, and refreshing finish.';
+  } else {
+    style = 'underextracted_weak';
+    styleLabelPl = 'Rozwodnione Cold Brew';
+    styleLabelEn = 'Dilute / weak Cold Brew';
+    recommendedDilutionPl = 'Brak potrzeby rozcieńczania; w przyszłości zredukuj ilość wody.';
+    recommendedDilutionEn = 'No dilution needed; reduce water volume for future batches.';
+    sensoryDescriptionPl = 'Lekki, cienki napar o niskiej intensywności smaku i braku wyrazistego body.';
+    sensoryDescriptionEn = 'Light, thin cup with low flavor intensity and lack of body.';
+  }
+
+  return {
+    doseGrams: dose,
+    waterGrams: water,
+    ratio,
+    ratioFormatted,
+    style,
+    styleLabelPl,
+    styleLabelEn,
+    recommendedDilutionPl,
+    recommendedDilutionEn,
+    sensoryDescriptionPl,
+    sensoryDescriptionEn,
+  };
+}

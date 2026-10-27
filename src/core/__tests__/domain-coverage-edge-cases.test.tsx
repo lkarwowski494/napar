@@ -49,7 +49,7 @@ import {
 } from '../database';
 import { BrewTimerEngine } from '../timer-engine';
 import { wInKeep } from '../unit-converter';
-import { scaleRecipeDose } from '../domain-rules';
+import { scaleRecipeDose, evaluateColdBrewRatio, ColdBrewRatioEvaluation } from '../domain-rules';
 import {
   recipeToCompactPayload,
   encodeRecipeToShareUrl,
@@ -399,6 +399,42 @@ describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
       expect(generic.parseSetting('650')).toBe(650);
 
       expect(getRecipeMicrons({})).toBeGreaterThan(0);
+    });
+  });
+
+  describe('TASK-P77-11-WZR: evaluateColdBrewRatio domain rules', () => {
+    test('klasyfikuje koncentrat cold brew (1:4 - 1:7) i zaleca rozcieńczenie', () => {
+      const evalConcentrate: ColdBrewRatioEvaluation = evaluateColdBrewRatio(100, 500);
+      expect(evalConcentrate.style).toBe('concentrate');
+      expect(evalConcentrate.ratio).toBe(5);
+      expect(evalConcentrate.ratioFormatted).toBe('1:5.0');
+      expect(evalConcentrate.styleLabelPl).toContain('Koncentrat');
+      expect(evalConcentrate.recommendedDilutionPl).toContain('1:1');
+      expect(evalConcentrate.recommendedDilutionEn).toContain('1:1');
+    });
+
+    test('klasyfikuje cold brew gotowe do picia (ready_to_drink, 1:8 - 1:15)', () => {
+      const evalRtd: ColdBrewRatioEvaluation = evaluateColdBrewRatio('60', '720');
+      expect(evalRtd.style).toBe('ready_to_drink');
+      expect(evalRtd.ratio).toBe(12);
+      expect(evalRtd.styleLabelPl).toContain('Gotowe do picia');
+      expect(evalRtd.styleLabelEn).toContain('Ready-to-drink');
+    });
+
+    test('klasyfikuje zbyt gęsty ekstrakt (overly_dense) oraz rozwodniony (underextracted_weak)', () => {
+      const dense = evaluateColdBrewRatio(100, 250);
+      expect(dense.style).toBe('overly_dense');
+
+      const weak = evaluateColdBrewRatio(20, 400);
+      expect(weak.style).toBe('underextracted_weak');
+    });
+
+    test('odporność na null, stringi, przecinki, ujemne wartości i -0', () => {
+      const fallback = evaluateColdBrewRatio(null as any, -100);
+      expect(fallback.ratio).toBe(0);
+      expect(fallback.style).toBe('overly_dense');
+      expect(Number.isFinite(fallback.ratio)).toBe(true);
+      expect(Object.is(fallback.ratio, -0)).toBe(false);
     });
   });
 });
