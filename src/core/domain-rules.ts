@@ -36,6 +36,12 @@ export interface TasteDiagnosis {
   steepTimeAdjustmentSeconds?: number;
 }
 
+export interface BeverageYieldResult {
+  doseGrams: number;
+  waterGrams: number;
+  beverageGrams: number;
+}
+
 /**
  * RD-01: Proporcja parzenia (Brew Ratio)
  * Oblicza masę wody dla zadanej dozy i współczynnika (np. 1:16.6)
@@ -105,6 +111,68 @@ export function calculateLiquidYield(
   let yieldGrams = Math.max(0, parsedWater - retained);
   if (Object.is(yieldGrams, -0)) yieldGrams = 0;
   return Number(yieldGrams.toFixed(1));
+}
+
+/**
+ * RD-02b: Odwrotna kalkulacja uzysku z uwzględnieniem retencji wody (Target Beverage Yield)
+ * Oblicza potrzebną dozę suchą i całkowitą objętość wody, aby otrzymać zadaną objętość gotowego naparu w naczyniu.
+ * Wzór: Beverage = Dose * (Ratio - RetentionFactor)  =>  Dose = Beverage / (Ratio - RetentionFactor)
+ */
+export function calculateDoseForBeverageYield(
+  targetBeverageGrams: number | string,
+  ratio: number | string = 16.0,
+  retentionFactor: number | string = 2.0,
+  maxDoseGrams = 1000.0,
+  maxWaterGrams = 50000.0
+): BeverageYieldResult {
+  const parsedBev =
+    typeof targetBeverageGrams === 'number'
+      ? targetBeverageGrams
+      : parseFloat(String(targetBeverageGrams).replace(/\uFEFF/g, '').replace(',', '.'));
+  const parsedRatio =
+    typeof ratio === 'number'
+      ? ratio
+      : parseFloat(String(ratio).replace(/\uFEFF/g, '').replace(',', '.'));
+  const parsedRetention =
+    typeof retentionFactor === 'number'
+      ? retentionFactor
+      : parseFloat(String(retentionFactor).replace(/\uFEFF/g, '').replace(',', '.'));
+
+  if (
+    !Number.isFinite(parsedBev) ||
+    !Number.isFinite(parsedRatio) ||
+    !Number.isFinite(parsedRetention) ||
+    parsedBev <= 0 ||
+    parsedRatio <= 0 ||
+    parsedRetention < 0 ||
+    parsedRatio <= parsedRetention
+  ) {
+    return { doseGrams: 0, waterGrams: 0, beverageGrams: 0 };
+  }
+
+  const effectiveRatio = parsedRatio - parsedRetention;
+  const rawDose = parsedBev / effectiveRatio;
+  const safeMaxDose = Number.isFinite(maxDoseGrams) && maxDoseGrams > 0 ? maxDoseGrams : 1000.0;
+  const safeMaxWater = Number.isFinite(maxWaterGrams) && maxWaterGrams > 0 ? maxWaterGrams : 50000.0;
+
+  let clampedDose = Math.min(rawDose, safeMaxDose);
+  let rawWater = clampedDose * parsedRatio;
+  let clampedWater = Math.min(rawWater, safeMaxWater);
+
+  if (clampedWater < rawWater) {
+    clampedDose = clampedWater / parsedRatio;
+  }
+
+  const finalDose = Number(clampedDose.toFixed(1));
+  const finalWater = Number(clampedWater.toFixed(1));
+  let finalBeverage = Math.max(0, finalWater - finalDose * parsedRetention);
+  if (Object.is(finalBeverage, -0)) finalBeverage = 0;
+
+  return {
+    doseGrams: Object.is(finalDose, -0) ? 0 : finalDose,
+    waterGrams: Object.is(finalWater, -0) ? 0 : finalWater,
+    beverageGrams: Number(finalBeverage.toFixed(1)),
+  };
 }
 
 /**
@@ -415,6 +483,12 @@ export interface TasteDiagnosis {
   grindAdjustment?: 'finer' | 'coarser';
   tempAdjustment?: 'higher' | 'lower';
   steepTimeAdjustmentSeconds?: number;
+}
+
+export interface BeverageYieldResult {
+  doseGrams: number;
+  waterGrams: number;
+  beverageGrams: number;
 }
 
 /**

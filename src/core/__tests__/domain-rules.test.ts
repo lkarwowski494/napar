@@ -15,6 +15,8 @@ import {
   calculateBatchScaling,
   calculateCaffeineDecay,
   scaleRecipeDose,
+  calculateDoseForBeverageYield,
+  BeverageYieldResult,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -649,6 +651,39 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(calculateCaffeineDecay('100,0 mg' as any, '5,0 h' as any, '5,0 h' as any)).toBe(50.0);
       expect(calculateCaffeineDecay(0, 5)).toBe(0);
       expect(Object.is(calculateCaffeineDecay(0, 5), -0)).toBe(false);
+    });
+  });
+
+  describe('TASK-P65-11-WZR: calculateDoseForBeverageYield odwrotna kalkulacja uzysku', () => {
+    it('oblicza dozę i wodę dla zadanego naparu w filiżance', () => {
+      const res: BeverageYieldResult = calculateDoseForBeverageYield(250, 16.0, 2.0);
+      expect(res.doseGrams).toBeCloseTo(17.9, 1);
+      expect(res.waterGrams).toBeCloseTo(285.7, 1);
+      expect(res.beverageGrams).toBeCloseTo(250.0, 0);
+    });
+
+    it('obsługuje stringi z przecinkami i spacjami', () => {
+      const res = calculateDoseForBeverageYield('300,0', '15,0', '2,0');
+      expect(res.doseGrams).toBeCloseTo(23.1, 1);
+      expect(res.waterGrams).toBeCloseTo(346.2, 1);
+      expect(res.beverageGrams).toBeGreaterThan(290);
+    });
+
+    it('bezpiecznie reaguje na zerowe, ujemne i niepoprawne dane', () => {
+      const zero = calculateDoseForBeverageYield(0, 16);
+      expect(zero.doseGrams).toBe(0);
+      expect(zero.waterGrams).toBe(0);
+      expect(zero.beverageGrams).toBe(0);
+
+      const invalid = calculateDoseForBeverageYield(250, 2.0, 2.0); // ratio == retention
+      expect(invalid.doseGrams).toBe(0);
+      expect(invalid.waterGrams).toBe(0);
+      expect(invalid.beverageGrams).toBe(0);
+
+      const nanRes = calculateDoseForBeverageYield(NaN, 16);
+      expect(nanRes.doseGrams).toBe(0);
+      expect(nanRes.waterGrams).toBe(0);
+      expect(nanRes.beverageGrams).toBe(0);
     });
   });
 });
