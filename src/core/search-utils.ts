@@ -400,3 +400,72 @@ export function extractSearchSnippet(
 
   return snippet;
 }
+
+
+export interface SearchCorrectionSuggestion {
+  originalQuery: string;
+  suggestedTerm: string;
+  distance: number;
+  similarityScore: number;
+}
+
+/**
+ * Podpowiada potencjalne korekty literówek dla zapytania wyszukiwania na podstawie
+ * słownika referencyjnego przy użyciu algorytmu odległości edycyjnej Levenshteina.
+ */
+export function suggestSearchCorrections(
+  query: string | undefined | null,
+  dictionary: string[],
+  maxSuggestions = 3,
+  maxDistance = 3
+): SearchCorrectionSuggestion[] {
+  if (
+    !query ||
+    typeof query !== 'string' ||
+    !query.trim() ||
+    !Array.isArray(dictionary) ||
+    dictionary.length === 0
+  ) {
+    return [];
+  }
+
+  const cleanQuery = query.trim();
+  const normQ = normSearch(cleanQuery);
+  if (!normQ) return [];
+
+  const safeMax = typeof maxSuggestions === 'number' && maxSuggestions > 0 ? maxSuggestions : 3;
+  const safeDist = typeof maxDistance === 'number' && maxDistance >= 0 ? maxDistance : 3;
+
+  const matches: SearchCorrectionSuggestion[] = [];
+  const seen = new Set<string>();
+
+  for (const term of dictionary) {
+    if (!term || typeof term !== 'string' || !term.trim()) continue;
+    const lowerTerm = term.trim().toLowerCase();
+    if (seen.has(lowerTerm)) continue;
+    seen.add(lowerTerm);
+
+    const normTerm = normSearch(term);
+    const dist = calculateLevenshteinDistance(normQ, normTerm);
+
+    if (dist <= safeDist) {
+      const maxLen = Math.max(normQ.length, normTerm.length);
+      const similarityScore = maxLen > 0 ? Number((1 - dist / maxLen).toFixed(2)) : 1.0;
+
+      matches.push({
+        originalQuery: cleanQuery,
+        suggestedTerm: term.trim(),
+        distance: dist,
+        similarityScore: Object.is(similarityScore, -0) ? 0 : similarityScore,
+      });
+    }
+  }
+
+  matches.sort((a, b) => {
+    if (a.distance !== b.distance) return a.distance - b.distance;
+    if (b.similarityScore !== a.similarityScore) return b.similarityScore - a.similarityScore;
+    return a.suggestedTerm.localeCompare(b.suggestedTerm);
+  });
+
+  return matches.slice(0, safeMax);
+}

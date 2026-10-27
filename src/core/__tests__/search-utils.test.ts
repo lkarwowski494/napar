@@ -17,6 +17,8 @@ import {
   filterByFuzzySearch,
   FuzzySearchOptions,
   extractSearchSnippet,
+  suggestSearchCorrections,
+  SearchCorrectionSuggestion,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -271,5 +273,32 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     // 4. Odporność na null, undefined, liczby ujemne i -0
     expect(extractSearchSnippet(null, 'test')).toBe('');
     expect(extractSearchSnippet(longText, null, -10)).toBeDefined();
+  });
+
+  test('TASK-P80-01-ODK: suggestSearchCorrections podpowiada korekty literówek na podstawie słownika', () => {
+    const dictionary = ['Geisha', 'Bourbon', 'Ethiopia', 'Kenya', 'Chemex', 'Aeropress', 'V60', 'Caturra'];
+
+    // 1. Literówka "geish" -> "Geisha"
+    const suggestions: SearchCorrectionSuggestion[] = suggestSearchCorrections('geish', dictionary);
+    expect(suggestions.length).toBeGreaterThan(0);
+    expect(suggestions[0].suggestedTerm).toBe('Geisha');
+    expect(suggestions[0].distance).toBe(1);
+    expect(suggestions[0].similarityScore).toBeGreaterThanOrEqual(0.8);
+
+    // 2. Literówka "chemx" -> "Chemex"
+    const chemxSug = suggestSearchCorrections('chemx', dictionary);
+    expect(chemxSug.length).toBeGreaterThan(0);
+    expect(chemxSug[0].suggestedTerm).toBe('Chemex');
+
+    // 3. Dokładne dopasowanie "kenya" -> distance 0, similarity 1
+    const exact = suggestSearchCorrections('kenya', dictionary);
+    expect(exact[0].distance).toBe(0);
+    expect(exact[0].similarityScore).toBe(1);
+
+    // 4. Pusty słownik, brak zapytania lub zbyt duża odległość
+    expect(suggestSearchCorrections('', dictionary)).toEqual([]);
+    expect(suggestSearchCorrections('xyzqwertyuiop', dictionary, 3, 2)).toEqual([]);
+    expect(suggestSearchCorrections(null as any, dictionary)).toEqual([]);
+    expect(suggestSearchCorrections('test', null as any)).toEqual([]);
   });
 });
