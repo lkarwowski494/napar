@@ -41,6 +41,7 @@ import {
   formatWcagRating,
   formatBrewTime,
   formatBrewDurationText,
+  formatRelativeDays,
 } from '../i18n';
 import { getAppSetting } from '../database';
 
@@ -482,5 +483,33 @@ describe('i18n System', () => {
     expect(formatBrewDurationText(0, 'pl')).toBe('0 s');
     expect(formatBrewDurationText(-0, 'en')).toBe('0s');
     expect(formatBrewDurationText(NaN, 'pl')).toBe('0 s');
+  });
+
+  test('TASK-P65-09-LOK: formatRelativeDays czytelnie formatuje dni relatywne w PL i EN', () => {
+    // 0 -> Dziś / Today
+    expect(formatRelativeDays(0, 'pl')).toBe('Dziś');
+    expect(formatRelativeDays(0, 'en')).toBe('Today');
+    expect(formatRelativeDays(-0, 'pl')).toBe('Dziś');
+    expect(formatRelativeDays(NaN, 'pl')).toBe('Dziś');
+    expect(formatRelativeDays(null, 'en')).toBe('Today');
+    expect(formatRelativeDays(undefined, 'pl')).toBe('Dziś');
+
+    // 1 -> Jutro / Tomorrow
+    expect(formatRelativeDays(1, 'pl')).toBe('Jutro');
+    expect(formatRelativeDays('1', 'en')).toBe('Tomorrow');
+
+    // -1 -> Wczoraj / Yesterday
+    expect(formatRelativeDays(-1, 'pl')).toBe('Wczoraj');
+    expect(formatRelativeDays('-1', 'en')).toBe('Yesterday');
+
+    // > 1 -> Za X dni / In X days
+    expect(formatRelativeDays(3, 'pl')).toBe('Za 3 dni');
+    expect(formatRelativeDays(14, 'en')).toBe('In 14 days');
+    expect(formatRelativeDays('5.2', 'pl')).toBe('Za 5 dni');
+
+    // < -1 -> X dni temu / X days ago
+    expect(formatRelativeDays(-4, 'pl')).toBe('4 dni temu');
+    expect(formatRelativeDays(-21, 'en')).toBe('21 days ago');
+    expect(formatRelativeDays('-7.8', 'pl')).toBe('8 dni temu');
   });
 });

@@ -7,6 +7,7 @@ import {
   calculateTeaCost,
   formatPlnCost,
   formatCost,
+  SupportedCurrency,
   DEFAULT_BREW_COST_PARAMETERS,
   DEFAULT_TEA_COST_PARAMETERS,
 } from '../cost-calculator';
@@ -162,6 +163,8 @@ describe('Cost Calculator Engine (Craft Economics)', () => {
   });
 
   test('TASK-P65-08-PRO: formatCost bezpiecznie formatuje kwoty wielowalutowe (PLN, EUR, USD, GBP)', () => {
+    const cur: SupportedCurrency = 'EUR';
+    expect(formatCost(3.5, cur)).toBe('€3.50');
     expect(formatCost(3.5, 'PLN')).toBe('3.50 zł');
     expect(formatCost(3.5)).toBe('3.50 zł');
     expect(formatCost('4,20', 'EUR')).toBe('€4.20');

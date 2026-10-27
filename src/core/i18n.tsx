@@ -1559,3 +1559,43 @@ export function formatBrewDurationText(
   }
   return isPolish ? `${mins} min ${secs} s` : `${mins}m ${secs}s`;
 }
+
+/**
+ * Formatuje liczbę dni względem dzisiaj do czytelnej postaci (np. 'Dziś', 'Jutro', 'Za 3 dni', '4 dni temu' w PL,
+ * 'Today', 'Tomorrow', 'In 3 days', '4 days ago' w EN/innych).
+ * Obsługuje stringi ('5.2', '-3'), chroni przed -0, NaN, null, undefined.
+ */
+export function formatRelativeDays(
+  daysOffset: number | string | undefined | null,
+  lang: SupportedLanguage | string = 'pl'
+): string {
+  const isPolish = typeof lang === 'string' && lang.toLowerCase().startsWith('pl');
+  if (daysOffset === undefined || daysOffset === null) {
+    return isPolish ? 'Dziś' : 'Today';
+  }
+  const rawDays =
+    typeof daysOffset === 'number'
+      ? daysOffset
+      : typeof daysOffset === 'string'
+      ? parseFloat(daysOffset.replace(/\uFEFF/g, '').replace(',', '.'))
+      : 0;
+  const safeDays =
+    Number.isFinite(rawDays) && !Object.is(rawDays, -0)
+      ? Math.max(-36500, Math.min(36500, Math.round(rawDays)))
+      : 0;
+
+  if (safeDays === 0) {
+    return isPolish ? 'Dziś' : 'Today';
+  }
+  if (safeDays === 1) {
+    return isPolish ? 'Jutro' : 'Tomorrow';
+  }
+  if (safeDays === -1) {
+    return isPolish ? 'Wczoraj' : 'Yesterday';
+  }
+  if (safeDays > 1) {
+    return isPolish ? `Za ${safeDays} dni` : `In ${safeDays} days`;
+  }
+  const absDays = Math.abs(safeDays);
+  return isPolish ? `${absDays} dni temu` : `${absDays} days ago`;
+}
