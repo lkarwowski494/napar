@@ -24,6 +24,7 @@ import {
   evaluateFrenchPressRatio,
   evaluateAeroPressRatio,
   evaluateMokaPotRatio,
+  evaluateTurkishCoffeeRatio,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
@@ -38,6 +39,7 @@ import {
   calculateMagnesiumCalciumRatio,
   calculateResidualAlkalinity,
   calculateSulfateToChlorideRatio,
+  calculateTotalHardnessFromIons,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -53,6 +55,7 @@ import {
   calculateBurrSpeedImpact,
   estimateGrindDuration,
   formatGrinderDialSetting,
+  calculateGrinderStepDelta,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -71,6 +74,7 @@ import {
   formatAltitude,
   formatPressureWithUnit,
   formatBrewTimeMinutesSeconds,
+  formatCaffeineDose,
   wInKeep,
 } from '../unit-converter';
 import {
@@ -83,11 +87,12 @@ import {
   getCoffeeOriginGuide,
   getCoffeeRoastLevelGuide,
   getCoffeeAltitudeGuide,
+  getTeaCategoryGuide,
 } from '../knowledge-data';
-import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed } from '../bpr-engine';
-import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize } from '../backup';
+import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed, detectBrewingHabitDrift } from '../bpr-engine';
+import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize, compareBackupVersions } from '../backup';
 import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings, evaluateTrialStatus } from '../app-access';
-import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate } from '../database';
+import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate, calculateBeanRestingReadiness } from '../database';
 import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore, filterSearchEntriesByTags } from '../search-utils';
 
 const mockDb: any = {
@@ -1109,6 +1114,96 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       // 10. filterSearchEntriesByTags
       const filteredTags = filterSearchEntriesByTags(val as any, val as any, val as any, val as any);
       expect(Array.isArray(filteredTags)).toBe(true);
+    }
+  });
+
+  test('Chaos 21: Fuzzing nowych funkcji domenowych (calculateBeanRestingReadiness, detectBrewingHabitDrift, compareBackupVersions, calculateTotalHardnessFromIons, calculateGrinderStepDelta, formatCaffeineDose, evaluateTurkishCoffeeRatio)', () => {
+    const chaoticInputs: unknown[] = [
+      null,
+      undefined,
+      NaN,
+      Infinity,
+      -Infinity,
+      -0,
+      -1,
+      -999999,
+      0,
+      0.0000001,
+      99999999,
+      '',
+      '   ',
+      '\uFEFF',
+      '\x00\x1F\x7F',
+      'invalid_string',
+      '99999999999999999999999999999999999999',
+      '1e308',
+      '-1e308',
+      'NaN',
+      'Infinity',
+      '-Infinity',
+      'true',
+      'false',
+      'null',
+      'undefined',
+      '☕️🚀🔥',
+      {},
+      [],
+      [null, undefined, 123, 'test'],
+      { a: 1, b: null, c: [false] },
+      () => {},
+      Symbol('chaos'),
+      new Date('invalid-date'),
+      new Date(0),
+      new Date('2026-10-28T00:00:00Z'),
+    ];
+
+    for (const val of chaoticInputs) {
+      // 1. calculateBeanRestingReadiness
+      const resting = calculateBeanRestingReadiness(val as any, val as any, val as any, val as any);
+      expect(typeof resting).toBe('object');
+      expect(typeof resting.status).toBe('string');
+      expect(typeof resting.readinessScore).toBe('number');
+      expect(typeof resting.statusLabelPl).toBe('string');
+
+      // 2. detectBrewingHabitDrift
+      const habitDrift = detectBrewingHabitDrift(val as any, val as any);
+      expect(typeof habitDrift).toBe('object');
+      expect(typeof habitDrift.category).toBe('string');
+      expect(typeof habitDrift.hasSignificantDrift).toBe('boolean');
+      expect(typeof habitDrift.sessionCount).toBe('number');
+
+      // 3. compareBackupVersions
+      const backupComp = compareBackupVersions(val as any, val as any);
+      expect(typeof backupComp).toBe('object');
+      expect(typeof backupComp.status).toBe('string');
+      expect(typeof backupComp.recommendedAction).toBe('string');
+
+      // 4. getTeaCategoryGuide
+      const teaGuide = getTeaCategoryGuide(val as any, val as any);
+      expect(teaGuide === null || typeof teaGuide === 'object').toBe(true);
+
+      // 5. calculateTotalHardnessFromIons
+      const totalHardness = calculateTotalHardnessFromIons(val as any, val as any);
+      expect(typeof totalHardness).toBe('object');
+      expect(typeof totalHardness.totalHardnessPpmCaCO3).toBe('number');
+      expect(typeof totalHardness.dominance).toBe('string');
+
+      // 6. calculateGrinderStepDelta
+      const stepDelta = calculateGrinderStepDelta(val as any, val as any, val as any, val as any);
+      expect(typeof stepDelta).toBe('object');
+      expect(typeof stepDelta.direction).toBe('string');
+      expect(typeof stepDelta.stepClicks).toBe('number');
+
+      // 7. formatCaffeineDose
+      const caffDose = formatCaffeineDose(val as any, val as any, val as any);
+      expect(typeof caffDose).toBe('string');
+      expect(caffDose.length).toBeGreaterThan(0);
+
+      // 8. evaluateTurkishCoffeeRatio
+      const turkishRatio = evaluateTurkishCoffeeRatio(val as any, val as any);
+      expect(typeof turkishRatio).toBe('object');
+      expect(typeof turkishRatio.ratio).toBe('number');
+      expect(typeof turkishRatio.style).toBe('string');
     }
   });
 });
