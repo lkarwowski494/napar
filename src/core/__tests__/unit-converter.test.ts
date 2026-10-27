@@ -17,6 +17,7 @@ import {
   formatPressure,
   formatFlowRate,
   formatExtractionYield,
+  formatTdsPercentage,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -304,6 +305,20 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatExtractionYield(Infinity)).toBe('50.0%');
       expect(formatExtractionYield(null)).toBe('0.0%');
       expect(formatExtractionYield(undefined)).toBe('0.0%');
+    });
+
+    test('TASK-P74-09-LOK: formatTdsPercentage formatuje TDS w procentach z zabezpieczeniami', () => {
+      expect(formatTdsPercentage(1.35)).toBe('1.35%');
+      expect(formatTdsPercentage(1.35, 1)).toBe('1.4%');
+      expect(formatTdsPercentage('1,40%')).toBe('1.40%');
+      expect(formatTdsPercentage(9.25)).toBe('9.25%');
+      expect(formatTdsPercentage(0)).toBe('0.00%');
+      expect(formatTdsPercentage(-0)).toBe('0.00%');
+      expect(formatTdsPercentage(-5)).toBe('0.00%');
+      expect(formatTdsPercentage(NaN)).toBe('0.00%');
+      expect(formatTdsPercentage(Infinity)).toBe('30.00%');
+      expect(formatTdsPercentage(null)).toBe('0.00%');
+      expect(formatTdsPercentage(undefined)).toBe('0.00%');
     });
   });
 });

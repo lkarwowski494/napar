@@ -312,3 +312,31 @@ export function formatExtractionYield(
 
   return `${safeVal.toFixed(decimals)}%`;
 }
+
+/**
+ * Formatuje stężenie TDS (Total Dissolved Solids) w procentach (np. 1.35 -> '1.35%').
+ */
+export function formatTdsPercentage(
+  tdsPercent: number | string | undefined | null,
+  decimals = 2
+): string {
+  if (tdsPercent === undefined || tdsPercent === null) return `${(0).toFixed(decimals)}%`;
+  let val: number;
+  if (typeof tdsPercent === 'number') {
+    val = tdsPercent;
+  } else if (typeof tdsPercent === 'string') {
+    const clean = tdsPercent
+      .replace(/\uFEFF/g, '')
+      .replace(/[^\d.,]/g, '')
+      .replace(',', '.')
+      .trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  const safeVal =
+    !Number.isNaN(val) && val >= 0 && !Object.is(val, -0) ? Math.min(30, val) : 0;
+
+  return `${safeVal.toFixed(decimals)}%`;
+}
