@@ -4,6 +4,8 @@
 
 import {
   calculateBrewCost,
+  calculateTeaCost,
+  formatPlnCost,
   DEFAULT_BREW_COST_PARAMETERS,
 } from '../cost-calculator';
 
@@ -126,5 +128,30 @@ describe('Cost Calculator Engine (Craft Economics)', () => {
       cafeReferencePrice: 1000,
     });
     expect(highSavings.savingsPercent).toBeLessThanOrEqual(100);
+  });
+
+  test('TASK-P60-08-PRO: calculateTeaCost oblicza koszt wielonaparowej sesji Gongfu Cha i koszt pojedynczej infuzji', () => {
+    const teaMetrics = calculateTeaCost({
+      leafGrams: 5,
+      teaPricePer100g: 60,
+      infusionsCount: 5,
+      waterWeightGramsPerInfusion: 100,
+      teaRoomReferencePricePerPot: 25.0,
+    });
+
+    expect(teaMetrics.leafCost).toBe(3.0); // 5g * 0.60 zł = 3.00 zł
+    expect(teaMetrics.totalSessionCost).toBeGreaterThan(3.0);
+    expect(teaMetrics.costPerInfusion).toBeCloseTo(teaMetrics.totalSessionCost / 5, 2);
+    expect(teaMetrics.savingsPerSession).toBeGreaterThan(20.0);
+    expect(teaMetrics.savingsPercent).toBeGreaterThan(80);
+  });
+
+  test('TASK-P60-08-PRO: formatPlnCost bezpiecznie formatuje kwoty w PLN z ochrona przed -0 i NaN', () => {
+    expect(formatPlnCost(3.5)).toBe('3.50 zł');
+    expect(formatPlnCost(0)).toBe('0.00 zł');
+    expect(formatPlnCost(-0)).toBe('0.00 zł');
+    expect(formatPlnCost('4,25')).toBe('4.25 zł');
+    expect(formatPlnCost(NaN)).toBe('0.00 zł');
+    expect(formatPlnCost(null)).toBe('0.00 zł');
   });
 });
