@@ -26,6 +26,9 @@ import {
   evaluateBrewMatrix,
   BrewMatrixEvaluation,
   BrewMatrixQuadrant,
+  evaluateEspressoRatio,
+  EspressoRatioEvaluation,
+  EspressoRatioStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -823,6 +826,50 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(fallback.quadrant).toBe('weak_under');
       expect(fallback.eyPercent).toBe(0);
       expect(fallback.tdsPercent).toBe(0);
+    });
+  });
+
+  describe('TASK-P75-11-WZR: evaluateEspressoRatio (Ekstrakcja Espresso Ratio)', () => {
+    it('klasyfikuje proporcje espresso i zwraca oczekiwania sensoryczne', () => {
+      // 1. Ristretto (1:1.0 - 1:1.5)
+      const ristretto: EspressoRatioEvaluation = evaluateEspressoRatio(18, 24);
+      expect(ristretto.style).toBe('ristretto');
+      const styleTest: EspressoRatioStyle = ristretto.style;
+      expect(styleTest).toBe('ristretto');
+      expect(ristretto.ratio).toBe(1.33);
+      expect(ristretto.ratioFormatted).toBe('1:1.3');
+      expect(ristretto.styleLabelPl).toBe('Ristretto');
+      expect(ristretto.styleLabelEn).toBe('Ristretto');
+      expect(ristretto.sensoryExpectationPl).toContain('gęste body');
+
+      // 2. Normale / Klasyczne Espresso (1:1.6 - 1:2.4)
+      const normale = evaluateEspressoRatio('18,0', '36,0');
+      expect(normale.style).toBe('normale');
+      expect(normale.ratio).toBe(2.0);
+      expect(normale.ratioFormatted).toBe('1:2.0');
+      expect(normale.styleLabelPl).toBe('Normale (Standard)');
+      expect(normale.styleLabelEn).toBe('Normale (Standard)');
+
+      // 3. Lungo (1:2.5 - 1:3.5)
+      const lungo = evaluateEspressoRatio(18, 54);
+      expect(lungo.style).toBe('lungo');
+      expect(lungo.ratio).toBe(3.0);
+      expect(lungo.ratioFormatted).toBe('1:3.0');
+      expect(lungo.styleLabelPl).toBe('Lungo');
+
+      // 4. Allongé / Przedłużone (> 1:3.5)
+      const allonge = evaluateEspressoRatio(18, 72);
+      expect(allonge.style).toBe('allonge');
+      expect(allonge.ratio).toBe(4.0);
+      expect(allonge.ratioFormatted).toBe('1:4.0');
+      expect(allonge.styleLabelPl).toContain('Allongé');
+
+      // 5. Odporność na zera, wartości ujemne, stringi i null
+      const fallback = evaluateEspressoRatio(null as any, undefined as any);
+      expect(fallback.ratio).toBe(0);
+      expect(fallback.style).toBe('ristretto');
+      expect(fallback.doseGrams).toBe(0);
+      expect(fallback.yieldGrams).toBe(0);
     });
   });
 });

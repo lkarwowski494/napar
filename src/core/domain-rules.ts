@@ -1054,3 +1054,90 @@ export function evaluateBrewMatrix(
     recommendationEn,
   };
 }
+
+export type EspressoRatioStyle = 'ristretto' | 'normale' | 'lungo' | 'allonge';
+
+export interface EspressoRatioEvaluation {
+  doseGrams: number;
+  yieldGrams: number;
+  ratio: number;
+  ratioFormatted: string;
+  style: EspressoRatioStyle;
+  styleLabelPl: string;
+  styleLabelEn: string;
+  sensoryExpectationPl: string;
+  sensoryExpectationEn: string;
+}
+
+/**
+ * Klasyfikuje proporcję espresso (in-to-out ratio) i określa styl oraz profil sensoryczny
+ * naparu (Ristretto <= 1:1.5, Normale 1:1.6 - 1:2.4, Lungo 1:2.5 - 1:3.5, Allongé > 1:3.5).
+ */
+export function evaluateEspressoRatio(
+  doseGrams: number | string,
+  yieldGrams: number | string
+): EspressoRatioEvaluation {
+  const parseVal = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const dose = parseVal(doseGrams);
+  const liquid = parseVal(yieldGrams);
+
+  let rawRatio = 0;
+  if (dose > 0 && liquid > 0) {
+    rawRatio = liquid / dose;
+  }
+
+  const ratio = Number(rawRatio.toFixed(2));
+  const ratioFormatted = `1:${ratio.toFixed(1)}`;
+
+  let style: EspressoRatioStyle;
+  let styleLabelPl: string;
+  let styleLabelEn: string;
+  let sensoryExpectationPl: string;
+  let sensoryExpectationEn: string;
+
+  if (ratio <= 1.5) {
+    style = 'ristretto';
+    styleLabelPl = 'Ristretto';
+    styleLabelEn = 'Ristretto';
+    sensoryExpectationPl = 'Skoncentrowany napar, gęste body, wysoka słodycz z dominacją nut kwasowych i zredukowaną goryczą.';
+    sensoryExpectationEn = 'Concentrated shot, thick syrupy body, high sweetness with upfront acidity and low bitterness.';
+  } else if (ratio <= 2.4) {
+    style = 'normale';
+    styleLabelPl = 'Normale (Standard)';
+    styleLabelEn = 'Normale (Standard)';
+    sensoryExpectationPl = 'Klasyczne zrównoważone espresso — optymalna harmonia słodyczy, kwasowości, aksamitnej cremy i czystego finiszu.';
+    sensoryExpectationEn = 'Classic balanced espresso — optimal harmony of sweetness, acidity, velvety crema and clean finish.';
+  } else if (ratio <= 3.5) {
+    style = 'lungo';
+    styleLabelPl = 'Lungo';
+    styleLabelEn = 'Lungo';
+    sensoryExpectationPl = 'Wydłużona ekstrakcja, lżejsze body, wyraźniejsza goryczka i nuty prażone przy wyższym uzysku rozpuszczalnych cząstek.';
+    sensoryExpectationEn = 'Extended extraction, lighter body, more pronounced roast and bitter notes with higher total extraction.';
+  } else {
+    style = 'allonge';
+    styleLabelPl = 'Allongé / Café Crème';
+    styleLabelEn = 'Allongé / Long Shot';
+    sensoryExpectationPl = 'Bardzo długa ekstrakcja o profilu zbliżonym do kawy przelewowej, wysoka przejrzystość i niska intensywność.';
+    sensoryExpectationEn = 'Very long shot approaching drip coffee clarity, high volume and low concentration.';
+  }
+
+  return {
+    doseGrams: dose,
+    yieldGrams: liquid,
+    ratio,
+    ratioFormatted,
+    style,
+    styleLabelPl,
+    styleLabelEn,
+    sensoryExpectationPl,
+    sensoryExpectationEn,
+  };
+}
