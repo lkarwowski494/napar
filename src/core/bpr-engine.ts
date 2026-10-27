@@ -1641,4 +1641,126 @@ export function generateAdaptiveRecipeAdjustment(
   };
 }
 
+export type RecipeComplexityLevel = 'beginner' | 'intermediate' | 'advanced' | 'master';
+
+export interface RecipeComplexityEvaluation {
+  complexityScore: number;
+  level: RecipeComplexityLevel;
+  stepCount: number;
+  totalDurationSeconds: number;
+  pourCount: number;
+  hasAgitation: boolean;
+  requiresSpecialTechnique: boolean;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function evaluateRecipeComplexity(recipe: unknown): RecipeComplexityEvaluation {
+  if (!recipe || typeof recipe !== 'object') {
+    return {
+      complexityScore: 0,
+      level: 'beginner',
+      stepCount: 0,
+      totalDurationSeconds: 0,
+      pourCount: 0,
+      hasAgitation: false,
+      requiresSpecialTechnique: false,
+      summaryPl: 'Prosta receptura — brak zdefiniowanych kroków procedury.',
+      summaryEn: 'Simple recipe — no procedure steps defined.',
+    };
+  }
+
+  const rec = recipe as Record<string, unknown>;
+  let steps: any[] = [];
+  if (Array.isArray(rec.steps)) {
+    steps = rec.steps;
+  } else if (typeof rec.stepsJson === 'string') {
+    try {
+      const parsed = JSON.parse(rec.stepsJson);
+      if (Array.isArray(parsed)) steps = parsed;
+    } catch {
+      steps = [];
+    }
+  }
+
+  const stepCount = steps.length;
+  let totalDurationSeconds = 0;
+  let pourCount = 0;
+  let hasAgitation = false;
+
+  for (const step of steps) {
+    if (!step || typeof step !== 'object') continue;
+    const dur =
+      typeof step.durationSeconds === 'number' &&
+      Number.isFinite(step.durationSeconds) &&
+      step.durationSeconds > 0
+        ? step.durationSeconds
+        : parseStepDurationSeconds(typeof step.description === 'string' ? step.description : '', 0);
+    totalDurationSeconds += dur;
+
+    const desc = `${step.title ?? ''} ${step.description ?? ''}`.toLowerCase();
+    if (/(?:polej|wlej|zalej|zalan|zalew|pour|bloom|preinfuz)/i.test(desc)) {
+      pourCount++;
+    }
+    if (/(?:zamieszaj|wymieszaj|swirl|stir|agitat|zakr[eę][cć]|mieszan)/i.test(desc)) {
+      hasAgitation = true;
+    }
+  }
+
+  const methodStr = typeof rec.method === 'string' ? rec.method.toLowerCase() : '';
+  const nameStr = typeof rec.name === 'string' ? rec.name.toLowerCase() : '';
+  const allText = `${methodStr} ${nameStr}`;
+
+  const requiresSpecialTechnique =
+    /(?:espresso|syfon|siphon|gongfu|ibrik|dżezw|turkish|ci[sś]nieni|bypass|turbulencj|pulse)/i.test(
+      allText
+    );
+
+  const stepScore = Math.min(30, stepCount * 6);
+  const durationScore =
+    totalDurationSeconds > 600
+      ? 15
+      : totalDurationSeconds > 300
+      ? 10
+      : totalDurationSeconds > 120
+      ? 5
+      : 0;
+  const pourScore = pourCount >= 4 ? 20 : pourCount >= 2 ? 10 : pourCount >= 1 ? 5 : 0;
+  const agitationScore = hasAgitation ? 15 : 0;
+  const techniqueScore = requiresSpecialTechnique ? 20 : 0;
+
+  const rawScore = stepScore + durationScore + pourScore + agitationScore + techniqueScore;
+  const complexityScore = Math.min(100, Math.max(0, rawScore));
+
+  let level: RecipeComplexityLevel = 'beginner';
+  let summaryPl = 'Prosta receptura dla początkujących z minimalną liczbą etapów.';
+  let summaryEn = 'Simple beginner-friendly recipe with minimal procedural steps.';
+
+  if (complexityScore >= 75) {
+    level = 'master';
+    summaryPl = 'Receptura mistrzowska wymagająca precyzyjnej kontroli ekstrakcji, zalewań i techniki.';
+    summaryEn = 'Master-level recipe requiring meticulous extraction control, pours, and technique.';
+  } else if (complexityScore >= 50) {
+    level = 'advanced';
+    summaryPl = 'Zaawansowana procedura parzenia z wieloetapowym dozowaniem wody i mieszaniem.';
+    summaryEn = 'Advanced brewing routine featuring multi-stage water delivery and agitation.';
+  } else if (complexityScore >= 25) {
+    level = 'intermediate';
+    summaryPl = 'Umiarkowanie złożona receptura wymagająca kontroli czasu i podstawowej techniki.';
+    summaryEn = 'Moderately complex routine requiring timing awareness and basic technique.';
+  }
+
+  return {
+    complexityScore,
+    level,
+    stepCount,
+    totalDurationSeconds,
+    pourCount,
+    hasAgitation,
+    requiresSpecialTechnique,
+    summaryPl,
+    summaryEn,
+  };
+}
+
 

@@ -26,6 +26,9 @@ import {
   HabitDriftMetrics,
   generateAdaptiveRecipeAdjustment,
   AdaptiveRecipeAdjustment,
+  evaluateRecipeComplexity,
+  RecipeComplexityEvaluation,
+  RecipeComplexityLevel,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -1203,6 +1206,60 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(combined.recommendedRatioDelta).toBe(-1);
       expect(combined.reasonPl).toContain('niedoekstrakcj');
       expect(combined.reasonPl).toContain('wodnisty');
+    });
+  });
+
+  describe('TASK-P93-04-SZT: evaluateRecipeComplexity', () => {
+    it('zwraca beginner dla pustej lub null receptury', () => {
+      const emptyRes: RecipeComplexityEvaluation = evaluateRecipeComplexity(null);
+      const testLevel: RecipeComplexityLevel = emptyRes.level;
+      expect(testLevel).toBe('beginner');
+      expect(emptyRes.complexityScore).toBe(0);
+      expect(emptyRes.level).toBe('beginner');
+      expect(emptyRes.stepCount).toBe(0);
+      expect(emptyRes.pourCount).toBe(0);
+      expect(emptyRes.hasAgitation).toBe(false);
+      expect(emptyRes.requiresSpecialTechnique).toBe(false);
+      expect(emptyRes.summaryPl).toContain('Prosta receptura');
+      expect(emptyRes.summaryEn).toContain('Simple');
+    });
+
+    it('ocenia zaawansowaną recepturę drip z wieloma zalaniami, mieszaniem i długim czasem', () => {
+      const advancedRecipe = {
+        name: 'V60 4:6 Method Kasuya',
+        method: 'V60',
+        steps: [
+          { description: 'Preinfuzja (bloom) 50g wody i delikatnie zamieszaj (swirl)', durationSeconds: 45 },
+          { description: 'Drugie zalanie 70g wody', durationSeconds: 45 },
+          { description: 'Trzecie zalanie 60g wody', durationSeconds: 45 },
+          { description: 'Czwarte zalanie 60g wody', durationSeconds: 45 },
+          { description: 'Piąte zalanie 60g wody, odczekaj do spłynięcia', durationSeconds: 60 },
+        ],
+      };
+
+      const res = evaluateRecipeComplexity(advancedRecipe);
+      expect(res.stepCount).toBe(5);
+      expect(res.pourCount).toBe(5);
+      expect(res.hasAgitation).toBe(true);
+      expect(res.totalDurationSeconds).toBe(240);
+      expect(res.complexityScore).toBeGreaterThanOrEqual(50);
+      expect(['advanced', 'master']).toContain(res.level);
+      expect(res.summaryPl).toBeDefined();
+      expect(res.summaryEn).toBeDefined();
+    });
+
+    it('wykrywa techniki specjalne (Espresso, Syfon, Gongfu)', () => {
+      const espressoRecipe = {
+        name: 'Classic 1:2 Espresso',
+        method: 'Espresso',
+        steps: [
+          { description: 'Ekstrakcja pod ciśnieniem 9 barów przez 28 sekund', durationSeconds: 28 },
+        ],
+      };
+
+      const res = evaluateRecipeComplexity(espressoRecipe);
+      expect(res.requiresSpecialTechnique).toBe(true);
+      expect(res.complexityScore).toBeGreaterThan(20);
     });
   });
 });
