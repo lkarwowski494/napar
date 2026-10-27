@@ -27,6 +27,9 @@ import {
   compareBackupVersions,
   BackupVersionComparison,
   BackupComparisonStatus,
+  generateBackupMigrationPlan,
+  BackupMigrationPlan,
+  BackupMigrationStep,
   NaparBackupEnvelope,
   localISODate,
   stampOf,
@@ -851,6 +854,63 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       const corrupt = compareBackupVersions(null, null);
       expect(corrupt.status).toBe('corrupt');
       expect(corrupt.recommendedAction).toBe('reject');
+    });
+
+    test('TASK-P90-05-ARC: generateBackupMigrationPlan generuje precyzyjny plan migracji schematu kopii', () => {
+      // 1. Kopia zgodna z bieżącą wersją schematu (SCHEMA_VERSION = 1)
+      const currentEnv = buildBackup({
+        inventory: [{ id: 'i1' }] as any,
+        customRecipes: [{ id: 'r1' }, { id: 'r2' }] as any,
+        sessions: [{ id: 's1' }] as any,
+        caffeineLogs: [] as any,
+      });
+
+      const currentPlan: BackupMigrationPlan = generateBackupMigrationPlan(currentEnv);
+      expect(currentPlan.fromSchemaVersion).toBe(SCHEMA_VERSION);
+      expect(currentPlan.toSchemaVersion).toBe(SCHEMA_VERSION);
+      expect(currentPlan.isMigrationRequired).toBe(false);
+      expect(currentPlan.canSafelyMigrate).toBe(true);
+      expect(currentPlan.totalItemsToMigrate).toBe(0);
+      expect(currentPlan.steps.every((s: BackupMigrationStep) => s.action === 'noop')).toBe(true);
+      expect(currentPlan.summaryPl).toContain('zgodna');
+
+      // 2. Starsza wersja schematu (v0) wymagająca migracji
+      const legacyEnv = {
+        format: 'napar-backup',
+        schemaVersion: 0,
+        exportedAt: '2025-01-01T00:00:00Z',
+        state: {
+          inventory: [{ id: 'legacy-1' }],
+          customRecipes: [{ id: 'rec-1' }],
+          sessions: [],
+          caffeineLogs: [],
+        },
+      };
+
+      const legacyPlan = generateBackupMigrationPlan(legacyEnv);
+      expect(legacyPlan.fromSchemaVersion).toBe(0);
+      expect(legacyPlan.toSchemaVersion).toBe(SCHEMA_VERSION);
+      expect(legacyPlan.isMigrationRequired).toBe(true);
+      expect(legacyPlan.canSafelyMigrate).toBe(true);
+      expect(legacyPlan.totalItemsToMigrate).toBe(2);
+      expect(legacyPlan.steps.some((s) => s.action === 'migrate_schema' && s.collection === 'inventory')).toBe(true);
+      expect(legacyPlan.summaryPl).toContain('starszą wersję');
+
+      // 3. Nowsza wersja schematu (v99) z przyszłości
+      const futureEnv = {
+        ...currentEnv,
+        schemaVersion: 99,
+      };
+      const futurePlan = generateBackupMigrationPlan(futureEnv);
+      expect(futurePlan.canSafelyMigrate).toBe(false);
+      expect(futurePlan.isMigrationRequired).toBe(false);
+      expect(futurePlan.summaryPl).toContain('nowszej');
+
+      // 4. Uszkodzone dane / null
+      const corruptPlan = generateBackupMigrationPlan(null);
+      expect(corruptPlan.canSafelyMigrate).toBe(false);
+      expect(corruptPlan.isMigrationRequired).toBe(false);
+      expect(corruptPlan.summaryPl).toContain('uszkodzona');
     });
   });
 });

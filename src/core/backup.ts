@@ -1234,4 +1234,212 @@ export function compareBackupVersions(
   };
 }
 
+export interface BackupMigrationStep {
+  collection: 'inventory' | 'customRecipes' | 'sessions' | 'caffeineLogs' | 'settings';
+  action: 'migrate_schema' | 'fill_defaults' | 'noop';
+  itemCount: number;
+  detailsPl: string;
+  detailsEn: string;
+}
+
+export interface BackupMigrationPlan {
+  fromSchemaVersion: number;
+  toSchemaVersion: number;
+  isMigrationRequired: boolean;
+  canSafelyMigrate: boolean;
+  steps: BackupMigrationStep[];
+  totalItemsToMigrate: number;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Generuje szczegółowy plan migracji struktury kopii zapasowej do bieżącej wersji schematu aplikacji.
+ */
+export function generateBackupMigrationPlan(envelope?: unknown): BackupMigrationPlan {
+  if (!envelope || typeof envelope !== 'object') {
+    return {
+      fromSchemaVersion: 0,
+      toSchemaVersion: SCHEMA_VERSION,
+      isMigrationRequired: false,
+      canSafelyMigrate: false,
+      steps: [],
+      totalItemsToMigrate: 0,
+      summaryPl: 'Nieprawidłowa lub uszkodzona koperta kopii zapasowej — migracja niemożliwa.',
+      summaryEn: 'Invalid or corrupt backup envelope — migration impossible.',
+    };
+  }
+
+  const env = envelope as Partial<NaparBackupEnvelope>;
+  if (env.format !== 'napar-backup') {
+    return {
+      fromSchemaVersion: typeof env.schemaVersion === 'number' ? env.schemaVersion : 0,
+      toSchemaVersion: SCHEMA_VERSION,
+      isMigrationRequired: false,
+      canSafelyMigrate: false,
+      steps: [],
+      totalItemsToMigrate: 0,
+      summaryPl: 'Nieprawidłowy format kopii (oczekiwano napar-backup) — uszkodzona koperta.',
+      summaryEn: 'Invalid backup format (expected napar-backup) — corrupt envelope.',
+    };
+  }
+
+  const fromVersion =
+    typeof env.schemaVersion === 'number' && Number.isFinite(env.schemaVersion)
+      ? env.schemaVersion
+      : 0;
+  const toVersion = SCHEMA_VERSION;
+
+  if (fromVersion > toVersion) {
+    return {
+      fromSchemaVersion: fromVersion,
+      toSchemaVersion: toVersion,
+      isMigrationRequired: false,
+      canSafelyMigrate: false,
+      steps: [],
+      totalItemsToMigrate: 0,
+      summaryPl: `Kopia pochodzi z nowszej wersji schematu (v${fromVersion} vs v${toVersion}). Wymagana aktualizacja aplikacji.`,
+      summaryEn: `Backup comes from a newer schema version (v${fromVersion} vs v${toVersion}). App update required.`,
+    };
+  }
+
+  const state = env.state && typeof env.state === 'object' ? env.state : ({} as Partial<NaparBackupData>);
+  const inventoryCount = Array.isArray(state.inventory) ? state.inventory.length : 0;
+  const recipesCount = Array.isArray(state.customRecipes) ? state.customRecipes.length : 0;
+  const sessionsCount = Array.isArray(state.sessions) ? state.sessions.length : 0;
+  const caffeineCount = Array.isArray(state.caffeineLogs) ? state.caffeineLogs.length : 0;
+  const settingsCount =
+    state.settings && typeof state.settings === 'object' && !Array.isArray(state.settings)
+      ? Object.keys(state.settings).length
+      : 0;
+
+  if (fromVersion === toVersion) {
+    const steps: BackupMigrationStep[] = [
+      {
+        collection: 'inventory',
+        action: 'noop',
+        itemCount: inventoryCount,
+        detailsPl: `Kolekcja spiżarni zgodna z bieżącą wersją v${toVersion} (${inventoryCount} elementów).`,
+        detailsEn: `Inventory collection matches current v${toVersion} (${inventoryCount} items).`,
+      },
+      {
+        collection: 'customRecipes',
+        action: 'noop',
+        itemCount: recipesCount,
+        detailsPl: `Kolekcja przepisów zgodna z bieżącą wersją v${toVersion} (${recipesCount} elementów).`,
+        detailsEn: `Recipes collection matches current v${toVersion} (${recipesCount} items).`,
+      },
+      {
+        collection: 'sessions',
+        action: 'noop',
+        itemCount: sessionsCount,
+        detailsPl: `Kolekcja sesji zgodna z bieżącą wersją v${toVersion} (${sessionsCount} elementów).`,
+        detailsEn: `Sessions collection matches current v${toVersion} (${sessionsCount} items).`,
+      },
+      {
+        collection: 'caffeineLogs',
+        action: 'noop',
+        itemCount: caffeineCount,
+        detailsPl: `Kolekcja logów kofeiny zgodna z bieżącą wersją v${toVersion} (${caffeineCount} elementów).`,
+        detailsEn: `Caffeine logs collection matches current v${toVersion} (${caffeineCount} items).`,
+      },
+      {
+        collection: 'settings',
+        action: 'noop',
+        itemCount: settingsCount,
+        detailsPl: `Ustawienia zgodne z bieżącą wersją v${toVersion} (${settingsCount} kluczy).`,
+        detailsEn: `Settings match current v${toVersion} (${settingsCount} keys).`,
+      },
+    ];
+
+    return {
+      fromSchemaVersion: fromVersion,
+      toSchemaVersion: toVersion,
+      isMigrationRequired: false,
+      canSafelyMigrate: true,
+      steps,
+      totalItemsToMigrate: 0,
+      summaryPl: `Kopia jest w pełni zgodna z bieżącym schematem (v${toVersion}). Migracja nie jest wymagana.`,
+      summaryEn: `Backup is fully compatible with current schema (v${toVersion}). No migration required.`,
+    };
+  }
+
+  // fromVersion < toVersion
+  const steps: BackupMigrationStep[] = [
+    {
+      collection: 'inventory',
+      action: inventoryCount > 0 ? 'migrate_schema' : 'noop',
+      itemCount: inventoryCount,
+      detailsPl:
+        inventoryCount > 0
+          ? `Migracja schematu ${inventoryCount} pozycji spiżarni (uzupełnienie brakujących typów napojów i statusów).`
+          : 'Brak pozycji w spiżarni do migracji.',
+      detailsEn:
+        inventoryCount > 0
+          ? `Migrating schema for ${inventoryCount} inventory items (filling beverage types and statuses).`
+          : 'No inventory items to migrate.',
+    },
+    {
+      collection: 'customRecipes',
+      action: recipesCount > 0 ? 'migrate_schema' : 'noop',
+      itemCount: recipesCount,
+      detailsPl:
+        recipesCount > 0
+          ? `Migracja schematu ${recipesCount} przepisów użytkownika (normalizacja kroków i ratio).`
+          : 'Brak przepisów do migracji.',
+      detailsEn:
+        recipesCount > 0
+          ? `Migrating schema for ${recipesCount} custom recipes (normalizing steps and ratio).`
+          : 'No custom recipes to migrate.',
+    },
+    {
+      collection: 'sessions',
+      action: sessionsCount > 0 ? 'migrate_schema' : 'noop',
+      itemCount: sessionsCount,
+      detailsPl:
+        sessionsCount > 0
+          ? `Migracja ${sessionsCount} sesji parzenia (uzupełnienie domyślnych pól sensorycznych).`
+          : 'Brak sesji do migracji.',
+      detailsEn:
+        sessionsCount > 0
+          ? `Migrating ${sessionsCount} brew sessions (populating default sensory fields).`
+          : 'No brew sessions to migrate.',
+    },
+    {
+      collection: 'caffeineLogs',
+      action: caffeineCount > 0 ? 'fill_defaults' : 'noop',
+      itemCount: caffeineCount,
+      detailsPl:
+        caffeineCount > 0
+          ? `Uzupełnienie domyślnych wartości dla ${caffeineCount} wpisów logu kofeiny.`
+          : 'Brak wpisów kofeiny do migracji.',
+      detailsEn:
+        caffeineCount > 0
+          ? `Filling defaults for ${caffeineCount} caffeine entries.`
+          : 'No caffeine logs to migrate.',
+    },
+    {
+      collection: 'settings',
+      action: 'fill_defaults',
+      itemCount: settingsCount,
+      detailsPl: `Uzupełnienie brakujących flag konfiguracji aplikacji (${settingsCount} istniejących kluczy).`,
+      detailsEn: `Filling missing app configuration flags (${settingsCount} existing keys).`,
+    },
+  ];
+
+  const totalItemsToMigrate = inventoryCount + recipesCount + sessionsCount + caffeineCount;
+
+  return {
+    fromSchemaVersion: fromVersion,
+    toSchemaVersion: toVersion,
+    isMigrationRequired: true,
+    canSafelyMigrate: true,
+    steps,
+    totalItemsToMigrate,
+    summaryPl: `Wykryto starszą wersję schematu (v${fromVersion} -> v${toVersion}). Przygotowano plan migracji (${totalItemsToMigrate} rekordów).`,
+    summaryEn: `Older schema version detected (v${fromVersion} -> v${toVersion}). Prepared migration plan (${totalItemsToMigrate} records).`,
+  };
+}
+
+
 
