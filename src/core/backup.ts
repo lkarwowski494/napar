@@ -715,3 +715,21 @@ export function mergeBackupEnvelopes(
     },
   };
 }
+
+
+/**
+ * Sprawdza, czy koperta kopii zapasowej jest pusta (brak danych lub zerowa liczba encji
+ * we wszystkich 4 kolekcjach: inwentarz, receptury, sesje, logi kofeiny).
+ */
+export function isBackupEmpty(envelope?: NaparBackupEnvelope | null): boolean {
+  if (!envelope || typeof envelope !== 'object' || !envelope.state || typeof envelope.state !== 'object') {
+    return true;
+  }
+
+  const inv = Array.isArray(envelope.state.inventory) ? envelope.state.inventory.length : 0;
+  const rec = Array.isArray(envelope.state.customRecipes) ? envelope.state.customRecipes.length : 0;
+  const ses = Array.isArray(envelope.state.sessions) ? envelope.state.sessions.length : 0;
+  const caf = Array.isArray(envelope.state.caffeineLogs) ? envelope.state.caffeineLogs.length : 0;
+
+  return inv + rec + ses + caf === 0;
+}

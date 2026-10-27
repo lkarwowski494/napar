@@ -18,6 +18,7 @@ import {
   BackupMergeOptions,
   getBackupRecordCounts,
   BackupRecordCounts,
+  isBackupEmpty,
   localISODate,
   stampOf,
   parseAndValidateBackup,
@@ -628,6 +629,35 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(emptyCounts.totalRecords).toBe(0);
       expect(emptyCounts.exportedAt).toBe('');
       expect(getBackupRecordCounts({} as any).totalRecords).toBe(0);
+    });
+
+    test('TASK-P78-05-ARC: isBackupEmpty weryfikuje czy koperta zawiera jakiekolwiek dane', () => {
+      // 1. Pusta koperta (zerowe kolekcje)
+      const emptyEnvelope = buildBackup({
+        inventory: [],
+        customRecipes: [],
+        sessions: [],
+        caffeineLogs: [],
+      });
+      expect(isBackupEmpty(emptyEnvelope)).toBe(true);
+
+      // 2. Koperta z pojedynczym elementem
+      const withItem = buildBackup({
+        inventory: [{ id: 'bean-1' }] as any,
+      });
+      expect(isBackupEmpty(withItem)).toBe(false);
+
+      // 3. Koperta z sesją
+      const withSession = buildBackup({
+        sessions: [{ id: 'sess-1' }] as any,
+      });
+      expect(isBackupEmpty(withSession)).toBe(false);
+
+      // 4. Odporność na null, undefined, pusty obiekt
+      expect(isBackupEmpty(null)).toBe(true);
+      expect(isBackupEmpty(undefined)).toBe(true);
+      expect(isBackupEmpty({} as any)).toBe(true);
+      expect(isBackupEmpty({ state: {} } as any)).toBe(true);
     });
   });
 });
