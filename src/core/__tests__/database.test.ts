@@ -2356,4 +2356,22 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(cloned.stepsJson).toContain('Preinfuzja');
     expect(cloned.stepsJson).toContain('Wycisk');
   });
+
+  test('TASK-P56-03-ZAK: escapeCsvCell zabezpiecza przed Formula Injection z wiodacymi spacjami/BOM, srednikami, -0 i bajtami zerowymi', () => {
+    // 1. Wiodące spacje lub BOM przed formułą
+    const spaceFormula = "   =cmd|' /C calc'!A0";
+    expect(escapeCsvCell(spaceFormula)).toBe("\"'   =cmd|' /C calc'!A0\"");
+
+    const bomFormula = '\uFEFF=1+1';
+    expect(escapeCsvCell(bomFormula)).toBe("\"'=1+1\"");
+
+    // 2. Średniki (separator CSV w Europie) wymagają cudzysłowu
+    expect(escapeCsvCell('Etiopia; Washed; V60')).toBe('"Etiopia; Washed; V60"');
+
+    // 3. Ochrona przed -0
+    expect(escapeCsvCell(-0)).toBe('0');
+
+    // 4. Usuwanie bajtów zerowych
+    expect(escapeCsvCell('Kawa\x00 Filter')).toBe('Kawa Filter');
+  });
 });

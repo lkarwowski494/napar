@@ -1256,18 +1256,27 @@ export function importDataJson(jsonStr: string): void {
  */
 export function escapeCsvCell(val: unknown): string {
   if (val === null || val === undefined) return '';
-  let str = String(val);
+  if (typeof val === 'number' && Object.is(val, -0)) return '0';
+  let str = String(val).replace(/\0/g, '').replace(/^\uFEFF/, '');
 
   // Jeśli nie jest to czysta liczba ujemna i zaczyna się od znaku niebezpiecznego
-  const isPureNegativeNumber = /^-\d+(\.\d+)?$/.test(str);
-  const dangerousFirstChars = ['=', '+', '-', '@', '\t', '\r'];
-  if (!isPureNegativeNumber && str.length > 0 && dangerousFirstChars.includes(str[0])) {
+  const isPureNegativeNumber = /^-\d+(\.\d+)?$/.test(str.trim());
+  const dangerousFirstChars = ['=', '+', '-', '@', '\t', '\r', '%'];
+  const dangerousFormulaChars = ['=', '+', '-', '@', '%'];
+  const spacesTrimmed = str.replace(/^[ ]+/, '');
+
+  if (
+    !isPureNegativeNumber &&
+    ((str.length > 0 && dangerousFirstChars.includes(str[0])) ||
+      (spacesTrimmed.length > 0 && dangerousFormulaChars.includes(spacesTrimmed[0])))
+  ) {
     str = `'${str}`;
   }
 
-  // Jeśli zawiera znaki specjalne CSV lub apostrof, zawiń w cudzysłów i podwój cudzysłowy
+  // Jeśli zawiera znaki specjalne CSV (w tym średnik dla Excela w Europie) lub apostrof, zawiń w cudzysłów i podwój cudzysłowy
   if (
     str.includes(',') ||
+    str.includes(';') ||
     str.includes('"') ||
     str.includes('\n') ||
     str.includes('\r') ||
