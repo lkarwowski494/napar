@@ -46,6 +46,8 @@ import {
   TrialStatusAnalysis,
   calculateAnnualVsMonthlySavings,
   AnnualSavingsSummary,
+  calculateLifetimeBreakEven,
+  LifetimeBreakEvenSummary,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1594,6 +1596,37 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(fallback.monthlyPricePln).toBe(19.99);
     expect(fallback.annualPricePln).toBe(149.99);
     expect(fallback.totalSavedPln).toBeGreaterThan(0);
+  });
+
+  test('TASK-P90-02-MON: calculateLifetimeBreakEven wylicza punkt rentowności zakupu dożywotniego', () => {
+    // 1. Standardowe ceny: Lifetime 299.99 zł, Monthly 19.99 zł, Annual 149.99 zł
+    const res: LifetimeBreakEvenSummary = calculateLifetimeBreakEven(299.99, 19.99, 149.99);
+    expect(res.lifetimePricePln).toBe(299.99);
+    expect(res.monthlyPricePln).toBe(19.99);
+    expect(res.annualPricePln).toBe(149.99);
+    expect(res.breakEvenMonthsVsMonthly).toBeCloseTo(15.0, 1);
+    expect(res.breakEvenYearsVsAnnual).toBeCloseTo(2.0, 1);
+    expect(res.isLifetimeRecommended).toBe(true);
+    expect(res.recommendationPl).toContain('15 mies.');
+    expect(res.recommendationEn).toContain('15 months');
+
+    // 2. Obsługa stringów z przecinkami
+    const strRes = calculateLifetimeBreakEven('240,00', '20,00', '120,00');
+    expect(strRes.breakEvenMonthsVsMonthly).toBe(12.0);
+    expect(strRes.breakEvenYearsVsAnnual).toBe(2.0);
+    expect(strRes.isLifetimeRecommended).toBe(true);
+
+    // 3. Drogi Lifetime (> 2.5 roku planu rocznego) -> isLifetimeRecommended = false
+    const expensiveLifetime = calculateLifetimeBreakEven(450, 19.99, 149.99);
+    expect(expensiveLifetime.breakEvenYearsVsAnnual).toBeCloseTo(3.0, 1);
+    expect(expensiveLifetime.isLifetimeRecommended).toBe(false);
+
+    // 4. Odporność na null, undefined, wartości ujemne
+    const fallback = calculateLifetimeBreakEven(null, undefined, null);
+    expect(fallback.lifetimePricePln).toBe(299.99);
+    expect(fallback.monthlyPricePln).toBe(19.99);
+    expect(fallback.annualPricePln).toBe(149.99);
+    expect(fallback.isLifetimeRecommended).toBe(true);
   });
 });
 

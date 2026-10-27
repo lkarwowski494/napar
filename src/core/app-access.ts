@@ -1415,5 +1415,64 @@ export function calculateAnnualVsMonthlySavings(
   };
 }
 
+export interface LifetimeBreakEvenSummary {
+  lifetimePricePln: number;
+  monthlyPricePln: number;
+  annualPricePln: number;
+  breakEvenMonthsVsMonthly: number;
+  breakEvenYearsVsAnnual: number;
+  isLifetimeRecommended: boolean;
+  recommendationPl: string;
+  recommendationEn: string;
+}
+
+/**
+ * Oblicza punkt rentowności zakupu dożywotniego (Lifetime) w porównaniu do subskrypcji miesięcznej i rocznej.
+ */
+export function calculateLifetimeBreakEven(
+  lifetimePricePln?: number | string | null,
+  monthlyPricePln?: number | string | null,
+  annualPricePln?: number | string | null
+): LifetimeBreakEvenSummary {
+  const parseNum = (v: unknown, fallback: number): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) && v > 0 ? v : fallback;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) && parsed > 0 ? parsed : fallback;
+    }
+    return fallback;
+  };
+
+  const lifetime = parseNum(lifetimePricePln, 299.99);
+  const monthly = parseNum(monthlyPricePln, 19.99);
+  const annual = parseNum(annualPricePln, 149.99);
+
+  const breakEvenMonthsVsMonthly = Math.round((lifetime / monthly) * 10) / 10;
+  const breakEvenYearsVsAnnual = Math.round((lifetime / annual) * 10) / 10;
+  const isLifetimeRecommended = breakEvenYearsVsAnnual <= 2.5;
+
+  let recommendationPl: string;
+  let recommendationEn: string;
+
+  if (isLifetimeRecommended) {
+    recommendationPl = `Zakup Lifetime zwraca się już po ${breakEvenMonthsVsMonthly} mies. rozliczenia miesięcznego (lub ${breakEvenYearsVsAnnual} roku planu rocznego) — najkorzystniejszy wybór dla stałych użytkowników.`;
+    recommendationEn = `Lifetime purchase breaks even after ${breakEvenMonthsVsMonthly} months of monthly plan (or ${breakEvenYearsVsAnnual} years of annual) — best value for regular brewers.`;
+  } else {
+    recommendationPl = `Punkt zwrotu Lifetime wynosi ${breakEvenYearsVsAnnual} lat planu rocznego. Jeśli planujesz krótsze użytkowanie, korzystniejszy może być plan roczny.`;
+    recommendationEn = `Lifetime break-even point is ${breakEvenYearsVsAnnual} years of annual plan. An annual subscription may be more economical for shorter timeframes.`;
+  }
+
+  return {
+    lifetimePricePln: lifetime,
+    monthlyPricePln: monthly,
+    annualPricePln: annual,
+    breakEvenMonthsVsMonthly,
+    breakEvenYearsVsAnnual,
+    isLifetimeRecommended,
+    recommendationPl,
+    recommendationEn,
+  };
+}
+
 
 
