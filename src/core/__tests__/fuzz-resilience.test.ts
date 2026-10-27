@@ -23,6 +23,7 @@ import {
   evaluatePourOverRatio,
   evaluateFrenchPressRatio,
   evaluateAeroPressRatio,
+  evaluateMokaPotRatio,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
@@ -36,6 +37,7 @@ import {
   evaluateWaterAlkalinity,
   calculateMagnesiumCalciumRatio,
   calculateResidualAlkalinity,
+  calculateSulfateToChlorideRatio,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -50,6 +52,7 @@ import {
   estimateGrindDistribution,
   calculateBurrSpeedImpact,
   estimateGrindDuration,
+  formatGrinderDialSetting,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -67,6 +70,7 @@ import {
   formatParticleSize,
   formatAltitude,
   formatPressureWithUnit,
+  formatBrewTimeMinutesSeconds,
   wInKeep,
 } from '../unit-converter';
 import {
@@ -78,12 +82,13 @@ import {
   getCoffeeProcessGuide,
   getCoffeeOriginGuide,
   getCoffeeRoastLevelGuide,
+  getCoffeeAltitudeGuide,
 } from '../knowledge-data';
-import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority } from '../bpr-engine';
-import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope } from '../backup';
-import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings } from '../app-access';
-import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness } from '../database';
-import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore } from '../search-utils';
+import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed } from '../bpr-engine';
+import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize } from '../backup';
+import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings, evaluateTrialStatus } from '../app-access';
+import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate } from '../database';
+import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore, filterSearchEntriesByTags } from '../search-utils';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -1016,6 +1021,94 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof relScore.score).toBe('number');
       expect(typeof relScore.exactMatch).toBe('boolean');
       expect(typeof relScore.tokenCoverage).toBe('number');
+    }
+  });
+
+  test('Chaos 20: Fuzzing estimateBackupFileSize, getCoffeeAltitudeGuide, calculateSulfateToChlorideRatio, formatGrinderDialSetting, formatBrewTimeMinutesSeconds, evaluateMokaPotRatio, summarizeBprActionFeed, calculateInventoryUsageRate, evaluateTrialStatus, filterSearchEntriesByTags (TASK-P87-12-NIE)', () => {
+    const chaoticInputs: any[] = [
+      null,
+      undefined,
+      NaN,
+      Infinity,
+      -Infinity,
+      -0,
+      -99999,
+      0,
+      '   ',
+      'foo,bar.baz',
+      '\uFEFF\u200B',
+      '99999999999999999999',
+      '-150,5',
+      {},
+      [],
+      { invalid: true },
+      [null, undefined, NaN],
+      () => {},
+      Symbol('chaos'),
+    ];
+
+    for (const val of chaoticInputs) {
+      // 1. estimateBackupFileSize
+      const backupSize = estimateBackupFileSize(val as any);
+      expect(typeof backupSize).toBe('object');
+      expect(typeof backupSize.estimatedBytes).toBe('number');
+      expect(typeof backupSize.estimatedKilobytes).toBe('number');
+      expect(typeof backupSize.formattedSize).toBe('string');
+
+      // 2. getCoffeeAltitudeGuide
+      const altGuide = getCoffeeAltitudeGuide(val as any);
+      expect(typeof altGuide).toBe('object');
+      expect(altGuide.altitudeMeters === null || typeof altGuide.altitudeMeters === 'number').toBe(true);
+      expect(typeof altGuide.band).toBe('string');
+      expect(typeof altGuide.bandLabelPl).toBe('string');
+
+      // 3. calculateSulfateToChlorideRatio
+      const scRatio = calculateSulfateToChlorideRatio(val as any, val as any);
+      expect(typeof scRatio).toBe('object');
+      expect(typeof scRatio.ratio).toBe('number');
+      expect(typeof scRatio.category).toBe('string');
+      expect(typeof scRatio.sensoryBalancePl).toBe('string');
+
+      // 4. formatGrinderDialSetting
+      const dialSetting = formatGrinderDialSetting(val as any, val as any, val as any);
+      expect(typeof dialSetting).toBe('string');
+      expect(dialSetting.length).toBeGreaterThan(0);
+
+      // 5. formatBrewTimeMinutesSeconds
+      const timeStr = formatBrewTimeMinutesSeconds(val as any, val as any);
+      expect(typeof timeStr).toBe('string');
+      expect(timeStr).toContain(':');
+
+      // 6. evaluateMokaPotRatio
+      const mokaRatio = evaluateMokaPotRatio(val as any, val as any);
+      expect(typeof mokaRatio).toBe('object');
+      expect(typeof mokaRatio.ratio).toBe('number');
+      expect(typeof mokaRatio.style).toBe('string');
+      expect(typeof mokaRatio.sensoryProfilePl).toBe('string');
+
+      // 7. summarizeBprActionFeed
+      const bprSummary = summarizeBprActionFeed(val as any);
+      expect(typeof bprSummary).toBe('object');
+      expect(typeof bprSummary.totalActions).toBe('number');
+      expect(typeof bprSummary.highUrgencyCount).toBe('number');
+
+      // 8. calculateInventoryUsageRate
+      const usageRate = calculateInventoryUsageRate(val as any, val as any);
+      expect(typeof usageRate).toBe('object');
+      expect(typeof usageRate.dailyConsumptionGrams).toBe('number');
+      expect(typeof usageRate.estimatedDaysRemaining).toBe('number');
+      expect(typeof usageRate.category).toBe('string');
+
+      // 9. evaluateTrialStatus
+      const trialStatus = evaluateTrialStatus(val as any, val as any, val as any);
+      expect(typeof trialStatus).toBe('object');
+      expect(typeof trialStatus.status).toBe('string');
+      expect(typeof trialStatus.daysRemaining).toBe('number');
+      expect(typeof trialStatus.isExpired).toBe('boolean');
+
+      // 10. filterSearchEntriesByTags
+      const filteredTags = filterSearchEntriesByTags(val as any, val as any, val as any, val as any);
+      expect(Array.isArray(filteredTags)).toBe(true);
     }
   });
 });

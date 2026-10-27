@@ -639,7 +639,12 @@ export function convertMicronsToGrinder(
   const cleanId = typeof grinderId === 'string' ? grinderId.trim().toLowerCase() : '';
   const grinder = findGrinderById(cleanId) || SUPPORTED_GRINDERS[0];
 
-  const parsedMicrons = typeof microns === 'string' ? parseFloat(microns.trim().replace(',', '.')) : Number(microns);
+  let parsedMicrons = NaN;
+  if (typeof microns === 'number') {
+    parsedMicrons = microns;
+  } else if (typeof microns === 'string') {
+    parsedMicrons = parseFloat(microns.trim().replace(',', '.'));
+  }
   const safeMicrons = Number.isFinite(parsedMicrons) && parsedMicrons > 0 && !Object.is(parsedMicrons, -0) ? parsedMicrons : 720;
   const targetMicrons = Math.max(150, Math.min(1500, safeMicrons));
   const effectiveMicrons = Math.max(0, targetMicrons - grinder.micronsPerSettingOffset);
