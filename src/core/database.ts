@@ -594,6 +594,48 @@ export function calculateInventorySummary(items?: InventoryItem[] | null): Inven
   };
 }
 
+/**
+ * Zwraca listę pozycji spiżarni o niskim stanie magazynowym (pozostała masa > 0 oraz <= thresholdGrams),
+ * posortowaną rosnąco według pozostałej masy (najbardziej wyczerpane pozycje na początku).
+ */
+export function getLowStockInventoryItems(
+  items?: InventoryItem[] | null,
+  thresholdGrams = 50
+): InventoryItem[] {
+  if (!Array.isArray(items) || items.length === 0) return [];
+
+  const rawThreshold =
+    typeof thresholdGrams === 'number'
+      ? thresholdGrams
+      : typeof thresholdGrams === 'string'
+      ? parseFloat((thresholdGrams as string).replace(/\uFEFF/g, '').replace(',', '.').trim())
+      : 50;
+
+  const safeThreshold =
+    Number.isFinite(rawThreshold) && rawThreshold > 0 && !Object.is(rawThreshold, -0)
+      ? rawThreshold
+      : 50;
+
+  const getWeight = (item: InventoryItem): number => {
+    if (!item || typeof item !== 'object') return 0;
+    const rawWeight =
+      typeof item.remainingWeightGrams === 'number'
+        ? item.remainingWeightGrams
+        : typeof item.remainingWeightGrams === 'string'
+        ? parseFloat((item.remainingWeightGrams as string).replace(/\uFEFF/g, '').replace(',', '.').trim())
+        : 0;
+    return Number.isFinite(rawWeight) && rawWeight > 0 && !Object.is(rawWeight, -0) ? rawWeight : 0;
+  };
+
+  const lowStock = items.filter((item) => {
+    if (!item || typeof item !== 'object') return false;
+    const weight = getWeight(item);
+    return weight > 0 && weight <= safeThreshold;
+  });
+
+  return lowStock.sort((a, b) => getWeight(a) - getWeight(b));
+}
+
 export function getInventoryItemById(id: string): InventoryItem | null {
   if (!id || typeof id !== 'string' || !id.trim()) return null;
   const safeId = id.trim();

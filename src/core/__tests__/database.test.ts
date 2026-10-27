@@ -19,6 +19,7 @@ import {
   BrewSessionFilterCriteria,
   calculateInventorySummary,
   InventorySummary,
+  getLowStockInventoryItems,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -2879,5 +2880,33 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(emptySummary.totalItems).toBe(0);
     expect(emptySummary.totalWeightGrams).toBe(0);
     expect(emptySummary.inStockCount).toBe(0);
+  });
+
+  test('TASK-P78-03-ZAK: getLowStockInventoryItems filtruje i sortuje pozycje z niskim stanem', () => {
+    const items = [
+      { id: '1', name: 'Pełna paczka', remainingWeightGrams: 250 },
+      { id: '2', name: 'Kończąca się Kenya', remainingWeightGrams: 35 },
+      { id: '3', name: 'Ostatnie parzenie', remainingWeightGrams: 15 },
+      { id: '4', name: 'Pusta paczka', remainingWeightGrams: 0 },
+      { id: '5', name: 'Wartość tekstowa', remainingWeightGrams: '45,0' },
+      { id: '6', name: 'Wartość ujemna', remainingWeightGrams: -10 },
+    ] as any[];
+
+    // 1. Domyślny próg 50 g
+    const lowDefault = getLowStockInventoryItems(items);
+    expect(lowDefault.length).toBe(3);
+    expect(lowDefault[0].id).toBe('3');
+    expect(lowDefault[1].id).toBe('2');
+    expect(lowDefault[2].id).toBe('5');
+
+    // 2. Własny próg (np. 30 g)
+    const low30 = getLowStockInventoryItems(items, 30);
+    expect(low30.length).toBe(1);
+    expect(low30[0].id).toBe('3');
+
+    // 3. Odporność na null, undefined i puste tablice
+    expect(getLowStockInventoryItems(null)).toEqual([]);
+    expect(getLowStockInventoryItems([])).toEqual([]);
+    expect(getLowStockInventoryItems(items, -100)).toHaveLength(3);
   });
 });
