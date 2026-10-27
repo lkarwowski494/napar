@@ -1,0 +1,52 @@
+{
+  "cycle": "P65",
+  "status": "completed",
+  "auditDate": "2026-10-27",
+  "tasks": [
+    {
+      "id": "TASK-P65-08-PRO",
+      "perspective": "08-PRO",
+      "title": "Wielowalutowe formatowanie kosztów parzenia w cost-calculator",
+      "targetFile": "src/core/cost-calculator.ts",
+      "testFile": "src/core/__tests__/cost-calculator.test.ts",
+      "status": "completed",
+      "commit": "3697753"
+    },
+    {
+      "id": "TASK-P65-09-LOK",
+      "perspective": "09-LOK",
+      "title": "Centralny helper formatowania relatywnego czasu formatRelativeDays w i18n",
+      "targetFile": "src/core/i18n.tsx",
+      "testFile": "src/core/__tests__/i18n.test.ts",
+      "status": "completed",
+      "commit": "f123f38"
+    },
+    {
+      "id": "TASK-P65-10-WYD",
+      "perspective": "10-WYD",
+      "title": "Statyczne metody metryk receptury w BrewTimerEngine",
+      "targetFile": "src/core/timer-engine.ts",
+      "testFile": "src/core/__tests__/timer-engine.test.ts",
+      "status": "completed",
+      "commit": "620fc44"
+    },
+    {
+      "id": "TASK-P65-11-WZR",
+      "perspective": "11-WZR",
+      "title": "Odwrotna kalkulacja uzysku z retencją calculateDoseForBeverageYield w domain-rules",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed",
+      "commit": "2ce22f8"
+    },
+    {
+      "id": "TASK-P65-12-NIE",
+      "perspective": "12-NIE",
+      "title": "Pakiet fuzzerów i testów odporności Chaos 11",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed",
+      "commit": "79c4e6a"
+    }
+  ]
+}
