@@ -44,6 +44,8 @@ import {
   SubscriptionSavingsAnalysis,
   evaluateTrialStatus,
   TrialStatusAnalysis,
+  calculateAnnualVsMonthlySavings,
+  AnnualSavingsSummary,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1555,6 +1557,43 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
 
     const invalidDate = evaluateTrialStatus('not-a-date', -5, fixedNow);
     expect(invalidDate.status).toBe('unknown');
+  });
+
+  test('TASK-P87-02-MON: calculateAnnualVsMonthlySavings wylicza oszczędności i równowartość darmowych miesięcy', () => {
+    // 1. Standardowy plan: 19.99 zł/mies. vs 149.99 zł/rok
+    const res: AnnualSavingsSummary = calculateAnnualVsMonthlySavings(19.99, 149.99);
+    expect(res.monthlyPricePln).toBe(19.99);
+    expect(res.annualPricePln).toBe(149.99);
+    expect(res.effectiveMonthlyCostPln).toBe(12.5);
+    expect(res.totalSavedPln).toBe(89.89);
+    expect(res.percentSaved).toBe(37);
+    expect(res.freeMonthsEquivalent).toBe(4.5);
+    expect(res.summaryPl).toContain('89.89 zł');
+    expect(res.summaryPl).toContain('37%');
+    expect(res.summaryPl).toContain('4.5');
+    expect(res.summaryEn).toContain('89.89 zł');
+    expect(res.summaryEn).toContain('4.5 months free');
+
+    // 2. Obsługa stringów z przecinkami dziesiętnymi
+    const strRes = calculateAnnualVsMonthlySavings('20,00', '120,00');
+    expect(strRes.monthlyPricePln).toBe(20.0);
+    expect(strRes.annualPricePln).toBe(120.0);
+    expect(strRes.effectiveMonthlyCostPln).toBe(10.0);
+    expect(strRes.totalSavedPln).toBe(120.0);
+    expect(strRes.percentSaved).toBe(50);
+    expect(strRes.freeMonthsEquivalent).toBe(6.0);
+
+    // 3. Przypadek gdy plan roczny jest droższy niż miesięczny (brak oszczędności)
+    const noSavings = calculateAnnualVsMonthlySavings(10, 200);
+    expect(noSavings.totalSavedPln).toBe(0);
+    expect(noSavings.percentSaved).toBe(0);
+    expect(noSavings.freeMonthsEquivalent).toBe(0);
+
+    // 4. Odporność na null, wartości ujemne i nienumeryczne
+    const fallback = calculateAnnualVsMonthlySavings(null as any, undefined as any);
+    expect(fallback.monthlyPricePln).toBe(19.99);
+    expect(fallback.annualPricePln).toBe(149.99);
+    expect(fallback.totalSavedPln).toBeGreaterThan(0);
   });
 });
 

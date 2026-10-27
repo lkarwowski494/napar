@@ -1351,4 +1351,69 @@ export function evaluateTrialStatus(
   };
 }
 
+export interface AnnualSavingsSummary {
+  monthlyPricePln: number;
+  annualPricePln: number;
+  effectiveMonthlyCostPln: number;
+  totalSavedPln: number;
+  percentSaved: number;
+  freeMonthsEquivalent: number;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Oblicza oszczędności finansowe i równowartość darmowych miesięcy przy wyborze planu rocznego
+ * w porównaniu z 12 miesiącami rozliczenia miesięcznego.
+ */
+export function calculateAnnualVsMonthlySavings(
+  monthlyPricePln?: number | string | null,
+  annualPricePln?: number | string | null
+): AnnualSavingsSummary {
+  const parseNum = (v: unknown, fallback: number): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) && v > 0 ? v : fallback;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) && parsed > 0 ? parsed : fallback;
+    }
+    return fallback;
+  };
+
+  const monthly = parseNum(monthlyPricePln, 19.99);
+  const annual = parseNum(annualPricePln, 149.99);
+
+  const yearlyIfMonthly = Math.round(monthly * 12 * 100) / 100;
+  const effectiveMonthly = Math.round((annual / 12) * 100) / 100;
+
+  let totalSaved = 0;
+  let percentSaved = 0;
+  let freeMonths = 0;
+  let summaryPl: string;
+  let summaryEn: string;
+
+  if (annual < yearlyIfMonthly) {
+    totalSaved = Math.round((yearlyIfMonthly - annual) * 100) / 100;
+    percentSaved = Math.round((totalSaved / yearlyIfMonthly) * 100);
+    const monthsPaid = annual / monthly;
+    freeMonths = Math.max(0, Math.round((12 - monthsPaid) * 10) / 10);
+    summaryPl = `Oszczędzasz ${totalSaved.toFixed(2)} zł rocznie (${percentSaved}%) — równowartość ${freeMonths} miesięcy gratis!`;
+    summaryEn = `Save ${totalSaved.toFixed(2)} zł per year (${percentSaved}%) — equivalent to ${freeMonths} months free!`;
+  } else {
+    summaryPl = 'Brak oszczędności w wybranym wariancie rocznym.';
+    summaryEn = 'No savings in the selected annual variant.';
+  }
+
+  return {
+    monthlyPricePln: monthly,
+    annualPricePln: annual,
+    effectiveMonthlyCostPln: effectiveMonthly,
+    totalSavedPln: totalSaved,
+    percentSaved,
+    freeMonthsEquivalent: freeMonths,
+    summaryPl,
+    summaryEn,
+  };
+}
+
+
 
