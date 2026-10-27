@@ -18,6 +18,8 @@ import {
   GrinderSettingOverviewItem,
   filterGrinders,
   GrinderSearchCriteria,
+  estimateGrindFinesRisk,
+  FinesRiskAnalysis,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -888,6 +890,32 @@ describe('Grinder Dial-in Converter Module', () => {
 
     const emptyFilter = filterGrinders(SUPPORTED_GRINDERS, {});
     expect(emptyFilter.length).toBe(SUPPORTED_GRINDERS.length);
+  });
+
+  test('TASK-P74-08-PRO: estimateGrindFinesRisk szacuje ryzyko pyłu kawowego', () => {
+    // 1. Drobny przemiał pod espresso (250 um) na młynku stożkowym -> wysokie ryzyko pyłu
+    const espressoConical: FinesRiskAnalysis = estimateGrindFinesRisk('comandante_c40', 250, 'dark');
+    expect(espressoConical.finesRiskScore).toBeGreaterThanOrEqual(70);
+    expect(espressoConical.riskLevel).toBe('high');
+    expect(espressoConical.cloggingRiskDescriptionPl).toContain('Wysoki');
+    expect(espressoConical.cloggingRiskDescriptionEn).toContain('High');
+
+    // 2. Grubszy przemiał pod filtr (750 um) na młynku z płaskimi żarnami (Fellow Ode Gen 2) -> niskie ryzyko
+    const filterFlat = estimateGrindFinesRisk('fellow_ode_gen2', 750, 'light');
+    expect(filterFlat.riskLevel).toBe('low');
+    expect(filterFlat.finesRiskScore).toBeLessThan(40);
+    expect(filterFlat.cloggingRiskDescriptionPl).toContain('Niski');
+
+    // 3. Średni przemiał (550 um) pod drip -> umiarkowane ryzyko
+    const midDrip = estimateGrindFinesRisk('comandante_c40', '550', 'medium');
+    expect(midDrip.riskLevel).toBe('moderate');
+
+    // 4. Odporność na null, undefined, nieznany młynek i wartości skrajne
+    const fallbackRisk = estimateGrindFinesRisk(null as any, -50);
+    expect(fallbackRisk).toBeDefined();
+    expect(fallbackRisk.targetMicrons).toBeGreaterThanOrEqual(0);
+    expect(fallbackRisk.finesRiskScore).toBeGreaterThanOrEqual(0);
+    expect(fallbackRisk.finesRiskScore).toBeLessThanOrEqual(100);
   });
 });
 

@@ -1207,3 +1207,106 @@ export function filterGrinders(
     return true;
   });
 }
+
+export interface FinesRiskAnalysis {
+  grinderId: string;
+  grinderName: string;
+  burrType: string;
+  targetMicrons: number;
+  finesRiskScore: number;
+  riskLevel: 'low' | 'moderate' | 'high';
+  cloggingRiskDescriptionPl: string;
+  cloggingRiskDescriptionEn: string;
+  recommendedAdjustmentPl: string;
+  recommendedAdjustmentEn: string;
+}
+
+/**
+ * Szacuje ryzyko powstawania nadmiernej ilości pyłu kawowego (fines)
+ * dla wybranego młynka, nastawy w mikronach i stopnia wypalenia ziaren.
+ */
+export function estimateGrindFinesRisk(
+  grinderIdOrModel: string | GrinderModel | null | undefined,
+  targetMicrons: number | string,
+  roastLevel: 'light' | 'medium' | 'dark' | string = 'light'
+): FinesRiskAnalysis {
+  let grinder: GrinderModel;
+  if (grinderIdOrModel && typeof grinderIdOrModel === 'object' && 'id' in grinderIdOrModel) {
+    grinder = grinderIdOrModel as GrinderModel;
+  } else if (typeof grinderIdOrModel === 'string') {
+    grinder = findGrinderById(grinderIdOrModel) || SUPPORTED_GRINDERS[0];
+  } else {
+    grinder = SUPPORTED_GRINDERS[0];
+  }
+
+  const rawMicrons =
+    typeof targetMicrons === 'number'
+      ? targetMicrons
+      : typeof targetMicrons === 'string'
+      ? parseFloat(targetMicrons.replace(/\uFEFF/g, '').replace(',', '.').trim())
+      : 720;
+  const safeMicrons = Number.isFinite(rawMicrons) && !Object.is(rawMicrons, -0) ? Math.max(0, Math.min(2500, rawMicrons)) : 720;
+
+  let baseScore: number;
+  if (safeMicrons < 350) {
+    baseScore = 75;
+  } else if (safeMicrons < 600) {
+    baseScore = 50;
+  } else if (safeMicrons < 850) {
+    baseScore = 30;
+  } else {
+    baseScore = 18;
+  }
+
+  const isFlat = (grinder.burrType || '').toLowerCase().includes('flat') || (grinder.burrTypePl || '').toLowerCase().includes('płask');
+  const burrModifier = isFlat ? -15 : 5;
+
+  const roast = typeof roastLevel === 'string' ? roastLevel.trim().toLowerCase() : 'light';
+  let roastModifier = 0;
+  if (roast.includes('dark') || roast.includes('ciemn')) {
+    roastModifier = 15;
+  } else if (roast.includes('med') || roast.includes('średn')) {
+    roastModifier = 5;
+  }
+
+  const totalScore = Math.max(0, Math.min(100, Math.round(baseScore + burrModifier + roastModifier)));
+
+  let riskLevel: 'low' | 'moderate' | 'high';
+  let cloggingRiskDescriptionPl: string;
+  let cloggingRiskDescriptionEn: string;
+  let recommendedAdjustmentPl: string;
+  let recommendedAdjustmentEn: string;
+
+  if (totalScore >= 70) {
+    riskLevel = 'high';
+    cloggingRiskDescriptionPl = 'Wysoki poziom pyłu kawowego — duże ryzyko przeciągania ekstrakcji i zatykania filtra papierowego.';
+    cloggingRiskDescriptionEn = 'High fines risk — elevated probability of extended drawdown and paper filter clogging.';
+    recommendedAdjustmentPl = 'Zastosuj grubszą nastawę o 1-2 kliki, delikatniejsze zalewanie bez intensywnego mieszania (swirl) lub sito odsiewające.';
+    recommendedAdjustmentEn = 'Grind 1-2 clicks coarser, pour gently without aggressive swirling, or use a particle sifter.';
+  } else if (totalScore >= 40) {
+    riskLevel = 'moderate';
+    cloggingRiskDescriptionPl = 'Umiarkowany poziom pyłu kawowego — zbalansowany przepływ wody z pożądanym ciałem naparu.';
+    cloggingRiskDescriptionEn = 'Moderate fines risk — balanced water flow rate with pleasant brew body.';
+    recommendedAdjustmentPl = 'Standardowa technika zalewania z umiarkowaną agitacją złoża kawowego.';
+    recommendedAdjustmentEn = 'Standard pouring technique with moderate bed agitation.';
+  } else {
+    riskLevel = 'low';
+    cloggingRiskDescriptionPl = 'Niski poziom pyłu kawowego — czysty profil sensoryczny, wysoka przejrzystość i szybki spływ wody.';
+    cloggingRiskDescriptionEn = 'Low fines risk — clean sensory profile, high clarity, and fast drawdown.';
+    recommendedAdjustmentPl = 'Brak konieczności korekty techniki; możesz zastosować nieco drobniejszy przemiał dla wyższej ekstrakcji.';
+    recommendedAdjustmentEn = 'No technique correction needed; you can grind slightly finer to increase extraction yield.';
+  }
+
+  return {
+    grinderId: grinder.id,
+    grinderName: grinder.name,
+    burrType: grinder.burrType,
+    targetMicrons: safeMicrons,
+    finesRiskScore: totalScore,
+    riskLevel,
+    cloggingRiskDescriptionPl,
+    cloggingRiskDescriptionEn,
+    recommendedAdjustmentPl,
+    recommendedAdjustmentEn,
+  };
+}
