@@ -555,4 +555,45 @@ export function formatPressureWithUnit(
   return `${safeNum.toFixed(dec)} bar`;
 }
 
+/**
+ * Formatuje czas parzenia w formacie M:SS lub MM:SS (np. 2:30, 0:00, 1:05, 12:45)
+ * z pełną sanityzacją wartości liczbowych, zabezpieczeniem przed -0, ujemnymi sekundami oraz NaN.
+ */
+export function formatBrewTimeMinutesSeconds(
+  totalSeconds: number | string | undefined | null,
+  showLeadingZeroMinutes: boolean = false
+): string {
+  if (totalSeconds === undefined || totalSeconds === null) {
+    return showLeadingZeroMinutes ? '00:00' : '0:00';
+  }
+
+  let val: number;
+  if (typeof totalSeconds === 'number') {
+    val = totalSeconds;
+  } else if (typeof totalSeconds === 'string') {
+    const clean = totalSeconds
+      .replace(/\uFEFF/g, '')
+      .replace(/[^\d.,-]/g, '')
+      .replace(',', '.')
+      .trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  const safeSeconds =
+    !Number.isNaN(val) && val >= 0 && !Object.is(val, -0)
+      ? Math.min(86400, Math.floor(val))
+      : 0;
+
+  const mins = Math.floor(safeSeconds / 60);
+  const secs = safeSeconds % 60;
+
+  const minsStr = showLeadingZeroMinutes ? String(mins).padStart(2, '0') : String(mins);
+  const secsStr = String(secs).padStart(2, '0');
+
+  return `${minsStr}:${secsStr}`;
+}
+
+
 

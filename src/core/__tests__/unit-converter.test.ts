@@ -22,6 +22,7 @@ import {
   formatParticleSize,
   formatAltitude,
   formatPressureWithUnit,
+  formatBrewTimeMinutesSeconds,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -418,6 +419,34 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatPressureWithUnit(null)).toBe('0.0 bar');
       expect(formatPressureWithUnit(undefined)).toBe('0.0 bar');
       expect(formatPressureWithUnit(null, 'psi')).toBe('0.0 psi');
+    });
+
+    test('TASK-P86-09-LOK: formatBrewTimeMinutesSeconds formatuje czas parzenia w formacie M:SS oraz MM:SS z pełną sanityzacją', () => {
+      // 1. Domyślny format M:SS (bez wiodącego zera dla minut jednocyfrowych)
+      expect(formatBrewTimeMinutesSeconds(0)).toBe('0:00');
+      expect(formatBrewTimeMinutesSeconds(45)).toBe('0:45');
+      expect(formatBrewTimeMinutesSeconds(65)).toBe('1:05');
+      expect(formatBrewTimeMinutesSeconds(150)).toBe('2:30');
+      expect(formatBrewTimeMinutesSeconds(725)).toBe('12:05');
+
+      // 2. Format z wiodącym zerem MM:SS (showLeadingZeroMinutes = true)
+      expect(formatBrewTimeMinutesSeconds(0, true)).toBe('00:00');
+      expect(formatBrewTimeMinutesSeconds(65, true)).toBe('01:05');
+      expect(formatBrewTimeMinutesSeconds(150, true)).toBe('02:30');
+      expect(formatBrewTimeMinutesSeconds(725, true)).toBe('12:05');
+
+      // 3. Stringi z przecinkami i jednostkami
+      expect(formatBrewTimeMinutesSeconds('185,5')).toBe('3:05');
+      expect(formatBrewTimeMinutesSeconds('90 s')).toBe('1:30');
+
+      // 4. Wartości brzegowe i defensywne
+      expect(formatBrewTimeMinutesSeconds(-0)).toBe('0:00');
+      expect(formatBrewTimeMinutesSeconds(-15)).toBe('0:00');
+      expect(formatBrewTimeMinutesSeconds(NaN)).toBe('0:00');
+      expect(formatBrewTimeMinutesSeconds(null)).toBe('0:00');
+      expect(formatBrewTimeMinutesSeconds(undefined)).toBe('0:00');
+      expect(formatBrewTimeMinutesSeconds(null, true)).toBe('00:00');
+      expect(formatBrewTimeMinutesSeconds(Infinity)).toBe('1440:00');
     });
   });
 });
