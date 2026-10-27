@@ -196,6 +196,28 @@ export const BOTTLED_WATER_BENCHMARKS: BottledWaterProfile[] = [
     verdictPl: 'Zrównoważona woda źródlana o umiarkowanym buforze, dobra do parzenia przelewowego i herbat.',
     verdictEn: 'Balanced Scottish spring water with moderate buffer, good for pour-overs and teas.',
   },
+  {
+    id: 'aqua_panna',
+    brandName: 'Acqua Panna',
+    originCountry: 'Włochy',
+    tdsPpm: 140,
+    estimatedGhPpm: 80,
+    estimatedKhPpm: 60,
+    suitability: 'EXCELLENT',
+    verdictPl: 'Oficjalna woda cuppingowa mistrzostw baristów (WBC). Aksamitne body i idealny balans minerałów.',
+    verdictEn: 'Official cupping water of World Barista Championships. Silky body and ideal mineral balance.',
+  },
+  {
+    id: 'crystal_geyser',
+    brandName: 'Crystal Geyser',
+    originCountry: 'USA',
+    tdsPpm: 110,
+    estimatedGhPpm: 55,
+    estimatedKhPpm: 40,
+    suitability: 'EXCELLENT',
+    verdictPl: 'Ulubiona woda amerykańskich kawiarni specialty do parzenia V60 i Kalita Wave. Bardzo czysty profil.',
+    verdictEn: 'US specialty coffee favorite for V60 and Kalita Wave. Exceptionally clean extraction profile.',
+  },
 ];
 
 /**
@@ -681,6 +703,25 @@ export function classifyWaterHardnessFromClark(clark: number | string): WaterHar
 }
 
 /**
+ * Klasyfikuje twardość wody na podstawie stopni francuskich (°fH).
+ * 1 °fH = 10.0 ppm CaCO3.
+ */
+export function classifyWaterHardnessFromFH(fH: number | string): WaterHardnessCategory {
+  if (typeof fH === 'number' && Object.is(fH, -0)) {
+    return 'VERY_SOFT';
+  }
+  if (fH === '0' || fH === 0 || fH === '-0') {
+    return 'VERY_SOFT';
+  }
+  const rawNum = typeof fH === 'string' ? parseFloat(fH.trim().replace(/,/g, '.')) : fH;
+  if (!Number.isFinite(rawNum) || rawNum < 0) {
+    return 'SOFT';
+  }
+  const ppm = degreesFHToPpmCaCO3(fH);
+  return classifyWaterHardness(ppm);
+}
+
+/**
  * Formatuje nazwę kategorii twardości wody w języku polskim lub angielskim.
  */
 export function formatWaterHardnessCategory(
@@ -795,6 +836,17 @@ const BOTTLED_ALIASES: Record<string, string> = {
   'highland spring': 'highland_spring',
   highlandspring: 'highland_spring',
   highland: 'highland_spring',
+  'acqua-panna': 'aqua_panna',
+  'acqua panna': 'aqua_panna',
+  acquapanna: 'aqua_panna',
+  'aqua-panna': 'aqua_panna',
+  'aqua panna': 'aqua_panna',
+  aquapanna: 'aqua_panna',
+  panna: 'aqua_panna',
+  'crystal-geyser': 'crystal_geyser',
+  'crystal geyser': 'crystal_geyser',
+  crystalgeyser: 'crystal_geyser',
+  geyser: 'crystal_geyser',
 };
 
 export function findBottledWaterById(id: string): BottledWaterProfile | undefined {

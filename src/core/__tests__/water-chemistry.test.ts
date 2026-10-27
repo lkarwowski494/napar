@@ -15,6 +15,7 @@ import {
   ppmCaCO3ToDegreesClark,
   degreesClarkToPpmCaCO3,
   classifyWaterHardnessFromClark,
+  classifyWaterHardnessFromFH,
   findWaterRecipeById,
   findBottledWaterById,
   formatWaterHardnessCategory,
@@ -743,5 +744,33 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(classifyWaterHardnessFromClark(NaN)).toBe('SOFT');
     expect(classifyWaterHardnessFromClark(-5)).toBe('SOFT');
   });
+
+  test('TASK-P57-07-JAK: classifyWaterHardnessFromFH i nowe profile wod butelkowanych (Acqua Panna, Crystal Geyser)', () => {
+    // 1. classifyWaterHardnessFromFH
+    expect(classifyWaterHardnessFromFH(0)).toBe('VERY_SOFT');
+    expect(classifyWaterHardnessFromFH(-0)).toBe('VERY_SOFT');
+    expect(classifyWaterHardnessFromFH('0')).toBe('VERY_SOFT');
+    expect(classifyWaterHardnessFromFH(3)).toBe('VERY_SOFT'); // 30 ppm
+    expect(classifyWaterHardnessFromFH('8,0')).toBe('SOFT'); // 80 ppm
+    expect(classifyWaterHardnessFromFH(12)).toBe('MODERATELY_HARD'); // 120 ppm
+    expect(classifyWaterHardnessFromFH(20)).toBe('HARD'); // 200 ppm
+    expect(classifyWaterHardnessFromFH(35)).toBe('VERY_HARD'); // 350 ppm
+    expect(classifyWaterHardnessFromFH(NaN)).toBe('SOFT');
+    expect(classifyWaterHardnessFromFH(-5)).toBe('SOFT');
+
+    // 2. findBottledWaterById dla Acqua Panna i Crystal Geyser
+    const panna = findBottledWaterById('acqua panna');
+    expect(panna).toBeDefined();
+    expect(panna?.id).toBe('aqua_panna');
+    expect(panna?.suitability).toBe('EXCELLENT');
+    expect(panna?.brandName).toContain('Panna');
+
+    const geyser = findBottledWaterById('crystal geyser');
+    expect(geyser).toBeDefined();
+    expect(geyser?.id).toBe('crystal_geyser');
+    expect(geyser?.suitability).toBe('EXCELLENT');
+    expect(geyser?.originCountry).toBe('USA');
+  });
 });
+
 
