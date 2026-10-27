@@ -595,5 +595,64 @@ export function formatBrewTimeMinutesSeconds(
   return `${minsStr}:${secsStr}`;
 }
 
+export type CaffeineUnit = 'mg' | 'g' | 'percent_daily_limit';
+
+/**
+ * Formatuje dawkę kofeiny w miligramach ('mg'), gramach ('g') lub w procentach zalecanego dziennego limitu ('percent_daily_limit', RDA).
+ * Domyślny dzienny limit wynosi 400 mg (zgodnie ze standardami EFSA / FDA).
+ */
+export function formatCaffeineDose(
+  caffeineMg: number | string | undefined | null,
+  unit: CaffeineUnit | string = 'mg',
+  dailyMaxMg: number = 400
+): string {
+  const normUnit = typeof unit === 'string' ? unit.trim().toLowerCase() : 'mg';
+
+  if (caffeineMg === undefined || caffeineMg === null) {
+    if (normUnit === 'g') return '0.00 g';
+    if (normUnit === 'percent_daily_limit') return '0% RDA';
+    return '0 mg';
+  }
+
+  let val: number;
+  if (typeof caffeineMg === 'number') {
+    val = caffeineMg;
+  } else if (typeof caffeineMg === 'string') {
+    const clean = caffeineMg
+      .replace(/\uFEFF/g, '')
+      .replace(/[^\d.,-]/g, '')
+      .replace(',', '.')
+      .trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  const safeMg =
+    !Number.isNaN(val) && val >= 0 && !Object.is(val, -0)
+      ? Math.min(5000, val)
+      : 0;
+
+  if (normUnit === 'g') {
+    const grams = safeMg / 1000;
+    const rounded = Number(grams.toFixed(2));
+    const safeGrams = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeGrams.toFixed(2)} g`;
+  }
+
+  if (normUnit === 'percent_daily_limit') {
+    const safeMax =
+      typeof dailyMaxMg === 'number' && Number.isFinite(dailyMaxMg) && dailyMaxMg > 0
+        ? dailyMaxMg
+        : 400;
+    const pct = Math.round((safeMg / safeMax) * 100);
+    return `${Math.max(0, pct)}% RDA`;
+  }
+
+  const rounded = Math.round(safeMg);
+  const safeRounded = Object.is(rounded, -0) ? 0 : rounded;
+  return `${safeRounded} mg`;
+}
+
 
 

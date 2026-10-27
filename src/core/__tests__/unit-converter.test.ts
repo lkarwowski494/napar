@@ -23,6 +23,8 @@ import {
   formatAltitude,
   formatPressureWithUnit,
   formatBrewTimeMinutesSeconds,
+  formatCaffeineDose,
+  CaffeineUnit,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -447,6 +449,35 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatBrewTimeMinutesSeconds(undefined)).toBe('0:00');
       expect(formatBrewTimeMinutesSeconds(null, true)).toBe('00:00');
       expect(formatBrewTimeMinutesSeconds(Infinity)).toBe('1440:00');
+    });
+
+    test('TASK-P89-09-LOK: formatCaffeineDose formatuje dawkę kofeiny w mg, g oraz % dziennego limitu (RDA)', () => {
+      // 1. Domyślnie miligramy (mg)
+      const standardDose = formatCaffeineDose(150);
+      expect(standardDose).toBe('150 mg');
+      expect(formatCaffeineDose('150,5 mg')).toBe('151 mg');
+      expect(formatCaffeineDose(80, 'mg')).toBe('80 mg');
+
+      // 2. Gramy (g) — np. 150 mg = 0.15 g
+      expect(formatCaffeineDose(150, 'g')).toBe('0.15 g');
+      expect(formatCaffeineDose(1000, 'g')).toBe('1.00 g');
+
+      // 3. Procent dziennego limitu (percent_daily_limit, domyślnie 400 mg FDA/EFSA)
+      const rdaUnit: CaffeineUnit = 'percent_daily_limit';
+      expect(formatCaffeineDose(150, rdaUnit)).toBe('38% RDA');
+      expect(formatCaffeineDose(200, 'percent_daily_limit')).toBe('50% RDA');
+      expect(formatCaffeineDose(400, 'percent_daily_limit')).toBe('100% RDA');
+      expect(formatCaffeineDose(100, 'percent_daily_limit', 200)).toBe('50% RDA'); // custom daily max
+
+      // 4. Wartości brzegowe i defensywne
+      expect(formatCaffeineDose(0)).toBe('0 mg');
+      expect(formatCaffeineDose(-0)).toBe('0 mg');
+      expect(formatCaffeineDose(-50)).toBe('0 mg');
+      expect(formatCaffeineDose(null)).toBe('0 mg');
+      expect(formatCaffeineDose(undefined)).toBe('0 mg');
+      expect(formatCaffeineDose(NaN)).toBe('0 mg');
+      expect(formatCaffeineDose(null, 'g')).toBe('0.00 g');
+      expect(formatCaffeineDose(null, 'percent_daily_limit')).toBe('0% RDA');
     });
   });
 });
