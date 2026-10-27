@@ -23,6 +23,9 @@ import {
   calculateEspressoFlowRate,
   classifyEspressoFlowRate,
   EspressoFlowRateEvaluation,
+  evaluateBrewMatrix,
+  BrewMatrixEvaluation,
+  BrewMatrixQuadrant,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -782,6 +785,44 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(classifyEspressoFlowRate('1,25').status).toBe('optimal');
       expect(classifyEspressoFlowRate(NaN).status).toBe('too_slow');
       expect(classifyEspressoFlowRate(null as any).status).toBe('too_slow');
+    });
+  });
+
+  describe('TASK-P72-11-WZR: evaluateBrewMatrix (SCA Brewing Control Chart)', () => {
+    it('diagnozuje kwadranty macierzy parzenia na podstawie EY i TDS', () => {
+      // 1. SCA Golden Cup (Ideal EY 18-22%, Ideal TDS 1.15-1.45%)
+      const ideal: BrewMatrixEvaluation = evaluateBrewMatrix(20.0, 1.30);
+      expect(ideal.quadrant).toBe('golden_cup');
+      expect(ideal.labelPl).toContain('Golden Cup');
+      expect(ideal.eyPercent).toBe(20.0);
+      expect(ideal.tdsPercent).toBe(1.3);
+
+      const quadTest: BrewMatrixQuadrant = ideal.quadrant;
+      expect(quadTest).toBe('golden_cup');
+
+      // 2. Weak & Under (np. EY 16.0%, TDS 1.0%)
+      const weakUnder = evaluateBrewMatrix('16,0', '1,0');
+      expect(weakUnder.quadrant).toBe('weak_under');
+      expect(weakUnder.labelEn).toBe('Weak & Under-extracted');
+
+      // 3. Strong & Over (np. EY 24.0%, TDS 1.6%)
+      const strongOver = evaluateBrewMatrix(24.0, 1.60);
+      expect(strongOver.quadrant).toBe('strong_over');
+      expect(strongOver.labelPl).toContain('Mocny i przeparzony');
+
+      // 4. Balanced Strength & Under (np. EY 16.0%, TDS 1.30%)
+      const balUnder = evaluateBrewMatrix(16.0, 1.30);
+      expect(balUnder.quadrant).toBe('balanced_under');
+
+      // 5. Weak & Ideal (np. EY 20.0%, TDS 1.0%)
+      const weakIdeal = evaluateBrewMatrix(20.0, 1.0);
+      expect(weakIdeal.quadrant).toBe('weak_ideal');
+
+      // 6. Odporność na null, ujemne i anomalie
+      const fallback = evaluateBrewMatrix(null as any, undefined as any);
+      expect(fallback.quadrant).toBe('weak_under');
+      expect(fallback.eyPercent).toBe(0);
+      expect(fallback.tdsPercent).toBe(0);
     });
   });
 });

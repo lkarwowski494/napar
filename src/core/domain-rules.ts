@@ -928,3 +928,129 @@ export function classifyEspressoFlowRate(
     diagnosisEn: 'Standard specialty espresso extraction flow rate.',
   };
 }
+
+export type BrewMatrixQuadrant =
+  | 'weak_under'
+  | 'balanced_under'
+  | 'strong_under'
+  | 'weak_ideal'
+  | 'golden_cup'
+  | 'strong_ideal'
+  | 'weak_over'
+  | 'balanced_over'
+  | 'strong_over';
+
+export interface BrewMatrixEvaluation {
+  eyPercent: number;
+  tdsPercent: number;
+  quadrant: BrewMatrixQuadrant;
+  labelPl: string;
+  labelEn: string;
+  recommendationPl: string;
+  recommendationEn: string;
+}
+
+/**
+ * Diagnozuje ekstrakcję na 9-kwadrantowej macierzy SCA Brewing Control Chart
+ * w relacji uzysku (EY%) do siły naparu (TDS%).
+ */
+export function evaluateBrewMatrix(
+  eyPercent: number | string,
+  tdsPercent: number | string
+): BrewMatrixEvaluation {
+  const parseVal = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const ey = Number(parseVal(eyPercent).toFixed(2));
+  const tds = Number(parseVal(tdsPercent).toFixed(2));
+
+  let quadrant: BrewMatrixQuadrant;
+  let labelPl: string;
+  let labelEn: string;
+  let recommendationPl: string;
+  let recommendationEn: string;
+
+  const isUnder = ey < 18.0;
+  const isOver = ey > 22.0;
+  const isWeak = tds < 1.15;
+  const isStrong = tds > 1.45;
+
+  if (isUnder) {
+    if (isWeak) {
+      quadrant = 'weak_under';
+      labelPl = 'Słaby i niedoparzony';
+      labelEn = 'Weak & Under-extracted';
+      recommendationPl = 'Zwiększ dozę (lub zmniejsz wodę) i zmiel drobniej.';
+      recommendationEn = 'Increase coffee dose (or reduce water) and grind finer.';
+    } else if (isStrong) {
+      quadrant = 'strong_under';
+      labelPl = 'Mocny i niedoparzony';
+      labelEn = 'Strong & Under-extracted';
+      recommendationPl = 'Zmniejsz dozę (więcej wody na gram kawy) i zmiel drobniej.';
+      recommendationEn = 'Reduce dose (higher brew ratio) and grind finer.';
+    } else {
+      quadrant = 'balanced_under';
+      labelPl = 'Zrównoważona moc, niedoparzony';
+      labelEn = 'Balanced Strength, Under-extracted';
+      recommendationPl = 'Zmiel drobniej lub podnieś temperaturę wody, aby zwiększyć ekstrakcję.';
+      recommendationEn = 'Grind finer or increase water temperature to extract more.';
+    }
+  } else if (isOver) {
+    if (isWeak) {
+      quadrant = 'weak_over';
+      labelPl = 'Słaby i przeparzony';
+      labelEn = 'Weak & Over-extracted';
+      recommendationPl = 'Zwiększ dozę kawy i zmiel grubiej, aby uniknąć goryczy i cierpkości.';
+      recommendationEn = 'Increase coffee dose and grind coarser to eliminate bitterness.';
+    } else if (isStrong) {
+      quadrant = 'strong_over';
+      labelPl = 'Mocny i przeparzony';
+      labelEn = 'Strong & Over-extracted';
+      recommendationPl = 'Zmniejsz dozę kawy i zmiel wyraźnie grubiej.';
+      recommendationEn = 'Decrease dose and grind coarser.';
+    } else {
+      quadrant = 'balanced_over';
+      labelPl = 'Zrównoważona moc, przeparzony';
+      labelEn = 'Balanced Strength, Over-extracted';
+      recommendationPl = 'Zmiel grubiej lub obniż temperaturę wody, aby zredukować cierpkość i posmak popiołowy.';
+      recommendationEn = 'Grind coarser or lower water temperature to tame bitterness and dryness.';
+    }
+  } else {
+    // Ideal EY
+    if (isWeak) {
+      quadrant = 'weak_ideal';
+      labelPl = 'Słaby, lecz zrównoważony';
+      labelEn = 'Weak & Balanced';
+      recommendationPl = 'Ekstrakcja jest poprawna, lecz napar jest zbyt wodnisty. Zwiększ dozę kawy zachowując stopień mielenia.';
+      recommendationEn = 'Extraction is balanced but beverage is watery. Increase dose keeping grind size.';
+    } else if (isStrong) {
+      quadrant = 'strong_ideal';
+      labelPl = 'Mocny, lecz zrównoważony';
+      labelEn = 'Strong & Balanced';
+      recommendationPl = 'Bardzo intensywny, pełny napar. Jeśli wolisz lżejszy profil, zwiększ proporcję wody.';
+      recommendationEn = 'Rich, intense cup. If you prefer a lighter brew, increase water ratio slightly.';
+    } else {
+      quadrant = 'golden_cup';
+      labelPl = 'SCA Golden Cup (Idealny)';
+      labelEn = 'SCA Golden Cup (Ideal)';
+      recommendationPl = 'Wzorcowy profil ekstrakcji — optymalna słodycz, zbalansowana kwasowość i pełne body.';
+      recommendationEn = 'Target extraction profile — optimal sweetness, balanced acidity and clarity.';
+    }
+  }
+
+  return {
+    eyPercent: ey,
+    tdsPercent: tds,
+    quadrant,
+    labelPl,
+    labelEn,
+    recommendationPl,
+    recommendationEn,
+  };
+}
