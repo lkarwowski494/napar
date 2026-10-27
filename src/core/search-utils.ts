@@ -307,3 +307,43 @@ export function isFuzzyMatch(
 
   return calculateLevenshteinDistance(sTarget, sQuery) <= allowedDist;
 }
+
+export interface FuzzySearchOptions {
+  maxDistance?: number;
+}
+
+/**
+ * Filtruje tablicę obiektów na podstawie rozmytego dopasowania (fuzzy match),
+ * tolerując literówki i drobne błędy zapisu.
+ */
+export function filterByFuzzySearch<T>(
+  items: T[] | undefined | null,
+  query: string | undefined | null,
+  extractFields: (item: T) => (string | undefined | null | unknown)[],
+  options?: FuzzySearchOptions
+): T[] {
+  if (!Array.isArray(items)) return [];
+  if (!query || typeof query !== 'string' || query.trim() === '') {
+    return [...items];
+  }
+
+  const normQuery = normSearch(query);
+  if (!normQuery) return [...items];
+
+  const maxDist = options?.maxDistance;
+
+  return items.filter((item) => {
+    if (!item) return false;
+    try {
+      const fields = extractFields(item);
+      if (!Array.isArray(fields) || fields.length === 0) return false;
+
+      return fields.some((field) => {
+        if (typeof field !== 'string' || !field.trim()) return false;
+        return isFuzzyMatch(field, normQuery, maxDist);
+      });
+    } catch {
+      return false;
+    }
+  });
+}

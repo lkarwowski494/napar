@@ -14,6 +14,8 @@ import {
   SearchHighlightSegment,
   calculateLevenshteinDistance,
   isFuzzyMatch,
+  filterByFuzzySearch,
+  FuzzySearchOptions,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -216,5 +218,34 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     // 4. Odporność na null i puste stringi
     expect(isFuzzyMatch(null, 'v60')).toBe(false);
     expect(isFuzzyMatch('v60', null)).toBe(false);
+  });
+
+  test('TASK-P75-01-ODK: filterByFuzzySearch filtruje kolekcję z tolerancją literówek', () => {
+    const items = [
+      { id: '1', name: 'Ethiopia Yirgacheffe Washed', origin: 'Ethiopia' },
+      { id: '2', name: 'Panama Geisha Boquete', origin: 'Panama' },
+      { id: '3', name: 'Colombia Huila Pink Bourbon', origin: 'Colombia' },
+      { id: '4', name: 'Kenya Nyeri AA', origin: 'Kenya' },
+    ];
+
+    const opts: FuzzySearchOptions = { maxDistance: 2 };
+
+    // 1. Wyszukiwanie z literówką "yirgahefe"
+    const byFuzzy = filterByFuzzySearch(items, 'yirgahefe', (item) => [item.name, item.origin], opts);
+    expect(byFuzzy.length).toBe(1);
+    expect(byFuzzy[0].id).toBe('1');
+
+    // 2. Wyszukiwanie z literówką "gesha" dla Panama Geisha
+    const byGeisha = filterByFuzzySearch(items, 'gesha', (item) => [item.name]);
+    expect(byGeisha.length).toBe(1);
+    expect(byGeisha[0].id).toBe('2');
+
+    // 3. Puste zapytanie zwraca wszystkie elementy
+    expect(filterByFuzzySearch(items, '', (item) => [item.name]).length).toBe(4);
+    expect(filterByFuzzySearch(items, null, (item) => [item.name]).length).toBe(4);
+
+    // 4. Odporność na nullish i błędy ekstraktora
+    expect(filterByFuzzySearch(null, 'test', () => [])).toEqual([]);
+    expect(filterByFuzzySearch(items, 'test', () => { throw new Error('fail'); })).toEqual([]);
   });
 });
