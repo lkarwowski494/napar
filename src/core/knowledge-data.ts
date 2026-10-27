@@ -1398,3 +1398,30 @@ export function findKnowledgeItemById(id: string | undefined | null): KnowledgeI
 
   return null;
 }
+
+export interface KnowledgeSummaryCounts {
+  varietiesCount: number;
+  processesCount: number;
+  originsCount: number;
+  teaCategoriesCount: number;
+  totalEntries: number;
+}
+
+/**
+ * Zwraca liczbę dostępnych wpisów wiedzy w podziale na kategorie.
+ */
+export function getKnowledgeSummaryCounts(): KnowledgeSummaryCounts {
+  const varietiesCount = Array.isArray(COFFEE_VARIETIES) ? COFFEE_VARIETIES.length : 0;
+  const processesCount = Array.isArray(COFFEE_PROCESSES) ? COFFEE_PROCESSES.length : 0;
+  const originsCount = Array.isArray(COFFEE_ORIGINS) ? COFFEE_ORIGINS.length : 0;
+  const teaCategoriesCount = Array.isArray(TEA_CATEGORIES) ? TEA_CATEGORIES.length : 0;
+  const totalEntries = varietiesCount + processesCount + originsCount + teaCategoriesCount;
+
+  return {
+    varietiesCount,
+    processesCount,
+    originsCount,
+    teaCategoriesCount,
+    totalEntries,
+  };
+}

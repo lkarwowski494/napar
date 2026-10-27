@@ -25,6 +25,8 @@ import {
   KnowledgeSearchResult,
   findKnowledgeItemById,
   KnowledgeItemMatch,
+  getKnowledgeSummaryCounts,
+  KnowledgeSummaryCounts,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1196,6 +1198,19 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findKnowledgeItemById('nieistniejace_id')).toBeNull();
     expect(findKnowledgeItemById('')).toBeNull();
     expect(findKnowledgeItemById(null as any)).toBeNull();
+  });
+
+  test('TASK-P71-06-TRE: getKnowledgeSummaryCounts zlicza dostępne encje w kompendium wiedzy', () => {
+    const counts: KnowledgeSummaryCounts = getKnowledgeSummaryCounts();
+    expect(counts).toBeDefined();
+    expect(counts.varietiesCount).toBe(COFFEE_VARIETIES.length);
+    expect(counts.processesCount).toBe(COFFEE_PROCESSES.length);
+    expect(counts.originsCount).toBe(COFFEE_ORIGINS.length);
+    expect(counts.teaCategoriesCount).toBe(TEA_CATEGORIES.length);
+    expect(counts.totalEntries).toBe(
+      counts.varietiesCount + counts.processesCount + counts.originsCount + counts.teaCategoriesCount
+    );
+    expect(counts.totalEntries).toBeGreaterThan(0);
   });
 });
 
