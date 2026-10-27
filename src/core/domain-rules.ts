@@ -1242,3 +1242,95 @@ export function evaluateColdBrewRatio(
     sensoryDescriptionEn,
   };
 }
+
+
+export type PourOverRatioStyle =
+  | 'strong_dense'
+  | 'balanced_specialty'
+  | 'light_delicate'
+  | 'overly_dilute';
+
+export interface PourOverRatioEvaluation {
+  doseGrams: number;
+  waterGrams: number;
+  ratio: number;
+  ratioFormatted: string;
+  style: PourOverRatioStyle;
+  styleLabelPl: string;
+  styleLabelEn: string;
+  sensoryExpectationPl: string;
+  sensoryExpectationEn: string;
+}
+
+/**
+ * Klasyfikuje proporcję metod przelewowych pour-over (V60, Chemex, Kalita Wave, Origami itp.)
+ * i określa styl oraz profil sensoryczny naparu (Strong < 1:14, Balanced 1:14 - 1:17, Light 1:17 - 1:19, Dilute > 1:19).
+ */
+export function evaluatePourOverRatio(
+  doseGrams: number | string,
+  waterGrams: number | string
+): PourOverRatioEvaluation {
+  const parseVal = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const dose = parseVal(doseGrams);
+  const water = parseVal(waterGrams);
+
+  let rawRatio = 0;
+  if (dose > 0 && water > 0) {
+    rawRatio = water / dose;
+  }
+
+  const ratio = Number(rawRatio.toFixed(2));
+  const ratioFormatted = `1:${ratio.toFixed(1)}`;
+
+  let style: PourOverRatioStyle;
+  let styleLabelPl: string;
+  let styleLabelEn: string;
+  let sensoryExpectationPl: string;
+  let sensoryExpectationEn: string;
+
+  if (ratio <= 0 || ratio < 14.0) {
+    style = 'strong_dense';
+    styleLabelPl = 'Skoncentrowany / Mocny';
+    styleLabelEn = 'Strong / Concentrated';
+    sensoryExpectationPl = 'Wysoka intensywność, gęste body, wyczuwalne nuty kwasowe i słodycz, ale ryzyko niedoekstrakcji.';
+    sensoryExpectationEn = 'High intensity, heavy body, pronounced acidity and sweetness, but risk of under-extraction.';
+  } else if (ratio <= 17.0) {
+    style = 'balanced_specialty';
+    styleLabelPl = 'Zrównoważone Specialty';
+    styleLabelEn = 'Balanced Specialty';
+    sensoryExpectationPl = 'Złoty standard parzenia specialty — czyste nuty terroir, wyrazista kwasowość owocowa, słodycz i gładki finisz.';
+    sensoryExpectationEn = 'Golden standard for specialty coffee — clean origin notes, vibrant fruit acidity, sweetness and smooth finish.';
+  } else if (ratio <= 19.0) {
+    style = 'light_delicate';
+    styleLabelPl = 'Lekki / Herbaciany';
+    styleLabelEn = 'Light / Tea-like';
+    sensoryExpectationPl = 'Lekkie, zwiewne body w stylu skandynawskim, uwypuklona przejrzystość nut kwiatowych i owocowych.';
+    sensoryExpectationEn = 'Light, airy tea-like body in Nordic style, highlighting delicate floral and fruity nuances.';
+  } else {
+    style = 'overly_dilute';
+    styleLabelPl = 'Rozwodniony / Wodnisty';
+    styleLabelEn = 'Overly Dilute / Watery';
+    sensoryExpectationPl = 'Płaski, rozwodniony napar o niskiej intensywności smaku, podatny na nadmierną ekstrakcję goryczy z pyłu.';
+    sensoryExpectationEn = 'Flat, thin watery cup with muted sweetness and risk of astringent over-extracted fines.';
+  }
+
+  return {
+    doseGrams: dose,
+    waterGrams: water,
+    ratio,
+    ratioFormatted,
+    style,
+    styleLabelPl,
+    styleLabelEn,
+    sensoryExpectationPl,
+    sensoryExpectationEn,
+  };
+}

@@ -32,6 +32,9 @@ import {
   evaluateColdBrewRatio,
   ColdBrewRatioEvaluation,
   ColdBrewStyle,
+  evaluatePourOverRatio,
+  PourOverRatioEvaluation,
+  PourOverRatioStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -907,6 +910,41 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       const fallback = evaluateColdBrewRatio(null as any, undefined as any);
       expect(fallback.ratio).toBe(0);
       expect(fallback.style).toBe('overly_dense');
+    });
+  });
+
+  describe('TASK-P80-11-WZR: evaluatePourOverRatio (Ocena proporcji przelewowych V60/Chemex/Kalita)', () => {
+    it('klasyfikuje proporcje przelewowe i określa profil sensoryczny naparu', () => {
+      // 1. Zrównoważone specialty (1:16 = 15g kawy na 240g wody)
+      const balanced: PourOverRatioEvaluation = evaluatePourOverRatio(15, 240);
+      expect(balanced.style).toBe('balanced_specialty');
+      const styleCheck: PourOverRatioStyle = balanced.style;
+      expect(styleCheck).toBe('balanced_specialty');
+      expect(balanced.ratio).toBe(16);
+      expect(balanced.ratioFormatted).toBe('1:16.0');
+      expect(balanced.styleLabelPl).toBe('Zrównoważone Specialty');
+      expect(balanced.sensoryExpectationPl).toContain('Złoty standard');
+      expect(balanced.sensoryExpectationEn).toContain('Golden standard');
+
+      // 2. Mocny / gęsty ekstrakt (< 1:14 = 20g kawy na 240g wody = 1:12)
+      const strong = evaluatePourOverRatio(20, 240);
+      expect(strong.style).toBe('strong_dense');
+      expect(strong.styleLabelPl).toBe('Skoncentrowany / Mocny');
+
+      // 3. Lekki i herbaciany (1:17 - 1:19 = 15g kawy na 270g wody = 1:18)
+      const light = evaluatePourOverRatio(15, 270);
+      expect(light.style).toBe('light_delicate');
+      expect(light.styleLabelPl).toBe('Lekki / Herbaciany');
+
+      // 4. Nadmiernie rozwodniony (> 1:19 = 10g kawy na 250g wody = 1:25)
+      const dilute = evaluatePourOverRatio(10, 250);
+      expect(dilute.style).toBe('overly_dilute');
+      expect(dilute.styleLabelPl).toBe('Rozwodniony / Wodnisty');
+
+      // 5. Odporność na zera, wartości ujemne, stringi i null
+      const fallback = evaluatePourOverRatio(null as any, undefined as any);
+      expect(fallback.ratio).toBe(0);
+      expect(fallback.style).toBe('strong_dense');
     });
   });
 });
