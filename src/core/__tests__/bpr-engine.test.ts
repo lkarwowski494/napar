@@ -6,6 +6,8 @@ import {
   CoffeeFreshnessStatus,
   filterProactiveActions,
   findNextRecommendedAction,
+  groupActionsByDate,
+  ActionGroupMap,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -789,6 +791,25 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(filterProactiveActions(null)).toEqual([]);
       expect(findNextRecommendedAction(null)).toBeNull();
       expect(findNextRecommendedAction([])).toBeNull();
+    });
+
+    it('TASK-P69-04-SZT: groupActionsByDate grupuje akcje wedlug dateIso', () => {
+      const actions = [
+        { id: 'act-1', dateIso: '2026-10-27', titlePl: 'Akcja 1' },
+        { id: 'act-2', dateIso: '2026-10-27', titlePl: 'Akcja 2' },
+        { id: 'act-3', dateIso: '2026-10-28', titlePl: 'Akcja 3' },
+      ] as any[];
+
+      const grouped: ActionGroupMap = groupActionsByDate(actions);
+      expect(grouped).toBeDefined();
+      expect(Array.isArray(grouped['2026-10-27'])).toBe(true);
+      expect(grouped['2026-10-27'].length).toBe(2);
+      expect(grouped['2026-10-28'].length).toBe(1);
+      expect(grouped['2026-10-29']).toBeUndefined();
+
+      // Odporność na null/undefined i puste kolekcje
+      expect(groupActionsByDate(null as any)).toEqual({});
+      expect(groupActionsByDate([])).toEqual({});
     });
   });
 });

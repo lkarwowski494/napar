@@ -869,3 +869,27 @@ export function generateActionIcsContent(
     'END:VCALENDAR',
   ].join('\r\n');
 }
+
+
+export interface ActionGroupMap {
+  [dateIso: string]: ProactiveActionItem[];
+}
+
+/**
+ * Grupuje akcje proaktywne według ich daty kalendarzowej (dateIso: YYYY-MM-DD).
+ */
+export function groupActionsByDate(actions: ProactiveActionItem[]): ActionGroupMap {
+  if (!Array.isArray(actions)) return {};
+
+  const map: ActionGroupMap = {};
+  for (const action of actions) {
+    if (!action || typeof action !== 'object') continue;
+    const dateKey = typeof action.dateIso === 'string' && action.dateIso.trim() ? action.dateIso.trim() : '';
+    if (!dateKey) continue;
+    if (!map[dateKey]) {
+      map[dateKey] = [];
+    }
+    map[dateKey].push(action);
+  }
+  return map;
+}
