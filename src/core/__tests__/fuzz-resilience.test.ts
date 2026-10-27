@@ -19,6 +19,7 @@ import {
   classifyEspressoFlowRate,
   evaluateBrewMatrix,
   evaluateEspressoRatio,
+  evaluateColdBrewRatio,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
@@ -28,6 +29,7 @@ import {
   calculateWaterBlend,
   calculateHardnessRatio,
   calculateWaterDilution,
+  estimateWaterTdsFromHardness,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -38,6 +40,7 @@ import {
   getGrindSettingsOverview,
   filterGrinders,
   estimateGrindFinesRisk,
+  calculateGrinderAdjustment,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -51,6 +54,7 @@ import {
   formatFlowRate,
   formatExtractionYield,
   formatTdsPercentage,
+  formatWaterHardness,
   wInKeep,
 } from '../unit-converter';
 import {
@@ -58,11 +62,12 @@ import {
   findKnowledgeItemById,
   getKnowledgeSummaryCounts,
   getTeaBrewingGuide,
+  getCoffeeVarietyGuide,
 } from '../knowledge-data';
-import { groupActionsByDate, getActionScheduleCounts } from '../bpr-engine';
-import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes } from '../backup';
+import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions } from '../bpr-engine';
+import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts } from '../backup';
 import { getSubscriptionBadgeInfo } from '../app-access';
-import { importDataJson, filterInventoryItems } from '../database';
+import { importDataJson, filterInventoryItems, calculateInventorySummary } from '../database';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -693,6 +698,68 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof remWater).toBe('number');
       expect(remWater).toBeGreaterThanOrEqual(0);
       expect(Number.isFinite(remWater)).toBe(true);
+    }
+  });
+
+  test('Chaos 16: Fuzzing evaluateColdBrewRatio, estimateWaterTdsFromHardness, calculateGrinderAdjustment, formatWaterHardness, BrewTimerEngine.calculateWaterPourProgress, getCoffeeVarietyGuide, searchProactiveActions, getBackupRecordCounts, calculateInventorySummary (TASK-P77-12-NIE)', () => {
+    const corruptInputs = [
+      -100000, -1, -0, 0, 0.0001, 10.0, 50.0, 150, 720, 2000, 10000, NaN, Infinity, -Infinity,
+      '', '   ', '\uFEFFtest', '10 °dH', '150,5 ppm', 'invalid', null, undefined,
+      true, false, {}, [], () => {},
+    ];
+
+    for (const val of corruptInputs) {
+      // 1. evaluateColdBrewRatio
+      const coldBrewEval = evaluateColdBrewRatio(val as any, val as any);
+      expect(typeof coldBrewEval).toBe('object');
+      expect(typeof coldBrewEval.ratio).toBe('number');
+      expect(typeof coldBrewEval.style).toBe('string');
+      expect(typeof coldBrewEval.styleLabelPl).toBe('string');
+      expect(typeof coldBrewEval.ratioFormatted).toBe('string');
+
+      // 2. estimateWaterTdsFromHardness
+      const tdsEst = estimateWaterTdsFromHardness(val as any, val as any);
+      expect(typeof tdsEst).toBe('object');
+      expect(typeof tdsEst.estimatedTdsPpm).toBe('number');
+      expect(typeof tdsEst.estimatedEcMicroSiemens).toBe('number');
+      expect(typeof tdsEst.category).toBe('string');
+
+      // 3. calculateGrinderAdjustment
+      const grindAdj = calculateGrinderAdjustment(val as any, val as any, val as any);
+      expect(typeof grindAdj).toBe('object');
+      expect(typeof grindAdj.clickDelta).toBe('number');
+      expect(typeof grindAdj.direction).toBe('string');
+      expect(typeof grindAdj.recommendationPl).toBe('string');
+
+      // 4. formatWaterHardness
+      const hardStr = formatWaterHardness(val as any, val as any);
+      expect(typeof hardStr).toBe('string');
+      expect(hardStr).not.toContain('NaN');
+      expect(hardStr).not.toContain('-0');
+
+      // 5. BrewTimerEngine.calculateWaterPourProgress
+      const pourProgress = BrewTimerEngine.calculateWaterPourProgress(val as any, val as any);
+      expect(typeof pourProgress).toBe('number');
+      expect(pourProgress).toBeGreaterThanOrEqual(0);
+      expect(pourProgress).toBeLessThanOrEqual(100);
+
+      // 6. getCoffeeVarietyGuide
+      const varietyGuide = getCoffeeVarietyGuide(val as any);
+      expect(varietyGuide === null || typeof varietyGuide === 'object').toBe(true);
+
+      // 7. searchProactiveActions
+      const actions = searchProactiveActions(val as any, val as any);
+      expect(Array.isArray(actions)).toBe(true);
+
+      // 8. getBackupRecordCounts
+      const backupCounts = getBackupRecordCounts(val as any);
+      expect(typeof backupCounts).toBe('object');
+      expect(typeof backupCounts.totalRecords).toBe('number');
+
+      // 9. calculateInventorySummary
+      const invSummary = calculateInventorySummary(val as any);
+      expect(typeof invSummary).toBe('object');
+      expect(typeof invSummary.totalWeightGrams).toBe('number');
     }
   });
 });
