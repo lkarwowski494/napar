@@ -1,0 +1,53 @@
+{
+  "cycle": "P90",
+  "status": "completed",
+  "perspectives": [
+    "01-ODK",
+    "02-MON",
+    "03-ZAK",
+    "04-SZT",
+    "05-ARC"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P90-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Implementacja agregacji faset wyszukiwania aggregateSearchFacets z typem SearchFacetItem w src/core/search-utils.ts i src/core/__tests__/search-utils.test.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P90-02-MON",
+      "perspective": "02-MON",
+      "description": "Implementacja kalkulatora progu rentowności zakupu dożywotniego calculateLifetimeBreakEven z typem LifetimeBreakEvenSummary w src/core/app-access.ts i src/core/__tests__/app-access.test.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P90-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja wskaźnika różnorodności spiżarni calculateStashDiversity z typem StashDiversityAnalysis w src/core/database.ts i src/core/__tests__/database.test.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P90-04-SZT",
+      "perspective": "04-SZT",
+      "description": "Implementacja adaptacyjnych korekt receptur generateAdaptiveRecipeAdjustment w silniku BPR w src/core/bpr-engine.ts i src/core/__tests__/bpr-engine.test.ts",
+      "targetFile": "src/core/bpr-engine.ts",
+      "testFile": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P90-05-ARC",
+      "perspective": "05-ARC",
+      "description": "Implementacja planu migracji kopii zapasowej generateBackupMigrationPlan z typem BackupMigrationPlan w src/core/backup.ts i src/core/__tests__/backup.test.ts",
+      "targetFile": "src/core/backup.ts",
+      "testFile": "src/core/__tests__/backup.test.ts",
+      "status": "completed"
+    }
+  ]
+}
