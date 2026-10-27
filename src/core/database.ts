@@ -321,6 +321,36 @@ export function getInventoryTotalWeight(includeArchived = false): {
   };
 }
 
+/**
+ * Zwraca pozycje ze spiżarni, których stan jest niski (0 < remainingWeightGrams <= thresholdGrams).
+ * Domyślny próg: 30g (wystarcza na około 1-2 zaparzenia).
+ */
+export function getInventoryLowStockItems(
+  thresholdGrams = 30.0,
+  includeArchived = false
+): InventoryItem[] {
+  const safeThreshold =
+    Number.isFinite(thresholdGrams) && thresholdGrams > 0 ? thresholdGrams : 30.0;
+  const items = getInventoryItems(includeArchived);
+  return items.filter((item) => {
+    if (!item) return false;
+    const rem = Number(item.remainingWeightGrams);
+    return Number.isFinite(rem) && rem > 0 && rem <= safeThreshold;
+  });
+}
+
+/**
+ * Zwraca pozycje ze spiżarni, które uległy wyczerpaniu (remainingWeightGrams <= 0).
+ */
+export function getInventoryOutOfStockItems(includeArchived = false): InventoryItem[] {
+  const items = getInventoryItems(includeArchived);
+  return items.filter((item) => {
+    if (!item) return false;
+    const rem = Number(item.remainingWeightGrams);
+    return !Number.isFinite(rem) || rem <= 0;
+  });
+}
+
 export function getInventoryItemById(id: string): InventoryItem | null {
   if (!id || typeof id !== 'string' || !id.trim()) return null;
   const safeId = id.trim();

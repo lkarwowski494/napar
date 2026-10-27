@@ -8,6 +8,8 @@ import {
   getInventoryItems,
   getInventoryItemById,
   getInventoryTotalWeight,
+  getInventoryLowStockItems,
+  getInventoryOutOfStockItems,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -2481,5 +2483,67 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(getInventoryTotalWeight(false).totalGrams).toBe(280);
     expect(getInventoryTotalWeight(true).totalGrams).toBe(330);
     expect(getInventoryTotalWeight(true).coffeeGrams).toBe(250);
+  });
+
+  test('TASK-P66-03-ZAK: getInventoryLowStockItems i getInventoryOutOfStockItems filtruja zapasy na wyczerpaniu i puste', () => {
+    initDatabase(mockDb as any);
+    mockDb.inventory.clear();
+
+    const lowStockBean: InventoryItem = {
+      id: 'bean-low-1',
+      name: 'Ethiopia Yirgacheffe',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 25, // <= 30g
+      flavorNotes: [],
+      isArchived: false,
+      isFavorite: false,
+      createdAt: '2026-10-27T08:00:00Z',
+      updatedAt: '2026-10-27T08:00:00Z',
+    };
+
+    const normalBean: InventoryItem = {
+      id: 'bean-norm-1',
+      name: 'Colombia Huila',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 150, // > 30g
+      flavorNotes: [],
+      isArchived: false,
+      isFavorite: false,
+      createdAt: '2026-10-27T08:00:00Z',
+      updatedAt: '2026-10-27T08:00:00Z',
+    };
+
+    const emptyBean: InventoryItem = {
+      id: 'bean-empty-1',
+      name: 'Finished Espresso',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 0, // out of stock
+      flavorNotes: [],
+      isArchived: false,
+      isFavorite: false,
+      createdAt: '2026-10-27T08:00:00Z',
+      updatedAt: '2026-10-27T08:00:00Z',
+    };
+
+    saveInventoryItem(lowStockBean);
+    saveInventoryItem(normalBean);
+    saveInventoryItem(emptyBean);
+
+    // Low stock: tylko bean-low-1 (0 < rem <= 30)
+    const lowStock = getInventoryLowStockItems(30);
+    expect(lowStock.length).toBe(1);
+    expect(lowStock[0].id).toBe('bean-low-1');
+
+    // Niestandardowy próg (np. 15g)
+    const lowStock15 = getInventoryLowStockItems(15);
+    expect(lowStock15.length).toBe(0);
+
+    // Out of stock: tylko bean-empty-1 (rem <= 0)
+    const outOfStock = getInventoryOutOfStockItems();
+    expect(outOfStock.length).toBe(1);
+    expect(outOfStock[0].id).toBe('bean-empty-1');
   });
 });
