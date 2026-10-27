@@ -403,3 +403,54 @@ function renderHardness(ppm: number, unit: string, decimals: number): string {
   const safeNum = Object.is(rounded, -0) ? 0 : rounded;
   return `${safeNum.toFixed(decimals)} ppm`;
 }
+
+
+/**
+ * Formatuje wielkość cząstek mielenia kawy w mikronach ('µm' / 'um') lub milimetrach ('mm')
+ * z pełną sanityzacją wartości liczbowych i zabezpieczeniem przed -0 oraz NaN.
+ */
+export function formatParticleSize(
+  microns: number | string | undefined | null,
+  unit: 'µm' | 'um' | 'mm' | string = 'µm',
+  decimals?: number
+): string {
+  if (microns === undefined || microns === null) {
+    const isMm = typeof unit === 'string' && unit.trim().toLowerCase() === 'mm';
+    const dec = typeof decimals === 'number' && Number.isFinite(decimals) ? Math.max(0, Math.min(6, decimals)) : isMm ? 2 : 0;
+    return isMm ? `${(0).toFixed(dec)} mm` : `${(0).toFixed(dec)} µm`;
+  }
+
+  let val: number;
+  if (typeof microns === 'number') {
+    val = microns;
+  } else if (typeof microns === 'string') {
+    const clean = microns
+      .replace(/\uFEFF/g, '')
+      .replace(/[^\d.,-]/g, '')
+      .replace(',', '.')
+      .trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  const safeMicrons =
+    !Number.isNaN(val) && val >= 0 && !Object.is(val, -0)
+      ? Math.min(5000, val)
+      : 0;
+
+  const normUnit = typeof unit === 'string' ? unit.trim().toLowerCase() : 'µm';
+  const isMm = normUnit === 'mm';
+  const dec = typeof decimals === 'number' && Number.isFinite(decimals) ? Math.max(0, Math.min(6, decimals)) : isMm ? 2 : 0;
+
+  if (isMm) {
+    const mm = safeMicrons / 1000;
+    const rounded = Number(mm.toFixed(dec));
+    const safeNum = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeNum.toFixed(dec)} mm`;
+  }
+
+  const rounded = Number(safeMicrons.toFixed(dec));
+  const safeNum = Object.is(rounded, -0) ? 0 : rounded;
+  return `${safeNum.toFixed(dec)} µm`;
+}

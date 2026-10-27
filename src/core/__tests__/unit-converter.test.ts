@@ -19,6 +19,7 @@ import {
   formatExtractionYield,
   formatTdsPercentage,
   formatWaterHardness,
+  formatParticleSize,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -346,6 +347,28 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatWaterHardness(Infinity)).toBe('2000.0 ppm');
       expect(formatWaterHardness(null)).toBe('0.0 ppm');
       expect(formatWaterHardness(undefined)).toBe('0.0 ppm');
+    });
+
+    test('TASK-P79-09-LOK: formatParticleSize formatuje wielkość cząstek mielenia w µm i mm', () => {
+      // 1. Domyślnie mikrony (µm) bez ułamków
+      expect(formatParticleSize(750)).toBe('750 µm');
+      expect(formatParticleSize('750 µm')).toBe('750 µm');
+      expect(formatParticleSize(750.4, 'µm', 1)).toBe('750.4 µm');
+      expect(formatParticleSize(600, 'um')).toBe('600 µm');
+
+      // 2. Milimetry (mm)
+      expect(formatParticleSize(750, 'mm')).toBe('0.75 mm');
+      expect(formatParticleSize(1000, 'mm')).toBe('1.00 mm');
+      expect(formatParticleSize(450, 'mm', 3)).toBe('0.450 mm');
+
+      // 3. Wartości brzegowe i defensywne
+      expect(formatParticleSize(0)).toBe('0 µm');
+      expect(formatParticleSize(-0)).toBe('0 µm');
+      expect(formatParticleSize(-50)).toBe('0 µm');
+      expect(formatParticleSize(NaN)).toBe('0 µm');
+      expect(formatParticleSize(Infinity)).toBe('5000 µm');
+      expect(formatParticleSize(null)).toBe('0 µm');
+      expect(formatParticleSize(undefined)).toBe('0 µm');
     });
   });
 });
