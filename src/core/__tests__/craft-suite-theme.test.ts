@@ -33,8 +33,7 @@ describe('Apps4Craft Suite Theme Tokens', () => {
     expect(piekarz.name).toBe('Piekarz');
     expect(piekarz.accent).toBe('#D49B42');
 
-    // Domyślny fallback na napar
-    // @ts-expect-error testowanie nieznanego id
+    // Domyślny fallback na napar przy nieznanym id
     const fallback = getCraftTheme('unknown_app');
     expect(fallback.id).toBe('napar');
   });
