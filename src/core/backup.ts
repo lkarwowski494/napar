@@ -927,3 +927,136 @@ export function sanitizeBackupEnvelope(candidate: unknown): NaparBackupEnvelope 
   };
 }
 
+export interface BackupFileSizeEstimate {
+  estimatedBytes: number;
+  estimatedKilobytes: number;
+  formattedSize: string;
+  collectionBreakdownBytes: {
+    inventory: number;
+    recipes: number;
+    sessions: number;
+    caffeine: number;
+    metadata: number;
+  };
+  collectionBreakdownPercent: {
+    inventory: number;
+    recipes: number;
+    sessions: number;
+    caffeine: number;
+    metadata: number;
+  };
+}
+
+/**
+ * Szacuje rozmiar pliku kopii zapasowej w bajtach i kilobajtach oraz rozbicie wagowe
+ * na poszczególne kolekcje (inventory, customRecipes, sessions, caffeineLogs, metadane).
+ */
+export function estimateBackupFileSize(
+  envelope?: NaparBackupEnvelope | null
+): BackupFileSizeEstimate {
+  const zeroBreakdown = {
+    inventory: 0,
+    recipes: 0,
+    sessions: 0,
+    caffeine: 0,
+    metadata: 0,
+  };
+
+  if (!envelope || typeof envelope !== 'object') {
+    return {
+      estimatedBytes: 0,
+      estimatedKilobytes: 0,
+      formattedSize: '0 B',
+      collectionBreakdownBytes: { ...zeroBreakdown },
+      collectionBreakdownPercent: { ...zeroBreakdown },
+    };
+  }
+
+  let totalJson = '';
+  try {
+    totalJson = JSON.stringify(envelope) || '';
+  } catch {
+    return {
+      estimatedBytes: 0,
+      estimatedKilobytes: 0,
+      formattedSize: '0 B',
+      collectionBreakdownBytes: { ...zeroBreakdown },
+      collectionBreakdownPercent: { ...zeroBreakdown },
+    };
+  }
+
+  const estimatedBytes = typeof Buffer !== 'undefined' && Buffer.byteLength
+    ? Buffer.byteLength(totalJson, 'utf8')
+    : totalJson.length;
+
+  if (estimatedBytes === 0) {
+    return {
+      estimatedBytes: 0,
+      estimatedKilobytes: 0,
+      formattedSize: '0 B',
+      collectionBreakdownBytes: { ...zeroBreakdown },
+      collectionBreakdownPercent: { ...zeroBreakdown },
+    };
+  }
+
+  const rawState =
+    envelope.state && typeof envelope.state === 'object'
+      ? envelope.state
+      : (envelope as any).data && typeof (envelope as any).data === 'object'
+      ? (envelope as any).data
+      : {};
+
+  const getBytes = (val: unknown): number => {
+    try {
+      const s = JSON.stringify(val || []);
+      return typeof Buffer !== 'undefined' && Buffer.byteLength ? Buffer.byteLength(s, 'utf8') : s.length;
+    } catch {
+      return 0;
+    }
+  };
+
+  const invBytes = getBytes(rawState.inventory);
+  const recBytes = getBytes(rawState.customRecipes || rawState.recipes);
+  const sesBytes = getBytes(rawState.sessions);
+  const cafBytes = getBytes(rawState.caffeineLogs || rawState.caffeine);
+
+  const sumCollections = invBytes + recBytes + sesBytes + cafBytes;
+  const metaBytes = Math.max(0, estimatedBytes - sumCollections);
+
+  const estimatedKilobytes = Number((estimatedBytes / 1024).toFixed(1));
+
+  let formattedSize: string;
+  if (estimatedBytes < 1024) {
+    formattedSize = `${estimatedBytes} B`;
+  } else if (estimatedBytes < 1024 * 1024) {
+    formattedSize = `${(estimatedBytes / 1024).toFixed(1)} KB`;
+  } else {
+    formattedSize = `${(estimatedBytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  const calcPercent = (bytes: number): number => {
+    return Math.max(0, Math.min(100, Math.round((bytes / estimatedBytes) * 100)));
+  };
+
+  return {
+    estimatedBytes,
+    estimatedKilobytes: Object.is(estimatedKilobytes, -0) ? 0 : estimatedKilobytes,
+    formattedSize,
+    collectionBreakdownBytes: {
+      inventory: invBytes,
+      recipes: recBytes,
+      sessions: sesBytes,
+      caffeine: cafBytes,
+      metadata: metaBytes,
+    },
+    collectionBreakdownPercent: {
+      inventory: calcPercent(invBytes),
+      recipes: calcPercent(recBytes),
+      sessions: calcPercent(sesBytes),
+      caffeine: calcPercent(cafBytes),
+      metadata: calcPercent(metaBytes),
+    },
+  };
+}
+
+

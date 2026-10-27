@@ -22,6 +22,8 @@ import {
   validateBackupEnvelopeIntegrity,
   BackupIntegrityReport,
   sanitizeBackupEnvelope,
+  estimateBackupFileSize,
+  BackupFileSizeEstimate,
   NaparBackupEnvelope,
   localISODate,
   stampOf,
@@ -749,6 +751,34 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(Array.isArray(fromNull.state.inventory)).toBe(true);
       expect(Array.isArray(fromNull.state.sessions)).toBe(true);
       expect(fromNull.schemaVersion).toBe(SCHEMA_VERSION);
+    });
+
+    test('TASK-P86-05-ARC: estimateBackupFileSize wylicza szacunkowy rozmiar pliku i rozbicie kolekcji', () => {
+      const envelope = buildBackup({
+        inventory: [{ id: 'inv-1', name: 'Ethiopia Yirgacheffe Washed 250g' }] as any,
+        customRecipes: [{ id: 'rec-1', name: 'V60 4:6 Method Kasuya Specialty' }] as any,
+        sessions: [{ id: 'sess-1', notes: 'Very sweet cup with citrus notes' }] as any,
+        caffeineLogs: [{ id: 'caff-1', doseMg: 150 }] as any,
+      });
+
+      // 1. Prawidłowa koperta z danymi
+      const sizeEst: BackupFileSizeEstimate = estimateBackupFileSize(envelope);
+      expect(sizeEst.estimatedBytes).toBeGreaterThan(100);
+      expect(sizeEst.estimatedKilobytes).toBeGreaterThan(0);
+      expect(sizeEst.formattedSize).toMatch(/KB$|B$/);
+      expect(sizeEst.collectionBreakdownBytes.inventory).toBeGreaterThan(0);
+      expect(sizeEst.collectionBreakdownBytes.recipes).toBeGreaterThan(0);
+      expect(sizeEst.collectionBreakdownBytes.sessions).toBeGreaterThan(0);
+      expect(sizeEst.collectionBreakdownBytes.caffeine).toBeGreaterThan(0);
+      expect(sizeEst.collectionBreakdownPercent.inventory).toBeGreaterThan(0);
+
+      // 2. Pusta koperta (nullish lub empty)
+      const emptyEst = estimateBackupFileSize(null);
+      expect(emptyEst.estimatedBytes).toBe(0);
+      expect(emptyEst.estimatedKilobytes).toBe(0);
+      expect(emptyEst.formattedSize).toBe('0 B');
+      expect(emptyEst.collectionBreakdownBytes.inventory).toBe(0);
+      expect(emptyEst.collectionBreakdownPercent.inventory).toBe(0);
     });
   });
 });
