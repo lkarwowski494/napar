@@ -2,7 +2,7 @@
 // Napar (Steepwise) — Unit Tests: Search Utilities (RD-ENG-07, NFR-INT-015)
 // ============================================================================
 
-import { normSearch, matchesSearch } from '../search-utils';
+import { normSearch, matchesSearch, tokenizeSearch, matchesAllTokens } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
   test('Wektory testowe z dokumentu BRD (RD-ENG-07)', () => {
@@ -40,5 +40,27 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     // Puste zapytanie pasuje do wszystkiego
     expect(matchesSearch(text, '')).toBe(true);
     expect(matchesSearch(text, '   ')).toBe(true);
+  });
+
+  test('TASK-P56-01-ODK: wieloznakowe dopasowanie tokenowe (all tokens matching in any order)', () => {
+    const text = 'Etiopia Yirgacheffe Żółty Miód (Natural V60)';
+    // Wyszukiwanie wielosłowne w innej kolejności
+    expect(matchesSearch(text, 'v60 etiopia')).toBe(true);
+    expect(matchesSearch(text, 'natural miod yirgacheffe')).toBe(true);
+    expect(matchesSearch(text, 'v60 kenya')).toBe(false);
+
+    // Bezpośrednie użycie tokenizeSearch i matchesAllTokens
+    expect(tokenizeSearch('  V60   Etiopia  Natural ')).toEqual(['v60', 'etiopia', 'natural']);
+    expect(matchesAllTokens(text, 'etiopia v60')).toBe(true);
+    expect(matchesAllTokens(text, 'etiopia chemex')).toBe(false);
+  });
+
+  test('TASK-P56-01-ODK: normalizacja znaków kontrolnych, BOM, podwójnych spacji i znaków ligaturowych', () => {
+    // BOM i znaki kontrolne
+    expect(normSearch('\uFEFFKawa\x00 Filter\t\r\n')).toBe('kawa filter');
+    // Niemieckie i nordyckie znaki specjalne
+    expect(normSearch('Kaffee Süß')).toBe('kaffee suss');
+    expect(normSearch('København')).toBe('kobenhavn');
+    expect(normSearch('Ærø')).toBe('aero');
   });
 });
