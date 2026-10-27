@@ -999,4 +999,33 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(findTeaCategoryById('darjeeling')?.id).toBe('tea-black');
     expect(findTeaCategoryById('ceylon')?.id).toBe('tea-black');
   });
+
+  test('TASK-P55-06-TRE: rozszerzenie bazy kultywarów (catuai amarillo/rojo, bourbon rayado, green/bronze tip geisha, dega, dilla alghe), terroir (bensa, inza, dota) i herbat (bi luo chun, anji bai cha, shou mei, gong mei, rou gui, shui xian)', () => {
+    // 1. Kultywary botaniczne
+    expect(findCoffeeVarietyById('catuai amarillo')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('catuai rojo')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('caturra amarillo')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('caturra rojo')?.id).toBe('variety-caturra-catuai');
+    expect(findCoffeeVarietyById('bourbon rayado')?.id).toBe('variety-bourbon');
+    expect(findCoffeeVarietyById('green tip geisha')?.id).toBe('variety-geisha');
+    expect(findCoffeeVarietyById('bronze tip geisha')?.id).toBe('variety-geisha');
+    expect(findCoffeeVarietyById('dilla alghe')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('dega')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('kurume')?.id).toBe('variety-ethiopian-landraces');
+    expect(findCoffeeVarietyById('wolisho')?.id).toBe('variety-ethiopian-landraces');
+
+    // 2. Terroir i mikro-regiony
+    expect(findCoffeeOriginById('bensa')?.id).toBe('origin-ethiopia');
+    expect(findCoffeeOriginById('inza')?.id).toBe('origin-colombia');
+    expect(findCoffeeOriginById('dota')?.id).toBe('origin-costa-rica');
+
+    // 3. Herbaty rzemieślnicze
+    expect(findTeaCategoryById('bi luo chun')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('anji bai cha')?.id).toBe('tea-green');
+    expect(findTeaCategoryById('shou mei')?.id).toBe('tea-white');
+    expect(findTeaCategoryById('gong mei')?.id).toBe('tea-white');
+    expect(findTeaCategoryById('rou gui')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('shui xian')?.id).toBe('tea-oolong');
+    expect(findTeaCategoryById('dan cong')?.id).toBe('tea-oolong');
+  });
 });
