@@ -2,7 +2,7 @@
 // Napar (Steepwise) — Unit Tests: Search Utilities (RD-ENG-07, NFR-INT-015)
 // ============================================================================
 
-import { normSearch, matchesSearch, tokenizeSearch, matchesAllTokens } from '../search-utils';
+import { normSearch, matchesSearch, tokenizeSearch, matchesAllTokens, matchesAnyField } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
   test('Wektory testowe z dokumentu BRD (RD-ENG-07)', () => {
@@ -62,5 +62,16 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     expect(normSearch('Kaffee Süß')).toBe('kaffee suss');
     expect(normSearch('København')).toBe('kobenhavn');
     expect(normSearch('Ærø')).toBe('aero');
+  });
+
+  test('TASK-P61-01-ODK: matchesAnyField przeszukuje wiele pol jednoczesnie z ochrona przed null/undefined', () => {
+    const fields = ['Etiopia Yirgacheffe', 'V60 3-Pour', 'James Hoffmann', null, undefined, 'Aromaty kwiatowe i cytrusowe'];
+
+    expect(matchesAnyField(fields, 'hoffmann v60')).toBe(true);
+    expect(matchesAnyField(fields, 'etiopia cytrusowe')).toBe(true);
+    expect(matchesAnyField(fields, 'kenya')).toBe(false);
+    expect(matchesAnyField(fields, '')).toBe(true);
+    expect(matchesAnyField(null as any, 'v60')).toBe(false);
+    expect(matchesAnyField([], 'v60')).toBe(false);
   });
 });

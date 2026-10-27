@@ -63,3 +63,19 @@ export function matchesSearch(text: string, query: string): boolean {
   if (tokens.length <= 1) return false;
   return tokens.every((token) => normTarget.includes(token));
 }
+
+/**
+ * Sprawdza czy którekolwiek pole z tablicy pasuje do zapytania wyszukiwania.
+ * Łączy niepuste pola tekstowe i dopasowuje tokeny zapytania w dowolnej kolejności.
+ */
+export function matchesAnyField(
+  fields: (string | undefined | null | unknown)[],
+  query: string | undefined | null
+): boolean {
+  if (!query || typeof query !== 'string' || query.trim() === '') return true;
+  if (!Array.isArray(fields) || fields.length === 0) return false;
+  const combined = fields
+    .filter((f): f is string => typeof f === 'string' && f.trim() !== '')
+    .join(' ');
+  return matchesSearch(combined, query);
+}
