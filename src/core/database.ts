@@ -1169,6 +1169,136 @@ export function calculateBeanRestingReadiness(
   };
 }
 
+export type StashDiversityRating = 'monoculture' | 'moderate' | 'diverse' | 'connoisseur';
+
+export interface StashDiversityAnalysis {
+  totalItems: number;
+  totalWeightGrams: number;
+  distinctOriginsCount: number;
+  distinctProcessesCount: number;
+  distinctRoastersCount: number;
+  coffeeCount: number;
+  teaCount: number;
+  diversityScore: number;
+  rating: StashDiversityRating;
+  ratingLabelPl: string;
+  ratingLabelEn: string;
+  insightsPl: string;
+  insightsEn: string;
+}
+
+/**
+ * Oblicza wskaźnik różnorodności kolekcji kawy i herbaty w spiżarni (terroir, metody obróbki, palarnie).
+ */
+export function calculateStashDiversity(
+  items?: InventoryItem[] | null
+): StashDiversityAnalysis {
+  if (!Array.isArray(items) || items.length === 0) {
+    return {
+      totalItems: 0,
+      totalWeightGrams: 0,
+      distinctOriginsCount: 0,
+      distinctProcessesCount: 0,
+      distinctRoastersCount: 0,
+      coffeeCount: 0,
+      teaCount: 0,
+      diversityScore: 0,
+      rating: 'monoculture',
+      ratingLabelPl: 'Monokultura / Pusta spiżarnia',
+      ratingLabelEn: 'Monoculture / Empty stash',
+      insightsPl: 'Brak pozycji w spiżarni. Dodaj kawy specialty lub herbaty, aby zbudować profil różnorodności.',
+      insightsEn: 'No items in stash. Add specialty coffees or teas to build your diversity profile.',
+    };
+  }
+
+  const origins = new Set<string>();
+  const processes = new Set<string>();
+  const roasters = new Set<string>();
+  let totalWeight = 0;
+  let coffeeCount = 0;
+  let teaCount = 0;
+
+  for (const item of items) {
+    if (!item || typeof item !== 'object') continue;
+    const isTea = typeof item.type === 'string' && item.type.trim().toLowerCase() === 'tea';
+    if (isTea) {
+      teaCount++;
+    } else {
+      coffeeCount++;
+    }
+
+    const orig = typeof item.origin === 'string' ? item.origin.trim().toLowerCase() : '';
+    if (orig) origins.add(orig);
+
+    const proc = typeof item.process === 'string' ? item.process.trim().toLowerCase() : '';
+    if (proc) processes.add(proc);
+
+    const roast = typeof item.roaster === 'string' ? item.roaster.trim().toLowerCase() : '';
+    if (roast) roasters.add(roast);
+
+    const w =
+      typeof item.remainingWeightGrams === 'number' &&
+      Number.isFinite(item.remainingWeightGrams) &&
+      item.remainingWeightGrams > 0
+        ? item.remainingWeightGrams
+        : 0;
+    totalWeight += w;
+  }
+
+  const distinctOrigins = origins.size;
+  const distinctProcesses = processes.size;
+  const distinctRoasters = roasters.size;
+
+  const originScore = Math.min(40, distinctOrigins * 10);
+  const processScore = Math.min(30, distinctProcesses * 10);
+  const roasterScore = Math.min(20, distinctRoasters * 10);
+  const dualBonus = coffeeCount > 0 && teaCount > 0 ? 10 : 0;
+
+  const diversityScore = Math.min(100, originScore + processScore + roasterScore + dualBonus);
+
+  let rating: StashDiversityRating = 'monoculture';
+  let ratingLabelPl = 'Monokultura / Pojedynczy profil';
+  let ratingLabelEn = 'Monoculture / Single profile';
+  let insightsPl = `Twoja spiżarnia skupia się na jednym profilu (${distinctOrigins} terroir). Warto spróbować innych odmian i obróbek.`;
+  let insightsEn = `Your stash focuses on a single profile (${distinctOrigins} origin). Consider trying different varieties and processing methods.`;
+
+  if (diversityScore >= 80) {
+    rating = 'connoisseur';
+    ratingLabelPl = 'Kolekcja konesera';
+    ratingLabelEn = 'Connoisseur collection';
+    insightsPl = `Wybitna różnorodność: ${distinctOrigins} unikalnych terroir i ${distinctProcesses} metod obróbki. Doskonała baza do cuppingu i kalibracji sensorycznej.`;
+    insightsEn = `Outstanding diversity: ${distinctOrigins} distinct origins and ${distinctProcesses} processes. Exceptional foundation for cupping and sensory calibration.`;
+  } else if (diversityScore >= 56) {
+    rating = 'diverse';
+    ratingLabelPl = 'Bogata kolekcja specialty';
+    ratingLabelEn = 'Rich specialty stash';
+    insightsPl = `Świetny balans: ${distinctOrigins} krajów pochodzenia i ${distinctRoasters} palarni. Masz zróżnicowany wachlarz nut smakowych.`;
+    insightsEn = `Great balance: ${distinctOrigins} origins and ${distinctRoasters} roasters. You have a broad sensory flavor spectrum.`;
+  } else if (diversityScore >= 35 && distinctOrigins > 1) {
+    rating = 'moderate';
+    ratingLabelPl = 'Umiarkowana różnorodność';
+    ratingLabelEn = 'Moderate diversity';
+    insightsPl = `Dobra baza codzienna (${distinctOrigins} terroir). Dodanie nowej metody obróbki (np. beztlenowej) wzbogaci doznania sensoryczne.`;
+    insightsEn = `Good daily foundation (${distinctOrigins} origins). Introducing an experimental process will elevate sensory variety.`;
+  }
+
+  return {
+    totalItems: items.length,
+    totalWeightGrams: Math.round(totalWeight * 10) / 10,
+    distinctOriginsCount: distinctOrigins,
+    distinctProcessesCount: distinctProcesses,
+    distinctRoastersCount: distinctRoasters,
+    coffeeCount,
+    teaCount,
+    diversityScore,
+    rating,
+    ratingLabelPl,
+    ratingLabelEn,
+    insightsPl,
+    insightsEn,
+  };
+}
+
 
 
 

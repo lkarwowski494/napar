@@ -31,6 +31,9 @@ import {
   calculateBeanRestingReadiness,
   BeanRestingReadinessAnalysis,
   BeanRestingStatus,
+  calculateStashDiversity,
+  StashDiversityAnalysis,
+  StashDiversityRating,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -3101,5 +3104,48 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(fallback.daysSinceRoast).toBeNull();
     expect(fallback.status).toBe('ready_to_brew');
     expect(fallback.readinessScore).toBe(70);
+  });
+
+  it('TASK-P90-03-ZAK: calculateStashDiversity ocenia różnorodność terroir, obróbek i palarni w spiżarni', () => {
+    // 1. Zróżnicowana kolekcja specialty (Etiopia, Kolumbia, Kenia, Panama; myta, natural, beztlenowa; kawa + herbata)
+    const richStash = [
+      { id: '1', name: 'Ethiopia Washed', type: 'coffee', origin: 'Ethiopia', process: 'Washed', roaster: 'Hard Beans', remainingWeightGrams: 250 },
+      { id: '2', name: 'Colombia Anaerobic', type: 'coffee', origin: 'Colombia', process: 'Anaerobic', roaster: 'Coffea Circulor', remainingWeightGrams: 200 },
+      { id: '3', name: 'Kenya Nyeri', type: 'coffee', origin: 'Kenya', process: 'Washed', roaster: 'Tim Wendelboe', remainingWeightGrams: 250 },
+      { id: '4', name: 'Panama Geisha Natural', type: 'coffee', origin: 'Panama', process: 'Natural', roaster: 'DAK', remainingWeightGrams: 100 },
+      { id: '5', name: 'Gyokuro Uji', type: 'tea', origin: 'Japan', process: 'Steamed', roaster: 'Ippodo', remainingWeightGrams: 50 },
+    ] as any[];
+
+    const connoisseur: StashDiversityAnalysis = calculateStashDiversity(richStash);
+    const ratingCheck: StashDiversityRating = connoisseur.rating;
+    expect(ratingCheck).toBe('connoisseur');
+    expect(connoisseur.diversityScore).toBeGreaterThanOrEqual(80);
+    expect(connoisseur.distinctOriginsCount).toBe(5);
+    expect(connoisseur.distinctProcessesCount).toBeGreaterThanOrEqual(3);
+    expect(connoisseur.distinctRoastersCount).toBe(5);
+    expect(connoisseur.coffeeCount).toBe(4);
+    expect(connoisseur.teaCount).toBe(1);
+    expect(connoisseur.totalWeightGrams).toBe(850);
+    expect(connoisseur.ratingLabelPl).toContain('konesera');
+    expect(connoisseur.insightsPl).toContain('terroir');
+
+    // 2. Monokultura (tylko 1 paczka kawy)
+    const singleBag = [
+      { id: '1', name: 'Brazil Cerrado', type: 'coffee', origin: 'Brazil', process: 'Natural', roaster: 'Local', remainingWeightGrams: 250 },
+    ] as any[];
+    const mono = calculateStashDiversity(singleBag);
+    expect(mono.rating).toBe('monoculture');
+    expect(mono.diversityScore).toBeLessThanOrEqual(35);
+    expect(mono.distinctOriginsCount).toBe(1);
+
+    // 3. Pusta spiżarnia lub null
+    const empty = calculateStashDiversity([]);
+    expect(empty.diversityScore).toBe(0);
+    expect(empty.rating).toBe('monoculture');
+    expect(empty.totalItems).toBe(0);
+
+    const fromNull = calculateStashDiversity(null);
+    expect(fromNull.diversityScore).toBe(0);
+    expect(fromNull.rating).toBe('monoculture');
   });
 });
