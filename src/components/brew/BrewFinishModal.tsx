@@ -79,15 +79,29 @@ export function BrewFinishModal({
 
   if (!visible) return null;
 
-  const formatTime = (seconds: number) => {
-    const rawS = typeof seconds === 'number' ? seconds : (typeof seconds === 'string' ? parseFloat(seconds) : 0);
+  const formatTime = (seconds: number | string) => {
+    let rawS = 0;
+    if (typeof seconds === 'number') {
+      rawS = seconds;
+    } else if (typeof seconds === 'string') {
+      const match = seconds.replace(',', '.').trim().match(/^[+-]?\d+(?:\.\d+)?/);
+      rawS = match ? parseFloat(match[0]) : 0;
+    }
     const s = Number.isFinite(rawS) && rawS > 0 && !Object.is(rawS, -0) ? Math.min(86400, Math.floor(rawS)) : 0;
     const mins = Math.floor(s / 60);
     const secs = s % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const rawWater = typeof waterGrams === 'number' ? waterGrams : (typeof (waterGrams as any) === 'string' ? parseFloat((waterGrams as any).replace(/,/g, '.')) : 0);
+  const rawWater =
+    typeof waterGrams === 'number'
+      ? waterGrams
+      : typeof (waterGrams as any) === 'string'
+      ? (() => {
+          const m = String(waterGrams).replace(/,/g, '.').trim().match(/^[+-]?\d+(?:\.\d+)?/);
+          return m ? parseFloat(m[0]) : 0;
+        })()
+      : 0;
   const safeWater = Number.isFinite(rawWater) && rawWater > 0 && !Object.is(rawWater, -0) ? Math.min(50000, Math.round(rawWater)) : 0;
 
   const rawRating = typeof rating === 'number' ? rating : (typeof rating === 'string' ? parseFloat(rating) : 0);
@@ -300,8 +314,8 @@ export function BrewFinishModal({
                 maxLength={6}
                 accessibilityLabel={t.brew?.tdsLabel || 'Odczyt TDS refractometru (%)'}
                 accessibilityHint={language === 'en' ? 'Enter refractometer TDS reading in percent' : 'Wprowadź odczyt TDS refractometru w procentach'}
-                value={tdsInput ?? ''}
-                onChangeText={onChangeTdsInput}
+                value={(tdsInput ?? '').replace(/[\x00-\x1F\x7F]/g, '')}
+                onChangeText={(val) => onChangeTdsInput((val || '').replace(/[\x00-\x1F\x7F]/g, '').slice(0, 6))}
               />
             </View>
 
@@ -312,8 +326,8 @@ export function BrewFinishModal({
               style={styles.notesInput}
               placeholder={t.brew?.baristaNotesPlaceholder || 'np. słodka brzoskwinia, delikatna jaśminowa kwasowość...'}
               placeholderTextColor={theme.colors.textMuted}
-              value={notes ?? ''}
-              onChangeText={onChangeNotes}
+              value={(notes ?? '').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')}
+              onChangeText={(val) => onChangeNotes((val || '').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').slice(0, 1000))}
               maxLength={1000}
               accessibilityLabel={t.brew?.baristaNotesTitle || 'Notatki Baristy'}
               accessibilityHint={language === 'en' ? 'Enter tasting notes and sensory feedback' : 'Wprowadź notatki sensoryczne z zaparzonego naparu'}

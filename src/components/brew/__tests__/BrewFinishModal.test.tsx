@@ -247,4 +247,46 @@ describe('BrewFinishModal Component', () => {
     expect(notesInput.props.accessibilityHint).toBeDefined();
     expect(notesInput.props.value).toBe('');
   });
+
+  test('TASK-P54-01-ODK: formatTime i safeWater parsują jednostki (125,5 s, 300 ml) a wejścia notatek i TDS sanityzują znaki kontrolne', () => {
+    const mockChangeTds = jest.fn();
+    const mockChangeNotes = jest.fn();
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewFinishModal
+          {...defaultProps}
+          totalElapsedSeconds={' 125,5 s ' as any}
+          waterGrams={' 320,8 ml ' as any}
+          notes={'Złożony napar\x00\x07 z nutami jaśminu'}
+          tdsInput={' 1,35 % '}
+          onChangeTdsInput={mockChangeTds}
+          onChangeNotes={mockChangeNotes}
+        />
+      );
+    });
+
+    const str = JSON.stringify(tree.toJSON());
+    // 125.5s -> 2:05 (125s)
+    expect(str).toContain('02:05');
+    // 320.8ml -> 321g
+    expect(str).toContain('321g');
+
+    // Sprawdzenie oczyszczenia znaków kontrolnych z pola value notatek
+    const notesInput = tree.root.findByProps({ testID: 'finish-notes-input' });
+    expect(notesInput.props.value).toBe('Złożony napar z nutami jaśminu');
+
+    // Sprawdzenie filtrowania znaków kontrolnych przy pisaniu
+    act(() => {
+      notesInput.props.onChangeText('Nowa\x00 notatka\x1F');
+    });
+    expect(mockChangeNotes).toHaveBeenCalledWith('Nowa notatka');
+
+    const tdsInput = tree.root.findByProps({ testID: 'tds-input' });
+    act(() => {
+      tdsInput.props.onChangeText('1.40\x00');
+    });
+    expect(mockChangeTds).toHaveBeenCalledWith('1.40');
+  });
 });
