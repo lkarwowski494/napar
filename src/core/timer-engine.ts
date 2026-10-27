@@ -131,6 +131,50 @@ export class BrewTimerEngine {
     return Math.min(86400, Math.max(0, remaining));
   }
 
+  /**
+   * Oblicza inkrementalną objętość wody do dolania w danym kroku (g).
+   * Jeśli receptura używa kumulacyjnych wartości targetWaterGrams, odejmuje wodę z poprzedniego kroku.
+   */
+  public static calculateStepWaterIncrement(
+    steps?: RecipeStep[] | null,
+    stepIndex = 0
+  ): number {
+    if (!Array.isArray(steps) || steps.length === 0) return 0;
+    const safeIndex =
+      Number.isFinite(stepIndex) && stepIndex >= 0 ? Math.floor(stepIndex) : 0;
+    if (safeIndex >= steps.length) return 0;
+
+    const currentStep = steps[safeIndex];
+    if (
+      !currentStep ||
+      !Number.isFinite(currentStep.targetWaterGrams) ||
+      (currentStep.targetWaterGrams as number) <= 0
+    ) {
+      return 0;
+    }
+
+    const currentWater = currentStep.targetWaterGrams as number;
+    if (safeIndex === 0) {
+      return Number(currentWater.toFixed(1));
+    }
+
+    let prevWater = 0;
+    for (let i = safeIndex - 1; i >= 0; i--) {
+      const prevStep = steps[i];
+      if (
+        prevStep &&
+        Number.isFinite(prevStep.targetWaterGrams) &&
+        (prevStep.targetWaterGrams as number) > 0
+      ) {
+        prevWater = prevStep.targetWaterGrams as number;
+        break;
+      }
+    }
+
+    const delta = currentWater >= prevWater ? currentWater - prevWater : currentWater;
+    return Number(Math.max(0, delta).toFixed(1));
+  }
+
   constructor(steps: RecipeStep[], callbacks: TimerCallbacks = {}) {
     this.steps = steps.map((s) => ({ ...s }));
     this.callbacks = callbacks;

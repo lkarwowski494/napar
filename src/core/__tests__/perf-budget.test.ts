@@ -185,4 +185,31 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
 
     expect(ms).toBeLessThan(50);
   });
+
+  test('Budżet 10: calculateStepWaterIncrement wykonuje 10 000 kalkulacji w czasie poniżej 50 ms (TASK-P72-10-WYD)', () => {
+    const steps = [
+      { id: '1', name: 'Bloom', targetWaterGrams: 50 },
+      { id: '2', name: 'Pour 1', targetWaterGrams: 150 },
+      { id: '3', name: 'Pour 2', targetWaterGrams: 250 },
+      { id: '4', name: 'Drawdown', targetWaterGrams: 250 },
+    ] as any[];
+
+    // 1. Poprawność biznesowa
+    expect(BrewTimerEngine.calculateStepWaterIncrement(steps, 0)).toBe(50);
+    expect(BrewTimerEngine.calculateStepWaterIncrement(steps, 1)).toBe(100);
+    expect(BrewTimerEngine.calculateStepWaterIncrement(steps, 2)).toBe(100);
+    expect(BrewTimerEngine.calculateStepWaterIncrement(steps, 3)).toBe(0);
+    expect(BrewTimerEngine.calculateStepWaterIncrement(null, 0)).toBe(0);
+    expect(BrewTimerEngine.calculateStepWaterIncrement(steps, 99)).toBe(0);
+
+    // 2. Budżet wydajnościowy
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        const stepIdx = i % 4;
+        BrewTimerEngine.calculateStepWaterIncrement(steps, stepIdx);
+      }
+    });
+
+    expect(ms).toBeLessThan(50);
+  });
 });
