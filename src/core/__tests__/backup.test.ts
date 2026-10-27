@@ -16,6 +16,8 @@ import {
   BackupDiffResult,
   mergeBackupEnvelopes,
   BackupMergeOptions,
+  getBackupRecordCounts,
+  BackupRecordCounts,
   localISODate,
   stampOf,
   parseAndValidateBackup,
@@ -603,6 +605,29 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       // 3. Odporność na błędy (brak parametrów)
       expect(() => mergeBackupEnvelopes(null as any, incoming)).toThrow();
       expect(() => mergeBackupEnvelopes(primary, null as any)).toThrow();
+    });
+
+    test('TASK-P76-05-ARC: getBackupRecordCounts zlicza całkowitą liczbę rekordów i metadane kopii', () => {
+      const envelope = buildBackup({
+        inventory: [{ id: 'i1' }, { id: 'i2' }] as any,
+        customRecipes: [{ id: 'r1' }] as any,
+        sessions: [{ id: 's1' }, { id: 's2' }, { id: 's3' }] as any,
+        caffeineLogs: [{ id: 'c1' }] as any,
+      });
+
+      const counts: BackupRecordCounts = getBackupRecordCounts(envelope);
+      expect(counts.inventoryCount).toBe(2);
+      expect(counts.recipesCount).toBe(1);
+      expect(counts.sessionsCount).toBe(3);
+      expect(counts.caffeineLogsCount).toBe(1);
+      expect(counts.totalRecords).toBe(7);
+      expect(counts.exportedAt).toBeDefined();
+
+      // Odporność na brakujące kolekcje i null/undefined
+      const emptyCounts = getBackupRecordCounts(null);
+      expect(emptyCounts.totalRecords).toBe(0);
+      expect(emptyCounts.exportedAt).toBe('');
+      expect(getBackupRecordCounts({} as any).totalRecords).toBe(0);
     });
   });
 });

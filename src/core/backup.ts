@@ -85,6 +85,47 @@ export function getBackupStats(envelope?: NaparBackupEnvelope | null): BackupSta
   };
 }
 
+export interface BackupRecordCounts {
+  inventoryCount: number;
+  recipesCount: number;
+  sessionsCount: number;
+  caffeineLogsCount: number;
+  totalRecords: number;
+  exportedAt: string;
+}
+
+/**
+ * Zwraca szczegółowe statystyki liczby rekordów oraz znacznik czasu wyeksportowania kopii zapasowej.
+ */
+export function getBackupRecordCounts(
+  envelope?: NaparBackupEnvelope | null
+): BackupRecordCounts {
+  if (!envelope || !envelope.state || typeof envelope.state !== 'object') {
+    return {
+      inventoryCount: 0,
+      recipesCount: 0,
+      sessionsCount: 0,
+      caffeineLogsCount: 0,
+      totalRecords: 0,
+      exportedAt: '',
+    };
+  }
+
+  const inv = Array.isArray(envelope.state.inventory) ? envelope.state.inventory.length : 0;
+  const rec = Array.isArray(envelope.state.customRecipes) ? envelope.state.customRecipes.length : 0;
+  const ses = Array.isArray(envelope.state.sessions) ? envelope.state.sessions.length : 0;
+  const caf = Array.isArray(envelope.state.caffeineLogs) ? envelope.state.caffeineLogs.length : 0;
+
+  return {
+    inventoryCount: inv,
+    recipesCount: rec,
+    sessionsCount: ses,
+    caffeineLogsCount: caf,
+    totalRecords: inv + rec + ses + caf,
+    exportedAt: typeof envelope.exportedAt === 'string' ? envelope.exportedAt.trim() : '',
+  };
+}
+
 function plItems(n: number): string {
   if (n === 1) return '1 pozycja';
   const rem10 = n % 10;
