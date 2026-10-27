@@ -1630,3 +1630,100 @@ export function calculateResidualAlkalinity(
   };
 }
 
+export type SulfateToChlorideCategory =
+  | 'very_bitter_dry'
+  | 'crisp_accentuated'
+  | 'balanced'
+  | 'sweet_rounded'
+  | 'full_sweet_malty';
+
+export interface SulfateToChlorideRatioAnalysis {
+  sulfatePpm: number;
+  chloridePpm: number;
+  ratio: number;
+  category: SulfateToChlorideCategory;
+  sensoryBalancePl: string;
+  sensoryBalanceEn: string;
+  brewingRecommendationPl: string;
+  brewingRecommendationEn: string;
+}
+
+/**
+ * Wylicza stosunek siarczanów do chlorków (SO4 : Cl) w wodzie
+ * i ocenia balans sensoryczny między wytrawnością/goryczką a słodyczą/pełnią naparu.
+ */
+export function calculateSulfateToChlorideRatio(
+  sulfatePpm: number | string,
+  chloridePpm: number | string
+): SulfateToChlorideRatioAnalysis {
+  const parseNum = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, Math.min(1000, v)) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, Math.min(1000, parsed)) : 0;
+    }
+    return 0;
+  };
+
+  const so4 = Number(parseNum(sulfatePpm).toFixed(1));
+  const cl = Number(parseNum(chloridePpm).toFixed(1));
+
+  let ratio: number;
+  if (cl === 0 && so4 === 0) {
+    ratio = 1.0;
+  } else if (cl === 0) {
+    ratio = Math.min(20.0, Number((so4 / 0.1).toFixed(2)));
+  } else {
+    ratio = Number((so4 / cl).toFixed(2));
+  }
+
+  let category: SulfateToChlorideCategory;
+  let sensoryBalancePl: string;
+  let sensoryBalanceEn: string;
+  let brewingRecommendationPl: string;
+  let brewingRecommendationEn: string;
+
+  if (ratio > 2.0) {
+    category = 'very_bitter_dry';
+    sensoryBalancePl = 'Wyraźna dominacja siarczanów — wytrawny, rześki finisz z mocno zarysowaną goryczką.';
+    sensoryBalanceEn = 'Strong sulfate dominance — dry, crisp finish with pronounced bitterness.';
+    brewingRecommendationPl = 'Idealne dla jasnych, rześkich przelewów oraz stylów wytrawnych; unikać przy ziarnach podatnych na cierpkość.';
+    brewingRecommendationEn = 'Ideal for light, crisp pour-overs and dry profiles; avoid with beans prone to astringency.';
+  } else if (ratio >= 1.3) {
+    category = 'crisp_accentuated';
+    sensoryBalancePl = 'Lekka przewaga siarczanów — podkreślona kwasowość, klarowność nut kwiatowych i wytrawność.';
+    sensoryBalanceEn = 'Slight sulfate advantage — enhanced acidity, floral clarity, and crispness.';
+    brewingRecommendationPl = 'Świetny balans dla mytych kaw afrykańskich (Etiopia, Kenia) i herbat wysokogórskich.';
+    brewingRecommendationEn = 'Great balance for washed African coffees (Ethiopia, Kenya) and high-mountain teas.';
+  } else if (ratio >= 0.8) {
+    category = 'balanced';
+    sensoryBalancePl = 'Równowaga siarczanów i chlorków — harmonijna relacja słodyczy, kwasowości i gęstości naparu.';
+    sensoryBalanceEn = 'Sulfate and chloride balance — harmonious harmony between sweetness, acidity, and body.';
+    brewingRecommendationPl = 'Wszechstronny profil optymalny do cuppingu SCA, dripów i klasycznego balansu sensorycznego.';
+    brewingRecommendationEn = 'Versatile profile optimal for SCA cupping, drip, and classic sensory balance.';
+  } else if (ratio >= 0.4) {
+    category = 'sweet_rounded';
+    sensoryBalancePl = 'Przewaga chlorków — uwypuklona słodycz, gładkie body i zaokrąglona kwasowość.';
+    sensoryBalanceEn = 'Chloride advantage — accentuated sweetness, smooth mouthfeel, and rounded acidity.';
+    brewingRecommendationPl = 'Doskonały profil dla obróbek naturalnych/honey oraz nowoczesnego espresso o gęstej teksturze.';
+    brewingRecommendationEn = 'Excellent for natural/honey process coffees and modern full-bodied espresso.';
+  } else {
+    category = 'full_sweet_malty';
+    sensoryBalancePl = 'Silna dominacja chlorków — maksymalnie aksamitne body, wysoka słodycz i stłumiona ostrość.';
+    sensoryBalanceEn = 'Strong chloride dominance — silky body, enhanced sweetness, and softened sharpness.';
+    brewingRecommendationPl = 'Polecane do ciemniejszych paleni, espresso mlecznego i herbat czarnych o głębokim likierze.';
+    brewingRecommendationEn = 'Recommended for darker roasts, milk-based espresso, and rich black teas.';
+  }
+
+  return {
+    sulfatePpm: so4,
+    chloridePpm: cl,
+    ratio,
+    category,
+    sensoryBalancePl,
+    sensoryBalanceEn,
+    brewingRecommendationPl,
+    brewingRecommendationEn,
+  };
+}
+

@@ -41,6 +41,9 @@ import {
   calculateResidualAlkalinity,
   ResidualAlkalinityAnalysis,
   ResidualAlkalinityCategory,
+  calculateSulfateToChlorideRatio,
+  SulfateToChlorideRatioAnalysis,
+  SulfateToChlorideCategory,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -1120,6 +1123,58 @@ describe('Water Chemistry & Mineralization Module', () => {
     const fallback = calculateResidualAlkalinity(null as any);
     expect(fallback.residualAlkalinityPpm).toBeLessThanOrEqual(0);
     expect(fallback.category).toBe('negative_or_very_low');
+  });
+
+  test('TASK-P86-07-JAK: calculateSulfateToChlorideRatio analizuje stosunek siarczanów do chlorków i balans sensoryczny', () => {
+    // 1. Dominacja siarczanów (> 2.0) -> wytrawność, goryczka
+    const bitterDry: SulfateToChlorideRatioAnalysis = calculateSulfateToChlorideRatio(100, 30);
+    const catCheck: SulfateToChlorideCategory = bitterDry.category;
+    expect(catCheck).toBe('very_bitter_dry');
+    expect(bitterDry.sulfatePpm).toBe(100);
+    expect(bitterDry.chloridePpm).toBe(30);
+    expect(bitterDry.ratio).toBe(3.33);
+    expect(bitterDry.sensoryBalancePl).toContain('siarczanów');
+    expect(bitterDry.brewingRecommendationPl).toContain('przelewów');
+    expect(bitterDry.sensoryBalanceEn).toContain('sulfate');
+
+    // 2. Lekka przewaga siarczanów (1.3 - 2.0) -> rześkość, kwasowość
+    const crisp = calculateSulfateToChlorideRatio('75,0', '50,0');
+    expect(crisp.category).toBe('crisp_accentuated');
+    expect(crisp.ratio).toBe(1.5);
+    expect(crisp.sensoryBalancePl).toContain('kwasowość');
+
+    // 3. Zbalansowany stosunek (0.8 - 1.3) -> harmonia
+    const balanced = calculateSulfateToChlorideRatio(50, 50);
+    expect(balanced.category).toBe('balanced');
+    expect(balanced.ratio).toBe(1.0);
+    expect(balanced.sensoryBalancePl).toContain('Równowaga');
+    expect(balanced.brewingRecommendationPl).toContain('cuppingu');
+
+    // 4. Przewaga chlorków (0.4 - <0.8) -> słodycz, krągłość
+    const sweet = calculateSulfateToChlorideRatio(30, 50);
+    expect(sweet.category).toBe('sweet_rounded');
+    expect(sweet.ratio).toBe(0.6);
+    expect(sweet.sensoryBalancePl).toContain('słodycz');
+
+    // 5. Silna dominacja chlorków (< 0.4) -> pełne body, słodycz
+    const fullSweet = calculateSulfateToChlorideRatio(10, 50);
+    expect(fullSweet.category).toBe('full_sweet_malty');
+    expect(fullSweet.ratio).toBe(0.2);
+    expect(fullSweet.sensoryBalancePl).toContain('aksamitne body');
+
+    // 6. Przypadki brzegowe: zerowe chlorki, zerowe siarczany, null, NaN
+    const zeroChloride = calculateSulfateToChlorideRatio(60, 0);
+    expect(zeroChloride.category).toBe('very_bitter_dry');
+    expect(zeroChloride.ratio).toBeGreaterThan(2.0);
+
+    const zeroBoth = calculateSulfateToChlorideRatio(0, 0);
+    expect(zeroBoth.category).toBe('balanced');
+    expect(zeroBoth.ratio).toBe(1.0);
+
+    const safeFallback = calculateSulfateToChlorideRatio(null as any, -10);
+    expect(safeFallback.sulfatePpm).toBe(0);
+    expect(safeFallback.chloridePpm).toBe(0);
+    expect(safeFallback.category).toBe('balanced');
   });
 });
 
