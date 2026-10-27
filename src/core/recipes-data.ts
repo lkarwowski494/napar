@@ -500,3 +500,51 @@ export function findMasterRecipeById(id: string): MasterRecipe | undefined {
 export function getMasterRecipesByType(type: 'COFFEE' | 'TEA'): MasterRecipe[] {
   return MASTER_RECIPES.filter((r) => r.type === type);
 }
+
+
+export interface RecipeFilterCriteria {
+  type?: 'COFFEE' | 'TEA' | string;
+  method?: string;
+  minWaterWeightGrams?: number;
+  maxWaterWeightGrams?: number;
+  query?: string;
+}
+
+/**
+ * Filtruje i przeszukuje receptury według zadanych kryteriów.
+ */
+export function filterRecipes(
+  recipes: MasterRecipe[] = MASTER_RECIPES,
+  criteria?: RecipeFilterCriteria
+): MasterRecipe[] {
+  if (!Array.isArray(recipes)) return [];
+  if (!criteria || typeof criteria !== 'object') return [...recipes];
+
+  const targetType = typeof criteria.type === 'string' ? criteria.type.trim().toUpperCase() : undefined;
+  const targetMethod = typeof criteria.method === 'string' ? criteria.method.trim().toLowerCase() : undefined;
+  const minWater = typeof criteria.minWaterWeightGrams === 'number' && Number.isFinite(criteria.minWaterWeightGrams)
+    ? criteria.minWaterWeightGrams
+    : undefined;
+  const maxWater = typeof criteria.maxWaterWeightGrams === 'number' && Number.isFinite(criteria.maxWaterWeightGrams)
+    ? criteria.maxWaterWeightGrams
+    : undefined;
+  const q = typeof criteria.query === 'string' ? criteria.query.trim().toLowerCase() : undefined;
+
+  return recipes.filter((r) => {
+    if (!r) return false;
+    if (targetType && r.type !== targetType) return false;
+    if (targetMethod && !r.method.toLowerCase().includes(targetMethod)) return false;
+    if (minWater !== undefined && r.waterWeightGrams < minWater) return false;
+    if (maxWater !== undefined && r.waterWeightGrams > maxWater) return false;
+    if (q) {
+      const matchName = r.name.toLowerCase().includes(q);
+      const matchNameEn = r.nameEn ? r.nameEn.toLowerCase().includes(q) : false;
+      const matchAuthor = r.author.toLowerCase().includes(q);
+      const matchMethod = r.method.toLowerCase().includes(q);
+      if (!matchName && !matchNameEn && !matchAuthor && !matchMethod) {
+        return false;
+      }
+    }
+    return true;
+  });
+}
