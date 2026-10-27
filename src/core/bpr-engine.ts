@@ -955,3 +955,73 @@ export function getActionScheduleCounts(actions: ProactiveActionItem[]): ActionS
 
   return counts;
 }
+
+export type ActionSortOption = 'date_asc' | 'date_desc' | 'urgency';
+
+/**
+ * Sortuje akcje proaktywne według wybranego kryterium:
+ * - date_asc: chronologicznie od najwcześniejszych (zaległe < 0 -> dziś 0 -> jutro 1 -> przyszłe > 1)
+ * - date_desc: od najpóźniejszych do najwcześniejszych
+ * - urgency: wg pilności (dziś -> jutro -> zaległe -> przyszłość; w ramach grupy wg ważności odznaki: warning > copper > success).
+ */
+export function sortProactiveActions(
+  actions: ProactiveActionItem[],
+  sortBy: ActionSortOption = 'date_asc'
+): ProactiveActionItem[] {
+  if (!Array.isArray(actions)) return [];
+  const copy = [...actions];
+
+  const colorPriority = (color?: string): number => {
+    switch (color) {
+      case 'warning':
+        return 1;
+      case 'copper':
+        return 2;
+      case 'success':
+        return 3;
+      default:
+        return 4;
+    }
+  };
+
+  const urgencyTier = (offset: number): number => {
+    if (offset === 0) return 1; // today
+    if (offset === 1) return 2; // tomorrow
+    if (offset < 0) return 3;  // overdue
+    return 4;                  // future
+  };
+
+  return copy.sort((a, b) => {
+    if (!a && !b) return 0;
+    if (!a) return 1;
+    if (!b) return -1;
+
+    const offsetA = typeof a.daysOffset === 'number' && Number.isFinite(a.daysOffset) ? a.daysOffset : 0;
+    const offsetB = typeof b.daysOffset === 'number' && Number.isFinite(b.daysOffset) ? b.daysOffset : 0;
+
+    switch (sortBy) {
+      case 'date_asc': {
+        if (offsetA !== offsetB) return offsetA - offsetB;
+        return (a.id || '').localeCompare(b.id || '');
+      }
+      case 'date_desc': {
+        if (offsetA !== offsetB) return offsetB - offsetA;
+        return (a.id || '').localeCompare(b.id || '');
+      }
+      case 'urgency': {
+        const tierA = urgencyTier(offsetA);
+        const tierB = urgencyTier(offsetB);
+        if (tierA !== tierB) return tierA - tierB;
+
+        const colorA = colorPriority(a.badgeColor);
+        const colorB = colorPriority(b.badgeColor);
+        if (colorA !== colorB) return colorA - colorB;
+
+        if (offsetA !== offsetB) return offsetA - offsetB;
+        return (a.id || '').localeCompare(b.id || '');
+      }
+      default:
+        return offsetA - offsetB;
+    }
+  });
+}

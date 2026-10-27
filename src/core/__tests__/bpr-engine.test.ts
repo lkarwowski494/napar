@@ -10,6 +10,8 @@ import {
   ActionGroupMap,
   getActionScheduleCounts,
   ActionScheduleCounts,
+  sortProactiveActions,
+  ActionSortOption,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -837,6 +839,39 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(emptyCounts.total).toBe(0);
       expect(emptyCounts.today).toBe(0);
       expect(emptyCounts.byBadgeColor.copper).toBe(0);
+    });
+
+    it('TASK-P73-04-SZT: sortProactiveActions sortuje akcje wg daty i pilności', () => {
+      const aTodayCopper = { id: 'act-today-cop', daysOffset: 0, badgeColor: 'copper' } as any;
+      const aTodayWarn = { id: 'act-today-warn', daysOffset: 0, badgeColor: 'warning' } as any;
+      const aTomorrow = { id: 'act-tom', daysOffset: 1, badgeColor: 'success' } as any;
+      const aOverdue = { id: 'act-over', daysOffset: -2, badgeColor: 'warning' } as any;
+      const aFuture = { id: 'act-fut', daysOffset: 5, badgeColor: 'copper' } as any;
+
+      const actions = [aFuture, aTomorrow, aOverdue, aTodayCopper, aTodayWarn];
+
+      // 1. Sortowanie chronologiczne rosnąco (date_asc)
+      const sortedAsc = sortProactiveActions(actions, 'date_asc');
+      expect(sortedAsc[0].id).toBe('act-over');
+      expect(sortedAsc[sortedAsc.length - 1].id).toBe('act-fut');
+
+      // 2. Sortowanie chronologiczne malejąco (date_desc)
+      const sortedDesc = sortProactiveActions(actions, 'date_desc');
+      expect(sortedDesc[0].id).toBe('act-fut');
+      expect(sortedDesc[sortedDesc.length - 1].id).toBe('act-over');
+
+      // 3. Sortowanie według pilności (urgency: today [warning > copper] -> tomorrow -> overdue -> future)
+      const sortOpt: ActionSortOption = 'urgency';
+      const sortedUrgency = sortProactiveActions(actions, sortOpt);
+      expect(sortedUrgency[0].id).toBe('act-today-warn');
+      expect(sortedUrgency[1].id).toBe('act-today-cop');
+      expect(sortedUrgency[2].id).toBe('act-tom');
+      expect(sortedUrgency[3].id).toBe('act-over');
+      expect(sortedUrgency[4].id).toBe('act-fut');
+
+      // 4. Odporność na null/undefined
+      expect(sortProactiveActions(null as any)).toEqual([]);
+      expect(sortProactiveActions([null as any, aTodayWarn])).toHaveLength(2);
     });
   });
 });
