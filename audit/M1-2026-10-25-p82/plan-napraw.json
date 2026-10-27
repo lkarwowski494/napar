@@ -1,0 +1,53 @@
+{
+  "cycle": "P82",
+  "status": "completed",
+  "perspectives": [
+    "09-LOK",
+    "10-WYD",
+    "11-WZR",
+    "12-NIE",
+    "01-ODK"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P82-09-LOK",
+      "perspective": "09-LOK",
+      "description": "Implementacja formatowania wysokości upraw formatAltitude z obsługą jednostek m i ft oraz lokalizacji w src/core/unit-converter.ts",
+      "targetFile": "src/core/unit-converter.ts",
+      "testFile": "src/core/__tests__/unit-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P82-10-WYD",
+      "perspective": "10-WYD",
+      "description": "Implementacja wyznaczania migawki aktywnego kroku BrewTimerEngine.getActiveStepSnapshot z typem ActiveStepSnapshot i testem budżetowym Budget 14 w src/core/timer-engine.ts i src/core/__tests__/perf-budget.test.ts",
+      "targetFile": "src/core/timer-engine.ts",
+      "testFile": "src/core/__tests__/perf-budget.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P82-11-WZR",
+      "perspective": "11-WZR",
+      "description": "Implementacja ewaluacji proporcji praski francuskiej evaluateFrenchPressRatio z typami FrenchPressRatioEvaluation i FrenchPressRatioStyle w src/core/domain-rules.ts",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P82-12-NIE",
+      "perspective": "12-NIE",
+      "description": "Implementacja testu odpornościowego Chaos 18 dla nowych modułów domenowych (P81) w src/core/__tests__/fuzz-resilience.test.ts",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P82-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Implementacja kalkulatora relewancji wyszukiwania calculateSearchRelevanceScore z typem SearchRelevanceScore w src/core/search-utils.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    }
+  ]
+}
