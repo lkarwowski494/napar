@@ -1158,3 +1158,52 @@ export function getGrindSettingsOverview(
     };
   });
 }
+
+export interface GrinderSearchCriteria {
+  query?: string;
+  burrType?: string;
+  maxStepMicrons?: number;
+}
+
+/**
+ * Filtruje i wyszukuje modele młynków według zadanych kryteriów (zapytanie tekstowe, typ żaren, skok mikroregulacji).
+ */
+export function filterGrinders(
+  grinders?: GrinderModel[] | null,
+  criteria: GrinderSearchCriteria = {}
+): GrinderModel[] {
+  const list = Array.isArray(grinders) ? grinders : SUPPORTED_GRINDERS;
+  const query = criteria && typeof criteria.query === 'string' ? criteria.query.trim().toLowerCase() : '';
+  const burr = criteria && typeof criteria.burrType === 'string' ? criteria.burrType.trim().toLowerCase() : '';
+  const maxStep = criteria && typeof criteria.maxStepMicrons === 'number' && Number.isFinite(criteria.maxStepMicrons)
+    ? criteria.maxStepMicrons
+    : null;
+
+  return list.filter((grinder) => {
+    if (!grinder || typeof grinder !== 'object') return false;
+
+    if (query) {
+      const name = (grinder.name || '').toLowerCase();
+      const id = (grinder.id || '').toLowerCase();
+      const burrName = (grinder.burrType || '').toLowerCase();
+      if (!name.includes(query) && !id.includes(query) && !burrName.includes(query)) {
+        return false;
+      }
+    }
+
+    if (burr) {
+      const burrName = (grinder.burrType || '').toLowerCase();
+      const burrPl = (grinder.burrTypePl || '').toLowerCase();
+      const burrEn = (grinder.burrTypeEn || '').toLowerCase();
+      if (!burrName.includes(burr) && !burrPl.includes(burr) && !burrEn.includes(burr)) {
+        return false;
+      }
+    }
+
+    if (maxStep !== null && grinder.stepMicrons > maxStep) {
+      return false;
+    }
+
+    return true;
+  });
+}

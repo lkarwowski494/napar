@@ -16,6 +16,8 @@ import {
   MethodGrindSettingResult,
   getGrindSettingsOverview,
   GrinderSettingOverviewItem,
+  filterGrinders,
+  GrinderSearchCriteria,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -859,6 +861,33 @@ describe('Grinder Dial-in Converter Module', () => {
     // 3. Fallback dla nieznanej metody i pustego wejścia
     const fallbackOverview = getGrindSettingsOverview(null as any);
     expect(fallbackOverview.length).toBe(SUPPORTED_GRINDERS.length);
+  });
+
+  test('TASK-P72-08-PRO: filterGrinders filtruje i wyszukuje młynki według kryteriów', () => {
+    // 1. Wyszukiwanie po nazwie modelu
+    const criteriaQuery: GrinderSearchCriteria = { query: 'comandante' };
+    const byQuery = filterGrinders(SUPPORTED_GRINDERS, criteriaQuery);
+    expect(byQuery.length).toBe(1);
+    expect(byQuery[0].id).toBe('comandante_c40');
+
+    // 2. Filtrowanie po typie żaren (np. stożkowe / conical)
+    const criteriaBurr: GrinderSearchCriteria = { burrType: 'conical' };
+    const conicalGrinders = filterGrinders(SUPPORTED_GRINDERS, criteriaBurr);
+    expect(conicalGrinders.length).toBeGreaterThan(0);
+    expect(conicalGrinders.some((g) => g.id === 'comandante_c40')).toBe(true);
+
+    // 3. Filtrowanie po skoku mikroregulacji (maxStepMicrons <= 20)
+    const criteriaFine: GrinderSearchCriteria = { maxStepMicrons: 20.0 };
+    const fineGrinders = filterGrinders(SUPPORTED_GRINDERS, criteriaFine);
+    expect(fineGrinders.length).toBeGreaterThan(0);
+    expect(fineGrinders.every((g) => g.stepMicrons <= 20.0)).toBe(true);
+
+    // 4. Odporność na null/undefined oraz puste kryteria (zwraca domyślną listę)
+    const defaultList = filterGrinders(null as any);
+    expect(defaultList.length).toBe(SUPPORTED_GRINDERS.length);
+
+    const emptyFilter = filterGrinders(SUPPORTED_GRINDERS, {});
+    expect(emptyFilter.length).toBe(SUPPORTED_GRINDERS.length);
   });
 });
 
