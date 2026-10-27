@@ -35,6 +35,9 @@ import {
   evaluateWaterAlkalinity,
   AlkalinityEvaluation,
   AlkalinityCategory,
+  calculateMagnesiumCalciumRatio,
+  MineralCationRatioAnalysis,
+  CationRatioCategory,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -1044,6 +1047,41 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(fallback.alkalinityPpm).toBe(0);
     expect(fallback.category).toBe('low_buffer');
     expect(fallback.bufferCapacity).toBe('insufficient');
+  });
+
+  test('TASK-P81-07-JAK: calculateMagnesiumCalciumRatio analizuje profil kationowy i wpływ na ekstrakcję', () => {
+    // 1. Zrównoważony profil specialty (np. Ca 20 ppm, Mg 20 ppm -> Mg/Ca = 1.0)
+    const balanced: MineralCationRatioAnalysis = calculateMagnesiumCalciumRatio(20, 20);
+    const catCheck: CationRatioCategory = balanced.category;
+    expect(catCheck).toBe('balanced_specialty');
+    expect(balanced.ratioMgToCa).toBe(1.0);
+    expect(balanced.sensoryEmphasisPl).toContain('Zrównoważony profil');
+    expect(balanced.sensoryEmphasisEn).toContain('Balanced');
+    expect(balanced.limescaleRisk).toBe('low');
+
+    // 2. Dominacja magnezu (np. Ca 10 ppm, Mg 30 ppm -> Mg/Ca = 3.0)
+    const mgDominant = calculateMagnesiumCalciumRatio('10,0', '30,0');
+    expect(mgDominant.category).toBe('magnesium_dominant');
+    expect(mgDominant.ratioMgToCa).toBe(3.0);
+    expect(mgDominant.sensoryEmphasisPl).toContain('Dominacja magnezu');
+    expect(mgDominant.recommendedUsagePl).toContain('przelewowych');
+
+    // 3. Dominacja wapnia (np. Ca 60 ppm, Mg 15 ppm -> Mg/Ca = 0.25)
+    const caDominant = calculateMagnesiumCalciumRatio(60, 15);
+    expect(caDominant.category).toBe('calcium_dominant');
+    expect(caDominant.ratioMgToCa).toBe(0.25);
+    expect(caDominant.sensoryEmphasisPl).toContain('Dominacja wapnia');
+
+    // 4. Czysto miękka woda (Ca 0, Mg 0)
+    const zeroWater = calculateMagnesiumCalciumRatio(0, 0);
+    expect(zeroWater.category).toBe('pure_soft');
+    expect(zeroWater.ratioMgToCa).toBe(0);
+    expect(zeroWater.limescaleRisk).toBe('minimal');
+
+    // 5. Odporność na null, ujemne wartości i NaN
+    const fallback = calculateMagnesiumCalciumRatio(null as any, undefined as any);
+    expect(fallback.category).toBe('pure_soft');
+    expect(fallback.ratioMgToCa).toBe(0);
   });
 });
 

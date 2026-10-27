@@ -1438,3 +1438,104 @@ export function evaluateWaterAlkalinity(khPpm: number | string): AlkalinityEvalu
     recommendedAdjustmentEn,
   };
 }
+
+
+export type CationRatioCategory = 'magnesium_dominant' | 'balanced_specialty' | 'calcium_dominant' | 'pure_soft';
+
+export interface MineralCationRatioAnalysis {
+  calciumIonPpm: number;
+  magnesiumIonPpm: number;
+  ratioMgToCa: number;
+  category: CationRatioCategory;
+  sensoryEmphasisPl: string;
+  sensoryEmphasisEn: string;
+  limescaleRisk: 'minimal' | 'low' | 'moderate' | 'high';
+  recommendedUsagePl: string;
+  recommendedUsageEn: string;
+}
+
+/**
+ * Analizuje stosunek kationów magnezu (Mg2+) do wapnia (Ca2+) w wodzie parzenia
+ * oraz ich wpływ sensoryczny na ekstrakcję kwasowości i ryzyko powstawania kamienia kotłowego.
+ */
+export function calculateMagnesiumCalciumRatio(
+  calciumIonPpm: number | string,
+  magnesiumIonPpm: number | string
+): MineralCationRatioAnalysis {
+  const parseNum = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, Math.min(2000, v)) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, Math.min(2000, parsed)) : 0;
+    }
+    return 0;
+  };
+
+  const ca = Number(parseNum(calciumIonPpm).toFixed(1));
+  const mg = Number(parseNum(magnesiumIonPpm).toFixed(1));
+
+  if (ca === 0 && mg === 0) {
+    return {
+      calciumIonPpm: 0,
+      magnesiumIonPpm: 0,
+      ratioMgToCa: 0,
+      category: 'pure_soft',
+      sensoryEmphasisPl: 'Brak minerałów kationowych — woda ultra-miękka, płaski napar pozbawiony wyrazistości.',
+      sensoryEmphasisEn: 'Zero cation minerals — ultra-soft water, thin extraction lacking vibrancy.',
+      limescaleRisk: 'minimal',
+      recommendedUsagePl: 'Zalecana remineralizacja solami magnezu i wapnia przed parzeniem.',
+      recommendedUsageEn: 'Remineralization with magnesium and calcium salts recommended before brewing.',
+    };
+  }
+
+  let rawRatio = 0;
+  if (ca > 0) {
+    rawRatio = mg / ca;
+  } else {
+    rawRatio = Number(mg.toFixed(2));
+  }
+
+  const ratioMgToCa = Number(rawRatio.toFixed(2));
+
+  let category: CationRatioCategory;
+  let sensoryEmphasisPl: string;
+  let sensoryEmphasisEn: string;
+  let limescaleRisk: 'minimal' | 'low' | 'moderate' | 'high';
+  let recommendedUsagePl: string;
+  let recommendedUsageEn: string;
+
+  if (ratioMgToCa > 2.0 || ca === 0) {
+    category = 'magnesium_dominant';
+    sensoryEmphasisPl = 'Dominacja magnezu — uwypuklona jasna, owocowa kwasowość i nuty kwiatowe. Minimalne ryzyko kamienia.';
+    sensoryEmphasisEn = 'Magnesium dominant — vibrant fruit acidity and delicate floral notes highlighted. Minimal scale risk.';
+    limescaleRisk = 'low';
+    recommendedUsagePl = 'Idealna do metod przelewowych (V60, Chemex) i ziaren jasno palonych (Nordic roast).';
+    recommendedUsageEn = 'Ideal for pour-over filters (V60, Chemex) and light Nordic roasts.';
+  } else if (ratioMgToCa >= 0.5) {
+    category = 'balanced_specialty';
+    sensoryEmphasisPl = 'Zrównoważony profil kationowy — harmonijna ekstrakcja słodyczy, kwasowości i aksamitnego ciała.';
+    sensoryEmphasisEn = 'Balanced cation profile — harmonic extraction of sweetness, acidity, and silky body.';
+    limescaleRisk = ca > 60 ? 'moderate' : 'low';
+    recommendedUsagePl = 'Uniwersalna woda do wszystkich metod parzenia specialty i espresso.';
+    recommendedUsageEn = 'All-around specialty water for filter brewing and espresso.';
+  } else {
+    category = 'calcium_dominant';
+    sensoryEmphasisPl = 'Dominacja wapnia — pełne, kremowe ciało, nuty czekoladowe, ale stłumiona kwasowość owocowa.';
+    sensoryEmphasisEn = 'Calcium dominant — heavy creamy body, chocolate and nutty notes, muted delicate acidity.';
+    limescaleRisk = ca > 80 ? 'high' : 'moderate';
+    recommendedUsagePl = 'Sprzyja tradycyjnemu espresso i kawom o profilu czekoladowo-orzechowym; zalecana ochrona bojlera.';
+    recommendedUsageEn = 'Favors classic espresso and chocolatey profiles; boiler scale protection recommended.';
+  }
+
+  return {
+    calciumIonPpm: ca,
+    magnesiumIonPpm: mg,
+    ratioMgToCa,
+    category,
+    sensoryEmphasisPl,
+    sensoryEmphasisEn,
+    limescaleRisk,
+    recommendedUsagePl,
+    recommendedUsageEn,
+  };
+}
