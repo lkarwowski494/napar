@@ -46,11 +46,20 @@ export interface CorruptStateRecovery {
 }
 
 export function buildBackup(state: NaparBackupData): NaparBackupEnvelope {
+  const safeState: NaparBackupData =
+    state && typeof state === 'object'
+      ? state
+      : {
+          inventory: [],
+          customRecipes: [],
+          sessions: [],
+          caffeineLogs: [],
+        };
   return {
     format: 'napar-backup',
     schemaVersion: SCHEMA_VERSION,
     exportedAt: new Date().toISOString(),
-    state,
+    state: safeState,
   };
 }
 
@@ -366,7 +375,11 @@ export function parseAndValidateBackup(rawJson: string): NaparBackupEnvelope {
     throw new Error('Nieprawidłowa struktura ustawień ("settings" musi być obiektem)');
   }
 
-  if (typeof envelope.exportedAt !== 'string' || !envelope.exportedAt.trim()) {
+  if (
+    typeof envelope.exportedAt !== 'string' ||
+    !envelope.exportedAt.trim() ||
+    isNaN(new Date(envelope.exportedAt).getTime())
+  ) {
     throw new Error('Nieprawidłowy lub brakujący znacznik czasu eksportu (exportedAt)');
   }
 

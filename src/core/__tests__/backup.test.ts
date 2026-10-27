@@ -382,6 +382,31 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       // Brudne / puste wejście
       expect(rotateBackupFiles([] as any, AUTO_RE, 5)).toEqual([]);
     });
+
+    test('TASK-P59-05-ARC: parseAndValidateBackup odrzuca nieliczbowe exportedAt a buildBackup bezpiecznie obsluguje null/undefined state', () => {
+      const validEnvelope = buildBackup({
+        inventory: [],
+        customRecipes: [],
+        sessions: [],
+        caffeineLogs: [],
+      });
+
+      // 1. Niepoprawny znacznik czasu exportedAt
+      const corruptTimeEnvelope = { ...validEnvelope, exportedAt: 'invalid-date-format' };
+      expect(() => parseAndValidateBackup(JSON.stringify(corruptTimeEnvelope))).toThrow(
+        'Nieprawidłowy lub brakujący znacznik czasu eksportu (exportedAt)'
+      );
+
+      // 2. buildBackup z null/undefined
+      const fallbackNull = buildBackup(null as any);
+      expect(fallbackNull.state).toBeDefined();
+      expect(Array.isArray(fallbackNull.state.inventory)).toBe(true);
+      expect(fallbackNull.schemaVersion).toBe(SCHEMA_VERSION);
+
+      const fallbackUndefined = buildBackup(undefined as any);
+      expect(fallbackUndefined.state).toBeDefined();
+      expect(Array.isArray(fallbackUndefined.state.customRecipes)).toBe(true);
+    });
   });
 });
 
