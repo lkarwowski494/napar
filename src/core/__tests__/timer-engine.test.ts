@@ -375,5 +375,26 @@ describe('BrewTimerEngine', () => {
       expect(snap.recommendedPourRate).toBe(0);
       engine.destroy();
     });
+
+    test('TASK-P65-10-WYD: calculateTotalRecipeDuration i calculateTotalTargetWater wyliczają metryki bez alokacji', () => {
+      expect(BrewTimerEngine.calculateTotalRecipeDuration(testSteps)).toBe(90);
+      expect(BrewTimerEngine.calculateTotalTargetWater(testSteps)).toBe(250.0);
+
+      // Edge cases & null safety
+      expect(BrewTimerEngine.calculateTotalRecipeDuration(null)).toBe(0);
+      expect(BrewTimerEngine.calculateTotalRecipeDuration(undefined)).toBe(0);
+      expect(BrewTimerEngine.calculateTotalRecipeDuration([])).toBe(0);
+      expect(BrewTimerEngine.calculateTotalTargetWater(null)).toBe(0);
+      expect(BrewTimerEngine.calculateTotalTargetWater([])).toBe(0);
+
+      const invalidSteps: any[] = [
+        { durationSeconds: NaN, targetWaterGrams: -50 },
+        { durationSeconds: -15, targetWaterGrams: NaN },
+        { durationSeconds: 45.8, targetWaterGrams: 300.25 },
+        { durationSeconds: 10, targetWaterGrams: 100 },
+      ];
+      expect(BrewTimerEngine.calculateTotalRecipeDuration(invalidSteps)).toBe(55); // floor(45.8) + 10 = 55
+      expect(BrewTimerEngine.calculateTotalTargetWater(invalidSteps)).toBe(300.3); // max rounded to 1 decimal place
+    });
   });
 });

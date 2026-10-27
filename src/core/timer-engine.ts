@@ -63,6 +63,36 @@ export class BrewTimerEngine {
   private pausedTotalElapsedMs = 0;
   private appStateSubscription: NativeEventSubscription | null = null;
 
+  /**
+   * Oblicza sumaryczny czas trwania receptury w sekundach bez alokacji stanu silnika.
+   */
+  public static calculateTotalRecipeDuration(steps?: RecipeStep[] | null): number {
+    if (!Array.isArray(steps) || steps.length === 0) return 0;
+    let total = 0;
+    for (const step of steps) {
+      if (step && Number.isFinite(step.durationSeconds) && step.durationSeconds > 0) {
+        total += Math.floor(step.durationSeconds);
+      }
+    }
+    return Math.min(86400, Math.max(0, total));
+  }
+
+  /**
+   * Oblicza maksymalną / docelową objętość wody w recepturze (g) bez alokacji stanu silnika.
+   */
+  public static calculateTotalTargetWater(steps?: RecipeStep[] | null): number {
+    if (!Array.isArray(steps) || steps.length === 0) return 0;
+    let maxWater = 0;
+    for (const step of steps) {
+      if (step && Number.isFinite(step.targetWaterGrams) && step.targetWaterGrams > 0) {
+        if (step.targetWaterGrams > maxWater) {
+          maxWater = step.targetWaterGrams;
+        }
+      }
+    }
+    return Number(maxWater.toFixed(1));
+  }
+
   constructor(steps: RecipeStep[], callbacks: TimerCallbacks = {}) {
     this.steps = steps.map((s) => ({ ...s }));
     this.callbacks = callbacks;
