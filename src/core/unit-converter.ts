@@ -503,3 +503,56 @@ export function formatAltitude(
   return `${meters} ${suffix}`;
 }
 
+/**
+ * Formatuje ciśnienie parzenia w barach ('bar') lub funtach na cal kwadratowy ('psi')
+ * z pełną sanityzacją wartości liczbowych, zabezpieczeniem przed -0 oraz NaN.
+ * 1 bar = 14.50377 psi (w obliczeniach 14.5038).
+ */
+export function formatPressureWithUnit(
+  bars: number | string | undefined | null,
+  unit: 'bar' | 'psi' | string = 'bar',
+  decimals?: number
+): string {
+  const normUnit = typeof unit === 'string' ? unit.trim().toLowerCase() : 'bar';
+  const isPsi = normUnit === 'psi';
+  const dec = typeof decimals === 'number' && Number.isFinite(decimals)
+    ? Math.max(0, Math.min(6, decimals))
+    : 1;
+
+  if (bars === undefined || bars === null) {
+    const val = 0;
+    return `${val.toFixed(dec)} ${isPsi ? 'psi' : 'bar'}`;
+  }
+
+  let val: number;
+  if (typeof bars === 'number') {
+    val = bars;
+  } else if (typeof bars === 'string') {
+    const clean = bars
+      .replace(/\uFEFF/g, '')
+      .replace(/[^\d.,-]/g, '')
+      .replace(',', '.')
+      .trim();
+    val = parseFloat(clean);
+  } else {
+    val = NaN;
+  }
+
+  const safeBars =
+    !Number.isNaN(val) && val >= 0 && !Object.is(val, -0)
+      ? Math.min(30, val)
+      : 0;
+
+  if (isPsi) {
+    const psiVal = safeBars * 14.5038;
+    const rounded = Number(psiVal.toFixed(dec));
+    const safeNum = Object.is(rounded, -0) ? 0 : rounded;
+    return `${safeNum.toFixed(dec)} psi`;
+  }
+
+  const rounded = Number(safeBars.toFixed(dec));
+  const safeNum = Object.is(rounded, -0) ? 0 : rounded;
+  return `${safeNum.toFixed(dec)} bar`;
+}
+
+

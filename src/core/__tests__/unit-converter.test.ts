@@ -21,6 +21,7 @@ import {
   formatWaterHardness,
   formatParticleSize,
   formatAltitude,
+  formatPressureWithUnit,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -394,6 +395,29 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatAltitude(null)).toBe('0 m n.p.m.');
       expect(formatAltitude(undefined)).toBe('0 m n.p.m.');
       expect(formatAltitude(null, 'ft', 'en')).toBe('0 ft a.s.l.');
+    });
+
+    test('TASK-P84-09-LOK: formatPressureWithUnit formatuje ciśnienie w bar i psi z elastycznymi jednostkami i precyzją', () => {
+      // 1. Domyślnie bary (bar)
+      expect(formatPressureWithUnit(9)).toBe('9.0 bar');
+      expect(formatPressureWithUnit('9,0 bar')).toBe('9.0 bar');
+      expect(formatPressureWithUnit(9.25, 'bar', 2)).toBe('9.25 bar');
+      expect(formatPressureWithUnit(9, 'bar', 0)).toBe('9 bar');
+
+      // 2. Funt na cal kwadratowy (psi) — 9 bar * 14.5038 ≈ 130.5 psi
+      expect(formatPressureWithUnit(9, 'psi')).toBe('130.5 psi');
+      expect(formatPressureWithUnit(9, 'psi', 0)).toBe('131 psi');
+      expect(formatPressureWithUnit('6,0', 'PSI', 1)).toBe('87.0 psi');
+
+      // 3. Wartości brzegowe i defensywne
+      expect(formatPressureWithUnit(0)).toBe('0.0 bar');
+      expect(formatPressureWithUnit(-0)).toBe('0.0 bar');
+      expect(formatPressureWithUnit(-5)).toBe('0.0 bar');
+      expect(formatPressureWithUnit(NaN)).toBe('0.0 bar');
+      expect(formatPressureWithUnit(Infinity)).toBe('30.0 bar');
+      expect(formatPressureWithUnit(null)).toBe('0.0 bar');
+      expect(formatPressureWithUnit(undefined)).toBe('0.0 bar');
+      expect(formatPressureWithUnit(null, 'psi')).toBe('0.0 psi');
     });
   });
 });
