@@ -39,6 +39,8 @@ import {
   getPluralCategory,
   formatTemplate,
   formatWcagRating,
+  formatBrewTime,
+  formatBrewDurationText,
 } from '../i18n';
 import { getAppSetting } from '../database';
 
@@ -454,5 +456,31 @@ describe('i18n System', () => {
     expect(formatWcagRating(5.0, true, 'pl')).toContain('AAA');
     expect(formatWcagRating(3.5, true, 'pl')).toContain('AA');
     expect(formatWcagRating(2.5, true, 'pl')).toContain('Niezgodny');
+  });
+
+  test('TASK-P60-09-LOK: formatBrewTime parsuje sekundy w formacie MM:SS z ochrona przed -0, NaN i znakami nieliczbowymi', () => {
+    expect(formatBrewTime(0)).toBe('00:00');
+    expect(formatBrewTime(-0)).toBe('00:00');
+    expect(formatBrewTime(65)).toBe('01:05');
+    expect(formatBrewTime(150)).toBe('02:30');
+    expect(formatBrewTime('185,5')).toBe('03:05');
+    expect(formatBrewTime('90 s')).toBe('01:30');
+    expect(formatBrewTime(-15)).toBe('00:00');
+    expect(formatBrewTime(NaN)).toBe('00:00');
+    expect(formatBrewTime(null as any)).toBe('00:00');
+    expect(formatBrewTime(undefined as any)).toBe('00:00');
+  });
+
+  test('TASK-P60-09-LOK: formatBrewDurationText formatuje czytelny czas w PL i EN', () => {
+    expect(formatBrewDurationText(45, 'pl')).toBe('45 s');
+    expect(formatBrewDurationText(45, 'en')).toBe('45s');
+    expect(formatBrewDurationText(120, 'pl')).toBe('2 min');
+    expect(formatBrewDurationText(120, 'en')).toBe('2m');
+    expect(formatBrewDurationText(155, 'pl')).toBe('2 min 35 s');
+    expect(formatBrewDurationText(155, 'en')).toBe('2m 35s');
+    expect(formatBrewDurationText('90,5', 'pl')).toBe('1 min 30 s');
+    expect(formatBrewDurationText(0, 'pl')).toBe('0 s');
+    expect(formatBrewDurationText(-0, 'en')).toBe('0s');
+    expect(formatBrewDurationText(NaN, 'pl')).toBe('0 s');
   });
 });

@@ -1505,3 +1505,57 @@ export function formatWcagRating(
   }
   return cleanLang === 'pl' ? 'Niezgodny (Fail)' : 'Fail';
 }
+
+/**
+ * Formatuje sekundy do postaci MM:SS (np. 150 -> '02:30'), z obsługą stringów ('90s', '185,5'),
+ * zabezpieczeniem przed -0, wartościami ujemnymi, NaN i wartościami powyżej 86400s (24h).
+ */
+export function formatBrewTime(seconds: number | string | undefined | null): string {
+  if (seconds === undefined || seconds === null) return '00:00';
+  const rawSec =
+    typeof seconds === 'number'
+      ? seconds
+      : typeof seconds === 'string'
+      ? parseFloat(seconds.replace(/\uFEFF/g, '').replace(',', '.'))
+      : 0;
+  const safeSec =
+    Number.isFinite(rawSec) && rawSec >= 0 && !Object.is(rawSec, -0)
+      ? Math.min(86400, Math.floor(rawSec))
+      : 0;
+  const mins = Math.floor(safeSec / 60);
+  const secs = safeSec % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Formatuje czytelny czas parzenia (np. '2 min 30 s' w PL, '2m 30s' w EN).
+ */
+export function formatBrewDurationText(
+  seconds: number | string | undefined | null,
+  lang: SupportedLanguage | string = 'pl'
+): string {
+  const isPolish = typeof lang === 'string' && lang.toLowerCase().startsWith('pl');
+  if (seconds === undefined || seconds === null) {
+    return isPolish ? '0 s' : '0s';
+  }
+  const rawSec =
+    typeof seconds === 'number'
+      ? seconds
+      : typeof seconds === 'string'
+      ? parseFloat(seconds.replace(/\uFEFF/g, '').replace(',', '.'))
+      : 0;
+  const safeSec =
+    Number.isFinite(rawSec) && rawSec >= 0 && !Object.is(rawSec, -0)
+      ? Math.min(86400, Math.floor(rawSec))
+      : 0;
+  const mins = Math.floor(safeSec / 60);
+  const secs = safeSec % 60;
+
+  if (mins === 0) {
+    return isPolish ? `${secs} s` : `${secs}s`;
+  }
+  if (secs === 0) {
+    return isPolish ? `${mins} min` : `${mins}m`;
+  }
+  return isPolish ? `${mins} min ${secs} s` : `${mins}m ${secs}s`;
+}
