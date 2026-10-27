@@ -1286,3 +1286,77 @@ export function getKnowledgeTitle(id: string, lang: 'pl' | 'en' | string = 'pl')
   return '';
 }
 
+export interface KnowledgeSearchResult {
+  id: string;
+  category: 'variety' | 'process' | 'origin' | 'tea';
+  title: string;
+  snippet: string;
+  keyNotes: string[];
+}
+
+/**
+ * Przeszukuje zintegrowaną bazę wiedzy (odmiany, obróbki, kraje i herbaty),
+ * zwracając zlokalizowane pozycje dopasowane do zapytania.
+ */
+export function searchKnowledgeBase(
+  query: string | undefined | null,
+  lang: 'pl' | 'en' | string = 'pl'
+): KnowledgeSearchResult[] {
+  if (!query || typeof query !== 'string' || !query.trim()) return [];
+  const cleanQuery = query.replace(/\uFEFF/g, '').trim();
+  if (!cleanQuery) return [];
+
+  const isEn = typeof lang === 'string' && (lang.trim().toLowerCase() === 'en' || lang.trim().toLowerCase().startsWith('en'));
+  const results: KnowledgeSearchResult[] = [];
+
+  // 1. Odmiany kawy
+  const varieties = searchCoffeeVarieties(cleanQuery);
+  for (const v of varieties) {
+    results.push({
+      id: v.id,
+      category: 'variety',
+      title: v.name,
+      snippet: isEn ? (v.descriptionEn || v.descriptionPl) : (v.descriptionPl || v.descriptionEn),
+      keyNotes: isEn ? (v.keyNotesEn || v.keyNotesPl) : (v.keyNotesPl || v.keyNotesEn),
+    });
+  }
+
+  // 2. Metody obróbki
+  const processes = searchCoffeeProcesses(cleanQuery);
+  for (const p of processes) {
+    results.push({
+      id: p.id,
+      category: 'process',
+      title: p.name,
+      snippet: isEn ? (p.descriptionEn || p.descriptionPl) : (p.descriptionPl || p.descriptionEn),
+      keyNotes: isEn ? (p.keyNotesEn || p.keyNotesPl) : (p.keyNotesPl || p.keyNotesEn),
+    });
+  }
+
+  // 3. Kraje pochodzenia
+  const origins = searchCoffeeOrigins(cleanQuery);
+  for (const o of origins) {
+    results.push({
+      id: o.id,
+      category: 'origin',
+      title: isEn ? (o.countryEn || o.country) : o.country,
+      snippet: isEn ? (o.descriptionEn || o.descriptionPl) : (o.descriptionPl || o.descriptionEn),
+      keyNotes: isEn ? (o.keyNotesEn || o.keyNotesPl) : (o.keyNotesPl || o.keyNotesEn),
+    });
+  }
+
+  // 4. Kategorie herbaty
+  const teas = searchTeaCategories(cleanQuery);
+  for (const t of teas) {
+    results.push({
+      id: t.id,
+      category: 'tea',
+      title: isEn ? (t.nameEn || t.namePl) : (t.namePl || t.nameEn),
+      snippet: isEn ? (t.descriptionEn || t.descriptionPl) : (t.descriptionPl || t.descriptionEn),
+      keyNotes: isEn ? (t.famousVarietiesEn || t.famousVarietiesPl) : (t.famousVarietiesPl || t.famousVarietiesEn),
+    });
+  }
+
+  return results;
+}
+

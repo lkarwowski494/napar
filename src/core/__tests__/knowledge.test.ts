@@ -21,6 +21,8 @@ import {
   getKnowledgeSensoryProfile,
   getKnowledgeKeyNotes,
   getKnowledgeTitle,
+  searchKnowledgeBase,
+  KnowledgeSearchResult,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1127,6 +1129,36 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(getKnowledgeTitle('unknown', 'pl')).toBe('');
     expect(getKnowledgeTitle(null as any, 'pl')).toBe('');
     expect(getKnowledgeTitle('', 'en')).toBe('');
+  });
+
+  test('TASK-P67-06-TRE: searchKnowledgeBase przeszukuje wszystkie kategorie bazy wiedzy (odmiany, obróbki, kraje, herbaty)', () => {
+    // 1. Wyszukanie Geishy
+    const geishaRes: KnowledgeSearchResult[] = searchKnowledgeBase('Geisha', 'pl');
+    expect(geishaRes.length).toBeGreaterThan(0);
+    expect(geishaRes[0].category).toBe('variety');
+    expect(geishaRes[0].title).toContain('Geisha');
+    expect(geishaRes[0].keyNotes.length).toBeGreaterThan(0);
+
+    // 2. Wyszukanie herbaty (np. Oolong)
+    const oolongRes = searchKnowledgeBase('Oolong', 'en');
+    expect(oolongRes.length).toBeGreaterThan(0);
+    expect(oolongRes.some((r) => r.category === 'tea')).toBe(true);
+
+    // 3. Wyszukanie kraju (Etiopia)
+    const ethiopiaRes = searchKnowledgeBase('Etiopia', 'pl');
+    expect(ethiopiaRes.length).toBeGreaterThan(0);
+    expect(ethiopiaRes.some((r) => r.category === 'origin')).toBe(true);
+
+    // 4. Wyszukanie obróbki (Natural)
+    const naturalRes = searchKnowledgeBase('Natural', 'en');
+    expect(naturalRes.length).toBeGreaterThan(0);
+    expect(naturalRes.some((r) => r.category === 'process')).toBe(true);
+
+    // 5. Puste zapytanie i skrajne wartości
+    expect(searchKnowledgeBase('')).toEqual([]);
+    expect(searchKnowledgeBase('   ')).toEqual([]);
+    expect(searchKnowledgeBase(null as any)).toEqual([]);
+    expect(searchKnowledgeBase('nieistniejacy_termin_xyz')).toEqual([]);
   });
 });
 
