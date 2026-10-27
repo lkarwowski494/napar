@@ -218,4 +218,47 @@ describe('RecipeStepEditor Component (TASK-P32-01-ODK)', () => {
     });
     expect(onUpdateStep).toHaveBeenCalledWith(0, 'durationSeconds', 0);
   });
+
+  test('TASK-P54-04-STU: onChangeNumber parsuje wejścia z jednostkami (250g, 45s) a onChangeText sanityzuje znaki kontrolne w nazwach i instrukcjach', () => {
+    const onUpdateStep = jest.fn();
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <RecipeStepEditor
+          steps={sampleSteps}
+          onAddStep={jest.fn()}
+          onRemoveStep={jest.fn()}
+          onUpdateStep={onUpdateStep}
+          t={translations.pl}
+        />
+      );
+    });
+
+    // 1. Parsowanie z jednostkami w wodzie i czasie
+    const waterInput = tree.root.findByProps({ testID: 'step-water-1' });
+    act(() => {
+      waterInput.props.onChangeNumber(' 250,5 g ');
+    });
+    expect(onUpdateStep).toHaveBeenCalledWith(0, 'targetWaterGrams', 251);
+
+    const durInput = tree.root.findByProps({ testID: 'step-duration-1' });
+    act(() => {
+      durInput.props.onChangeNumber(' 90,4 s ');
+    });
+    expect(onUpdateStep).toHaveBeenCalledWith(0, 'durationSeconds', 90);
+
+    // 2. Sanityzacja znaków kontrolnych w nazwie kroku
+    const nameInput = tree.root.findByProps({ testID: 'step-name-1' });
+    act(() => {
+      nameInput.props.onChangeText('Infuzja\x00 wstępna\x1F');
+    });
+    expect(onUpdateStep).toHaveBeenCalledWith(0, 'namePl', 'Infuzja wstępna');
+
+    // 3. Sanityzacja znaków kontrolnych w instrukcji kroku
+    const instrInput = tree.root.findByProps({ testID: 'step-instruction-1' });
+    act(() => {
+      instrInput.props.onChangeText('Zalej spiralnie\x00 i zamieszaj\x07');
+    });
+    expect(onUpdateStep).toHaveBeenCalledWith(0, 'instructionPl', 'Zalej spiralnie i zamieszaj');
+  });
 });

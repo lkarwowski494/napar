@@ -77,7 +77,13 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
               <Field
                 testID={`step-name-${stepNum}`}
                 value={step.namePl ?? ''}
-                onChangeText={(val) => onUpdateStep(index, 'namePl', typeof val === 'string' ? val.slice(0, 100) : '')}
+                onChangeText={(val) =>
+                  onUpdateStep(
+                    index,
+                    'namePl',
+                    typeof val === 'string' ? val.replace(/[\x00-\x1F\x7F]/g, '').slice(0, 100) : ''
+                  )
+                }
                 accessibilityLabel={`${t?.recipeBuilder?.stepName || 'Nazwa kroku'} ${stepNum}`}
                 accessibilityHint={t?.recipeBuilder?.stepNameHint || 'Wpisz nazwę tego kroku parzenia'}
               />
@@ -91,9 +97,13 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
                 value={step.targetWaterGrams}
                 onChangeNumber={(val) => {
                   const rawInput: any = val;
-                  const parsedVal = typeof rawInput === 'number'
-                    ? rawInput
-                    : (typeof rawInput === 'string' ? parseFloat(rawInput.replace(',', '.')) : 0);
+                  let parsedVal = 0;
+                  if (typeof rawInput === 'number') {
+                    parsedVal = rawInput;
+                  } else if (typeof rawInput === 'string') {
+                    const m = rawInput.replace(',', '.').trim().match(/^[+-]?\d+(?:\.\d+)?/);
+                    parsedVal = m ? parseFloat(m[0]) : 0;
+                  }
                   const rawVal = Number.isFinite(parsedVal) ? parsedVal : 0;
                   const safeVal = Math.max(0, Math.min(50000, Math.round(rawVal)));
                   onUpdateStep(index, 'targetWaterGrams', Object.is(safeVal, -0) ? 0 : safeVal);
@@ -112,9 +122,13 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
                 value={step.durationSeconds}
                 onChangeNumber={(val) => {
                   const rawInput: any = val;
-                  const parsedVal = typeof rawInput === 'number'
-                    ? rawInput
-                    : (typeof rawInput === 'string' ? parseFloat(rawInput.replace(',', '.')) : 0);
+                  let parsedVal = 0;
+                  if (typeof rawInput === 'number') {
+                    parsedVal = rawInput;
+                  } else if (typeof rawInput === 'string') {
+                    const m = rawInput.replace(',', '.').trim().match(/^[+-]?\d+(?:\.\d+)?/);
+                    parsedVal = m ? parseFloat(m[0]) : 0;
+                  }
                   const rawVal = Number.isFinite(parsedVal) ? parsedVal : 0;
                   const safeVal = Math.max(0, Math.min(86400, Math.round(rawVal)));
                   onUpdateStep(index, 'durationSeconds', Object.is(safeVal, -0) ? 0 : safeVal);
@@ -132,7 +146,13 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
           <Field
             testID={`step-instruction-${stepNum}`}
             value={step.instructionPl ?? ''}
-            onChangeText={(val) => onUpdateStep(index, 'instructionPl', typeof val === 'string' ? val.slice(0, 2000) : '')}
+            onChangeText={(val) =>
+              onUpdateStep(
+                index,
+                'instructionPl',
+                typeof val === 'string' ? val.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').slice(0, 2000) : ''
+              )
+            }
             placeholder={t?.recipeBuilder?.stepInstructionPlaceholder || 'np. Wlej 50g wody'}
             accessibilityLabel={`${t?.recipeBuilder?.stepInstruction || 'Instrukcja kroku'} ${stepNum}`}
             accessibilityHint={t?.recipeBuilder?.stepInstructionHint || 'Wpisz szczegółową instrukcję wykonania kroku'}
