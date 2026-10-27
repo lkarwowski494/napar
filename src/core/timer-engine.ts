@@ -34,6 +34,14 @@ export interface TimerCallbacks {
   onFinish?: () => void;
 }
 
+export interface StepTimeWindow {
+  stepIndex: number;
+  startSecond: number;
+  endSecond: number;
+  durationSeconds: number;
+  isValidStep: boolean;
+}
+
 /**
  * RD-ENG-06 & NFR-PERF-004: Wyliczanie czasu timera odporne na uśpienie w tle
  * r = max(0, ceil((endAtMs - nowMs) / 1000))
@@ -207,6 +215,48 @@ export class BrewTimerEngine {
     const progress = Math.min(100, (poured / total) * 100);
     const rounded = Number(progress.toFixed(1));
     return Object.is(rounded, -0) ? 0 : rounded;
+  }
+
+  /**
+   * Wylicza bezwzględne okno czasowe (początek, koniec, czas trwania w sekundach)
+   * dla wskazanego kroku receptury w osi czasu całego parzenia.
+   */
+  public static calculateStepTimeWindow(
+    steps?: RecipeStep[] | null,
+    stepIndex: number = 0
+  ): StepTimeWindow {
+    if (!Array.isArray(steps) || steps.length === 0 || stepIndex < 0 || stepIndex >= steps.length) {
+      return {
+        stepIndex: Math.max(0, stepIndex || 0),
+        startSecond: 0,
+        endSecond: 0,
+        durationSeconds: 0,
+        isValidStep: false,
+      };
+    }
+
+    let startSecond = 0;
+    for (let i = 0; i < stepIndex; i++) {
+      const d = steps[i]?.durationSeconds;
+      if (typeof d === 'number' && Number.isFinite(d) && d > 0 && !Object.is(d, -0)) {
+        startSecond += Math.floor(d);
+      }
+    }
+
+    const currentStep = steps[stepIndex];
+    const durRaw = currentStep?.durationSeconds;
+    const durationSeconds =
+      typeof durRaw === 'number' && Number.isFinite(durRaw) && durRaw > 0 && !Object.is(durRaw, -0)
+        ? Math.floor(durRaw)
+        : 0;
+
+    return {
+      stepIndex,
+      startSecond,
+      endSecond: startSecond + durationSeconds,
+      durationSeconds,
+      isValidStep: true,
+    };
   }
 
   constructor(steps: RecipeStep[], callbacks: TimerCallbacks = {}) {

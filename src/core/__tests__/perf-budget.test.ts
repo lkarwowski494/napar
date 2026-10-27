@@ -14,7 +14,7 @@ import { createGongfuSession, recordGongfuInfusion } from '../gongfu-session';
 import { convertMicronsToGrinder, SUPPORTED_GRINDERS } from '../grinder-converter';
 import { calculateWaterMinerals, WATER_RECIPES } from '../water-chemistry';
 import { normSearch, rankSearchResults } from '../search-utils';
-import { BrewTimerEngine } from '../timer-engine';
+import { BrewTimerEngine, StepTimeWindow } from '../timer-engine';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => ({
@@ -261,6 +261,51 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       for (let i = 0; i < 10000; i++) {
         const poured = (i * 7) % 350;
         BrewTimerEngine.calculateWaterPourProgress(steps, poured);
+      }
+    });
+
+    expect(ms).toBeLessThan(50);
+  });
+
+  test('Budżet 13: calculateStepTimeWindow wylicza okno czasowe kroku w czasie poniżej 50 ms (TASK-P79-10-WYD)', () => {
+    const steps = [
+      { stepNumber: 1, namePl: 'Preinfuzja', durationSeconds: 30, targetWaterGrams: 50 },
+      { stepNumber: 2, namePl: 'Zalanie 1', durationSeconds: 45, targetWaterGrams: 150 },
+      { stepNumber: 3, namePl: 'Zalanie 2', durationSeconds: 60, targetWaterGrams: 250 },
+    ] as any[];
+
+    // 1. Poprawność biznesowa
+    const win0: StepTimeWindow = BrewTimerEngine.calculateStepTimeWindow(steps, 0);
+    expect(win0.stepIndex).toBe(0);
+    expect(win0.startSecond).toBe(0);
+    expect(win0.endSecond).toBe(30);
+    expect(win0.durationSeconds).toBe(30);
+    expect(win0.isValidStep).toBe(true);
+
+    const win1 = BrewTimerEngine.calculateStepTimeWindow(steps, 1);
+    expect(win1.startSecond).toBe(30);
+    expect(win1.endSecond).toBe(75);
+    expect(win1.durationSeconds).toBe(45);
+    expect(win1.isValidStep).toBe(true);
+
+    const win2 = BrewTimerEngine.calculateStepTimeWindow(steps, 2);
+    expect(win2.startSecond).toBe(75);
+    expect(win2.endSecond).toBe(135);
+    expect(win2.durationSeconds).toBe(60);
+    expect(win2.isValidStep).toBe(true);
+
+    // Kroki poza zakresem i nullish
+    const winInvalid = BrewTimerEngine.calculateStepTimeWindow(steps, 99);
+    expect(winInvalid.isValidStep).toBe(false);
+    expect(winInvalid.durationSeconds).toBe(0);
+
+    const winNull = BrewTimerEngine.calculateStepTimeWindow(null, 0);
+    expect(winNull.isValidStep).toBe(false);
+
+    // 2. Budżet wydajnościowy
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        BrewTimerEngine.calculateStepTimeWindow(steps, i % 3);
       }
     });
 
