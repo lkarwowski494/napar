@@ -962,6 +962,214 @@ export function calculateInventoryUsageRate(
   };
 }
 
+export type BeanRestingStatus = 'too_fresh_degassing' | 'ready_to_brew' | 'peak_flavor' | 'past_peak';
+
+export interface BeanRestingReadinessAnalysis {
+  daysSinceRoast: number | null;
+  processType: 'washed' | 'natural_honey' | 'anaerobic_experimental';
+  brewMethodCategory: 'filter' | 'espresso';
+  minimumRestDays: number;
+  peakStartDays: number;
+  peakEndDays: number;
+  readinessScore: number;
+  status: BeanRestingStatus;
+  statusLabelPl: string;
+  statusLabelEn: string;
+  recommendationPl: string;
+  recommendationEn: string;
+}
+
+/**
+ * Analizuje gotowość ziaren kawy do parzenia po paleniu (resting window)
+ * w zależności od metody obróbki (washed, natural/honey, anaerobic/experimental)
+ * oraz metody parzenia (filter vs espresso).
+ */
+export function calculateBeanRestingReadiness(
+  roastDate?: string | Date | null,
+  processType?: string | null,
+  brewMethodCategory: 'filter' | 'espresso' | string = 'filter',
+  currentDate?: string | Date | null
+): BeanRestingReadinessAnalysis {
+  const normProcess = typeof processType === 'string'
+    ? processType.replace(/\uFEFF/g, '').toLowerCase()
+    : '';
+
+  let resolvedProcess: 'washed' | 'natural_honey' | 'anaerobic_experimental';
+  if (
+    normProcess.includes('anaerob') ||
+    normProcess.includes('experim') ||
+    normProcess.includes('koji') ||
+    normProcess.includes('yeast') ||
+    normProcess.includes('thermal') ||
+    normProcess.includes('macer')
+  ) {
+    resolvedProcess = 'anaerobic_experimental';
+  } else if (
+    normProcess.includes('natural') ||
+    normProcess.includes('honey') ||
+    normProcess.includes('pulped')
+  ) {
+    resolvedProcess = 'natural_honey';
+  } else {
+    resolvedProcess = 'washed';
+  }
+
+  const normMethod = typeof brewMethodCategory === 'string'
+    ? brewMethodCategory.replace(/\uFEFF/g, '').toLowerCase()
+    : 'filter';
+  const resolvedMethod: 'filter' | 'espresso' =
+    normMethod.includes('espresso') || normMethod.includes('moka') ? 'espresso' : 'filter';
+
+  let minimumRestDays = 7;
+  let peakStartDays = 10;
+  let peakEndDays = 28;
+
+  if (resolvedProcess === 'washed') {
+    if (resolvedMethod === 'espresso') {
+      minimumRestDays = 12;
+      peakStartDays = 16;
+      peakEndDays = 35;
+    } else {
+      minimumRestDays = 7;
+      peakStartDays = 10;
+      peakEndDays = 28;
+    }
+  } else if (resolvedProcess === 'natural_honey') {
+    if (resolvedMethod === 'espresso') {
+      minimumRestDays = 16;
+      peakStartDays = 21;
+      peakEndDays = 45;
+    } else {
+      minimumRestDays = 10;
+      peakStartDays = 14;
+      peakEndDays = 35;
+    }
+  } else {
+    // anaerobic_experimental
+    if (resolvedMethod === 'espresso') {
+      minimumRestDays = 20;
+      peakStartDays = 25;
+      peakEndDays = 55;
+    } else {
+      minimumRestDays = 14;
+      peakStartDays = 18;
+      peakEndDays = 42;
+    }
+  }
+
+  if (!roastDate) {
+    return {
+      daysSinceRoast: null,
+      processType: resolvedProcess,
+      brewMethodCategory: resolvedMethod,
+      minimumRestDays,
+      peakStartDays,
+      peakEndDays,
+      readinessScore: 70,
+      status: 'ready_to_brew',
+      statusLabelPl: 'Brak daty palenia — załóż profil standardowy',
+      statusLabelEn: 'No roast date — assuming standard profile',
+      recommendationPl: 'Brak daty palenia. Skontroluj odgazowanie podczas preinfuzji.',
+      recommendationEn: 'No roast date. Monitor degassing during blooming.',
+    };
+  }
+
+  const parseDate = (d: string | Date): number => {
+    if (d instanceof Date) return d.getTime();
+    if (typeof d === 'string') {
+      const parsed = Date.parse(d.replace(/\uFEFF/g, '').trim());
+      return Number.isFinite(parsed) ? parsed : NaN;
+    }
+    return NaN;
+  };
+
+  const roastMs = parseDate(roastDate);
+  const nowMs = currentDate ? parseDate(currentDate) : Date.now();
+
+  if (Number.isNaN(roastMs) || Number.isNaN(nowMs)) {
+    return {
+      daysSinceRoast: null,
+      processType: resolvedProcess,
+      brewMethodCategory: resolvedMethod,
+      minimumRestDays,
+      peakStartDays,
+      peakEndDays,
+      readinessScore: 70,
+      status: 'ready_to_brew',
+      statusLabelPl: 'Nieprawidłowa data palenia',
+      statusLabelEn: 'Invalid roast date',
+      recommendationPl: 'Nieprawidłowa data palenia — zastosuj standardowe parametry ekstrakcji.',
+      recommendationEn: 'Invalid roast date — use standard extraction parameters.',
+    };
+  }
+
+  const diffMs = nowMs - roastMs;
+  const days = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+
+  let status: BeanRestingStatus;
+  let readinessScore: number;
+  let statusLabelPl: string;
+  let statusLabelEn: string;
+  let recommendationPl: string;
+  let recommendationEn: string;
+
+  if (days < minimumRestDays) {
+    status = 'too_fresh_degassing';
+    readinessScore = Math.max(10, Math.round((days / minimumRestDays) * 60));
+    const daysLeft = minimumRestDays - days;
+    statusLabelPl = `Kawa zbyt świeża — intensywne odgazowywanie (odczekaj jeszcze ${daysLeft} dni)`;
+    statusLabelEn = `Too fresh — vigorous degassing (rest for another ${daysLeft} days)`;
+    recommendationPl = `Ziarna uwalniają duże ilości CO2. Wydłuż preinfuzję i intensywniej mieszaj bloom, lub odczekaj ${daysLeft} dni.`;
+    recommendationEn = `Beans are rapidly degassing CO2. Extend bloom time or let beans rest for another ${daysLeft} days.`;
+  } else if (days < peakStartDays) {
+    status = 'ready_to_brew';
+    readinessScore = 80;
+    statusLabelPl = 'Kawa zdatna do parzenia (zbliża się do szczytu smaku)';
+    statusLabelEn = 'Ready to brew (approaching flavor peak)';
+    recommendationPl = 'Kawa nadaje się do picia, jednak pełnię nut smakowych osiągnie za kilka dni.';
+    recommendationEn = 'Beans are good to brew, but full complexity will unfold in a few days.';
+  } else if (days <= peakEndDays) {
+    status = 'peak_flavor';
+    readinessScore = 100;
+    statusLabelPl = 'Optymalny szczyt sensoryczny (Peak Flavor)';
+    statusLabelEn = 'Optimal sensory peak (Peak Flavor)';
+    recommendationPl = 'Najlepszy czas na parzenie — maksymalna ekspresja terroir, krystaliczna czystość i słodycz.';
+    recommendationEn = 'Peak drinking window — maximum terroir expression, pristine clarity, and sweetness.';
+  } else if (days <= peakEndDays + 45) {
+    status = 'ready_to_brew';
+    const progress = (days - peakEndDays) / 45;
+    readinessScore = Math.max(50, Math.round(90 - progress * 40));
+    statusLabelPl = 'Dobra stabilność aromatu (poza szczytem)';
+    statusLabelEn = 'Good flavor stability (past peak)';
+    recommendationPl = 'Subtelne nuty kwiatowe mogą słabnąć; doskonała baza pod zbalansowane przelewy i espresso.';
+    recommendationEn = 'Delicate florals may taper off; great for balanced pour-overs and espresso.';
+  } else {
+    status = 'past_peak';
+    const pastDays = days - (peakEndDays + 45);
+    readinessScore = Math.max(10, Math.round(40 - (pastDays / 30) * 20));
+    statusLabelPl = 'Starzejące się ziarna (zalecane szybkie zużycie)';
+    statusLabelEn = 'Aging beans (consume soon)';
+    recommendationPl = 'Ziarna tracą lotne aromaty. Zwiększ dozę lub użyj do cold brew i kaw mlecznych.';
+    recommendationEn = 'Volatiles are diminishing. Increase dose or brew as cold brew / milk drinks.';
+  }
+
+  return {
+    daysSinceRoast: days,
+    processType: resolvedProcess,
+    brewMethodCategory: resolvedMethod,
+    minimumRestDays,
+    peakStartDays,
+    peakEndDays,
+    readinessScore,
+    status,
+    statusLabelPl,
+    statusLabelEn,
+    recommendationPl,
+    recommendationEn,
+  };
+}
+
+
 
 
 export function getInventoryItemById(id: string): InventoryItem | null {

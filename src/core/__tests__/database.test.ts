@@ -28,6 +28,9 @@ import {
   calculateInventoryUsageRate,
   InventoryUsageRateAnalysis,
   InventoryUsageRateCategory,
+  calculateBeanRestingReadiness,
+  BeanRestingReadinessAnalysis,
+  BeanRestingStatus,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -3029,5 +3032,74 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(fallback.totalRemainingGrams).toBe(0);
     expect(fallback.dailyConsumptionGrams).toBe(30);
     expect(fallback.estimatedDaysRemaining).toBe(0);
+  });
+
+  test('TASK-P88-03-ZAK: calculateBeanRestingReadiness analizuje gotowość ziaren w zależności od obróbki i metody parzenia', () => {
+    const fixedNow = new Date('2026-10-27T12:00:00Z');
+
+    // 1. Kawa myta (washed) pod filtr, palona 3 dni temu (2026-10-24) -> zbyt świeża (odgazowanie)
+    const tooFreshWashed: BeanRestingReadinessAnalysis = calculateBeanRestingReadiness(
+      '2026-10-24T12:00:00Z',
+      'washed',
+      'filter',
+      fixedNow
+    );
+    const statusCheck: BeanRestingStatus = tooFreshWashed.status;
+    expect(statusCheck).toBe('too_fresh_degassing');
+    expect(tooFreshWashed.daysSinceRoast).toBe(3);
+    expect(tooFreshWashed.processType).toBe('washed');
+    expect(tooFreshWashed.brewMethodCategory).toBe('filter');
+    expect(tooFreshWashed.minimumRestDays).toBe(7);
+    expect(tooFreshWashed.readinessScore).toBeLessThan(70);
+    expect(tooFreshWashed.statusLabelPl).toContain('zbyt świeża');
+
+    // 2. Kawa myta pod filtr w szczycie smaku (14 dni temu = 2026-10-13) -> peak_flavor
+    const peakWashed = calculateBeanRestingReadiness(
+      '2026-10-13T12:00:00Z',
+      'washed',
+      'filter',
+      fixedNow
+    );
+    expect(peakWashed.status).toBe('peak_flavor');
+    expect(peakWashed.readinessScore).toBe(100);
+    expect(peakWashed.statusLabelPl).toContain('Optymalny szczyt');
+
+    // 3. Kawa naturalna (natural / honey) pod espresso, palona 10 dni temu -> zbyt świeża pod espresso (wymaga min 16 dni)
+    const naturalEspresso = calculateBeanRestingReadiness(
+      '2026-10-17T12:00:00Z',
+      'natural',
+      'espresso',
+      fixedNow
+    );
+    expect(naturalEspresso.processType).toBe('natural_honey');
+    expect(naturalEspresso.brewMethodCategory).toBe('espresso');
+    expect(naturalEspresso.minimumRestDays).toBe(16);
+    expect(naturalEspresso.status).toBe('too_fresh_degassing');
+
+    // 4. Kawa anaerobowa (anaerobic) pod espresso, palona 30 dni temu -> peak_flavor (wymaga min 20 dni, peak 25-55)
+    const anaerobicEspresso = calculateBeanRestingReadiness(
+      '2026-09-27T12:00:00Z',
+      'anaerobic',
+      'espresso',
+      fixedNow
+    );
+    expect(anaerobicEspresso.processType).toBe('anaerobic_experimental');
+    expect(anaerobicEspresso.status).toBe('peak_flavor');
+
+    // 5. Kawa stara (120 dni temu) -> past_peak
+    const oldBeans = calculateBeanRestingReadiness(
+      '2026-06-29T12:00:00Z',
+      'washed',
+      'filter',
+      fixedNow
+    );
+    expect(oldBeans.status).toBe('past_peak');
+    expect(oldBeans.readinessScore).toBeLessThan(50);
+
+    // 6. Odporność na brak daty i nieprawidłowe wartości
+    const fallback = calculateBeanRestingReadiness(null, null, null, fixedNow);
+    expect(fallback.daysSinceRoast).toBeNull();
+    expect(fallback.status).toBe('ready_to_brew');
+    expect(fallback.readinessScore).toBe(70);
   });
 });
