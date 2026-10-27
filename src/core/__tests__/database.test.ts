@@ -25,6 +25,9 @@ import {
   calculateBeanFreshness,
   BeanFreshnessAnalysis,
   BeanFreshnessPhase,
+  calculateInventoryUsageRate,
+  InventoryUsageRateAnalysis,
+  InventoryUsageRateCategory,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -2985,5 +2988,46 @@ describe('Napar SQLite Database & Repositories', () => {
     const invalid = calculateBeanFreshness('not-a-date');
     expect(invalid.phase).toBe('unknown');
     expect(invalid.phaseLabelPl).toBe('Nieprawidłowa data');
+  });
+
+  test('TASK-P85-03-ZAK: calculateInventoryUsageRate analizuje tempo zużycia kawy i wylicza rezerwę dni', () => {
+    // 1. Umiarkowane tempo (500g przy 25g dziennie -> 20 dni, 2.9 tyg., moderate)
+    const moderate: InventoryUsageRateAnalysis = calculateInventoryUsageRate(500, 25);
+    const catCheck: InventoryUsageRateCategory = moderate.category;
+    expect(catCheck).toBe('moderate');
+    expect(moderate.totalRemainingGrams).toBe(500);
+    expect(moderate.dailyConsumptionGrams).toBe(25);
+    expect(moderate.estimatedDaysRemaining).toBe(20);
+    expect(moderate.estimatedWeeksRemaining).toBe(2.9);
+    expect(moderate.categoryLabelPl).toContain('Umiarkowane');
+    expect(moderate.categoryLabelEn).toContain('Moderate');
+    expect(moderate.advicePl).toContain('optymalna rotacja');
+
+    // 2. Niskie tempo (250g przy 10g dziennie -> slow)
+    const slow = calculateInventoryUsageRate('250,0', '10');
+    expect(slow.category).toBe('slow');
+    expect(slow.estimatedDaysRemaining).toBe(25);
+    expect(slow.categoryLabelPl).toBe('Niskie zużycie');
+
+    // 3. Szybkie tempo (1000g przy 50g dziennie -> fast)
+    const fast = calculateInventoryUsageRate(1000, 50);
+    expect(fast.category).toBe('fast');
+    expect(fast.estimatedDaysRemaining).toBe(20);
+
+    // 4. Bardzo wysokie tempo / biurowe (1500g przy 100g dziennie -> excessive)
+    const excessive = calculateInventoryUsageRate(1500, 100);
+    expect(excessive.category).toBe('excessive');
+
+    // 5. Pusty stan magazynu (0g)
+    const empty = calculateInventoryUsageRate(0, 30);
+    expect(empty.totalRemainingGrams).toBe(0);
+    expect(empty.estimatedDaysRemaining).toBe(0);
+    expect(empty.estimatedWeeksRemaining).toBe(0);
+
+    // 6. Odporność na null, stringi, liczby ujemne i -0
+    const fallback = calculateInventoryUsageRate(null as any, -20);
+    expect(fallback.totalRemainingGrams).toBe(0);
+    expect(fallback.dailyConsumptionGrams).toBe(30);
+    expect(fallback.estimatedDaysRemaining).toBe(0);
   });
 });

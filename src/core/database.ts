@@ -868,6 +868,101 @@ export function calculateBeanFreshness(
   };
 }
 
+export type InventoryUsageRateCategory = 'slow' | 'moderate' | 'fast' | 'excessive';
+
+export interface InventoryUsageRateAnalysis {
+  totalRemainingGrams: number;
+  dailyConsumptionGrams: number;
+  estimatedDaysRemaining: number;
+  estimatedWeeksRemaining: number;
+  category: InventoryUsageRateCategory;
+  categoryLabelPl: string;
+  categoryLabelEn: string;
+  advicePl: string;
+  adviceEn: string;
+}
+
+/**
+ * Analizuje dzienne tempo zużycia kawy, wyliczając rezerwę magazynową (w dniach i tygodniach)
+ * oraz kategoryzując profil zużycia (slow, moderate, fast, excessive) z praktycznymi poradami.
+ */
+export function calculateInventoryUsageRate(
+  totalRemainingGrams: number | string,
+  dailyConsumptionGrams: number | string = 30
+): InventoryUsageRateAnalysis {
+  const parseNum = (v: unknown, fallback: number): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? v : fallback;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? parsed : fallback;
+    }
+    return fallback;
+  };
+
+  const rawGrams = parseNum(totalRemainingGrams, 0);
+  const safeRemainingGrams = rawGrams <= 0 ? 0 : Math.min(100000, Number(rawGrams.toFixed(1)));
+  const totalGrams = Object.is(safeRemainingGrams, -0) ? 0 : safeRemainingGrams;
+
+  const rawDaily = parseNum(dailyConsumptionGrams, 30);
+  const safeDaily = rawDaily <= 0 ? 30 : Math.min(2000, Number(rawDaily.toFixed(1)));
+  const dailyGrams = Object.is(safeDaily, -0) ? 30 : safeDaily;
+
+  let estimatedDaysRemaining = 0;
+  let estimatedWeeksRemaining = 0;
+
+  if (totalGrams > 0 && dailyGrams > 0) {
+    estimatedDaysRemaining = Math.round(totalGrams / dailyGrams);
+    const rawWeeks = estimatedDaysRemaining / 7;
+    estimatedWeeksRemaining = Number(rawWeeks.toFixed(1));
+    if (Object.is(estimatedWeeksRemaining, -0)) estimatedWeeksRemaining = 0;
+  }
+
+  let category: InventoryUsageRateCategory;
+  let categoryLabelPl: string;
+  let categoryLabelEn: string;
+  let advicePl: string;
+  let adviceEn: string;
+
+  if (dailyGrams < 15) {
+    category = 'slow';
+    categoryLabelPl = 'Niskie zużycie';
+    categoryLabelEn = 'Low Consumption';
+    advicePl = 'Tempo ok. 1 kawy dziennie lub rzadziej — zapas wystarczy na długo, uważaj na utratę świeżości ziaren.';
+    adviceEn = 'Rate of ~1 cup daily or less — stock will last long, beware of beans losing freshness.';
+  } else if (dailyGrams <= 35) {
+    category = 'moderate';
+    categoryLabelPl = 'Umiarkowane / Standardowe';
+    categoryLabelEn = 'Moderate / Standard';
+    advicePl = 'Klasyczne dzienne tempo (1-2 kawy) — optymalna rotacja paczek ziaren.';
+    adviceEn = 'Classic daily pace (1-2 cups) — optimal bean bag rotation.';
+  } else if (dailyGrams <= 65) {
+    category = 'fast';
+    categoryLabelPl = 'Wysokie zużycie';
+    categoryLabelEn = 'High Consumption';
+    advicePl = 'Intensywne parzenie (3-4 kawy dziennie) — zaplanuj kolejne zamówienie z wyprzedzeniem.';
+    adviceEn = 'Active brewing (3-4 cups daily) — plan your next bean order in advance.';
+  } else {
+    category = 'excessive';
+    categoryLabelPl = 'Bardzo wysokie / Biurowe';
+    categoryLabelEn = 'Very High / Office';
+    advicePl = 'Tempo biurowe lub wieloosobowe — zapas kurczy się bardzo szybko.';
+    adviceEn = 'Office or multi-person pace — inventory depletes rapidly.';
+  }
+
+  return {
+    totalRemainingGrams: totalGrams,
+    dailyConsumptionGrams: dailyGrams,
+    estimatedDaysRemaining,
+    estimatedWeeksRemaining,
+    category,
+    categoryLabelPl,
+    categoryLabelEn,
+    advicePl,
+    adviceEn,
+  };
+}
+
+
 
 export function getInventoryItemById(id: string): InventoryItem | null {
   if (!id || typeof id !== 'string' || !id.trim()) return null;
