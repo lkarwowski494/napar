@@ -229,7 +229,12 @@ export function formatTrialStatusSummary(
   }
   const rawBrewsVal = typeof state.brewsRemaining === 'number'
     ? state.brewsRemaining
-    : (typeof (state as any).brewsRemaining === 'string' ? parseFloat(String((state as any).brewsRemaining).replace(',', '.')) : 0);
+    : (typeof (state as any).brewsRemaining === 'string'
+        ? (() => {
+            const m = String((state as any).brewsRemaining).replace(',', '.').trim().match(/^[+-]?\d+(?:\.\d+)?/);
+            return m ? parseFloat(m[0]) : 0;
+          })()
+        : 0);
   const rawBrews = Number.isFinite(rawBrewsVal) && rawBrewsVal >= 0
     ? Math.floor(rawBrewsVal)
     : 0;
@@ -237,7 +242,12 @@ export function formatTrialStatusSummary(
 
   const rawDaysVal = typeof state.daysRemaining === 'number'
     ? state.daysRemaining
-    : (typeof (state as any).daysRemaining === 'string' ? parseFloat(String((state as any).daysRemaining).replace(',', '.')) : 0);
+    : (typeof (state as any).daysRemaining === 'string'
+        ? (() => {
+            const m = String((state as any).daysRemaining).replace(',', '.').trim().match(/^[+-]?\d+(?:\.\d+)?/);
+            return m ? parseFloat(m[0]) : 0;
+          })()
+        : 0);
   const rawDays = Number.isFinite(rawDaysVal) && rawDaysVal >= 0
     ? Math.floor(rawDaysVal)
     : 0;
@@ -317,7 +327,8 @@ export function restorePurchases(): RestorePurchasesResult {
     setAppSetting('subscription_tier', effectiveTier);
     setAppSetting('verified_purchase_tier', effectiveTier);
     let receipt: StoreKitReceipt | undefined;
-    const receiptJson = getAppSetting('verified_receipt_json', '');
+    const rawReceiptJson = getAppSetting('verified_receipt_json', '');
+    const receiptJson = typeof rawReceiptJson === 'string' ? rawReceiptJson.replace(/^\uFEFF/, '').trim() : '';
     if (receiptJson) {
       try {
         const parsed = JSON.parse(receiptJson);
@@ -326,19 +337,19 @@ export function restorePurchases(): RestorePurchasesResult {
           typeof parsed === 'object' &&
           !Array.isArray(parsed) &&
           typeof parsed.productId === 'string' &&
-          parsed.productId.trim() &&
+          parsed.productId.replace(/[\x00-\x1F\x7F]/g, '').trim() &&
           typeof parsed.transactionId === 'string' &&
-          parsed.transactionId.trim() &&
+          parsed.transactionId.replace(/[\x00-\x1F\x7F]/g, '').trim() &&
           typeof parsed.purchaseDate === 'string' &&
-          parsed.purchaseDate.trim() &&
+          parsed.purchaseDate.replace(/[\x00-\x1F\x7F]/g, '').trim() &&
           typeof parsed.signature === 'string' &&
-          parsed.signature.trim()
+          parsed.signature.replace(/[\x00-\x1F\x7F]/g, '').trim()
         ) {
           receipt = {
-            productId: parsed.productId.trim(),
-            transactionId: parsed.transactionId.trim(),
-            purchaseDate: parsed.purchaseDate.trim(),
-            signature: parsed.signature.trim(),
+            productId: parsed.productId.replace(/[\x00-\x1F\x7F]/g, '').trim(),
+            transactionId: parsed.transactionId.replace(/[\x00-\x1F\x7F]/g, '').trim(),
+            purchaseDate: parsed.purchaseDate.replace(/[\x00-\x1F\x7F]/g, '').trim(),
+            signature: parsed.signature.replace(/[\x00-\x1F\x7F]/g, '').trim(),
           };
         }
       } catch {

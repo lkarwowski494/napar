@@ -999,4 +999,35 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(formatSubscriptionTierName(' \x00pl.lukasz.napar.monthly\x1F ', 'pl')).toBe('Subskrypcja Miesięczna');
     expect(formatSubscriptionTierName(' \tannual\r\n ', 'en')).toBe('Annual Pass');
   });
+
+  test('TASK-P54-02-MON: restorePurchases parsuje JSON z BOM i znakami kontrolnymi, a formatTrialStatusSummary radzi sobie z jednostkami w stringach', () => {
+    // 1. restorePurchases z BOM \uFEFF i znakami kontrolnymi w verified_receipt_json
+    setAppSetting('has_verified_purchase', 'true');
+    setAppSetting('verified_purchase_tier', 'annual');
+    const dirtyReceiptJson = '\uFEFF\r\n' + JSON.stringify({
+      productId: 'pl.lukasz.napar.annual\x00',
+      transactionId: 'tx-restore-12345\x1F',
+      purchaseDate: '2026-10-25T12:00:00.000Z',
+      signature: 'valid-sig-restore-12345',
+    }) + '\n\t';
+    setAppSetting('verified_receipt_json', dirtyReceiptJson);
+
+    const restoreRes = restorePurchases();
+    expect(restoreRes.restored).toBe(true);
+    expect(restoreRes.isSubscribed).toBe(true);
+    expect(restoreRes.subscriptionTier).toBe('annual');
+    expect(restoreRes.receipt).toBeDefined();
+    expect(restoreRes.receipt?.productId).toBe('pl.lukasz.napar.annual');
+    expect(restoreRes.receipt?.transactionId).toBe('tx-restore-12345');
+
+    // 2. formatTrialStatusSummary z jednostkami w polach stringowych (np. "10 parzeń", "5 dni")
+    const stateWithUnits: any = {
+      status: 'trial_active',
+      brewsRemaining: ' 10 parzeń ',
+      daysRemaining: ' 5 dni ',
+      isSubscribed: false,
+    };
+    expect(formatTrialStatusSummary(stateWithUnits, 'pl')).toBe('Okres próbny: 10 parzeń · 5 dni');
+    expect(formatTrialStatusSummary(stateWithUnits, 'en')).toBe('Trial: 10 brews · 5 days remaining');
+  });
 });
