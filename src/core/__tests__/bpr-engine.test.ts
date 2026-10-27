@@ -3,6 +3,7 @@ import {
   parseSteepIncrementSeconds,
   calculateNextSteepDuration,
   calculateCoffeeFreshness,
+  CoffeeFreshnessStatus,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -723,7 +724,8 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
 
       // 2. Data w przyszłości lub zbyt świeża (odpoczynek: np. 2 dni po paleniu dla filtra 10 dni) -> 'too_fresh'
       const fresh2Days = calculateCoffeeFreshness('2026-10-25T12:00:00.000Z', 'light filter', refDate);
-      expect(fresh2Days.status).toBe('too_fresh');
+      const expectedStatus: CoffeeFreshnessStatus = fresh2Days.status;
+      expect(expectedStatus).toBe('too_fresh');
       expect(fresh2Days.daysSinceRoast).toBe(2);
       expect(fresh2Days.degassingDays).toBe(10);
       expect(fresh2Days.messagePl).toContain('odpoczywa');

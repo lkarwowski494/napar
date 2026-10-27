@@ -8,12 +8,12 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | Kategoria | Łącznie | Pokryte | Pokrycie % | Status |
 | :--- | :---: | :---: | :---: | :---: |
 | **EKRAN** | 9 | 9 | **100.0%** | ✅ POKRYTE |
-| **UI** | 92 | 92 | **100.0%** | ✅ POKRYTE |
-| **TEKST** | 481 | 481 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 209 | 209 | **100.0%** | ✅ POKRYTE |
-| **WYMIAR** | 37 | 37 | **100.0%** | ✅ POKRYTE |
+| **UI** | 94 | 94 | **100.0%** | ✅ POKRYTE |
+| **TEKST** | 506 | 506 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 260 | 260 | **100.0%** | ✅ POKRYTE |
+| **WYMIAR** | 40 | 39 | **97.5%** | ❌ BRAKI |
 
-Łącznie elementów: **828** | Pokrytych: **828** | Brakujących: **0**
+Łącznie elementów: **909** | Pokrytych: **908** | Brakujących: **1**
 
 ## Szczegółowa Lista Elementów
 
@@ -21,7 +21,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | :--- | :--- | :--- | :---: | :--- |
 | `EKRAN` | `/(tabs)/beans` | `app/(tabs)/beans.tsx` | ✅ | tests/interaction-guards.test.ts, tests/state-sequences.test.ts |
 | `EKRAN` | `/(tabs)/caffeine` | `app/(tabs)/caffeine.tsx` | ✅ | tests/airplane-mode.test.ts, tests/oracle-coffee.test.ts |
-| `EKRAN` | `/(tabs)/dialin` | `app/(tabs)/dialin.tsx` | ✅ | src/components/__tests__/AppGuideModal.test.tsx, src/core/__tests__/i18n.test.ts |
+| `EKRAN` | `/(tabs)/dialin` | `app/(tabs)/dialin.tsx` | ✅ | src/components/__tests__/AppGuideModal.test.tsx, src/core/__tests__/app-access.test.ts |
 | `EKRAN` | `/(tabs)/index` | `app/(tabs)/index.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/public-repo.test.ts |
 | `EKRAN` | `/(tabs)/journal` | `app/(tabs)/journal.tsx` | ✅ | tests/interaction-guards.test.ts, src/components/icons/__tests__/CraftIcons.test.tsx |
 | `EKRAN` | `/(tabs)/settings` | `app/(tabs)/settings.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
@@ -40,22 +40,22 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `UI` | `common.next` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/bpr-components.test.tsx |
 | `UI` | `common.finish` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/bpr-components.test.tsx |
 | `UI` | `common.ok` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/bpr-components.test.tsx |
-| `UI` | `common.error` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/__tests__/ui-components.test.tsx |
-| `UI` | `common.howItWorks` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/core/__tests__/domain-coverage-edge-cases.test.tsx |
-| `UI` | `common.timerStepWarning` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/core/__tests__/domain-coverage-edge-cases.test.tsx |
-| `UI` | `common.stepFinished` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/core/__tests__/domain-coverage-edge-cases.test.tsx |
-| `UI` | `common.brewingFinished` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/core/__tests__/domain-coverage-edge-cases.test.tsx |
+| `UI` | `common.error` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/RecipeSelectModal.test.tsx |
+| `UI` | `common.howItWorks` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/RecipeSelectModal.test.tsx |
+| `UI` | `common.timerStepWarning` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/RecipeSelectModal.test.tsx |
+| `UI` | `common.stepFinished` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/RecipeSelectModal.test.tsx |
+| `UI` | `common.brewingFinished` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/RecipeSelectModal.test.tsx |
 | `UI` | `common.grams` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewQuickPrepCard.test.tsx |
 | `UI` | `common.seconds` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
-| `UI` | `common.celsius` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/core/__tests__/domain-coverage-edge-cases.test.tsx |
-| `UI` | `common.modalClose` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/core/__tests__/domain-coverage-edge-cases.test.tsx |
-| `UI` | `common.saveSuccess` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/core/__tests__/domain-coverage-edge-cases.test.tsx |
-| `UI` | `common.coffeeBeans` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/core/__tests__/domain-coverage-edge-cases.test.tsx |
-| `UI` | `common.looseLeafTea` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/core/__tests__/domain-coverage-edge-cases.test.tsx |
+| `UI` | `common.celsius` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/RecipeSelectModal.test.tsx |
+| `UI` | `common.modalClose` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/RecipeSelectModal.test.tsx |
+| `UI` | `common.saveSuccess` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/RecipeSelectModal.test.tsx |
+| `UI` | `common.coffeeBeans` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/RecipeSelectModal.test.tsx |
+| `UI` | `common.looseLeafTea` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/RecipeSelectModal.test.tsx |
 | `TEKST` | `tabs.brew` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `tabs.beans` | `src/core/i18n.tsx` | ✅ | tests/interaction-guards.test.ts, tests/state-sequences.test.ts |
 | `TEKST` | `tabs.journal` | `src/core/i18n.tsx` | ✅ | tests/interaction-guards.test.ts, src/components/icons/__tests__/CraftIcons.test.tsx |
-| `TEKST` | `tabs.dialin` | `src/core/i18n.tsx` | ✅ | src/components/__tests__/AppGuideModal.test.tsx, src/core/__tests__/i18n.test.ts |
+| `TEKST` | `tabs.dialin` | `src/core/i18n.tsx` | ✅ | src/components/__tests__/AppGuideModal.test.tsx, src/core/__tests__/app-access.test.ts |
 | `TEKST` | `tabs.caffeine` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/oracle-coffee.test.ts |
 | `TEKST` | `tabs.settings` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.recipe` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
@@ -110,6 +110,8 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `brew.importSuccess` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.duplicateRecipe` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.duplicateSuccess` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `UI` | `brew.editRecipe` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.pourToWeightOnScale` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.addTime10` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.subTime10` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.totalTimeLabel` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
@@ -136,6 +138,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `UI` | `brew.finishBrewBtn` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `UI` | `brew.finishAndSave` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.recipeSearchPlaceholder` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
+| `TEKST` | `brew.recipeSearchHint` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.methodSiphon` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.siphonDesc` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
 | `TEKST` | `brew.methodFrenchPress` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/migration-v1-to-v2.test.ts |
@@ -233,40 +236,45 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `gongfu.totalCaffeine` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/recipe-select-inline.test.tsx |
 | `TEKST` | `gongfu.infusionCaffeine` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/recipe-select-inline.test.tsx |
 | `UI` | `gongfu.finishSession` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/recipe-select-inline.test.tsx |
-| `TEKST` | `recipeBuilder.titleNew` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `UI` | `recipeBuilder.titleEdit` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.nameLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.namePlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.typeLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
+| `TEKST` | `recipeBuilder.titleNew` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `UI` | `recipeBuilder.titleEdit` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.nameLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.namePlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.typeLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
 | `TEKST` | `recipeBuilder.coffee` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `recipeBuilder.tea` | `src/core/i18n.tsx` | ✅ | tests/matrix-coverage-gap.test.tsx, tests/recipe-select-inline.test.tsx |
-| `TEKST` | `recipeBuilder.methodLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.methodPlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.authorLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.authorPlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.descriptionLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.descriptionPlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.doseLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.waterLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.tempLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.grindLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.grindPlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.stepsTitle` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.addStep` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.removeStep` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.paramsAndRatio` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.stepName` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/database.test.ts |
-| `TEKST` | `recipeBuilder.calculatedRatio` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.stepTimeSec` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.stepDurationSec` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/domain-coverage-edge-cases.test.tsx |
-| `TEKST` | `recipeBuilder.stepWaterGrams` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.stepInstruction` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.stepInstructionPlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `UI` | `recipeBuilder.saveRecipeBtn` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `UI` | `recipeBuilder.deleteRecipeConfirmTitle` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `UI` | `recipeBuilder.deleteRecipeConfirmMsg` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `TEKST` | `recipeBuilder.fillRequired` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/i18n.test.ts |
-| `UI` | `recipeBuilder.duplicateBtn` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/core/__tests__/brew-screen.test.tsx |
+| `TEKST` | `recipeBuilder.methodLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.methodPlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.authorLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.authorPlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.descriptionLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.descriptionPlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.doseLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.doseLabelImperial` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.waterLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.waterLabelImperial` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.tempLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.tempLabelImperial` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.grindLabel` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.grindPlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.stepsTitle` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.addStep` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.addStepHint` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.removeStep` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.paramsAndRatio` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.stepName` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.stepNumberPrefix` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.calculatedRatio` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.stepTimeSec` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.stepDurationSec` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.stepWaterGrams` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.stepInstruction` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.stepInstructionPlaceholder` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `UI` | `recipeBuilder.saveRecipeBtn` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `UI` | `recipeBuilder.deleteRecipeConfirmTitle` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `UI` | `recipeBuilder.deleteRecipeConfirmMsg` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `TEKST` | `recipeBuilder.fillRequired` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
+| `UI` | `recipeBuilder.duplicateBtn` | `src/core/i18n.tsx` | ✅ | src/components/recipe-builder/__tests__/RecipeBasicInfoCard.test.tsx, src/components/recipe-builder/__tests__/RecipeStepEditor.test.tsx |
 | `TEKST` | `stash.title` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/i18n-no-polish-in-en.test.tsx |
 | `TEKST` | `stash.addNew` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `TEKST` | `stash.freshness` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
@@ -290,6 +298,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `stash.archivePrompt` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `TEKST` | `stash.archiveNow` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `UI` | `stash.markFinished` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
+| `UI` | `stash.markFinishedAndArchive` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `UI` | `stash.deletePack` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `UI` | `stash.deletePackConfirmTitle` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `UI` | `stash.deletePackConfirmMsg` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
@@ -310,14 +319,5 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `stash.notesPlaceholder` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `TEKST` | `stash.nameError` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 | `TEKST` | `stash.addSuccessTitle` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `TEKST` | `stash.addSuccess` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `TEKST` | `stash.updateSuccessTitle` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `TEKST` | `stash.updateSuccess` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `TEKST` | `stash.archivedSuccessTitle` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `TEKST` | `stash.archivedSuccess` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `UI` | `stash.saveToStash` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `TEKST` | `stash.useTemplate` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `TEKST` | `stash.favoriteAdd` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
-| `TEKST` | `stash.favoriteRemove` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/brew/__tests__/BrewHeader.test.tsx |
 
-*(... i 528 kolejnych elementów w pełnym wykazie)*
+*(... i 609 kolejnych elementów w pełnym wykazie)*
