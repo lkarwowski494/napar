@@ -20,6 +20,7 @@ import {
   evaluateBrewMatrix,
   evaluateEspressoRatio,
   evaluateColdBrewRatio,
+  evaluatePourOverRatio,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
@@ -30,6 +31,7 @@ import {
   calculateHardnessRatio,
   calculateWaterDilution,
   estimateWaterTdsFromHardness,
+  evaluateWaterAlkalinity,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -41,6 +43,7 @@ import {
   filterGrinders,
   estimateGrindFinesRisk,
   calculateGrinderAdjustment,
+  estimateGrindDistribution,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -55,6 +58,7 @@ import {
   formatExtractionYield,
   formatTdsPercentage,
   formatWaterHardness,
+  formatParticleSize,
   wInKeep,
 } from '../unit-converter';
 import {
@@ -63,11 +67,13 @@ import {
   getKnowledgeSummaryCounts,
   getTeaBrewingGuide,
   getCoffeeVarietyGuide,
+  getCoffeeProcessGuide,
 } from '../knowledge-data';
-import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions } from '../bpr-engine';
-import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts } from '../backup';
-import { getSubscriptionBadgeInfo } from '../app-access';
-import { importDataJson, filterInventoryItems, calculateInventorySummary } from '../database';
+import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById } from '../bpr-engine';
+import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty } from '../backup';
+import { getSubscriptionBadgeInfo, getPaywallCallToAction } from '../app-access';
+import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems } from '../database';
+import { extractSearchSnippet } from '../search-utils';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -760,6 +766,76 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       const invSummary = calculateInventorySummary(val as any);
       expect(typeof invSummary).toBe('object');
       expect(typeof invSummary.totalWeightGrams).toBe('number');
+    }
+  });
+
+  test('Chaos 17: Fuzzing evaluatePourOverRatio, evaluateWaterAlkalinity, estimateGrindDistribution, formatParticleSize, getCoffeeProcessGuide, BrewTimerEngine.calculateStepTimeWindow, extractSearchSnippet, getPaywallCallToAction, isBackupEmpty, getProactiveActionById, getLowStockInventoryItems (TASK-P80-12-NIE)', () => {
+    const corruptInputs = [
+      -100000, -1, -0, 0, 0.0001, 15.0, 40.0, 150, 750, 2000, 10000, NaN, Infinity, -Infinity,
+      '', '   ', '\uFEFFtest', '750 µm', '0.75 mm', '40 ppm', 'invalid', null, undefined,
+      true, false, {}, [], () => {},
+    ];
+
+    for (const val of corruptInputs) {
+      // 1. evaluatePourOverRatio
+      const pourOverEval = evaluatePourOverRatio(val as any, val as any);
+      expect(typeof pourOverEval).toBe('object');
+      expect(typeof pourOverEval.ratio).toBe('number');
+      expect(typeof pourOverEval.style).toBe('string');
+      expect(typeof pourOverEval.styleLabelPl).toBe('string');
+      expect(typeof pourOverEval.ratioFormatted).toBe('string');
+
+      // 2. evaluateWaterAlkalinity
+      const alkEval = evaluateWaterAlkalinity(val as any);
+      expect(typeof alkEval).toBe('object');
+      expect(typeof alkEval.alkalinityPpm).toBe('number');
+      expect(typeof alkEval.category).toBe('string');
+      expect(typeof alkEval.bufferCapacity).toBe('string');
+
+      // 3. estimateGrindDistribution
+      const grindDist = estimateGrindDistribution(val as any, val as any);
+      expect(typeof grindDist).toBe('object');
+      expect(typeof grindDist.targetMicrons).toBe('number');
+      expect(typeof grindDist.span).toBe('number');
+      expect(typeof grindDist.unimodalityScore).toBe('number');
+
+      // 4. formatParticleSize
+      const formattedSize = formatParticleSize(val as any, val as any);
+      expect(typeof formattedSize).toBe('string');
+      expect(formattedSize.length).toBeGreaterThan(0);
+
+      // 5. getCoffeeProcessGuide
+      const processGuide = getCoffeeProcessGuide(val as any, val as any);
+      expect(processGuide === null || typeof processGuide === 'object').toBe(true);
+
+      // 6. BrewTimerEngine.calculateStepTimeWindow
+      const timeWindow = BrewTimerEngine.calculateStepTimeWindow(val as any, val as any);
+      expect(typeof timeWindow).toBe('object');
+      expect(typeof timeWindow.isValidStep).toBe('boolean');
+      expect(typeof timeWindow.startSecond).toBe('number');
+      expect(typeof timeWindow.durationSeconds).toBe('number');
+
+      // 7. extractSearchSnippet
+      const snippet = extractSearchSnippet(val as any, val as any);
+      expect(typeof snippet).toBe('string');
+
+      // 8. getPaywallCallToAction
+      const cta = getPaywallCallToAction(val as any);
+      expect(typeof cta).toBe('object');
+      expect(typeof cta.titlePl).toBe('string');
+      expect(typeof cta.urgency).toBe('string');
+
+      // 9. isBackupEmpty
+      const emptyCheck = isBackupEmpty(val as any);
+      expect(typeof emptyCheck).toBe('boolean');
+
+      // 10. getProactiveActionById
+      const action = getProactiveActionById(val as any, val as any);
+      expect(action === undefined || typeof action === 'object').toBe(true);
+
+      // 11. getLowStockInventoryItems
+      const lowStock = getLowStockInventoryItems(val as any, val as any);
+      expect(Array.isArray(lowStock)).toBe(true);
     }
   });
 });
