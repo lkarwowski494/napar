@@ -1868,4 +1868,86 @@ export function getCoffeeAltitudeGuide(
   };
 }
 
+export interface TeaCategoryGuide {
+  id: string;
+  name: string;
+  traditionalName: string;
+  oxidationRangePercent: string;
+  killGreenMethod: string;
+  waterTemperatureCelsius: number;
+  recommendedVessel: string;
+  sensoryProfile: string;
+  famousVarieties: string[];
+  famousRegions: string[];
+  healthAttributes: string;
+  description: string;
+}
+
+const TEA_RECOMMENDED_VESSELS: Record<string, { pl: string; en: string }> = {
+  'tea-white': {
+    pl: 'Gaiwan porcelanowy lub szklany czajniczek',
+    en: 'Porcelain Gaiwan or glass teapot',
+  },
+  'tea-green': {
+    pl: 'Kyusu z bocznym uchwytem, Shiboridashi lub czara szklana',
+    en: 'Side-handle Kyusu, Shiboridashi, or glass pitcher',
+  },
+  'tea-yellow': {
+    pl: 'Porcelanowy Gaiwan lub wysoka szklanka',
+    en: 'Porcelain Gaiwan or tall glass tumbler',
+  },
+  'tea-oolong': {
+    pl: 'Czajniczek z gliny Yixing (Zisha) lub cienkościenny Gaiwan',
+    en: 'Yixing clay teapot (Zisha) or thin-walled Gaiwan',
+  },
+  'tea-black': {
+    pl: 'Czajniczek ceramiczny lub porcelanowy Gaiwan',
+    en: 'Ceramic teapot or porcelain Gaiwan',
+  },
+  'tea-puerh': {
+    pl: 'Grubościenny czajniczek Yixing (Zisha / Jianshui)',
+    en: 'Thick-walled Yixing clay teapot (Zisha / Jianshui)',
+  },
+};
+
+/**
+ * Zwraca kompendium i rekomendowane naczynie dla wybranej kategorii herbaty rzemieślniczej.
+ */
+export function getTeaCategoryGuide(
+  idOrQuery: string | undefined | null,
+  lang: 'pl' | 'en' | string = 'pl'
+): TeaCategoryGuide | null {
+  if (!idOrQuery || typeof idOrQuery !== 'string') return null;
+  const tea = findTeaCategoryById(idOrQuery);
+  if (!tea) return null;
+
+  const isEn =
+    typeof lang === 'string' &&
+    (lang.trim().toLowerCase() === 'en' || lang.trim().toLowerCase().startsWith('en'));
+
+  const vessel = TEA_RECOMMENDED_VESSELS[tea.id] || {
+    pl: 'Gaiwan porcelanowy lub czajniczek ceramiczny',
+    en: 'Porcelain Gaiwan or ceramic teapot',
+  };
+
+  return {
+    id: tea.id,
+    name: isEn ? (tea.nameEn || tea.namePl) : (tea.namePl || tea.nameEn),
+    traditionalName: tea.traditionalName,
+    oxidationRangePercent: tea.oxidationRangePercent,
+    killGreenMethod: tea.killGreenMethod,
+    waterTemperatureCelsius: tea.waterTemperatureCelsius,
+    recommendedVessel: isEn ? vessel.en : vessel.pl,
+    sensoryProfile: isEn ? tea.sensoryProfileEn : tea.sensoryProfilePl,
+    famousVarieties: isEn
+      ? tea.famousVarietiesEn && tea.famousVarietiesEn.length > 0
+        ? tea.famousVarietiesEn
+        : tea.famousVarietiesPl
+      : tea.famousVarietiesPl,
+    famousRegions: tea.famousRegions,
+    healthAttributes: tea.healthAttributesPl,
+    description: isEn ? tea.descriptionEn : tea.descriptionPl,
+  };
+}
+
 

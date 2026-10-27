@@ -42,6 +42,8 @@ import {
   getCoffeeAltitudeGuide,
   CoffeeAltitudeGuide,
   CoffeeAltitudeBand,
+  getTeaCategoryGuide,
+  TeaCategoryGuide,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1389,6 +1391,39 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
 
     const invalid = getCoffeeAltitudeGuide('not-a-number');
     expect(invalid.band).toBe('unknown');
+  });
+
+  test('TASK-P88-06-TRE: getTeaCategoryGuide generuje kompendium i rekomendacje naczynia dla kategorii herbaty', () => {
+    // 1. Zielona herbata (tea-green) w języku polskim
+    const green: TeaCategoryGuide | null = getTeaCategoryGuide('tea-green');
+    expect(green).not.toBeNull();
+    expect(green?.id).toBe('tea-green');
+    expect(green?.name).toContain('Zielona');
+    expect(green?.traditionalName).toContain('Lǜ Chá');
+    expect(green?.waterTemperatureCelsius).toBe(75);
+    expect(green?.recommendedVessel).toContain('Kyusu');
+    expect(green?.famousRegions).toContain('Uji (Kioto, Japonia)');
+    expect(green?.famousVarieties.length).toBeGreaterThan(0);
+    expect(green?.healthAttributes).toContain('L-teanin');
+
+    // 2. Wersja angielska i alias (oolong)
+    const oolongEn: TeaCategoryGuide | null = getTeaCategoryGuide('oolong', 'en');
+    expect(oolongEn).not.toBeNull();
+    expect(oolongEn?.id).toBe('tea-oolong');
+    expect(oolongEn?.name).toBe('Oolong Tea');
+    expect(oolongEn?.recommendedVessel).toContain('Yixing');
+    expect(oolongEn?.waterTemperatureCelsius).toBe(95);
+
+    // 3. Inne kategorie (puerh, white, black, yellow)
+    expect(getTeaCategoryGuide('puerh')?.id).toBe('tea-puerh');
+    expect(getTeaCategoryGuide('white')?.id).toBe('tea-white');
+    expect(getTeaCategoryGuide('black')?.id).toBe('tea-black');
+    expect(getTeaCategoryGuide('yellow')?.id).toBe('tea-yellow');
+
+    // 4. Odporność na brakujące, puste i nieistniejące zapytania
+    expect(getTeaCategoryGuide(null)).toBeNull();
+    expect(getTeaCategoryGuide('')).toBeNull();
+    expect(getTeaCategoryGuide('unknown-tea-category')).toBeNull();
   });
 });
 
