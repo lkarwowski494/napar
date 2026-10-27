@@ -1,0 +1,53 @@
+{
+  "cycle": "P79",
+  "status": "completed",
+  "perspectives": [
+    "06-TRE",
+    "07-JAK",
+    "08-PRO",
+    "09-LOK",
+    "10-WYD"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P79-06-TRE",
+      "perspective": "06-TRE",
+      "description": "Implementacja przewodnika metod obróbki kawy getCoffeeProcessGuide z typem CoffeeProcessGuide w src/core/knowledge-data.ts",
+      "targetFile": "src/core/knowledge-data.ts",
+      "testFile": "src/core/__tests__/knowledge.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P79-07-JAK",
+      "perspective": "07-JAK",
+      "description": "Implementacja ewaluacji zasadowości i bufora wody evaluateWaterAlkalinity z typami AlkalinityEvaluation i AlkalinityCategory w src/core/water-chemistry.ts",
+      "targetFile": "src/core/water-chemistry.ts",
+      "testFile": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P79-08-PRO",
+      "perspective": "08-PRO",
+      "description": "Implementacja estymatora rozkładu wielkości cząstek estimateGrindDistribution z typem GrindDistributionEstimate w src/core/grinder-converter.ts",
+      "targetFile": "src/core/grinder-converter.ts",
+      "testFile": "src/core/__tests__/grinder-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P79-09-LOK",
+      "perspective": "09-LOK",
+      "description": "Implementacja formatowania wielkości cząstek formatParticleSize w src/core/unit-converter.ts",
+      "targetFile": "src/core/unit-converter.ts",
+      "testFile": "src/core/__tests__/unit-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P79-10-WYD",
+      "perspective": "10-WYD",
+      "description": "Implementacja okna czasowego kroku BrewTimerEngine.calculateStepTimeWindow z typem StepTimeWindow i Budżetu 13 w src/core/__tests__/perf-budget.test.ts",
+      "targetFile": "src/core/timer-engine.ts",
+      "testFile": "src/core/__tests__/perf-budget.test.ts",
+      "status": "completed"
+    }
+  ]
+}
