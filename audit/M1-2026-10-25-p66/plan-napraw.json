@@ -1,0 +1,52 @@
+{
+  "cycle": "P66",
+  "status": "completed",
+  "auditDate": "2026-10-27",
+  "tasks": [
+    {
+      "id": "TASK-P66-01-ODK",
+      "perspective": "01-ODK",
+      "title": "Ranking trafności wyników wyszukiwania rankSearchResults w search-utils",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed",
+      "commit": "79b0746"
+    },
+    {
+      "id": "TASK-P66-02-MON",
+      "perspective": "02-MON",
+      "title": "Zlokalizowane metadane cenowe getTierPricingInfo w app-access",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed",
+      "commit": "445c093"
+    },
+    {
+      "id": "TASK-P66-03-ZAK",
+      "perspective": "03-ZAK",
+      "title": "Alerty niskiego stanu i wyczerpania zapasów w database",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed",
+      "commit": "2adffbf"
+    },
+    {
+      "id": "TASK-P66-04-SZT",
+      "perspective": "04-SZT",
+      "title": "Filtrowanie akcji i wybór najbliższej rekomendacji w bpr-engine",
+      "targetFile": "src/core/bpr-engine.ts",
+      "testFile": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed",
+      "commit": "4249d85"
+    },
+    {
+      "id": "TASK-P66-05-ARC",
+      "perspective": "05-ARC",
+      "title": "Strukturalny walidator validateBackupEnvelope w backup",
+      "targetFile": "src/core/backup.ts",
+      "testFile": "src/core/__tests__/backup.test.ts",
+      "status": "completed",
+      "commit": "79aebec"
+    }
+  ]
+}
