@@ -85,6 +85,61 @@ export function getBackupStats(envelope?: NaparBackupEnvelope | null): BackupSta
   };
 }
 
+function plItems(n: number): string {
+  if (n === 1) return '1 pozycja';
+  const rem10 = n % 10;
+  const rem100 = n % 100;
+  if (rem10 >= 2 && rem10 <= 4 && (rem100 < 10 || rem100 >= 20)) return `${n} pozycje`;
+  return `${n} pozycji`;
+}
+
+function plRecipes(n: number): string {
+  if (n === 1) return '1 receptura';
+  const rem10 = n % 10;
+  const rem100 = n % 100;
+  if (rem10 >= 2 && rem10 <= 4 && (rem100 < 10 || rem100 >= 20)) return `${n} receptury`;
+  return `${n} receptur`;
+}
+
+function plSessions(n: number): string {
+  if (n === 1) return '1 sesja';
+  const rem10 = n % 10;
+  const rem100 = n % 100;
+  if (rem10 >= 2 && rem10 <= 4 && (rem100 < 10 || rem100 >= 20)) return `${n} sesje`;
+  return `${n} sesji`;
+}
+
+/**
+ * Generuje zwięzłe, zlokalizowane podsumowanie zawartości kopii zapasowej.
+ */
+export function formatBackupSummary(
+  envelope?: NaparBackupEnvelope | null,
+  language: 'pl' | 'en' | string = 'pl'
+): string {
+  if (!envelope || !envelope.state || typeof envelope.state !== 'object') {
+    return typeof language === 'string' && language.toLowerCase().startsWith('en')
+      ? 'No backup data available'
+      : 'Brak danych kopii zapasowej';
+  }
+
+  const isEn = typeof language === 'string' && language.toLowerCase().startsWith('en');
+  const stats = getBackupStats(envelope);
+  const dateStr =
+    typeof envelope.createdAt === 'string' && envelope.createdAt.length >= 10
+      ? envelope.createdAt.slice(0, 10)
+      : localISODate();
+
+  if (isEn) {
+    const items = `${stats.inventoryCount} ${stats.inventoryCount === 1 ? 'item' : 'items'}`;
+    const recipes = `${stats.recipesCount} ${stats.recipesCount === 1 ? 'recipe' : 'recipes'}`;
+    const sessions = `${stats.sessionsCount} ${stats.sessionsCount === 1 ? 'session' : 'sessions'}`;
+    return `Backup from ${dateStr}: ${items}, ${recipes}, ${sessions}`;
+  }
+
+  return `Kopia z ${dateStr}: ${plItems(stats.inventoryCount)}, ${plRecipes(stats.recipesCount)}, ${plSessions(stats.sessionsCount)}`;
+}
+
+
 export function localISODate(d: Date = new Date()): string {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');

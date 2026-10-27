@@ -8,6 +8,7 @@ import { importDataJson, getRecipes, saveRecipe } from '../database';
 import {
   buildBackup,
   getBackupStats,
+  formatBackupSummary,
   localISODate,
   stampOf,
   parseAndValidateBackup,
@@ -442,6 +443,31 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
         sessionsCount: 0,
         caffeineLogsCount: 0,
       });
+    });
+
+    test('TASK-P64-05-ARC: formatBackupSummary generuje czytelne podsumowanie kopii zapasowej w jezyku PL i EN', () => {
+      const envelope = buildBackup({
+        inventory: [{ id: 'inv-1' } as any, { id: 'inv-2' } as any],
+        customRecipes: [{ id: 'rec-1' } as any],
+        sessions: [{ id: 'sess-1' } as any, { id: 'sess-2' } as any, { id: 'sess-3' } as any],
+        caffeineLogs: [],
+      });
+
+      // Język polski
+      const summaryPl = formatBackupSummary(envelope, 'pl');
+      expect(summaryPl).toContain('2 pozycje');
+      expect(summaryPl).toContain('1 receptura');
+      expect(summaryPl).toContain('3 sesje');
+
+      // Język angielski
+      const summaryEn = formatBackupSummary(envelope, 'en');
+      expect(summaryEn).toContain('2 items');
+      expect(summaryEn).toContain('1 recipe');
+      expect(summaryEn).toContain('3 sessions');
+
+      // Obsługa pustego obiektu i null
+      expect(formatBackupSummary(null, 'pl')).toBe('Brak danych kopii zapasowej');
+      expect(formatBackupSummary(null, 'en')).toBe('No backup data available');
     });
   });
 });
