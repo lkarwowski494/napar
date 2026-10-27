@@ -644,12 +644,18 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       // 2. Koperta z pojedynczym elementem
       const withItem = buildBackup({
         inventory: [{ id: 'bean-1' }] as any,
+        customRecipes: [],
+        sessions: [],
+        caffeineLogs: [],
       });
       expect(isBackupEmpty(withItem)).toBe(false);
 
       // 3. Koperta z sesją
       const withSession = buildBackup({
+        inventory: [],
+        customRecipes: [],
         sessions: [{ id: 'sess-1' }] as any,
+        caffeineLogs: [],
       });
       expect(isBackupEmpty(withSession)).toBe(false);
 
