@@ -35,6 +35,10 @@ import {
   CoffeeProcessGuide,
   getCoffeeOriginGuide,
   CoffeeOriginGuide,
+  getCoffeeRoastLevelGuide,
+  CoffeeRoastLevelGuide,
+  CoffeeRoastLevelKey,
+  COFFEE_ROAST_LEVEL_GUIDES,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1309,6 +1313,39 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(getCoffeeOriginGuide('unknown-country')).toBeNull();
     expect(getCoffeeOriginGuide(null as any)).toBeNull();
     expect(getCoffeeOriginGuide('')).toBeNull();
+  });
+
+  test('TASK-P83-06-TRE: getCoffeeRoastLevelGuide zwraca przewodnik po stopniach palenia kawy', () => {
+    expect(COFFEE_ROAST_LEVEL_GUIDES.length).toBeGreaterThanOrEqual(5);
+
+    // 1. Jasne palenie (light)
+    const lightGuide: CoffeeRoastLevelGuide | null = getCoffeeRoastLevelGuide('light');
+    expect(lightGuide).not.toBeNull();
+    const keyCheck: CoffeeRoastLevelKey = lightGuide!.key;
+    expect(keyCheck).toBe('light');
+    expect(lightGuide?.namePl).toContain('Jasne');
+    expect(lightGuide?.recommendedWaterTempRange).toContain('92');
+    expect(lightGuide?.solubilityLevel).toBe('low');
+    expect(lightGuide?.flavorProfilePl).toContain('kwasowość');
+    expect(lightGuide?.extractionTipsPl).toContain('wyższą temperaturę');
+
+    // 2. Średnie palenie (medium / omniroast)
+    const medGuide = getCoffeeRoastLevelGuide('omniroast');
+    expect(medGuide).not.toBeNull();
+    expect(medGuide?.key).toBe('medium');
+    expect(medGuide?.solubilityLevel).toBe('high');
+    expect(medGuide?.flavorProfilePl).toContain('czekolady');
+
+    // 3. Ciemne palenie (dark)
+    const darkGuide = getCoffeeRoastLevelGuide('dark');
+    expect(darkGuide).not.toBeNull();
+    expect(darkGuide?.key).toBe('dark');
+    expect(darkGuide?.solubilityLevel).toBe('very_high');
+
+    // 4. Odporność na nieznane stopnie palenia, null i puste stringi
+    expect(getCoffeeRoastLevelGuide('unknown-roast')).toBeNull();
+    expect(getCoffeeRoastLevelGuide(null as any)).toBeNull();
+    expect(getCoffeeRoastLevelGuide('')).toBeNull();
   });
 });
 

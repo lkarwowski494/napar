@@ -1637,3 +1637,120 @@ export function getCoffeeOriginGuide(
     description: isEn ? origin.descriptionEn : origin.descriptionPl,
   };
 }
+
+export type CoffeeRoastLevelKey =
+  | 'light'
+  | 'medium_light'
+  | 'medium'
+  | 'medium_dark'
+  | 'dark';
+
+export interface CoffeeRoastLevelGuide {
+  key: CoffeeRoastLevelKey;
+  namePl: string;
+  nameEn: string;
+  recommendedWaterTempRange: string;
+  restingWindowDays: string;
+  solubilityLevel: 'low' | 'moderate' | 'high' | 'very_high';
+  flavorProfilePl: string;
+  flavorProfileEn: string;
+  extractionTipsPl: string;
+  extractionTipsEn: string;
+}
+
+export const COFFEE_ROAST_LEVEL_GUIDES: CoffeeRoastLevelGuide[] = [
+  {
+    key: 'light',
+    namePl: 'Jasne (Light / Filter / Cinnamon)',
+    nameEn: 'Light (Filter / Cinnamon)',
+    recommendedWaterTempRange: '92–96°C',
+    restingWindowDays: '14–30 dni',
+    solubilityLevel: 'low',
+    flavorProfilePl: 'Wyrazista kwasowość owocowa (cytrusy, owoce pestkowe), nuty kwiatowe i herbaciane, lekkie ciało.',
+    flavorProfileEn: 'Vibrant fruit acidity (citrus, stone fruits), floral and tea-like notes, delicate body.',
+    extractionTipsPl: 'Niska rozpuszczalność ziaren — stosuj wyższą temperaturę wody (93–96°C) i drobniejszy przemiał.',
+    extractionTipsEn: 'Low bean solubility — use higher water temperature (93–96°C) and finer grind.',
+  },
+  {
+    key: 'medium_light',
+    namePl: 'Jasno-średnie (Medium-Light / City+)',
+    nameEn: 'Medium-Light (City+)',
+    recommendedWaterTempRange: '90–94°C',
+    restingWindowDays: '10–24 dni',
+    solubilityLevel: 'moderate',
+    flavorProfilePl: 'Zrównoważona kwasowość owocowa z narastającą słodyczą karmelu, miodu i orzechów.',
+    flavorProfileEn: 'Balanced fruit acidity with developing sweetness of caramel, honey, and nuts.',
+    extractionTipsPl: 'Uniwersalny profil pod przelewy i nowoczesne espresso — woda ok. 92–94°C.',
+    extractionTipsEn: 'Versatile profile for pour over and modern espresso — water around 92–94°C.',
+  },
+  {
+    key: 'medium',
+    namePl: 'Średnie (Medium / Omniroast / Full City)',
+    nameEn: 'Medium (Omniroast / Full City)',
+    recommendedWaterTempRange: '88–92°C',
+    restingWindowDays: '7–21 dni',
+    solubilityLevel: 'high',
+    flavorProfilePl: 'Wysoka słodycz czekolady mlecznej, toffi i prażonych migdałów, niska łagodna kwasowość, kremowe body.',
+    flavorProfileEn: 'Rich sweetness of milk chocolate, toffee, and toasted almonds, mild acidity, creamy body.',
+    extractionTipsPl: 'Wysoka rozpuszczalność — obniż temperaturę wody do 88–92°C, aby uniknąć nadmiernej goryczy.',
+    extractionTipsEn: 'High solubility — lower water temperature to 88–92°C to avoid over-extracting bitterness.',
+  },
+  {
+    key: 'medium_dark',
+    namePl: 'Średnio-ciemne (Medium-Dark / Vienna)',
+    nameEn: 'Medium-Dark (Vienna)',
+    recommendedWaterTempRange: '84–88°C',
+    restingWindowDays: '5–14 dni',
+    solubilityLevel: 'high',
+    flavorProfilePl: 'Gorzka czekolada, kakao, nuty przypraw korzennych i dymne, gęste syropowate body, śladowa kwasowość.',
+    flavorProfileEn: 'Dark chocolate, cocoa, spice and subtle smoky notes, heavy syrupy body, minimal acidity.',
+    extractionTipsPl: 'Szybka ekstrakcja — grubszy przemiał, niższa temperatura (85–88°C), idealne do kawiarki i tradycyjnego espresso.',
+    extractionTipsEn: 'Fast extraction — coarser grind, lower temp (85–88°C), great for Moka pot and traditional espresso.',
+  },
+  {
+    key: 'dark',
+    namePl: 'Ciemne (Dark / French / Italian)',
+    nameEn: 'Dark (French / Italian)',
+    recommendedWaterTempRange: '80–85°C',
+    restingWindowDays: '3–10 dni',
+    solubilityLevel: 'very_high',
+    flavorProfilePl: 'Intensywna gorycz palona, melasa, ciemny karmel, bardzo ciężkie oleiste body, zerowa kwasowość.',
+    flavorProfileEn: 'Intense roasty bitterness, molasses, dark caramel, very heavy oily body, zero acidity.',
+    extractionTipsPl: 'Bardzo porowate ziarna — woda 80–84°C, skrócony czas kontaktu, doskonałe z mlekiem.',
+    extractionTipsEn: 'Highly porous beans — water 80–84°C, shortened contact time, excellent in milk beverages.',
+  },
+];
+
+/**
+ * Zwraca przewodnik po profilu stopnia palenia kawy, rekomendowanych temperaturach wody,
+ * oknie leżakowania i charakterystyce sensorycznej.
+ */
+export function getCoffeeRoastLevelGuide(
+  roastLevel: string | undefined | null
+): CoffeeRoastLevelGuide | null {
+  if (!roastLevel || typeof roastLevel !== 'string' || !roastLevel.trim()) {
+    return null;
+  }
+
+  const query = roastLevel.trim().toLowerCase();
+
+  // 1. Dokładne dopasowanie klucza
+  const exactKey = COFFEE_ROAST_LEVEL_GUIDES.find((g) => g.key === query);
+  if (exactKey) return exactKey;
+
+  // 2. Dokładne dopasowanie nazwy
+  const exactName = COFFEE_ROAST_LEVEL_GUIDES.find(
+    (g) => g.namePl.toLowerCase() === query || g.nameEn.toLowerCase() === query
+  );
+  if (exactName) return exactName;
+
+  // 3. Dopasowanie podciągu
+  return (
+    COFFEE_ROAST_LEVEL_GUIDES.find((g) => {
+      if (query.includes(g.key)) return true;
+      if (g.namePl.toLowerCase().includes(query) || g.nameEn.toLowerCase().includes(query)) return true;
+      return false;
+    }) || null
+  );
+}
+
