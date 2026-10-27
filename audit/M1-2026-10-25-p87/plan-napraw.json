@@ -1,0 +1,53 @@
+{
+  "cycle": "P87",
+  "status": "completed",
+  "perspectives": [
+    "10-WYD",
+    "11-WZR",
+    "12-NIE",
+    "01-ODK",
+    "02-MON"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P87-10-WYD",
+      "perspective": "10-WYD",
+      "description": "Implementacja Budżetu 16 wydajności obliczeń masowych chemii wody (calculateSulfateToChlorideRatio i calculateResidualAlkalinity 10 000 operacji < 80ms) w src/core/__tests__/perf-budget.test.ts",
+      "targetFile": "src/core/water-chemistry.ts",
+      "testFile": "src/core/__tests__/perf-budget.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P87-11-WZR",
+      "perspective": "11-WZR",
+      "description": "Implementacja reguły ewaluacji proporcji kawiarki evaluateMokaPotRatio z typami MokaPotRatioEvaluation i MokaPotRatioStyle w src/core/domain-rules.ts i src/core/__tests__/domain-rules.test.ts",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P87-12-NIE",
+      "perspective": "12-NIE",
+      "description": "Implementacja Chaos 20 w testach odpornościowych na anomalie wejściowe i brzegowe w src/core/__tests__/fuzz-resilience.test.ts",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P87-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Implementacja filtru zakresów numerycznych filterSearchEntriesByNumericRange z interfejsem NumericRangeFilterOptions w src/core/search-utils.ts i src/core/__tests__/search-utils.test.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P87-02-MON",
+      "perspective": "02-MON",
+      "description": "Implementacja kalkulatora korzyści planu rocznego calculateAnnualVsMonthlySavings z typem AnnualSavingsSummary w src/core/app-access.ts i src/core/__tests__/app-access.test.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    }
+  ]
+}
