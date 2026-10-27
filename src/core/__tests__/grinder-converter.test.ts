@@ -27,6 +27,8 @@ import {
   calculateBurrSpeedImpact,
   BurrSpeedImpactAnalysis,
   BurrSpeedCategory,
+  estimateGrindDuration,
+  GrindTimeEstimate,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -1016,6 +1018,43 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(fallbackRes.burrType).toBe('conical');
     expect(fallbackRes.speedCategory).toBe('medium');
     expect(fallbackRes.heatGenerationScore).toBeGreaterThan(0);
+  });
+
+  test('TASK-P84-08-PRO: estimateGrindDuration szacuje czas mielenia porcji kawy dla młynków ręcznych i elektrycznych', () => {
+    // 1. Młynek ręczny (np. Comandante C40 dla 18g przy 750 µm)
+    const manualEst: GrindTimeEstimate = estimateGrindDuration('comandante_c40', 18, 750);
+    expect(manualEst.grinderId).toBe('comandante_c40');
+    expect(manualEst.grinderName).toContain('Comandante');
+    expect(manualEst.doseGrams).toBe(18);
+    expect(manualEst.targetMicrons).toBe(750);
+    expect(manualEst.isElectric).toBe(false);
+    expect(manualEst.throughputGramsPerSecond).toBeGreaterThan(0.4);
+    expect(manualEst.throughputGramsPerSecond).toBeLessThan(1.5);
+    expect(manualEst.estimatedSeconds).toBeGreaterThan(15);
+    expect(manualEst.estimatedSeconds).toBeLessThan(45);
+    expect(manualEst.formattedDuration).toMatch(/s$/);
+    expect(manualEst.advicePl).toContain('Comandante');
+    expect(manualEst.adviceEn).toContain('Comandante');
+
+    // 2. Młynek elektryczny dużej wydajności (np. Mahlkönig EK43 dla 30g przy 850 µm)
+    const ek43Est: GrindTimeEstimate = estimateGrindDuration('mahlkoenig_ek43', '30', '850');
+    expect(ek43Est.isElectric).toBe(true);
+    expect(ek43Est.throughputGramsPerSecond).toBeGreaterThan(5.0);
+    expect(ek43Est.estimatedSeconds).toBeLessThan(10);
+
+    // 3. Wpływ grubości mielenia (espresso vs cold brew / coarse na tym samym młynku)
+    const espressoEst = estimateGrindDuration('1zpresso_k_ultra', 18, 300);
+    const coarseEst = estimateGrindDuration('1zpresso_k_ultra', 18, 1100);
+    expect(espressoEst.estimatedSeconds).toBeGreaterThan(coarseEst.estimatedSeconds);
+    expect(espressoEst.throughputGramsPerSecond).toBeLessThan(coarseEst.throughputGramsPerSecond);
+
+    // 4. Odporność na nieznany młynek, wartości null, ujemne dawki i stringi
+    const fallbackEst = estimateGrindDuration(null as any, -10, 'invalid');
+    expect(fallbackEst.grinderId).toBe('generic_grinder');
+    expect(fallbackEst.doseGrams).toBe(15);
+    expect(fallbackEst.targetMicrons).toBe(700);
+    expect(fallbackEst.estimatedSeconds).toBeGreaterThan(0);
+    expect(fallbackEst.formattedDuration.length).toBeGreaterThan(0);
   });
 });
 

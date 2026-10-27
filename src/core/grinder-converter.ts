@@ -1583,3 +1583,104 @@ export function calculateBurrSpeedImpact(
   };
 }
 
+export interface GrindTimeEstimate {
+  grinderId: string;
+  grinderName: string;
+  doseGrams: number;
+  targetMicrons: number;
+  isElectric: boolean;
+  throughputGramsPerSecond: number;
+  estimatedSeconds: number;
+  formattedDuration: string;
+  advicePl: string;
+  adviceEn: string;
+}
+
+/**
+ * Szacuje czas mielenia porcji ziaren kawy dla wybranego modelu młynka i grubości przemiału.
+ */
+export function estimateGrindDuration(
+  grinderId: string,
+  doseGrams: number | string,
+  targetMicrons?: number | string
+): GrindTimeEstimate {
+  const grinder = (typeof grinderId === 'string' && findGrinderById(grinderId)) ||
+    SUPPORTED_GRINDERS.find((g) => g.id === 'generic_grinder') ||
+    SUPPORTED_GRINDERS[0];
+
+  const parseNum = (v: unknown, fallback: number): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? v : fallback;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? parsed : fallback;
+    }
+    return fallback;
+  };
+
+  const rawDose = parseNum(doseGrams, 15);
+  const safeDose = rawDose <= 0 ? 15 : Math.max(1, Math.min(200, Math.round(rawDose * 10) / 10));
+
+  const rawMicrons = parseNum(targetMicrons, 700);
+  const safeMicrons = rawMicrons < 100 ? 700 : Math.max(150, Math.min(1600, Math.round(rawMicrons)));
+
+  const electricIds = new Set([
+    'fellow_ode_gen2',
+    'baratza_encore',
+    'wilfa_svart',
+    'eureka_mignon',
+    'niche_zero',
+    'mahlkoenig_ek43',
+    'timemore_sculptor',
+  ]);
+  const isElectric = electricIds.has(grinder.id);
+
+  let baseThroughput = 0.65;
+  if (grinder.id === 'mahlkoenig_ek43') baseThroughput = 10.0;
+  else if (grinder.id === 'timemore_sculptor') baseThroughput = 4.0;
+  else if (grinder.id === 'fellow_ode_gen2') baseThroughput = 3.5;
+  else if (grinder.id === 'eureka_mignon') baseThroughput = 2.2;
+  else if (grinder.id === 'baratza_encore') baseThroughput = 2.0;
+  else if (grinder.id === 'wilfa_svart') baseThroughput = 1.8;
+  else if (grinder.id === 'niche_zero') baseThroughput = 1.8;
+  else if (isElectric) baseThroughput = 2.5;
+  else if (grinder.id === '1zpresso_k_ultra') baseThroughput = 0.9;
+  else if (grinder.id === 'kingrinder_k6') baseThroughput = 0.85;
+  else if (grinder.id === '1zpresso_j_max') baseThroughput = 0.75;
+  else if (grinder.id === 'comandante_c40') baseThroughput = 0.65;
+  else if (grinder.id === 'kinu_m47') baseThroughput = 0.65;
+  else if (grinder.id === '1zpresso_zp6') baseThroughput = 0.6;
+  else if (grinder.id === 'timemore_c2_c3') baseThroughput = 0.55;
+  else baseThroughput = 0.65;
+
+  const micronFactor = Math.max(0.65, Math.min(1.35, safeMicrons / 700));
+  const throughputGramsPerSecond = Math.round(baseThroughput * micronFactor * 100) / 100;
+  const estimatedSeconds = Math.max(1, Math.round(safeDose / throughputGramsPerSecond));
+
+  const formattedDuration =
+    estimatedSeconds >= 60
+      ? `${Math.floor(estimatedSeconds / 60)} min ${estimatedSeconds % 60} s`
+      : `${estimatedSeconds} s`;
+
+  const advicePl = isElectric
+    ? `Młynek elektryczny ${grinder.name}: zmielenie ${safeDose}g przy grubości ${safeMicrons} µm zajmie ok. ${formattedDuration}.`
+    : `Młynek ręczny ${grinder.name}: zmielenie ${safeDose}g przy grubości ${safeMicrons} µm zajmie ok. ${formattedDuration} przy jednostajnym tempie kręcenia.`;
+
+  const adviceEn = isElectric
+    ? `Electric grinder ${grinder.name}: grinding ${safeDose}g at ${safeMicrons} µm will take approximately ${formattedDuration}.`
+    : `Manual grinder ${grinder.name}: grinding ${safeDose}g at ${safeMicrons} µm will take approximately ${formattedDuration} at steady hand-cranking speed.`;
+
+  return {
+    grinderId: grinder.id,
+    grinderName: grinder.name,
+    doseGrams: safeDose,
+    targetMicrons: safeMicrons,
+    isElectric,
+    throughputGramsPerSecond,
+    estimatedSeconds,
+    formattedDuration,
+    advicePl,
+    adviceEn,
+  };
+}
+
+
