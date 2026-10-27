@@ -1555,3 +1555,42 @@ export function getCoffeeVarietyGuide(
     recommendedRoast: variety.recommendedRoast,
   };
 }
+
+
+export interface CoffeeProcessGuide {
+  id: string;
+  name: string;
+  processType: string;
+  sensoryImpact: string;
+  dryingDurationDays: string;
+  waterConsumption: string;
+  keyNotes: string[];
+  description: string;
+}
+
+/**
+ * Zwraca zoptymalizowany przewodnik i profil sensoryczny dla wybranej metody obróbki kawy.
+ */
+export function getCoffeeProcessGuide(
+  idOrQuery: string | undefined | null,
+  lang: 'pl' | 'en' | string = 'pl'
+): CoffeeProcessGuide | null {
+  if (!idOrQuery || typeof idOrQuery !== 'string') return null;
+  const process = findCoffeeProcessById(idOrQuery);
+  if (!process) return null;
+
+  const isEn =
+    typeof lang === 'string' &&
+    (lang.trim().toLowerCase() === 'en' || lang.trim().toLowerCase().startsWith('en'));
+
+  return {
+    id: process.id,
+    name: process.name,
+    processType: process.processType,
+    sensoryImpact: isEn ? process.sensoryImpactEn : process.sensoryImpactPl,
+    dryingDurationDays: process.dryingDurationDays,
+    waterConsumption: process.waterConsumption,
+    keyNotes: isEn ? process.keyNotesEn : process.keyNotesPl,
+    description: isEn ? process.descriptionEn : process.descriptionPl,
+  };
+}

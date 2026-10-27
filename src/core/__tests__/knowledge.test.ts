@@ -31,6 +31,8 @@ import {
   TeaBrewingGuide,
   getCoffeeVarietyGuide,
   CoffeeVarietyGuide,
+  getCoffeeProcessGuide,
+  CoffeeProcessGuide,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1255,6 +1257,31 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(getCoffeeVarietyGuide('unknown-variety')).toBeNull();
     expect(getCoffeeVarietyGuide(null as any)).toBeNull();
     expect(getCoffeeVarietyGuide('')).toBeNull();
+  });
+
+  test('TASK-P79-06-TRE: getCoffeeProcessGuide zwraca przewodnik obróbki kawy', () => {
+    // 1. Myta (washed) w języku polskim
+    const washedGuide: CoffeeProcessGuide | null = getCoffeeProcessGuide('process-washed', 'pl');
+    expect(washedGuide).not.toBeNull();
+    expect(washedGuide?.processType).toBe('WASHED');
+    expect(washedGuide?.name).toBe('Washed (Mokra / Myta)');
+    expect(washedGuide?.dryingDurationDays).toBeDefined();
+    expect(washedGuide?.waterConsumption).toBe('Wysokie');
+    expect(washedGuide?.sensoryImpact).toContain('przejrzystość');
+    expect(washedGuide?.keyNotes.length).toBeGreaterThan(0);
+    expect(washedGuide?.description).toContain('Klasyczna metoda');
+
+    // 2. Natural w języku angielskim
+    const naturalGuide = getCoffeeProcessGuide('natural', 'en');
+    expect(naturalGuide).not.toBeNull();
+    expect(naturalGuide?.processType).toBe('NATURAL');
+    expect(naturalGuide?.sensoryImpact).toBeDefined();
+    expect(naturalGuide?.description).toBeDefined();
+
+    // 3. Odporność na nieistniejące ID, puste stringi i null
+    expect(getCoffeeProcessGuide('unknown-process')).toBeNull();
+    expect(getCoffeeProcessGuide(null as any)).toBeNull();
+    expect(getCoffeeProcessGuide('')).toBeNull();
   });
 });
 
