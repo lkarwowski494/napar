@@ -1497,3 +1497,89 @@ export function estimateGrindDistribution(
     descriptionEn,
   };
 }
+
+export type BurrSpeedCategory = 'ultra_low' | 'low' | 'medium' | 'high';
+
+export interface BurrSpeedImpactAnalysis {
+  rpm: number;
+  burrType: 'conical' | 'flat';
+  speedCategory: BurrSpeedCategory;
+  heatGenerationScore: number;
+  finesTendencyScore: number;
+  clarityVsBody: 'high_clarity' | 'balanced' | 'full_body';
+  descriptionPl: string;
+  descriptionEn: string;
+}
+
+/**
+ * Szacuje wpływ prędkości obrotowej żaren (RPM) oraz geometrii żaren na nagrzewanie,
+ * frakcję pyłu i profil sensoryczny (przejrzystość vs body).
+ */
+export function calculateBurrSpeedImpact(
+  rpm: number | string,
+  burrType: 'conical' | 'flat' | string = 'flat'
+): BurrSpeedImpactAnalysis {
+  const parseNum = (v: unknown, fallback = 900): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(100, Math.min(3000, v)) : fallback;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(100, Math.min(3000, parsed)) : fallback;
+    }
+    return fallback;
+  };
+
+  const safeRpm = Math.round(parseNum(rpm, 900));
+  const isFlat =
+    typeof burrType === 'string' &&
+    (burrType.trim().toLowerCase().includes('flat') || burrType.trim().toLowerCase() === 'plaskie' || burrType.trim().toLowerCase() === 'płaskie');
+  const type: 'conical' | 'flat' = isFlat ? 'flat' : 'conical';
+
+  let speedCategory: BurrSpeedCategory;
+  let heatGenerationScore: number;
+  let finesTendencyScore: number;
+  let clarityVsBody: 'high_clarity' | 'balanced' | 'full_body';
+  let descriptionPl: string;
+  let descriptionEn: string;
+
+  if (safeRpm < 500) {
+    speedCategory = 'ultra_low';
+    heatGenerationScore = Math.round(10 + (safeRpm / 500) * 15);
+    finesTendencyScore = type === 'flat' ? 20 : 35;
+    clarityVsBody = 'high_clarity';
+    descriptionPl = 'Bardzo niskie obroty żaren — minimalne nagrzewanie przemiału, zredukowana ilość pyłu i maksymalna przejrzystość nut smakowych.';
+    descriptionEn = 'Very low burr RPM — minimal heat buildup, reduced fines, and peak flavor clarity.';
+  } else if (safeRpm < 900) {
+    speedCategory = 'low';
+    heatGenerationScore = Math.round(25 + ((safeRpm - 500) / 400) * 20);
+    finesTendencyScore = type === 'flat' ? 35 : 50;
+    clarityVsBody = 'high_clarity';
+    descriptionPl = 'Niskie obroty żaren — zrównoważona retencja i wysoka czystość profilu sensorycznego.';
+    descriptionEn = 'Low burr RPM — balanced retention and high sensory clarity.';
+  } else if (safeRpm < 1400) {
+    speedCategory = 'medium';
+    heatGenerationScore = Math.round(45 + ((safeRpm - 900) / 500) * 25);
+    finesTendencyScore = type === 'flat' ? 55 : 68;
+    clarityVsBody = 'balanced';
+    descriptionPl = 'Umiarkowane obroty żaren — wszechstronny profil parzenia łączący dobrą ekstrakcję z wyrazistym body.';
+    descriptionEn = 'Moderate burr RPM — versatile profile balancing solid extraction with noticeable body.';
+  } else {
+    speedCategory = 'high';
+    heatGenerationScore = Math.min(100, Math.round(70 + ((safeRpm - 1400) / 1600) * 30));
+    finesTendencyScore = type === 'flat' ? 75 : 88;
+    clarityVsBody = 'full_body';
+    descriptionPl = 'Wysokie obroty żaren — szybsze mielenie, wyższa temperatura komory mielenia i większa frakcja pyłu dająca pełniejsze body.';
+    descriptionEn = 'High burr RPM — fast throughput, higher chamber heat, and increased fines creating heavier body.';
+  }
+
+  return {
+    rpm: safeRpm,
+    burrType: type,
+    speedCategory,
+    heatGenerationScore,
+    finesTendencyScore,
+    clarityVsBody,
+    descriptionPl,
+    descriptionEn,
+  };
+}
+

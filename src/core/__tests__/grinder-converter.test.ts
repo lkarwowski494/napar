@@ -24,6 +24,9 @@ import {
   GrinderAdjustmentResult,
   estimateGrindDistribution,
   GrindDistributionEstimate,
+  calculateBurrSpeedImpact,
+  BurrSpeedImpactAnalysis,
+  BurrSpeedCategory,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -977,6 +980,42 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(fallbackDist.targetRangePercentage).toBeGreaterThan(0);
     expect(fallbackDist.finesPercentage).toBeGreaterThan(0);
     expect(fallbackDist.bouldersPercentage).toBeGreaterThan(0);
+  });
+
+  test('TASK-P81-08-PRO: calculateBurrSpeedImpact szacuje wpływ prędkości obrotowej żaren na przemiał', () => {
+    // 1. Bardzo niskie obroty (ultra low RPM, np. 400 RPM dla żaren płaskich)
+    const ultraLow: BurrSpeedImpactAnalysis = calculateBurrSpeedImpact(400, 'flat');
+    const ultraLowCategory: BurrSpeedCategory = ultraLow.speedCategory;
+    expect(ultraLow.rpm).toBe(400);
+    expect(ultraLow.burrType).toBe('flat');
+    expect(ultraLowCategory).toBe('ultra_low');
+    expect(ultraLow.clarityVsBody).toBe('high_clarity');
+    expect(ultraLow.heatGenerationScore).toBeLessThan(30);
+    expect(ultraLow.descriptionPl).toContain('Bardzo niskie obroty');
+    expect(ultraLow.descriptionEn).toContain('Very low burr RPM');
+
+    // 2. Średnie obroty (medium RPM, np. 1100 RPM dla stożków)
+    const medium: BurrSpeedImpactAnalysis = calculateBurrSpeedImpact('1100', 'conical');
+    const medCategory: BurrSpeedCategory = medium.speedCategory;
+    expect(medium.rpm).toBe(1100);
+    expect(medium.burrType).toBe('conical');
+    expect(medCategory).toBe('medium');
+    expect(medium.clarityVsBody).toBe('balanced');
+    expect(medium.finesTendencyScore).toBeGreaterThan(ultraLow.finesTendencyScore);
+
+    // 3. Wysokie obroty (high RPM, np. 1600 RPM)
+    const high: BurrSpeedImpactAnalysis = calculateBurrSpeedImpact(1600, 'flat');
+    const highCat: BurrSpeedCategory = high.speedCategory;
+    expect(highCat).toBe('high');
+    expect(high.clarityVsBody).toBe('full_body');
+    expect(high.heatGenerationScore).toBeGreaterThanOrEqual(70);
+
+    // 4. Odporność na null, stringi, wartości ujemne i -0
+    const fallbackRes = calculateBurrSpeedImpact(null as any, 'unknown');
+    expect(fallbackRes.rpm).toBe(900);
+    expect(fallbackRes.burrType).toBe('conical');
+    expect(fallbackRes.speedCategory).toBe('medium');
+    expect(fallbackRes.heatGenerationScore).toBeGreaterThan(0);
   });
 });
 
