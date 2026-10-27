@@ -33,6 +33,9 @@ import {
   calculateGrinderStepDelta,
   GrinderStepDeltaAnalysis,
   GrindAdjustmentDirection,
+  estimateGrinderRetention,
+  GrinderRetentionEstimate,
+  GrinderRetentionClass,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -1125,6 +1128,47 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(fallback.grinderId).toBe('generic_grinder');
     expect(fallback.direction).toBe('unchanged');
     expect(fallback.stepClicks).toBe(0);
+  });
+
+  test('TASK-P91-08-PRO: estimateGrinderRetention szacuje retencję komory żaren i dawkę przedmuchu (purge)', () => {
+    // 1. Młynek ręczny (Comandante C40) - ultra_low retention
+    const c40Ret: GrinderRetentionEstimate = estimateGrinderRetention('comandante_c40');
+    const classCheck: GrinderRetentionClass = c40Ret.retentionClass;
+    expect(classCheck).toBe('ultra_low');
+    expect(c40Ret.isHandGrinder).toBe(true);
+    expect(c40Ret.typicalRetentionGrams).toBeLessThanOrEqual(0.3);
+    expect(c40Ret.recommendedPurgeGrams).toBe(0);
+    expect(c40Ret.advicePl).toContain('ręczny');
+    expect(c40Ret.adviceEn.toLowerCase()).toContain('manual');
+
+    // 2. Młynek ręczny ze zmianą ziaren
+    const c40Change = estimateGrinderRetention('c40', { isChangingBeans: true });
+    expect(c40Change.recommendedPurgeGrams).toBe(1.0);
+
+    // 3. Młynek elektryczny single-dose (Fellow Ode Gen 2) - low retention
+    const odeRet = estimateGrinderRetention('fellow_ode_gen2');
+    expect(odeRet.retentionClass).toBe('low');
+    expect(odeRet.isHandGrinder).toBe(false);
+    expect(odeRet.typicalRetentionGrams).toBeLessThanOrEqual(0.8);
+
+    // 4. Młynek tradycyjny z hopperem (Baratza Encore) - medium retention
+    const encoreRet = estimateGrinderRetention('baratza_encore');
+    expect(encoreRet.retentionClass).toBe('medium');
+    expect(encoreRet.typicalRetentionGrams).toBeGreaterThan(0.8);
+    expect(encoreRet.recommendedPurgeGrams).toBeGreaterThanOrEqual(1.0);
+
+    // 5. Zmiana ziaren i duża zmiana nastawy na młynku hopperowym
+    const encoreHeavy = estimateGrinderRetention('baratza_encore', {
+      isChangingBeans: true,
+      isLargeGrindAdjustment: true,
+    });
+    expect(encoreHeavy.recommendedPurgeGrams).toBeGreaterThanOrEqual(3.0);
+
+    // 6. Odporność na null, undefined i nieznany identyfikator
+    const generic = estimateGrinderRetention(null);
+    expect(generic.grinderId).toBe('generic_grinder');
+    expect(generic.typicalRetentionGrams).toBeDefined();
+    expect(generic.advicePl).toBeDefined();
   });
 });
 

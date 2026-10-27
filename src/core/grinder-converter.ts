@@ -1799,5 +1799,132 @@ export function calculateGrinderStepDelta(
   };
 }
 
+export type GrinderRetentionClass = 'ultra_low' | 'low' | 'medium' | 'high';
+
+export interface GrinderRetentionEstimate {
+  grinderId: string;
+  grinderName: string;
+  isHandGrinder: boolean;
+  retentionClass: GrinderRetentionClass;
+  typicalRetentionGrams: number;
+  recommendedPurgeGrams: number;
+  advicePl: string;
+  adviceEn: string;
+}
+
+/**
+ * Szacuje retencję kawy w komorze żaren i wylocie młynka oraz rekomenduje dawkę przedmuchu (purge dose)
+ * przy zmianie ziaren lub znaczącej regulacji grubości mielenia.
+ */
+export function estimateGrinderRetention(
+  grinderId: string | undefined | null,
+  options?: {
+    isChangingBeans?: boolean;
+    isLargeGrindAdjustment?: boolean;
+  } | null
+): GrinderRetentionEstimate {
+  const cleanId = typeof grinderId === 'string' ? grinderId.trim().toLowerCase() : '';
+  const grinder =
+    (cleanId && findGrinderById(cleanId)) ||
+    SUPPORTED_GRINDERS.find((g) => g.id === 'generic_grinder') ||
+    SUPPORTED_GRINDERS[0];
+
+  const electricIds = new Set([
+    'fellow_ode_gen2',
+    'baratza_encore',
+    'wilfa_svart',
+    'eureka_mignon',
+    'niche_zero',
+    'mahlkoenig_ek43',
+    'timemore_sculptor',
+  ]);
+
+  const singleDoseElectricIds = new Set([
+    'fellow_ode_gen2',
+    'niche_zero',
+    'timemore_sculptor',
+  ]);
+
+  const isHand = !electricIds.has(grinder.id) && grinder.id !== 'generic_grinder';
+
+  let retentionClass: GrinderRetentionClass = 'medium';
+  let typicalRetentionGrams = 1.0;
+  let basePurgeGrams = 1.0;
+
+  if (isHand) {
+    retentionClass = 'ultra_low';
+    typicalRetentionGrams = 0.1;
+    basePurgeGrams = 0;
+  } else if (singleDoseElectricIds.has(grinder.id)) {
+    retentionClass = 'low';
+    typicalRetentionGrams = 0.4;
+    basePurgeGrams = 0.5;
+  } else if (grinder.id === 'eureka_mignon' || grinder.id === 'mahlkoenig_ek43') {
+    retentionClass = 'high';
+    typicalRetentionGrams = 2.5;
+    basePurgeGrams = 2.5;
+  } else if (grinder.id === 'baratza_encore' || grinder.id === 'wilfa_svart') {
+    retentionClass = 'medium';
+    typicalRetentionGrams = 1.2;
+    basePurgeGrams = 1.5;
+  } else {
+    // generic grinder
+    retentionClass = 'medium';
+    typicalRetentionGrams = 1.0;
+    basePurgeGrams = 1.0;
+  }
+
+  const isChangingBeans = Boolean(options?.isChangingBeans);
+  const isLargeGrindAdjustment = Boolean(options?.isLargeGrindAdjustment);
+
+  let recommendedPurgeGrams = basePurgeGrams;
+  if (isChangingBeans) {
+    if (retentionClass === 'ultra_low') {
+      recommendedPurgeGrams = 1.0;
+    } else if (retentionClass === 'low') {
+      recommendedPurgeGrams = 1.5;
+    } else if (retentionClass === 'medium') {
+      recommendedPurgeGrams = 2.5;
+    } else {
+      recommendedPurgeGrams = 4.0;
+    }
+  }
+
+  if (isLargeGrindAdjustment) {
+    recommendedPurgeGrams += retentionClass === 'ultra_low' ? 0.5 : 1.0;
+  }
+
+  recommendedPurgeGrams = Math.round(recommendedPurgeGrams * 10) / 10;
+
+  let advicePl = '';
+  let adviceEn = '';
+
+  if (retentionClass === 'ultra_low') {
+    advicePl = `Młynek ręczny ${grinder.name} posiada znikomą retencję (~${typicalRetentionGrams}g). Wystarczy delikatne ostukanie żaren.`;
+    adviceEn = `Manual grinder ${grinder.name} features negligible retention (~${typicalRetentionGrams}g). Gentle tap is sufficient.`;
+  } else if (retentionClass === 'low') {
+    advicePl = `Młynek single-dose ${grinder.name} charakteryzuje się niską retencją (~${typicalRetentionGrams}g). Rekomendowany przedmuch: ${recommendedPurgeGrams}g.`;
+    adviceEn = `Single-dose grinder ${grinder.name} features low retention (~${typicalRetentionGrams}g). Recommended purge: ${recommendedPurgeGrams}g.`;
+  } else if (retentionClass === 'medium') {
+    advicePl = `Młynek elektryczny ${grinder.name} ma umiarkowaną retencję (~${typicalRetentionGrams}g). Przed parzeniem zaleca się przemielić ${recommendedPurgeGrams}g kawy.`;
+    adviceEn = `Electric grinder ${grinder.name} has moderate retention (~${typicalRetentionGrams}g). Purging ${recommendedPurgeGrams}g of coffee recommended.`;
+  } else {
+    advicePl = `Młynek ${grinder.name} zatrzymuje sporo kawy w kanale wylotowym (~${typicalRetentionGrams}g). Wymagany przedmuch (purge): ${recommendedPurgeGrams}g.`;
+    adviceEn = `Grinder ${grinder.name} retains significant coffee in chute (~${typicalRetentionGrams}g). Required purge: ${recommendedPurgeGrams}g.`;
+  }
+
+  return {
+    grinderId: grinder.id,
+    grinderName: grinder.name,
+    isHandGrinder: isHand,
+    retentionClass,
+    typicalRetentionGrams,
+    recommendedPurgeGrams,
+    advicePl,
+    adviceEn,
+  };
+}
+
+
 
 
