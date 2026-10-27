@@ -21,6 +21,8 @@ import {
   isBackupEmpty,
   validateBackupEnvelopeIntegrity,
   BackupIntegrityReport,
+  sanitizeBackupEnvelope,
+  NaparBackupEnvelope,
   localISODate,
   stampOf,
   parseAndValidateBackup,
@@ -704,6 +706,49 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       const invalidJsonReport = validateBackupEnvelopeIntegrity('not a json');
       expect(invalidJsonReport.isValid).toBe(false);
       expect(invalidJsonReport.issues.length).toBeGreaterThan(0);
+    });
+
+    test('TASK-P83-05-ARC: sanitizeBackupEnvelope naprawia i normalizuje strukturę koperty kopii zapasowej', () => {
+      // 1. Zwykła poprawna koperta z zanieczyszczonymi rekordami (brakujące id, nie-obiekty)
+      const dirty = {
+        format: 'napar-backup',
+        schemaVersion: 1,
+        exportedAt: '2026-10-27T10:00:00Z',
+        state: {
+          inventory: [{ id: 'valid-1', name: 'Kenya' }, null, { name: 'No ID' }, 'string-item'],
+          customRecipes: [{ id: 'rec-1', name: 'V60' }],
+          sessions: [{ id: 'sess-1' }],
+          caffeineLogs: [{ id: 'caff-1' }],
+        },
+      };
+
+      const sanitized: NaparBackupEnvelope = sanitizeBackupEnvelope(dirty);
+      expect(sanitized.format).toBe('napar-backup');
+      expect(sanitized.schemaVersion).toBe(1);
+      expect(sanitized.state.inventory).toHaveLength(1);
+      expect(sanitized.state.inventory[0].id).toBe('valid-1');
+      expect(sanitized.state.customRecipes).toHaveLength(1);
+
+      // 2. Format legacy (użycie .data zamiast .state oraz .recipes zamiast .customRecipes)
+      const legacy = {
+        version: 1,
+        data: {
+          inventory: [{ id: 'leg-inv-1' }],
+          recipes: [{ id: 'leg-rec-1' }],
+        },
+      };
+      const fromLegacy = sanitizeBackupEnvelope(legacy);
+      expect(fromLegacy.format).toBe('napar-backup');
+      expect(fromLegacy.state.inventory).toHaveLength(1);
+      expect(fromLegacy.state.customRecipes).toHaveLength(1);
+      expect(fromLegacy.state.sessions).toEqual([]);
+
+      // 3. Odporność na null, undefined, nie-obiekt
+      const fromNull = sanitizeBackupEnvelope(null);
+      expect(fromNull.format).toBe('napar-backup');
+      expect(Array.isArray(fromNull.state.inventory)).toBe(true);
+      expect(Array.isArray(fromNull.state.sessions)).toBe(true);
+      expect(fromNull.schemaVersion).toBe(SCHEMA_VERSION);
     });
   });
 });

@@ -856,3 +856,74 @@ export function validateBackupEnvelopeIntegrity(candidate: unknown): BackupInteg
     exportedAtIso,
   };
 }
+
+/**
+ * Sanityzuje i normalizuje nieznaną strukturę kopii zapasowej do kanonicznego formatu NaparBackupEnvelope.
+ * Naprawia brakujące lub uszkodzone kolekcje (inventory, customRecipes/recipes, sessions, caffeineLogs),
+ * migruje dane z kontenera legacy .data do .state, filtruje uszkodzone rekordy (wymagające id i obiektu)
+ * oraz uzupełnia brakujące metadane koperty.
+ */
+export function sanitizeBackupEnvelope(candidate: unknown): NaparBackupEnvelope {
+  const defaultEmptyState: NaparBackupData = {
+    inventory: [],
+    customRecipes: [],
+    sessions: [],
+    caffeineLogs: [],
+    settings: {},
+  };
+
+  const defaultEnvelope: NaparBackupEnvelope = {
+    format: 'napar-backup',
+    schemaVersion: SCHEMA_VERSION,
+    exportedAt: new Date().toISOString(),
+    state: defaultEmptyState,
+  };
+
+  if (!candidate || typeof candidate !== 'object') {
+    return defaultEnvelope;
+  }
+
+  const obj = candidate as Record<string, any>;
+  const rawState = obj.state && typeof obj.state === 'object' ? obj.state : obj.data && typeof obj.data === 'object' ? obj.data : obj;
+
+  const sanitizeArray = <T extends { id?: any }>(arr: unknown): T[] => {
+    if (!Array.isArray(arr)) return [];
+    return arr.filter((item): item is T => {
+      return item && typeof item === 'object' && typeof item.id === 'string' && item.id.trim().length > 0;
+    });
+  };
+
+  const sanitizedInventory = sanitizeArray<InventoryItem>(rawState.inventory);
+  const rawRecipes = rawState.customRecipes || rawState.recipes;
+  const sanitizedRecipes = sanitizeArray<SavedRecipe>(rawRecipes);
+  const sanitizedSessions = sanitizeArray<BrewSession>(rawState.sessions);
+  const sanitizedCaffeine = sanitizeArray<CaffeineLog>(rawState.caffeineLogs || rawState.caffeine);
+
+  const rawSettings = rawState.settings;
+  const sanitizedSettings: Record<string, unknown> =
+    rawSettings && typeof rawSettings === 'object' && !Array.isArray(rawSettings) ? { ...rawSettings } : {};
+
+  const schemaVersion =
+    typeof obj.schemaVersion === 'number' && Number.isFinite(obj.schemaVersion) && obj.schemaVersion > 0
+      ? Math.floor(obj.schemaVersion)
+      : SCHEMA_VERSION;
+
+  const exportedAt =
+    typeof obj.exportedAt === 'string' && obj.exportedAt.trim()
+      ? obj.exportedAt.trim()
+      : new Date().toISOString();
+
+  return {
+    format: 'napar-backup',
+    schemaVersion,
+    exportedAt,
+    state: {
+      inventory: sanitizedInventory,
+      customRecipes: sanitizedRecipes,
+      sessions: sanitizedSessions,
+      caffeineLogs: sanitizedCaffeine,
+      settings: sanitizedSettings,
+    },
+  };
+}
+
