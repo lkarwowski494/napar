@@ -20,6 +20,9 @@ import {
   calculateBypassBrew,
   BypassBrewParams,
   BypassBrewResult,
+  calculateEspressoFlowRate,
+  classifyEspressoFlowRate,
+  EspressoFlowRateEvaluation,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -740,6 +743,45 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(() => calculateBypassBrew({ concentrateDoseGrams: 20, concentrateWaterGrams: 100 })).toThrow();
       expect(() => calculateBypassBrew({ concentrateDoseGrams: 20, concentrateWaterGrams: 200, targetTotalWaterGrams: 100 })).toThrow();
       expect(() => calculateBypassBrew({ concentrateDoseGrams: 20, concentrateWaterGrams: 200, targetRatio: 5 })).toThrow();
+    });
+  });
+
+  describe('TASK-P70-11-WZR: calculateEspressoFlowRate i classifyEspressoFlowRate', () => {
+    it('oblicza prędkość przepływu espresso (g/s)', () => {
+      // 36g w 27s = 1.33 g/s
+      expect(calculateEspressoFlowRate(36, 27)).toBe(1.33);
+      // 40g w 20s = 2.0 g/s
+      expect(calculateEspressoFlowRate(40, 20)).toBe(2.0);
+      // Obsługa stringów z przecinkami
+      expect(calculateEspressoFlowRate('36,0 g', '30,0 s')).toBe(1.2);
+      // Bezpieczeństwo zerowe i ujemne
+      expect(calculateEspressoFlowRate(0, 25)).toBe(0);
+      expect(calculateEspressoFlowRate(36, 0)).toBe(0);
+      expect(calculateEspressoFlowRate(-36, 25)).toBe(0);
+      expect(calculateEspressoFlowRate(NaN, 25)).toBe(0);
+    });
+
+    it('klasyfikuje przepływ espresso (too_slow, optimal, too_fast)', () => {
+      // Optymalny: 1.33 g/s
+      const opt: EspressoFlowRateEvaluation = classifyEspressoFlowRate(1.33);
+      expect(opt.status).toBe('optimal');
+      expect(opt.labelPl).toContain('Optymalny');
+      expect(opt.flowRateGps).toBe(1.33);
+
+      // Zbyt wolny (dławienie): 0.6 g/s
+      const slow = classifyEspressoFlowRate(0.6);
+      expect(slow.status).toBe('too_slow');
+      expect(slow.labelPl).toContain('wolny');
+
+      // Zbyt szybki (gushing): 2.5 g/s
+      const fast = classifyEspressoFlowRate(2.5);
+      expect(fast.status).toBe('too_fast');
+      expect(fast.labelPl).toContain('szybki');
+
+      // Odporność na stringi i wartości brzegowe
+      expect(classifyEspressoFlowRate('1,25').status).toBe('optimal');
+      expect(classifyEspressoFlowRate(NaN).status).toBe('too_slow');
+      expect(classifyEspressoFlowRate(null as any).status).toBe('too_slow');
     });
   });
 });

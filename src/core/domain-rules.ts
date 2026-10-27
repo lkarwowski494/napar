@@ -831,3 +831,100 @@ export function calculateBypassBrew(params: BypassBrewParams): BypassBrewResult 
 
 
 
+
+
+export interface EspressoFlowRateEvaluation {
+  flowRateGps: number;
+  status: 'too_slow' | 'optimal' | 'too_fast';
+  labelPl: string;
+  labelEn: string;
+  diagnosisPl: string;
+  diagnosisEn: string;
+}
+
+/**
+ * RD-26: Oblicza średnią prędkość przepływu espresso (g/s).
+ */
+export function calculateEspressoFlowRate(
+  beverageYieldGrams: number | string,
+  brewTimeSeconds: number | string
+): number {
+  const yieldG =
+    typeof beverageYieldGrams === 'number'
+      ? beverageYieldGrams
+      : typeof beverageYieldGrams === 'string'
+      ? parseFloat(beverageYieldGrams.replace(/\uFEFF/g, '').replace(',', '.').trim())
+      : NaN;
+
+  const timeS =
+    typeof brewTimeSeconds === 'number'
+      ? brewTimeSeconds
+      : typeof brewTimeSeconds === 'string'
+      ? parseFloat(brewTimeSeconds.replace(/\uFEFF/g, '').replace(',', '.').trim())
+      : NaN;
+
+  if (
+    !Number.isFinite(yieldG) ||
+    !Number.isFinite(timeS) ||
+    yieldG <= 0 ||
+    timeS <= 0 ||
+    Object.is(yieldG, -0) ||
+    Object.is(timeS, -0)
+  ) {
+    return 0;
+  }
+
+  const rate = yieldG / timeS;
+  return Number(rate.toFixed(2));
+}
+
+/**
+ * RD-27: Klasyfikuje przepływ espresso w celu diagnozy ekstrakcji.
+ * Standard specialty espresso: 1.0 - 1.8 g/s (typowo 36g w 25-30s = 1.2-1.4 g/s).
+ */
+export function classifyEspressoFlowRate(
+  flowRateGps: number | string
+): EspressoFlowRateEvaluation {
+  const rate =
+    typeof flowRateGps === 'number'
+      ? flowRateGps
+      : typeof flowRateGps === 'string'
+      ? parseFloat(flowRateGps.replace(/\uFEFF/g, '').replace(',', '.').trim())
+      : NaN;
+
+  const safeRate = Number.isFinite(rate) && rate > 0 && !Object.is(rate, -0) ? rate : 0;
+  const roundedRate = Number(safeRate.toFixed(2));
+
+  if (roundedRate < 1.0) {
+    return {
+      flowRateGps: roundedRate,
+      status: 'too_slow',
+      labelPl: 'Zbyt wolny (dławienie)',
+      labelEn: 'Too Slow (Restricted)',
+      diagnosisPl: 'Kawa wypływa zbyt wolno; ryzyko przeparzenia i goryczy. Zmiel grubiej.',
+      diagnosisEn: 'Flow is choked; risk of over-extraction and bitterness. Grind coarser.',
+    };
+  }
+
+  if (roundedRate > 1.8) {
+    return {
+      flowRateGps: roundedRate,
+      status: 'too_fast',
+      labelPl: 'Zbyt szybki (gushing)',
+      labelEn: 'Too Fast (Gushing)',
+      diagnosisPl:
+        'Kawa wypływa zbyt gwałtownie; ryzyko niedoparzenia i kwasowości. Zmiel drobniej lub popraw dystrybucję (WDT).',
+      diagnosisEn:
+        'Flow is rushing; risk of under-extraction and sourness. Grind finer or improve distribution (WDT).',
+    };
+  }
+
+  return {
+    flowRateGps: roundedRate,
+    status: 'optimal',
+    labelPl: 'Optymalny',
+    labelEn: 'Optimal',
+    diagnosisPl: 'Wzorcowe tempo ekstrakcji espresso w stylu specialty.',
+    diagnosisEn: 'Standard specialty espresso extraction flow rate.',
+  };
+}
