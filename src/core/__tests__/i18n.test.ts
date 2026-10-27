@@ -38,6 +38,7 @@ import {
   plural,
   getPluralCategory,
   formatTemplate,
+  formatWcagRating,
 } from '../i18n';
 import { getAppSetting } from '../database';
 
@@ -417,5 +418,41 @@ describe('i18n System', () => {
   test('TASK-P42-09-LOK: Klucz markFinishedAndArchive jest zdefiniowany w stash w PL i EN', () => {
     expect(translations.pl.stash.markFinishedAndArchive).toBe('Oznacz jako zużytą i zarchiwizuj');
     expect(translations.en.stash.markFinishedAndArchive).toBe('Mark as Finished & Archive');
+  });
+
+  test('TASK-P58-09-LOK: formatTemplate oczyszcza BOM, chroni przed -0, obsluguje null/undefined', () => {
+    expect(formatTemplate('\uFEFFWaga: {val}g', { val: -0 })).toBe('Waga: 0g');
+    expect(formatTemplate('Uzytkownik: {name}', { name: undefined as any })).toBe('Uzytkownik: ');
+    expect(formatTemplate('Kawa: {bean}, Notatki: {notes}', { bean: 'Etiopia', notes: null as any })).toBe('Kawa: Etiopia, Notatki: ');
+    expect(formatTemplate(null as any, { val: 123 })).toBe('');
+    expect(formatTemplate(undefined as any, { val: 123 })).toBe('');
+  });
+
+  test('TASK-P58-09-LOK: pluralPl oraz plural parsuja stringi, przecinki i chronia przed -0 / NaN', () => {
+    expect(pluralPl('1' as any, 'klik', 'kliki', 'klików')).toBe('klik');
+    expect(pluralPl('2' as any, 'klik', 'kliki', 'klików')).toBe('kliki');
+    expect(pluralPl('2,5' as any, 'klik', 'kliki', 'klików')).toBe('kliki');
+    expect(pluralPl(-0, 'klik', 'kliki', 'klików')).toBe('klików');
+    expect(pluralPl(NaN, 'klik', 'kliki', 'klików')).toBe('klików');
+
+    expect(plural('pl', '1' as any, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekunda');
+    expect(plural('pl', '3' as any, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekundy');
+    expect(plural('en', '1' as any, { one: 'second', other: 'seconds' })).toBe('second');
+    expect(plural('en', '5' as any, { one: 'second', other: 'seconds' })).toBe('seconds');
+  });
+
+  test('TASK-P58-09-LOK: formatWcagRating poprawnie ocenia i formatuje orzeczenia WCAG w PL i EN', () => {
+    // Normal text (progi 4.5:1 dla AA, 7.0:1 dla AAA)
+    expect(formatWcagRating(7.5, false, 'pl')).toContain('AAA');
+    expect(formatWcagRating(7.5, false, 'en')).toContain('AAA');
+    expect(formatWcagRating(5.0, false, 'pl')).toContain('AA');
+    expect(formatWcagRating(5.0, false, 'en')).toContain('AA');
+    expect(formatWcagRating(3.5, false, 'pl')).toContain('Niezgodny');
+    expect(formatWcagRating(3.5, false, 'en')).toContain('Fail');
+
+    // Large text (progi 3.0:1 dla AA, 4.5:1 dla AAA)
+    expect(formatWcagRating(5.0, true, 'pl')).toContain('AAA');
+    expect(formatWcagRating(3.5, true, 'pl')).toContain('AA');
+    expect(formatWcagRating(2.5, true, 'pl')).toContain('Niezgodny');
   });
 });

@@ -1384,24 +1384,40 @@ export function getCurrentTranslations(): Translations {
   return translations[lang] || translations.en;
 }
 
+function parseCount(count: number | string | any): number {
+  if (typeof count === 'number') {
+    if (isNaN(count)) return NaN;
+    return Object.is(count, -0) ? 0 : count;
+  }
+  if (typeof count === 'string') {
+    const clean = count.replace(/\uFEFF/g, '').replace(',', '.').trim();
+    const parsed = parseFloat(clean);
+    if (isNaN(parsed)) return NaN;
+    return Object.is(parsed, -0) ? 0 : parsed;
+  }
+  return NaN;
+}
+
 /**
  * Wykrywa kategorię liczby mnogiej zgodnie z regułami CLDR / Intl.PluralRules.
  * Posiada wbudowany bezpieczny fallback dla środowiska Hermes / braku pełnego Intl.
  */
 export function getPluralCategory(
   lang: string,
-  count: number
+  count: number | string
 ): 'zero' | 'one' | 'two' | 'few' | 'many' | 'other' {
+  const parsed = parseCount(count);
+  const num = isNaN(parsed) ? 0 : parsed;
   try {
     if (typeof Intl !== 'undefined' && typeof Intl.PluralRules === 'function') {
-      return new Intl.PluralRules(lang).select(count) as any;
+      return new Intl.PluralRules(lang).select(num) as any;
     }
   } catch {
     // bezpieczny fallback dla Hermesa
   }
 
-  const abs = Math.abs(Math.floor(count));
-  if (lang.toLowerCase().startsWith('pl')) {
+  const abs = Math.abs(Math.floor(num));
+  if (typeof lang === 'string' && lang.toLowerCase().startsWith('pl')) {
     const n = abs % 100;
     const n10 = n % 10;
     if (abs === 1) return 'one';
@@ -1419,8 +1435,10 @@ export function getPluralCategory(
  * - jeśli n10 in {2, 3, 4} i n not in {12, 13, 14} -> few (np. 2 serie, 22 serie, 104 serie)
  * - inaczej -> many (np. 0 serii, 5 serii, 12 serii, 21 serii, 112 serii)
  */
-export function pluralPl(count: number, one: string, few: string, many: string): string {
-  const abs = Math.abs(Math.floor(count));
+export function pluralPl(count: number | string, one: string, few: string, many: string): string {
+  const parsed = parseCount(count);
+  if (isNaN(parsed)) return many;
+  const abs = Math.abs(Math.floor(parsed));
   const n = abs % 100;
   const n10 = n % 10;
   if (abs === 1) return one;
@@ -1433,7 +1451,7 @@ export function pluralPl(count: number, one: string, few: string, many: string):
  */
 export function plural(
   lang: SupportedLanguage,
-  count: number,
+  count: number | string,
   forms: { one: string; few?: string; many?: string; other?: string; zero?: string; two?: string }
 ): string {
   const category = getPluralCategory(lang, count);
@@ -1448,11 +1466,42 @@ export function plural(
 /**
  * Uniwersalny formatator szablonów z podstawianiem tokenów {param} (wielokrotne wystąpienia)
  */
-export function formatTemplate(template: string, params: Record<string, string | number>): string {
-  if (!template) return '';
-  let result = template;
+export function formatTemplate(template: string, params: Record<string, string | number | any>): string {
+  if (typeof template !== 'string' || !template) return '';
+  let result = template.replace(/\uFEFF/g, '');
+  if (!params || typeof params !== 'object') return result;
   for (const [key, value] of Object.entries(params)) {
-    result = result.split(`{${key}}`).join(String(value));
+    let strVal = '';
+    if (value !== undefined && value !== null) {
+      if (typeof value === 'number') {
+        strVal = Object.is(value, -0) ? '0' : String(value);
+      } else {
+        strVal = String(value);
+      }
+    }
+    result = result.split(`{${key}}`).join(strVal);
   }
   return result;
+}
+
+/**
+ * Zwraca sformatowane i zlokalizowane orzeczenie dostępności kontrastu WCAG 2.1
+ */
+export function formatWcagRating(
+  ratio: number,
+  isLargeText = false,
+  lang: SupportedLanguage | string = 'pl'
+): string {
+  const cleanLang = typeof lang === 'string' && lang.toLowerCase().startsWith('pl') ? 'pl' : 'en';
+  const safeRatio = Number.isFinite(ratio) ? Math.max(0, ratio) : 0;
+  const thresholdAAA = isLargeText ? 4.5 : 7.0;
+  const thresholdAA = isLargeText ? 3.0 : 4.5;
+
+  if (safeRatio >= thresholdAAA) {
+    return cleanLang === 'pl' ? 'WCAG AAA (Znakomity)' : 'WCAG AAA (Enhanced)';
+  }
+  if (safeRatio >= thresholdAA) {
+    return cleanLang === 'pl' ? 'WCAG AA (Zgodny)' : 'WCAG AA (Pass)';
+  }
+  return cleanLang === 'pl' ? 'Niezgodny (Fail)' : 'Fail';
 }
