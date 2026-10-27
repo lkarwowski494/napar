@@ -1,0 +1,53 @@
+{
+  "cycle": "P70",
+  "status": "completed",
+  "perspectives": [
+    "09-LOK",
+    "10-WYD",
+    "11-WZR",
+    "12-NIE",
+    "01-ODK"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P70-09-LOK",
+      "perspective": "09-LOK",
+      "description": "Dodanie formatowania prędkości przepływu naparu formatFlowRate (g/s) z lokalizacją i sanityzacją w src/core/unit-converter.ts",
+      "targetFile": "src/core/unit-converter.ts",
+      "testFile": "src/core/__tests__/unit-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P70-10-WYD",
+      "perspective": "10-WYD",
+      "description": "Dodanie szybkiej metody wyliczania pozostałego czasu receptury calculateRemainingRecipeTime w src/core/timer-engine.ts oraz benchmarku Budżet 9 w src/core/__tests__/perf-budget.test.ts",
+      "targetFile": "src/core/timer-engine.ts",
+      "testFile": "src/core/__tests__/timer-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P70-11-WZR",
+      "perspective": "11-WZR",
+      "description": "Wdrożenie kalkulatora i klasyfikatora przepływu espresso calculateEspressoFlowRate i classifyEspressoFlowRate z typem EspressoFlowRateEvaluation w src/core/domain-rules.ts",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P70-12-NIE",
+      "perspective": "12-NIE",
+      "description": "Rozbudowa pakietu testów odpornościowych o zestaw Chaos 13 dla funkcji z P69 i P70 w src/core/__tests__/fuzz-resilience.test.ts",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P70-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Implementacja segmentacji podświetlania wyników wyszukiwania highlightSearchMatch z typem SearchHighlightSegment w src/core/search-utils.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    }
+  ]
+}
