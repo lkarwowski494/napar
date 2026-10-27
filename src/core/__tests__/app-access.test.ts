@@ -38,6 +38,8 @@ import {
   TrialProgressInfo,
   getPaywallCallToAction,
   PaywallCallToAction,
+  formatSubscriptionDiscount,
+  SubscriptionDiscountInfo,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1451,6 +1453,36 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const defaultCta = getPaywallCallToAction(null);
     expect(defaultCta).toBeDefined();
     expect(typeof defaultCta.urgency).toBe('string');
+  });
+
+  test('TASK-P80-02-MON: formatSubscriptionDiscount wylicza rabat i oszczędność na paywallu', () => {
+    // 1. Standardowy rabat (np. plan roczny 120 zł vs 12 * 15 zł = 180 zł -> 33% rabatu, 60 zł oszczędności)
+    const discount: SubscriptionDiscountInfo = formatSubscriptionDiscount(180, 120, 'zł');
+    expect(discount.hasDiscount).toBe(true);
+    expect(discount.discountPercent).toBe(33);
+    expect(discount.discountFormatted).toBe('-33%');
+    expect(discount.savedAmount).toBe(60);
+    expect(discount.savingsLabelPl).toContain('60,00 zł');
+    expect(discount.savingsLabelPl).toContain('-33%');
+    expect(discount.savingsLabelEn).toContain('Save');
+
+    // 2. Stringi z przecinkami
+    const strDiscount = formatSubscriptionDiscount('100,00', '75,00', 'zł');
+    expect(strDiscount.hasDiscount).toBe(true);
+    expect(strDiscount.discountPercent).toBe(25);
+    expect(strDiscount.savedAmount).toBe(25);
+
+    // 3. Brak rabatu (cena promocyjna równa lub wyższa od bazowej)
+    const noDiscount = formatSubscriptionDiscount(100, 100);
+    expect(noDiscount.hasDiscount).toBe(false);
+    expect(noDiscount.discountPercent).toBe(0);
+    expect(noDiscount.savedAmount).toBe(0);
+    expect(noDiscount.savingsLabelPl).toBe('Brak rabatu');
+
+    // 4. Odporność na zera, wartości ujemne, null i undefined
+    const fallback = formatSubscriptionDiscount(null as any, -50);
+    expect(fallback.hasDiscount).toBe(false);
+    expect(fallback.discountPercent).toBe(0);
   });
 });
 

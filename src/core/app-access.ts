@@ -1130,3 +1130,68 @@ export function getPaywallCallToAction(state?: AppAccessState | null): PaywallCa
     recommendedTier: 'annual',
   };
 }
+
+
+export interface SubscriptionDiscountInfo {
+  discountPercent: number;
+  discountFormatted: string;
+  savedAmount: number;
+  savingsLabelPl: string;
+  savingsLabelEn: string;
+  hasDiscount: boolean;
+}
+
+/**
+ * Oblicza procentowy rabat i kwotę oszczędności pomiędzy ceną bazową (np. 12x subskrypcja miesięczna)
+ * a ceną promocyjną lub roczną, formatując zlokalizowane etykiety dla widoku paywalla.
+ */
+export function formatSubscriptionDiscount(
+  basePrice: number | string | undefined | null,
+  discountedPrice: number | string | undefined | null,
+  currencySymbol = 'zł'
+): SubscriptionDiscountInfo {
+  const parseVal = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(/[^\d.,-]/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const base = parseVal(basePrice);
+  const discounted = parseVal(discountedPrice);
+
+  if (base <= 0 || discounted >= base) {
+    return {
+      discountPercent: 0,
+      discountFormatted: '0%',
+      savedAmount: 0,
+      savingsLabelPl: 'Brak rabatu',
+      savingsLabelEn: 'No discount',
+      hasDiscount: false,
+    };
+  }
+
+  const rawDiff = base - discounted;
+  const savedAmount = Number(rawDiff.toFixed(2));
+  const rawPct = Math.round((rawDiff / base) * 100);
+  const discountPercent = Math.min(100, Math.max(1, rawPct));
+  const discountFormatted = `-${discountPercent}%`;
+
+  const sym = typeof currencySymbol === 'string' && currencySymbol.trim() ? currencySymbol.trim() : 'zł';
+  const savedPl = savedAmount.toFixed(2).replace('.', ',');
+  const savedEn = savedAmount.toFixed(2);
+
+  const savingsLabelPl = `Oszczędzasz ${savedPl} ${sym} (${discountFormatted})`;
+  const savingsLabelEn = `Save ${savedEn} ${sym} (${discountPercent}% off)`;
+
+  return {
+    discountPercent,
+    discountFormatted,
+    savedAmount,
+    savingsLabelPl,
+    savingsLabelEn,
+    hasDiscount: true,
+  };
+}
