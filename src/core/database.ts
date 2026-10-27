@@ -351,6 +351,84 @@ export function getInventoryOutOfStockItems(includeArchived = false): InventoryI
   });
 }
 
+export type InventorySortOption =
+  | 'roast_date_desc'
+  | 'roast_date_asc'
+  | 'remaining_desc'
+  | 'remaining_asc'
+  | 'name_asc'
+  | 'rating_desc';
+
+/**
+ * Sortuje pozycje ze spiżarni według wybranego kryterium.
+ */
+export function sortInventoryItems(
+  items: InventoryItem[],
+  sortBy: InventorySortOption = 'roast_date_desc'
+): InventoryItem[] {
+  if (!Array.isArray(items)) return [];
+  const copy = [...items];
+
+  return copy.sort((a, b) => {
+    if (!a && !b) return 0;
+    if (!a) return 1;
+    if (!b) return -1;
+
+    switch (sortBy) {
+      case 'roast_date_desc': {
+        const dateA = a.roastOrHarvestDate ? new Date(a.roastOrHarvestDate).getTime() : 0;
+        const dateB = b.roastOrHarvestDate ? new Date(b.roastOrHarvestDate).getTime() : 0;
+        const safeA = Number.isFinite(dateA) ? dateA : 0;
+        const safeB = Number.isFinite(dateB) ? dateB : 0;
+        if (safeB !== safeA) return safeB - safeA;
+        return a.name.localeCompare(b.name);
+      }
+      case 'roast_date_asc': {
+        const dateA = a.roastOrHarvestDate ? new Date(a.roastOrHarvestDate).getTime() : Infinity;
+        const dateB = b.roastOrHarvestDate ? new Date(b.roastOrHarvestDate).getTime() : Infinity;
+        const safeA = Number.isFinite(dateA) ? dateA : Infinity;
+        const safeB = Number.isFinite(dateB) ? dateB : Infinity;
+        if (safeA !== safeB) return safeA - safeB;
+        return a.name.localeCompare(b.name);
+      }
+      case 'remaining_desc': {
+        const remA = Number(a.remainingWeightGrams) || 0;
+        const remB = Number(b.remainingWeightGrams) || 0;
+        if (remB !== remA) return remB - remA;
+        return a.name.localeCompare(b.name);
+      }
+      case 'remaining_asc': {
+        const remA = Number(a.remainingWeightGrams) || 0;
+        const remB = Number(b.remainingWeightGrams) || 0;
+        if (remA !== remB) return remA - remB;
+        return a.name.localeCompare(b.name);
+      }
+      case 'name_asc': {
+        return a.name.localeCompare(b.name);
+      }
+      case 'rating_desc': {
+        const ratA = Number(a.rating) || 0;
+        const ratB = Number(b.rating) || 0;
+        if (ratB !== ratA) return ratB - ratA;
+        return a.name.localeCompare(b.name);
+      }
+      default:
+        return a.name.localeCompare(b.name);
+    }
+  });
+}
+
+/**
+ * Pobiera pozycje ze spiżarni posortowane według wybranego kryterium.
+ */
+export function getSortedInventoryItems(
+  sortBy: InventorySortOption = 'roast_date_desc',
+  includeArchived = false
+): InventoryItem[] {
+  const items = getInventoryItems(includeArchived);
+  return sortInventoryItems(items, sortBy);
+}
+
 export function getInventoryItemById(id: string): InventoryItem | null {
   if (!id || typeof id !== 'string' || !id.trim()) return null;
   const safeId = id.trim();

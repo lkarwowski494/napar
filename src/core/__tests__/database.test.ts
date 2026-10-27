@@ -10,6 +10,9 @@ import {
   getInventoryTotalWeight,
   getInventoryLowStockItems,
   getInventoryOutOfStockItems,
+  sortInventoryItems,
+  getSortedInventoryItems,
+  InventorySortOption,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -2545,5 +2548,98 @@ describe('Napar SQLite Database & Repositories', () => {
     const outOfStock = getInventoryOutOfStockItems();
     expect(outOfStock.length).toBe(1);
     expect(outOfStock[0].id).toBe('bean-empty-1');
+  });
+
+  test('TASK-P68-03-ZAK: sortInventoryItems i getSortedInventoryItems sortuja pozycje spizarni', () => {
+    const opt: InventorySortOption = 'roast_date_desc';
+    expect(opt).toBe('roast_date_desc');
+
+    const bFresh: InventoryItem = {
+      id: 'b-fresh',
+      name: 'Kenya Nyeri',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 100,
+      roastOrHarvestDate: '2026-10-20',
+      rating: 4.8,
+      isArchived: false,
+      isFavorite: true,
+      flavorNotes: [],
+      createdAt: '2026-10-20T08:00:00Z',
+      updatedAt: '2026-10-20T08:00:00Z',
+    };
+
+    const bOld: InventoryItem = {
+      id: 'b-old',
+      name: 'Brazil Santos',
+      type: 'coffee',
+      initialWeightGrams: 1000,
+      remainingWeightGrams: 500,
+      roastOrHarvestDate: '2026-09-01',
+      rating: 4.0,
+      isArchived: false,
+      isFavorite: false,
+      flavorNotes: [],
+      createdAt: '2026-09-01T08:00:00Z',
+      updatedAt: '2026-09-01T08:00:00Z',
+    };
+
+    const bNoDate: InventoryItem = {
+      id: 'b-nodate',
+      name: 'Artisan Blend',
+      type: 'coffee',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 25,
+      rating: 4.5,
+      isArchived: false,
+      isFavorite: false,
+      flavorNotes: [],
+      createdAt: '2026-10-01T08:00:00Z',
+      updatedAt: '2026-10-01T08:00:00Z',
+    };
+
+    const items = [bOld, bNoDate, bFresh];
+
+    // 1. roast_date_desc (najświeższe pierwsze)
+    const sortedFresh = sortInventoryItems(items, 'roast_date_desc');
+    expect(sortedFresh[0].id).toBe('b-fresh');
+    expect(sortedFresh[1].id).toBe('b-old');
+    expect(sortedFresh[2].id).toBe('b-nodate');
+
+    // 2. remaining_desc (najwięcej pozostało)
+    const sortedRem = sortInventoryItems(items, 'remaining_desc');
+    expect(sortedRem[0].id).toBe('b-old'); // 500g
+    expect(sortedRem[1].id).toBe('b-fresh'); // 100g
+    expect(sortedRem[2].id).toBe('b-nodate'); // 25g
+
+    // 3. remaining_asc (najmniej pozostało)
+    const sortedRemAsc = sortInventoryItems(items, 'remaining_asc');
+    expect(sortedRemAsc[0].id).toBe('b-nodate'); // 25g
+    expect(sortedRemAsc[2].id).toBe('b-old'); // 500g
+
+    // 4. name_asc (alfabetycznie)
+    const sortedName = sortInventoryItems(items, 'name_asc');
+    expect(sortedName[0].name).toBe('Artisan Blend');
+    expect(sortedName[1].name).toBe('Brazil Santos');
+    expect(sortedName[2].name).toBe('Kenya Nyeri');
+
+    // 5. rating_desc (najwyższa ocena)
+    const sortedRating = sortInventoryItems(items, 'rating_desc');
+    expect(sortedRating[0].id).toBe('b-fresh'); // 4.8
+    expect(sortedRating[1].id).toBe('b-nodate'); // 4.5
+    expect(sortedRating[2].id).toBe('b-old'); // 4.0
+
+    // 6. getSortedInventoryItems z bazy danych
+    initDatabase(mockDb as any);
+    mockDb.inventory.clear();
+    mockDb.inventory.set(bFresh.id, { ...bFresh, is_favorite: 1, is_archived: 0, remaining_weight_g: 100 });
+    mockDb.inventory.set(bOld.id, { ...bOld, is_favorite: 0, is_archived: 0, remaining_weight_g: 500 });
+    const fromDb = getSortedInventoryItems('remaining_desc');
+    expect(fromDb.length).toBe(2);
+    expect(fromDb[0].id).toBe('b-old');
+
+    // 7. Bezpieczeństwo null/undefined
+    expect(sortInventoryItems(null as any)).toEqual([]);
+    expect(sortInventoryItems([null as any, bFresh])).toBeDefined();
   });
 });
