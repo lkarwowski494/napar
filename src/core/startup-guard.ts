@@ -26,10 +26,29 @@ export const crashLoopGuard = {
         return { crash_count: 0, lastAttemptAt: new Date().toISOString() };
       }
       const raw = await FileSystem.readAsStringAsync(path);
-      const parsed = JSON.parse(raw);
+      const cleanRaw = (raw || '').replace(/\uFEFF/g, '').trim();
+      if (!cleanRaw) {
+        return { crash_count: 0, lastAttemptAt: new Date().toISOString() };
+      }
+      const parsed = JSON.parse(cleanRaw);
+      let crashCount = 0;
+      if (
+        typeof parsed.crash_count === 'number' &&
+        Number.isFinite(parsed.crash_count) &&
+        parsed.crash_count > 0 &&
+        !Object.is(parsed.crash_count, -0)
+      ) {
+        crashCount = Math.min(100, Math.floor(parsed.crash_count));
+      }
+
+      const validDate =
+        typeof parsed.lastAttemptAt === 'string' && !isNaN(new Date(parsed.lastAttemptAt).getTime())
+          ? parsed.lastAttemptAt
+          : new Date().toISOString();
+
       return {
-        crash_count: typeof parsed.crash_count === 'number' ? parsed.crash_count : 0,
-        lastAttemptAt: parsed.lastAttemptAt || new Date().toISOString(),
+        crash_count: crashCount,
+        lastAttemptAt: validDate,
       };
     } catch {
       return { crash_count: 0, lastAttemptAt: new Date().toISOString() };
@@ -47,7 +66,7 @@ export const crashLoopGuard = {
 
   async recordStartupAttempt(): Promise<{ crashCount: number; shouldEnterSafeMode: boolean }> {
     const state = await this.readState();
-    state.crash_count += 1;
+    state.crash_count = Math.min(100, state.crash_count + 1);
     state.lastAttemptAt = new Date().toISOString();
     await this.writeState(state);
 

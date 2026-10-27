@@ -89,4 +89,36 @@ describe('Startup Crash Loop Guard (TASK-R12-01)', () => {
       (FileSystem as any).writeAsStringAsync = origWrite;
     }
   });
+
+  test('TASK-P60-10-WYD: readState oczyszcza BOM i poprawnie parsuje plik ze znacznikiem \uFEFF', async () => {
+    const rawWithBom = '\uFEFF' + JSON.stringify({ crash_count: 2, lastAttemptAt: '2026-10-27T07:00:00.000Z' });
+    await FileSystem.writeAsStringAsync('', rawWithBom);
+
+    const state = await crashLoopGuard.readState();
+    expect(state.crash_count).toBe(2);
+    expect(state.lastAttemptAt).toBe('2026-10-27T07:00:00.000Z');
+  });
+
+  test('TASK-P60-10-WYD: readState i recordStartupAttempt chronią przed wartościami ujemnymi, -0, NaN i nieprawidłowymi datami', async () => {
+    const corrupted = JSON.stringify({ crash_count: -10, lastAttemptAt: 'not-a-valid-date' });
+    await FileSystem.writeAsStringAsync('', corrupted);
+
+    const state = await crashLoopGuard.readState();
+    expect(state.crash_count).toBe(0);
+    expect(!isNaN(new Date(state.lastAttemptAt).getTime())).toBe(true);
+
+    const nextAttempt = await crashLoopGuard.recordStartupAttempt();
+    expect(nextAttempt.crashCount).toBe(1);
+    expect(nextAttempt.shouldEnterSafeMode).toBe(false);
+  });
+
+  test('TASK-P60-10-WYD: recordStartupAttempt ogranicza maksymalny licznik awarii do 100', async () => {
+    await FileSystem.writeAsStringAsync('', JSON.stringify({ crash_count: 999, lastAttemptAt: new Date().toISOString() }));
+    const state = await crashLoopGuard.readState();
+    expect(state.crash_count).toBe(100);
+
+    const nextAttempt = await crashLoopGuard.recordStartupAttempt();
+    expect(nextAttempt.crashCount).toBe(100);
+    expect(nextAttempt.shouldEnterSafeMode).toBe(true);
+  });
 });
