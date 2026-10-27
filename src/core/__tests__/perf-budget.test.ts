@@ -22,6 +22,8 @@ import {
 import { formatBrewTimeMinutesSeconds } from '../unit-converter';
 import { normSearch, rankSearchResults } from '../search-utils';
 import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot, CumulativeWaterPoint } from '../timer-engine';
+import { calculateLifetimeBreakEven } from '../app-access';
+import { generateAdaptiveRecipeAdjustment } from '../bpr-engine';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => ({
@@ -32,7 +34,7 @@ jest.mock('expo-sqlite', () => ({
   })),
 }));
 
-import { escapeCsvValue } from '../database';
+import { escapeCsvValue, calculateStashDiversity } from '../database';
 
 function measureCpuMs(fn: () => unknown, runs = 5): number {
   fn(); // Rozgrzewka JIT
@@ -449,6 +451,35 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       for (let i = 0; i < 10000; i++) {
         calculateTotalHardnessFromIons(15 + (i % 25), 8 + (i % 15));
         formatBrewTimeMinutesSeconds(60 + (i % 300), (i % 2) === 0);
+      }
+    });
+
+    expect(ms).toBeLessThan(80);
+  });
+
+  test('Budżet 18: 10 000 obliczeń wskaźników różnorodności (calculateStashDiversity), opłacalności (calculateLifetimeBreakEven) i adaptacji BPR (< 80 ms)', () => {
+    // 1. Poprawność biznesowa
+    const sampleStash = [
+      { id: 'b1', name: 'Kenya', type: 'coffee' as const, origin: 'Kenya', process: 'Washed', roasterOrProducer: 'Hard Beans', remainingWeightGrams: 200, initialWeightGrams: 250, flavorNotes: [], isFavorite: false, isArchived: false, createdAt: '', updatedAt: '' },
+      { id: 'b2', name: 'Ethiopia', type: 'coffee' as const, origin: 'Ethiopia', process: 'Natural', roasterOrProducer: 'Kafar', remainingWeightGrams: 150, initialWeightGrams: 250, flavorNotes: [], isFavorite: false, isArchived: false, createdAt: '', updatedAt: '' },
+      { id: 't1', name: 'Sencha', type: 'tea' as const, origin: 'Japan', process: 'Steamed', remainingWeightGrams: 50, initialWeightGrams: 50, flavorNotes: [], isFavorite: false, isArchived: false, createdAt: '', updatedAt: '' },
+    ];
+    const diversity = calculateStashDiversity(sampleStash);
+    expect(diversity.diversityScore).toBeGreaterThanOrEqual(60);
+
+    const breakEven = calculateLifetimeBreakEven(149.99, 9.99, 49.99);
+    expect(typeof breakEven.isLifetimeRecommended).toBe('boolean');
+    expect(breakEven.breakEvenMonthsVsMonthly).toBeGreaterThan(0);
+
+    const adj = generateAdaptiveRecipeAdjustment('V60', { isTooSour: true });
+    expect(adj.recommendedGrindDeltaClicks).toBe(-2);
+
+    // 2. Budżet wydajnościowy: 10 000 wywołań w pętli < 80 ms
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        calculateStashDiversity(sampleStash);
+        calculateLifetimeBreakEven(150 + (i % 20), 50 + (i % 10), 10);
+        generateAdaptiveRecipeAdjustment('V60', { isTooSour: (i % 2) === 0 });
       }
     });
 
