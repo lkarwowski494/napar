@@ -1,0 +1,53 @@
+{
+  "cycle": "P91",
+  "status": "completed",
+  "perspectives": [
+    "06-TRE",
+    "07-JAK",
+    "08-PRO",
+    "09-LOK",
+    "10-WYD"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P91-06-TRE",
+      "perspective": "06-TRE",
+      "description": "Implementacja porównania metod obróbki kawy compareCoffeeProcesses z typem CoffeeProcessComparison w src/core/knowledge-data.ts i src/core/__tests__/knowledge.test.ts",
+      "targetFile": "src/core/knowledge-data.ts",
+      "testFile": "src/core/__tests__/knowledge.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P91-07-JAK",
+      "perspective": "07-JAK",
+      "description": "Implementacja kalkulatora ryzyka osadzania kamienia evaluateLimescaleRisk z typami LimescaleRiskAssessment i LimescaleRiskLevel w src/core/water-chemistry.ts i src/core/__tests__/water-chemistry.test.ts",
+      "targetFile": "src/core/water-chemistry.ts",
+      "testFile": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P91-08-PRO",
+      "perspective": "08-PRO",
+      "description": "Implementacja kalkulatora retencji i przedmuchu młynka estimateGrinderRetention z typami GrinderRetentionEstimate i GrinderRetentionClass w src/core/grinder-converter.ts i src/core/__tests__/grinder-converter.test.ts",
+      "targetFile": "src/core/grinder-converter.ts",
+      "testFile": "src/core/__tests__/grinder-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P91-09-LOK",
+      "perspective": "09-LOK",
+      "description": "Implementacja wielojednostkowego formatowania wagi spiżarni formatStashWeight z typem WeightDisplayFormat w src/core/unit-converter.ts i src/core/__tests__/unit-converter.test.ts",
+      "targetFile": "src/core/unit-converter.ts",
+      "testFile": "src/core/__tests__/unit-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P91-10-WYD",
+      "perspective": "10-WYD",
+      "description": "Implementacja Budżetu 18 dla 10 000 wywołań kalkulatorów różnorodności, break-even i adaptacji BPR (< 80 ms) w src/core/__tests__/perf-budget.test.ts",
+      "targetFile": "src/core/__tests__/perf-budget.test.ts",
+      "testFile": "src/core/__tests__/perf-budget.test.ts",
+      "status": "completed"
+    }
+  ]
+}
