@@ -1683,4 +1683,19 @@ export function estimateGrindDuration(
   };
 }
 
+/**
+ * Zwraca sformatowaną nastawę wybranego młynka dla zadanej grubości mielenia w mikronach.
+ */
+export function formatGrinderDialSetting(
+  grinderId: string,
+  microns: number | string,
+  language = 'pl'
+): string {
+  const cleanId = typeof grinderId === 'string' ? grinderId.trim().toLowerCase() : '';
+  const grinder = findGrinderById(cleanId) || SUPPORTED_GRINDERS[0];
+  const res = convertMicronsToGrinder(microns, grinder.id, language);
+  return res.formatted;
+}
+
+
 

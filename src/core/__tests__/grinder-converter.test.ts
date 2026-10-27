@@ -29,6 +29,7 @@ import {
   BurrSpeedCategory,
   estimateGrindDuration,
   GrindTimeEstimate,
+  formatGrinderDialSetting,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -1055,6 +1056,32 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(fallbackEst.targetMicrons).toBe(700);
     expect(fallbackEst.estimatedSeconds).toBeGreaterThan(0);
     expect(fallbackEst.formattedDuration.length).toBeGreaterThan(0);
+  });
+
+  test('TASK-P86-08-PRO: formatGrinderDialSetting formatuje nastawę wybranego młynka dla zadanych mikronów', () => {
+    // 1. Comandante C40: 720 µm -> 24 kliki (PL i EN)
+    expect(formatGrinderDialSetting('comandante_c40', 720)).toBe('24 klików');
+    expect(formatGrinderDialSetting('c40', 720, 'en')).toBe('24 clicks');
+
+    // 2. 1Zpresso K-Ultra: 720 µm -> 3.6 (36 klików)
+    expect(formatGrinderDialSetting('1zpresso_k_ultra', 720)).toBe('3.6 (36 klików)');
+    expect(formatGrinderDialSetting('k-ultra', 720, 'en')).toBe('3.6 (36 clicks)');
+
+    // 3. Fellow Ode Gen 2: 720 µm -> 5
+    expect(formatGrinderDialSetting('fellow_ode_gen2', 720)).toBe('5');
+
+    // 4. Baratza Encore: 720 µm -> Nastawa #16
+    expect(formatGrinderDialSetting('baratza_encore', 720)).toBe('Nastawa #16');
+    expect(formatGrinderDialSetting('encore', 720, 'en')).toBe('Setting #16');
+
+    // 5. Obsługa stringów z przecinkami i wartości skrajnych
+    expect(formatGrinderDialSetting('comandante_c40', '720,0')).toBe('24 klików');
+    expect(formatGrinderDialSetting('c40', 2000)).toBe('45 klików'); // clamped to max
+    expect(formatGrinderDialSetting('c40', 50)).toBe('5 klików'); // clamped to min
+
+    // 6. Odporność na null, undefined, nieznany młynek
+    expect(formatGrinderDialSetting(null as any, 720)).toContain('klik');
+    expect(formatGrinderDialSetting('unknown_grinder', 720)).toContain('klik');
   });
 });
 
