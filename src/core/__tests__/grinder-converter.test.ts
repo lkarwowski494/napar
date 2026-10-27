@@ -22,6 +22,8 @@ import {
   FinesRiskAnalysis,
   calculateGrinderAdjustment,
   GrinderAdjustmentResult,
+  estimateGrindDistribution,
+  GrindDistributionEstimate,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -949,6 +951,32 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(adjFallback.grinderId).toBe(SUPPORTED_GRINDERS[0].id);
     expect(Number.isFinite(adjFallback.clickDelta)).toBe(true);
     expect(Object.is(adjFallback.clickDelta, -0)).toBe(false);
+  });
+
+  test('TASK-P79-08-PRO: estimateGrindDistribution szacuje rozkład cząstek i unimodalność żaren', () => {
+    // 1. Żarna płaskie (flat burrs) przy 750 µm
+    const flatDist: GrindDistributionEstimate = estimateGrindDistribution(750, 'flat');
+    expect(flatDist.targetMicrons).toBe(750);
+    expect(flatDist.burrType).toBe('flat');
+    expect(flatDist.span).toBeLessThan(1.2);
+    expect(flatDist.unimodalityScore).toBeGreaterThanOrEqual(70);
+    expect(flatDist.descriptionPl).toContain('Żarna płaskie');
+    expect(flatDist.descriptionEn).toContain('Flat burrs');
+
+    // 2. Żarna stożkowe (conical burrs) przy 750 µm
+    const conicalDist = estimateGrindDistribution('750,0', 'conical');
+    expect(conicalDist.burrType).toBe('conical');
+    expect(conicalDist.span).toBeGreaterThan(flatDist.span);
+    expect(conicalDist.finesPercentage).toBeGreaterThan(flatDist.finesPercentage);
+    expect(conicalDist.descriptionPl).toContain('Żarna stożkowe');
+
+    // 3. Odporność na nieznany typ żaren, null, NaN i wartości skrajne
+    const fallbackDist = estimateGrindDistribution(null as any, 'unknown');
+    expect(fallbackDist.targetMicrons).toBe(750);
+    expect(fallbackDist.burrType).toBe('conical');
+    expect(fallbackDist.targetRangePercentage).toBeGreaterThan(0);
+    expect(fallbackDist.finesPercentage).toBeGreaterThan(0);
+    expect(fallbackDist.bouldersPercentage).toBeGreaterThan(0);
   });
 });
 

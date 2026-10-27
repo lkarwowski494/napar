@@ -1408,3 +1408,92 @@ export function calculateGrinderAdjustment(
     recommendationEn,
   };
 }
+
+
+export interface GrindDistributionEstimate {
+  targetMicrons: number;
+  burrType: 'conical' | 'flat';
+  finesPercentage: number;
+  targetRangePercentage: number;
+  bouldersPercentage: number;
+  span: number;
+  d10Microns: number;
+  d50Microns: number;
+  d90Microns: number;
+  unimodalityScore: number;
+  descriptionPl: string;
+  descriptionEn: string;
+}
+
+/**
+ * Szacuje profil rozkładu wielkości cząstek mielenia (fines, boulders, span, unimodality)
+ * na podstawie wielkości docelowej w mikronach oraz geometrii żaren (stożkowe vs płaskie).
+ */
+export function estimateGrindDistribution(
+  targetMicrons: number | string,
+  burrType: 'conical' | 'flat' | string = 'conical'
+): GrindDistributionEstimate {
+  const parseNum = (v: unknown, fallback = 750): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(150, Math.min(1500, v)) : fallback;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(150, Math.min(1500, parsed)) : fallback;
+    }
+    return fallback;
+  };
+
+  const safeTarget = Math.round(parseNum(targetMicrons, 750));
+  const isFlat =
+    typeof burrType === 'string' &&
+    (burrType.trim().toLowerCase().includes('flat') || burrType.trim().toLowerCase() === 'plaskie' || burrType.trim().toLowerCase() === 'płaskie');
+  const type: 'conical' | 'flat' = isFlat ? 'flat' : 'conical';
+
+  let d10Microns: number;
+  let d50Microns: number;
+  let d90Microns: number;
+  let finesPercentage: number;
+  let bouldersPercentage: number;
+  let span: number;
+  let unimodalityScore: number;
+  let descriptionPl: string;
+  let descriptionEn: string;
+
+  d50Microns = safeTarget;
+
+  if (type === 'flat') {
+    d10Microns = Math.round(safeTarget * 0.55);
+    d90Microns = Math.round(safeTarget * 1.55);
+    span = Number(((d90Microns - d10Microns) / d50Microns).toFixed(2));
+    finesPercentage = Number((8 + (1500 - safeTarget) * 0.005).toFixed(1));
+    bouldersPercentage = Number((6 + safeTarget * 0.004).toFixed(1));
+    unimodalityScore = Math.min(100, Math.max(0, Math.round(85 - span * 10)));
+    descriptionPl = 'Żarna płaskie — wąski rozkład wielkości cząstek (unimodalny), wyższa przejrzystość smaku i wysoka ekstrakcja.';
+    descriptionEn = 'Flat burrs — narrow particle size distribution (unimodal), enhanced flavor clarity and higher extraction.';
+  } else {
+    d10Microns = Math.round(safeTarget * 0.40);
+    d90Microns = Math.round(safeTarget * 1.80);
+    span = Number(((d90Microns - d10Microns) / d50Microns).toFixed(2));
+    finesPercentage = Number((14 + (1500 - safeTarget) * 0.006).toFixed(1));
+    bouldersPercentage = Number((9 + safeTarget * 0.005).toFixed(1));
+    unimodalityScore = Math.min(100, Math.max(0, Math.round(70 - span * 10)));
+    descriptionPl = 'Żarna stożkowe — szerszy, bimodalny rozkład cząstek, więcej pyłu budującego kremowe body i słodycz.';
+    descriptionEn = 'Conical burrs — broader, bimodal particle distribution, higher fines producing fuller body and sweetness.';
+  }
+
+  const targetRangePercentage = Number(Math.max(0, 100 - finesPercentage - bouldersPercentage).toFixed(1));
+
+  return {
+    targetMicrons: safeTarget,
+    burrType: type,
+    finesPercentage,
+    targetRangePercentage,
+    bouldersPercentage,
+    span,
+    d10Microns,
+    d50Microns,
+    d90Microns,
+    unimodalityScore,
+    descriptionPl,
+    descriptionEn,
+  };
+}
