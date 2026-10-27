@@ -17,6 +17,7 @@ import {
   calculateBypassBrew,
   calculateEspressoFlowRate,
   classifyEspressoFlowRate,
+  evaluateBrewMatrix,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
@@ -24,6 +25,7 @@ import {
   classifyWaterHardnessFromFH,
   evaluateWaterSuitability,
   calculateWaterBlend,
+  calculateHardnessRatio,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -32,6 +34,7 @@ import {
   findGrindCategoryById,
   getGrinderSettingForMethod,
   getGrindSettingsOverview,
+  filterGrinders,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -43,11 +46,14 @@ import {
   formatRatio,
   formatPressure,
   formatFlowRate,
+  formatExtractionYield,
   wInKeep,
 } from '../unit-converter';
-import { searchKnowledgeBase, findKnowledgeItemById } from '../knowledge-data';
-import { groupActionsByDate } from '../bpr-engine';
-import { filterBackupEnvelope } from '../backup';
+import { searchKnowledgeBase, findKnowledgeItemById, getKnowledgeSummaryCounts } from '../knowledge-data';
+import { groupActionsByDate, getActionScheduleCounts } from '../bpr-engine';
+import { filterBackupEnvelope, diffBackupEnvelopes } from '../backup';
+import { getSubscriptionBadgeInfo } from '../app-access';
+import { importDataJson, filterInventoryItems } from '../database';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -63,8 +69,6 @@ const mockDb: any = {
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => mockDb),
 }));
-
-import { importDataJson } from '../database';
 
 describe('Chaos & Fuzzing: Extraction Mathematics & Physical Limits', () => {
   test('Chaos 1: Ekstremalne, ujemne i zmutowane liczby w kalkulatorze proporcji i uzysku', () => {
@@ -542,6 +546,72 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof flowClass.labelPl).toBe('string');
       expect(typeof flowClass.labelEn).toBe('string');
       expect(typeof flowClass.flowRateGps).toBe('number');
+    }
+  });
+
+  test('Chaos 14: Fuzzing getSubscriptionBadgeInfo, filterInventoryItems, getActionScheduleCounts, diffBackupEnvelopes, getKnowledgeSummaryCounts, calculateHardnessRatio, filterGrinders, formatExtractionYield, calculateStepWaterIncrement, evaluateBrewMatrix (TASK-P73-12-NIE)', () => {
+    const corruptInputs = [
+      -100000, -1, -0, 0, 0.0001, 1.33, 15.5, 250, 10000, NaN, Infinity, -Infinity,
+      '', '   ', '\uFEFFtest', '20,5%', '1.5', 'invalid', null, undefined,
+      true, false, {}, [], () => {},
+    ];
+
+    for (const val of corruptInputs) {
+      // 1. getSubscriptionBadgeInfo
+      const badge = getSubscriptionBadgeInfo(val as any, val as any);
+      expect(typeof badge).toBe('object');
+      expect(typeof badge.badgeLabel).toBe('string');
+      expect(typeof badge.badgeVariant).toBe('string');
+      expect(typeof badge.isPro).toBe('boolean');
+
+      // 2. filterInventoryItems
+      const invFiltered = filterInventoryItems(val as any, val as any);
+      expect(Array.isArray(invFiltered)).toBe(true);
+
+      // 3. getActionScheduleCounts
+      const scheduleCounts = getActionScheduleCounts(val as any);
+      expect(typeof scheduleCounts.total).toBe('number');
+      expect(typeof scheduleCounts.today).toBe('number');
+      expect(typeof scheduleCounts.byBadgeColor).toBe('object');
+
+      // 4. diffBackupEnvelopes
+      const backupDiff = diffBackupEnvelopes(val as any, val as any);
+      expect(typeof backupDiff.isIdentical).toBe('boolean');
+      expect(typeof backupDiff.inventory.delta).toBe('number');
+
+      // 5. getKnowledgeSummaryCounts
+      const summaryCounts = getKnowledgeSummaryCounts();
+      expect(typeof summaryCounts.totalEntries).toBe('number');
+      expect(summaryCounts.totalEntries).toBeGreaterThan(0);
+
+      // 6. calculateHardnessRatio
+      const hardnessRatio = calculateHardnessRatio(val as any, val as any);
+      expect(typeof hardnessRatio.ratio).toBe('number');
+      expect(typeof hardnessRatio.category).toBe('string');
+      expect(typeof hardnessRatio.descriptionPl).toBe('string');
+
+      // 7. filterGrinders
+      const grinders = filterGrinders(val as any, val as any);
+      expect(Array.isArray(grinders)).toBe(true);
+
+      // 8. formatExtractionYield
+      const eyStr = formatExtractionYield(val as any);
+      expect(typeof eyStr).toBe('string');
+      expect(eyStr).toContain('%');
+      expect(eyStr).not.toContain('NaN');
+      expect(eyStr).not.toContain('-0');
+
+      // 9. calculateStepWaterIncrement
+      const stepWater = BrewTimerEngine.calculateStepWaterIncrement(val as any, val as any);
+      expect(typeof stepWater).toBe('number');
+      expect(stepWater).toBeGreaterThanOrEqual(0);
+      expect(Number.isFinite(stepWater)).toBe(true);
+
+      // 10. evaluateBrewMatrix
+      const brewMatrix = evaluateBrewMatrix(val as any, val as any);
+      expect(typeof brewMatrix.quadrant).toBe('string');
+      expect(typeof brewMatrix.labelPl).toBe('string');
+      expect(typeof brewMatrix.recommendationPl).toBe('string');
     }
   });
 });
