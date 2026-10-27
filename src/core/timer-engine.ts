@@ -42,6 +42,15 @@ export interface StepTimeWindow {
   isValidStep: boolean;
 }
 
+export interface ActiveStepSnapshot {
+  stepIndex: number;
+  step: RecipeStep | null;
+  stepElapsedSeconds: number;
+  stepRemainingSeconds: number;
+  stepProgressPercent: number;
+  isFinished: boolean;
+}
+
 /**
  * RD-ENG-06 & NFR-PERF-004: Wyliczanie czasu timera odporne na uśpienie w tle
  * r = max(0, ceil((endAtMs - nowMs) / 1000))
@@ -256,6 +265,73 @@ export class BrewTimerEngine {
       endSecond: startSecond + durationSeconds,
       durationSeconds,
       isValidStep: true,
+    };
+  }
+
+  /**
+   * Wyznacza migawkę aktywnego kroku (indeks, upływ czasu w kroku, pozostały czas, % postępu)
+   * na podstawie łącznego czasu trwania dotychczasowego parzenia (elapsedSeconds).
+   */
+  public static getActiveStepSnapshot(
+    steps?: RecipeStep[] | null,
+    elapsedSeconds: number = 0
+  ): ActiveStepSnapshot {
+    if (!Array.isArray(steps) || steps.length === 0) {
+      return {
+        stepIndex: 0,
+        step: null,
+        stepElapsedSeconds: 0,
+        stepRemainingSeconds: 0,
+        stepProgressPercent: 0,
+        isFinished: true,
+      };
+    }
+
+    const safeElapsed =
+      typeof elapsedSeconds === 'number' && Number.isFinite(elapsedSeconds) && elapsedSeconds > 0 && !Object.is(elapsedSeconds, -0)
+        ? Math.floor(elapsedSeconds)
+        : 0;
+
+    let accumulated = 0;
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i];
+      const dur =
+        typeof step?.durationSeconds === 'number' && Number.isFinite(step.durationSeconds) && step.durationSeconds > 0 && !Object.is(step.durationSeconds, -0)
+          ? Math.floor(step.durationSeconds)
+          : 0;
+
+      if (safeElapsed < accumulated + dur) {
+        const stepElapsed = safeElapsed - accumulated;
+        const stepRemaining = Math.max(0, dur - stepElapsed);
+        const percent = dur > 0 ? Number(((stepElapsed / dur) * 100).toFixed(1)) : 100;
+        return {
+          stepIndex: i,
+          step,
+          stepElapsedSeconds: stepElapsed,
+          stepRemainingSeconds: stepRemaining,
+          stepProgressPercent: percent,
+          isFinished: false,
+        };
+      }
+
+      accumulated += dur;
+    }
+
+    // Parzenie dobiegło końca
+    const lastIndex = steps.length - 1;
+    const lastStep = steps[lastIndex];
+    const lastDur =
+      typeof lastStep?.durationSeconds === 'number' && Number.isFinite(lastStep.durationSeconds) && lastStep.durationSeconds > 0
+        ? Math.floor(lastStep.durationSeconds)
+        : 0;
+
+    return {
+      stepIndex: lastIndex,
+      step: lastStep,
+      stepElapsedSeconds: lastDur,
+      stepRemainingSeconds: 0,
+      stepProgressPercent: 100,
+      isFinished: true,
     };
   }
 

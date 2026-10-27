@@ -14,7 +14,7 @@ import { createGongfuSession, recordGongfuInfusion } from '../gongfu-session';
 import { convertMicronsToGrinder, SUPPORTED_GRINDERS } from '../grinder-converter';
 import { calculateWaterMinerals, WATER_RECIPES } from '../water-chemistry';
 import { normSearch, rankSearchResults } from '../search-utils';
-import { BrewTimerEngine, StepTimeWindow } from '../timer-engine';
+import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot } from '../timer-engine';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => ({
@@ -311,4 +311,49 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
 
     expect(ms).toBeLessThan(50);
   });
+
+  test('Budżet 14: getActiveStepSnapshot wyznacza stan aktywnego kroku w czasie poniżej 50 ms (TASK-P82-10-WYD)', () => {
+    const steps = [
+      { stepNumber: 1, namePl: 'Preinfuzja', durationSeconds: 30, targetWaterGrams: 50 },
+      { stepNumber: 2, namePl: 'Zalanie 1', durationSeconds: 45, targetWaterGrams: 150 },
+      { stepNumber: 3, namePl: 'Zalanie 2', durationSeconds: 60, targetWaterGrams: 250 },
+    ] as any[];
+
+    // 1. Poprawność biznesowa
+    // Przy t = 10s -> Krok 0 (Preinfuzja), upłynęło 10s, zostało 20s, ~33.3%
+    const snap10: ActiveStepSnapshot = BrewTimerEngine.getActiveStepSnapshot(steps, 10);
+    expect(snap10.stepIndex).toBe(0);
+    expect(snap10.stepElapsedSeconds).toBe(10);
+    expect(snap10.stepRemainingSeconds).toBe(20);
+    expect(snap10.stepProgressPercent).toBeCloseTo(33.3, 0);
+    expect(snap10.isFinished).toBe(false);
+
+    // Przy t = 50s -> Krok 1 (Zalanie 1: start 30s, dur 45s), upłynęło 20s w kroku, zostało 25s
+    const snap50 = BrewTimerEngine.getActiveStepSnapshot(steps, 50);
+    expect(snap50.stepIndex).toBe(1);
+    expect(snap50.stepElapsedSeconds).toBe(20);
+    expect(snap50.stepRemainingSeconds).toBe(25);
+    expect(snap50.isFinished).toBe(false);
+
+    // Przy t = 200s (poza czasem całego parzenia 135s) -> Zakończone
+    const snapEnd = BrewTimerEngine.getActiveStepSnapshot(steps, 200);
+    expect(snapEnd.stepIndex).toBe(2);
+    expect(snapEnd.isFinished).toBe(true);
+    expect(snapEnd.stepProgressPercent).toBe(100);
+
+    // Wartości brzegowe i null
+    const snapNull = BrewTimerEngine.getActiveStepSnapshot(null, 15);
+    expect(snapNull.isFinished).toBe(true);
+    expect(snapNull.step).toBeNull();
+
+    // 2. Budżet wydajnościowy
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        BrewTimerEngine.getActiveStepSnapshot(steps, (i * 3) % 200);
+      }
+    });
+
+    expect(ms).toBeLessThan(50);
+  });
 });
+
