@@ -744,3 +744,68 @@ export function formatStashWeight(
 
 
 
+
+
+export interface CostPerCupFormat {
+  costPerCup: number;
+  costPerCupFormatted: string;
+  totalCupsInBag: number;
+  costPerGram: number;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Wylicza i formatuje koszt pojedynczej porcji naparu (filiżanki)
+ * na podstawie ceny paczki, jej gramatury oraz dozy surowca.
+ */
+export function formatCostPerCup(
+  costPerBag: number | string | undefined | null,
+  bagWeightGrams: number | string | undefined | null,
+  doseGrams: number | string | undefined | null,
+  currencySymbol = 'zł'
+): CostPerCupFormat {
+  const parseNum = (v: unknown, fallback = 0, min = 0, max = 1000000): number => {
+    if (typeof v === 'number') {
+      return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(min, Math.min(max, v)) : fallback;
+    }
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0)
+        ? Math.max(min, Math.min(max, parsed))
+        : fallback;
+    }
+    return fallback;
+  };
+
+  const cost = parseNum(costPerBag, 0, 0, 100000);
+  const bagWeight = parseNum(bagWeightGrams != null ? bagWeightGrams : 250, 250, 1, 1000000);
+  const dose = parseNum(doseGrams != null ? doseGrams : 15, 15, 0.1, 1000);
+
+  const cleanCurrency =
+    typeof currencySymbol === 'string' && currencySymbol.trim() ? currencySymbol.trim() : 'zł';
+
+  const costPerGram = bagWeight > 0 ? cost / bagWeight : 0;
+  const rawCostPerCup = costPerGram * dose;
+  const costPerCup = Number(rawCostPerCup.toFixed(2));
+  const safeCostPerCup = Object.is(costPerCup, -0) ? 0 : costPerCup;
+
+  const totalCupsInBag = dose > 0 ? Math.floor(bagWeight / dose) : 0;
+
+  const isPrefixCurrency = ['$', '€', '£', '¥'].includes(cleanCurrency);
+  const costPerCupFormatted = isPrefixCurrency
+    ? `${cleanCurrency}${safeCostPerCup.toFixed(2)}`
+    : `${safeCostPerCup.toFixed(2)} ${cleanCurrency}`;
+
+  const summaryPl = `Koszt porcji naparu: ${costPerCupFormatted} (paczka wystarcza na ${totalCupsInBag} filiżanek przy dozie ${dose}g).`;
+  const summaryEn = `Cost per brew: ${costPerCupFormatted} (${totalCupsInBag} cups per bag at ${dose}g dose).`;
+
+  return {
+    costPerCup: safeCostPerCup,
+    costPerCupFormatted,
+    totalCupsInBag,
+    costPerGram,
+    summaryPl,
+    summaryEn,
+  };
+}

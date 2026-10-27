@@ -27,6 +27,8 @@ import {
   CaffeineUnit,
   formatStashWeight,
   WeightDisplayFormat,
+  formatCostPerCup,
+  CostPerCupFormat,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -511,6 +513,32 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatStashWeight(NaN)).toBe('0 g');
       expect(formatStashWeight(null, 'kilograms')).toBe('0.00 kg');
       expect(formatStashWeight(null, 'auto', 'imperial')).toBe('0.0 oz');
+    });
+
+    test('TASK-P94-09-LOK: formatCostPerCup wylicza i formatuje koszt pojedynczej filiżanki naparu', () => {
+      // 1. Kawa specialty: paczka 250g za 50 zł, doza 15g -> 50 / 250 = 0.20 zł/g -> 15g = 3.00 zł
+      const costPl: CostPerCupFormat = formatCostPerCup(50, 250, 15, 'zł');
+      expect(costPl.costPerGram).toBeCloseTo(0.2, 2);
+      expect(costPl.costPerCup).toBe(3);
+      expect(costPl.costPerCupFormatted).toBe('3.00 zł');
+      expect(costPl.totalCupsInBag).toBe(16); // Math.floor(250 / 15) = 16
+      expect(costPl.summaryPl).toContain('3.00 zł');
+      expect(costPl.summaryEn).toBeDefined();
+
+      // 2. Format walutowy prefix (dolar $)
+      const costUsd = formatCostPerCup('20.00', '250', '15', '$');
+      expect(costUsd.costPerCupFormatted).toBe('$1.20');
+      expect(costUsd.totalCupsInBag).toBe(16);
+
+      // 3. Odporność na stringi z przecinkami i wartości domyślne
+      const costDefault = formatCostPerCup('40,0', null, undefined);
+      expect(costDefault.totalCupsInBag).toBe(16); // 250g / 15g
+      expect(costDefault.costPerCup).toBe(2.4);
+
+      // 4. Skrajne wartości / zero
+      const costZero = formatCostPerCup(0, 250, 15);
+      expect(costZero.costPerCup).toBe(0);
+      expect(costZero.costPerCupFormatted).toBe('0.00 zł');
     });
   });
 });
