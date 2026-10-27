@@ -1261,8 +1261,8 @@ export function escapeCsvCell(val: unknown): string {
 
   // Jeśli nie jest to czysta liczba ujemna i zaczyna się od znaku niebezpiecznego
   const isPureNegativeNumber = /^-\d+(\.\d+)?$/.test(str.trim());
-  const dangerousFirstChars = ['=', '+', '-', '@', '\t', '\r', '%'];
-  const dangerousFormulaChars = ['=', '+', '-', '@', '%'];
+  const dangerousFirstChars = ['=', '+', '-', '@', '\t', '\r', '%', '|'];
+  const dangerousFormulaChars = ['=', '+', '-', '@', '%', '|'];
   const spacesTrimmed = str.replace(/^[ ]+/, '');
 
   if (
@@ -1380,7 +1380,7 @@ export function exportInventoryCsv(): string {
 export function getAppSetting(key: string, defaultValue = ''): string {
   try {
     if (!key || typeof key !== 'string') return defaultValue;
-    const safeKey = key.replace(/[\x00-\x1F\x7F]/g, '').trim();
+    const safeKey = key.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim();
     if (!safeKey) return defaultValue;
     const db = getDatabase();
     const row = db.getFirstSync<{ value: string }>(
@@ -1398,7 +1398,7 @@ export function setAppSetting(key: string, value: any): void;
 export function setAppSetting(key: string, value: any): void {
   try {
     if (!key || typeof key !== 'string') return;
-    const safeKey = key.replace(/[\x00-\x1F\x7F]/g, '').trim();
+    const safeKey = key.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim();
     if (!safeKey) return;
     const safeValue = value === null || value === undefined ? '' : String(value);
     const db = getDatabase();

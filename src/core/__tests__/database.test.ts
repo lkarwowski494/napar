@@ -2374,4 +2374,15 @@ describe('Napar SQLite Database & Repositories', () => {
     // 4. Usuwanie bajtów zerowych
     expect(escapeCsvCell('Kawa\x00 Filter')).toBe('Kawa Filter');
   });
+
+  test('TASK-P59-03-ZAK: escapeCsvCell neutralizuje formuly potoku | oraz getAppSetting/setAppSetting oczyszczaja BOM w kluczach', () => {
+    // 1. Potok DDE Formula Injection
+    expect(escapeCsvCell("|' /C calc'!A0")).toBe("\"'|' /C calc'!A0\"");
+    expect(escapeCsvCell("   |calc")).toBe("\"'   |calc\"");
+
+    // 2. BOM w kluczach ustawień
+    setAppSetting('\uFEFFapp_theme_mode', 'dark');
+    expect(getAppSetting('\uFEFFapp_theme_mode')).toBe('dark');
+    expect(getAppSetting('app_theme_mode')).toBe('dark');
+  });
 });
