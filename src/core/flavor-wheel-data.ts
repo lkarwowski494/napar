@@ -145,3 +145,84 @@ export const SCA_FLAVOR_WHEEL: FlavorCategory[] = [
     ],
   },
 ];
+
+/**
+ * Wyszukuje kategorię koła smaków po identyfikatorze (odporne na wielkość liter, spacje i BOM).
+ */
+export function findCategoryById(id: string | undefined | null): FlavorCategory | undefined {
+  if (!id || typeof id !== 'string') return undefined;
+  const cleanId = id.replace(/\uFEFF/g, '').trim().toLowerCase();
+  return SCA_FLAVOR_WHEEL.find((c) => c.id.toLowerCase() === cleanId);
+}
+
+/**
+ * Zwraca płaską listę unikalnych deskryptorów ze wszystkich kategorii.
+ */
+export function getAllDescriptors(): string[] {
+  const result: string[] = [];
+  for (const cat of SCA_FLAVOR_WHEEL) {
+    for (const sub of cat.subcategories) {
+      for (const desc of sub.descriptors) {
+        if (!result.includes(desc)) {
+          result.push(desc);
+        }
+      }
+    }
+  }
+  return result;
+}
+
+/**
+ * Odnajduje kategorię i podkategorię dla zadanego deskryptora smakowego.
+ */
+export function findDescriptorCategory(
+  descriptor: string | undefined | null
+): { category: FlavorCategory; subcategory: FlavorCategory['subcategories'][0] } | undefined {
+  if (!descriptor || typeof descriptor !== 'string') return undefined;
+  const clean = descriptor.replace(/\uFEFF/g, '').trim().toLowerCase();
+  if (!clean) return undefined;
+
+  for (const cat of SCA_FLAVOR_WHEEL) {
+    for (const sub of cat.subcategories) {
+      const match = sub.descriptors.find((d) => d.toLowerCase() === clean);
+      if (match) {
+        return { category: cat, subcategory: sub };
+      }
+    }
+  }
+  return undefined;
+}
+
+export interface SearchedDescriptor {
+  descriptor: string;
+  categoryNamePl: string;
+  categoryNameEn: string;
+  color: string;
+}
+
+/**
+ * Filtruje deskryptory sensoryczne na podstawie zapytania tekstowego.
+ */
+export function searchDescriptors(query: string | undefined | null): SearchedDescriptor[] {
+  if (!query || typeof query !== 'string') return [];
+  const clean = query.replace(/\uFEFF/g, '').trim().toLowerCase();
+  if (!clean) return [];
+
+  const results: SearchedDescriptor[] = [];
+  for (const cat of SCA_FLAVOR_WHEEL) {
+    for (const sub of cat.subcategories) {
+      for (const desc of sub.descriptors) {
+        if (desc.toLowerCase().includes(clean)) {
+          results.push({
+            descriptor: desc,
+            categoryNamePl: cat.namePl,
+            categoryNameEn: cat.nameEn,
+            color: cat.color,
+          });
+        }
+      }
+    }
+  }
+  return results;
+}
+

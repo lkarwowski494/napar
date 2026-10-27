@@ -5,7 +5,13 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { FlavorWheelPicker } from '../flavor-wheel-picker';
-import { SCA_FLAVOR_WHEEL } from '../flavor-wheel-data';
+import {
+  SCA_FLAVOR_WHEEL,
+  findCategoryById,
+  getAllDescriptors,
+  findDescriptorCategory,
+  searchDescriptors,
+} from '../flavor-wheel-data';
 
 describe('SCA Flavor Wheel Data & Picker Component', () => {
   test('Taksonomia SCA zawiera 6 głównych kategorii', () => {
@@ -150,6 +156,46 @@ describe('SCA Flavor Wheel Data & Picker Component', () => {
     const citrusChip = findPressableWithText(tree.root, 'Cytryna');
     expect(citrusChip.props.accessibilityRole).toBe('checkbox');
     expect(citrusChip.props.accessibilityState).toEqual({ checked: false });
+  });
+
+  test('TASK-P60-07-JAK: findCategoryById wyszukuje kategorię z odpornością na wielkość liter i BOM', () => {
+    expect(findCategoryById('fruity')?.id).toBe('fruity');
+    expect(findCategoryById('\uFEFFFRUITY ')?.id).toBe('fruity');
+    expect(findCategoryById('non-existent')).toBeUndefined();
+    expect(findCategoryById(null as any)).toBeUndefined();
+  });
+
+  test('TASK-P60-07-JAK: getAllDescriptors zwraca płaską listę wszystkich unikalnych deskryptorów', () => {
+    const descriptors = getAllDescriptors();
+    expect(Array.isArray(descriptors)).toBe(true);
+    expect(descriptors.length).toBeGreaterThan(20);
+    expect(descriptors).toContain('Bergamotka');
+    expect(descriptors).toContain('Ciemna czekolada');
+    expect(descriptors).toContain('Jaśmin');
+  });
+
+  test('TASK-P60-07-JAK: findDescriptorCategory odnajduje kategorię i podkategorię dla zadanego deskryptora', () => {
+    const result = findDescriptorCategory('Bergamotka');
+    expect(result).toBeDefined();
+    expect(result?.category.id).toBe('fruity');
+    expect(result?.subcategory.namePl).toBe('Cytrusowe');
+
+    const teaResult = findDescriptorCategory('\uFEFF Earl Grey ');
+    expect(teaResult).toBeDefined();
+    expect(teaResult?.category.id).toBe('tea_green');
+
+    expect(findDescriptorCategory('Nieznany')).toBeUndefined();
+    expect(findDescriptorCategory('')).toBeUndefined();
+  });
+
+  test('TASK-P60-07-JAK: searchDescriptors filtruje deskryptory po fragmencie tekstu', () => {
+    const matches = searchDescriptors('czekolada');
+    expect(matches.length).toBe(2);
+    expect(matches[0].descriptor).toContain('czekolada');
+    expect(matches[0].color).toBe('#D97736');
+
+    const empty = searchDescriptors('');
+    expect(empty).toEqual([]);
   });
 });
 
