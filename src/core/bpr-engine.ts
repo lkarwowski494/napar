@@ -30,6 +30,7 @@ export interface ProactiveActionItem {
   subtitlePl: string;
   subtitleEn: string;
   badgeColor: 'copper' | 'success' | 'warning';
+  priority?: 'high' | 'medium' | 'low' | string;
   inventoryItemId?: string;
   recipeId?: string;
   recommendedMethod?: string;
@@ -1119,7 +1120,7 @@ export interface ActionPriorityEvaluation {
  * uwzględniając deklarowany priorytet akcji oraz dystans czasowy (daysOffset).
  */
 export function calculateActionPriorityScore(
-  action?: ProactiveActionItem | null
+  action?: Partial<ProactiveActionItem> | null
 ): ActionPriorityEvaluation {
   if (!action || typeof action !== 'object') {
     return {
