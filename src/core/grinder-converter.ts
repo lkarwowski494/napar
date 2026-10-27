@@ -1310,3 +1310,101 @@ export function estimateGrindFinesRisk(
     recommendedAdjustmentEn,
   };
 }
+
+export interface GrinderAdjustmentResult {
+  grinderId: string;
+  grinderName: string;
+  startMicrons: number;
+  targetMicrons: number;
+  startClicks: number;
+  targetClicks: number;
+  clickDelta: number;
+  direction: 'coarser' | 'finer' | 'identical';
+  formattedStartSetting: string;
+  formattedTargetSetting: string;
+  recommendationPl: string;
+  recommendationEn: string;
+}
+
+/**
+ * Asystuje w precyzyjnej zmianie nastawy młynka pomiędzy dwoma rozmiarami cząstek w mikronach,
+ * obliczając różnicę w klikach, kierunek regulacji oraz wskazówkę dla użytkownika.
+ */
+export function calculateGrinderAdjustment(
+  grinderIdOrModel: string | GrinderModel | null | undefined,
+  startMicrons: number | string,
+  targetMicrons: number | string,
+  language: string = 'pl'
+): GrinderAdjustmentResult {
+  let grinder: GrinderModel;
+  if (grinderIdOrModel && typeof grinderIdOrModel === 'object' && 'id' in grinderIdOrModel) {
+    grinder = grinderIdOrModel as GrinderModel;
+  } else if (typeof grinderIdOrModel === 'string') {
+    grinder = findGrinderById(grinderIdOrModel) || SUPPORTED_GRINDERS[0];
+  } else {
+    grinder = SUPPORTED_GRINDERS[0];
+  }
+
+  const parseM = (m: number | string, defaultVal: number): number => {
+    if (typeof m === 'number') {
+      return Number.isFinite(m) && !Object.is(m, -0) ? Math.max(150, Math.min(1500, m)) : defaultVal;
+    }
+    if (typeof m === 'string') {
+      const parsed = parseFloat(m.trim().replace(',', '.'));
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(150, Math.min(1500, parsed)) : defaultVal;
+    }
+    return defaultVal;
+  };
+
+  const safeStart = parseM(startMicrons, 720);
+  const safeTarget = parseM(targetMicrons, 720);
+
+  const startConv = convertMicronsToGrinder(safeStart, grinder.id, language);
+  const targetConv = convertMicronsToGrinder(safeTarget, grinder.id, language);
+
+  const startClicks = startConv.rawValue;
+  const targetClicks = targetConv.rawValue;
+  let clickDelta = targetClicks - startClicks;
+  if (Object.is(clickDelta, -0)) {
+    clickDelta = 0;
+  }
+
+  let direction: 'coarser' | 'finer' | 'identical';
+  let recommendationPl: string;
+  let recommendationEn: string;
+
+  const absClicks = Math.abs(clickDelta);
+
+  if (clickDelta > 0) {
+    direction = 'coarser';
+    const unitPl = absClicks === 1 ? 'klik' : absClicks < 5 ? 'kliki' : 'klików';
+    const unitEn = absClicks === 1 ? 'click' : 'clicks';
+    recommendationPl = `Przestaw młynek o ${absClicks} ${unitPl} grubiej.`;
+    recommendationEn = `Adjust grinder ${absClicks} ${unitEn} coarser.`;
+  } else if (clickDelta < 0) {
+    direction = 'finer';
+    const unitPl = absClicks === 1 ? 'klik' : absClicks < 5 ? 'kliki' : 'klików';
+    const unitEn = absClicks === 1 ? 'click' : 'clicks';
+    recommendationPl = `Przestaw młynek o ${absClicks} ${unitPl} drobniej.`;
+    recommendationEn = `Adjust grinder ${absClicks} ${unitEn} finer.`;
+  } else {
+    direction = 'identical';
+    recommendationPl = 'Brak konieczności regulacji — nastawa jest optymalna.';
+    recommendationEn = 'No adjustment needed — the setting is already optimal.';
+  }
+
+  return {
+    grinderId: grinder.id,
+    grinderName: startConv.grinderName,
+    startMicrons: safeStart,
+    targetMicrons: safeTarget,
+    startClicks,
+    targetClicks,
+    clickDelta,
+    direction,
+    formattedStartSetting: startConv.formatted,
+    formattedTargetSetting: targetConv.formatted,
+    recommendationPl,
+    recommendationEn,
+  };
+}

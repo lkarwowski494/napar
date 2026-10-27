@@ -20,6 +20,8 @@ import {
   GrinderSearchCriteria,
   estimateGrindFinesRisk,
   FinesRiskAnalysis,
+  calculateGrinderAdjustment,
+  GrinderAdjustmentResult,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -916,6 +918,37 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(fallbackRisk.targetMicrons).toBeGreaterThanOrEqual(0);
     expect(fallbackRisk.finesRiskScore).toBeGreaterThanOrEqual(0);
     expect(fallbackRisk.finesRiskScore).toBeLessThanOrEqual(100);
+  });
+
+  test('TASK-P77-08-PRO: calculateGrinderAdjustment precyzyjnie asystuje w przestawianiu klików młynka', () => {
+    // 1. Przestawienie z drobniejszego na grubszy (coarser)
+    const adjCoarser = calculateGrinderAdjustment('comandante_c40', 600, 800, 'pl');
+    expect(adjCoarser.direction).toBe('coarser');
+    expect(adjCoarser.clickDelta).toBeGreaterThan(0);
+    expect(adjCoarser.recommendationPl).toContain('grubiej');
+    expect(adjCoarser.recommendationEn).toContain('coarser');
+    expect(adjCoarser.formattedStartSetting).toBeDefined();
+    expect(adjCoarser.formattedTargetSetting).toBeDefined();
+
+    // 2. Przestawienie z grubszego na drobniejszy (finer)
+    const adjFiner = calculateGrinderAdjustment('timemore_c2_c3', 800, 500, 'en');
+    expect(adjFiner.direction).toBe('finer');
+    expect(adjFiner.clickDelta).toBeLessThan(0);
+    expect(adjFiner.recommendationPl).toContain('drobniej');
+    expect(adjFiner.recommendationEn).toContain('finer');
+
+    // 3. Brak zmiany (identical)
+    const adjIdentical = calculateGrinderAdjustment('comandante_c40', 720, 720);
+    expect(adjIdentical.direction).toBe('identical');
+    expect(adjIdentical.clickDelta).toBe(0);
+    expect(adjIdentical.recommendationPl).toContain('optymalna');
+
+    // 4. Odporność na null, stringi, wartości ujemne i -0
+    const adjFallback = calculateGrinderAdjustment(null as any, -100, '900,5');
+    expect(adjFallback).toBeDefined();
+    expect(adjFallback.grinderId).toBe(SUPPORTED_GRINDERS[0].id);
+    expect(Number.isFinite(adjFallback.clickDelta)).toBe(true);
+    expect(Object.is(adjFallback.clickDelta, -0)).toBe(false);
   });
 });
 
