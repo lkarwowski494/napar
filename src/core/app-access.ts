@@ -284,6 +284,40 @@ export function formatTrialBadgeText(
   return formatTrialStatusSummary(safeState, language);
 }
 
+/**
+ * Sprawdza czy użytkownik posiada pełne uprawnienia rzemieślnicze (Apps4Brew Pro).
+ * Zwraca true jeśli subskrypcja jest aktywna LUB jeśli trwa bezpłatny okres próbny (trial_active).
+ */
+export function isProAccessGranted(state?: AppAccessState | null): boolean {
+  const current = state && typeof state === 'object' ? state : getAppAccessState();
+  return Boolean(current.isSubscribed || current.status === 'trial_active');
+}
+
+/**
+ * Mapuje identyfikator produktu StoreKit na wewnętrzny poziom subskrypcji.
+ */
+export function getSubscriptionTierFromProductId(
+  productId: string | undefined | null
+): 'monthly' | 'annual' | 'lifetime' | 'none' {
+  if (!productId || typeof productId !== 'string') return 'none';
+  const clean = productId
+    .replace(/\uFEFF/g, '')
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    .trim()
+    .toLowerCase();
+
+  if (clean === STORE_PRODUCT_IDS.lifetime.toLowerCase() || clean.includes('lifetime')) {
+    return 'lifetime';
+  }
+  if (clean === STORE_PRODUCT_IDS.annual.toLowerCase() || clean.includes('annual')) {
+    return 'annual';
+  }
+  if (clean === STORE_PRODUCT_IDS.monthly.toLowerCase() || clean.includes('monthly')) {
+    return 'monthly';
+  }
+  return 'none';
+}
+
 export function recordBrewCompleted(): AppAccessState {
   const current = getAppAccessState();
   if (current.isSubscribed) {

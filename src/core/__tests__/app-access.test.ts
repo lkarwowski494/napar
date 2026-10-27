@@ -22,6 +22,8 @@ import {
   formatSubscriptionTierName,
   formatTrialStatusSummary,
   formatTrialBadgeText,
+  isProAccessGranted,
+  getSubscriptionTierFromProductId,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1087,6 +1089,25 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(edgeEn).toBe('Trial: 0 brews · 0 days remaining');
     expect(edgeEn).not.toContain('-0');
     expect(edgeEn).not.toContain('NaN');
+  });
+
+  test('TASK-P61-02-MON: isProAccessGranted i getSubscriptionTierFromProductId poprawnie weryfikuja uprawnienia i ID produktow', () => {
+    // 1. isProAccessGranted
+    expect(isProAccessGranted({ status: 'trial_active', isSubscribed: false } as any)).toBe(true);
+    expect(isProAccessGranted({ status: 'trial_expired', isSubscribed: true } as any)).toBe(true);
+    expect(isProAccessGranted({ status: 'trial_expired', isSubscribed: false } as any)).toBe(false);
+    resetTrialForTesting();
+    expect(isProAccessGranted(null)).toBe(true); // default active trial
+    setTrialExpiredForTesting();
+    expect(isProAccessGranted(null)).toBe(false);
+
+    // 2. getSubscriptionTierFromProductId
+    expect(getSubscriptionTierFromProductId(STORE_PRODUCT_IDS.lifetime)).toBe('lifetime');
+    expect(getSubscriptionTierFromProductId(STORE_PRODUCT_IDS.annual)).toBe('annual');
+    expect(getSubscriptionTierFromProductId(STORE_PRODUCT_IDS.monthly)).toBe('monthly');
+    expect(getSubscriptionTierFromProductId('\uFEFFannual')).toBe('annual');
+    expect(getSubscriptionTierFromProductId('unknown.product')).toBe('none');
+    expect(getSubscriptionTierFromProductId(null)).toBe('none');
   });
 });
 
