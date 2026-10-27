@@ -32,6 +32,8 @@ import {
   PaywallFeatureHighlight,
   getSubscriptionBadgeInfo,
   SubscriptionBadgeInfo,
+  getFeatureAccessLevel,
+  FeatureAccessLevel,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1271,6 +1273,57 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const defaultBadge = getSubscriptionBadgeInfo(null, 'pl');
     expect(defaultBadge).toBeDefined();
     expect(defaultBadge.badgeVariant).toBeDefined();
+  });
+
+  test('TASK-P73-02-MON: getFeatureAccessLevel określa status i powód dostępności funkcji', () => {
+    // 1. Funkcja Free Core (zawsze dostępna)
+    const freeLevel: FeatureAccessLevel = getFeatureAccessLevel('timer');
+    expect(freeLevel.isAccessible).toBe(true);
+    expect(freeLevel.requiresPro).toBe(false);
+    expect(freeLevel.accessReason).toBe('free_core');
+
+    // 2. Wygasły trial i funkcja Pro
+    const expiredState = {
+      status: 'trial_expired' as const,
+      brewsCount: 15,
+      brewsRemaining: 0,
+      daysRemaining: 0,
+      isSubscribed: false,
+      canCreate: false,
+      isHistoryReadOnly: true,
+      subscriptionTier: 'none' as const,
+    };
+    const gatedLevel = getFeatureAccessLevel('custom_recipes', expiredState);
+    expect(gatedLevel.isAccessible).toBe(false);
+    expect(gatedLevel.requiresPro).toBe(true);
+    expect(gatedLevel.accessReason).toBe('paywall_gated');
+
+    // 3. Aktywny trial i funkcja Pro
+    const trialState = {
+      ...expiredState,
+      status: 'trial_active' as const,
+      daysRemaining: 10,
+    };
+    const trialLevel = getFeatureAccessLevel('water_chemistry', trialState);
+    expect(trialLevel.isAccessible).toBe(true);
+    expect(trialLevel.requiresPro).toBe(true);
+    expect(trialLevel.accessReason).toBe('trial_active');
+
+    // 4. Aktywna subskrypcja Pro
+    const proState = {
+      ...expiredState,
+      status: 'subscribed' as const,
+      isSubscribed: true,
+    };
+    const proLevel = getFeatureAccessLevel('water_chemistry', proState);
+    expect(proLevel.isAccessible).toBe(true);
+    expect(proLevel.requiresPro).toBe(true);
+    expect(proLevel.accessReason).toBe('subscribed');
+
+    // 5. Odporność na null/undefined
+    const defaultLevel = getFeatureAccessLevel(null as any);
+    expect(defaultLevel).toBeDefined();
+    expect(defaultLevel.featureId).toBe('');
   });
 });
 

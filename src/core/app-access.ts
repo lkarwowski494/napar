@@ -928,3 +928,66 @@ export function getSubscriptionBadgeInfo(
   };
 }
 
+export interface FeatureAccessLevel {
+  featureId: string;
+  isAccessible: boolean;
+  requiresPro: boolean;
+  accessReason: 'free_core' | 'trial_active' | 'subscribed' | 'paywall_gated';
+  bannerTitlePl: string;
+  bannerTitleEn: string;
+}
+
+/**
+ * Zwraca szczegółowy poziom uprawnień użytkownika dla wybranej funkcji (Free Core, Trial, Pro, Paywall).
+ */
+export function getFeatureAccessLevel(
+  feature: string | undefined | null,
+  state?: AppAccessState | null
+): FeatureAccessLevel {
+  const current = state && typeof state === 'object' && 'status' in state ? state : getAppAccessState();
+  const cleanFeature = (typeof feature === 'string' ? feature : '').trim().toLowerCase();
+  const isFreeCore = FREE_CORE_FEATURES.has(cleanFeature);
+
+  if (isFreeCore) {
+    return {
+      featureId: cleanFeature,
+      isAccessible: true,
+      requiresPro: false,
+      accessReason: 'free_core',
+      bannerTitlePl: 'Funkcja bezpłatna (Free Core)',
+      bannerTitleEn: 'Free Core Feature',
+    };
+  }
+
+  if (current.isSubscribed) {
+    return {
+      featureId: cleanFeature,
+      isAccessible: true,
+      requiresPro: true,
+      accessReason: 'subscribed',
+      bannerTitlePl: 'Odblokowano w pakiecie PRO',
+      bannerTitleEn: 'Unlocked with PRO Pass',
+    };
+  }
+
+  if (current.status === 'trial_active') {
+    return {
+      featureId: cleanFeature,
+      isAccessible: true,
+      requiresPro: true,
+      accessReason: 'trial_active',
+      bannerTitlePl: 'Dostępne w okresie próbnym (Trial)',
+      bannerTitleEn: 'Available during Trial',
+    };
+  }
+
+  return {
+    featureId: cleanFeature,
+    isAccessible: false,
+    requiresPro: true,
+    accessReason: 'paywall_gated',
+    bannerTitlePl: 'Wymaga licencji PRO',
+    bannerTitleEn: 'Requires PRO Access',
+  };
+}
+
