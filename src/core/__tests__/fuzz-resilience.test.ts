@@ -983,7 +983,7 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof frenchRatio.style).toBe('string');
 
       // 7. getCoffeeRoastLevelGuide
-      const roastGuide = getCoffeeRoastLevelGuide(val as any, val as any);
+      const roastGuide = getCoffeeRoastLevelGuide(val as any);
       expect(roastGuide === null || typeof roastGuide === 'object').toBe(true);
 
       // 8. sanitizeBackupEnvelope
