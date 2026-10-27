@@ -1301,6 +1301,96 @@ export function calculateStashDiversity(
   };
 }
 
+export interface StashBrewsEstimate {
+  totalRemainingWeightGrams: number;
+  averageDoseGrams: number;
+  estimatedTotalBrews: number;
+  coffeeBrewsRemaining: number;
+  teaBrewsRemaining: number;
+  estimatedDaysRemaining: number;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function estimateRemainingBrews(
+  items: InventoryItem[] | undefined | null,
+  options?: {
+    coffeeDoseGrams?: number | string | null;
+    teaDoseGrams?: number | string | null;
+    brewsPerDay?: number | string | null;
+  } | null
+): StashBrewsEstimate {
+  const safeItems = Array.isArray(items) ? items : [];
+
+  const rawCoffeeDose = options?.coffeeDoseGrams != null ? Number(options.coffeeDoseGrams) : NaN;
+  const coffeeDose = Number.isFinite(rawCoffeeDose) && rawCoffeeDose > 0 ? rawCoffeeDose : 15;
+
+  const rawTeaDose = options?.teaDoseGrams != null ? Number(options.teaDoseGrams) : NaN;
+  const teaDose = Number.isFinite(rawTeaDose) && rawTeaDose > 0 ? rawTeaDose : 4;
+
+  const rawBrewsPerDay = options?.brewsPerDay != null ? Number(options.brewsPerDay) : NaN;
+  const brewsPerDay = Number.isFinite(rawBrewsPerDay) && rawBrewsPerDay > 0 ? rawBrewsPerDay : 2;
+
+  let coffeeWeight = 0;
+  let teaWeight = 0;
+
+  for (const item of safeItems) {
+    if (!item || typeof item !== 'object') continue;
+    if (item.isArchived) continue;
+
+    const w =
+      typeof item.remainingWeightGrams === 'number' &&
+      Number.isFinite(item.remainingWeightGrams) &&
+      item.remainingWeightGrams > 0
+        ? item.remainingWeightGrams
+        : 0;
+
+    if (w <= 0) continue;
+
+    const type = typeof item.type === 'string' ? item.type.toLowerCase().trim() : 'coffee';
+    if (type === 'tea') {
+      teaWeight += w;
+    } else {
+      coffeeWeight += w;
+    }
+  }
+
+  const totalRemainingWeightGrams = Math.round((coffeeWeight + teaWeight) * 10) / 10;
+  const coffeeBrewsRemaining = Math.floor(coffeeWeight / coffeeDose);
+  const teaBrewsRemaining = Math.floor(teaWeight / teaDose);
+  const estimatedTotalBrews = coffeeBrewsRemaining + teaBrewsRemaining;
+
+  const averageDoseGrams =
+    estimatedTotalBrews > 0
+      ? Math.round((totalRemainingWeightGrams / estimatedTotalBrews) * 10) / 10
+      : 0;
+
+  const estimatedDaysRemaining =
+    brewsPerDay > 0 ? Math.floor(estimatedTotalBrews / brewsPerDay) : 0;
+
+  let summaryPl: string;
+  let summaryEn: string;
+
+  if (estimatedTotalBrews === 0) {
+    summaryPl = 'Brak dostępnych zapasów w spiżarni do zaparzenia.';
+    summaryEn = 'No stash inventory available for brewing.';
+  } else {
+    summaryPl = `Pozostało łącznie ${estimatedTotalBrews} parzeń (${coffeeBrewsRemaining} kaw, ${teaBrewsRemaining} herbat) – zapas na około ${estimatedDaysRemaining} dni.`;
+    summaryEn = `Estimated ${estimatedTotalBrews} brews remaining (${coffeeBrewsRemaining} coffee, ${teaBrewsRemaining} tea) – supply for approximately ${estimatedDaysRemaining} days.`;
+  }
+
+  return {
+    totalRemainingWeightGrams,
+    averageDoseGrams,
+    estimatedTotalBrews,
+    coffeeBrewsRemaining,
+    teaBrewsRemaining,
+    estimatedDaysRemaining,
+    summaryPl,
+    summaryEn,
+  };
+}
+
 
 
 

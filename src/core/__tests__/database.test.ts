@@ -34,6 +34,8 @@ import {
   calculateStashDiversity,
   StashDiversityAnalysis,
   StashDiversityRating,
+  estimateRemainingBrews,
+  StashBrewsEstimate,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -3147,5 +3149,46 @@ describe('Napar SQLite Database & Repositories', () => {
     const fromNull = calculateStashDiversity(null);
     expect(fromNull.diversityScore).toBe(0);
     expect(fromNull.rating).toBe('monoculture');
+  });
+
+  it('TASK-P92-03-ZAK: estimateRemainingBrews wylicza liczbę pozostałych parzeń i dni zapasu w spiżarni', () => {
+    // 1. Zwykły inwentarz: 300g kawy (15g doza -> 20 parzeń) + 20g herbaty (4g doza -> 5 parzeń) = 25 parzeń; przy 2 parzeniach/dzień = 12 dni
+    const items = [
+      { id: '1', name: 'Ethiopia', type: 'coffee', remainingWeightGrams: 200, isArchived: false },
+      { id: '2', name: 'Colombia', type: 'coffee', remainingWeightGrams: 100, isArchived: false },
+      { id: '3', name: 'Sencha', type: 'tea', remainingWeightGrams: 20, isArchived: false },
+      { id: '4', name: 'Empty', type: 'coffee', remainingWeightGrams: 0, isArchived: false },
+      { id: '5', name: 'Archived', type: 'coffee', remainingWeightGrams: 100, isArchived: true },
+    ] as any[];
+
+    const estimate: StashBrewsEstimate = estimateRemainingBrews(items, {
+      coffeeDoseGrams: 15,
+      teaDoseGrams: 4,
+      brewsPerDay: 2,
+    });
+
+    expect(estimate.totalRemainingWeightGrams).toBe(320);
+    expect(estimate.coffeeBrewsRemaining).toBe(20);
+    expect(estimate.teaBrewsRemaining).toBe(5);
+    expect(estimate.estimatedTotalBrews).toBe(25);
+    expect(estimate.estimatedDaysRemaining).toBe(12);
+    expect(estimate.averageDoseGrams).toBeCloseTo(12.8, 1);
+    expect(estimate.summaryPl).toContain('25 parzeń');
+    expect(estimate.summaryEn).toContain('25 brews');
+
+    // 2. Domyślne parametry (15g kawa, 4g herbata, 2 parzenia/dzień)
+    const defaultEstimate = estimateRemainingBrews(items);
+    expect(defaultEstimate.estimatedTotalBrews).toBe(25);
+    expect(defaultEstimate.estimatedDaysRemaining).toBe(12);
+
+    // 3. Pusty inwentarz / null
+    const emptyEstimate = estimateRemainingBrews([]);
+    expect(emptyEstimate.estimatedTotalBrews).toBe(0);
+    expect(emptyEstimate.estimatedDaysRemaining).toBe(0);
+    expect(emptyEstimate.totalRemainingWeightGrams).toBe(0);
+    expect(emptyEstimate.summaryPl).toContain('Brak dostępnych zapasów');
+
+    const nullEstimate = estimateRemainingBrews(null);
+    expect(nullEstimate.estimatedTotalBrews).toBe(0);
   });
 });
