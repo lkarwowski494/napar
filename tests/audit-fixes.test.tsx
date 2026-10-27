@@ -417,6 +417,24 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
       expect(content).toContain('android.permission.REQUEST_INSTALL_PACKAGES');
     });
 
+    test('TASK-P55-10-WYD: verify-native.mjs weryfikuje nagłówki WebP/PNG oraz blokuje fingerprint, nfc i modyfikacje sieci w android.permissions', () => {
+      const verifyScript = join(root, 'scripts', 'verify-native.mjs');
+      expect(existsSync(verifyScript)).toBe(true);
+      const content = readFileSync(verifyScript, 'utf8');
+      expect(content).toContain('0x52'); // 'R'
+      expect(content).toContain('0x49'); // 'I'
+      expect(content).toContain('0x46'); // 'F'
+      expect(content).toContain('0x57'); // 'W'
+      expect(content).toContain('0x45'); // 'E'
+      expect(content).toContain('0x42'); // 'B'
+      expect(content).toContain('0x50'); // 'P'
+      expect(content).toContain('android.permission.USE_FINGERPRINT');
+      expect(content).toContain('android.permission.NFC');
+      expect(content).toContain('android.permission.CHANGE_NETWORK_STATE');
+      expect(content).toContain('android.permission.CHANGE_WIFI_STATE');
+      expect(content).toContain('NSNFCReaderUsageDescription');
+    });
+
     test('SEC-03: Publiczne repozytorium nie zawiera nieautoryzowanych wywołań sieciowych', () => {
       const publicRepoTest = join(root, 'tests', 'public-repo.test.ts');
       expect(existsSync(publicRepoTest)).toBe(true);

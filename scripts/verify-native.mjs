@@ -200,6 +200,12 @@ try {
     'android.permission.POST_NOTIFICATIONS',
     'android.permission.SYSTEM_ALERT_WINDOW',
     'android.permission.REQUEST_INSTALL_PACKAGES',
+    'android.permission.USE_FINGERPRINT',
+    'android.permission.NFC',
+    'android.permission.READ_SYNC_SETTINGS',
+    'android.permission.WRITE_SYNC_SETTINGS',
+    'android.permission.CHANGE_NETWORK_STATE',
+    'android.permission.CHANGE_WIFI_STATE',
   ];
   for (const forbidden of forbiddenPerms) {
     check(
@@ -428,6 +434,7 @@ try {
     'NSSiriUsageDescription',
     'NSHomeKitUsageDescription',
     'NFCReaderUsageDescription',
+    'NSNFCReaderUsageDescription',
     'NSPhotoLibraryUsageDescription',
     'NSPhotoLibraryAddUsageDescription',
     'NSNearbyInteractionUsageDescription',
@@ -543,6 +550,12 @@ try {
     'android.permission.POST_NOTIFICATIONS',
     'android.permission.SYSTEM_ALERT_WINDOW',
     'android.permission.REQUEST_INSTALL_PACKAGES',
+    'android.permission.USE_FINGERPRINT',
+    'android.permission.NFC',
+    'android.permission.READ_SYNC_SETTINGS',
+    'android.permission.WRITE_SYNC_SETTINGS',
+    'android.permission.CHANGE_NETWORK_STATE',
+    'android.permission.CHANGE_WIFI_STATE',
   ];
   for (const forbidden of forbiddenAndroidPermissions) {
     check(
@@ -647,6 +660,46 @@ try {
       const w = buf.readUInt32BE(16);
       const h = buf.readUInt32BE(20);
       check(w >= 32 && h >= 32, `Favicon ma wymiary ${w}x${h} (wymagane min. 32x32)`);
+    }
+  }
+
+  // 1e. Weryfikacja formatów graficznych PNG oraz WebP w katalogu assets (TASK-P55-10-WYD)
+  const assetsDir = join(root, 'assets');
+  if (existsSync(assetsDir)) {
+    const assetFiles = readdirSync(assetsDir);
+    for (const file of assetFiles) {
+      const fullPath = join(assetsDir, file);
+      if (file.endsWith('.png')) {
+        const buf = readFileSync(fullPath);
+        check(
+          buf.length >= 8 &&
+            buf[0] === 0x89 &&
+            buf[1] === 0x50 &&
+            buf[2] === 0x4e &&
+            buf[3] === 0x47 &&
+            buf[4] === 0x0d &&
+            buf[5] === 0x0a &&
+            buf[6] === 0x1a &&
+            buf[7] === 0x0a,
+          `Plik assets/${file} nie posiada prawidłowego nagłówka PNG (magic bytes 89 50 4E 47)`
+        );
+      } else if (file.endsWith('.webp')) {
+        const buf = readFileSync(fullPath);
+        const isRiffWebp =
+          buf.length >= 12 &&
+          buf[0] === 0x52 && // 'R'
+          buf[1] === 0x49 && // 'I'
+          buf[2] === 0x46 && // 'F'
+          buf[3] === 0x46 && // 'F'
+          buf[8] === 0x57 && // 'W'
+          buf[9] === 0x45 && // 'E'
+          buf[10] === 0x42 && // 'B'
+          buf[11] === 0x50; // 'P'
+        check(
+          isRiffWebp,
+          `Plik assets/${file} nie posiada prawidłowego nagłówka WebP (magic bytes RIFF....WEBP)`
+        );
+      }
     }
   }
 
