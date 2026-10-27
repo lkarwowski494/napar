@@ -636,6 +636,114 @@ export function getLowStockInventoryItems(
   return lowStock.sort((a, b) => getWeight(a) - getWeight(b));
 }
 
+export interface InventoryTotalValueResult {
+  totalItemsCount: number;
+  inStockItemsCount: number;
+  totalRemainingWeightGrams: number;
+  estimatedTotalValuePln: number;
+  averageValuePerPackagePln: number;
+  formattedTotalValuePln: string;
+}
+
+/**
+ * Szacuje całkowitą wartość rynkową oraz gramaturę zapasów kawy i herbaty w spiżarni,
+ * uwzględniając podane ceny paczek lub domyślną stawkę za kilogram surowca specialty.
+ */
+export function calculateInventoryTotalValue(
+  items?: InventoryItem[] | null,
+  estimatedCostPerKgPln = 160
+): InventoryTotalValueResult {
+  if (!Array.isArray(items) || items.length === 0) {
+    return {
+      totalItemsCount: 0,
+      inStockItemsCount: 0,
+      totalRemainingWeightGrams: 0,
+      estimatedTotalValuePln: 0,
+      averageValuePerPackagePln: 0,
+      formattedTotalValuePln: '0,00 zł',
+    };
+  }
+
+  const rawRate =
+    typeof estimatedCostPerKgPln === 'number'
+      ? estimatedCostPerKgPln
+      : typeof estimatedCostPerKgPln === 'string'
+      ? parseFloat((estimatedCostPerKgPln as string).replace(/\uFEFF/g, '').replace(',', '.').trim())
+      : 160;
+  const costPerKg = Number.isFinite(rawRate) && rawRate > 0 && !Object.is(rawRate, -0) ? rawRate : 160;
+
+  let totalItemsCount = 0;
+  let inStockItemsCount = 0;
+  let totalRemainingWeightGrams = 0;
+  let estimatedTotalValue = 0;
+
+  for (const item of items) {
+    if (!item || typeof item !== 'object') continue;
+    totalItemsCount++;
+
+    const rawWeight =
+      typeof item.remainingWeightGrams === 'number'
+        ? item.remainingWeightGrams
+        : typeof item.remainingWeightGrams === 'string'
+        ? parseFloat((item.remainingWeightGrams as string).replace(/\uFEFF/g, '').replace(',', '.').trim())
+        : 0;
+    const remWeight = Number.isFinite(rawWeight) && rawWeight > 0 && !Object.is(rawWeight, -0) ? rawWeight : 0;
+
+    if (remWeight > 0) {
+      inStockItemsCount++;
+      totalRemainingWeightGrams += remWeight;
+
+      const rawInit =
+        typeof item.initialWeightGrams === 'number'
+          ? item.initialWeightGrams
+          : typeof item.initialWeightGrams === 'string'
+          ? parseFloat((item.initialWeightGrams as string).replace(/\uFEFF/g, '').replace(',', '.').trim())
+          : 0;
+      const initWeight = Number.isFinite(rawInit) && rawInit > 0 && !Object.is(rawInit, -0) ? rawInit : 0;
+
+      const rawPrice =
+        typeof (item as any).price === 'number'
+          ? (item as any).price
+          : typeof (item as any).price === 'string'
+          ? parseFloat(String((item as any).price).replace(/\uFEFF/g, '').replace(',', '.').trim())
+          : typeof (item as any).pricePerPackage === 'number'
+          ? (item as any).pricePerPackage
+          : undefined;
+
+      if (rawPrice !== undefined && Number.isFinite(rawPrice) && rawPrice > 0 && !Object.is(rawPrice, -0)) {
+        if (initWeight > 0 && remWeight <= initWeight) {
+          estimatedTotalValue += rawPrice * (remWeight / initWeight);
+        } else {
+          estimatedTotalValue += rawPrice;
+        }
+      } else {
+        estimatedTotalValue += (remWeight / 1000) * costPerKg;
+      }
+    }
+  }
+
+  totalRemainingWeightGrams = Number(totalRemainingWeightGrams.toFixed(1));
+  if (Object.is(totalRemainingWeightGrams, -0)) totalRemainingWeightGrams = 0;
+
+  const estimatedTotalValuePln = Number(estimatedTotalValue.toFixed(2));
+  const safeTotalValue = Object.is(estimatedTotalValuePln, -0) ? 0 : estimatedTotalValuePln;
+
+  const rawAvg = inStockItemsCount > 0 ? safeTotalValue / inStockItemsCount : 0;
+  const averageValuePerPackagePln = Number(rawAvg.toFixed(2));
+  const safeAvg = Object.is(averageValuePerPackagePln, -0) ? 0 : averageValuePerPackagePln;
+
+  const formattedTotalValuePln = `${safeTotalValue.toFixed(2).replace('.', ',')} zł`;
+
+  return {
+    totalItemsCount,
+    inStockItemsCount,
+    totalRemainingWeightGrams,
+    estimatedTotalValuePln: safeTotalValue,
+    averageValuePerPackagePln: safeAvg,
+    formattedTotalValuePln,
+  };
+}
+
 export function getInventoryItemById(id: string): InventoryItem | null {
   if (!id || typeof id !== 'string' || !id.trim()) return null;
   const safeId = id.trim();

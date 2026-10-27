@@ -20,6 +20,8 @@ import {
   calculateInventorySummary,
   InventorySummary,
   getLowStockInventoryItems,
+  calculateInventoryTotalValue,
+  InventoryTotalValueResult,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -2908,5 +2910,34 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(getLowStockInventoryItems(null)).toEqual([]);
     expect(getLowStockInventoryItems([])).toEqual([]);
     expect(getLowStockInventoryItems(items, -100)).toHaveLength(3);
+  });
+
+  test('TASK-P80-03-ZAK: calculateInventoryTotalValue wylicza sumaryczną wartość i stan magazynu', () => {
+    const items = [
+      { id: '1', name: 'Kolumbia Geisha', remainingWeightGrams: 200, initialWeightGrams: 250, price: 100 }, // (200/250)*100 = 80 zł
+      { id: '2', name: 'Etiopia Yirgacheffe', remainingWeightGrams: 250, initialWeightGrams: 250, price: 60 }, // 60 zł
+      { id: '3', name: 'Brak ceny - szacunek z kg', remainingWeightGrams: 500 }, // 0.5 kg * 160 zł/kg = 80 zł
+      { id: '4', name: 'Pusta paczka', remainingWeightGrams: 0, price: 50 }, // 0 g -> 0 zł
+    ] as any[];
+
+    // 1. Standardowe obliczenie
+    const result: InventoryTotalValueResult = calculateInventoryTotalValue(items, 160);
+    expect(result.totalItemsCount).toBe(4);
+    expect(result.inStockItemsCount).toBe(3);
+    expect(result.totalRemainingWeightGrams).toBe(950);
+    expect(result.estimatedTotalValuePln).toBe(220); // 80 + 60 + 80 = 220 zł
+    expect(result.averageValuePerPackagePln).toBeCloseTo(73.33, 1);
+    expect(result.formattedTotalValuePln).toBe('220,00 zł');
+
+    // 2. Własny szacunek ceny za kg
+    const customRate = calculateInventoryTotalValue([{ remainingWeightGrams: 1000 }] as any, 200);
+    expect(customRate.estimatedTotalValuePln).toBe(200);
+
+    // 3. Odporność na null, puste tablice i zera
+    const emptyResult = calculateInventoryTotalValue(null);
+    expect(emptyResult.totalItemsCount).toBe(0);
+    expect(emptyResult.inStockItemsCount).toBe(0);
+    expect(emptyResult.estimatedTotalValuePln).toBe(0);
+    expect(emptyResult.formattedTotalValuePln).toBe('0,00 zł');
   });
 });
