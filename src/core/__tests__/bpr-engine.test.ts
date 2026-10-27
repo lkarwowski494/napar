@@ -20,6 +20,10 @@ import {
   rankActionsByPriority,
   summarizeBprActionFeed,
   BprActionFeedSummary,
+  detectBrewingHabitDrift,
+  HabitDriftAnalysis,
+  HabitDriftCategory,
+  HabitDriftMetrics,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -1069,6 +1073,72 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(emptySummary.recommendedNextAction).toBeNull();
       expect(emptySummary.dominantBadgeColor).toBe('none');
       expect(emptySummary.summaryMessagePl).toContain('Brak zaplanowanych rekomendacji');
+    });
+
+    it('TASK-P88-04-SZT: detectBrewingHabitDrift analizuje powtarzalność parametrów i wykrywa dryf nawyków', () => {
+      // 1. Zauważalne wydłużenie czasu (time_drift_slower: czas 220s vs referencyjny 180s = +40s)
+      const slowSessions = [
+        { id: 's1', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 215, rating: 4 },
+        { id: 's2', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 225, rating: 4 },
+        { id: 's3', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 220, rating: 4 },
+      ] as any[];
+
+      const slowDrift: HabitDriftAnalysis = detectBrewingHabitDrift(slowSessions, {
+        averageBrewTimeSeconds: 180,
+        averageWaterTempCelsius: 93,
+        averageRatio: 16.7,
+        averageRating: 4.0,
+      });
+
+      const catCheck: HabitDriftCategory = slowDrift.category;
+      expect(catCheck).toBe('time_drift_slower');
+      expect(slowDrift.hasSignificantDrift).toBe(true);
+      expect(slowDrift.timeDeltaSeconds).toBe(40);
+      expect(slowDrift.insightPl).toContain('+40s');
+      expect(slowDrift.recommendationPl).toContain('żaren');
+      expect(slowDrift.recommendationEn).toContain('burr');
+
+      // 2. Dryf temperatury wody (temp_drift: woda 88°C vs referencyjna 93°C = -5°C)
+      const coldSessions = [
+        { id: 's4', doseGrams: 15, waterGrams: 250, waterTempCelsius: 88, totalTimeSeconds: 180, rating: 4 },
+        { id: 's5', doseGrams: 15, waterGrams: 250, waterTempCelsius: 88, totalTimeSeconds: 180, rating: 4 },
+        { id: 's6', doseGrams: 15, waterGrams: 250, waterTempCelsius: 88, totalTimeSeconds: 180, rating: 4 },
+      ] as any[];
+
+      const tempDrift = detectBrewingHabitDrift(coldSessions, {
+        averageBrewTimeSeconds: 180,
+        averageWaterTempCelsius: 93,
+        averageRatio: 16.7,
+        averageRating: 4.0,
+      });
+      expect(tempDrift.category).toBe('temp_drift');
+      expect(tempDrift.hasSignificantDrift).toBe(true);
+      expect(tempDrift.tempDeltaCelsius).toBe(-5);
+      expect(tempDrift.insightPl).toContain('-5°C');
+
+      // 3. Stabilna powtarzalność (stable)
+      const stableSessions = [
+        { id: 's7', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 182, rating: 5 },
+        { id: 's8', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 180, rating: 5 },
+        { id: 's9', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 178, rating: 5 },
+      ] as any[];
+
+      const stable = detectBrewingHabitDrift(stableSessions);
+      expect(stable.category).toBe('stable');
+      expect(stable.hasSignificantDrift).toBe(false);
+      expect(stable.insightPl).toContain('stabilne i powtarzalne');
+
+      // 4. Za mała próba (< 3 sesje)
+      const smallSample = detectBrewingHabitDrift([slowSessions[0]]);
+      expect(smallSample.sessionCount).toBe(1);
+      expect(smallSample.hasSignificantDrift).toBe(false);
+      expect(smallSample.category).toBe('stable');
+      expect(smallSample.insightPl).toContain('Zbyt mała próba');
+
+      // 5. Odporność na null i puste dane
+      const emptyDrift = detectBrewingHabitDrift(null);
+      expect(emptyDrift.sessionCount).toBe(0);
+      expect(emptyDrift.category).toBe('stable');
     });
   });
 });

@@ -1324,4 +1324,222 @@ export function summarizeBprActionFeed(
   };
 }
 
+export type HabitDriftCategory =
+  | 'stable'
+  | 'time_drift_slower'
+  | 'time_drift_faster'
+  | 'temp_drift'
+  | 'ratio_drift';
+
+export interface HabitDriftMetrics {
+  averageBrewTimeSeconds: number;
+  averageWaterTempCelsius: number;
+  averageRatio: number;
+  averageRating: number;
+}
+
+export interface HabitDriftAnalysis {
+  category: HabitDriftCategory;
+  hasSignificantDrift: boolean;
+  sessionCount: number;
+  currentMetrics: HabitDriftMetrics;
+  referenceMetrics: HabitDriftMetrics;
+  timeDeltaSeconds: number;
+  tempDeltaCelsius: number;
+  ratioDelta: number;
+  insightPl: string;
+  insightEn: string;
+  recommendationPl: string;
+  recommendationEn: string;
+}
+
+/**
+ * Analizuje powtarzalność ostatnich sesji parzenia i wykrywa dryf nawyków (czas, temperatura, proporcje).
+ */
+export function detectBrewingHabitDrift(
+  recentSessions?: Array<{
+    id?: string;
+    doseGrams?: number;
+    waterGrams?: number;
+    waterTempCelsius?: number;
+    totalTimeSeconds?: number;
+    rating?: number;
+  }> | null,
+  referenceMetrics?: Partial<HabitDriftMetrics> | null
+): HabitDriftAnalysis {
+  const defaultRef: HabitDriftMetrics = {
+    averageBrewTimeSeconds: 180,
+    averageWaterTempCelsius: 93,
+    averageRatio: 16.0,
+    averageRating: 4.0,
+  };
+
+  const safeRef: HabitDriftMetrics = {
+    averageBrewTimeSeconds:
+      typeof referenceMetrics?.averageBrewTimeSeconds === 'number' && Number.isFinite(referenceMetrics.averageBrewTimeSeconds)
+        ? referenceMetrics.averageBrewTimeSeconds
+        : defaultRef.averageBrewTimeSeconds,
+    averageWaterTempCelsius:
+      typeof referenceMetrics?.averageWaterTempCelsius === 'number' && Number.isFinite(referenceMetrics.averageWaterTempCelsius)
+        ? referenceMetrics.averageWaterTempCelsius
+        : defaultRef.averageWaterTempCelsius,
+    averageRatio:
+      typeof referenceMetrics?.averageRatio === 'number' && Number.isFinite(referenceMetrics.averageRatio)
+        ? referenceMetrics.averageRatio
+        : defaultRef.averageRatio,
+    averageRating:
+      typeof referenceMetrics?.averageRating === 'number' && Number.isFinite(referenceMetrics.averageRating)
+        ? referenceMetrics.averageRating
+        : defaultRef.averageRating,
+  };
+
+  if (!Array.isArray(recentSessions) || recentSessions.length === 0) {
+    return {
+      category: 'stable',
+      hasSignificantDrift: false,
+      sessionCount: 0,
+      currentMetrics: {
+        averageBrewTimeSeconds: 0,
+        averageWaterTempCelsius: 0,
+        averageRatio: 0,
+        averageRating: 0,
+      },
+      referenceMetrics: safeRef,
+      timeDeltaSeconds: 0,
+      tempDeltaCelsius: 0,
+      ratioDelta: 0,
+      insightPl: 'Brak zarejestrowanych sesji do analizy powtarzalności parametrów.',
+      insightEn: 'No recorded sessions to analyze parameter consistency.',
+      recommendationPl: 'Zarejestruj kilka kolejnych naparów, aby wygenerować analizę powtarzalności.',
+      recommendationEn: 'Log several consecutive brews to generate a repeatability analysis.',
+    };
+  }
+
+  const validSessions = recentSessions.filter((s) => s && typeof s === 'object');
+  const sessionCount = validSessions.length;
+
+  let sumTime = 0;
+  let countTime = 0;
+  let sumTemp = 0;
+  let countTemp = 0;
+  let sumRatio = 0;
+  let countRatio = 0;
+  let sumRating = 0;
+  let countRating = 0;
+
+  for (const s of validSessions) {
+    if (typeof s.totalTimeSeconds === 'number' && Number.isFinite(s.totalTimeSeconds) && s.totalTimeSeconds > 0) {
+      sumTime += s.totalTimeSeconds;
+      countTime++;
+    }
+    if (typeof s.waterTempCelsius === 'number' && Number.isFinite(s.waterTempCelsius) && s.waterTempCelsius > 0) {
+      sumTemp += s.waterTempCelsius;
+      countTemp++;
+    }
+    if (
+      typeof s.waterGrams === 'number' &&
+      Number.isFinite(s.waterGrams) &&
+      s.waterGrams > 0 &&
+      typeof s.doseGrams === 'number' &&
+      Number.isFinite(s.doseGrams) &&
+      s.doseGrams > 0
+    ) {
+      sumRatio += s.waterGrams / s.doseGrams;
+      countRatio++;
+    }
+    if (typeof s.rating === 'number' && Number.isFinite(s.rating) && s.rating > 0) {
+      sumRating += s.rating;
+      countRating++;
+    }
+  }
+
+  const currentMetrics: HabitDriftMetrics = {
+    averageBrewTimeSeconds: countTime > 0 ? Math.round(sumTime / countTime) : safeRef.averageBrewTimeSeconds,
+    averageWaterTempCelsius: countTemp > 0 ? Math.round((sumTemp / countTemp) * 10) / 10 : safeRef.averageWaterTempCelsius,
+    averageRatio: countRatio > 0 ? Math.round((sumRatio / countRatio) * 10) / 10 : safeRef.averageRatio,
+    averageRating: countRating > 0 ? Math.round((sumRating / countRating) * 10) / 10 : safeRef.averageRating,
+  };
+
+  const timeDeltaSeconds = Math.round(currentMetrics.averageBrewTimeSeconds - safeRef.averageBrewTimeSeconds);
+  const tempDeltaCelsius = Math.round((currentMetrics.averageWaterTempCelsius - safeRef.averageWaterTempCelsius) * 10) / 10;
+  const ratioDelta = Math.round((currentMetrics.averageRatio - safeRef.averageRatio) * 10) / 10;
+
+  if (sessionCount < 3) {
+    return {
+      category: 'stable',
+      hasSignificantDrift: false,
+      sessionCount,
+      currentMetrics,
+      referenceMetrics: safeRef,
+      timeDeltaSeconds,
+      tempDeltaCelsius,
+      ratioDelta,
+      insightPl: `Zbyt mała próba do wykrycia dryfu nawyków (${sessionCount} z min. 3 wymaganych sesji).`,
+      insightEn: `Sample size too small to detect habit drift (${sessionCount} of min. 3 sessions required).`,
+      recommendationPl: 'Kontynuuj parzenie z bieżącymi parametrami, aby zebrać więcej danych.',
+      recommendationEn: 'Continue brewing with current settings to collect more baseline data.',
+    };
+  }
+
+  let category: HabitDriftCategory = 'stable';
+  let hasSignificantDrift = false;
+  let insightPl = 'Twoje nawyki parzenia są stabilne i powtarzalne.';
+  let insightEn = 'Your brewing parameters are stable and consistent.';
+  let recommendationPl = 'Utrzymuj bieżące nastawy młynka i recepturę.';
+  let recommendationEn = 'Maintain current grinder settings and recipe.';
+
+  if (timeDeltaSeconds >= 25) {
+    category = 'time_drift_slower';
+    hasSignificantDrift = true;
+    insightPl = `Średni czas parzenia wydłużył się o +${timeDeltaSeconds}s (obecnie ${currentMetrics.averageBrewTimeSeconds}s vs wzorzec ${safeRef.averageBrewTimeSeconds}s).`;
+    insightEn = `Average brew time slowed by +${timeDeltaSeconds}s (now ${currentMetrics.averageBrewTimeSeconds}s vs reference ${safeRef.averageBrewTimeSeconds}s).`;
+    recommendationPl: 'Sprawdź stan żaren młynka lub oczyść je z nagromadzonego pyłu (fines retention).';
+    recommendationEn: 'Inspect grinder burrs or clean out fines retention to restore target flow rate.';
+  } else if (timeDeltaSeconds <= -25) {
+    category = 'time_drift_faster';
+    hasSignificantDrift = true;
+    insightPl = `Średni czas parzenia skrócił się o ${timeDeltaSeconds}s (obecnie ${currentMetrics.averageBrewTimeSeconds}s vs wzorzec ${safeRef.averageBrewTimeSeconds}s).`;
+    insightEn = `Average brew time sped up by ${timeDeltaSeconds}s (now ${currentMetrics.averageBrewTimeSeconds}s vs reference ${safeRef.averageBrewTimeSeconds}s).`;
+    recommendationPl = 'Zwróć uwagę na kanałowanie (channeling) lub zmiel ziarna nieco drobniej.';
+    recommendationEn = 'Watch for channeling or adjust grinder setting slightly finer.';
+  } else if (Math.abs(tempDeltaCelsius) >= 3) {
+    category = 'temp_drift';
+    hasSignificantDrift = true;
+    const sign = tempDeltaCelsius > 0 ? `+${tempDeltaCelsius}` : `${tempDeltaCelsius}`;
+    insightPl = `Temperatura wody przesunęła się o ${sign}°C (obecnie ${currentMetrics.averageWaterTempCelsius}°C vs wzorzec ${safeRef.averageWaterTempCelsius}°C).`;
+    insightEn = `Water temperature drifted by ${sign}°C (now ${currentMetrics.averageWaterTempCelsius}°C vs reference ${safeRef.averageWaterTempCelsius}°C).`;
+    recommendationPl = 'Skontroluj nastawę czajnika z termostatem, aby zachować optymalną ekstrakcję.';
+    recommendationEn = 'Verify temperature-controlled kettle settings to maintain target extraction.';
+  } else if (Math.abs(ratioDelta) >= 1.5) {
+    category = 'ratio_drift';
+    hasSignificantDrift = true;
+    const sign = ratioDelta > 0 ? `+${ratioDelta}` : `${ratioDelta}`;
+    insightPl = `Proporcja wody do kawy uległa zmianie o ${sign} (obecnie 1:${currentMetrics.averageRatio} vs 1:${safeRef.averageRatio}).`;
+    insightEn = `Brew ratio shifted by ${sign} (now 1:${currentMetrics.averageRatio} vs 1:${safeRef.averageRatio}).`;
+    recommendationPl = 'Skalibruj wagę kuchenną i trzymaj się stałej receptury.';
+    recommendationEn = 'Tare your digital scale and verify bean-to-water ratio.';
+  }
+
+  // Handle recommendation for time_drift_slower properly (fixing typo in object property if any)
+  if (category === 'time_drift_slower') {
+    recommendationPl = 'Sprawdź stan żaren młynka lub oczyść je z nagromadzonego pyłu (fines retention).';
+    recommendationEn = 'Inspect grinder burrs or clean out fines retention to restore target flow rate.';
+  }
+
+  return {
+    category,
+    hasSignificantDrift,
+    sessionCount,
+    currentMetrics,
+    referenceMetrics: safeRef,
+    timeDeltaSeconds,
+    tempDeltaCelsius,
+    ratioDelta,
+    insightPl,
+    insightEn,
+    recommendationPl,
+    recommendationEn,
+  };
+}
+
 
