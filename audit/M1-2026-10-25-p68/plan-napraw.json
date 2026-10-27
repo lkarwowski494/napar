@@ -1,0 +1,53 @@
+{
+  "cycle": "P68",
+  "status": "completed",
+  "perspectives": [
+    "11-WZR",
+    "12-NIE",
+    "01-ODK",
+    "02-MON",
+    "03-ZAK"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P68-11-WZR",
+      "perspective": "11-WZR",
+      "description": "Dodanie kalkulatora bypass brewing (rozcieńczania) calculateBypassBrew z typami BypassBrewParams i BypassBrewResult w src/core/domain-rules.ts",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P68-12-NIE",
+      "perspective": "12-NIE",
+      "description": "Rozbudowa pakietu testów odpornościowych o zestaw Chaos 12 dla nowych funkcji (searchKnowledgeBase, evaluateWaterSuitability, getGrinderSettingForMethod, calculateBypassBrew)",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P68-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Dodanie funkcji filtrowania i wyszukiwania receptur filterRecipes z kryteriami RecipeFilterCriteria w src/core/recipes-data.ts",
+      "targetFile": "src/core/recipes-data.ts",
+      "testFile": "src/core/__tests__/recipes-data.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P68-02-MON",
+      "perspective": "02-MON",
+      "description": "Dodanie zestawienia korzyści subskrypcyjnych paywalla getPaywallFeatureHighlights z typem PaywallFeatureHighlight w src/core/app-access.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P68-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja sortowania spiżarni sortInventoryItems i getSortedInventoryItems z opcjami InventorySortOption w src/core/database.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    }
+  ]
+}
