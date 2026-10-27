@@ -2,7 +2,13 @@
 // Apps4Craft Unified Design System — Suite Theme Tests
 // ============================================================================
 
-import { CRAFT_APPS, sharedCraftTokens, getCraftTheme } from '../craft-suite-theme';
+import {
+  CRAFT_APPS,
+  sharedCraftTokens,
+  getCraftTheme,
+  getAllCraftApps,
+  isValidCraftAppId,
+} from '../craft-suite-theme';
 
 describe('Apps4Craft Suite Theme Tokens', () => {
   test('Definiuje spójną paletę dla wszystkich 5 aplikacji kuchennych', () => {
@@ -56,5 +62,28 @@ describe('Apps4Craft Suite Theme Tokens', () => {
     expect(getCraftTheme(null as any).id).toBe('napar');
     expect(getCraftTheme(undefined as any).id).toBe('napar');
     expect(getCraftTheme('' as any).id).toBe('napar');
+  });
+
+  test('TASK-P61-04-SZT: getAllCraftApps zwraca 5 aplikacji kulinarnych a isValidCraftAppId weryfikuje identyfikator', () => {
+    // 1. getAllCraftApps
+    const apps = getAllCraftApps();
+    expect(Array.isArray(apps)).toBe(true);
+    expect(apps.length).toBe(5);
+    const ids = apps.map((a) => a.id);
+    expect(ids).toEqual(['napar', 'piekarz', 'sloik', 'masaz', 'ferment']);
+
+    // 2. isValidCraftAppId
+    expect(isValidCraftAppId('napar')).toBe(true);
+    expect(isValidCraftAppId('piekarz')).toBe(true);
+    expect(isValidCraftAppId('sloik')).toBe(true);
+    expect(isValidCraftAppId('masaz')).toBe(true);
+    expect(isValidCraftAppId('ferment')).toBe(true);
+    expect(isValidCraftAppId('\uFEFFnapar')).toBe(true);
+    expect(isValidCraftAppId('PIEKARZ')).toBe(true);
+
+    expect(isValidCraftAppId('unknown')).toBe(false);
+    expect(isValidCraftAppId(null)).toBe(false);
+    expect(isValidCraftAppId(undefined)).toBe(false);
+    expect(isValidCraftAppId(123)).toBe(false);
   });
 });

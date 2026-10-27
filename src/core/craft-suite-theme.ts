@@ -147,3 +147,19 @@ export function getCraftTheme(appId: CraftAppId | string = 'napar'): CraftAppThe
   const cleanId = appId.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
   return (CRAFT_APPS as Record<string, CraftAppTheme>)[cleanId] ?? CRAFT_APPS.napar;
 }
+
+/**
+ * Zwraca listę wszystkich motywów aplikacji wchodzących w skład rodziny Apps4Craft.
+ */
+export function getAllCraftApps(): CraftAppTheme[] {
+  return Object.values(CRAFT_APPS);
+}
+
+/**
+ * Sprawdza czy dany identyfikator odpowiada jednej z 5 aplikacji rodziny Apps4Craft.
+ */
+export function isValidCraftAppId(id: unknown): id is CraftAppId {
+  if (!id || typeof id !== 'string') return false;
+  const cleanId = id.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase();
+  return cleanId in CRAFT_APPS;
+}
