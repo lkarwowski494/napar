@@ -7,6 +7,7 @@ import {
   calculateTeaCost,
   formatPlnCost,
   DEFAULT_BREW_COST_PARAMETERS,
+  DEFAULT_TEA_COST_PARAMETERS,
 } from '../cost-calculator';
 
 describe('Cost Calculator Engine (Craft Economics)', () => {
@@ -131,6 +132,10 @@ describe('Cost Calculator Engine (Craft Economics)', () => {
   });
 
   test('TASK-P60-08-PRO: calculateTeaCost oblicza koszt wielonaparowej sesji Gongfu Cha i koszt pojedynczej infuzji', () => {
+    expect(DEFAULT_TEA_COST_PARAMETERS.leafGrams).toBe(5.0);
+    expect(DEFAULT_TEA_COST_PARAMETERS.teaPricePer100g).toBe(60.0);
+    expect(DEFAULT_TEA_COST_PARAMETERS.infusionsCount).toBe(5);
+
     const teaMetrics = calculateTeaCost({
       leafGrams: 5,
       teaPricePer100g: 60,
