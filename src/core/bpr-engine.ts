@@ -1190,3 +1190,28 @@ export function calculateActionPriorityScore(
     recommendedTimingEn,
   };
 }
+
+/**
+ * Sortuje listę rekomendacji proaktywnych BPR malejąco według wyliczonego punktowego priorytetu
+ * (calculateActionPriorityScore), a w przypadku remisu rosnąco według daysOffset (najbliższe najpierw).
+ */
+export function rankActionsByPriority(
+  actions?: ProactiveActionItem[] | null
+): ProactiveActionItem[] {
+  if (!Array.isArray(actions) || actions.length === 0) return [];
+
+  const validActions = actions.filter((act) => act && typeof act === 'object');
+  if (validActions.length === 0) return [];
+
+  return [...validActions].sort((a, b) => {
+    const scoreA = calculateActionPriorityScore(a).score;
+    const scoreB = calculateActionPriorityScore(b).score;
+    if (scoreB !== scoreA) {
+      return scoreB - scoreA;
+    }
+    const offsetA = typeof a.daysOffset === 'number' && Number.isFinite(a.daysOffset) ? a.daysOffset : 0;
+    const offsetB = typeof b.daysOffset === 'number' && Number.isFinite(b.daysOffset) ? b.daysOffset : 0;
+    return offsetA - offsetB;
+  });
+}
+

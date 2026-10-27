@@ -17,6 +17,7 @@ import {
   getProactiveActionById,
   calculateActionPriorityScore,
   ActionPriorityEvaluation,
+  rankActionsByPriority,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -997,6 +998,37 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       const evalNull = calculateActionPriorityScore(null);
       expect(evalNull.score).toBe(0);
       expect(evalNull.urgency).toBe('low');
+    });
+
+    it('TASK-P83-04-SZT: rankActionsByPriority sortuje akcje proaktywne malejąco według priorytetu BPR', () => {
+      const actions = [
+        { id: 'low-act', titlePl: 'Niski priorytet', priority: 'low', daysOffset: 5 },
+        { id: 'crit-today', titlePl: 'Krytyczny dzisiaj', priority: 'high', daysOffset: 0 },
+        { id: 'high-soon', titlePl: 'Wysoki jutro', priority: 'high', daysOffset: 1 },
+        { id: 'med-act', titlePl: 'Średni priorytet', priority: 'medium', daysOffset: 2 },
+      ] as any[];
+
+      // 1. Sortowanie rankActionsByPriority
+      const ranked = rankActionsByPriority(actions);
+      expect(ranked).toHaveLength(4);
+      expect(ranked[0].id).toBe('crit-today');
+      expect(ranked[1].id).toBe('high-soon');
+      expect(ranked[2].id).toBe('med-act');
+      expect(ranked[3].id).toBe('low-act');
+
+      // 2. Obsługa remisu — ten sam priorytet, sortowanie rosnąco po daysOffset
+      const ties = [
+        { id: 'tie-day-3', priority: 'medium', daysOffset: 3 },
+        { id: 'tie-day-1', priority: 'medium', daysOffset: 1 },
+      ] as any[];
+      const rankedTies = rankActionsByPriority(ties);
+      expect(rankedTies[0].id).toBe('tie-day-1');
+      expect(rankedTies[1].id).toBe('tie-day-3');
+
+      // 3. Odporność na null, puste tablice i uszkodzone elementy
+      expect(rankActionsByPriority(null)).toEqual([]);
+      expect(rankActionsByPriority([])).toEqual([]);
+      expect(rankActionsByPriority([null, undefined] as any)).toEqual([]);
     });
   });
 });
