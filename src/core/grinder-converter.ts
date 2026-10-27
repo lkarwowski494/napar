@@ -1097,3 +1097,34 @@ export function getRecommendedGrindForRecipe(
     microns,
   };
 }
+
+export interface MethodGrindSettingResult {
+  clicks: number;
+  formatted: string;
+  microns: number;
+  category: GrindCategory;
+  grinderName: string;
+}
+
+/**
+ * Wylicza bezpośrednią nastawę wybranego młynka dla wskazanej metody parzenia (np. V60, AeroPress, Chemex, Espresso).
+ */
+export function getGrinderSettingForMethod(
+  grinderId: string,
+  method: string,
+  language = 'pl'
+): MethodGrindSettingResult {
+  const safeMethod = typeof method === 'string' ? method.trim() : '';
+  const microns = getRecipeMicrons({ method: safeMethod });
+  const grinder = findGrinderById(grinderId) || SUPPORTED_GRINDERS[0];
+  const converted = convertMicronsToGrinder(microns, grinder.id, language);
+  const category = findGrindCategoryForMicrons(microns);
+
+  return {
+    clicks: converted.rawValue,
+    formatted: converted.formatted,
+    microns,
+    category,
+    grinderName: grinder.name,
+  };
+}

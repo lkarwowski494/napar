@@ -12,6 +12,8 @@ import {
   findGrinderById,
   findGrindCategoryForMicrons,
   findGrindCategoryById,
+  getGrinderSettingForMethod,
+  MethodGrindSettingResult,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -806,6 +808,32 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(findGrindCategoryForMicrons(NaN).id).toBe('pourover_v60');
     expect(findGrindCategoryForMicrons(-100).id).toBe('pourover_v60');
     expect(findGrindCategoryForMicrons('invalid').id).toBe('pourover_v60');
+  });
+
+  test('TASK-P67-08-PRO: getGrinderSettingForMethod wylicza nastawe mlynka bezposrednio dla metody parzenia', () => {
+    // 1. V60 na Comandante C40 (~720 µm -> 24 kliki)
+    const c40V60: MethodGrindSettingResult = getGrinderSettingForMethod('comandante_c40', 'V60', 'pl');
+    expect(c40V60.clicks).toBe(24);
+    expect(c40V60.formatted).toContain('24');
+    expect(c40V60.category.id).toBe('pourover_v60');
+    expect(c40V60.microns).toBe(720);
+
+    // 2. AeroPress na 1Zpresso K-Ultra (~560 µm -> 28 klików / 2.8)
+    const kUltraAero = getGrinderSettingForMethod('1zpresso_k_ultra', 'AeroPress', 'en');
+    expect(kUltraAero.clicks).toBe(28);
+    expect(kUltraAero.formatted).toBe('2.8 (28 clicks)');
+    expect(kUltraAero.category.id).toBe('aeropress');
+
+    // 3. Chemex na Fellow Ode Gen 2 (~900 µm -> nastawa)
+    const odeChemex = getGrinderSettingForMethod('fellow_ode_gen2', 'Chemex', 'pl');
+    expect(odeChemex.clicks).toBeGreaterThan(10);
+    expect(odeChemex.category.id).toBe('chemex_cupping');
+
+    // 4. Odporność na nieznane metody i młynek null
+    const fallbackRes = getGrinderSettingForMethod(null as any, 'unknown_method');
+    expect(fallbackRes.clicks).toBeGreaterThan(0);
+    expect(fallbackRes.formatted).toBeDefined();
+    expect(fallbackRes.category).toBeDefined();
   });
 });
 
