@@ -1055,3 +1055,78 @@ export function getTrialProgressInfo(state?: AppAccessState | null): TrialProgre
   };
 }
 
+
+
+export interface PaywallCallToAction {
+  titlePl: string;
+  titleEn: string;
+  subtitlePl: string;
+  subtitleEn: string;
+  buttonTextPl: string;
+  buttonTextEn: string;
+  urgency: 'low' | 'medium' | 'high';
+  recommendedTier: 'monthly' | 'annual' | 'lifetime';
+}
+
+/**
+ * Zwraca zoptymalizowaną treść wezwania do działania (CTA) w paywallu oraz poziom pilności (urgency)
+ * w zależności od aktualnego stanu subskrypcji lub etapu okresu próbnego.
+ */
+export function getPaywallCallToAction(state?: AppAccessState | null): PaywallCallToAction {
+  const current = state && typeof state === 'object' && 'status' in state ? state : getAppAccessState();
+
+  if (current.isSubscribed) {
+    return {
+      titlePl: 'Subskrypcja aktywna',
+      titleEn: 'Subscription Active',
+      subtitlePl: 'Wszystkie funkcje profesjonalne i bazy wiedzy są w pełni odblokowane.',
+      subtitleEn: 'All pro tools and craft knowledge bases are fully unlocked.',
+      buttonTextPl: 'Zarządzaj subskrypcją',
+      buttonTextEn: 'Manage Subscription',
+      urgency: 'low',
+      recommendedTier: current.subscriptionTier === 'monthly' || current.subscriptionTier === 'lifetime'
+        ? current.subscriptionTier
+        : 'annual',
+    };
+  }
+
+  if (current.status === 'trial_expired') {
+    return {
+      titlePl: 'Okres próbny zakończony',
+      titleEn: 'Free Trial Expired',
+      subtitlePl: 'Odblokuj nieograniczone parzenia, asystenta BPR oraz pełną bazę sensoryczną.',
+      subtitleEn: 'Unlock unlimited brewing, BPR engine, and full sensory compendium.',
+      buttonTextPl: 'Odblokuj Napar Pro',
+      buttonTextEn: 'Unlock Napar Pro',
+      urgency: 'high',
+      recommendedTier: 'annual',
+    };
+  }
+
+  const daysRem = Number.isFinite(current.daysRemaining) ? current.daysRemaining : TRIAL_DURATION_DAYS;
+  const brewsRem = Number.isFinite(current.brewsRemaining) ? current.brewsRemaining : TRIAL_MAX_BREWS;
+
+  if (daysRem <= 3 || brewsRem <= 3) {
+    return {
+      titlePl: 'Twój okres próbny wkrótce się kończy',
+      titleEn: 'Your Free Trial Is Ending Soon',
+      subtitlePl: `Pozostało Ci ${daysRem} dni lub ${brewsRem} parzeń. Wybierz plan roczny z 2 miesiącami gratis.`,
+      subtitleEn: `You have ${daysRem} days or ${brewsRem} brews left. Choose the annual plan to save with 2 months free.`,
+      buttonTextPl: 'Przejdź na Pro',
+      buttonTextEn: 'Upgrade to Pro',
+      urgency: 'medium',
+      recommendedTier: 'annual',
+    };
+  }
+
+  return {
+    titlePl: 'Odkryj pełnię możliwości Napar Pro',
+    titleEn: 'Experience the Full Power of Napar Pro',
+    subtitlePl: 'Przetestuj zaawansowane profile mielenia, dial-in espresso i estymację kofeiny.',
+    subtitleEn: 'Explore advanced grind profiling, espresso dial-in, and caffeine curve tracking.',
+    buttonTextPl: 'Rozpocznij subskrypcję',
+    buttonTextEn: 'Start Subscription',
+    urgency: 'low',
+    recommendedTier: 'annual',
+  };
+}

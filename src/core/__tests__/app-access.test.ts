@@ -36,6 +36,8 @@ import {
   FeatureAccessLevel,
   getTrialProgressInfo,
   TrialProgressInfo,
+  getPaywallCallToAction,
+  PaywallCallToAction,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1388,6 +1390,67 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const defaultProgress = getTrialProgressInfo(null);
     expect(defaultProgress).toBeDefined();
     expect(typeof defaultProgress.percentUsed).toBe('number');
+  });
+
+  test('TASK-P78-02-MON: getPaywallCallToAction wyznacza wezwanie do działania i poziom pilności', () => {
+    // 1. Aktywna subskrypcja -> urgency 'low'
+    const subState = {
+      isSubscribed: true,
+      subscriptionTier: 'annual' as const,
+      status: 'subscribed' as const,
+      canCreate: true,
+      isHistoryReadOnly: false,
+      brewsCount: 20,
+      brewsRemaining: Infinity,
+      daysRemaining: Infinity,
+    };
+    const subCta = getPaywallCallToAction(subState);
+    expect(subCta.urgency).toBe('low');
+    expect(subCta.titlePl).toContain('aktywna');
+    expect(subCta.buttonTextPl).toContain('Zarządzaj');
+
+    // 2. Wygasły okres próbny -> urgency 'high'
+    const expiredState = {
+      isSubscribed: false,
+      subscriptionTier: 'none' as const,
+      status: 'trial_expired' as const,
+      canCreate: false,
+      isHistoryReadOnly: true,
+      brewsCount: TRIAL_MAX_BREWS,
+      brewsRemaining: 0,
+      daysRemaining: 0,
+    };
+    const expCta = getPaywallCallToAction(expiredState);
+    expect(expCta.urgency).toBe('high');
+    expect(expCta.titlePl).toContain('zakończony');
+    expect(expCta.buttonTextPl).toContain('Odblokuj');
+    expect(expCta.recommendedTier).toBe('annual');
+
+    // 3. Kończący się okres próbny (<= 3 dni) -> urgency 'medium'
+    const soonState = {
+      ...expiredState,
+      status: 'trial_active' as const,
+      daysRemaining: 2,
+      brewsRemaining: 4,
+    };
+    const soonCta = getPaywallCallToAction(soonState);
+    expect(soonCta.urgency).toBe('medium');
+    expect(soonCta.titlePl).toContain('kończy');
+
+    // 4. Początek okresu próbnego -> urgency 'low'
+    const freshState = {
+      ...expiredState,
+      status: 'trial_active' as const,
+      daysRemaining: 12,
+      brewsRemaining: 10,
+    };
+    const freshCta = getPaywallCallToAction(freshState);
+    expect(freshCta.urgency).toBe('low');
+
+    // 5. Odporność na null/undefined
+    const defaultCta = getPaywallCallToAction(null);
+    expect(defaultCta).toBeDefined();
+    expect(typeof defaultCta.urgency).toBe('string');
   });
 });
 
