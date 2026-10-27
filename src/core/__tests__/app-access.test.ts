@@ -48,6 +48,9 @@ import {
   AnnualSavingsSummary,
   calculateLifetimeBreakEven,
   LifetimeBreakEvenSummary,
+  compareSubscriptionPlans,
+  SubscriptionPlanComparison,
+  SubscriptionPlanComparisonItem,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1627,6 +1630,45 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(fallback.monthlyPricePln).toBe(19.99);
     expect(fallback.annualPricePln).toBe(149.99);
     expect(fallback.isLifetimeRecommended).toBe(true);
+  });
+
+  test('TASK-P92-02-MON: compareSubscriptionPlans generuje zestawienie i porównanie planów subskrypcji', () => {
+    // 1. Domyślne ceny
+    const comparison: SubscriptionPlanComparison = compareSubscriptionPlans();
+    expect(comparison.plans).toHaveLength(3);
+
+    const monthlyPlan: SubscriptionPlanComparisonItem = comparison.plans.find((p) => p.tier === 'monthly')!;
+    const annualPlan = comparison.plans.find((p) => p.tier === 'annual')!;
+    const lifetimePlan = comparison.plans.find((p) => p.tier === 'lifetime')!;
+
+    expect(monthlyPlan.pricePln).toBe(19.99);
+    expect(monthlyPlan.monthlyEquivalentPln).toBe(19.99);
+    expect(monthlyPlan.savingsPercentageVsMonthly).toBe(0);
+
+    expect(annualPlan.pricePln).toBe(149.99);
+    expect(annualPlan.monthlyEquivalentPln).toBeCloseTo(12.5, 1);
+    expect(annualPlan.savingsPercentageVsMonthly).toBeGreaterThan(30);
+    expect(annualPlan.isPopular).toBe(true);
+
+    expect(lifetimePlan.pricePln).toBe(299.99);
+    expect(lifetimePlan.isBestValue).toBe(true);
+
+    expect(comparison.bestValueTier).toBe('lifetime');
+    expect(comparison.annualSavingsPln).toBeGreaterThan(80);
+
+    // 2. Własne ceny przekazane jako obiekt
+    const custom = compareSubscriptionPlans({
+      monthly: 10,
+      annual: 80,
+      lifetime: 160,
+    });
+    expect(custom.annualSavingsPln).toBe(40);
+    expect(custom.recommendedTier).toBe('lifetime'); // 160 / 80 = 2.0 <= 2.0 -> lifetime
+
+    // 3. Odporność na null i wartości ujemne
+    const fallback = compareSubscriptionPlans(null);
+    expect(fallback.plans).toHaveLength(3);
+    expect(fallback.bestValueTier).toBe('lifetime');
   });
 });
 

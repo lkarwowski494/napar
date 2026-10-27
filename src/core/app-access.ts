@@ -1474,5 +1474,100 @@ export function calculateLifetimeBreakEven(
   };
 }
 
+export interface SubscriptionPlanComparisonItem {
+  tier: 'monthly' | 'annual' | 'lifetime';
+  namePl: string;
+  nameEn: string;
+  pricePln: number;
+  monthlyEquivalentPln: number;
+  savingsPercentageVsMonthly: number;
+  badgePl?: string;
+  badgeEn?: string;
+  isPopular?: boolean;
+  isBestValue?: boolean;
+}
+
+export interface SubscriptionPlanComparison {
+  plans: SubscriptionPlanComparisonItem[];
+  annualSavingsPln: number;
+  bestValueTier: 'monthly' | 'annual' | 'lifetime';
+  recommendedTier: 'monthly' | 'annual' | 'lifetime';
+}
+
+/**
+ * Generuje szczegółowe zestawienie i porównanie planów subskrypcji dla ekranu paywalla / monetyzacji.
+ */
+export function compareSubscriptionPlans(
+  prices?: {
+    monthly?: number | string | null;
+    annual?: number | string | null;
+    lifetime?: number | string | null;
+  } | null
+): SubscriptionPlanComparison {
+  const parseNum = (v: unknown, fallback: number): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) && v > 0 ? v : fallback;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) && parsed > 0 ? parsed : fallback;
+    }
+    return fallback;
+  };
+
+  const monthlyPrice = parseNum(prices?.monthly, 19.99);
+  const annualPrice = parseNum(prices?.annual, 149.99);
+  const lifetimePrice = parseNum(prices?.lifetime, 299.99);
+
+  const monthlyEquivalentAnnual = Math.round((annualPrice / 12) * 100) / 100;
+  const annualVsMonthlySavingsPercent = Math.max(
+    0,
+    Math.round(((monthlyPrice * 12 - annualPrice) / (monthlyPrice * 12)) * 100)
+  );
+  const annualSavingsPln = Math.max(0, Math.round((monthlyPrice * 12 - annualPrice) * 100) / 100);
+
+  const plans: SubscriptionPlanComparisonItem[] = [
+    {
+      tier: 'monthly',
+      namePl: 'Miesięczny',
+      nameEn: 'Monthly',
+      pricePln: monthlyPrice,
+      monthlyEquivalentPln: monthlyPrice,
+      savingsPercentageVsMonthly: 0,
+    },
+    {
+      tier: 'annual',
+      namePl: 'Roczny',
+      nameEn: 'Annual',
+      pricePln: annualPrice,
+      monthlyEquivalentPln: monthlyEquivalentAnnual,
+      savingsPercentageVsMonthly: annualVsMonthlySavingsPercent,
+      badgePl: 'Najpopularniejszy',
+      badgeEn: 'Most Popular',
+      isPopular: true,
+    },
+    {
+      tier: 'lifetime',
+      namePl: 'Dożywotni (Lifetime)',
+      nameEn: 'Lifetime',
+      pricePln: lifetimePrice,
+      monthlyEquivalentPln: 0,
+      savingsPercentageVsMonthly: 100,
+      badgePl: 'Jednorazowo',
+      badgeEn: 'One-time',
+      isBestValue: true,
+    },
+  ];
+
+  const ratioLifetimeToAnnual = lifetimePrice / annualPrice;
+  const recommendedTier = ratioLifetimeToAnnual <= 2.0 ? 'lifetime' : 'annual';
+
+  return {
+    plans,
+    annualSavingsPln,
+    bestValueTier: 'lifetime',
+    recommendedTier,
+  };
+}
+
+
 
 
