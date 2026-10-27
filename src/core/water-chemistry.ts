@@ -879,3 +879,53 @@ export function findBottledWaterById(id: string): BottledWaterProfile | undefine
     return false;
   });
 }
+
+/**
+ * Zwraca listę wód butelkowanych przefiltrowanych wg oceny przydatności (suitability).
+ * Domyślnie lub dla 'ALL' zwraca wszystkie dostępne wody.
+ */
+export function getBottledWatersBySuitability(
+  suitability?: BottledWaterProfile['suitability'] | 'ALL' | string
+): BottledWaterProfile[] {
+  if (!suitability || typeof suitability !== 'string') {
+    return [...BOTTLED_WATER_BENCHMARKS];
+  }
+  const clean = suitability.trim().toUpperCase();
+  if (!clean || clean === 'ALL') {
+    return [...BOTTLED_WATER_BENCHMARKS];
+  }
+  return BOTTLED_WATER_BENCHMARKS.filter((w) => w.suitability === clean);
+}
+
+/**
+ * Wyszukuje wody butelkowane wg zapytania tekstowego (nazwa marki, kraj pochodzenia, werdykt).
+ */
+export function searchBottledWaters(query?: string): BottledWaterProfile[] {
+  if (typeof query !== 'string') {
+    return [...BOTTLED_WATER_BENCHMARKS];
+  }
+  const clean = query.trim().toLowerCase();
+  if (!clean) {
+    return [...BOTTLED_WATER_BENCHMARKS];
+  }
+  const normQuery = clean.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  return BOTTLED_WATER_BENCHMARKS.filter((w) => {
+    if (!w) return false;
+    const brandLower = (w.brandName || '').toLowerCase();
+    const brandNorm = brandLower.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const originLower = (w.originCountry || '').toLowerCase();
+    const originNorm = originLower.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const idLower = (w.id || '').toLowerCase();
+
+    return (
+      brandLower.includes(clean) ||
+      brandNorm.includes(normQuery) ||
+      originLower.includes(clean) ||
+      originNorm.includes(normQuery) ||
+      idLower.includes(clean) ||
+      idLower.includes(normQuery)
+    );
+  });
+}
+

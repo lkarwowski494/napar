@@ -18,6 +18,8 @@ import {
   classifyWaterHardnessFromFH,
   findWaterRecipeById,
   findBottledWaterById,
+  getBottledWatersBySuitability,
+  searchBottledWaters,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -770,6 +772,28 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(geyser?.id).toBe('crystal_geyser');
     expect(geyser?.suitability).toBe('EXCELLENT');
     expect(geyser?.originCountry).toBe('USA');
+  });
+
+  test('TASK-P62-07-JAK: getBottledWatersBySuitability i searchBottledWaters umozliwiaja selekcje i wyszukiwanie wod mineralnych', () => {
+    // 1. getBottledWatersBySuitability
+    const excellent = getBottledWatersBySuitability('EXCELLENT');
+    expect(Array.isArray(excellent)).toBe(true);
+    expect(excellent.length).toBeGreaterThanOrEqual(2);
+    expect(excellent.every((w) => w.suitability === 'EXCELLENT')).toBe(true);
+
+    const all = getBottledWatersBySuitability('ALL');
+    expect(all.length).toBeGreaterThan(excellent.length);
+
+    // 2. searchBottledWaters
+    const zywiec = searchBottledWaters('Żywiec');
+    expect(zywiec.length).toBeGreaterThanOrEqual(1);
+    expect(zywiec[0].brandName).toContain('Żywiec');
+
+    const empty = searchBottledWaters('');
+    expect(empty.length).toBe(all.length);
+
+    const nonExistent = searchBottledWaters('mars-spring-water');
+    expect(nonExistent).toEqual([]);
   });
 });
 
