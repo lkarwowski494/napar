@@ -761,6 +761,51 @@ export function buildFourteenDayCalendar(
 }
 
 /**
+ * Filtruje listę wygenerowanych akcji proaktywnego kalendarza (np. na dziś, nadchodzące lub wszystkie aktywne).
+ */
+export function filterProactiveActions(
+  actions?: ProactiveActionItem[] | null,
+  filter: 'today' | 'upcoming' | 'all' = 'all'
+): ProactiveActionItem[] {
+  if (!Array.isArray(actions) || actions.length === 0) return [];
+  const cleanFilter = typeof filter === 'string' ? filter.trim().toLowerCase() : 'all';
+
+  return actions
+    .filter((act) => {
+      if (!act || typeof act.daysOffset !== 'number' || !Number.isFinite(act.daysOffset)) {
+        return false;
+      }
+      if (cleanFilter === 'today') {
+        return act.daysOffset === 0;
+      }
+      if (cleanFilter === 'upcoming') {
+        return act.daysOffset > 0;
+      }
+      // 'all'
+      return act.daysOffset >= 0;
+    })
+    .sort((a, b) => a.daysOffset - b.daysOffset);
+}
+
+/**
+ * Wybiera najbliższą zalecaną akcję do wykonania (priorytetowo na dziś, a w razie braku — najbliższą nadchodzącą).
+ */
+export function findNextRecommendedAction(
+  actions?: ProactiveActionItem[] | null
+): ProactiveActionItem | null {
+  if (!Array.isArray(actions) || actions.length === 0) return null;
+  const todayActions = filterProactiveActions(actions, 'today');
+  if (todayActions.length > 0) {
+    return todayActions[0];
+  }
+  const upcomingActions = filterProactiveActions(actions, 'upcoming');
+  if (upcomingActions.length > 0) {
+    return upcomingActions[0];
+  }
+  return null;
+}
+
+/**
  * Generuje zawartość pliku kalendarzowego iCalendar (.ics, RFC 5545)
  * dla wybranej akcji z harmonogramu.
  */

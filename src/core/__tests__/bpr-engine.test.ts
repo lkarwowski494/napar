@@ -4,6 +4,8 @@ import {
   calculateNextSteepDuration,
   calculateCoffeeFreshness,
   CoffeeFreshnessStatus,
+  filterProactiveActions,
+  findNextRecommendedAction,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -747,6 +749,46 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(expired.status).toBe('expired');
       expect(expired.messagePl).toContain('Zestarzała');
       expect(expired.messageEn).toContain('Aged');
+    });
+
+    it('TASK-P66-04-SZT: filterProactiveActions i findNextRecommendedAction selekcjonuja akcje kalendarza', () => {
+      const actions = [
+        { id: 'act-past', dateIso: '2026-10-25', daysOffset: -2, titlePl: 'Przeszła', titleEn: 'Past' },
+        { id: 'act-today-1', dateIso: '2026-10-27', daysOffset: 0, titlePl: 'Poranny V60', titleEn: 'Morning V60' },
+        { id: 'act-today-2', dateIso: '2026-10-27', daysOffset: 0, titlePl: 'Popołudniowy Gaiwan', titleEn: 'Afternoon Gaiwan' },
+        { id: 'act-up-1', dateIso: '2026-10-28', daysOffset: 1, titlePl: 'Szczyt smaku Kenia', titleEn: 'Peak Flavor Kenya' },
+        { id: 'act-up-2', dateIso: '2026-10-30', daysOffset: 3, titlePl: 'Otwórz Geishę', titleEn: 'Open Geisha' },
+      ] as any[];
+
+      // 1. filterProactiveActions('today')
+      const today = filterProactiveActions(actions, 'today');
+      expect(today.length).toBe(2);
+      expect(today[0].id).toBe('act-today-1');
+
+      // 2. filterProactiveActions('upcoming')
+      const upcoming = filterProactiveActions(actions, 'upcoming');
+      expect(upcoming.length).toBe(2);
+      expect(upcoming[0].id).toBe('act-up-1');
+      expect(upcoming[1].id).toBe('act-up-2');
+
+      // 3. filterProactiveActions('all')
+      const allActive = filterProactiveActions(actions, 'all');
+      expect(allActive.length).toBe(4); // pomija przeszłe (< 0)
+
+      // 4. findNextRecommendedAction (priorytetyzuje dzisiejszą akcję)
+      const nextToday = findNextRecommendedAction(actions);
+      expect(nextToday?.id).toBe('act-today-1');
+
+      // 5. findNextRecommendedAction gdy brak dzisiejszych -> zwraca najbliższą nadchodzącą
+      const nextUpcomingOnly = findNextRecommendedAction([
+        { id: 'act-up-1', dateIso: '2026-10-28', daysOffset: 1, titlePl: 'Jutro', titleEn: 'Tomorrow' },
+      ] as any[]);
+      expect(nextUpcomingOnly?.id).toBe('act-up-1');
+
+      // 6. Odporność na null/undefined/pustą tablicę
+      expect(filterProactiveActions(null)).toEqual([]);
+      expect(findNextRecommendedAction(null)).toBeNull();
+      expect(findNextRecommendedAction([])).toBeNull();
     });
   });
 });
