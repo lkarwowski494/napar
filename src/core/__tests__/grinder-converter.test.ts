@@ -746,4 +746,38 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(findGrinderById('comandante mk3')?.id).toBe('comandante_c40');
     expect(findGrinderById('mignon filtro')?.id).toBe('eureka_mignon');
   });
+
+  test('TASK-P57-08-PRO: obsługa młynków Niche Zero, Mahlkönig EK43 oraz Timemore Sculptor z konwersją nastaw', () => {
+    // 1. Niche Zero
+    const niche = findGrinderById('niche zero');
+    expect(niche).toBeDefined();
+    expect(niche?.id).toBe('niche_zero');
+    expect(niche?.burrType).toContain('Mazzer Kony');
+
+    // Espresso ~350 µm -> (350 - 150) / 20 = nastawa 10
+    const nicheEspresso = convertMicronsToGrinder(350, 'niche_zero');
+    expect(nicheEspresso.rawValue).toBe(10);
+    expect(nicheEspresso.formatted).toContain('10');
+
+    // 2. Mahlkönig EK43
+    const ek43 = findGrinderById('ek43');
+    expect(ek43).toBeDefined();
+    expect(ek43?.id).toBe('mahlkoenig_ek43');
+    expect(ek43?.burrType).toContain('98mm');
+
+    // Filter V60 ~775 µm -> (775 - 100) / 75 = dial 9.0
+    const ek43Filter = convertMicronsToGrinder(775, 'ek43');
+    expect(ek43Filter.rawValue).toBe(9);
+
+    // 3. Timemore Sculptor
+    const sculptor = findGrinderById('sculptor');
+    expect(sculptor).toBeDefined();
+    expect(sculptor?.id).toBe('timemore_sculptor');
+
+    // 4. Konwersja między Niche Zero a EK43
+    const crossRes = convertBetweenGrinders('niche_zero', '20', 'mahlkoenig_ek43');
+    expect(crossRes.targetFormatted).toBeDefined();
+    expect(crossRes.microns).toBeGreaterThan(0);
+  });
 });
+

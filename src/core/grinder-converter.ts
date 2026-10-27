@@ -324,6 +324,66 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     },
   },
   {
+    id: 'niche_zero',
+    name: 'Niche Zero',
+    burrType: 'Mazzer Kony (63mm stożkowe)',
+    burrTypePl: 'Mazzer Kony (63mm stożkowe)',
+    burrTypeEn: 'Mazzer Kony (63mm conical)',
+    stepMicrons: 20.0,
+    minSetting: 0,
+    maxSetting: 60,
+    micronsPerSettingOffset: 150,
+    formatSetting: (clicks: number, lang = 'pl') => {
+      const c = Object.is(Math.round(clicks), -0) ? 0 : Math.round(clicks);
+      return lang === 'en' ? `Niche #${c}` : `Nastawa Niche #${c}`;
+    },
+    parseSetting: (text: string) => {
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
+      const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 25;
+      return 150 + num * 20.0;
+    },
+  },
+  {
+    id: 'mahlkoenig_ek43',
+    name: 'Mahlkönig EK43 / EK43S',
+    burrType: 'Płaskie żarna odlewane 98mm (Cast Steel)',
+    burrTypePl: 'Płaskie żarna odlewane 98mm (Cast Steel)',
+    burrTypeEn: 'Cast steel 98mm flat burrs',
+    stepMicrons: 75.0,
+    minSetting: 1,
+    maxSetting: 16,
+    micronsPerSettingOffset: 100,
+    formatSetting: (clicks: number, lang = 'pl') => {
+      const c = Object.is(Math.round(clicks), -0) ? 0 : Math.round(clicks);
+      return lang === 'en' ? `Dial #${c}` : `Tarcza #${c}`;
+    },
+    parseSetting: (text: string) => {
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
+      const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 9;
+      return 100 + num * 75.0;
+    },
+  },
+  {
+    id: 'timemore_sculptor',
+    name: 'Timemore Sculptor 064 / 078',
+    burrType: 'Turbo Burrs / Płaskie 64mm/78mm',
+    burrTypePl: 'Turbo Burrs / Płaskie 64mm/78mm',
+    burrTypeEn: 'Turbo Burrs / Flat 64mm/78mm',
+    stepMicrons: 55.0,
+    minSetting: 0,
+    maxSetting: 18,
+    micronsPerSettingOffset: 200,
+    formatSetting: (clicks: number, lang = 'pl') => {
+      const c = Object.is(Math.round(clicks), -0) ? 0 : Math.round(clicks);
+      return lang === 'en' ? `Dial #${c}` : `Nastawa #${c}`;
+    },
+    parseSetting: (text: string) => {
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
+      const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 9;
+      return 200 + num * 55.0;
+    },
+  },
+  {
     id: 'generic_grinder',
     name: 'Inny młynek (Skala uniwersalna µm)',
     namePl: 'Inny młynek (Skala uniwersalna µm)',
@@ -460,6 +520,25 @@ const GRINDER_ALIASES: Record<string, string> = {
   'mignon crono': 'eureka_mignon',
   'mignon manuale': 'eureka_mignon',
   'mignon silenzio': 'eureka_mignon',
+  niche: 'niche_zero',
+  'niche-zero': 'niche_zero',
+  'niche zero': 'niche_zero',
+  nichezero: 'niche_zero',
+  ek43: 'mahlkoenig_ek43',
+  ek43s: 'mahlkoenig_ek43',
+  'ek-43': 'mahlkoenig_ek43',
+  'ek 43': 'mahlkoenig_ek43',
+  mahlkonig: 'mahlkoenig_ek43',
+  mahlkoenig: 'mahlkoenig_ek43',
+  'mahlkonig ek43': 'mahlkoenig_ek43',
+  'mahlkoenig ek43': 'mahlkoenig_ek43',
+  sculptor: 'timemore_sculptor',
+  'timemore sculptor': 'timemore_sculptor',
+  'timemore-sculptor': 'timemore_sculptor',
+  'sculptor 078': 'timemore_sculptor',
+  'sculptor-078': 'timemore_sculptor',
+  'sculptor 064': 'timemore_sculptor',
+  'sculptor-064': 'timemore_sculptor',
 };
 
 export function findGrinderById(id: string): GrinderModel | undefined {
