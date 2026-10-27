@@ -175,6 +175,26 @@ export class BrewTimerEngine {
     return Number(Math.max(0, delta).toFixed(1));
   }
 
+  /**
+   * Oblicza całkowitą docelową objętość wody (g) dla danej receptury na podstawie kroków.
+   */
+  public static calculateTotalTargetWater(steps?: RecipeStep[] | null): number {
+    if (!Array.isArray(steps) || steps.length === 0) return 0;
+    let maxWater = 0;
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i];
+      if (
+        step &&
+        typeof step === 'object' &&
+        Number.isFinite(step.targetWaterGrams) &&
+        (step.targetWaterGrams as number) > maxWater
+      ) {
+        maxWater = step.targetWaterGrams as number;
+      }
+    }
+    return Number(maxWater.toFixed(1));
+  }
+
   constructor(steps: RecipeStep[], callbacks: TimerCallbacks = {}) {
     this.steps = steps.map((s) => ({ ...s }));
     this.callbacks = callbacks;
