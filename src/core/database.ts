@@ -1233,7 +1233,9 @@ export function calculateStashDiversity(
     const proc = typeof item.process === 'string' ? item.process.trim().toLowerCase() : '';
     if (proc) processes.add(proc);
 
-    const roast = typeof item.roaster === 'string' ? item.roaster.trim().toLowerCase() : '';
+    const itemAny = item as unknown as Record<string, unknown>;
+    const roastVal = item.roasterOrProducer ?? itemAny.roaster;
+    const roast = typeof roastVal === 'string' ? roastVal.trim().toLowerCase() : '';
     if (roast) roasters.add(roast);
 
     const w =

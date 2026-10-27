@@ -453,7 +453,7 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
 
     // 2. Odporność na pustą tablicę, null, undefined i błędy ekstraktora
     expect(aggregateSearchFacets(null, { method: (it: any) => it.method })).toEqual({ method: [] });
-    expect(aggregateSearchFacets([], { method: (it) => it.method })).toEqual({ method: [] });
+    expect(aggregateSearchFacets([], { method: (it: any) => it.method })).toEqual({ method: [] });
     expect(aggregateSearchFacets(items, null as any)).toEqual({});
     expect(aggregateSearchFacets(items, {
       broken: () => { throw new Error('boom'); },
