@@ -79,3 +79,30 @@ export function matchesAnyField(
     .join(' ');
   return matchesSearch(combined, query);
 }
+
+/**
+ * Filtruje tablicę obiektów dowolnego typu na podstawie zapytania wyszukiwania
+ * i funkcji ekstrahującej przeszukiwane pola tekstowe.
+ */
+export function filterBySearch<T>(
+  items: T[] | undefined | null,
+  query: string | undefined | null,
+  extractFields: (item: T) => (string | undefined | null | unknown)[]
+): T[] {
+  if (!Array.isArray(items)) return [];
+  if (!query || typeof query !== 'string' || query.trim() === '') {
+    return [...items];
+  }
+  if (typeof extractFields !== 'function') return [...items];
+
+  return items.filter((item) => {
+    if (!item) return false;
+    try {
+      const fields = extractFields(item);
+      return matchesAnyField(fields, query);
+    } catch {
+      return false;
+    }
+  });
+}
+

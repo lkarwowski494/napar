@@ -2,7 +2,14 @@
 // Napar (Steepwise) — Unit Tests: Search Utilities (RD-ENG-07, NFR-INT-015)
 // ============================================================================
 
-import { normSearch, matchesSearch, tokenizeSearch, matchesAllTokens, matchesAnyField } from '../search-utils';
+import {
+  normSearch,
+  matchesSearch,
+  tokenizeSearch,
+  matchesAllTokens,
+  matchesAnyField,
+  filterBySearch,
+} from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
   test('Wektory testowe z dokumentu BRD (RD-ENG-07)', () => {
@@ -73,5 +80,40 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     expect(matchesAnyField(fields, '')).toBe(true);
     expect(matchesAnyField(null as any, 'v60')).toBe(false);
     expect(matchesAnyField([], 'v60')).toBe(false);
+  });
+
+  test('TASK-P63-01-ODK: filterBySearch filtruje tablice obiektow na podstawie zapytania i ekstraktora pol', () => {
+    interface SampleCoffee {
+      id: string;
+      roastery: string;
+      origin: string;
+      notes: string[];
+    }
+    const coffees: SampleCoffee[] = [
+      { id: '1', roastery: 'HAYB', origin: 'Etiopia Guji', notes: ['morela', 'bergamotka'] },
+      { id: '2', roastery: 'Coffea Circulor', origin: 'Panama Geisha', notes: ['jaśmin', 'brzoskwinia'] },
+      { id: '3', roastery: 'Hard Beans', origin: 'Kenia Nyeri', notes: ['czarna porzeczka'] },
+    ];
+
+    // 1. Dopasowanie po nazwie i nutach
+    const guji = filterBySearch(coffees, 'guji morela', (c) => [c.roastery, c.origin, ...c.notes]);
+    expect(guji.length).toBe(1);
+    expect(guji[0].id).toBe('1');
+
+    // 2. Dopasowanie wielowyrazowe z polskimi znakami
+    const panama = filterBySearch(coffees, 'jasmin circuLOR', (c) => [c.roastery, c.origin, ...c.notes]);
+    expect(panama.length).toBe(1);
+    expect(panama[0].id).toBe('2');
+
+    // 3. Puste zapytanie zwraca wszystkie
+    expect(filterBySearch(coffees, '', (c) => [c.origin]).length).toBe(3);
+    expect(filterBySearch(coffees, null as any, (c) => [c.origin]).length).toBe(3);
+
+    // 4. Brak dopasowania
+    expect(filterBySearch(coffees, 'Brazylia', (c) => [c.origin]).length).toBe(0);
+
+    // 5. Odporność na nullish items
+    expect(filterBySearch(null as any, 'guji', () => [])).toEqual([]);
+    expect(filterBySearch(undefined as any, 'guji', () => [])).toEqual([]);
   });
 });
