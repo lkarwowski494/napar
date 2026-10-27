@@ -591,6 +591,32 @@ export function ppmCaCO3ToDegreesFH(ppm: number | string): number {
   return result;
 }
 
+/**
+ * Konwertuje twardość z ppm CaCO3 na stopnie Clarka / angielskie °e (1 °Clark = 14.254 ppm CaCO3)
+ */
+export function ppmCaCO3ToDegreesClark(ppm: number | string): number {
+  if (typeof ppm !== 'number' && typeof ppm !== 'string') return 0;
+  const numPpm = typeof ppm === 'string' ? parseFloat(ppm.trim().replace(/,/g, '.')) : ppm;
+  if (!Number.isFinite(numPpm) || numPpm <= 0 || Object.is(numPpm, -0)) return 0;
+  const safePpm = Math.min(10000, numPpm);
+  let result = Number((safePpm / 14.254).toFixed(4));
+  if (Object.is(result, -0)) result = 0;
+  return result;
+}
+
+/**
+ * Konwertuje twardość ze stopni Clarka / angielskich °e na ppm CaCO3 (1 °Clark = 14.254 ppm CaCO3)
+ */
+export function degreesClarkToPpmCaCO3(clark: number | string): number {
+  if (typeof clark !== 'number' && typeof clark !== 'string') return 0;
+  const numClark = typeof clark === 'string' ? parseFloat(clark.trim().replace(/,/g, '.')) : clark;
+  if (!Number.isFinite(numClark) || numClark <= 0 || Object.is(numClark, -0)) return 0;
+  const safeClark = Math.min(1000, numClark);
+  let result = Number((safeClark * 14.254).toFixed(2));
+  if (Object.is(result, -0)) result = 0;
+  return result;
+}
+
 export type WaterHardnessCategory = 'VERY_SOFT' | 'SOFT' | 'MODERATELY_HARD' | 'HARD' | 'VERY_HARD';
 
 /**
@@ -633,6 +659,24 @@ export function classifyWaterHardnessFromDH(dH: number | string): WaterHardnessC
     return 'SOFT';
   }
   const ppm = degreesDHToPpmCaCO3(dH);
+  return classifyWaterHardness(ppm);
+}
+
+/**
+ * Klasyfikuje twardość wody bezpośrednio ze stopni Clarka (°e / °Clark)
+ */
+export function classifyWaterHardnessFromClark(clark: number | string): WaterHardnessCategory {
+  if (typeof clark === 'number' && Object.is(clark, -0)) {
+    return 'VERY_SOFT';
+  }
+  if (clark === '0' || clark === 0) {
+    return 'VERY_SOFT';
+  }
+  const rawNum = typeof clark === 'string' ? parseFloat(clark.trim().replace(/,/g, '.')) : clark;
+  if (!Number.isFinite(rawNum) || rawNum < 0) {
+    return 'SOFT';
+  }
+  const ppm = degreesClarkToPpmCaCO3(clark);
   return classifyWaterHardness(ppm);
 }
 

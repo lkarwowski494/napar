@@ -12,6 +12,9 @@ import {
   getWaterProfileName,
   ppmCaCO3ToDegreesDH,
   degreesDHToPpmCaCO3,
+  ppmCaCO3ToDegreesClark,
+  degreesClarkToPpmCaCO3,
+  classifyWaterHardnessFromClark,
   findWaterRecipeById,
   findBottledWaterById,
   formatWaterHardnessCategory,
@@ -694,6 +697,51 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(degreesFHToPpmCaCO3(12)).toBe(120);
     expect(degreesFHToPpmCaCO3('18,5')).toBe(185);
     expect(degreesFHToPpmCaCO3(-0)).toBe(0);
+  });
+
+  test('TASK-P55-07-JAK: ppmCaCO3ToDegreesClark, degreesClarkToPpmCaCO3 i classifyWaterHardnessFromClark obsługuja stopnie Clarka (°e)', () => {
+    // 1. ppmCaCO3ToDegreesClark
+    expect(ppmCaCO3ToDegreesClark(142.54)).toBe(10);
+    expect(ppmCaCO3ToDegreesClark('142,54')).toBe(10);
+    expect(ppmCaCO3ToDegreesClark(0)).toBe(0);
+    expect(ppmCaCO3ToDegreesClark(-0)).toBe(0);
+    expect(Object.is(ppmCaCO3ToDegreesClark(-0), -0)).toBe(false);
+    expect(ppmCaCO3ToDegreesClark(-10)).toBe(0);
+    expect(ppmCaCO3ToDegreesClark(NaN)).toBe(0);
+    expect(ppmCaCO3ToDegreesClark(Infinity)).toBe(0);
+    expect(ppmCaCO3ToDegreesClark(null as any)).toBe(0);
+    expect(ppmCaCO3ToDegreesClark({} as any)).toBe(0);
+    expect(ppmCaCO3ToDegreesClark(999999)).toBe(ppmCaCO3ToDegreesClark(10000));
+
+    // 2. degreesClarkToPpmCaCO3
+    expect(degreesClarkToPpmCaCO3(10)).toBe(142.54);
+    expect(degreesClarkToPpmCaCO3('10,5')).toBe(149.67);
+    expect(degreesClarkToPpmCaCO3(0)).toBe(0);
+    expect(degreesClarkToPpmCaCO3(-0)).toBe(0);
+    expect(Object.is(degreesClarkToPpmCaCO3(-0), -0)).toBe(false);
+    expect(degreesClarkToPpmCaCO3(-5)).toBe(0);
+    expect(degreesClarkToPpmCaCO3(NaN)).toBe(0);
+    expect(degreesClarkToPpmCaCO3(Infinity)).toBe(0);
+    expect(degreesClarkToPpmCaCO3(null as any)).toBe(0);
+    expect(degreesClarkToPpmCaCO3([] as any)).toBe(0);
+    expect(degreesClarkToPpmCaCO3(999999)).toBe(degreesClarkToPpmCaCO3(1000));
+
+    // 3. Spójność dwustronna: 10 °e -> ppm -> °e powraca do 10 °e
+    const ppm = degreesClarkToPpmCaCO3(10);
+    const clarkBack = Math.round(ppmCaCO3ToDegreesClark(ppm));
+    expect(clarkBack).toBe(10);
+
+    // 4. classifyWaterHardnessFromClark
+    expect(classifyWaterHardnessFromClark(0)).toBe('VERY_SOFT');
+    expect(classifyWaterHardnessFromClark(-0)).toBe('VERY_SOFT');
+    expect(classifyWaterHardnessFromClark('0')).toBe('VERY_SOFT');
+    expect(classifyWaterHardnessFromClark(2)).toBe('VERY_SOFT'); // ~28.5 ppm
+    expect(classifyWaterHardnessFromClark('5,0')).toBe('SOFT'); // ~71.3 ppm
+    expect(classifyWaterHardnessFromClark(10)).toBe('MODERATELY_HARD'); // ~142.5 ppm
+    expect(classifyWaterHardnessFromClark(15)).toBe('HARD'); // ~213.8 ppm
+    expect(classifyWaterHardnessFromClark(25)).toBe('VERY_HARD'); // ~356.4 ppm
+    expect(classifyWaterHardnessFromClark(NaN)).toBe('SOFT');
+    expect(classifyWaterHardnessFromClark(-5)).toBe('SOFT');
   });
 });
 
