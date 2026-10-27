@@ -7,6 +7,7 @@ import * as Sharing from 'expo-sharing';
 import { importDataJson, getRecipes, saveRecipe } from '../database';
 import {
   buildBackup,
+  getBackupStats,
   localISODate,
   stampOf,
   parseAndValidateBackup,
@@ -406,6 +407,41 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       const fallbackUndefined = buildBackup(undefined as any);
       expect(fallbackUndefined.state).toBeDefined();
       expect(Array.isArray(fallbackUndefined.state.customRecipes)).toBe(true);
+    });
+
+    test('TASK-P62-05-ARC: getBackupStats poprawnie zlicza elementy kopii zapasowej i chroni przed null/undefined', () => {
+      const envelope = buildBackup({
+        inventory: [{ id: 'inv-1' } as any, { id: 'inv-2' } as any],
+        customRecipes: [{ id: 'rec-1' } as any],
+        sessions: [{ id: 'sess-1' } as any, { id: 'sess-2' } as any, { id: 'sess-3' } as any],
+        caffeineLogs: [],
+      });
+
+      const stats = getBackupStats(envelope);
+      expect(stats.inventoryCount).toBe(2);
+      expect(stats.recipesCount).toBe(1);
+      expect(stats.sessionsCount).toBe(3);
+      expect(stats.caffeineLogsCount).toBe(0);
+
+      // Null i undefined
+      expect(getBackupStats(null)).toEqual({
+        inventoryCount: 0,
+        recipesCount: 0,
+        sessionsCount: 0,
+        caffeineLogsCount: 0,
+      });
+      expect(getBackupStats(undefined)).toEqual({
+        inventoryCount: 0,
+        recipesCount: 0,
+        sessionsCount: 0,
+        caffeineLogsCount: 0,
+      });
+      expect(getBackupStats({} as any)).toEqual({
+        inventoryCount: 0,
+        recipesCount: 0,
+        sessionsCount: 0,
+        caffeineLogsCount: 0,
+      });
     });
   });
 });

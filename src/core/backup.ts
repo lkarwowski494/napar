@@ -63,6 +63,28 @@ export function buildBackup(state: NaparBackupData): NaparBackupEnvelope {
   };
 }
 
+export interface BackupStats {
+  inventoryCount: number;
+  recipesCount: number;
+  sessionsCount: number;
+  caffeineLogsCount: number;
+}
+
+/**
+ * Zwraca podsumowanie liczbowe pozycji zawartych w kopii zapasowej.
+ */
+export function getBackupStats(envelope?: NaparBackupEnvelope | null): BackupStats {
+  if (!envelope || !envelope.state || typeof envelope.state !== 'object') {
+    return { inventoryCount: 0, recipesCount: 0, sessionsCount: 0, caffeineLogsCount: 0 };
+  }
+  return {
+    inventoryCount: Array.isArray(envelope.state.inventory) ? envelope.state.inventory.length : 0,
+    recipesCount: Array.isArray(envelope.state.customRecipes) ? envelope.state.customRecipes.length : 0,
+    sessionsCount: Array.isArray(envelope.state.sessions) ? envelope.state.sessions.length : 0,
+    caffeineLogsCount: Array.isArray(envelope.state.caffeineLogs) ? envelope.state.caffeineLogs.length : 0,
+  };
+}
+
 export function localISODate(d: Date = new Date()): string {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
