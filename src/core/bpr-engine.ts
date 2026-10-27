@@ -1084,3 +1084,22 @@ export function searchProactiveActions(
     return true;
   });
 }
+
+
+/**
+ * Wyszukuje pojedynczą akcję proaktywną po jej identyfikatorze ID
+ * z odpornością na wielkość liter, białe znaki i brakujące dane.
+ */
+export function getProactiveActionById(
+  actions?: ProactiveActionItem[] | null,
+  actionId?: string | null
+): ProactiveActionItem | undefined {
+  if (!Array.isArray(actions) || actions.length === 0) return undefined;
+  if (!actionId || typeof actionId !== 'string' || !actionId.trim()) return undefined;
+
+  const targetId = actionId.trim().toLowerCase();
+  return actions.find((act) => {
+    if (!act || typeof act !== 'object' || !act.id || typeof act.id !== 'string') return false;
+    return act.id.trim().toLowerCase() === targetId;
+  });
+}

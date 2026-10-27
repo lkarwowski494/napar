@@ -14,6 +14,7 @@ import {
   ActionSortOption,
   searchProactiveActions,
   ActionSearchCriteria,
+  getProactiveActionById,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -931,6 +932,27 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       // 5. Puste wejście i odporność na null
       expect(searchProactiveActions(null as any)).toEqual([]);
       expect(searchProactiveActions(all, {})).toHaveLength(3);
+    });
+
+    it('TASK-P78-04-SZT: getProactiveActionById wyszukuje akcję po ID z odpornością na wielkość liter i spacje', () => {
+      const actions = [
+        { id: 'act-v60-kenya', titlePl: 'Parzenie V60: Kenya AA' },
+        { id: 'act-sencha-peak', titlePl: 'Szczyt smaku: Sencha' },
+      ] as any[];
+
+      // 1. Dokładne dopasowanie
+      expect(getProactiveActionById(actions, 'act-v60-kenya')?.titlePl).toBe('Parzenie V60: Kenya AA');
+
+      // 2. Wielkość liter i białe znaki
+      expect(getProactiveActionById(actions, '  ACT-SENCHA-PEAK  ')?.titlePl).toBe('Szczyt smaku: Sencha');
+
+      // 3. Brak dopasowania
+      expect(getProactiveActionById(actions, 'unknown-act')).toBeUndefined();
+
+      // 4. Odporność na nullish
+      expect(getProactiveActionById(null, 'act-v60-kenya')).toBeUndefined();
+      expect(getProactiveActionById(actions, null)).toBeUndefined();
+      expect(getProactiveActionById(actions, '')).toBeUndefined();
     });
   });
 });
