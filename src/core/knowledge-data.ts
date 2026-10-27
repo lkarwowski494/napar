@@ -1754,3 +1754,118 @@ export function getCoffeeRoastLevelGuide(
   );
 }
 
+export type CoffeeAltitudeBand = 'very_high' | 'high' | 'medium' | 'low' | 'unknown';
+
+export interface CoffeeAltitudeGuide {
+  altitudeMeters: number | null;
+  band: CoffeeAltitudeBand;
+  shgClassification: string;
+  beanDensity: 'very_high' | 'high' | 'moderate' | 'low' | 'unknown';
+  acidityPotential: 'vibrant_complex' | 'bright_balanced' | 'mild_sweet' | 'low_muted' | 'unknown';
+  bandLabelPl: string;
+  bandLabelEn: string;
+  sensoryProfilePl: string;
+  sensoryProfileEn: string;
+  roastingAndBrewingAdvicePl: string;
+  roastingAndBrewingAdviceEn: string;
+}
+
+/**
+ * Zwraca przewodnik po wysokości upraw kawy, klasyfikacji SHG/HG, gęstości ziaren
+ * oraz zaleceniach temperaturowych i sensorycznych.
+ */
+export function getCoffeeAltitudeGuide(
+  altitudeMeters: number | string | undefined | null
+): CoffeeAltitudeGuide {
+  const parseNum = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) && v > 0 ? v : 0;
+    if (typeof v === 'string') {
+      const clean = v.replace(/\uFEFF/g, '').replace(/[^\d.,]/g, '').replace(',', '.').trim();
+      const parsed = parseFloat(clean);
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) && parsed > 0 ? parsed : 0;
+    }
+    return 0;
+  };
+
+  const safeAlt = Math.round(parseNum(altitudeMeters));
+
+  if (safeAlt <= 0) {
+    return {
+      altitudeMeters: null,
+      band: 'unknown',
+      shgClassification: 'Unspecified',
+      beanDensity: 'unknown',
+      acidityPotential: 'unknown',
+      bandLabelPl: 'Nieznana wysokość',
+      bandLabelEn: 'Unknown Altitude',
+      sensoryProfilePl: 'Brak danych o wysokości uprawy — standardowy profil zbalansowany.',
+      sensoryProfileEn: 'No altitude data — standard balanced profile.',
+      roastingAndBrewingAdvicePl: 'Dostosuj parametry parzenia (90–93°C) na podstawie stopnia palenia i metody obróbki.',
+      roastingAndBrewingAdviceEn: 'Adjust brewing parameters (90–93°C) based on roast level and processing method.',
+    };
+  }
+
+  if (safeAlt > 1800) {
+    return {
+      altitudeMeters: safeAlt,
+      band: 'very_high',
+      shgClassification: 'Strictly High Grown (SHG / SHB)',
+      beanDensity: 'very_high',
+      acidityPotential: 'vibrant_complex',
+      bandLabelPl: 'Bardzo wysoka (> 1800 m n.p.m.)',
+      bandLabelEn: 'Very High (> 1800 m a.s.l.)',
+      sensoryProfilePl: 'Wybitna, złożona kwasowość owocowa (cytrusy, owoce pestkowe), intensywne aromaty kwiatowe, duża gęstość ziaren i czysty, elegancki profil.',
+      sensoryProfileEn: 'Exceptional, complex fruit acidity (citrus, stone fruits), intense florals, high bean density and elegant clean cup.',
+      roastingAndBrewingAdvicePl: 'Gęste ziarna wymagają wyższej temperatury ekstrakcji (93–96°C) oraz drobniejszego przemiału, by wydobyć pełnię słodyczy.',
+      roastingAndBrewingAdviceEn: 'Dense beans benefit from higher brew temperature (93–96°C) and finer grind to extract full sweetness.',
+    };
+  }
+
+  if (safeAlt >= 1400) {
+    return {
+      altitudeMeters: safeAlt,
+      band: 'high',
+      shgClassification: 'High Grown (HG / HB)',
+      beanDensity: 'high',
+      acidityPotential: 'bright_balanced',
+      bandLabelPl: 'Wysoka (1400–1800 m n.p.m.)',
+      bandLabelEn: 'High (1400–1800 m a.s.l.)',
+      sensoryProfilePl: 'Zrównoważona jasna kwasowość, nuty karmelu, czekolady i owoców leśnych, krągłe body.',
+      sensoryProfileEn: 'Balanced bright acidity, notes of caramel, chocolate, and berries, round body.',
+      roastingAndBrewingAdvicePl: 'Wszechstronny profil parzenia (91–94°C) — doskonałe zarówno do metod przelewowych (V60/Chemex), jak i nowoczesnego espresso.',
+      roastingAndBrewingAdviceEn: 'Versatile brewing profile (91–94°C) — excels in both pour over (V60/Chemex) and modern espresso.',
+    };
+  }
+
+  if (safeAlt >= 1000) {
+    return {
+      altitudeMeters: safeAlt,
+      band: 'medium',
+      shgClassification: 'Medium Grown / Standard',
+      beanDensity: 'moderate',
+      acidityPotential: 'mild_sweet',
+      bandLabelPl: 'Średnia (1000–1399 m n.p.m.)',
+      bandLabelEn: 'Medium (1000–1399 m a.s.l.)',
+      sensoryProfilePl: 'Łagodna, niska kwasowość, dominacja nut orzechowych, kakaowych i melasy, gęstsze body.',
+      sensoryProfileEn: 'Mild, sweet low acidity, dominant nutty, cocoa, and molasses notes, fuller body.',
+      roastingAndBrewingAdvicePl: 'Podatniejsze na ekstrakcję — woda 88–92°C, świetna baza pod tradycyjne espresso, kawiarkę i kawy mleczne.',
+      roastingAndBrewingAdviceEn: 'More soluble beans — water 88–92°C, great base for traditional espresso, Moka pot, and milk drinks.',
+    };
+  }
+
+  return {
+    altitudeMeters: safeAlt,
+    band: 'low',
+    shgClassification: 'Low Grown / Prime',
+    beanDensity: 'low',
+    acidityPotential: 'low_muted',
+    bandLabelPl: 'Niska (< 1000 m n.p.m.)',
+    bandLabelEn: 'Low (< 1000 m a.s.l.)',
+    sensoryProfilePl: 'Znikoma kwasowość, nuty ziemiste, przyprawowe i ciemnego karmelu, miękkie i ciężkie body.',
+    sensoryProfileEn: 'Low acidity, earthy, spicy, and dark caramel notes, soft and heavy body.',
+    roastingAndBrewingAdvicePl: 'Bardzo porowate ziarna — niższa temperatura (84–88°C), grubszy przemiał, by uniknąć goryczy i cierpkości.',
+    roastingAndBrewingAdviceEn: 'Porous beans — lower temp (84–88°C), coarser grind to avoid bitterness and astringency.',
+  };
+}
+
+

@@ -39,6 +39,9 @@ import {
   CoffeeRoastLevelGuide,
   CoffeeRoastLevelKey,
   COFFEE_ROAST_LEVEL_GUIDES,
+  getCoffeeAltitudeGuide,
+  CoffeeAltitudeGuide,
+  CoffeeAltitudeBand,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1346,6 +1349,46 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(getCoffeeRoastLevelGuide('unknown-roast')).toBeNull();
     expect(getCoffeeRoastLevelGuide(null as any)).toBeNull();
     expect(getCoffeeRoastLevelGuide('')).toBeNull();
+  });
+
+  test('TASK-P86-06-TRE: getCoffeeAltitudeGuide kategoryzuje wysokość upraw i podaje rekomendacje gęstości ziaren', () => {
+    // 1. Bardzo wysoka wysokość (> 1800 m n.p.m., np. 2100 m Yirgacheffe / Huila)
+    const veryHigh: CoffeeAltitudeGuide = getCoffeeAltitudeGuide(2100);
+    const bandCheck: CoffeeAltitudeBand = veryHigh.band;
+    expect(bandCheck).toBe('very_high');
+    expect(veryHigh.altitudeMeters).toBe(2100);
+    expect(veryHigh.beanDensity).toBe('very_high');
+    expect(veryHigh.shgClassification).toContain('Strictly High Grown');
+    expect(veryHigh.acidityPotential).toBe('vibrant_complex');
+    expect(veryHigh.sensoryProfilePl).toContain('kwasowość');
+    expect(veryHigh.roastingAndBrewingAdvicePl).toContain('93–96°C');
+
+    // 2. Wysoka wysokość (1400–1800 m n.p.m.)
+    const high = getCoffeeAltitudeGuide('1650');
+    expect(high.band).toBe('high');
+    expect(high.beanDensity).toBe('high');
+    expect(high.shgClassification).toContain('High Grown');
+    expect(high.acidityPotential).toBe('bright_balanced');
+
+    // 3. Średnia wysokość (1000–1399 m n.p.m.)
+    const med = getCoffeeAltitudeGuide(1200);
+    expect(med.band).toBe('medium');
+    expect(med.beanDensity).toBe('moderate');
+    expect(med.acidityPotential).toBe('mild_sweet');
+
+    // 4. Niska wysokość (< 1000 m n.p.m.)
+    const low = getCoffeeAltitudeGuide(800);
+    expect(low.band).toBe('low');
+    expect(low.beanDensity).toBe('low');
+
+    // 5. Nieznana wysokość (0, ujemne, null, niepoprawne stringi)
+    const unknown = getCoffeeAltitudeGuide(null);
+    expect(unknown.band).toBe('unknown');
+    expect(unknown.altitudeMeters).toBeNull();
+    expect(unknown.beanDensity).toBe('unknown');
+
+    const invalid = getCoffeeAltitudeGuide('not-a-number');
+    expect(invalid.band).toBe('unknown');
   });
 });
 
