@@ -18,6 +18,8 @@ import {
   calculateActionPriorityScore,
   ActionPriorityEvaluation,
   rankActionsByPriority,
+  summarizeBprActionFeed,
+  BprActionFeedSummary,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -1029,6 +1031,44 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(rankActionsByPriority(null)).toEqual([]);
       expect(rankActionsByPriority([])).toEqual([]);
       expect(rankActionsByPriority([null, undefined] as any)).toEqual([]);
+    });
+
+    it('TASK-P85-04-SZT: summarizeBprActionFeed agreguje statystyki kanału rekomendacji BPR', () => {
+      const actions = [
+        { id: 'act-1', daysOffset: 0, badgeColor: 'copper', priority: 'high', titlePl: 'Pilna kawa na dziś' },
+        { id: 'act-2', daysOffset: 0, badgeColor: 'copper', priority: 'medium', titlePl: 'Druga kawa na dziś' },
+        { id: 'act-3', daysOffset: 2, badgeColor: 'success', priority: 'low', titlePl: 'Kawa za 2 dni' },
+      ] as any[];
+
+      // 1. Podsumowanie dla aktywnego kanału
+      const summary: BprActionFeedSummary = summarizeBprActionFeed(actions);
+      expect(summary.totalActions).toBe(3);
+      expect(summary.todayCount).toBe(2);
+      expect(summary.upcomingCount).toBe(1);
+      expect(summary.highUrgencyCount).toBe(1);
+      expect(summary.dominantBadgeColor).toBe('copper');
+      expect(summary.recommendedNextAction).not.toBeNull();
+      expect(summary.recommendedNextAction?.id).toBe('act-1');
+      expect(summary.summaryMessagePl).toContain('2 rekomendacji na dziś');
+      expect(summary.summaryMessageEn).toContain('2 recommendations for today');
+
+      // 2. Podsumowanie dla wyłącznie nadchodzących akcji
+      const upcomingOnly = [
+        { id: 'act-up', daysOffset: 3, badgeColor: 'warning', priority: 'medium' },
+      ] as any[];
+      const upSummary = summarizeBprActionFeed(upcomingOnly);
+      expect(upSummary.todayCount).toBe(0);
+      expect(upSummary.upcomingCount).toBe(1);
+      expect(upSummary.dominantBadgeColor).toBe('warning');
+      expect(upSummary.summaryMessagePl).toContain('za 3 dni');
+
+      // 3. Pusta lista lub null
+      const emptySummary = summarizeBprActionFeed(null);
+      expect(emptySummary.totalActions).toBe(0);
+      expect(emptySummary.todayCount).toBe(0);
+      expect(emptySummary.recommendedNextAction).toBeNull();
+      expect(emptySummary.dominantBadgeColor).toBe('none');
+      expect(emptySummary.summaryMessagePl).toContain('Brak zaplanowanych rekomendacji');
     });
   });
 });

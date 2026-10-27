@@ -1215,3 +1215,113 @@ export function rankActionsByPriority(
   });
 }
 
+export interface BprActionFeedSummary {
+  totalActions: number;
+  todayCount: number;
+  upcomingCount: number;
+  highUrgencyCount: number;
+  recommendedNextAction: ProactiveActionItem | null;
+  dominantBadgeColor: 'copper' | 'success' | 'warning' | 'none';
+  summaryMessagePl: string;
+  summaryMessageEn: string;
+}
+
+/**
+ * Agreguje statystyki kanału rekomendacji BPR (liczba akcji, podział na dziś/nadchodzące,
+ * akcje pilne, najbliższa rekomendacja, dominujący kolor odznaki) wraz ze zlokalizowanym komunikatem.
+ */
+export function summarizeBprActionFeed(
+  actions?: ProactiveActionItem[] | null
+): BprActionFeedSummary {
+  if (!Array.isArray(actions) || actions.length === 0) {
+    return {
+      totalActions: 0,
+      todayCount: 0,
+      upcomingCount: 0,
+      highUrgencyCount: 0,
+      recommendedNextAction: null,
+      dominantBadgeColor: 'none',
+      summaryMessagePl: 'Brak zaplanowanych rekomendacji — dodaj kawę do spiżarni, aby uruchomić silnik BPR.',
+      summaryMessageEn: 'No scheduled recommendations — add coffee to inventory to activate BPR engine.',
+    };
+  }
+
+  const validActions = actions.filter((act): act is ProactiveActionItem => Boolean(act && typeof act === 'object'));
+  if (validActions.length === 0) {
+    return {
+      totalActions: 0,
+      todayCount: 0,
+      upcomingCount: 0,
+      highUrgencyCount: 0,
+      recommendedNextAction: null,
+      dominantBadgeColor: 'none',
+      summaryMessagePl: 'Brak zaplanowanych rekomendacji — dodaj kawę do spiżarni, aby uruchomić silnik BPR.',
+      summaryMessageEn: 'No scheduled recommendations — add coffee to inventory to activate BPR engine.',
+    };
+  }
+
+  let todayCount = 0;
+  let upcomingCount = 0;
+  let highUrgencyCount = 0;
+  const colorCounts: Record<'copper' | 'success' | 'warning', number> = {
+    copper: 0,
+    success: 0,
+    warning: 0,
+  };
+
+  for (const act of validActions) {
+    const offset = typeof act.daysOffset === 'number' && Number.isFinite(act.daysOffset) ? act.daysOffset : 0;
+    if (offset === 0) {
+      todayCount++;
+    } else if (offset > 0) {
+      upcomingCount++;
+    }
+
+    const priorityInfo = calculateActionPriorityScore(act);
+    if (priorityInfo.urgency === 'high') {
+      highUrgencyCount++;
+    }
+
+    if (act.badgeColor === 'copper' || act.badgeColor === 'success' || act.badgeColor === 'warning') {
+      colorCounts[act.badgeColor]++;
+    }
+  }
+
+  let dominantBadgeColor: 'copper' | 'success' | 'warning' | 'none' = 'none';
+  let maxCount = 0;
+  for (const [color, count] of Object.entries(colorCounts)) {
+    if (count > maxCount) {
+      maxCount = count;
+      dominantBadgeColor = color as 'copper' | 'success' | 'warning';
+    }
+  }
+
+  const recommendedNextAction = findNextRecommendedAction(validActions);
+
+  let summaryMessagePl: string;
+  let summaryMessageEn: string;
+
+  if (todayCount > 0) {
+    summaryMessagePl = `Masz ${todayCount} rekomendacji na dziś (${highUrgencyCount} pilnych).`;
+    summaryMessageEn = `You have ${todayCount} recommendations for today (${highUrgencyCount} urgent).`;
+  } else if (recommendedNextAction && typeof recommendedNextAction.daysOffset === 'number') {
+    summaryMessagePl = `Brak akcji na dziś. Najbliższa rekomendacja za ${recommendedNextAction.daysOffset} dni.`;
+    summaryMessageEn = `No actions for today. Next recommendation in ${recommendedNextAction.daysOffset} days.`;
+  } else {
+    summaryMessagePl = 'Brak aktywnych rekomendacji na najbliższe dni.';
+    summaryMessageEn = 'No active recommendations for upcoming days.';
+  }
+
+  return {
+    totalActions: validActions.length,
+    todayCount,
+    upcomingCount,
+    highUrgencyCount,
+    recommendedNextAction,
+    dominantBadgeColor,
+    summaryMessagePl,
+    summaryMessageEn,
+  };
+}
+
+
