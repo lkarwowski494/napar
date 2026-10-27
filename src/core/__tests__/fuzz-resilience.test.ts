@@ -14,10 +14,21 @@ import {
   calculateHoursUntilSafeCaffeine,
   calculateCaffeineDecay,
   calculateDoseForBeverageYield,
+  calculateBypassBrew,
 } from '../domain-rules';
-import { calculateWaterMinerals, classifyWaterHardness, classifyWaterHardnessFromFH } from '../water-chemistry';
+import {
+  calculateWaterMinerals,
+  classifyWaterHardness,
+  classifyWaterHardnessFromFH,
+  evaluateWaterSuitability,
+} from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
-import { convertMicronsToGrinder, findGrindCategoryForMicrons, findGrindCategoryById } from '../grinder-converter';
+import {
+  convertMicronsToGrinder,
+  findGrindCategoryForMicrons,
+  findGrindCategoryById,
+  getGrinderSettingForMethod,
+} from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
 import {
@@ -25,8 +36,11 @@ import {
   formatWaterVolume,
   formatDoseWeight,
   formatWaterWeight,
+  formatRatio,
+  formatPressure,
   wInKeep,
 } from '../unit-converter';
+import { searchKnowledgeBase } from '../knowledge-data';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -391,6 +405,65 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(Number.isFinite(water)).toBe(true);
       expect(water).toBeGreaterThanOrEqual(0);
       expect(Object.is(water, -0)).toBe(false);
+    }
+  });
+
+  test('Chaos 12: Fuzzing searchKnowledgeBase, evaluateWaterSuitability, getGrinderSettingForMethod, formatRatio/Pressure, calculateBypassBrew (TASK-P68-12-NIE)', () => {
+    const corruptInputs = [
+      -100000, -1, -0, 0, 0.0001, 15.5, 250, 10000, NaN, Infinity, -Infinity,
+      '', '   ', '\uFEFFtest', '185,5', '3.50 bar', 'invalid', null, undefined,
+      true, false, {}, [], () => {},
+    ];
+
+    for (const val of corruptInputs) {
+      // 1. searchKnowledgeBase
+      const searchRes = searchKnowledgeBase(val as any);
+      expect(Array.isArray(searchRes)).toBe(true);
+      for (const item of searchRes) {
+        expect(typeof item.id).toBe('string');
+        expect(typeof item.title).toBe('string');
+        expect(typeof item.category).toBe('string');
+      }
+
+      // 2. evaluateWaterSuitability
+      for (const bev of ['coffee', 'tea', val]) {
+        const evalRes = evaluateWaterSuitability(val as any, val as any, bev as any);
+        expect(evalRes).toBeDefined();
+        expect(typeof evalRes.suitability).toBe('string');
+        expect(typeof evalRes.ratingPl).toBe('string');
+        expect(typeof evalRes.ratingEn).toBe('string');
+        expect(typeof evalRes.verdictPl).toBe('string');
+        expect(typeof evalRes.verdictEn).toBe('string');
+      }
+
+      // 3. getGrinderSettingForMethod
+      const grindRes = getGrinderSettingForMethod(val as any, val as any, val as any);
+      expect(grindRes).toBeDefined();
+      expect(typeof grindRes.formatted).toBe('string');
+      expect(typeof grindRes.microns).toBe('number');
+      expect(Number.isFinite(grindRes.microns)).toBe(true);
+      expect(Number.isFinite(grindRes.clicks)).toBe(true);
+
+      // 4. formatRatio & formatPressure
+      const ratioStr = formatRatio(val as any);
+      expect(typeof ratioStr).toBe('string');
+      expect(ratioStr).not.toContain('NaN');
+      expect(ratioStr).not.toContain('-0');
+
+      const pressStr = formatPressure(val as any);
+      expect(typeof pressStr).toBe('string');
+      expect(pressStr).not.toContain('NaN');
+      expect(pressStr).not.toContain('-0');
+
+      // 5. calculateBypassBrew resilience on faulty inputs
+      try {
+        const bypassRes = calculateBypassBrew(val as any);
+        expect(bypassRes).toBeDefined();
+        expect(typeof bypassRes.concentrateDoseGrams).toBe('number');
+        expect(typeof bypassRes.bypassWaterGrams).toBe('number');
+      } catch (err: any) {
+        expect(err instanceof Error).toBe(true);
+      }
     }
   });
 });
