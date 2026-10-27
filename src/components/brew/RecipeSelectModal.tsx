@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
 import { CopyIcon, EditIcon } from '../icons/CraftIcons';
 import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../core/unit-converter';
-import { normSearch } from '../../core/search-utils';
+import { normSearch, matchesSearch } from '../../core/search-utils';
 
 export interface RecipeSelectModalProps {
   visible: boolean;
@@ -82,12 +82,8 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
       return false;
     }
     if (searchQuery.trim()) {
-      const q = normSearch(searchQuery);
-      const matchName = normSearch(r.name || '').includes(q);
-      const matchMethod = normSearch(r.method || '').includes(q);
-      const matchAuthor = normSearch(r.author || '').includes(q);
-      const matchDesc = normSearch(r.description || '').includes(q);
-      if (!matchName && !matchMethod && !matchAuthor && !matchDesc) return false;
+      const combinedFields = [r.name, r.method, r.author, r.description].filter(Boolean).join(' ');
+      if (!matchesSearch(combinedFields, searchQuery)) return false;
     }
     return true;
   });

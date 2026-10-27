@@ -332,4 +332,68 @@ describe('RecipeSelectModal Component', () => {
     expect(fullRenderedText).not.toContain('Kawa (1)');
     expect(fullRenderedText).not.toContain('Herbata (1)');
   });
+
+  test('TASK-P58-01-ODK: wyszukiwarka receptur obsluguje zapytania wielotokenowe (np. "v60 hoffmann")', () => {
+    const testRecipes: any[] = [
+      {
+        id: 'rec-hoffmann-v60',
+        name: 'The Ultimate Technique',
+        method: 'V60',
+        author: 'James Hoffmann',
+        description: 'Precyzyjna metoda 5 zalań',
+        beverageType: 'COFFEE',
+        doseGrams: 15,
+        waterGrams: 250,
+        waterTemp: 100,
+      },
+      {
+        id: 'rec-kasuya-v60',
+        name: '4:6 Method',
+        method: 'V60',
+        author: 'Tetsu Kasuya',
+        description: 'Metoda 4 do 6 dla balansu słodyczy',
+        beverageType: 'COFFEE',
+        doseGrams: 20,
+        waterGrams: 300,
+        waterTemp: 92,
+      },
+      {
+        id: 'rec-aeropress',
+        name: 'Aeropress Standard',
+        method: 'AeroPress',
+        author: 'Alan Adler',
+        description: 'Klasyczne parzenie tłokowe',
+        beverageType: 'COFFEE',
+        doseGrams: 14,
+        waterGrams: 200,
+        waterTemp: 85,
+      },
+    ];
+
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(
+        <RecipeSelectModal
+          {...defaultProps}
+          recipes={testRecipes}
+          activeRecipeId="rec-hoffmann-v60"
+        />
+      );
+    });
+
+    const root = tree!.root;
+    const searchInput = root.findByProps({ testID: 'recipe-search-input' });
+
+    // Wpisujemy zapytanie wielotokenowe "v60 hoffmann"
+    act(() => {
+      searchInput.props.onChangeText('v60 hoffmann');
+    });
+
+    // Receptura Hoffmanna powinna być odnaleziona
+    expect(root.findByProps({ testID: 'recipe-option-rec-hoffmann-v60' })).toBeDefined();
+
+    // Pozostałe receptury powinny być odfiltrowane
+    expect(() => root.findByProps({ testID: 'recipe-option-rec-kasuya-v60' })).toThrow();
+    expect(() => root.findByProps({ testID: 'recipe-option-rec-aeropress' })).toThrow();
+  });
 });
