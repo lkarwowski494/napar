@@ -32,6 +32,9 @@ import {
   WaterDilutionResult,
   estimateWaterTdsFromHardness,
   WaterTdsEstimate,
+  evaluateWaterAlkalinity,
+  AlkalinityEvaluation,
+  AlkalinityCategory,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -1000,6 +1003,47 @@ describe('Water Chemistry & Mineralization Module', () => {
     const fallbackEst = estimateWaterTdsFromHardness(null as any, undefined as any);
     expect(fallbackEst.estimatedTdsPpm).toBe(15); // tylko domyślne dodatkowe sole 15 ppm
     expect(fallbackEst.category).toBe('low_mineral');
+  });
+
+  test('TASK-P79-07-JAK: evaluateWaterAlkalinity analizuje zasadowość i pojemność buforową wody', () => {
+    // 1. Zrównoważony bufor specialty (KH 40 ppm CaCO3 wg SCA)
+    const optimal: AlkalinityEvaluation = evaluateWaterAlkalinity(40);
+    const catCheck: AlkalinityCategory = optimal.category;
+    expect(catCheck).toBe('optimal_buffer');
+    expect(optimal.alkalinityPpm).toBe(40);
+    expect(optimal.category).toBe('optimal_buffer');
+    expect(optimal.bufferCapacity).toBe('ideal');
+    expect(optimal.acidityImpactPl).toContain('Optymalny bufor');
+    expect(optimal.acidityImpactEn).toContain('Optimal');
+    expect(optimal.recommendedAdjustmentPl).toContain('SCA');
+
+    // 2. Niski bufor (KH 15 ppm - podatność na agresywną kwasowość)
+    const low = evaluateWaterAlkalinity('15,0');
+    expect(low.alkalinityPpm).toBe(15);
+    expect(low.category).toBe('low_buffer');
+    expect(low.bufferCapacity).toBe('insufficient');
+    expect(low.acidityImpactPl).toContain('Niski bufor');
+    expect(low.recommendedAdjustmentPl).toContain('sodę oczyszczoną');
+
+    // 3. Umiarkowanie podwyższony bufor (KH 70 ppm)
+    const moderate = evaluateWaterAlkalinity(70);
+    expect(moderate.alkalinityPpm).toBe(70);
+    expect(moderate.category).toBe('moderate_buffer');
+    expect(moderate.bufferCapacity).toBe('elevated');
+    expect(moderate.acidityImpactPl).toContain('Podwyższony bufor');
+
+    // 4. Zbyt wysoki bufor (KH 120 ppm - kredowy, płaski napar)
+    const excessive = evaluateWaterAlkalinity(120);
+    expect(excessive.alkalinityPpm).toBe(120);
+    expect(excessive.category).toBe('excessive_buffer');
+    expect(excessive.bufferCapacity).toBe('excessive');
+    expect(excessive.acidityImpactPl).toContain('Zbyt wysoka');
+
+    // 5. Odporność na null, ujemne, spacje i anomalie
+    const fallback = evaluateWaterAlkalinity(null as any);
+    expect(fallback.alkalinityPpm).toBe(0);
+    expect(fallback.category).toBe('low_buffer');
+    expect(fallback.bufferCapacity).toBe('insufficient');
   });
 });
 

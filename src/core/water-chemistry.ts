@@ -1361,3 +1361,80 @@ export function estimateWaterTdsFromHardness(
     descriptionEn,
   };
 }
+
+
+export type AlkalinityCategory = 'low_buffer' | 'optimal_buffer' | 'moderate_buffer' | 'excessive_buffer';
+
+export interface AlkalinityEvaluation {
+  alkalinityPpm: number;
+  category: AlkalinityCategory;
+  bufferCapacity: 'insufficient' | 'ideal' | 'elevated' | 'excessive';
+  acidityImpactPl: string;
+  acidityImpactEn: string;
+  recommendedAdjustmentPl: string;
+  recommendedAdjustmentEn: string;
+}
+
+/**
+ * Ocenia zasadowość (alkalinity / KH w ppm CaCO3) wody, jej pojemność buforową
+ * oraz wpływ na sensorykę kwasowości w naparze kawowym.
+ */
+export function evaluateWaterAlkalinity(khPpm: number | string): AlkalinityEvaluation {
+  const parseNum = (v: unknown, fallback = 0): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : fallback;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : fallback;
+    }
+    return fallback;
+  };
+
+  const alkalinityPpm = Number(parseNum(khPpm, 0).toFixed(1));
+
+  let category: AlkalinityCategory;
+  let bufferCapacity: 'insufficient' | 'ideal' | 'elevated' | 'excessive';
+  let acidityImpactPl: string;
+  let acidityImpactEn: string;
+  let recommendedAdjustmentPl: string;
+  let recommendedAdjustmentEn: string;
+
+  if (alkalinityPpm < 25) {
+    category = 'low_buffer';
+    bufferCapacity = 'insufficient';
+    acidityImpactPl = 'Niski bufor — kwasowość kawy może być agresywna, ostra i nieprzyjemnie cytrynowa, a napar podatny na wahania pH.';
+    acidityImpactEn = 'Low buffer — coffee acidity may taste sour, sharp and unbuffered, making the brew vulnerable to pH drops.';
+    recommendedAdjustmentPl = 'Dodaj wodorowęglan sodu (sodę oczyszczoną) lub wodorowęglan potasu, aby podnieść KH do ~40 ppm.';
+    recommendedAdjustmentEn = 'Add sodium or potassium bicarbonate to raise alkalinity/KH to ~40 ppm.';
+  } else if (alkalinityPpm <= 55) {
+    category = 'optimal_buffer';
+    bufferCapacity = 'ideal';
+    acidityImpactPl = 'Optymalny bufor specialty — doskonały balans pomiędzy czystą, żywą kwasowością a słodyczą i stabilnością pH.';
+    acidityImpactEn = 'Optimal specialty buffer — perfect balance of vibrant, clean acidity, sweetness and pH stability.';
+    recommendedAdjustmentPl = 'Parametry w strefie idealnej według standardów SCA (docelowo 40 ppm CaCO3). Nie wymaga korekty.';
+    recommendedAdjustmentEn = 'Parameters within the ideal SCA window (target 40 ppm CaCO3). No adjustment needed.';
+  } else if (alkalinityPpm <= 90) {
+    category = 'moderate_buffer';
+    bufferCapacity = 'elevated';
+    acidityImpactPl = 'Podwyższony bufor — delikatne nuty owocowe i cytrusowe są stłumione, uwypuklone nuty czekoladowe i prażone.';
+    acidityImpactEn = 'Elevated buffer — delicate fruity and floral acidity is muted, shifting flavor toward roasted and chocolate notes.';
+    recommendedAdjustmentPl = 'Rozcieńcz wodę wodą demineralizowaną / RO lub użyj filtra dekarbonizującego (wymiana kationowa).';
+    recommendedAdjustmentEn = 'Dilute with RO / distilled water or use a decarbonizing ion-exchange filter.';
+  } else {
+    category = 'excessive_buffer';
+    bufferCapacity = 'excessive';
+    acidityImpactPl = 'Zbyt wysoka zasadowość — napar jest płaski, kredowy, pozbawiony energii i słodyczy. Wysokie ryzyko osadzania kamienia kotłowego.';
+    acidityImpactEn = 'Excessive alkalinity — brew is chalky, dull, lacking vibrancy and sweetness. High risk of limescale buildup.';
+    recommendedAdjustmentPl = 'Wymaga znacznego rozcieńczenia z wodą RO / demineralizowaną lub całkowitego uzdatnienia osmotycznego.';
+    recommendedAdjustmentEn = 'Requires substantial dilution with RO / distilled water or complete reverse osmosis remineralization.';
+  }
+
+  return {
+    alkalinityPpm,
+    category,
+    bufferCapacity,
+    acidityImpactPl,
+    acidityImpactEn,
+    recommendedAdjustmentPl,
+    recommendedAdjustmentEn,
+  };
+}
