@@ -44,6 +44,9 @@ import {
   CoffeeAltitudeBand,
   getTeaCategoryGuide,
   TeaCategoryGuide,
+  compareCoffeeProcesses,
+  CoffeeProcessComparison,
+  CoffeeProcessComparisonItem,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1424,6 +1427,38 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(getTeaCategoryGuide(null)).toBeNull();
     expect(getTeaCategoryGuide('')).toBeNull();
     expect(getTeaCategoryGuide('unknown-tea-category')).toBeNull();
+  });
+
+  test('TASK-P91-06-TRE: compareCoffeeProcesses porównuje dwie metody obróbki kawy', () => {
+    // 1. Washed vs Natural (język polski)
+    const compPl: CoffeeProcessComparison | null = compareCoffeeProcesses('washed', 'natural', 'pl');
+    expect(compPl).not.toBeNull();
+    expect(compPl?.processA.id).toBe('process-washed');
+    expect(compPl?.processB.id).toBe('process-natural');
+    expect(compPl?.processA.waterConsumption).toBeDefined();
+    expect(compPl?.processB.dryingDurationDays).toBeDefined();
+    expect(compPl?.comparisonSummaryPl).toContain('Washed');
+    expect(compPl?.comparisonSummaryPl).toContain('Natural');
+    expect(Array.isArray(compPl?.distinctNotesA)).toBe(true);
+    expect(Array.isArray(compPl?.distinctNotesB)).toBe(true);
+    expect(Array.isArray(compPl?.sharedNotes)).toBe(true);
+
+    const sampleItem: CoffeeProcessComparisonItem = compPl!.processA;
+    expect(sampleItem.id).toBe('process-washed');
+
+    // 2. Wersja angielska i aliasy (anaerobic vs honey)
+    const compEn = compareCoffeeProcesses('anaerobic', 'honey', 'en');
+    expect(compEn).not.toBeNull();
+    expect(compEn?.processA.id).toBe('process-anaerobic');
+    expect(compEn?.processB.id).toBe('process-honey');
+    expect(compEn?.comparisonSummaryEn).toContain('Anaerobic');
+
+    // 3. Odporność na błędne i nieistniejące parametry
+    expect(compareCoffeeProcesses('washed', null)).toBeNull();
+    expect(compareCoffeeProcesses(null, 'natural')).toBeNull();
+    expect(compareCoffeeProcesses('unknown-process', 'natural')).toBeNull();
+    expect(compareCoffeeProcesses('washed', 'unknown-process')).toBeNull();
+    expect(compareCoffeeProcesses('', '')).toBeNull();
   });
 });
 

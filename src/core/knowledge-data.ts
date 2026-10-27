@@ -1950,4 +1950,83 @@ export function getTeaCategoryGuide(
   };
 }
 
+export interface CoffeeProcessComparisonItem {
+  id: string;
+  name: string;
+  processType: string;
+  sensoryImpact: string;
+  waterConsumption: string;
+  dryingDurationDays: string;
+  keyNotes: string[];
+}
+
+export interface CoffeeProcessComparison {
+  processA: CoffeeProcessComparisonItem;
+  processB: CoffeeProcessComparisonItem;
+  sharedNotes: string[];
+  distinctNotesA: string[];
+  distinctNotesB: string[];
+  comparisonSummaryPl: string;
+  comparisonSummaryEn: string;
+}
+
+/**
+ * Porównuje dwie metody obróbki kawy (np. Washed vs Natural, Anaerobic vs Honey)
+ * zestawiając ich parametry technologiczne, profile sensoryczne i nuty smakowe.
+ */
+export function compareCoffeeProcesses(
+  processAIdOrQuery: string | undefined | null,
+  processBIdOrQuery: string | undefined | null,
+  lang: 'pl' | 'en' | string = 'pl'
+): CoffeeProcessComparison | null {
+  if (!processAIdOrQuery || !processBIdOrQuery) return null;
+  const guideA = getCoffeeProcessGuide(processAIdOrQuery, lang);
+  const guideB = getCoffeeProcessGuide(processBIdOrQuery, lang);
+  if (!guideA || !guideB) return null;
+
+  const notesA = Array.isArray(guideA.keyNotes) ? guideA.keyNotes : [];
+  const notesB = Array.isArray(guideB.keyNotes) ? guideB.keyNotes : [];
+
+  const lowerB = new Set(notesB.map((n) => n.toLowerCase().trim()));
+  const lowerA = new Set(notesA.map((n) => n.toLowerCase().trim()));
+
+  const sharedNotes = notesA.filter((n) => lowerB.has(n.toLowerCase().trim()));
+  const distinctNotesA = notesA.filter((n) => !lowerB.has(n.toLowerCase().trim()));
+  const distinctNotesB = notesB.filter((n) => !lowerA.has(n.toLowerCase().trim()));
+
+  const processA: CoffeeProcessComparisonItem = {
+    id: guideA.id,
+    name: guideA.name,
+    processType: guideA.processType,
+    sensoryImpact: guideA.sensoryImpact,
+    waterConsumption: guideA.waterConsumption,
+    dryingDurationDays: guideA.dryingDurationDays,
+    keyNotes: notesA,
+  };
+
+  const processB: CoffeeProcessComparisonItem = {
+    id: guideB.id,
+    name: guideB.name,
+    processType: guideB.processType,
+    sensoryImpact: guideB.sensoryImpact,
+    waterConsumption: guideB.waterConsumption,
+    dryingDurationDays: guideB.dryingDurationDays,
+    keyNotes: notesB,
+  };
+
+  const comparisonSummaryPl = `Porównanie obróbki ${guideA.name} i ${guideB.name}: ${guideA.name} (${guideA.sensoryImpact}) vs ${guideB.name} (${guideB.sensoryImpact}).`;
+  const comparisonSummaryEn = `Comparison between ${guideA.name} and ${guideB.name}: ${guideA.name} (${guideA.sensoryImpact}) vs ${guideB.name} (${guideB.sensoryImpact}).`;
+
+  return {
+    processA,
+    processB,
+    sharedNotes,
+    distinctNotesA,
+    distinctNotesB,
+    comparisonSummaryPl,
+    comparisonSummaryEn,
+  };
+}
+
+
 
