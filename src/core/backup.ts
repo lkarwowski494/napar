@@ -1059,4 +1059,179 @@ export function estimateBackupFileSize(
   };
 }
 
+export type BackupComparisonStatus =
+  | 'identical'
+  | 'local_ahead'
+  | 'remote_ahead'
+  | 'divergent_conflict'
+  | 'corrupt';
+
+export interface BackupVersionComparison {
+  status: BackupComparisonStatus;
+  localExportedAt: string | null;
+  remoteExportedAt: string | null;
+  localItemCount: number;
+  remoteItemCount: number;
+  differenceItemCount: number;
+  recommendedAction: 'keep_local' | 'restore_remote' | 'merge_required' | 'reject';
+  summaryMessagePl: string;
+  summaryMessageEn: string;
+}
+
+/**
+ * Porównuje wersje dwóch kopert kopii zapasowej (np. lokalnej i importowanej/chmurowej)
+ * i wykrywa czy kopie są identyczne, nowsze, czy występuje konflikt wersji.
+ */
+export function compareBackupVersions(
+  localEnvelope?: unknown,
+  remoteEnvelope?: unknown
+): BackupVersionComparison {
+  const isEnvValid = (env: unknown): env is NaparBackupEnvelope => {
+    if (!env || typeof env !== 'object') return false;
+    const e = env as Record<string, unknown>;
+    return (
+      (e.format === 'napar-backup' || typeof e.version === 'number') &&
+      (Boolean(e.state && typeof e.state === 'object') || Boolean(e.data && typeof e.data === 'object'))
+    );
+  };
+
+  const getCounts = (env: unknown): { count: number; exportedAt: string | null; timeMs: number } => {
+    if (!env || typeof env !== 'object') return { count: 0, exportedAt: null, timeMs: NaN };
+    const e = env as any;
+    const state =
+      e.state && typeof e.state === 'object'
+        ? e.state
+        : e.data && typeof e.data === 'object'
+        ? e.data
+        : {};
+    const inv = Array.isArray(state.inventory) ? state.inventory.length : 0;
+    const rec = Array.isArray(state.customRecipes || state.recipes)
+      ? (state.customRecipes || state.recipes).length
+      : 0;
+    const ses = Array.isArray(state.sessions) ? state.sessions.length : 0;
+    const caf = Array.isArray(state.caffeineLogs || state.caffeine)
+      ? (state.caffeineLogs || state.caffeine).length
+      : 0;
+    const exportedAt =
+      typeof e.exportedAt === 'string' && e.exportedAt.trim().length > 0
+        ? e.exportedAt.trim()
+        : null;
+    const timeMs = exportedAt ? Date.parse(exportedAt) : NaN;
+    return { count: inv + rec + ses + caf, exportedAt, timeMs };
+  };
+
+  const localValid = isEnvValid(localEnvelope);
+  const remoteValid = isEnvValid(remoteEnvelope);
+
+  if (!localValid && !remoteValid) {
+    return {
+      status: 'corrupt',
+      localExportedAt: null,
+      remoteExportedAt: null,
+      localItemCount: 0,
+      remoteItemCount: 0,
+      differenceItemCount: 0,
+      recommendedAction: 'reject',
+      summaryMessagePl: 'Obie kopie zapasowe są uszkodzone lub nieprawidłowe.',
+      summaryMessageEn: 'Both backup files are corrupt or invalid.',
+    };
+  }
+
+  const localInfo = getCounts(localEnvelope);
+  const remoteInfo = getCounts(remoteEnvelope);
+
+  if (!localValid && remoteValid) {
+    return {
+      status: 'remote_ahead',
+      localExportedAt: null,
+      remoteExportedAt: remoteInfo.exportedAt,
+      localItemCount: 0,
+      remoteItemCount: remoteInfo.count,
+      differenceItemCount: -remoteInfo.count,
+      recommendedAction: 'restore_remote',
+      summaryMessagePl: 'Lokalna kopia jest uszkodzona — zalecane przywrócenie ze zdalnej kopii.',
+      summaryMessageEn: 'Local backup is corrupt — restoring from remote backup is recommended.',
+    };
+  }
+
+  if (localValid && !remoteValid) {
+    return {
+      status: 'local_ahead',
+      localExportedAt: localInfo.exportedAt,
+      remoteExportedAt: null,
+      localItemCount: localInfo.count,
+      remoteItemCount: 0,
+      differenceItemCount: localInfo.count,
+      recommendedAction: 'keep_local',
+      summaryMessagePl: 'Zdalna kopia jest uszkodzona — zalecane zachowanie lokalnych danych.',
+      summaryMessageEn: 'Remote backup is corrupt — keeping local data is recommended.',
+    };
+  }
+
+  const diffItems = localInfo.count - remoteInfo.count;
+  const isTimeEqual =
+    localInfo.exportedAt === remoteInfo.exportedAt ||
+    (!Number.isNaN(localInfo.timeMs) &&
+      !Number.isNaN(remoteInfo.timeMs) &&
+      localInfo.timeMs === remoteInfo.timeMs);
+
+  if (isTimeEqual && diffItems === 0) {
+    return {
+      status: 'identical',
+      localExportedAt: localInfo.exportedAt,
+      remoteExportedAt: remoteInfo.exportedAt,
+      localItemCount: localInfo.count,
+      remoteItemCount: remoteInfo.count,
+      differenceItemCount: 0,
+      recommendedAction: 'keep_local',
+      summaryMessagePl: 'Obie kopie zapasowe są identyczne pod względem daty i liczby rekordów.',
+      summaryMessageEn: 'Both backups are identical in timestamp and item count.',
+    };
+  }
+
+  const hasValidTimes = !Number.isNaN(localInfo.timeMs) && !Number.isNaN(remoteInfo.timeMs);
+
+  if (hasValidTimes) {
+    if (localInfo.timeMs > remoteInfo.timeMs && diffItems >= 0) {
+      return {
+        status: 'local_ahead',
+        localExportedAt: localInfo.exportedAt,
+        remoteExportedAt: remoteInfo.exportedAt,
+        localItemCount: localInfo.count,
+        remoteItemCount: remoteInfo.count,
+        differenceItemCount: diffItems,
+        recommendedAction: 'keep_local',
+        summaryMessagePl: `Lokalna kopia jest nowsza (+${diffItems} rekordów). Zalecane zachowanie lokalnych danych.`,
+        summaryMessageEn: `Local backup is newer (+${diffItems} items). Keeping local data recommended.`,
+      };
+    }
+
+    if (remoteInfo.timeMs > localInfo.timeMs && diffItems <= 0) {
+      return {
+        status: 'remote_ahead',
+        localExportedAt: localInfo.exportedAt,
+        remoteExportedAt: remoteInfo.exportedAt,
+        localItemCount: localInfo.count,
+        remoteItemCount: remoteInfo.count,
+        differenceItemCount: diffItems,
+        recommendedAction: 'restore_remote',
+        summaryMessagePl: `Zdalna kopia jest nowsza (+${Math.abs(diffItems)} rekordów). Zalecane przywrócenie ze zdalnej kopii.`,
+        summaryMessageEn: `Remote backup is newer (+${Math.abs(diffItems)} items). Restoring remote backup recommended.`,
+      };
+    }
+  }
+
+  return {
+    status: 'divergent_conflict',
+    localExportedAt: localInfo.exportedAt,
+    remoteExportedAt: remoteInfo.exportedAt,
+    localItemCount: localInfo.count,
+    remoteItemCount: remoteInfo.count,
+    differenceItemCount: diffItems,
+    recommendedAction: 'merge_required',
+    summaryMessagePl: 'Wykryto rozbieżność danych między kopiami (konflikt wersji). Zalecane scalenie.',
+    summaryMessageEn: 'Data divergence detected between backup copies (version conflict). Merge recommended.',
+  };
+}
+
 

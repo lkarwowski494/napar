@@ -24,6 +24,9 @@ import {
   sanitizeBackupEnvelope,
   estimateBackupFileSize,
   BackupFileSizeEstimate,
+  compareBackupVersions,
+  BackupVersionComparison,
+  BackupComparisonStatus,
   NaparBackupEnvelope,
   localISODate,
   stampOf,
@@ -779,6 +782,75 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(emptyEst.formattedSize).toBe('0 B');
       expect(emptyEst.collectionBreakdownBytes.inventory).toBe(0);
       expect(emptyEst.collectionBreakdownPercent.inventory).toBe(0);
+    });
+
+    test('TASK-P88-05-ARC: compareBackupVersions porównuje wersje kopii zapasowych i wykrywa konflikty', () => {
+      const baseEnv: NaparBackupEnvelope = buildBackup({
+        inventory: [{ id: 'inv-1', name: 'Ethiopia' }] as any,
+        customRecipes: [{ id: 'rec-1', name: 'V60' }] as any,
+        sessions: [],
+        caffeineLogs: [],
+      });
+      baseEnv.exportedAt = '2026-10-25T12:00:00Z';
+
+      // 1. Identyczne kopie
+      const sameComparison: BackupVersionComparison = compareBackupVersions(baseEnv, baseEnv);
+      const sameStatus: BackupComparisonStatus = sameComparison.status;
+      expect(sameStatus).toBe('identical');
+      expect(sameComparison.recommendedAction).toBe('keep_local');
+      expect(sameComparison.differenceItemCount).toBe(0);
+      expect(sameComparison.summaryMessagePl).toContain('identyczne');
+
+      // 2. Local ahead (lokalna kopia nowsza i z większą liczbą rekordów)
+      const newerLocal: NaparBackupEnvelope = {
+        ...baseEnv,
+        exportedAt: '2026-10-27T12:00:00Z',
+        state: {
+          ...baseEnv.state,
+          sessions: [{ id: 'sess-1', notes: 'Great brew' }] as any,
+        },
+      };
+      const localAhead = compareBackupVersions(newerLocal, baseEnv);
+      expect(localAhead.status).toBe('local_ahead');
+      expect(localAhead.recommendedAction).toBe('keep_local');
+      expect(localAhead.differenceItemCount).toBe(1);
+      expect(localAhead.summaryMessagePl).toContain('Lokalna');
+
+      // 3. Remote ahead (zdalna kopia nowsza i z większą liczbą rekordów)
+      const remoteAhead = compareBackupVersions(baseEnv, newerLocal);
+      expect(remoteAhead.status).toBe('remote_ahead');
+      expect(remoteAhead.recommendedAction).toBe('restore_remote');
+      expect(remoteAhead.differenceItemCount).toBe(-1);
+      expect(remoteAhead.summaryMessagePl).toContain('Zdalna');
+
+      // 4. Divergent conflict (zdalna nowsza data, ale lokalna ma więcej rekordów)
+      const olderMoreItems: NaparBackupEnvelope = {
+        ...baseEnv,
+        exportedAt: '2026-10-24T12:00:00Z',
+        state: {
+          ...baseEnv.state,
+          sessions: [{ id: 'sess-1' }, { id: 'sess-2' }] as any,
+        },
+      };
+      const newerFewerItems: NaparBackupEnvelope = {
+        ...baseEnv,
+        exportedAt: '2026-10-27T12:00:00Z',
+        state: {
+          inventory: [],
+          customRecipes: [],
+          sessions: [],
+          caffeineLogs: [],
+        },
+      };
+      const conflict = compareBackupVersions(olderMoreItems, newerFewerItems);
+      expect(conflict.status).toBe('divergent_conflict');
+      expect(conflict.recommendedAction).toBe('merge_required');
+      expect(conflict.summaryMessagePl).toContain('konflikt');
+
+      // 5. Corrupt / missing input
+      const corrupt = compareBackupVersions(null, null);
+      expect(corrupt.status).toBe('corrupt');
+      expect(corrupt.recommendedAction).toBe('reject');
     });
   });
 });
