@@ -106,3 +106,76 @@ export function filterBySearch<T>(
   });
 }
 
+/**
+ * RD-ENG-07: Sortuje elementy według trafności dopasowania do zapytania.
+ * Wyniki z dopasowaniem w tytule (dokładne/prefiksowe/zawiera) otrzymują wyższy priorytet
+ * niż wyniki pasujące wyłącznie w polach pomocniczych (secondary).
+ * Zachowuje stabilną kolejność dla wyników o tym samym priorytecie.
+ */
+export function rankSearchResults<T>(
+  items: T[] | undefined | null,
+  query: string | undefined | null,
+  extractTitle: (item: T) => string | undefined | null,
+  extractSecondary?: (item: T) => (string | undefined | null | unknown)[]
+): T[] {
+  if (!Array.isArray(items) || items.length === 0) return [];
+  if (!query || typeof query !== 'string' || !query.trim()) {
+    return [...items];
+  }
+  const normQuery = normSearch(query);
+  if (!normQuery) return [...items];
+
+  const scored: { item: T; score: number; index: number }[] = [];
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (!item) continue;
+    let titleStr = '';
+    try {
+      titleStr = typeof extractTitle === 'function' ? String(extractTitle(item) ?? '') : '';
+    } catch {
+      titleStr = '';
+    }
+    const normTitle = normSearch(titleStr);
+
+    let secondaryFields: (string | undefined | null | unknown)[] = [];
+    if (typeof extractSecondary === 'function') {
+      try {
+        secondaryFields = extractSecondary(item) || [];
+      } catch {
+        secondaryFields = [];
+      }
+    }
+
+    // Obliczamy wagę dopasowania:
+    // 100: dokładne dopasowanie tytułu
+    // 80: tytuł zaczyna się od zapytania
+    // 60: tytuł zawiera całe zapytanie
+    // 40: tytuł zawiera wszystkie tokeny
+    // 20: którekolwiek pole pomocnicze zawiera dopasowanie
+    let score = 0;
+    if (normTitle === normQuery) {
+      score = 100;
+    } else if (normTitle.startsWith(normQuery)) {
+      score = 80;
+    } else if (normTitle.includes(normQuery)) {
+      score = 60;
+    } else if (matchesSearch(normTitle, normQuery)) {
+      score = 40;
+    } else if (matchesAnyField(secondaryFields, normQuery)) {
+      score = 20;
+    }
+
+    if (score > 0) {
+      scored.push({ item, score, index: i });
+    }
+  }
+
+  scored.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.index - b.index;
+  });
+
+  return scored.map((s) => s.item);
+}
+

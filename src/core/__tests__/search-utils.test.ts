@@ -9,6 +9,7 @@ import {
   matchesAllTokens,
   matchesAnyField,
   filterBySearch,
+  rankSearchResults,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -115,5 +116,47 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     // 5. Odporność na nullish items
     expect(filterBySearch(null as any, 'guji', () => [])).toEqual([]);
     expect(filterBySearch(undefined as any, 'guji', () => [])).toEqual([]);
+  });
+
+  test('TASK-P66-01-ODK: rankSearchResults sortuje elementy wg trafnosci (tytuł > pola pomocnicze)', () => {
+    interface RecipeEntry {
+      id: string;
+      title: string;
+      notes: string;
+    }
+
+    const recipes: RecipeEntry[] = [
+      { id: '1', title: 'Chemex Classic', notes: 'Zastosuj gruby przemiał i filtr v60' },
+      { id: '2', title: 'V60 Tetsu Kasuya 4:6', notes: 'Japońska metoda dla drippera v60' },
+      { id: '3', title: 'AeroPress Inverted', notes: 'Bardzo klarowny napar v60 like' },
+      { id: '4', title: 'V60 Hoffmann 1-Cup', notes: 'Standardowy przepis V60' },
+    ];
+
+    // Szukamy "V60"
+    // 'V60 Tetsu Kasuya 4:6' zaczyna się od 'v60' (score 80)
+    // 'V60 Hoffmann 1-Cup' zaczyna się od 'v60' (score 80)
+    // 'Chemex Classic' i 'AeroPress Inverted' mają v60 tylko w notes (score 20)
+    const ranked = rankSearchResults(
+      recipes,
+      'V60',
+      (r) => r.title,
+      (r) => [r.notes]
+    );
+
+    expect(ranked.length).toBe(4);
+    expect(ranked[0].id).toBe('2'); // Pierwszy z prefiksem V60
+    expect(ranked[1].id).toBe('4'); // Drugi z prefiksem V60
+    expect(['1', '3']).toContain(ranked[2].id);
+    expect(['1', '3']).toContain(ranked[3].id);
+
+    // Dokładne dopasowanie tytułu
+    const single = [{ id: 'x', title: 'V60', notes: '' }, { id: 'y', title: 'V60 4:6', notes: '' }];
+    const rankedSingle = rankSearchResults(single, 'v60', (s) => s.title);
+    expect(rankedSingle[0].id).toBe('x'); // Dokładne dopasowanie 'v60' == 'v60'
+
+    // Puste zapytanie lub brak pasujących
+    expect(rankSearchResults(recipes, '', (r) => r.title).length).toBe(4);
+    expect(rankSearchResults(recipes, 'Kalita', (r) => r.title).length).toBe(0);
+    expect(rankSearchResults(null, 'v60', () => '')).toEqual([]);
   });
 });
