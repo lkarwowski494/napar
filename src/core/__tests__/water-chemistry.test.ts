@@ -44,6 +44,9 @@ import {
   calculateSulfateToChlorideRatio,
   SulfateToChlorideRatioAnalysis,
   SulfateToChlorideCategory,
+  calculateTotalHardnessFromIons,
+  TotalHardnessIonAnalysis,
+  HardnessDominance,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -1175,6 +1178,47 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(safeFallback.sulfatePpm).toBe(0);
     expect(safeFallback.chloridePpm).toBe(0);
     expect(safeFallback.category).toBe('balanced');
+  });
+
+  test('TASK-P88-07-JAK: calculateTotalHardnessFromIons przelicza jony Ca i Mg na twardość ogólną GH', () => {
+    // 1. Zrównoważony profil jonowy (Ca 20 ppm, Mg 10 ppm)
+    const balanced: TotalHardnessIonAnalysis = calculateTotalHardnessFromIons(20, 10);
+    const domCheck: HardnessDominance = balanced.dominance;
+    expect(domCheck).toBe('balanced');
+    expect(balanced.calciumPpm).toBe(20);
+    expect(balanced.magnesiumPpm).toBe(10);
+    expect(balanced.calciumHardnessPpmCaCO3).toBeCloseTo(49.9, 1);
+    expect(balanced.magnesiumHardnessPpmCaCO3).toBeCloseTo(41.2, 1);
+    expect(balanced.totalHardnessPpmCaCO3).toBeCloseTo(91.1, 1);
+    expect(balanced.totalHardnessGermanDegrees).toBeCloseTo(5.1, 1);
+    expect(balanced.totalHardnessFrenchDegrees).toBeCloseTo(9.1, 1);
+    expect(balanced.calciumPercentage).toBeGreaterThan(40);
+    expect(balanced.magnesiumPercentage).toBeGreaterThan(35);
+    expect(balanced.brewingImpactPl.toLowerCase()).toContain('zrównoważony');
+
+    // 2. Dominacja wapnia (Ca 50 ppm, Mg 2 ppm -> Ca% >= 65%)
+    const caDom = calculateTotalHardnessFromIons('50,0', '2,0');
+    expect(caDom.dominance).toBe('calcium_dominant');
+    expect(caDom.calciumPercentage).toBeGreaterThanOrEqual(65);
+    expect(caDom.brewingImpactPl).toContain('wapnia');
+    expect(caDom.brewingImpactEn.toLowerCase()).toContain('calcium');
+
+    // 3. Dominacja magnezu (Ca 5 ppm, Mg 25 ppm -> Mg% >= 65%)
+    const mgDom = calculateTotalHardnessFromIons(5, 25);
+    expect(mgDom.dominance).toBe('magnesium_dominant');
+    expect(mgDom.magnesiumPercentage).toBeGreaterThanOrEqual(65);
+    expect(mgDom.brewingImpactPl).toContain('magnezu');
+    expect(mgDom.brewingImpactEn.toLowerCase()).toContain('magnesium');
+
+    // 4. Przypadki brzegowe: 0, wartości ujemne, null, niepoprawne stringi
+    const zeroHardness = calculateTotalHardnessFromIons(0, 0);
+    expect(zeroHardness.totalHardnessPpmCaCO3).toBe(0);
+    expect(zeroHardness.dominance).toBe('balanced');
+
+    const invalidInput = calculateTotalHardnessFromIons(null as any, 'invalid');
+    expect(invalidInput.calciumPpm).toBe(0);
+    expect(invalidInput.magnesiumPpm).toBe(0);
+    expect(invalidInput.totalHardnessPpmCaCO3).toBe(0);
   });
 });
 

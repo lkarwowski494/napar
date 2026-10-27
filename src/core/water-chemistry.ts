@@ -1727,3 +1727,91 @@ export function calculateSulfateToChlorideRatio(
   };
 }
 
+export type HardnessDominance = 'calcium_dominant' | 'magnesium_dominant' | 'balanced';
+
+export interface TotalHardnessIonAnalysis {
+  calciumPpm: number;
+  magnesiumPpm: number;
+  calciumHardnessPpmCaCO3: number;
+  magnesiumHardnessPpmCaCO3: number;
+  totalHardnessPpmCaCO3: number;
+  totalHardnessGermanDegrees: number; // °dH
+  totalHardnessFrenchDegrees: number; // °fH
+  dominance: HardnessDominance;
+  calciumPercentage: number;
+  magnesiumPercentage: number;
+  brewingImpactPl: string;
+  brewingImpactEn: string;
+}
+
+/**
+ * Przelicza stężenia jonów wapnia (Ca2+) i magnezu (Mg2+) na twardość ogólną (GH jako ppm CaCO3, °dH, °fH)
+ * oraz ocenia dominację kationową i wpływ na ekstrakcję kawy.
+ * Formuła Standard Methods / SCA: GH (ppm CaCO3) = Ca * 2.497 + Mg * 4.118
+ */
+export function calculateTotalHardnessFromIons(
+  calciumPpm: number | string | undefined | null,
+  magnesiumPpm: number | string | undefined | null
+): TotalHardnessIonAnalysis {
+  const sanitize = (val: unknown): number => {
+    if (typeof val === 'number') {
+      return Number.isFinite(val) && val > 0 ? val : 0;
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(',', '.').trim());
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+    }
+    return 0;
+  };
+
+  const ca = sanitize(calciumPpm);
+  const mg = sanitize(magnesiumPpm);
+
+  const caHardness = Math.round(ca * 2.497 * 10) / 10;
+  const mgHardness = Math.round(mg * 4.118 * 10) / 10;
+  const totalGh = Math.round((caHardness + mgHardness) * 10) / 10;
+
+  const totalDdH = Math.round((totalGh / 17.848) * 10) / 10;
+  const totalFh = Math.round((totalGh / 10) * 10) / 10;
+
+  let caPercent = 0;
+  let mgPercent = 0;
+  let dominance: HardnessDominance = 'balanced';
+  let brewingImpactPl = 'Brak wykrywalnych jonów twardości (woda ultraczysta / demineralizowana).';
+  let brewingImpactEn = 'No detectable hardness ions (ultrapure / demineralized water).';
+
+  if (totalGh > 0) {
+    caPercent = Math.round((caHardness / totalGh) * 1000) / 10;
+    mgPercent = Math.round((mgHardness / totalGh) * 1000) / 10;
+
+    if (caPercent >= 65) {
+      dominance = 'calcium_dominant';
+      brewingImpactPl = `Przewaga wapnia (${caPercent}%) — uwypukla przejrzystość, czystość i delikatne nuty owocowe, z mniejszą ekstrakcją ciężkich związków.`;
+      brewingImpactEn = `Calcium dominance (${caPercent}%) — enhances clarity, cleanliness, and delicate florals with lower extraction of heavy flavors.`;
+    } else if (mgPercent >= 65) {
+      dominance = 'magnesium_dominant';
+      brewingImpactPl = `Przewaga magnezu (${mgPercent}%) — silnie wiąże tlenowe grupy kwasów owocowych, maksymalizując słodycz i owocową kwasowość.`;
+      brewingImpactEn = `Magnesium dominance (${mgPercent}%) — strongly binds oxygen-rich fruit acids, maximizing sweetness and vibrant fruit acidity.`;
+    } else {
+      dominance = 'balanced';
+      brewingImpactPl = `Zrównoważony profil jonowy (Ca ${caPercent}%, Mg ${mgPercent}%) — optymalny balans słodyczy, body i kwasowości w metodach przelewowych.`;
+      brewingImpactEn = `Balanced cation profile (Ca ${caPercent}%, Mg ${mgPercent}%) — optimal balance of sweetness, body, and acidity for pour-overs.`;
+    }
+  }
+
+  return {
+    calciumPpm: ca,
+    magnesiumPpm: mg,
+    calciumHardnessPpmCaCO3: caHardness,
+    magnesiumHardnessPpmCaCO3: mgHardness,
+    totalHardnessPpmCaCO3: totalGh,
+    totalHardnessGermanDegrees: totalDdH,
+    totalHardnessFrenchDegrees: totalFh,
+    dominance,
+    calciumPercentage: caPercent,
+    magnesiumPercentage: mgPercent,
+    brewingImpactPl,
+    brewingImpactEn,
+  };
+}
+
