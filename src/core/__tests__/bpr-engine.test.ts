@@ -8,6 +8,8 @@ import {
   findNextRecommendedAction,
   groupActionsByDate,
   ActionGroupMap,
+  getActionScheduleCounts,
+  ActionScheduleCounts,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -810,6 +812,31 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       // Odporność na null/undefined i puste kolekcje
       expect(groupActionsByDate(null as any)).toEqual({});
       expect(groupActionsByDate([])).toEqual({});
+    });
+
+    it('TASK-P71-04-SZT: getActionScheduleCounts zlicza akcje wg statusu i koloru odznaki', () => {
+      const actions = [
+        { id: 'act-1', daysOffset: 0, badgeColor: 'copper' },
+        { id: 'act-2', daysOffset: 1, badgeColor: 'success' },
+        { id: 'act-3', daysOffset: 3, badgeColor: 'copper' },
+        { id: 'act-4', daysOffset: -1, badgeColor: 'warning' },
+      ] as any[];
+
+      const counts: ActionScheduleCounts = getActionScheduleCounts(actions);
+      expect(counts.total).toBe(4);
+      expect(counts.today).toBe(1);
+      expect(counts.tomorrow).toBe(1);
+      expect(counts.upcoming).toBe(1);
+      expect(counts.overdue).toBe(1);
+      expect(counts.byBadgeColor.copper).toBe(2);
+      expect(counts.byBadgeColor.success).toBe(1);
+      expect(counts.byBadgeColor.warning).toBe(1);
+
+      // Odporność na wartości null i puste tablice
+      const emptyCounts = getActionScheduleCounts(null as any);
+      expect(emptyCounts.total).toBe(0);
+      expect(emptyCounts.today).toBe(0);
+      expect(emptyCounts.byBadgeColor.copper).toBe(0);
     });
   });
 });

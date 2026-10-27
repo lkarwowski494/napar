@@ -893,3 +893,65 @@ export function groupActionsByDate(actions: ProactiveActionItem[]): ActionGroupM
   }
   return map;
 }
+
+export interface ActionScheduleCounts {
+  total: number;
+  today: number;
+  tomorrow: number;
+  upcoming: number;
+  overdue: number;
+  byBadgeColor: {
+    copper: number;
+    success: number;
+    warning: number;
+  };
+}
+
+/**
+ * Podlicza akcje proaktywne w harmonogramie z podziałem na statusy i warianty kolorystyczne.
+ */
+export function getActionScheduleCounts(actions: ProactiveActionItem[]): ActionScheduleCounts {
+  const counts: ActionScheduleCounts = {
+    total: 0,
+    today: 0,
+    tomorrow: 0,
+    upcoming: 0,
+    overdue: 0,
+    byBadgeColor: {
+      copper: 0,
+      success: 0,
+      warning: 0,
+    },
+  };
+
+  if (!Array.isArray(actions)) return counts;
+
+  for (const action of actions) {
+    if (!action || typeof action !== 'object') continue;
+    counts.total++;
+
+    const offset = typeof action.daysOffset === 'number' && !Number.isNaN(action.daysOffset)
+      ? action.daysOffset
+      : 0;
+
+    if (offset === 0) {
+      counts.today++;
+    } else if (offset === 1) {
+      counts.tomorrow++;
+    } else if (offset > 1) {
+      counts.upcoming++;
+    } else if (offset < 0) {
+      counts.overdue++;
+    }
+
+    if (action.badgeColor === 'copper') {
+      counts.byBadgeColor.copper++;
+    } else if (action.badgeColor === 'success') {
+      counts.byBadgeColor.success++;
+    } else if (action.badgeColor === 'warning') {
+      counts.byBadgeColor.warning++;
+    }
+  }
+
+  return counts;
+}
