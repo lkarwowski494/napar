@@ -636,5 +636,31 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(darkAction?.id).toBe('action-peak-now-coffee-dark');
       expect(darkAction?.daysOffset).toBe(0);
     });
+
+    it('TASK-P54-03-ZAK: parseStepDurationSeconds parsuje godziny (pojedyncze, zakresy, złożone i naturalne) dla Cold Brew z clampem do 86400', () => {
+      // 1. Naturalne wyrażenia godzinowe
+      expect(parseStepDurationSeconds('Maceruj przez pół godziny w temperaturze pokojowej')).toBe(1800);
+      expect(parseStepDurationSeconds('Steep for half an hour on the counter')).toBe(1800);
+      expect(parseStepDurationSeconds('Zostaw na półtorej godziny')).toBe(5400);
+      expect(parseStepDurationSeconds('Infuse for one and a half hours')).toBe(5400);
+
+      // 2. Pojedyncze godziny
+      expect(parseStepDurationSeconds('Maceruj w lodówce przez 12 godzin')).toBe(43200);
+      expect(parseStepDurationSeconds('Parz przez 8 godz.')).toBe(28800);
+      expect(parseStepDurationSeconds('Steep for 10 hours')).toBe(36000);
+      expect(parseStepDurationSeconds('Cold brew 12 hrs')).toBe(43200);
+      expect(parseStepDurationSeconds('Ekstrakcja 1.5 godz.')).toBe(5400);
+
+      // 3. Zakres godzin (dolna granica)
+      expect(parseStepDurationSeconds('Zostaw na 12-16 godzin')).toBe(43200);
+      expect(parseStepDurationSeconds('Steep for 8 to 12 hours')).toBe(28800);
+
+      // 4. Złożone godziny i minuty
+      expect(parseStepDurationSeconds('1 godzina i 30 minut powolnej maceracji')).toBe(5400);
+      expect(parseStepDurationSeconds('1 hr 15 mins cold immersion')).toBe(4500);
+
+      // 5. Clampowanie do 86400 dla ekstrakcji powyżej 24 godzin
+      expect(parseStepDurationSeconds('Ekstrakcja przez 36 godzin')).toBe(86400);
+    });
   });
 });
