@@ -26,6 +26,8 @@ import {
   calculateWaterBlend,
   WaterBlendParams,
   WaterBlendResult,
+  calculateHardnessRatio,
+  HardnessRatioAnalysis,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -898,6 +900,35 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(() => calculateWaterBlend(null as any)).toThrow();
     expect(() => calculateWaterBlend({ tapHardnessPpm: 0, targetHardnessPpm: 50, totalBatchGrams: 1000 })).toThrow();
     expect(() => calculateWaterBlend({ tapHardnessPpm: 100, pureWaterHardnessPpm: 150, targetHardnessPpm: 50, totalBatchGrams: 1000 })).toThrow();
+  });
+
+  test('TASK-P72-07-JAK: calculateHardnessRatio analizuje stosunek twardości GH do KH', () => {
+    // 1. Zrównoważona woda specialty (np. Barista Hustle 80/40 -> ratio 2.0)
+    const balanced: HardnessRatioAnalysis = calculateHardnessRatio(80, 40);
+    expect(balanced.ratio).toBe(2.0);
+    expect(balanced.category).toBe('balanced');
+    expect(balanced.descriptionPl).toContain('Optymalna');
+    expect(balanced.descriptionEn).toContain('Optimal');
+
+    // 2. Woda nadmiernie zbuforowana (np. GH 60, KH 50 -> ratio 1.2)
+    const buffered = calculateHardnessRatio('60', '50');
+    expect(buffered.ratio).toBe(1.2);
+    expect(buffered.category).toBe('chalky_buffered');
+    expect(buffered.descriptionPl).toContain('tłumiona');
+
+    // 3. Woda z niewystarczającym buforem (np. GH 100, KH 20 -> ratio 5.0)
+    const unbuffered = calculateHardnessRatio('100,0', '20,0');
+    expect(unbuffered.ratio).toBe(5.0);
+    expect(unbuffered.category).toBe('acidic_unbuffered');
+    expect(unbuffered.descriptionPl).toContain('Wysoka proporcja');
+
+    // 4. Odporność na zera, brak KH, wartości ujemne i null
+    const zeroKh = calculateHardnessRatio(50, 0);
+    expect(zeroKh.category).toBe('acidic_unbuffered');
+
+    const empty = calculateHardnessRatio(null as any, undefined as any);
+    expect(empty.ratio).toBe(0);
+    expect(empty.category).toBe('chalky_buffered');
   });
 });
 

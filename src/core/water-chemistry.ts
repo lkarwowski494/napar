@@ -1144,3 +1144,67 @@ export function calculateWaterBlend(params: WaterBlendParams): WaterBlendResult 
     effectiveHardnessPpm: Number(effectivePpm.toFixed(1)),
   };
 }
+
+export interface HardnessRatioAnalysis {
+  ratio: number;
+  category: 'balanced' | 'chalky_buffered' | 'acidic_unbuffered';
+  descriptionPl: string;
+  descriptionEn: string;
+}
+
+/**
+ * Oblicza i analizuje stosunek twardości ogólnej (GH) do twardości węglanowej / alkaliczności (KH).
+ * Optymalna relacja dla specialty coffee mieści się w zakresie 1.5 - 3.5.
+ */
+export function calculateHardnessRatio(
+  ghPpm: number | string,
+  khPpm: number | string
+): HardnessRatioAnalysis {
+  const parseVal = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const gh = parseVal(ghPpm);
+  const kh = parseVal(khPpm);
+
+  let rawRatio: number;
+  if (kh > 0) {
+    rawRatio = gh / kh;
+  } else if (gh > 0) {
+    rawRatio = gh;
+  } else {
+    rawRatio = 0;
+  }
+
+  const ratio = Number(Math.min(100, rawRatio).toFixed(2));
+
+  let category: 'balanced' | 'chalky_buffered' | 'acidic_unbuffered';
+  let descriptionPl: string;
+  let descriptionEn: string;
+
+  if (ratio < 1.5) {
+    category = 'chalky_buffered';
+    descriptionPl = 'Niska proporcja GH:KH (< 1.5) — kwasowość jest silnie tłumiona przez bufor zasadowy, napar może być płaski.';
+    descriptionEn = 'Low GH:KH ratio (< 1.5) — acidity is excessively buffered, beverage may taste chalky or flat.';
+  } else if (ratio > 3.5) {
+    category = 'acidic_unbuffered';
+    descriptionPl = 'Wysoka proporcja GH:KH (> 3.5) — niewystarczający bufor zasadowy, kwasowość może być ostra i gryząca.';
+    descriptionEn = 'High GH:KH ratio (> 3.5) — insufficient alkalinity buffer, acidity may taste sour or aggressive.';
+  } else {
+    category = 'balanced';
+    descriptionPl = 'Optymalna proporcja GH:KH (1.5 - 3.5) — zrównoważona ekstrakcja z zachowaniem słodyczy i żywej kwasowości.';
+    descriptionEn = 'Optimal GH:KH ratio (1.5 - 3.5) — balanced extraction preserving sweetness and vibrant acidity.';
+  }
+
+  return {
+    ratio,
+    category,
+    descriptionPl,
+    descriptionEn,
+  };
+}
