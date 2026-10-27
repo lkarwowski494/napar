@@ -645,13 +645,19 @@ export function mergeBackupEnvelopes(
     return [...Array.from(map.values()), ...withoutId];
   };
 
-  const pState = primary.state && typeof primary.state === 'object' ? primary.state : ({} as any);
-  const iState = incoming.state && typeof incoming.state === 'object' ? incoming.state : ({} as any);
+  const pState =
+    primary.state && typeof primary.state === 'object'
+      ? primary.state
+      : { inventory: [], customRecipes: [], sessions: [], caffeineLogs: [] };
+  const iState =
+    incoming.state && typeof incoming.state === 'object'
+      ? incoming.state
+      : { inventory: [], customRecipes: [], sessions: [], caffeineLogs: [] };
 
-  const mergedInventory = mergeCollection(pState.inventory, iState.inventory);
-  const mergedRecipes = mergeCollection(pState.customRecipes, iState.customRecipes);
-  const mergedSessions = mergeCollection(pState.sessions, iState.sessions);
-  const mergedCaffeine = mergeCollection(pState.caffeineLogs, iState.caffeineLogs);
+  const mergedInventory = mergeCollection<InventoryItem>(pState.inventory, iState.inventory);
+  const mergedRecipes = mergeCollection<SavedRecipe>(pState.customRecipes, iState.customRecipes);
+  const mergedSessions = mergeCollection<BrewSession>(pState.sessions, iState.sessions);
+  const mergedCaffeine = mergeCollection<CaffeineLog>(pState.caffeineLogs, iState.caffeineLogs);
 
   return {
     ...primary,
