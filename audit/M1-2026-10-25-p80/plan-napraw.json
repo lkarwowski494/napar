@@ -1,0 +1,53 @@
+{
+  "cycle": "P80",
+  "status": "completed",
+  "perspectives": [
+    "11-WZR",
+    "12-NIE",
+    "01-ODK",
+    "02-MON",
+    "03-ZAK"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P80-11-WZR",
+      "perspective": "11-WZR",
+      "description": "Implementacja oceny proporcji przelewowej evaluatePourOverRatio z typami PourOverRatioEvaluation i PourOverRatioStyle w src/core/domain-rules.ts",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P80-12-NIE",
+      "perspective": "12-NIE",
+      "description": "Implementacja zestawu testów odpornościowych Chaos 17 (fuzzing evaluateWaterAlkalinity, estimateGrindDistribution, formatParticleSize) w src/core/__tests__/fuzz-resilience.test.ts",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P80-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Implementacja podpowiedzi wyszukiwania suggestSearchCorrections z typem SearchCorrectionSuggestion w src/core/search-utils.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P80-02-MON",
+      "perspective": "02-MON",
+      "description": "Implementacja kalkulatora rabatu subskrypcyjnego formatSubscriptionDiscount z typem SubscriptionDiscountInfo w src/core/app-access.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P80-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja sumarycznej wartości magazynu kawy calculateInventoryTotalValue z typem InventoryTotalValueResult w src/core/database.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    }
+  ]
+}
