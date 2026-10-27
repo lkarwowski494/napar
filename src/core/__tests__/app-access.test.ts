@@ -30,6 +30,8 @@ import {
   TierPricingInfo,
   getPaywallFeatureHighlights,
   PaywallFeatureHighlight,
+  getSubscriptionBadgeInfo,
+  SubscriptionBadgeInfo,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1203,6 +1205,72 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const fallbackHighlights = getPaywallFeatureHighlights(null as any);
     expect(Array.isArray(fallbackHighlights)).toBe(true);
     expect(fallbackHighlights.length).toBe(plHighlights.length);
+  });
+
+  test('TASK-P71-02-MON: getSubscriptionBadgeInfo wyznacza etykietę i wariant odznaki subskrypcji', () => {
+    // 1. Użytkownik subskrybujący PRO Lifetime
+    const subscribedState = {
+      status: 'subscribed' as const,
+      brewsCount: 10,
+      brewsRemaining: Infinity,
+      daysRemaining: Infinity,
+      isSubscribed: true,
+      canCreate: true,
+      isHistoryReadOnly: false,
+      subscriptionTier: 'lifetime' as const,
+    };
+    const badgePro: SubscriptionBadgeInfo = getSubscriptionBadgeInfo(subscribedState, 'pl');
+    expect(badgePro.badgeVariant).toBe('gold');
+    expect(badgePro.isPro).toBe(true);
+    expect(badgePro.badgeLabel).toBe('PRO Dożywotni');
+    expect(badgePro.tier).toBe('lifetime');
+
+    // 2. Wariant angielski dla subskrypcji rocznej
+    const badgeAnnualEn = getSubscriptionBadgeInfo({
+      ...subscribedState,
+      subscriptionTier: 'annual',
+    }, 'en');
+    expect(badgeAnnualEn.badgeLabel).toBe('PRO Annual');
+    expect(badgeAnnualEn.badgeVariant).toBe('gold');
+
+    // 3. Aktywny trial
+    const trialState = {
+      status: 'trial_active' as const,
+      brewsCount: 5,
+      brewsRemaining: 10,
+      daysRemaining: 7,
+      isSubscribed: false,
+      canCreate: true,
+      isHistoryReadOnly: false,
+      subscriptionTier: 'none' as const,
+    };
+    const badgeTrial = getSubscriptionBadgeInfo(trialState, 'en');
+    expect(badgeTrial.badgeVariant).toBe('blue');
+    expect(badgeTrial.isPro).toBe(false);
+    expect(badgeTrial.badgeLabel).toBe('Trial (7d)');
+    expect(badgeTrial.expiresInDays).toBe(7);
+
+    // 4. Wygasły trial (free)
+    const expiredState = {
+      status: 'trial_expired' as const,
+      brewsCount: 15,
+      brewsRemaining: 0,
+      daysRemaining: 0,
+      isSubscribed: false,
+      canCreate: false,
+      isHistoryReadOnly: true,
+      subscriptionTier: 'none' as const,
+    };
+    const badgeExpired = getSubscriptionBadgeInfo(expiredState, 'pl');
+    expect(badgeExpired.badgeVariant).toBe('gray');
+    expect(badgeExpired.isPro).toBe(false);
+    expect(badgeExpired.badgeLabel).toBe('Plan darmowy');
+    expect(badgeExpired.expiresInDays).toBe(0);
+
+    // 5. Pobranie z globalnego stanu z fallbackiem
+    const defaultBadge = getSubscriptionBadgeInfo(null, 'pl');
+    expect(defaultBadge).toBeDefined();
+    expect(defaultBadge.badgeVariant).toBeDefined();
   });
 });
 

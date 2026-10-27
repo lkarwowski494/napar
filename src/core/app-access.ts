@@ -870,3 +870,61 @@ export function getPaywallFeatureHighlights(
     },
   ];
 }
+
+export interface SubscriptionBadgeInfo {
+  tier: 'none' | 'monthly' | 'annual' | 'lifetime';
+  status: AppAccessStatus;
+  badgeLabel: string;
+  badgeVariant: 'gold' | 'blue' | 'gray';
+  isPro: boolean;
+  expiresInDays?: number;
+}
+
+export function getSubscriptionBadgeInfo(
+  state?: AppAccessState | null,
+  language?: string | null
+): SubscriptionBadgeInfo {
+  const current = state && typeof state === 'object' && 'status' in state ? state : getAppAccessState();
+  const isEn = typeof language === 'string' && language.trim().toLowerCase().startsWith('en');
+
+  if (current.isSubscribed) {
+    let tierLabel = 'PRO';
+    if (current.subscriptionTier === 'lifetime') {
+      tierLabel = isEn ? 'PRO Lifetime' : 'PRO Dożywotni';
+    } else if (current.subscriptionTier === 'annual') {
+      tierLabel = isEn ? 'PRO Annual' : 'PRO Roczny';
+    } else if (current.subscriptionTier === 'monthly') {
+      tierLabel = isEn ? 'PRO Monthly' : 'PRO Miesięczny';
+    }
+    return {
+      tier: current.subscriptionTier,
+      status: current.status,
+      badgeLabel: tierLabel,
+      badgeVariant: 'gold',
+      isPro: true,
+    };
+  }
+
+  if (current.status === 'trial_active') {
+    const days = Number.isFinite(current.daysRemaining) && current.daysRemaining >= 0 ? current.daysRemaining : 0;
+    const label = isEn ? `Trial (${days}d)` : `Próbny (${days} dni)`;
+    return {
+      tier: 'none',
+      status: 'trial_active',
+      badgeLabel: label,
+      badgeVariant: 'blue',
+      isPro: false,
+      expiresInDays: days,
+    };
+  }
+
+  return {
+    tier: 'none',
+    status: 'trial_expired',
+    badgeLabel: isEn ? 'Free Plan' : 'Plan darmowy',
+    badgeVariant: 'gray',
+    isPro: false,
+    expiresInDays: 0,
+  };
+}
+
