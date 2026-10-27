@@ -10,6 +10,8 @@ import {
   matchesAnyField,
   filterBySearch,
   rankSearchResults,
+  highlightSearchMatch,
+  SearchHighlightSegment,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -158,5 +160,36 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     expect(rankSearchResults(recipes, '', (r) => r.title).length).toBe(4);
     expect(rankSearchResults(recipes, 'Kalita', (r) => r.title).length).toBe(0);
     expect(rankSearchResults(null, 'v60', () => '')).toEqual([]);
+  });
+
+  test('TASK-P70-01-ODK: highlightSearchMatch dzieli tekst na pasujace i niepasujace segmenty', () => {
+    // 1. Podział tekstu "Etiopia Yirgacheffe" dla zapytania "etiop"
+    const segs: SearchHighlightSegment[] = highlightSearchMatch('Etiopia Yirgacheffe', 'etiop');
+    expect(segs.length).toBe(2);
+    expect(segs[0]).toEqual({ text: 'Etiop', isMatch: true });
+    expect(segs[1]).toEqual({ text: 'ia Yirgacheffe', isMatch: false });
+
+    // 2. Dopasowanie w środku: "Chemex Classic" dla "mex"
+    const segsMid = highlightSearchMatch('Chemex Classic', 'mex');
+    expect(segsMid.length).toBe(3);
+    expect(segsMid[0]).toEqual({ text: 'Che', isMatch: false });
+    expect(segsMid[1]).toEqual({ text: 'mex', isMatch: true });
+    expect(segsMid[2]).toEqual({ text: ' Classic', isMatch: false });
+
+    // 3. Brak dopasowania
+    const noMatch = highlightSearchMatch('Kenia Nyeri', 'Guji');
+    expect(noMatch.length).toBe(1);
+    expect(noMatch[0]).toEqual({ text: 'Kenia Nyeri', isMatch: false });
+
+    // 4. Bezpieczeństwo znaków specjalnych regex (np. "[", "(", "*", "+")
+    const specialChars = highlightSearchMatch('V60 (Kasuya 4:6)', '(Kasuya');
+    expect(specialChars.length).toBe(3);
+    expect(specialChars[1]).toEqual({ text: '(Kasuya', isMatch: true });
+
+    // 5. Puste wejścia i null
+    expect(highlightSearchMatch('', 'test')).toEqual([]);
+    expect(highlightSearchMatch(null, 'test')).toEqual([]);
+    expect(highlightSearchMatch('Kawa', '')).toEqual([{ text: 'Kawa', isMatch: false }]);
+    expect(highlightSearchMatch('Kawa', null)).toEqual([{ text: 'Kawa', isMatch: false }]);
   });
 });

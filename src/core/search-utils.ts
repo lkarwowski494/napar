@@ -186,3 +186,46 @@ export function rankSearchResults<T>(
   return scored.map((s) => s.item);
 }
 
+
+
+export interface SearchHighlightSegment {
+  text: string;
+  isMatch: boolean;
+}
+
+/**
+ * Dzieli tekst źródłowy na segmenty dopasowane i niedopasowane do zapytania wyszukiwania.
+ * Ułatwia renderowanie podświetlonych fragmentów w komponentach UI.
+ */
+export function highlightSearchMatch(
+  text: string | undefined | null,
+  query: string | undefined | null
+): SearchHighlightSegment[] {
+  if (text === undefined || text === null) return [];
+  const rawText = String(text);
+  if (!rawText) return [];
+  if (!query || typeof query !== 'string' || !query.trim()) {
+    return [{ text: rawText, isMatch: false }];
+  }
+
+  const cleanQuery = query.trim();
+  const escapedQuery = cleanQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  let regex: RegExp;
+  try {
+    regex = new RegExp(`(${escapedQuery})`, 'gi');
+  } catch {
+    return [{ text: rawText, isMatch: false }];
+  }
+
+  const parts = rawText.split(regex);
+  const segments: SearchHighlightSegment[] = [];
+
+  for (const part of parts) {
+    if (!part) continue;
+    const isMatch = part.toLowerCase() === cleanQuery.toLowerCase();
+    segments.push({ text: part, isMatch });
+  }
+
+  return segments.length > 0 ? segments : [{ text: rawText, isMatch: false }];
+}
