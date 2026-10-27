@@ -87,6 +87,16 @@ export const crashLoopGuard = {
   async resetCrashCount(): Promise<void> {
     await this.recordStartupSuccess();
   },
+
+  async getCrashCount(): Promise<number> {
+    const state = await this.readState();
+    return state.crash_count;
+  },
+
+  async isInSafeMode(): Promise<boolean> {
+    const state = await this.readState();
+    return state.crash_count >= 3;
+  },
 };
 
 export const recordStartupSuccess = () => crashLoopGuard.recordStartupSuccess();

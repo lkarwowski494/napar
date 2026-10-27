@@ -121,4 +121,26 @@ describe('Startup Crash Loop Guard (TASK-R12-01)', () => {
     expect(nextAttempt.crashCount).toBe(100);
     expect(nextAttempt.shouldEnterSafeMode).toBe(true);
   });
+
+  test('TASK-P63-10-WYD: isInSafeMode i getCrashCount umozliwiaja bezinwazyjny odczyt stanu awaryjnego', async () => {
+    // Stan początkowy
+    expect(await crashLoopGuard.getCrashCount()).toBe(0);
+    expect(await crashLoopGuard.isInSafeMode()).toBe(false);
+
+    // Po 2 awariach
+    await crashLoopGuard.recordStartupAttempt();
+    await crashLoopGuard.recordStartupAttempt();
+    expect(await crashLoopGuard.getCrashCount()).toBe(2);
+    expect(await crashLoopGuard.isInSafeMode()).toBe(false);
+
+    // Po 3 awariach -> Safe Mode
+    await crashLoopGuard.recordStartupAttempt();
+    expect(await crashLoopGuard.getCrashCount()).toBe(3);
+    expect(await crashLoopGuard.isInSafeMode()).toBe(true);
+
+    // Po resecie
+    await crashLoopGuard.resetCrashCount();
+    expect(await crashLoopGuard.getCrashCount()).toBe(0);
+    expect(await crashLoopGuard.isInSafeMode()).toBe(false);
+  });
 });
