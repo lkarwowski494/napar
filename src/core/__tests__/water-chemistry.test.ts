@@ -23,6 +23,9 @@ import {
   searchWaterRecipes,
   evaluateWaterSuitability,
   WaterSuitabilityEvaluation,
+  calculateWaterBlend,
+  WaterBlendParams,
+  WaterBlendResult,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -845,6 +848,56 @@ describe('Water Chemistry & Mineralization Module', () => {
     const fallback = evaluateWaterSuitability(NaN, -10);
     expect(fallback.suitability).toBeDefined();
     expect(fallback.ratingPl).toBeDefined();
+  });
+
+  test('TASK-P69-07-JAK: calculateWaterBlend oblicza proporcje mieszania kranówki z wodą RO', () => {
+    // 1. Zwykłe rozcieńczanie: kranówka 300 ppm + woda RO 0 ppm -> cel 100 ppm, partia 1000g
+    const params: WaterBlendParams = {
+      tapHardnessPpm: 300,
+      pureWaterHardnessPpm: 0,
+      targetHardnessPpm: 100,
+      totalBatchGrams: 1000,
+    };
+    const blend: WaterBlendResult = calculateWaterBlend(params);
+    expect(blend.tapWaterGrams).toBeCloseTo(333.3, 1);
+    expect(blend.pureWaterGrams).toBeCloseTo(666.7, 1);
+    expect(blend.totalBatchGrams).toBe(1000);
+    expect(blend.effectiveHardnessPpm).toBeCloseTo(100, 1);
+
+    // 2. Woda RO o twardości szczątkowej 10 ppm: kranówka 210 ppm, cel 70 ppm, partia 500g
+    const blendRo = calculateWaterBlend({
+      tapHardnessPpm: 210,
+      pureWaterHardnessPpm: 10,
+      targetHardnessPpm: 70,
+      totalBatchGrams: 500,
+    });
+    expect(blendRo.tapWaterGrams).toBe(150);
+    expect(blendRo.pureWaterGrams).toBe(350);
+    expect(blendRo.effectiveHardnessPpm).toBe(70);
+
+    // 3. Cel wyższy niż kranówka -> 100% kranówki
+    const highTarget = calculateWaterBlend({
+      tapHardnessPpm: 150,
+      targetHardnessPpm: 200,
+      totalBatchGrams: 1000,
+    });
+    expect(highTarget.tapWaterGrams).toBe(1000);
+    expect(highTarget.pureWaterGrams).toBe(0);
+
+    // 4. Cel niższy niż czysta woda -> 100% czystej
+    const lowTarget = calculateWaterBlend({
+      tapHardnessPpm: 200,
+      pureWaterHardnessPpm: 20,
+      targetHardnessPpm: 10,
+      totalBatchGrams: 800,
+    });
+    expect(lowTarget.tapWaterGrams).toBe(0);
+    expect(lowTarget.pureWaterGrams).toBe(800);
+
+    // 5. Błędy i niepoprawne dane
+    expect(() => calculateWaterBlend(null as any)).toThrow();
+    expect(() => calculateWaterBlend({ tapHardnessPpm: 0, targetHardnessPpm: 50, totalBatchGrams: 1000 })).toThrow();
+    expect(() => calculateWaterBlend({ tapHardnessPpm: 100, pureWaterHardnessPpm: 150, targetHardnessPpm: 50, totalBatchGrams: 1000 })).toThrow();
   });
 });
 

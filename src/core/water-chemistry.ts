@@ -1073,3 +1073,74 @@ export function evaluateWaterSuitability(
 }
 
 
+
+
+export interface WaterBlendParams {
+  tapHardnessPpm: number;
+  pureWaterHardnessPpm?: number;
+  targetHardnessPpm: number;
+  totalBatchGrams: number;
+}
+
+export interface WaterBlendResult {
+  tapWaterGrams: number;
+  pureWaterGrams: number;
+  totalBatchGrams: number;
+  effectiveHardnessPpm: number;
+}
+
+/**
+ * Oblicza proporcje mieszania twardej wody kranowej z wodą zdemineralizowaną (RO / destylowaną)
+ * w celu osiągnięcia zadanego poziomu twardości ogólnej lub bufora.
+ */
+export function calculateWaterBlend(params: WaterBlendParams): WaterBlendResult {
+  if (!params || typeof params !== 'object') {
+    throw new Error('Parametry mieszania wody są wymagane');
+  }
+
+  const tapHardness = Number(params.tapHardnessPpm);
+  const pureHardness =
+    params.pureWaterHardnessPpm != null && Number.isFinite(Number(params.pureWaterHardnessPpm))
+      ? Math.max(0, Number(params.pureWaterHardnessPpm))
+      : 0;
+  const targetHardness = Number(params.targetHardnessPpm);
+  const totalBatch = Number(params.totalBatchGrams);
+
+  if (!Number.isFinite(tapHardness) || tapHardness <= 0) {
+    throw new Error('Twardość wody kranowej musi być większa od zera');
+  }
+  if (!Number.isFinite(targetHardness) || targetHardness < 0) {
+    throw new Error('Docelowa twardość wody nie może być ujemna');
+  }
+  if (!Number.isFinite(totalBatch) || totalBatch <= 0) {
+    throw new Error('Objętość partii wody musi być większa od zera');
+  }
+
+  if (tapHardness <= pureHardness) {
+    throw new Error('Twardość kranowa musi być większa niż twardość wody czystej');
+  }
+
+  let tapGrams: number;
+  let pureGrams: number;
+
+  if (targetHardness >= tapHardness) {
+    tapGrams = totalBatch;
+    pureGrams = 0;
+  } else if (targetHardness <= pureHardness) {
+    tapGrams = 0;
+    pureGrams = totalBatch;
+  } else {
+    const factor = (targetHardness - pureHardness) / (tapHardness - pureHardness);
+    tapGrams = totalBatch * factor;
+    pureGrams = totalBatch - tapGrams;
+  }
+
+  const effectivePpm = (tapGrams * tapHardness + pureGrams * pureHardness) / totalBatch;
+
+  return {
+    tapWaterGrams: Number(tapGrams.toFixed(1)),
+    pureWaterGrams: Number(pureGrams.toFixed(1)),
+    totalBatchGrams: Number(totalBatch.toFixed(1)),
+    effectiveHardnessPpm: Number(effectivePpm.toFixed(1)),
+  };
+}
