@@ -80,11 +80,19 @@ export function rotateBackupFiles(
   poolRegex: RegExp,
   keepCount = AUTO_KEEP
 ): string[] {
+  if (!Array.isArray(fileList) || fileList.length === 0) return [];
+
+  const rawKeep = typeof keepCount === 'number' ? keepCount : parseInt(String(keepCount), 10);
+  const safeKeep =
+    Number.isFinite(rawKeep) && rawKeep >= 0 && !Object.is(rawKeep, -0)
+      ? Math.floor(rawKeep)
+      : AUTO_KEEP;
+
   const pool = fileList
     .map((f) => [f, poolRegex.exec(f)] as const)
     .filter((x): x is readonly [string, RegExpExecArray] => !!x[1]);
 
-  if (pool.length <= keepCount) {
+  if (pool.length <= safeKeep) {
     return [];
   }
 
@@ -95,7 +103,7 @@ export function rotateBackupFiles(
     return keyA < keyB ? 1 : keyA > keyB ? -1 : 0;
   });
 
-  return sorted.slice(keepCount).map(([f]) => f);
+  return sorted.slice(safeKeep).map(([f]) => f);
 }
 
 /**
@@ -293,14 +301,23 @@ export async function dismissCorruptState(fileName: string): Promise<void> {
  * Waliduje poprawność schematu pliku kopii zapasowej.
  */
 export function parseAndValidateBackup(rawJson: string): NaparBackupEnvelope {
+  if (typeof rawJson !== 'string') {
+    throw new Error('Nieprawidłowy format JSON');
+  }
+
+  const cleanJson = rawJson.replace(/^\uFEFF/, '').trim();
+  if (!cleanJson) {
+    throw new Error('Nieprawidłowy format JSON');
+  }
+
   let parsed: unknown;
   try {
-    parsed = JSON.parse(rawJson);
+    parsed = JSON.parse(cleanJson);
   } catch {
     throw new Error('Nieprawidłowy format JSON');
   }
 
-  if (!parsed || typeof parsed !== 'object') {
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
     throw new Error('Plik kopii musi być obiektem JSON');
   }
 
@@ -310,7 +327,12 @@ export function parseAndValidateBackup(rawJson: string): NaparBackupEnvelope {
     throw new Error('Nieznany format pliku (oczekiwano "napar-backup")');
   }
 
-  if (typeof envelope.schemaVersion !== 'number' || envelope.schemaVersion <= 0) {
+  if (
+    typeof envelope.schemaVersion !== 'number' ||
+    !Number.isInteger(envelope.schemaVersion) ||
+    envelope.schemaVersion <= 0 ||
+    Object.is(envelope.schemaVersion, -0)
+  ) {
     throw new Error('Nieprawidłowa wersja schematu kopii');
   }
 

@@ -333,4 +333,55 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(afterDismiss).toBeNull();
     });
   });
+
+  describe('TASK-P57-05-ARC: Odpornosc parseAndValidateBackup i rotateBackupFiles na dane brzegowe', () => {
+    test('parseAndValidateBackup parsuje JSON z BOM, odrzuca nie-stringi i weryfikuje calkowitoliczbowy schemaVersion', () => {
+      const validEnvelope = buildBackup({
+        inventory: [],
+        customRecipes: [],
+        sessions: [],
+        caffeineLogs: [],
+      });
+
+      // 1. BOM na początku pliku JSON
+      const jsonWithBom = '\uFEFF' + JSON.stringify(validEnvelope);
+      const parsedBom = parseAndValidateBackup(jsonWithBom);
+      expect(parsedBom.format).toBe('napar-backup');
+      expect(parsedBom.schemaVersion).toBe(SCHEMA_VERSION);
+
+      // 2. Wejścia niebędące stringiem
+      expect(() => parseAndValidateBackup(null as any)).toThrow();
+      expect(() => parseAndValidateBackup(undefined as any)).toThrow();
+      expect(() => parseAndValidateBackup({} as any)).toThrow();
+
+      // 3. Float lub nieprawidłowy schemaVersion
+      const envelopeFloatVersion = { ...validEnvelope, schemaVersion: 1.5 };
+      expect(() => parseAndValidateBackup(JSON.stringify(envelopeFloatVersion))).toThrow(
+        'Nieprawidłowa wersja schematu kopii'
+      );
+
+      const envelopeNegativeZero = { ...validEnvelope, schemaVersion: -0 };
+      expect(() => parseAndValidateBackup(JSON.stringify(envelopeNegativeZero))).toThrow(
+        'Nieprawidłowa wersja schematu kopii'
+      );
+    });
+
+    test('rotateBackupFiles radzi sobie z keepCount=0, NaN, ujemnymi liczbami i brudna lista plikow', () => {
+      const files = [
+        'napar-kopia-2026-10-17-080000.json',
+        'napar-kopia-2026-10-17-080001.json',
+      ];
+
+      // keepCount = 0 -> wszystkie pliki do usunięcia
+      expect(rotateBackupFiles(files, AUTO_RE, 0)).toHaveLength(2);
+
+      // keepCount = NaN lub ujemny -> bezpieczny fallback do AUTO_KEEP
+      expect(rotateBackupFiles(files, AUTO_RE, NaN as any)).toHaveLength(0);
+      expect(rotateBackupFiles(files, AUTO_RE, -5)).toHaveLength(0);
+
+      // Brudne / puste wejście
+      expect(rotateBackupFiles([] as any, AUTO_RE, 5)).toEqual([]);
+    });
+  });
 });
+
