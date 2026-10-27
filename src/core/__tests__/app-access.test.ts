@@ -26,6 +26,8 @@ import {
   getSubscriptionTierFromProductId,
   isFeatureGated,
   getGatedFeatureNotice,
+  getTierPricingInfo,
+  TierPricingInfo,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1147,6 +1149,35 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(noticeEn.title).toBeDefined();
     expect(noticeEn.message).toBeDefined();
     expect(noticeEn.title.length).toBeGreaterThan(0);
+  });
+
+  test('TASK-P66-02-MON: getTierPricingInfo zwraca zlokalizowany cennik i kotwice cenowe dla planów', () => {
+    // 1. Plan roczny w PLN
+    const annualPl: TierPricingInfo = getTierPricingInfo('annual', 'PLN', 'pl');
+    expect(annualPl.tier).toBe('annual');
+    expect(annualPl.productId).toBe(STORE_PRODUCT_IDS.annual);
+    expect(annualPl.priceFormatted).toContain('zł');
+    expect(annualPl.periodLabel).toBe('rok');
+    expect(annualPl.monthlyEquivalentFormatted).toBeDefined();
+    expect(annualPl.anchorComparison).toContain('kawa');
+
+    // 2. Plan miesięczny w EUR
+    const monthlyEur = getTierPricingInfo('monthly', 'EUR', 'en');
+    expect(monthlyEur.tier).toBe('monthly');
+    expect(monthlyEur.priceFormatted).toContain('€');
+    expect(monthlyEur.periodLabel).toBe('month');
+    expect(monthlyEur.anchorComparison).toContain('espresso');
+
+    // 3. Plan dożywotni w USD
+    const lifetimeUsd = getTierPricingInfo('lifetime', 'USD', 'en');
+    expect(lifetimeUsd.tier).toBe('lifetime');
+    expect(lifetimeUsd.priceFormatted).toContain('$');
+    expect(lifetimeUsd.periodLabel).toBe('lifetime');
+
+    // 4. Odporność na brak parametrów i anomalie
+    const fallbackInfo = getTierPricingInfo(null as any, undefined as any);
+    expect(fallbackInfo.tier).toBe('annual');
+    expect(fallbackInfo.priceFormatted).toContain('zł');
   });
 });
 

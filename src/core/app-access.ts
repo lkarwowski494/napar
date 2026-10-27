@@ -711,3 +711,94 @@ export function useAppAccess() {
     recordBrew,
   };
 }
+
+export interface TierPricingInfo {
+  tier: 'monthly' | 'annual' | 'lifetime';
+  productId: string;
+  priceFormatted: string;
+  periodLabel: string;
+  monthlyEquivalentFormatted?: string;
+  savingsDescription?: string;
+  anchorComparison: string;
+}
+
+/**
+ * Zwraca zlokalizowany cennik, etykiety okresów oraz kotwice cenowe "Cheaper than Espresso"
+ * dla wybranego planu subskrypcji w zdefiniowanej walucie (PLN, EUR, USD, GBP).
+ */
+export function getTierPricingInfo(
+  tier: 'monthly' | 'annual' | 'lifetime' | string,
+  currency: 'PLN' | 'EUR' | 'USD' | 'GBP' | string = 'PLN',
+  language: 'pl' | 'en' | string = 'pl'
+): TierPricingInfo {
+  const cleanTierStr = typeof tier === 'string'
+    ? tier.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().toLowerCase()
+    : '';
+  const safeTier: 'monthly' | 'annual' | 'lifetime' =
+    cleanTierStr === 'monthly' || cleanTierStr === 'lifetime' ? cleanTierStr : 'annual';
+
+  const cleanCurr = typeof currency === 'string'
+    ? currency.replace(/\uFEFF/g, '').trim().toUpperCase()
+    : 'PLN';
+  const safeCurr: 'PLN' | 'EUR' | 'USD' | 'GBP' =
+    cleanCurr === 'EUR' || cleanCurr === 'USD' || cleanCurr === 'GBP' ? cleanCurr : 'PLN';
+
+  const isEn = typeof language === 'string' && language.trim().toLowerCase().startsWith('en');
+
+  const productId = STORE_PRODUCT_IDS[safeTier];
+
+  if (safeTier === 'monthly') {
+    const prices: Record<string, string> = {
+      PLN: '8.99 zł',
+      EUR: '€1.99',
+      USD: '$1.99',
+      GBP: '£1.79',
+    };
+    return {
+      tier: 'monthly',
+      productId,
+      priceFormatted: prices[safeCurr] || prices.PLN,
+      periodLabel: isEn ? 'month' : 'miesiąc',
+      anchorComparison: isEn ? 'Cheaper than a single cafe espresso' : 'Taniej niż pojedyncze espresso w kawiarni',
+    };
+  }
+
+  if (safeTier === 'lifetime') {
+    const prices: Record<string, string> = {
+      PLN: '129.99 zł',
+      EUR: '€29.99',
+      USD: '$32.99',
+      GBP: '£26.99',
+    };
+    return {
+      tier: 'lifetime',
+      productId,
+      priceFormatted: prices[safeCurr] || prices.PLN,
+      periodLabel: isEn ? 'lifetime' : 'na zawsze',
+      anchorComparison: isEn ? 'One-time payment, lifetime access' : 'Jednorazowa opłata, dożywotni dostęp',
+    };
+  }
+
+  // annual (default)
+  const prices: Record<string, string> = {
+    PLN: '59.99 zł',
+    EUR: '€13.99',
+    USD: '$14.99',
+    GBP: '£11.99',
+  };
+  const monthlyEquivalents: Record<string, string> = {
+    PLN: isEn ? '5.00 zł / mo' : '5.00 zł / mies.',
+    EUR: isEn ? '€1.17 / mo' : '€1.17 / mies.',
+    USD: isEn ? '$1.25 / mo' : '$1.25 / mies.',
+    GBP: isEn ? '£1.00 / mo' : '£1.00 / mies.',
+  };
+  return {
+    tier: 'annual',
+    productId,
+    priceFormatted: prices[safeCurr] || prices.PLN,
+    periodLabel: isEn ? 'year' : 'rok',
+    monthlyEquivalentFormatted: monthlyEquivalents[safeCurr] || monthlyEquivalents.PLN,
+    savingsDescription: isEn ? 'Save 44%' : 'Oszczędzasz 44%',
+    anchorComparison: isEn ? 'Less than 1 specialty coffee per month' : 'Mniej niż 1 kawa specialty miesięcznie',
+  };
+}
