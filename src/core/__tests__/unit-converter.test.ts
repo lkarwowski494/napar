@@ -12,6 +12,7 @@ import {
   formatTemperature,
   formatDoseWeight,
   formatWaterWeight,
+  formatWaterVolume,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -227,6 +228,27 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(wInKeep(' 250,5 g ', 'g')).toBe(250.5);
       expect(wInKeep('-0', 'g')).toBe(0);
       expect(Object.is(wInKeep('-0', 'g'), -0)).toBe(false);
+    });
+
+    test('TASK-P62-09-LOK: formatWaterVolume oraz formatTemperature odporne na stringi, przecinki, jednostki i -0', () => {
+      // 1. formatTemperature ze stringami, przecinkami i -0
+      expect(formatTemperature('93,5 °C', 'metric')).toBe('94°C');
+      expect(formatTemperature('93', 'imperial')).toBe('199°F');
+      expect(formatTemperature(-0, 'metric')).toBe('0°C');
+      expect(formatTemperature('invalid', 'metric')).toBe('0°C');
+      expect(formatTemperature('invalid', 'imperial')).toBe('32°F');
+
+      // 2. formatWaterVolume
+      expect(formatWaterVolume(250, 'metric')).toBe('250 ml');
+      expect(formatWaterVolume(250, 'imperial')).toBe('8.45 fl oz');
+      expect(formatWaterVolume('250,5 ml', 'metric')).toBe('250.5 ml');
+      expect(formatWaterVolume(-0, 'metric')).toBe('0 ml');
+      expect(formatWaterVolume('invalid', 'metric')).toBe('0 ml');
+      expect(formatWaterVolume('invalid', 'imperial')).toBe('0 fl oz');
+
+      // 3. formatDoseWeight i formatWaterWeight ze stringami
+      expect(formatDoseWeight('18,5 g', 'metric')).toBe('18.5g');
+      expect(formatWaterWeight('300,5 g', 'metric')).toBe('300.5g');
     });
   });
 });

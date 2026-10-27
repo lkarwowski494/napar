@@ -84,40 +84,58 @@ export function fluidOuncesToMl(flOz: number | string): number {
 /**
  * Formatuje temperaturę zgodnie z wybranym układem jednostek
  */
-export function formatTemperature(celsius: number, unitSystem: UnitSystem = 'metric'): string {
-  if (!Number.isFinite(celsius)) {
+export function formatTemperature(celsius: number | string, unitSystem: UnitSystem = 'metric'): string {
+  const num = parseNumeric(celsius);
+  if (isNaN(num)) {
     return unitSystem === 'imperial' ? '32°F' : '0°C';
   }
   if (unitSystem === 'imperial') {
-    return `${celsiusToFahrenheit(celsius)}°F`;
+    return `${celsiusToFahrenheit(num)}°F`;
   }
-  return `${Math.round(celsius)}°C`;
+  const rounded = Math.round(num);
+  return `${Object.is(rounded, -0) ? 0 : rounded}°C`;
 }
 
 /**
  * Formatuje wagę suchą kawy / herbaty zgodnie z wybranym układem jednostek
  */
-export function formatDoseWeight(grams: number, unitSystem: UnitSystem = 'metric'): string {
-  if (!Number.isFinite(grams) || grams < 0) {
+export function formatDoseWeight(grams: number | string, unitSystem: UnitSystem = 'metric'): string {
+  const num = parseNumeric(grams);
+  if (isNaN(num) || num < 0 || Object.is(num, -0)) {
     return unitSystem === 'imperial' ? '0 oz' : '0g';
   }
   if (unitSystem === 'imperial') {
-    return `${gramsToOunces(grams)} oz`;
+    return `${gramsToOunces(num)} oz`;
   }
-  return `${Number(grams.toFixed(1))}g`;
+  return `${Number(num.toFixed(1))}g`;
 }
 
 /**
- * Formatuje objętość lub wagę wody
+ * Formatuje wagę wody (g lub fl oz)
  */
-export function formatWaterWeight(grams: number, unitSystem: UnitSystem = 'metric'): string {
-  if (!Number.isFinite(grams) || grams < 0) {
+export function formatWaterWeight(grams: number | string, unitSystem: UnitSystem = 'metric'): string {
+  const num = parseNumeric(grams);
+  if (isNaN(num) || num < 0 || Object.is(num, -0)) {
     return unitSystem === 'imperial' ? '0 fl oz' : '0g';
   }
   if (unitSystem === 'imperial') {
-    return `${mlToFluidOunces(grams)} fl oz`;
+    return `${mlToFluidOunces(num)} fl oz`;
   }
-  return `${Number(grams.toFixed(1))}g`;
+  return `${Number(num.toFixed(1))}g`;
+}
+
+/**
+ * Formatuje objętość wody (ml lub fl oz)
+ */
+export function formatWaterVolume(gramsOrMl: number | string, unitSystem: UnitSystem = 'metric'): string {
+  const num = parseNumeric(gramsOrMl);
+  if (isNaN(num) || num < 0 || Object.is(num, -0)) {
+    return unitSystem === 'imperial' ? '0 fl oz' : '0 ml';
+  }
+  if (unitSystem === 'imperial') {
+    return `${mlToFluidOunces(num)} fl oz`;
+  }
+  return `${Number(num.toFixed(1))} ml`;
 }
 
 /**
