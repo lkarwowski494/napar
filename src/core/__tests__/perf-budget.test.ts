@@ -14,6 +14,7 @@ import { createGongfuSession, recordGongfuInfusion } from '../gongfu-session';
 import { convertMicronsToGrinder, SUPPORTED_GRINDERS } from '../grinder-converter';
 import { calculateWaterMinerals, WATER_RECIPES } from '../water-chemistry';
 import { normSearch, rankSearchResults } from '../search-utils';
+import { BrewTimerEngine } from '../timer-engine';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => ({
@@ -164,5 +165,24 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     });
 
     expect(ms).toBeLessThan(80);
+  });
+
+  test('Budżet 9: calculateRemainingRecipeTime wykonuje 10 000 kalkulacji w czasie poniżej 50 ms (TASK-P70-10-WYD)', () => {
+    const steps = [
+      { id: '1', name: 'Bloom', durationSeconds: 45, waterGrams: 50 },
+      { id: '2', name: 'Pour 1', durationSeconds: 30, waterGrams: 150 },
+      { id: '3', name: 'Pour 2', durationSeconds: 30, waterGrams: 250 },
+      { id: '4', name: 'Drawdown', durationSeconds: 45, waterGrams: 250 },
+    ] as any[];
+
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        const stepIdx = i % 4;
+        const elapsed = (i * 3) % 45;
+        BrewTimerEngine.calculateRemainingRecipeTime(steps, stepIdx, elapsed);
+      }
+    });
+
+    expect(ms).toBeLessThan(50);
   });
 });

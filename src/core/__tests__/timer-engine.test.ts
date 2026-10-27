@@ -396,5 +396,22 @@ describe('BrewTimerEngine', () => {
       expect(BrewTimerEngine.calculateTotalRecipeDuration(invalidSteps)).toBe(55); // floor(45.8) + 10 = 55
       expect(BrewTimerEngine.calculateTotalTargetWater(invalidSteps)).toBe(300.3); // max rounded to 1 decimal place
     });
+
+    test('TASK-P70-10-WYD: calculateRemainingRecipeTime wylicza pozostały czas procedury bez alokacji', () => {
+      // testSteps: 30s + 60s = 90s
+      // Krok 0, upłynęło 10s -> (30 - 10) + 60 = 80s
+      expect(BrewTimerEngine.calculateRemainingRecipeTime(testSteps, 0, 10)).toBe(80);
+      // Krok 0, upłynęło 30s -> 0 + 60 = 60s
+      expect(BrewTimerEngine.calculateRemainingRecipeTime(testSteps, 0, 30)).toBe(60);
+      // Krok 1, upłynęło 15s -> 60 - 15 = 45s
+      expect(BrewTimerEngine.calculateRemainingRecipeTime(testSteps, 1, 15)).toBe(45);
+      // Krok poza zakresem -> 0s
+      expect(BrewTimerEngine.calculateRemainingRecipeTime(testSteps, 2, 0)).toBe(0);
+
+      // Null safety & edge cases
+      expect(BrewTimerEngine.calculateRemainingRecipeTime(null, 0, 0)).toBe(0);
+      expect(BrewTimerEngine.calculateRemainingRecipeTime([], 0, 0)).toBe(0);
+      expect(BrewTimerEngine.calculateRemainingRecipeTime(testSteps, -1, -5)).toBe(90);
+    });
   });
 });

@@ -93,6 +93,44 @@ export class BrewTimerEngine {
     return Number(maxWater.toFixed(1));
   }
 
+  /**
+   * Oblicza szacowany pozostały czas trwania procedury (w sekundach)
+   * na podstawie bieżącego kroku, upływu czasu w tym kroku oraz przyszłych kroków.
+   */
+  public static calculateRemainingRecipeTime(
+    steps?: RecipeStep[] | null,
+    currentStepIndex = 0,
+    currentStepElapsedSeconds = 0
+  ): number {
+    if (!Array.isArray(steps) || steps.length === 0) return 0;
+
+    const safeIndex =
+      Number.isFinite(currentStepIndex) && currentStepIndex >= 0
+        ? Math.floor(currentStepIndex)
+        : 0;
+
+    if (safeIndex >= steps.length) return 0;
+
+    const safeElapsed =
+      Number.isFinite(currentStepElapsedSeconds) && currentStepElapsedSeconds >= 0
+        ? Math.floor(currentStepElapsedSeconds)
+        : 0;
+
+    let remaining = 0;
+    for (let i = safeIndex; i < steps.length; i++) {
+      const step = steps[i];
+      if (!step || !Number.isFinite(step.durationSeconds) || step.durationSeconds <= 0) continue;
+      const stepDur = Math.floor(step.durationSeconds);
+      if (i === safeIndex) {
+        remaining += Math.max(0, stepDur - safeElapsed);
+      } else {
+        remaining += stepDur;
+      }
+    }
+
+    return Math.min(86400, Math.max(0, remaining));
+  }
+
   constructor(steps: RecipeStep[], callbacks: TimerCallbacks = {}) {
     this.steps = steps.map((s) => ({ ...s }));
     this.callbacks = callbacks;
