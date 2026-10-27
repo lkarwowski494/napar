@@ -536,3 +536,49 @@ export function filterBackupEnvelope(
     },
   };
 }
+
+export interface BackupDiffResult {
+  inventory: { source: number; target: number; delta: number };
+  recipes: { source: number; target: number; delta: number };
+  sessions: { source: number; target: number; delta: number };
+  caffeine: { source: number; target: number; delta: number };
+  isIdentical: boolean;
+}
+
+/**
+ * Porównuje rozmiary kolekcji dwóch kopert kopii zapasowych (np. chmura vs lokalna).
+ */
+export function diffBackupEnvelopes(
+  source?: NaparBackupEnvelope | null,
+  target?: NaparBackupEnvelope | null
+): BackupDiffResult {
+  const getCounts = (env?: NaparBackupEnvelope | null) => {
+    if (!env || typeof env !== 'object' || !env.state || typeof env.state !== 'object') {
+      return { inv: 0, rec: 0, ses: 0, caf: 0 };
+    }
+    return {
+      inv: Array.isArray(env.state.inventory) ? env.state.inventory.length : 0,
+      rec: Array.isArray(env.state.customRecipes) ? env.state.customRecipes.length : 0,
+      ses: Array.isArray(env.state.sessions) ? env.state.sessions.length : 0,
+      caf: Array.isArray(env.state.caffeineLogs) ? env.state.caffeineLogs.length : 0,
+    };
+  };
+
+  const s = getCounts(source);
+  const t = getCounts(target);
+
+  const deltaInv = t.inv - s.inv;
+  const deltaRec = t.rec - s.rec;
+  const deltaSes = t.ses - s.ses;
+  const deltaCaf = t.caf - s.caf;
+
+  const isIdentical = deltaInv === 0 && deltaRec === 0 && deltaSes === 0 && deltaCaf === 0;
+
+  return {
+    inventory: { source: s.inv, target: t.inv, delta: deltaInv },
+    recipes: { source: s.rec, target: t.rec, delta: deltaRec },
+    sessions: { source: s.ses, target: t.ses, delta: deltaSes },
+    caffeine: { source: s.caf, target: t.caf, delta: deltaCaf },
+    isIdentical,
+  };
+}

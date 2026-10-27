@@ -12,6 +12,8 @@ import {
   validateBackupEnvelope,
   filterBackupEnvelope,
   BackupFilterOptions,
+  diffBackupEnvelopes,
+  BackupDiffResult,
   localISODate,
   stampOf,
   parseAndValidateBackup,
@@ -531,6 +533,40 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       const filterOpts: BackupFilterOptions = { includeRecipes: true };
       expect(filterOpts.includeRecipes).toBe(true);
       expect(() => filterBackupEnvelope(null as any)).toThrow();
+    });
+
+    test('TASK-P71-05-ARC: diffBackupEnvelopes porównuje dwie koperty i liczy delty', () => {
+      const sourceEnv = buildBackup({
+        inventory: [{ id: 'i1' }] as any,
+        customRecipes: [{ id: 'r1' }, { id: 'r2' }] as any,
+        sessions: [{ id: 's1' }] as any,
+        caffeineLogs: [] as any,
+      });
+
+      const targetEnv = buildBackup({
+        inventory: [{ id: 'i1' }, { id: 'i2' }, { id: 'i3' }] as any,
+        customRecipes: [{ id: 'r1' }, { id: 'r2' }] as any,
+        sessions: [{ id: 's1' }, { id: 's2' }] as any,
+        caffeineLogs: [{ id: 'c1' }] as any,
+      });
+
+      const diff: BackupDiffResult = diffBackupEnvelopes(sourceEnv, targetEnv);
+      expect(diff.isIdentical).toBe(false);
+      expect(diff.inventory).toEqual({ source: 1, target: 3, delta: 2 });
+      expect(diff.recipes).toEqual({ source: 2, target: 2, delta: 0 });
+      expect(diff.sessions).toEqual({ source: 1, target: 2, delta: 1 });
+      expect(diff.caffeine).toEqual({ source: 0, target: 1, delta: 1 });
+
+      // Identyczne koperty
+      const identicalDiff = diffBackupEnvelopes(sourceEnv, sourceEnv);
+      expect(identicalDiff.isIdentical).toBe(true);
+      expect(identicalDiff.inventory.delta).toBe(0);
+
+      // Odporność na null/undefined
+      const fallbackDiff = diffBackupEnvelopes(null, undefined);
+      expect(fallbackDiff.isIdentical).toBe(true);
+      expect(fallbackDiff.inventory.source).toBe(0);
+      expect(fallbackDiff.inventory.target).toBe(0);
     });
   });
 });
