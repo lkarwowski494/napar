@@ -1,0 +1,53 @@
+{
+  "cycle": "P73",
+  "status": "completed",
+  "perspectives": [
+    "12-NIE",
+    "01-ODK",
+    "02-MON",
+    "03-ZAK",
+    "04-SZT"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P73-12-NIE",
+      "perspective": "12-NIE",
+      "description": "Dodanie zestawu testów odpornościowych Chaos 14 fuzzującego funkcje z P71 i P72 w src/core/__tests__/fuzz-resilience.test.ts",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P73-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Implementacja calculateLevenshteinDistance i isFuzzyMatch w src/core/search-utils.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P73-02-MON",
+      "perspective": "02-MON",
+      "description": "Wdrożenie getFeatureAccessLevel z typem FeatureAccessLevel w src/core/app-access.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P73-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Wdrożenie filtrowania sesji parzenia filterBrewSessions z typem BrewSessionFilterCriteria w src/core/database.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P73-04-SZT",
+      "perspective": "04-SZT",
+      "description": "Implementacja sortowania akcji proaktywnych sortProactiveActions z typem ActionSortOption w src/core/bpr-engine.ts",
+      "targetFile": "src/core/bpr-engine.ts",
+      "testFile": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    }
+  ]
+}
