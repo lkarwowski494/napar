@@ -21,6 +21,8 @@ import {
   evaluateEspressoRatio,
   evaluateColdBrewRatio,
   evaluatePourOverRatio,
+  evaluateFrenchPressRatio,
+  evaluateAeroPressRatio,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
@@ -33,6 +35,7 @@ import {
   estimateWaterTdsFromHardness,
   evaluateWaterAlkalinity,
   calculateMagnesiumCalciumRatio,
+  calculateResidualAlkalinity,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -46,6 +49,7 @@ import {
   calculateGrinderAdjustment,
   estimateGrindDistribution,
   calculateBurrSpeedImpact,
+  estimateGrindDuration,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -61,6 +65,8 @@ import {
   formatTdsPercentage,
   formatWaterHardness,
   formatParticleSize,
+  formatAltitude,
+  formatPressureWithUnit,
   wInKeep,
 } from '../unit-converter';
 import {
@@ -71,12 +77,13 @@ import {
   getCoffeeVarietyGuide,
   getCoffeeProcessGuide,
   getCoffeeOriginGuide,
+  getCoffeeRoastLevelGuide,
 } from '../knowledge-data';
-import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore } from '../bpr-engine';
-import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity } from '../backup';
-import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount } from '../app-access';
-import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue } from '../database';
-import { extractSearchSnippet, suggestSearchCorrections } from '../search-utils';
+import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority } from '../bpr-engine';
+import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope } from '../backup';
+import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings } from '../app-access';
+import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness } from '../database';
+import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore } from '../search-utils';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -912,6 +919,103 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       // 8. suggestSearchCorrections
       const corrections = suggestSearchCorrections(val as any, val as any);
       expect(Array.isArray(corrections)).toBe(true);
+    }
+  });
+
+  test('Chaos 19: Fuzzing calculateResidualAlkalinity, estimateGrindDuration, formatPressureWithUnit, formatAltitude, evaluateAeroPressRatio, evaluateFrenchPressRatio, getCoffeeRoastLevelGuide, sanitizeBackupEnvelope, calculateSubscriptionSavings, calculateBeanFreshness, rankActionsByPriority, calculateSearchRelevanceScore (TASK-P85-12-NIE)', () => {
+    const chaoticInputs: any[] = [
+      null,
+      undefined,
+      NaN,
+      Infinity,
+      -Infinity,
+      -0,
+      -99999,
+      0,
+      '   ',
+      'foo,bar.baz',
+      '\uFEFF\u200B',
+      '99999999999999999999',
+      '-150,5',
+      {},
+      [],
+      { invalid: true },
+      [null, undefined, NaN],
+      () => {},
+      Symbol('chaos'),
+    ];
+
+    for (const val of chaoticInputs) {
+      // 1. calculateResidualAlkalinity
+      const resAlk = calculateResidualAlkalinity(val as any, val as any, val as any);
+      expect(typeof resAlk).toBe('object');
+      expect(typeof resAlk.residualAlkalinityPpm).toBe('number');
+      expect(typeof resAlk.category).toBe('string');
+      expect(typeof resAlk.sensoryAcidityImpactPl).toBe('string');
+
+      // 2. estimateGrindDuration
+      const grindDuration = estimateGrindDuration(val as any, val as any, val as any);
+      expect(typeof grindDuration).toBe('object');
+      expect(typeof grindDuration.estimatedSeconds).toBe('number');
+      expect(typeof grindDuration.formattedDuration).toBe('string');
+      expect(typeof grindDuration.isElectric).toBe('boolean');
+
+      // 3. formatPressureWithUnit
+      const pressureStr = formatPressureWithUnit(val as any, val as any, val as any);
+      expect(typeof pressureStr).toBe('string');
+      expect(pressureStr.length).toBeGreaterThan(0);
+
+      // 4. formatAltitude
+      const altStr = formatAltitude(val as any, val as any, val as any);
+      expect(typeof altStr).toBe('string');
+      expect(altStr.length).toBeGreaterThan(0);
+
+      // 5. evaluateAeroPressRatio
+      const aeroRatio = evaluateAeroPressRatio(val as any, val as any);
+      expect(typeof aeroRatio).toBe('object');
+      expect(typeof aeroRatio.ratio).toBe('number');
+      expect(typeof aeroRatio.style).toBe('string');
+
+      // 6. evaluateFrenchPressRatio
+      const frenchRatio = evaluateFrenchPressRatio(val as any, val as any);
+      expect(typeof frenchRatio).toBe('object');
+      expect(typeof frenchRatio.ratio).toBe('number');
+      expect(typeof frenchRatio.style).toBe('string');
+
+      // 7. getCoffeeRoastLevelGuide
+      const roastGuide = getCoffeeRoastLevelGuide(val as any, val as any);
+      expect(roastGuide === null || typeof roastGuide === 'object').toBe(true);
+
+      // 8. sanitizeBackupEnvelope
+      try {
+        const sanitized = sanitizeBackupEnvelope(val as any);
+        expect(typeof sanitized).toBe('object');
+      } catch (err: any) {
+        expect(err instanceof Error).toBe(true);
+      }
+
+      // 9. calculateSubscriptionSavings
+      const savings = calculateSubscriptionSavings(val as any, val as any);
+      expect(typeof savings).toBe('object');
+      expect(typeof savings.savedAmountPln).toBe('number');
+      expect(typeof savings.savingsPercent).toBe('number');
+
+      // 10. calculateBeanFreshness
+      const freshness = calculateBeanFreshness(val as any, val as any);
+      expect(typeof freshness).toBe('object');
+      expect(freshness.daysSinceRoast === null || typeof freshness.daysSinceRoast === 'number').toBe(true);
+      expect(typeof freshness.phase).toBe('string');
+
+      // 11. rankActionsByPriority
+      const ranked = rankActionsByPriority(val as any);
+      expect(Array.isArray(ranked)).toBe(true);
+
+      // 12. calculateSearchRelevanceScore
+      const relScore = calculateSearchRelevanceScore(val as any, val as any);
+      expect(typeof relScore).toBe('object');
+      expect(typeof relScore.score).toBe('number');
+      expect(typeof relScore.exactMatch).toBe('boolean');
+      expect(typeof relScore.tokenCoverage).toBe('number');
     }
   });
 });
