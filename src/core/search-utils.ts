@@ -620,4 +620,71 @@ export function filterSearchEntriesByTags<T>(
   });
 }
 
+export interface NumericRangeFilterOptions {
+  min?: number | string | null;
+  max?: number | string | null;
+  inclusive?: boolean;
+}
+
+/**
+ * Filtruje kolekcję encji według zadanego przedziału numerycznego (np. wysokość upraw, proporcja, doza, woda).
+ * Z pełną sanityzacją wartości wejściowych, obsługą stringów z przecinkami dziesiętnymi, NaN, Infinity i -0.
+ */
+export function filterSearchEntriesByNumericRange<T>(
+  entries: T[] | undefined | null,
+  valueExtractor: (entry: T) => number | string | undefined | null,
+  options?: NumericRangeFilterOptions | null
+): T[] {
+  if (!Array.isArray(entries)) return [];
+  if (typeof valueExtractor !== 'function') return [];
+
+  const parseNum = (v: unknown): number | null => {
+    if (v === null || v === undefined) return null;
+    if (typeof v === 'number') {
+      return Number.isFinite(v) && !Object.is(v, -0) ? v : Object.is(v, -0) ? 0 : null;
+    }
+    if (typeof v === 'string') {
+      const clean = v.replace(/\uFEFF/g, '').replace(/[^\d.,+-]/g, '').replace(',', '.').trim();
+      const parsed = parseFloat(clean);
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? parsed : Object.is(parsed, -0) ? 0 : null;
+    }
+    return null;
+  };
+
+  const minVal = parseNum(options?.min);
+  const maxVal = parseNum(options?.max);
+  const inclusive = options?.inclusive !== false;
+
+  // Jeśli brak filtrów min i max, zwracamy kopię tablicy
+  if (minVal === null && maxVal === null) {
+    return entries.slice();
+  }
+
+  return entries.filter((entry) => {
+    let val: number | null = null;
+    try {
+      val = parseNum(valueExtractor(entry));
+    } catch {
+      return false;
+    }
+
+    if (val === null) return false;
+
+    if (minVal !== null) {
+      if (inclusive ? val < minVal : val <= minVal) {
+        return false;
+      }
+    }
+
+    if (maxVal !== null) {
+      if (inclusive ? val > maxVal : val >= maxVal) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}
+
+
 

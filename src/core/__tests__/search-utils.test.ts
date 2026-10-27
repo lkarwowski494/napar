@@ -22,6 +22,8 @@ import {
   calculateSearchRelevanceScore,
   SearchRelevanceScore,
   filterSearchEntriesByTags,
+  filterSearchEntriesByNumericRange,
+  NumericRangeFilterOptions,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -375,5 +377,43 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     // 5. Odporność na nullish kolekcję, uszkodzone tagi i błędy ekstraktora
     expect(filterSearchEntriesByTags(null, (c: any) => c.tags, ['floral'])).toEqual([]);
     expect(filterSearchEntriesByTags(coffees, () => { throw new Error('fail'); }, ['floral'])).toEqual([]);
+  });
+
+  test('TASK-P87-01-ODK: filterSearchEntriesByNumericRange filtruje elementy po przedziale numerycznym', () => {
+    const coffees = [
+      { id: '1', name: 'Ethiopia Yirgacheffe', altitude: 2100, dose: 15 },
+      { id: '2', name: 'Colombia Huila', altitude: 1750, dose: 18 },
+      { id: '3', name: 'Brazil Santos', altitude: 900, dose: '20,0' },
+      { id: '4', name: 'Unknown Estate', altitude: null, dose: 16 },
+    ];
+
+    // 1. Filtr z min i max (przedział 1000 - 2000m) -> Colombia Huila (1750m)
+    const midAltitude = filterSearchEntriesByNumericRange(coffees, (c) => c.altitude, { min: 1000, max: 2000 });
+    expect(midAltitude.length).toBe(1);
+    expect(midAltitude[0].id).toBe('2');
+
+    // 2. Filtr tylko min (>= 1750m) w trybie inclusive (domyślnym) -> Ethiopia (2100) i Colombia (1750)
+    const highAltitude = filterSearchEntriesByNumericRange(coffees, (c) => c.altitude, { min: 1750 });
+    expect(highAltitude.length).toBe(2);
+
+    // 3. Tryb exclusive (inclusive = false) dla min: 1750 -> tylko Ethiopia (2100)
+    const strictHigh = filterSearchEntriesByNumericRange(coffees, (c) => c.altitude, { min: 1750, inclusive: false });
+    expect(strictHigh.length).toBe(1);
+    expect(strictHigh[0].id).toBe('1');
+
+    // 4. Parsowanie stringów z przecinkami dziesiętnymi w dozie
+    const doseFilter = filterSearchEntriesByNumericRange(coffees, (c) => c.dose, { min: '17,5', max: '21' });
+    expect(doseFilter.length).toBe(2);
+    const ids = doseFilter.map((c) => c.id);
+    expect(ids).toContain('2');
+    expect(ids).toContain('3');
+
+    // 5. Brak kryteriów min/max zwraca całą listę
+    const noFilter = filterSearchEntriesByNumericRange(coffees, (c) => c.altitude, null);
+    expect(noFilter.length).toBe(4);
+
+    // 6. Odporność na błędy ekstraktora i pustą listę
+    expect(filterSearchEntriesByNumericRange(null, (c: any) => c.dose)).toEqual([]);
+    expect(filterSearchEntriesByNumericRange(coffees, () => { throw new Error('fail'); }, { min: 10 })).toEqual([]);
   });
 });
