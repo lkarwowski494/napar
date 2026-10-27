@@ -662,5 +662,28 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       // 5. Clampowanie do 86400 dla ekstrakcji powyżej 24 godzin
       expect(parseStepDurationSeconds('Ekstrakcja przez 36 godzin')).toBe(86400);
     });
+
+    it('TASK-P58-11-WZR: bpr-engine obsluguje notacje minutowa m, BOM i bezpiecznie chroni przed blednymi parametrami', () => {
+      // 1. Notacja m w parowaniu czasu
+      expect(parseStepDurationSeconds('Odczekaj 2m 30s przed nastepnym zalaniem')).toBe(150);
+      expect(parseStepDurationSeconds('Zaparzaj przez 1m 45s')).toBe(105);
+      expect(parseStepDurationSeconds('Czas ekstrakcji 2m30s')).toBe(150);
+      expect(parseStepDurationSeconds('Odczekaj 2m')).toBe(120);
+      expect(parseStepDurationSeconds('\uFEFFPreinfuzja przez 45s')).toBe(45);
+
+      // 2. calculateNextSteepDuration z pustymi/nieprawidłowymi parametrami
+      expect(calculateNextSteepDuration(undefined as any)).toBe(15);
+      expect(calculateNextSteepDuration(null as any)).toBe(15);
+      expect(calculateNextSteepDuration({ baseDurationSeconds: -0, infusionNumber: 1 })).toBe(15);
+
+      // 3. calculateRoastDegassingWindow z BOM i typami niebędącymi stringami
+      const { calculateRoastDegassingWindow } = require('../bpr-engine');
+      expect(calculateRoastDegassingWindow('\uFEFFlight')).toEqual({ degassingDays: 10, peakEndDays: 45 });
+      expect(calculateRoastDegassingWindow('\uFEFFdark')).toEqual({ degassingDays: 5, peakEndDays: 25 });
+      expect(calculateRoastDegassingWindow(12345 as any)).toEqual({ degassingDays: 7, peakEndDays: 35 });
+
+      // 4. escapeIcsText z BOM
+      expect(escapeIcsText('\uFEFFTest\\;,\n')).toBe('Test\\\\\\;\\,\\n');
+    });
   });
 });

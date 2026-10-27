@@ -70,7 +70,12 @@ export function parseStepDurationSeconds(
     return safeFallback;
   }
 
-  const normalized = instruction.trim().toLowerCase().replace(/,/g, '.');
+  const normalized = instruction
+    .replace(/\uFEFF/g, '')
+    .replace(/[\x00-\x1F\x7F-\x9F]/g, ' ')
+    .trim()
+    .toLowerCase()
+    .replace(/,/g, '.');
 
   // 0. Ułamki i naturalne wyrażenia czasu (pół minuty, 1/2 minuty, kwadrans, godziny)
   if (/(?:p[oó][lł]torej\s*godzin|one\s+and\s+a\s+half\s*hour|1\s+1\/2\s*h(?:our)?)/i.test(normalized)) {
@@ -156,9 +161,9 @@ export function parseStepDurationSeconds(
     }
   }
 
-  // 3. Złożone minuty i sekundy: np. "1 min 30 sek", "2 minuty i 15 sekund", "1 min 45 s"
+  // 3. Złożone minuty i sekundy: np. "1 min 30 sek", "2 minuty i 15 sekund", "1 min 45 s", "2m 30s", "2m30s"
   const compoundMatch = normalized.match(
-    /(\d+(?:\.\d+)?)\s*(?:minut(?:[a-ząęółśżźćń]+)?|minutes?|mins?|min\b)\s*(?:i|and)?\s*(\d+(?:\.\d+)?)\s*(?:sekund(?:[a-ząęółśżźćń]+)?|sek\b|secs?\b|sec(?:onds?)?\b|s\b)/i
+    /(\d+(?:\.\d+)?)\s*(?:minut(?:[a-ząęółśżźćń]+)?|minutes?|mins?|min\b|m(?=\d|\b))\s*(?:i|and)?\s*(\d+(?:\.\d+)?)\s*(?:sekund(?:[a-ząęółśżźćń]+)?|sek\b|secs?\b|sec(?:onds?)?\b|s\b)/i
   );
   if (compoundMatch) {
     const mins = parseFloat(compoundMatch[1]);
@@ -169,9 +174,9 @@ export function parseStepDurationSeconds(
     }
   }
 
-  // 4. Pojedyncze minuty (+ opcjonalne sekundy): np. "przez 2 minuty", "1.5 min", "wait 2 mins", "steep 4 minutes"
+  // 4. Pojedyncze minuty (+ opcjonalne sekundy): np. "przez 2 minuty", "1.5 min", "wait 2 mins", "steep 4 minutes", "odczekaj 2m"
   const minSingleMatch = normalized.match(
-    /(\d+(?:\.\d+)?)\s*(?:minut(?:[a-ząęółśżźćń]+)?|minutes?|mins?|min\b)/i
+    /(\d+(?:\.\d+)?)\s*(?:minut(?:[a-ząęółśżźćń]+)?|minutes?|mins?|min\b|m\b)/i
   );
   if (minSingleMatch) {
     const mins = parseFloat(minSingleMatch[1]);
@@ -240,6 +245,9 @@ export function calculateNextSteepDuration(params: {
   infusionNumber: number;
   incrementSeconds?: number | string;
 }): number {
+  if (!params || typeof params !== 'object') {
+    return 15;
+  }
   const rawBase = typeof params.baseDurationSeconds === 'number'
     ? params.baseDurationSeconds
     : (typeof params.baseDurationSeconds === 'string' ? parseFloat(params.baseDurationSeconds.replace(',', '.')) : 15);
@@ -268,7 +276,11 @@ export function calculateRoastDegassingWindow(roastProfile?: string | null): {
     return { degassingDays: 7, peakEndDays: 35 };
   }
 
-  const clean = roastProfile.trim().toLowerCase();
+  const clean = roastProfile
+    .replace(/\uFEFF/g, '')
+    .replace(/[\x00-\x1F\x7F-\x9F]/g, ' ')
+    .trim()
+    .toLowerCase();
 
   // Ciemny wypał / espresso / dark: odgazowuje szybciej, starzeje się szybciej
   if (
@@ -626,6 +638,7 @@ export function buildFourteenDayCalendar(
 export function escapeIcsText(str: string): string {
   if (typeof str !== 'string' || !str) return '';
   return str
+    .replace(/\uFEFF/g, '')
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
     .replace(/\\/g, '\\\\')
     .replace(/;/g, '\\;')
