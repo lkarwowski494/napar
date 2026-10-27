@@ -15,6 +15,8 @@ import {
   InventorySortOption,
   filterInventoryItems,
   InventoryFilterCriteria,
+  filterBrewSessions,
+  BrewSessionFilterCriteria,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -2738,5 +2740,88 @@ describe('Napar SQLite Database & Repositories', () => {
     // 6. Odporność na null/undefined
     expect(filterInventoryItems(null as any)).toEqual([]);
     expect(filterInventoryItems([null as any, item1])).toHaveLength(1);
+  });
+
+  test('TASK-P73-03-ZAK: filterBrewSessions filtruje sesje parzenia po kryteriach', () => {
+    const ses1: BrewSession = {
+      id: 'ses-1',
+      recipeId: 'rec-1',
+      recipeName: 'V60 Kasuya 4:6',
+      inventoryItemId: 'inv-1',
+      inventoryItemName: 'Ethiopia Yirgacheffe',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 20,
+      waterGrams: 300,
+      waterTempCelsius: 92,
+      totalTimeSeconds: 210,
+      rating: 5,
+      flavorTags: ['floral', 'bergamot'],
+      brewedAt: '2026-10-27T08:00:00Z',
+    };
+
+    const ses2: BrewSession = {
+      id: 'ses-2',
+      recipeId: 'rec-2',
+      recipeName: 'AeroPress Inverted',
+      beverageType: 'COFFEE',
+      method: 'AeroPress',
+      doseGrams: 15,
+      waterGrams: 200,
+      waterTempCelsius: 85,
+      totalTimeSeconds: 120,
+      rating: 4,
+      flavorTags: ['chocolate'],
+      brewedAt: '2026-10-25T10:00:00Z',
+    };
+
+    const ses3: BrewSession = {
+      id: 'ses-3',
+      beverageType: 'TEA',
+      method: 'Gaiwan',
+      doseGrams: 5,
+      waterGrams: 100,
+      waterTempCelsius: 80,
+      totalTimeSeconds: 30,
+      rating: 4.5,
+      flavorTags: ['umami'],
+      brewedAt: '2026-10-26T14:00:00Z',
+    };
+
+    const allSessions = [ses1, ses2, ses3];
+
+    // 1. Filtrowanie po typie naparu (beverageType)
+    const criteriaType: BrewSessionFilterCriteria = { beverageType: 'COFFEE' };
+    const coffeeSessions: BrewSession[] = filterBrewSessions(allSessions, criteriaType);
+    expect(coffeeSessions.length).toBe(2);
+    expect(coffeeSessions.every((s) => s.beverageType === 'COFFEE')).toBe(true);
+
+    // 2. Filtrowanie po metodzie (method)
+    const criteriaMethod: BrewSessionFilterCriteria = { method: 'v60' };
+    const v60Sessions = filterBrewSessions(allSessions, criteriaMethod);
+    expect(v60Sessions.length).toBe(1);
+    expect(v60Sessions[0].id).toBe('ses-1');
+
+    // 3. Filtrowanie po minimalnej ocenie (minRating)
+    const criteriaRating: BrewSessionFilterCriteria = { minRating: 4.5 };
+    const highRated = filterBrewSessions(allSessions, criteriaRating);
+    expect(highRated.length).toBe(2);
+    expect(highRated.some((s) => s.id === 'ses-2')).toBe(false);
+
+    // 4. Filtrowanie po haśle tekstowym (query)
+    const criteriaQuery: BrewSessionFilterCriteria = { query: 'yirgacheffe' };
+    const querySessions = filterBrewSessions(allSessions, criteriaQuery);
+    expect(querySessions.length).toBe(1);
+    expect(querySessions[0].id).toBe('ses-1');
+
+    // 5. Filtrowanie po dacie (sinceIso)
+    const criteriaDate: BrewSessionFilterCriteria = { sinceIso: '2026-10-27T00:00:00Z' };
+    const recentSessions = filterBrewSessions(allSessions, criteriaDate);
+    expect(recentSessions.length).toBe(1);
+    expect(recentSessions[0].id).toBe('ses-1');
+
+    // 6. Odporność na null/undefined
+    expect(filterBrewSessions(null as any)).toEqual([]);
+    expect(filterBrewSessions([null as any, ses1])).toHaveLength(1);
   });
 });

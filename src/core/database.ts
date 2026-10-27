@@ -1020,6 +1020,95 @@ function mapRowToRecipe(row: RecipeRow): SavedRecipe {
 // Repozytorium: Dziennik Parzeń (Brew Sessions / Journal)
 // ----------------------------------------------------------------------------
 
+export interface BrewSessionFilterCriteria {
+  query?: string;
+  beverageType?: 'COFFEE' | 'TEA' | 'all';
+  method?: string;
+  inventoryItemId?: string;
+  recipeId?: string;
+  minRating?: number;
+  sinceIso?: string;
+}
+
+/**
+ * Filtruje sesje parzenia ze wskazanymi kryteriami.
+ */
+export function filterBrewSessions(
+  sessions: BrewSession[],
+  criteria: BrewSessionFilterCriteria = {}
+): BrewSession[] {
+  if (!Array.isArray(sessions)) return [];
+  const query = criteria && typeof criteria.query === 'string' ? criteria.query.trim().toLowerCase() : '';
+  const bevType =
+    criteria && criteria.beverageType && criteria.beverageType !== 'all'
+      ? criteria.beverageType.toUpperCase()
+      : null;
+  const method = criteria && typeof criteria.method === 'string' ? criteria.method.trim().toLowerCase() : '';
+  const invId = criteria && typeof criteria.inventoryItemId === 'string' ? criteria.inventoryItemId.trim() : '';
+  const recId = criteria && typeof criteria.recipeId === 'string' ? criteria.recipeId.trim() : '';
+  const minRating =
+    criteria && typeof criteria.minRating === 'number' && !Number.isNaN(criteria.minRating)
+      ? criteria.minRating
+      : null;
+
+  let sinceTime = 0;
+  if (criteria && typeof criteria.sinceIso === 'string' && criteria.sinceIso.trim()) {
+    const t = new Date(criteria.sinceIso.trim()).getTime();
+    if (Number.isFinite(t)) {
+      sinceTime = t;
+    }
+  }
+
+  return sessions.filter((session) => {
+    if (!session || typeof session !== 'object') return false;
+
+    if (bevType && (session.beverageType || '').toUpperCase() !== bevType) {
+      return false;
+    }
+
+    if (method) {
+      const sMethod = (session.method || '').toLowerCase();
+      if (!sMethod.includes(method)) return false;
+    }
+
+    if (invId && session.inventoryItemId !== invId) {
+      return false;
+    }
+
+    if (recId && session.recipeId !== recId) {
+      return false;
+    }
+
+    if (minRating !== null && (!(Number(session.rating) >= minRating))) {
+      return false;
+    }
+
+    if (sinceTime > 0) {
+      const sTime = session.brewedAt ? new Date(session.brewedAt).getTime() : 0;
+      if (sTime < sinceTime) return false;
+    }
+
+    if (query) {
+      const rName = (session.recipeName || '').toLowerCase();
+      const iName = (session.inventoryItemName || '').toLowerCase();
+      const sMethod = (session.method || '').toLowerCase();
+      const notes = (session.notes || '').toLowerCase();
+      const tags = Array.isArray(session.flavorTags) ? session.flavorTags.join(' ').toLowerCase() : '';
+
+      const match =
+        rName.includes(query) ||
+        iName.includes(query) ||
+        sMethod.includes(query) ||
+        notes.includes(query) ||
+        tags.includes(query);
+
+      if (!match) return false;
+    }
+
+    return true;
+  });
+}
+
 export function getBrewSessions(limit?: number, offset?: number): BrewSession[] {
   const db = getDatabase();
   const rawOffset = typeof offset === 'number' ? offset : (typeof offset === 'string' ? parseFloat(offset) : NaN);
