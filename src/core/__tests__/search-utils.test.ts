@@ -19,6 +19,8 @@ import {
   extractSearchSnippet,
   suggestSearchCorrections,
   SearchCorrectionSuggestion,
+  calculateSearchRelevanceScore,
+  SearchRelevanceScore,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -300,5 +302,41 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     expect(suggestSearchCorrections('xyzqwertyuiop', dictionary, 3, 2)).toEqual([]);
     expect(suggestSearchCorrections(null as any, dictionary)).toEqual([]);
     expect(suggestSearchCorrections('test', null as any)).toEqual([]);
+  });
+
+  test('TASK-P82-01-ODK: calculateSearchRelevanceScore ocenia relewancję dopasowania wyszukiwania', () => {
+    // 1. Dokładne dopasowanie (exact match) -> 100 punktów
+    const exact: SearchRelevanceScore = calculateSearchRelevanceScore('Ethiopia Yirgacheffe', 'ethiopia yirgacheffe');
+    expect(exact.score).toBe(100);
+    expect(exact.exactMatch).toBe(true);
+    expect(exact.prefixMatch).toBe(true);
+    expect(exact.tokenCoverage).toBe(1);
+
+    // 2. Dopasowanie prefiksowe (prefix match) -> >= 80 punktów
+    const prefix = calculateSearchRelevanceScore('Ethiopia Yirgacheffe Washed', 'Ethiopia');
+    expect(prefix.score).toBeGreaterThanOrEqual(80);
+    expect(prefix.exactMatch).toBe(false);
+    expect(prefix.prefixMatch).toBe(true);
+    expect(prefix.tokenCoverage).toBe(1);
+
+    // 3. Wszystkie tokeny dopasowane w środku tekstu
+    const allTokens = calculateSearchRelevanceScore('Specialty Coffee Ethiopia Natural', 'Ethiopia Natural');
+    expect(allTokens.score).toBeGreaterThanOrEqual(70);
+    expect(allTokens.tokenCoverage).toBe(1);
+
+    // 4. Częściowe dopasowanie tokenów
+    const partial = calculateSearchRelevanceScore('Panama Geisha Washed', 'Geisha Natural');
+    expect(partial.tokenCoverage).toBe(0.5);
+    expect(partial.score).toBeGreaterThan(0);
+    expect(partial.score).toBeLessThan(70);
+
+    // 5. Brak dopasowania lub puste dane
+    const zero = calculateSearchRelevanceScore('Kenya Nyeri', 'Colombia Huila');
+    expect(zero.score).toBe(0);
+    expect(zero.tokenCoverage).toBe(0);
+
+    const empty = calculateSearchRelevanceScore(null, 'test');
+    expect(empty.score).toBe(0);
+    expect(empty.tokenCoverage).toBe(0);
   });
 });

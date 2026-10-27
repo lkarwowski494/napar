@@ -469,3 +469,94 @@ export function suggestSearchCorrections(
 
   return matches.slice(0, safeMax);
 }
+
+export interface SearchRelevanceScore {
+  score: number;
+  exactMatch: boolean;
+  prefixMatch: boolean;
+  tokenCoverage: number;
+}
+
+/**
+ * Oblicza punktowy wskaźnik dopasowania wyszukiwania (0-100) dla zadanego tekstu i zapytania,
+ * badając zgodność dokładną, prefiksową oraz ułamek odnalezionych tokenów (token coverage).
+ */
+export function calculateSearchRelevanceScore(
+  text: string | undefined | null,
+  query: string | undefined | null
+): SearchRelevanceScore {
+  if (
+    !text ||
+    typeof text !== 'string' ||
+    !text.trim() ||
+    !query ||
+    typeof query !== 'string' ||
+    !query.trim()
+  ) {
+    return {
+      score: 0,
+      exactMatch: false,
+      prefixMatch: false,
+      tokenCoverage: 0,
+    };
+  }
+
+  const normT = normSearch(text);
+  const normQ = normSearch(query);
+
+  if (!normT || !normQ) {
+    return {
+      score: 0,
+      exactMatch: false,
+      prefixMatch: false,
+      tokenCoverage: 0,
+    };
+  }
+
+  if (normT === normQ) {
+    return {
+      score: 100,
+      exactMatch: true,
+      prefixMatch: true,
+      tokenCoverage: 1,
+    };
+  }
+
+  const prefixMatch = normT.startsWith(normQ);
+  const tokens = tokenizeSearch(normQ);
+  if (tokens.length === 0) {
+    return {
+      score: 0,
+      exactMatch: false,
+      prefixMatch: false,
+      tokenCoverage: 0,
+    };
+  }
+
+  let matchedTokensCount = 0;
+  for (const token of tokens) {
+    if (normT.includes(token)) {
+      matchedTokensCount++;
+    }
+  }
+
+  const tokenCoverage = Number((matchedTokensCount / tokens.length).toFixed(2));
+  let score = 0;
+
+  if (prefixMatch) {
+    score = Math.max(80, Math.round(80 + tokenCoverage * 15));
+  } else if (tokenCoverage === 1) {
+    const containsPhrase = normT.includes(normQ);
+    score = containsPhrase ? 85 : 70;
+  } else if (tokenCoverage > 0) {
+    score = Math.round(tokenCoverage * 60);
+  }
+
+  return {
+    score,
+    exactMatch: false,
+    prefixMatch,
+    tokenCoverage,
+  };
+}
+
