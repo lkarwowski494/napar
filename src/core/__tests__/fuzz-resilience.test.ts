@@ -32,6 +32,7 @@ import {
   calculateWaterDilution,
   estimateWaterTdsFromHardness,
   evaluateWaterAlkalinity,
+  calculateMagnesiumCalciumRatio,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -44,6 +45,7 @@ import {
   estimateGrindFinesRisk,
   calculateGrinderAdjustment,
   estimateGrindDistribution,
+  calculateBurrSpeedImpact,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -68,12 +70,13 @@ import {
   getTeaBrewingGuide,
   getCoffeeVarietyGuide,
   getCoffeeProcessGuide,
+  getCoffeeOriginGuide,
 } from '../knowledge-data';
-import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById } from '../bpr-engine';
-import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty } from '../backup';
-import { getSubscriptionBadgeInfo, getPaywallCallToAction } from '../app-access';
-import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems } from '../database';
-import { extractSearchSnippet } from '../search-utils';
+import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore } from '../bpr-engine';
+import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity } from '../backup';
+import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount } from '../app-access';
+import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue } from '../database';
+import { extractSearchSnippet, suggestSearchCorrections } from '../search-utils';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -836,6 +839,79 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       // 11. getLowStockInventoryItems
       const lowStock = getLowStockInventoryItems(val as any, val as any);
       expect(Array.isArray(lowStock)).toBe(true);
+    }
+  });
+
+  test('Chaos 18: Fuzzing calculateBurrSpeedImpact, calculateMagnesiumCalciumRatio, getCoffeeOriginGuide, validateBackupEnvelopeIntegrity, calculateActionPriorityScore, calculateInventoryTotalValue, formatSubscriptionDiscount, suggestSearchCorrections (TASK-P82-12-NIE)', () => {
+    const chaoticInputs: any[] = [
+      null,
+      undefined,
+      NaN,
+      Infinity,
+      -Infinity,
+      -0,
+      -99999,
+      0,
+      '   ',
+      'foo,bar.baz',
+      '\uFEFF\u200B',
+      '99999999999999999999',
+      '-150,5',
+      {},
+      [],
+      { invalid: true },
+      [null, undefined, NaN],
+      () => {},
+      Symbol('chaos'),
+    ];
+
+    for (const val of chaoticInputs) {
+      // 1. calculateBurrSpeedImpact
+      const burrSpeed = calculateBurrSpeedImpact(val as any, val as any);
+      expect(typeof burrSpeed).toBe('object');
+      expect(typeof burrSpeed.rpm).toBe('number');
+      expect(typeof burrSpeed.speedCategory).toBe('string');
+      expect(typeof burrSpeed.descriptionPl).toBe('string');
+
+      // 2. calculateMagnesiumCalciumRatio
+      const catRatio = calculateMagnesiumCalciumRatio(val as any, val as any);
+      expect(typeof catRatio).toBe('object');
+      expect(typeof catRatio.ratioMgToCa).toBe('number');
+      expect(typeof catRatio.category).toBe('string');
+      expect(typeof catRatio.sensoryEmphasisPl).toBe('string');
+
+      // 3. getCoffeeOriginGuide
+      const originGuide = getCoffeeOriginGuide(val as any, val as any);
+      expect(originGuide === null || typeof originGuide === 'object').toBe(true);
+
+      // 4. validateBackupEnvelopeIntegrity
+      const backupReport = validateBackupEnvelopeIntegrity(val as any);
+      expect(typeof backupReport).toBe('object');
+      expect(typeof backupReport.isValid).toBe('boolean');
+      expect(Array.isArray(backupReport.issues)).toBe(true);
+
+      // 5. calculateActionPriorityScore
+      const prioScore = calculateActionPriorityScore(val as any);
+      expect(typeof prioScore).toBe('object');
+      expect(typeof prioScore.score).toBe('number');
+      expect(typeof prioScore.urgency).toBe('string');
+      expect(typeof prioScore.urgencyLabelPl).toBe('string');
+
+      // 6. calculateInventoryTotalValue
+      const invValue = calculateInventoryTotalValue(val as any);
+      expect(typeof invValue).toBe('object');
+      expect(typeof invValue.estimatedTotalValuePln).toBe('number');
+      expect(typeof invValue.formattedTotalValuePln).toBe('string');
+
+      // 7. formatSubscriptionDiscount
+      const discountInfo = formatSubscriptionDiscount(val as any, val as any);
+      expect(typeof discountInfo).toBe('object');
+      expect(typeof discountInfo.hasDiscount).toBe('boolean');
+      expect(typeof discountInfo.discountPercent).toBe('number');
+
+      // 8. suggestSearchCorrections
+      const corrections = suggestSearchCorrections(val as any, val as any);
+      expect(Array.isArray(corrections)).toBe(true);
     }
   });
 });
