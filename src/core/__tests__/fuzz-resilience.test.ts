@@ -27,6 +27,7 @@ import {
   evaluateTurkishCoffeeRatio,
   evaluateCuppingRatio,
   evaluateSiphonRatio,
+  evaluateChemexRatio,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
@@ -44,6 +45,7 @@ import {
   calculateTotalHardnessFromIons,
   evaluateLimescaleRisk,
   evaluateBoilerCorrosionRisk,
+  calculateWaterHardnessScale,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -62,6 +64,7 @@ import {
   calculateGrinderStepDelta,
   estimateGrinderRetention,
   estimateBurrSeasoningProgress,
+  estimateGrindDistributionSpread,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -83,6 +86,7 @@ import {
   formatCaffeineDose,
   formatStashWeight,
   formatCostPerCup,
+  formatFlowRateProfile,
   wInKeep,
 } from '../unit-converter';
 import {
@@ -98,12 +102,13 @@ import {
   getTeaCategoryGuide,
   compareCoffeeProcesses,
   compareCoffeeVarieties,
+  compareCoffeeOrigins,
 } from '../knowledge-data';
-import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed, detectBrewingHabitDrift, generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity } from '../bpr-engine';
-import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize, compareBackupVersions, generateBackupMigrationPlan, calculateBackupHealthScore } from '../backup';
-import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings, evaluateTrialStatus, calculateLifetimeBreakEven, compareSubscriptionPlans } from '../app-access';
-import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate, calculateBeanRestingReadiness, calculateStashDiversity, estimateRemainingBrews } from '../database';
-import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore, filterSearchEntriesByTags, filterBySearchFacets } from '../search-utils';
+import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed, detectBrewingHabitDrift, generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, calculateBrewConsistencyIndex } from '../bpr-engine';
+import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize, compareBackupVersions, generateBackupMigrationPlan, calculateBackupHealthScore, compactBackupEnvelope } from '../backup';
+import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings, evaluateTrialStatus, calculateLifetimeBreakEven, compareSubscriptionPlans, evaluateUpsellTrigger } from '../app-access';
+import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate, calculateBeanRestingReadiness, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover } from '../database';
+import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore, filterSearchEntriesByTags, filterBySearchFacets, parseSearchQuery } from '../search-utils';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -1374,6 +1379,97 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof costCup).toBe('object');
       expect(typeof costCup.costPerCup).toBe('number');
       expect(typeof costCup.costPerCupFormatted).toBe('string');
+    }
+  });
+
+  test('Chaos 24: Fuzzing evaluateUpsellTrigger, evaluateStashTurnover, calculateBrewConsistencyIndex, compactBackupEnvelope, compareCoffeeOrigins, calculateWaterHardnessScale, estimateGrindDistributionSpread, formatFlowRateProfile, evaluateChemexRatio, parseSearchQuery (TASK-P97-12-NIE)', () => {
+    const chaoticValues: any[] = [
+      null,
+      undefined,
+      NaN,
+      Infinity,
+      -Infinity,
+      -0,
+      0,
+      1,
+      -1,
+      '',
+      '   ',
+      '\uFEFF\u0000',
+      '---\r\n\t',
+      'invalid-json-{["',
+      {},
+      [],
+      { id: 'x', dose: NaN, remainingWeightGrams: -50, steps: null },
+      { [Object.prototype as any]: 'polluted' },
+      true,
+      false,
+      '999999999999999999999999999999999999999999',
+    ];
+
+    for (const val of chaoticValues) {
+      // 1. evaluateUpsellTrigger
+      const upsell = evaluateUpsellTrigger(val);
+      expect(typeof upsell).toBe('object');
+      expect(typeof upsell.shouldShowUpsell).toBe('boolean');
+      expect(typeof upsell.urgency).toBe('string');
+
+      // 2. evaluateStashTurnover
+      const turnover = evaluateStashTurnover(val);
+      expect(typeof turnover).toBe('object');
+      expect(typeof turnover.totalItems).toBe('number');
+      expect(typeof turnover.consumptionPercent).toBe('number');
+
+      // 3. calculateBrewConsistencyIndex
+      const consistency = calculateBrewConsistencyIndex(val);
+      expect(typeof consistency).toBe('object');
+      expect(typeof consistency.consistencyScore).toBe('number');
+      expect(typeof consistency.grade).toBe('string');
+
+      // 4. compactBackupEnvelope
+      const compactRes = compactBackupEnvelope(val);
+      expect(typeof compactRes).toBe('object');
+      expect(typeof compactRes.originalRecordCount).toBe('number');
+      expect(typeof compactRes.compactedRecordCount).toBe('number');
+
+      // 5. compareCoffeeOrigins
+      const originComp = compareCoffeeOrigins(val, val);
+      expect(originComp === null || typeof originComp === 'object').toBe(true);
+
+      // 6. calculateWaterHardnessScale
+      const hardness = calculateWaterHardnessScale(val);
+      expect(typeof hardness).toBe('object');
+      expect(typeof hardness.hardnessPpm).toBe('number');
+      expect(typeof hardness.level).toBe('string');
+      expect(typeof hardness.isScaCompliant).toBe('boolean');
+
+      // 7. estimateGrindDistributionSpread
+      const grindSpread = estimateGrindDistributionSpread(val);
+      expect(typeof grindSpread).toBe('object');
+      expect(typeof grindSpread.uniformityScore).toBe('number');
+      expect(typeof grindSpread.grade).toBe('string');
+
+      // 8. formatFlowRateProfile
+      const flowProf = formatFlowRateProfile(val);
+      expect(typeof flowProf).toBe('object');
+      expect(typeof flowProf.gramsPerSecond).toBe('number');
+      expect(typeof flowProf.phase).toBe('string');
+
+      // 9. evaluateChemexRatio
+      const chemex = evaluateChemexRatio(val, val);
+      expect(typeof chemex).toBe('object');
+      expect(typeof chemex.ratio).toBe('number');
+      expect(typeof chemex.style).toBe('string');
+      expect(typeof chemex.isClassicBalanced).toBe('boolean');
+
+      // 10. parseSearchQuery
+      const parsedQuery = parseSearchQuery(val);
+      expect(typeof parsedQuery).toBe('object');
+      expect(typeof parsedQuery.rawQuery).toBe('string');
+      expect(Array.isArray(parsedQuery.freeTextTokens)).toBe(true);
+      expect(typeof parsedQuery.fieldFilters).toBe('object');
+      expect(Array.isArray(parsedQuery.negatedTokens)).toBe(true);
+      expect(typeof parsedQuery.isEmpty).toBe('boolean');
     }
   });
 });
