@@ -2111,3 +2111,101 @@ export function compareCoffeeVarieties(
 
 
 
+
+
+export interface CoffeeOriginComparisonItem {
+  id: string;
+  country: string;
+  countryCode: string;
+  typicalAltitudeMeters: string;
+  mainVarieties: string[];
+  flavorProfile: string;
+  keyNotes: string[];
+}
+
+export interface CoffeeOriginComparison {
+  originA: CoffeeOriginComparisonItem;
+  originB: CoffeeOriginComparisonItem;
+  sharedNotes: string[];
+  distinctNotesA: string[];
+  distinctNotesB: string[];
+  altitudeDeltaMeters: number;
+  comparisonSummaryPl: string;
+  comparisonSummaryEn: string;
+}
+
+function parseOriginAltitudeRange(altStr: unknown): { min: number; max: number; avg: number } {
+  if (!altStr || typeof altStr !== 'string') return { min: 0, max: 0, avg: 0 };
+  const matches = altStr.match(/\d[\d\s]*\d|\d+/g);
+  if (!matches || matches.length === 0) return { min: 0, max: 0, avg: 0 };
+  const nums = matches
+    .map((m) => parseInt(m.replace(/\s+/g, ''), 10))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  if (nums.length === 0) return { min: 0, max: 0, avg: 0 };
+  const min = Math.min(...nums);
+  const max = Math.max(...nums);
+  return { min, max, avg: (min + max) / 2 };
+}
+
+/**
+ * Porównuje dwa kraje pochodzenia kawy (np. Etiopia vs Kolumbia, Kenia vs Brazylia)
+ * zestawiając ich terroir, wysokość upraw, odmiany i profile sensoryczne.
+ */
+export function compareCoffeeOrigins(
+  originAIdOrCode: string | undefined | null,
+  originBIdOrCode: string | undefined | null,
+  lang: 'pl' | 'en' | string = 'pl'
+): CoffeeOriginComparison | null {
+  if (!originAIdOrCode || !originBIdOrCode) return null;
+  const guideA = getCoffeeOriginGuide(originAIdOrCode, lang);
+  const guideB = getCoffeeOriginGuide(originBIdOrCode, lang);
+  if (!guideA || !guideB) return null;
+
+  const notesA = Array.isArray(guideA.keyNotes) ? guideA.keyNotes : [];
+  const notesB = Array.isArray(guideB.keyNotes) ? guideB.keyNotes : [];
+
+  const lowerB = new Set(notesB.map((n) => n.toLowerCase().trim()));
+  const lowerA = new Set(notesA.map((n) => n.toLowerCase().trim()));
+
+  const sharedNotes = notesA.filter((n) => lowerB.has(n.toLowerCase().trim()));
+  const distinctNotesA = notesA.filter((n) => !lowerB.has(n.toLowerCase().trim()));
+  const distinctNotesB = notesB.filter((n) => !lowerA.has(n.toLowerCase().trim()));
+
+  const altA = parseOriginAltitudeRange(guideA.typicalAltitudeMeters);
+  const altB = parseOriginAltitudeRange(guideB.typicalAltitudeMeters);
+  const altitudeDeltaMeters = Math.round(Math.abs(altA.avg - altB.avg));
+
+  const originA: CoffeeOriginComparisonItem = {
+    id: guideA.id,
+    country: guideA.country,
+    countryCode: guideA.countryCode,
+    typicalAltitudeMeters: String(guideA.typicalAltitudeMeters || ''),
+    mainVarieties: Array.isArray(guideA.mainVarieties) ? guideA.mainVarieties : [],
+    flavorProfile: guideA.flavorProfile,
+    keyNotes: notesA,
+  };
+
+  const originB: CoffeeOriginComparisonItem = {
+    id: guideB.id,
+    country: guideB.country,
+    countryCode: guideB.countryCode,
+    typicalAltitudeMeters: String(guideB.typicalAltitudeMeters || ''),
+    mainVarieties: Array.isArray(guideB.mainVarieties) ? guideB.mainVarieties : [],
+    flavorProfile: guideB.flavorProfile,
+    keyNotes: notesB,
+  };
+
+  const comparisonSummaryPl = `Porównanie krajów pochodzenia ${guideA.country} i ${guideB.country}: ${guideA.country} (${guideA.flavorProfile}) vs ${guideB.country} (${guideB.flavorProfile}). Różnica średniej wysokości upraw: ~${altitudeDeltaMeters}m.`;
+  const comparisonSummaryEn = `Comparison between origins ${guideA.country} and ${guideB.country}: ${guideA.country} (${guideA.flavorProfile}) vs ${guideB.country} (${guideB.flavorProfile}). Average altitude delta: ~${altitudeDeltaMeters}m.`;
+
+  return {
+    originA,
+    originB,
+    sharedNotes,
+    distinctNotesA,
+    distinctNotesB,
+    altitudeDeltaMeters,
+    comparisonSummaryPl,
+    comparisonSummaryEn,
+  };
+}

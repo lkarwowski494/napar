@@ -50,6 +50,9 @@ import {
   compareCoffeeVarieties,
   CoffeeVarietyComparison,
   CoffeeVarietyComparisonItem,
+  compareCoffeeOrigins,
+  CoffeeOriginComparison,
+  CoffeeOriginComparisonItem,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1494,6 +1497,39 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(compareCoffeeVarieties('unknown-var', 'bourbon')).toBeNull();
     expect(compareCoffeeVarieties('geisha', 'unknown-var')).toBeNull();
     expect(compareCoffeeVarieties('', '')).toBeNull();
+  });
+
+  test('TASK-P95-06-TRE: compareCoffeeOrigins zestawia dwa kraje pochodzenia kawy', () => {
+    // 1. Etiopia vs Kolumbia (język polski)
+    const compPl: CoffeeOriginComparison | null = compareCoffeeOrigins('ethiopia', 'colombia', 'pl');
+    expect(compPl).not.toBeNull();
+    expect(compPl?.originA.country).toBe('Etiopia');
+    expect(compPl?.originB.country).toBe('Kolumbia');
+    expect(compPl?.originA.countryCode).toBe('ET');
+    expect(compPl?.originB.countryCode).toBe('CO');
+    expect(compPl?.altitudeDeltaMeters).toBeGreaterThan(0);
+    expect(compPl?.comparisonSummaryPl).toContain('Etiopia');
+    expect(compPl?.comparisonSummaryPl).toContain('Kolumbia');
+    expect(Array.isArray(compPl?.distinctNotesA)).toBe(true);
+    expect(Array.isArray(compPl?.distinctNotesB)).toBe(true);
+    expect(Array.isArray(compPl?.sharedNotes)).toBe(true);
+
+    const sampleItem: CoffeeOriginComparisonItem = compPl!.originA;
+    expect(sampleItem.id).toBe('origin-ethiopia');
+
+    // 2. Wersja angielska (kenya vs brazil)
+    const compEn = compareCoffeeOrigins('kenya', 'brazil', 'en');
+    expect(compEn).not.toBeNull();
+    expect(compEn?.originA.country).toBe('Kenya');
+    expect(compEn?.originB.country).toBe('Brazil');
+    expect(compEn?.comparisonSummaryEn).toContain('Kenya');
+
+    // 3. Odporność na błędy
+    expect(compareCoffeeOrigins('ethiopia', null)).toBeNull();
+    expect(compareCoffeeOrigins(null, 'colombia')).toBeNull();
+    expect(compareCoffeeOrigins('unknown-country', 'colombia')).toBeNull();
+    expect(compareCoffeeOrigins('ethiopia', 'unknown-country')).toBeNull();
+    expect(compareCoffeeOrigins('', '')).toBeNull();
   });
 });
 
