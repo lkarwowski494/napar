@@ -29,6 +29,9 @@ import {
   WeightDisplayFormat,
   formatCostPerCup,
   CostPerCupFormat,
+  formatFlowRateProfile,
+  FlowRateProfile,
+  FlowRatePhase,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -539,6 +542,39 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       const costZero = formatCostPerCup(0, 250, 15);
       expect(costZero.costPerCup).toBe(0);
       expect(costZero.costPerCupFormatted).toBe('0.00 zł');
+    });
+
+    test('TASK-P96-09-LOK: formatFlowRateProfile analizuje profil prędkości przepływu wody i fazę zalewania', () => {
+      // 1. Spokojna preinfuzja (bloom) 2.0 g/s
+      const bloom: FlowRateProfile = formatFlowRateProfile(2.0);
+      const testPhase: FlowRatePhase = bloom.phase;
+      expect(testPhase).toBe('bloom');
+      expect(bloom.gramsPerSecond).toBe(2.0);
+      expect(bloom.formattedMetric).toBe('2.0 g/s');
+      expect(bloom.formattedImperial).toBe('0.07 oz/s');
+      expect(bloom.phasePl).toContain('Preinfuz');
+      expect(bloom.summaryPl).toContain('2.0 g/s');
+      expect(bloom.summaryEn).toBeDefined();
+
+      // 2. Stabilny strumień główny (4.5 g/s -> ~0.16 oz/s)
+      const steadyImp = formatFlowRateProfile('4,5');
+      expect(steadyImp.phase).toBe('steady');
+      expect(steadyImp.gramsPerSecond).toBe(4.5);
+      expect(steadyImp.ouncesPerSecond).toBeCloseTo(0.16, 2);
+      expect(steadyImp.formattedImperial).toBe('0.16 oz/s');
+      expect(steadyImp.phaseEn).toContain('Steady');
+
+      // 3. Intensywne szybkie zalanie (7.0 g/s)
+      const fastPour = formatFlowRateProfile(7.0);
+      expect(fastPour.phase).toBe('fast');
+      expect(fastPour.formattedMetric).toBe('7.0 g/s');
+      expect(fastPour.phasePl).toContain('Szybki');
+
+      // 4. Odporność na null, NaN i wartości ujemne
+      const fallback = formatFlowRateProfile(null);
+      expect(fallback.gramsPerSecond).toBe(0);
+      expect(fallback.formattedMetric).toBe('0.0 g/s');
+      expect(fallback.phase).toBe('bloom');
     });
   });
 });

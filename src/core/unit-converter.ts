@@ -809,3 +809,85 @@ export function formatCostPerCup(
     summaryEn,
   };
 }
+
+
+export type FlowRatePhase = 'bloom' | 'steady' | 'fast' | 'turbulent';
+
+export interface FlowRateProfile {
+  gramsPerSecond: number;
+  ouncesPerSecond: number;
+  formattedMetric: string;
+  formattedImperial: string;
+  phase: FlowRatePhase;
+  phasePl: string;
+  phaseEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function formatFlowRateProfile(
+  flowRateGramsPerSec: number | string | undefined | null
+): FlowRateProfile {
+  let val = 0;
+  if (typeof flowRateGramsPerSec === 'number') {
+    val =
+      Number.isFinite(flowRateGramsPerSec) &&
+      !Object.is(flowRateGramsPerSec, -0) &&
+      flowRateGramsPerSec > 0
+        ? flowRateGramsPerSec
+        : 0;
+  } else if (typeof flowRateGramsPerSec === 'string') {
+    const cleaned = flowRateGramsPerSec
+      .replace(/\uFEFF/g, '')
+      .replace(/[^\d.,]/g, '')
+      .replace(',', '.')
+      .trim();
+    const parsed = parseFloat(cleaned);
+    val = Number.isFinite(parsed) && !Object.is(parsed, -0) && parsed > 0 ? parsed : 0;
+  }
+
+  const safeGps = Math.min(100, Math.round(val * 10) / 10);
+  const rawOps = safeGps * 0.035274;
+  const safeOps = Math.round(rawOps * 100) / 100;
+
+  const formattedMetric = `${safeGps.toFixed(1)} g/s`;
+  const formattedImperial = `${safeOps.toFixed(2)} oz/s`;
+
+  let phase: FlowRatePhase = 'bloom';
+  let phasePl = 'Preinfuzja (bloom) — łagodny, kontrolowany strumień';
+  let phaseEn = 'Pre-infusion (bloom) — gentle, controlled stream';
+  let summaryPl = `Przepływ ${formattedMetric} (${formattedImperial}): łagodne zwilżanie złoża.`;
+  let summaryEn = `Flow rate ${formattedMetric} (${formattedImperial}): gentle coffee bed saturation.`;
+
+  if (safeGps > 8.0) {
+    phase = 'turbulent';
+    phasePl = 'Silna turbulencja — bardzo szybkie zalanie centralne';
+    phaseEn = 'High turbulence — aggressive center pouring';
+    summaryPl = `Przepływ ${formattedMetric} (${formattedImperial}): intensywne mieszanie złoża.`;
+    summaryEn = `Flow rate ${formattedMetric} (${formattedImperial}): vigorous slurry agitation.`;
+  } else if (safeGps >= 5.5) {
+    phase = 'fast';
+    phasePl = 'Szybki strumień główny — budowanie poziomu wody';
+    phaseEn = 'Fast main pour — water level buildup';
+    summaryPl = `Przepływ ${formattedMetric} (${formattedImperial}): szybkie podnoszenie słupa wody.`;
+    summaryEn = `Flow rate ${formattedMetric} (${formattedImperial}): rapid water level elevation.`;
+  } else if (safeGps >= 2.5) {
+    phase = 'steady';
+    phasePl = 'Stabilny strumień jednostajny — równomierne zalewanie spiralne';
+    phaseEn = 'Steady continuous pour — uniform circular coverage';
+    summaryPl = `Przepływ ${formattedMetric} (${formattedImperial}): optymalne zalewanie standardowe.`;
+    summaryEn = `Flow rate ${formattedMetric} (${formattedImperial}): optimal standard pour distribution.`;
+  }
+
+  return {
+    gramsPerSecond: safeGps,
+    ouncesPerSecond: safeOps,
+    formattedMetric,
+    formattedImperial,
+    phase,
+    phasePl,
+    phaseEn,
+    summaryPl,
+    summaryEn,
+  };
+}
