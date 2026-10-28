@@ -50,6 +50,9 @@ import {
   evaluateCuppingRatio,
   CuppingRatioEvaluation,
   CuppingRatioStyle,
+  evaluateSiphonRatio,
+  SiphonRatioEvaluation,
+  SiphonRatioStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -1141,6 +1144,39 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(fallback.ratio).toBe(0);
       expect(fallback.style).toBe('concentrated');
       expect(fallback.isScaCompliant).toBe(false);
+    });
+
+    it('TASK-P94-11-WZR: evaluateSiphonRatio ocenia proporcje parzenia w syfonie próżniowym (Vacuum Pot)', () => {
+      // 1. Złoty standard syfonu (20g na 300g wody = 1:15.0)
+      const standard: SiphonRatioEvaluation = evaluateSiphonRatio(20, 300);
+      const styleCheck: SiphonRatioStyle = standard.style;
+      expect(styleCheck).toBe('balanced_classic');
+      expect(standard.isBalanced).toBe(true);
+      expect(standard.ratio).toBe(15);
+      expect(standard.ratioFormatted).toBe('1:15.0');
+      expect(standard.styleLabelPl).toContain('Zbalansowany');
+      expect(standard.brewingRecommendationPl).toContain('syfon');
+
+      // 2. Gęsty / mocny (< 1:14 = np. 25g na 300g = 1:12.0)
+      const dense = evaluateSiphonRatio('25,0', '300');
+      expect(dense.style).toBe('dense_strong');
+      expect(dense.isBalanced).toBe(false);
+      expect(dense.styleLabelPl).toContain('Mocny');
+
+      // 3. Lekki / delikatny (16.6..18.0 = np. 17g na 300g ≈ 1:17.6)
+      const light = evaluateSiphonRatio(17, 300);
+      expect(light.style).toBe('light_delicate');
+      expect(light.styleLabelPl).toContain('Lekki');
+
+      // 4. Skrajny (> 18.0)
+      const extreme = evaluateSiphonRatio(10, 250);
+      expect(extreme.style).toBe('extreme');
+
+      // 5. Odporność na null, zera i wartości ujemne
+      const fallback = evaluateSiphonRatio(null as any, -100);
+      expect(fallback.ratio).toBe(0);
+      expect(fallback.style).toBe('dense_strong');
+      expect(fallback.isBalanced).toBe(false);
     });
   });
 });

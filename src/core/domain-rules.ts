@@ -1846,3 +1846,123 @@ export function evaluateCuppingRatio(
 
 
 
+
+
+export type SiphonRatioStyle = 'dense_strong' | 'balanced_classic' | 'light_delicate' | 'extreme';
+
+export interface SiphonRatioEvaluation {
+  doseGrams: number;
+  waterGrams: number;
+  ratio: number;
+  ratioFormatted: string;
+  style: SiphonRatioStyle;
+  isBalanced: boolean;
+  styleLabelPl: string;
+  styleLabelEn: string;
+  sensoryProfilePl: string;
+  sensoryProfileEn: string;
+  brewingRecommendationPl: string;
+  brewingRecommendationEn: string;
+}
+
+/**
+ * Ocenia proporcje parzenia kawy w syfonie próżniowym (Vacuum Pot)
+ * pod kątem balansu sensorycznego, wyrazistości nut i czystości ekstrakcji.
+ */
+export function evaluateSiphonRatio(
+  doseGrams: number | string | undefined | null,
+  waterGrams: number | string | undefined | null
+): SiphonRatioEvaluation {
+  const parseNum = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const dose = parseNum(doseGrams);
+  const water = parseNum(waterGrams);
+
+  let rawRatio = 0;
+  if (dose > 0 && water > 0) {
+    rawRatio = water / dose;
+  }
+
+  const ratio = Math.round(rawRatio * 10) / 10;
+  const ratioFormatted = `1:${ratio.toFixed(1)}`;
+
+  let style: SiphonRatioStyle;
+  let isBalanced = false;
+  let styleLabelPl: string;
+  let styleLabelEn: string;
+  let sensoryProfilePl: string;
+  let sensoryProfileEn: string;
+  let brewingRecommendationPl: string;
+  let brewingRecommendationEn: string;
+
+  if (ratio <= 0 || ratio < 14.0) {
+    style = 'dense_strong';
+    isBalanced = false;
+    styleLabelPl = 'Mocny / Skoncentrowany napar';
+    styleLabelEn = 'Dense / Concentrated brew';
+    sensoryProfilePl =
+      'Intensywny napar o ciężkim body i mocnym akcencie goryczkowym. Może przysłaniać delikatniejsze nuty kwiatowe.';
+    sensoryProfileEn =
+      'Intense brew with heavy body and bold bitterness. May overpower delicate floral nuances.';
+    brewingRecommendationPl =
+      'Zmniejsz dozę ziaren lub użyj nieco więcej wody, aby osiągnąć klasyczny balans 1:15.';
+    brewingRecommendationEn =
+      'Reduce coffee dose or add more water to achieve classic 1:15 balance.';
+  } else if (ratio <= 16.5) {
+    style = 'balanced_classic';
+    isBalanced = true;
+    styleLabelPl = 'Zbalansowany standard syfonu (1:14.5 – 1:16.5)';
+    styleLabelEn = 'Balanced classic siphon (1:14.5 – 1:16.5)';
+    sensoryProfilePl =
+      'Wzorcowy profil próżniowy: jedwabiste, herbaciane body, niezwykle czysty profil smakowy i wyrazista słodycz.';
+    sensoryProfileEn =
+      'Benchmark siphon cup: silky tea-like body, ultra-clean flavor clarity and vibrant sweetness.';
+    brewingRecommendationPl =
+      'Optymalna proporcja dla syfonu. Parz przez 45–60 sekund po wymieszaniu i odstaw źródło ciepła.';
+    brewingRecommendationEn =
+      'Optimal ratio for siphon brewing. Steep for 45–60 seconds after stirring and remove heat source.';
+  } else if (ratio <= 18.0) {
+    style = 'light_delicate';
+    isBalanced = false;
+    styleLabelPl = 'Lekki / Delikatny napar';
+    styleLabelEn = 'Light / Delicate brew';
+    sensoryProfilePl =
+      'Bardzo lekki napar z dominacją zwiewnych nut kwasowych, o obniżonej konsystencji.';
+    sensoryProfileEn = 'Very light cup dominated by ethereal acidity with lighter body.';
+    brewingRecommendationPl =
+      'Dobre dla ziaren o bardzo delikatnym profilu (np. etiopskie odmiany dzikie).';
+    brewingRecommendationEn =
+      'Great for subtle, delicate beans (e.g. wild heirloom Ethiopian varietals).';
+  } else {
+    style = 'extreme';
+    isBalanced = false;
+    styleLabelPl = 'Zbyt rozwodniony / Skrajna proporcja';
+    styleLabelEn = 'Overly diluted / Extreme ratio';
+    sensoryProfilePl = 'Wodnista filiżanka o znikomej słodyczy i braku głębi smakowej.';
+    sensoryProfileEn = 'Watery cup with minimal sweetness and lacking depth.';
+    brewingRecommendationPl = 'Zwiększ dozę kawy do minimum 18–20g na 300ml wody.';
+    brewingRecommendationEn = 'Increase coffee dose to at least 18–20g per 300ml of water.';
+  }
+
+  return {
+    doseGrams: dose,
+    waterGrams: water,
+    ratio,
+    ratioFormatted,
+    style,
+    isBalanced,
+    styleLabelPl,
+    styleLabelEn,
+    sensoryProfilePl,
+    sensoryProfileEn,
+    brewingRecommendationPl,
+    brewingRecommendationEn,
+  };
+}
