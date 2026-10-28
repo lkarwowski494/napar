@@ -29,6 +29,9 @@ import {
   evaluateRecipeComplexity,
   RecipeComplexityEvaluation,
   RecipeComplexityLevel,
+  calculateBrewConsistencyIndex,
+  BrewConsistencyIndex,
+  BrewConsistencyGrade,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -1260,6 +1263,61 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       const res = evaluateRecipeComplexity(espressoRecipe);
       expect(res.requiresSpecialTechnique).toBe(true);
       expect(res.complexityScore).toBeGreaterThan(20);
+    });
+  });
+
+  describe('TASK-P95-04-SZT: calculateBrewConsistencyIndex', () => {
+    it('zwraca neutralny wynik dla pustych lub zbyt małej liczby sesji (<2)', () => {
+      const emptyRes: BrewConsistencyIndex = calculateBrewConsistencyIndex([]);
+      const testGrade: BrewConsistencyGrade = emptyRes.grade;
+      expect(testGrade).toBe('consistent');
+      expect(emptyRes.sessionCount).toBe(0);
+      expect(emptyRes.consistencyScore).toBe(100);
+      expect(emptyRes.doseStdDev).toBe(0);
+      expect(emptyRes.summaryPl).toContain('Zbyt mała liczba sesji');
+
+      const nullRes = calculateBrewConsistencyIndex(null);
+      expect(nullRes.sessionCount).toBe(0);
+
+      const singleRes = calculateBrewConsistencyIndex([{ doseGrams: 15, waterGrams: 250, brewTimeSeconds: 180 }]);
+      expect(singleRes.sessionCount).toBe(1);
+      expect(singleRes.consistencyScore).toBe(100);
+    });
+
+    it('zwraca exceptional dla identycznych sesji parzenia', () => {
+      const identicalSessions = [
+        { doseGrams: 15, waterGrams: 240, brewTimeSeconds: 180 },
+        { doseGrams: 15, waterGrams: 240, brewTimeSeconds: 180 },
+        { doseGrams: 15, waterGrams: 240, brewTimeSeconds: 180 },
+      ];
+
+      const res = calculateBrewConsistencyIndex(identicalSessions);
+      expect(res.sessionCount).toBe(3);
+      expect(res.grade).toBe('exceptional');
+      expect(res.consistencyScore).toBe(100);
+      expect(res.doseStdDev).toBe(0);
+      expect(res.ratioStdDev).toBe(0);
+      expect(res.durationStdDev).toBe(0);
+      expect(res.averageDoseGrams).toBe(15);
+      expect(res.averageRatio).toBe(16);
+      expect(res.averageDurationSeconds).toBe(180);
+      expect(res.summaryPl).toContain('Wybitna powtarzalność');
+    });
+
+    it('wykrywa wahania parametrów i zwraca niższą ocenę dla nieregularnych sesji', () => {
+      const variableSessions = [
+        { doseGrams: 14, waterGrams: 200, brewTimeSeconds: 120 },
+        { doseGrams: 18, waterGrams: 300, brewTimeSeconds: 260 },
+        { doseGrams: 16, waterGrams: 250, brewTimeSeconds: 190 },
+      ];
+
+      const res = calculateBrewConsistencyIndex(variableSessions);
+      expect(res.sessionCount).toBe(3);
+      expect(res.doseStdDev).toBeGreaterThan(0);
+      expect(res.consistencyScore).toBeLessThan(90);
+      expect(['variable', 'erratic', 'consistent']).toContain(res.grade);
+      expect(res.summaryPl).toBeDefined();
+      expect(res.summaryEn).toBeDefined();
     });
   });
 });

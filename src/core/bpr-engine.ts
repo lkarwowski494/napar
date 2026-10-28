@@ -1764,3 +1764,142 @@ export function evaluateRecipeComplexity(recipe: unknown): RecipeComplexityEvalu
 }
 
 
+
+
+export type BrewConsistencyGrade = 'exceptional' | 'consistent' | 'variable' | 'erratic';
+
+export interface BrewConsistencyIndex {
+  grade: BrewConsistencyGrade;
+  consistencyScore: number;
+  sessionCount: number;
+  averageDoseGrams: number;
+  doseStdDev: number;
+  averageRatio: number;
+  ratioStdDev: number;
+  averageDurationSeconds: number;
+  durationStdDev: number;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function calculateBrewConsistencyIndex(
+  sessions: unknown[] | null | undefined
+): BrewConsistencyIndex {
+  const safeSessions = Array.isArray(sessions) ? sessions : [];
+
+  interface CleanBrew {
+    dose: number;
+    water: number;
+    ratio: number;
+    duration: number;
+  }
+
+  const cleanBrews: CleanBrew[] = [];
+
+  for (const s of safeSessions) {
+    if (!s || typeof s !== 'object') continue;
+    const session = s as Record<string, unknown>;
+
+    const dose =
+      typeof session.doseGrams === 'number' && Number.isFinite(session.doseGrams) && session.doseGrams > 0
+        ? session.doseGrams
+        : typeof session.dose === 'number' && Number.isFinite(session.dose) && session.dose > 0
+        ? session.dose
+        : 0;
+
+    const water =
+      typeof session.waterGrams === 'number' && Number.isFinite(session.waterGrams) && session.waterGrams > 0
+        ? session.waterGrams
+        : typeof session.water === 'number' && Number.isFinite(session.water) && session.water > 0
+        ? session.water
+        : 0;
+
+    const duration =
+      typeof session.brewTimeSeconds === 'number' && Number.isFinite(session.brewTimeSeconds) && session.brewTimeSeconds > 0
+        ? session.brewTimeSeconds
+        : typeof session.durationSeconds === 'number' && Number.isFinite(session.durationSeconds) && session.durationSeconds > 0
+        ? session.durationSeconds
+        : 0;
+
+    if (dose > 0 && water > 0) {
+      const ratio = water / dose;
+      cleanBrews.push({ dose, water, ratio, duration });
+    }
+  }
+
+  const sessionCount = cleanBrews.length;
+
+  if (sessionCount < 2) {
+    const single = cleanBrews[0];
+    return {
+      grade: 'consistent',
+      consistencyScore: 100,
+      sessionCount,
+      averageDoseGrams: single ? Math.round(single.dose * 10) / 10 : 0,
+      doseStdDev: 0,
+      averageRatio: single ? Math.round(single.ratio * 10) / 10 : 0,
+      ratioStdDev: 0,
+      averageDurationSeconds: single ? Math.round(single.duration) : 0,
+      durationStdDev: 0,
+      summaryPl: 'Zbyt mała liczba sesji do wyznaczenia odchylenia standardowego parametrów (wymagane min. 2).',
+      summaryEn: 'Too few sessions to compute parameter standard deviations (minimum 2 required).',
+    };
+  }
+
+  const sumDose = cleanBrews.reduce((acc, b) => acc + b.dose, 0);
+  const avgDose = sumDose / sessionCount;
+  const varianceDose =
+    cleanBrews.reduce((acc, b) => acc + Math.pow(b.dose - avgDose, 2), 0) / sessionCount;
+  const doseStdDev = Math.round(Math.sqrt(varianceDose) * 100) / 100;
+
+  const sumRatio = cleanBrews.reduce((acc, b) => acc + b.ratio, 0);
+  const avgRatio = sumRatio / sessionCount;
+  const varianceRatio =
+    cleanBrews.reduce((acc, b) => acc + Math.pow(b.ratio - avgRatio, 2), 0) / sessionCount;
+  const ratioStdDev = Math.round(Math.sqrt(varianceRatio) * 100) / 100;
+
+  const sumDuration = cleanBrews.reduce((acc, b) => acc + b.duration, 0);
+  const avgDuration = sumDuration / sessionCount;
+  const varianceDuration =
+    cleanBrews.reduce((acc, b) => acc + Math.pow(b.duration - avgDuration, 2), 0) / sessionCount;
+  const durationStdDev = Math.round(Math.sqrt(varianceDuration) * 100) / 100;
+
+  const doseCv = avgDose > 0 ? doseStdDev / avgDose : 0;
+  const ratioCv = avgRatio > 0 ? ratioStdDev / avgRatio : 0;
+  const durCv = avgDuration > 0 ? durationStdDev / avgDuration : 0;
+
+  const compositePenalty = doseCv * 35 + ratioCv * 40 + durCv * 25;
+  const consistencyScore = Math.max(0, Math.min(100, Math.round(100 - compositePenalty * 100)));
+
+  let grade: BrewConsistencyGrade = 'erratic';
+  let summaryPl = `Niska powtarzalność parametrów (wskaźnik: ${consistencyScore}/100) — zauważalne odchylenia w dozie lub proporcji.`;
+  let summaryEn = `Low brewing consistency score (${consistencyScore}/100) — noticeable deviations across dose or ratio.`;
+
+  if (consistencyScore >= 90) {
+    grade = 'exceptional';
+    summaryPl = `Wybitna powtarzalność sesji parzenia (wskaźnik: ${consistencyScore}/100) — precyzyjnie kontrolowana doza, woda i czas.`;
+    summaryEn = `Exceptional brewing consistency score (${consistencyScore}/100) — tightly controlled dose, water, and timing.`;
+  } else if (consistencyScore >= 75) {
+    grade = 'consistent';
+    summaryPl = `Dobra powtarzalność sesji (wskaźnik: ${consistencyScore}/100) z niewielkimi, dopuszczalnymi wahaniami.`;
+    summaryEn = `Good brewing consistency score (${consistencyScore}/100) with minor acceptable variations.`;
+  } else if (consistencyScore >= 50) {
+    grade = 'variable';
+    summaryPl = `Umiarkowanie zróżnicowane parametry parzenia (wskaźnik: ${consistencyScore}/100).`;
+    summaryEn = `Moderately variable brewing parameters score (${consistencyScore}/100).`;
+  }
+
+  return {
+    grade,
+    consistencyScore,
+    sessionCount,
+    averageDoseGrams: Math.round(avgDose * 10) / 10,
+    doseStdDev,
+    averageRatio: Math.round(avgRatio * 10) / 10,
+    ratioStdDev,
+    averageDurationSeconds: Math.round(avgDuration),
+    durationStdDev,
+    summaryPl,
+    summaryEn,
+  };
+}
