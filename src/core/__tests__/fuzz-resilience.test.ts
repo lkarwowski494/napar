@@ -26,6 +26,7 @@ import {
   evaluateMokaPotRatio,
   evaluateTurkishCoffeeRatio,
   evaluateCuppingRatio,
+  evaluateSiphonRatio,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
@@ -42,6 +43,7 @@ import {
   calculateSulfateToChlorideRatio,
   calculateTotalHardnessFromIons,
   evaluateLimescaleRisk,
+  evaluateBoilerCorrosionRisk,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -59,6 +61,7 @@ import {
   formatGrinderDialSetting,
   calculateGrinderStepDelta,
   estimateGrinderRetention,
+  estimateBurrSeasoningProgress,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -79,6 +82,7 @@ import {
   formatBrewTimeMinutesSeconds,
   formatCaffeineDose,
   formatStashWeight,
+  formatCostPerCup,
   wInKeep,
 } from '../unit-converter';
 import {
@@ -93,12 +97,13 @@ import {
   getCoffeeAltitudeGuide,
   getTeaCategoryGuide,
   compareCoffeeProcesses,
+  compareCoffeeVarieties,
 } from '../knowledge-data';
-import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed, detectBrewingHabitDrift, generateAdaptiveRecipeAdjustment } from '../bpr-engine';
-import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize, compareBackupVersions, generateBackupMigrationPlan } from '../backup';
-import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings, evaluateTrialStatus, calculateLifetimeBreakEven } from '../app-access';
-import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate, calculateBeanRestingReadiness, calculateStashDiversity } from '../database';
-import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore, filterSearchEntriesByTags } from '../search-utils';
+import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed, detectBrewingHabitDrift, generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity } from '../bpr-engine';
+import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize, compareBackupVersions, generateBackupMigrationPlan, calculateBackupHealthScore } from '../backup';
+import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings, evaluateTrialStatus, calculateLifetimeBreakEven, compareSubscriptionPlans } from '../app-access';
+import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate, calculateBeanRestingReadiness, calculateStashDiversity, estimateRemainingBrews } from '../database';
+import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore, filterSearchEntriesByTags, filterBySearchFacets } from '../search-utils';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -1283,6 +1288,92 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof adaptAdj).toBe('object');
       expect(typeof adaptAdj.method).toBe('string');
       expect(typeof adaptAdj.recommendedGrindDeltaClicks).toBe('number');
+    }
+  });
+
+  test('TASK-P94-12-NIE: Chaos 23: Fuzzing odpornościowy dla nowych kalkulatorów P92-P94', () => {
+    const chaoticValues: any[] = [
+      null,
+      undefined,
+      NaN,
+      Infinity,
+      -Infinity,
+      -0,
+      0,
+      -100,
+      9999999,
+      '',
+      '   ',
+      '\uFEFF',
+      'invalid_string',
+      '12,50',
+      '--15',
+      {},
+      [],
+      { nested: { corrupt: true } },
+      [null, undefined, NaN],
+      true,
+      false,
+      Symbol('chaos'),
+      () => {},
+      new Date('invalid'),
+    ];
+
+    for (const val of chaoticValues) {
+      // 1. evaluateSiphonRatio
+      const siphon = evaluateSiphonRatio(val, val);
+      expect(typeof siphon).toBe('object');
+      expect(typeof siphon.style).toBe('string');
+      expect(typeof siphon.isBalanced).toBe('boolean');
+      expect(typeof siphon.ratio).toBe('number');
+
+      // 2. evaluateRecipeComplexity
+      const complexity = evaluateRecipeComplexity(val);
+      expect(typeof complexity).toBe('object');
+      expect(typeof complexity.complexityScore).toBe('number');
+      expect(typeof complexity.level).toBe('string');
+
+      // 3. calculateBackupHealthScore
+      const backupHealth = calculateBackupHealthScore(val);
+      expect(typeof backupHealth).toBe('object');
+      expect(typeof backupHealth.score).toBe('number');
+      expect(typeof backupHealth.grade).toBe('string');
+
+      // 4. compareCoffeeVarieties
+      const varComp = compareCoffeeVarieties(val, val);
+      expect(varComp === null || typeof varComp === 'object').toBe(true);
+
+      // 5. evaluateBoilerCorrosionRisk
+      const corrRisk = evaluateBoilerCorrosionRisk(val);
+      expect(typeof corrRisk).toBe('object');
+      expect(typeof corrRisk.riskLevel).toBe('string');
+      expect(typeof corrRisk.isPittingRisk).toBe('boolean');
+
+      // 6. estimateBurrSeasoningProgress
+      const seasoning = estimateBurrSeasoningProgress(val);
+      expect(typeof seasoning).toBe('object');
+      expect(typeof seasoning.stage).toBe('string');
+      expect(typeof seasoning.progressPercent).toBe('number');
+
+      // 7. estimateRemainingBrews
+      const brews = estimateRemainingBrews(val, val);
+      expect(typeof brews).toBe('object');
+      expect(typeof brews.estimatedTotalBrews).toBe('number');
+
+      // 8. compareSubscriptionPlans
+      const plans = compareSubscriptionPlans(val, val, val);
+      expect(typeof plans).toBe('object');
+      expect(Array.isArray(plans.plans)).toBe(true);
+
+      // 9. filterBySearchFacets
+      const filtered = filterBySearchFacets(val, val);
+      expect(Array.isArray(filtered)).toBe(true);
+
+      // 10. formatCostPerCup
+      const costCup = formatCostPerCup(val, val, val, val);
+      expect(typeof costCup).toBe('object');
+      expect(typeof costCup.costPerCup).toBe('number');
+      expect(typeof costCup.costPerCupFormatted).toBe('string');
     }
   });
 });
