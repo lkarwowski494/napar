@@ -29,6 +29,8 @@ import {
   filterBySearchFacets,
   parseSearchQuery,
   ParsedSearchQuery,
+  highlightSearchMatches,
+  SearchMatchHighlight,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -539,5 +541,45 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     expect(parseSearchQuery(null).isEmpty).toBe(true);
     expect(parseSearchQuery(undefined).isEmpty).toBe(true);
     expect(parseSearchQuery(123 as any).isEmpty).toBe(true);
+  });
+
+  test('TASK-P97-01-ODK: highlightSearchMatches dzieli tekst na segmenty z flagą isMatch', () => {
+    // 1. Dopasowanie pojedynczego terminu (case-insensitive)
+    const single = highlightSearchMatches('Ethiopia Yirgacheffe Washed', 'yir');
+    expect(single.length).toBe(3);
+    expect(single[0]).toEqual({ text: 'Ethiopia ', isMatch: false });
+    expect(single[1]).toEqual({ text: 'Yir', isMatch: true });
+    expect(single[2]).toEqual({ text: 'gacheffe Washed', isMatch: false });
+
+    const sample: SearchMatchHighlight = single[0];
+    expect(sample.isMatch).toBe(false);
+
+    // 2. Wiele dopasowań i tokenów
+    const multi = highlightSearchMatches('Panama Geisha Natural', ['panama', 'natural']);
+    expect(multi).toEqual([
+      { text: 'Panama', isMatch: true },
+      { text: ' Geisha ', isMatch: false },
+      { text: 'Natural', isMatch: true },
+    ]);
+
+    // 3. Bezpieczeństwo znaków specjalnych regex (np. [V60] + Chemex)
+    const regexSafe = highlightSearchMatches('Metoda [V60] + Chemex', '[V60]');
+    expect(regexSafe).toEqual([
+      { text: 'Metoda ', isMatch: false },
+      { text: '[V60]', isMatch: true },
+      { text: ' + Chemex', isMatch: false },
+    ]);
+
+    // 4. Brak dopasowania lub puste zapytanie
+    const noMatch = highlightSearchMatches('Kenya Nyeri', 'colombia');
+    expect(noMatch).toEqual([{ text: 'Kenya Nyeri', isMatch: false }]);
+
+    const emptyQuery = highlightSearchMatches('Kenya Nyeri', '');
+    expect(emptyQuery).toEqual([{ text: 'Kenya Nyeri', isMatch: false }]);
+
+    // 5. Odporność na null, undefined i wartości brzegowe
+    expect(highlightSearchMatches(null, 'test')).toEqual([]);
+    expect(highlightSearchMatches(undefined, 'test')).toEqual([]);
+    expect(highlightSearchMatches('', 'test')).toEqual([]);
   });
 });

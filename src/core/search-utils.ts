@@ -918,3 +918,89 @@ export function parseSearchQuery(rawQuery: string | undefined | null): ParsedSea
     isEmpty,
   };
 }
+
+
+export interface SearchMatchHighlight {
+  text: string;
+  isMatch: boolean;
+}
+
+/**
+ * Bezpiecznie dzieli tekst na pasujące i niepasujące segmenty na podstawie zapytania
+ * lub listy tokenów (np. dla podświetlania w interfejsie użytkownika), zachowując wielkość liter.
+ */
+export function highlightSearchMatches(
+  text: string | undefined | null,
+  queryOrTokens: string | string[] | undefined | null
+): SearchMatchHighlight[] {
+  if (typeof text !== 'string' || text.length === 0) {
+    return [];
+  }
+
+  let tokens: string[] = [];
+  if (Array.isArray(queryOrTokens)) {
+    tokens = queryOrTokens
+      .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
+      .map((t) => t.trim());
+  } else if (typeof queryOrTokens === 'string') {
+    tokens = queryOrTokens
+      .split(/\s+/)
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0);
+  }
+
+  if (tokens.length === 0) {
+    return [{ text, isMatch: false }];
+  }
+
+  const intervals: [number, number][] = [];
+  const lowerText = text.toLowerCase();
+
+  for (const token of tokens) {
+    const lowerToken = token.toLowerCase();
+    let startIndex = 0;
+    while (startIndex < lowerText.length) {
+      const idx = lowerText.indexOf(lowerToken, startIndex);
+      if (idx === -1) break;
+      intervals.push([idx, idx + lowerToken.length]);
+      startIndex = idx + Math.max(1, lowerToken.length);
+    }
+  }
+
+  if (intervals.length === 0) {
+    return [{ text, isMatch: false }];
+  }
+
+  intervals.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+
+  const merged: [number, number][] = [];
+  let current = intervals[0];
+
+  for (let i = 1; i < intervals.length; i++) {
+    const next = intervals[i];
+    if (next[0] <= current[1]) {
+      current[1] = Math.max(current[1], next[1]);
+    } else {
+      merged.push(current);
+      current = next;
+    }
+  }
+  merged.push(current);
+
+  const result: SearchMatchHighlight[] = [];
+  let cursor = 0;
+
+  for (const [start, end] of merged) {
+    if (start > cursor) {
+      result.push({ text: text.slice(cursor, start), isMatch: false });
+    }
+    result.push({ text: text.slice(start, end), isMatch: true });
+    cursor = end;
+  }
+
+  if (cursor < text.length) {
+    result.push({ text: text.slice(cursor), isMatch: false });
+  }
+
+  return result;
+}
