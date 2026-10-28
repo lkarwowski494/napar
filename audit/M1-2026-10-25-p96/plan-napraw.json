@@ -1,0 +1,53 @@
+{
+  "cycle": "P96",
+  "status": "completed",
+  "perspectives": [
+    "07-JAK",
+    "08-PRO",
+    "09-LOK",
+    "10-WYD",
+    "11-WZR"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P96-07-JAK",
+      "perspective": "07-JAK",
+      "description": "Implementacja kalkulatora twardości wody calculateWaterHardnessScale z typami WaterHardnessScale i WaterHardnessLevel w src/core/water-chemistry.ts i src/core/__tests__/water-chemistry.test.ts",
+      "targetFile": "src/core/water-chemistry.ts",
+      "testFile": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P96-08-PRO",
+      "perspective": "08-PRO",
+      "description": "Implementacja szacowania rozkładu wielkości cząstek przemiału estimateGrindDistributionSpread z typami GrindDistributionSpread i GrindUniformityGrade w src/core/grinder-converter.ts i src/core/__tests__/grinder-converter.test.ts",
+      "targetFile": "src/core/grinder-converter.ts",
+      "testFile": "src/core/__tests__/grinder-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P96-09-LOK",
+      "perspective": "09-LOK",
+      "description": "Implementacja profilowania przepływu wody formatFlowRateProfile z typami FlowRateProfile i FlowRatePhase w src/core/unit-converter.ts i src/core/__tests__/unit-converter.test.ts",
+      "targetFile": "src/core/unit-converter.ts",
+      "testFile": "src/core/__tests__/unit-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P96-10-WYD",
+      "perspective": "10-WYD",
+      "description": "Wdrożenie Budżetu 20 weryfikującego wydajność CPU dla 10 000 operacji kalkulatorów domeny w src/core/__tests__/perf-budget.test.ts",
+      "targetFile": "src/core/__tests__/perf-budget.test.ts",
+      "testFile": "src/core/__tests__/perf-budget.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P96-11-WZR",
+      "perspective": "11-WZR",
+      "description": "Implementacja ewaluatora proporcji Chemex evaluateChemexRatio z typami ChemexRatioEvaluation i ChemexRatioStyle w src/core/domain-rules.ts i src/core/__tests__/domain-rules.test.ts",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed"
+    }
+  ]
+}
