@@ -1,0 +1,53 @@
+{
+  "cycle": "P95",
+  "status": "completed",
+  "perspectives": [
+    "02-MON",
+    "03-ZAK",
+    "04-SZT",
+    "05-ARC",
+    "06-TRE"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P95-02-MON",
+      "perspective": "02-MON",
+      "description": "Implementacja analizatora momentu konwersji i korzyści Pro evaluateUpsellTrigger z typami UpsellTriggerEvaluation i UpsellUrgency w src/core/app-access.ts i src/core/__tests__/app-access.test.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P95-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja analityka rotacji i zużycia zapasów evaluateStashTurnover z typem StashTurnoverAnalysis w src/core/database.ts i src/core/__tests__/database.test.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P95-04-SZT",
+      "perspective": "04-SZT",
+      "description": "Implementacja wskaźnika powtarzalności parzenia calculateBrewConsistencyIndex z typami BrewConsistencyIndex i BrewConsistencyGrade w src/core/bpr-engine.ts i src/core/__tests__/bpr-engine.test.ts",
+      "targetFile": "src/core/bpr-engine.ts",
+      "testFile": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P95-05-ARC",
+      "perspective": "05-ARC",
+      "description": "Implementacja kompaktora i optymalizatora kopii zapasowej compactBackupEnvelope z typem CompactBackupResult w src/core/backup.ts i src/core/__tests__/backup.test.ts",
+      "targetFile": "src/core/backup.ts",
+      "testFile": "src/core/__tests__/backup.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P95-06-TRE",
+      "perspective": "06-TRE",
+      "description": "Implementacja komparatora krajów pochodzenia i terroir compareCoffeeOrigins z typami CoffeeOriginComparison i CoffeeOriginComparisonItem w src/core/knowledge-data.ts i src/core/__tests__/knowledge.test.ts",
+      "targetFile": "src/core/knowledge-data.ts",
+      "testFile": "src/core/__tests__/knowledge.test.ts",
+      "status": "completed"
+    }
+  ]
+}
