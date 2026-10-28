@@ -1966,3 +1966,132 @@ export function evaluateSiphonRatio(
     brewingRecommendationEn,
   };
 }
+
+
+export type ChemexRatioStyle =
+  | 'dense_concentrated'
+  | 'balanced_classic'
+  | 'light_delicate'
+  | 'watery';
+
+export interface ChemexRatioEvaluation {
+  doseGrams: number;
+  waterGrams: number;
+  ratio: number;
+  ratioFormatted: string;
+  style: ChemexRatioStyle;
+  isClassicBalanced: boolean;
+  styleLabelPl: string;
+  styleLabelEn: string;
+  sensoryProfilePl: string;
+  sensoryProfileEn: string;
+  brewingRecommendationPl: string;
+  brewingRecommendationEn: string;
+}
+
+/**
+ * Ocenia proporcje parzenia kawy w zaparzaczu Chemex
+ * pod kątem krystalicznej czystości naparu, słodyczy i balansu ekstrakcji w grubych filtrach papierowych.
+ */
+export function evaluateChemexRatio(
+  doseGrams: number | string | undefined | null,
+  waterGrams: number | string | undefined | null
+): ChemexRatioEvaluation {
+  const parseNum = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const dose = parseNum(doseGrams);
+  const water = parseNum(waterGrams);
+
+  let rawRatio = 0;
+  if (dose > 0 && water > 0) {
+    rawRatio = water / dose;
+  }
+
+  const ratio = Math.round(rawRatio * 10) / 10;
+  const ratioFormatted = `1:${ratio.toFixed(1)}`;
+
+  let style: ChemexRatioStyle;
+  let isClassicBalanced = false;
+  let styleLabelPl: string;
+  let styleLabelEn: string;
+  let sensoryProfilePl: string;
+  let sensoryProfileEn: string;
+  let brewingRecommendationPl: string;
+  let brewingRecommendationEn: string;
+
+  if (ratio <= 0 || ratio < 14.0) {
+    style = 'dense_concentrated';
+    isClassicBalanced = false;
+    styleLabelPl = 'Gęsty / Skoncentrowany napar';
+    styleLabelEn = 'Dense / Concentrated brew';
+    sensoryProfilePl =
+      'Intensywny napar o podwyższonej kwasowości lub goryczce, przytłumiający czystość filtrów Chemex.';
+    sensoryProfileEn =
+      'Intense brew with elevated acidity or bitterness, masking Chemex filter clarity.';
+    brewingRecommendationPl =
+      'Zwiększ ilość wody lub zmniejsz dozę kawy, aby osiągnąć klasyczny zakres 1:15 – 1:16.6.';
+    brewingRecommendationEn =
+      'Increase water amount or reduce coffee dose to reach the classic 1:15 – 1:16.6 range.';
+  } else if (ratio <= 17.0) {
+    style = 'balanced_classic';
+    isClassicBalanced = true;
+    styleLabelPl = 'Zbalansowany standard Chemex (1:14.0 – 1:17.0)';
+    styleLabelEn = 'Balanced classic Chemex (1:14.0 – 1:17.0)';
+    sensoryProfilePl =
+      'Krystalicznie czysty napar, wysoka słodycz, lśniąca kwasowość i aksamitne, lekkie body.';
+    sensoryProfileEn =
+      'Crystal clear cup, high sweetness, sparkling acidity, and silky, tea-like light body.';
+    brewingRecommendationPl =
+      'Wzorcowa proporcja dla Chemex. Stosuj grubszy przemiał i polewanie spiralne od środka.';
+    brewingRecommendationEn =
+      'Benchmark Chemex ratio. Use medium-coarse grind and gentle spiral pouring from center.';
+  } else if (ratio <= 19.0) {
+    style = 'light_delicate';
+    isClassicBalanced = false;
+    styleLabelPl = 'Lekki / Delikatny napar (1:17.1 – 1:19.0)';
+    styleLabelEn = 'Light / Delicate brew (1:17.1 – 1:19.0)';
+    sensoryProfilePl =
+      'Bardzo zwiewny napar z wyeksponowaną kwasowością kwiatowo-owocową i lekkim finiszem.';
+    sensoryProfileEn =
+      'Very delicate cup emphasizing floral and citrus acidity with an airy finish.';
+    brewingRecommendationPl =
+      'Doskonałe dla bardzo jasnych ziaren terroir Afryki Wschodniej (Etiopia, Kenia).';
+    brewingRecommendationEn =
+      'Great for ultra-light East African terroir roasts (Ethiopia, Kenya).';
+  } else {
+    style = 'watery';
+    isClassicBalanced = false;
+    styleLabelPl = 'Zbyt rozwodniony napar (> 1:19.0)';
+    styleLabelEn = 'Watery brew (> 1:19.0)';
+    sensoryProfilePl =
+      'Rozwodniona filiżanka o płaskim profilu, braku słodyczy i pustym posmaku.';
+    sensoryProfileEn =
+      'Diluted cup with flat profile, lacking sweetness and hollow aftertaste.';
+    brewingRecommendationPl =
+      'Zwiększ dozę kawy do standardowych 30g na 500ml wody (1:16.7).';
+    brewingRecommendationEn =
+      'Increase coffee dose to standard 30g per 500ml water (1:16.7).';
+  }
+
+  return {
+    doseGrams: dose,
+    waterGrams: water,
+    ratio,
+    ratioFormatted,
+    style,
+    isClassicBalanced,
+    styleLabelPl,
+    styleLabelEn,
+    sensoryProfilePl,
+    sensoryProfileEn,
+    brewingRecommendationPl,
+    brewingRecommendationEn,
+  };
+}

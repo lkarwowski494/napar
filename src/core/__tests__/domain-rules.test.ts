@@ -53,6 +53,9 @@ import {
   evaluateSiphonRatio,
   SiphonRatioEvaluation,
   SiphonRatioStyle,
+  evaluateChemexRatio,
+  ChemexRatioEvaluation,
+  ChemexRatioStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -1177,6 +1180,41 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(fallback.ratio).toBe(0);
       expect(fallback.style).toBe('dense_strong');
       expect(fallback.isBalanced).toBe(false);
+    });
+
+    it('TASK-P96-11-WZR: evaluateChemexRatio ocenia proporcje parzenia w zaparzaczu Chemex', () => {
+      // 1. Złoty standard Chemex (30g na 500g wody = 1:16.7)
+      const standard: ChemexRatioEvaluation = evaluateChemexRatio(30, 500);
+      const styleCheck: ChemexRatioStyle = standard.style;
+      expect(styleCheck).toBe('balanced_classic');
+      expect(standard.isClassicBalanced).toBe(true);
+      expect(standard.ratio).toBeCloseTo(16.7, 1);
+      expect(standard.ratioFormatted).toBe('1:16.7');
+      expect(standard.styleLabelPl).toContain('Zbalansowany');
+      expect(standard.brewingRecommendationPl).toContain('Chemex');
+      expect(standard.brewingRecommendationEn).toBeDefined();
+
+      // 2. Gęsty / skoncentrowany (< 1:14 = np. 35g na 450g = 1:12.9)
+      const dense = evaluateChemexRatio('35,0', '450');
+      expect(dense.style).toBe('dense_concentrated');
+      expect(dense.isClassicBalanced).toBe(false);
+      expect(dense.styleLabelPl).toContain('Skoncentrowany');
+
+      // 3. Lekki / delikatny (17.1..19.0 = np. 25g na 450g = 1:18.0)
+      const light = evaluateChemexRatio(25, 450);
+      expect(light.style).toBe('light_delicate');
+      expect(light.styleLabelPl).toContain('Lekki');
+
+      // 4. Skrajnie rozwodniony (> 19.0 = np. 20g na 450g = 1:22.5)
+      const watery = evaluateChemexRatio(20, 450);
+      expect(watery.style).toBe('watery');
+      expect(watery.isClassicBalanced).toBe(false);
+
+      // 5. Odporność na null, zera i wartości ujemne
+      const fallback = evaluateChemexRatio(null as any, -100);
+      expect(fallback.ratio).toBe(0);
+      expect(fallback.style).toBe('dense_concentrated');
+      expect(fallback.isClassicBalanced).toBe(false);
     });
   });
 });
