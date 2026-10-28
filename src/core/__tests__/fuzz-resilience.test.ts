@@ -1361,12 +1361,12 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof brews.estimatedTotalBrews).toBe('number');
 
       // 8. compareSubscriptionPlans
-      const plans = compareSubscriptionPlans(val, val, val);
+      const plans = compareSubscriptionPlans(val as any);
       expect(typeof plans).toBe('object');
       expect(Array.isArray(plans.plans)).toBe(true);
 
       // 9. filterBySearchFacets
-      const filtered = filterBySearchFacets(val, val);
+      const filtered = filterBySearchFacets(val as any, val as any, val as any);
       expect(Array.isArray(filtered)).toBe(true);
 
       // 10. formatCostPerCup
