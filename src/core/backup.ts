@@ -1570,3 +1570,128 @@ export function calculateBackupHealthScore(envelope?: unknown): BackupHealthScor
 
 
 
+
+
+export interface CompactBackupResult {
+  compactedEnvelope: unknown;
+  originalRecordCount: number;
+  compactedRecordCount: number;
+  removedDuplicatesCount: number;
+  cleanedFieldsCount: number;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function compactBackupEnvelope(envelope?: unknown): CompactBackupResult {
+  if (!envelope || typeof envelope !== 'object') {
+    return {
+      compactedEnvelope: null,
+      originalRecordCount: 0,
+      compactedRecordCount: 0,
+      removedDuplicatesCount: 0,
+      cleanedFieldsCount: 0,
+      summaryPl: 'Nieprawidłowa koperta kopii zapasowej.',
+      summaryEn: 'Invalid backup envelope.',
+    };
+  }
+
+  const env = envelope as Record<string, unknown>;
+  const state =
+    env.state && typeof env.state === 'object' && !Array.isArray(env.state)
+      ? (env.state as Record<string, unknown>)
+      : null;
+
+  if (!state) {
+    return {
+      compactedEnvelope: { ...env },
+      originalRecordCount: 0,
+      compactedRecordCount: 0,
+      removedDuplicatesCount: 0,
+      cleanedFieldsCount: 0,
+      summaryPl: 'Nieprawidłowa struktura danych stanu kopii zapasowej.',
+      summaryEn: 'Invalid backup state data structure.',
+    };
+  }
+
+  let cleanedFieldsCount = 0;
+  let removedDuplicatesCount = 0;
+  let originalRecordCount = 0;
+
+  function compactCollection(arr: unknown[]): any[] {
+    const seenIds = new Set<string>();
+    const result: any[] = [];
+
+    for (const item of arr) {
+      originalRecordCount++;
+      if (!item || typeof item !== 'object') {
+        continue;
+      }
+
+      const rec = { ...(item as Record<string, unknown>) };
+      const id =
+        typeof rec.id === 'string' || typeof rec.id === 'number' ? String(rec.id).trim() : '';
+
+      if (id) {
+        if (seenIds.has(id)) {
+          removedDuplicatesCount++;
+          continue;
+        }
+        seenIds.add(id);
+      }
+
+      for (const [key, val] of Object.entries(rec)) {
+        if (typeof val === 'string') {
+          const trimmed = val.trim();
+          if (trimmed !== val) {
+            cleanedFieldsCount++;
+            rec[key] = trimmed;
+          }
+        }
+      }
+
+      result.push(rec);
+    }
+
+    return result;
+  }
+
+  const rawInv = Array.isArray(state.inventory) ? state.inventory : [];
+  const rawRec = Array.isArray(state.customRecipes) ? state.customRecipes : [];
+  const rawSes = Array.isArray(state.sessions) ? state.sessions : [];
+  const rawCaf = Array.isArray(state.caffeineLogs) ? state.caffeineLogs : [];
+
+  const compactedInventory = compactCollection(rawInv);
+  const compactedRecipes = compactCollection(rawRec);
+  const compactedSessions = compactCollection(rawSes);
+  const compactedCaffeine = compactCollection(rawCaf);
+
+  const compactedRecordCount =
+    compactedInventory.length +
+    compactedRecipes.length +
+    compactedSessions.length +
+    compactedCaffeine.length;
+
+  const compactedEnvelope = {
+    ...env,
+    state: {
+      ...state,
+      inventory: compactedInventory,
+      customRecipes: compactedRecipes,
+      sessions: compactedSessions,
+      caffeineLogs: compactedCaffeine,
+    },
+  };
+
+  const summaryPl = `Zoptymalizowano kopię zapasową: zachowano ${compactedRecordCount} z ${originalRecordCount} rekordów, usunięto ${removedDuplicatesCount} duplikatów, oczyszczono ${cleanedFieldsCount} pól tekstowych.`;
+  const summaryEn = `Compacted backup envelope: retained ${compactedRecordCount} of ${originalRecordCount} records, removed ${removedDuplicatesCount} duplicates, cleaned ${cleanedFieldsCount} text fields.`;
+
+  return {
+    compactedEnvelope,
+    originalRecordCount,
+    compactedRecordCount,
+    removedDuplicatesCount,
+    cleanedFieldsCount,
+    summaryPl,
+    summaryEn,
+  };
+}

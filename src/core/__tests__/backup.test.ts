@@ -33,6 +33,8 @@ import {
   calculateBackupHealthScore,
   BackupHealthScore,
   BackupHealthGrade,
+  compactBackupEnvelope,
+  CompactBackupResult,
   NaparBackupEnvelope,
   localISODate,
   stampOf,
@@ -955,6 +957,44 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(invalidHealth.score).toBe(0);
       expect(invalidHealth.totalRecords).toBe(0);
       expect(invalidHealth.summaryPl).toContain('uszkodzona');
+    });
+
+    test('TASK-P95-05-ARC: compactBackupEnvelope usuwa duplikaty ID, oczyszcza białe znaki i optymalizuje stan', () => {
+      const rawEnv = buildBackup({
+        inventory: [
+          { id: 'i1', name: '  Ethiopia Yirgacheffe  ', remainingWeightGrams: 250 },
+          { id: 'i1', name: 'Ethiopia Duplikat', remainingWeightGrams: 200 },
+          { id: 'i2', name: 'Kenya Nyeri', remainingWeightGrams: 100 },
+        ] as any,
+        customRecipes: [
+          { id: 'r1', name: '  V60 Recipe  ' },
+        ] as any,
+        sessions: [
+          { id: 's1', recipeName: '  V60  ' },
+          { id: 's1', recipeName: 'V60 Dubel' },
+        ] as any,
+        caffeineLogs: [],
+      });
+
+      const res: CompactBackupResult = compactBackupEnvelope(rawEnv);
+      expect(res.originalRecordCount).toBe(6);
+      expect(res.compactedRecordCount).toBe(4);
+      expect(res.removedDuplicatesCount).toBe(2);
+      expect(res.cleanedFieldsCount).toBeGreaterThan(0);
+      expect(res.summaryPl).toContain('Zoptymalizowano kopię');
+      expect(res.summaryEn).toBeDefined();
+
+      const compactedState = (res.compactedEnvelope as any).state;
+      expect(compactedState.inventory.length).toBe(2);
+      expect(compactedState.inventory[0].name).toBe('Ethiopia Yirgacheffe');
+      expect(compactedState.sessions.length).toBe(1);
+      expect(compactedState.sessions[0].recipeName).toBe('V60');
+
+      // Null / pusty envelope
+      const emptyRes = compactBackupEnvelope(null);
+      expect(emptyRes.originalRecordCount).toBe(0);
+      expect(emptyRes.compactedRecordCount).toBe(0);
+      expect(emptyRes.summaryPl).toContain('Nieprawidłowa');
     });
   });
 });
