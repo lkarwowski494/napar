@@ -1,0 +1,53 @@
+{
+  "cycle": "P94",
+  "status": "completed",
+  "perspectives": [
+    "09-LOK",
+    "10-WYD",
+    "11-WZR",
+    "12-NIE",
+    "01-ODK"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P94-09-LOK",
+      "perspective": "09-LOK",
+      "description": "Implementacja formatera kosztu filiżanki naparu formatCostPerCup z typem CostPerCupFormat w src/core/unit-converter.ts i src/core/__tests__/unit-converter.test.ts",
+      "targetFile": "src/core/unit-converter.ts",
+      "testFile": "src/core/__tests__/unit-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P94-10-WYD",
+      "perspective": "10-WYD",
+      "description": "Implementacja Budżetu 19 dla 10 000 operacji kalkulatorów domenowych i BPR w src/core/__tests__/perf-budget.test.ts",
+      "targetFile": "src/core/__tests__/perf-budget.test.ts",
+      "testFile": "src/core/__tests__/perf-budget.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P94-11-WZR",
+      "perspective": "11-WZR",
+      "description": "Implementacja ewaluatora proporcji parzenia w syfonie evaluateSiphonRatio z typami SiphonRatioEvaluation i SiphonRatioStyle w src/core/domain-rules.ts i src/core/__tests__/domain-rules.test.ts",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P94-12-NIE",
+      "perspective": "12-NIE",
+      "description": "Wdrożenie testu odpornościowego Chaos 23 dla nowych kalkulatorów P92-P93 w src/core/__tests__/fuzz-resilience.test.ts",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P94-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Implementacja zaawansowanego parsera zapytań wyszukiwania parseSearchQuery z typem ParsedSearchQuery w src/core/search-utils.ts i src/core/__tests__/search-utils.test.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    }
+  ]
+}
