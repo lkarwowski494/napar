@@ -2055,3 +2055,123 @@ export function estimateBurrSeasoningProgress(
     impactNotesEn,
   };
 }
+
+
+export type GrindUniformityGrade = 'exceptional' | 'good' | 'moderate' | 'broad';
+
+export interface GrindDistributionSpread {
+  burrType: 'flat' | 'conical' | 'other';
+  targetMicrons: number;
+  spreadMicrons: number;
+  finesPercent: number;
+  bouldersPercent: number;
+  uniformityScore: number;
+  grade: GrindUniformityGrade;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function estimateGrindDistributionSpread(
+  params?: {
+    burrType?: 'flat' | 'conical' | string | null;
+    targetMicrons?: number | string | null;
+    rpm?: number | string | null;
+  } | null
+): GrindDistributionSpread {
+  const parseNum = (v: unknown, fallback = 0, min = 0, max = 3000): number => {
+    if (typeof v === 'number') {
+      return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(min, Math.min(max, v)) : fallback;
+    }
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0)
+        ? Math.max(min, Math.min(max, parsed))
+        : fallback;
+    }
+    return fallback;
+  };
+
+  const rawType =
+    typeof params?.burrType === 'string' ? params.burrType.trim().toLowerCase() : '';
+  const burrType: 'flat' | 'conical' | 'other' = rawType.includes('flat')
+    ? 'flat'
+    : rawType.includes('conical')
+    ? 'conical'
+    : 'conical';
+
+  const targetMicrons = Number(parseNum(params?.targetMicrons, 750, 100, 2500).toFixed(0));
+
+  let finesPercent = 10;
+  let bouldersPercent = 8;
+  let spreadMicrons = 400;
+
+  if (burrType === 'flat') {
+    if (targetMicrons <= 350) {
+      finesPercent = 10;
+      bouldersPercent = 3;
+      spreadMicrons = 250;
+    } else if (targetMicrons <= 900) {
+      finesPercent = 7;
+      bouldersPercent = 5;
+      spreadMicrons = 320;
+    } else {
+      finesPercent = 8;
+      bouldersPercent = 9;
+      spreadMicrons = 420;
+    }
+  } else {
+    if (targetMicrons <= 350) {
+      finesPercent = 16;
+      bouldersPercent = 4;
+      spreadMicrons = 380;
+    } else if (targetMicrons <= 900) {
+      finesPercent = 12;
+      bouldersPercent = 8;
+      spreadMicrons = 480;
+    } else {
+      finesPercent = 14;
+      bouldersPercent = 12;
+      spreadMicrons = 600;
+    }
+  }
+
+  const baseUniformity = burrType === 'flat' ? 90 : 75;
+  const finesPenalty = Math.max(0, (finesPercent - 8) * 1.5);
+  const bouldersPenalty = Math.max(0, (bouldersPercent - 6) * 1.2);
+  const uniformityScore = Math.max(
+    0,
+    Math.min(100, Math.round(baseUniformity - finesPenalty - bouldersPenalty))
+  );
+
+  let grade: GrindUniformityGrade = 'broad';
+  let summaryPl = `Szeroki rozkład cząstek (wynik: ${uniformityScore}/100) — zauważalny pył i cząstki grube.`;
+  let summaryEn = `Broad particle distribution (${uniformityScore}/100) — noticeable fines and boulders.`;
+
+  if (uniformityScore >= 85) {
+    grade = 'exceptional';
+    summaryPl = `Wybitna unimodalność i wąski rozkład cząstek (żarna ${
+      burrType === 'flat' ? 'płaskie' : 'stożkowe'
+    }, ${targetMicrons} µm).`;
+    summaryEn = `Exceptional unimodality and narrow particle spread (${burrType} burrs, ${targetMicrons} µm).`;
+  } else if (uniformityScore >= 70) {
+    grade = 'good';
+    summaryPl = `Dobra powtarzalność i kontrolowana frakcja pyłu (wynik: ${uniformityScore}/100).`;
+    summaryEn = `Good particle uniformity with controlled fines (${uniformityScore}/100).`;
+  } else if (uniformityScore >= 55) {
+    grade = 'moderate';
+    summaryPl = `Umiarkowana równomierność — klasyczny rozkład bimodalny.`;
+    summaryEn = `Moderate uniformity — classic bimodal distribution.`;
+  }
+
+  return {
+    burrType,
+    targetMicrons,
+    spreadMicrons,
+    finesPercent,
+    bouldersPercent,
+    uniformityScore,
+    grade,
+    summaryPl,
+    summaryEn,
+  };
+}

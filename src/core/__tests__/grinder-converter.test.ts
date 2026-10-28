@@ -39,6 +39,9 @@ import {
   estimateBurrSeasoningProgress,
   BurrSeasoningEstimate,
   BurrSeasoningStage,
+  estimateGrindDistributionSpread,
+  GrindDistributionSpread,
+  GrindUniformityGrade,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -1215,6 +1218,37 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(fallback.burrType).toBe('conical');
     expect(fallback.kilogramsGround).toBe(0);
     expect(fallback.progressPercent).toBe(0);
+  });
+
+  test('TASK-P96-08-PRO: estimateGrindDistributionSpread szacuje rozkład cząstek i frakcję pyłu', () => {
+    // 1. Żarna płaskie pod przelew (800 µm) -> wysoka równomierność (unimodalna)
+    const flatFilter: GrindDistributionSpread = estimateGrindDistributionSpread({
+      burrType: 'flat',
+      targetMicrons: 800,
+    });
+    const gradeCheck: GrindUniformityGrade = flatFilter.grade;
+    expect(gradeCheck).toBe('exceptional');
+    expect(flatFilter.burrType).toBe('flat');
+    expect(flatFilter.targetMicrons).toBe(800);
+    expect(flatFilter.finesPercent).toBeLessThan(12);
+    expect(flatFilter.uniformityScore).toBeGreaterThanOrEqual(85);
+    expect(flatFilter.summaryPl).toContain('płask');
+    expect(flatFilter.summaryEn).toBeDefined();
+
+    // 2. Żarna stożkowe pod espresso (250 µm) -> bimodalny rozkład ze zwiększoną frakcją pyłu
+    const conicalEspresso = estimateGrindDistributionSpread({
+      burrType: 'conical',
+      targetMicrons: '250',
+    });
+    expect(conicalEspresso.burrType).toBe('conical');
+    expect(conicalEspresso.finesPercent).toBeGreaterThanOrEqual(12);
+    expect(conicalEspresso.uniformityScore).toBeLessThan(85);
+
+    // 3. Odporność na null, wartości ujemne i puste parametry
+    const fallback = estimateGrindDistributionSpread(null);
+    expect(fallback.burrType).toBe('conical');
+    expect(fallback.targetMicrons).toBe(750);
+    expect(fallback.uniformityScore).toBeGreaterThan(0);
   });
 });
 
