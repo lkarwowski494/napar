@@ -51,6 +51,9 @@ import {
   compareSubscriptionPlans,
   SubscriptionPlanComparison,
   SubscriptionPlanComparisonItem,
+  evaluateUpsellTrigger,
+  UpsellTriggerEvaluation,
+  UpsellUrgency,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1669,6 +1672,40 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const fallback = compareSubscriptionPlans(null);
     expect(fallback.plans).toHaveLength(3);
     expect(fallback.bestValueTier).toBe('lifetime');
+  });
+
+  test('TASK-P95-02-MON: evaluateUpsellTrigger analizuje zaangażowanie i rekomenduje optymalny moment upsellu Pro', () => {
+    // 1. Użytkownik z aktywną subskrypcją (brak upsellu)
+    const subUser: UpsellTriggerEvaluation = evaluateUpsellTrigger({ isSubscribed: true });
+    const urgencyCheck: UpsellUrgency = subUser.urgency;
+    expect(urgencyCheck).toBe('low');
+    expect(subUser.shouldShowUpsell).toBe(false);
+
+    // 2. Wygasły okres próbny (natychmiastowy upsell)
+    const expired = evaluateUpsellTrigger({ isTrialExpired: true });
+    expect(expired.shouldShowUpsell).toBe(true);
+    expect(expired.urgency).toBe('immediate');
+    expect(expired.headlinePl).toContain('Okres próbny');
+
+    // 3. Zbliżanie się do limitu (13/15 parzeń) -> wysoki priorytet
+    const nearLimit = evaluateUpsellTrigger({ brewsCompleted: 13, daysSinceInstall: 10 });
+    expect(nearLimit.shouldShowUpsell).toBe(true);
+    expect(nearLimit.urgency).toBe('high');
+    expect(nearLimit.headlinePl).toContain('limitu');
+
+    // 4. Zaangażowany użytkownik (własne przepisy, 6 parzeń) -> umiarkowany priorytet
+    const engaged = evaluateUpsellTrigger({ brewsCompleted: 6, hasCustomRecipes: true });
+    expect(engaged.shouldShowUpsell).toBe(true);
+    expect(engaged.urgency).toBe('medium');
+
+    // 5. Nowy użytkownik (początek okresu próbnego) -> brak nachalnego upsellu
+    const fresh = evaluateUpsellTrigger({ brewsCompleted: 1, daysSinceInstall: 1 });
+    expect(fresh.shouldShowUpsell).toBe(false);
+    expect(fresh.urgency).toBe('low');
+
+    // 6. Odporność na null i wartości ujemne
+    const fallback = evaluateUpsellTrigger(null);
+    expect(fallback.shouldShowUpsell).toBe(false);
   });
 });
 

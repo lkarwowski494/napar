@@ -1571,3 +1571,107 @@ export function compareSubscriptionPlans(
 
 
 
+
+
+export type UpsellUrgency = 'low' | 'medium' | 'high' | 'immediate';
+
+export interface UpsellTriggerEvaluation {
+  shouldShowUpsell: boolean;
+  urgency: UpsellUrgency;
+  recommendedTier: 'monthly' | 'annual' | 'lifetime';
+  triggerReasonPl: string;
+  triggerReasonEn: string;
+  headlinePl: string;
+  headlineEn: string;
+}
+
+/**
+ * Analizuje moment konwersji i zaangażowanie użytkownika, rekomendując optymalny
+ * moment wyświetlenia korzyści Napar Pro i poziom pilności.
+ */
+export function evaluateUpsellTrigger(
+  params?: {
+    brewsCompleted?: number | string | null;
+    daysSinceInstall?: number | string | null;
+    hasCustomRecipes?: boolean | null;
+    isTrialExpired?: boolean | null;
+    isSubscribed?: boolean | null;
+  } | null
+): UpsellTriggerEvaluation {
+  const parseNum = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const isSubscribed = Boolean(params?.isSubscribed);
+  const isTrialExpired = Boolean(params?.isTrialExpired);
+  const brewsCompleted = parseNum(params?.brewsCompleted);
+  const daysSinceInstall = parseNum(params?.daysSinceInstall);
+  const hasCustomRecipes = Boolean(params?.hasCustomRecipes);
+
+  if (isSubscribed) {
+    return {
+      shouldShowUpsell: false,
+      urgency: 'low',
+      recommendedTier: 'annual',
+      triggerReasonPl: 'Użytkownik posiada aktywny dostęp Pro.',
+      triggerReasonEn: 'User has active Pro access.',
+      headlinePl: 'Aktywna subskrypcja Napar Pro',
+      headlineEn: 'Active Napar Pro subscription',
+    };
+  }
+
+  if (isTrialExpired) {
+    return {
+      shouldShowUpsell: true,
+      urgency: 'immediate',
+      recommendedTier: 'annual',
+      triggerReasonPl:
+        'Okres próbny wygasł — wymagana aktywacja licencji, aby kontynuować zapisywanie sesji.',
+      triggerReasonEn:
+        'Trial period has expired — license activation required to continue logging brews.',
+      headlinePl: 'Okres próbny dobiegł końca',
+      headlineEn: 'Trial period has expired',
+    };
+  }
+
+  if (brewsCompleted >= 12 || daysSinceInstall >= 12) {
+    return {
+      shouldShowUpsell: true,
+      urgency: 'high',
+      recommendedTier: 'annual',
+      triggerReasonPl: 'Zbliżasz się do limitu parzeń lub końca 14-dniowego okresu próbnego.',
+      triggerReasonEn: 'Approaching the brew limit or end of 14-day trial.',
+      headlinePl: 'Zbliżasz się do limitu okresu próbnego',
+      headlineEn: 'Approaching trial limit',
+    };
+  }
+
+  if (hasCustomRecipes || brewsCompleted >= 5) {
+    return {
+      shouldShowUpsell: true,
+      urgency: 'medium',
+      recommendedTier: 'annual',
+      triggerReasonPl:
+        'Wysokie zaangażowanie — odblokuj nieograniczone receptury, bazę wiedzy i eksport CSV.',
+      triggerReasonEn:
+        'High engagement — unlock unlimited recipes, knowledge base, and CSV export.',
+      headlinePl: 'Odblokuj pełny potencjał Napar Pro',
+      headlineEn: 'Unlock full potential of Napar Pro',
+    };
+  }
+
+  return {
+    shouldShowUpsell: false,
+    urgency: 'low',
+    recommendedTier: 'annual',
+    triggerReasonPl: 'Początkowy etap poznawania aplikacji.',
+    triggerReasonEn: 'Early exploration stage.',
+    headlinePl: 'Odkrywaj parzenie z Napar',
+    headlineEn: 'Explore brewing with Napar',
+  };
+}
