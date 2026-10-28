@@ -12,18 +12,19 @@ import {
   evaluateCuppingRatio,
 } from '../domain-rules';
 import { createGongfuSession, recordGongfuInfusion } from '../gongfu-session';
-import { convertMicronsToGrinder, SUPPORTED_GRINDERS } from '../grinder-converter';
+import { convertMicronsToGrinder, SUPPORTED_GRINDERS, estimateGrindDistributionSpread } from '../grinder-converter';
 import {
   calculateWaterMinerals,
   WATER_RECIPES,
   calculateSulfateToChlorideRatio,
   calculateResidualAlkalinity,
   calculateTotalHardnessFromIons,
+  calculateWaterHardnessScale,
 } from '../water-chemistry';
-import { formatBrewTimeMinutesSeconds, formatCostPerCup } from '../unit-converter';
+import { formatBrewTimeMinutesSeconds, formatCostPerCup, formatFlowRateProfile } from '../unit-converter';
 import { normSearch, rankSearchResults, filterBySearchFacets } from '../search-utils';
 import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot, CumulativeWaterPoint } from '../timer-engine';
-import { calculateLifetimeBreakEven } from '../app-access';
+import { calculateLifetimeBreakEven, evaluateUpsellTrigger } from '../app-access';
 import { generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity } from '../bpr-engine';
 
 jest.mock('expo-sqlite', () => ({
@@ -35,7 +36,7 @@ jest.mock('expo-sqlite', () => ({
   })),
 }));
 
-import { escapeCsvValue, calculateStashDiversity, estimateRemainingBrews } from '../database';
+import { escapeCsvValue, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover } from '../database';
 
 function measureCpuMs(fn: () => unknown, runs = 5): number {
   fn(); // Rozgrzewka JIT
@@ -516,6 +517,41 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
         estimateRemainingBrews(items, { brewsPerDay: 2 });
         formatCostPerCup(50 + (i % 20), 250, 15);
         evaluateRecipeComplexity(recipe);
+      }
+    });
+
+    expect(ms).toBeLessThan(150);
+  });
+
+  test('TASK-P96-10-WYD: Budżet 20: 10 000 obliczeń triggera upsell, rotacji spiżarni, skali twardości i profilu przepływu (< 150 ms)', () => {
+    // 1. Poprawność biznesowa
+    const upsell = evaluateUpsellTrigger({ brewsCompleted: 15, isSubscribed: false });
+    expect(upsell.shouldShowUpsell).toBe(true);
+
+    const inventoryItems = [
+      { id: '1', name: 'Ethiopia', initialWeightGrams: 250, remainingWeightGrams: 50, isArchived: false },
+      { id: '2', name: 'Kenya', initialWeightGrams: 250, remainingWeightGrams: 250, isArchived: false },
+    ] as any[];
+    const turnover = evaluateStashTurnover(inventoryItems);
+    expect(turnover.totalItems).toBe(2);
+
+    const waterScale = calculateWaterHardnessScale(80);
+    expect(waterScale.isScaCompliant).toBe(true);
+
+    const grindSpread = estimateGrindDistributionSpread({ burrType: 'flat', targetMicrons: 800 });
+    expect(grindSpread.uniformityScore).toBeGreaterThan(80);
+
+    const flowProfile = formatFlowRateProfile(3.5);
+    expect(flowProfile.phase).toBe('steady');
+
+    // 2. Budżet wydajnościowy: 10 000 wywołań w pętli < 150 ms
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        evaluateUpsellTrigger({ brewsCompleted: 10 + (i % 20), isSubscribed: false });
+        evaluateStashTurnover(inventoryItems);
+        calculateWaterHardnessScale(60 + (i % 100));
+        estimateGrindDistributionSpread({ burrType: 'flat', targetMicrons: 500 + (i % 400) });
+        formatFlowRateProfile(2.0 + ((i % 50) / 10));
       }
     });
 
