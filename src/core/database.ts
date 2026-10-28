@@ -2757,3 +2757,105 @@ export function getHasCompletedOnboarding(): boolean {
 export function setHasCompletedOnboarding(completed: boolean): void {
   setAppSetting('onboarding_completed', Boolean(completed) ? 'true' : 'false');
 }
+
+
+export interface StashTurnoverAnalysis {
+  totalItems: number;
+  activeItemsCount: number;
+  depletedItemsCount: number;
+  archivedItemsCount: number;
+  depletionRatePercent: number;
+  totalInitialWeightGrams: number;
+  totalRemainingWeightGrams: number;
+  totalConsumedWeightGrams: number;
+  consumptionPercent: number;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function evaluateStashTurnover(
+  items: InventoryItem[] | undefined | null
+): StashTurnoverAnalysis {
+  const safeItems = Array.isArray(items) ? items : [];
+  const totalItems = safeItems.length;
+
+  let activeItemsCount = 0;
+  let depletedItemsCount = 0;
+  let archivedItemsCount = 0;
+  let totalInitialWeightGrams = 0;
+  let totalRemainingWeightGrams = 0;
+
+  for (const item of safeItems) {
+    if (!item || typeof item !== 'object') continue;
+
+    const isArchived = Boolean(item.isArchived);
+    if (isArchived) {
+      archivedItemsCount++;
+    }
+
+    const rem =
+      typeof item.remainingWeightGrams === 'number' &&
+      Number.isFinite(item.remainingWeightGrams) &&
+      item.remainingWeightGrams > 0
+        ? item.remainingWeightGrams
+        : 0;
+
+    const init =
+      typeof item.initialWeightGrams === 'number' &&
+      Number.isFinite(item.initialWeightGrams) &&
+      item.initialWeightGrams > 0
+        ? item.initialWeightGrams
+        : rem;
+
+    totalInitialWeightGrams += init;
+    totalRemainingWeightGrams += rem;
+
+    if (rem <= 0) {
+      depletedItemsCount++;
+    } else if (!isArchived) {
+      activeItemsCount++;
+    }
+  }
+
+  totalInitialWeightGrams = Math.round(totalInitialWeightGrams * 10) / 10;
+  totalRemainingWeightGrams = Math.round(totalRemainingWeightGrams * 10) / 10;
+  const totalConsumedWeightGrams = Math.max(
+    0,
+    Math.round((totalInitialWeightGrams - totalRemainingWeightGrams) * 10) / 10
+  );
+
+  const consumptionPercent =
+    totalInitialWeightGrams > 0
+      ? Math.round((totalConsumedWeightGrams / totalInitialWeightGrams) * 1000) / 10
+      : 0;
+
+  const depletionRatePercent =
+    totalItems > 0
+      ? Math.round((depletedItemsCount / totalItems) * 1000) / 10
+      : 0;
+
+  let summaryPl: string;
+  let summaryEn: string;
+
+  if (totalItems === 0) {
+    summaryPl = 'Brak pozycji w spiżarni do analizy rotacji.';
+    summaryEn = 'No stash items available for turnover analysis.';
+  } else {
+    summaryPl = `Zużyto ${totalConsumedWeightGrams}g z ${totalInitialWeightGrams}g zapasów (${consumptionPercent}%). Aktywne paczki: ${activeItemsCount}, wyczerpane: ${depletedItemsCount}.`;
+    summaryEn = `Consumed ${totalConsumedWeightGrams}g out of ${totalInitialWeightGrams}g stash (${consumptionPercent}%). Active bags: ${activeItemsCount}, depleted: ${depletedItemsCount}.`;
+  }
+
+  return {
+    totalItems,
+    activeItemsCount,
+    depletedItemsCount,
+    archivedItemsCount,
+    depletionRatePercent,
+    totalInitialWeightGrams,
+    totalRemainingWeightGrams,
+    totalConsumedWeightGrams,
+    consumptionPercent,
+    summaryPl,
+    summaryEn,
+  };
+}

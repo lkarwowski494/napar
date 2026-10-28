@@ -36,6 +36,8 @@ import {
   StashDiversityRating,
   estimateRemainingBrews,
   StashBrewsEstimate,
+  evaluateStashTurnover,
+  StashTurnoverAnalysis,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -3190,5 +3192,36 @@ describe('Napar SQLite Database & Repositories', () => {
 
     const nullEstimate = estimateRemainingBrews(null);
     expect(nullEstimate.estimatedTotalBrews).toBe(0);
+  });
+
+  it('TASK-P95-03-ZAK: evaluateStashTurnover analizuje wskaźniki rotacji, zużycia i wyczerpania paczek w spiżarni', () => {
+    const items = [
+      { id: '1', name: 'Ethiopia', initialWeightGrams: 250, remainingWeightGrams: 50, isArchived: false },
+      { id: '2', name: 'Colombia', initialWeightGrams: 250, remainingWeightGrams: 0, isArchived: false },
+      { id: '3', name: 'Kenya', initialWeightGrams: 250, remainingWeightGrams: 250, isArchived: false },
+      { id: '4', name: 'Old Brazil', initialWeightGrams: 250, remainingWeightGrams: 0, isArchived: true },
+    ] as any[];
+
+    const turnover: StashTurnoverAnalysis = evaluateStashTurnover(items);
+    expect(turnover.totalItems).toBe(4);
+    expect(turnover.activeItemsCount).toBe(2); // items 1, 3
+    expect(turnover.depletedItemsCount).toBe(2); // items 2, 4
+    expect(turnover.archivedItemsCount).toBe(1); // item 4
+    expect(turnover.totalInitialWeightGrams).toBe(1000);
+    expect(turnover.totalRemainingWeightGrams).toBe(300);
+    expect(turnover.totalConsumedWeightGrams).toBe(700);
+    expect(turnover.consumptionPercent).toBe(70);
+    expect(turnover.depletionRatePercent).toBe(50);
+    expect(turnover.summaryPl).toContain('700g');
+    expect(turnover.summaryEn).toBeDefined();
+
+    // Pusty inwentarz / null
+    const empty = evaluateStashTurnover([]);
+    expect(empty.totalItems).toBe(0);
+    expect(empty.consumptionPercent).toBe(0);
+    expect(empty.summaryPl).toContain('Brak pozycji');
+
+    const nullTurnover = evaluateStashTurnover(null);
+    expect(nullTurnover.totalItems).toBe(0);
   });
 });
