@@ -853,3 +853,68 @@ export function filterBySearchFacets<T>(
 
 
 
+
+
+export interface ParsedSearchQuery {
+  rawQuery: string;
+  freeTextTokens: string[];
+  fieldFilters: Record<string, string[]>;
+  negatedTokens: string[];
+  isEmpty: boolean;
+}
+
+/**
+ * Parsuje złożone zapytanie wyszukiwania, wyodrębniając filtry polowe (np. method:v60),
+ * tokeny zanegowane (np. -decaf) oraz swobodne tokeny tekstowe.
+ */
+export function parseSearchQuery(rawQuery: string | undefined | null): ParsedSearchQuery {
+  if (typeof rawQuery !== 'string' || !rawQuery.trim()) {
+    return {
+      rawQuery: typeof rawQuery === 'string' ? rawQuery : '',
+      freeTextTokens: [],
+      fieldFilters: {},
+      negatedTokens: [],
+      isEmpty: true,
+    };
+  }
+
+  const cleanRaw = rawQuery.replace(/\uFEFF/g, '').trim();
+  const rawTokens = cleanRaw.split(/\s+/).filter(Boolean);
+
+  const freeTextTokens: string[] = [];
+  const fieldFilters: Record<string, string[]> = {};
+  const negatedTokens: string[] = [];
+
+  for (const token of rawTokens) {
+    const fieldMatch = token.match(/^([a-zA-Z_]+):(.+)$/);
+    if (fieldMatch) {
+      const fieldKey = fieldMatch[1].toLowerCase();
+      const fieldValue = fieldMatch[2].toLowerCase();
+      if (!fieldFilters[fieldKey]) {
+        fieldFilters[fieldKey] = [];
+      }
+      fieldFilters[fieldKey].push(fieldValue);
+      continue;
+    }
+
+    if (token.startsWith('-') && token.length > 1) {
+      negatedTokens.push(token.slice(1).toLowerCase());
+      continue;
+    }
+
+    freeTextTokens.push(token.toLowerCase());
+  }
+
+  const isEmpty =
+    freeTextTokens.length === 0 &&
+    Object.keys(fieldFilters).length === 0 &&
+    negatedTokens.length === 0;
+
+  return {
+    rawQuery: cleanRaw,
+    freeTextTokens,
+    fieldFilters,
+    negatedTokens,
+    isEmpty,
+  };
+}

@@ -27,6 +27,8 @@ import {
   aggregateSearchFacets,
   SearchFacetItem,
   filterBySearchFacets,
+  parseSearchQuery,
+  ParsedSearchQuery,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -507,5 +509,35 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     }, {
       broken: () => { throw new Error('fail'); },
     })).toEqual([]);
+  });
+
+  test('TASK-P94-01-ODK: parseSearchQuery parsuje zapytania z filtrami polowymi i negacjami', () => {
+    // 1. Złożone zapytanie z tokenami swobodnymi, filtrami polowymi i negacją
+    const parsed: ParsedSearchQuery = parseSearchQuery('ethiopia method:v60 origin:yirgacheffe -decaf -dark');
+    expect(parsed.isEmpty).toBe(false);
+    expect(parsed.rawQuery).toBe('ethiopia method:v60 origin:yirgacheffe -decaf -dark');
+    expect(parsed.freeTextTokens).toEqual(['ethiopia']);
+    expect(parsed.fieldFilters).toEqual({
+      method: ['v60'],
+      origin: ['yirgacheffe'],
+    });
+    expect(parsed.negatedTokens).toEqual(['decaf', 'dark']);
+
+    // 2. Wiele wartości tego samego filtra (np. roaster:hardbeans roaster:kafar)
+    const multiFilter = parseSearchQuery('roaster:hardbeans roaster:kafar washed');
+    expect(multiFilter.freeTextTokens).toEqual(['washed']);
+    expect(multiFilter.fieldFilters.roaster).toEqual(['hardbeans', 'kafar']);
+
+    // 3. Puste zapytanie lub whitespace
+    const empty = parseSearchQuery('   ');
+    expect(empty.isEmpty).toBe(true);
+    expect(empty.freeTextTokens).toEqual([]);
+    expect(empty.fieldFilters).toEqual({});
+    expect(empty.negatedTokens).toEqual([]);
+
+    // 4. Odporność na null, undefined i wartości nienapisowe
+    expect(parseSearchQuery(null).isEmpty).toBe(true);
+    expect(parseSearchQuery(undefined).isEmpty).toBe(true);
+    expect(parseSearchQuery(123 as any).isEmpty).toBe(true);
   });
 });
