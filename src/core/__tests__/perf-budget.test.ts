@@ -9,6 +9,7 @@ import {
   calculateExtractionYield,
   estimateCoffeeCaffeineMg,
   estimateTeaInfusionCaffeineMg,
+  evaluateCuppingRatio,
 } from '../domain-rules';
 import { createGongfuSession, recordGongfuInfusion } from '../gongfu-session';
 import { convertMicronsToGrinder, SUPPORTED_GRINDERS } from '../grinder-converter';
@@ -19,11 +20,11 @@ import {
   calculateResidualAlkalinity,
   calculateTotalHardnessFromIons,
 } from '../water-chemistry';
-import { formatBrewTimeMinutesSeconds } from '../unit-converter';
-import { normSearch, rankSearchResults } from '../search-utils';
+import { formatBrewTimeMinutesSeconds, formatCostPerCup } from '../unit-converter';
+import { normSearch, rankSearchResults, filterBySearchFacets } from '../search-utils';
 import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot, CumulativeWaterPoint } from '../timer-engine';
 import { calculateLifetimeBreakEven } from '../app-access';
-import { generateAdaptiveRecipeAdjustment } from '../bpr-engine';
+import { generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity } from '../bpr-engine';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => ({
@@ -34,7 +35,7 @@ jest.mock('expo-sqlite', () => ({
   })),
 }));
 
-import { escapeCsvValue, calculateStashDiversity } from '../database';
+import { escapeCsvValue, calculateStashDiversity, estimateRemainingBrews } from '../database';
 
 function measureCpuMs(fn: () => unknown, runs = 5): number {
   fn(); // Rozgrzewka JIT
@@ -484,6 +485,41 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     });
 
     expect(ms).toBeLessThan(80);
+  });
+
+  test('TASK-P94-10-WYD: Budżet 19: 10 000 obliczeń ewaluacji cuppingu, szacowania parzeń i kosztu filiżanki (< 150 ms)', () => {
+    // 1. Poprawność biznesowa
+    const cupping = evaluateCuppingRatio(11, 200);
+    expect(cupping.isScaCompliant).toBe(true);
+
+    const items = [
+      { id: '1', type: 'coffee', remainingWeightGrams: 300, isArchived: false },
+      { id: '2', type: 'tea', remainingWeightGrams: 20, isArchived: false },
+    ] as any[];
+    const brews = estimateRemainingBrews(items);
+    expect(brews.estimatedTotalBrews).toBe(25);
+
+    const cost = formatCostPerCup(50, 250, 15, 'zł');
+    expect(cost.costPerCup).toBe(3);
+
+    const recipe = {
+      name: 'V60 3-pour',
+      steps: [{ title: 'Bloom', durationSeconds: 45 }, { title: 'Pour 2', durationSeconds: 60 }],
+    };
+    const complexity = evaluateRecipeComplexity(recipe);
+    expect(complexity.stepCount).toBe(2);
+
+    // 2. Budżet wydajnościowy: 10 000 wywołań w pętli < 150 ms
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        evaluateCuppingRatio(11, 200 + (i % 20));
+        estimateRemainingBrews(items, { brewsPerDay: 2 });
+        formatCostPerCup(50 + (i % 20), 250, 15);
+        evaluateRecipeComplexity(recipe);
+      }
+    });
+
+    expect(ms).toBeLessThan(150);
   });
 });
 
