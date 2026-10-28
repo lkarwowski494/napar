@@ -53,6 +53,9 @@ import {
   evaluateBoilerCorrosionRisk,
   BoilerCorrosionRiskAssessment,
   BoilerCorrosionRiskLevel,
+  calculateWaterHardnessScale,
+  WaterHardnessScale,
+  WaterHardnessLevel,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -1304,6 +1307,38 @@ describe('Water Chemistry & Mineralization Module', () => {
     const fallback = evaluateBoilerCorrosionRisk(null);
     expect(fallback.riskLevel).toBe('safe');
     expect(fallback.chloridePpm).toBe(0);
+  });
+
+  test('TASK-P96-07-JAK: calculateWaterHardnessScale kategoryzuje twardość ogólną i przelicza jednostki (°dH, °fH, gpg)', () => {
+    // 1. Woda miękka specialty zgodna ze standardem SCA (80 ppm CaCO3)
+    const scaWater: WaterHardnessScale = calculateWaterHardnessScale(80);
+    const testLevel: WaterHardnessLevel = scaWater.level;
+    expect(testLevel).toBe('soft');
+    expect(scaWater.hardnessPpm).toBe(80);
+    expect(scaWater.isScaCompliant).toBe(true);
+    expect(scaWater.germanDegreesDh).toBeCloseTo(4.48, 1);
+    expect(scaWater.frenchDegreesFh).toBe(8.0);
+    expect(scaWater.grainsPerGallonGpg).toBeCloseTo(4.67, 1);
+    expect(scaWater.recommendationPl).toContain('SCA');
+    expect(scaWater.recommendationEn).toBeDefined();
+
+    // 2. Woda bardzo twarda kranowa (350 ppm)
+    const hardWater = calculateWaterHardnessScale('350,0');
+    expect(hardWater.level).toBe('very_hard');
+    expect(hardWater.isScaCompliant).toBe(false);
+    expect(hardWater.germanDegreesDh).toBeGreaterThan(19);
+    expect(hardWater.recommendationPl).toContain('Zmiękcz');
+
+    // 3. Woda bardzo miękka (RO / destylowana 20 ppm)
+    const roWater = calculateWaterHardnessScale(20);
+    expect(roWater.level).toBe('very_soft');
+    expect(roWater.isScaCompliant).toBe(false);
+
+    // 4. Odporność na null, NaN i ujemne
+    const fallback = calculateWaterHardnessScale(null);
+    expect(fallback.hardnessPpm).toBe(0);
+    expect(fallback.level).toBe('very_soft');
+    expect(fallback.germanDegreesDh).toBe(0);
   });
 });
 

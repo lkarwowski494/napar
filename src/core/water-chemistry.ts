@@ -2018,3 +2018,88 @@ export function evaluateBoilerCorrosionRisk(
 }
 
 
+
+
+export type WaterHardnessLevel =
+  | 'very_soft'
+  | 'soft'
+  | 'moderately_hard'
+  | 'hard'
+  | 'very_hard';
+
+export interface WaterHardnessScale {
+  hardnessPpm: number;
+  level: WaterHardnessLevel;
+  germanDegreesDh: number;
+  frenchDegreesFh: number;
+  grainsPerGallonGpg: number;
+  isScaCompliant: boolean;
+  recommendationPl: string;
+  recommendationEn: string;
+}
+
+export function calculateWaterHardnessScale(
+  hardnessPpm: number | string | null | undefined
+): WaterHardnessScale {
+  let val = 0;
+  if (typeof hardnessPpm === 'number') {
+    val =
+      Number.isFinite(hardnessPpm) && !Object.is(hardnessPpm, -0) && hardnessPpm > 0
+        ? hardnessPpm
+        : 0;
+  } else if (typeof hardnessPpm === 'string') {
+    const cleaned = hardnessPpm.replace(/\uFEFF/g, '').replace(',', '.').trim();
+    const parsed = parseFloat(cleaned);
+    val = Number.isFinite(parsed) && !Object.is(parsed, -0) && parsed > 0 ? parsed : 0;
+  }
+
+  const roundedPpm = Math.round(val * 10) / 10;
+  const germanDegreesDh = Math.round((roundedPpm / 17.848) * 100) / 100;
+  const frenchDegreesFh = Math.round((roundedPpm / 10.0) * 100) / 100;
+  const grainsPerGallonGpg = Math.round((roundedPpm / 17.118) * 100) / 100;
+
+  let level: WaterHardnessLevel = 'very_soft';
+  let recommendationPl =
+    'Woda bardzo miękka (<60 ppm CaCO3). Może powodować niedoekstrakcję i płaski profil smakowy.';
+  let recommendationEn =
+    'Very soft water (<60 ppm CaCO3). May lead to underextraction and flat flavor profile.';
+
+  if (roundedPpm > 300) {
+    level = 'very_hard';
+    recommendationPl =
+      'Woda bardzo twarda (>300 ppm CaCO3). Zmiękcz wodę (filtr RO lub dejonizacja), aby chronić sprzęt przed kamieniem i uniknąć cierpkości.';
+    recommendationEn =
+      'Very hard water (>300 ppm CaCO3). Soften water (RO or deionization) to protect equipment from scale and prevent chalkiness.';
+  } else if (roundedPpm >= 180) {
+    level = 'hard';
+    recommendationPl =
+      'Woda twarda (180–300 ppm CaCO3). Wymaga filtracji zmiękczającej w celu ochrony bojlera i zrównoważenia ekstrakcji.';
+    recommendationEn =
+      'Hard water (180–300 ppm CaCO3). Requires softening filtration to protect boiler and balance extraction.';
+  } else if (roundedPpm >= 120) {
+    level = 'moderately_hard';
+    recommendationPl =
+      'Woda umiarkowanie twarda (120–180 ppm CaCO3). Dobra ekstrakcja, ale monitoruj odkładanie się kamienia.';
+    recommendationEn =
+      'Moderately hard water (120–180 ppm CaCO3). Good extraction, but monitor limescale accumulation.';
+  } else if (roundedPpm >= 60) {
+    level = 'soft';
+    recommendationPl =
+      'Woda miękka w idealnym zakresie specialty SCA (50–175 ppm CaCO3). Znakomity balans słodyczy, kwasowości i czystości naparu.';
+    recommendationEn =
+      'Soft water within ideal SCA specialty range (50–175 ppm CaCO3). Excellent balance of sweetness, acidity, and clarity.';
+  }
+
+  const isScaCompliant = roundedPpm >= 50 && roundedPpm <= 175;
+
+  return {
+    hardnessPpm: roundedPpm,
+    level,
+    germanDegreesDh,
+    frenchDegreesFh,
+    grainsPerGallonGpg,
+    isScaCompliant,
+    recommendationPl,
+    recommendationEn,
+  };
+}
