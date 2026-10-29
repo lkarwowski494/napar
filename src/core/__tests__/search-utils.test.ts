@@ -37,6 +37,9 @@ import {
   calculateSearchTermCoverage,
   SearchTermCoverage,
   SearchCoverageTier,
+  calculateSearchMatchRelevance,
+  SearchMatchRelevanceResult,
+  SearchRelevanceGrade,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -679,5 +682,52 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     expect(fallbackNull.totalQueryTerms).toBe(0);
     const coverageResult: SearchTermCoverage = fallbackNull;
     expect(coverageResult.summaryEn).toBeTruthy();
+  });
+
+  test('TASK-P104-01-ODK: calculateSearchMatchRelevance ocenia trafność dopasowania z typami SearchMatchRelevanceResult i SearchRelevanceGrade', () => {
+    // 1. Dokładne dopasowanie (exact, 100 pkt)
+    const exact: SearchMatchRelevanceResult = calculateSearchMatchRelevance('etiopia yirgacheffe', 'Etiopia Yirgacheffe');
+    const grade: SearchRelevanceGrade = exact.grade;
+    expect(grade).toBe('exact');
+    expect(exact.relevanceScore).toBe(100);
+    expect(exact.isExactMatch).toBe(true);
+    expect(exact.explanationPl).toContain('Ścisłe dopasowanie');
+
+    // 2. Dopasowanie prefiksu frazy (high)
+    const prefix = calculateSearchMatchRelevance('etiopia', 'Etiopia Guji Washed');
+    expect(prefix.grade).toBe('high');
+    expect(prefix.relevanceScore).toBeGreaterThanOrEqual(80);
+    expect(prefix.isPrefixMatch).toBe(true);
+    expect(prefix.explanationEn).toContain('High relevance');
+
+    // 3. Dopasowanie słowa wewnątrz tekstu (word prefix -> high)
+    const wordMatch = calculateSearchMatchRelevance('guji', 'Kawa Etiopia Guji Grade 1');
+    expect(wordMatch.grade).toBe('high');
+    expect(wordMatch.relevanceScore).toBe(80);
+    expect(wordMatch.isSubstringMatch).toBe(true);
+
+    // 4. Dopasowanie podciągu wewnątrz słowa (substring -> medium)
+    const subMatch = calculateSearchMatchRelevance('chem', 'Parzenie kawy w Chemexie');
+    expect(subMatch.grade).toBe('high'); // 'chem' starts 'chemexie' -> wordPrefix!
+    const innerSub = calculateSearchMatchRelevance('mex', 'Parzenie kawy w Chemexie');
+    expect(innerSub.grade).toBe('medium');
+    expect(innerSub.relevanceScore).toBe(60);
+
+    // 5. Zbliżone dopasowanie z literówką (Levenshtein distance)
+    const typo = calculateSearchMatchRelevance('yirgachefe', 'yirgacheffe'); // 1 brakująca litera 'f'
+    expect(['medium', 'high']).toContain(typo.grade);
+    expect(typo.relevanceScore).toBeGreaterThan(0);
+
+    // 6. Całkowity brak dopasowania (none, 0 pkt)
+    const noMatch = calculateSearchMatchRelevance('herbata', 'Kawa Kolumbia');
+    expect(noMatch.grade).toBe('none');
+    expect(noMatch.relevanceScore).toBe(0);
+
+    // 7. Odporność na null i puste stringi
+    const fallback = calculateSearchMatchRelevance(null, null);
+    expect(fallback.grade).toBe('none');
+    expect(fallback.relevanceScore).toBe(0);
+    const resultType: SearchMatchRelevanceResult = fallback;
+    expect(resultType.explanationEn).toBeTruthy();
   });
 });

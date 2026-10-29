@@ -1245,3 +1245,115 @@ export function calculateSearchTermCoverage(
     summaryEn,
   };
 }
+
+export type SearchRelevanceGrade = 'exact' | 'high' | 'medium' | 'low' | 'none';
+
+export interface SearchMatchRelevanceResult {
+  searchTerm: string;
+  targetText: string;
+  relevanceScore: number;
+  grade: SearchRelevanceGrade;
+  isExactMatch: boolean;
+  isPrefixMatch: boolean;
+  isSubstringMatch: boolean;
+  explanationPl: string;
+  explanationEn: string;
+}
+
+/**
+ * Ocenia stopień trafności dopasowania zapytania wyszukiwania do tekstu docelowego,
+ * uwzględniając dopasowanie ścisłe, prefiks słowa, podciąg oraz odległość Levenshteina.
+ */
+export function calculateSearchMatchRelevance(
+  searchTerm: string | undefined | null,
+  targetText: string | undefined | null
+): SearchMatchRelevanceResult {
+  const normTerm = typeof searchTerm === 'string' ? normSearch(searchTerm).trim() : '';
+  const normTarget = typeof targetText === 'string' ? normSearch(targetText).trim() : '';
+
+  if (!normTerm || !normTarget) {
+    return {
+      searchTerm: typeof searchTerm === 'string' ? searchTerm : '',
+      targetText: typeof targetText === 'string' ? targetText : '',
+      relevanceScore: 0,
+      grade: 'none',
+      isExactMatch: false,
+      isPrefixMatch: false,
+      isSubstringMatch: false,
+      explanationPl: 'Brak terminu lub tekstu docelowego — trafność 0.',
+      explanationEn: 'Missing search term or target text — relevance 0.',
+    };
+  }
+
+  const isExactMatch = normTerm === normTarget;
+  const isPrefixMatch = normTarget.startsWith(normTerm);
+  const isSubstringMatch = normTarget.includes(normTerm);
+
+  let relevanceScore = 0;
+  let grade: SearchRelevanceGrade = 'none';
+
+  if (isExactMatch) {
+    relevanceScore = 100;
+    grade = 'exact';
+  } else if (isPrefixMatch) {
+    const ratio = normTerm.length / normTarget.length;
+    relevanceScore = Math.min(95, Math.round(80 + ratio * 15));
+    grade = 'high';
+  } else if (isSubstringMatch) {
+    const words = normTarget.split(/\s+/);
+    const wordPrefix = words.some((w) => w.startsWith(normTerm));
+    if (wordPrefix) {
+      relevanceScore = 80;
+      grade = 'high';
+    } else {
+      relevanceScore = 60;
+      grade = 'medium';
+    }
+  } else {
+    const dist = calculateLevenshteinDistance(normTerm, normTarget);
+    const maxLen = Math.max(normTerm.length, normTarget.length);
+    const similarity = maxLen > 0 ? (maxLen - dist) / maxLen : 0;
+    if (similarity >= 0.7) {
+      relevanceScore = Math.round(similarity * 60);
+      grade = 'medium';
+    } else if (similarity >= 0.4) {
+      relevanceScore = Math.round(similarity * 40);
+      grade = 'low';
+    } else {
+      relevanceScore = 0;
+      grade = 'none';
+    }
+  }
+
+  let explanationPl = '';
+  let explanationEn = '';
+
+  if (grade === 'exact') {
+    explanationPl = 'Ścisłe dopasowanie pełnej frazy (100 punktów).';
+    explanationEn = 'Exact full string match (100 points).';
+  } else if (grade === 'high') {
+    explanationPl = `Wysoka trafność (${relevanceScore}/100): prefiks słowa lub kluczowej frazy.`;
+    explanationEn = `High relevance (${relevanceScore}/100): word or phrase prefix match.`;
+  } else if (grade === 'medium') {
+    explanationPl = `Umiarkowana trafność (${relevanceScore}/100): podciąg w tekście lub bliskie podobieństwo leksykalne.`;
+    explanationEn = `Moderate relevance (${relevanceScore}/100): substring match or close lexical similarity.`;
+  } else if (grade === 'low') {
+    explanationPl = `Niska trafność (${relevanceScore}/100): częściowe dopasowanie z literówkami.`;
+    explanationEn = `Low relevance (${relevanceScore}/100): partial match with potential typos.`;
+  } else {
+    explanationPl = 'Brak dopasowania semantycznego lub leksykalnego (0 punktów).';
+    explanationEn = 'No semantic or lexical match found (0 points).';
+  }
+
+  return {
+    searchTerm: typeof searchTerm === 'string' ? searchTerm : '',
+    targetText: typeof targetText === 'string' ? targetText : '',
+    relevanceScore,
+    grade,
+    isExactMatch,
+    isPrefixMatch,
+    isSubstringMatch,
+    explanationPl,
+    explanationEn,
+  };
+}
