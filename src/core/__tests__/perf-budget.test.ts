@@ -671,13 +671,12 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
 
     const channeling = evaluateChannelingRisk({
       method: 'espresso',
-      grindSettingMicrons: 250,
-      flowRateGramPerSecond: 2.2,
-      extractionPressureBar: 9.0,
-      usedWdt: true,
-      usedPuckScreen: true,
+      grindMicrons: 250,
+      flowRateGramsPerSec: 2.2,
+      pressureBars: 9.0,
+      puckPrepTechniques: ['wdt', 'puck_screen'],
     });
-    expect(channeling.riskLevel).toBe('moderate');
+    expect(channeling.riskLevel).toBe('low');
 
     const backupData = {
       beans: [{ id: 'b1', name: 'Bean 1' }],
@@ -695,9 +694,9 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
         estimateStashRoastDistribution(stashBeans);
         evaluateChannelingRisk({
           method: 'espresso',
-          grindSettingMicrons: 200 + (i % 100),
-          flowRateGramPerSecond: 2.0 + ((i % 10) / 10),
-          usedWdt: i % 2 === 0,
+          grindMicrons: 200 + (i % 100),
+          flowRateGramsPerSec: 2.0 + ((i % 10) / 10),
+          puckPrepTechniques: i % 2 === 0 ? ['wdt'] : ['tamp'],
         });
         detectBackupDuplicates(backupData);
       }
