@@ -2396,3 +2396,97 @@ export function evaluateChannelingRisk(options?: {
     summaryEn,
   };
 }
+
+export type RoastDevelopmentCategory = 'underdeveloped' | 'light_nordic' | 'balanced' | 'baked';
+
+export interface RoastDevelopmentResult {
+  totalRoastTimeSeconds: number;
+  firstCrackTimeSeconds: number;
+  developmentTimeSeconds: number;
+  developmentTimeRatioPercent: number;
+  category: RoastDevelopmentCategory;
+  roastStylePl: string;
+  roastStyleEn: string;
+  advisoryPl: string;
+  advisoryEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Oblicza i analizuje wskaźnik rozwoju wypalania kawy (Development Time Ratio - DTR).
+ * Wzór: DTR (%) = ((Czas całkowity - Czas pierwszego pęknięcia) / Czas całkowity) * 100%
+ */
+export function calculateRoastDevelopmentRatio(
+  totalRoastTimeSeconds?: number | string | null,
+  firstCrackTimeSeconds?: number | string | null
+): RoastDevelopmentResult {
+  const parseNum = (val: unknown, fallback: number, min: number, max: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.min(max, Math.max(min, val));
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.min(max, Math.max(min, parsed));
+      }
+    }
+    return fallback;
+  };
+
+  const total = Math.round(parseNum(totalRoastTimeSeconds, 600, 60, 3600));
+  const fc = Math.round(parseNum(firstCrackTimeSeconds, 480, 30, total));
+
+  const safeFc = Math.min(fc, total);
+  const devSeconds = Math.max(0, total - safeFc);
+  const dtrPercent = total > 0 ? Math.round((devSeconds / total) * 1000) / 10 : 0;
+
+  let category: RoastDevelopmentCategory = 'balanced';
+  let roastStylePl = '';
+  let roastStyleEn = '';
+  let advisoryPl = '';
+  let advisoryEn = '';
+
+  if (dtrPercent < 12.0) {
+    category = 'underdeveloped';
+    roastStylePl = 'Kawa niedorozwinięta (Underdeveloped)';
+    roastStyleEn = 'Underdeveloped Roast';
+    advisoryPl = 'Bardzo krótki czas rozwoju: ryzyko trawiastości, nut warzywnych, ściągającej kwasowości i gęstego, twardego rdzenia ziaren.';
+    advisoryEn = 'Very short development: risk of grassy, vegetal astringency and hard unroasted bean core.';
+  } else if (dtrPercent <= 16.0) {
+    category = 'light_nordic';
+    roastStylePl = 'Profil jasny skandynawski (Light Nordic Filter)';
+    roastStyleEn = 'Light Nordic Filter Profile';
+    advisoryPl = 'Wzorcowy profil pod metody przelewowe (Drip / V60 / AeroPress): krystaliczna czystość, wysoka kwasowość owocowa i pełna ekspresja terroir.';
+    advisoryEn = 'Benchmark pour-over profile (Drip / V60 / AeroPress): sparkling transparency, vibrant fruit acidity, and unmasked terroir.';
+  } else if (dtrPercent <= 22.0) {
+    category = 'balanced';
+    roastStylePl = 'Profil zrównoważony specialty (Omniroast / Espresso)';
+    roastStyleEn = 'Balanced Specialty Profile (Omniroast / Espresso)';
+    advisoryPl = 'Harmonijny rozwój cukrów: wysoka słodycz karmelizacji, zbalansowana kwasowość i gładkie, soczyste body.';
+    advisoryEn = 'Harmonious caramelization: high sweetness, rounded fruit acidity, and silky balanced body.';
+  } else {
+    category = 'baked';
+    roastStylePl = 'Profil przepieczony (Baked / Extended Roast)';
+    roastStyleEn = 'Baked / Extended Roast Profile';
+    advisoryPl = 'Zbyt długi czas rozwoju: utrata lotnych aromatów, płaski chlebowy finisz i degradacja kwasowości organicznej.';
+    advisoryEn = 'Excessive development time: loss of volatile origin aromatics, flat bready notes, and collapsed acidity.';
+  }
+
+  const summaryPl = `Czas rozwoju (DTR): ${dtrPercent.toFixed(1)}% (${devSeconds}s z ${total}s, ${roastStylePl}). ${advisoryPl}`;
+  const summaryEn = `Development Time Ratio (DTR): ${dtrPercent.toFixed(1)}% (${devSeconds}s of ${total}s, ${roastStyleEn}). ${advisoryEn}`;
+
+  return {
+    totalRoastTimeSeconds: total,
+    firstCrackTimeSeconds: safeFc,
+    developmentTimeSeconds: devSeconds,
+    developmentTimeRatioPercent: dtrPercent,
+    category,
+    roastStylePl,
+    roastStyleEn,
+    advisoryPl,
+    advisoryEn,
+    summaryPl,
+    summaryEn,
+  };
+}

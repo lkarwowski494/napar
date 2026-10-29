@@ -43,6 +43,9 @@ import {
   evaluateChannelingRisk,
   ChannelingRiskAssessment,
   ChannelingRiskLevel,
+  calculateRoastDevelopmentRatio,
+  RoastDevelopmentResult,
+  RoastDevelopmentCategory,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -1471,6 +1474,53 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(fallback.riskLevel).toBeDefined();
       const assessment: ChannelingRiskAssessment = fallback;
       expect(assessment.mitigationsEn.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('TASK-P105-04-SZT: calculateRoastDevelopmentRatio analizuje czas rozwoju wypalania (DTR)', () => {
+    it('oblicza wzorcowy profil jasny skandynawski (DTR 14.3%)', () => {
+      // Czas całkowity: 630s (10:30), First crack: 540s (9:00) -> devTime = 90s -> DTR = 90 / 630 = 14.3%
+      const nordic: RoastDevelopmentResult = calculateRoastDevelopmentRatio(630, 540);
+      const cat: RoastDevelopmentCategory = nordic.category;
+      expect(cat).toBe('light_nordic');
+      expect(nordic.developmentTimeSeconds).toBe(90);
+      expect(nordic.developmentTimeRatioPercent).toBe(14.3);
+      expect(nordic.roastStylePl).toContain('skandynawski');
+      expect(nordic.summaryPl).toContain('14.3%');
+    });
+
+    it('wykrywa profil niedorozwinięty (DTR < 12%)', () => {
+      // Total: 600s, FC: 550s -> devTime = 50s -> DTR = 8.3%
+      const under = calculateRoastDevelopmentRatio(600, 550);
+      expect(under.category).toBe('underdeveloped');
+      expect(under.developmentTimeRatioPercent).toBe(8.3);
+      expect(under.advisoryPl).toContain('trawiastości');
+    });
+
+    it('wykrywa profil zbalansowany specialty (DTR 18.0%)', () => {
+      // Total: 600s, FC: 492s -> devTime = 108s -> DTR = 18.0%
+      const balanced = calculateRoastDevelopmentRatio(600, 492);
+      expect(balanced.category).toBe('balanced');
+      expect(balanced.developmentTimeRatioPercent).toBe(18.0);
+      expect(balanced.advisoryEn).toContain('sweetness');
+    });
+
+    it('wykrywa profil przepieczony (baked, DTR > 22%)', () => {
+      // Total: 600s, FC: 450s -> devTime = 150s -> DTR = 25.0%
+      const baked = calculateRoastDevelopmentRatio(600, 450);
+      expect(baked.category).toBe('baked');
+      expect(baked.developmentTimeRatioPercent).toBe(25.0);
+      expect(baked.roastStylePl).toContain('przepieczony');
+    });
+
+    it('obsługuje null i stringi', () => {
+      const fallback = calculateRoastDevelopmentRatio(null, null);
+      expect(fallback.totalRoastTimeSeconds).toBe(600);
+      expect(fallback.firstCrackTimeSeconds).toBe(480);
+      expect(fallback.developmentTimeRatioPercent).toBe(20.0);
+      expect(fallback.category).toBe('balanced');
+      const devRes: RoastDevelopmentResult = fallback;
+      expect(devRes.summaryEn).toBeTruthy();
     });
   });
 });
