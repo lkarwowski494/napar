@@ -2220,3 +2220,85 @@ export function evaluateSwitchImmersionRatio(options?: {
     brewingRecommendationEn,
   };
 }
+
+export type ZeroBypassBrewStyle = 'high_yield_clarity' | 'balanced_zero_bypass' | 'concentrated_short';
+
+export interface ZeroBypassEvaluation {
+  ratio: number;
+  status: 'under_concentrated' | 'optimal' | 'intense_high_extraction';
+  style: ZeroBypassBrewStyle;
+  recommendedMinRatio: number;
+  recommendedMaxRatio: number;
+  advisoryPl: string;
+  advisoryEn: string;
+}
+
+export function evaluateZeroBypassRatio(
+  ratioInput?: number | string | null,
+  options?: {
+    isPulsarValveControlled?: boolean | null;
+  } | null
+): ZeroBypassEvaluation {
+  const parseNum = (val: unknown, fallback: number, min: number, max: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.max(min, Math.min(max, val));
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.max(min, Math.min(max, parsed));
+      }
+    }
+    return fallback;
+  };
+
+  const ratio = Math.round(parseNum(ratioInput, 18, 5, 35) * 10) / 10;
+  const isPulsar = options?.isPulsarValveControlled === true;
+
+  let status: 'under_concentrated' | 'optimal' | 'intense_high_extraction' = 'optimal';
+  let style: ZeroBypassBrewStyle = 'balanced_zero_bypass';
+  let advisoryPl = '';
+  let advisoryEn = '';
+
+  const recommendedMinRatio = 16;
+  const recommendedMaxRatio = 21;
+
+  if (ratio < recommendedMinRatio) {
+    status = 'intense_high_extraction';
+    style = 'concentrated_short';
+    advisoryPl = `Proporcja 1:${ratio}: bardzo wysokie stężenie i intensywność. Ze względu na 100% przepływu wody przez złoże kawy w zaparzaczu zero-bypass, zaleca się proporcję 1:17 do 1:20 dla uzyskania wyższej czystości smaku.`;
+    advisoryEn = `Ratio 1:${ratio}: very high concentration and intensity. Due to 100% water contact in zero-bypass brewers, 1:17 to 1:20 is recommended for superior sweetness and clarity.`;
+  } else if (ratio > recommendedMaxRatio) {
+    status = 'under_concentrated';
+    style = 'high_yield_clarity';
+    advisoryPl = `Proporcja 1:${ratio}: niska koncentracja TDS. Ryzyko ściągającego finiszu i nadekstrakcji późnych tanin. Rozważ zmniejszenie proporcji do maksymalnie 1:20.`;
+    advisoryEn = `Ratio 1:${ratio}: low TDS concentration. Risk of astringency and overextracted bitter tannins. Consider dialing back to 1:20.`;
+  } else {
+    status = 'optimal';
+    if (ratio >= 19.0) {
+      style = 'high_yield_clarity';
+      advisoryPl = `Proporcja 1:${ratio}: wysoka czystość i krystaliczny profil smakowy zero-bypass. Doskonały balans pomiędzy wysokim uzyskiem (22–25% EY) a lekkim body.`;
+      advisoryEn = `Ratio 1:${ratio}: high clarity and sparkling zero-bypass profile. Superb balance between elevated extraction (22–25% EY) and transparent body.`;
+    } else {
+      style = 'balanced_zero_bypass';
+      advisoryPl = `Proporcja 1:${ratio}: optymalna proporcja zero-bypass. Pełny balans słodyczy, czystej kwasowości i soczystego body przy zerowym ominięciu złoża.`;
+      advisoryEn = `Ratio 1:${ratio}: optimal zero-bypass ratio. Excellent balance of sweetness, clean acidity, and juicy body with zero filter bypass.`;
+    }
+  }
+
+  if (isPulsar) {
+    advisoryPl += ' [NextLevel Pulsar: wykorzystaj zawór przepływu do 30–45s pełnej preinfuzji immersyjnej przed otwarciem perkolacji].';
+    advisoryEn += ' [NextLevel Pulsar: leverage the flow control valve for a 30–45s steep immersion bloom before opening percolation].';
+  }
+
+  return {
+    ratio,
+    status,
+    style,
+    recommendedMinRatio,
+    recommendedMaxRatio,
+    advisoryPl,
+    advisoryEn,
+  };
+}
+

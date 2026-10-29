@@ -59,6 +59,9 @@ import {
   evaluateSwitchImmersionRatio,
   SwitchImmersionEvaluation,
   SwitchBrewStyle,
+  evaluateZeroBypassRatio,
+  ZeroBypassEvaluation,
+  ZeroBypassBrewStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -1268,6 +1271,43 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(fallback.doseGrams).toBe(18);
       expect(fallback.waterGrams).toBe(280);
       expect(fallback.style).toBe('classic_switch');
+    });
+
+    it('TASK-P101-11-WZR: evaluateZeroBypassRatio ewaluuje proporcje parzenia zero-bypass (Tricolate, NextLevel Pulsar)', () => {
+      // 1. Zbalansowana ekstrakcja zero-bypass (1:18)
+      const optimal = evaluateZeroBypassRatio(18);
+      expect(optimal.ratio).toBe(18);
+      expect(optimal.status).toBe('optimal');
+      expect(optimal.style).toBe('balanced_zero_bypass');
+      expect(optimal.recommendedMinRatio).toBe(16);
+      expect(optimal.recommendedMaxRatio).toBe(21);
+      expect(optimal.advisoryPl).toContain('optymalna proporcja');
+      const styleType: ZeroBypassBrewStyle = optimal.style;
+      expect(styleType).toBe('balanced_zero_bypass');
+
+      // 2. Wysoka czystość / wyższa proporcja (1:20) z kontrolą zaworu Pulsar
+      const pulsarClarity = evaluateZeroBypassRatio('20.0', { isPulsarValveControlled: true });
+      expect(pulsarClarity.ratio).toBe(20);
+      expect(pulsarClarity.status).toBe('optimal');
+      expect(pulsarClarity.style).toBe('high_yield_clarity');
+      expect(pulsarClarity.advisoryPl).toContain('Pulsar');
+
+      // 3. Zbyt niska proporcja (1:14) -> zbyt intensywny napar
+      const shortBrew = evaluateZeroBypassRatio(14);
+      expect(shortBrew.status).toBe('intense_high_extraction');
+      expect(shortBrew.style).toBe('concentrated_short');
+
+      // 4. Zbyt wysoka proporcja (1:24) -> niska koncentracja i taniny
+      const overExt = evaluateZeroBypassRatio(24);
+      expect(overExt.status).toBe('under_concentrated');
+      expect(overExt.advisoryEn).toContain('Consider');
+
+      // 5. Odporność na null i anomalie
+      const fallback = evaluateZeroBypassRatio(null, null);
+      expect(fallback.ratio).toBe(18);
+      expect(fallback.status).toBe('optimal');
+      const evalResult: ZeroBypassEvaluation = fallback;
+      expect(evalResult.advisoryEn).toBeTruthy();
     });
   });
 });
