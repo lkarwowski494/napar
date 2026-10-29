@@ -1850,7 +1850,7 @@ export function evaluateInventoryStashLimit(options?: {
   currentItemCount?: number | string | null;
   isProUser?: boolean | null;
   maxFreeLimit?: number | string | null;
-}): InventoryStashLimitEvaluation {
+} | null): InventoryStashLimitEvaluation {
   const parseNum = (val: unknown, fallback: number, min: number): number => {
     if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
       return Math.max(min, val);
