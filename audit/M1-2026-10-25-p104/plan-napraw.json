@@ -1,0 +1,53 @@
+{
+  "cycle": "P104",
+  "status": "completed",
+  "perspectives": [
+    "11-WZR",
+    "12-NIE",
+    "01-ODK",
+    "02-MON",
+    "03-ZAK"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P104-11-WZR",
+      "perspective": "11-WZR",
+      "description": "Implementacja kalkulatora rozcieńczania koncentratu Cold Brew calculateColdBrewDilutionRatio z typami ColdBrewDilutionResult i ColdBrewStrengthCategory w src/core/domain-rules.ts i src/core/__tests__/domain-rules.test.ts",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P104-12-NIE",
+      "perspective": "12-NIE",
+      "description": "Implementacja testu odpornościowego Chaos 27 (2 000 iteracji fuzzingu dla funkcji wprowadzonych w P103) w src/core/__tests__/fuzz-resilience.test.ts",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P104-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Implementacja oceny trafności dopasowania wyszukiwania calculateSearchMatchRelevance z typami SearchMatchRelevanceResult i SearchRelevanceGrade w src/core/search-utils.ts i src/core/__tests__/search-utils.test.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P104-02-MON",
+      "perspective": "02-MON",
+      "description": "Implementacja ewaluatora dostępu do zaawansowanych formatów eksportu evaluateExportFormatAccess z typami ExportFormatAccessEvaluation i ExportFormatTier w src/core/app-access.ts i src/core/__tests__/app-access.test.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P104-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja wskaźnika świeżości kawy w spiżarni calculateStashFreshnessIndex z typami StashFreshnessReport i BeanFreshnessStage w src/core/database.ts i src/core/__tests__/database.test.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    }
+  ]
+}
