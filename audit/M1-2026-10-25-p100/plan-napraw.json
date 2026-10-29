@@ -1,0 +1,53 @@
+{
+  "cycle": "P100",
+  "status": "completed",
+  "perspectives": [
+    "03-ZAK",
+    "04-SZT",
+    "05-ARC",
+    "06-TRE",
+    "07-JAK"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P100-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja analizatora efektywności kosztowej spiżarni calculateStashCostEfficiency z typami StashCostEfficiencyReport i StashCostEfficiencyTier w src/core/database.ts i src/core/__tests__/database.test.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P100-04-SZT",
+      "perspective": "04-SZT",
+      "description": "Implementacja predyktora profilu mielenia na podstawie obróbki i stopnia palenia predictGrindProfileByProcessAndRoast z typami PredictedGrindProfile i GrindDensityCategory w src/core/bpr-engine.ts i src/core/__tests__/bpr-engine.test.ts",
+      "targetFile": "src/core/bpr-engine.ts",
+      "testFile": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P100-05-ARC",
+      "perspective": "05-ARC",
+      "description": "Implementacja generatora deterministycznej sumy kontrolnej kopii zapasowej computeBackupChecksum z typem BackupChecksumResult w src/core/backup.ts i src/core/__tests__/backup.test.ts",
+      "targetFile": "src/core/backup.ts",
+      "testFile": "src/core/__tests__/backup.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P100-06-TRE",
+      "perspective": "06-TRE",
+      "description": "Implementacja rekomendatora metod parzenia dla terroir recommendBrewMethodsForOrigin z typami OriginBrewRecommendation i OriginBrewMethodMatch w src/core/knowledge-data.ts i src/core/__tests__/knowledge.test.ts",
+      "targetFile": "src/core/knowledge-data.ts",
+      "testFile": "src/core/__tests__/knowledge.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P100-07-JAK",
+      "perspective": "07-JAK",
+      "description": "Implementacja kalkulatora wpływu wrzenia i dekarbonizacji wody calculateBoilingDegassingImpact z typami BoilingDegassingImpact i DegassingEfficiencyLevel w src/core/water-chemistry.ts i src/core/__tests__/water-chemistry.test.ts",
+      "targetFile": "src/core/water-chemistry.ts",
+      "testFile": "src/core/__tests__/water-chemistry.test.ts",
+      "status": "completed"
+    }
+  ]
+}
