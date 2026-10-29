@@ -614,14 +614,14 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
       initialWeightGrams: 250,
       remainingWeightGrams: 200,
       price: 60,
-    };
+    } as any;
 
     const efficiency = calculateStashCostEfficiency([stashItem], { standardDoseGrams: 15 });
     expect(efficiency.totalItemsCount).toBe(1);
     expect(efficiency.estimatedCostPerCupPln).toBe(3.6);
     expect(efficiency.tier).toBe('specialty');
 
-    const grindPred = predictGrindProfileByProcessAndRoast('washed', 'light');
+    const grindPred = predictGrindProfileByProcessAndRoast({ process: 'washed', roastLevel: 'light' });
     expect(grindPred.densityCategory).toBe('very_dense');
     expect(grindPred.recommendedMicrons).toBeGreaterThan(0);
     expect(grindPred.cloggingRisk).toBe('low');
@@ -642,7 +642,7 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     const ms = measureCpuMs(() => {
       for (let i = 0; i < 10000; i++) {
         calculateStashCostEfficiency([stashItem], { standardDoseGrams: 15 + (i % 5) });
-        predictGrindProfileByProcessAndRoast(i % 2 === 0 ? 'washed' : 'natural', i % 3 === 0 ? 'light' : 'medium');
+        predictGrindProfileByProcessAndRoast({ process: i % 2 === 0 ? 'washed' : 'natural', roastLevel: i % 3 === 0 ? 'light' : 'medium' });
         recommendBrewMethodsForOrigin(i % 2 === 0 ? 'ethiopia' : 'colombia', 'en');
         calculateBoilingDegassingImpact({ initialAlkalinityPpm: 50 + (i % 20), boilingDurationSeconds: 60 + (i % 60) });
       }

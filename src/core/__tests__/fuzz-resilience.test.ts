@@ -1613,7 +1613,7 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof stashEff.estimatedCostPerCupPln).toBe('number');
 
       // 2. predictGrindProfileByProcessAndRoast
-      const grindPred = predictGrindProfileByProcessAndRoast(val, val);
+      const grindPred = predictGrindProfileByProcessAndRoast(val);
       expect(typeof grindPred).toBe('object');
       expect(typeof grindPred.baseMicrons).toBe('number');
       expect(typeof grindPred.densityCategory).toBe('string');

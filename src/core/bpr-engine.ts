@@ -2143,7 +2143,7 @@ export function predictGrindProfileByProcessAndRoast(options?: {
   process?: string | null;
   roastLevel?: string | null;
   baseMicrons?: number | string | null;
-}): PredictedGrindProfile {
+} | null): PredictedGrindProfile {
   const parseBase = (val: unknown, fallback: number): number => {
     if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
       return Math.max(100, Math.min(2000, val));
