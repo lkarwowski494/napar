@@ -50,6 +50,7 @@ import {
   calculateWaterHardnessScale,
   evaluateWaterAlkalinityBuffer,
   calculateBoilingDegassingImpact,
+  evaluateLarsonSkoldIndex,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -71,6 +72,7 @@ import {
   estimateGrindDistributionSpread,
   calculateGrinderBurrCalibration,
   estimateRdtStaticReduction,
+  calculateBurrGeometryProfile,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -95,6 +97,7 @@ import {
   formatFlowRateProfile,
   formatExtractionPressure,
   formatRoastWeightLoss,
+  formatBoilingPointAtAltitude,
   wInKeep,
 } from '../unit-converter';
 import {
@@ -113,6 +116,7 @@ import {
   compareCoffeeOrigins,
   compareTeaCategories,
   recommendBrewMethodsForOrigin,
+  compareRoastLevels,
 } from '../knowledge-data';
 import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed, detectBrewingHabitDrift, generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, calculateBrewConsistencyIndex, generateExtractionTroubleshootingGuide, predictGrindProfileByProcessAndRoast } from '../bpr-engine';
 import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize, compareBackupVersions, generateBackupMigrationPlan, calculateBackupHealthScore, compactBackupEnvelope, auditBackupRelationalIntegrity, computeBackupChecksum } from '../backup';
@@ -1667,6 +1671,70 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof alkBuffer).toBe('object');
       expect(typeof alkBuffer.level).toBe('string');
       expect(typeof alkBuffer.alkalinityPpm).toBe('number');
+    }
+  });
+
+  test('Chaos 27: 2 000 iteracji fuzzingu dla funkcji z P103: compareRoastLevels, evaluateLarsonSkoldIndex, calculateBurrGeometryProfile, formatBoilingPointAtAltitude (TASK-P104-12-NIE)', () => {
+    const corruptPool = [
+      -100000, -99.9, -1, -0, 0, 0.0001, 1, 15.5, 60, 93, 100, 250, 1500, 2400, 8848, 100000,
+      NaN, Infinity, -Infinity,
+      '', '   ', '\uFEFFlight', 'dark', 'medium', '35.45', '120,5', 'invalid',
+      null, undefined, true, false,
+      {}, { burrType: 'conical', burrDiameterMm: '48', targetMethod: 'espresso' },
+      { burrType: null, burrDiameterMm: NaN },
+      [], ['light'], () => {},
+    ];
+
+    for (let i = 0; i < 2000; i++) {
+      const a = corruptPool[i % corruptPool.length];
+      const b = corruptPool[(i * 3 + 1) % corruptPool.length];
+      const c = corruptPool[(i * 7 + 2) % corruptPool.length];
+
+      // 1. compareRoastLevels
+      const roastComp = compareRoastLevels(a as any, b as any, c as any);
+      expect(roastComp === null || typeof roastComp === 'object').toBe(true);
+      if (roastComp) {
+        expect(typeof roastComp.acidityDiff).toBe('number');
+        expect(typeof roastComp.bitternessDiff).toBe('number');
+        expect(typeof roastComp.summaryPl).toBe('string');
+        expect(typeof roastComp.summaryEn).toBe('string');
+      }
+
+      // 2. evaluateLarsonSkoldIndex
+      const larson = evaluateLarsonSkoldIndex(a as any, b as any, c as any);
+      expect(typeof larson).toBe('object');
+      expect(typeof larson.larsonSkoldIndex).toBe('number');
+      expect(Number.isFinite(larson.larsonSkoldIndex)).toBe(true);
+      expect(typeof larson.riskLevel).toBe('string');
+      expect(typeof larson.summaryPl).toBe('string');
+      expect(typeof larson.summaryEn).toBe('string');
+
+      // 3. calculateBurrGeometryProfile
+      const burrOpt = typeof a === 'object' && a !== null ? a : { burrType: a as any, burrDiameterMm: b as any, targetMethod: c as any };
+      const burrProf = calculateBurrGeometryProfile(burrOpt as any);
+      expect(typeof burrProf).toBe('object');
+      expect(typeof burrProf.burrDiameterMm).toBe('number');
+      expect(Number.isFinite(burrProf.burrDiameterMm)).toBe(true);
+      expect(typeof burrProf.distributionType).toBe('string');
+      expect(typeof burrProf.clarityScore).toBe('number');
+      expect(typeof burrProf.summaryPl).toBe('string');
+      expect(typeof burrProf.summaryEn).toBe('string');
+
+      // 4. formatBoilingPointAtAltitude
+      const targetUnit = i % 2 === 0 ? 'F' : 'C';
+      const locale = i % 3 === 0 ? 'en' : 'pl';
+      const boil = formatBoilingPointAtAltitude(a as any, targetUnit as any, locale);
+      expect(typeof boil).toBe('object');
+      expect(typeof boil.altitudeMeters).toBe('number');
+      expect(Number.isFinite(boil.altitudeMeters)).toBe(true);
+      expect(typeof boil.boilingPointCelsius).toBe('number');
+      expect(Number.isFinite(boil.boilingPointCelsius)).toBe(true);
+      expect(typeof boil.boilingPointFahrenheit).toBe('number');
+      expect(Number.isFinite(boil.boilingPointFahrenheit)).toBe(true);
+      expect(typeof boil.formattedTemperature).toBe('string');
+      expect(boil.formattedTemperature).not.toContain('NaN');
+      expect(typeof boil.summaryPl).toBe('string');
+      expect(typeof boil.summaryEn).toBe('string');
     }
   });
 
