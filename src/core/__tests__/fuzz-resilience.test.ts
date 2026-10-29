@@ -28,6 +28,7 @@ import {
   evaluateCuppingRatio,
   evaluateSiphonRatio,
   evaluateChemexRatio,
+  evaluateSwitchImmersionRatio,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
@@ -46,6 +47,7 @@ import {
   evaluateLimescaleRisk,
   evaluateBoilerCorrosionRisk,
   calculateWaterHardnessScale,
+  evaluateWaterAlkalinityBuffer,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -65,6 +67,7 @@ import {
   estimateGrinderRetention,
   estimateBurrSeasoningProgress,
   estimateGrindDistributionSpread,
+  calculateGrinderBurrCalibration,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -87,6 +90,7 @@ import {
   formatStashWeight,
   formatCostPerCup,
   formatFlowRateProfile,
+  formatExtractionPressure,
   wInKeep,
 } from '../unit-converter';
 import {
@@ -103,12 +107,13 @@ import {
   compareCoffeeProcesses,
   compareCoffeeVarieties,
   compareCoffeeOrigins,
+  compareTeaCategories,
 } from '../knowledge-data';
-import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed, detectBrewingHabitDrift, generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, calculateBrewConsistencyIndex } from '../bpr-engine';
-import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize, compareBackupVersions, generateBackupMigrationPlan, calculateBackupHealthScore, compactBackupEnvelope } from '../backup';
-import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings, evaluateTrialStatus, calculateLifetimeBreakEven, compareSubscriptionPlans, evaluateUpsellTrigger } from '../app-access';
-import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate, calculateBeanRestingReadiness, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover } from '../database';
-import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore, filterSearchEntriesByTags, filterBySearchFacets, parseSearchQuery } from '../search-utils';
+import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed, detectBrewingHabitDrift, generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, calculateBrewConsistencyIndex, generateExtractionTroubleshootingGuide } from '../bpr-engine';
+import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize, compareBackupVersions, generateBackupMigrationPlan, calculateBackupHealthScore, compactBackupEnvelope, auditBackupRelationalIntegrity } from '../backup';
+import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings, evaluateTrialStatus, calculateLifetimeBreakEven, compareSubscriptionPlans, evaluateUpsellTrigger, evaluateFeatureEntitlement } from '../app-access';
+import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate, calculateBeanRestingReadiness, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover, calculateStashDepletionForecast } from '../database';
+import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore, filterSearchEntriesByTags, filterBySearchFacets, parseSearchQuery, highlightSearchMatches } from '../search-utils';
 
 const mockDb: any = {
   inventory: new Map(),
@@ -1470,6 +1475,100 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof parsedQuery.fieldFilters).toBe('object');
       expect(Array.isArray(parsedQuery.negatedTokens)).toBe(true);
       expect(typeof parsedQuery.isEmpty).toBe('boolean');
+    }
+  });
+
+  test('TASK-P99-12-NIE: Chaos 25: Fuzzing 10 nowych funkcji domenowych (Switch, Alkalinity, BurrCalibration, Pressure, TeaComp, Troubleshooting, RelationalAudit, FeatureEntitlement, StashForecast, HighlightMatches)', () => {
+    const chaoticPayloads: any[] = [
+      null,
+      undefined,
+      NaN,
+      Infinity,
+      -Infinity,
+      -0,
+      0,
+      -999999,
+      999999999,
+      '',
+      '   ',
+      '\uFEFF\u0000',
+      '\' OR 1=1 --',
+      '<script>alert("xss")</script>',
+      '{{constructor.constructor("alert(1)")()}}',
+      'invalid,string.number',
+      [],
+      [null, undefined, NaN, 'bad'],
+      {},
+      { id: null, dose: -10, nested: { corrupt: true } },
+      new Date('invalid date'),
+      true,
+      false,
+    ];
+
+    for (const val of chaoticPayloads) {
+      // 1. evaluateSwitchImmersionRatio
+      const switchRes = evaluateSwitchImmersionRatio(val);
+      expect(typeof switchRes).toBe('object');
+      expect(typeof switchRes.ratio).toBe('number');
+      expect(typeof switchRes.style).toBe('string');
+      expect(typeof switchRes.isOptimalSwitch).toBe('boolean');
+
+      // 2. evaluateWaterAlkalinityBuffer
+      const alkBuffer = evaluateWaterAlkalinityBuffer(val);
+      expect(typeof alkBuffer).toBe('object');
+      expect(typeof alkBuffer.alkalinityPpm).toBe('number');
+      expect(typeof alkBuffer.level).toBe('string');
+      expect(typeof alkBuffer.isScaOptimal).toBe('boolean');
+
+      // 3. calculateGrinderBurrCalibration
+      const burrCalib = calculateGrinderBurrCalibration(val);
+      expect(typeof burrCalib).toBe('object');
+      expect(typeof burrCalib.status).toBe('string');
+      expect(typeof burrCalib.currentClick).toBe('number');
+
+      // 4. formatExtractionPressure
+      const press = formatExtractionPressure(val);
+      expect(typeof press).toBe('object');
+      expect(typeof press.bars).toBe('number');
+      expect(typeof press.zone).toBe('string');
+      expect(typeof press.formattedMetric).toBe('string');
+
+      // 5. compareTeaCategories
+      const teaComp = compareTeaCategories(val, val);
+      expect(teaComp === null || typeof teaComp === 'object').toBe(true);
+
+      // 6. generateExtractionTroubleshootingGuide
+      const trouble = generateExtractionTroubleshootingGuide(val);
+      expect(typeof trouble).toBe('object');
+      expect(typeof trouble.primaryIssue).toBe('string');
+      expect(typeof trouble.severity).toBe('string');
+      expect(Array.isArray(trouble.actions)).toBe(true);
+
+      // 7. auditBackupRelationalIntegrity
+      const auditRel = auditBackupRelationalIntegrity(val);
+      expect(typeof auditRel).toBe('object');
+      expect(typeof auditRel.isFullyConsistent).toBe('boolean');
+      expect(Array.isArray(auditRel.orphans)).toBe(true);
+
+      // 8. evaluateFeatureEntitlement
+      const entitle = evaluateFeatureEntitlement(val, val);
+      expect(typeof entitle).toBe('object');
+      expect(typeof entitle.isEntitled).toBe('boolean');
+      expect(typeof entitle.requiresPro).toBe('boolean');
+
+      // 9. calculateStashDepletionForecast
+      const forecast = calculateStashDepletionForecast(val, val);
+      expect(typeof forecast).toBe('object');
+      expect(typeof forecast.totalRemainingWeightGrams).toBe('number');
+      expect(typeof forecast.urgency).toBe('string');
+
+      // 10. highlightSearchMatches
+      const highlighted = highlightSearchMatches(val, val);
+      expect(Array.isArray(highlighted)).toBe(true);
+      for (const h of highlighted) {
+        expect(typeof h.text).toBe('string');
+        expect(typeof h.isMatch).toBe('boolean');
+      }
     }
   });
 });
