@@ -2859,3 +2859,101 @@ export function evaluateStashTurnover(
     summaryEn,
   };
 }
+
+
+export type StashDepletionUrgency = 'critical' | 'low_stock' | 'adequate' | 'abundant';
+
+export interface StashDepletionForecast {
+  totalRemainingWeightGrams: number;
+  dailyConsumptionGrams: number;
+  estimatedDaysRemaining: number;
+  projectedDepletionDateIso: string;
+  urgency: StashDepletionUrgency;
+  activeItemCount: number;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function calculateStashDepletionForecast(
+  items: InventoryItem[] | undefined | null,
+  options?: {
+    dailyConsumptionGrams?: number | string | null;
+    referenceDateIso?: string | null;
+  } | null
+): StashDepletionForecast {
+  const safeItems = Array.isArray(items) ? items : [];
+
+  const rawDaily =
+    options?.dailyConsumptionGrams != null ? Number(options.dailyConsumptionGrams) : NaN;
+  const dailyConsumptionGrams = Number.isFinite(rawDaily) && rawDaily > 0 ? rawDaily : 30;
+
+  let baseDate = new Date();
+  if (typeof options?.referenceDateIso === 'string' && options.referenceDateIso.trim()) {
+    const parsed = new Date(options.referenceDateIso.trim());
+    if (!isNaN(parsed.getTime())) {
+      baseDate = parsed;
+    }
+  }
+
+  let totalRemainingWeightGrams = 0;
+  let activeItemCount = 0;
+
+  for (const item of safeItems) {
+    if (!item || typeof item !== 'object') continue;
+    if (item.isArchived) continue;
+
+    const rem =
+      typeof item.remainingWeightGrams === 'number' &&
+      Number.isFinite(item.remainingWeightGrams) &&
+      item.remainingWeightGrams > 0
+        ? item.remainingWeightGrams
+        : 0;
+
+    if (rem > 0) {
+      totalRemainingWeightGrams += rem;
+      activeItemCount++;
+    }
+  }
+
+  totalRemainingWeightGrams = Math.round(totalRemainingWeightGrams * 10) / 10;
+  const estimatedDaysRemaining =
+    dailyConsumptionGrams > 0
+      ? Math.floor(totalRemainingWeightGrams / dailyConsumptionGrams)
+      : 0;
+
+  const targetDate = new Date(baseDate.getTime() + estimatedDaysRemaining * 86400000);
+  const projectedDepletionDateIso = targetDate.toISOString().slice(0, 10);
+
+  let urgency: StashDepletionUrgency = 'critical';
+  let summaryPl = `Brak zapasów w spiżarni! Konieczne pilne zamówienie kawy.`;
+  let summaryEn = `No stash remaining! Urgent coffee reorder required.`;
+
+  if (estimatedDaysRemaining > 21) {
+    urgency = 'abundant';
+    summaryPl = `Zapas obfity: wystarczy na około ${estimatedDaysRemaining} dni (do ${projectedDepletionDateIso}). Aktywne paczki: ${activeItemCount}.`;
+    summaryEn = `Abundant supply: lasts approximately ${estimatedDaysRemaining} days (until ${projectedDepletionDateIso}). Active bags: ${activeItemCount}.`;
+  } else if (estimatedDaysRemaining >= 8) {
+    urgency = 'adequate';
+    summaryPl = `Zapas stabilny: wystarczy na około ${estimatedDaysRemaining} dni (do ${projectedDepletionDateIso}). Aktywne paczki: ${activeItemCount}.`;
+    summaryEn = `Adequate supply: lasts approximately ${estimatedDaysRemaining} days (until ${projectedDepletionDateIso}). Active bags: ${activeItemCount}.`;
+  } else if (estimatedDaysRemaining >= 3) {
+    urgency = 'low_stock';
+    summaryPl = `Niski stan zapasów: pozostało na około ${estimatedDaysRemaining} dni (do ${projectedDepletionDateIso}). Zalecane zamówienie nowej paczki.`;
+    summaryEn = `Low stock: approximately ${estimatedDaysRemaining} days remaining (until ${projectedDepletionDateIso}). Recommended to reorder.`;
+  } else if (estimatedDaysRemaining > 0) {
+    urgency = 'critical';
+    summaryPl = `Krytyczny stan zapasów: pozostało na zaledwie ${estimatedDaysRemaining} dni (do ${projectedDepletionDateIso})!`;
+    summaryEn = `Critical stock: only ${estimatedDaysRemaining} days remaining (until ${projectedDepletionDateIso})!`;
+  }
+
+  return {
+    totalRemainingWeightGrams,
+    dailyConsumptionGrams,
+    estimatedDaysRemaining,
+    projectedDepletionDateIso,
+    urgency,
+    activeItemCount,
+    summaryPl,
+    summaryEn,
+  };
+}

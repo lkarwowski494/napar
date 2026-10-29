@@ -38,6 +38,9 @@ import {
   StashBrewsEstimate,
   evaluateStashTurnover,
   StashTurnoverAnalysis,
+  calculateStashDepletionForecast,
+  StashDepletionForecast,
+  StashDepletionUrgency,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -3223,5 +3226,45 @@ describe('Napar SQLite Database & Repositories', () => {
 
     const nullTurnover = evaluateStashTurnover(null);
     expect(nullTurnover.totalItems).toBe(0);
+  });
+
+  it('TASK-P97-03-ZAK: calculateStashDepletionForecast prognozuje datę wyczerpania i pilność uzupełnienia zapasów', () => {
+    const items = [
+      { id: '1', name: 'Ethiopia', remainingWeightGrams: 150, isArchived: false },
+      { id: '2', name: 'Kenya', remainingWeightGrams: 150, isArchived: false },
+      { id: '3', name: 'Empty', remainingWeightGrams: 0, isArchived: false },
+      { id: '4', name: 'Archived', remainingWeightGrams: 200, isArchived: true },
+    ] as any[];
+
+    // 300g łącznie przy 30g/dzień -> 10 dni, data ref: 2026-11-01 -> wyczerpanie: 2026-11-11
+    const forecast: StashDepletionForecast = calculateStashDepletionForecast(items, {
+      dailyConsumptionGrams: 30,
+      referenceDateIso: '2026-11-01T08:00:00.000Z',
+    });
+    const testUrgency: StashDepletionUrgency = forecast.urgency;
+    expect(testUrgency).toBe('adequate');
+    expect(forecast.totalRemainingWeightGrams).toBe(300);
+    expect(forecast.activeItemCount).toBe(2);
+    expect(forecast.estimatedDaysRemaining).toBe(10);
+    expect(forecast.projectedDepletionDateIso).toBe('2026-11-11');
+    expect(forecast.summaryPl).toContain('10 dni');
+    expect(forecast.summaryEn).toBeDefined();
+
+    // Niski stan zapasów (< 3 dni) -> critical
+    const critical = calculateStashDepletionForecast(
+      [{ id: '1', remainingWeightGrams: 50, isArchived: false }] as any,
+      { dailyConsumptionGrams: 30, referenceDateIso: '2026-11-01T08:00:00.000Z' }
+    );
+    expect(critical.estimatedDaysRemaining).toBe(1);
+    expect(critical.urgency).toBe('critical');
+
+    // Pusty inwentarz
+    const empty = calculateStashDepletionForecast([]);
+    expect(empty.estimatedDaysRemaining).toBe(0);
+    expect(empty.urgency).toBe('critical');
+    expect(empty.summaryPl).toContain('Brak zapasów');
+
+    const nullForecast = calculateStashDepletionForecast(null);
+    expect(nullForecast.estimatedDaysRemaining).toBe(0);
   });
 });
