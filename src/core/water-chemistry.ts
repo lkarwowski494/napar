@@ -2376,3 +2376,124 @@ export function evaluateLarsonSkoldIndex(
     summaryEn,
   };
 }
+
+export type ConductivityScaleCategory =
+  | 'ultra_pure'
+  | 'soft_specialty'
+  | 'balanced_sca'
+  | 'hard_tap';
+
+export interface ConductivityToTdsResult {
+  conductivityUsCm: number;
+  conversionFactor: number;
+  factorName: string;
+  tdsPpm: number;
+  category: ConductivityScaleCategory;
+  categoryLabelPl: string;
+  categoryLabelEn: string;
+  suitabilityPl: string;
+  suitabilityEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Konwertuje przewodność elektryczną wody (EC w µS/cm) na sumę substancji rozpuszczonych (TDS w ppm)
+ * w oparciu o współczynniki kalibracji (Coffee Standard 0.50, Natural 442 0.64, KCl 0.70).
+ */
+export function convertConductivityToTds(
+  conductivityUsCm?: number | string | null,
+  conversionFactor?: number | 'coffee' | 'standard' | 'natural_442' | string | null
+): ConductivityToTdsResult {
+  const parseNum = (val: unknown, fallback: number, min: number, max: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.min(max, Math.max(min, val));
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.min(max, Math.max(min, parsed));
+      }
+    }
+    return fallback;
+  };
+
+  const ec = Math.round(parseNum(conductivityUsCm, 150, 0, 5000) * 10) / 10;
+
+  let factor = 0.5;
+  let factorName = 'Coffee Standard (0.50)';
+
+  if (typeof conversionFactor === 'string') {
+    const rawF = conversionFactor.trim().toLowerCase();
+    if (rawF.includes('442') || rawF.includes('natural')) {
+      factor = 0.64;
+      factorName = 'Natural 442 (0.64)';
+    } else if (rawF.includes('kcl') || rawF.includes('high')) {
+      factor = 0.7;
+      factorName = 'KCl Standard (0.70)';
+    } else if (rawF.includes('coffee') || rawF.includes('standard')) {
+      factor = 0.5;
+      factorName = 'Coffee Standard (0.50)';
+    } else {
+      const numF = parseFloat(rawF.replace(',', '.'));
+      if (Number.isFinite(numF)) {
+        factor = Math.min(0.85, Math.max(0.45, Math.round(numF * 100) / 100));
+        factorName = `Custom (${factor.toFixed(2)})`;
+      }
+    }
+  } else if (typeof conversionFactor === 'number' && Number.isFinite(conversionFactor)) {
+    factor = Math.min(0.85, Math.max(0.45, Math.round(conversionFactor * 100) / 100));
+    factorName = `Custom (${factor.toFixed(2)})`;
+  }
+
+  const tdsPpm = Math.round(ec * factor * 10) / 10;
+
+  let category: ConductivityScaleCategory = 'balanced_sca';
+  let categoryLabelPl = 'Złoty standard specialty';
+  let categoryLabelEn = 'SCA Golden Standard';
+  let suitabilityPl = '';
+  let suitabilityEn = '';
+
+  if (tdsPpm < 15) {
+    category = 'ultra_pure';
+    categoryLabelPl = 'Woda ultra-czysta (RO / demineralizowana)';
+    categoryLabelEn = 'Ultra-pure / Demineralized Water';
+    suitabilityPl = 'Zbyt niska mineralizacja do bezpośredniej ekstrakcji kawy; wymaga dodania buforu i minerałów twardości.';
+    suitabilityEn = 'Insufficient mineral content for balanced extraction; requires remineralization with buffer and hardness.';
+  } else if (tdsPpm < 75) {
+    category = 'soft_specialty';
+    categoryLabelPl = 'Woda miękka specialty';
+    categoryLabelEn = 'Soft Specialty Water';
+    suitabilityPl = 'Znakomita do delikatnych zielonych i białych herbat oraz bardzo jasnych przelewów Nordic roast.';
+    suitabilityEn = 'Superb for delicate green/white teas and ultra-light Nordic pour-overs.';
+  } else if (tdsPpm <= 175) {
+    category = 'balanced_sca';
+    categoryLabelPl = 'Złoty standard SCA (zrównoważona)';
+    categoryLabelEn = 'SCA Golden Standard (Balanced)';
+    suitabilityPl = 'Optymalny balans buforu KH i twardości GH: wyrazista słodycz, czysta kwasowość i stabilna ekstrakcja.';
+    suitabilityEn = 'Optimal balance of KH buffer and GH hardness: rich sweetness, crisp acidity, and stable extraction.';
+  } else {
+    category = 'hard_tap';
+    categoryLabelPl = 'Woda twarda / kranowa';
+    categoryLabelEn = 'Hard / High Mineral Tap Water';
+    suitabilityPl = 'Wysokie ryzyko osadzania kamienia kotłowego i przytłumienia owocowej kwasowości kawy.';
+    suitabilityEn = 'High scaling risk in kettle/boiler and muting of delicate origin fruit notes.';
+  }
+
+  const summaryPl = `Przewodność ${ec} µS/cm -> TDS: ${tdsPpm} ppm (współczynnik: ${factorName}, kategoria: ${categoryLabelPl}). ${suitabilityPl}`;
+  const summaryEn = `Conductivity ${ec} µS/cm -> TDS: ${tdsPpm} ppm (factor: ${factorName}, category: ${categoryLabelEn}). ${suitabilityEn}`;
+
+  return {
+    conductivityUsCm: ec,
+    conversionFactor: factor,
+    factorName,
+    tdsPpm,
+    category,
+    categoryLabelPl,
+    categoryLabelEn,
+    suitabilityPl,
+    suitabilityEn,
+    summaryPl,
+    summaryEn,
+  };
+}

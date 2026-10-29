@@ -66,6 +66,9 @@ import {
   evaluateLarsonSkoldIndex,
   LarsonSkoldIndexResult,
   LarsonSkoldRiskLevel,
+  convertConductivityToTds,
+  ConductivityToTdsResult,
+  ConductivityScaleCategory,
 } from '../water-chemistry';
 
 describe('Water Chemistry & Mineralization Module', () => {
@@ -1474,6 +1477,51 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(fallback.sulfatePpm).toBe(0);
     expect(fallback.alkalinityPpm).toBe(0);
     expect(fallback.riskLevel).toBe('low');
+  });
+
+  test('TASK-P105-07-JAK: convertConductivityToTds przelicza przewodność na TDS z typami ConductivityToTdsResult i ConductivityScaleCategory', () => {
+    // 1. Złoty standard SCA (EC 250 µS/cm * 0.50 = 125 ppm)
+    const sca: ConductivityToTdsResult = convertConductivityToTds(250, 'coffee');
+    const scaleType: ConductivityScaleCategory = sca.category;
+    expect(scaleType).toBe('balanced_sca');
+    expect(sca.conductivityUsCm).toBe(250);
+    expect(sca.conversionFactor).toBe(0.5);
+    expect(sca.tdsPpm).toBe(125.0);
+    expect(sca.factorName).toContain('0.50');
+    expect(sca.suitabilityPl).toContain('Optymalny balans');
+    expect(sca.summaryPl).toContain('125 ppm');
+
+    // 2. Miękka woda specialty z konwersją Natural 442 (EC 80 µS/cm * 0.64 = 51.2 ppm)
+    const soft = convertConductivityToTds('80', 'natural_442');
+    expect(soft.category).toBe('soft_specialty');
+    expect(soft.conversionFactor).toBe(0.64);
+    expect(soft.tdsPpm).toBe(51.2);
+    expect(soft.suitabilityEn).toContain('Nordic pour-overs');
+
+    // 3. Woda ultra-czysta RO (EC 10 µS/cm * 0.5 = 5.0 ppm)
+    const ro = convertConductivityToTds(10);
+    expect(ro.category).toBe('ultra_pure');
+    expect(ro.tdsPpm).toBe(5.0);
+    expect(ro.categoryLabelPl).toContain('demineralizowana');
+
+    // 4. Twarda woda kranowa z faktorem KCl (EC 400 µS/cm * 0.70 = 280 ppm)
+    const hard = convertConductivityToTds(400, 'kcl');
+    expect(hard.category).toBe('hard_tap');
+    expect(hard.tdsPpm).toBe(280.0);
+    expect(hard.suitabilityPl).toContain('kamienia');
+
+    // 5. Niestandardowy współczynnik numeryczny (np. 0.55)
+    const custom = convertConductivityToTds(200, 0.55);
+    expect(custom.conversionFactor).toBe(0.55);
+    expect(custom.tdsPpm).toBe(110.0);
+
+    // 6. Odporność na null i wartości domyślne
+    const fallback = convertConductivityToTds(null, null);
+    expect(fallback.conductivityUsCm).toBe(150);
+    expect(fallback.tdsPpm).toBe(75.0);
+    expect(fallback.conversionFactor).toBe(0.5);
+    const condResult: ConductivityToTdsResult = fallback;
+    expect(condResult.summaryEn).toBeTruthy();
   });
 });
 
