@@ -29,6 +29,7 @@ import {
   evaluateSiphonRatio,
   evaluateChemexRatio,
   evaluateSwitchImmersionRatio,
+  evaluateZeroBypassRatio,
 } from '../domain-rules';
 import {
   calculateWaterMinerals,
@@ -48,6 +49,7 @@ import {
   evaluateBoilerCorrosionRisk,
   calculateWaterHardnessScale,
   evaluateWaterAlkalinityBuffer,
+  calculateBoilingDegassingImpact,
 } from '../water-chemistry';
 import { BrewTimerEngine } from '../timer-engine';
 import {
@@ -68,6 +70,7 @@ import {
   estimateBurrSeasoningProgress,
   estimateGrindDistributionSpread,
   calculateGrinderBurrCalibration,
+  estimateRdtStaticReduction,
 } from '../grinder-converter';
 import { calculateBrewCost, calculateTeaCost, formatPlnCost, formatCost } from '../cost-calculator';
 import { formatRelativeDays } from '../i18n';
@@ -91,6 +94,7 @@ import {
   formatCostPerCup,
   formatFlowRateProfile,
   formatExtractionPressure,
+  formatRoastWeightLoss,
   wInKeep,
 } from '../unit-converter';
 import {
@@ -108,11 +112,12 @@ import {
   compareCoffeeVarieties,
   compareCoffeeOrigins,
   compareTeaCategories,
+  recommendBrewMethodsForOrigin,
 } from '../knowledge-data';
-import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed, detectBrewingHabitDrift, generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, calculateBrewConsistencyIndex, generateExtractionTroubleshootingGuide } from '../bpr-engine';
-import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize, compareBackupVersions, generateBackupMigrationPlan, calculateBackupHealthScore, compactBackupEnvelope, auditBackupRelationalIntegrity } from '../backup';
+import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed, detectBrewingHabitDrift, generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, calculateBrewConsistencyIndex, generateExtractionTroubleshootingGuide, predictGrindProfileByProcessAndRoast } from '../bpr-engine';
+import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize, compareBackupVersions, generateBackupMigrationPlan, calculateBackupHealthScore, compactBackupEnvelope, auditBackupRelationalIntegrity, computeBackupChecksum } from '../backup';
 import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings, evaluateTrialStatus, calculateLifetimeBreakEven, compareSubscriptionPlans, evaluateUpsellTrigger, evaluateFeatureEntitlement } from '../app-access';
-import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate, calculateBeanRestingReadiness, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover, calculateStashDepletionForecast } from '../database';
+import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate, calculateBeanRestingReadiness, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover, calculateStashDepletionForecast, calculateStashCostEfficiency } from '../database';
 import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore, filterSearchEntriesByTags, filterBySearchFacets, parseSearchQuery, highlightSearchMatches } from '../search-utils';
 
 const mockDb: any = {
@@ -1571,4 +1576,98 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       }
     }
   });
+
+  test('TASK-P101-12-NIE: Chaos 26: Fuzzing 10 funkcji domenowych z P100 i P101 na 2 000 mutacji wejściowych', () => {
+    const edgeVectors: any[] = [
+      null,
+      undefined,
+      NaN,
+      Infinity,
+      -Infinity,
+      -0,
+      0,
+      1,
+      -1,
+      '',
+      '   ',
+      '\uFEFF',
+      'xyz!@#',
+      '1e30',
+      '-1e30',
+      '18,5',
+      '  24.0  ',
+      {},
+      [],
+      { invalid: true },
+      [null, undefined, 42],
+    ];
+
+    for (let i = 0; i < 200; i++) {
+      const val = edgeVectors[i % edgeVectors.length];
+
+      // 1. calculateStashCostEfficiency
+      const stashEff = calculateStashCostEfficiency(val, val);
+      expect(typeof stashEff).toBe('object');
+      expect(typeof stashEff.totalItemsCount).toBe('number');
+      expect(typeof stashEff.tier).toBe('string');
+      expect(typeof stashEff.estimatedCostPerCupPln).toBe('number');
+
+      // 2. predictGrindProfileByProcessAndRoast
+      const grindPred = predictGrindProfileByProcessAndRoast(val, val);
+      expect(typeof grindPred).toBe('object');
+      expect(typeof grindPred.baseMicrons).toBe('number');
+      expect(typeof grindPred.densityCategory).toBe('string');
+      expect(typeof grindPred.cloggingRisk).toBe('string');
+
+      // 3. computeBackupChecksum
+      const checksum = computeBackupChecksum(val);
+      expect(typeof checksum).toBe('object');
+      expect(typeof checksum.checksumHex).toBe('string');
+      expect(typeof checksum.bytesHashed).toBe('number');
+
+      // 4. recommendBrewMethodsForOrigin
+      const originRec = recommendBrewMethodsForOrigin(val, val);
+      expect(originRec === null || typeof originRec === 'object').toBe(true);
+
+      // 5. calculateBoilingDegassingImpact
+      const boiling = calculateBoilingDegassingImpact(val);
+      expect(typeof boiling).toBe('object');
+      expect(typeof boiling.efficiencyLevel).toBe('string');
+      expect(typeof boiling.residualAlkalinityPpm).toBe('number');
+
+      // 6. estimateRdtStaticReduction
+      const rdt = estimateRdtStaticReduction(val, val);
+      expect(typeof rdt).toBe('object');
+      expect(typeof rdt.doseGrams).toBe('number');
+      expect(typeof rdt.staticLevel).toBe('string');
+      expect(typeof rdt.estimatedRetentionGrams).toBe('number');
+
+      // 7. formatRoastWeightLoss
+      const roastLoss = formatRoastWeightLoss(val, val, val);
+      expect(typeof roastLoss).toBe('object');
+      expect(typeof roastLoss.lossPercentage).toBe('number');
+      expect(typeof roastLoss.formattedLoss).toBe('string');
+      expect(typeof roastLoss.category).toBe('string');
+
+      // 8. evaluateZeroBypassRatio
+      const zeroBypass = evaluateZeroBypassRatio(val, val);
+      expect(typeof zeroBypass).toBe('object');
+      expect(typeof zeroBypass.ratio).toBe('number');
+      expect(typeof zeroBypass.status).toBe('string');
+      expect(typeof zeroBypass.style).toBe('string');
+
+      // 9. calculateGrinderBurrCalibration
+      const burrCalib = calculateGrinderBurrCalibration(val);
+      expect(typeof burrCalib).toBe('object');
+      expect(typeof burrCalib.status).toBe('string');
+      expect(typeof burrCalib.currentClick).toBe('number');
+
+      // 10. evaluateWaterAlkalinityBuffer
+      const alkBuffer = evaluateWaterAlkalinityBuffer(val);
+      expect(typeof alkBuffer).toBe('object');
+      expect(typeof alkBuffer.level).toBe('string');
+      expect(typeof alkBuffer.alkalinityPpm).toBe('number');
+    }
+  });
+
 });
