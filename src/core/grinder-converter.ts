@@ -2508,3 +2508,169 @@ export function calculateBurrGeometryProfile(
     summaryEn,
   };
 }
+
+
+export type BurrRpmTier = 'low_rpm' | 'medium_rpm' | 'high_rpm';
+
+export interface BurrSpeedRecommendationResult {
+  roastLevel: string;
+  brewMethod: string;
+  recommendedRpmRange: string;
+  targetRpm: number;
+  tier: BurrRpmTier;
+  finesProfilePl: string;
+  finesProfileEn: string;
+  sensoryRationalePl: string;
+  sensoryRationaleEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Rekomenduje optymalną prędkość obrotową żaren (RPM) młynka elektrycznego
+ * na podstawie stopnia palenia kawy oraz metody ekstrakcji.
+ */
+export function recommendBurrSpeedForRoast(
+  roastLevel?: string | null,
+  brewMethod?: string | null
+): BurrSpeedRecommendationResult {
+  const rawRoast = typeof roastLevel === 'string' ? roastLevel.trim().toLowerCase() : '';
+  const rawMethod = typeof brewMethod === 'string' ? brewMethod.trim().toLowerCase() : '';
+
+  let normalizedRoast: 'light' | 'medium' | 'dark' = 'medium';
+  if (
+    rawRoast.includes('light') ||
+    rawRoast.includes('jasn') ||
+    rawRoast.includes('nordic') ||
+    rawRoast.includes('cinnamon')
+  ) {
+    normalizedRoast = 'light';
+  } else if (
+    rawRoast.includes('dark') ||
+    rawRoast.includes('ciemn') ||
+    rawRoast.includes('french') ||
+    rawRoast.includes('italian')
+  ) {
+    normalizedRoast = 'dark';
+  } else {
+    normalizedRoast = 'medium';
+  }
+
+  let normalizedMethod: 'espresso' | 'filter' | 'immersion' = 'filter';
+  if (
+    rawMethod.includes('espresso') ||
+    rawMethod.includes('kawiark') ||
+    rawMethod.includes('moka') ||
+    rawMethod.includes('flair')
+  ) {
+    normalizedMethod = 'espresso';
+  } else if (
+    rawMethod.includes('french') ||
+    rawMethod.includes('cupping') ||
+    rawMethod.includes('cold') ||
+    rawMethod.includes('immersion') ||
+    rawMethod.includes('aeropress')
+  ) {
+    normalizedMethod = 'immersion';
+  } else {
+    normalizedMethod = 'filter';
+  }
+
+  let tier: BurrRpmTier = 'medium_rpm';
+  let targetRpm = 800;
+  let recommendedRpmRange = '700 - 900 RPM';
+  let finesProfilePl = '';
+  let finesProfileEn = '';
+  let sensoryRationalePl = '';
+  let sensoryRationaleEn = '';
+  let summaryPl = '';
+  let summaryEn = '';
+
+  if (normalizedRoast === 'light') {
+    if (normalizedMethod === 'espresso') {
+      tier = 'low_rpm';
+      targetRpm = 600;
+      recommendedRpmRange = '500 - 700 RPM';
+      finesProfilePl = 'Zredukowana produkcja pyłu pozwala na drobniejsze mielenie jasnych ziaren bez zatykania sitka.';
+      finesProfileEn = 'Reduced fines yield allows finer grinding for dense light roasts without basket clogging.';
+      sensoryRationalePl = 'Wyższa ekstrakcja kwasów organicznych i cukrów, czysta tekstura bez ściągającej goryczy.';
+      sensoryRationaleEn = 'Higher extraction of organic acids and sugars, clean cup texture without astringency.';
+      summaryPl = `Zalecane niskie obroty (${recommendedRpmRange}, cel: ${targetRpm} RPM) pod jasne espresso. Minimalizuje to opór pyłu i umożliwia równomierną ekstrakcję.`;
+      summaryEn = `Low RPM recommended (${recommendedRpmRange}, target: ${targetRpm} RPM) for light roast espresso. Minimizes fines migration for uniform extraction.`;
+    } else {
+      // filter or immersion
+      tier = 'low_rpm';
+      targetRpm = 500;
+      recommendedRpmRange = '400 - 600 RPM';
+      finesProfilePl = 'Minimalna produkcja pyłu (fines), maksymalna unimodalność rozkładu cząstek.';
+      finesProfileEn = 'Minimal fines generation, maximizing particle size distribution unimodality.';
+      sensoryRationalePl = 'Wysoka klarowność smaku, soczysta i przejrzysta kwasowość, uwypuklenie nut kwiatowo-owocowych.';
+      sensoryRationaleEn = 'High flavor clarity, crisp transparent acidity, highlighting delicate floral and fruity notes.';
+      summaryPl = `Zalecane niskie obroty (${recommendedRpmRange}, cel: ${targetRpm} RPM). Dla jasnego palenia i metod przelewowych minimalizuje to powstawanie drobin i zapobiega zatykaniu filtra.`;
+      summaryEn = `Low RPM recommended (${recommendedRpmRange}, target: ${targetRpm} RPM). For light roasts and drip methods, this minimizes fines generation and prevents filter clogging.`;
+    }
+  } else if (normalizedRoast === 'dark') {
+    if (normalizedMethod === 'espresso') {
+      tier = 'high_rpm';
+      targetRpm = 1200;
+      recommendedRpmRange = '1100 - 1400 RPM';
+      finesProfilePl = 'Podwyższona frakcja drobin (fines) zwiększająca opór ciastka i gęstość cremy.';
+      finesProfileEn = 'Higher fines proportion increasing puck resistance and rich crema density.';
+      sensoryRationalePl = 'Czekoladowo-orzechowa słodycz, gęste syropowate body, niska goryczka termiczna.';
+      sensoryRationaleEn = 'Rich chocolate-nutty sweetness, dense syrupy mouthfeel, and low thermal bitterness.';
+      summaryPl = `Zalecane wyższe obroty (${recommendedRpmRange}, cel: ${targetRpm} RPM). Dla ciemnego palenia i espresso tworzy optymalną strukturę drobin dla gęstej cremy.`;
+      summaryEn = `High RPM recommended (${recommendedRpmRange}, target: ${targetRpm} RPM). For dark roasts and espresso, produces the right fines structure for thick crema.`;
+    } else {
+      // dark filter
+      tier = 'medium_rpm';
+      targetRpm = 700;
+      recommendedRpmRange = '600 - 800 RPM';
+      finesProfilePl = 'Umiarkowane obroty chronią kruche, ciemno palone ziarna przed nadmiernym rozpadem w pył.';
+      finesProfileEn = 'Moderate RPM prevents brittle dark roast beans from excessive shattering into fines.';
+      sensoryRationalePl = 'Czysty napar bez popiołowych i ściągających posmaków, zachowanie nut karmelu i prażonych orzechów.';
+      sensoryRationaleEn = 'Clean brew without ashy astringency, preserving sweet caramel and roasted nut notes.';
+      summaryPl = `Zalecane umiarkowane obroty (${recommendedRpmRange}, cel: ${targetRpm} RPM) dla ciemnego palenia w metodach grawitacyjnych.`;
+      summaryEn = `Moderate RPM recommended (${recommendedRpmRange}, target: ${targetRpm} RPM) for dark roast filter brews.`;
+    }
+  } else {
+    // medium roast
+    if (normalizedMethod === 'espresso') {
+      tier = 'medium_rpm';
+      targetRpm = 900;
+      recommendedRpmRange = '800 - 1000 RPM';
+      finesProfilePl = 'Umiarkowana frakcja drobin zapewniająca stabilne ciśnienie ekstrakcji i ładną cremę.';
+      finesProfileEn = 'Moderate fines fraction providing stable extraction pressure and good crema.';
+      sensoryRationalePl = 'Balans między słodyczą karmelu, nutami owocowymi a pełnym body espresso.';
+      sensoryRationaleEn = 'Balanced ratio between caramel sweetness, fruity acidity, and full espresso body.';
+      summaryPl = `Zalecane umiarkowane obroty (${recommendedRpmRange}, cel: ${targetRpm} RPM) dla zrównoważonego profilu espresso.`;
+      summaryEn = `Moderate RPM recommended (${recommendedRpmRange}, target: ${targetRpm} RPM) for balanced espresso extraction.`;
+    } else {
+      tier = 'medium_rpm';
+      targetRpm = 800;
+      recommendedRpmRange = '700 - 900 RPM';
+      finesProfilePl = 'Zrównoważona ilość frakcji drobnej zapewniająca słodycz i aksamitną teksturę.';
+      finesProfileEn = 'Balanced fines yield delivering pleasant sweetness and velvety texture.';
+      sensoryRationalePl = 'Harmonijna równowaga między separacją nut smakowych a gęstością i słodyczą naparu.';
+      sensoryRationaleEn = 'Harmonious balance between note separation and cup body/sweetness.';
+      summaryPl = `Zalecane umiarkowane obroty (${recommendedRpmRange}, cel: ${targetRpm} RPM). Złoty środek między separacją smaków a przyjemną słodyczą i balansem naparu.`;
+      summaryEn = `Moderate RPM recommended (${recommendedRpmRange}, target: ${targetRpm} RPM). Golden middle between flavor separation and rich sweetness and cup balance.`;
+    }
+  }
+
+  const finalRoast = roastLevel && typeof roastLevel === 'string' && roastLevel.trim() ? roastLevel.trim() : normalizedRoast;
+  const finalMethod = brewMethod && typeof brewMethod === 'string' && brewMethod.trim() ? brewMethod.trim() : normalizedMethod;
+
+  return {
+    roastLevel: finalRoast,
+    brewMethod: finalMethod,
+    recommendedRpmRange,
+    targetRpm,
+    tier,
+    finesProfilePl,
+    finesProfileEn,
+    sensoryRationalePl,
+    sensoryRationaleEn,
+    summaryPl,
+    summaryEn,
+  };
+}

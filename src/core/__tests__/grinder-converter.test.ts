@@ -51,6 +51,9 @@ import {
   calculateBurrGeometryProfile,
   BurrGeometryProfile,
   BurrDistributionType,
+  recommendBurrSpeedForRoast,
+  BurrSpeedRecommendationResult,
+  BurrRpmTier,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -1398,6 +1401,55 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(fallbackProfile.burrDiameterMm).toBe(64);
     expect(fallbackProfile.distributionType).toBe('unimodal');
     expect(fallbackProfile.summaryEn).toBeTruthy();
+  });
+
+  test('TASK-P105-08-PRO: recommendBurrSpeedForRoast rekomenduje obroty żaren z typami BurrSpeedRecommendationResult i BurrRpmTier', () => {
+    // 1. Jasne palenie pod metody przelewowe (niski RPM pod unimodalność)
+    const lightFilter: BurrSpeedRecommendationResult = recommendBurrSpeedForRoast('light', 'v60');
+    const tierCheck: BurrRpmTier = lightFilter.tier;
+    expect(tierCheck).toBe('low_rpm');
+    expect(lightFilter.targetRpm).toBe(500);
+    expect(lightFilter.recommendedRpmRange).toContain('400 - 600');
+    expect(lightFilter.finesProfilePl).toContain('Minimalna produkcja pyłu');
+    expect(lightFilter.sensoryRationalePl).toContain('klarowność smaku');
+    expect(lightFilter.summaryPl).toContain('niskie obroty');
+
+    // 2. Jasne palenie pod espresso (redukcja pyłu pod precyzyjną ekstrakcję)
+    const lightEspresso = recommendBurrSpeedForRoast('jasne', 'espresso');
+    expect(lightEspresso.tier).toBe('low_rpm');
+    expect(lightEspresso.targetRpm).toBe(600);
+    expect(lightEspresso.recommendedRpmRange).toContain('500 - 700');
+    expect(lightEspresso.summaryEn).toContain('light roast espresso');
+
+    // 3. Średnie palenie pod filtr / omni (zbalansowane obroty)
+    const medFilter = recommendBurrSpeedForRoast('medium', 'chemex');
+    expect(medFilter.tier).toBe('medium_rpm');
+    expect(medFilter.targetRpm).toBe(800);
+    expect(medFilter.finesProfilePl).toContain('Zrównoważona');
+
+    // 4. Średnie palenie pod espresso
+    const medEspresso = recommendBurrSpeedForRoast('srednie', 'espresso');
+    expect(medEspresso.tier).toBe('medium_rpm');
+    expect(medEspresso.targetRpm).toBe(900);
+
+    // 5. Ciemne palenie pod espresso (wysoki RPM pod gęstą cremę i body)
+    const darkEspresso = recommendBurrSpeedForRoast('dark', 'espresso');
+    expect(darkEspresso.tier).toBe('high_rpm');
+    expect(darkEspresso.targetRpm).toBe(1200);
+    expect(darkEspresso.recommendedRpmRange).toContain('1100 - 1400');
+    expect(darkEspresso.finesProfilePl).toContain('Podwyższona frakcja drobin');
+    expect(darkEspresso.summaryPl).toContain('gęstej cremy');
+
+    // 6. Ciemne palenie pod filtr
+    const darkFilter = recommendBurrSpeedForRoast('dark', 'drip');
+    expect(darkFilter.tier).toBe('medium_rpm');
+    expect(darkFilter.targetRpm).toBe(700);
+
+    // 7. Odporność na null, puste i nieznane wartości
+    const fallback = recommendBurrSpeedForRoast(null, null);
+    expect(fallback.tier).toBe('medium_rpm');
+    expect(fallback.targetRpm).toBe(800);
+    expect(fallback.summaryEn).toBeTruthy();
   });
 });
 
