@@ -3111,3 +3111,139 @@ export function calculateStashCostEfficiency(
     summaryEn,
   };
 }
+
+export type DominantRoastProfile = 'light' | 'medium' | 'dark' | 'balanced' | 'empty';
+
+export interface StashRoastDistributionReport {
+  totalActiveBags: number;
+  totalGrams: number;
+  lightCount: number;
+  mediumCount: number;
+  darkCount: number;
+  lightGrams: number;
+  mediumGrams: number;
+  darkGrams: number;
+  lightPercent: number;
+  mediumPercent: number;
+  darkPercent: number;
+  dominantProfile: DominantRoastProfile;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function estimateStashRoastDistribution(
+  items?: InventoryItem[] | unknown[] | null
+): StashRoastDistributionReport {
+  const safeItems = Array.isArray(items) ? items : [];
+
+  let lightCount = 0;
+  let mediumCount = 0;
+  let darkCount = 0;
+  let lightGrams = 0;
+  let mediumGrams = 0;
+  let darkGrams = 0;
+
+  for (const item of safeItems) {
+    if (!item || typeof item !== 'object' || (item as any).isArchived) continue;
+
+    let grams = 0;
+    if (typeof (item as any).remainingWeightGrams === 'number') {
+      grams = (item as any).remainingWeightGrams;
+    } else if (typeof (item as any).remainingWeightGrams === 'string') {
+      const parsed = parseFloat(
+        (item as any).remainingWeightGrams.replace(/\uFEFF/g, '').replace(',', '.').trim()
+      );
+      grams = Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    if (grams <= 0) continue;
+
+    const rawRoast =
+      typeof (item as any).roastLevel === 'string'
+        ? (item as any).roastLevel.trim().toLowerCase()
+        : typeof (item as any).roast_level === 'string'
+        ? (item as any).roast_level.trim().toLowerCase()
+        : typeof (item as any).roastProfile === 'string'
+        ? (item as any).roastProfile.trim().toLowerCase()
+        : 'medium';
+
+    if (
+      rawRoast.includes('light') ||
+      rawRoast.includes('jasn') ||
+      rawRoast.includes('cinnamon') ||
+      rawRoast.includes('nordic') ||
+      rawRoast.includes('filter')
+    ) {
+      lightCount++;
+      lightGrams += grams;
+    } else if (
+      rawRoast.includes('dark') ||
+      rawRoast.includes('ciemn') ||
+      rawRoast.includes('italian') ||
+      rawRoast.includes('french') ||
+      rawRoast.includes('full city')
+    ) {
+      darkCount++;
+      darkGrams += grams;
+    } else {
+      mediumCount++;
+      mediumGrams += grams;
+    }
+  }
+
+  const totalActiveBags = lightCount + mediumCount + darkCount;
+  const totalGrams = Math.round((lightGrams + mediumGrams + darkGrams) * 10) / 10;
+
+  if (totalGrams <= 0) {
+    return {
+      totalActiveBags: 0,
+      totalGrams: 0,
+      lightCount: 0,
+      mediumCount: 0,
+      darkCount: 0,
+      lightGrams: 0,
+      mediumGrams: 0,
+      darkGrams: 0,
+      lightPercent: 0,
+      mediumPercent: 0,
+      darkPercent: 0,
+      dominantProfile: 'empty',
+      summaryPl: 'Brak aktywnych kaw w spiżarni.',
+      summaryEn: 'No active coffees in stash.',
+    };
+  }
+
+  const lightPercent = Math.round((lightGrams / totalGrams) * 100);
+  const mediumPercent = Math.round((mediumGrams / totalGrams) * 100);
+  const darkPercent = Math.round((darkGrams / totalGrams) * 100);
+
+  let dominantProfile: DominantRoastProfile = 'balanced';
+  if (lightPercent >= 60) {
+    dominantProfile = 'light';
+  } else if (mediumPercent >= 60) {
+    dominantProfile = 'medium';
+  } else if (darkPercent >= 60) {
+    dominantProfile = 'dark';
+  }
+
+  const summaryPl = `Rozkład palenia w spiżarni: ${lightPercent}% jasne (${Math.round(lightGrams)}g), ${mediumPercent}% średnie (${Math.round(mediumGrams)}g), ${darkPercent}% ciemne (${Math.round(darkGrams)}g). Dominujący profil: ${dominantProfile}.`;
+  const summaryEn = `Stash roast distribution: ${lightPercent}% light (${Math.round(lightGrams)}g), ${mediumPercent}% medium (${Math.round(mediumGrams)}g), ${darkPercent}% dark (${Math.round(darkGrams)}g). Dominant profile: ${dominantProfile}.`;
+
+  return {
+    totalActiveBags,
+    totalGrams,
+    lightCount,
+    mediumCount,
+    darkCount,
+    lightGrams: Math.round(lightGrams * 10) / 10,
+    mediumGrams: Math.round(mediumGrams * 10) / 10,
+    darkGrams: Math.round(darkGrams * 10) / 10,
+    lightPercent,
+    mediumPercent,
+    darkPercent,
+    dominantProfile,
+    summaryPl,
+    summaryEn,
+  };
+}
+

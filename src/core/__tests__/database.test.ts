@@ -44,6 +44,9 @@ import {
   calculateStashCostEfficiency,
   StashCostEfficiencyReport,
   StashCostEfficiencyTier,
+  estimateStashRoastDistribution,
+  StashRoastDistributionReport,
+  DominantRoastProfile,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -3325,5 +3328,86 @@ describe('Napar SQLite Database & Repositories', () => {
     // Odporność na null
     const nullReport = calculateStashCostEfficiency(null);
     expect(nullReport.totalItemsCount).toBe(0);
+  });
+
+  test('TASK-P102-03-ZAK: estimateStashRoastDistribution wyznacza rozkład stopni palenia kaw w spiżarni', () => {
+    const items = [
+      {
+        id: '1',
+        name: 'Ethiopia Yirgacheffe',
+        roastLevel: 'light',
+        remainingWeightGrams: 200,
+        isArchived: false,
+      },
+      {
+        id: '2',
+        name: 'Kenya Nyeri',
+        roastLevel: 'jasne (nordic)',
+        remainingWeightGrams: 300,
+        isArchived: false,
+      },
+      {
+        id: '3',
+        name: 'Brazil Cerrado',
+        roastLevel: 'medium',
+        remainingWeightGrams: 250,
+        isArchived: false,
+      },
+      {
+        id: '4',
+        name: 'Italian Espresso',
+        roastLevel: 'dark',
+        remainingWeightGrams: 250,
+        isArchived: false,
+      },
+      {
+        id: '5',
+        name: 'Old Empty Bag',
+        roastLevel: 'light',
+        remainingWeightGrams: 0,
+        isArchived: false,
+      },
+      {
+        id: '6',
+        name: 'Archived Bag',
+        roastLevel: 'medium',
+        remainingWeightGrams: 500,
+        isArchived: true,
+      },
+    ] as any[];
+
+    // 1. Spiżarnia z różnymi profilami: 500g jasnej, 250g średniej, 250g ciemnej = 1000g
+    const dist = estimateStashRoastDistribution(items);
+    expect(dist.totalActiveBags).toBe(4);
+    expect(dist.totalGrams).toBe(1000);
+    expect(dist.lightGrams).toBe(500);
+    expect(dist.mediumGrams).toBe(250);
+    expect(dist.darkGrams).toBe(250);
+    expect(dist.lightPercent).toBe(50);
+    expect(dist.mediumPercent).toBe(25);
+    expect(dist.darkPercent).toBe(25);
+    expect(dist.dominantProfile).toBe('balanced');
+    const profileType: DominantRoastProfile = dist.dominantProfile;
+    expect(profileType).toBe('balanced');
+    expect(dist.summaryPl).toContain('50%');
+
+    // 2. Spiżarnia zdominowana przez jasne palenie (>= 60%)
+    const lightItems = [
+      { id: '1', name: 'Ethiopia', roastLevel: 'light', remainingWeightGrams: 800 },
+      { id: '2', name: 'Brazil', roastLevel: 'medium', remainingWeightGrams: 200 },
+    ] as any[];
+    const lightDist = estimateStashRoastDistribution(lightItems);
+    expect(lightDist.dominantProfile).toBe('light');
+
+    // 3. Pusta spiżarnia i null
+    const emptyDist = estimateStashRoastDistribution([]);
+    expect(emptyDist.totalActiveBags).toBe(0);
+    expect(emptyDist.dominantProfile).toBe('empty');
+
+    const fallbackNull = estimateStashRoastDistribution(null);
+    expect(fallbackNull.totalGrams).toBe(0);
+    expect(fallbackNull.dominantProfile).toBe('empty');
+    const distResult: StashRoastDistributionReport = fallbackNull;
+    expect(distResult.summaryEn).toBeTruthy();
   });
 });
