@@ -62,6 +62,9 @@ import {
   evaluateZeroBypassRatio,
   ZeroBypassEvaluation,
   ZeroBypassBrewStyle,
+  calculateColdBrewDilutionRatio,
+  ColdBrewDilutionResult,
+  ColdBrewStrengthCategory,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -1308,6 +1311,60 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(fallback.status).toBe('optimal');
       const evalResult: ZeroBypassEvaluation = fallback;
       expect(evalResult.advisoryEn).toBeTruthy();
+    });
+
+    test('TASK-P104-11-WZR: calculateColdBrewDilutionRatio oblicza rozcieńczenie koncentratu Cold Brew z typami ColdBrewDilutionResult i ColdBrewStrengthCategory', () => {
+      // 1. Standardowe rozcieńczenie 1:1 z wodą (200g koncentratu -> 200g wody)
+      const standard: ColdBrewDilutionResult = calculateColdBrewDilutionRatio(200, {
+        targetStrength: 'standard',
+        dilutionLiquid: 'water',
+      });
+      const strengthType: ColdBrewStrengthCategory = standard.targetStrength;
+      expect(strengthType).toBe('standard');
+      expect(standard.concentrateWeightGrams).toBe(200);
+      expect(standard.dilutionLiquid).toBe('water');
+      expect(standard.dilutionRatio).toBe(1.0);
+      expect(standard.dilutionLiquidGrams).toBe(200);
+      expect(standard.totalBeverageWeightGrams).toBe(400);
+      expect(standard.estimatedServingCount).toBe(2);
+      expect(standard.recipeAdvicePl).toContain('Klasyczne rozcieńczenie');
+      expect(standard.summaryPl).toContain('wody');
+
+      // 2. Mieszanka z mlekiem (Iced Latte) w proporcji bold (2:1, ratio 0.5)
+      const latte = calculateColdBrewDilutionRatio('250', {
+        targetStrength: 'bold',
+        dilutionLiquid: 'milk',
+      });
+      expect(latte.concentrateWeightGrams).toBe(250);
+      expect(latte.dilutionLiquid).toBe('milk');
+      expect(latte.dilutionRatio).toBe(0.5);
+      expect(latte.dilutionLiquidGrams).toBe(125);
+      expect(latte.totalBeverageWeightGrams).toBe(375);
+      expect(latte.recipeAdvicePl).toContain('Iced Latte');
+
+      // 3. Cold Brew Tonic (proporcja light 1:1.5)
+      const tonic = calculateColdBrewDilutionRatio(200, {
+        targetStrength: 'light',
+        dilutionLiquid: 'tonic',
+      });
+      expect(tonic.dilutionLiquid).toBe('tonic');
+      expect(tonic.dilutionRatio).toBe(1.5);
+      expect(tonic.dilutionLiquidGrams).toBe(300);
+      expect(tonic.totalBeverageWeightGrams).toBe(500);
+      expect(tonic.recipeAdviceEn).toContain('orange wheel');
+
+      // 4. Czysty koncentrat bez rozcieńczenia
+      const concOnly = calculateColdBrewDilutionRatio(300, { targetStrength: 'concentrate' });
+      expect(concOnly.targetStrength).toBe('concentrate');
+      expect(concOnly.dilutionLiquidGrams).toBe(0);
+      expect(concOnly.totalBeverageWeightGrams).toBe(300);
+
+      // 5. Odporność na wartości null i domyślne fallbacki
+      const fallback = calculateColdBrewDilutionRatio(null, null);
+      expect(fallback.concentrateWeightGrams).toBe(200);
+      expect(fallback.dilutionLiquid).toBe('water');
+      expect(fallback.targetStrength).toBe('standard');
+      expect(fallback.summaryEn).toBeTruthy();
     });
   });
 });

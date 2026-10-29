@@ -2302,3 +2302,114 @@ export function evaluateZeroBypassRatio(
   };
 }
 
+export type ColdBrewStrengthCategory = 'concentrate' | 'bold' | 'standard' | 'light';
+
+export interface ColdBrewDilutionResult {
+  concentrateWeightGrams: number;
+  dilutionLiquid: 'water' | 'milk' | 'tonic';
+  targetStrength: ColdBrewStrengthCategory;
+  dilutionRatio: number;
+  dilutionLiquidGrams: number;
+  totalBeverageWeightGrams: number;
+  estimatedServingCount: number;
+  recipeAdvicePl: string;
+  recipeAdviceEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Oblicza proporcje rozcieńczania skoncentrowanego ekstraktu Cold Brew
+ * wodą, mlekiem lub tonikiem do pożądanej mocy naparu (RTD / bold / light).
+ */
+export function calculateColdBrewDilutionRatio(
+  concentrateWeightGrams?: number | string | null,
+  options?: {
+    targetStrength?: 'concentrate' | 'bold' | 'standard' | 'light' | string | null;
+    dilutionLiquid?: 'water' | 'milk' | 'tonic' | string | null;
+    servingSizeGrams?: number | string | null;
+  } | null
+): ColdBrewDilutionResult {
+  const parseNum = (val: unknown, fallback: number, min: number, max: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.min(max, Math.max(min, val));
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.min(max, Math.max(min, parsed));
+      }
+    }
+    return fallback;
+  };
+
+  const conc = Math.round(parseNum(concentrateWeightGrams, 200, 10, 10000));
+
+  const rawLiquid = typeof options?.dilutionLiquid === 'string' ? options.dilutionLiquid.trim().toLowerCase() : '';
+  let dilutionLiquid: 'water' | 'milk' | 'tonic' = 'water';
+  if (rawLiquid.includes('milk') || rawLiquid.includes('mle')) {
+    dilutionLiquid = 'milk';
+  } else if (rawLiquid.includes('tonic') || rawLiquid.includes('tonik')) {
+    dilutionLiquid = 'tonic';
+  }
+
+  const rawStrength = typeof options?.targetStrength === 'string' ? options.targetStrength.trim().toLowerCase() : '';
+  let targetStrength: ColdBrewStrengthCategory = 'standard';
+  let dilutionRatio = 1.0;
+
+  if (rawStrength.includes('concentrate') || rawStrength.includes('nierozcieńczony')) {
+    targetStrength = 'concentrate';
+    dilutionRatio = 0.0;
+  } else if (rawStrength.includes('bold') || rawStrength.includes('mocn')) {
+    targetStrength = 'bold';
+    dilutionRatio = 0.5;
+  } else if (rawStrength.includes('light') || rawStrength.includes('lekk')) {
+    targetStrength = 'light';
+    dilutionRatio = 1.5;
+  } else {
+    targetStrength = 'standard';
+    dilutionRatio = 1.0;
+  }
+
+  const dilutionLiquidGrams = Math.round(conc * dilutionRatio);
+  const totalBeverageWeightGrams = conc + dilutionLiquidGrams;
+
+  const servingSize = parseNum(options?.servingSizeGrams, 200, 50, 1000);
+  const estimatedServingCount = Math.max(1, Math.round((totalBeverageWeightGrams / servingSize) * 10) / 10);
+
+  let recipeAdvicePl = '';
+  let recipeAdviceEn = '';
+
+  if (targetStrength === 'concentrate') {
+    recipeAdvicePl = 'Czysty koncentrat: wysoka goryczka i kofeina, idealna baza do autorskich mocktaili i deserów.';
+    recipeAdviceEn = 'Pure concentrate: bold intensity and elevated caffeine, great base for signature mocktails and desserts.';
+  } else if (dilutionLiquid === 'milk') {
+    recipeAdvicePl = 'Mieszanka z mlekiem / napojem owsianym: kremowy profil Iced Latte o głębokich nutach czekoladowo-karmelowych.';
+    recipeAdviceEn = 'Blend with milk / oat drink: creamy Iced Latte profile accentuating chocolate and toffee undertones.';
+  } else if (dilutionLiquid === 'tonic') {
+    recipeAdvicePl = 'Cold Brew Tonic: podawaj z plastrem pomarańczy i lodem, wlewając kawę powoli na tonik.';
+    recipeAdviceEn = 'Cold Brew Tonic: serve over ice with an orange wheel, layering coffee gently on top of tonic water.';
+  } else {
+    recipeAdvicePl = 'Klasyczne rozcieńczenie wodą: gładki, aksamitny napar o czystym orzeźwiającym smaku i niskiej goryczce.';
+    recipeAdviceEn = 'Classic water dilution: smooth, refreshing cup with balanced mouthfeel and crisp lingering finish.';
+  }
+
+  const liquidPl = dilutionLiquid === 'milk' ? 'mleka' : dilutionLiquid === 'tonic' ? 'toniku' : 'wody';
+  const summaryPl = `Koncentrat ${conc}g + ${dilutionLiquidGrams}g ${liquidPl} (${targetStrength}, stosunek 1:${dilutionRatio}). Łącznie ${totalBeverageWeightGrams}g (~${estimatedServingCount} porcji). ${recipeAdvicePl}`;
+  const summaryEn = `Concentrate ${conc}g + ${dilutionLiquidGrams}g of ${dilutionLiquid} (${targetStrength}, ratio 1:${dilutionRatio}). Total ${totalBeverageWeightGrams}g (~${estimatedServingCount} servings). ${recipeAdviceEn}`;
+
+  return {
+    concentrateWeightGrams: conc,
+    dilutionLiquid,
+    targetStrength,
+    dilutionRatio,
+    dilutionLiquidGrams,
+    totalBeverageWeightGrams,
+    estimatedServingCount,
+    recipeAdvicePl,
+    recipeAdviceEn,
+    summaryPl,
+    summaryEn,
+  };
+}
+
