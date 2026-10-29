@@ -45,6 +45,9 @@ import {
   calculateGrinderBurrCalibration,
   GrinderBurrCalibration,
   BurrCalibrationStatus,
+  estimateRdtStaticReduction,
+  RdtStaticReduction,
+  RdtStaticLevel,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -1300,6 +1303,50 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(fallbackCalib.status).toBe('aligned');
     expect(fallbackCalib.currentClick).toBe(15);
     expect(fallbackCalib.targetMicrons).toBe(600);
+  });
+
+  test('TASK-P101-08-PRO: estimateRdtStaticReduction szacuje redukcję ładunku elektrostatycznego i retencji techniką RDT', () => {
+    // 1. Brak RDT (0 kropel, ciemne palenie, niska wilgotność) -> skrajna elektryzacja
+    const noRdt = estimateRdtStaticReduction(18, {
+      roastLevel: 'dark',
+      appliedDrops: 0,
+      ambientHumidityPercent: 30,
+    });
+    expect(noRdt.doseGrams).toBe(18);
+    expect(noRdt.appliedDrops).toBe(0);
+    expect(noRdt.staticLevel).toBe('extreme');
+    expect(noRdt.chaffDispersalRisk).toBe('high');
+    expect(noRdt.estimatedRetentionGrams).toBeGreaterThan(0.3);
+    expect(noRdt.recommendationPl).toContain('RDT');
+
+    // 2. Optymalne RDT (1-2 krople, średnie palenie) -> minimalna retencja
+    const optimalRdt = estimateRdtStaticReduction(18, {
+      roastLevel: 'medium',
+      appliedDrops: 2,
+      ambientHumidityPercent: 45,
+    });
+    expect(optimalRdt.staticLevel).toBe('minimal');
+    expect(optimalRdt.chaffDispersalRisk).toBe('low');
+    expect(optimalRdt.estimatedRetentionGrams).toBeLessThanOrEqual(0.15);
+    const staticType: RdtStaticLevel = optimalRdt.staticLevel;
+    expect(staticType).toBe('minimal');
+
+    // 3. Nadmierna ilość wody (>= 4 krople) -> ryzyko zaklejania żaren
+    const overMoist = estimateRdtStaticReduction(15, {
+      roastLevel: 'light',
+      appliedDrops: 5,
+    });
+    expect(overMoist.staticLevel).toBe('over_moisturized');
+    expect(overMoist.recommendationPl).toContain('za dużo');
+    expect(overMoist.recommendationEn.toLowerCase()).toContain('too much');
+
+    // 4. Wartości brzegowe i null
+    const fallbackRdt = estimateRdtStaticReduction(null, null);
+    expect(fallbackRdt.doseGrams).toBe(18);
+    expect(fallbackRdt.appliedDrops).toBe(0);
+    expect(['extreme', 'moderate']).toContain(fallbackRdt.staticLevel);
+    const rdtResult: RdtStaticReduction = fallbackRdt;
+    expect(rdtResult.recommendationEn).toBeTruthy();
   });
 });
 

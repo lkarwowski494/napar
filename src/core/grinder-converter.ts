@@ -2261,3 +2261,96 @@ export function calculateGrinderBurrCalibration(params?: {
     summaryEn,
   };
 }
+
+export type RdtStaticLevel = 'extreme' | 'moderate' | 'minimal' | 'over_moisturized';
+
+export interface RdtStaticReduction {
+  doseGrams: number;
+  appliedDrops: number;
+  staticLevel: RdtStaticLevel;
+  estimatedRetentionGrams: number;
+  chaffDispersalRisk: 'low' | 'medium' | 'high';
+  recommendationPl: string;
+  recommendationEn: string;
+}
+
+export function estimateRdtStaticReduction(
+  doseGrams?: number | string | null,
+  options?: {
+    roastLevel?: 'light' | 'medium' | 'dark' | string | null;
+    appliedDrops?: number | string | null;
+    ambientHumidityPercent?: number | string | null;
+  } | null
+): RdtStaticReduction {
+  const parseNum = (val: unknown, fallback: number, min: number, max: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.max(min, Math.min(max, val));
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.max(min, Math.min(max, parsed));
+      }
+    }
+    return fallback;
+  };
+
+  const dose = Math.round(parseNum(doseGrams, 18, 5, 100) * 10) / 10;
+  const drops = Math.round(parseNum(options?.appliedDrops, 0, 0, 10));
+  const humidity = parseNum(options?.ambientHumidityPercent, 45, 10, 95);
+
+  const rawRoast = typeof options?.roastLevel === 'string' ? options.roastLevel.trim().toLowerCase() : 'medium';
+  const roast = rawRoast.includes('dark') || rawRoast.includes('ciemn') ? 'dark' : rawRoast.includes('light') || rawRoast.includes('jasn') ? 'light' : 'medium';
+
+  let staticLevel: RdtStaticLevel = 'minimal';
+  let chaffDispersalRisk: 'low' | 'medium' | 'high' = 'low';
+  let estimatedRetentionGrams = 0.05;
+
+  if (drops >= 4) {
+    staticLevel = 'over_moisturized';
+    chaffDispersalRisk = 'low';
+    estimatedRetentionGrams = 0.25;
+  } else if (drops === 0) {
+    chaffDispersalRisk = humidity > 55 ? 'medium' : 'high';
+    staticLevel = humidity > 55 && roast === 'light' ? 'moderate' : 'extreme';
+    const roastMultiplier = roast === 'dark' ? 1.3 : roast === 'medium' ? 1.0 : 0.8;
+    const humidityMultiplier = humidity < 35 ? 1.4 : humidity > 55 ? 0.7 : 1.0;
+    const baseRetention = (dose / 18) * 0.55;
+    estimatedRetentionGrams = Math.round(baseRetention * roastMultiplier * humidityMultiplier * 100) / 100;
+  } else if (drops === 3) {
+    staticLevel = 'minimal';
+    chaffDispersalRisk = 'low';
+    estimatedRetentionGrams = 0.1;
+  } else {
+    staticLevel = 'minimal';
+    chaffDispersalRisk = 'low';
+    estimatedRetentionGrams = 0.05;
+  }
+
+  let recommendationPl = '';
+  let recommendationEn = '';
+
+  if (staticLevel === 'over_moisturized') {
+    recommendationPl = `Zastosowano za dużo kropel wody (${drops}). Ryzyko zbrylania przemiału i zaklejania komory żaren. Zredukuj do 1-2 kropel.`;
+    recommendationEn = `Too much water applied (${drops} drops). Risk of coffee clumping and burr gumming. Reduce to 1-2 drops.`;
+  } else if (staticLevel === 'extreme') {
+    recommendationPl = `Wysoki ładunek elektrostatyczny bez RDT (estymowana retencja: ${estimatedRetentionGrams}g, wysoki rozrzut łusek). Zastosuj 1-2 krople wody (RDT) lub wymieszaj ziarna wilgotną łyżeczką.`;
+    recommendationEn = `High electrostatic charge without RDT (estimated retention: ${estimatedRetentionGrams}g, high chaff flyaway). Apply 1-2 water drops (RDT) or stir beans with a damp spoon.`;
+  } else if (staticLevel === 'moderate') {
+    recommendationPl = `Umiarkowana elektryzacja przemiału. Zalecana technika RDT (1 kropla wody przed mieleniem) w celu zminimalizowania retencji do <0.1g.`;
+    recommendationEn = `Moderate static charge. RDT technique (1 drop of water before grinding) recommended to reduce retention below 0.1g.`;
+  } else {
+    recommendationPl = `Optymalna technika RDT (${drops} ${drops === 1 ? 'kropla' : 'krople'}). Ładunek elektrostatyczny zneutralizowany, znikoma retencja (${estimatedRetentionGrams}g) i czysty wysyp kawy.`;
+    recommendationEn = `Optimal RDT technique (${drops} ${drops === 1 ? 'drop' : 'drops'}). Electrostatic charge neutralized, negligible retention (${estimatedRetentionGrams}g), clean chute exit.`;
+  }
+
+  return {
+    doseGrams: dose,
+    appliedDrops: drops,
+    staticLevel,
+    estimatedRetentionGrams,
+    chaffDispersalRisk,
+    recommendationPl,
+    recommendationEn,
+  };
+}
