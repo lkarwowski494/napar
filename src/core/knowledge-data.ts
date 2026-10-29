@@ -2478,3 +2478,132 @@ export function recommendBrewMethodsForOrigin(
     summaryEn,
   };
 }
+
+export interface RoastLevelComparisonItem {
+  key: CoffeeRoastLevelKey;
+  namePl: string;
+  nameEn: string;
+  solubilityLevel: 'low' | 'moderate' | 'high' | 'very_high';
+  solubilityScore: number;
+  recommendedWaterTempRange: string;
+  restingWindowDays: string;
+  acidityScore: number;
+  bitternessScore: number;
+  bodyScore: number;
+  flavorProfilePl: string;
+  flavorProfileEn: string;
+}
+
+export interface RoastLevelComparison {
+  roastA: RoastLevelComparisonItem;
+  roastB: RoastLevelComparisonItem;
+  acidityDiff: number;
+  bitternessDiff: number;
+  bodyDiff: number;
+  solubilityDiff: number;
+  primaryShiftPl: string;
+  primaryShiftEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Porównuje dwa profile stopnia palenia kawy pod kątem kwasowości, goryczki,
+ * cielistości, rozpuszczalności oraz sugerowanych parametrów parzenia.
+ */
+export function compareRoastLevels(
+  roastA: string | undefined | null,
+  roastB: string | undefined | null,
+  lang: string = 'pl'
+): RoastLevelComparison | null {
+  const guideA = getCoffeeRoastLevelGuide(roastA);
+  const guideB = getCoffeeRoastLevelGuide(roastB);
+
+  if (!guideA || !guideB) {
+    return null;
+  }
+
+  const mapScore = (key: CoffeeRoastLevelKey) => {
+    switch (key) {
+      case 'light':
+        return { acidity: 5, bitterness: 1, body: 1, solubility: 1 };
+      case 'medium_light':
+        return { acidity: 4, bitterness: 2, body: 2, solubility: 2 };
+      case 'medium':
+        return { acidity: 3, bitterness: 3, body: 3, solubility: 3 };
+      case 'medium_dark':
+        return { acidity: 2, bitterness: 4, body: 4, solubility: 3 };
+      case 'dark':
+      default:
+        return { acidity: 1, bitterness: 5, body: 5, solubility: 4 };
+    }
+  };
+
+  const scoresA = mapScore(guideA.key);
+  const scoresB = mapScore(guideB.key);
+
+  const itemA: RoastLevelComparisonItem = {
+    key: guideA.key,
+    namePl: guideA.namePl,
+    nameEn: guideA.nameEn,
+    solubilityLevel: guideA.solubilityLevel,
+    solubilityScore: scoresA.solubility,
+    recommendedWaterTempRange: guideA.recommendedWaterTempRange,
+    restingWindowDays: guideA.restingWindowDays,
+    acidityScore: scoresA.acidity,
+    bitternessScore: scoresA.bitterness,
+    bodyScore: scoresA.body,
+    flavorProfilePl: guideA.flavorProfilePl,
+    flavorProfileEn: guideA.flavorProfileEn,
+  };
+
+  const itemB: RoastLevelComparisonItem = {
+    key: guideB.key,
+    namePl: guideB.namePl,
+    nameEn: guideB.nameEn,
+    solubilityLevel: guideB.solubilityLevel,
+    solubilityScore: scoresB.solubility,
+    recommendedWaterTempRange: guideB.recommendedWaterTempRange,
+    restingWindowDays: guideB.restingWindowDays,
+    acidityScore: scoresB.acidity,
+    bitternessScore: scoresB.bitterness,
+    bodyScore: scoresB.body,
+    flavorProfilePl: guideB.flavorProfilePl,
+    flavorProfileEn: guideB.flavorProfileEn,
+  };
+
+  const acidityDiff = scoresA.acidity - scoresB.acidity;
+  const bitternessDiff = scoresA.bitterness - scoresB.bitterness;
+  const bodyDiff = scoresA.body - scoresB.body;
+  const solubilityDiff = scoresA.solubility - scoresB.solubility;
+
+  let primaryShiftPl: string;
+  let primaryShiftEn: string;
+
+  if (acidityDiff > 0) {
+    primaryShiftPl = 'Wyższa kwasowość owocowa, lżejsze body i niższa gorycz w profilu A.';
+    primaryShiftEn = 'Higher fruit acidity, lighter body, and lower bitterness in profile A.';
+  } else if (acidityDiff < 0) {
+    primaryShiftPl = 'Głębszy stopień wypalenia, wyższa goryczka, gęstsze body i większa rozpuszczalność w profilu A.';
+    primaryShiftEn = 'Deeper roast degree, higher bitterness, fuller body, and greater solubility in profile A.';
+  } else {
+    primaryShiftPl = 'Zbliżony lub identyczny stopień palenia z porównywalną równowagą sensoryczną.';
+    primaryShiftEn = 'Similar or identical roast degree with comparable sensory balance.';
+  }
+
+  const summaryPl = `Porównanie palenia [${itemA.namePl}] vs [${itemB.namePl}]: różnica kwasowości ${acidityDiff > 0 ? '+' : ''}${acidityDiff}, goryczki ${bitternessDiff > 0 ? '+' : ''}${bitternessDiff}. ${primaryShiftPl}`;
+  const summaryEn = `Roast comparison [${itemA.nameEn}] vs [${itemB.nameEn}]: acidity diff ${acidityDiff > 0 ? '+' : ''}${acidityDiff}, bitterness diff ${bitternessDiff > 0 ? '+' : ''}${bitternessDiff}. ${primaryShiftEn}`;
+
+  return {
+    roastA: itemA,
+    roastB: itemB,
+    acidityDiff,
+    bitternessDiff,
+    bodyDiff,
+    solubilityDiff,
+    primaryShiftPl,
+    primaryShiftEn,
+    summaryPl,
+    summaryEn,
+  };
+}

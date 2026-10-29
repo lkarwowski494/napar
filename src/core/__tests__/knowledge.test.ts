@@ -59,6 +59,9 @@ import {
   recommendBrewMethodsForOrigin,
   OriginBrewRecommendation,
   OriginBrewMethodMatch,
+  compareRoastLevels,
+  RoastLevelComparison,
+  RoastLevelComparisonItem,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1591,6 +1594,56 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(recommendBrewMethodsForOrigin(null)).toBeNull();
     expect(recommendBrewMethodsForOrigin('')).toBeNull();
     expect(recommendBrewMethodsForOrigin('unknown-country-404')).toBeNull();
+  });
+
+  test('TASK-P103-06-TRE: compareRoastLevels porównuje stopnie palenia z typami RoastLevelComparison i RoastLevelComparisonItem', () => {
+    // 1. Porównanie jasne (light) vs ciemne (dark)
+    const comp: RoastLevelComparison | null = compareRoastLevels('light', 'dark', 'pl');
+    expect(comp).not.toBeNull();
+    const itemA: RoastLevelComparisonItem = comp!.roastA;
+    const itemB: RoastLevelComparisonItem = comp!.roastB;
+
+    expect(itemA.key).toBe('light');
+    expect(itemA.acidityScore).toBe(5);
+    expect(itemA.bitternessScore).toBe(1);
+    expect(itemA.bodyScore).toBe(1);
+    expect(itemA.solubilityScore).toBe(1);
+    expect(itemA.solubilityLevel).toBe('low');
+
+    expect(itemB.key).toBe('dark');
+    expect(itemB.acidityScore).toBe(1);
+    expect(itemB.bitternessScore).toBe(5);
+    expect(itemB.bodyScore).toBe(5);
+    expect(itemB.solubilityScore).toBe(4);
+    expect(itemB.solubilityLevel).toBe('very_high');
+
+    expect(comp!.acidityDiff).toBe(4); // 5 - 1
+    expect(comp!.bitternessDiff).toBe(-4); // 1 - 5
+    expect(comp!.bodyDiff).toBe(-4); // 1 - 5
+    expect(comp!.solubilityDiff).toBe(-3); // 1 - 4
+    expect(comp!.primaryShiftPl).toContain('Wyższa kwasowość owocowa');
+    expect(comp!.summaryPl).toContain('Porównanie palenia');
+
+    // 2. Porównanie ciemne vs jasne (język angielski)
+    const compRev = compareRoastLevels('dark', 'light', 'en');
+    expect(compRev).not.toBeNull();
+    expect(compRev!.acidityDiff).toBe(-4);
+    expect(compRev!.bitternessDiff).toBe(4);
+    expect(compRev!.primaryShiftEn).toContain('Deeper roast degree');
+    expect(compRev!.summaryEn).toContain('Roast comparison');
+
+    // 3. Porównanie identycznych profili
+    const compSame = compareRoastLevels('medium', 'medium');
+    expect(compSame).not.toBeNull();
+    expect(compSame!.acidityDiff).toBe(0);
+    expect(compSame!.bitternessDiff).toBe(0);
+    expect(compSame!.primaryShiftPl).toContain('Zbliżony lub identyczny stopień palenia');
+
+    // 4. Odporność na błędne dane i brak profilu
+    expect(compareRoastLevels(null, 'medium')).toBeNull();
+    expect(compareRoastLevels('light', null)).toBeNull();
+    expect(compareRoastLevels('invalid_roast', 'light')).toBeNull();
+    expect(compareRoastLevels('', '')).toBeNull();
   });
 });
 
