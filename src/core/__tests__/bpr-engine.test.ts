@@ -37,6 +37,9 @@ import {
   TroubleshootingAction,
   TroubleshootingActionType,
   TroubleshootingSymptom,
+  predictGrindProfileByProcessAndRoast,
+  PredictedGrindProfile,
+  GrindDensityCategory,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -1377,6 +1380,45 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(['channeling', 'imbalanced']).toContain(guide.primaryIssue);
       expect(guide.severity).toBe('severe');
       expect(guide.actions.some(a => a.targetVariable === 'technique' || a.actionType === 'adjust_pouring_technique')).toBe(true);
+    });
+  });
+
+  describe('TASK-P100-04-SZT: predictGrindProfileByProcessAndRoast', () => {
+    it('prognozuje drobniejszy przemiał dla gęstych ziaren jasno palonych mytych', () => {
+      const pred: PredictedGrindProfile = predictGrindProfileByProcessAndRoast({
+        method: 'v60',
+        process: 'washed',
+        roastLevel: 'light',
+        baseMicrons: 720,
+      });
+      const density: GrindDensityCategory = pred.densityCategory;
+      expect(density).toBe('very_dense');
+      expect(pred.baseMicrons).toBe(720);
+      expect(pred.micronDelta).toBe(-25);
+      expect(pred.recommendedMicrons).toBe(695);
+      expect(pred.cloggingRisk).toBe('low');
+      expect(pred.recommendedWaterTempCelsius).toBe(95);
+      expect(pred.rationalePl).toContain('wysokiej gęstości');
+      expect(pred.summaryPl).toContain('695 µm');
+    });
+
+    it('prognozuje grubszy przemiał dla ziaren ciemno palonych z uwagi na kruchość i pył', () => {
+      const darkPred = predictGrindProfileByProcessAndRoast({
+        method: 'espresso',
+        process: 'natural',
+        roastLevel: 'dark',
+      });
+      expect(darkPred.densityCategory).toBe('brittle');
+      expect(darkPred.micronDelta).toBeGreaterThan(0);
+      expect(darkPred.cloggingRisk).toBe('high');
+      expect(darkPred.recommendedWaterTempCelsius).toBeLessThan(90);
+    });
+
+    it('obsługuje brak argumentów i null/undefined bezpiecznie', () => {
+      const fallback = predictGrindProfileByProcessAndRoast(null as any);
+      expect(fallback.baseMicrons).toBe(720);
+      expect(fallback.recommendedMicrons).toBeGreaterThan(0);
+      expect(fallback.densityCategory).toBeDefined();
     });
   });
 });

@@ -2116,3 +2116,142 @@ export function generateExtractionTroubleshootingGuide(options?: {
     },
   };
 }
+
+
+// ============================================================================
+// TASK-P100-04-SZT: Grind Profile Predictor (Predyktor profilu przemiału BPR)
+// ============================================================================
+
+export type GrindDensityCategory = 'very_dense' | 'dense' | 'balanced' | 'brittle' | 'porous';
+
+export interface PredictedGrindProfile {
+  baseMicrons: number;
+  recommendedMicrons: number;
+  micronDelta: number;
+  densityCategory: GrindDensityCategory;
+  cloggingRisk: 'low' | 'medium' | 'high';
+  finesProductionTendency: 'low' | 'medium' | 'high';
+  recommendedWaterTempCelsius: number;
+  rationalePl: string;
+  rationaleEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function predictGrindProfileByProcessAndRoast(options?: {
+  method?: string | null;
+  process?: string | null;
+  roastLevel?: string | null;
+  baseMicrons?: number | string | null;
+}): PredictedGrindProfile {
+  const parseBase = (val: unknown, fallback: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.max(100, Math.min(2000, val));
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.max(100, Math.min(2000, parsed));
+      }
+    }
+    return fallback;
+  };
+
+  const methodNorm = typeof options?.method === 'string' ? options.method.trim().toLowerCase() : '';
+  let defaultBase = 720; // V60
+  if (methodNorm.includes('espresso')) defaultBase = 350;
+  else if (methodNorm.includes('aeropress')) defaultBase = 560;
+  else if (methodNorm.includes('chemex')) defaultBase = 880;
+  else if (methodNorm.includes('french') || methodNorm.includes('press')) defaultBase = 1150;
+  else if (methodNorm.includes('cold')) defaultBase = 1150;
+  else if (methodNorm.includes('cupping')) defaultBase = 880;
+
+  const baseMicrons = Math.round(parseBase(options?.baseMicrons, defaultBase));
+
+  const processNorm = typeof options?.process === 'string' ? options.process.trim().toLowerCase() : 'washed';
+  const roastNorm = typeof options?.roastLevel === 'string' ? options.roastLevel.trim().toLowerCase() : 'light';
+
+  const isWashed = processNorm.includes('wash') || processNorm.includes('mokra');
+  const isNatural = processNorm.includes('nat') || processNorm.includes('sucha');
+  const isAnaerobic = processNorm.includes('anaerob') || processNorm.includes('ferment') || processNorm.includes('honey');
+
+  const isLight = roastNorm.includes('light') || roastNorm.includes('jasn') || roastNorm.includes('cinnamon');
+  const isDark = roastNorm.includes('dark') || roastNorm.includes('ciemn') || roastNorm.includes('french') || roastNorm.includes('italian');
+  const isMedium = !isLight && !isDark;
+
+  let delta = 0;
+  let densityCategory: GrindDensityCategory = 'balanced';
+  let cloggingRisk: 'low' | 'medium' | 'high' = 'medium';
+  let finesProductionTendency: 'low' | 'medium' | 'high' = 'medium';
+  let recommendedWaterTempCelsius = 92;
+
+  if (isLight) {
+    if (isWashed) {
+      densityCategory = 'very_dense';
+      delta = -25;
+      cloggingRisk = 'low';
+      finesProductionTendency = 'low';
+      recommendedWaterTempCelsius = 95;
+    } else {
+      densityCategory = 'dense';
+      delta = 15;
+      cloggingRisk = 'medium';
+      finesProductionTendency = 'medium';
+      recommendedWaterTempCelsius = 92;
+    }
+  } else if (isDark) {
+    densityCategory = 'brittle';
+    delta = 35;
+    cloggingRisk = 'high';
+    finesProductionTendency = 'high';
+    recommendedWaterTempCelsius = 86;
+  } else {
+    // Medium roast
+    if (isNatural || isAnaerobic) {
+      densityCategory = 'porous';
+      delta = 20;
+      cloggingRisk = 'medium';
+      finesProductionTendency = 'medium';
+      recommendedWaterTempCelsius = 90;
+    } else {
+      densityCategory = 'balanced';
+      delta = 0;
+      cloggingRisk = 'low';
+      finesProductionTendency = 'low';
+      recommendedWaterTempCelsius = 92;
+    }
+  }
+
+  const recommendedMicrons = Math.max(100, Math.min(2000, baseMicrons + delta));
+
+  const rationalePl =
+    delta < 0
+      ? `Ziarna o wysokiej gęstości (${densityCategory}) i obróbce mytej generują mało pyłu. Zalecany drobniejszy przemiał (${delta} µm) i wyższa temperatura (${recommendedWaterTempCelsius}°C) dla pełnego otwarcia kwasowości.`
+      : delta > 0
+      ? `Ziarna bardziej porowate/kruche (${densityCategory}) wytwarzają więcej pyłu. Zalecany grubszy przemiał (+${delta} µm) i łagodniejsza temperatura (${recommendedWaterTempCelsius}°C) chronią przed zatykaniem filtra i goryczą.`
+      : `Zrównoważony profil ziaren (${densityCategory}). Standardowa nastawa przemiału i temperatura ${recommendedWaterTempCelsius}°C.`;
+
+  const rationaleEn =
+    delta < 0
+      ? `High-density washed beans (${densityCategory}) generate low fines. Recommended finer grind (${delta} µm) and higher temp (${recommendedWaterTempCelsius}°C) to unlock vibrant acidity.`
+      : delta > 0
+      ? `Porous/brittle beans (${densityCategory}) produce elevated fines. Recommended coarser grind (+${delta} µm) and lower temp (${recommendedWaterTempCelsius}°C) to prevent clogging and bitterness.`
+      : `Balanced bean structure (${densityCategory}). Standard grind setting and ${recommendedWaterTempCelsius}°C water temp.`;
+
+  const summaryPl = `Predykcja przemiału: ${recommendedMicrons} µm (baza: ${baseMicrons} µm, korekta: ${delta > 0 ? '+' : ''}${delta} µm). Ryzyko zatykania: ${cloggingRisk}.`;
+  const summaryEn = `Grind prediction: ${recommendedMicrons} µm (base: ${baseMicrons} µm, adjustment: ${delta > 0 ? '+' : ''}${delta} µm). Clogging risk: ${cloggingRisk}.`;
+
+  return {
+    baseMicrons,
+    recommendedMicrons,
+    micronDelta: delta,
+    densityCategory,
+    cloggingRisk,
+    finesProductionTendency,
+    recommendedWaterTempCelsius,
+    rationalePl,
+    rationaleEn,
+    summaryPl,
+    summaryEn,
+  };
+}
