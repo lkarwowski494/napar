@@ -42,6 +42,9 @@ import {
   estimateGrindDistributionSpread,
   GrindDistributionSpread,
   GrindUniformityGrade,
+  calculateGrinderBurrCalibration,
+  GrinderBurrCalibration,
+  BurrCalibrationStatus,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -1249,6 +1252,54 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(fallback.burrType).toBe('conical');
     expect(fallback.targetMicrons).toBe(750);
     expect(fallback.uniformityScore).toBeGreaterThan(0);
+  });
+
+  test('TASK-P98-08-PRO: calculateGrinderBurrCalibration oblicza przesunięcie punktu zerowego i zalecaną korektę klików', () => {
+    // 1. Idealnie skalibrowany młynek (offset = 0)
+    const aligned: GrinderBurrCalibration = calculateGrinderBurrCalibration({
+      currentClick: 20,
+      targetMicrons: 600,
+      zeroClickOffset: 0,
+      micronsPerClick: 30, // Comandante
+    });
+    expect(aligned.status).toBe('aligned');
+    expect(aligned.zeroClickOffset).toBe(0);
+    expect(aligned.effectiveClick).toBe(20);
+    expect(aligned.estimatedMicrons).toBe(600);
+    expect(aligned.deltaMicrons).toBe(0);
+    expect(aligned.recommendedCalibratedClick).toBe(20);
+    expect(aligned.recommendedClickAdjustment).toBe(0);
+    expect(aligned.summaryPl).toContain('skalibrowany idealnie');
+
+    // 2. Niewielkie przesunięcie (+1 klik od zera)
+    const minorOffset = calculateGrinderBurrCalibration({
+      currentClick: 25,
+      targetMicrons: 500,
+      zeroClickOffset: 1,
+      micronsPerClick: 25,
+    });
+    expect(minorOffset.status).toBe('minor_offset');
+    expect(minorOffset.effectiveClick).toBe(24);
+    expect(minorOffset.recommendedCalibratedClick).toBe(21); // 500/25 = 20 + 1 offset = 21
+    expect(minorOffset.recommendedClickAdjustment).toBe(-4);
+    const statusType: BurrCalibrationStatus = minorOffset.status;
+    expect(statusType).toBe('minor_offset');
+
+    // 3. Znaczne rozkalibrowanie (-4 kliki)
+    const misaligned = calculateGrinderBurrCalibration({
+      currentClick: 10,
+      targetMicrons: 600,
+      zeroClickOffset: -4,
+      micronsPerClick: 20,
+    });
+    expect(misaligned.status).toBe('misaligned');
+    expect(misaligned.summaryPl).toContain('Znaczne przesunięcie');
+
+    // 4. Odporność na null i puste wartości
+    const fallbackCalib = calculateGrinderBurrCalibration(null);
+    expect(fallbackCalib.status).toBe('aligned');
+    expect(fallbackCalib.currentClick).toBe(15);
+    expect(fallbackCalib.targetMicrons).toBe(600);
   });
 });
 

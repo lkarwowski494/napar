@@ -2175,3 +2175,89 @@ export function estimateGrindDistributionSpread(
     summaryEn,
   };
 }
+
+
+// ============================================================================
+// TASK-P98-08-PRO: Grinder Burr Calibration Engine (Kalibrator punktu zerowego żaren)
+// ============================================================================
+
+export type BurrCalibrationStatus = 'aligned' | 'minor_offset' | 'misaligned';
+
+export interface GrinderBurrCalibration {
+  currentClick: number;
+  effectiveClick: number;
+  targetMicrons: number;
+  estimatedMicrons: number;
+  deltaMicrons: number;
+  recommendedClickAdjustment: number;
+  recommendedCalibratedClick: number;
+  zeroClickOffset: number;
+  micronsPerClick: number;
+  status: BurrCalibrationStatus;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function calculateGrinderBurrCalibration(params?: {
+  currentClick?: number | string | null;
+  targetMicrons?: number | string | null;
+  zeroClickOffset?: number | string | null;
+  micronsPerClick?: number | string | null;
+}): GrinderBurrCalibration {
+  const parseNum = (val: unknown, fallback: number, min: number, max: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.max(min, Math.min(max, val));
+    }
+    if (typeof val === 'string') {
+      const normalized = val.trim().replace(',', '.');
+      const parsed = parseFloat(normalized);
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.max(min, Math.min(max, parsed));
+      }
+    }
+    return fallback;
+  };
+
+  const currentClick = Math.round(parseNum(params?.currentClick, 15, 0, 200));
+  const targetMicrons = Math.round(parseNum(params?.targetMicrons, 600, 50, 2500));
+  const zeroClickOffset = Math.round(parseNum(params?.zeroClickOffset, 0, -50, 50));
+  const micronsPerClick = Math.round(parseNum(params?.micronsPerClick, 25, 1, 200) * 10) / 10;
+
+  const effectiveClick = Math.max(0, currentClick - zeroClickOffset);
+  const estimatedMicrons = Math.round(effectiveClick * micronsPerClick);
+  const deltaMicrons = estimatedMicrons - targetMicrons;
+
+  const recommendedIdealClicks = Math.round(targetMicrons / micronsPerClick);
+  const recommendedCalibratedClick = Math.max(0, recommendedIdealClicks + zeroClickOffset);
+  const recommendedClickAdjustment = recommendedCalibratedClick - currentClick;
+
+  const absOffset = Math.abs(zeroClickOffset);
+  const status: BurrCalibrationStatus =
+    absOffset === 0 ? 'aligned' : absOffset <= 2 ? 'minor_offset' : 'misaligned';
+
+  let summaryPl = `Młynek skalibrowany idealnie (punkt zerowy na kliku 0). Realna grubość: ${estimatedMicrons} µm (cel: ${targetMicrons} µm).`;
+  let summaryEn = `Grinder perfectly aligned (zero touch at click 0). Actual particle size: ${estimatedMicrons} µm (target: ${targetMicrons} µm).`;
+
+  if (status === 'minor_offset') {
+    summaryPl = `Niewielkie przesunięcie punktu zerowego żaren (${zeroClickOffset > 0 ? '+' : ''}${zeroClickOffset} klik). Realna grubość: ${estimatedMicrons} µm. Zalecana nastawa dla ${targetMicrons} µm: klik ${recommendedCalibratedClick}.`;
+    summaryEn = `Minor zero-point offset (${zeroClickOffset > 0 ? '+' : ''}${zeroClickOffset} clicks). Actual particle size: ${estimatedMicrons} µm. Recommended setting for ${targetMicrons} µm: click ${recommendedCalibratedClick}.`;
+  } else if (status === 'misaligned') {
+    summaryPl = `Znaczne przesunięcie żaren (${zeroClickOffset > 0 ? '+' : ''}${zeroClickOffset} klików). Wymagana korekta tarczy kalibracyjnej lub nastawy na klik ${recommendedCalibratedClick}.`;
+    summaryEn = `Significant burr misalignment (${zeroClickOffset > 0 ? '+' : ''}${zeroClickOffset} clicks). Recalibrate adjustment dial or set to click ${recommendedCalibratedClick}.`;
+  }
+
+  return {
+    currentClick,
+    effectiveClick,
+    targetMicrons,
+    estimatedMicrons,
+    deltaMicrons,
+    recommendedClickAdjustment,
+    recommendedCalibratedClick,
+    zeroClickOffset,
+    micronsPerClick,
+    status,
+    summaryPl,
+    summaryEn,
+  };
+}
