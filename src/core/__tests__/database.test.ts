@@ -41,6 +41,9 @@ import {
   calculateStashDepletionForecast,
   StashDepletionForecast,
   StashDepletionUrgency,
+  calculateStashCostEfficiency,
+  StashCostEfficiencyReport,
+  StashCostEfficiencyTier,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -3266,5 +3269,61 @@ describe('Napar SQLite Database & Repositories', () => {
 
     const nullForecast = calculateStashDepletionForecast(null);
     expect(nullForecast.estimatedDaysRemaining).toBe(0);
+  });
+
+  test('TASK-P100-03-ZAK: calculateStashCostEfficiency analizuje efektywność kosztową spiżarni i segment cenowy', () => {
+    const items = [
+      {
+        id: '1',
+        name: 'Brazil Santos',
+        initialWeightGrams: 250,
+        remainingWeightGrams: 200,
+        price: 35, // 14 zł / 100g -> value
+        isArchived: false,
+      },
+      {
+        id: '2',
+        name: 'Panama Geisha',
+        initialWeightGrams: 100,
+        remainingWeightGrams: 100,
+        price: 80, // 80 zł / 100g -> ultra_premium
+        isArchived: false,
+      },
+      {
+        id: '3',
+        name: 'Archived Empty',
+        initialWeightGrams: 250,
+        remainingWeightGrams: 0,
+        price: 45,
+        isArchived: true,
+      },
+    ] as any[];
+
+    // Wycena: Brazil: 35 * (200/250) = 28 PLN. Geisha: 80 PLN. Razem: 108 PLN dla 300g -> 36 PLN / 100g -> specialty
+    const report: StashCostEfficiencyReport = calculateStashCostEfficiency(items, { standardDoseGrams: 15 });
+    const testTier: StashCostEfficiencyTier = report.tier;
+    expect(testTier).toBe('specialty');
+    expect(report.totalItemsCount).toBe(2);
+    expect(report.totalRemainingWeightGrams).toBe(300);
+    expect(report.totalEstimatedValuePln).toBe(108);
+    expect(report.averageCostPer100gPln).toBe(36);
+    expect(report.estimatedCostPerCupPln).toBe(5.4); // 36 * 0.15 = 5.4 PLN
+    expect(report.mostAffordableItemName).toBe('Brazil Santos');
+    expect(report.mostAffordableCostPer100g).toBe(14);
+    expect(report.mostPremiumItemName).toBe('Panama Geisha');
+    expect(report.mostPremiumCostPer100g).toBe(80);
+    expect(report.summaryPl).toContain('36.00 zł/100g');
+    expect(report.summaryEn).toBeDefined();
+
+    // Pusta spiżarnia
+    const emptyReport = calculateStashCostEfficiency([]);
+    expect(emptyReport.totalItemsCount).toBe(0);
+    expect(emptyReport.totalEstimatedValuePln).toBe(0);
+    expect(emptyReport.tier).toBe('value');
+    expect(emptyReport.summaryPl).toContain('pusta');
+
+    // Odporność na null
+    const nullReport = calculateStashCostEfficiency(null);
+    expect(nullReport.totalItemsCount).toBe(0);
   });
 });

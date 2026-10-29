@@ -2957,3 +2957,157 @@ export function calculateStashDepletionForecast(
     summaryEn,
   };
 }
+
+
+// ============================================================================
+// TASK-P100-03-ZAK: Stash Cost Efficiency Analyzer (Analizator opłacalności spiżarni)
+// ============================================================================
+
+export type StashCostEfficiencyTier = 'budget' | 'value' | 'specialty' | 'ultra_premium';
+
+export interface StashCostEfficiencyReport {
+  totalItemsCount: number;
+  totalRemainingWeightGrams: number;
+  totalEstimatedValuePln: number;
+  averageCostPer100gPln: number;
+  estimatedCostPerCupPln: number;
+  tier: StashCostEfficiencyTier;
+  mostAffordableItemName?: string;
+  mostAffordableCostPer100g?: number;
+  mostPremiumItemName?: string;
+  mostPremiumCostPer100g?: number;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function calculateStashCostEfficiency(
+  items: InventoryItem[] | undefined | null,
+  options?: {
+    standardDoseGrams?: number | string | null;
+    defaultCostPerKgPln?: number | string | null;
+  } | null
+): StashCostEfficiencyReport {
+  const parseNum = (val: unknown, fallback: number, min: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.max(min, val);
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.max(min, parsed);
+      }
+    }
+    return fallback;
+  };
+
+  const standardDose = parseNum(options?.standardDoseGrams, 15, 1);
+  const defaultCostPerKg = parseNum(options?.defaultCostPerKgPln, 160, 1);
+  const defaultCostPer100g = defaultCostPerKg / 10;
+
+  const safeItems = Array.isArray(items) ? items : [];
+  let totalRemainingWeightGrams = 0;
+  let totalEstimatedValuePln = 0;
+  let validItemsCount = 0;
+
+  let mostAffordableName: string | undefined;
+  let mostAffordableCost: number = Infinity;
+  let mostPremiumName: string | undefined;
+  let mostPremiumCost: number = -Infinity;
+
+  for (const item of safeItems) {
+    if (!item || typeof item !== 'object' || item.isArchived) continue;
+
+    const remWeight =
+      typeof item.remainingWeightGrams === 'number' && Number.isFinite(item.remainingWeightGrams) && item.remainingWeightGrams > 0
+        ? item.remainingWeightGrams
+        : 0;
+
+    if (remWeight <= 0) continue;
+
+    validItemsCount++;
+    totalRemainingWeightGrams += remWeight;
+
+    const initWeight =
+      typeof item.initialWeightGrams === 'number' && Number.isFinite(item.initialWeightGrams) && item.initialWeightGrams > 0
+        ? item.initialWeightGrams
+        : remWeight;
+
+    const rawPrice =
+      typeof (item as any).price === 'number' && Number.isFinite((item as any).price) && (item as any).price > 0
+        ? (item as any).price
+        : typeof (item as any).pricePerPackage === 'number' && Number.isFinite((item as any).pricePerPackage) && (item as any).pricePerPackage > 0
+        ? (item as any).pricePerPackage
+        : undefined;
+
+    let itemCostPer100g = defaultCostPer100g;
+    let itemValue = (remWeight / 1000) * defaultCostPerKg;
+
+    if (rawPrice !== undefined) {
+      itemCostPer100g = (rawPrice / initWeight) * 100;
+      itemValue = rawPrice * (remWeight / initWeight);
+    }
+
+    totalEstimatedValuePln += itemValue;
+
+    const itemName = typeof item.name === 'string' && item.name.trim() ? item.name.trim() : `Paczka #${validItemsCount}`;
+
+    if (itemCostPer100g < mostAffordableCost) {
+      mostAffordableCost = itemCostPer100g;
+      mostAffordableName = itemName;
+    }
+    if (itemCostPer100g > mostPremiumCost) {
+      mostPremiumCost = itemCostPer100g;
+      mostPremiumName = itemName;
+    }
+  }
+
+  if (validItemsCount === 0 || totalRemainingWeightGrams <= 0) {
+    return {
+      totalItemsCount: 0,
+      totalRemainingWeightGrams: 0,
+      totalEstimatedValuePln: 0,
+      averageCostPer100gPln: 0,
+      estimatedCostPerCupPln: 0,
+      tier: 'value',
+      summaryPl: 'Spiżarnia jest pusta. Brak danych do analizy kosztów.',
+      summaryEn: 'Stash is empty. No cost efficiency data available.',
+    };
+  }
+
+  const averageCostPer100gPln = Math.round((totalEstimatedValuePln / totalRemainingWeightGrams) * 100 * 100) / 100;
+  const estimatedCostPerCupPln = Math.round((averageCostPer100gPln / 100) * standardDose * 100) / 100;
+  const roundedTotalValue = Math.round(totalEstimatedValuePln * 100) / 100;
+
+  let tier: StashCostEfficiencyTier = 'value';
+  let summaryPl = `Średni koszt ziaren w spiżarni to ${averageCostPer100gPln.toFixed(2)} zł/100g (~${estimatedCostPerCupPln.toFixed(2)} zł za filiżankę). Segment: codzienny specialty.`;
+  let summaryEn = `Average stash cost is ${averageCostPer100gPln.toFixed(2)} PLN/100g (~${estimatedCostPerCupPln.toFixed(2)} PLN per cup). Segment: daily specialty.`;
+
+  if (averageCostPer100gPln >= 45) {
+    tier = 'ultra_premium';
+    summaryPl = `Wybitna selekcja ultra-premium: średnio ${averageCostPer100gPln.toFixed(2)} zł/100g (~${estimatedCostPerCupPln.toFixed(2)} zł/filiżankę). Segment: mikroloty i geishe.`;
+    summaryEn = `Ultra-premium selection: average ${averageCostPer100gPln.toFixed(2)} PLN/100g (~${estimatedCostPerCupPln.toFixed(2)} PLN/cup). Segment: geishas and competition nanolots.`;
+  } else if (averageCostPer100gPln >= 20) {
+    tier = 'specialty';
+    summaryPl = `Profil specialty: średnio ${averageCostPer100gPln.toFixed(2)} zł/100g (~${estimatedCostPerCupPln.toFixed(2)} zł za filiżankę). Segment: single origin speciality.`;
+    summaryEn = `Specialty tier: average ${averageCostPer100gPln.toFixed(2)} PLN/100g (~${estimatedCostPerCupPln.toFixed(2)} PLN per cup). Segment: single origin specialty.`;
+  } else if (averageCostPer100gPln < 10) {
+    tier = 'budget';
+    summaryPl = `Ekonomiczna spiżarnia: średnio ${averageCostPer100gPln.toFixed(2)} zł/100g (~${estimatedCostPerCupPln.toFixed(2)} zł za filiżankę). Segment: budżetowy.`;
+    summaryEn = `Budget stash: average ${averageCostPer100gPln.toFixed(2)} PLN/100g (~${estimatedCostPerCupPln.toFixed(2)} PLN per cup). Segment: budget friendly.`;
+  }
+
+  return {
+    totalItemsCount: validItemsCount,
+    totalRemainingWeightGrams: Math.round(totalRemainingWeightGrams * 10) / 10,
+    totalEstimatedValuePln: roundedTotalValue,
+    averageCostPer100gPln,
+    estimatedCostPerCupPln,
+    tier,
+    mostAffordableItemName: mostAffordableName,
+    mostAffordableCostPer100g: Number.isFinite(mostAffordableCost) ? Math.round(mostAffordableCost * 100) / 100 : undefined,
+    mostPremiumItemName: mostPremiumName,
+    mostPremiumCostPer100g: Number.isFinite(mostPremiumCost) && mostPremiumCost > 0 ? Math.round(mostPremiumCost * 100) / 100 : undefined,
+    summaryPl,
+    summaryEn,
+  };
+}
