@@ -1675,3 +1675,150 @@ export function evaluateUpsellTrigger(
     headlineEn: 'Explore brewing with Napar',
   };
 }
+
+
+export type AppFeatureId =
+  | 'water_calculator'
+  | 'custom_recipes'
+  | 'bpr_ai_calendar'
+  | 'data_export_json'
+  | 'caffeine_kinetics_healthkit'
+  | 'grinder_calibration';
+
+export interface FeatureEntitlementCheck {
+  featureId: AppFeatureId;
+  isEntitled: boolean;
+  requiresPro: boolean;
+  isUsageLimitReached: boolean;
+  currentUsage: number;
+  maxAllowedUsage: number;
+  reasonPl: string;
+  reasonEn: string;
+  upgradePromptPl: string;
+  upgradePromptEn: string;
+}
+
+/**
+ * Weryfikuje uprawnienia i limity dostępu do wybranej funkcji aplikacji
+ * dla użytkowników darmowych oraz subskrybentów wersji Napar Pro.
+ */
+export function evaluateFeatureEntitlement(
+  featureId: AppFeatureId | string | undefined | null,
+  options?: {
+    isProUser?: boolean | null;
+    currentUsageCount?: number | null;
+  } | null
+): FeatureEntitlementCheck {
+  const parseUsage = (v: unknown): number => {
+    if (typeof v === 'number') return Number.isFinite(v) && !Object.is(v, -0) ? Math.max(0, v) : 0;
+    if (typeof v === 'string') {
+      const parsed = parseFloat(v.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      return Number.isFinite(parsed) && !Object.is(parsed, -0) ? Math.max(0, parsed) : 0;
+    }
+    return 0;
+  };
+
+  const isPro = Boolean(options?.isProUser);
+  const currentUsage = parseUsage(options?.currentUsageCount);
+
+  const cleanId =
+    typeof featureId === 'string' && featureId.trim()
+      ? (featureId.trim().toLowerCase() as AppFeatureId)
+      : ('water_calculator' as AppFeatureId);
+
+  if (isPro) {
+    return {
+      featureId: cleanId,
+      isEntitled: true,
+      requiresPro: false,
+      isUsageLimitReached: false,
+      currentUsage,
+      maxAllowedUsage: Infinity,
+      reasonPl: 'Pełny dostęp do funkcji w ramach aktywnej licencji Napar Pro.',
+      reasonEn: 'Full feature entitlement granted under active Napar Pro license.',
+      upgradePromptPl: '',
+      upgradePromptEn: '',
+    };
+  }
+
+  switch (cleanId) {
+    case 'custom_recipes': {
+      const maxAllowed = 3;
+      const isLimitReached = currentUsage >= maxAllowed;
+      return {
+        featureId: cleanId,
+        isEntitled: !isLimitReached,
+        requiresPro: isLimitReached,
+        isUsageLimitReached: isLimitReached,
+        currentUsage,
+        maxAllowedUsage: maxAllowed,
+        reasonPl: isLimitReached
+          ? `Osiągnięto limit darmowych receptur autorskich (${maxAllowed}).`
+          : `Darmowy dostęp: wykorzystano ${currentUsage} z ${maxAllowed} receptur autorskich.`,
+        reasonEn: isLimitReached
+          ? `Free custom recipes limit reached (${maxAllowed}).`
+          : `Free access: ${currentUsage} of ${maxAllowed} custom recipes used.`,
+        upgradePromptPl:
+          'Przejdź na Napar Pro, aby tworzyć nielimitowaną liczbę autorskich receptur i procedur.',
+        upgradePromptEn:
+          'Upgrade to Napar Pro to create unlimited author recipes and custom routines.',
+      };
+    }
+
+    case 'caffeine_kinetics_healthkit': {
+      return {
+        featureId: cleanId,
+        isEntitled: false,
+        requiresPro: true,
+        isUsageLimitReached: true,
+        currentUsage,
+        maxAllowedUsage: 0,
+        reasonPl: 'Synchronizacja z Apple HealthKit oraz model metaboliczny są funkcjami Pro.',
+        reasonEn: 'Apple HealthKit sync and personalized metabolic model require Pro.',
+        upgradePromptPl:
+          'Aktywuj Napar Pro, aby zsynchronizować spożycie kofeiny z Apple Zdrowie i dbać o sen.',
+        upgradePromptEn:
+          'Activate Napar Pro to sync caffeine data with Apple Health and optimize sleep.',
+      };
+    }
+
+    case 'bpr_ai_calendar': {
+      const maxAllowed = 3;
+      const isLimitReached = currentUsage > maxAllowed;
+      return {
+        featureId: cleanId,
+        isEntitled: !isLimitReached,
+        requiresPro: isLimitReached,
+        isUsageLimitReached: isLimitReached,
+        currentUsage,
+        maxAllowedUsage: maxAllowed,
+        reasonPl: isLimitReached
+          ? 'Pełny 14-dniowy kalendarz proaktywny BPR wymaga Napar Pro.'
+          : 'Darmowy dostęp: 3-dniowy harmonogram parzeń.',
+        reasonEn: isLimitReached
+          ? 'Full 14-day proactive BPR calendar requires Napar Pro.'
+          : 'Free access: 3-day brew action schedule.',
+        upgradePromptPl: 'Odblokuj 14-dniowy kalendarz BPR i eksport iCal w wersji Pro.',
+        upgradePromptEn: 'Unlock 14-day BPR calendar and iCal export in Pro.',
+      };
+    }
+
+    case 'data_export_json':
+    case 'water_calculator':
+    case 'grinder_calibration':
+    default: {
+      return {
+        featureId: cleanId,
+        isEntitled: true,
+        requiresPro: false,
+        isUsageLimitReached: false,
+        currentUsage,
+        maxAllowedUsage: Infinity,
+        reasonPl: 'Funkcja dostępna bezpłatnie w planie darmowym.',
+        reasonEn: 'Feature is available for free in standard plan.',
+        upgradePromptPl: '',
+        upgradePromptEn: '',
+      };
+    }
+  }
+}

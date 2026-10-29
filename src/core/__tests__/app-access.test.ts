@@ -54,6 +54,9 @@ import {
   evaluateUpsellTrigger,
   UpsellTriggerEvaluation,
   UpsellUrgency,
+  evaluateFeatureEntitlement,
+  FeatureEntitlementCheck,
+  AppFeatureId,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1706,6 +1709,48 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     // 6. Odporność na null i wartości ujemne
     const fallback = evaluateUpsellTrigger(null);
     expect(fallback.shouldShowUpsell).toBe(false);
+  });
+
+  test('TASK-P97-02-MON: evaluateFeatureEntitlement weryfikuje uprawnienia i limity funkcji Pro vs Free', () => {
+    // 1. Użytkownik Pro (pełny dostęp do wszystkiego)
+    const proCheck: FeatureEntitlementCheck = evaluateFeatureEntitlement('custom_recipes', {
+      isProUser: true,
+      currentUsageCount: 10,
+    });
+    const testId: AppFeatureId = proCheck.featureId;
+    expect(testId).toBe('custom_recipes');
+    expect(proCheck.isEntitled).toBe(true);
+    expect(proCheck.requiresPro).toBe(false);
+    expect(proCheck.isUsageLimitReached).toBe(false);
+    expect(proCheck.maxAllowedUsage).toBe(Infinity);
+    expect(proCheck.reasonPl).toContain('Pro');
+
+    // 2. Użytkownik Free z limitem przepisów autorskich (limit 3, zużyto 3) -> limit osiągnięty
+    const limitReached = evaluateFeatureEntitlement('custom_recipes', {
+      isProUser: false,
+      currentUsageCount: 3,
+    });
+    expect(limitReached.isEntitled).toBe(false);
+    expect(limitReached.requiresPro).toBe(true);
+    expect(limitReached.isUsageLimitReached).toBe(true);
+    expect(limitReached.maxAllowedUsage).toBe(3);
+    expect(limitReached.upgradePromptPl).toContain('Pro');
+    expect(limitReached.upgradePromptEn).toBeDefined();
+
+    // 3. Użytkownik Free korzystający z darmowej funkcji (data_export_json)
+    const freeExport = evaluateFeatureEntitlement('data_export_json', { isProUser: false });
+    expect(freeExport.isEntitled).toBe(true);
+    expect(freeExport.requiresPro).toBe(false);
+
+    // 4. Funkcja wyłącznie w Pro (caffeine_kinetics_healthkit)
+    const proOnly = evaluateFeatureEntitlement('caffeine_kinetics_healthkit', { isProUser: false });
+    expect(proOnly.isEntitled).toBe(false);
+    expect(proOnly.requiresPro).toBe(true);
+
+    // 5. Odporność na nieznany featureId lub null
+    const fallback = evaluateFeatureEntitlement(null as any);
+    expect(fallback.isEntitled).toBe(true);
+    expect(fallback.requiresPro).toBe(false);
   });
 });
 
