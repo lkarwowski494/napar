@@ -21,6 +21,9 @@ import {
   isBackupEmpty,
   validateBackupEnvelopeIntegrity,
   BackupIntegrityReport,
+  auditBackupRelationalIntegrity,
+  BackupRelationalIntegrityReport,
+  RelationalOrphanItem,
   sanitizeBackupEnvelope,
   estimateBackupFileSize,
   BackupFileSizeEstimate,
@@ -995,6 +998,56 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(emptyRes.originalRecordCount).toBe(0);
       expect(emptyRes.compactedRecordCount).toBe(0);
       expect(emptyRes.summaryPl).toContain('Nieprawidłowa');
+    });
+
+    test('TASK-P98-05-ARC: auditBackupRelationalIntegrity wykrywa osierocone referencje do inwentarza i receptur', () => {
+      const backupData = buildBackup({
+        inventory: [
+          { id: 'inv-1', name: 'Kenya Nyeri' },
+          { id: 'inv-2', name: 'Ethiopia Guji' },
+        ] as any,
+        customRecipes: [
+          { id: 'rec-custom-1', name: 'My V60' },
+        ] as any,
+        sessions: [
+          // Sesja poprawnie powiązana z istniejącą paczką i przepisem
+          { id: 'ses-1', inventoryItemId: 'inv-1', recipeId: 'rec-custom-1', recipeName: 'My V60' },
+          // Sesja powiązana z przepisem wzorcowym (master-)
+          { id: 'ses-2', inventoryItemId: 'inv-2', recipeId: 'master-aeropress', recipeName: 'AeroPress Standard' },
+          // Sesja ze skasowaną paczką (orphan inventory)
+          { id: 'ses-3', inventoryItemId: 'inv-deleted-999', recipeId: 'rec-custom-1' },
+          // Sesja ze skasowaną recepturą autorską (orphan recipe)
+          { id: 'ses-4', inventoryItemId: 'inv-1', recipeId: 'rec-unknown-404' },
+        ] as any,
+        caffeineLogs: [],
+      });
+
+      const report: BackupRelationalIntegrityReport = auditBackupRelationalIntegrity(backupData);
+      expect(report.totalSessionsAudited).toBe(4);
+      expect(report.isFullyConsistent).toBe(false);
+      expect(report.linkedInventoryCount).toBe(3);
+      expect(report.linkedRecipeCount).toBe(3);
+      expect(report.orphanedInventoryReferences).toBe(1);
+      expect(report.orphanedRecipeReferences).toBe(1);
+      expect(report.orphans).toHaveLength(2);
+
+      const invOrphan: RelationalOrphanItem | undefined = report.orphans.find((o) => o.orphanType === 'missing_inventory_item');
+      expect(invOrphan).toBeDefined();
+      expect(invOrphan?.referenceId).toBe('inv-deleted-999');
+
+      const recOrphan: RelationalOrphanItem | undefined = report.orphans.find((o) => o.orphanType === 'missing_recipe');
+      expect(recOrphan).toBeDefined();
+      expect(recOrphan?.referenceId).toBe('rec-unknown-404');
+
+      expect(report.relationalConsistencyScore).toBeLessThan(100);
+      expect(report.summaryPl).toContain('Wykryto 2 osieroconych relacji');
+      expect(report.summaryEn).toBeDefined();
+
+      // Odporność na pusty / uszkodzony obiekt
+      const emptyAudit = auditBackupRelationalIntegrity(null);
+      expect(emptyAudit.isFullyConsistent).toBe(true);
+      expect(emptyAudit.relationalConsistencyScore).toBe(100);
+      expect(emptyAudit.orphans).toEqual([]);
     });
   });
 });

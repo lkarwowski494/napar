@@ -1695,3 +1695,155 @@ export function compactBackupEnvelope(envelope?: unknown): CompactBackupResult {
     summaryEn,
   };
 }
+
+
+// ============================================================================
+// TASK-P98-05-ARC: Relational Integrity Auditor (Audytor spójności relacyjnej)
+// ============================================================================
+
+export interface RelationalOrphanItem {
+  orphanType: 'missing_inventory_item' | 'missing_recipe';
+  sessionId: string;
+  referenceId: string;
+  sessionRecipeName?: string;
+  sessionBrewDate?: string;
+  messagePl: string;
+  messageEn: string;
+}
+
+export interface BackupRelationalIntegrityReport {
+  isFullyConsistent: boolean;
+  relationalConsistencyScore: number;
+  totalSessionsAudited: number;
+  linkedInventoryCount: number;
+  linkedRecipeCount: number;
+  orphanedInventoryReferences: number;
+  orphanedRecipeReferences: number;
+  orphans: RelationalOrphanItem[];
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function auditBackupRelationalIntegrity(candidate: unknown): BackupRelationalIntegrityReport {
+  if (!candidate || typeof candidate !== 'object') {
+    return {
+      isFullyConsistent: true,
+      relationalConsistencyScore: 100,
+      totalSessionsAudited: 0,
+      linkedInventoryCount: 0,
+      linkedRecipeCount: 0,
+      orphanedInventoryReferences: 0,
+      orphanedRecipeReferences: 0,
+      orphans: [],
+      summaryPl: 'Brak danych do audytu relacyjnego kopii zapasowej.',
+      summaryEn: 'No backup data available for relational integrity audit.',
+    };
+  }
+
+  const envelope = candidate as Record<string, unknown>;
+  const state = (envelope.state && typeof envelope.state === 'object' ? envelope.state : envelope) as Record<string, unknown>;
+
+  const inventory = Array.isArray(state.inventory) ? state.inventory : [];
+  const customRecipes = Array.isArray(state.customRecipes) ? state.customRecipes : [];
+  const sessions = Array.isArray(state.sessions) ? state.sessions : [];
+
+  const inventoryIds = new Set<string>();
+  for (const item of inventory) {
+    if (item && typeof item === 'object' && item.id != null) {
+      inventoryIds.add(String(item.id).trim());
+    }
+  }
+
+  const recipeIds = new Set<string>();
+  for (const recipe of customRecipes) {
+    if (recipe && typeof recipe === 'object' && recipe.id != null) {
+      recipeIds.add(String(recipe.id).trim());
+    }
+  }
+
+  const orphans: RelationalOrphanItem[] = [];
+  let linkedInventoryCount = 0;
+  let linkedRecipeCount = 0;
+  let orphanedInventoryReferences = 0;
+  let orphanedRecipeReferences = 0;
+
+  for (const session of sessions) {
+    if (!session || typeof session !== 'object') continue;
+
+    const sId = String(session.id || 'unknown');
+    const rName = session.recipeName ? String(session.recipeName) : undefined;
+    const bDate = session.brewDateIso ? String(session.brewDateIso) : undefined;
+
+    // Walidacja referencji do inwentarza (paczki ziaren)
+    const rawInvId = session.inventoryItemId != null ? String(session.inventoryItemId).trim() : '';
+    if (rawInvId) {
+      if (inventoryIds.has(rawInvId)) {
+        linkedInventoryCount++;
+      } else {
+        orphanedInventoryReferences++;
+        orphans.push({
+          orphanType: 'missing_inventory_item',
+          sessionId: sId,
+          referenceId: rawInvId,
+          sessionRecipeName: rName,
+          sessionBrewDate: bDate,
+          messagePl: `Sesja ${sId} odwołuje się do nieistniejącej paczki w spiżarni (ID: ${rawInvId}).`,
+          messageEn: `Session ${sId} references a missing inventory item (ID: ${rawInvId}).`,
+        });
+      }
+    }
+
+    // Walidacja referencji do receptury
+    const rawRecipeId = session.recipeId != null ? String(session.recipeId).trim() : '';
+    if (rawRecipeId) {
+      const isMasterRecipe =
+        rawRecipeId.startsWith('master-') ||
+        rawRecipeId.startsWith('builtin-') ||
+        rawRecipeId.startsWith('default-') ||
+        rawRecipeId.startsWith('core-');
+
+      if (recipeIds.has(rawRecipeId) || isMasterRecipe) {
+        linkedRecipeCount++;
+      } else {
+        orphanedRecipeReferences++;
+        orphans.push({
+          orphanType: 'missing_recipe',
+          sessionId: sId,
+          referenceId: rawRecipeId,
+          sessionRecipeName: rName,
+          sessionBrewDate: bDate,
+          messagePl: `Sesja ${sId} odwołuje się do brakującej receptury autorskiej (ID: ${rawRecipeId}).`,
+          messageEn: `Session ${sId} references a missing custom recipe (ID: ${rawRecipeId}).`,
+        });
+      }
+    }
+  }
+
+  const totalSessionsAudited = sessions.length;
+  const totalOrphans = orphanedInventoryReferences + orphanedRecipeReferences;
+  const isFullyConsistent = totalOrphans === 0;
+
+  const penalty = totalSessionsAudited > 0 ? (totalOrphans / totalSessionsAudited) * 50 : 0;
+  const relationalConsistencyScore = Math.max(0, Math.min(100, Math.round(100 - penalty)));
+
+  const summaryPl = isFullyConsistent
+    ? `Pełna spójność relacyjna (${relationalConsistencyScore}/100): ${totalSessionsAudited} sesji, 0 osieroconych referencji.`
+    : `Wykryto ${totalOrphans} osieroconych relacji w kopii zapasowej (${relationalConsistencyScore}/100): ${orphanedInventoryReferences} brakujących paczek, ${orphanedRecipeReferences} brakujących receptur.`;
+
+  const summaryEn = isFullyConsistent
+    ? `Full relational integrity (${relationalConsistencyScore}/100): ${totalSessionsAudited} sessions, 0 orphaned references.`
+    : `Detected ${totalOrphans} orphaned references in backup (${relationalConsistencyScore}/100): ${orphanedInventoryReferences} missing inventory items, ${orphanedRecipeReferences} missing recipes.`;
+
+  return {
+    isFullyConsistent,
+    relationalConsistencyScore,
+    totalSessionsAudited,
+    linkedInventoryCount,
+    linkedRecipeCount,
+    orphanedInventoryReferences,
+    orphanedRecipeReferences,
+    orphans,
+    summaryPl,
+    summaryEn,
+  };
+}
