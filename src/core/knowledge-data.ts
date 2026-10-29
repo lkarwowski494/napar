@@ -2607,3 +2607,120 @@ export function compareRoastLevels(
     summaryEn,
   };
 }
+
+export type TerroirAltitudeCategory =
+  | 'strictly_high_grown'
+  | 'high_grown'
+  | 'medium_grown'
+  | 'low_grown';
+
+export interface OriginAltitudeTierResult {
+  altitudeMeters: number | null;
+  tier: TerroirAltitudeCategory;
+  tierAcronym: string;
+  tierNamePl: string;
+  tierNameEn: string;
+  beanDensity: 'very_high' | 'high' | 'medium' | 'low';
+  acidityPotential: 'outstanding_complex' | 'high_bright' | 'moderate_sweet' | 'low_muted';
+  brewingRecommendationPl: string;
+  brewingRecommendationEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Klasyfikuje wysokość upraw terroir (SHG / HG / MG / LG) oraz określa gęstość ziaren,
+ * potencjał kwasowości owocowej i rekomendowane podejście do ekstrakcji.
+ */
+export function classifyOriginAltitudeTier(
+  altitudeMeters: number | string | null | undefined
+): OriginAltitudeTierResult {
+  let alt: number | null = null;
+  if (altitudeMeters !== null && altitudeMeters !== undefined) {
+    const parsed =
+      typeof altitudeMeters === 'number'
+        ? altitudeMeters
+        : parseFloat(String(altitudeMeters).replace(/\uFEFF/g, '').replace('m', '').replace(',', '.').trim());
+    if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+      alt = Math.min(8848, Math.max(0, Math.round(parsed)));
+    }
+  }
+
+  if (alt === null) {
+    return {
+      altitudeMeters: null,
+      tier: 'medium_grown',
+      tierAcronym: 'MG',
+      tierNamePl: 'Medium Grown (Wysokość nieokreślona)',
+      tierNameEn: 'Medium Grown (Unspecified Altitude)',
+      beanDensity: 'medium',
+      acidityPotential: 'moderate_sweet',
+      brewingRecommendationPl: 'Brak danych o wysokości upraw: zalecana standardowa woda 92–94°C.',
+      brewingRecommendationEn: 'Missing altitude data: standard 92–94°C water recommended.',
+      summaryPl: 'Wysokość upraw nieokreślona: domyślny profil średni (MG).',
+      summaryEn: 'Terroir altitude unspecified: default medium profile (MG).',
+    };
+  }
+
+  if (alt >= 1500) {
+    return {
+      altitudeMeters: alt,
+      tier: 'strictly_high_grown',
+      tierAcronym: 'SHG / SHB',
+      tierNamePl: 'Strictly High Grown / Strictly Hard Bean (Wysokogórskie uprawy)',
+      tierNameEn: 'Strictly High Grown / Strictly Hard Bean (High Altitude)',
+      beanDensity: 'very_high',
+      acidityPotential: 'outstanding_complex',
+      brewingRecommendationPl: 'Ziarna o bardzo wysokiej gęstości komórkowej. Stosuj wyższą temperaturę wody (93–96°C) i nieco drobniejszy przemiał.',
+      brewingRecommendationEn: 'Very high cellular bean density. Use higher water temperature (93–96°C) and slightly finer grind for drip extraction.',
+      summaryPl: `Wysokość upraw ${alt}m n.p.m.: klasa [SHG / SHB] (bardzo twarde ziarno, wybitna kwasowość owocowa).`,
+      summaryEn: `Terroir altitude ${alt}m a.s.l.: class [SHG / SHB] (strictly hard bean, outstanding complex acidity).`,
+    };
+  }
+
+  if (alt >= 1200) {
+    return {
+      altitudeMeters: alt,
+      tier: 'high_grown',
+      tierAcronym: 'HG / HB',
+      tierNamePl: 'High Grown / Hard Bean (Wysokie uprawy)',
+      tierNameEn: 'High Grown / Hard Bean',
+      beanDensity: 'high',
+      acidityPotential: 'high_bright',
+      brewingRecommendationPl: 'Znakomita kwasowość owocowa i wyrazista słodycz. Woda 92–94°C, uniwersalny profil pod przelewy i nowoczesne espresso.',
+      brewingRecommendationEn: 'Vibrant fruit acidity and sweetness. Water 92–94°C, versatile profile for pour-overs and modern espresso.',
+      summaryPl: `Wysokość upraw ${alt}m n.p.m.: klasa [HG / HB] (twarde ziarno, wysoka cytrusowa kwasowość).`,
+      summaryEn: `Terroir altitude ${alt}m a.s.l.: class [HG / HB] (hard bean, bright fruit acidity).`,
+    };
+  }
+
+  if (alt >= 900) {
+    return {
+      altitudeMeters: alt,
+      tier: 'medium_grown',
+      tierAcronym: 'MG',
+      tierNamePl: 'Medium Grown (Średnie uprawy)',
+      tierNameEn: 'Medium Grown',
+      beanDensity: 'medium',
+      acidityPotential: 'moderate_sweet',
+      brewingRecommendationPl: 'Łagodna kwasowość, nuty orzechowo-czekoladowe, pełniejsze body. Doskonała baza pod tradycyjne espresso i kawiarkę.',
+      brewingRecommendationEn: 'Mild acidity, nutty-chocolate notes, medium to heavy body. Great base for traditional espresso and moka.',
+      summaryPl: `Wysokość upraw ${alt}m n.p.m.: klasa [MG] (średnia twardość, wysoka słodycz, zbalansowana kwasowość).`,
+      summaryEn: `Terroir altitude ${alt}m a.s.l.: class [MG] (medium density, high sweetness, balanced acidity).`,
+    };
+  }
+
+  return {
+    altitudeMeters: alt,
+    tier: 'low_grown',
+    tierAcronym: 'LG',
+    tierNamePl: 'Low Grown / Prime (Niskie uprawy)',
+    tierNameEn: 'Low Grown / Prime',
+    beanDensity: 'low',
+    acidityPotential: 'low_muted',
+    brewingRecommendationPl: 'Niższa gęstość ziaren i niska kwasowość. Obniż temperaturę wody (88–91°C) i zastosuj grubszy przemiał.',
+    brewingRecommendationEn: 'Softer bean density and subdued acidity. Lower brew temp (88–91°C) and coarsen grind to prevent bitterness.',
+    summaryPl: `Wysokość upraw ${alt}m n.p.m.: klasa [LG] (miękkie ziarno, niska kwasowość, głębokie nuty prażone).`,
+    summaryEn: `Terroir altitude ${alt}m a.s.l.: class [LG] (soft bean, low acidity, heavy roasty character).`,
+  };
+}

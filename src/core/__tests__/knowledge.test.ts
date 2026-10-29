@@ -62,6 +62,9 @@ import {
   compareRoastLevels,
   RoastLevelComparison,
   RoastLevelComparisonItem,
+  classifyOriginAltitudeTier,
+  OriginAltitudeTierResult,
+  TerroirAltitudeCategory,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1644,6 +1647,46 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(compareRoastLevels('light', null)).toBeNull();
     expect(compareRoastLevels('invalid_roast', 'light')).toBeNull();
     expect(compareRoastLevels('', '')).toBeNull();
+  });
+
+  test('TASK-P105-06-TRE: classifyOriginAltitudeTier klasyfikuje wysokość upraw z typami OriginAltitudeTierResult i TerroirAltitudeCategory', () => {
+    // 1. Ekstremalnie wysokie uprawy (SHG / SHB, >= 1500m)
+    const shg: OriginAltitudeTierResult = classifyOriginAltitudeTier(1950);
+    const tierType: TerroirAltitudeCategory = shg.tier;
+    expect(tierType).toBe('strictly_high_grown');
+    expect(shg.altitudeMeters).toBe(1950);
+    expect(shg.tierAcronym).toBe('SHG / SHB');
+    expect(shg.beanDensity).toBe('very_high');
+    expect(shg.acidityPotential).toBe('outstanding_complex');
+    expect(shg.brewingRecommendationPl).toContain('bardzo wysokiej gęstości');
+    expect(shg.summaryPl).toContain('SHG / SHB');
+
+    // 2. Wysokie uprawy (HG / HB, 1200 - 1499m)
+    const hg = classifyOriginAltitudeTier('1350m');
+    expect(hg.tier).toBe('high_grown');
+    expect(hg.tierAcronym).toBe('HG / HB');
+    expect(hg.beanDensity).toBe('high');
+    expect(hg.acidityPotential).toBe('high_bright');
+
+    // 3. Średnie uprawy (MG, 900 - 1199m)
+    const mg = classifyOriginAltitudeTier(1050);
+    expect(mg.tier).toBe('medium_grown');
+    expect(mg.tierAcronym).toBe('MG');
+    expect(mg.beanDensity).toBe('medium');
+
+    // 4. Niskie uprawy (LG, < 900m)
+    const lg = classifyOriginAltitudeTier(600);
+    expect(lg.tier).toBe('low_grown');
+    expect(lg.tierAcronym).toBe('LG');
+    expect(lg.beanDensity).toBe('low');
+    expect(lg.acidityPotential).toBe('low_muted');
+
+    // 5. Brak danych lub null
+    const fallback = classifyOriginAltitudeTier(null);
+    expect(fallback.altitudeMeters).toBeNull();
+    expect(fallback.tier).toBe('medium_grown');
+    const resultObj: OriginAltitudeTierResult = fallback;
+    expect(resultObj.summaryEn).toBeTruthy();
   });
 });
 
