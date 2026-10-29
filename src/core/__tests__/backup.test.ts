@@ -24,6 +24,8 @@ import {
   auditBackupRelationalIntegrity,
   BackupRelationalIntegrityReport,
   RelationalOrphanItem,
+  computeBackupChecksum,
+  BackupChecksumResult,
   sanitizeBackupEnvelope,
   estimateBackupFileSize,
   BackupFileSizeEstimate,
@@ -1048,6 +1050,51 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(emptyAudit.isFullyConsistent).toBe(true);
       expect(emptyAudit.relationalConsistencyScore).toBe(100);
       expect(emptyAudit.orphans).toEqual([]);
+    });
+
+    test('TASK-P100-05-ARC: computeBackupChecksum wylicza deterministyczną sumę kontrolną i jest odporny na kolejność pól', () => {
+      const dataA = buildBackup({
+        inventory: [{ id: 'inv-1', name: 'Ethiopia Yirgacheffe' }] as any,
+        customRecipes: [{ id: 'rec-1', name: 'V60 4:6' }] as any,
+        sessions: [],
+        caffeineLogs: [],
+      });
+
+      // Ta sama zawartość w innej kolejności pól w obiekcie
+      const dataB = buildBackup({
+        inventory: [{ name: 'Ethiopia Yirgacheffe', id: 'inv-1' }] as any,
+        customRecipes: [{ name: 'V60 4:6', id: 'rec-1' }] as any,
+        sessions: [],
+        caffeineLogs: [],
+      });
+
+      const resA: BackupChecksumResult = computeBackupChecksum(dataA);
+      const resB = computeBackupChecksum(dataB);
+
+      expect(resA.checksumHex).toBe(resB.checksumHex);
+      expect(resA.checksumHex.length).toBe(8);
+      expect(resA.recordCount).toBe(2);
+      expect(resA.collectionBreakdown.inventory).toBe(1);
+      expect(resA.collectionBreakdown.customRecipes).toBe(1);
+      expect(resA.bytesHashed).toBeGreaterThan(0);
+      expect(resA.summaryPl).toContain(resA.checksumHex.toUpperCase());
+      expect(resA.summaryEn).toBeDefined();
+
+      // Zmiana danych powoduje zmianę sumy kontrolnej
+      const dataC = buildBackup({
+        inventory: [{ id: 'inv-1', name: 'Kenya Nyeri' }] as any,
+        customRecipes: [{ id: 'rec-1', name: 'V60 4:6' }] as any,
+        sessions: [],
+        caffeineLogs: [],
+      });
+      const resC = computeBackupChecksum(dataC);
+      expect(resC.checksumHex).not.toBe(resA.checksumHex);
+
+      // Pusty / uszkodzony payload
+      const empty = computeBackupChecksum(null);
+      expect(empty.checksumHex).toBe('00000000');
+      expect(empty.bytesHashed).toBe(0);
+      expect(empty.recordCount).toBe(0);
     });
   });
 });

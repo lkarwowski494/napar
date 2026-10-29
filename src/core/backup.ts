@@ -1847,3 +1847,97 @@ export function auditBackupRelationalIntegrity(candidate: unknown): BackupRelati
     summaryEn,
   };
 }
+
+
+// ============================================================================
+// TASK-P100-05-ARC: Backup Deterministic Checksum Engine (Suma kontrolna kopii)
+// ============================================================================
+
+export interface BackupChecksumResult {
+  checksumHex: string;
+  bytesHashed: number;
+  recordCount: number;
+  collectionBreakdown: {
+    inventory: number;
+    customRecipes: number;
+    sessions: number;
+    caffeineLogs: number;
+  };
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function computeBackupChecksum(candidate: unknown): BackupChecksumResult {
+  const emptyResult: BackupChecksumResult = {
+    checksumHex: '00000000',
+    bytesHashed: 0,
+    recordCount: 0,
+    collectionBreakdown: {
+      inventory: 0,
+      customRecipes: 0,
+      sessions: 0,
+      caffeineLogs: 0,
+    },
+    summaryPl: 'Brak danych do wyliczenia sumy kontrolnej kopii.',
+    summaryEn: 'No backup data available for checksum calculation.',
+  };
+
+  if (!candidate || typeof candidate !== 'object') {
+    return emptyResult;
+  }
+
+  const envelope = candidate as Record<string, unknown>;
+  const state = (envelope.state && typeof envelope.state === 'object' ? envelope.state : envelope) as Record<string, unknown>;
+
+  const inventory = Array.isArray(state.inventory) ? state.inventory : [];
+  const customRecipes = Array.isArray(state.customRecipes) ? state.customRecipes : [];
+  const sessions = Array.isArray(state.sessions) ? state.sessions : [];
+  const caffeineLogs = Array.isArray(state.caffeineLogs) ? state.caffeineLogs : [];
+
+  const recordCount = inventory.length + customRecipes.length + sessions.length + caffeineLogs.length;
+
+  const extractCanonicalString = (items: unknown[]): string => {
+    return items
+      .filter((i) => i && typeof i === 'object')
+      .map((item) => {
+        const obj = item as Record<string, unknown>;
+        const keys = Object.keys(obj).sort();
+        return keys.map((k) => `${k}:${String(obj[k])}`).join('|');
+      })
+      .sort()
+      .join(';');
+  };
+
+  const canonicalPayload = [
+    `inv:${extractCanonicalString(inventory)}`,
+    `rec:${extractCanonicalString(customRecipes)}`,
+    `ses:${extractCanonicalString(sessions)}`,
+    `caf:${extractCanonicalString(caffeineLogs)}`,
+  ].join('##');
+
+  let hash = 2166136261;
+  for (let i = 0; i < canonicalPayload.length; i++) {
+    hash ^= canonicalPayload.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  const checksumHex = (hash >>> 0).toString(16).padStart(8, '0');
+  const bytesHashed = canonicalPayload.length;
+
+  const summaryPl = `Suma kontrolna kopii: 0x${checksumHex.toUpperCase()} (${recordCount} rekordów, ${bytesHashed} bajtów).`;
+  const summaryEn = `Backup checksum: 0x${checksumHex.toUpperCase()} (${recordCount} records, ${bytesHashed} bytes).`;
+
+  return {
+    checksumHex,
+    bytesHashed,
+    recordCount,
+    collectionBreakdown: {
+      inventory: inventory.length,
+      customRecipes: customRecipes.length,
+      sessions: sessions.length,
+      caffeineLogs: caffeineLogs.length,
+    },
+    summaryPl,
+    summaryEn,
+  };
+}
