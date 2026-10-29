@@ -3247,3 +3247,169 @@ export function estimateStashRoastDistribution(
   };
 }
 
+export type BeanFreshnessStage = 'degassing' | 'peak' | 'optimal' | 'declining' | 'stale' | 'unknown';
+
+export interface StashFreshnessReport {
+  daysSinceRoast: number | null;
+  packaging: 'valve_bag' | 'nitrogen_flushed' | 'vacuum_sealed' | 'frozen' | 'open';
+  freshnessScore: number;
+  stage: BeanFreshnessStage;
+  recommendedUseBeforeDays: number;
+  advisoryPl: string;
+  advisoryEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Szacuje wskaźnik świeżości kawy w spiżarni w oparciu o datę palenia
+ * oraz rodzaj opakowania (zaworek jednokierunkowy, próżnia, azot, zamrożenie, otwarta paczka).
+ */
+export function calculateStashFreshnessIndex(
+  roastDate: string | Date | null | undefined,
+  options?: {
+    packaging?: 'valve_bag' | 'nitrogen_flushed' | 'vacuum_sealed' | 'frozen' | 'open' | string | null;
+    currentDate?: string | Date | null;
+  } | null
+): StashFreshnessReport {
+  const parseDate = (d: unknown): Date | null => {
+    if (d instanceof Date && !isNaN(d.getTime())) return d;
+    if (typeof d === 'string' && d.trim()) {
+      const parsed = new Date(d.trim());
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return null;
+  };
+
+  const roast = parseDate(roastDate);
+  const now = parseDate(options?.currentDate) || new Date();
+
+  const rawPack = typeof options?.packaging === 'string' ? options.packaging.trim().toLowerCase() : '';
+  let packaging: 'valve_bag' | 'nitrogen_flushed' | 'vacuum_sealed' | 'frozen' | 'open' = 'valve_bag';
+  if (rawPack.includes('froz') || rawPack.includes('zamro')) {
+    packaging = 'frozen';
+  } else if (rawPack.includes('open') || rawPack.includes('otwart')) {
+    packaging = 'open';
+  } else if (rawPack.includes('nitro') || rawPack.includes('azot')) {
+    packaging = 'nitrogen_flushed';
+  } else if (rawPack.includes('vac') || rawPack.includes('próżn') || rawPack.includes('prozn')) {
+    packaging = 'vacuum_sealed';
+  }
+
+  if (!roast) {
+    return {
+      daysSinceRoast: null,
+      packaging,
+      freshnessScore: 50,
+      stage: 'unknown',
+      recommendedUseBeforeDays: 60,
+      advisoryPl: 'Brak daty palenia — zalecana ocena sensoryczna na podstawie aromatu suchych ziaren.',
+      advisoryEn: 'Roast date unknown — sensory aroma assessment recommended.',
+      summaryPl: 'Świeżość kawy: nieznana (brak daty palenia).',
+      summaryEn: 'Coffee freshness: unknown (missing roast date).',
+    };
+  }
+
+  const diffMs = now.getTime() - roast.getTime();
+  const daysSinceRoast = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+
+  let freshnessScore = 100;
+  let stage: BeanFreshnessStage = 'peak';
+  let recommendedUseBeforeDays = 60;
+  let advisoryPl = '';
+  let advisoryEn = '';
+
+  if (packaging === 'frozen') {
+    recommendedUseBeforeDays = 365;
+    freshnessScore = 95;
+    stage = daysSinceRoast > 180 ? 'optimal' : 'peak';
+    advisoryPl = 'Kawa zamrożona: degradacja lipidów i utlenianie zatrzymane niemal w 100%. Miel bezpośrednio po wyjęciu z zamrażarki.';
+    advisoryEn = 'Frozen coffee: lipid oxidation and staling practically halted. Grind directly from frozen.';
+  } else if (packaging === 'open') {
+    recommendedUseBeforeDays = 21;
+    if (daysSinceRoast <= 7) {
+      stage = 'optimal';
+      freshnessScore = 90;
+      advisoryPl = 'Otwarta paczka: wysoka świeżość, zalecane szczelne zamykanie klipsem lub pojemnikiem próżniowym.';
+      advisoryEn = 'Open bag: high freshness, keep tightly sealed or in a vacuum canister.';
+    } else if (daysSinceRoast <= 21) {
+      stage = 'declining';
+      freshnessScore = 65;
+      advisoryPl = 'Otwarta paczka: postępująca ekspozycja na tlen, zalecane zużycie w ciągu kilku dni.';
+      advisoryEn = 'Open bag: advancing oxygen exposure, consume within a few days.';
+    } else {
+      stage = 'stale';
+      freshnessScore = 30;
+      advisoryPl = 'Otwarta paczka powyżej 3 tygodni: utrata delikatnych nut kwasowości, kawa nadaje się głównie do kawiarki.';
+      advisoryEn = 'Open bag over 3 weeks: delicate origin aromatics muted, best for Moka pot.';
+    }
+  } else if (packaging === 'nitrogen_flushed' || packaging === 'vacuum_sealed') {
+    recommendedUseBeforeDays = 180;
+    if (daysSinceRoast <= 60) {
+      stage = 'peak';
+      freshnessScore = 100;
+      advisoryPl = 'Pakowanie w atmosferze ochronnej / próżni: pełna świeżość i znikome utlenianie ziaren.';
+      advisoryEn = 'Flushed / vacuum packaging: pristine freshness and minimal bean oxidation.';
+    } else if (daysSinceRoast <= 120) {
+      stage = 'optimal';
+      freshnessScore = 90;
+      advisoryPl = 'Stabilny bukiet aromatyczny w szczelnym opakowaniu ochronnym.';
+      advisoryEn = 'Stable aromatic bouquet protected in sealed barrier bag.';
+    } else if (daysSinceRoast <= 180) {
+      stage = 'declining';
+      freshnessScore = 70;
+      advisoryPl = 'Powolny spadek intensywności aromatu po kilku miesiącach od palenia.';
+      advisoryEn = 'Slow aromatic decline after several months of resting.';
+    } else {
+      stage = 'stale';
+      freshnessScore = 40;
+      advisoryPl = 'Przekroczone rekomendowane okno świeżości (powyżej 6 miesięcy).';
+      advisoryEn = 'Past recommended freshness window (over 6 months).';
+    }
+  } else {
+    // standard valve_bag
+    recommendedUseBeforeDays = 60;
+    if (daysSinceRoast <= 5) {
+      stage = 'degassing';
+      freshnessScore = 80;
+      advisoryPl = 'Aktywne odgazowywanie CO2: odczekaj jeszcze kilka dni (leżakowanie), by uniknąć pienienia w dripperze.';
+      advisoryEn = 'Active CO2 degassing: allow resting for a few more days to prevent turbulent bloom bubbling.';
+    } else if (daysSinceRoast <= 28) {
+      stage = 'peak';
+      freshnessScore = 100;
+      advisoryPl = 'Szczytowa jakość (Peak Flavor): pełny bukiet sensoryczny, idealny czas na parzenie metodami przelewowymi.';
+      advisoryEn = 'Peak Flavor window: full aromatic clarity, prime time for specialty brewing.';
+    } else if (daysSinceRoast <= 60) {
+      stage = 'optimal';
+      freshnessScore = 85;
+      advisoryPl = 'Wzorcowa, dojrzała świeżość kawy z harmonijnym balansem smaku.';
+      advisoryEn = 'Standard mature specialty freshness with harmonious cup balance.';
+    } else if (daysSinceRoast <= 90) {
+      stage = 'declining';
+      freshnessScore = 60;
+      advisoryPl = 'Spadek intensywności owocowych nut; ziarna wciąż doskonałe do espresso i kawiarki.';
+      advisoryEn = 'Subtle fading of fruit acidity; beans still great for espresso and moka.';
+    } else {
+      stage = 'stale';
+      freshnessScore = 30;
+      advisoryPl = 'Ziarna starzejące się (powyżej 90 dni): płaski profil smakowy, zalecane szybkie zużycie.';
+      advisoryEn = 'Aged beans (over 90 days): flat flavor profile, rapid consumption recommended.';
+    }
+  }
+
+  const summaryPl = `Świeżość: ${daysSinceRoast} dni od palenia (${stage.toUpperCase()}, wynik: ${freshnessScore}/100, opakowanie: ${packaging}). ${advisoryPl}`;
+  const summaryEn = `Freshness: ${daysSinceRoast} days off roast (${stage.toUpperCase()}, score: ${freshnessScore}/100, pack: ${packaging}). ${advisoryEn}`;
+
+  return {
+    daysSinceRoast,
+    packaging,
+    freshnessScore,
+    stage,
+    recommendedUseBeforeDays,
+    advisoryPl,
+    advisoryEn,
+    summaryPl,
+    summaryEn,
+  };
+}
+

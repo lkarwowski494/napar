@@ -47,6 +47,9 @@ import {
   estimateStashRoastDistribution,
   StashRoastDistributionReport,
   DominantRoastProfile,
+  calculateStashFreshnessIndex,
+  StashFreshnessReport,
+  BeanFreshnessStage,
   saveInventoryItem,
   deductInventoryWeight,
   deductBeansForBrew,
@@ -3409,5 +3412,58 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(fallbackNull.dominantProfile).toBe('empty');
     const distResult: StashRoastDistributionReport = fallbackNull;
     expect(distResult.summaryEn).toBeTruthy();
+  });
+
+  test('TASK-P104-03-ZAK: calculateStashFreshnessIndex szacuje świeżość kawy z typami StashFreshnessReport i BeanFreshnessStage', () => {
+    const baseDate = new Date('2026-10-20T12:00:00Z');
+
+    // 1. Kawa świeżo palona w fazie degassing (3 dni temu, zaworek)
+    const degassing = calculateStashFreshnessIndex('2026-10-17T12:00:00Z', {
+      packaging: 'valve_bag',
+      currentDate: baseDate,
+    });
+    const stageType: BeanFreshnessStage = degassing.stage;
+    expect(stageType).toBe('degassing');
+    expect(degassing.daysSinceRoast).toBe(3);
+    expect(degassing.packaging).toBe('valve_bag');
+    expect(degassing.freshnessScore).toBe(80);
+    expect(degassing.advisoryPl).toContain('odgazowywanie');
+
+    // 2. Szczyt bukietu (Peak Flavor, 14 dni temu)
+    const peak = calculateStashFreshnessIndex('2026-10-06T12:00:00Z', {
+      packaging: 'valve_bag',
+      currentDate: baseDate,
+    });
+    expect(peak.stage).toBe('peak');
+    expect(peak.freshnessScore).toBe(100);
+    expect(peak.daysSinceRoast).toBe(14);
+    expect(peak.advisoryEn).toContain('Peak Flavor');
+
+    // 3. Kawa zamrożona (60 dni od palenia, ale zamrożona) -> peak/optimal, wysoki wynik
+    const frozen = calculateStashFreshnessIndex('2026-08-20T12:00:00Z', {
+      packaging: 'frozen',
+      currentDate: baseDate,
+    });
+    expect(frozen.packaging).toBe('frozen');
+    expect(frozen.freshnessScore).toBe(95);
+    expect(frozen.recommendedUseBeforeDays).toBe(365);
+    expect(frozen.advisoryPl).toContain('zamrożona');
+
+    // 4. Otwarta paczka od 30 dni -> stale
+    const staleOpen = calculateStashFreshnessIndex('2026-09-20T12:00:00Z', {
+      packaging: 'open',
+      currentDate: baseDate,
+    });
+    expect(staleOpen.packaging).toBe('open');
+    expect(staleOpen.stage).toBe('stale');
+    expect(staleOpen.freshnessScore).toBeLessThanOrEqual(40);
+
+    // 5. Brak daty palenia i wartości null
+    const noDate = calculateStashFreshnessIndex(null, null);
+    expect(noDate.daysSinceRoast).toBeNull();
+    expect(noDate.stage).toBe('unknown');
+    expect(noDate.freshnessScore).toBe(50);
+    const reportType: StashFreshnessReport = noDate;
+    expect(reportType.summaryEn).toBeTruthy();
   });
 });
