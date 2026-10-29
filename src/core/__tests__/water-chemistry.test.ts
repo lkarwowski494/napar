@@ -63,6 +63,9 @@ import {
   BoilingDegassingImpact,
   DegassingEfficiencyLevel,
   formatWaterHardnessCategory,
+  evaluateLarsonSkoldIndex,
+  LarsonSkoldIndexResult,
+  LarsonSkoldRiskLevel,
 } from '../water-chemistry';
 
 describe('Water Chemistry & Mineralization Module', () => {
@@ -1411,6 +1414,66 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(fallback.initialAlkalinityPpm).toBe(50);
     expect(fallback.residualAlkalinityPpm).toBeGreaterThan(0);
     expect(fallback.efficiencyLevel).toBe('gentle');
+  });
+
+  test('TASK-P103-07-JAK: evaluateLarsonSkoldIndex ocenia wskaźnik korozyjności Larsona-Skolda z typami LarsonSkoldIndexResult i LarsonSkoldRiskLevel', () => {
+    // 1. Bezpieczna woda (LI < 0.8) -> 'low'
+    // Cl = 10 ppm, SO4 = 20 ppm, Alk = 60 ppm
+    // meqCl = 10 / 35.45 = 0.282
+    // meqSO4 = 40 / 96.06 = 0.416
+    // sum = 0.698
+    // meqAlk = 60 / 50.04 = 1.199
+    // LI = 0.698 / 1.199 = 0.58
+    const safe: LarsonSkoldIndexResult = evaluateLarsonSkoldIndex(10, 20, 60);
+    const risk: LarsonSkoldRiskLevel = safe.riskLevel;
+    expect(risk).toBe('low');
+    expect(safe.larsonSkoldIndex).toBeLessThan(0.8);
+    expect(safe.chloridePpm).toBe(10);
+    expect(safe.sulfatePpm).toBe(20);
+    expect(safe.alkalinityPpm).toBe(60);
+    expect(safe.corrosionTendencyPl).toContain('Niska tendencja korozyjna');
+    expect(safe.summaryPl).toContain('Wskaźnik Larsona-Skolda');
+
+    // 2. Umiarkowane ryzyko (0.8 <= LI < 1.2) -> 'moderate'
+    // Cl = 20, SO4 = 30, Alk = 45
+    // meqCl = 20 / 35.45 = 0.564, meqSO4 = 60 / 96.06 = 0.625, sum = 1.189
+    // meqAlk = 45 / 50.04 = 0.899 => LI = 1.189 / 0.899 = 1.32 (high)
+    // Niech Cl = 15, SO4 = 20, Alk = 45
+    // meqCl = 0.423, meqSO4 = 0.416, sum = 0.839 => LI = 0.839 / 0.899 = 0.93 => moderate
+    const mod = evaluateLarsonSkoldIndex('15', '20', '45');
+    expect(mod.riskLevel).toBe('moderate');
+    expect(mod.larsonSkoldIndex).toBeGreaterThanOrEqual(0.8);
+    expect(mod.larsonSkoldIndex).toBeLessThan(1.2);
+    expect(mod.corrosionTendencyEn).toContain('Moderate corrosion risk');
+
+    // 3. Wysokie ryzyko (1.2 <= LI < 2.5) -> 'high'
+    // Cl = 35, SO4 = 50, Alk = 40
+    // meqCl = 0.987, meqSO4 = 1.041, sum = 2.028, meqAlk = 0.799 => LI = 2.54 (severe)
+    // Cl = 25, SO4 = 40, Alk = 40 => meqCl = 0.705, meqSO4 = 0.833, sum = 1.538 => LI = 1.92 => high
+    const high = evaluateLarsonSkoldIndex(25, 40, 40);
+    expect(high.riskLevel).toBe('high');
+    expect(high.larsonSkoldIndex).toBeGreaterThanOrEqual(1.2);
+    expect(high.larsonSkoldIndex).toBeLessThan(2.5);
+    expect(high.recommendationPl).toContain('filtrację odwróconej osmozy');
+
+    // 4. Krytyczne / severe (LI >= 2.5)
+    // Cl = 60, SO4 = 80, Alk = 20
+    const severe = evaluateLarsonSkoldIndex(60, 80, 20);
+    expect(severe.riskLevel).toBe('severe');
+    expect(severe.larsonSkoldIndex).toBeGreaterThanOrEqual(2.5);
+    expect(severe.corrosionTendencyPl).toContain('Krytyczne zagrożenie');
+
+    // 5. Zero alkalinity z obecnością chlorków/siarczanów -> 'severe'
+    const zeroAlk = evaluateLarsonSkoldIndex(20, 20, 0);
+    expect(zeroAlk.riskLevel).toBe('severe');
+    expect(zeroAlk.larsonSkoldIndex).toBe(99.9);
+
+    // 6. Odporność na null / undefined / ujemne liczby
+    const fallback = evaluateLarsonSkoldIndex(null, undefined, null);
+    expect(fallback.chloridePpm).toBe(0);
+    expect(fallback.sulfatePpm).toBe(0);
+    expect(fallback.alkalinityPpm).toBe(0);
+    expect(fallback.riskLevel).toBe('low');
   });
 });
 

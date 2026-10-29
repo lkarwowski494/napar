@@ -2282,3 +2282,97 @@ export function calculateBoilingDegassingImpact(options?: {
     recommendationEn,
   };
 }
+
+export type LarsonSkoldRiskLevel = 'low' | 'moderate' | 'high' | 'severe';
+
+export interface LarsonSkoldIndexResult {
+  chloridePpm: number;
+  sulfatePpm: number;
+  alkalinityPpm: number;
+  larsonSkoldIndex: number;
+  riskLevel: LarsonSkoldRiskLevel;
+  corrosionTendencyPl: string;
+  corrosionTendencyEn: string;
+  recommendationPl: string;
+  recommendationEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Ocenia wskaźnik korozyjności Larsona-Skolda (Larson-Skold Index - LI),
+ * który wyznacza proporcję jonów agresywnych (chlorki, siarczany)
+ * do jonów buforujących (wodorowęglany / zasadowość) w ekspresach ciśnieniowych i bojlerach.
+ * Wzór: LI = ( [Cl-] / 35.45 + 2 * [SO42-] / 96.06 ) / ( [Alkalinity CaCO3] / 50.04 )
+ */
+export function evaluateLarsonSkoldIndex(
+  chloridePpm: number | string | null | undefined,
+  sulfatePpm: number | string | null | undefined,
+  alkalinityPpm: number | string | null | undefined,
+  options?: { locale?: string } | null
+): LarsonSkoldIndexResult {
+  const parseDefensive = (val: number | string | null | undefined, defaultVal = 0): number => {
+    if (val === null || val === undefined) return defaultVal;
+    const parsed = typeof val === 'number' ? val : parseFloat(String(val));
+    return isNaN(parsed) || !isFinite(parsed) ? defaultVal : Math.max(0, parsed);
+  };
+
+  const cl = parseDefensive(chloridePpm, 0);
+  const so4 = parseDefensive(sulfatePpm, 0);
+  const alk = parseDefensive(alkalinityPpm, 0);
+
+  let rawIndex = 0;
+  if (alk <= 0) {
+    rawIndex = cl > 0 || so4 > 0 ? 99.9 : 0;
+  } else {
+    const meqCl = cl / 35.45;
+    const meqSO4 = (2 * so4) / 96.06;
+    const meqAlk = alk / 50.04;
+    rawIndex = (meqCl + meqSO4) / meqAlk;
+  }
+
+  const larsonSkoldIndex = Math.round(rawIndex * 100) / 100;
+
+  let riskLevel: LarsonSkoldRiskLevel = 'low';
+  let corrosionTendencyPl = 'Niska tendencja korozyjna; woda bezpieczna dla mosiężnych i stalowych bojlerów.';
+  let corrosionTendencyEn = 'Low corrosion tendency; water is safe for brass and stainless steel boilers.';
+  let recommendationPl = 'Wskaźnik w normie (LI < 0.8). Bufor wodorowęglanowy skutecznie neutralizuje jony korozyjne.';
+  let recommendationEn = 'Index within safe range (LI < 0.8). Bicarbonate buffer effectively passivates corrosive ions.';
+
+  if (larsonSkoldIndex >= 2.5 || (alk === 0 && (cl > 0 || so4 > 0))) {
+    riskLevel = 'severe';
+    corrosionTendencyPl = 'Krytyczne zagrożenie wżerowe i agresywna korozja metalowych elementów ekspresu.';
+    corrosionTendencyEn = 'Severe pitting hazard and aggressive corrosion of espresso machine metal parts.';
+    recommendationPl = 'Konieczna demineralizacja i remineralizacja: drastyczny nadmiar chlorków/siarczanów niszczy pasywację metalu.';
+    recommendationEn = 'Immediate remineralization/filtration required: extreme chloride/sulfate levels actively destroy metal passivation.';
+  } else if (larsonSkoldIndex >= 1.2) {
+    riskLevel = 'high';
+    corrosionTendencyPl = 'Wysoka korozyjność; chlorki i siarczany dominują nad buforem wodorowęglanowym.';
+    corrosionTendencyEn = 'High corrosion tendency; chlorides and sulfates overpower the bicarbonate buffer.';
+    recommendationPl = 'Zwiększ alkaliczność wody (KH) lub zastosuj filtrację odwróconej osmozy, aby obniżyć chlorki.';
+    recommendationEn = 'Increase water alkalinity (KH) or apply reverse osmosis to reduce aggressive chloride concentration.';
+  } else if (larsonSkoldIndex >= 0.8) {
+    riskLevel = 'moderate';
+    corrosionTendencyPl = 'Umiarkowane ryzyko korozji; jony agresywne zbliżają się do stężenia buforu alkalicznego.';
+    corrosionTendencyEn = 'Moderate corrosion risk; corrosive ions approaching alkaline buffer concentrations.';
+    recommendationPl = 'Zalecane regularne inspekcje bojlera parowego i utrzymywanie stabilnego buforu KH.';
+    recommendationEn = 'Regular steam boiler inspections recommended along with maintaining a stable KH buffer.';
+  }
+
+  const summaryPl = `Wskaźnik Larsona-Skolda: ${larsonSkoldIndex.toFixed(2)} (${riskLevel.toUpperCase()}). ${corrosionTendencyPl}`;
+  const summaryEn = `Larson-Skold Index: ${larsonSkoldIndex.toFixed(2)} (${riskLevel.toUpperCase()}). ${corrosionTendencyEn}`;
+
+  return {
+    chloridePpm: cl,
+    sulfatePpm: so4,
+    alkalinityPpm: alk,
+    larsonSkoldIndex,
+    riskLevel,
+    corrosionTendencyPl,
+    corrosionTendencyEn,
+    recommendationPl,
+    recommendationEn,
+    summaryPl,
+    summaryEn,
+  };
+}
