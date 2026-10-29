@@ -1004,3 +1004,155 @@ export function highlightSearchMatches(
 
   return result;
 }
+
+
+// ============================================================================
+// TASK-P99-01-ODK: Multi-Field Search Relevance Scorer (Wielopolowy skaner relewancji)
+// ============================================================================
+
+export type MultiFieldMatchTier = 'exact' | 'strong' | 'moderate' | 'weak' | 'none';
+
+export interface MultiFieldSearchScore {
+  totalScore: number;
+  tier: MultiFieldMatchTier;
+  dominantField: 'title' | 'subtitle' | 'content' | 'tags' | 'none';
+  matchedTokens: string[];
+  missingTokens: string[];
+  fieldScores: {
+    title: number;
+    subtitle: number;
+    content: number;
+    tags: number;
+  };
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function evaluateMultiFieldSearchScore(
+  item:
+    | {
+        title?: string | null;
+        subtitle?: string | null;
+        content?: string | null;
+        tags?: string[] | null;
+      }
+    | null
+    | undefined,
+  query: string | null | undefined,
+  weights?: {
+    title?: number;
+    subtitle?: number;
+    content?: number;
+    tags?: number;
+  } | null
+): MultiFieldSearchScore {
+  const emptyResult: MultiFieldSearchScore = {
+    totalScore: 0,
+    tier: 'none',
+    dominantField: 'none',
+    matchedTokens: [],
+    missingTokens: [],
+    fieldScores: { title: 0, subtitle: 0, content: 0, tags: 0 },
+    summaryPl: 'Brak dopasowania do zapytania wyszukiwania.',
+    summaryEn: 'No match for the search query.',
+  };
+
+  if (!item || typeof item !== 'object' || !query || typeof query !== 'string' || !query.trim()) {
+    return emptyResult;
+  }
+
+  const tokens = tokenizeSearch(query);
+  if (tokens.length === 0) {
+    return emptyResult;
+  }
+
+  const titleStr = typeof item.title === 'string' ? item.title : '';
+  const subtitleStr = typeof item.subtitle === 'string' ? item.subtitle : '';
+  const contentStr = typeof item.content === 'string' ? item.content : '';
+  const tagsStr = Array.isArray(item.tags)
+    ? item.tags.filter((t) => typeof t === 'string').join(' ')
+    : '';
+
+  const wTitle = typeof weights?.title === 'number' && weights.title >= 0 ? weights.title : 0.45;
+  const wSub = typeof weights?.subtitle === 'number' && weights.subtitle >= 0 ? weights.subtitle : 0.25;
+  const wTags = typeof weights?.tags === 'number' && weights.tags >= 0 ? weights.tags : 0.20;
+  const wContent = typeof weights?.content === 'number' && weights.content >= 0 ? weights.content : 0.10;
+  const totalWeight = (wTitle + wSub + wTags + wContent) || 1.0;
+
+  const scoreTitle = calculateSearchRelevanceScore(titleStr, query).score;
+  const scoreSubtitle = calculateSearchRelevanceScore(subtitleStr, query).score;
+  const scoreTags = calculateSearchRelevanceScore(tagsStr, query).score;
+  const scoreContent = calculateSearchRelevanceScore(contentStr, query).score;
+
+  const weightedSum =
+    (scoreTitle * wTitle +
+      scoreSubtitle * wSub +
+      scoreTags * wTags +
+      scoreContent * wContent) /
+    totalWeight;
+
+  const totalScore = Math.max(0, Math.min(100, Math.round(weightedSum)));
+
+  // Dopasowanie tokenów w dowolnym z pól
+  const combinedNormText = normSearch(`${titleStr} ${subtitleStr} ${tagsStr} ${contentStr}`);
+  const matchedTokens: string[] = [];
+  const missingTokens: string[] = [];
+
+  for (const token of tokens) {
+    if (combinedNormText.includes(token)) {
+      matchedTokens.push(token);
+    } else {
+      missingTokens.push(token);
+    }
+  }
+
+  let dominantField: 'title' | 'subtitle' | 'content' | 'tags' | 'none' = 'none';
+  if (totalScore > 0) {
+    const scores = [
+      { field: 'title' as const, score: scoreTitle },
+      { field: 'subtitle' as const, score: scoreSubtitle },
+      { field: 'tags' as const, score: scoreTags },
+      { field: 'content' as const, score: scoreContent },
+    ];
+    scores.sort((a, b) => b.score - a.score);
+    dominantField = scores[0].field;
+  }
+
+  let tier: MultiFieldMatchTier = 'none';
+  let summaryPl = 'Brak dopasowania do zapytania.';
+  let summaryEn = 'No query match.';
+
+  if (totalScore >= 90) {
+    tier = 'exact';
+    summaryPl = `Dokładne dopasowanie (${totalScore}/100) w polu ${dominantField}.`;
+    summaryEn = `Exact match (${totalScore}/100) in ${dominantField} field.`;
+  } else if (totalScore >= 65) {
+    tier = 'strong';
+    summaryPl = `Silne dopasowanie wielopolowe (${totalScore}/100) z dominacją pola ${dominantField}.`;
+    summaryEn = `Strong multi-field match (${totalScore}/100) dominated by ${dominantField}.`;
+  } else if (totalScore >= 40) {
+    tier = 'moderate';
+    summaryPl = `Umiarkowane dopasowanie (${totalScore}/100), odnaleziono ${matchedTokens.length}/${tokens.length} słów kluczowych.`;
+    summaryEn = `Moderate match (${totalScore}/100), matched ${matchedTokens.length}/${tokens.length} keywords.`;
+  } else if (totalScore > 0) {
+    tier = 'weak';
+    summaryPl = `Częściowe lub słabe dopasowanie (${totalScore}/100).`;
+    summaryEn = `Partial or weak match (${totalScore}/100).`;
+  }
+
+  return {
+    totalScore,
+    tier,
+    dominantField,
+    matchedTokens,
+    missingTokens,
+    fieldScores: {
+      title: scoreTitle,
+      subtitle: scoreSubtitle,
+      content: scoreContent,
+      tags: scoreTags,
+    },
+    summaryPl,
+    summaryEn,
+  };
+}

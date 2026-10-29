@@ -31,6 +31,9 @@ import {
   ParsedSearchQuery,
   highlightSearchMatches,
   SearchMatchHighlight,
+  evaluateMultiFieldSearchScore,
+  MultiFieldSearchScore,
+  MultiFieldMatchTier,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -581,5 +584,46 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     expect(highlightSearchMatches(null, 'test')).toEqual([]);
     expect(highlightSearchMatches(undefined, 'test')).toEqual([]);
     expect(highlightSearchMatches('', 'test')).toEqual([]);
+  });
+
+  test('TASK-P99-01-ODK: evaluateMultiFieldSearchScore wylicza ważoną relewancję w polach tytułu, podtytułu, treści i tagów', () => {
+    const item = {
+      title: 'Ethiopia Yirgacheffe Washed',
+      subtitle: 'Specialty Coffee from Kochere',
+      content: 'Floral aroma with jasmine and bergamot citrus notes.',
+      tags: ['washed', 'africa', 'floral', 'ethiopia'],
+    };
+
+    // 1. Dokładne dopasowanie w tytule
+    const exactTitle: MultiFieldSearchScore = evaluateMultiFieldSearchScore(item, 'Ethiopia Yirgacheffe Washed');
+    expect(exactTitle.totalScore).toBeGreaterThanOrEqual(40);
+    expect(exactTitle.dominantField).toBe('title');
+    expect(exactTitle.matchedTokens).toContain('ethiopia');
+    expect(exactTitle.fieldScores.title).toBe(100);
+
+    // 2. Dopasowanie wielopolowe (zapytanie: ethiopia jasmine)
+    const multiMatch = evaluateMultiFieldSearchScore(item, 'ethiopia jasmine');
+    expect(multiMatch.totalScore).toBeGreaterThan(0);
+    expect(multiMatch.matchedTokens).toEqual(expect.arrayContaining(['ethiopia', 'jasmine']));
+    expect(multiMatch.missingTokens).toHaveLength(0);
+    const tierType: MultiFieldMatchTier = multiMatch.tier;
+    expect(['exact', 'strong', 'moderate', 'weak']).toContain(tierType);
+    expect(multiMatch.summaryPl).toBeDefined();
+
+    // 3. Brak dopasowania (zapytanie: colombia bourbon)
+    const noMatch = evaluateMultiFieldSearchScore(item, 'colombia bourbon');
+    expect(noMatch.totalScore).toBe(0);
+    expect(noMatch.tier).toBe('none');
+    expect(noMatch.dominantField).toBe('none');
+    expect(noMatch.missingTokens).toEqual(['colombia', 'bourbon']);
+
+    // 4. Odporność na null, undefined i puste zapytanie
+    const fallbackNull = evaluateMultiFieldSearchScore(null, 'test');
+    expect(fallbackNull.totalScore).toBe(0);
+    expect(fallbackNull.tier).toBe('none');
+
+    const emptyQ = evaluateMultiFieldSearchScore(item, '');
+    expect(emptyQ.totalScore).toBe(0);
+    expect(emptyQ.tier).toBe('none');
   });
 });
