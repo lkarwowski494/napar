@@ -1,0 +1,53 @@
+{
+  "cycle": "P102",
+  "status": "completed",
+  "perspectives": [
+    "01-ODK",
+    "02-MON",
+    "03-ZAK",
+    "04-SZT",
+    "05-ARC"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P102-01-ODK",
+      "perspective": "01-ODK",
+      "description": "Implementacja kalkulatora pokrycia haseł wyszukiwania calculateSearchTermCoverage z typami SearchTermCoverage i SearchCoverageTier w src/core/search-utils.ts i src/core/__tests__/search-utils.test.ts",
+      "targetFile": "src/core/search-utils.ts",
+      "testFile": "src/core/__tests__/search-utils.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P102-02-MON",
+      "perspective": "02-MON",
+      "description": "Implementacja ewaluatora limitu własnych receptur w planie darmowym evaluateCustomRecipeLimit z typami CustomRecipeLimitEvaluation i CustomRecipeLimitStatus w src/core/app-access.ts i src/core/__tests__/app-access.test.ts",
+      "targetFile": "src/core/app-access.ts",
+      "testFile": "src/core/__tests__/app-access.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P102-03-ZAK",
+      "perspective": "03-ZAK",
+      "description": "Implementacja estymatora rozkładu stopni palenia w spiżarni estimateStashRoastDistribution z typami StashRoastDistributionReport i DominantRoastProfile w src/core/database.ts i src/core/__tests__/database.test.ts",
+      "targetFile": "src/core/database.ts",
+      "testFile": "src/core/__tests__/database.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P102-04-SZT",
+      "perspective": "04-SZT",
+      "description": "Implementacja ewaluatora ryzyka kanałowania (channeling) evaluateChannelingRisk z typami ChannelingRiskAssessment i ChannelingRiskLevel w src/core/bpr-engine.ts i src/core/__tests__/bpr-engine.test.ts",
+      "targetFile": "src/core/bpr-engine.ts",
+      "testFile": "src/core/__tests__/bpr-engine.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P102-05-ARC",
+      "perspective": "05-ARC",
+      "description": "Implementacja detektora duplikatów w kopii zapasowej detectBackupDuplicates z typami BackupDuplicateReport i BackupDuplicateItem w src/core/backup.ts i src/core/__tests__/backup.test.ts",
+      "targetFile": "src/core/backup.ts",
+      "testFile": "src/core/__tests__/backup.test.ts",
+      "status": "completed"
+    }
+  ]
+}
