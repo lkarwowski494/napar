@@ -2209,3 +2209,101 @@ export function compareCoffeeOrigins(
     comparisonSummaryEn,
   };
 }
+
+
+// ============================================================================
+// TASK-P98-06-TRE: Tea Category Comparator (Porównywarka kategorii herbat)
+// ============================================================================
+
+export interface TeaCategoryComparisonItem {
+  id: string;
+  name: string;
+  traditionalName: string;
+  oxidationRangePercent: string;
+  waterTemperatureCelsius: number;
+  recommendedVessel: string;
+  sensoryProfile: string;
+  famousVarieties: string[];
+}
+
+export interface TeaCategoryComparison {
+  categoryA: TeaCategoryComparisonItem;
+  categoryB: TeaCategoryComparisonItem;
+  temperatureDeltaCelsius: number;
+  sharedVarieties: string[];
+  distinctVarietiesA: string[];
+  distinctVarietiesB: string[];
+  comparisonSummaryPl: string;
+  comparisonSummaryEn: string;
+}
+
+/**
+ * Porównuje dwie kategorie herbaty (np. zielona vs pu-erh, oolong vs biała)
+ * zestawiając poziom oksydacji, temperaturę parzenia, rekomendowane naczynie i profil sensoryczny.
+ */
+export function compareTeaCategories(
+  categoryAId: string | undefined | null,
+  categoryBId: string | undefined | null,
+  lang: 'pl' | 'en' | string = 'pl'
+): TeaCategoryComparison | null {
+  if (!categoryAId || !categoryBId) return null;
+  const guideA = getTeaCategoryGuide(categoryAId, lang);
+  const guideB = getTeaCategoryGuide(categoryBId, lang);
+  if (!guideA || !guideB) return null;
+
+  const varsA = Array.isArray(guideA.famousVarieties) ? guideA.famousVarieties : [];
+  const varsB = Array.isArray(guideB.famousVarieties) ? guideB.famousVarieties : [];
+
+  const lowerB = new Set(varsB.map((v) => v.toLowerCase().trim()));
+  const lowerA = new Set(varsA.map((v) => v.toLowerCase().trim()));
+
+  const sharedVarieties = varsA.filter((v) => lowerB.has(v.toLowerCase().trim()));
+  const distinctVarietiesA = varsA.filter((v) => !lowerB.has(v.toLowerCase().trim()));
+  const distinctVarietiesB = varsB.filter((v) => !lowerA.has(v.toLowerCase().trim()));
+
+  const tempA =
+    typeof guideA.waterTemperatureCelsius === 'number' && Number.isFinite(guideA.waterTemperatureCelsius)
+      ? guideA.waterTemperatureCelsius
+      : 0;
+  const tempB =
+    typeof guideB.waterTemperatureCelsius === 'number' && Number.isFinite(guideB.waterTemperatureCelsius)
+      ? guideB.waterTemperatureCelsius
+      : 0;
+  const temperatureDeltaCelsius = Math.abs(tempA - tempB);
+
+  const categoryA: TeaCategoryComparisonItem = {
+    id: guideA.id,
+    name: guideA.name,
+    traditionalName: guideA.traditionalName,
+    oxidationRangePercent: guideA.oxidationRangePercent,
+    waterTemperatureCelsius: guideA.waterTemperatureCelsius,
+    recommendedVessel: guideA.recommendedVessel,
+    sensoryProfile: guideA.sensoryProfile,
+    famousVarieties: varsA,
+  };
+
+  const categoryB: TeaCategoryComparisonItem = {
+    id: guideB.id,
+    name: guideB.name,
+    traditionalName: guideB.traditionalName,
+    oxidationRangePercent: guideB.oxidationRangePercent,
+    waterTemperatureCelsius: guideB.waterTemperatureCelsius,
+    recommendedVessel: guideB.recommendedVessel,
+    sensoryProfile: guideB.sensoryProfile,
+    famousVarieties: varsB,
+  };
+
+  const comparisonSummaryPl = `Porównanie kategorii herbat: ${guideA.name} (${guideA.traditionalName}, oksydacja: ${guideA.oxidationRangePercent}, ${guideA.waterTemperatureCelsius}°C) vs ${guideB.name} (${guideB.traditionalName}, oksydacja: ${guideB.oxidationRangePercent}, ${guideB.waterTemperatureCelsius}°C). Różnica zalecanej temperatury: ${temperatureDeltaCelsius}°C.`;
+  const comparisonSummaryEn = `Comparison between tea categories: ${guideA.name} (${guideA.traditionalName}, oxidation: ${guideA.oxidationRangePercent}, ${guideA.waterTemperatureCelsius}°C) vs ${guideB.name} (${guideB.traditionalName}, oxidation: ${guideB.oxidationRangePercent}, ${guideB.waterTemperatureCelsius}°C). Water temperature delta: ${temperatureDeltaCelsius}°C.`;
+
+  return {
+    categoryA,
+    categoryB,
+    temperatureDeltaCelsius,
+    sharedVarieties,
+    distinctVarietiesA,
+    distinctVarietiesB,
+    comparisonSummaryPl,
+    comparisonSummaryEn,
+  };
+}

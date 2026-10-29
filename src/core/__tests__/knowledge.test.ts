@@ -53,6 +53,9 @@ import {
   compareCoffeeOrigins,
   CoffeeOriginComparison,
   CoffeeOriginComparisonItem,
+  compareTeaCategories,
+  TeaCategoryComparison,
+  TeaCategoryComparisonItem,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1530,6 +1533,34 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(compareCoffeeOrigins('unknown-country', 'colombia')).toBeNull();
     expect(compareCoffeeOrigins('ethiopia', 'unknown-country')).toBeNull();
     expect(compareCoffeeOrigins('', '')).toBeNull();
+  });
+
+  test('TASK-P98-06-TRE: compareTeaCategories zestawia dwie kategorie herbaty', () => {
+    // 1. Zielona vs Czarna (język polski)
+    const compPl: TeaCategoryComparison | null = compareTeaCategories('green', 'black', 'pl');
+    expect(compPl).not.toBeNull();
+    expect(compPl?.categoryA.id).toBe('tea-green');
+    expect(compPl?.categoryB.id).toBe('tea-black');
+    expect(compPl?.temperatureDeltaCelsius).toBeGreaterThan(0);
+    expect(compPl?.comparisonSummaryPl).toContain('oksydacja');
+    expect(Array.isArray(compPl?.categoryA.famousVarieties)).toBe(true);
+    expect(Array.isArray(compPl?.categoryB.famousVarieties)).toBe(true);
+
+    const sampleItem: TeaCategoryComparisonItem = compPl!.categoryA;
+    expect(sampleItem.id).toBe('tea-green');
+
+    // 2. Wersja angielska (oolong vs white)
+    const compEn = compareTeaCategories('tea-oolong', 'tea-white', 'en');
+    expect(compEn).not.toBeNull();
+    expect(compEn?.categoryA.name).toBe('Oolong Tea');
+    expect(compEn?.categoryB.name).toBe('White Tea');
+    expect(compEn?.comparisonSummaryEn).toContain('Water temperature delta');
+
+    // 3. Odporność na błędy i null
+    expect(compareTeaCategories('tea-green', null)).toBeNull();
+    expect(compareTeaCategories(null, 'tea-black')).toBeNull();
+    expect(compareTeaCategories('unknown-tea', 'tea-black')).toBeNull();
+    expect(compareTeaCategories('', '')).toBeNull();
   });
 });
 
