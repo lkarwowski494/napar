@@ -34,6 +34,9 @@ import {
   evaluateMultiFieldSearchScore,
   MultiFieldSearchScore,
   MultiFieldMatchTier,
+  calculateSearchTermCoverage,
+  SearchTermCoverage,
+  SearchCoverageTier,
 } from '../search-utils';
 
 describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
@@ -625,5 +628,56 @@ describe('Search Utilities (RD-ENG-07 & NFR-INT-015)', () => {
     const emptyQ = evaluateMultiFieldSearchScore(item, '');
     expect(emptyQ.totalScore).toBe(0);
     expect(emptyQ.tier).toBe('none');
+  });
+
+  test('TASK-P102-01-ODK: calculateSearchTermCoverage oblicza pokrycie tokenów zapytania w docelowym tekście', () => {
+    const target = 'Kawa speciality Etiopia Yirgacheffe obróbka myta o profilu jaśmin i bergamotka';
+
+    // 1. Pełne dopasowanie wszystkich słów (100% - exact_full)
+    const full = calculateSearchTermCoverage('etiopia jaśmin myta', target);
+    expect(full.totalQueryTerms).toBe(3);
+    expect(full.matchedTermsCount).toBe(3);
+    expect(full.coverageRatio).toBe(1.0);
+    expect(full.coveragePercent).toBe(100);
+    expect(full.tier).toBe('exact_full');
+    expect(full.missingTerms).toHaveLength(0);
+    const tierType: SearchCoverageTier = full.tier;
+    expect(tierType).toBe('exact_full');
+    expect(full.summaryPl).toContain('100%');
+
+    // 2. Częściowe wysokie dopasowanie (2/3 = 67% - high_coverage)
+    const high = calculateSearchTermCoverage('etiopia kenya jasmin', target);
+    expect(high.totalQueryTerms).toBe(3);
+    expect(high.matchedTermsCount).toBe(2);
+    expect(high.coveragePercent).toBe(67);
+    expect(high.tier).toBe('high_coverage');
+    expect(high.missingTerms).toContain('kenya');
+
+    // 3. Niskie dopasowanie (1/4 = 25% - partial)
+    const partial = calculateSearchTermCoverage('brazylia kolumbia kenia jaśmin', target);
+    expect(partial.totalQueryTerms).toBe(4);
+    expect(partial.matchedTermsCount).toBe(1);
+    expect(partial.coveragePercent).toBe(25);
+    expect(partial.tier).toBe('partial');
+
+    // 4. Całkowity brak dopasowania (0% - none)
+    const none = calculateSearchTermCoverage('herbata sencha japonia', target);
+    expect(none.matchedTermsCount).toBe(0);
+    expect(none.coveragePercent).toBe(0);
+    expect(none.tier).toBe('none');
+
+    // 5. Obsługa tablicy ciągów, pustego zapytania i wartości null
+    const arrayTarget = calculateSearchTermCoverage('yirgacheffe', ['Etiopia', 'Yirgacheffe']);
+    expect(arrayTarget.coveragePercent).toBe(100);
+
+    const empty = calculateSearchTermCoverage('', target);
+    expect(empty.totalQueryTerms).toBe(0);
+    expect(empty.coveragePercent).toBe(100);
+    expect(empty.tier).toBe('exact_full');
+
+    const fallbackNull = calculateSearchTermCoverage(null, null);
+    expect(fallbackNull.totalQueryTerms).toBe(0);
+    const coverageResult: SearchTermCoverage = fallbackNull;
+    expect(coverageResult.summaryEn).toBeTruthy();
   });
 });

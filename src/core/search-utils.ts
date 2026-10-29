@@ -1156,3 +1156,92 @@ export function evaluateMultiFieldSearchScore(
     summaryEn,
   };
 }
+
+export type SearchCoverageTier = 'exact_full' | 'high_coverage' | 'partial' | 'none';
+
+export interface SearchTermCoverage {
+  query: string;
+  totalQueryTerms: number;
+  matchedTermsCount: number;
+  coverageRatio: number;
+  coveragePercent: number;
+  tier: SearchCoverageTier;
+  matchedTerms: string[];
+  missingTerms: string[];
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function calculateSearchTermCoverage(
+  query: string | undefined | null,
+  targetText: string | string[] | undefined | null
+): SearchTermCoverage {
+  const safeQuery = typeof query === 'string' ? query.trim() : '';
+  const tokens = Array.from(new Set(tokenizeSearch(safeQuery)));
+
+  let flatTarget = '';
+  if (Array.isArray(targetText)) {
+    flatTarget = targetText.filter((t) => typeof t === 'string').join(' ');
+  } else if (typeof targetText === 'string') {
+    flatTarget = targetText;
+  }
+  const normTarget = normSearch(flatTarget);
+
+  if (tokens.length === 0) {
+    return {
+      query: safeQuery,
+      totalQueryTerms: 0,
+      matchedTermsCount: 0,
+      coverageRatio: 1.0,
+      coveragePercent: 100,
+      tier: 'exact_full',
+      matchedTerms: [],
+      missingTerms: [],
+      summaryPl: 'Puste zapytanie wyszukiwania (pokrycie: 100%).',
+      summaryEn: 'Empty search query (coverage: 100%).',
+    };
+  }
+
+  const matchedTerms: string[] = [];
+  const missingTerms: string[] = [];
+
+  for (const token of tokens) {
+    if (normTarget.includes(token)) {
+      matchedTerms.push(token);
+    } else {
+      missingTerms.push(token);
+    }
+  }
+
+  const matchedTermsCount = matchedTerms.length;
+  const coverageRatio = Math.round((matchedTermsCount / tokens.length) * 100) / 100;
+  const coveragePercent = Math.round((matchedTermsCount / tokens.length) * 100);
+
+  let tier: SearchCoverageTier = 'none';
+  if (coveragePercent === 100) {
+    tier = 'exact_full';
+  } else if (coveragePercent >= 65) {
+    tier = 'high_coverage';
+  } else if (coveragePercent > 0) {
+    tier = 'partial';
+  }
+
+  const missingFormattedPl = missingTerms.length > 0 ? missingTerms.join(', ') : 'brak';
+  const missingFormattedEn = missingTerms.length > 0 ? missingTerms.join(', ') : 'none';
+
+  const summaryPl = `Pokrycie zapytania: ${coveragePercent}% (${matchedTermsCount}/${tokens.length} słów kluczowych). Brakujące: ${missingFormattedPl}.`;
+  const summaryEn = `Query coverage: ${coveragePercent}% (${matchedTermsCount}/${tokens.length} terms). Missing: ${missingFormattedEn}.`;
+
+  return {
+    query: safeQuery,
+    totalQueryTerms: tokens.length,
+    matchedTermsCount,
+    coverageRatio,
+    coveragePercent,
+    tier,
+    matchedTerms,
+    missingTerms,
+    summaryPl,
+    summaryEn,
+  };
+}
