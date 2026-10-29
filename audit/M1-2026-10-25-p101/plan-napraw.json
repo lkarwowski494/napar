@@ -1,0 +1,53 @@
+{
+  "cycle": "P101",
+  "status": "completed",
+  "perspectives": [
+    "08-PRO",
+    "09-LOK",
+    "10-WYD",
+    "11-WZR",
+    "12-NIE"
+  ],
+  "tasks": [
+    {
+      "id": "TASK-P101-08-PRO",
+      "perspective": "08-PRO",
+      "description": "Implementacja estymatora redukcji ładunku elektrostatycznego i retencji techniką RDT (Ross Droplet Technique) estimateRdtStaticReduction z typami RdtStaticReduction i RdtStaticLevel w src/core/grinder-converter.ts i src/core/__tests__/grinder-converter.test.ts",
+      "targetFile": "src/core/grinder-converter.ts",
+      "testFile": "src/core/__tests__/grinder-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P101-09-LOK",
+      "perspective": "09-LOK",
+      "description": "Implementacja formatera ubytku masy w procesie palenia formatRoastWeightLoss z typami RoastWeightLossFormat i RoastLossCategory w src/core/unit-converter.ts i src/core/__tests__/unit-converter.test.ts",
+      "targetFile": "src/core/unit-converter.ts",
+      "testFile": "src/core/__tests__/unit-converter.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P101-10-WYD",
+      "perspective": "10-WYD",
+      "description": "Implementacja testu wydajnościowego Budżet 22 (10 000 kalkulacji < 200 ms dla funkcji z P100) w src/core/__tests__/perf-budget.test.ts",
+      "targetFile": "src/core/__tests__/perf-budget.test.ts",
+      "testFile": "src/core/__tests__/perf-budget.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P101-11-WZR",
+      "perspective": "11-WZR",
+      "description": "Implementacja reguły ewaluacji proporcji parzenia zero-bypass evaluateZeroBypassRatio z typami ZeroBypassEvaluation i ZeroBypassBrewStyle w src/core/domain-rules.ts i src/core/__tests__/domain-rules.test.ts",
+      "targetFile": "src/core/domain-rules.ts",
+      "testFile": "src/core/__tests__/domain-rules.test.ts",
+      "status": "completed"
+    },
+    {
+      "id": "TASK-P101-12-NIE",
+      "perspective": "12-NIE",
+      "description": "Implementacja testu odpornościowego Chaos 26 (fuzzing 10 funkcji domenowych z P100 i P101 na 2 000 mutacji wejściowych) w src/core/__tests__/fuzz-resilience.test.ts",
+      "targetFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "testFile": "src/core/__tests__/fuzz-resilience.test.ts",
+      "status": "completed"
+    }
+  ]
+}
