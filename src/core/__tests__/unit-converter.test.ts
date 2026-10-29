@@ -38,6 +38,9 @@ import {
   formatRoastWeightLoss,
   RoastWeightLossFormat,
   RoastLossCategory,
+  formatBoilingPointAtAltitude,
+  AltitudeBoilingPoint,
+  AltitudeBoilingUnit,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -665,6 +668,50 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(fallback.category).toBe('medium');
       const lossFormat: RoastWeightLossFormat = fallback;
       expect(lossFormat.descriptionPl).toBeTruthy();
+    });
+
+    test('TASK-P103-09-LOK: formatBoilingPointAtAltitude oblicza i formatuje temperaturę wrzenia wody na wysokości n.p.m.', () => {
+      // 1. Poziom morza (0m n.p.m.)
+      const seaLevel: AltitudeBoilingPoint = formatBoilingPointAtAltitude(0, 'C', 'pl');
+      const unit: AltitudeBoilingUnit = seaLevel.selectedUnit;
+      expect(unit).toBe('C');
+      expect(seaLevel.altitudeMeters).toBe(0);
+      expect(seaLevel.boilingPointCelsius).toBe(100.0);
+      expect(seaLevel.boilingPointFahrenheit).toBe(212.0);
+      expect(seaLevel.formattedTemperature).toBe('100,0°C');
+      expect(seaLevel.brewImpactPl).toContain('bliski 100°C');
+      expect(seaLevel.recommendationPl).toContain('Odczekaj 30–45 sekund');
+      expect(seaLevel.summaryPl).toContain('Wysokość 0m n.p.m.');
+
+      // 2. Wysokość w Denver / Addis Ababa (1500m n.p.m., Fahrenheit, język angielski)
+      // 100 - (1500 / 300) = 95.0°C
+      // 95.0 * 1.8 + 32 = 203.0°F
+      const denver = formatBoilingPointAtAltitude('1500', 'F', 'en');
+      expect(denver.altitudeMeters).toBe(1500);
+      expect(denver.boilingPointCelsius).toBe(95.0);
+      expect(denver.boilingPointFahrenheit).toBe(203.0);
+      expect(denver.selectedUnit).toBe('F');
+      expect(denver.formattedTemperature).toBe('203.0°F');
+      expect(denver.brewImpactEn).toContain('Moderate altitude');
+      expect(denver.recommendationEn).toContain('Pour straight off the boil');
+
+      // 3. Ekstremalna wysokość (Bogota / Mexico City: 2400m n.p.m., °C, język polski)
+      // 100 - (2400 / 300) = 92.0°C
+      const bogota = formatBoilingPointAtAltitude(2400, 'C', 'pl');
+      expect(bogota.boilingPointCelsius).toBe(92.0);
+      expect(bogota.formattedTemperature).toBe('92,0°C');
+      expect(bogota.brewImpactPl).toContain('Wysokogórski punkt wrzenia');
+      expect(bogota.recommendationPl).toContain('Zalewaj od razu po zagotowaniu');
+
+      // 4. Odporność na wartości null, ujemne i nienumeryczne
+      const fallback = formatBoilingPointAtAltitude(null, 'C', 'en');
+      expect(fallback.altitudeMeters).toBe(0);
+      expect(fallback.boilingPointCelsius).toBe(100.0);
+      expect(fallback.formattedTemperature).toBe('100.0°C');
+
+      const negativeAlt = formatBoilingPointAtAltitude(-500);
+      expect(negativeAlt.altitudeMeters).toBe(0);
+      expect(negativeAlt.boilingPointCelsius).toBe(100.0);
     });
   });
 });

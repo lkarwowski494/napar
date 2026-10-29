@@ -1093,3 +1093,95 @@ export function formatRoastWeightLoss(
     descriptionEn,
   };
 }
+
+export type AltitudeBoilingUnit = 'C' | 'F';
+
+export interface AltitudeBoilingPoint {
+  altitudeMeters: number;
+  boilingPointCelsius: number;
+  boilingPointFahrenheit: number;
+  selectedUnit: AltitudeBoilingUnit;
+  formattedTemperature: string;
+  brewImpactPl: string;
+  brewImpactEn: string;
+  recommendationPl: string;
+  recommendationEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Oblicza i formatuje rzeczywistą temperaturę wrzenia wody na danej wysokości n.p.m.
+ * oraz generuje rekomendacje parzenia i kompensacji ekstrakcji dla baristy.
+ * Zależność: T_boil = 100 - (wysokość / 300) °C
+ */
+export function formatBoilingPointAtAltitude(
+  altitudeMeters: number | string | null | undefined,
+  targetUnit: AltitudeBoilingUnit = 'C',
+  locale: string = 'pl'
+): AltitudeBoilingPoint {
+  let alt = 0;
+  if (altitudeMeters !== null && altitudeMeters !== undefined) {
+    const parsed = typeof altitudeMeters === 'number' ? altitudeMeters : parseFloat(String(altitudeMeters));
+    if (!isNaN(parsed) && isFinite(parsed)) {
+      alt = Math.min(8848, Math.max(0, parsed));
+    }
+  }
+
+  const isEn = locale.toLowerCase().startsWith('en');
+  const unit: AltitudeBoilingUnit = targetUnit === 'F' ? 'F' : 'C';
+
+  // Obliczenie punktu wrzenia (°C)
+  const boilC = Math.round((100 - alt / 300) * 10) / 10;
+  const boilF = Math.round((boilC * 1.8 + 32) * 10) / 10;
+
+  let formattedTemperature = '';
+  if (unit === 'F') {
+    formattedTemperature = isEn
+      ? `${boilF.toFixed(1)}°F`
+      : `${boilF.toFixed(1).replace('.', ',')}°F`;
+  } else {
+    formattedTemperature = isEn
+      ? `${boilC.toFixed(1)}°C`
+      : `${boilC.toFixed(1).replace('.', ',')}°C`;
+  }
+
+  let brewImpactPl = '';
+  let brewImpactEn = '';
+  let recommendationPl = '';
+  let recommendationEn = '';
+
+  if (alt >= 1800) {
+    brewImpactPl = 'Wysokogórski punkt wrzenia (<94°C): woda wrze w niższej temperaturze, co obniża kinetykę ekstrakcji jasnych ziaren specialty.';
+    brewImpactEn = 'High-altitude boiling point (<94°C): water boils at lower temperature, slowing extraction kinetics for light specialty roasts.';
+    recommendationPl = 'Zalewaj od razu po zagotowaniu (0s po wrzeniu), rozważ drobniejszy przemiał lub wydłużenie czasu ekstrakcji.';
+    recommendationEn = 'Pour immediately off the boil (0s delay), consider a finer grind setting or extending contact time.';
+  } else if (alt >= 800) {
+    brewImpactPl = 'Umiarkowana wysokość: woda wrze w granicach 94–97°C, co idealnie pasuje do metod przelewowych.';
+    brewImpactEn = 'Moderate altitude: water boils between 94–97°C, which fits pour-over extraction exceptionally well.';
+    recommendationPl = 'Wylewaj wodę bezpośrednio po zagotowaniu, nie odczekuj przed zalaniem drippera.';
+    recommendationEn = 'Pour straight off the boil, avoid letting kettle cool down before pour-over brewing.';
+  } else {
+    brewImpactPl = 'Niska wysokość n.p.m.: punkt wrzenia bliski 100°C z pełną kontrolą nad profilem termicznym.';
+    brewImpactEn = 'Low altitude: boiling point close to 100°C with full thermal headroom.';
+    recommendationPl = 'Odczekaj 30–45 sekund po zagotowaniu lub ustaw termostat czajnika na 92–94°C.';
+    recommendationEn = 'Wait 30–45 seconds off-boil or set temperature kettle to 92–94°C.';
+  }
+
+  const summaryPl = `Wysokość ${alt}m n.p.m.: punkt wrzenia ${boilC.toFixed(1).replace('.', ',')}°C (${boilF.toFixed(1).replace('.', ',')}°F). ${brewImpactPl}`;
+  const summaryEn = `Altitude ${alt}m: boiling point ${boilC.toFixed(1)}°C (${boilF.toFixed(1)}°F). ${brewImpactEn}`;
+
+  return {
+    altitudeMeters: alt,
+    boilingPointCelsius: boilC,
+    boilingPointFahrenheit: boilF,
+    selectedUnit: unit,
+    formattedTemperature,
+    brewImpactPl,
+    brewImpactEn,
+    recommendationPl,
+    recommendationEn,
+    summaryPl,
+    summaryEn,
+  };
+}
