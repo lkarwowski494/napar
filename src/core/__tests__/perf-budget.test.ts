@@ -12,7 +12,7 @@ import {
   evaluateCuppingRatio,
 } from '../domain-rules';
 import { createGongfuSession, recordGongfuInfusion } from '../gongfu-session';
-import { convertMicronsToGrinder, SUPPORTED_GRINDERS, estimateGrindDistributionSpread } from '../grinder-converter';
+import { convertMicronsToGrinder, SUPPORTED_GRINDERS, estimateGrindDistributionSpread, calculateGrinderBurrCalibration } from '../grinder-converter';
 import {
   calculateWaterMinerals,
   WATER_RECIPES,
@@ -20,12 +20,14 @@ import {
   calculateResidualAlkalinity,
   calculateTotalHardnessFromIons,
   calculateWaterHardnessScale,
+  evaluateWaterAlkalinityBuffer,
 } from '../water-chemistry';
-import { formatBrewTimeMinutesSeconds, formatCostPerCup, formatFlowRateProfile } from '../unit-converter';
+import { formatBrewTimeMinutesSeconds, formatCostPerCup, formatFlowRateProfile, formatExtractionPressure } from '../unit-converter';
 import { normSearch, rankSearchResults, filterBySearchFacets } from '../search-utils';
 import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot, CumulativeWaterPoint } from '../timer-engine';
 import { calculateLifetimeBreakEven, evaluateUpsellTrigger } from '../app-access';
-import { generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity } from '../bpr-engine';
+import { generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, generateExtractionTroubleshootingGuide } from '../bpr-engine';
+import { auditBackupRelationalIntegrity } from '../backup';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => ({
@@ -36,7 +38,7 @@ jest.mock('expo-sqlite', () => ({
   })),
 }));
 
-import { escapeCsvValue, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover } from '../database';
+import { escapeCsvValue, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover, calculateStashDepletionForecast } from '../database';
 
 function measureCpuMs(fn: () => unknown, runs = 5): number {
   fn(); // Rozgrzewka JIT
@@ -556,6 +558,49 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     });
 
     expect(ms).toBeLessThan(150);
+  });
+
+  test('TASK-P99-10-WYD: Budżet 21: 10 000 kalkulacji prognozy zapasów, troubleshootingu, audytu relacyjnego i kalibracji żaren (< 200 ms)', () => {
+    // 1. Poprawność biznesowa
+    const stashItem = { id: 'inv-1', name: 'Ethiopia', initialWeightGrams: 250, remainingWeightGrams: 100, isArchived: false } as any;
+    const forecast = calculateStashDepletionForecast([stashItem], { dailyConsumptionGrams: 18 });
+    expect(forecast.totalRemainingWeightGrams).toBe(100);
+
+    const guide = generateExtractionTroubleshootingGuide({ symptoms: ['sour', 'fast_drawdown'] });
+    expect(guide.primaryIssue).toBe('underextraction');
+
+    const backupSample = {
+      state: {
+        inventory: [{ id: 'inv-1' }],
+        customRecipes: [{ id: 'rec-1' }],
+        sessions: [{ id: 'ses-1', inventoryItemId: 'inv-1', recipeId: 'rec-1' }],
+      },
+    };
+    const relationalAudit = auditBackupRelationalIntegrity(backupSample);
+    expect(relationalAudit.isFullyConsistent).toBe(true);
+
+    const alkalinity = evaluateWaterAlkalinityBuffer(40);
+    expect(alkalinity.level).toBe('balanced');
+
+    const burrCalib = calculateGrinderBurrCalibration({ currentClick: 20, targetMicrons: 600, zeroClickOffset: 0 });
+    expect(burrCalib.status).toBe('aligned');
+
+    const pressure = formatExtractionPressure(9.0);
+    expect(pressure.zone).toBe('espresso_classic');
+
+    // 2. Budżet wydajnościowy CPU: 10 000 iteracji w pętli < 150 ms
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        calculateStashDepletionForecast([stashItem], { dailyConsumptionGrams: 15 + (i % 5) });
+        generateExtractionTroubleshootingGuide({ symptoms: ['sour'] });
+        auditBackupRelationalIntegrity(backupSample);
+        evaluateWaterAlkalinityBuffer(30 + (i % 50));
+        calculateGrinderBurrCalibration({ currentClick: 15 + (i % 10), targetMicrons: 500 });
+        formatExtractionPressure(6.0 + ((i % 40) / 10));
+      }
+    });
+
+    expect(ms).toBeLessThan(200);
   });
 });
 
