@@ -2189,3 +2189,96 @@ export function evaluateWaterAlkalinityBuffer(
     recommendationEn,
   };
 }
+
+
+// ============================================================================
+// TASK-P100-07-JAK: Boiling Degassing & Decarbonation Impact (Dekarbonizacja wrzenia)
+// ============================================================================
+
+export type DegassingEfficiencyLevel = 'gentle' | 'optimal' | 'excessive_deoxygenation';
+
+export interface BoilingDegassingImpact {
+  initialAlkalinityPpm: number;
+  initialTotalHardnessPpm: number;
+  boilingDurationSeconds: number;
+  residualAlkalinityPpm: number;
+  residualTotalHardnessPpm: number;
+  alkalinityLossPercent: number;
+  efficiencyLevel: DegassingEfficiencyLevel;
+  oxygenRetentionPercent: number;
+  sensoryAssessmentPl: string;
+  sensoryAssessmentEn: string;
+  recommendationPl: string;
+  recommendationEn: string;
+}
+
+export function calculateBoilingDegassingImpact(options?: {
+  initialAlkalinityPpm?: number | string | null;
+  initialTotalHardnessPpm?: number | string | null;
+  boilingDurationSeconds?: number | string | null;
+}): BoilingDegassingImpact {
+  const parseNum = (val: unknown, fallback: number, min: number, max: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.max(min, Math.min(max, val));
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.max(min, Math.min(max, parsed));
+      }
+    }
+    return fallback;
+  };
+
+  const initialAlkalinityPpm = Math.round(parseNum(options?.initialAlkalinityPpm, 50, 0, 500) * 10) / 10;
+  const initialTotalHardnessPpm = Math.round(parseNum(options?.initialTotalHardnessPpm, 100, 0, 1000) * 10) / 10;
+  const boilingDurationSeconds = Math.round(parseNum(options?.boilingDurationSeconds, 30, 0, 600));
+
+  const lossFraction = Math.min(0.6, 0.05 + (boilingDurationSeconds / 60) * 0.12);
+  const alkalinityLossPercent = Math.round(lossFraction * 100);
+
+  const residualAlkalinityPpm = Math.max(0, Math.round(initialAlkalinityPpm * (1 - lossFraction) * 10) / 10);
+  const khDelta = initialAlkalinityPpm - residualAlkalinityPpm;
+
+  const residualTotalHardnessPpm = Math.max(
+    0,
+    Math.round((initialTotalHardnessPpm - khDelta * 0.7) * 10) / 10
+  );
+
+  const oxygenRetentionPercent = Math.max(10, Math.round(100 - (boilingDurationSeconds / 60) * 25));
+
+  let efficiencyLevel: DegassingEfficiencyLevel = 'gentle';
+  let sensoryAssessmentPl = 'Krótkie zagotowanie: zachowana wysoka świeżość wody i rozpuszczony tlen.';
+  let sensoryAssessmentEn = 'Brief boil: high dissolved oxygen and cup freshness preserved.';
+  let recommendationPl = 'Optymalny czas dla delikatnych przelewów; woda zachowuje pełny blask kwasowości.';
+  let recommendationEn = 'Optimal timing for delicate pour-overs; water retains vibrant fruit acidity.';
+
+  if (boilingDurationSeconds > 150) {
+    efficiencyLevel = 'excessive_deoxygenation';
+    sensoryAssessmentPl = `Długie wrzenie (${boilingDurationSeconds}s): znaczne odgazowanie tlenu (${oxygenRetentionPercent}%) i ryzyko mdłego, płaskiego naparu.`;
+    sensoryAssessmentEn = `Prolonged boiling (${boilingDurationSeconds}s): severe oxygen loss (${oxygenRetentionPercent}%) risking a dull, flat extraction.`;
+    recommendationPl = 'Unikaj wielokrotnego lub długiego gotowania tej samej wody w czajniku.';
+    recommendationEn = 'Avoid prolonged or repeated re-boiling of the same kettle water.';
+  } else if (boilingDurationSeconds > 45) {
+    efficiencyLevel = 'optimal';
+    sensoryAssessmentPl = `Umiarkowane wrzenie: obniżenie bufora KH o ${alkalinityLossPercent}%, co sprzyja wyeksponowaniu kwasowości twardej kranówki.`;
+    sensoryAssessmentEn = `Moderate boil: KH buffer reduced by ${alkalinityLossPercent}%, helping brighten hard tap water.`;
+    recommendationPl = 'Dobra technika dla zmiękczenia twardszej wody przed zalaniem drippera.';
+    recommendationEn = 'Effective technique to naturally soften moderately hard water before brewing.';
+  }
+
+  return {
+    initialAlkalinityPpm,
+    initialTotalHardnessPpm,
+    boilingDurationSeconds,
+    residualAlkalinityPpm,
+    residualTotalHardnessPpm,
+    alkalinityLossPercent,
+    efficiencyLevel,
+    oxygenRetentionPercent,
+    sensoryAssessmentPl,
+    sensoryAssessmentEn,
+    recommendationPl,
+    recommendationEn,
+  };
+}

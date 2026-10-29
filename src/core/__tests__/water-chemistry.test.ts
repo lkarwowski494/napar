@@ -59,6 +59,9 @@ import {
   evaluateWaterAlkalinityBuffer,
   WaterAlkalinityBufferEvaluation,
   AlkalinityBufferLevel,
+  calculateBoilingDegassingImpact,
+  BoilingDegassingImpact,
+  DegassingEfficiencyLevel,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -1374,6 +1377,40 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(fallbackBuffer.alkalinityPpm).toBe(0);
     const level: AlkalinityBufferLevel = fallbackBuffer.level;
     expect(level).toBe('unbuffered');
+  });
+
+  test('TASK-P100-07-JAK: calculateBoilingDegassingImpact oblicza dekarbonizację i spadek tlenu podczas wrzenia', () => {
+    // 1. Krótkie wrzenie (30 sekund)
+    const gentle: BoilingDegassingImpact = calculateBoilingDegassingImpact({
+      initialAlkalinityPpm: 60,
+      initialTotalHardnessPpm: 120,
+      boilingDurationSeconds: 30,
+    });
+    const effLevel: DegassingEfficiencyLevel = gentle.efficiencyLevel;
+    expect(effLevel).toBe('gentle');
+    expect(gentle.initialAlkalinityPpm).toBe(60);
+    expect(gentle.residualAlkalinityPpm).toBeLessThan(60);
+    expect(gentle.residualTotalHardnessPpm).toBeLessThan(120);
+    expect(gentle.oxygenRetentionPercent).toBeGreaterThanOrEqual(80);
+    expect(gentle.sensoryAssessmentPl).toContain('świeżość');
+    expect(gentle.recommendationPl).toBeDefined();
+
+    // 2. Długie wrzenie (180 sekund / 3 minuty) -> excessive_deoxygenation
+    const excessive = calculateBoilingDegassingImpact({
+      initialAlkalinityPpm: 80,
+      initialTotalHardnessPpm: 150,
+      boilingDurationSeconds: 180,
+    });
+    expect(excessive.efficiencyLevel).toBe('excessive_deoxygenation');
+    expect(excessive.alkalinityLossPercent).toBeGreaterThanOrEqual(40);
+    expect(excessive.oxygenRetentionPercent).toBeLessThan(50);
+    expect(excessive.sensoryAssessmentPl).toContain('Długie wrzenie');
+
+    // 3. Odporność na null i puste argumenty
+    const fallback = calculateBoilingDegassingImpact(null);
+    expect(fallback.initialAlkalinityPpm).toBe(50);
+    expect(fallback.residualAlkalinityPpm).toBeGreaterThan(0);
+    expect(fallback.efficiencyLevel).toBe('gentle');
   });
 });
 
