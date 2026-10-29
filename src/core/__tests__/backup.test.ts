@@ -29,6 +29,9 @@ import {
   detectBackupDuplicates,
   BackupDuplicateReport,
   BackupDuplicateItem,
+  simulateBackupRestore,
+  BackupRestoreSimulationResult,
+  BackupRestoreConflictType,
   sanitizeBackupEnvelope,
   estimateBackupFileSize,
   BackupFileSizeEstimate,
@@ -1152,6 +1155,67 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(fallback.hasDuplicates).toBe(false);
       expect(fallback.totalDuplicateCount).toBe(0);
       expect(fallback.summaryEn).toBeDefined();
+    });
+
+    test('TASK-P105-05-ARC: simulateBackupRestore symuluje przywracanie kopii z typami BackupRestoreSimulationResult i BackupRestoreConflictType', () => {
+      // 1. Bezpieczne przywracanie do pustej bazy
+      const incomingEnvelope = {
+        version: 1,
+        data: {
+          inventory: [{ id: 'b1' }, { id: 'b2' }],
+          customRecipes: [{ id: 'r1' }],
+          sessions: [{ id: 's1' }, { id: 's2' }, { id: 's3' }],
+          caffeineLogs: [{ id: 'c1' }],
+        },
+      };
+
+      const simClean: BackupRestoreSimulationResult = simulateBackupRestore(incomingEnvelope, {
+        inventory: 0,
+        recipes: 0,
+        sessions: 0,
+        caffeineLogs: 0,
+      });
+      const conflict: BackupRestoreConflictType = simClean.conflictType;
+      expect(conflict).toBe('none');
+      expect(simClean.canRestoreSafely).toBe(true);
+      expect(simClean.totalIncomingRecords).toBe(7);
+      expect(simClean.itemsToInsert).toBe(7);
+      expect(simClean.itemsToUpdate).toBe(0);
+      expect(simClean.recordsBreakdown.inventory).toBe(2);
+      expect(simClean.recordsBreakdown.recipes).toBe(1);
+      expect(simClean.recordsBreakdown.sessions).toBe(3);
+      expect(simClean.summaryPl).toContain('7 do wstawienia');
+
+      // 2. Przywracanie z nakładającymi się rekordami (merge / id_collision)
+      const simMerge = simulateBackupRestore(incomingEnvelope, {
+        inventory: 2,
+        recipes: 1,
+        sessions: 1,
+        caffeineLogs: 0,
+      });
+      expect(simMerge.conflictType).toBe('id_collision');
+      expect(simMerge.canRestoreSafely).toBe(true);
+      expect(simMerge.itemsToUpdate).toBe(4);
+      expect(simMerge.itemsToInsert).toBe(3);
+      expect(simMerge.recommendationPl).toContain('trybie łączenia');
+
+      // 3. Niezgodny schemat przyszłości (np. version 99)
+      const futureEnv = { version: 99, data: { inventory: [{ id: '1' }] } };
+      const simFuture = simulateBackupRestore(futureEnv);
+      expect(simFuture.conflictType).toBe('schema_mismatch');
+      expect(simFuture.canRestoreSafely).toBe(false);
+      expect(simFuture.recommendationEn).toContain('Unsupported schema');
+
+      // 4. Pusty ładunek lub null
+      const simEmpty = simulateBackupRestore({ data: {} });
+      expect(simEmpty.conflictType).toBe('empty_payload');
+      expect(simEmpty.canRestoreSafely).toBe(false);
+
+      const simNull = simulateBackupRestore(null);
+      expect(simNull.conflictType).toBe('empty_payload');
+      expect(simNull.canRestoreSafely).toBe(false);
+      const resType: BackupRestoreSimulationResult = simNull;
+      expect(resType.summaryEn).toBeTruthy();
     });
   });
 });

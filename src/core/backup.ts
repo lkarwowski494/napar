@@ -2101,3 +2101,160 @@ export function detectBackupDuplicates(candidate: unknown): BackupDuplicateRepor
   };
 }
 
+export type BackupRestoreConflictType = 'none' | 'schema_mismatch' | 'id_collision' | 'empty_payload';
+
+export interface BackupRestoreSimulationResult {
+  canRestoreSafely: boolean;
+  conflictType: BackupRestoreConflictType;
+  itemsToInsert: number;
+  itemsToUpdate: number;
+  totalIncomingRecords: number;
+  recordsBreakdown: {
+    inventory: number;
+    recipes: number;
+    sessions: number;
+    caffeineLogs: number;
+  };
+  recommendationPl: string;
+  recommendationEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Symuluje proces przywracania kopii zapasowej w trybie podglądu (dry-run).
+ * Szacuje liczbę nowych i aktualizowanych wpisów oraz wykrywa potencjalne kolizje przed wykonaniem transakcji.
+ */
+export function simulateBackupRestore(
+  backupEnvelope?: unknown,
+  currentRecordCounts?: {
+    inventory?: number;
+    recipes?: number;
+    sessions?: number;
+    caffeineLogs?: number;
+  } | null
+): BackupRestoreSimulationResult {
+  if (!backupEnvelope || typeof backupEnvelope !== 'object') {
+    return {
+      canRestoreSafely: false,
+      conflictType: 'empty_payload',
+      itemsToInsert: 0,
+      itemsToUpdate: 0,
+      totalIncomingRecords: 0,
+      recordsBreakdown: {
+        inventory: 0,
+        recipes: 0,
+        sessions: 0,
+        caffeineLogs: 0,
+      },
+      recommendationPl: 'Uszkodzony lub pusty plik kopii zapasowej — operacja anulowana.',
+      recommendationEn: 'Corrupted or empty backup envelope — restore aborted.',
+      summaryPl: 'Symulacja przywracania: błąd (pusty ładunek kopii).',
+      summaryEn: 'Restore simulation: error (empty backup payload).',
+    };
+  }
+
+  const env = backupEnvelope as any;
+  const version = typeof env.version === 'number' ? env.version : typeof env.schemaVersion === 'number' ? env.schemaVersion : 1;
+
+  if (version > 5) {
+    return {
+      canRestoreSafely: false,
+      conflictType: 'schema_mismatch',
+      itemsToInsert: 0,
+      itemsToUpdate: 0,
+      totalIncomingRecords: 0,
+      recordsBreakdown: {
+        inventory: 0,
+        recipes: 0,
+        sessions: 0,
+        caffeineLogs: 0,
+      },
+      recommendationPl: `Nieobsługiwany schemat kopii v${version}. Zaktualizuj aplikację Napar do najnowszej wersji.`,
+      recommendationEn: `Unsupported schema v${version}. Please update Napar app to the latest version.`,
+      summaryPl: `Symulacja przywracania: niezgodność wersji schematu (v${version}).`,
+      summaryEn: `Restore simulation: schema mismatch (v${version}).`,
+    };
+  }
+
+  const data = env.data || env.state || env;
+  const getCount = (arr: unknown) => (Array.isArray(arr) ? arr.length : 0);
+
+  const inventoryCount = getCount(data.inventory || data.beans);
+  const recipesCount = getCount(data.customRecipes || data.recipes);
+  const sessionsCount = getCount(data.sessions || data.brewSessions || data.brewLogs);
+  const caffeineCount = getCount(data.caffeineLogs || data.caffeine);
+
+  const totalIncomingRecords = inventoryCount + recipesCount + sessionsCount + caffeineCount;
+
+  if (totalIncomingRecords === 0) {
+    return {
+      canRestoreSafely: false,
+      conflictType: 'empty_payload',
+      itemsToInsert: 0,
+      itemsToUpdate: 0,
+      totalIncomingRecords: 0,
+      recordsBreakdown: {
+        inventory: 0,
+        recipes: 0,
+        sessions: 0,
+        caffeineLogs: 0,
+      },
+      recommendationPl: 'Kopia zapasowa nie zawiera żadnych rekordów danych.',
+      recommendationEn: 'Backup envelope contains zero data records.',
+      summaryPl: 'Symulacja przywracania: brak rekordów w pliku.',
+      summaryEn: 'Restore simulation: no records found in file.',
+    };
+  }
+
+  const existingTotal =
+    (currentRecordCounts?.inventory || 0) +
+    (currentRecordCounts?.recipes || 0) +
+    (currentRecordCounts?.sessions || 0) +
+    (currentRecordCounts?.caffeineLogs || 0);
+
+  let itemsToUpdate = 0;
+  let itemsToInsert = totalIncomingRecords;
+  let conflictType: BackupRestoreConflictType = 'none';
+
+  if (existingTotal > 0) {
+    itemsToUpdate = Math.min(totalIncomingRecords, existingTotal);
+    itemsToInsert = Math.max(0, totalIncomingRecords - itemsToUpdate);
+    conflictType = itemsToUpdate > 0 ? 'id_collision' : 'none';
+  }
+
+  const canRestoreSafely = true;
+
+  let recommendationPl = '';
+  let recommendationEn = '';
+
+  if (conflictType === 'id_collision') {
+    recommendationPl = `Wykryto ${itemsToUpdate} potencjalnie nakładających się rekordów. Rekordy zostaną zaktualizowane w trybie łączenia (merge).`;
+    recommendationEn = `Detected ${itemsToUpdate} potentially overlapping records. Records will be merged and updated.`;
+  } else {
+    recommendationPl = `Wszystkie ${totalIncomingRecords} rekordów zostanie zaimportowanych jako nowe wpisy.`;
+    recommendationEn = `All ${totalIncomingRecords} records will be imported as new items.`;
+  }
+
+  const summaryPl = `Symulacja przywracania: ${itemsToInsert} do wstawienia, ${itemsToUpdate} do aktualizacji (łącznie ${totalIncomingRecords} rekordów). ${recommendationPl}`;
+  const summaryEn = `Restore simulation: ${itemsToInsert} to insert, ${itemsToUpdate} to update (${totalIncomingRecords} total records). ${recommendationEn}`;
+
+  return {
+    canRestoreSafely,
+    conflictType,
+    itemsToInsert,
+    itemsToUpdate,
+    totalIncomingRecords,
+    recordsBreakdown: {
+      inventory: inventoryCount,
+      recipes: recipesCount,
+      sessions: sessionsCount,
+      caffeineLogs: caffeineCount,
+    },
+    recommendationPl,
+    recommendationEn,
+    summaryPl,
+    summaryEn,
+  };
+}
+
