@@ -2307,3 +2307,174 @@ export function compareTeaCategories(
     comparisonSummaryEn,
   };
 }
+
+
+// ============================================================================
+// TASK-P100-06-TRE: Origin Brew Method Recommender (Rekomendator metod dla terroir)
+// ============================================================================
+
+export interface OriginBrewMethodMatch {
+  methodId: string;
+  methodNamePl: string;
+  methodNameEn: string;
+  suitabilityScore: number;
+  recommendedWaterTempCelsius: number;
+  sensoryFocusPl: string;
+  sensoryFocusEn: string;
+}
+
+export interface OriginBrewRecommendation {
+  originId: string;
+  country: string;
+  countryCode: string;
+  primaryFlavorProfile: string;
+  recommendedMethods: OriginBrewMethodMatch[];
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function recommendBrewMethodsForOrigin(
+  originIdOrCode: string | undefined | null,
+  lang: 'pl' | 'en' | string = 'pl'
+): OriginBrewRecommendation | null {
+  if (!originIdOrCode || typeof originIdOrCode !== 'string' || !originIdOrCode.trim()) {
+    return null;
+  }
+
+  const originGuide = getCoffeeOriginGuide(originIdOrCode, lang);
+  if (!originGuide) return null;
+
+  const isEn = typeof lang === 'string' && lang.trim().toLowerCase().startsWith('en');
+  const code = originGuide.countryCode.toUpperCase();
+
+  const methods: OriginBrewMethodMatch[] = [];
+
+  if (code === 'ET') {
+    methods.push({
+      methodId: 'v60',
+      methodNamePl: 'Drip V60',
+      methodNameEn: 'V60 Pour Over',
+      suitabilityScore: 98,
+      recommendedWaterTempCelsius: 94,
+      sensoryFocusPl: 'Ekspozycja eterycznych nut kwiatowych jaśminu i rześkiej cytrusowości bergamotki.',
+      sensoryFocusEn: 'Highlights delicate jasmine florals and vibrant bergamot citrus acidity.',
+    });
+    methods.push({
+      methodId: 'chemex',
+      methodNamePl: 'Chemex',
+      methodNameEn: 'Chemex',
+      suitabilityScore: 92,
+      recommendedWaterTempCelsius: 93,
+      sensoryFocusPl: 'Krystaliczna czystość naparu i wyeksponowanie lekkiego, herbacianego body.',
+      sensoryFocusEn: 'Crystalline cup clarity accentuating light, tea-like body.',
+    });
+    methods.push({
+      methodId: 'aeropress',
+      methodNamePl: 'AeroPress (Inverted)',
+      methodNameEn: 'AeroPress (Inverted)',
+      suitabilityScore: 88,
+      recommendedWaterTempCelsius: 90,
+      sensoryFocusPl: 'Soczyste owocowe nuty brzoskwini z delikatną, jedwabistą teksturą.',
+      sensoryFocusEn: 'Juicy stone fruit sweetness with a smooth, velvety mouthfeel.',
+    });
+  } else if (code === 'KE') {
+    methods.push({
+      methodId: 'v60',
+      methodNamePl: 'Drip V60',
+      methodNameEn: 'V60 Pour Over',
+      suitabilityScore: 98,
+      recommendedWaterTempCelsius: 95,
+      sensoryFocusPl: 'Intensywna kwasowość czarnej porzeczki, żurawiny i głęboka soczystość.',
+      sensoryFocusEn: 'Explosive blackcurrant and cranberry acidity with mouth-watering juiciness.',
+    });
+    methods.push({
+      methodId: 'kalita_wave',
+      methodNamePl: 'Kalita Wave',
+      methodNameEn: 'Kalita Wave',
+      suitabilityScore: 90,
+      recommendedWaterTempCelsius: 93,
+      sensoryFocusPl: 'Płaskie dno drippera stabilizuje ekstrakcję i łagodzi ostrość kwasu fosforowego.',
+      sensoryFocusEn: 'Flat-bottom geometry evens out extraction, balancing phosphoric brightness.',
+    });
+    methods.push({
+      methodId: 'siphon',
+      methodNamePl: 'Syfon Próżniowy',
+      methodNameEn: 'Vacuum Siphon',
+      suitabilityScore: 88,
+      recommendedWaterTempCelsius: 93,
+      sensoryFocusPl: 'Znakomita klarowność i głębia aromatów czerwonych owoców.',
+      sensoryFocusEn: 'Superb aromatics, high extraction clarity, and lingering berry finish.',
+    });
+  } else if (code === 'BR') {
+    methods.push({
+      methodId: 'espresso',
+      methodNamePl: 'Espresso',
+      methodNameEn: 'Espresso',
+      suitabilityScore: 96,
+      recommendedWaterTempCelsius: 91,
+      sensoryFocusPl: 'Gęsta crema, nuty ciemnej czekolady, orzechów laskowych i wysoka słodycz.',
+      sensoryFocusEn: 'Rich viscous crema, dark chocolate, hazelnut, and low perceived acidity.',
+    });
+    methods.push({
+      methodId: 'french_press',
+      methodNamePl: 'French Press',
+      methodNameEn: 'French Press',
+      sensoryFocusPl: 'Pełne body, niska kwasowość i wyrazista słodycz prażonych migdałów.',
+      sensoryFocusEn: 'Heavy mouthfeel, minimal acidity, and pleasant roasted almond sweetness.',
+      suitabilityScore: 92,
+      recommendedWaterTempCelsius: 92,
+    });
+    methods.push({
+      methodId: 'moka_pot',
+      methodNamePl: 'Kawiarka (Moka Pot)',
+      methodNameEn: 'Moka Pot',
+      suitabilityScore: 88,
+      recommendedWaterTempCelsius: 90,
+      sensoryFocusPl: 'Mocny, deserowy napar idealnie komponujący się ze spienionym mlekiem.',
+      sensoryFocusEn: 'Bold, dessert-like cup ideal as a standalone brew or milk-based beverage.',
+    });
+  } else {
+    // Profil uniwersalny (Kolumbia, Gwatemala, Kostaryka, Panama, itp.)
+    methods.push({
+      methodId: 'v60',
+      methodNamePl: 'Drip V60',
+      methodNameEn: 'V60 Pour Over',
+      suitabilityScore: 94,
+      recommendedWaterTempCelsius: 92,
+      sensoryFocusPl: 'Zrównoważona słodycz karmelu, cytrusowa kwasowość i wysoka przejrzystość.',
+      sensoryFocusEn: 'Balanced caramel sweetness, crisp citrus notes, and high transparency.',
+    });
+    methods.push({
+      methodId: 'aeropress',
+      methodNamePl: 'AeroPress',
+      methodNameEn: 'AeroPress',
+      suitabilityScore: 91,
+      recommendedWaterTempCelsius: 91,
+      sensoryFocusPl: 'Uniwersalna ekstrakcja uwypuklająca słodkie nuty owoców pestkowych i kakao.',
+      sensoryFocusEn: 'Versatile extraction accentuating stone fruit sweetness and cocoa nibs.',
+    });
+    methods.push({
+      methodId: 'switch',
+      methodNamePl: 'Hario Switch (Hybryda)',
+      methodNameEn: 'Hario Switch (Hybrid)',
+      suitabilityScore: 88,
+      recommendedWaterTempCelsius: 92,
+      sensoryFocusPl: 'Połączenie słodyczy immersji i czystości papierowego filtra.',
+      sensoryFocusEn: 'Combination of immersion sweetness and paper filter clarity.',
+    });
+  }
+
+  const countryName = originGuide.country;
+  const summaryPl = `Rekomendowane metody parzenia dla terroir ${countryName} (${originGuide.flavorProfile}): na pierwszym miejscu ${methods[0].methodNamePl} (dopasowanie: ${methods[0].suitabilityScore}%).`;
+  const summaryEn = `Recommended brewing methods for ${countryName} terroir (${originGuide.flavorProfile}): top pick is ${methods[0].methodNameEn} (suitability: ${methods[0].suitabilityScore}%).`;
+
+  return {
+    originId: originGuide.id,
+    country: originGuide.country,
+    countryCode: originGuide.countryCode,
+    primaryFlavorProfile: originGuide.flavorProfile,
+    recommendedMethods: methods,
+    summaryPl,
+    summaryEn,
+  };
+}

@@ -56,6 +56,9 @@ import {
   compareTeaCategories,
   TeaCategoryComparison,
   TeaCategoryComparisonItem,
+  recommendBrewMethodsForOrigin,
+  OriginBrewRecommendation,
+  OriginBrewMethodMatch,
 } from '../knowledge-data';
 
 describe('Baza Wiedzy: Odmiany Botaniczne Kawy (COFFEE_VARIETIES)', () => {
@@ -1561,6 +1564,33 @@ describe('Baza Wiedzy: Klasyfikacja Herbaty Rzemieślniczej (TEA_CATEGORIES)', (
     expect(compareTeaCategories(null, 'tea-black')).toBeNull();
     expect(compareTeaCategories('unknown-tea', 'tea-black')).toBeNull();
     expect(compareTeaCategories('', '')).toBeNull();
+  });
+
+  test('TASK-P100-06-TRE: recommendBrewMethodsForOrigin dobiera optymalne metody parzenia dla terroir', () => {
+    // 1. Etiopia -> Drip V60 (kwiaty, bergamotka, wysoka temperatura 94°C)
+    const ethiopiaRec: OriginBrewRecommendation | null = recommendBrewMethodsForOrigin('ethiopia', 'pl');
+    expect(ethiopiaRec).not.toBeNull();
+    expect(ethiopiaRec?.countryCode).toBe('ET');
+    expect(ethiopiaRec?.recommendedMethods.length).toBeGreaterThanOrEqual(3);
+    const topMethod: OriginBrewMethodMatch = ethiopiaRec!.recommendedMethods[0];
+    expect(topMethod.methodId).toBe('v60');
+    expect(topMethod.suitabilityScore).toBeGreaterThanOrEqual(95);
+    expect(topMethod.recommendedWaterTempCelsius).toBe(94);
+    expect(topMethod.sensoryFocusPl).toContain('jaśmin');
+    expect(ethiopiaRec?.summaryPl).toContain('Drip V60');
+
+    // 2. Brazylia (język angielski) -> Espresso i French Press (czekolada, orzechy)
+    const brazilRec = recommendBrewMethodsForOrigin('brazil', 'en');
+    expect(brazilRec).not.toBeNull();
+    expect(brazilRec?.countryCode).toBe('BR');
+    expect(brazilRec?.recommendedMethods[0].methodId).toBe('espresso');
+    expect(brazilRec?.recommendedMethods[0].sensoryFocusEn).toContain('chocolate');
+    expect(brazilRec?.summaryEn).toContain('Espresso');
+
+    // 3. Odporność na błędy i null
+    expect(recommendBrewMethodsForOrigin(null)).toBeNull();
+    expect(recommendBrewMethodsForOrigin('')).toBeNull();
+    expect(recommendBrewMethodsForOrigin('unknown-country-404')).toBeNull();
   });
 });
 
