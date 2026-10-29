@@ -32,6 +32,9 @@ import {
   formatFlowRateProfile,
   FlowRateProfile,
   FlowRatePhase,
+  formatExtractionPressure,
+  ExtractionPressureFormat,
+  PressureZone,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -575,6 +578,49 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(fallback.gramsPerSecond).toBe(0);
       expect(fallback.formattedMetric).toBe('0.0 g/s');
       expect(fallback.phase).toBe('bloom');
+    });
+
+    test('TASK-P98-09-LOK: formatExtractionPressure formatuje ciśnienie w barach, psi i kPa oraz wyznacza strefę ciśnienia', () => {
+      // 1. Klasyczne espresso 9.0 bar (standard)
+      const classic: ExtractionPressureFormat = formatExtractionPressure(9.0);
+      expect(classic.bars).toBe(9.0);
+      expect(classic.psi).toBe(130.5);
+      expect(classic.kpa).toBe(900);
+      expect(classic.formattedMetric).toBe('9.0 bar');
+      expect(classic.formattedImperial).toBe('130.5 psi');
+      const zoneType: PressureZone = classic.zone;
+      expect(zoneType).toBe('espresso_classic');
+      expect(classic.zonePl).toContain('9 bar');
+      expect(classic.summaryPl).toContain('crema');
+
+      // 2. Nowoczesne espresso 6.0 bar (ze stringa z przecinkiem)
+      const modern = formatExtractionPressure('6,0');
+      expect(modern.zone).toBe('espresso_modern');
+      expect(modern.bars).toBe(6.0);
+      expect(modern.psi).toBeCloseTo(87.0, 1);
+      expect(modern.kpa).toBe(600);
+      expect(modern.zonePl).toContain('6–8 bar');
+
+      // 3. AeroPress (0.8 bar)
+      const aero = formatExtractionPressure(0.8);
+      expect(aero.zone).toBe('aeropress');
+      expect(aero.zonePl).toContain('AeroPress');
+
+      // 4. Drip / grawitacja (0.0 bar)
+      const drip = formatExtractionPressure(0);
+      expect(drip.zone).toBe('gravity');
+      expect(drip.zonePl).toContain('Grawitacyjna');
+
+      // 5. Nadmierne ciśnienie (12.0 bar)
+      const over = formatExtractionPressure(12.0);
+      expect(over.zone).toBe('overpressure');
+      expect(over.zonePl).toContain('Nadmierne');
+
+      // 6. Odporność na null i ujemne
+      const fallback = formatExtractionPressure(null);
+      expect(fallback.bars).toBe(0);
+      expect(fallback.formattedMetric).toBe('0.0 bar');
+      expect(fallback.zone).toBe('gravity');
     });
   });
 });

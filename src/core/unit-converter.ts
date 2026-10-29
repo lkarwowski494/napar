@@ -891,3 +891,111 @@ export function formatFlowRateProfile(
     summaryEn,
   };
 }
+
+
+// ============================================================================
+// TASK-P98-09-LOK: Extraction Pressure Formatter (Formater ciśnienia ekstrakcji)
+// ============================================================================
+
+export type PressureZone =
+  | 'gravity'
+  | 'aeropress'
+  | 'moka_pot'
+  | 'espresso_modern'
+  | 'espresso_classic'
+  | 'overpressure';
+
+export interface ExtractionPressureFormat {
+  bars: number;
+  psi: number;
+  kpa: number;
+  formattedMetric: string;
+  formattedImperial: string;
+  zone: PressureZone;
+  zonePl: string;
+  zoneEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Formatuje i kategoryzuje ciśnienie ekstrakcji w barach, psi oraz kPa,
+ * określając strefę ciśnienia dla metod przelewowych, AeroPressu, kawiarki i espresso.
+ */
+export function formatExtractionPressure(
+  barsInput: number | string | null | undefined,
+  options?: { precision?: number }
+): ExtractionPressureFormat {
+  let rawBars = 0;
+  if (typeof barsInput === 'number' && Number.isFinite(barsInput) && !Object.is(barsInput, -0)) {
+    rawBars = barsInput;
+  } else if (typeof barsInput === 'string') {
+    const parsed = parseFloat(barsInput.trim().replace(',', '.'));
+    if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+      rawBars = parsed;
+    }
+  }
+
+  const safeBars = Math.max(0, Math.min(25, rawBars));
+  const precision =
+    typeof options?.precision === 'number' && Number.isFinite(options.precision) && options.precision >= 0
+      ? Math.min(3, Math.round(options.precision))
+      : 1;
+
+  const psi = Math.round(safeBars * 14.50377 * 10) / 10;
+  const kpa = Math.round(safeBars * 100 * 10) / 10;
+
+  const formattedMetric = `${safeBars.toFixed(precision)} bar`;
+  const formattedImperial = `${psi.toFixed(precision)} psi`;
+
+  let zone: PressureZone = 'gravity';
+  let zonePl = 'Grawitacyjna / Immersyjna (Drip, Chemex, Syfon)';
+  let zoneEn = 'Gravity / Immersion (Drip, Chemex, Siphon)';
+  let summaryPl = `Ciśnienie ${formattedMetric} (${formattedImperial}): swobodny spływ grawitacyjny bez ciśnienia tłoka.`;
+  let summaryEn = `Pressure ${formattedMetric} (${formattedImperial}): atmospheric gravity drawdown without piston pressure.`;
+
+  if (safeBars > 10.0) {
+    zone = 'overpressure';
+    zonePl = 'Nadmierne ciśnienie (ryzyko kanałowania i zatkania sitka)';
+    zoneEn = 'Overpressure (channeling and choking risk)';
+    summaryPl = `Ciśnienie ${formattedMetric} (${formattedImperial}): zbyt wysoki opór złoża, zmiel grubiej.`;
+    summaryEn = `Pressure ${formattedMetric} (${formattedImperial}): excessive puck resistance, grind coarser.`;
+  } else if (safeBars >= 8.5) {
+    zone = 'espresso_classic';
+    zonePl = 'Klasyczne espresso 9 bar (standard tradycyjny)';
+    zoneEn = 'Classic espresso 9 bar (traditional standard)';
+    summaryPl = `Ciśnienie ${formattedMetric} (${formattedImperial}): wzorcowa crema i wysoka gęstość body.`;
+    summaryEn = `Pressure ${formattedMetric} (${formattedImperial}): benchmark crema and rich viscous body.`;
+  } else if (safeBars >= 5.0) {
+    zone = 'espresso_modern';
+    zonePl = 'Nowoczesne espresso specialty 6–8 bar';
+    zoneEn = 'Modern specialty espresso 6–8 bar';
+    summaryPl = `Ciśnienie ${formattedMetric} (${formattedImperial}): wysoka słodycz, mniejsza gorycz i czystsza kwasowość.`;
+    summaryEn = `Pressure ${formattedMetric} (${formattedImperial}): enhanced sweetness, low bitterness, and clean acidity.`;
+  } else if (safeBars >= 1.5) {
+    zone = 'moka_pot';
+    zonePl = 'Kawiarka ciśnieniowa (Moka Pot)';
+    zoneEn = 'Moka pot steam pressure';
+    summaryPl = `Ciśnienie ${formattedMetric} (${formattedImperial}): umiarkowane ciśnienie pary wodnej.`;
+    summaryEn = `Pressure ${formattedMetric} (${formattedImperial}): moderate steam extraction pressure.`;
+  } else if (safeBars >= 0.3) {
+    zone = 'aeropress';
+    zonePl = 'AeroPress / Ręczny docisk tłoka';
+    zoneEn = 'AeroPress / Manual piston press';
+    summaryPl = `Ciśnienie ${formattedMetric} (${formattedImperial}): delikatna kompresja ręczna.`;
+    summaryEn = `Pressure ${formattedMetric} (${formattedImperial}): gentle manual plunger compression.`;
+  }
+
+  return {
+    bars: Math.round(safeBars * 100) / 100,
+    psi,
+    kpa,
+    formattedMetric,
+    formattedImperial,
+    zone,
+    zonePl,
+    zoneEn,
+    summaryPl,
+    summaryEn,
+  };
+}
