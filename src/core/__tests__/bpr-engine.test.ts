@@ -32,6 +32,11 @@ import {
   calculateBrewConsistencyIndex,
   BrewConsistencyIndex,
   BrewConsistencyGrade,
+  generateExtractionTroubleshootingGuide,
+  ExtractionTroubleshootingGuide,
+  TroubleshootingAction,
+  TroubleshootingActionType,
+  TroubleshootingSymptom,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -1318,6 +1323,60 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(['variable', 'erratic', 'consistent']).toContain(res.grade);
       expect(res.summaryPl).toBeDefined();
       expect(res.summaryEn).toBeDefined();
+    });
+  });
+
+  describe('TASK-P97-04-SZT: generateExtractionTroubleshootingGuide', () => {
+    it('obsługuje pustą tablicę lub brak symptomów zwracając status optimal', () => {
+      const guide = generateExtractionTroubleshootingGuide({ symptoms: [] });
+      expect(guide.primaryIssue).toBe('optimal');
+      expect(guide.severity).toBe('none');
+      expect(guide.confidenceScore).toBe(100);
+      expect(guide.actions).toHaveLength(0);
+      expect(guide.recommendedNextBrewAdjustments.grindStepDelta).toBe(0);
+      expect(guide.recommendedNextBrewAdjustments.waterTempDeltaC).toBe(0);
+      expect(guide.recommendedNextBrewAdjustments.doseDeltaGrams).toBe(0);
+    });
+
+    it('obsługuje null/undefined options bezpiecznie', () => {
+      // @ts-expect-error testowanie odporności na null
+      const guide = generateExtractionTroubleshootingGuide(null);
+      expect(guide.primaryIssue).toBe('optimal');
+      expect(guide.severity).toBe('none');
+      expect(guide.actions).toEqual([]);
+    });
+
+    it('diagnozuje niedoekstrakcję przy kwaśnym smaku lub szybkim przepływie', () => {
+      const symptoms: TroubleshootingSymptom[] = ['sour', 'fast_drawdown'];
+      const guide: ExtractionTroubleshootingGuide = generateExtractionTroubleshootingGuide({ symptoms });
+      expect(guide.primaryIssue).toBe('underextraction');
+      expect(guide.severity).toBe('moderate');
+      expect(guide.recommendedNextBrewAdjustments.grindStepDelta).toBeLessThan(0);
+      expect(guide.recommendedNextBrewAdjustments.waterTempDeltaC).toBeGreaterThan(0);
+      const grindAction = guide.actions.find(a => a.targetVariable === 'grind');
+      expect(grindAction).toBeDefined();
+      expect(grindAction?.direction).toBe('finer');
+    });
+
+    it('diagnozuje nadekstrakcję przy goryczy i ściągającym smaku', () => {
+      const symptoms: TroubleshootingSymptom[] = ['bitter', 'astringent'];
+      const guide = generateExtractionTroubleshootingGuide({ symptoms });
+      expect(guide.primaryIssue).toBe('overextraction');
+      expect(guide.recommendedNextBrewAdjustments.grindStepDelta).toBeGreaterThan(0);
+      expect(guide.recommendedNextBrewAdjustments.waterTempDeltaC).toBeLessThan(0);
+      const grindAction: TroubleshootingAction | undefined = guide.actions.find(a => a.targetVariable === 'grind');
+      expect(grindAction?.direction).toBe('coarser');
+      const actionType: TroubleshootingActionType = 'adjust_grind';
+      expect(guide.actions.map(a => a.actionType)).toContain(actionType);
+    });
+
+    it('diagnozuje kanałowanie lub niespójność przy sprzecznych symptomach (sour + bitter)', () => {
+      const guide = generateExtractionTroubleshootingGuide({
+        symptoms: ['sour', 'bitter', 'channeling'],
+      });
+      expect(['channeling', 'imbalanced']).toContain(guide.primaryIssue);
+      expect(guide.severity).toBe('severe');
+      expect(guide.actions.some(a => a.targetVariable === 'technique' || a.actionType === 'adjust_pouring_technique')).toBe(true);
     });
   });
 });

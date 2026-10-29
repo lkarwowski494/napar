@@ -1903,3 +1903,216 @@ export function calculateBrewConsistencyIndex(
     summaryEn,
   };
 }
+
+
+// ============================================================================
+// TASK-P97-04-SZT: Extraction Troubleshooting Engine (Przewodnik ekstrakcji)
+// ============================================================================
+
+export type TroubleshootingSymptom =
+  | 'sour'
+  | 'bitter'
+  | 'astringent'
+  | 'weak'
+  | 'harsh'
+  | 'channeling'
+  | 'fast_drawdown'
+  | 'slow_drawdown';
+
+export type TroubleshootingActionType =
+  | 'adjust_grind'
+  | 'adjust_water_temp'
+  | 'adjust_ratio'
+  | 'adjust_pouring_technique'
+  | 'extend_bloom';
+
+export interface TroubleshootingAction {
+  actionType: TroubleshootingActionType;
+  priority: number;
+  targetVariable: 'grind' | 'temperature' | 'ratio' | 'technique' | 'bloom';
+  direction: 'finer' | 'coarser' | 'increase' | 'decrease' | 'gentler' | 'agitate_more';
+  descriptionPl: string;
+  descriptionEn: string;
+}
+
+export interface ExtractionTroubleshootingGuide {
+  primaryIssue: 'underextraction' | 'overextraction' | 'channeling' | 'imbalanced' | 'optimal';
+  severity: 'mild' | 'moderate' | 'severe' | 'none';
+  confidenceScore: number;
+  actions: TroubleshootingAction[];
+  diagnosisPl: string;
+  diagnosisEn: string;
+  recommendedNextBrewAdjustments: {
+    grindStepDelta: number;
+    waterTempDeltaC: number;
+    doseDeltaGrams: number;
+  };
+}
+
+export function generateExtractionTroubleshootingGuide(options?: {
+  symptoms?: TroubleshootingSymptom[];
+  brewMethod?: string;
+  currentTempC?: number;
+  currentRatio?: number;
+}): ExtractionTroubleshootingGuide {
+  const safeSymptoms = Array.isArray(options?.symptoms)
+    ? options!.symptoms.filter((s): s is TroubleshootingSymptom =>
+        typeof s === 'string' &&
+        [
+          'sour',
+          'bitter',
+          'astringent',
+          'weak',
+          'harsh',
+          'channeling',
+          'fast_drawdown',
+          'slow_drawdown',
+        ].includes(s)
+      )
+    : [];
+
+  if (safeSymptoms.length === 0) {
+    return {
+      primaryIssue: 'optimal',
+      severity: 'none',
+      confidenceScore: 100,
+      actions: [],
+      diagnosisPl: 'Profil ekstrakcji zrównoważony. Brak konieczności wprowadzania korekt.',
+      diagnosisEn: 'Balanced extraction profile. No corrective adjustments needed.',
+      recommendedNextBrewAdjustments: {
+        grindStepDelta: 0,
+        waterTempDeltaC: 0,
+        doseDeltaGrams: 0,
+      },
+    };
+  }
+
+  const hasSour = safeSymptoms.includes('sour');
+  const hasFast = safeSymptoms.includes('fast_drawdown');
+  const hasBitter = safeSymptoms.includes('bitter');
+  const hasAstringent = safeSymptoms.includes('astringent');
+  const hasSlow = safeSymptoms.includes('slow_drawdown');
+  const hasChanneling = safeSymptoms.includes('channeling');
+  const hasWeak = safeSymptoms.includes('weak');
+  const hasHarsh = safeSymptoms.includes('harsh');
+
+  const underPoints = (hasSour ? 2 : 0) + (hasFast ? 1 : 0) + (hasWeak ? 1 : 0);
+  const overPoints = (hasBitter ? 2 : 0) + (hasAstringent ? 2 : 0) + (hasSlow ? 1 : 0) + (hasHarsh ? 1 : 0);
+
+  let primaryIssue: ExtractionTroubleshootingGuide['primaryIssue'] = 'imbalanced';
+  const actions: TroubleshootingAction[] = [];
+  let grindStepDelta = 0;
+  let waterTempDeltaC = 0;
+  let doseDeltaGrams = 0;
+
+  if (hasChanneling || (underPoints > 0 && overPoints > 0)) {
+    primaryIssue = hasChanneling ? 'channeling' : 'imbalanced';
+    actions.push({
+      actionType: 'adjust_pouring_technique',
+      priority: 1,
+      targetVariable: 'technique',
+      direction: 'gentler',
+      descriptionPl: 'Polewaj wodą delikatniej, jednostajnym ruchem spiralnym, unikając zalewania ścianek drippera.',
+      descriptionEn: 'Pour water more gently in steady concentric spirals, avoiding direct contact with filter walls.',
+    });
+    actions.push({
+      actionType: 'extend_bloom',
+      priority: 2,
+      targetVariable: 'bloom',
+      direction: 'increase',
+      descriptionPl: 'Zwiększ ilość wody na preinfuzję i wydłuż czas bloomu do 45 sekund dla pełnego zwilżenia.',
+      descriptionEn: 'Increase bloom water volume and extend pre-infusion to 45 seconds for thorough saturation.',
+    });
+    grindStepDelta = 0;
+    waterTempDeltaC = 0;
+  } else if (underPoints > overPoints) {
+    primaryIssue = 'underextraction';
+    grindStepDelta = -1;
+    waterTempDeltaC = 2;
+    actions.push({
+      actionType: 'adjust_grind',
+      priority: 1,
+      targetVariable: 'grind',
+      direction: 'finer',
+      descriptionPl: 'Zmniejsz stopień mielenia (o 1-2 kliki drobniej), aby zwiększyć pole powierzchni i opór złoża.',
+      descriptionEn: 'Grind finer (1-2 clicks finer) to increase extraction surface and bed resistance.',
+    });
+    actions.push({
+      actionType: 'adjust_water_temp',
+      priority: 2,
+      targetVariable: 'temperature',
+      direction: 'increase',
+      descriptionPl: 'Podnieś temperaturę wody o 2°C, aby przyspieszyć wypłukiwanie związków słodkich.',
+      descriptionEn: 'Raise water temperature by 2°C to enhance extraction of sweet aromatic compounds.',
+    });
+    if (hasWeak) {
+      actions.push({
+        actionType: 'adjust_ratio',
+        priority: 3,
+        targetVariable: 'ratio',
+        direction: 'increase',
+        descriptionPl: 'Zwiększ dozę kawy o 0.5g lub skróć proporcję wody dla pełniejszego body.',
+        descriptionEn: 'Increase coffee dose by 0.5g or tighten brew ratio for greater body.',
+      });
+      doseDeltaGrams = 0.5;
+    }
+  } else {
+    primaryIssue = 'overextraction';
+    grindStepDelta = 1;
+    waterTempDeltaC = -2;
+    actions.push({
+      actionType: 'adjust_grind',
+      priority: 1,
+      targetVariable: 'grind',
+      direction: 'coarser',
+      descriptionPl: 'Zwiększ grubość mielenia (o 1-2 kliki grubiej), aby zapobiec nadekstrakcji tanin i pyłu.',
+      descriptionEn: 'Grind coarser (1-2 clicks coarser) to prevent excessive tannin extraction and clogging.',
+    });
+    actions.push({
+      actionType: 'adjust_water_temp',
+      priority: 2,
+      targetVariable: 'temperature',
+      direction: 'decrease',
+      descriptionPl: 'Obniż temperaturę wody o 2-3°C w celu złagodzenia goryczy i suchości.',
+      descriptionEn: 'Lower water temperature by 2-3°C to soften harsh bitterness and dry astringency.',
+    });
+  }
+
+  const severityCount = safeSymptoms.length;
+  const severity: ExtractionTroubleshootingGuide['severity'] =
+    severityCount >= 3 ? 'severe' : severityCount >= 2 ? 'moderate' : 'mild';
+
+  const confidenceScore = Math.min(95, 75 + safeSymptoms.length * 5);
+
+  const diagnosisPl =
+    primaryIssue === 'underextraction'
+      ? 'Wykryto niedoekstrakcję: dominacja nieprzyjemnej kwasowości lub zbyt szybki spływ wody.'
+      : primaryIssue === 'overextraction'
+      ? 'Wykryto nadekstrakcję: dominacja goryczy, ściągającego posmaku lub wolny spływ.'
+      : primaryIssue === 'channeling'
+      ? 'Wykryto kanałowanie złoża: woda omija część kawy drążąc tunele przez nierównomierny przemiał lub polewanie.'
+      : 'Wykryto niespójną ekstrakcję z mieszanymi wadami sensorycznymi.';
+
+  const diagnosisEn =
+    primaryIssue === 'underextraction'
+      ? 'Underextraction detected: prominent sourness or excessively fast drawdown.'
+      : primaryIssue === 'overextraction'
+      ? 'Overextraction detected: bitter, dry or astringent notes and slow drawdown.'
+      : primaryIssue === 'channeling'
+      ? 'Channeling detected: water streams through bed cracks leading to uneven extraction.'
+      : 'Imbalanced extraction detected with conflicting sensory notes.';
+
+  return {
+    primaryIssue,
+    severity,
+    confidenceScore,
+    actions,
+    diagnosisPl,
+    diagnosisEn,
+    recommendedNextBrewAdjustments: {
+      grindStepDelta,
+      waterTempDeltaC,
+      doseDeltaGrams,
+    },
+  };
+}
