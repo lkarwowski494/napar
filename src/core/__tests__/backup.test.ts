@@ -26,6 +26,9 @@ import {
   RelationalOrphanItem,
   computeBackupChecksum,
   BackupChecksumResult,
+  detectBackupDuplicates,
+  BackupDuplicateReport,
+  BackupDuplicateItem,
   sanitizeBackupEnvelope,
   estimateBackupFileSize,
   BackupFileSizeEstimate,
@@ -1095,6 +1098,60 @@ describe('Backup Engine (Apps4Brew SEC-09)', () => {
       expect(empty.checksumHex).toBe('00000000');
       expect(empty.bytesHashed).toBe(0);
       expect(empty.recordCount).toBe(0);
+    });
+
+    it('TASK-P102-05-ARC: detectBackupDuplicates wykrywa zduplikowane rekordy w kopii zapasowej', () => {
+      // 1. Kopia z duplikatami (powtórzone ID oraz ten sam model kawy z innym ID)
+      const dirtyBackup = {
+        state: {
+          inventory: [
+            { id: 'inv-1', name: 'Ethiopia Yirgacheffe', brand: 'Specialty Roastery' },
+            { id: 'inv-1', name: 'Ethiopia Yirgacheffe', brand: 'Specialty Roastery' }, // duplicate ID
+            { id: 'inv-2', name: 'Ethiopia Yirgacheffe', brand: 'Specialty Roastery' }, // duplicate content
+            { id: 'inv-3', name: 'Colombia Geisha', brand: 'Origin Roasters' },
+          ],
+          customRecipes: [
+            { id: 'rec-1', name: 'V60 4:6 Standard', method: 'V60' },
+            { id: 'rec-2', name: 'V60 4:6 Standard', method: 'V60' }, // duplicate recipe name+method
+          ],
+          sessions: [
+            { id: 'ses-1', createdAt: '2026-10-25T10:00:00Z', recipeId: 'rec-1', doseGrams: 15 },
+            { id: 'ses-1', createdAt: '2026-10-25T10:00:00Z', recipeId: 'rec-1', doseGrams: 15 }, // duplicate ID
+          ],
+          caffeineLogs: [],
+        },
+      };
+
+      const report: BackupDuplicateReport = detectBackupDuplicates(dirtyBackup);
+      expect(report.hasDuplicates).toBe(true);
+      expect(report.totalDuplicateCount).toBeGreaterThan(0);
+      expect(report.duplicateInventoryCount).toBeGreaterThan(0);
+      expect(report.duplicateRecipesCount).toBe(1);
+      expect(report.duplicateSessionsCount).toBe(1);
+      expect(report.summaryPl).toContain('Wykryto');
+      expect(report.duplicates.length).toBe(report.totalDuplicateCount);
+      const firstDup: BackupDuplicateItem = report.duplicates[0];
+      expect(firstDup.collection).toBeDefined();
+
+      // 2. Czysta kopia bez duplikatów
+      const cleanBackup = {
+        state: {
+          inventory: [{ id: 'inv-1', name: 'Kenya Nyeri' }],
+          customRecipes: [{ id: 'rec-1', name: 'AeroPress Champion' }],
+          sessions: [{ id: 'ses-1' }],
+          caffeineLogs: [],
+        },
+      };
+      const cleanReport = detectBackupDuplicates(cleanBackup);
+      expect(cleanReport.hasDuplicates).toBe(false);
+      expect(cleanReport.totalDuplicateCount).toBe(0);
+      expect(cleanReport.summaryPl).toContain('Brak zduplikowanych');
+
+      // 3. Odporność na null i puste obiekty
+      const fallback = detectBackupDuplicates(null);
+      expect(fallback.hasDuplicates).toBe(false);
+      expect(fallback.totalDuplicateCount).toBe(0);
+      expect(fallback.summaryEn).toBeDefined();
     });
   });
 });

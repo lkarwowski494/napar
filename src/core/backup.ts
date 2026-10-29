@@ -1941,3 +1941,163 @@ export function computeBackupChecksum(candidate: unknown): BackupChecksumResult 
     summaryEn,
   };
 }
+
+export interface BackupDuplicateItem {
+  collection: 'inventory' | 'customRecipes' | 'sessions' | 'caffeineLogs';
+  id: string;
+  duplicateField: string;
+  duplicateValue: string;
+  occurrenceCount: number;
+}
+
+export interface BackupDuplicateReport {
+  hasDuplicates: boolean;
+  totalDuplicateCount: number;
+  duplicateInventoryCount: number;
+  duplicateRecipesCount: number;
+  duplicateSessionsCount: number;
+  duplicateCaffeineCount: number;
+  duplicates: BackupDuplicateItem[];
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function detectBackupDuplicates(candidate: unknown): BackupDuplicateReport {
+  const emptyReport: BackupDuplicateReport = {
+    hasDuplicates: false,
+    totalDuplicateCount: 0,
+    duplicateInventoryCount: 0,
+    duplicateRecipesCount: 0,
+    duplicateSessionsCount: 0,
+    duplicateCaffeineCount: 0,
+    duplicates: [],
+    summaryPl: 'Brak zduplikowanych rekordów w kopii zapasowej.',
+    summaryEn: 'No duplicate records detected in backup envelope.',
+  };
+
+  if (!candidate || typeof candidate !== 'object') {
+    return emptyReport;
+  }
+
+  const root = candidate as Record<string, unknown>;
+  const payload = (root.state && typeof root.state === 'object'
+    ? root.state
+    : root.payload && typeof root.payload === 'object'
+    ? root.payload
+    : root) as Record<string, unknown>;
+
+  const inventory = Array.isArray(payload.inventory) ? payload.inventory : [];
+  const customRecipes = Array.isArray(payload.customRecipes) ? payload.customRecipes : [];
+  const sessions = Array.isArray(payload.sessions) ? payload.sessions : [];
+  const caffeineLogs = Array.isArray(payload.caffeineLogs) ? payload.caffeineLogs : [];
+
+  const duplicates: BackupDuplicateItem[] = [];
+
+  const checkDuplicates = (
+    items: unknown[],
+    collection: 'inventory' | 'customRecipes' | 'sessions' | 'caffeineLogs',
+    contentKeyExtractor?: (item: Record<string, unknown>) => string | null
+  ) => {
+    const idCounts = new Map<string, number>();
+    const contentCounts = new Map<string, { count: number; firstId: string }>();
+
+    for (const item of items) {
+      if (!item || typeof item !== 'object') continue;
+      const rec = item as Record<string, unknown>;
+      const id = typeof rec.id === 'string' && rec.id.trim() ? rec.id.trim() : '';
+
+      if (id) {
+        idCounts.set(id, (idCounts.get(id) || 0) + 1);
+      }
+
+      if (contentKeyExtractor) {
+        const contentKey = contentKeyExtractor(rec);
+        if (contentKey) {
+          const prev = contentCounts.get(contentKey);
+          if (prev) {
+            prev.count += 1;
+          } else {
+            contentCounts.set(contentKey, { count: 1, firstId: id });
+          }
+        }
+      }
+    }
+
+    const reportedIds = new Set<string>();
+
+    for (const [id, count] of idCounts.entries()) {
+      if (count > 1) {
+        duplicates.push({
+          collection,
+          id,
+          duplicateField: 'id',
+          duplicateValue: id,
+          occurrenceCount: count,
+        });
+        reportedIds.add(id);
+      }
+    }
+
+    if (contentKeyExtractor) {
+      for (const [key, { count, firstId }] of contentCounts.entries()) {
+        if (count > 1 && !reportedIds.has(firstId)) {
+          duplicates.push({
+            collection,
+            id: firstId,
+            duplicateField: 'content_signature',
+            duplicateValue: key,
+            occurrenceCount: count,
+          });
+        }
+      }
+    }
+  };
+
+  checkDuplicates(inventory, 'inventory', (rec) => {
+    const name = typeof rec.name === 'string' ? rec.name.trim().toLowerCase() : '';
+    const brand = typeof rec.brand === 'string' ? rec.brand.trim().toLowerCase() : '';
+    return name ? `${brand}::${name}` : null;
+  });
+
+  checkDuplicates(customRecipes, 'customRecipes', (rec) => {
+    const name = typeof rec.name === 'string' ? rec.name.trim().toLowerCase() : '';
+    const method = typeof rec.method === 'string' ? rec.method.trim().toLowerCase() : '';
+    return name ? `${method}::${name}` : null;
+  });
+
+  checkDuplicates(sessions, 'sessions', (rec) => {
+    const createdAt = typeof rec.createdAt === 'string' ? rec.createdAt.trim() : '';
+    const recipeId = typeof rec.recipeId === 'string' ? rec.recipeId.trim() : '';
+    const dose = typeof rec.doseGrams === 'number' ? rec.doseGrams : '';
+    return createdAt ? `${createdAt}::${recipeId}::${dose}` : null;
+  });
+
+  checkDuplicates(caffeineLogs, 'caffeineLogs');
+
+  const duplicateInventoryCount = duplicates.filter((d) => d.collection === 'inventory').length;
+  const duplicateRecipesCount = duplicates.filter((d) => d.collection === 'customRecipes').length;
+  const duplicateSessionsCount = duplicates.filter((d) => d.collection === 'sessions').length;
+  const duplicateCaffeineCount = duplicates.filter((d) => d.collection === 'caffeineLogs').length;
+  const totalDuplicateCount = duplicates.length;
+  const hasDuplicates = totalDuplicateCount > 0;
+
+  const summaryPl = hasDuplicates
+    ? `Wykryto ${totalDuplicateCount} duplikatów w kopii zapasowej (inwentarz: ${duplicateInventoryCount}, receptury: ${duplicateRecipesCount}, sesje: ${duplicateSessionsCount}, kofeina: ${duplicateCaffeineCount}).`
+    : 'Brak zduplikowanych rekordów w kopii zapasowej.';
+  const summaryEn = hasDuplicates
+    ? `Detected ${totalDuplicateCount} duplicates in backup envelope (inventory: ${duplicateInventoryCount}, recipes: ${duplicateRecipesCount}, sessions: ${duplicateSessionsCount}, caffeine: ${duplicateCaffeineCount}).`
+    : 'No duplicate records detected in backup envelope.';
+
+  return {
+    hasDuplicates,
+    totalDuplicateCount,
+    duplicateInventoryCount,
+    duplicateRecipesCount,
+    duplicateSessionsCount,
+    duplicateCaffeineCount,
+    duplicates,
+    summaryPl,
+    summaryEn,
+  };
+}
+
