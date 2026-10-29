@@ -21,13 +21,15 @@ import {
   calculateTotalHardnessFromIons,
   calculateWaterHardnessScale,
   evaluateWaterAlkalinityBuffer,
+  calculateBoilingDegassingImpact,
 } from '../water-chemistry';
 import { formatBrewTimeMinutesSeconds, formatCostPerCup, formatFlowRateProfile, formatExtractionPressure } from '../unit-converter';
 import { normSearch, rankSearchResults, filterBySearchFacets } from '../search-utils';
 import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot, CumulativeWaterPoint } from '../timer-engine';
 import { calculateLifetimeBreakEven, evaluateUpsellTrigger } from '../app-access';
-import { generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, generateExtractionTroubleshootingGuide } from '../bpr-engine';
+import { generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, generateExtractionTroubleshootingGuide, predictGrindProfileByProcessAndRoast } from '../bpr-engine';
 import { auditBackupRelationalIntegrity } from '../backup';
+import { recommendBrewMethodsForOrigin } from '../knowledge-data';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => ({
@@ -38,7 +40,7 @@ jest.mock('expo-sqlite', () => ({
   })),
 }));
 
-import { escapeCsvValue, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover, calculateStashDepletionForecast } from '../database';
+import { escapeCsvValue, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover, calculateStashDepletionForecast, calculateStashCostEfficiency } from '../database';
 
 function measureCpuMs(fn: () => unknown, runs = 5): number {
   fn(); // Rozgrzewka JIT
@@ -602,5 +604,51 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
 
     expect(ms).toBeLessThan(200);
   });
-});
 
+  test('TASK-P101-10-WYD: Budżet 22: 10 000 obliczeń efektywności spiżarni, predykcji mielenia, rekomendacji metod i wrzenia (< 200 ms)', () => {
+    // 1. Poprawność biznesowa
+    const stashItem = {
+      id: 'stash-item-1',
+      brand: 'Specialty Roastery',
+      name: 'Kenya Nyeri',
+      initialWeightGrams: 250,
+      remainingWeightGrams: 200,
+      price: 60,
+    };
+
+    const efficiency = calculateStashCostEfficiency([stashItem], { standardDoseGrams: 15 });
+    expect(efficiency.totalItemsCount).toBe(1);
+    expect(efficiency.estimatedCostPerCupPln).toBe(3.6);
+    expect(efficiency.tier).toBe('specialty');
+
+    const grindPred = predictGrindProfileByProcessAndRoast('washed', 'light');
+    expect(grindPred.densityCategory).toBe('very_dense');
+    expect(grindPred.recommendedMicrons).toBeGreaterThan(0);
+    expect(grindPred.cloggingRisk).toBe('low');
+
+    const recMethods = recommendBrewMethodsForOrigin('ethiopia', 'pl');
+    expect(recMethods).toBeDefined();
+    expect(recMethods?.recommendedMethods.length).toBeGreaterThan(0);
+
+    const boiling = calculateBoilingDegassingImpact({
+      initialAlkalinityPpm: 60,
+      initialTotalHardnessPpm: 120,
+      boilingDurationSeconds: 120,
+    });
+    expect(boiling.efficiencyLevel).toBe('optimal');
+    expect(boiling.residualAlkalinityPpm).toBeLessThan(60);
+
+    // 2. Budżet wydajnościowy: 10 000 wywołań w pętli < 200 ms
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        calculateStashCostEfficiency([stashItem], { standardDoseGrams: 15 + (i % 5) });
+        predictGrindProfileByProcessAndRoast(i % 2 === 0 ? 'washed' : 'natural', i % 3 === 0 ? 'light' : 'medium');
+        recommendBrewMethodsForOrigin(i % 2 === 0 ? 'ethiopia' : 'colombia', 'en');
+        calculateBoilingDegassingImpact({ initialAlkalinityPpm: 50 + (i % 20), boilingDurationSeconds: 60 + (i % 60) });
+      }
+    });
+
+    expect(ms).toBeLessThan(200);
+  });
+
+});
