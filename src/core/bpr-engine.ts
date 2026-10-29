@@ -2255,3 +2255,144 @@ export function predictGrindProfileByProcessAndRoast(options?: {
     summaryEn,
   };
 }
+
+export type ChannelingRiskLevel = 'low' | 'moderate' | 'high' | 'critical';
+
+export interface ChannelingRiskAssessment {
+  riskScore: number;
+  riskLevel: ChannelingRiskLevel;
+  primaryRiskFactor: string;
+  appliedPrepTechniques: string[];
+  mitigationsPl: string[];
+  mitigationsEn: string[];
+  summaryPl: string;
+  summaryEn: string;
+}
+
+export function evaluateChannelingRisk(options?: {
+  method?: string | null;
+  grindMicrons?: number | string | null;
+  flowRateGramsPerSec?: number | string | null;
+  pressureBars?: number | string | null;
+  puckPrepTechniques?: string[] | null;
+} | null): ChannelingRiskAssessment {
+  const parseNum = (val: unknown, fallback: number, min: number, max: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.max(min, Math.min(max, val));
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.max(min, Math.min(max, parsed));
+      }
+    }
+    return fallback;
+  };
+
+  const rawMethod = typeof options?.method === 'string' ? options.method.trim().toLowerCase() : 'espresso';
+  const isEspresso = rawMethod.includes('espresso') || rawMethod.includes('lever') || rawMethod.includes('dzwign');
+
+  const grind = parseNum(options?.grindMicrons, isEspresso ? 250 : 750, 50, 2000);
+  const flowRate = parseNum(options?.flowRateGramsPerSec, isEspresso ? 1.5 : 4.0, 0, 20);
+  const pressure = parseNum(options?.pressureBars, isEspresso ? 9.0 : 0, 0, 20);
+
+  const rawTechniques = Array.isArray(options?.puckPrepTechniques)
+    ? options.puckPrepTechniques.map((t) => (typeof t === 'string' ? t.trim().toLowerCase() : '')).filter(Boolean)
+    : [];
+
+  const hasWdt = rawTechniques.some((t) => t.includes('wdt') || t.includes('igly') || t.includes('needle'));
+  const hasPuckScreen = rawTechniques.some((t) => t.includes('screen') || t.includes('siatka'));
+  const hasPaperFilter = rawTechniques.some((t) => t.includes('paper') || t.includes('filtr'));
+
+  let riskScore = 20;
+  const mitigationsPl: string[] = [];
+  const mitigationsEn: string[] = [];
+  let primaryRiskFactor = 'none_optimal';
+
+  if (isEspresso) {
+    if (grind < 180) {
+      riskScore += 30;
+      primaryRiskFactor = 'ultra_fine_grind';
+      mitigationsPl.push('Zwiększ grubość mielenia o 20–40 µm, aby uniknąć zadławienia i mikrokanałowania.');
+      mitigationsEn.push('Coarsen grind size by 20–40 µm to avoid choking and micro-channeling.');
+    }
+    if (pressure > 9.5) {
+      riskScore += 25;
+      if (primaryRiskFactor === 'none_optimal') primaryRiskFactor = 'excessive_pressure';
+      mitigationsPl.push('Obniż ciśnienie ekstrakcji do 6–8 bar (zmniejsza kompresję i erozję kanałów).');
+      mitigationsEn.push('Lower extraction pressure to 6–8 bar to decrease puck compression and channeling erosion.');
+    }
+    if (flowRate > 2.8) {
+      riskScore += 25;
+      if (primaryRiskFactor === 'none_optimal') primaryRiskFactor = 'high_flow_rate';
+      mitigationsPl.push('Zbyt szybki przepływ sugeruje przebicie ciastka. Zmiel drobniej lub popraw dystrybucję.');
+      mitigationsEn.push('Excessive flow rate indicates puck perforation. Grind finer or refine distribution.');
+    }
+    if (!hasWdt) {
+      riskScore += 20;
+      if (primaryRiskFactor === 'none_optimal') primaryRiskFactor = 'lack_of_wdt';
+      mitigationsPl.push('Zastosuj dystrybucję igłową (WDT), aby rozbić grudki i wyrównać gęstość złoża.');
+      mitigationsEn.push('Apply needle distribution (WDT) to eliminate clumps and even out bed density.');
+    } else {
+      riskScore -= 25;
+    }
+    if (hasPuckScreen) {
+      riskScore -= 15;
+    }
+    if (hasPaperFilter) {
+      riskScore -= 10;
+    }
+  } else {
+    if (grind < 450) {
+      riskScore += 35;
+      primaryRiskFactor = 'ultra_fine_grind';
+      mitigationsPl.push('Przemiał jest zbyt drobny na dripper przelewowy; zwiększ grubość mielenia.');
+      mitigationsEn.push('Grind is overly fine for manual drip; coarsen particle size.');
+    }
+    if (flowRate > 6.0) {
+      riskScore += 25;
+      if (primaryRiskFactor === 'none_optimal') primaryRiskFactor = 'turbulent_pour';
+      mitigationsPl.push('Zbyt agresywny strumień wody; lej delikatniej blisko złoża kawy.');
+      mitigationsEn.push('Overly aggressive pour stream; pour gently close to coffee bed.');
+    }
+    if (hasWdt || rawTechniques.some((t) => t.includes('swirl') || t.includes('miesz'))) {
+      riskScore -= 15;
+    }
+  }
+
+  riskScore = Math.max(0, Math.min(100, Math.round(riskScore)));
+
+  let riskLevel: ChannelingRiskLevel = 'low';
+  if (riskScore >= 75) {
+    riskLevel = 'critical';
+  } else if (riskScore >= 50) {
+    riskLevel = 'high';
+  } else if (riskScore >= 25) {
+    riskLevel = 'moderate';
+  }
+
+  if (mitigationsPl.length === 0) {
+    mitigationsPl.push('Parametry ekstrakcji i przygotowanie ciastka są wzorcowe.');
+    mitigationsEn.push('Puck prep and extraction parameters are in optimal range.');
+  }
+
+  const summaryPl =
+    riskScore >= 50
+      ? `Wysokie ryzyko kanałowania (${riskScore}/100, poziom: ${riskLevel}). Główny czynnik: ${primaryRiskFactor}.`
+      : `Stabilna ekstrakcja bez tendencji do kanałowania (${riskScore}/100, poziom: ${riskLevel}).`;
+  const summaryEn =
+    riskScore >= 50
+      ? `High channeling risk (${riskScore}/100, level: ${riskLevel}). Primary factor: ${primaryRiskFactor}.`
+      : `Stable extraction with low channeling tendency (${riskScore}/100, level: ${riskLevel}).`;
+
+  return {
+    riskScore,
+    riskLevel,
+    primaryRiskFactor,
+    appliedPrepTechniques: rawTechniques,
+    mitigationsPl,
+    mitigationsEn,
+    summaryPl,
+    summaryEn,
+  };
+}

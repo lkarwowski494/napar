@@ -40,6 +40,9 @@ import {
   predictGrindProfileByProcessAndRoast,
   PredictedGrindProfile,
   GrindDensityCategory,
+  evaluateChannelingRisk,
+  ChannelingRiskAssessment,
+  ChannelingRiskLevel,
   buildProactiveActionSchedule,
   buildFourteenDayCalendar,
   generateActionIcsContent,
@@ -1419,6 +1422,55 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(fallback.baseMicrons).toBe(720);
       expect(fallback.recommendedMicrons).toBeGreaterThan(0);
       expect(fallback.densityCategory).toBeDefined();
+    });
+  });
+
+  describe('TASK-P102-04-SZT: evaluateChannelingRisk szacuje ryzyko kanałowania w ekstrakcji', () => {
+    it('wykrywa krytyczne ryzyko kanałowania dla espresso bez WDT przy wysokim ciśnieniu i drobnym przemiale', () => {
+      const critical = evaluateChannelingRisk({
+        method: 'espresso',
+        grindMicrons: 150,
+        pressureBars: 11.0,
+        flowRateGramsPerSec: 3.5,
+        puckPrepTechniques: ['tamp'],
+      });
+      expect(critical.riskScore).toBeGreaterThan(75);
+      expect(critical.riskLevel).toBe('critical');
+      const levelType: ChannelingRiskLevel = critical.riskLevel;
+      expect(levelType).toBe('critical');
+      expect(critical.mitigationsPl.length).toBeGreaterThan(0);
+      expect(critical.summaryPl).toContain('Wysokie ryzyko');
+    });
+
+    it('wykazuje niskie ryzyko kanałowania przy starannym WDT, puck screenie i 7 barach', () => {
+      const low = evaluateChannelingRisk({
+        method: 'espresso',
+        grindMicrons: 260,
+        pressureBars: 7.0,
+        flowRateGramsPerSec: 1.5,
+        puckPrepTechniques: ['wdt', 'puck_screen', 'tamp'],
+      });
+      expect(low.riskScore).toBeLessThan(25);
+      expect(low.riskLevel).toBe('low');
+      expect(low.appliedPrepTechniques).toContain('wdt');
+    });
+
+    it('obsługuje metody przelewowe (V60)', () => {
+      const filter = evaluateChannelingRisk({
+        method: 'v60',
+        grindMicrons: 400,
+        flowRateGramsPerSec: 7.0,
+      });
+      expect(filter.riskLevel).toBe('critical');
+      expect(filter.summaryEn).toBeDefined();
+    });
+
+    it('obsługuje null i wartości domyślne bezpiecznie', () => {
+      const fallback = evaluateChannelingRisk(null);
+      expect(fallback.riskScore).toBeGreaterThanOrEqual(0);
+      expect(fallback.riskLevel).toBeDefined();
+      const assessment: ChannelingRiskAssessment = fallback;
+      expect(assessment.mitigationsEn.length).toBeGreaterThan(0);
     });
   });
 });
