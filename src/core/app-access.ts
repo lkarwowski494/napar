@@ -1822,3 +1822,111 @@ export function evaluateFeatureEntitlement(
     }
   }
 }
+
+
+// ============================================================================
+// TASK-P99-02-MON: Inventory Stash Limit & Paywall Evaluator (Ewaluator limitu spiżarni)
+// ============================================================================
+
+export type StashLimitStatus = 'available' | 'approaching_limit' | 'limit_reached' | 'unlimited';
+
+export interface InventoryStashLimitEvaluation {
+  currentItemCount: number;
+  maxFreeLimit: number;
+  isProUser: boolean;
+  canAddNewItem: boolean;
+  remainingSlots: number;
+  status: StashLimitStatus;
+  percentUsed: number;
+  bannerTitlePl: string;
+  bannerTitleEn: string;
+  bannerMessagePl: string;
+  bannerMessageEn: string;
+  upgradeCallToActionPl: string;
+  upgradeCallToActionEn: string;
+}
+
+export function evaluateInventoryStashLimit(options?: {
+  currentItemCount?: number | string | null;
+  isProUser?: boolean | null;
+  maxFreeLimit?: number | string | null;
+}): InventoryStashLimitEvaluation {
+  const parseNum = (val: unknown, fallback: number, min: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.max(min, val);
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.max(min, parsed);
+      }
+    }
+    return fallback;
+  };
+
+  const isProUser = Boolean(options?.isProUser);
+  const currentItemCount = Math.round(parseNum(options?.currentItemCount, 0, 0));
+  const maxFreeLimit = Math.round(parseNum(options?.maxFreeLimit, 5, 1));
+
+  if (isProUser) {
+    return {
+      currentItemCount,
+      maxFreeLimit,
+      isProUser: true,
+      canAddNewItem: true,
+      remainingSlots: Infinity,
+      status: 'unlimited',
+      percentUsed: 0,
+      bannerTitlePl: 'Nielimitowana spiżarnia Napar Pro',
+      bannerTitleEn: 'Unlimited Napar Pro Stash',
+      bannerMessagePl: `Posiadasz ${currentItemCount} aktywnych paczek w spiżarni bez żadnych ograniczeń.`,
+      bannerMessageEn: `You have ${currentItemCount} active beans in your stash without restrictions.`,
+      upgradeCallToActionPl: '',
+      upgradeCallToActionEn: '',
+    };
+  }
+
+  const remainingSlots = Math.max(0, maxFreeLimit - currentItemCount);
+  const canAddNewItem = currentItemCount < maxFreeLimit;
+  const percentUsed = Math.min(100, Math.round((currentItemCount / maxFreeLimit) * 100));
+
+  let status: StashLimitStatus = 'available';
+  let bannerTitlePl = 'Darmowa spiżarnia';
+  let bannerTitleEn = 'Free Stash';
+  let bannerMessagePl = `Wykorzystano ${currentItemCount} z ${maxFreeLimit} darmowych miejsc na paczki kawy.`;
+  let bannerMessageEn = `Using ${currentItemCount} of ${maxFreeLimit} free coffee stash slots.`;
+  let upgradeCallToActionPl = 'Odblokuj nielimitowaną spiżarnię w Napar Pro.';
+  let upgradeCallToActionEn = 'Unlock unlimited stash in Napar Pro.';
+
+  if (currentItemCount >= maxFreeLimit) {
+    status = 'limit_reached';
+    bannerTitlePl = 'Osiągnięto limit darmowej spiżarni';
+    bannerTitleEn = 'Free Stash Limit Reached';
+    bannerMessagePl = `Osiągnięto limit ${maxFreeLimit} paczek kawy. Aby dodać kolejną, zarchiwizuj pustą paczkę lub przejdź na Napar Pro.`;
+    bannerMessageEn = `Limit of ${maxFreeLimit} coffee bags reached. To add more, archive empty bags or upgrade to Napar Pro.`;
+    upgradeCallToActionPl = 'Przejdź na Pro, aby dodać nielimitowaną liczbę ziaren.';
+    upgradeCallToActionEn = 'Upgrade to Pro to store unlimited coffee bags.';
+  } else if (currentItemCount >= maxFreeLimit - 1) {
+    status = 'approaching_limit';
+    bannerTitlePl = 'Spiżarnia prawie pełna';
+    bannerTitleEn = 'Stash Almost Full';
+    bannerMessagePl = `Pozostało tylko ${remainingSlots} wolne miejsce w darmowej spiżarni (łącznie ${maxFreeLimit}).`;
+    bannerMessageEn = `Only ${remainingSlots} free stash slot remaining (out of ${maxFreeLimit}).`;
+  }
+
+  return {
+    currentItemCount,
+    maxFreeLimit,
+    isProUser: false,
+    canAddNewItem,
+    remainingSlots,
+    status,
+    percentUsed,
+    bannerTitlePl,
+    bannerTitleEn,
+    bannerMessagePl,
+    bannerMessageEn,
+    upgradeCallToActionPl,
+    upgradeCallToActionEn,
+  };
+}

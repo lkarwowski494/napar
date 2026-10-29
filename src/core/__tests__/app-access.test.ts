@@ -57,6 +57,9 @@ import {
   evaluateFeatureEntitlement,
   FeatureEntitlementCheck,
   AppFeatureId,
+  evaluateInventoryStashLimit,
+  InventoryStashLimitEvaluation,
+  StashLimitStatus,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1751,6 +1754,55 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     const fallback = evaluateFeatureEntitlement(null as any);
     expect(fallback.isEntitled).toBe(true);
     expect(fallback.requiresPro).toBe(false);
+  });
+
+  test('TASK-P99-02-MON: evaluateInventoryStashLimit weryfikuje limit spiżarni dla darmowych i Pro', () => {
+    // 1. Użytkownik Pro -> nielimitowana spiżarnia
+    const proStash: InventoryStashLimitEvaluation = evaluateInventoryStashLimit({
+      currentItemCount: 15,
+      isProUser: true,
+    });
+    expect(proStash.isProUser).toBe(true);
+    expect(proStash.canAddNewItem).toBe(true);
+    expect(proStash.remainingSlots).toBe(Infinity);
+    const proStatus: StashLimitStatus = proStash.status;
+    expect(proStatus).toBe('unlimited');
+    expect(proStash.bannerTitlePl).toContain('Nielimitowana');
+
+    // 2. Użytkownik Free z miejscem w spiżarni (2 z 5)
+    const freeWithSlots = evaluateInventoryStashLimit({
+      currentItemCount: 2,
+      isProUser: false,
+    });
+    expect(freeWithSlots.isProUser).toBe(false);
+    expect(freeWithSlots.canAddNewItem).toBe(true);
+    expect(freeWithSlots.remainingSlots).toBe(3);
+    expect(freeWithSlots.status).toBe('available');
+    expect(freeWithSlots.percentUsed).toBe(40);
+
+    // 3. Użytkownik Free blisko limitu (4 z 5)
+    const approaching = evaluateInventoryStashLimit({
+      currentItemCount: '4',
+      isProUser: false,
+    });
+    expect(approaching.status).toBe('approaching_limit');
+    expect(approaching.remainingSlots).toBe(1);
+
+    // 4. Użytkownik Free osiągnął limit (5 z 5)
+    const reached = evaluateInventoryStashLimit({
+      currentItemCount: 5,
+      isProUser: false,
+    });
+    expect(reached.status).toBe('limit_reached');
+    expect(reached.canAddNewItem).toBe(false);
+    expect(reached.remainingSlots).toBe(0);
+    expect(reached.upgradeCallToActionPl).toContain('Pro');
+
+    // 5. Odporność na null i puste argumenty
+    const fallbackNull = evaluateInventoryStashLimit(null);
+    expect(fallbackNull.isProUser).toBe(false);
+    expect(fallbackNull.canAddNewItem).toBe(true);
+    expect(fallbackNull.remainingSlots).toBe(5);
   });
 });
 
