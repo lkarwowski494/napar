@@ -24,11 +24,11 @@ import {
   calculateBoilingDegassingImpact,
 } from '../water-chemistry';
 import { formatBrewTimeMinutesSeconds, formatCostPerCup, formatFlowRateProfile, formatExtractionPressure } from '../unit-converter';
-import { normSearch, rankSearchResults, filterBySearchFacets } from '../search-utils';
+import { normSearch, rankSearchResults, filterBySearchFacets, calculateSearchTermCoverage } from '../search-utils';
 import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot, CumulativeWaterPoint } from '../timer-engine';
-import { calculateLifetimeBreakEven, evaluateUpsellTrigger } from '../app-access';
-import { generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, generateExtractionTroubleshootingGuide, predictGrindProfileByProcessAndRoast } from '../bpr-engine';
-import { auditBackupRelationalIntegrity } from '../backup';
+import { calculateLifetimeBreakEven, evaluateUpsellTrigger, evaluateCustomRecipeLimit } from '../app-access';
+import { generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, generateExtractionTroubleshootingGuide, predictGrindProfileByProcessAndRoast, evaluateChannelingRisk } from '../bpr-engine';
+import { auditBackupRelationalIntegrity, detectBackupDuplicates } from '../backup';
 import { recommendBrewMethodsForOrigin } from '../knowledge-data';
 
 jest.mock('expo-sqlite', () => ({
@@ -40,7 +40,7 @@ jest.mock('expo-sqlite', () => ({
   })),
 }));
 
-import { escapeCsvValue, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover, calculateStashDepletionForecast, calculateStashCostEfficiency } from '../database';
+import { escapeCsvValue, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover, calculateStashDepletionForecast, calculateStashCostEfficiency, estimateStashRoastDistribution } from '../database';
 
 function measureCpuMs(fn: () => unknown, runs = 5): number {
   fn(); // Rozgrzewka JIT
@@ -645,6 +645,61 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
         predictGrindProfileByProcessAndRoast({ process: i % 2 === 0 ? 'washed' : 'natural', roastLevel: i % 3 === 0 ? 'light' : 'medium' });
         recommendBrewMethodsForOrigin(i % 2 === 0 ? 'ethiopia' : 'colombia', 'en');
         calculateBoilingDegassingImpact({ initialAlkalinityPpm: 50 + (i % 20), boilingDurationSeconds: 60 + (i % 60) });
+      }
+    });
+
+    expect(ms).toBeLessThan(200);
+  });
+
+  test('TASK-P103-10-WYD: Budżet 23: 10 000 obliczeń pokrycia wyszukiwania, limitu receptur, rozkładu palenia, ryzyka kanałowania i duplikatów kopii (< 200 ms)', () => {
+    // 1. Poprawność biznesowa
+    const searchCoverage = calculateSearchTermCoverage('etiopia washed yirgacheffe', 'Kawa Etiopia Yirgacheffe Washed specialty');
+    expect(searchCoverage.tier).toBe('exact_full');
+    expect(searchCoverage.coverageRatio).toBe(1.0);
+
+    const recipeLimit = evaluateCustomRecipeLimit(3, { hasProAccess: false });
+    expect(recipeLimit.status).toBe('within_limit');
+    expect(recipeLimit.canCreateNewRecipe).toBe(true);
+
+    const stashBeans = [
+      { id: '1', brand: 'Roastery', name: 'Ethiopia', roastLevel: 'light', remainingWeightGrams: 200 },
+      { id: '2', brand: 'Roastery', name: 'Brazil', roastLevel: 'medium', remainingWeightGrams: 250 },
+    ] as any;
+    const roastDist = estimateStashRoastDistribution(stashBeans);
+    expect(roastDist.totalActiveBags).toBe(2);
+    expect(roastDist.dominantProfile).toBe('balanced');
+
+    const channeling = evaluateChannelingRisk({
+      method: 'espresso',
+      grindSettingMicrons: 250,
+      flowRateGramPerSecond: 2.2,
+      extractionPressureBar: 9.0,
+      usedWdt: true,
+      usedPuckScreen: true,
+    });
+    expect(channeling.riskLevel).toBe('moderate');
+
+    const backupData = {
+      beans: [{ id: 'b1', name: 'Bean 1' }],
+      recipes: [{ id: 'r1', name: 'Recipe 1' }],
+      brewLogs: [{ id: 'l1', recipeId: 'r1' }],
+    };
+    const dupCheck = detectBackupDuplicates(backupData);
+    expect(dupCheck.hasDuplicates).toBe(false);
+
+    // 2. Budżet wydajnościowy: 10 000 wywołań w pętli < 200 ms
+    const ms = measureCpuMs(() => {
+      for (let i = 0; i < 10000; i++) {
+        calculateSearchTermCoverage('ethiopia washed', 'Ethiopia Yirgacheffe Washed');
+        evaluateCustomRecipeLimit(i % 8, { hasProAccess: i % 2 === 0 });
+        estimateStashRoastDistribution(stashBeans);
+        evaluateChannelingRisk({
+          method: 'espresso',
+          grindSettingMicrons: 200 + (i % 100),
+          flowRateGramPerSecond: 2.0 + ((i % 10) / 10),
+          usedWdt: i % 2 === 0,
+        });
+        detectBackupDuplicates(backupData);
       }
     });
 
