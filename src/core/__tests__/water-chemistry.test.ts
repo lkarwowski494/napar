@@ -56,6 +56,9 @@ import {
   calculateWaterHardnessScale,
   WaterHardnessScale,
   WaterHardnessLevel,
+  evaluateWaterAlkalinityBuffer,
+  WaterAlkalinityBufferEvaluation,
+  AlkalinityBufferLevel,
   formatWaterHardnessCategory,
 } from '../water-chemistry';
 
@@ -1339,6 +1342,38 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(fallback.hardnessPpm).toBe(0);
     expect(fallback.level).toBe('very_soft');
     expect(fallback.germanDegreesDh).toBe(0);
+  });
+
+  test('TASK-P98-07-JAK: evaluateWaterAlkalinityBuffer ocenia bufor alkaliczności i wpływ na kwasowość', () => {
+    // 1. Idealny bufor SCA (40 ppm CaCO3)
+    const scaBuffer: WaterAlkalinityBufferEvaluation = evaluateWaterAlkalinityBuffer(40);
+    expect(scaBuffer.alkalinityPpm).toBe(40);
+    expect(scaBuffer.level).toBe('balanced');
+    expect(scaBuffer.isScaOptimal).toBe(true);
+    expect(scaBuffer.recommendedAdjustmentPpm).toBe(0);
+    expect(scaBuffer.degreesGermanDkh).toBeCloseTo(2.24, 1);
+    expect(scaBuffer.milliEquivalentsPerLiter).toBeCloseTo(0.8, 1);
+    expect(scaBuffer.acidityImpactPl).toContain('SCA');
+    expect(scaBuffer.recommendationPl).toBeDefined();
+
+    // 2. Bardzo wysoki bufor (150 ppm CaCO3) - zgaszenie kwasowości
+    const highBuffer = evaluateWaterAlkalinityBuffer(150);
+    expect(highBuffer.level).toBe('excessive');
+    expect(highBuffer.isScaOptimal).toBe(false);
+    expect(highBuffer.recommendedAdjustmentPpm).toBeLessThan(0);
+    expect(highBuffer.acidityImpactPl).toContain('kredowy');
+
+    // 3. Woda niebuforowana (< 20 ppm) - ostra kwasowość
+    const unbuffered = evaluateWaterAlkalinityBuffer(10);
+    expect(unbuffered.level).toBe('unbuffered');
+    expect(unbuffered.isScaOptimal).toBe(false);
+    expect(unbuffered.recommendedAdjustmentPpm).toBe(30);
+
+    // 4. Odporność na dane brzegowe: null, NaN, ujemne
+    const fallbackBuffer = evaluateWaterAlkalinityBuffer(null as any);
+    expect(fallbackBuffer.alkalinityPpm).toBe(0);
+    const level: AlkalinityBufferLevel = fallbackBuffer.level;
+    expect(level).toBe('unbuffered');
   });
 });
 

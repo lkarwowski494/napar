@@ -2103,3 +2103,89 @@ export function calculateWaterHardnessScale(
     recommendationEn,
   };
 }
+
+
+// ============================================================================
+// TASK-P98-07-JAK: Water Alkalinity Buffer Evaluator (Bufor alkaliczności wody)
+// ============================================================================
+
+export type AlkalinityBufferLevel = 'unbuffered' | 'crisp' | 'balanced' | 'high' | 'excessive';
+
+export interface WaterAlkalinityBufferEvaluation {
+  alkalinityPpm: number;
+  level: AlkalinityBufferLevel;
+  degreesGermanDkh: number;
+  milliEquivalentsPerLiter: number;
+  isScaOptimal: boolean;
+  recommendedAdjustmentPpm: number;
+  acidityImpactPl: string;
+  acidityImpactEn: string;
+  recommendationPl: string;
+  recommendationEn: string;
+}
+
+/**
+ * Ocenia zdolność buforowania kwasów organicznych (alkaliczność wody jako ppm CaCO3),
+ * wpływ na percepcję kwasowości w filiżance oraz stopnie dKH.
+ */
+export function evaluateWaterAlkalinityBuffer(
+  alkalinityPpm: number
+): WaterAlkalinityBufferEvaluation {
+  const safePpm =
+    typeof alkalinityPpm === 'number' && Number.isFinite(alkalinityPpm) && !Object.is(alkalinityPpm, -0)
+      ? Math.max(0, Math.min(1000, alkalinityPpm))
+      : 0;
+
+  const roundedPpm = Math.round(safePpm * 10) / 10;
+  const degreesGermanDkh = Math.round((roundedPpm / 17.848) * 100) / 100;
+  const milliEquivalentsPerLiter = Math.round((roundedPpm / 50.04) * 100) / 100;
+
+  const targetScaAlkalinity = 40;
+  const recommendedAdjustmentPpm = Math.round((targetScaAlkalinity - roundedPpm) * 10) / 10;
+  const isScaOptimal = roundedPpm >= 35 && roundedPpm <= 45;
+
+  let level: AlkalinityBufferLevel = 'unbuffered';
+  let acidityImpactPl = 'Agresywna, ostra i niekontrolowana kwasowość. Brak bufora stabilizującego pH.';
+  let acidityImpactEn = 'Harsh, sharp, and erratic acidity. Total lack of pH buffering capacity.';
+  let recommendationPl = 'Dodaj wodorowęglan potasu (KHCO3) lub sodu (NaHCO3) do poziomu ~40 ppm CaCO3 dla osłodzenia naparu.';
+  let recommendationEn = 'Add potassium (KHCO3) or sodium bicarbonate (NaHCO3) to ~40 ppm CaCO3 to buffer and sweeten.';
+
+  if (roundedPpm > 120) {
+    level = 'excessive';
+    acidityImpactPl = 'Całkowite zgaszenie kwasowości owocowej, mdły, kredowy i płaski profil smakowy.';
+    acidityImpactEn = 'Complete flattening of fruity acidity, chalky, dull, and lifeless flavor profile.';
+    recommendationPl = 'Zredukuj alkaliczność przez filtrację odwróconej osmozy (RO) lub dejonizację.';
+    recommendationEn = 'Reduce alkalinity via reverse osmosis (RO) filtration or deionization.';
+  } else if (roundedPpm >= 75) {
+    level = 'high';
+    acidityImpactPl = 'Wyciszenie delikatnych nut kwasowości, dominacja ciężkich nut orzechowo-czekoladowych.';
+    acidityImpactEn = 'Muted delicate fruit acids, dominance of heavy nutty and roasty chocolate notes.';
+    recommendationPl = 'Rozcieńcz wodę wodą destylowaną/RO, aby przywrócić soczystość i blask kawy.';
+    recommendationEn = 'Dilute water with distilled/RO water to restore cup juiciness and vibrancy.';
+  } else if (roundedPpm >= 40) {
+    level = 'balanced';
+    acidityImpactPl = 'Idealny balans SCA: żywa, soczysta kwasowość harmonijnie połączona ze słodyczą.';
+    acidityImpactEn = 'Ideal SCA balance: vibrant, juicy acidity seamlessly harmonized with sweetness.';
+    recommendationPl = 'Optymalny bufor alkaliczności dla filtrów specialty i espresso.';
+    recommendationEn = 'Optimal alkalinity buffer for specialty filter brews and espresso.';
+  } else if (roundedPpm >= 20) {
+    level = 'crisp';
+    acidityImpactPl = 'Wyrazista, krystaliczna i jasna kwasowość; styl skandynawski dla kaw mytych.';
+    acidityImpactEn = 'Prominent, crystalline, and bright acidity; Nordic style for high-elevation washed coffees.';
+    recommendationPl = 'Znakomita woda dla miłośników owocowych nut Kenii i Etiopii.';
+    recommendationEn = 'Superb water profile for fruit-forward Kenyan and Ethiopian light roasts.';
+  }
+
+  return {
+    alkalinityPpm: roundedPpm,
+    level,
+    degreesGermanDkh,
+    milliEquivalentsPerLiter,
+    isScaOptimal,
+    recommendedAdjustmentPpm,
+    acidityImpactPl,
+    acidityImpactEn,
+    recommendationPl,
+    recommendationEn,
+  };
+}
