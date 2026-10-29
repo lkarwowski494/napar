@@ -2095,3 +2095,128 @@ export function evaluateChemexRatio(
     brewingRecommendationEn,
   };
 }
+
+
+// ============================================================================
+// TASK-P99-11-WZR: Hybrid Switch Immersion Ratio Evaluator (Reguła hybrydowa Switch)
+// ============================================================================
+
+export type SwitchBrewStyle = 'concentrated_immersion' | 'classic_switch' | 'light_tea_like' | 'watery';
+
+export interface SwitchImmersionEvaluation {
+  doseGrams: number;
+  waterGrams: number;
+  ratio: number;
+  ratioFormatted: string;
+  style: SwitchBrewStyle;
+  isOptimalSwitch: boolean;
+  recommendedSteepSeconds: number;
+  styleLabelPl: string;
+  styleLabelEn: string;
+  sensoryProfilePl: string;
+  sensoryProfileEn: string;
+  brewingRecommendationPl: string;
+  brewingRecommendationEn: string;
+}
+
+/**
+ * Ocenia proporcję parzenia dla hybrydowych metod infuzyjno-przelewowych (Hario Switch, Clever Dripper),
+ * określając profil sensoryczny, optymalny czas zamknięcia zaworu i styl ekstrakcji.
+ */
+export function evaluateSwitchImmersionRatio(options?: {
+  doseGrams?: number | string | null;
+  waterGrams?: number | string | null;
+  steepTimeSeconds?: number | string | null;
+}): SwitchImmersionEvaluation {
+  const parseNum = (val: unknown, fallback: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0) && val > 0) {
+      return val;
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.trim().replace(',', '.'));
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0) && parsed > 0) {
+        return parsed;
+      }
+    }
+    return fallback;
+  };
+
+  const dose = Math.round(parseNum(options?.doseGrams, 18) * 10) / 10;
+  const water = Math.round(parseNum(options?.waterGrams, 280) * 10) / 10;
+  const ratio = Math.round((water / dose) * 10) / 10;
+  const ratioFormatted = `1:${ratio.toFixed(1)}`;
+
+  let style: SwitchBrewStyle = 'classic_switch';
+  let isOptimalSwitch = true;
+  let recommendedSteepSeconds = 120;
+  let styleLabelPl = 'Klasyczny Hario Switch (1:14.5 – 1:16.5)';
+  let styleLabelEn = 'Classic Hario Switch (1:14.5 – 1:16.5)';
+  let sensoryProfilePl =
+    'Optymalna harmonia: wysoka słodycz i aksamitne body z pełnej immersji połączone z czystością spływu przez papierowy filtr.';
+  let sensoryProfileEn =
+    'Optimal balance: deep sweetness and velvety body of full immersion combined with paper-filtered clarity.';
+  let brewingRecommendationPl =
+    'Zamknij zawór na 2:00 minuty po zalaniu wodą 90–93°C, a następnie zwolnij przełącznik dla swobodnego spływu.';
+  let brewingRecommendationEn =
+    'Keep switch closed for 2:00 minutes with 90–93°C water, then press release button for clean drawdown.';
+
+  if (ratio < 14.5) {
+    style = 'concentrated_immersion';
+    isOptimalSwitch = false;
+    recommendedSteepSeconds = 105;
+    styleLabelPl = 'Skoncentrowana immersja (< 1:14.5)';
+    styleLabelEn = 'Concentrated immersion (< 1:14.5)';
+    sensoryProfilePl =
+      'Gęsta, likierowa tekstura i intensywny ekstrakt; styl God-Method lub pod napar z lodem.';
+    sensoryProfileEn =
+      'Dense liqueur-like mouthfeel and rich intensity; ideal for God-Method or iced brews.';
+    brewingRecommendationPl =
+      'Wydłuż preinfuzję otwartą do 30s, zamknij zawór na kolejne 60s i zredukuj opór złoża.';
+    brewingRecommendationEn =
+      'Perform open bloom for 30s, close switch for 60s, and brew over ice or enjoy intense body.';
+  } else if (ratio > 18.0) {
+    style = 'watery';
+    isOptimalSwitch = false;
+    recommendedSteepSeconds = 90;
+    styleLabelPl = 'Zbyt rozwodniony napar (> 1:18.0)';
+    styleLabelEn = 'Watery brew (> 1:18.0)';
+    sensoryProfilePl =
+      'Niski ekstrakt, spłaszczona słodycz i wodnisty finisz wskutek nadmiaru wody.';
+    sensoryProfileEn =
+      'Thin cup, diluted sweetness, and hollow mouthfeel due to excess water ratio.';
+    brewingRecommendationPl =
+      'Zwiększ dozę kawy lub zmniejsz ilość wody do zalecanych proporcji 1:15–1:16.';
+    brewingRecommendationEn =
+      'Increase coffee dose or reduce water volume to optimal 1:15–1:16 ratio.';
+  } else if (ratio > 16.5) {
+    style = 'light_tea_like';
+    isOptimalSwitch = true;
+    recommendedSteepSeconds = 120;
+    styleLabelPl = 'Lekki i herbaciany (1:16.6 – 1:18.0)';
+    styleLabelEn = 'Light and tea-like (1:16.6 – 1:18.0)';
+    sensoryProfilePl =
+      'Zwiewna, krystalicznie czysta filiżanka z wyeksponowaną kwasowością i delikatnymi nutami kwiatowymi.';
+    sensoryProfileEn =
+      'Crisp, tea-like clarity accentuating floral notes and lively fruit acidity.';
+    brewingRecommendationPl =
+      'Znakomity profil dla mytych kaw z Panamy i Etiopii z infuzją 1:45-2:00 min.';
+    brewingRecommendationEn =
+      'Superb for delicate washed geishas and Ethiopian coffees steeped for 1:45-2:00 min.';
+  }
+
+  return {
+    doseGrams: dose,
+    waterGrams: water,
+    ratio,
+    ratioFormatted,
+    style,
+    isOptimalSwitch,
+    recommendedSteepSeconds,
+    styleLabelPl,
+    styleLabelEn,
+    sensoryProfilePl,
+    sensoryProfileEn,
+    brewingRecommendationPl,
+    brewingRecommendationEn,
+  };
+}

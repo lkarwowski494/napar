@@ -56,6 +56,9 @@ import {
   evaluateChemexRatio,
   ChemexRatioEvaluation,
   ChemexRatioStyle,
+  evaluateSwitchImmersionRatio,
+  SwitchImmersionEvaluation,
+  SwitchBrewStyle,
 } from '../domain-rules';
 
 describe('Napar Domain Rules (RD-01…RD-30)', () => {
@@ -1215,6 +1218,56 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(fallback.ratio).toBe(0);
       expect(fallback.style).toBe('dense_concentrated');
       expect(fallback.isClassicBalanced).toBe(false);
+    });
+
+    it('TASK-P99-11-WZR: evaluateSwitchImmersionRatio ocenia proporcję hybrydy Switch i zaleca czas infuzji', () => {
+      // 1. Złoty standard Hario Switch (1:15.6 = 18g na 280g)
+      const classic: SwitchImmersionEvaluation = evaluateSwitchImmersionRatio({
+        doseGrams: 18,
+        waterGrams: 280,
+      });
+      const styleType: SwitchBrewStyle = classic.style;
+      expect(styleType).toBe('classic_switch');
+      expect(classic.isOptimalSwitch).toBe(true);
+      expect(classic.ratio).toBe(15.6);
+      expect(classic.ratioFormatted).toBe('1:15.6');
+      expect(classic.recommendedSteepSeconds).toBe(120);
+      expect(classic.styleLabelPl).toContain('Klasyczny');
+      expect(classic.sensoryProfilePl).toContain('immersji');
+      expect(classic.brewingRecommendationPl).toContain('zawór');
+
+      // 2. Skoncentrowana immersja / God Method (1:13.3 = 15g na 200g ze stringa)
+      const godMethod = evaluateSwitchImmersionRatio({
+        doseGrams: '15,0',
+        waterGrams: '200',
+      });
+      expect(godMethod.style).toBe('concentrated_immersion');
+      expect(godMethod.isOptimalSwitch).toBe(false);
+      expect(godMethod.ratio).toBeCloseTo(13.3, 1);
+      expect(godMethod.styleLabelPl).toContain('Skoncentrowana');
+
+      // 3. Lekki i herbaciany profil (1:17.3 = 15g na 260g)
+      const teaLike = evaluateSwitchImmersionRatio({
+        doseGrams: 15,
+        waterGrams: 260,
+      });
+      expect(teaLike.style).toBe('light_tea_like');
+      expect(teaLike.isOptimalSwitch).toBe(true);
+      expect(teaLike.styleLabelPl).toContain('herbaciany');
+
+      // 4. Rozwodniony napar (1:20 = 15g na 300g)
+      const watery = evaluateSwitchImmersionRatio({
+        doseGrams: 15,
+        waterGrams: 300,
+      });
+      expect(watery.style).toBe('watery');
+      expect(watery.isOptimalSwitch).toBe(false);
+
+      // 5. Odporność na brak argumentów i null
+      const fallback = evaluateSwitchImmersionRatio(null as any);
+      expect(fallback.doseGrams).toBe(18);
+      expect(fallback.waterGrams).toBe(280);
+      expect(fallback.style).toBe('classic_switch');
     });
   });
 });
