@@ -2203,7 +2203,7 @@ export function calculateGrinderBurrCalibration(params?: {
   targetMicrons?: number | string | null;
   zeroClickOffset?: number | string | null;
   micronsPerClick?: number | string | null;
-}): GrinderBurrCalibration {
+} | null): GrinderBurrCalibration {
   const parseNum = (val: unknown, fallback: number, min: number, max: number): number => {
     if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
       return Math.max(min, Math.min(max, val));
