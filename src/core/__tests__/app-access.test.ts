@@ -60,6 +60,9 @@ import {
   evaluateInventoryStashLimit,
   InventoryStashLimitEvaluation,
   StashLimitStatus,
+  evaluateCustomRecipeLimit,
+  CustomRecipeLimitEvaluation,
+  CustomRecipeLimitStatus,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1803,6 +1806,45 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(fallbackNull.isProUser).toBe(false);
     expect(fallbackNull.canAddNewItem).toBe(true);
     expect(fallbackNull.remainingSlots).toBe(5);
+  });
+
+  test('TASK-P102-02-MON: evaluateCustomRecipeLimit ewaluuje limit własnych receptur w planie darmowym i Pro', () => {
+    // 1. Użytkownik Pro -> brak limitu (unlimited_pro)
+    const pro = evaluateCustomRecipeLimit(12, { hasProAccess: true });
+    expect(pro.isPro).toBe(true);
+    expect(pro.status).toBe('unlimited_pro');
+    expect(pro.canCreateNewRecipe).toBe(true);
+    expect(pro.remainingSlots).toBe(Infinity);
+    const statusType: CustomRecipeLimitStatus = pro.status;
+    expect(statusType).toBe('unlimited_pro');
+
+    // 2. Użytkownik Free z wolnymi slotami (2 z 5)
+    const free = evaluateCustomRecipeLimit(2, { hasProAccess: false, maxFreeRecipes: 5 });
+    expect(free.isPro).toBe(false);
+    expect(free.status).toBe('within_limit');
+    expect(free.canCreateNewRecipe).toBe(true);
+    expect(free.remainingSlots).toBe(3);
+
+    // 3. Użytkownik Free blisko limitu (4 z 5)
+    const approaching = evaluateCustomRecipeLimit('4', { hasProAccess: false });
+    expect(approaching.status).toBe('approaching_limit');
+    expect(approaching.canCreateNewRecipe).toBe(true);
+    expect(approaching.remainingSlots).toBe(1);
+
+    // 4. Użytkownik Free osiągnął limit (5 z 5)
+    const reached = evaluateCustomRecipeLimit(5, { hasProAccess: false });
+    expect(reached.status).toBe('limit_reached');
+    expect(reached.canCreateNewRecipe).toBe(false);
+    expect(reached.remainingSlots).toBe(0);
+    expect(reached.upsellMessagePl).toContain('limit');
+
+    // 5. Odporność na null i wartości domyślne
+    const fallback = evaluateCustomRecipeLimit(null, null);
+    expect(fallback.currentRecipeCount).toBe(0);
+    expect(fallback.maxFreeAllowed).toBe(5);
+    expect(fallback.status).toBe('within_limit');
+    const limitResult: CustomRecipeLimitEvaluation = fallback;
+    expect(limitResult.upsellMessageEn).toBeTruthy();
   });
 });
 

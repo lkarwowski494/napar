@@ -1930,3 +1930,82 @@ export function evaluateInventoryStashLimit(options?: {
     upgradeCallToActionEn,
   };
 }
+
+export type CustomRecipeLimitStatus = 'within_limit' | 'approaching_limit' | 'limit_reached' | 'unlimited_pro';
+
+export interface CustomRecipeLimitEvaluation {
+  currentRecipeCount: number;
+  maxFreeAllowed: number;
+  isPro: boolean;
+  canCreateNewRecipe: boolean;
+  remainingSlots: number;
+  status: CustomRecipeLimitStatus;
+  upsellMessagePl: string;
+  upsellMessageEn: string;
+}
+
+export function evaluateCustomRecipeLimit(
+  recipeCount?: number | string | null,
+  options?: {
+    hasProAccess?: boolean | null;
+    maxFreeRecipes?: number | string | null;
+  } | null
+): CustomRecipeLimitEvaluation {
+  const parseNum = (val: unknown, fallback: number, min: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.max(min, val);
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.max(min, parsed);
+      }
+    }
+    return fallback;
+  };
+
+  const isPro = options?.hasProAccess === true;
+  const currentRecipeCount = Math.round(parseNum(recipeCount, 0, 0));
+  const maxFreeAllowed = Math.round(parseNum(options?.maxFreeRecipes, 5, 1));
+
+  if (isPro) {
+    return {
+      currentRecipeCount,
+      maxFreeAllowed,
+      isPro: true,
+      canCreateNewRecipe: true,
+      remainingSlots: Infinity,
+      status: 'unlimited_pro',
+      upsellMessagePl: 'Pakiet Pro aktywny: nielimitowana liczba własnych receptur parzenia.',
+      upsellMessageEn: 'Pro access active: unlimited custom brewing recipes.',
+    };
+  }
+
+  const remainingSlots = Math.max(0, maxFreeAllowed - currentRecipeCount);
+  const canCreateNewRecipe = currentRecipeCount < maxFreeAllowed;
+
+  let status: CustomRecipeLimitStatus = 'within_limit';
+  let upsellMessagePl = `Wykorzystano ${currentRecipeCount} z ${maxFreeAllowed} darmowych receptur.`;
+  let upsellMessageEn = `Used ${currentRecipeCount} of ${maxFreeAllowed} free custom recipes.`;
+
+  if (currentRecipeCount >= maxFreeAllowed) {
+    status = 'limit_reached';
+    upsellMessagePl = `Osiągnięto limit ${maxFreeAllowed} własnych receptur w planie darmowym. Odblokuj Napar Pro, aby tworzyć nielimitowane przepisy.`;
+    upsellMessageEn = `Reached free limit of ${maxFreeAllowed} custom recipes. Upgrade to Napar Pro for unlimited brewing recipes.`;
+  } else if (remainingSlots <= 1) {
+    status = 'approaching_limit';
+    upsellMessagePl = `Pozostało tylko ${remainingSlots} wolne miejsce na własną recepturę (${currentRecipeCount}/${maxFreeAllowed}). Przejdź na Pro bez limitów.`;
+    upsellMessageEn = `Only ${remainingSlots} custom recipe slot remaining (${currentRecipeCount}/${maxFreeAllowed}). Upgrade to Pro for unlimited slots.`;
+  }
+
+  return {
+    currentRecipeCount,
+    maxFreeAllowed,
+    isPro: false,
+    canCreateNewRecipe,
+    remainingSlots,
+    status,
+    upsellMessagePl,
+    upsellMessageEn,
+  };
+}
