@@ -2216,7 +2216,7 @@ export function calculateBoilingDegassingImpact(options?: {
   initialAlkalinityPpm?: number | string | null;
   initialTotalHardnessPpm?: number | string | null;
   boilingDurationSeconds?: number | string | null;
-}): BoilingDegassingImpact {
+} | null): BoilingDegassingImpact {
   const parseNum = (val: unknown, fallback: number, min: number, max: number): number => {
     if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
       return Math.max(min, Math.min(max, val));
