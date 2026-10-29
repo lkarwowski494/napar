@@ -2354,3 +2354,157 @@ export function estimateRdtStaticReduction(
     recommendationEn,
   };
 }
+
+export type BurrDistributionType = 'unimodal' | 'bimodal' | 'hybrid';
+
+export interface BurrGeometryProfile {
+  burrType: 'flat' | 'conical' | 'hybrid';
+  burrDiameterMm: number;
+  distributionType: BurrDistributionType;
+  primarySuitability: 'filter' | 'espresso' | 'all-round';
+  finesRatioScore: number;
+  clarityScore: number;
+  bodyScore: number;
+  retentionTendency: 'low' | 'moderate' | 'high';
+  sensoryCharacterPl: string;
+  sensoryCharacterEn: string;
+  recommendationPl: string;
+  recommendationEn: string;
+  summaryPl: string;
+  summaryEn: string;
+}
+
+/**
+ * Szacuje profil cząstek, czystość sensoryczną i charakterystykę ekstrakcji
+ * w oparciu o geometrię (płaskie / stożkowe / hybrydowe) oraz średnicę żaren młynka.
+ */
+export function calculateBurrGeometryProfile(
+  options?: {
+    burrType?: 'flat' | 'conical' | 'hybrid' | string | null;
+    burrDiameterMm?: number | string | null;
+    targetMethod?: string | null;
+  } | null
+): BurrGeometryProfile {
+  const rawType = typeof options?.burrType === 'string' ? options.burrType.trim().toLowerCase() : '';
+  let burrType: 'flat' | 'conical' | 'hybrid' = 'flat';
+  if (rawType.includes('conic') || rawType.includes('stożk') || rawType.includes('stozk')) {
+    burrType = 'conical';
+  } else if (rawType.includes('hybr') || rawType.includes('drm')) {
+    burrType = 'hybrid';
+  } else {
+    burrType = 'flat';
+  }
+
+  let defaultDiameter = 64;
+  if (burrType === 'conical') defaultDiameter = 40;
+  if (burrType === 'hybrid') defaultDiameter = 68;
+
+  let parsedDiameter = defaultDiameter;
+  if (options?.burrDiameterMm !== null && options?.burrDiameterMm !== undefined) {
+    const num = typeof options.burrDiameterMm === 'number' ? options.burrDiameterMm : parseFloat(String(options.burrDiameterMm));
+    if (!isNaN(num) && isFinite(num) && num > 0) {
+      parsedDiameter = Math.min(140, Math.max(25, num));
+    }
+  }
+
+  const method = typeof options?.targetMethod === 'string' ? options.targetMethod.trim().toLowerCase() : '';
+
+  let distributionType: BurrDistributionType = 'unimodal';
+  let primarySuitability: 'filter' | 'espresso' | 'all-round' = 'filter';
+  let finesRatioScore = 4;
+  let clarityScore = 8;
+  let bodyScore = 6;
+  let retentionTendency: 'low' | 'moderate' | 'high' = 'moderate';
+  let sensoryCharacterPl = '';
+  let sensoryCharacterEn = '';
+
+  if (burrType === 'conical') {
+    distributionType = 'bimodal';
+    primarySuitability = 'espresso';
+    finesRatioScore = 8;
+    clarityScore = 6;
+    bodyScore = 9;
+    retentionTendency = parsedDiameter <= 48 ? 'low' : 'moderate';
+    sensoryCharacterPl = 'Rozkład bimodalny z wyraźnym pikiem drobin (fines). Gęste, kremowe body, wysoka słodycz i łagodna kwasowość.';
+    sensoryCharacterEn = 'Bimodal particle distribution with prominent fines peak. Dense, syrupy body, high sweetness, and smooth rounded acidity.';
+  } else if (burrType === 'hybrid') {
+    distributionType = 'hybrid';
+    primarySuitability = 'all-round';
+    finesRatioScore = 6;
+    clarityScore = 8;
+    bodyScore = 8;
+    retentionTendency = 'moderate';
+    sensoryCharacterPl = 'Hybrydowy profil mielenia łączący łagodne kruszenie stożkowe z precyzyjnym cięciem płaskim. Doskonały balans separacji i tekstury.';
+    sensoryCharacterEn = 'Hybrid grind geometry combining gentle conical pre-breaking with precise flat burr finish. Optimal balance of clarity and mouthfeel.';
+  } else {
+    // flat burrs
+    if (parsedDiameter >= 80) {
+      distributionType = 'unimodal';
+      primarySuitability = 'filter';
+      finesRatioScore = 2;
+      clarityScore = 10;
+      bodyScore = 5;
+      retentionTendency = 'high';
+      sensoryCharacterPl = 'Wysoce unimodalny rozkład cząstek o ultra-niskiej produkcji pyłu. Znakomita separacja nut kwiatowych i owocowych, zwiewne herbaciane body.';
+      sensoryCharacterEn = 'Highly unimodal particle size distribution with ultra-low fines yield. Outstanding floral and citrus flavor separation, tea-like body.';
+    } else if (parsedDiameter >= 60) {
+      distributionType = 'unimodal';
+      primarySuitability = 'all-round';
+      finesRatioScore = 4;
+      clarityScore = 9;
+      bodyScore = 6;
+      retentionTendency = 'moderate';
+      sensoryCharacterPl = 'Unimodalna charakterystyka z wysoką czystością naparu, wyrazistą kwasowością i zbalansowaną słodyczą.';
+      sensoryCharacterEn = 'Unimodal profile delivering high cup clarity, pronounced acidity, and balanced sweetness.';
+    } else {
+      distributionType = 'hybrid';
+      primarySuitability = 'all-round';
+      finesRatioScore = 5;
+      clarityScore = 7;
+      bodyScore = 7;
+      retentionTendency = 'low';
+      sensoryCharacterPl = 'Kompaktowe żarna płaskie oferujące wszechstronny profil mielenia pod przelewy i tradycyjne espresso.';
+      sensoryCharacterEn = 'Compact flat burrs offering an all-round profile for drip brew methods and traditional espresso.';
+    }
+  }
+
+  let recommendationPl = '';
+  let recommendationEn = '';
+
+  if (method.includes('espresso') && burrType === 'flat' && distributionType === 'unimodal' && parsedDiameter >= 80) {
+    recommendationPl = 'Ultra-unimodalne żarna płaskie w espresso wymagają bardzo precyzyjnej ekstrakcji (np. preinfuzja, puck screen, drobniejsze sitko), by uniknąć kanałowania.';
+    recommendationEn = 'Ultra-unimodal flat burrs in espresso require strict preparation (pre-infusion, puck screen, high-precision basket) to avoid channeling.';
+  } else if (method.includes('filter') || method.includes('v60') || method.includes('drip')) {
+    if (burrType === 'conical') {
+      recommendationPl = 'Żarna stożkowe w metodach przelewowych produkują więcej drobin (fines) — warto zastosować nieco grubszy przemiał i mniejszą liczbę zalań.';
+      recommendationEn = 'Conical burrs generate higher fines in pour-overs — consider a slightly coarser setting and fewer pours to prevent drawdown stalls.';
+    } else {
+      recommendationPl = 'Idealny profil żaren pod metody przelewowe — znakomita przejrzystość, czysty drawdown i równomierna ekstrakcja.';
+      recommendationEn = 'Ideal burr profile for drip and pour-overs — great clarity, fast clean drawdown, and uniform extraction.';
+    }
+  } else {
+    recommendationPl = `Rekomendowane zastosowanie: ${primarySuitability === 'filter' ? 'metody przelewowe (drip / pour-over)' : primarySuitability === 'espresso' ? 'espresso i kawiarka' : 'wszechstronne (omni / all-round)'}.`;
+    recommendationEn = `Recommended use: ${primarySuitability === 'filter' ? 'pour-over and drip methods' : primarySuitability === 'espresso' ? 'espresso and Moka pot' : 'all-round versatility'}.`;
+  }
+
+  const burrTypePl = burrType === 'flat' ? 'płaskie' : burrType === 'conical' ? 'stożkowe' : 'hybrydowe';
+  const summaryPl = `Geometria: żarna ${burrTypePl} ${parsedDiameter}mm (${distributionType}). Czystość: ${clarityScore}/10, body: ${bodyScore}/10. ${sensoryCharacterPl}`;
+  const summaryEn = `Geometry: ${burrType} ${parsedDiameter}mm (${distributionType}). Clarity: ${clarityScore}/10, body: ${bodyScore}/10. ${sensoryCharacterEn}`;
+
+  return {
+    burrType,
+    burrDiameterMm: parsedDiameter,
+    distributionType,
+    primarySuitability,
+    finesRatioScore,
+    clarityScore,
+    bodyScore,
+    retentionTendency,
+    sensoryCharacterPl,
+    sensoryCharacterEn,
+    recommendationPl,
+    recommendationEn,
+    summaryPl,
+    summaryEn,
+  };
+}

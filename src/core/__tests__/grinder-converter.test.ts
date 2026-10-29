@@ -48,6 +48,9 @@ import {
   estimateRdtStaticReduction,
   RdtStaticReduction,
   RdtStaticLevel,
+  calculateBurrGeometryProfile,
+  BurrGeometryProfile,
+  BurrDistributionType,
 } from '../grinder-converter';
 
 describe('Grinder Dial-in Converter Module', () => {
@@ -1347,6 +1350,54 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(['extreme', 'moderate']).toContain(fallbackRdt.staticLevel);
     const rdtResult: RdtStaticReduction = fallbackRdt;
     expect(rdtResult.recommendationEn).toBeTruthy();
+  });
+
+  test('TASK-P103-08-PRO: calculateBurrGeometryProfile szacuje profil żaren z typami BurrGeometryProfile i BurrDistributionType', () => {
+    // 1. Duże żarna płaskie (98mm, unimodalne pod drip/filter)
+    const flat98: BurrGeometryProfile = calculateBurrGeometryProfile({
+      burrType: 'flat',
+      burrDiameterMm: 98,
+      targetMethod: 'v60',
+    });
+    const distType: BurrDistributionType = flat98.distributionType;
+    expect(distType).toBe('unimodal');
+    expect(flat98.burrType).toBe('flat');
+    expect(flat98.burrDiameterMm).toBe(98);
+    expect(flat98.clarityScore).toBe(10);
+    expect(flat98.finesRatioScore).toBeLessThanOrEqual(3);
+    expect(flat98.primarySuitability).toBe('filter');
+    expect(flat98.sensoryCharacterPl).toContain('unimodalny');
+    expect(flat98.recommendationPl).toContain('Idealny profil żaren pod metody przelewowe');
+
+    // 2. Żarna stożkowe (40mm, bimodalne pod espresso)
+    const conical40 = calculateBurrGeometryProfile({
+      burrType: 'conical',
+      burrDiameterMm: 40,
+      targetMethod: 'espresso',
+    });
+    expect(conical40.distributionType).toBe('bimodal');
+    expect(conical40.burrType).toBe('conical');
+    expect(conical40.bodyScore).toBeGreaterThanOrEqual(8);
+    expect(conical40.finesRatioScore).toBeGreaterThanOrEqual(7);
+    expect(conical40.primarySuitability).toBe('espresso');
+    expect(conical40.sensoryCharacterEn).toContain('Bimodal');
+
+    // 3. Żarna hybrydowe (DRM / hybrid)
+    const hybridProfile = calculateBurrGeometryProfile({
+      burrType: 'hybrid',
+      burrDiameterMm: 68,
+    });
+    expect(hybridProfile.distributionType).toBe('hybrid');
+    expect(hybridProfile.burrType).toBe('hybrid');
+    expect(hybridProfile.primarySuitability).toBe('all-round');
+    expect(hybridProfile.summaryPl).toContain('hybryd');
+
+    // 4. Odporność na brak opcji i wartości null
+    const fallbackProfile = calculateBurrGeometryProfile(null);
+    expect(fallbackProfile.burrType).toBe('flat');
+    expect(fallbackProfile.burrDiameterMm).toBe(64);
+    expect(fallbackProfile.distributionType).toBe('unimodal');
+    expect(fallbackProfile.summaryEn).toBeTruthy();
   });
 });
 
