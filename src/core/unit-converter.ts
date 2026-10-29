@@ -999,3 +999,97 @@ export function formatExtractionPressure(
     summaryEn,
   };
 }
+
+export type RoastLossCategory = 'very_light' | 'light' | 'medium' | 'medium_dark' | 'dark';
+
+export interface RoastWeightLossFormat {
+  lossPercentage: number;
+  formattedLoss: string;
+  category: RoastLossCategory;
+  categoryNamePl: string;
+  categoryNameEn: string;
+  descriptionPl: string;
+  descriptionEn: string;
+}
+
+export function formatRoastWeightLoss(
+  greenGrams?: number | string | null,
+  roastedGrams?: number | string | null,
+  locale = 'pl'
+): RoastWeightLossFormat {
+  const parseNum = (val: unknown, fallback: number, min: number, max: number): number => {
+    if (typeof val === 'number' && Number.isFinite(val) && !Object.is(val, -0)) {
+      return Math.max(min, Math.min(max, val));
+    }
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val.replace(/\uFEFF/g, '').replace(',', '.').trim());
+      if (Number.isFinite(parsed) && !Object.is(parsed, -0)) {
+        return Math.max(min, Math.min(max, parsed));
+      }
+    }
+    return fallback;
+  };
+
+  const isEn = typeof locale === 'string' && locale.trim().toLowerCase().startsWith('en');
+  const green = parseNum(greenGrams, 1000, 10, 100000);
+  const roasted = parseNum(roastedGrams, 850, 5, 100000);
+
+  let lossPercentage = 0;
+  if (green > 0 && roasted <= green) {
+    lossPercentage = Math.round(((green - roasted) / green) * 1000) / 10;
+  } else if (roasted > green) {
+    lossPercentage = 0;
+  }
+
+  let category: RoastLossCategory = 'medium';
+  let categoryNamePl = '';
+  let categoryNameEn = '';
+  let descriptionPl = '';
+  let descriptionEn = '';
+
+  if (lossPercentage < 11.5) {
+    category = 'very_light';
+    categoryNamePl = 'Bardzo jasne (cynamonowe)';
+    categoryNameEn = 'Very light (cinnamon / light city)';
+    descriptionPl = `Ubytek masy ${lossPercentage}%: wysoka kwasowość, niska karmelizacja, profil skandynawski.`;
+    descriptionEn = `Weight loss ${lossPercentage}%: pronounced acidity, minimal caramelization, cinnamon roast.`;
+  } else if (lossPercentage < 13.5) {
+    category = 'light';
+    categoryNamePl = 'Jasne (metody przelewowe)';
+    categoryNameEn = 'Light (filter / Nordic)';
+    descriptionPl = `Ubytek masy ${lossPercentage}%: wzorcowy profil do metod alternatywnych (V60, Chemex, AeroPress).`;
+    descriptionEn = `Weight loss ${lossPercentage}%: benchmark profile for manual filter brewing (V60, Chemex, AeroPress).`;
+  } else if (lossPercentage <= 15.5) {
+    category = 'medium';
+    categoryNamePl = 'Średnie (omni-roast)';
+    categoryNameEn = 'Medium (omni-roast)';
+    descriptionPl = `Ubytek masy ${lossPercentage}%: zbalansowana słodycz i kwasowość, uniwersalne palenie.`;
+    descriptionEn = `Weight loss ${lossPercentage}%: balanced sweetness and acidity, versatile omni-roast profile.`;
+  } else if (lossPercentage <= 18.0) {
+    category = 'medium_dark';
+    categoryNamePl = 'Średnio-ciemne (espresso klasyczne)';
+    categoryNameEn = 'Medium-dark (classic espresso)';
+    descriptionPl = `Ubytek masy ${lossPercentage}%: wysokie body, niska kwasowość, nuty czekoladowo-orzechowe.`;
+    descriptionEn = `Weight loss ${lossPercentage}%: heavy body, muted acidity, chocolate-nutty espresso notes.`;
+  } else {
+    category = 'dark';
+    categoryNamePl = 'Ciemne (włoskie)';
+    categoryNameEn = 'Dark (Italian / full city)';
+    descriptionPl = `Ubytek masy ${lossPercentage}%: intensywna gorycz, nuty palone, głęboka crema espresso.`;
+    descriptionEn = `Weight loss ${lossPercentage}%: intense roasty notes, low acidity, thick traditional crema.`;
+  }
+
+  const formattedLoss = isEn
+    ? `${lossPercentage.toFixed(1)}%`
+    : `${lossPercentage.toFixed(1).replace('.', ',')}%`;
+
+  return {
+    lossPercentage,
+    formattedLoss,
+    category,
+    categoryNamePl,
+    categoryNameEn,
+    descriptionPl,
+    descriptionEn,
+  };
+}

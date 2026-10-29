@@ -35,6 +35,9 @@ import {
   formatExtractionPressure,
   ExtractionPressureFormat,
   PressureZone,
+  formatRoastWeightLoss,
+  RoastWeightLossFormat,
+  RoastLossCategory,
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -621,6 +624,47 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(fallback.bars).toBe(0);
       expect(fallback.formattedMetric).toBe('0.0 bar');
       expect(fallback.zone).toBe('gravity');
+    });
+
+    test('TASK-P101-09-LOK: formatRoastWeightLoss formatuje ubytek masy wypalania i kategoryzuje stopień palenia', () => {
+      // 1. Jasne palenie (1000g -> 875g = 12.5% loss)
+      const light = formatRoastWeightLoss(1000, 875, 'pl');
+      expect(light.lossPercentage).toBe(12.5);
+      expect(light.formattedLoss).toBe('12,5%');
+      expect(light.category).toBe('light');
+      expect(light.categoryNamePl).toContain('Jasne');
+      const catType: RoastLossCategory = light.category;
+      expect(catType).toBe('light');
+
+      // 2. Średnie palenie po angielsku (1000g -> 855g = 14.5% loss)
+      const medium = formatRoastWeightLoss('1000', '855', 'en');
+      expect(medium.lossPercentage).toBe(14.5);
+      expect(medium.formattedLoss).toBe('14.5%');
+      expect(medium.category).toBe('medium');
+      expect(medium.categoryNameEn).toContain('Medium');
+
+      // 3. Ciemne palenie (500g -> 405g = 19.0% loss)
+      const dark = formatRoastWeightLoss(500, 405, 'pl');
+      expect(dark.lossPercentage).toBe(19.0);
+      expect(dark.category).toBe('dark');
+      expect(dark.categoryNamePl).toContain('Ciemne');
+
+      // 4. Bardzo jasne palenie (1000g -> 895g = 10.5% loss)
+      const veryLight = formatRoastWeightLoss(1000, 895, 'pl');
+      expect(veryLight.lossPercentage).toBe(10.5);
+      expect(veryLight.category).toBe('very_light');
+
+      // 5. Średnio-ciemne (1000g -> 835g = 16.5% loss)
+      const medDark = formatRoastWeightLoss(1000, 835, 'pl');
+      expect(medDark.lossPercentage).toBe(16.5);
+      expect(medDark.category).toBe('medium_dark');
+
+      // 6. Odporność na null i anomalie
+      const fallback = formatRoastWeightLoss(null, null);
+      expect(fallback.lossPercentage).toBe(15.0);
+      expect(fallback.category).toBe('medium');
+      const lossFormat: RoastWeightLossFormat = fallback;
+      expect(lossFormat.descriptionPl).toBeTruthy();
     });
   });
 });
