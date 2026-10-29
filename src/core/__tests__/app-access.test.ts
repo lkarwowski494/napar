@@ -63,6 +63,9 @@ import {
   evaluateCustomRecipeLimit,
   CustomRecipeLimitEvaluation,
   CustomRecipeLimitStatus,
+  evaluateExportFormatAccess,
+  ExportFormatAccessEvaluation,
+  ExportFormatTier,
 } from '../app-access';
 import { initDatabase, setAppSetting, getAppSetting } from '../database';
 
@@ -1845,6 +1848,58 @@ describe('App Access & Monetization Engine (Cheaper than Espresso)', () => {
     expect(fallback.status).toBe('within_limit');
     const limitResult: CustomRecipeLimitEvaluation = fallback;
     expect(limitResult.upsellMessageEn).toBeTruthy();
+  });
+
+  test('TASK-P104-02-MON: evaluateExportFormatAccess ocenia uprawnienia eksportu z typami ExportFormatAccessEvaluation i ExportFormatTier', () => {
+    // 1. Format darmowy (JSON) dla użytkownika Free
+    const freeJson: ExportFormatAccessEvaluation = evaluateExportFormatAccess('json', { hasProAccess: false });
+    const tierType: ExportFormatTier = freeJson.tier;
+    expect(tierType).toBe('free');
+    expect(freeJson.format).toBe('json');
+    expect(freeJson.isAllowed).toBe(true);
+    expect(freeJson.isPro).toBe(false);
+    expect(freeJson.gateMessagePl).toContain('darmowego');
+
+    // 2. Format darmowy (CSV)
+    const freeCsv = evaluateExportFormatAccess('csv', { hasProAccess: false });
+    expect(freeCsv.tier).toBe('free');
+    expect(freeCsv.format).toBe('csv');
+    expect(freeCsv.isAllowed).toBe(true);
+
+    // 3. Format zaawansowany (PDF brew card) - zablokowany dla Free
+    const gatedPdf = evaluateExportFormatAccess('pdf_card', { hasProAccess: false });
+    expect(gatedPdf.tier).toBe('pro_required');
+    expect(gatedPdf.format).toBe('pdf_card');
+    expect(gatedPdf.isAllowed).toBe(false);
+    expect(gatedPdf.gateMessagePl).toContain('Napar Pro');
+    expect(gatedPdf.gateMessageEn).toContain('requires Napar Pro');
+
+    // 4. Format zaawansowany (PDF brew card) - odblokowany dla Pro
+    const proPdf = evaluateExportFormatAccess('pdf', { hasProAccess: true });
+    expect(proPdf.tier).toBe('pro_required');
+    expect(proPdf.isAllowed).toBe(true);
+    expect(proPdf.isPro).toBe(true);
+    expect(proPdf.gateMessagePl).toContain('odblokowany');
+
+    // 5. Surowa telemetria z sensorów (BLE scale / flow telemetry)
+    const telemetry = evaluateExportFormatAccess('sensor_telemetry', { hasProAccess: true });
+    expect(telemetry.tier).toBe('pro_required');
+    expect(telemetry.format).toBe('sensor_telemetry');
+    expect(telemetry.isAllowed).toBe(true);
+    expect(telemetry.featureTitlePl).toContain('telemetria');
+
+    // 6. Zaszyfrowana kopia AES
+    const encrypted = evaluateExportFormatAccess('encrypted_backup', { hasProAccess: false });
+    expect(encrypted.tier).toBe('pro_required');
+    expect(encrypted.isAllowed).toBe(false);
+
+    // 7. Odporność na null i fallback domyślny
+    const fallback = evaluateExportFormatAccess(null, null);
+    expect(fallback.format).toBe('json');
+    expect(fallback.tier).toBe('free');
+    expect(fallback.isAllowed).toBe(true);
+    const accessResult: ExportFormatAccessEvaluation = fallback;
+    expect(accessResult.gateMessageEn).toBeTruthy();
   });
 });
 

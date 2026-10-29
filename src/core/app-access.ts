@@ -2009,3 +2009,91 @@ export function evaluateCustomRecipeLimit(
     upsellMessageEn,
   };
 }
+
+export type ExportFormatTier = 'free' | 'pro_required';
+
+export interface ExportFormatAccessEvaluation {
+  format: 'json' | 'csv' | 'pdf_card' | 'sensor_telemetry' | 'encrypted_backup';
+  tier: ExportFormatTier;
+  isAllowed: boolean;
+  isPro: boolean;
+  featureTitlePl: string;
+  featureTitleEn: string;
+  gateMessagePl: string;
+  gateMessageEn: string;
+}
+
+/**
+ * Ocenia uprawnienia dostępu do formatu eksportu danych (JSON/CSV w planie bezpłatnym,
+ * karty PDF i surowa telemetria w pakiecie Napar Pro).
+ */
+export function evaluateExportFormatAccess(
+  format?: 'json' | 'csv' | 'pdf_card' | 'sensor_telemetry' | 'encrypted_backup' | string | null,
+  options?: {
+    hasProAccess?: boolean | null;
+  } | null
+): ExportFormatAccessEvaluation {
+  const isPro = options?.hasProAccess === true;
+  const rawFormat = typeof format === 'string' ? format.trim().toLowerCase() : 'json';
+
+  let resolvedFormat: 'json' | 'csv' | 'pdf_card' | 'sensor_telemetry' | 'encrypted_backup' = 'json';
+  let tier: ExportFormatTier = 'free';
+  let featureTitlePl = '';
+  let featureTitleEn = '';
+
+  if (rawFormat.includes('csv')) {
+    resolvedFormat = 'csv';
+    tier = 'free';
+    featureTitlePl = 'Eksport tabelaryczny CSV (inwentarz i dziennik)';
+    featureTitleEn = 'Tabular CSV Export (Inventory and Logbook)';
+  } else if (rawFormat.includes('pdf')) {
+    resolvedFormat = 'pdf_card';
+    tier = 'pro_required';
+    featureTitlePl = 'Wydruk eleganckiej karty parzenia PDF (Specialty Brew Card)';
+    featureTitleEn = 'Printable Specialty Brew Card PDF';
+  } else if (rawFormat.includes('sensor') || rawFormat.includes('telemetr')) {
+    resolvedFormat = 'sensor_telemetry';
+    tier = 'pro_required';
+    featureTitlePl = 'Surowa telemetria z sensorów (waga BLE, ciśnienie i przepływ)';
+    featureTitleEn = 'Raw Sensor Telemetry (BLE Scale, Pressure & Flow)';
+  } else if (rawFormat.includes('encrypt') || rawFormat.includes('szyfr')) {
+    resolvedFormat = 'encrypted_backup';
+    tier = 'pro_required';
+    featureTitlePl = 'Zaszyfrowana kopia zapasowa AES-256';
+    featureTitleEn = 'Encrypted AES-256 Backup Envelope';
+  } else {
+    resolvedFormat = 'json';
+    tier = 'free';
+    featureTitlePl = 'Standardowy eksport JSON (pełna kopia danych)';
+    featureTitleEn = 'Standard JSON Export (Full Data Backup)';
+  }
+
+  const isAllowed = tier === 'free' || isPro;
+
+  let gateMessagePl = '';
+  let gateMessageEn = '';
+
+  if (isAllowed) {
+    if (tier === 'free') {
+      gateMessagePl = `Format [${resolvedFormat.toUpperCase()}] dostępny w ramach standardowego darmowego eksportu Napar.`;
+      gateMessageEn = `Format [${resolvedFormat.toUpperCase()}] available under standard free Napar export.`;
+    } else {
+      gateMessagePl = `Format [${resolvedFormat.toUpperCase()}] odblokowany dzięki aktywnej subskrypcji Napar Pro.`;
+      gateMessageEn = `Format [${resolvedFormat.toUpperCase()}] unlocked with active Napar Pro subscription.`;
+    }
+  } else {
+    gateMessagePl = `Format [${resolvedFormat.toUpperCase()}] wymaga pakietu Napar Pro. Uaktualnij subskrypcję, aby eksportować zaawansowane dane.`;
+    gateMessageEn = `Format [${resolvedFormat.toUpperCase()}] requires Napar Pro. Upgrade to export advanced data.`;
+  }
+
+  return {
+    format: resolvedFormat,
+    tier,
+    isAllowed,
+    isPro,
+    featureTitlePl,
+    featureTitleEn,
+    gateMessagePl,
+    gateMessageEn,
+  };
+}
