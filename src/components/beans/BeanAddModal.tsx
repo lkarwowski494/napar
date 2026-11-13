@@ -16,6 +16,7 @@ import { saveInventoryItem, getUnitSystem } from '../../core/database';
 import { ouncesToGrams } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
 import { KnowledgeTemplate } from './BeanCompendiumModal';
+import { runSave } from '../../../lib/save-feedback';
 
 export interface BeanAddModalProps {
   visible: boolean;
@@ -131,7 +132,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
       updatedAt: new Date().toISOString(),
     };
 
-    saveInventoryItem(newItem);
+    if (!runSave(() => saveInventoryItem(newItem), t.common)) return;
     onSaved();
     onClose();
     resetForm();

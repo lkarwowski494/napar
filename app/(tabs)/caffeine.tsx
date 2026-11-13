@@ -36,6 +36,7 @@ import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { BedtimeCurfewCard } from '../../src/components/caffeine/BedtimeCurfewCard';
 import { CaffeineLogList } from '../../src/components/caffeine/CaffeineLogList';
 import { CaffeineQuickAddModal } from '../../src/components/caffeine/CaffeineQuickAddModal';
+import { runSave } from '../../lib/save-feedback';
 
 export default function CaffeineScreen() {
   const { t, language } = useTranslation();
@@ -155,7 +156,7 @@ export default function CaffeineScreen() {
       doseGrams: doseG,
       caffeineMg: mg,
     };
-    logCaffeine(log);
+    if (!runSave(() => logCaffeine(log), t.common)) return;
 
     // HealthKit deferred to v1.2 (DEC-01)
 
@@ -164,7 +165,7 @@ export default function CaffeineScreen() {
   };
 
   const handleDeleteLog = (log: CaffeineLog) => {
-    deleteCaffeineLog(log.id);
+    if (!runSave(() => deleteCaffeineLog(log.id), t.common)) return;
     loadLogs();
   };
 

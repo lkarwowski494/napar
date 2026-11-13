@@ -29,6 +29,7 @@ import { RecipeBasicInfoCard } from '../src/components/recipe-builder/RecipeBasi
 import { RecipeParamsCard } from '../src/components/recipe-builder/RecipeParamsCard';
 import { RecipeStepEditor } from '../src/components/recipe-builder/RecipeStepEditor';
 import { RecipeTypeSelector } from '../src/components/recipe-builder/RecipeTypeSelector';
+import { runSave } from '../lib/save-feedback';
 
 export default function RecipeBuilderScreen() {
   const router = useRouter();
@@ -214,7 +215,7 @@ export default function RecipeBuilderScreen() {
       createdAt: new Date().toISOString(),
     };
 
-    saveRecipe(recipe);
+    if (!runSave(() => saveRecipe(recipe), t.common)) return;
     announce(t.recipeBuilder.saveRecipeBtn);
     router.back();
   };
@@ -231,7 +232,7 @@ export default function RecipeBuilderScreen() {
       actionText: t.common.delete,
       destructive: true,
       onConfirm: () => {
-        deleteRecipe(id);
+        if (!runSave(() => deleteRecipe(id), t.common)) return;
         announce(t.common.delete);
         router.back();
       },

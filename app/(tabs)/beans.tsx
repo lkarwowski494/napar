@@ -29,6 +29,7 @@ import { BeanAddModal } from '../../src/components/beans/BeanAddModal';
 import { BeanEditModal } from '../../src/components/beans/BeanEditModal';
 import { BeanTopBar } from '../../src/components/beans/BeanTopBar';
 import { BeanItemCard } from '../../src/components/beans/BeanItemCard';
+import { runSave } from '../../lib/save-feedback';
 
 export default function BeansScreen() {
   const router = useRouter();
@@ -106,7 +107,7 @@ export default function BeansScreen() {
       isFavorite: !item.isFavorite,
       updatedAt: new Date().toISOString(),
     };
-    saveInventoryItem(updated);
+    if (!runSave(() => saveInventoryItem(updated), t.common)) return;
     loadData();
   };
 
@@ -116,7 +117,7 @@ export default function BeansScreen() {
       isArchived: !item.isArchived,
       updatedAt: new Date().toISOString(),
     };
-    saveInventoryItem(updated);
+    if (!runSave(() => saveInventoryItem(updated), t.common)) return;
     loadData();
   };
 

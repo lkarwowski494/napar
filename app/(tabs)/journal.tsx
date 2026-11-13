@@ -30,6 +30,7 @@ import { ProactiveCalendarCard } from '../../src/components/journal/ProactiveCal
 import { JournalFilterBar } from '../../src/components/journal/JournalFilterBar';
 import { useJournalAnalytics } from '../../src/core/useJournalAnalytics';
 import { ProactiveActionItem } from '../../src/core/bpr-engine';
+import { runSave } from '../../lib/save-feedback';
 
 export default function JournalScreen() {
   const router = useRouter();
@@ -104,7 +105,7 @@ export default function JournalScreen() {
       actionText: t.common.delete,
       destructive: true,
       onConfirm: () => {
-        deleteBrewSession(session.id);
+        if (!runSave(() => deleteBrewSession(session.id), t.common)) return;
         loadData();
       },
     });

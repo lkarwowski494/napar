@@ -40,6 +40,7 @@ import {
   dismissCorruptState,
   CorruptStateRecovery,
 } from './backup';
+import { runSave } from '../../lib/save-feedback';
 
 export type AnyRecipe = SavedRecipe | MasterRecipe;
 
@@ -398,15 +399,21 @@ export function useBrewWorkflow() {
 
   const handleFinishSave = () => {
     const tdsNum = parseFloat(tdsInput);
-    finishAndSaveSession({
-      rating,
-      tasteBalance,
-      flavorTags: selectedTags,
-      sensory: sensoryProfile,
-      tdsPercentage: isNaN(tdsNum) ? undefined : tdsNum,
-      notes: notes.trim() || undefined,
-      logToCaffeineTracker: true,
-    });
+    // M1-audytor-generalny-007: przy błędzie zapisu okno zakończenia zostaje otwarte z ocenami i notatkami.
+    const saved = runSave(
+      () =>
+        finishAndSaveSession({
+          rating,
+          tasteBalance,
+          flavorTags: selectedTags,
+          sensory: sensoryProfile,
+          tdsPercentage: isNaN(tdsNum) ? undefined : tdsNum,
+          notes: notes.trim() || undefined,
+          logToCaffeineTracker: true,
+        }),
+      t.common
+    );
+    if (!saved) return;
     recordBrew();
     setShowFinishModal(false);
     resetTimer();

@@ -57,10 +57,11 @@ jest.mock('expo-keep-awake', () => ({
   deactivateKeepAwake: jest.fn(),
 }));
 
+const mockRouterBack = jest.fn();
 jest.mock('expo-router', () => ({
   useRouter: () => ({
     push: jest.fn(),
-    back: jest.fn(),
+    back: mockRouterBack,
   }),
 }));
 
@@ -247,8 +248,8 @@ describe('GongfuScreen Component', () => {
       }
     });
 
-    const saveSessionSpy = jest.spyOn(databaseModule, 'saveBrewSession');
-    const logCaffeineSpy = jest.spyOn(databaseModule, 'logCaffeine');
+    // M1-audytor-generalny-007: sesja i log kofeiny zapisują się razem przez recordBrewSessionTransaction.
+    const txSpy = jest.spyOn(databaseModule, 'recordBrewSessionTransaction');
 
     let tree: any;
     renderer.act(() => {
@@ -295,8 +296,9 @@ describe('GongfuScreen Component', () => {
     });
 
     expect(alertSpy).toHaveBeenCalled();
-    expect(saveSessionSpy).toHaveBeenCalled();
-    expect(logCaffeineSpy).toHaveBeenCalled();
+    expect(txSpy).toHaveBeenCalledTimes(1);
+    expect(txSpy.mock.calls[0][0].method).toBe('GONGFU');
+    expect(txSpy.mock.calls[0][2]?.brewSessionId).toBe(txSpy.mock.calls[0][0].id);
   });
 
   test('W trybie wygasłego trialu próba rozpoczęcia parzenia Gongfu Cha otwiera Paywall', () => {
@@ -382,5 +384,67 @@ describe('GongfuScreen Component', () => {
 
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Steep #1 delivers ~60 mg (RD-19 extraction kinetics).');
+  });
+});
+
+
+// M1-audytor-generalny-007 (05-architekt-007, 08-programista-007, 05-architekt-011)
+describe('GongfuScreen — zapis sesji jedną transakcją i komunikat przy błędzie (M1-audytor-generalny-007)', () => {
+  function runInfusionAndSave() {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<GongfuScreen />);
+    });
+    const press = (label: string) => {
+      const txt = tree.root.findAll((n: any) => n.props && n.props.children === label)[0];
+      let btn = txt.parent;
+      while (btn && !btn.props.onPress) btn = btn.parent;
+      renderer.act(() => {
+        btn.props.onPress();
+      });
+    };
+    press('START INFUZJI');
+    renderer.act(() => {
+      for (let i = 0; i < 25; i++) jest.advanceTimersByTime(1000);
+    });
+    press('+ Kolejna Infuzja');
+    press('Zapisz');
+    return tree;
+  }
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    mockRouterBack.mockClear();
+    jest.spyOn(Alert, 'alert').mockImplementation((_t, _m, buttons) => {
+      const confirmBtn = buttons?.find((b: any) => b.text === 'Zapisz');
+      confirmBtn?.onPress?.();
+    });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  test('sesja, log kofeiny i odliczenie wagi idą jednym recordBrewSessionTransaction', () => {
+    const txSpy = jest.spyOn(databaseModule, 'recordBrewSessionTransaction');
+    const directSave = jest.spyOn(databaseModule, 'saveBrewSession');
+    const directLog = jest.spyOn(databaseModule, 'logCaffeine');
+    runInfusionAndSave();
+    expect(txSpy).toHaveBeenCalledTimes(1);
+    const [session, , log] = txSpy.mock.calls[0];
+    expect(session.method).toBe('GONGFU');
+    expect(log?.brewSessionId).toBe(session.id);
+    expect(directSave).not.toHaveBeenCalled();
+    expect(directLog).not.toHaveBeenCalled();
+  });
+
+  test('błąd zapisu: komunikat „Nie udało się zapisać zmian”, ekran zostaje otwarty', () => {
+    jest.spyOn(databaseModule, 'recordBrewSessionTransaction').mockImplementation(() => {
+      throw new Error('database or disk is full');
+    });
+    runInfusionAndSave();
+    const titles = (Alert.alert as jest.Mock).mock.calls.map((c) => c[0]);
+    expect(titles).toContain(translations.pl.common.saveErrorTitle);
+    expect(mockRouterBack).not.toHaveBeenCalled();
   });
 });

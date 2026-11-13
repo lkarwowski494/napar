@@ -400,3 +400,46 @@ describe('Import odrzuca nowszy format i złe typy bez zapisu (M1-audytor-genera
     sqlite.__closeAll();
   });
 });
+
+describe('Zapis Gongfu jest atomowy (M1-audytor-generalny-007; 05-architekt-007)', () => {
+  test('błąd przy zapisie logu kofeiny: brak sesji, brak logu, waga paczki bez zmian (0/3)', () => {
+    const { db, sqlite } = loadDatabase();
+    db.saveInventoryItem({
+      id: 'tea-1',
+      name: 'Da Hong Pao',
+      type: 'tea',
+      initialWeightGrams: 100,
+      remainingWeightGrams: 100,
+      flavorNotes: [],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-11-01T08:00:00.000Z',
+      updatedAt: '2026-11-01T08:00:00.000Z',
+    });
+    const mock = sqlite as SqliteMock & { __failOn: (re: RegExp) => void; __clearFailures: () => void };
+    mock.__failOn(/INSERT INTO caffeine_logs/);
+    expect(() =>
+      db.recordBrewSessionTransaction(
+        {
+          id: 'g1',
+          inventoryItemId: 'tea-1',
+          beverageType: 'TEA',
+          method: 'GONGFU',
+          doseGrams: 7,
+          waterGrams: 120,
+          waterTempCelsius: 96,
+          totalTimeSeconds: 60,
+          flavorTags: [],
+          brewedAt: '2026-11-02T08:00:00.000Z',
+        },
+        { itemId: 'tea-1', doseGrams: 7 },
+        { id: 'gl1', brewSessionId: 'g1', beverageName: 'Da Hong Pao', beverageType: 'tea', consumedAt: '2026-11-02T08:00:00.000Z', doseGrams: 7, caffeineMg: 40 }
+      )
+    ).toThrow(/disk I\/O error/);
+    mock.__clearFailures();
+    expect(count(db, 'SELECT COUNT(*) AS c FROM brew_sessions')).toBe(0);
+    expect(count(db, 'SELECT COUNT(*) AS c FROM caffeine_logs')).toBe(0);
+    expect(db.getInventoryItemById('tea-1')?.remainingWeightGrams).toBe(100);
+    sqlite.__closeAll();
+  });
+});

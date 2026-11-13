@@ -15,6 +15,7 @@ import { useTranslation, formatTemplate } from '../../core/i18n';
 import { saveInventoryItem, deleteInventoryItem, getUnitSystem } from '../../core/database';
 import { gramsToOunces, ouncesToGrams, roundTo } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
+import { runSave } from '../../../lib/save-feedback';
 
 export interface BeanEditModalProps {
   visible: boolean;
@@ -134,7 +135,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
       updatedAt: new Date().toISOString(),
     };
 
-    saveInventoryItem(updatedItem);
+    if (!runSave(() => saveInventoryItem(updatedItem), t.common)) return;
     onSaved();
     onClose();
     Alert.alert(t.stash?.updateSuccessTitle || 'Zapisano!', formatTemplate(t.stash?.updateSuccess || 'Paczka "{name}" została zaktualizowana.', { name: updatedItem.name }));
@@ -153,7 +154,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
       isArchived: true,
       updatedAt: new Date().toISOString(),
     };
-    saveInventoryItem(updatedItem);
+    if (!runSave(() => saveInventoryItem(updatedItem), t.common)) return;
     onSaved();
     onClose();
     Alert.alert(t.stash?.archivedSuccessTitle || 'Zarchiwizowano', t.stash?.archivedSuccess || 'Paczka została oznaczona jako zużyta (0 g) i przeniesiona do archiwum.');
@@ -170,7 +171,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           text: 'Usuń',
           style: 'destructive',
           onPress: () => {
-            deleteInventoryItem(item.id);
+            if (!runSave(() => deleteInventoryItem(item.id), t.common)) return;
             onDeleted();
             onClose();
           },

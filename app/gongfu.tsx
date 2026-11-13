@@ -25,14 +25,12 @@ import {
   getRecommendedGongfuSteepSeconds,
 } from '../src/core/gongfu-session';
 import {
-  saveBrewSession,
-  logCaffeine,
-  deductInventoryWeight,
+  recordBrewSessionTransaction,
   getInventoryItems,
   getUnitSystem,
   buildBackupState,
 } from '../src/core/database';
-import { InventoryItem } from '../src/core/database-schema';
+import { InventoryItem, BrewSession, CaffeineLog } from '../src/core/database-schema';
 import { theme } from '../src/core/theme';
 import { confirmAction } from '../src/core/confirm';
 import { announce } from '../src/core/announce';
@@ -44,6 +42,7 @@ import { playTimerChime } from '../src/core/timer-audio';
 import { GongfuSessionSetup } from '../src/components/gongfu/GongfuSessionSetup';
 import { GongfuActiveInfusion } from '../src/components/gongfu/GongfuActiveInfusion';
 import { GongfuInfusionHistory } from '../src/components/gongfu/GongfuInfusionHistory';
+import { runSave } from '../lib/save-feedback';
 
 export default function GongfuScreen() {
   const router = useRouter();
@@ -211,8 +210,8 @@ export default function GongfuScreen() {
         const doseNum = parseFloat(leafDoseGrams) || 7;
         const totalDuration = session.infusions.reduce((sum, inf) => sum + inf.durationSeconds, 0);
 
-        // Zapis do brew_sessions
-        saveBrewSession({
+        // M1-audytor-generalny-007: sesja, log kofeiny i odliczenie wagi w jednej transakcji; błąd = komunikat, ekran zostaje.
+        const gongfuSession: BrewSession = {
           id: session.id,
           inventoryItemId: selectedInventoryId || undefined,
           inventoryItemName: teaName,
@@ -231,10 +230,8 @@ export default function GongfuScreen() {
             .join('; ')}`,
           infusionNumber: session.infusions.length,
           brewedAt: new Date().toISOString(),
-        });
-
-        // Log kofeiny
-        logCaffeine({
+        };
+        const gongfuCaffeineLog: CaffeineLog = {
           id: `caff-${Date.now()}`,
           brewSessionId: session.id,
           beverageName: `${teaName} (Gongfu Cha)`,
@@ -242,12 +239,17 @@ export default function GongfuScreen() {
           consumedAt: new Date().toISOString(),
           doseGrams: doseNum,
           caffeineMg: session.totalCaffeineMg,
-        });
-
-        // Odliczenie gramatury ze spiżarni
-        if (selectedInventoryId) {
-          deductInventoryWeight(selectedInventoryId, doseNum);
-        }
+        };
+        const saved = runSave(
+          () =>
+            recordBrewSessionTransaction(
+              gongfuSession,
+              selectedInventoryId ? { itemId: selectedInventoryId, doseGrams: doseNum } : undefined,
+              gongfuCaffeineLog
+            ),
+          t.common
+        );
+        if (!saved) return;
 
         recordBrew();
         try {
