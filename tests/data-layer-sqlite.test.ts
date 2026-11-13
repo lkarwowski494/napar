@@ -112,8 +112,17 @@ describe('Warstwa danych na node:sqlite (M1-audytor-generalny-001)', () => {
     const customBefore = Number(before.prepare('SELECT COUNT(*) AS c FROM recipes WHERE is_custom = 1').get().c);
     before.close();
 
+    // Kopia przed migracją trafia do katalogu dokumentów (M1-audytor-generalny-005): tu katalog tymczasowy.
+    const legacyFs = require('expo-file-system/legacy');
+    const originalDocDir = legacyFs.documentDirectory;
+    legacyFs.documentDirectory = `file://${tmpDir}/`;
     const { db, sqlite } = loadDatabase(copy);
-    const conn = db.getDatabase();
+    let conn;
+    try {
+      conn = db.getDatabase();
+    } finally {
+      legacyFs.documentDirectory = originalDocDir;
+    }
 
     expect(conn.getFirstSync<{ user_version: number }>('PRAGMA user_version')).toEqual({ user_version: 3 });
     for (const t of ['inventory_items', 'brew_sessions', 'caffeine_logs']) {

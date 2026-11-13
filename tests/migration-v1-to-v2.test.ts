@@ -4,8 +4,42 @@
 // ============================================================================
 
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { initDatabase, createPreMigrationBackup } from '../src/core/database';
+
+// M1-audytor-generalny-005: kopia przed migracją jest prawdziwym plikiem sprawdzanym osobnym połączeniem,
+// więc weryfikację kopii wykonuje node:sqlite, a katalog dokumentów to katalog tymczasowy.
+jest.mock('expo-sqlite', () => require('./support/expo-sqlite-node').createExpoSqliteMock());
+const legacyFs = require('expo-file-system/legacy');
+const FIXTURE_V1 = path.join(__dirname, 'fixtures', 'napar-v1.0.db');
+let docsDir: string;
+const originalDocDir = legacyFs.documentDirectory;
+beforeAll(() => {
+  docsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'napar-mig-docs-'));
+  legacyFs.documentDirectory = `file://${docsDir}/`;
+});
+afterAll(() => {
+  legacyFs.documentDirectory = originalDocDir;
+  fs.rmSync(docsDir, { recursive: true, force: true });
+});
+
+/** Atrapa bazy v1 wykonuje VACUUM INTO jako kopię pliku fixture v1 (1 sesja), tak jak zrobiłby to SQLite. */
+function withRealBackup(db: any): any {
+  const run = db.runSync;
+  const first = db.getFirstSync;
+  db.runSync = jest.fn((query: string, params?: any[]) => {
+    if (/^VACUUM INTO \?/.test(query)) {
+      fs.copyFileSync(FIXTURE_V1, params![0]);
+      return { changes: 0 };
+    }
+    return run(query, params);
+  });
+  db.getFirstSync = jest.fn((query: string, params?: any[]) =>
+    query === 'SELECT COUNT(*) AS c FROM brew_sessions' ? { c: 1 } : first(query, params)
+  );
+  return db;
+}
 
 describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
   const fixturePath = path.join(__dirname, 'fixtures', 'napar-v1.0.db');
@@ -33,21 +67,18 @@ describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
     expect(buf.subarray(68, 72).toString('ascii')).toBe('NAPR');
   });
 
-  test('Procedura createPreMigrationBackup tworzy snapshot zabezpieczający przed migracją', () => {
-    const mockBackups = new Map<string, any>();
+  test('createPreMigrationBackup bez prawdziwej kopii rzuca błąd zamiast udawać sukces (M1-audytor-generalny-005)', () => {
+    // Wcześniej: przy nieudanym VACUUM INTO funkcja zapisywała wiersz-atrapę w migration_backups i zwracała nazwę jak przy sukcesie.
+    const queries: string[] = [];
     const mockDb: any = {
       getFirstSync: jest.fn(() => ({ c: 42 })),
-      runSync: jest.fn((query: string, params?: any[]) => {
-        if (query.includes('INSERT INTO migration_backups')) {
-          mockBackups.set(params![0], { id: params![0], createdAt: params![1], count: params![2] });
-        }
+      runSync: jest.fn((query: string) => {
+        queries.push(query);
       }),
     };
 
-    const backupKey = createPreMigrationBackup(mockDb, 1);
-    expect(backupKey).toMatch(/^napar-pre-v1-/);
-    expect(mockBackups.has(backupKey)).toBe(true);
-    expect(mockBackups.get(backupKey).count).toBe(42);
+    expect(() => createPreMigrationBackup(mockDb, 1)).toThrow(/kopii bezpieczeństwa przed migracją v1/);
+    expect(queries.some((q) => q.includes('migration_backups'))).toBe(false);
   });
 
   test('Bezstratna migracja v1.0 do v3.0 zachowuje 100% rekordów i rozszerza schemat', () => {
@@ -129,7 +160,7 @@ describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
     };
 
     // Uruchomienie migracji przez initDatabase
-    initDatabase(mockDb);
+    initDatabase(withRealBackup(mockDb));
 
     // 1. Weryfikacja atomowego bloku transakcyjnego
     expect(executedQueries).toContain('BEGIN TRANSACTION;');
@@ -184,7 +215,7 @@ describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
     };
 
     expect(() => {
-      initDatabase(failingDb);
+      initDatabase(withRealBackup(failingDb));
     }).toThrow('Disk IO Error simulation during migration');
 
     expect(rolledBack).toBe(true);

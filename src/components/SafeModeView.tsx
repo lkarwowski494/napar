@@ -21,9 +21,12 @@ import { createRescueExport, resetDatabaseSafely, type RescueCounts } from '../c
 import { deviceRescueContext, pathToUri } from '../core/rescue-expo';
 import { detectSystemLanguage } from '../core/i18n';
 
+export type SafeModeReason = 'crash-loop' | 'database' | 'too-new';
+
 export interface SafeModeViewProps {
   onRetry: () => void;
   language?: 'pl' | 'en';
+  reason?: SafeModeReason;
 }
 
 const MESSAGES = {
@@ -31,6 +34,9 @@ const MESSAGES = {
     badge: 'TRYB AWARYJNY / SAFE MODE',
     title: 'Wykryto problem ze startem',
     desc: 'Aplikacja kilka razy z rzędu nie uruchomiła się poprawnie. Zanim spróbujesz czegokolwiek innego, zrób kopię ratunkową bazy.',
+    descDatabase: 'Aplikacja nie mogła otworzyć bazy danych. Zanim spróbujesz czegokolwiek innego, zrób kopię ratunkową bazy.',
+    descTooNew:
+      'Dane zapisała nowsza wersja Napar i ta wersja aplikacji ich nie odczyta. Zaktualizuj aplikację. Do tego czasu nie resetuj bazy, bo usuniesz te dane z aplikacji. Kopię ratunkową bazy możesz zrobić w każdej chwili.',
     prepDb: 'Przygotowywanie bazy danych do eksportu...',
     noDbTitle: 'Brak pliku',
     noDbDesc: 'Nie znaleziono pliku bazy SQLite na dysku.',
@@ -72,6 +78,9 @@ const MESSAGES = {
     badge: 'RESCUE MODE / SAFE MODE',
     title: 'Startup Problem Detected',
     desc: 'The app failed to start several times in a row. Before you try anything else, make a rescue copy of the database.',
+    descDatabase: 'The app could not open its database. Before you try anything else, make a rescue copy of the database.',
+    descTooNew:
+      'A newer version of Napar saved this data, and this version of the app cannot read it. Update the app. Until then, do not reset the database, or you will delete this data from the app. You can make a rescue copy of the database at any time.',
     prepDb: 'Preparing database for export...',
     noDbTitle: 'File Not Found',
     noDbDesc: 'SQLite database file was not found on disk.',
@@ -111,7 +120,7 @@ const MESSAGES = {
   },
 };
 
-export const SafeModeView: React.FC<SafeModeViewProps> = ({ onRetry, language }) => {
+export const SafeModeView: React.FC<SafeModeViewProps> = ({ onRetry, language, reason = 'crash-loop' }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
 
@@ -235,7 +244,7 @@ export const SafeModeView: React.FC<SafeModeViewProps> = ({ onRetry, language })
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.badge}>{m.badge}</Text>
         <Text style={styles.title}>{m.title}</Text>
-        <Text style={styles.desc}>{m.desc}</Text>
+        <Text style={styles.desc}>{reason === 'database' ? m.descDatabase : reason === 'too-new' ? m.descTooNew : m.desc}</Text>
 
         {statusMessage ? <Text style={styles.status}>{statusMessage}</Text> : null}
         {loading ? <ActivityIndicator size="large" color="#D97736" style={styles.loader} /> : null}

@@ -12,7 +12,8 @@ import { LanguageProvider, useTranslation } from '../src/core/i18n';
 import { BrewProvider } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
 import { crashLoopGuard, recordStartupSuccess } from '../src/core/startup-guard';
-import { SafeModeView } from '../src/components/SafeModeView';
+import { SafeModeView, type SafeModeReason } from '../src/components/SafeModeView';
+import { openDatabaseAtStartup } from '../src/core/database';
 
 function StartupSuccessNotifier() {
   useEffect(() => {
@@ -68,6 +69,7 @@ function RootStack() {
 export default function RootLayout() {
   const [isSafeMode, setIsSafeMode] = useState<boolean>(false);
   const [isReady, setIsReady] = useState<boolean>(false);
+  const [safeReason, setSafeReason] = useState<SafeModeReason>('crash-loop');
 
   useEffect(() => {
     let active = true;
@@ -76,6 +78,13 @@ export default function RootLayout() {
         const { shouldEnterSafeMode } = await crashLoopGuard.recordStartupAttempt();
         if (shouldEnterSafeMode) {
           if (active) setIsSafeMode(true);
+        } else {
+          // M1-audytor-generalny-005: baza otwierana przed pierwszym ekranem; błąd kopii/migracji → tryb awaryjny.
+          const opened = openDatabaseAtStartup();
+          if (!opened.ok && active) {
+            setSafeReason(opened.reason);
+            setIsSafeMode(true);
+          }
         }
       } catch {
         if (active) setIsSafeMode(true);
@@ -89,7 +98,13 @@ export default function RootLayout() {
   }, []);
 
   const handleRetry = async () => {
-    await crashLoopGuard.resetCrashCount();
+    // Jedna próba: kolejny start bez kamienia milowego wraca od razu do trybu awaryjnego (M1-audytor-generalny-005).
+    await crashLoopGuard.recordRetry();
+    const opened = openDatabaseAtStartup();
+    if (!opened.ok) {
+      setSafeReason(opened.reason);
+      return;
+    }
     setIsSafeMode(false);
   };
 
@@ -105,7 +120,7 @@ export default function RootLayout() {
     return (
       <SafeAreaProvider>
         <StatusBar barStyle="light-content" />
-        <SafeModeView onRetry={handleRetry} />
+        <SafeModeView onRetry={handleRetry} reason={safeReason} />
       </SafeAreaProvider>
     );
   }

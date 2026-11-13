@@ -3,24 +3,9 @@
 // ============================================================================
 
 import { crashLoopGuard, recordStartupSuccess } from '../startup-guard';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
-jest.mock('expo-file-system', () => {
-  let fileContent = '';
-  return {
-    documentDirectory: 'file:///data/user/0/pl.lukasz.napar/files/',
-    getInfoAsync: jest.fn(async () => ({
-      exists: Boolean(fileContent),
-    })),
-    readAsStringAsync: jest.fn(async () => fileContent),
-    writeAsStringAsync: jest.fn(async (_path: string, content: string) => {
-      fileContent = content;
-    }),
-    __reset: () => {
-      fileContent = '';
-    },
-  };
-});
+// Atrapa legacy z jest.setup.js (pliki w pamięci po ścieżce); guard importuje 'expo-file-system/legacy' (M1-audytor-generalny-005).
 
 describe('Startup Crash Loop Guard (TASK-R12-01)', () => {
   beforeEach(() => {
@@ -92,7 +77,7 @@ describe('Startup Crash Loop Guard (TASK-R12-01)', () => {
 
   test('TASK-P60-10-WYD: readState oczyszcza BOM i poprawnie parsuje plik ze znacznikiem \uFEFF', async () => {
     const rawWithBom = '\uFEFF' + JSON.stringify({ crash_count: 2, lastAttemptAt: '2026-10-27T07:00:00.000Z' });
-    await FileSystem.writeAsStringAsync('', rawWithBom);
+    await FileSystem.writeAsStringAsync(await crashLoopGuard.getGuardPath(), rawWithBom);
 
     const state = await crashLoopGuard.readState();
     expect(state.crash_count).toBe(2);
@@ -101,7 +86,7 @@ describe('Startup Crash Loop Guard (TASK-R12-01)', () => {
 
   test('TASK-P60-10-WYD: readState i recordStartupAttempt chronią przed wartościami ujemnymi, -0, NaN i nieprawidłowymi datami', async () => {
     const corrupted = JSON.stringify({ crash_count: -10, lastAttemptAt: 'not-a-valid-date' });
-    await FileSystem.writeAsStringAsync('', corrupted);
+    await FileSystem.writeAsStringAsync(await crashLoopGuard.getGuardPath(), corrupted);
 
     const state = await crashLoopGuard.readState();
     expect(state.crash_count).toBe(0);
@@ -113,7 +98,7 @@ describe('Startup Crash Loop Guard (TASK-R12-01)', () => {
   });
 
   test('TASK-P60-10-WYD: recordStartupAttempt ogranicza maksymalny licznik awarii do 100', async () => {
-    await FileSystem.writeAsStringAsync('', JSON.stringify({ crash_count: 999, lastAttemptAt: new Date().toISOString() }));
+    await FileSystem.writeAsStringAsync(await crashLoopGuard.getGuardPath(), JSON.stringify({ crash_count: 999, lastAttemptAt: new Date().toISOString() }));
     const state = await crashLoopGuard.readState();
     expect(state.crash_count).toBe(100);
 

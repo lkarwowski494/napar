@@ -19,6 +19,8 @@ const mockDb: any = {
     return null;
   }),
   getAllSync: jest.fn(() => []),
+  // initDatabase wstawia receptury wzorcowe przez prepareSync; bez tej metody getDatabase rzuca (M1-audytor-generalny-005).
+  prepareSync: jest.fn(() => ({ executeSync: jest.fn(), finalizeSync: jest.fn() })),
   runSync: jest.fn((q, p) => {
     if (q.includes('INSERT OR REPLACE INTO app_settings')) {
       mockDb.app_settings.set(p?.[0], p?.[1]);

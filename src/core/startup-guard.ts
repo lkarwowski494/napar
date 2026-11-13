@@ -3,9 +3,11 @@
 // Protects against repeated crash loops during startup and initialization
 // ============================================================================
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 const GUARD_FILE = 'crash_count.json';
+/** Liczba startów z rzędu bez kamienia milowego, od której aplikacja startuje w trybie awaryjnym. */
+export const SAFE_MODE_THRESHOLD = 3;
 
 interface GuardState {
   crash_count: number;
@@ -14,7 +16,7 @@ interface GuardState {
 
 export const crashLoopGuard = {
   async getGuardPath(): Promise<string> {
-    const docDir = (FileSystem as any).documentDirectory || '';
+    const docDir = FileSystem.documentDirectory || '';
     return `${docDir}${GUARD_FILE}`;
   },
 
@@ -70,7 +72,7 @@ export const crashLoopGuard = {
     state.lastAttemptAt = new Date().toISOString();
     await this.writeState(state);
 
-    const shouldEnterSafeMode = state.crash_count >= 3;
+    const shouldEnterSafeMode = state.crash_count >= SAFE_MODE_THRESHOLD;
     return {
       crashCount: state.crash_count,
       shouldEnterSafeMode,
@@ -80,6 +82,17 @@ export const crashLoopGuard = {
   async recordStartupSuccess(): Promise<void> {
     await this.writeState({
       crash_count: 0,
+      lastAttemptAt: new Date().toISOString(),
+    });
+  },
+
+  /**
+   * „Spróbuj uruchomić normalnie” z trybu awaryjnego: jedna próba. Licznik = próg − 1, więc kolejny start
+   * bez kamienia milowego wraca od razu do trybu awaryjnego (wzorzec strażnika roli 12; M1-audytor-generalny-005).
+   */
+  async recordRetry(): Promise<void> {
+    await this.writeState({
+      crash_count: SAFE_MODE_THRESHOLD - 1,
       lastAttemptAt: new Date().toISOString(),
     });
   },
@@ -95,7 +108,7 @@ export const crashLoopGuard = {
 
   async isInSafeMode(): Promise<boolean> {
     const state = await this.readState();
-    return state.crash_count >= 3;
+    return state.crash_count >= SAFE_MODE_THRESHOLD;
   },
 };
 

@@ -32,9 +32,8 @@ jest.mock('expo-file-system/legacy', () => {
   };
 });
 
-jest.mock('expo-file-system', () => {
-  return require('expo-file-system/legacy');
-});
+// M1-audytor-generalny-005: bez aliasu 'expo-file-system' → atrapa legacy. Alias ukrywał, że metody legacy
+// importowane z głównego modułu rzucają w SDK 57; kod aplikacji importuje teraz 'expo-file-system/legacy'.
 
 jest.mock('expo-audio', () => ({
   createAudioPlayer: jest.fn(() => ({

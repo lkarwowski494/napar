@@ -5,8 +5,9 @@ import type { NaparBackupData } from './backup';
 // ============================================================================
 
 import * as SQLite from 'expo-sqlite';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { dbDirectory } from './db-path';
+import { uriToPath } from './rescue-expo';
 import {
   InventoryItem,
   SavedRecipe,
@@ -96,50 +97,113 @@ let dbInstance: SQLite.SQLiteDatabase | null = null;
 export function getDatabase(): SQLite.SQLiteDatabase {
   if (!dbInstance) {
     const safeDir = dbDirectory(SQLite.defaultDatabaseDirectory);
-    dbInstance = safeDir
+    const db = safeDir
       ? SQLite.openDatabaseSync('napar.db', undefined, safeDir)
       : SQLite.openDatabaseSync('napar.db');
-    initDatabase(dbInstance);
+    try {
+      initDatabase(db);
+    } catch (err) {
+      // Bez pół-zainicjalizowanej bazy: kolejne wywołanie spróbuje od nowa i znów zgłosi błąd (M1-audytor-generalny-005).
+      try {
+        db.closeSync();
+      } catch {
+        // połączenie już zamknięte
+      }
+      throw err;
+    }
+    dbInstance = db;
   }
   return dbInstance;
 }
 
-export function createPreMigrationBackup(db: SQLite.SQLiteDatabase, fromVersion: number): string {
-  const timestamp = Date.now();
-  const backupFileName = `napar-pre-v${fromVersion}-${timestamp}.db`;
+export type StartupDatabaseResult =
+  | { ok: true }
+  | { ok: false; reason: 'database' | 'too-new'; message: string };
 
+/**
+ * Otwarcie bazy przy starcie interfejsu, przed pierwszym ekranem: błąd kopii, migracji albo baza nowsza
+ * niż aplikacja kończą się trybem awaryjnym z przyczyną, a nie pracą na pół-zmigrowanej bazie (M1-audytor-generalny-005).
+ */
+export function openDatabaseAtStartup(): StartupDatabaseResult {
   try {
-    // 1. Scalenie bufora WAL do pliku bazy SQLite
-    try {
-      db.execSync('PRAGMA wal_checkpoint(TRUNCATE);');
-    } catch {
-      // Ignoruj w środowisku mocka SQLite
-    }
-
-    // 2. Utworzenie fizycznej kopii bazy danych
-    const docDir = (FileSystem as any).documentDirectory || '';
-    const backupPath = docDir ? `${docDir}${backupFileName}` : backupFileName;
-
-    try {
-      db.execSync(`VACUUM INTO '${backupPath}';`);
-    } catch {
-      // Fallback jeśli VACUUM INTO nie jest obsługiwane w testach
-      const count = db.getFirstSync<{ c: number }>('SELECT COUNT(*) as c FROM brew_sessions');
-      db.runSync(
-        'CREATE TABLE IF NOT EXISTS migration_backups (id TEXT PRIMARY KEY, created_at TEXT, sessions_count INTEGER)',
-        []
-      );
-      db.runSync(
-        'INSERT INTO migration_backups (id, created_at, sessions_count) VALUES (?, ?, ?) ON CONFLICT(id) DO UPDATE SET created_at = excluded.created_at, sessions_count = excluded.sessions_count',
-        [backupFileName, new Date().toISOString(), count?.c || 0]
-      );
-    }
-
-    return backupFileName;
-  } catch (err: any) {
-    throw new Error(`Błąd tworzenia kopii bezpieczeństwa przed migracją v${fromVersion}: ${err.message}`);
+    getDatabase();
+    return { ok: true };
+  } catch (err: unknown) {
+    return {
+      ok: false,
+      reason: err instanceof DatabaseTooNewError ? 'too-new' : 'database',
+      message: err instanceof Error ? err.message : String(err),
+    };
   }
 }
+
+/** Wersja schematu tej aplikacji (PRAGMA user_version). */
+export const TARGET_SCHEMA_VERSION = 3;
+
+export class DatabaseTooNewError extends Error {
+  constructor(public readonly version: number) {
+    super(`Baza w wersji ${version} jest nowsza niż obsługiwana ${TARGET_SCHEMA_VERSION}`);
+    this.name = 'DatabaseTooNewError';
+  }
+}
+
+/**
+ * Kopia bazy przed migracją: VACUUM INTO do pliku w Documents (ścieżka systemu plików, nie URI),
+ * sprawdzona osobnym połączeniem (integrity_check i liczba sesji). Błąd = brak migracji.
+ * Zwraca ścieżkę pliku kopii. (M1-audytor-generalny-005; 12-niezawodnosc-004)
+ */
+export function createPreMigrationBackup(db: SQLite.SQLiteDatabase, fromVersion: number): string {
+  const docUri = FileSystem.documentDirectory;
+  if (!docUri) {
+    throw new Error(`Błąd tworzenia kopii bezpieczeństwa przed migracją v${fromVersion}: brak katalogu dokumentów`);
+  }
+  const dir = uriToPath(docUri).replace(/\/$/, '');
+  const backupFileName = `napar-pre-v${fromVersion}-${Date.now()}.db`;
+  const backupPath = `${dir}/${backupFileName}`;
+  try {
+    db.runSync('VACUUM INTO ?', [backupPath]);
+    const source = db.getFirstSync<{ c: number }>('SELECT COUNT(*) AS c FROM brew_sessions');
+    const copy = SQLite.openDatabaseSync(backupFileName, undefined, dir);
+    try {
+      const integrity = copy.getFirstSync<{ integrity_check: string }>('PRAGMA integrity_check');
+      const copied = copy.getFirstSync<{ c: number }>('SELECT COUNT(*) AS c FROM brew_sessions');
+      if (integrity?.integrity_check !== 'ok' || copied?.c !== source?.c) {
+        throw new Error(`kopia niezgodna (integrity_check: ${integrity?.integrity_check}, sesje ${copied?.c}/${source?.c})`);
+      }
+    } finally {
+      copy.closeSync();
+    }
+    return backupPath;
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`Błąd tworzenia kopii bezpieczeństwa przed migracją v${fromVersion}: ${msg}`);
+  }
+}
+
+/** ALTER TABLE … ADD COLUMN; pomija tylko „duplicate column name”, każdy inny błąd przerywa migrację. */
+function addColumnIfMissing(db: SQLite.SQLiteDatabase, sql: string): void {
+  try {
+    db.runSync(sql);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (!/duplicate column name/i.test(msg)) throw err;
+  }
+}
+
+/**
+ * Migracje schematu. Treść wydanej migracji do v3 bez zmian (te same polecenia SQL);
+ * zmieniona tylko obsługa błędów i kolejność względem kopii (M1-audytor-generalny-005; 05-architekt-010).
+ */
+const MIGRATIONS: ReadonlyArray<{ version: number; up: (db: SQLite.SQLiteDatabase) => void }> = [
+  {
+    version: 3,
+    up: (db) => {
+      addColumnIfMissing(db, 'ALTER TABLE brew_sessions ADD COLUMN sensory_scores_json TEXT');
+      addColumnIfMissing(db, 'ALTER TABLE brew_sessions ADD COLUMN water_profile TEXT');
+      db.runSync('CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL)');
+    },
+  },
+];
 
 export function initDatabase(db?: SQLite.SQLiteDatabase): void {
   const targetDb = db || dbInstance;
@@ -154,6 +218,22 @@ export function initDatabase(db?: SQLite.SQLiteDatabase): void {
     // Ignoruj błąd PRAGMA w środowiskach zastępczych
   }
 
+  let currentVersion = 0;
+  try {
+    const versionRow = targetDb.getFirstSync<{ user_version: number }>('PRAGMA user_version');
+    if (versionRow && typeof versionRow.user_version === 'number') {
+      currentVersion = versionRow.user_version;
+    }
+  } catch {
+    currentVersion = 0;
+  }
+
+  // Baza nowsza niż aplikacja (np. starszy build na nowszej bazie): odrzucona, zanim cokolwiek zmieni plik
+  // (także tryb dziennika, który jest trwały w pliku).
+  if (currentVersion > TARGET_SCHEMA_VERSION) {
+    throw new DatabaseTooNewError(currentVersion);
+  }
+
   try {
     targetDb.execSync('PRAGMA journal_mode = WAL;');
   } catch {
@@ -166,47 +246,25 @@ export function initDatabase(db?: SQLite.SQLiteDatabase): void {
     // Ignoruj błąd PRAGMA w środowiskach zastępczych
   }
 
-  let currentVersion = 0;
-  try {
-    const versionRow = targetDb.getFirstSync<{ user_version: number }>('PRAGMA user_version');
-    if (versionRow && typeof versionRow.user_version === 'number') {
-      currentVersion = versionRow.user_version;
-    }
-  } catch {
-    currentVersion = 0;
-  }
-
-  targetDb.execSync(SCHEMA_SQL);
-
-  const TARGET_SCHEMA_VERSION = 3;
-  if (currentVersion < TARGET_SCHEMA_VERSION) {
-    createPreMigrationBackup(targetDb, currentVersion);
+  if (currentVersion >= TARGET_SCHEMA_VERSION) {
+    targetDb.execSync(SCHEMA_SQL);
+  } else {
+    // Kopia przed migracją istniejącej bazy; błąd kopii = brak migracji (M1-audytor-generalny-005).
+    if (currentVersion >= 1) createPreMigrationBackup(targetDb, currentVersion);
+    // Schemat i migracje w jednej transakcji: błąd wycofuje także nowe tabele i indeksy.
+    targetDb.execSync('BEGIN TRANSACTION;');
     try {
-      targetDb.execSync('BEGIN TRANSACTION;');
-      try {
-        targetDb.runSync('ALTER TABLE brew_sessions ADD COLUMN sensory_scores_json TEXT');
-      } catch {
-        // Kolumna już istnieje
+      targetDb.execSync(SCHEMA_SQL);
+      for (const m of MIGRATIONS) {
+        if (m.version > currentVersion) m.up(targetDb);
       }
-      try {
-        targetDb.runSync('ALTER TABLE brew_sessions ADD COLUMN water_profile TEXT');
-      } catch {
-        // Kolumna już istnieje
-      }
-      targetDb.runSync(
-        'CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL)'
-      );
-      try {
-        targetDb.execSync(`PRAGMA user_version = ${TARGET_SCHEMA_VERSION};`);
-      } catch {
-        // Ignoruj błąd w mockach
-      }
+      targetDb.execSync(`PRAGMA user_version = ${TARGET_SCHEMA_VERSION};`);
       targetDb.execSync('COMMIT;');
     } catch (migError) {
       try {
         targetDb.execSync('ROLLBACK;');
       } catch {
-        // ignore
+        // transakcja już wycofana
       }
       throw migError;
     }

@@ -39,6 +39,14 @@ function plain(row) {
   return row === undefined ? null : { ...row };
 }
 
+const failures = [];
+
+function maybeFail(sql) {
+  for (const f of failures) {
+    if (f.test(sql)) throw new Error(`disk I/O error (wstrzyknięty w teście): ${sql.slice(0, 60)}`);
+  }
+}
+
 class NodeSQLiteDatabase {
   constructor(path) {
     this.databasePath = path;
@@ -46,19 +54,23 @@ class NodeSQLiteDatabase {
   }
 
   execSync(source) {
+    maybeFail(source);
     this.native.exec(source);
   }
 
   runSync(sql, ...args) {
+    maybeFail(sql);
     const r = this.native.prepare(sql).run(...bind(toParams(args)));
     return { lastInsertRowId: Number(r.lastInsertRowid), changes: Number(r.changes) };
   }
 
   getFirstSync(sql, ...args) {
+    maybeFail(sql);
     return plain(this.native.prepare(sql).get(...bind(toParams(args))));
   }
 
   getAllSync(sql, ...args) {
+    maybeFail(sql);
     return this.native.prepare(sql).all(...bind(toParams(args))).map(plain);
   }
 
@@ -104,13 +116,20 @@ function createExpoSqliteMock() {
   return {
     __esModule: true,
     defaultDatabaseDirectory: undefined,
-    openDatabaseSync: (_name, _options, _dir) => {
-      const db = new NodeSQLiteDatabase(state.nextPath);
+    openDatabaseSync: (name, _options, dir) => {
+      // Z katalogiem: plik dir/name (np. weryfikacja kopii); bez katalogu: ścieżka ustawiona przez test.
+      const db = new NodeSQLiteDatabase(dir ? `${dir.replace(/\/$/, '')}/${name}` : state.nextPath);
       state.opened.push(db);
       return db;
     },
     __setNextPath: (p) => {
       state.nextPath = p;
+    },
+    __failOn: (re) => {
+      failures.push(re);
+    },
+    __clearFailures: () => {
+      failures.length = 0;
     },
     __closeAll: () => {
       for (const db of state.opened.splice(0)) {

@@ -142,3 +142,18 @@ describe('SafeModeView — kopia ratunkowa i reset (M1-audytor-generalny-004)', 
     expect(JSON.stringify(tree.toJSON())).toContain('Sesje: 12 · Wpisy kofeiny: 30');
   });
 });
+
+describe('SafeModeView — przyczyna trybu awaryjnego (M1-audytor-generalny-005)', () => {
+  test.each([
+    ['database', 'pl', 'nie mogła otworzyć bazy danych'],
+    ['too-new', 'pl', 'Dane zapisała nowsza wersja Napar'],
+    ['database', 'en', 'could not open its database'],
+    ['too-new', 'en', 'A newer version of Napar saved this data'],
+  ] as const)('powód %s (%s) pokazuje właściwy opis', (reason, language, text) => {
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<SafeModeView onRetry={jest.fn()} language={language} reason={reason} />);
+    });
+    expect(JSON.stringify(tree.toJSON())).toContain(text);
+  });
+});

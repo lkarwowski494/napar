@@ -297,11 +297,10 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(reloaded!.createdAt).toBe(initialCreatedAt);
   });
 
-  test('createPreMigrationBackup tworzy fizyczny plik kopii SQLite przed migracją (M1-audytor-generalny-006)', () => {
+  test('createPreMigrationBackup na emulacji bez VACUUM INTO zgłasza błąd zamiast udawanej kopii (M1-audytor-generalny-005)', () => {
+    // Prawdziwa kopia (plik, integrity_check, liczności): tests/startup-migration.test.ts na node:sqlite.
     initDatabase(mockDb as any);
-    const backupFile = createPreMigrationBackup(mockDb as any, 1);
-    expect(backupFile).toMatch(/^napar-pre-v1-\d+\.db$/);
-    expect(mockDb.execSync).toHaveBeenCalledWith('PRAGMA wal_checkpoint(TRUNCATE);');
+    expect(() => createPreMigrationBackup(mockDb as any, 1)).toThrow(/kopii bezpieczeństwa przed migracją v1/);
   });
 
   test('Inicjalizacja bazy i seeding domyślnych przepisów', () => {
