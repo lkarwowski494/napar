@@ -482,7 +482,8 @@ describe('BrewContext & BrewProvider', () => {
     });
 
     expect(saved.waterProfile).toBe('hendon_custom');
-    expect(saved.grindSetting).toContain('Timemore');
+    // M1-audytor-generalny-008: puste mielenie zostaje brakiem, zamiast rekomendacji młynka (Timemore).
+    expect(saved.grindSetting).toBeUndefined();
     expect(announceSpy).toHaveBeenCalledWith(expect.stringContaining('finished. Total time:'));
 
     jest.useRealTimers();

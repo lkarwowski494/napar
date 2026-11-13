@@ -97,6 +97,7 @@ import {
   setHasCompletedOnboarding,
   getBeveragePreference,
   setBeveragePreference,
+  DataValidationError,
 } from '../database';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog, SCHEMA_SQL } from '../database-schema';
 
@@ -1224,7 +1225,12 @@ describe('Napar SQLite Database & Repositories', () => {
       brewedAt: '2026-10-26T00:00:00.000Z',
     };
 
-    saveBrewSession(brokenSession);
+    // M1-audytor-generalny-008: zła dawka/woda/temperatura blokuje zapis zamiast zamieniać się na 15/250/92.
+    expect(() => saveBrewSession(brokenSession)).toThrow(DataValidationError);
+    expect(getBrewSessionById('session-invalid-boundary')).toBeNull();
+
+    // Pozostała sanityzacja (czas ujemny, ocena poza skalą) przy poprawnych liczbach parzenia.
+    saveBrewSession({ ...brokenSession, doseGrams: 15, waterGrams: 250, waterTempCelsius: 92 });
     const retrieved = getBrewSessionById('session-invalid-boundary');
     expect(retrieved).not.toBeNull();
     expect(retrieved!.doseGrams).toBe(15);
@@ -1251,7 +1257,12 @@ describe('Napar SQLite Database & Repositories', () => {
       createdAt: '2026-10-26T00:00:00.000Z',
     };
 
-    saveRecipe(brokenRecipe);
+    // M1-audytor-generalny-008: zła dawka/woda/temperatura receptury blokuje zapis.
+    expect(() => saveRecipe(brokenRecipe)).toThrow(DataValidationError);
+    expect(getRecipeById('test-broken-recipe-numerics')).toBeNull();
+
+    // Proporcja NaN przy poprawnych liczbach: zachowanie bez zmian (poza zakresem 008).
+    saveRecipe({ ...brokenRecipe, doseGrams: 15, waterGrams: 250, waterTempCelsius: 92 });
     const retrieved = getRecipeById('test-broken-recipe-numerics');
     expect(retrieved).not.toBeNull();
     expect(retrieved!.doseGrams).toBe(15);
@@ -1276,7 +1287,12 @@ describe('Napar SQLite Database & Repositories', () => {
       updatedAt: '2026-10-26T00:00:00.000Z',
     };
 
-    saveInventoryItem(invalidItem);
+    // M1-audytor-generalny-008: zła waga blokuje zapis zamiast zamieniać się na 250 g / 0 g.
+    expect(() => saveInventoryItem(invalidItem)).toThrow(DataValidationError);
+    expect(getInventoryItemById('test-invalid-boundary')).toBeNull();
+
+    // Ocena poza skalą przy poprawnych wagach: zostaje brakiem.
+    saveInventoryItem({ ...invalidItem, initialWeightGrams: 250, remainingWeightGrams: 0 });
     const retrieved = getInventoryItemById('test-invalid-boundary');
     expect(retrieved).not.toBeNull();
     expect(retrieved!.initialWeightGrams).toBe(250);
@@ -1726,6 +1742,7 @@ describe('Napar SQLite Database & Repositories', () => {
       method: '',
       doseGrams: 15,
       waterGrams: 250,
+      waterTempCelsius: 93, // M1-audytor-generalny-008: temperatura wymagana (brak nie zamienia się na 92)
       stepsJson: '[]',
     };
     saveRecipe(recipeWithLooseFields);
@@ -1773,9 +1790,10 @@ describe('Napar SQLite Database & Repositories', () => {
       id: 'rec-duplicate-test',
       name: 'Batch Brew',
       beverageType: 'COFFEE',
-      method: 'Batch Brew',
-      doseGrams: -0,
-      waterGrams: -0,
+      // M1-audytor-generalny-008: dawka i woda muszą być poprawne; temperatura -0 → 0 jest poprawna tylko dla cold brew.
+      method: 'Cold Brew',
+      doseGrams: 15,
+      waterGrams: 250,
       waterTempCelsius: -0,
       recommendedRatio: -0,
       stepsJson: 'broken-json-{{{',
@@ -1805,6 +1823,7 @@ describe('Napar SQLite Database & Repositories', () => {
       method: 'v60',
       doseGrams: 15,
       waterGrams: 250,
+      waterTempCelsius: 93, // M1-audytor-generalny-008: temperatura wymagana
       totalTimeSeconds: 150,
       flavorTags: ['  jaśmin  ', '', '   ', 'cytrusy'],
       brewedAt: '2026-10-26T12:00:00Z',
@@ -1829,11 +1848,14 @@ describe('Napar SQLite Database & Repositories', () => {
       initialWeightGrams: 250,
       remainingWeightGrams: 250,
     };
-    saveInventoryItem(itemMessy);
+    // M1-audytor-generalny-008: pusta nazwa blokuje zapis zamiast „Bez nazwy”.
+    expect(() => saveInventoryItem(itemMessy)).toThrow(DataValidationError);
+    expect(getInventoryItemById('inv-messy-1')).toBeNull();
 
+    saveInventoryItem({ ...itemMessy, name: '  Kenia  ' });
     const saved = getInventoryItemById('inv-messy-1');
     expect(saved).not.toBeNull();
-    expect(saved?.name).toBe('Bez nazwy');
+    expect(saved?.name).toBe('Kenia');
     expect(saved?.type).toBe('coffee');
     expect(saved?.roastProfile).toBe('medium-light');
     expect(saved?.flavorNotes).toEqual(['czekolada', 'karmel']);

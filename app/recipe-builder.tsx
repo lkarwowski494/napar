@@ -204,9 +204,10 @@ export default function RecipeBuilderScreen() {
       method: method.trim() || 'Manual Drip',
       author: author.trim() || undefined,
       description: description.trim() || undefined,
-      doseGrams: doseNum,
-      waterGrams: waterNum,
-      waterTempCelsius: parseFloat(waterTempCelsius) || 93,
+      doseGrams: parseFloat(doseGrams.replace(',', '.')),
+      waterGrams: parseFloat(waterGrams.replace(',', '.')),
+      // M1-audytor-generalny-008: bez 93 °C / 15 g / 250 g w miejsce złej liczby; saveRecipe zgłasza błąd walidacji.
+      waterTempCelsius: parseFloat(waterTempCelsius.replace(',', '.')),
       grindSizeDescription: grindSize.trim() || undefined,
       recommendedRatio: currentRatio,
       stepsJson: JSON.stringify(steps),

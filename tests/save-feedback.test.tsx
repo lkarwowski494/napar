@@ -29,7 +29,18 @@ const texts: SaveErrorTexts = translations.pl.common;
 
 afterEach(() => jest.restoreAllMocks());
 
-describe('runSave (M1-audytor-generalny-007)', () => {
+describe('runSave (M1-audytor-generalny-007, -008)', () => {
+  test('błąd walidacji (008) pokazuje komunikat o złej wartości, nie o braku miejsca', () => {
+    const { DataValidationError } = require('../src/core/validation-error');
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    expect(
+      runSave(() => {
+        throw new DataValidationError('doseGrams');
+      }, texts)
+    ).toBe(false);
+    expect(alert).toHaveBeenCalledWith(texts.invalidValueTitle, texts.invalidValueDesc);
+  });
+
   test('udany zapis: true i brak komunikatu; nieudany: false i komunikat błędu zapisu', () => {
     const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
     expect(runSave(() => undefined, texts)).toBe(true);
@@ -44,6 +55,35 @@ describe('runSave (M1-audytor-generalny-007)', () => {
 });
 
 describe('Okno zakończenia parzenia przy błędzie zapisu (M1-audytor-generalny-007; 05-architekt-011)', () => {
+  test('M1-audytor-generalny-008: parzenie bez wpisanego mielenia zapisuje mielenie jako brak, nie rekomendację młynka', () => {
+    const { BrewProvider } = require('../src/core/brew-context');
+    const databaseModule = require('../src/core/database');
+    jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    const tx = jest.spyOn(databaseModule, 'recordBrewSessionTransaction').mockImplementation(() => undefined);
+    const { useBrew } = require('../src/core/brew-context');
+    let brew: any;
+    const Grab = () => {
+      brew = useBrew();
+      return null;
+    };
+    renderer.act(() => {
+      renderer.create(
+        <BrewProvider>
+          <Grab />
+        </BrewProvider>
+      );
+    });
+    // Użytkownik wyczyścił pole mielenia (pusta wartość): zapis nie może wstawić rekomendacji młynka.
+    renderer.act(() => {
+      brew.setGrindSetting('');
+    });
+    renderer.act(() => {
+      brew.finishAndSaveSession({ rating: undefined, flavorTags: [], logToCaffeineTracker: false });
+    });
+    expect(tx).toHaveBeenCalled();
+    expect(tx.mock.calls[0][0].grindSetting).toBeUndefined();
+  });
+
   test('zapis rzuca: okno zostaje otwarte z notatką, bez „Zapisano!”', () => {
     const { useBrewWorkflow } = require('../src/core/useBrewWorkflow');
     const { BrewProvider } = require('../src/core/brew-context');

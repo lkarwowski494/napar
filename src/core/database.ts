@@ -1,5 +1,8 @@
 import { saveCorruptState, parseAndValidateBackup, SCHEMA_VERSION as BACKUP_SCHEMA_VERSION } from './backup';
 import { parseImportCollections } from './import-validation';
+import { DataValidationError } from './validation-error';
+
+export { DataValidationError };
 import type { NaparBackupData } from './backup';
 // ============================================================================
 // Napar (Steepwise) — SQLite Database Client & Repositories
@@ -1474,18 +1477,14 @@ export function saveInventoryItem(item: InventoryItem): void {
   const rawInit = typeof item.initialWeightGrams === 'number'
     ? item.initialWeightGrams
     : parseFloat(String(item.initialWeightGrams ?? '').replace(',', '.'));
-  const safeInit = Number.isFinite(rawInit) && rawInit >= 0
-    ? Number(Math.min(100000, rawInit).toFixed(1))
-    : 250;
-  const initWeight = Object.is(safeInit, -0) ? 0 : safeInit;
+  if (!Number.isFinite(rawInit) || rawInit < 0) throw new DataValidationError('initialWeightGrams');
+  const initWeight = Number(Math.min(100000, rawInit).toFixed(1)) || 0;
 
   const rawRem = typeof item.remainingWeightGrams === 'number'
     ? item.remainingWeightGrams
     : parseFloat(String(item.remainingWeightGrams ?? '').replace(',', '.'));
-  const safeRem = Number.isFinite(rawRem) && rawRem >= 0
-    ? Number(Math.min(100000, rawRem).toFixed(1))
-    : 0;
-  const remWeight = Object.is(safeRem, -0) ? 0 : safeRem;
+  if (!Number.isFinite(rawRem) || rawRem < 0) throw new DataValidationError('remainingWeightGrams');
+  const remWeight = Number(Math.min(100000, rawRem).toFixed(1)) || 0;
 
   const rawRating = typeof item.rating === 'number'
     ? item.rating
@@ -1516,7 +1515,8 @@ export function saveInventoryItem(item: InventoryItem): void {
       : null;
 
   const cleanId = typeof item.id === 'string' && item.id.trim() ? item.id.trim() : `item-${Date.now()}`;
-  const cleanName = typeof item.name === 'string' && item.name.trim() ? item.name.trim().slice(0, 200) : 'Bez nazwy';
+  if (typeof item.name !== 'string' || !item.name.trim()) throw new DataValidationError('name');
+  const cleanName = item.name.trim().slice(0, 200);
   const cleanType = typeof item.type === 'string' && item.type.trim().toLowerCase() === 'tea' ? 'tea' : 'coffee';
   const cleanRoastProfile = typeof item.roastProfile === 'string' && item.roastProfile.trim() ? item.roastProfile.trim().slice(0, 50) : null;
   const sanitizedFlavorNotes = Array.isArray(item.flavorNotes)
@@ -1705,19 +1705,19 @@ export function saveRecipe(recipe: SavedRecipe): void {
   if (!safeId) return;
 
   const rawDose = typeof recipe.doseGrams === 'number' ? recipe.doseGrams : parseFloat(String(recipe.doseGrams).replace(',', '.'));
-  const safeDose = Number.isFinite(rawDose) && rawDose > 0 ? Number(Math.min(1000, Math.max(1, rawDose)).toFixed(1)) : 15;
-  const dose = Object.is(safeDose, -0) ? 15 : safeDose;
+  if (!Number.isFinite(rawDose) || rawDose <= 0) throw new DataValidationError('doseGrams');
+  const dose = Number(Math.min(1000, Math.max(1, rawDose)).toFixed(1));
 
   const rawWater = typeof recipe.waterGrams === 'number' ? recipe.waterGrams : parseFloat(String(recipe.waterGrams).replace(',', '.'));
-  const safeWater = Number.isFinite(rawWater) && rawWater > 0 ? Number(Math.min(50000, Math.max(10, rawWater)).toFixed(1)) : 250;
-  const water = Object.is(safeWater, -0) ? 250 : safeWater;
+  if (!Number.isFinite(rawWater) || rawWater <= 0) throw new DataValidationError('waterGrams');
+  const water = Number(Math.min(50000, Math.max(10, rawWater)).toFixed(1));
 
   const isColdBrew = (recipe.method && /cold|ice|zimn/i.test(recipe.method)) || (recipe.name && /cold|ice|zimn/i.test(recipe.name));
   const rawTemp = typeof recipe.waterTempCelsius === 'number' ? recipe.waterTempCelsius : parseFloat(String(recipe.waterTempCelsius).replace(',', '.'));
-  const safeTemp = Number.isFinite(rawTemp) && (rawTemp > 0 || (isColdBrew && rawTemp === 0))
-    ? Math.min(100, Math.max(0, Math.round(rawTemp)))
-    : 92;
-  const temp = Object.is(safeTemp, -0) ? 0 : safeTemp;
+  if (!(Number.isFinite(rawTemp) && (rawTemp > 0 || (isColdBrew && rawTemp === 0)))) {
+    throw new DataValidationError('waterTempCelsius');
+  }
+  const temp = Math.min(100, Math.max(0, Math.round(rawTemp))) || 0;
 
   let rawRatio: number;
   const rawRatioVal = (recipe as any).recommendedRatio;
@@ -2117,19 +2117,20 @@ export function saveBrewSession(session: BrewSession): void {
   const db = getDatabase();
 
   const rawDose = typeof session.doseGrams === 'number' ? session.doseGrams : (typeof (session as any).doseGrams === 'string' ? parseFloat((session as any).doseGrams.replace(',', '.')) : NaN);
-  const safeDoseVal = Number.isFinite(rawDose) && rawDose > 0 ? Number(Math.min(1000, Math.max(1, rawDose)).toFixed(1)) : 15;
-  const dose = Object.is(safeDoseVal, -0) ? 15 : safeDoseVal;
+  // M1-audytor-generalny-008: zła albo brakująca liczba blokuje zapis zamiast zamieniać się na 15 / 250 / 92.
+  if (!Number.isFinite(rawDose) || rawDose <= 0) throw new DataValidationError('doseGrams');
+  const dose = Number(Math.min(1000, Math.max(1, rawDose)).toFixed(1));
 
   const rawWater = typeof session.waterGrams === 'number' ? session.waterGrams : (typeof (session as any).waterGrams === 'string' ? parseFloat((session as any).waterGrams.replace(',', '.')) : NaN);
-  const safeWaterVal = Number.isFinite(rawWater) && rawWater > 0 ? Number(Math.min(50000, Math.max(10, rawWater)).toFixed(1)) : 250;
-  const water = Object.is(safeWaterVal, -0) ? 250 : safeWaterVal;
+  if (!Number.isFinite(rawWater) || rawWater <= 0) throw new DataValidationError('waterGrams');
+  const water = Number(Math.min(50000, Math.max(10, rawWater)).toFixed(1));
 
   const isColdBrew = (session.method && /cold|ice|zimn/i.test(session.method)) || (session.recipeName && /cold|ice|zimn/i.test(session.recipeName));
   const rawTemp = typeof session.waterTempCelsius === 'number' ? session.waterTempCelsius : (typeof (session as any).waterTempCelsius === 'string' ? parseFloat((session as any).waterTempCelsius.replace(',', '.')) : NaN);
-  const safeTemp = Number.isFinite(rawTemp) && (rawTemp > 0 || (isColdBrew && rawTemp === 0))
-    ? Math.min(100, Math.max(0, Math.round(rawTemp)))
-    : 92;
-  const temp = Object.is(safeTemp, -0) ? 0 : safeTemp;
+  if (!(Number.isFinite(rawTemp) && (rawTemp > 0 || (isColdBrew && rawTemp === 0)))) {
+    throw new DataValidationError('waterTempCelsius');
+  }
+  const temp = Math.min(100, Math.max(0, Math.round(rawTemp))) || 0;
 
   const rawTotalTime = typeof session.totalTimeSeconds === 'number' ? session.totalTimeSeconds : (typeof (session as any).totalTimeSeconds === 'string' ? parseFloat((session as any).totalTimeSeconds.replace(',', '.')) : NaN);
   const safeTotalTime = Number.isFinite(rawTotalTime) && rawTotalTime >= 0 ? Math.round(rawTotalTime) : 0;
@@ -2315,9 +2316,10 @@ function mapRowToBrewSession(row: BrewSessionRow): BrewSession {
     inventoryItemName: row.inventory_item_name || undefined,
     beverageType: row.beverage_type,
     method: row.method,
-    doseGrams: Number.isFinite(row.dose_g) && row.dose_g > 0 ? row.dose_g : 15,
-    waterGrams: Number.isFinite(row.water_g) && row.water_g > 0 ? row.water_g : 250,
-    waterTempCelsius: Number.isFinite(row.water_temp_c) && row.water_temp_c > 0 ? row.water_temp_c : 92,
+    // M1-audytor-generalny-008: odczyt pokazuje zapisaną wartość (kolumny NOT NULL), bez podmiany na 15/250/92.
+    doseGrams: row.dose_g,
+    waterGrams: row.water_g,
+    waterTempCelsius: row.water_temp_c,
     waterProfile: row.water_profile || undefined,
     grindSetting: row.grind_setting || undefined,
     totalTimeSeconds: Number.isFinite(row.total_time_seconds) && row.total_time_seconds >= 0 ? row.total_time_seconds : 0,

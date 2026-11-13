@@ -322,7 +322,8 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       waterGrams,
       waterTempCelsius,
       waterProfile: data.waterProfile || waterProfile,
-      grindSetting: grindSetting || `${grinderRecommendation.grinderName}: ${grinderRecommendation.formatted}`,
+      // M1-audytor-generalny-008: mielenie, którego użytkownik nie wpisał, zostaje brakiem (nie rekomendacją młynka).
+      grindSetting: grindSetting || undefined,
       totalTimeSeconds: snapshot.totalElapsedSeconds,
       rating: data.rating,
       flavorTags: data.flavorTags || [],

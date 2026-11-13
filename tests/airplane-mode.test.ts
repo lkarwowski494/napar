@@ -221,9 +221,10 @@ describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
       name: 'Offline Chemex Special',
       method: 'chemex',
       beverageType: 'coffee',
-      coffeeGrams: 30,
+      // M1-audytor-generalny-008: właściwe nazwy pól (dawniej coffeeGrams/waterTempC zamieniały się po cichu na 15 g / 92 °C).
+      doseGrams: 30,
       waterGrams: 500,
-      waterTempC: 94,
+      waterTempCelsius: 94,
       targetTimeSeconds: 240,
       steps: [
         { stepNumber: 1, name: 'Bloom', targetWaterGrams: 90, durationSeconds: 45, instruction: 'Zalej 90g' },
@@ -268,6 +269,7 @@ describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
         tastingNotes: 'Bergamot, jasmine, clean finish',
         doseGrams: 30,
         waterGrams: 500,
+        waterTempCelsius: 94, // M1-audytor-generalny-008: temperatura wymagana (brak nie zamienia się na 92 °C)
         grindSetting: '22 clics',
         brewTimeSeconds: 235,
         date: new Date().toISOString(),

@@ -438,6 +438,14 @@ describe('GongfuScreen — zapis sesji jedną transakcją i komunikat przy błę
     expect(directLog).not.toHaveBeenCalled();
   });
 
+  test('M1-audytor-generalny-008: sesja Gongfu bez oceny i balansu, których użytkownik nie podał', () => {
+    const txSpy = jest.spyOn(databaseModule, 'recordBrewSessionTransaction');
+    runInfusionAndSave();
+    const [session] = txSpy.mock.calls[0];
+    expect(session.rating).toBeUndefined();
+    expect(session.tasteBalance).toBeUndefined();
+  });
+
   test('błąd zapisu: komunikat „Nie udało się zapisać zmian”, ekran zostaje otwarty', () => {
     jest.spyOn(databaseModule, 'recordBrewSessionTransaction').mockImplementation(() => {
       throw new Error('database or disk is full');

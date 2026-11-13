@@ -443,3 +443,100 @@ describe('Zapis Gongfu jest atomowy (M1-audytor-generalny-007; 05-architekt-007)
     sqlite.__closeAll();
   });
 });
+
+describe('Brak zostaje brakiem, zła liczba blokuje zapis (M1-audytor-generalny-008; 08-programista-004)', () => {
+  const base = {
+    id: 'v1',
+    beverageType: 'TEA' as const,
+    method: 'GONGFU',
+    doseGrams: 7,
+    waterGrams: 120,
+    waterTempCelsius: 96,
+    totalTimeSeconds: 60,
+    flavorTags: [],
+    brewedAt: '2026-11-02T08:00:00.000Z',
+  };
+
+  test('sesja bez oceny i balansu ma te pola puste (NULL), nie 5 i „balanced”', () => {
+    const { db, sqlite } = loadDatabase();
+    db.saveBrewSession(base);
+    const row = db.getDatabase().getFirstSync<{ rating: number | null; taste_balance: string | null }>(
+      'SELECT rating, taste_balance FROM brew_sessions WHERE id = ?',
+      ['v1']
+    );
+    expect(row).toEqual({ rating: null, taste_balance: null });
+    sqlite.__closeAll();
+  });
+
+  test.each([
+    ['doseGrams', NaN],
+    ['waterGrams', NaN],
+    ['waterTempCelsius', NaN],
+  ])('saveBrewSession z %s = %p: błąd walidacji, zero zapisów (zamiast 15/250/92)', (field, value) => {
+    const { db, sqlite } = loadDatabase();
+    let err: unknown;
+    try {
+      db.saveBrewSession({ ...base, [field]: value });
+    } catch (e) {
+      err = e;
+    }
+    expect(err).toBeInstanceOf(db.DataValidationError);
+    expect(count(db, 'SELECT COUNT(*) AS c FROM brew_sessions')).toBe(0);
+    sqlite.__closeAll();
+  });
+
+  test('paczka bez nazwy albo ze złą wagą: błąd walidacji zamiast „Bez nazwy” i 250 g', () => {
+    const { db, sqlite } = loadDatabase();
+    const bean = {
+      id: 'b-x',
+      name: 'Kenia',
+      type: 'coffee' as const,
+      initialWeightGrams: 250,
+      remainingWeightGrams: 250,
+      flavorNotes: [],
+      isFavorite: false,
+      isArchived: false,
+      createdAt: '2026-11-01T08:00:00.000Z',
+      updatedAt: '2026-11-01T08:00:00.000Z',
+    };
+    expect(() => db.saveInventoryItem({ ...bean, name: '  ' })).toThrow(db.DataValidationError);
+    expect(() => db.saveInventoryItem({ ...bean, initialWeightGrams: NaN })).toThrow(db.DataValidationError);
+    expect(() => db.saveInventoryItem({ ...bean, remainingWeightGrams: NaN })).toThrow(db.DataValidationError);
+    expect(count(db, 'SELECT COUNT(*) AS c FROM inventory_items')).toBe(0);
+    sqlite.__closeAll();
+  });
+
+  test('receptura ze złą dawką, wodą albo temperaturą: błąd walidacji', () => {
+    const { db, sqlite } = loadDatabase();
+    const recipe = {
+      id: 'r-x',
+      name: 'Test',
+      beverageType: 'COFFEE' as const,
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      recommendedRatio: 16.7,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-11-01T08:00:00.000Z',
+    };
+    for (const f of ['doseGrams', 'waterGrams', 'waterTempCelsius']) {
+      expect(() => db.saveRecipe({ ...recipe, [f]: NaN })).toThrow(db.DataValidationError);
+    }
+    expect(db.getRecipeById('r-x')).toBeNull();
+    sqlite.__closeAll();
+  });
+
+  test('odczyt sesji pokazuje zapisaną wartość, nie podmienia jej na 15/250/92', () => {
+    const { db, sqlite } = loadDatabase();
+    db.getDatabase().runSync(
+      `INSERT INTO brew_sessions (id, beverage_type, method, dose_g, water_g, water_temp_c, total_time_seconds, brewed_at)
+       VALUES ('raw', 'COFFEE', 'V60', 0, 0, 0, 0, '2026-11-01T08:00:00.000Z')`
+    );
+    const s = db.getBrewSessionById('raw');
+    expect([s?.doseGrams, s?.waterGrams, s?.waterTempCelsius]).toEqual([0, 0, 0]);
+    sqlite.__closeAll();
+  });
+});

@@ -6,10 +6,13 @@
 // ============================================================================
 
 import { Alert } from 'react-native';
+import { DataValidationError } from '../src/core/validation-error';
 
 export interface SaveErrorTexts {
   saveErrorTitle: string;
   saveErrorDesc: string;
+  invalidValueTitle: string;
+  invalidValueDesc: string;
 }
 
 /**
@@ -20,8 +23,10 @@ export function runSave(operation: () => void, texts: SaveErrorTexts): boolean {
   try {
     operation();
     return true;
-  } catch {
-    Alert.alert(texts.saveErrorTitle, texts.saveErrorDesc);
+  } catch (err) {
+    // M1-audytor-generalny-008: zła wartość w formularzu to inny komunikat niż awaria zapisu.
+    if (err instanceof DataValidationError) Alert.alert(texts.invalidValueTitle, texts.invalidValueDesc);
+    else Alert.alert(texts.saveErrorTitle, texts.saveErrorDesc);
     return false;
   }
 }

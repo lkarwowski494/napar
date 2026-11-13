@@ -207,7 +207,8 @@ export default function GongfuScreen() {
       message: `Zapisujesz sesję ${teaName} z ${session.infusions.length} zalaniami (łącznie ~${session.totalCaffeineMg} mg kofeiny).`,
       actionText: t.common.save,
       onConfirm: () => {
-        const doseNum = parseFloat(leafDoseGrams) || 7;
+        // M1-audytor-generalny-008: zła liczba blokuje zapis (DataValidationError → komunikat w runSave), bez 7 g / 96 °C.
+        const doseNum = parseFloat(leafDoseGrams.replace(',', '.'));
         const totalDuration = session.infusions.reduce((sum, inf) => sum + inf.durationSeconds, 0);
 
         // M1-audytor-generalny-007: sesja, log kofeiny i odliczenie wagi w jednej transakcji; błąd = komunikat, ekran zostaje.
@@ -219,11 +220,9 @@ export default function GongfuScreen() {
           method: 'GONGFU',
           doseGrams: doseNum,
           waterGrams: session.vesselCapacityMl,
-          waterTempCelsius: parseFloat(waterTempCelsius) || 96,
+          waterTempCelsius: parseFloat(waterTempCelsius.replace(',', '.')),
           totalTimeSeconds: totalDuration,
-          rating: 5,
           flavorTags: ['Gongfu Cha', `${session.infusions.length} infuzji`],
-          tasteBalance: 'balanced',
           caffeineContentMg: session.totalCaffeineMg,
           notes: `Sesja Gongfu Cha: ${session.infusions.length} zalań. ${session.infusions
             .map((inf) => `#${inf.infusionNumber}: ${inf.durationSeconds}s${inf.notes ? ` (${inf.notes})` : ''}`)
