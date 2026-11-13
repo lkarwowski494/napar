@@ -31,13 +31,10 @@ import {
   setCaffeineHalfLife,
   getBedtimeHour,
   setBedtimeHour,
-  getInventoryItems,
-  getRecipes,
-  getBrewSessions,
-  getCaffeineLogs,
   BeveragePreference,
   getBeveragePreference,
   setBeveragePreference,
+  buildBackupState,
 } from '../src/core/database';
 import { useBrew } from '../src/core/brew-context';
 import {
@@ -48,7 +45,7 @@ import {
 } from '../src/core/healthkit';
 import { theme } from '../src/core/theme';
 import { useTranslation } from '../src/core/i18n';
-import { safetyBackup, NaparBackupData } from '../src/core/backup';
+import { safetyBackup } from '../src/core/backup';
 import { useAppAccess } from '../src/core/app-access';
 import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
 import { JsonExportModal, JsonImportModal } from '../src/components/settings/JsonBackupModals';
@@ -200,13 +197,7 @@ export default function SettingsScreen() {
         return;
       }
       // Apps4Brew SEC-09 & BR-TEST-022: Tworzenie kopii bezpieczeństwa przed niszczącym importem
-      const currentData: NaparBackupData = {
-        inventory: getInventoryItems(true),
-        customRecipes: getRecipes(),
-        sessions: getBrewSessions(),
-        caffeineLogs: getCaffeineLogs(),
-      };
-      await safetyBackup('import', currentData);
+      await safetyBackup('import', buildBackupState());
 
       importDataJson(importJsonText.trim());
       setShowImportModal(false);

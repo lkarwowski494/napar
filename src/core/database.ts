@@ -1,4 +1,5 @@
 import { saveCorruptState } from './backup';
+import type { NaparBackupData } from './backup';
 // ============================================================================
 // Napar (Steepwise) — SQLite Database Client & Repositories
 // ============================================================================
@@ -2401,22 +2402,60 @@ export interface BackupData {
   customRecipes: SavedRecipe[];
   sessions: BrewSession[];
   caffeineLogs: CaffeineLog[];
+  settings?: Record<string, unknown>;
+}
+
+/**
+ * Wszystkie logi kofeiny, bez limitu listy ekranowej (getCaffeineLogs() bez argumentu ucina do 200).
+ * Źródło dla kopii i eksportu (M1-audytor-generalny-003).
+ */
+export function getAllCaffeineLogsForBackup(): CaffeineLog[] {
+  const db = getDatabase();
+  const rows = db.getAllSync<CaffeineLogRow>('SELECT * FROM caffeine_logs ORDER BY consumed_at ASC');
+  return rows.map((r) => ({
+    id: r.id,
+    brewSessionId: r.brew_session_id || undefined,
+    beverageName: r.beverage_name,
+    beverageType: r.beverage_type,
+    consumedAt: r.consumed_at,
+    doseGrams: r.dose_g,
+    caffeineMg: r.caffeine_mg,
+  }));
+}
+
+export function getAllAppSettings(): Record<string, string> {
+  const db = getDatabase();
+  const rows = db.getAllSync<{ key: string; value: string }>('SELECT key, value FROM app_settings ORDER BY key');
+  const settings: Record<string, string> = {};
+  for (const r of rows) settings[r.key] = r.value;
+  return settings;
+}
+
+/**
+ * Komplet danych użytkownika do kopii automatycznej, kopii bezpieczeństwa i eksportu:
+ * spiżarnia z archiwum, własne receptury, wszystkie sesje, wszystkie logi kofeiny i ustawienia.
+ * Kopia ma być kompletna (zasada 10; M1-audytor-generalny-003).
+ */
+export function buildBackupState(): NaparBackupData {
+  return {
+    inventory: getInventoryItems(true),
+    customRecipes: getRecipes().filter((r) => r.isCustom),
+    sessions: getBrewSessions(),
+    caffeineLogs: getAllCaffeineLogsForBackup(),
+    settings: getAllAppSettings(),
+  };
 }
 
 export function exportAllDataJson(): string {
-  const inventory = getInventoryItems(true);
-  const allRecipes = getRecipes();
-  const customRecipes = allRecipes.filter((r) => r.isCustom);
-  const sessions = getBrewSessions(5000);
-  const caffeineLogs = getCaffeineLogs();
-
+  const state = buildBackupState();
   const data: BackupData = {
     version: 1,
     exportedAt: new Date().toISOString(),
-    inventory,
-    customRecipes,
-    sessions,
-    caffeineLogs,
+    inventory: state.inventory,
+    customRecipes: state.customRecipes,
+    sessions: state.sessions,
+    caffeineLogs: state.caffeineLogs,
+    settings: state.settings,
   };
   return JSON.stringify(data, null, 2);
 }
@@ -2536,7 +2575,7 @@ export function escapeCsvCell(val: unknown): string {
 export const escapeCsvValue = escapeCsvCell;
 
 export function exportSessionsCsv(): string {
-  const sessions = getBrewSessions(10000);
+  const sessions = getBrewSessions();
   const headers = [
     'id',
     'brewed_at',

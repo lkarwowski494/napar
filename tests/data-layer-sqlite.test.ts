@@ -212,3 +212,74 @@ describe('Zapis rodzica nie kasuje dzieci (M1-audytor-generalny-002; 05-architek
     expect(hits).toEqual([]);
   });
 });
+
+describe('Kopie i eksport są kompletne (M1-audytor-generalny-003; 05-architekt-001, 08-programista-002, 12-niezawodnosc-007)', () => {
+  const N_LOGS = 250;
+  const N_SESSIONS = 5001;
+
+  function seedMany(db: DbModule) {
+    const conn = db.getDatabase();
+    conn.execSync('BEGIN');
+    for (let i = 0; i < N_SESSIONS; i++) {
+      conn.runSync(
+        `INSERT INTO brew_sessions (id, beverage_type, method, dose_g, water_g, water_temp_c, total_time_seconds, brewed_at)
+         VALUES (?, 'COFFEE', 'V60', 15, 250, 94, 180, ?)`,
+        [`s${i}`, new Date(Date.UTC(2020, 0, 1) + i * 3600_000).toISOString()]
+      );
+    }
+    for (let i = 0; i < N_LOGS; i++) {
+      conn.runSync(
+        `INSERT INTO caffeine_logs (id, brew_session_id, beverage_name, beverage_type, consumed_at, dose_g, caffeine_mg)
+         VALUES (?, ?, 'V60', 'coffee', ?, 15, 100)`,
+        [`log${i}`, `s${i}`, new Date(Date.UTC(2020, 0, 1) + i * 3600_000).toISOString()]
+      );
+    }
+    conn.execSync('COMMIT');
+    db.setAppSetting('unitSystem', 'imperial');
+  }
+
+  test('eksport JSON zawiera wszystkie sesje, logi kofeiny i ustawienia', () => {
+    const { db, sqlite } = loadDatabase();
+    seedMany(db);
+    const exported = JSON.parse(db.exportAllDataJson());
+    expect(exported.sessions).toHaveLength(N_SESSIONS);
+    expect(exported.caffeineLogs).toHaveLength(N_LOGS);
+    expect(exported.settings).toEqual(expect.objectContaining({ unitSystem: 'imperial' }));
+    sqlite.__closeAll();
+  });
+
+  test('import własnego eksportu zostawia 250/250 logów i 5001/5001 sesji', () => {
+    const { db, sqlite } = loadDatabase();
+    seedMany(db);
+    db.importDataJson(db.exportAllDataJson());
+    expect(count(db, 'SELECT COUNT(*) AS c FROM caffeine_logs')).toBe(N_LOGS);
+    expect(count(db, 'SELECT COUNT(*) AS c FROM brew_sessions')).toBe(N_SESSIONS);
+    sqlite.__closeAll();
+  });
+
+  test('stan kopii (buildBackupState) ma komplet sesji, logów i ustawień', () => {
+    const { db, sqlite } = loadDatabase();
+    seedMany(db);
+    expect(db.getAllCaffeineLogsForBackup()).toHaveLength(N_LOGS);
+    expect(db.getAllAppSettings()).toEqual(expect.objectContaining({ unitSystem: 'imperial' }));
+    const state = db.buildBackupState();
+    expect(state.sessions).toHaveLength(N_SESSIONS);
+    expect(state.caffeineLogs).toHaveLength(N_LOGS);
+    expect(state.settings).toEqual(expect.objectContaining({ unitSystem: 'imperial' }));
+    sqlite.__closeAll();
+  });
+
+  test('kopie automatyczne i kopia przed importem nie biorą danych z list ekranowych z limitem', () => {
+    const root = path.join(__dirname, '..');
+    const sites = ['src/core/brew-context.tsx', 'app/gongfu.tsx', 'app/settings.tsx', 'src/core/database.ts'];
+    const offending: string[] = [];
+    for (const rel of sites) {
+      fs.readFileSync(path.join(root, rel), 'utf8').split('\n').forEach((line, i) => {
+        if (/getBrewSessions\(\s*\d+\s*\)|getCaffeineLogs\(\s*\)/.test(line) && !/^\s*(\/\/|\*)/.test(line)) {
+          offending.push(`${rel}:${i + 1}`);
+        }
+      });
+    }
+    expect(offending).toEqual([]);
+  });
+});
