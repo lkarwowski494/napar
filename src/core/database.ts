@@ -1,4 +1,5 @@
-import { saveCorruptState } from './backup';
+import { saveCorruptState, parseAndValidateBackup, SCHEMA_VERSION as BACKUP_SCHEMA_VERSION } from './backup';
+import { parseImportCollections } from './import-validation';
 import type { NaparBackupData } from './backup';
 // ============================================================================
 // Napar (Steepwise) — SQLite Database Client & Repositories
@@ -2527,39 +2528,43 @@ export function importDataJson(jsonStr: string): void {
     throw new Error('Nieprawidłowy format JSON');
   }
 
-  let parsed: any;
+  let parsed: unknown;
   try {
     parsed = JSON.parse(cleanJson);
   } catch {
     throw new Error('Nieprawidłowy format JSON');
   }
 
-  if (!parsed || typeof parsed !== 'object') {
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
     throw new Error('Nieprawidłowy format pliku kopii zapasowej');
   }
+  const root: Record<string, unknown> = { ...parsed };
 
-  let data: BackupData;
-  if (parsed.format === 'napar-backup' && (parsed.state || parsed.payload)) {
-    const s = parsed.state || parsed.payload;
-    data = {
-      version: 1,
-      exportedAt: parsed.exportedAt || new Date().toISOString(),
-      inventory: s.inventory || [],
-      customRecipes: s.customRecipes || [],
-      sessions: s.sessions || [],
-      caffeineLogs: s.caffeineLogs || [],
-    };
-  } else if (parsed.version === 1) {
-    data = parsed as BackupData;
+  // M1-audytor-generalny-006: wersja formatu i typy pól sprawdzone, zanim import dotknie bazy.
+  let collections: unknown;
+  if (root.format === 'napar-backup' && root.state !== undefined) {
+    collections = parseAndValidateBackup(cleanJson).state; // odrzuca kopię z nowszej wersji aplikacji
+  } else if (root.format === 'napar-backup' && root.payload !== undefined) {
+    const ver = root.schemaVersion;
+    if (typeof ver !== 'number' || !Number.isInteger(ver) || ver <= 0) {
+      throw new Error('Nieprawidłowa wersja schematu kopii');
+    }
+    if (ver > BACKUP_SCHEMA_VERSION) {
+      throw new Error(`Kopia pochodzi z nowszej wersji aplikacji (v${ver}). Zaktualizuj aplikację.`);
+    }
+    collections = root.payload;
+  } else if (root.version === 1) {
+    collections = root;
   } else {
     throw new Error('Nieprawidłowy format pliku kopii zapasowej (version !== 1)');
   }
 
+  const data = parseImportCollections(collections);
   const db = getDatabase();
-  const safeInventory = Array.isArray(data.inventory) ? data.inventory : [];
-  const safeCustomRecipes = Array.isArray(data.customRecipes) ? data.customRecipes : [];
-  const safeSessions = Array.isArray(data.sessions) ? data.sessions : [];
-  const safeCaffeineLogs = Array.isArray(data.caffeineLogs) ? data.caffeineLogs : [];
+  const safeInventory = data.inventory;
+  const safeCustomRecipes = data.customRecipes;
+  const safeSessions = data.sessions;
+  const safeCaffeineLogs = data.caffeineLogs;
 
   try {
     runInTransactionSync(db, () => {

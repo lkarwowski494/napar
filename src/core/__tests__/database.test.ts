@@ -1920,8 +1920,8 @@ describe('Napar SQLite Database & Repositories', () => {
       caffeineLogs: undefined as any,
     };
 
-    // Nie powinno rzucać błędem TypeError: not iterable
-    expect(() => importDataJson(JSON.stringify(corruptedBackup))).not.toThrow();
+    // M1-audytor-generalny-006: zły typ sekcji to błąd z nazwą pola, a nie cichy import pustych danych.
+    expect(() => importDataJson(JSON.stringify(corruptedBackup))).toThrow(/„inventory”/);
 
     // Kopia zapasowa z tablicami zawierającymi elementy null/string
     const arrayWithNulls = {
@@ -1932,7 +1932,9 @@ describe('Napar SQLite Database & Repositories', () => {
       sessions: [null],
       caffeineLogs: ['invalid'],
     };
-    expect(() => importDataJson(JSON.stringify(arrayWithNulls))).not.toThrow();
+    // Element null/tekst w liście: błąd z indeksem rekordu, niczego nie zapisano (także poprawnej paczki obok).
+    expect(() => importDataJson(JSON.stringify(arrayWithNulls))).toThrow(/„inventory\[0\]”/);
+    expect(getInventoryItemById('inv-valid')).toBeNull();
   });
 
   test('TASK-P44-05-ARC: logCaffeine generuje fallback ID, parsuje wagi string, normalizuje beverageType i chroni przed -0', () => {

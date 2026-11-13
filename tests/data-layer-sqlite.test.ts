@@ -292,3 +292,111 @@ describe('Kopie i eksport są kompletne (M1-audytor-generalny-003; 05-architekt-
     expect(offending).toEqual([]);
   });
 });
+
+describe('Import odrzuca nowszy format i złe typy bez zapisu (M1-audytor-generalny-006; 05-architekt-005, 08-programista-011)', () => {
+  const tables = ['inventory_items', 'brew_sessions', 'caffeine_logs', 'recipes', 'app_settings'];
+  const snapshot = (db: DbModule) => tables.map((t) => [t, count(db, `SELECT COUNT(*) AS c FROM ${t}`)]);
+  const validSession = {
+    id: 'imp-s1',
+    beverageType: 'COFFEE',
+    method: 'V60',
+    doseGrams: 15,
+    waterGrams: 250,
+    waterTempCelsius: 94,
+    totalTimeSeconds: 180,
+    flavorTags: [],
+    brewedAt: '2026-11-01T08:00:00.000Z',
+  };
+  const validBean = {
+    id: 'imp-b1',
+    name: 'Kolumbia',
+    type: 'coffee',
+    initialWeightGrams: 250,
+    remainingWeightGrams: 200,
+    flavorNotes: [],
+    isFavorite: false,
+    isArchived: false,
+    createdAt: '2026-11-01T08:00:00.000Z',
+    updatedAt: '2026-11-01T08:00:00.000Z',
+  };
+
+  test('koperta ze schemaVersion wyższym niż obsługiwany: komunikat o nowszej wersji, liczności bez zmian', () => {
+    const { db, sqlite } = loadDatabase();
+    const before = snapshot(db);
+    const file = JSON.stringify({
+      format: 'napar-backup',
+      schemaVersion: 99,
+      exportedAt: '2026-11-13T10:00:00.000Z',
+      state: { inventory: [validBean], customRecipes: [], sessions: [validSession], caffeineLogs: [] },
+    });
+    expect(() => db.importDataJson(file)).toThrow(/nowszej wersji/);
+    expect(snapshot(db)).toEqual(before);
+    sqlite.__closeAll();
+  });
+
+  test('pole o złym typie (sensory.acidity = "x"): błąd z nazwą pola, nic nie zapisane', () => {
+    const { db, sqlite } = loadDatabase();
+    const before = snapshot(db);
+    const file = JSON.stringify({
+      version: 1,
+      exportedAt: '2026-11-13T10:00:00.000Z',
+      inventory: [validBean],
+      customRecipes: [],
+      sessions: [{ ...validSession, sensory: { acidity: 'x', sweetness: 3, body: 3, clarity: 3, finish: 3 } }],
+      caffeineLogs: [],
+    });
+    expect(() => db.importDataJson(file)).toThrow(/sessions\[0\]\.sensory\.acidity/);
+    expect(snapshot(db)).toEqual(before);
+    sqlite.__closeAll();
+  });
+
+  test('pełny eksport aplikacji (paczka, własna receptura, sesja z sensoryką, log) wraca importem 1:1 do nowej bazy', () => {
+    const src = loadDatabase();
+    src.db.saveInventoryItem({ ...validBean, type: 'coffee', rating: 4.5, origin: 'Huila' });
+    src.db.saveRecipe({
+      id: 'r-own',
+      name: 'Moja V60',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      recommendedRatio: 16.7,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-11-01T08:00:00.000Z',
+    });
+    src.db.recordBrewSessionTransaction(
+      { ...validSession, beverageType: 'COFFEE', inventoryItemId: 'imp-b1', rating: 4, sensory: { acidity: 3, sweetness: 4, body: 3, clarity: 4, finish: 3 } },
+      undefined,
+      { id: 'imp-l1', brewSessionId: 'imp-s1', beverageName: 'V60', beverageType: 'coffee', consumedAt: '2026-11-01T08:00:00.000Z', doseGrams: 15, caffeineMg: 110 }
+    );
+    const file = src.db.exportAllDataJson();
+    src.sqlite.__closeAll();
+
+    const dst = loadDatabase();
+    dst.db.importDataJson(file);
+    expect(dst.db.getInventoryItemById('imp-b1')?.origin).toBe('Huila');
+    expect(dst.db.getRecipeById('r-own')?.name).toBe('Moja V60');
+    expect(dst.db.getBrewSessionById('imp-s1')?.sensory).toEqual({ acidity: 3, sweetness: 4, body: 3, clarity: 4, finish: 3 });
+    expect(count(dst.db, 'SELECT COUNT(*) AS c FROM caffeine_logs')).toBe(1);
+    dst.sqlite.__closeAll();
+  });
+
+  test('liczba jako napis (doseGrams = "abc") nie zamienia się po cichu na wartość domyślną', () => {
+    const { db, sqlite } = loadDatabase();
+    const before = snapshot(db);
+    const file = JSON.stringify({
+      version: 1,
+      exportedAt: '2026-11-13T10:00:00.000Z',
+      inventory: [],
+      customRecipes: [],
+      sessions: [{ ...validSession, doseGrams: 'abc' }],
+      caffeineLogs: [],
+    });
+    expect(() => db.importDataJson(file)).toThrow(/sessions\[0\]\.doseGrams/);
+    expect(snapshot(db)).toEqual(before);
+    sqlite.__closeAll();
+  });
+});
