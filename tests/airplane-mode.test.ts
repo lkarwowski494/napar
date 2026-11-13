@@ -57,9 +57,9 @@ const mockDb: any = {
     return [];
   }),
   runSync: jest.fn((query: string, params?: any[]) => {
-    if (query.includes('INSERT OR REPLACE INTO app_settings')) {
+    if (query.includes('INSERT INTO app_settings')) {
       mockSettings.set(params![0], params![1]);
-    } else if (query.includes('INSERT OR REPLACE INTO inventory_items')) {
+    } else if (query.includes('INSERT INTO inventory_items')) {
       const [id, name, type, roaster, origin, roastDate, profile, process, variety, initW, remW, notes, rating, isFav, isArch, created, updated] = params!;
       mockInventory.set(id, {
         id, name, type, roaster_or_producer: roaster, origin, roast_or_harvest_date: roastDate,
@@ -80,7 +80,7 @@ const mockDb: any = {
         water_temp_c: temp, grind_size_description: grind, recommended_ratio: ratio, steps_json: steps,
         is_custom: isCustom, is_favorite: isFav, created_at: created
       });
-    } else if (query.includes('INSERT INTO brew_sessions') || query.includes('INSERT OR REPLACE INTO brew_sessions')) {
+    } else if (query.includes('INSERT INTO brew_sessions')) {
       const id = params![0];
       mockSessions.set(id, {
         id,

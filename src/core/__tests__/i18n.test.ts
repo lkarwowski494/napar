@@ -18,7 +18,7 @@ const mockDb: any = {
   }),
   getAllSync: jest.fn(() => []),
   runSync: jest.fn((query: string, params?: any[]) => {
-    if (query.includes('INSERT OR REPLACE INTO app_settings')) {
+    if (query.includes('INSERT INTO app_settings')) {
       mockSettings.set(params![0], params![1]);
     }
   }),

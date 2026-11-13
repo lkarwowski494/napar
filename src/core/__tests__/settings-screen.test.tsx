@@ -21,7 +21,7 @@ const mockDb: any = {
   }),
   getAllSync: jest.fn(() => []),
   runSync: jest.fn((query: string, params?: any[]) => {
-    if (query.includes('INSERT OR REPLACE INTO app_settings')) {
+    if (query.includes('INSERT INTO app_settings')) {
       mockSettings.set(params![0], params![1]);
     }
   }),
@@ -444,7 +444,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['default_grinder', 'fellow_ode_gen2']
     );
   });
@@ -467,7 +467,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['unit_system', 'imperial']
     );
 
@@ -477,7 +477,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['unit_system', 'metric']
     );
   });
@@ -500,7 +500,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['voice_announce_enabled', 'false']
     );
 
@@ -512,7 +512,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['haptics_enabled', 'false']
     );
   });
@@ -541,7 +541,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['caffeine_half_life_hours', '5.5']
     );
 
@@ -552,7 +552,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['caffeine_half_life_hours', '5.0']
     );
 
@@ -563,7 +563,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['bedtime_hour', '24']
     );
 
@@ -574,7 +574,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['bedtime_hour', '23']
     );
   });
@@ -597,7 +597,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['healthkit_sync_enabled', 'true']
     );
 
@@ -606,7 +606,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['healthkit_sync_enabled', 'false']
     );
   });
@@ -635,7 +635,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['beverage_preference', 'coffee']
     );
 
@@ -645,7 +645,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['beverage_preference', 'tea']
     );
 
@@ -655,7 +655,7 @@ describe('SettingsScreen Component', () => {
     });
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT OR REPLACE INTO app_settings'),
+      expect.stringContaining('INSERT INTO app_settings'),
       ['beverage_preference', 'both']
     );
   });

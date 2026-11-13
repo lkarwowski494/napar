@@ -129,7 +129,7 @@ export function createPreMigrationBackup(db: SQLite.SQLiteDatabase, fromVersion:
         []
       );
       db.runSync(
-        'INSERT OR REPLACE INTO migration_backups (id, created_at, sessions_count) VALUES (?, ?, ?)',
+        'INSERT INTO migration_backups (id, created_at, sessions_count) VALUES (?, ?, ?) ON CONFLICT(id) DO UPDATE SET created_at = excluded.created_at, sessions_count = excluded.sessions_count',
         [backupFileName, new Date().toISOString(), count?.c || 0]
       );
     }
@@ -1464,12 +1464,28 @@ export function saveInventoryItem(item: InventoryItem): void {
     : [];
 
   db.runSync(
-    `INSERT OR REPLACE INTO inventory_items (
+    `INSERT INTO inventory_items (
       id, name, type, roaster_or_producer, origin,
       roast_or_harvest_date, roast_profile, process, variety,
       initial_weight_g, remaining_weight_g, flavor_notes_json,
       rating, is_favorite, is_archived, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      name = excluded.name,
+      type = excluded.type,
+      roaster_or_producer = excluded.roaster_or_producer,
+      origin = excluded.origin,
+      roast_or_harvest_date = excluded.roast_or_harvest_date,
+      roast_profile = excluded.roast_profile,
+      process = excluded.process,
+      variety = excluded.variety,
+      initial_weight_g = excluded.initial_weight_g,
+      remaining_weight_g = excluded.remaining_weight_g,
+      flavor_notes_json = excluded.flavor_notes_json,
+      rating = excluded.rating,
+      is_favorite = excluded.is_favorite,
+      is_archived = excluded.is_archived,
+      updated_at = excluded.updated_at`,
     [
       cleanId,
       cleanName,
@@ -2098,13 +2114,36 @@ export function saveBrewSession(session: BrewSession): void {
     : 'v60';
 
   db.runSync(
-    `INSERT OR REPLACE INTO brew_sessions (
+    `INSERT INTO brew_sessions (
       id, recipe_id, recipe_name, inventory_item_id, inventory_item_name,
       beverage_type, method, dose_g, water_g, water_temp_c, water_profile,
       grind_setting, total_time_seconds, rating, flavor_tags_json,
       taste_balance, tds_percentage, extraction_yield_percentage,
       caffeine_content_mg, notes, infusion_number, sensory_scores_json, brewed_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      recipe_id = excluded.recipe_id,
+      recipe_name = excluded.recipe_name,
+      inventory_item_id = excluded.inventory_item_id,
+      inventory_item_name = excluded.inventory_item_name,
+      beverage_type = excluded.beverage_type,
+      method = excluded.method,
+      dose_g = excluded.dose_g,
+      water_g = excluded.water_g,
+      water_temp_c = excluded.water_temp_c,
+      water_profile = excluded.water_profile,
+      grind_setting = excluded.grind_setting,
+      total_time_seconds = excluded.total_time_seconds,
+      rating = excluded.rating,
+      flavor_tags_json = excluded.flavor_tags_json,
+      taste_balance = excluded.taste_balance,
+      tds_percentage = excluded.tds_percentage,
+      extraction_yield_percentage = excluded.extraction_yield_percentage,
+      caffeine_content_mg = excluded.caffeine_content_mg,
+      notes = excluded.notes,
+      infusion_number = excluded.infusion_number,
+      sensory_scores_json = excluded.sensory_scores_json,
+      brewed_at = excluded.brewed_at`,
     [
       safeId,
       safeRecipeId,
@@ -2321,9 +2360,16 @@ export function logCaffeine(log: CaffeineLog): void {
       : new Date().toISOString();
 
   db.runSync(
-    `INSERT OR REPLACE INTO caffeine_logs (
+    `INSERT INTO caffeine_logs (
       id, brew_session_id, beverage_name, beverage_type, consumed_at, dose_g, caffeine_mg
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      brew_session_id = excluded.brew_session_id,
+      beverage_name = excluded.beverage_name,
+      beverage_type = excluded.beverage_type,
+      consumed_at = excluded.consumed_at,
+      dose_g = excluded.dose_g,
+      caffeine_mg = excluded.caffeine_mg`,
     [
       safeId,
       log.brewSessionId ?? null,
@@ -2653,7 +2699,7 @@ export function setAppSetting(key: string, value: any): void {
     const safeValue = value === null || value === undefined ? '' : String(value);
     const db = getDatabase();
     db.runSync(
-      'INSERT OR REPLACE INTO app_settings (key, value) VALUES (?, ?)',
+      'INSERT INTO app_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
       [safeKey, safeValue]
     );
   } catch {

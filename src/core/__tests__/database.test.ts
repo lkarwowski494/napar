@@ -164,7 +164,7 @@ const mockDb: any = {
     return [];
   }),
   runSync: jest.fn((query: string, params?: any[]) => {
-    if (query.includes('INSERT OR REPLACE INTO inventory_items')) {
+    if (query.includes('INSERT INTO inventory_items')) {
       const [id, name, type, roaster, origin, roastDate, profile, process, variety, initW, remW, notes, rating, isFav, isArch, created, updated] = params!;
       mockDb.inventory.set(id, {
         id, name, type, roaster_or_producer: roaster, origin, roast_or_harvest_date: roastDate,
@@ -216,7 +216,7 @@ const mockDb: any = {
       } else {
         mockDb.recipes.delete(params![0]);
       }
-    } else if (query.includes('INSERT OR REPLACE INTO brew_sessions')) {
+    } else if (query.includes('INSERT INTO brew_sessions')) {
       const [id, rId, rName, iId, iName, type, method, dose, water, temp, waterProfile, grind, time, rating, tags, balance, tds, ey, caff, notes, inf, sensory, brewed] = params!;
       mockDb.sessions.set(id, {
         id, recipe_id: rId, recipe_name: rName, inventory_item_id: iId, inventory_item_name: iName,
@@ -227,7 +227,7 @@ const mockDb: any = {
       });
     } else if (query.includes('DELETE FROM brew_sessions WHERE id = ?')) {
       mockDb.sessions.delete(params![0]);
-    } else if (query.includes('INSERT OR REPLACE INTO caffeine_logs')) {
+    } else if (query.includes('INSERT INTO caffeine_logs')) {
       const [id, bId, name, type, consumed, dose, caff] = params!;
       mockDb.caffeine.set(id, {
         id, brew_session_id: bId, beverage_name: name, beverage_type: type,
@@ -235,7 +235,7 @@ const mockDb: any = {
       });
     } else if (query.includes('DELETE FROM caffeine_logs WHERE id = ?')) {
       mockDb.caffeine.delete(params![0]);
-    } else if (query.includes('INSERT OR REPLACE INTO app_settings')) {
+    } else if (query.includes('INSERT INTO app_settings')) {
       const [key, value] = params!;
       mockDb.settings.set(key, value);
     }

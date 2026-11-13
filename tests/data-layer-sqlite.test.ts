@@ -127,3 +127,88 @@ describe('Warstwa danych na node:sqlite (M1-audytor-generalny-001)', () => {
     sqlite.__closeAll();
   });
 });
+
+describe('Zapis rodzica nie kasuje dzieci (M1-audytor-generalny-002; 05-architekt-002, 08-programista-001, 12-niezawodnosc-005)', () => {
+  const bean = {
+    id: 'bean-1',
+    name: 'Kenia AA',
+    type: 'coffee' as const,
+    initialWeightGrams: 250,
+    remainingWeightGrams: 250,
+    flavorNotes: [],
+    isFavorite: false,
+    isArchived: false,
+    createdAt: '2026-11-01T08:00:00.000Z',
+    updatedAt: '2026-11-01T08:00:00.000Z',
+  };
+  const session = (n: number) => ({
+    id: `s${n}`,
+    inventoryItemId: 'bean-1',
+    inventoryItemName: 'Kenia AA',
+    beverageType: 'COFFEE' as const,
+    method: 'V60',
+    doseGrams: 15,
+    waterGrams: 250,
+    waterTempCelsius: 94,
+    totalTimeSeconds: 180,
+    flavorTags: [],
+    brewedAt: `2026-11-0${n}T08:00:00.000Z`,
+  });
+  const log = (n: number) => ({
+    id: `log${n}`,
+    brewSessionId: `s${n}`,
+    beverageName: 'V60',
+    beverageType: 'coffee' as const,
+    consumedAt: `2026-11-0${n}T08:00:00.000Z`,
+    doseGrams: 15,
+    caffeineMg: 100,
+  });
+
+  function seed(db: DbModule) {
+    db.saveInventoryItem(bean);
+    for (const n of [1, 2, 3]) db.recordBrewSessionTransaction(session(n), undefined, log(n));
+  }
+
+  test('ulubiona, archiwum i edycja paczki zostawiają jej 3 sesje powiązane (3/3)', () => {
+    const { db, sqlite } = loadDatabase();
+    seed(db);
+    const linked = () => count(db, 'SELECT COUNT(*) AS c FROM brew_sessions WHERE inventory_item_id = ?', 'bean-1');
+    expect(linked()).toBe(3);
+    db.saveInventoryItem({ ...bean, isFavorite: true });
+    expect(linked()).toBe(3);
+    db.saveInventoryItem({ ...bean, isFavorite: true, isArchived: true });
+    db.saveInventoryItem({ ...bean, name: 'Kenia AA (2)', remainingWeightGrams: 100 });
+    expect(linked()).toBe(3);
+    expect(db.getInventoryItemById('bean-1')?.name).toBe('Kenia AA (2)');
+    sqlite.__closeAll();
+  });
+
+  test('ponowny zapis tej samej sesji zostawia jej log kofeiny (3/3)', () => {
+    const { db, sqlite } = loadDatabase();
+    seed(db);
+    expect(count(db, 'SELECT COUNT(*) AS c FROM caffeine_logs')).toBe(3);
+    db.saveBrewSession({ ...session(1), notes: 'poprawka notatki' });
+    expect(count(db, 'SELECT COUNT(*) AS c FROM caffeine_logs')).toBe(3);
+    expect(db.getBrewSessionById('s1')?.notes).toBe('poprawka notatki');
+    sqlite.__closeAll();
+  });
+
+  test('trwała kontrola: w src i app nie ma INSERT OR REPLACE', () => {
+    const roots = ['src', 'app'].map((d) => path.join(__dirname, '..', d));
+    const hits: string[] = [];
+    const walk = (dir: string) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const p = path.join(dir, e.name);
+        if (e.isDirectory()) {
+          if (e.name !== '__tests__' && e.name !== 'node_modules') walk(p);
+        } else if (/\.(ts|tsx)$/.test(e.name)) {
+          fs.readFileSync(p, 'utf8').split('\n').forEach((line, i) => {
+            if (/INSERT\s+OR\s+REPLACE/i.test(line)) hits.push(`${path.relative(path.join(__dirname, '..'), p)}:${i + 1}`);
+          });
+        }
+      }
+    };
+    roots.forEach(walk);
+    expect(hits).toEqual([]);
+  });
+});

@@ -140,7 +140,7 @@ const mockDb: any = {
     return [];
   }),
   runSync: jest.fn((q, p) => {
-    if (q.includes('INSERT OR REPLACE INTO app_settings')) {
+    if (q.includes('INSERT INTO app_settings')) {
       mockDb.app_settings.set(p?.[0], p?.[1]);
     }
   }),

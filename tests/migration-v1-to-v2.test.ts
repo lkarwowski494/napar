@@ -38,7 +38,7 @@ describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
     const mockDb: any = {
       getFirstSync: jest.fn(() => ({ c: 42 })),
       runSync: jest.fn((query: string, params?: any[]) => {
-        if (query.includes('INSERT OR REPLACE INTO migration_backups')) {
+        if (query.includes('INSERT INTO migration_backups')) {
           mockBackups.set(params![0], { id: params![0], createdAt: params![1], count: params![2] });
         }
       }),
