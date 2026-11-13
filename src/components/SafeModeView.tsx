@@ -15,8 +15,10 @@ import {
   ScrollView,
 } from 'react-native';
 import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { crashLoopGuard } from '../core/startup-guard';
+import { createRescueExport, resetDatabaseSafely, type RescueCounts } from '../core/rescue';
+import { deviceRescueContext, pathToUri } from '../core/rescue-expo';
 import { detectSystemLanguage } from '../core/i18n';
 
 export interface SafeModeViewProps {
@@ -28,12 +30,15 @@ const MESSAGES = {
   pl: {
     badge: 'TRYB AWARYJNY / SAFE MODE',
     title: 'Wykryto problem ze startem',
-    desc: 'Aplikacja napotkała powtarzające się błędy podczas uruchamiania bazy danych SQLite. Twoje dane są bezpieczne na dysku. Skorzystaj z poniższych opcji ratunkowych:',
+    desc: 'Aplikacja kilka razy z rzędu nie uruchomiła się poprawnie. Zanim spróbujesz czegokolwiek innego, zrób kopię ratunkową bazy.',
     prepDb: 'Przygotowywanie bazy danych do eksportu...',
     noDbTitle: 'Brak pliku',
     noDbDesc: 'Nie znaleziono pliku bazy SQLite na dysku.',
     dbShareTitle: 'Eksport ratunkowy bazy SQLite (Napar)',
-    dbExported: 'Baza danych została wyeksportowana.',
+    dbExported: (c: RescueCounts) =>
+      `Sprawdzona kopia bazy jest w aplikacji Pliki, w folderze Napar › kopie-ratunkowe. Sesje: ${c.sessions} · Wpisy kofeiny: ${c.caffeineLogs} · Paczki: ${c.inventory} · Własne receptury: ${c.customRecipes}`,
+    rawSaved:
+      'Nie udało się zrobić sprawdzonej kopii bazy, więc zapisano surowe pliki bazy w aplikacji Pliki, w folderze Napar › kopie-ratunkowe. Skopiuj ten folder poza urządzenie, zanim zresetujesz bazę albo usuniesz aplikację.',
     noShareTitle: 'Niedostępne',
     noShareDesc: 'Udostępnianie plików nie jest dostępne na tym urządzeniu.',
     exportErrTitle: 'Błąd eksportu',
@@ -46,13 +51,19 @@ const MESSAGES = {
     jsonExported: (file: string) => `Wyeksportowano kopię: ${file}`,
     jsonErrDesc: 'Nie udało się wyeksportować kopii JSON.',
     resetTitle: 'Reset bazy danych',
-    resetConfirm: 'Czy na pewno chcesz usunąć uszkodzoną bazę SQLite? Upewnij się, że wyeksportowałeś plik bazy lub kopię JSON. Wszystkie lokalne dane zostaną zresetowane.',
+    resetConfirm: 'Dziennik, spiżarnia, wpisy kofeiny, własne receptury i ustawienia zostaną usunięte z aplikacji. Najpierw aplikacja zapisze kopię ratunkową bazy w folderze kopie-ratunkowe. Jeśli kopia się nie uda, nic nie zostanie usunięte.',
     cancel: 'Anuluj',
     deleteAndReset: 'Usuń i zresetuj',
     resetDoneTitle: 'Zresetowano',
-    resetDoneDesc: 'Baza została usunięta. Aplikacja uruchomi się z czystym stanem.',
+    resetDoneDesc: 'Baza została usunięta. Kopia ratunkowa jest w aplikacji Pliki, w folderze Napar › kopie-ratunkowe. Aplikacja uruchomi się od nowa, bez danych.',
+    resetBlockedTitle: 'Reset wstrzymany',
+    resetBlockedDesc: (reason: string) =>
+      `Nie udało się zrobić kopii ratunkowej bazy, więc niczego nie usunięto. Sprawdź, czy na urządzeniu jest wolne miejsce, i spróbuj ponownie. Szczegóły: ${reason}`,
+    resetIncompleteTitle: 'Reset nieukończony',
+    resetIncompleteDesc: (reason: string) =>
+      `Kopia ratunkowa jest w aplikacji Pliki, w folderze Napar › kopie-ratunkowe, ale nie udało się usunąć wszystkich plików bazy. Uruchom aplikację ponownie i powtórz reset. Szczegóły: ${reason}`,
     errTitle: 'Błąd',
-    btnExportDb: 'Eksportuj surową bazę SQLite',
+    btnExportDb: 'Zrób kopię ratunkową bazy',
     btnExportJson: 'Eksportuj ostatnią kopię JSON',
     btnRetry: 'Spróbuj uruchomić normalnie',
     btnResetDb: 'Zresetuj uszkodzoną bazę',
@@ -60,12 +71,15 @@ const MESSAGES = {
   en: {
     badge: 'RESCUE MODE / SAFE MODE',
     title: 'Startup Problem Detected',
-    desc: 'The app encountered repeated issues while initializing the SQLite database. Your data files are safe on disk. Please choose a recovery option below:',
+    desc: 'The app failed to start several times in a row. Before you try anything else, make a rescue copy of the database.',
     prepDb: 'Preparing database for export...',
     noDbTitle: 'File Not Found',
     noDbDesc: 'SQLite database file was not found on disk.',
     dbShareTitle: 'Rescue export of SQLite database (Steepwise)',
-    dbExported: 'Database has been exported successfully.',
+    dbExported: (c: RescueCounts) =>
+      `A verified copy of the database is in the Files app, in the Napar › kopie-ratunkowe folder. Sessions: ${c.sessions} · Caffeine entries: ${c.caffeineLogs} · Packs: ${c.inventory} · Custom recipes: ${c.customRecipes}`,
+    rawSaved:
+      'A verified copy of the database could not be made, so the raw database files were saved in the Files app, in the Napar › kopie-ratunkowe folder. Copy this folder off the device before you reset the database or delete the app.',
     noShareTitle: 'Not Available',
     noShareDesc: 'File sharing is not available on this device.',
     exportErrTitle: 'Export Error',
@@ -78,13 +92,19 @@ const MESSAGES = {
     jsonExported: (file: string) => `Exported backup: ${file}`,
     jsonErrDesc: 'Could not export JSON backup file.',
     resetTitle: 'Reset Database',
-    resetConfirm: 'Are you sure you want to delete the damaged SQLite database? Please ensure you have exported a database file or JSON backup first. All local data will be reset.',
+    resetConfirm: 'Your journal, pantry, caffeine entries, custom recipes and settings will be deleted from the app. First, the app saves a rescue copy of the database to the kopie-ratunkowe folder. If the copy fails, nothing is deleted.',
     cancel: 'Cancel',
     deleteAndReset: 'Delete and Reset',
     resetDoneTitle: 'Reset Complete',
-    resetDoneDesc: 'Database was deleted. The app will restart with a clean state.',
+    resetDoneDesc: 'The database was deleted. A rescue copy is in the Files app, in the Napar › kopie-ratunkowe folder. The app will restart without data.',
+    resetBlockedTitle: 'Reset Stopped',
+    resetBlockedDesc: (reason: string) =>
+      `The rescue copy of the database could not be made, so nothing was deleted. Check that the device has free storage and try again. Details: ${reason}`,
+    resetIncompleteTitle: 'Reset Incomplete',
+    resetIncompleteDesc: (reason: string) =>
+      `The rescue copy is in the Files app, in the Napar › kopie-ratunkowe folder, but not all database files could be deleted. Restart the app and try the reset again. Details: ${reason}`,
     errTitle: 'Error',
-    btnExportDb: 'Export Raw SQLite Database',
+    btnExportDb: 'Make Rescue Copy of Database',
     btnExportJson: 'Export Latest JSON Backup',
     btnRetry: 'Try Normal Startup Again',
     btnResetDb: 'Reset Damaged Database',
@@ -102,34 +122,28 @@ export const SafeModeView: React.FC<SafeModeViewProps> = ({ onRetry, language })
     setLoading(true);
     setStatusMessage(m.prepDb);
     try {
-      const docDir = (FileSystem as any).documentDirectory || '';
-      // Sprawdź lokalizację bazy w /Library/SQLite lub SQLite/ lub root
-      const possiblePaths = [
-        `${docDir}SQLite/napar.db`,
-        `${docDir}napar.db`,
-        docDir.replace('/Documents/', '/Library/') + 'SQLite/napar.db',
-      ];
-
-      let foundPath: string | null = null;
-      for (const p of possiblePaths) {
-        const info = await FileSystem.getInfoAsync(p);
-        if (info.exists) {
-          foundPath = p;
-          break;
-        }
-      }
-
-      if (!foundPath) {
+      const ctx = deviceRescueContext();
+      if ('error' in ctx) {
         Alert.alert(m.noDbTitle, m.noDbDesc);
         return;
       }
-
+      // M1-audytor-generalny-004: kopia przez VACUUM INTO bez migracji, sprawdzona; nigdy sam plik .db bez -wal.
+      const result = await createRescueExport(ctx);
+      if (!result.ok) {
+        if (result.reason === 'no-database') Alert.alert(m.noDbTitle, m.noDbDesc);
+        else Alert.alert(m.exportErrTitle, `${m.exportErrDesc} ${result.reason}`);
+        return;
+      }
+      if (result.kind === 'raw') {
+        setStatusMessage(m.rawSaved);
+        return;
+      }
       if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(foundPath, {
+        await Sharing.shareAsync(pathToUri(result.file), {
           mimeType: 'application/x-sqlite3',
           dialogTitle: m.dbShareTitle,
         });
-        setStatusMessage(m.dbExported);
+        setStatusMessage(m.dbExported(result.counts));
       } else {
         Alert.alert(m.noShareTitle, m.noShareDesc);
       }
@@ -190,20 +204,17 @@ export const SafeModeView: React.FC<SafeModeViewProps> = ({ onRetry, language })
           onPress: async () => {
             setLoading(true);
             try {
-              const docDir = (FileSystem as any).documentDirectory || '';
-              const paths = [
-                `${docDir}SQLite/napar.db`,
-                `${docDir}SQLite/napar.db-wal`,
-                `${docDir}SQLite/napar.db-shm`,
-                `${docDir}napar.db`,
-                docDir.replace('/Documents/', '/Library/') + 'SQLite/napar.db',
-              ];
-              for (const p of paths) {
-                try {
-                  await FileSystem.deleteAsync(p, { idempotent: true });
-                } catch {
-                  // ignore
+              // M1-audytor-generalny-004: najpierw sprawdzona kopia, potem usunięcie .db, -wal, -shm.
+              const ctx = deviceRescueContext();
+              const result = 'error' in ctx ? { ok: false as const, reason: ctx.error } : await resetDatabaseSafely(ctx);
+              if (!result.ok) {
+                // Kopia powstała, ale usuwanie zawiodło: „niczego nie usunięto” byłoby nieprawdą (rola 04, fix 2026-11-13).
+                if ('backup' in result && result.backup?.ok) {
+                  Alert.alert(m.resetIncompleteTitle, m.resetIncompleteDesc(result.reason));
+                } else {
+                  Alert.alert(m.resetBlockedTitle, m.resetBlockedDesc(result.reason));
                 }
+                return;
               }
               await crashLoopGuard.resetCrashCount();
               Alert.alert(m.resetDoneTitle, m.resetDoneDesc);

@@ -35,7 +35,7 @@ describe('SafeModeView Component (TASK-R12-02 / DEC-07)', () => {
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('TRYB AWARYJNY / SAFE MODE');
     expect(str).toContain('Wykryto problem ze startem');
-    expect(str).toContain('Eksportuj surową bazę SQLite');
+    expect(str).toContain('Zrób kopię ratunkową bazy');
     expect(str).toContain('Eksportuj ostatnią kopię JSON');
     expect(str).toContain('Spróbuj uruchomić normalnie');
     expect(str).toContain('Zresetuj uszkodzoną bazę');
@@ -51,10 +51,94 @@ describe('SafeModeView Component (TASK-R12-02 / DEC-07)', () => {
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('RESCUE MODE / SAFE MODE');
     expect(str).toContain('Startup Problem Detected');
-    expect(str).toContain('Export Raw SQLite Database');
+    expect(str).toContain('Make Rescue Copy of Database');
     expect(str).toContain('Export Latest JSON Backup');
     expect(str).toContain('Try Normal Startup Again');
     expect(str).toContain('Reset Damaged Database');
     expect(str).not.toMatch(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/);
+  });
+});
+
+// M1-audytor-generalny-004: ekran używa sprawdzonej kopii (rescue.ts); reset bez kopii jest wstrzymany.
+jest.mock('../../core/rescue-expo', () => ({
+  deviceRescueContext: jest.fn(() => ({ dbPath: '/x/Library/SQLite/napar.db', rescueDir: '/x/Documents/kopie-ratunkowe' })),
+  pathToUri: (p: string) => `file://${p}`,
+}));
+jest.mock('../../core/rescue', () => ({
+  createRescueExport: jest.fn(),
+  resetDatabaseSafely: jest.fn(),
+}));
+
+describe('SafeModeView — kopia ratunkowa i reset (M1-audytor-generalny-004)', () => {
+  const { Alert } = require('react-native');
+  const rescue = require('../../core/rescue');
+
+  beforeEach(() => {
+    jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    (Sharing.shareAsync as jest.Mock).mockClear();
+  });
+
+  function pressByText(tree: any, text: string) {
+    const button = tree.root.findAll((n: any) => typeof n.props.onPress === 'function' && JSON.stringify(n.findAllByType(require('react-native').Text).map((t: any) => t.props.children)).includes(text))[0];
+    return button.props.onPress();
+  }
+
+  test('reset bez udanej kopii pokazuje „Reset wstrzymany” i nie restartuje aplikacji', async () => {
+    rescue.resetDatabaseSafely.mockResolvedValue({ ok: false, reason: 'ENOSPC' });
+    const onRetry = jest.fn();
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<SafeModeView onRetry={onRetry} language="pl" />);
+    });
+    pressByText(tree, 'Zresetuj uszkodzoną bazę');
+    const confirmButtons = (Alert.alert as jest.Mock).mock.calls[0][2];
+    await renderer.act(async () => {
+      await confirmButtons[1].onPress();
+    });
+    const last = (Alert.alert as jest.Mock).mock.calls.at(-1);
+    expect(last[0]).toBe('Reset wstrzymany');
+    expect(last[1]).toContain('niczego nie usunięto');
+    expect(onRetry).not.toHaveBeenCalled();
+  });
+
+  test('kopia powstała, ale usuwanie zawiodło: „Reset nieukończony”, a nie „niczego nie usunięto”', async () => {
+    rescue.resetDatabaseSafely.mockResolvedValue({
+      ok: false,
+      reason: 'still-exists: napar.db-wal',
+      backup: { ok: true, kind: 'snapshot', file: '/x/k.db', counts: { sessions: 1, caffeineLogs: 0, inventory: 0, customRecipes: 0 }, rawCopyDir: null },
+    });
+    const onRetry = jest.fn();
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<SafeModeView onRetry={onRetry} language="pl" />);
+    });
+    pressByText(tree, 'Zresetuj uszkodzoną bazę');
+    const confirmButtons = (Alert.alert as jest.Mock).mock.calls.at(-1)[2];
+    await renderer.act(async () => {
+      await confirmButtons[1].onPress();
+    });
+    const last = (Alert.alert as jest.Mock).mock.calls.at(-1);
+    expect(last[0]).toBe('Reset nieukończony');
+    expect(last[1]).not.toContain('niczego nie usunięto');
+    expect(onRetry).not.toHaveBeenCalled();
+  });
+
+  test('eksport udostępnia sprawdzoną kopię i pokazuje liczności', async () => {
+    rescue.createRescueExport.mockResolvedValue({
+      ok: true,
+      kind: 'snapshot',
+      file: '/x/Documents/kopie-ratunkowe/napar-kopia.db',
+      counts: { sessions: 12, caffeineLogs: 30, inventory: 3, customRecipes: 1 },
+      rawCopyDir: null,
+    });
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<SafeModeView onRetry={jest.fn()} language="pl" />);
+    });
+    await renderer.act(async () => {
+      await pressByText(tree, 'Zrób kopię ratunkową bazy');
+    });
+    expect(Sharing.shareAsync).toHaveBeenCalledWith('file:///x/Documents/kopie-ratunkowe/napar-kopia.db', expect.anything());
+    expect(JSON.stringify(tree.toJSON())).toContain('Sesje: 12 · Wpisy kofeiny: 30');
   });
 });
