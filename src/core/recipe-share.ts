@@ -7,7 +7,6 @@ import { SavedRecipe } from './database-schema';
 import { MasterRecipe, RecipeStep } from './recipes-data';
 
 export const RECIPE_SHARE_PROTOCOL = 'napar://recipe';
-export const RECIPE_SHARE_WEB_URL = 'https://napar.app/recipe';
 
 export interface CompactRecipeStep {
   n: string; // Nazwa kroku (namePl)
@@ -267,15 +266,9 @@ export function recipeToCompactPayload(
 /**
  * Eksportuje recepturę do adresu Universal Link oraz schematu aplikacji (napar://)
  */
-export function encodeRecipeToShareUrl(
-  recipe: SavedRecipe | MasterRecipe,
-  useWebScheme: boolean | string = false
-): string {
-  const isWeb =
-    useWebScheme === true ||
-    (typeof useWebScheme === 'string' &&
-      (useWebScheme.trim().toLowerCase() === 'true' || useWebScheme.trim() === '1'));
-  const base = isWeb ? RECIPE_SHARE_WEB_URL : RECIPE_SHARE_PROTOCOL;
+export function encodeRecipeToShareUrl(recipe: SavedRecipe | MasterRecipe): string {
+  // M1-audytor-generalny-022: bez wariantu z domeną WWW (domena niezarejestrowana) — tylko schemat napar://.
+  const base = RECIPE_SHARE_PROTOCOL;
 
   if (!recipe || typeof recipe !== 'object') {
     return `${base}?v=1&d=`;

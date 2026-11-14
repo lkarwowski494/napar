@@ -53,8 +53,10 @@ import { CaffeineSettingsCard } from '../src/components/settings/CaffeineSetting
 import { DataBackupCard } from '../src/components/settings/DataBackupCard';
 import { GrinderSelectionCard } from '../src/components/settings/GrinderSelectionCard';
 import { AppPreferencesCard } from '../src/components/settings/AppPreferencesCard';
+import { APP_STORE_ID, appStoreReviewUrl } from '../src/core/app-identity';
 
 export default function SettingsScreen() {
+  const storeId = APP_STORE_ID;
   const { t, language, setLanguage } = useTranslation();
 
   let brewCtx: any = null;
@@ -322,16 +324,21 @@ export default function SettingsScreen() {
           <Text style={styles.infoLabel}>{language === 'pl' ? 'Kontakt i Wsparcie' : 'Contact & Support'}</Text>
           <Text style={[styles.infoValue, { color: theme.colors.copper }]}>kontakt@apps4brew.pl ↗</Text>
         </Pressable>
-        <View style={styles.divider} />
-        <Pressable
-          style={styles.infoRow}
-          onPress={() => Linking.openURL('https://apps.apple.com/app/id6470000000?action=write-review')}
-          accessibilityRole="link"
-          accessibilityLabel={language === 'pl' ? 'Oceń w App Store' : 'Rate in App Store'}
-        >
-          <Text style={styles.infoLabel}>{language === 'pl' ? 'Oceń w App Store' : 'Rate in App Store'}</Text>
-          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>{language === 'pl' ? 'Wystaw ocenę ↗' : 'Write review ↗'}</Text>
-        </Pressable>
+        {/* M1-audytor-generalny-022: link oceny tylko przy prawdziwym Apple ID (app-identity.ts). */}
+        {storeId && (
+          <>
+          <View style={styles.divider} />
+          <Pressable
+            style={styles.infoRow}
+            onPress={() => Linking.openURL(appStoreReviewUrl(storeId))}
+            accessibilityRole="link"
+            accessibilityLabel={language === 'pl' ? 'Oceń w App Store' : 'Rate in App Store'}
+          >
+            <Text style={styles.infoLabel}>{language === 'pl' ? 'Oceń w App Store' : 'Rate in App Store'}</Text>
+            <Text style={[styles.infoValue, { color: theme.colors.copper }]}>{language === 'pl' ? 'Wystaw ocenę ↗' : 'Write review ↗'}</Text>
+          </Pressable>
+          </>
+        )}
       </View>
     </ScrollView>
   );

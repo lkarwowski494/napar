@@ -12,7 +12,6 @@ import {
   stripControlChars,
   parseNumberWithUnit,
   RECIPE_SHARE_PROTOCOL,
-  RECIPE_SHARE_WEB_URL,
 } from '../recipe-share';
 import { MASTER_RECIPES } from '../recipes-data';
 import { SavedRecipe } from '../database-schema';
@@ -89,9 +88,7 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(appUrl.startsWith(RECIPE_SHARE_PROTOCOL)).toBe(true);
     expect(appUrl).toContain('?v=1&d=');
 
-    const webUrl = encodeRecipeToShareUrl(sampleSavedRecipe, true);
-    expect(webUrl.startsWith(RECIPE_SHARE_WEB_URL)).toBe(true);
-    expect(webUrl).toContain('?v=1&d=');
+    // M1-audytor-generalny-022: wariant https://napar.app usunięty (domena niezarejestrowana).
   });
 
   test('Prawidłowo dekoduje i odtwarza recepturę z wygenerowanego URL', () => {
@@ -110,8 +107,8 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(result!.originalSteps[1].targetWaterGrams).toBe(300);
   });
 
-  test('Prawidłowo dekoduje recepturę z webowego linku https://', () => {
-    const webUrl = encodeRecipeToShareUrl(sampleSavedRecipe, true);
+  test('Prawidłowo dekoduje recepturę z webowego linku https:// (stare linki nadal się importują)', () => {
+    const webUrl = encodeRecipeToShareUrl(sampleSavedRecipe).replace('napar://recipe', 'https://napar.app/recipe');
     const result = decodeRecipeFromShareUrl(webUrl);
 
     expect(result).not.toBeNull();
@@ -932,7 +929,6 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
   test('TASK-P39-11-WZR: encodeRecipeToShareUrl defensywnie obsluguje null i undefined recipe', () => {
     expect(encodeRecipeToShareUrl(null as any)).toBe('napar://recipe?v=1&d=');
     expect(encodeRecipeToShareUrl(undefined as any)).toBe('napar://recipe?v=1&d=');
-    expect(encodeRecipeToShareUrl(null as any, true)).toBe('https://napar.app/recipe?v=1&d=');
   });
 
   test('TASK-P40-11-WZR: decodeRecipeFromShareUrl wczesnie odrzuca nienapisowe wejscia, spacje oraz normalizuje language', () => {
@@ -1032,7 +1028,7 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     expect(decodedTea?.recipe.beverageType).toBe('TEA');
   });
 
-  test('TASK-P44-11-WZR: encodeRecipeToShareUrl defensywnie parsuje flage useWebScheme (string true/1 vs false/0)', () => {
+  test('TASK-P44-11-WZR: encodeRecipeToShareUrl zawsze używa schematu napar:// (M1-audytor-generalny-022)', () => {
     const dummyRecipe: any = {
       name: 'V60 Test',
       beverageType: 'COFFEE',
@@ -1042,18 +1038,8 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
       stepsJson: '[]',
     };
 
-    expect(encodeRecipeToShareUrl(dummyRecipe, 'true')).toMatch(/^https:\/\/napar\.app\//);
-    expect(encodeRecipeToShareUrl(dummyRecipe, '1')).toMatch(/^https:\/\/napar\.app\//);
-    expect(encodeRecipeToShareUrl(dummyRecipe, true)).toMatch(/^https:\/\/napar\.app\//);
-
-    expect(encodeRecipeToShareUrl(dummyRecipe, 'false')).toMatch(/^napar:\/\//);
-    expect(encodeRecipeToShareUrl(dummyRecipe, '0')).toMatch(/^napar:\/\//);
-    expect(encodeRecipeToShareUrl(dummyRecipe, false)).toMatch(/^napar:\/\//);
-    expect(encodeRecipeToShareUrl(dummyRecipe, null as any)).toMatch(/^napar:\/\//);
-    expect(encodeRecipeToShareUrl(dummyRecipe, undefined as any)).toMatch(/^napar:\/\//);
-
-    expect(encodeRecipeToShareUrl(null as any, 'true')).toBe('https://napar.app/recipe?v=1&d=');
-    expect(encodeRecipeToShareUrl(null as any, 'false')).toBe('napar://recipe?v=1&d=');
+    expect(encodeRecipeToShareUrl(dummyRecipe)).toMatch(/^napar:\/\//);
+    expect(encodeRecipeToShareUrl(null as any)).toBe('napar://recipe?v=1&d=');
   });
 
   test('TASK-P45-11-WZR: decodeRecipeFromShareUrl parsuje URL z wielkimi literami w parametrach query (?D=, ?DATA=)', () => {
