@@ -165,9 +165,7 @@ export default function CaffeineScreen() {
             .replace('{max}', '400')}
         </Text>
         <Text style={styles.efsaNoteText}>
-          {t.caffeine.efsaDisclaimer || (language === 'pl'
-            ? 'Limit dzienny (EFSA 2015): 400 mg dla zdrowych dorosłych (maks. 200 mg w jednej dawce) · 200 mg w ciąży i podczas laktacji.'
-            : 'Daily limit (EFSA 2015): 400 mg for healthy adults (max 200 mg single dose) · 200 mg during pregnancy & lactation.')}
+          {t.caffeine.efsaDisclaimer}
         </Text>
 
         <View style={styles.efsaProgressBar}>
@@ -220,10 +218,8 @@ export default function CaffeineScreen() {
 
       {/* Zastrzeżenie medyczne i źródła (App Store 1.4.1 / EFSA 2015) */}
       <View style={styles.disclaimerCard}>
-        <Text style={styles.disclaimerTitle}>Zastrzeżenie informacyjne (EFSA 2015)</Text>
-        <Text style={styles.disclaimerText}>
-          Informacja edukacyjna — nie stanowi porady medycznej ani diagnozy. Szacunki oparte na modelu jednokompartmentowym I rzędu (t₁/₂ = 3–12 h); rzeczywisty metabolizm zależy m.in. od aktywności enzymu CYP1A2, ciąży, leków i wrażliwości receptorów adenozynowych. Przed decyzjami zdrowotnymi skonsultuj się z lekarzem. Źródła: EFSA NDA Panel (2015, doi:10.2903/j.efsa.2015.4102); Nehlig (2018, doi:10.1124/pr.117.014407); Drake et al. (2013, doi:10.5664/jcsm.3170).
-        </Text>
+        <Text style={styles.disclaimerTitle}>{t.caffeine.disclaimerTitle}</Text>
+        <Text style={styles.disclaimerText}>{t.caffeine.disclaimerText}</Text>
       </View>
     </ScrollView>
   );

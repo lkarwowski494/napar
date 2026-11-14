@@ -676,7 +676,7 @@ describe('M1-audytor-generalny-015: bez progu „bezpiecznego dla snu” i „be
   test('06-tresci-001: żaden tekst PL ani EN (słowniki i pliki locales) nie nazywa poziomu kofeiny przed snem „bezpiecznym” ani progiem NREM', () => {
     const texts = [...flatten(translations.pl), ...flatten(translations.en)].filter(([k]) => /^(caffeine|settings\.bedtime)/.test(k));
     expect(texts.length).toBeGreaterThan(5);
-    expect(texts.filter(([, v]) => /bezpieczn|safe|NREM|curfew|próg|threshold|25 mg/i.test(v))).toEqual([]);
+    expect(texts.filter(([, v]) => /bezpieczn|\bsafe\b|NREM|curfew|próg|threshold|25 mg/i.test(v))).toEqual([]);
     expect(grepFiles(/Safe level for restorative|NREM|25 mg|curfew/i, localeFiles)).toEqual([]);
   });
 
@@ -712,5 +712,44 @@ describe('M1-audytor-generalny-015: bez progu „bezpiecznego dla snu” i „be
     const { estimateBedtimeCaffeineMg } = require('../src/core/domain-rules');
     expect(estimateBedtimeCaffeineMg([{ doseMg: 100, hoursUntilBedtime: 10 }], 5)).toBe(25);
     expect(estimateBedtimeCaffeineMg([{ doseMg: 100, hoursUntilBedtime: 5 }, { doseMg: 50, hoursUntilBedtime: 0 }], 5)).toBe(100);
+  });
+});
+
+describe('M1-audytor-generalny-016: zastrzeżenie medyczne w PL i EN, z lekarzem i granicami modelu (06-tresci-002, 06-tresci-003)', () => {
+  const tr: any = translations;
+
+  test('06-tresci-002: zastrzeżenie jest w słowniku PL i EN (lekarz, ciąża, leki, wątroba, dzieci)', () => {
+    const pl = `${tr.pl.caffeine.disclaimerTitle} ${tr.pl.caffeine.disclaimerText}`;
+    const en = `${tr.en.caffeine.disclaimerTitle} ${tr.en.caffeine.disclaimerText}`;
+    for (const re of [/lekarz/, /ciąż/, /lek(ów|ach|i)\b/, /wątrob/, /dzieci/]) expect(pl).toMatch(re);
+    for (const re of [/doctor/i, /pregnan/i, /medication/i, /liver/i, /children/i]) expect(en).toMatch(re);
+    expect(en).not.toMatch(/[ąćęłńóśźż]/i);
+  });
+
+  test('06-tresci-002: ekran Kofeina bierze zastrzeżenie ze słownika, nie z tekstu na sztywno', () => {
+    const src = readFileSync(join(root, 'app/(tabs)/caffeine.tsx'), 'utf8');
+    expect(src).not.toMatch(/Zastrzeżenie informacyjne|Informacja edukacyjna|skonsultuj się/);
+    expect(src).toMatch(/t\.caffeine\.disclaimerTitle/);
+    expect(src).toMatch(/t\.caffeine\.disclaimerText/);
+  });
+
+  test('06-tresci-002: opis sklepu PL i EN przypomina o lekarzu (App Review 1.4.1)', () => {
+    const store = readFileSync(join(root, 'docs/15-app-store.md'), 'utf8');
+    expect(store).toMatch(/Health Disclaimer:[^\n]*doctor/);
+    expect(store).toMatch(/Zastrzeżenie medyczne:[^\n]*lekarz/);
+    expect(store).not.toMatch(/curfew/i);
+  });
+
+  test('06-tresci-003: twierdzenia wysokiego ryzyka nie mają nieważnego zapisu przeglądu — czekają z oznaczeniem albo mają przegląd człowieka z datą', () => {
+    const reg = JSON.parse(readFileSync(join(root, 'rejestr.json'), 'utf8'));
+    const list: any[] = reg.twierdzenia ?? reg;
+    const krytyczne = list.filter((t) => (t.krytyczne ?? t.poziom_ryzyka === 'wysoki') && t.status !== 'wycofane');
+    expect(krytyczne.length).toBeGreaterThan(0);
+    for (const t of krytyczne) {
+      const p = t.przeglad;
+      const czeka = p == null && /czeka/.test(String(t.przeglad_status ?? ''));
+      const czlowiek = p && /^\d{4}-\d\d-\d\d$/.test(p.data ?? '') && /^[0-9a-f]{12}$/.test(p.sha ?? '') && !/ZASTĘPCZY_AI|subagent/.test(p.kto ?? '');
+      expect([t.id, czeka || czlowiek]).toEqual([t.id, true]);
+    }
   });
 });

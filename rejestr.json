@@ -2,21 +2,83 @@
   "twierdzenia": [
     {
       "id": "EFSA-CAFF-2015",
-      "tekst": "Bezpieczne spożycie kofeiny wynosi do 400 mg/dobę (maks. 200 mg jednorazowo) dla zdrowych dorosłych niebędących w ciąży oraz do 200 mg/dobę dla kobiet w ciąży i karmiących piersią.",
+      "tekst": "EFSA: spożycie do 400 mg kofeiny na dobę nie budzi zastrzeżeń dotyczących bezpieczeństwa u zdrowych dorosłych z wyjątkiem kobiet w ciąży; pojedyncze dawki do 200 mg (ok. 3 mg/kg m.c.) nie budzą zastrzeżeń; w ciąży i podczas karmienia do 200 mg na dobę nie budzi zastrzeżeń dla płodu.",
       "kategoria": "zdrowie-farmakokinetyka",
       "poziom_ryzyka": "wysoki",
       "zrodlo": {
-        "tier": 1,
-        "tytul": "Scientific Opinion on the safety of caffeine",
-        "autor_lub_wydawca": "EFSA Panel on Dietetic Products, Nutrition and Allergies (NDA), European Food Safety Authority (EFSA), EFSA Journal 2015;13(5):4102",
-        "url_lub_isbn": "https://doi.org/10.2903/j.efsa.2015.4102",
-        "cytat_doslowny": "Habitual caffeine consumption up to 400 mg per day does not give rise to safety concerns for non-pregnant adults. Habitual caffeine consumption up to 200 mg per day by pregnant women does not give rise to safety concerns for the fetus.",
-        "data_dostepu": "2026-10-24"
+        "tier": 3,
+        "tytul": "EFSA explains risk assessment: Caffeine (2015)",
+        "autor_lub_wydawca": "European Food Safety Authority (EFSA)",
+        "url_lub_isbn": "https://www.efsa.europa.eu/sites/default/files/corporate_publications/files/efsaexplainscaffeine150527.pdf",
+        "cytat_doslowny": "Intakes up to 400mg per day (about 5.7mg/kg bw per day) consumed throughout the day do not raise safety concerns for healthy adults in the general population, except pregnant women.",
+        "cytaty_dodatkowe": [
+          "Single doses of caffeine up to 200mg – about 3mg per kilogram of body weight (mg/kg bw) from all sources do not raise safety concerns for the general healthy adult population.",
+          "Caffeine intakes from all sources up to 200mg per day consumed throughout the day do not raise safety concerns for the foetus."
+        ],
+        "data_dostepu": "2026-11-14",
+        "uwagi": "Opis EFSA pochodny opinii EFSA Journal 2015;13(5):4102 (szczebel 1; HTTP 403 w dniu odczytu); jedno źródło. Dawny cytat z rejestru (2026-10-24) nie został sprawdzony na tekście opinii."
       },
-      "przeglad": {
-        "kto": "PRZEGLĄD_ZASTĘPCZY_AI (wymaga zatwierdzenia właściciela)",
-        "data": "2026-10-24",
-        "sha": "f07796f0a54093c19d76c88ade8516e091e0410d"
+      "przeglad": null,
+      "przeglad_status": "czeka na przegląd człowieka (stan projektu: przegląd człowieka; zapis „PRZEGLĄD_ZASTĘPCZY_AI” z 2026-10-24 unieważniony 2026-11-14 — brak osoby i skrótu przejrzanej wersji zdań)",
+      "status": "potwierdzone"
+    },
+    {
+      "id": "EFSA-T12-ZAKRES",
+      "tekst": "EFSA: u zdrowych dorosłych średni czas półtrwania kofeiny wynosi około 4 godzin, w zakresie od 2 do 8 godzin; zależy m.in. od wieku, masy ciała, ciąży, przyjmowanych leków i stanu wątroby.",
+      "kategoria": "zdrowie-farmakokinetyka",
+      "poziom_ryzyka": "wysoki",
+      "status": "potwierdzone",
+      "wielkosc": "kofeina_t12_zakres_doroslych",
+      "wartosc": "2–8 (średnio ok. 4)",
+      "jednostka": "h",
+      "zrodlo": {
+        "tier": 3,
+        "tytul": "EFSA explains risk assessment: Caffeine (2015)",
+        "autor_lub_wydawca": "EFSA",
+        "url_lub_isbn": "https://www.efsa.europa.eu/sites/default/files/corporate_publications/files/efsaexplainscaffeine150527.pdf",
+        "cytat_doslowny": "In healthy adults, the average half-life is approximately four hours, with a range of two to eight hours.",
+        "cytaty_dodatkowe": [
+          "varies widely, depending on factors such as age, body weight, pregnancy status, medication intake and liver health."
+        ],
+        "data_dostepu": "2026-11-14",
+        "uwagi": "Opis EFSA pochodny opinii EFSA Journal 2015;13(5):4102 (szczebel 1; HTTP 403 w dniu odczytu); jedno źródło."
+      },
+      "przeglad": null,
+      "przeglad_status": "czeka na przegląd człowieka"
+    },
+    {
+      "id": "GRZEG-PK-CZYNNIKI",
+      "tekst": "Na farmakokinetykę kofeiny wpływają palenie, doustna antykoncepcja, ciąża, otyłość, spożycie alkoholu i jednoczesne przyjmowanie leków; choroby wątroby silnie zmniejszają klirens kofeiny.",
+      "kategoria": "zdrowie-farmakokinetyka",
+      "poziom_ryzyka": "wysoki",
+      "status": "potwierdzone",
+      "zrodlo": {
+        "tier": 2,
+        "tytul": "Pharmacokinetics of Caffeine: A Systematic Analysis of Reported Data for Application in Metabolic Phenotyping and Liver Function Testing",
+        "autor_lub_wydawca": "Grzegorzewski J. i in., Frontiers in Pharmacology 2022 (PMC8914174)",
+        "url_lub_isbn": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8914174/fullTextXML (https://pmc.ncbi.nlm.nih.gov/articles/PMC8914174/)",
+        "cytat_doslowny": "use of oral contraceptives have been shown to influence caffeine pharmacokinetics, as have pregnancy, obesity, alcohol consumption, and the coadministrations of drugs",
+        "cytaty_dodatkowe": [
+          "For caffeine which is predominantly metabolized by the liver, various liver diseases result in a strong reduction in caffeine clearance."
+        ],
+        "data_dostepu": "2026-11-14"
+      },
+      "przeglad": null,
+      "przeglad_status": "czeka na przegląd człowieka"
+    },
+    {
+      "id": "APPLE-1.4.1-LEKARZ",
+      "tekst": "Wytyczne App Review 1.4.1: aplikacje mają przypominać użytkownikom o konsultacji z lekarzem obok korzystania z aplikacji i przed decyzjami medycznymi.",
+      "kategoria": "wytyczne-sklepu",
+      "poziom_ryzyka": "sredni",
+      "status": "potwierdzone",
+      "zrodlo": {
+        "tier": 1,
+        "tytul": "App Review Guidelines",
+        "autor_lub_wydawca": "Apple",
+        "url_lub_isbn": "https://developer.apple.com/app-store/review/guidelines/",
+        "cytat_doslowny": "Apps should remind users to check with a doctor in addition to using the app and before making medical decisions.",
+        "data_dostepu": "2026-11-14"
       }
     },
     {
@@ -32,11 +94,10 @@
         "cytat_doslowny": "Caffeine is almost completely metabolized by the liver, with only 1–5% excreted unchanged in urine. More than 95% of caffeine clearance is mediated by CYP1A2.",
         "data_dostepu": "2026-10-24"
       },
-      "przeglad": {
-        "kto": "PRZEGLĄD_ZASTĘPCZY_AI (wymaga zatwierdzenia właściciela)",
-        "data": "2026-10-24",
-        "sha": "f07796f0a54093c19d76c88ade8516e091e0410d"
-      }
+      "przeglad": null,
+      "przeglad_status": "czeka na przegląd człowieka (stan projektu: przegląd człowieka; zapis „PRZEGLĄD_ZASTĘPCZY_AI” z 2026-10-24 unieważniony 2026-11-14 — brak osoby i skrótu przejrzanej wersji zdań)",
+      "status": "otwarte",
+      "uwagi_2026_11_14": "[DO USTALENIA] Pełny tekst niedostępny (Europe PMC: PMID 29514871, brak PMC; doi → Elsevier bez treści). Nieużywany w zastrzeżeniu ekranu od 2026-11-14; zakres t½ z EFSA-T12-ZAKRES."
     },
     {
       "id": "DRAKE-SLEEP-2013",
@@ -51,11 +112,8 @@
         "cytat_doslowny": "Even at 6 hours, caffeine reduced sleep by more than 1 hour.",
         "data_dostepu": "2026-11-14"
       },
-      "przeglad": {
-        "kto": "PRZEGLĄD_ZASTĘPCZY_AI (wymaga zatwierdzenia właściciela)",
-        "data": "2026-10-24",
-        "sha": "f07796f0a54093c19d76c88ade8516e091e0410d"
-      }
+      "przeglad": null,
+      "przeglad_status": "czeka na przegląd człowieka (stan projektu: przegląd człowieka; zapis „PRZEGLĄD_ZASTĘPCZY_AI” z 2026-10-24 unieważniony 2026-11-14 — brak osoby i skrótu przejrzanej wersji zdań)"
     },
     {
       "id": "SEN-PROG-25MG",
@@ -81,7 +139,8 @@
         "data_dostepu": "2026-11-14",
         "uwagi": "Opis EFSA pochodny opinii EFSA Journal 2015;13(5):4102 (szczebel 1, niedostępna: HTTP 403 w dniu odczytu); jedno źródło."
       },
-      "przeglad": null
+      "przeglad": null,
+      "przeglad_status": "czeka na przegląd człowieka (stan projektu: przegląd człowieka; zapis „PRZEGLĄD_ZASTĘPCZY_AI” z 2026-10-24 unieważniony 2026-11-14 — brak osoby i skrótu przejrzanej wersji zdań)"
     },
     {
       "id": "SCA-GOLDENCUP-EY",

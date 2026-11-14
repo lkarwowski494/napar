@@ -55,7 +55,7 @@ Precyzyjne narzędzia: dwukierunkowy kalkulator proporcji (Brew Ratio), kalkulat
 Zero logowania, zero chmury, zero analityki i trackerów reklamowych. Pełny eksport i import bazy danych w formacie JSON oraz eksport historii parzeń do CSV.
 
 ---
-Zastrzeżenie medyczne: Wskaźniki stężenia kofeiny i okna snu mają charakter wyłącznie orientacyjny i edukacyjny, oparty na średnich modelach populacyjnych (EFSA 2015). Nie stanowią porady medycznej ani diagnozy klinicznej. Przed zmianą nawyków żywieniowych skonsultuj się z lekarzem.
+Zastrzeżenie medyczne: Szacunki kofeiny w organizmie mają charakter wyłącznie informacyjny, dotyczą zdrowych dorosłych i pochodzą z prostego modelu eliminacji. Mogą być błędne w ciąży, przy chorobach wątroby, przy przyjmowaniu leków oraz u dzieci i młodzieży. Nie stanowią porady medycznej ani diagnozy. Skonsultuj się z lekarzem, zanim podejmiesz decyzje dotyczące zdrowia.
 
 Klauzula nominative fair use: Wszelkie nazwy urządzeń, akcesoriów i marek (takich jak V60, AeroPress, Chemex, Comandante itp.) są używane wyłącznie w celach informacyjnych i opisu kompatybilności. Wszystkie znaki towarowe należą do ich prawnych właścicieli.
 ```
@@ -85,7 +85,7 @@ Track your daily caffeine intake and an estimate of the caffeine in your body at
 No account creation, no cloud servers, no third-party trackers, and no advertisements. Full local JSON database backup/restore and CSV journal export.
 
 ---
-Health Disclaimer: Caffeine level estimates and bedtime curfew recommendations are provided for informational and educational purposes only, based on population averages (EFSA 2015). They do not constitute medical advice or clinical diagnosis.
+Health Disclaimer: Caffeine level estimates are for information only, apply to healthy adults and come from a simple elimination model. They may be wrong during pregnancy, with liver disease, when taking medication, and for children and adolescents. They do not constitute medical advice or diagnosis. Check with a doctor in addition to using the app and before making medical decisions.
 
 Nominative Fair Use Notice: All product and company names, brewer types, and grinder models (such as V60, AeroPress, Chemex, Comandante, etc.) are trademarks or registered trademarks of their respective holders. Use of them does not imply any affiliation with or endorsement by them.
 ```

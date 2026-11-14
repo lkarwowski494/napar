@@ -514,7 +514,9 @@ export const translations = {
       logDoseBtn: '+ Zarejestruj Dawkę',
       activeCaffeineTitle: 'AKTYWNA KOFEINA W KRWIOBIEGU',
       dailyTotalLabel: 'Dobowy bilans: {current} mg / {max} mg (EFSA 2015)',
-      efsaDisclaimer: 'Limit dzienny (EFSA 2015): 400 mg dla zdrowych dorosłych (maks. 200 mg w jednej dawce) · 200 mg w ciąży i podczas laktacji.',
+      efsaDisclaimer: 'EFSA 2015: do 400 mg na dobę nie budzi zastrzeżeń u zdrowych dorosłych poza kobietami w ciąży; pojedyncza dawka do 200 mg · w ciąży i podczas karmienia do 200 mg na dobę.',
+      disclaimerTitle: 'Zastrzeżenie: informacja, nie porada medyczna',
+      disclaimerText: 'Szacunki pochodzą z prostego modelu eliminacji (ilość kofeiny maleje o połowę co czas półtrwania; model pomija fazę wchłaniania) i dotyczą zdrowych dorosłych. Według EFSA czas półtrwania kofeiny u dorosłych zależy m.in. od wieku, masy ciała, ciąży, przyjmowanych leków i stanu wątroby. Na przemiany kofeiny wpływają też palenie, antykoncepcja doustna, otyłość i alkohol. Szacunek może być błędny w ciąży, przy chorobach wątroby, przy przyjmowaniu leków oraz u dzieci i młodzieży. Skonsultuj się z lekarzem, zanim podejmiesz decyzje dotyczące zdrowia. Źródła: EFSA (2015, doi:10.2903/j.efsa.2015.4102); Grzegorzewski i in. (2022, Front. Pharmacol., PMC8914174); Drake i in. (2013, doi:10.5664/jcsm.3170).',
     },
     sensory: {
       title: 'Wykres Sensoryki SCA (Spider Graph)',
@@ -1099,7 +1101,9 @@ export const translations = {
       logDoseBtn: '+ Log Caffeine Dose',
       activeCaffeineTitle: 'ACTIVE CAFFEINE IN BLOODSTREAM',
       dailyTotalLabel: 'Daily total: {current} mg / {max} mg (EFSA 2015)',
-      efsaDisclaimer: 'Daily limit (EFSA 2015): 400 mg for healthy adults (max 200 mg single dose) · 200 mg during pregnancy & lactation.',
+      efsaDisclaimer: 'EFSA 2015: up to 400 mg per day raises no safety concerns for healthy adults, except pregnant women; single doses up to 200 mg · up to 200 mg per day during pregnancy and lactation.',
+      disclaimerTitle: 'Disclaimer: information, not medical advice',
+      disclaimerText: 'Estimates come from a simple elimination model (the amount of caffeine halves every half-life; the model ignores the absorption phase) and apply to healthy adults. According to EFSA, caffeine half-life in adults depends on factors such as age, body weight, pregnancy, medication intake and liver health. Smoking, oral contraceptives, obesity and alcohol also affect how the body processes caffeine. The estimate may be wrong during pregnancy, with liver disease, when taking medication, and for children and adolescents. Check with a doctor before making medical decisions. Sources: EFSA (2015, doi:10.2903/j.efsa.2015.4102); Grzegorzewski et al. (2022, Front. Pharmacol., PMC8914174); Drake et al. (2013, doi:10.5664/jcsm.3170).',
     },
     sensory: {
       title: 'SCA Sensory Spider Graph',

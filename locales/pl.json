@@ -474,12 +474,14 @@
     "logDoseBtn": "+ Zarejestruj Dawkę",
     "activeCaffeineTitle": "AKTYWNA KOFEINA W KRWIOBIEGU",
     "dailyTotalLabel": "Dobowy bilans: {current} mg / {max} mg (EFSA 2015)",
-    "efsaDisclaimer": "Limit dzienny (EFSA 2015): 400 mg dla zdrowych dorosłych (maks. 200 mg w jednej dawce) · 200 mg w ciąży i podczas laktacji.",
+    "efsaDisclaimer": "EFSA 2015: do 400 mg na dobę nie budzi zastrzeżeń u zdrowych dorosłych poza kobietami w ciąży; pojedyncza dawka do 200 mg · w ciąży i podczas karmienia do 200 mg na dobę.",
     "bedtimeCardTitle": "Kofeina o porze snu",
     "bedtimeEarlierA11y": "Wcześniejsza godzina snu",
     "bedtimeLaterA11y": "Późniejsza godzina snu",
     "bedtimeEstimate": "Szacowana kofeina w organizmie o {hour}:00: {mg} mg",
-    "bedtimeEstimateNote": "To szacunek z modelu eliminacji, nie ocena snu. EFSA: pojedyncza dawka 100 mg może wpływać na długość i przebieg snu u niektórych dorosłych, zwłaszcza wypita tuż przed snem."
+    "bedtimeEstimateNote": "To szacunek z modelu eliminacji, nie ocena snu. EFSA: pojedyncza dawka 100 mg może wpływać na długość i przebieg snu u niektórych dorosłych, zwłaszcza wypita tuż przed snem.",
+    "disclaimerTitle": "Zastrzeżenie: informacja, nie porada medyczna",
+    "disclaimerText": "Szacunki pochodzą z prostego modelu eliminacji (ilość kofeiny maleje o połowę co czas półtrwania; model pomija fazę wchłaniania) i dotyczą zdrowych dorosłych. Według EFSA czas półtrwania kofeiny u dorosłych zależy m.in. od wieku, masy ciała, ciąży, przyjmowanych leków i stanu wątroby. Na przemiany kofeiny wpływają też palenie, antykoncepcja doustna, otyłość i alkohol. Szacunek może być błędny w ciąży, przy chorobach wątroby, przy przyjmowaniu leków oraz u dzieci i młodzieży. Skonsultuj się z lekarzem, zanim podejmiesz decyzje dotyczące zdrowia. Źródła: EFSA (2015, doi:10.2903/j.efsa.2015.4102); Grzegorzewski i in. (2022, Front. Pharmacol., PMC8914174); Drake i in. (2013, doi:10.5664/jcsm.3170)."
   },
   "sensory": {
     "title": "Wykres Sensoryki SCA (Spider Graph)",
