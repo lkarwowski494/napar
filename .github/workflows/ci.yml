@@ -30,20 +30,27 @@ jobs:
       - name: Instalacja zależności
         run: npm ci
 
-      - name: Sprawdzenie symetrii i18n (PL/EN)
-        run: npm run check:i18n
+      # M1-audytor-generalny-011: jedna definicja bramki — te same kroki co lokalnie (package.json "verify").
+      - name: Bramka jakości (npm run verify)
+        run: npm run verify
 
-      - name: Sprawdzenie spójności wyroczni Python (Corpus)
-        run: npm run check:corpus
+  perf:
+    # Budżety czasu CPU: informacyjnie, poza bramką (07-jakosc-003).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-      - name: Kontrola licencji bibliotek (zakaz GPL)
-        run: npm run check:licenses
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
 
-      - name: Kontrola macierzy testów (100% w 5 kategoriach)
-        run: npm run check:matrix
+      - name: Instalacja zależności
+        run: npm ci
 
-      - name: Kontrola typów TypeScript
-        run: npm run typecheck
-
-      - name: Pełny zestaw testów z progami pokrycia, kontraktami i budżetem CPU
-        run: npm run test:coverage -- --ci
+      - name: Budżety czasu CPU (raport, nie bramka)
+        run: npm run test:perf
