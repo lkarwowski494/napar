@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BrewQuickPrepCard Component (Apps4Craft Design System)
+// Napar — BrewQuickPrepCard Component (Apps4Craft Design System)
 // "The Three Numbers": Dose, Water, Grind/Temp with batch scaling under 15 seconds.
 // 100% Offline-First.
 // ============================================================================

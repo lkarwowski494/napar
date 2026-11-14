@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Wykres Kinetyki Kofeiny (Caffeine Elimination Curve)
+// Napar — Wykres Kinetyki Kofeiny (Caffeine Elimination Curve)
 // Model jedno-kompartmentowy z zaznaczeniem pory snu (bez progu snu — M1-audytor-generalny-015, DEC-05 a)
 // ============================================================================
 

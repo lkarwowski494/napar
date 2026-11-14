@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BrewFinishModal Component Tests
+// Napar — BrewFinishModal Component Tests
 // ============================================================================
 
 import React from 'react';

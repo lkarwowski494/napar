@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — ProactiveCalendarCard (14-Day Calendar & 1-Tap Action Feed)
+// Napar — ProactiveCalendarCard (14-Day Calendar & 1-Tap Action Feed)
 // Przekształcenie pasywnych list w Proaktywny Kalendarz i Harmonogram Akcji
 // ============================================================================
 

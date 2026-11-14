@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Craft Economics Engine: Cost Calculator (Zadanie N2)
+// Napar — Craft Economics Engine: Cost Calculator (Zadanie N2)
 // Calculates raw bean cost, mineralized water, kettle energy, filter paper
 // and comparison against specialty coffee cafe benchmark.
 // Apps4Brew Studio — 100% Offline-First, Zero Telemetry.

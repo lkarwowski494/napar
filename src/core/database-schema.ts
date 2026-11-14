@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — SQLite Database Schema & Types
+// Napar — SQLite Database Schema & Types
 // Offline-first, Zero-login, pure local persistence with expo-sqlite
 // ============================================================================
 

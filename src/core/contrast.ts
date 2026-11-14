@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — WCAG 2.1 Contrast & Relative Luminance (RD-ENG-02)
+// Napar — WCAG 2.1 Contrast & Relative Luminance (RD-ENG-02)
 // Exact standard implementation per BRD-QA-REL 1.0 & WCAG 2.1
 // ============================================================================
 

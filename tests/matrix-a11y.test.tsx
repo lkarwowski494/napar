@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Accessibility Audit (matrix-a11y.test.tsx)
+// Napar — Accessibility Audit (matrix-a11y.test.tsx)
 // NFR-A11Y-001..008 & RD-ENG-03: Touch target >= 44pt, non-empty labels, roles & states
 // ============================================================================
 

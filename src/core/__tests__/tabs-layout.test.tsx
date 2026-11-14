@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: TabLayout & TabIcon
+// Napar — Unit Tests: TabLayout & TabIcon
 // Apps4Brew: Artisanal tabs navigation, haptic accents, settings button
 // ============================================================================
 

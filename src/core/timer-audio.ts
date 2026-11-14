@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Timer Audio & Haptic Chime Engine (Zadanie N4)
+// Napar — Timer Audio & Haptic Chime Engine (Zadanie N4)
 // Plays an acoustic chime tone, triggers haptic cues, and announces VoiceOver
 // on 3-second step warning and stage completion.
 // Apps4Brew Studio — 100% Offline-First.

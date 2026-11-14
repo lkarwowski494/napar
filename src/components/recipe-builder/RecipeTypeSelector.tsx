@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — RecipeTypeSelector Component
+// Napar — RecipeTypeSelector Component
 // Beverage type toggle (Coffee vs Tea)
 // ============================================================================
 

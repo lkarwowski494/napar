@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Dial-in Doctor & Kalkulatory Ekstrakcji
+// Napar — Dial-in Doctor & Kalkulatory Ekstrakcji
 // Deterministyczny kompas sensoryczny, dwukierunkowe Ratio i TDS / EY%
 // ============================================================================
 

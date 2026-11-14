@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Contract & System Integrity Tests
+// Napar — Contract & System Integrity Tests
 // Pattern: System Architecture, Metadata, i18n Symmetry & Zero-Telemetry Contracts
 // ============================================================================
 

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Monitor Kofeiny i Kalkulator Snu (Caffeine & Sleep Curfew)
+// Napar — Monitor Kofeiny i Kalkulator Snu (Caffeine & Sleep Curfew)
 // Kinetyka eliminacji (t1/2), szacunek kofeiny o porze snu (bez progu, DEC-05 a) i dobowy bilans EFSA
 // ============================================================================
 

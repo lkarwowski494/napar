@@ -46,7 +46,7 @@ export function DripperExtractionGauge({
 }
 
 // ============================================================================
-// Napar (Steepwise) — BrewActiveFocusTimer Component (Apps4Craft Design System)
+// Napar — BrewActiveFocusTimer Component (Apps4Craft Design System)
 // Immersive Focus Mode: Clear typography readable from 1 meter, fat thumb controls.
 // 100% Offline-First.
 // ============================================================================

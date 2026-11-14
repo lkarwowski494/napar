@@ -1,5 +1,5 @@
 // ============================================================================
-// Apps4Brew / Napar (Steepwise) — SQLite Migration Test (v1.0 -> v3.0)
+// Apps4Brew / Napar — SQLite Migration Test (v1.0 -> v3.0)
 // TASK-R10-01: Physical DB fixture verification and lossless migration
 // ============================================================================
 

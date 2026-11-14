@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — AppPreferencesCard Component
+// Napar — AppPreferencesCard Component
 // Language, Beverage preferences, Unit system, and Accessibility toggles
 // ============================================================================
 

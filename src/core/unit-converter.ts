@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Converter (Metric / Imperial — DEC-21 & NFR-I18N)
+// Napar — Unit Converter (Metric / Imperial — DEC-21 & NFR-I18N)
 // Obsługa jednostek metrycznych (°C, g, ml) i imperialnych (°F, oz, fl oz)
 // ============================================================================
 

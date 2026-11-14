@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — System Internacjonalizacji (i18n)
+// Napar — System Internacjonalizacji (i18n)
 // 100% Offline-first, Zero tracking, Zero external deps (Pure React Context)
 // Obsługa: 'pl' (Napar) oraz 'en' (Steepwise)
 // ============================================================================

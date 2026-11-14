@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — ProcedureModal (Asystent Procedury Krok po Kroku)
+// Napar — ProcedureModal (Asystent Procedury Krok po Kroku)
 // Zero-Click Context Tools:
 // - Automatycznie parsuje czas z opisu kroku (parseStepDurationSeconds)
 // - Automatycznie uruchamia stoper odliczający przy wejściu w krok

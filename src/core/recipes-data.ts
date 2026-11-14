@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Master Recipes Data (BR-MAG-005)
+// Napar — Master Recipes Data (BR-MAG-005)
 // 24 verified master recipes for coffee and artisan tea
 // ============================================================================
 

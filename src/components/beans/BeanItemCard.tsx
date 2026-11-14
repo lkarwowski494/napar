@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BeanItemCard Component
+// Napar — BeanItemCard Component
 // Card displaying an individual coffee bean or tea stash item
 // ============================================================================
 

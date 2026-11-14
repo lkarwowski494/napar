@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Integration Test: TASK-R07-01 & P16 Inline De-Modalization
+// Napar — Integration Test: TASK-R07-01 & P16 Inline De-Modalization
 // Verifies inline foldable card pattern (no <Modal> component mounted for selection)
 // ============================================================================
 

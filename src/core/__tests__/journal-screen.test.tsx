@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit & Integration Tests: JournalScreen
+// Napar — Unit & Integration Tests: JournalScreen
 // Search, filtering, and SCA Sensory Spider Graph verification
 // ============================================================================
 

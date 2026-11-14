@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Wymiana Receptur Offline (Kody QR / Universal Links)
+// Napar — Wymiana Receptur Offline (Kody QR / Universal Links)
 // ZP-02, ZP-06, DEC-20: 100% offline, zero-login, peer-to-peer recipe sharing
 // ============================================================================
 

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — GongfuActiveInfusion Component
+// Napar — GongfuActiveInfusion Component
 // Active Countdown Timer and Infusion Capture Card
 // ============================================================================
 

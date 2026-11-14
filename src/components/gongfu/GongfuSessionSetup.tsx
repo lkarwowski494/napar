@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — GongfuSessionSetup Component
+// Napar — GongfuSessionSetup Component
 // Tea type selection and Leaf/Vessel parameter setup
 // ============================================================================
 

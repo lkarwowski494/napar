@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Spiżarnia Ziaren i Liści (Inventory / Stash)
+// Napar — Spiżarnia Ziaren i Liści (Inventory / Stash)
 // Śledzenie świeżości (Resting Window), wagi w paczce i nut sensorycznych
 // ============================================================================
 

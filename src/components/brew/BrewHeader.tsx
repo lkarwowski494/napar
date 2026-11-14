@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BrewHeader Component (Apps4Craft Design System)
+// Napar — BrewHeader Component (Apps4Craft Design System)
 // Artisanal, calm header: Grinder Clicks, Recipe & Stash Selectors, Vector Icons.
 // 100% Offline-First. Zero Emojis.
 // ============================================================================

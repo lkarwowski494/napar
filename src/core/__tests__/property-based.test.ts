@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Property-Based & Mathematical Invariant Tests
+// Napar — Property-Based & Mathematical Invariant Tests
 // Generative testing of mathematical models, monotonicity, conservation laws & bijectivity
 // Powered by fast-check with deterministic PRNG seeding (BR-TEST-006..010)
 // ============================================================================

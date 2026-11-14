@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Tabs Layout (Expo Router)
+// Napar — Tabs Layout (Expo Router)
 // Apps4Craft Studio: Minimalist vector icons, warm artisanal aesthetic.
 // ============================================================================
 

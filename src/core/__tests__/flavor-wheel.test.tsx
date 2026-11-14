@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: SCA Flavor Wheel & Picker
+// Napar — Unit Tests: SCA Flavor Wheel & Picker
 // ============================================================================
 
 import React from 'react';

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Wykres Radarowy Sensoryki SVG (Spider Graph / Radar Chart)
+// Napar — Wykres Radarowy Sensoryki SVG (Spider Graph / Radar Chart)
 // 5 osi SCA: Kwasowość, Słodycz, Ciało, Czystość, Finisz (skala 1–5)
 // ============================================================================
 

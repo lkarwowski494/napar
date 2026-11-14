@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Timer Audio & Chime
+// Napar — Unit Tests: Timer Audio & Chime
 // ============================================================================
 
 import { createAudioPlayer } from 'expo-audio';

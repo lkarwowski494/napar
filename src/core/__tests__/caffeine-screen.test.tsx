@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: CaffeineScreen (app/(tabs)/caffeine.tsx)
+// Napar — Unit Tests: CaffeineScreen (app/(tabs)/caffeine.tsx)
 // ============================================================================
 
 import React from 'react';

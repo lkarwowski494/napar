@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Accessibility (a11y), Contrast & VoiceOver Tests
+// Napar — Accessibility (a11y), Contrast & VoiceOver Tests
 // WCAG 2.1 AA Contrast Ratios, VoiceOver Accessibility Roles & Touch Target Ergonomics
 // ============================================================================
 

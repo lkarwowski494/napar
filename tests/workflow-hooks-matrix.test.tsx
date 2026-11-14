@@ -1,5 +1,5 @@
 // ============================================================================
-// Apps4Brew / Napar (Steepwise) — Workflow & Hooks Matrix Test
+// Apps4Brew / Napar — Workflow & Hooks Matrix Test
 // Validates extracted workflow helpers, journal analytics, and locales matrix
 // ============================================================================
 

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: BeanItemCard
+// Napar — Unit Tests: BeanItemCard
 // ============================================================================
 
 import React from 'react';

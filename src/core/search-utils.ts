@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Search Utilities (RD-ENG-07, NFR-INT-015)
+// Napar — Search Utilities (RD-ENG-07, NFR-INT-015)
 // Normalizacja tekstu wyszukiwarki z obsługą polskich znaków diakrytycznych
 // ============================================================================
 

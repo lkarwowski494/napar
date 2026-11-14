@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — useJournalAnalytics Hook / Helper
+// Napar — useJournalAnalytics Hook / Helper
 // Aggregation of brew analytics, sensory averages, taste balance & flavor tags
 // ============================================================================
 

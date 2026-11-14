@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BrewModalsContainer Component
+// Napar — BrewModalsContainer Component
 // Encapsulates modal dialogues outside the core inline interaction loop
 // ============================================================================
 

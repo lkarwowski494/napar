@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — JournalFilterBar Component
+// Napar — JournalFilterBar Component
 // Search input and category filter chips for brew journal sessions
 // ============================================================================
 

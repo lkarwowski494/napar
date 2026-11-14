@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Dziennik Degustacji (Brew Journal & History)
+// Napar — Dziennik Degustacji (Brew Journal & History)
 // Historia sesji, oceny sensoryczne, balans smaku, TDS i Extraction Yield
 // ============================================================================
 

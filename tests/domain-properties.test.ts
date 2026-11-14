@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — fast-check Property Tests (BR-TEST-006, BR-TEST-009)
+// Napar — fast-check Property Tests (BR-TEST-006, BR-TEST-009)
 // Generative testing of domain invariants with deterministic seeding
 // ============================================================================
 

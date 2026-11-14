@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: BeanEditModal
+// Napar — Unit Tests: BeanEditModal
 // ============================================================================
 
 import React from 'react';

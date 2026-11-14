@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Water Chemistry & Mineralization
+// Napar — Unit Tests: Water Chemistry & Mineralization
 // ============================================================================
 
 import {

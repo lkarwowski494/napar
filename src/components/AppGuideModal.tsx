@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — AppGuideModal ([🧭 Jak działa aplikacja?])
+// Napar — AppGuideModal ([🧭 Jak działa aplikacja?])
 // Zero-Clutter Header helper modal explaining the 1->2->3->4 causal process
 // and the 5 Bottom Tabs.
 // ============================================================================

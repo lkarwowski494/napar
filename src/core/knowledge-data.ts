@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Knowledge Base / Kompendium Terroir, Odmian i Tradycji
+// Napar — Knowledge Base / Kompendium Terroir, Odmian i Tradycji
 // (BR-WIEDZA-001 & BR-WIEDZA-002)
 // Specialty Coffee Varieties, Processing, Origins & Artisan Tea Classification
 // All sensory descriptions externalized into i18n catalog (TASK-R09-02)

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Theme & Visual Constants
+// Napar — Theme & Visual Constants
 // Calm, artisanal aesthetic (Apps4Brew: warm copper, tea emerald, deep slate)
 // ============================================================================
 

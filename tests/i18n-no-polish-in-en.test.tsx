@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — No Polish in EN Guard (NFR-I18N-003)
+// Napar — No Polish in EN Guard (NFR-I18N-003)
 // Guarantees zero Polish diacritics and zero leaked Polish domain words in EN dictionary
 // ============================================================================
 

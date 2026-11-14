@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BrewQuickPrepCard Component Tests
+// Napar — BrewQuickPrepCard Component Tests
 // ============================================================================
 
 import React from 'react';

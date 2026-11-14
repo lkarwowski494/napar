@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Common UI Components (S1..S16, NFR-INT-001..016)
+// Napar — Common UI Components (S1..S16, NFR-INT-001..016)
 // Komponenty interfejsu użytkownika: NumInput, Field, Empty, Missing, Btn, SearchField, SwipeRow
 // ============================================================================
 

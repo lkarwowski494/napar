@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Dostępność i VoiceOver (wzorce Apps4Brew, BR-DOST-001, DEC-13)
+// Napar — Dostępność i VoiceOver (wzorce Apps4Brew, BR-DOST-001, DEC-13)
 // Komunikaty głosowe w treści poprzez natywne announceForAccessibility
 // ============================================================================
 

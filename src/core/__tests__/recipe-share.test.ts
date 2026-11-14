@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Offline Recipe Sharing & QR Code (DEC-20)
+// Napar — Unit Tests: Offline Recipe Sharing & QR Code (DEC-20)
 // ============================================================================
 
 import {

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: GongfuScreen UI & Multi-Infusion Tracker
+// Napar — Unit Tests: GongfuScreen UI & Multi-Infusion Tracker
 // ============================================================================
 
 import React from 'react';

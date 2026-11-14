@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Hierarchiczne Koło Smaków SCA (SCA Flavor Wheel)
+// Napar — Hierarchiczne Koło Smaków SCA (SCA Flavor Wheel)
 // Zgodne z oficjalną taksonomią Specialty Coffee Association i World Coffee Research
 // ============================================================================
 

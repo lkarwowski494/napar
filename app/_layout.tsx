@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Root Layout (Expo Router)
+// Napar — Root Layout (Expo Router)
 // Apps4Brew: Pure local state, zero login, artisanal dark theme
 // Includes Crash Loop Guard & Safe Mode (TASK-R12-01 & TASK-R12-02)
 // ============================================================================

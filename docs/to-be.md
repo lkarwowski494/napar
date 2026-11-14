@@ -1,4 +1,4 @@
-# Napar (Steepwise) — Architektura Procesów Docelowych (To-Be Lean BPR)
+# Napar — Architektura Procesów Docelowych (To-Be Lean BPR)
 
 > **Status:** Obowiązujący standard architektoniczny UX / BPR dla wersji v1.0+  
 > **Wzorzec Wiodący:** Lean BPR + P16 („Jedna Otwarta Karta Inline”)  

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: ExtractionYieldTab
+// Napar — Unit Tests: ExtractionYieldTab
 // ============================================================================
 
 import React from 'react';

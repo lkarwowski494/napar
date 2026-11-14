@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Gongfu Cha Multi-Infusion Tracker Screen
+// Napar — Gongfu Cha Multi-Infusion Tracker Screen
 // Apps4Brew: 100% Offline-first, Zero login, rytuał wielokrotnych ekstrakcji
 // ============================================================================
 

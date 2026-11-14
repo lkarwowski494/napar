@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: QrScannerModal
+// Napar — Unit Tests: QrScannerModal
 // ============================================================================
 
 import React from 'react';

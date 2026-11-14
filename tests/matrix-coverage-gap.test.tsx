@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Full AST Matrix Gap Coverage Test
+// Napar — Full AST Matrix Gap Coverage Test
 // Satisfies 100% coverage across LOGIKA and WYMIAR (BR-TEST-028..031)
 // ============================================================================
 

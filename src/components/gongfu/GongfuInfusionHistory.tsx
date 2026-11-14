@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — GongfuInfusionHistory Component
+// Napar — GongfuInfusionHistory Component
 // Caffeine Estimation and Session Infusions List
 // ============================================================================
 

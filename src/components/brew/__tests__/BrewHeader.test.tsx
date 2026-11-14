@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BrewHeader Component Tests
+// Napar — BrewHeader Component Tests
 // ============================================================================
 
 import React from 'react';

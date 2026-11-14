@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — CaffeineQuickAddModal Component
+// Napar — CaffeineQuickAddModal Component
 // Modal with preset beverage options for rapid caffeine logging
 // ============================================================================
 

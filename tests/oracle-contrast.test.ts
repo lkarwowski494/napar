@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Theme Contrast Oracle Test (RD-ENG-02, BR-TEST-013, NFR-A11Y-005)
+// Napar — Theme Contrast Oracle Test (RD-ENG-02, BR-TEST-013, NFR-A11Y-005)
 // Verifies TS WCAG 2.1 contrast calculations against Python 3 oracle
 // ============================================================================
 

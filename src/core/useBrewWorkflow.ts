@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — useBrewWorkflow Custom Hook
+// Napar — useBrewWorkflow Custom Hook
 // State management and orchestration for Active Brew Screen (BPR & Lean UI)
 // 100% Strictly Typed, Zero `any`
 // ============================================================================

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: CaffeineCurveChart
+// Napar — Unit Tests: CaffeineCurveChart
 // ============================================================================
 
 import React from 'react';

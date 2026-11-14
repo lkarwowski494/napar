@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Bramka osiągalności src/core (DEC-02, M1-audytor-generalny-010)
+// Napar — Bramka osiągalności src/core (DEC-02, M1-audytor-generalny-010)
 // Każda deklaracja w src/core ma drogę z app/ albo src/components/ albo nazwany
 // wyjątek w scripts/reachability-exceptions.json. Test uruchamia ten sam skrypt
 // co `npm run check:reachability`, żeby bramka działała też w CI (test:coverage).

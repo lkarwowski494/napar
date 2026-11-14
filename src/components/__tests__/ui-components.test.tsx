@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: UI Components (S1..S16, NFR-INT-001..016)
+// Napar — Unit Tests: UI Components (S1..S16, NFR-INT-001..016)
 // ============================================================================
 
 import React from 'react';

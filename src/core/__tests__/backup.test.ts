@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Backup Engine
+// Napar — Unit Tests: Backup Engine
 // ============================================================================
 
 import * as FileSystem from 'expo-file-system/legacy';

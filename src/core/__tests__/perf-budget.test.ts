@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Performance & Time Budget Tests
+// Napar — Performance & Time Budget Tests
 // Pattern: Performance Regression Guards & Execution Budgets (cf. organizer perf-budget)
 // ============================================================================
 

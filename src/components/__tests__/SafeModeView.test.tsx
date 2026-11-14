@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: SafeModeView (TASK-R12-02)
+// Napar — Unit Tests: SafeModeView (TASK-R12-02)
 // ============================================================================
 
 import React from 'react';

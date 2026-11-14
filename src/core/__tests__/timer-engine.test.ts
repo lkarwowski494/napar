@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: BrewTimerEngine
+// Napar — Unit Tests: BrewTimerEngine
 // ============================================================================
 
 import { BrewTimerEngine, TimerSnapshot, remainingTimerSec } from '../timer-engine';

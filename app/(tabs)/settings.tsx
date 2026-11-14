@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Karta Ustawień w Dolnym Pasku Nawigacji (Bottom Tabs)
+// Napar — Karta Ustawień w Dolnym Pasku Nawigacji (Bottom Tabs)
 // BPR Pillar 2: Ustawienia jako dedykowana ostatnia karta dolnego paska
 // ============================================================================
 

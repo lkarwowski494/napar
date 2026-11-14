@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Komponent Wyboru Nut Smakowych (SCA Flavor Wheel Picker)
+// Napar — Komponent Wyboru Nut Smakowych (SCA Flavor Wheel Picker)
 // Hierarchiczny selektor z kategoriami, podkategoriami i wybranymi tagami
 // ============================================================================
 

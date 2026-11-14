@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — First Launch Onboarding Modal (Ritual Personalization)
+// Napar — First Launch Onboarding Modal (Ritual Personalization)
 // Allows third-wave coffee purists and artisan tea masters to personalize their UI
 // ============================================================================
 

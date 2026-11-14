@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Close Button & Modal Guard (S1, NFR-INT-001)
+// Napar — Close Button & Modal Guard (S1, NFR-INT-001)
 // Every modal screen must have a dismiss/cancel button with accessible label
 // ============================================================================
 

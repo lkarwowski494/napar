@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Standard Spójnych Potwierdzeń (wzorce Apps4Brew)
+// Napar — Standard Spójnych Potwierdzeń (wzorce Apps4Brew)
 // Zgodność z Apple HIG Alerts: zawsze „Anuluj” jako przycisk rezygnacji
 // ============================================================================
 

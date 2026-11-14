@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Frontend Unit & Safety Tests:
+// Napar — Frontend Unit & Safety Tests:
 // Modal Safe Area Inset Protection, Touch Target Clickability & Beverage Toggle
 // ============================================================================
 

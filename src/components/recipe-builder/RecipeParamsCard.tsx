@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — RecipeParamsCard Component
+// Napar — RecipeParamsCard Component
 // Parameters, ratio badge, unit converter preview, and grind setting
 // ============================================================================
 

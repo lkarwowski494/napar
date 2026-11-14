@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Core Domain Rules (RD-01…RD-30)
+// Napar — Core Domain Rules (RD-01…RD-30)
 // Deterministic formulas for extraction, kinetics, water, and grind adjustments.
 // ============================================================================
 

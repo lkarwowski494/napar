@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Ekran Główny: Asystent Parzenia (Active Brew Assistant)
+// Napar — Ekran Główny: Asystent Parzenia (Active Brew Assistant)
 // Apps4Brew: Zero-login, instant start, precyzyjny stoper z haptyką i Live Guidance
 // Lean BPR & Wzorzec P16 ("Jedna Otwarta Karta Inline")
 // 100% Strictly Typed, Zero `any`

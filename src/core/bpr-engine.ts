@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Silnik Automatyzacji Procesowej BPR (To-Be Architecture)
+// Napar — Silnik Automatyzacji Procesowej BPR (To-Be Architecture)
 // 1. Automatyczne parsowanie czasu z opisu kroku procedury (Zero-Click Timer)
 // 2. 14-dniowy Proaktywny Kalendarz i Harmonogram Akcji (1-Tap Action Feed)
 // 3. Generator przypomnień kalendarzowych RFC 5545 (.ics)

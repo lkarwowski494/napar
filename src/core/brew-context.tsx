@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Active Brew Context & Provider
+// Napar — Active Brew Context & Provider
 // Bridges recipes, inventory, timer engine, and session logging
 // ============================================================================
 

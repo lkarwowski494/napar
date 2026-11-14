@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Grinder Dial-in Converter
+// Napar — Grinder Dial-in Converter
 // Konwerter nastaw młynków specialty na bazie średniej wielkości cząstek (mikrony µm)
 // Comandante C40, Timemore C2/C3, 1Zpresso K-Ultra, Fellow Ode Gen 2, Baratza Encore, Kingrinder K6
 // ============================================================================

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Komponent Wektorowego Kodu QR (Offline SVG QR Code)
+// Napar — Komponent Wektorowego Kodu QR (Offline SVG QR Code)
 // DEC-20: Czyste renderowanie SVG offline bez zewnętrznych serwisów sieciowych
 // ============================================================================
 

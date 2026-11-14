@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Timer Engine & State Machine (BR-PAR-002, BR-PAR-003)
+// Napar — Timer Engine & State Machine (BR-PAR-002, BR-PAR-003)
 // Deterministic active brew timer, pour rate calculator, haptics and awake lock
 // ============================================================================
 

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Grinder Dial-in Converter
+// Napar — Unit Tests: Grinder Dial-in Converter
 // ============================================================================
 
 import {

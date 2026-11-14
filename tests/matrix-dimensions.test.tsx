@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Dimensions & AX5 Layout Resilience (NFR-A11Y-004)
+// Napar — Dimensions & AX5 Layout Resilience (NFR-A11Y-004)
 // Validates UI components render without crash under 320pt width and AX5 font scaling
 // ============================================================================
 

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Coffee Physics Oracle Test (BR-TEST-011, BR-TEST-012, ZP-06)
+// Napar — Coffee Physics Oracle Test (BR-TEST-011, BR-TEST-012, ZP-06)
 // Verifies TS calculations against independent Python 3 ground-truth corpus
 // ============================================================================
 

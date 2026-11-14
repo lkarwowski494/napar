@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Custom Recipe Builder & Database Persistence
+// Napar — Unit Tests: Custom Recipe Builder & Database Persistence
 // ============================================================================
 
 import React from 'react';

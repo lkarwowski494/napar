@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Ustawienia i Kopia Zapasowa (Apps4Brew)
+// Napar — Ustawienia i Kopia Zapasowa (Apps4Brew)
 // ZP-02, ZP-06, ZP-07, ZP-08, ZP-10: 100% offline, zero-login, darmowy eksport JSON
 // ============================================================================
 

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Kreator Własnych Receptur (Custom Recipe Builder)
+// Napar — Kreator Własnych Receptur (Custom Recipe Builder)
 // Apps4Brew: 100% Offline-first, Zero login, SQLite local persistence
 // ============================================================================
 

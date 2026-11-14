@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Component Integration Tests: BrewScreen & Screens
+// Napar — Component Integration Tests: BrewScreen & Screens
 // ============================================================================
 
 import React from 'react';

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: SettingsScreen (i18n, Backup & Privacy)
+// Napar — Unit Tests: SettingsScreen (i18n, Backup & Privacy)
 // Apps4Brew: 100% Offline-first, Zero login, Free JSON Backup, Language Switch
 // ============================================================================
 

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: CaffeineSettingsCard
+// Napar — Unit Tests: CaffeineSettingsCard
 // ============================================================================
 
 import React from 'react';

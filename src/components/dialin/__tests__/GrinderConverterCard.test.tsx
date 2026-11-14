@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: GrinderConverterCard
+// Napar — Unit Tests: GrinderConverterCard
 // ============================================================================
 
 import React from 'react';

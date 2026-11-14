@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Startup Crash Loop Guard (TASK-R12-01)
+// Napar — Startup Crash Loop Guard (TASK-R12-01)
 // Protects against repeated crash loops during startup and initialization
 // ============================================================================
 

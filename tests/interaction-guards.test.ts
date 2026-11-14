@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Interaction Guards S1..S16 (NFR-INT-001..016)
+// Napar — Interaction Guards S1..S16 (NFR-INT-001..016)
 // Enforces standard Apps4Brew interaction patterns across the entire codebase
 // ============================================================================
 

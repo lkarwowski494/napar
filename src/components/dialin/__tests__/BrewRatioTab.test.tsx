@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: BrewRatioTab
+// Napar — Unit Tests: BrewRatioTab
 // ============================================================================
 
 import React from 'react';

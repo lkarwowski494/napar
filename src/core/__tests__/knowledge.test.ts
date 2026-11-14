@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit & Contract Tests: Knowledge Base
+// Napar — Unit & Contract Tests: Knowledge Base
 // (BR-WIEDZA-001 & BR-WIEDZA-002)
 // Specialty Coffee Varieties, Processes, Origins & Artisan Tea Classification
 // ============================================================================

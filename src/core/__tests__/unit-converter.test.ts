@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Unit Converter (Metric / Imperial)
+// Napar — Unit Tests: Unit Converter (Metric / Imperial)
 // ============================================================================
 
 import {

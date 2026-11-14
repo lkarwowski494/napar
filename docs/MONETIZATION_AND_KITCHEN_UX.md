@@ -1,4 +1,4 @@
-# Napar (Steepwise) — Kitchen-Proof UX i model wersji 1.0
+# Napar — Kitchen-Proof UX i model wersji 1.0
 
 ## 1. Wstęp i Cel Architektoniczny
 Aplikacja **Napar (Steepwise)** została zaprojektowana i zoptymalizowana pod kątem standardów **Apps4Brew Studio**:

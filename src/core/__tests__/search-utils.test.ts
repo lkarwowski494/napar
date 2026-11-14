@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Search Utilities (RD-ENG-07, NFR-INT-015)
+// Napar — Unit Tests: Search Utilities (RD-ENG-07, NFR-INT-015)
 // ============================================================================
 
 import {

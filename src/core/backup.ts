@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Backup Engine (BR-TEST-022, BR-TEST-023, RD-ENG-12)
+// Napar — Backup Engine (BR-TEST-022, BR-TEST-023, RD-ENG-12)
 // Rotating 10 auto-backups in Documents/Backup/, safety backups before destructive
 // operations, separated safety pool, and standardized BackupEnvelope<T> format.
 // Apps4Brew Studio — 100% Offline-First, Zero Telemetry.

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — CaffeineLogList Component
+// Napar — CaffeineLogList Component
 // Log list of daily caffeine intakes with deletion actions
 // ============================================================================
 

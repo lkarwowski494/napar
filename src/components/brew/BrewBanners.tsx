@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BrewBanners Component
+// Napar — BrewBanners Component
 // System notices, crash recovery banners, and golden rules
 // ============================================================================
 

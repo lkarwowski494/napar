@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Startup Crash Loop Guard (TASK-R12-01)
+// Napar — Unit Tests: Startup Crash Loop Guard (TASK-R12-01)
 // ============================================================================
 
 import { crashLoopGuard, recordStartupSuccess } from '../startup-guard';

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BrewFinishModal Component (Cupping Sheet & Dial-in Doctor)
+// Napar — BrewFinishModal Component (Cupping Sheet & Dial-in Doctor)
 // Evaluates taste, suggests 1-tap dial-in diagnosis, shows craft economics.
 // Apps4Brew Studio — 100% Offline-First.
 // ============================================================================

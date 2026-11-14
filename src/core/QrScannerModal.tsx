@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Skaner Kodów QR Receptur (Zadanie N6 / expo-camera)
+// Napar — Skaner Kodów QR Receptur (Zadanie N6 / expo-camera)
 // Pozwala bezprzewodowo, w 100% offline zeskanować kod QR receptury od innego baristy.
 // Apps4Brew Studio — 100% Offline-First, Zero Telemetry.
 // ============================================================================

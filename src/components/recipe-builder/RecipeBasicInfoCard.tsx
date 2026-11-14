@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — RecipeBasicInfoCard Component
+// Napar — RecipeBasicInfoCard Component
 // Name, method, author, and description fields
 // ============================================================================
 

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Gongfu Cha Multi-Infusion Model
+// Napar — Unit Tests: Gongfu Cha Multi-Infusion Model
 // ============================================================================
 
 import {

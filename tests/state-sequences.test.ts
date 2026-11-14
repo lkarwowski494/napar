@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — State Sequences & Invariants (BR-TEST-007..010)
+// Napar — State Sequences & Invariants (BR-TEST-007..010)
 // 30-50 random operations on application state with guaranteed opening step
 // and invariant assertion after each mutation
 // ============================================================================

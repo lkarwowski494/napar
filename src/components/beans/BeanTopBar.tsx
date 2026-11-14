@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BeanTopBar Component
+// Napar — BeanTopBar Component
 // Filter bar with Compendium and Add button
 // ============================================================================
 

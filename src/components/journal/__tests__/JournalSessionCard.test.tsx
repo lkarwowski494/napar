@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: JournalSessionCard
+// Napar — Unit Tests: JournalSessionCard
 // ============================================================================
 
 import React from 'react';

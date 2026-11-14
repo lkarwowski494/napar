@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Safe Mode Rescue View (DEC-07 / TASK-R12-02)
+// Napar — Safe Mode Rescue View (DEC-07 / TASK-R12-02)
 // Rendered when startup crash loop is detected (zero database/brew-context imports)
 // Fully localized in PL and EN
 // ============================================================================

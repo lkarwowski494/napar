@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — RecipeStepEditor Component
+// Napar — RecipeStepEditor Component
 // Multi-step infusion sequence builder with time, water target, and instructions
 // ============================================================================
 

@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Database & Repositories
+// Napar — Unit Tests: Database & Repositories
 // ============================================================================
 
 import {

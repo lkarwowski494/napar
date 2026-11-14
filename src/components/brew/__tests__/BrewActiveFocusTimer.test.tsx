@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BrewActiveFocusTimer Component Tests
+// Napar — BrewActiveFocusTimer Component Tests
 // ============================================================================
 
 import React from 'react';

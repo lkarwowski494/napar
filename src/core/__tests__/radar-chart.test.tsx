@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Sensory Radar Chart
+// Napar — Unit Tests: Sensory Radar Chart
 // ============================================================================
 
 import React from 'react';

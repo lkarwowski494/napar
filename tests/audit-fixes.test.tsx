@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Testy Regresyjne Znalezisk Audytu BRD-QA-REL 1.0 (KROK 3)
+// Napar — Testy Regresyjne Znalezisk Audytu BRD-QA-REL 1.0 (KROK 3)
 // Identyfikatory testów odpowiadają znaleziskom z docs/25-audyt-brd-qa-rel.md
 // ============================================================================
 

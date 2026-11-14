@@ -5,7 +5,7 @@ import { DataValidationError } from './validation-error';
 export { DataValidationError };
 import type { NaparBackupData } from './backup';
 // ============================================================================
-// Napar (Steepwise) — SQLite Database Client & Repositories
+// Napar — SQLite Database Client & Repositories
 // ============================================================================
 
 import * as SQLite from 'expo-sqlite';

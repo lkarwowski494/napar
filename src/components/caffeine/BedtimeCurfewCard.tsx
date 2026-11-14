@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — BedtimeCurfewCard Component
+// Napar — BedtimeCurfewCard Component
 // Szacunek kofeiny o porze snu i czas półtrwania (t1/2) — bez progu i oceny snu (M1-audytor-generalny-015, DEC-05 a)
 // ============================================================================
 

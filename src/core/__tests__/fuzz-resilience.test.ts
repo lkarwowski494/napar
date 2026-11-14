@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Fuzz, Chaos & Resilience Engineering Tests
+// Napar — Fuzz, Chaos & Resilience Engineering Tests
 // Chaos injection, corrupted input payloads, boundary mutations & state machine fuzzing
 // ============================================================================
 

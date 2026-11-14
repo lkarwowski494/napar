@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Dual Swipe + VoiceOver Delete Guard (S4, NFR-INT-004)
+// Napar — Dual Swipe + VoiceOver Delete Guard (S4, NFR-INT-004)
 // List item deletion must support both swipe gesture and VoiceOver action/visible button
 // ============================================================================
 

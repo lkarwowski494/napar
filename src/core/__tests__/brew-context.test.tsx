@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: BrewContext & BrewProvider
+// Napar — Unit Tests: BrewContext & BrewProvider
 // ============================================================================
 
 import React from 'react';

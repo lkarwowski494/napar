@@ -1,5 +1,5 @@
 // ============================================================================
-// Apps4Brew / Napar (Steepwise) — Zero-Network Airplane Mode QA Test
+// Apps4Brew / Napar — Zero-Network Airplane Mode QA Test
 // TASK-R11-01 / Forensic QA: 100% local operation without network / telemetry
 // ============================================================================
 

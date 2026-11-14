@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: i18n & Language Localization
+// Napar — Unit Tests: i18n & Language Localization
 // ============================================================================
 
 import React from 'react';

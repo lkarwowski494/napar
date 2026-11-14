@@ -1,6 +1,6 @@
 import { BeanItemCard } from '../../components/beans/BeanItemCard';
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: Beans & Leaves Stash / Inventory Screen
+// Napar — Unit Tests: Beans & Leaves Stash / Inventory Screen
 // Apps4Brew: 100% Offline-first, Zero login, Resting Window & Freshness Tracking
 // ============================================================================
 

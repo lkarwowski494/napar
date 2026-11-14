@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Unit Tests: WaterChemistryTab
+// Napar — Unit Tests: WaterChemistryTab
 // ============================================================================
 
 import React from 'react';
