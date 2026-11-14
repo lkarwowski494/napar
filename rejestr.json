@@ -1,324 +1,406 @@
-{
-  "twierdzenia": [
-    {
-      "id": "EFSA-CAFF-2015",
-      "tekst": "EFSA: spożycie do 400 mg kofeiny na dobę nie budzi zastrzeżeń dotyczących bezpieczeństwa u zdrowych dorosłych z wyjątkiem kobiet w ciąży; pojedyncze dawki do 200 mg (ok. 3 mg/kg m.c.) nie budzą zastrzeżeń; w ciąży i podczas karmienia do 200 mg na dobę nie budzi zastrzeżeń dla płodu.",
-      "kategoria": "zdrowie-farmakokinetyka",
-      "poziom_ryzyka": "wysoki",
-      "zrodlo": {
-        "tier": 3,
+[
+  {
+    "id": "EFSA-CAFF-2015",
+    "twierdzenie": "EFSA: spożycie do 400 mg kofeiny na dobę nie budzi zastrzeżeń dotyczących bezpieczeństwa u zdrowych dorosłych z wyjątkiem kobiet w ciąży; pojedyncze dawki do 200 mg (ok. 3 mg/kg m.c.) nie budzą zastrzeżeń; w ciąży i podczas karmienia do 200 mg na dobę nie budzi zastrzeżeń dla płodu.",
+    "kategoria": "zdrowie-farmakokinetyka",
+    "zrodla": [
+      {
+        "adres": "https://www.efsa.europa.eu/sites/default/files/corporate_publications/files/efsaexplainscaffeine150527.pdf",
         "tytul": "EFSA explains risk assessment: Caffeine (2015)",
-        "autor_lub_wydawca": "European Food Safety Authority (EFSA)",
-        "url_lub_isbn": "https://www.efsa.europa.eu/sites/default/files/corporate_publications/files/efsaexplainscaffeine150527.pdf",
-        "cytat_doslowny": "Intakes up to 400mg per day (about 5.7mg/kg bw per day) consumed throughout the day do not raise safety concerns for healthy adults in the general population, except pregnant women.",
+        "wydawca": "European Food Safety Authority (EFSA)",
+        "cytat": "Intakes up to 400mg per day (about 5.7mg/kg bw per day) consumed throughout the day do not raise safety concerns for healthy adults in the general population, except pregnant women.",
+        "odczyt": "2026-11-14",
+        "szczebel": 1,
         "cytaty_dodatkowe": [
           "Single doses of caffeine up to 200mg – about 3mg per kilogram of body weight (mg/kg bw) from all sources do not raise safety concerns for the general healthy adult population.",
           "Caffeine intakes from all sources up to 200mg per day consumed throughout the day do not raise safety concerns for the foetus."
         ],
-        "data_dostepu": "2026-11-14",
-        "uwagi": "Opis EFSA pochodny opinii EFSA Journal 2015;13(5):4102 (szczebel 1; HTTP 403 w dniu odczytu); jedno źródło. Dawny cytat z rejestru (2026-10-24) nie został sprawdzony na tekście opinii."
-      },
-      "przeglad": null,
-      "przeglad_status": "czeka na przegląd człowieka (stan projektu: przegląd człowieka; zapis „PRZEGLĄD_ZASTĘPCZY_AI” z 2026-10-24 unieważniony 2026-11-14 — brak osoby i skrótu przejrzanej wersji zdań)",
-      "status": "potwierdzone"
-    },
-    {
-      "id": "EFSA-T12-ZAKRES",
-      "tekst": "EFSA: u zdrowych dorosłych średni czas półtrwania kofeiny wynosi około 4 godzin, w zakresie od 2 do 8 godzin; zależy m.in. od wieku, masy ciała, ciąży, przyjmowanych leków i stanu wątroby.",
-      "kategoria": "zdrowie-farmakokinetyka",
-      "poziom_ryzyka": "wysoki",
-      "status": "potwierdzone",
-      "wielkosc": "kofeina_t12_zakres_doroslych",
-      "wartosc": "2–8 (średnio ok. 4)",
-      "jednostka": "h",
-      "zrodlo": {
-        "tier": 3,
+        "uwagi": "Dokument EFSA opisujący opinię EFSA Journal 2015;13(5):4102 (źródło pochodne — szczebel oryginału 1 wg BRD C4 §1); opinia: HTTP 403 w dniu odczytu."
+      }
+    ],
+    "status": "potwierdzone",
+    "uproszczenie": null,
+    "krytyczne": true,
+    "przeglad": null,
+    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)"
+  },
+  {
+    "id": "EFSA-T12-ZAKRES",
+    "twierdzenie": "EFSA: u zdrowych dorosłych średni czas półtrwania kofeiny wynosi około 4 godzin, w zakresie od 2 do 8 godzin; zależy m.in. od wieku, masy ciała, ciąży, przyjmowanych leków i stanu wątroby.",
+    "kategoria": "zdrowie-farmakokinetyka",
+    "zrodla": [
+      {
+        "adres": "https://www.efsa.europa.eu/sites/default/files/corporate_publications/files/efsaexplainscaffeine150527.pdf",
         "tytul": "EFSA explains risk assessment: Caffeine (2015)",
-        "autor_lub_wydawca": "EFSA",
-        "url_lub_isbn": "https://www.efsa.europa.eu/sites/default/files/corporate_publications/files/efsaexplainscaffeine150527.pdf",
-        "cytat_doslowny": "In healthy adults, the average half-life is approximately four hours, with a range of two to eight hours.",
+        "wydawca": "EFSA",
+        "cytat": "In healthy adults, the average half-life is approximately four hours, with a range of two to eight hours.",
+        "odczyt": "2026-11-14",
+        "szczebel": 1,
         "cytaty_dodatkowe": [
           "varies widely, depending on factors such as age, body weight, pregnancy status, medication intake and liver health."
         ],
-        "data_dostepu": "2026-11-14",
-        "uwagi": "Opis EFSA pochodny opinii EFSA Journal 2015;13(5):4102 (szczebel 1; HTTP 403 w dniu odczytu); jedno źródło."
-      },
-      "przeglad": null,
-      "przeglad_status": "czeka na przegląd człowieka"
-    },
-    {
-      "id": "GRZEG-PK-CZYNNIKI",
-      "tekst": "Na farmakokinetykę kofeiny wpływają palenie, doustna antykoncepcja, ciąża, otyłość, spożycie alkoholu i jednoczesne przyjmowanie leków; choroby wątroby silnie zmniejszają klirens kofeiny.",
-      "kategoria": "zdrowie-farmakokinetyka",
-      "poziom_ryzyka": "wysoki",
-      "status": "potwierdzone",
-      "zrodlo": {
-        "tier": 2,
+        "uwagi": "Dokument EFSA opisujący opinię EFSA Journal 2015;13(5):4102 (źródło pochodne — szczebel oryginału 1 wg BRD C4 §1); opinia: HTTP 403 w dniu odczytu."
+      }
+    ],
+    "status": "potwierdzone",
+    "uproszczenie": "Aplikacja liczy eliminację jednym t½ (bez fazy wchłaniania) — uproszczenie nazwane w zastrzeżeniu ekranu Kofeina; zakres ustawienia 2–8 h równy zakresowi EFSA.",
+    "krytyczne": true,
+    "przeglad": null,
+    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)",
+    "wielkosc": "kofeina_t12_zakres_doroslych",
+    "wartosc": "2–8 (średnio ok. 4)",
+    "jednostka": "h"
+  },
+  {
+    "id": "GRZEG-PK-CZYNNIKI",
+    "twierdzenie": "Na farmakokinetykę kofeiny wpływają palenie, doustna antykoncepcja, ciąża, otyłość, spożycie alkoholu i jednoczesne przyjmowanie leków; choroby wątroby silnie zmniejszają klirens kofeiny.",
+    "kategoria": "zdrowie-farmakokinetyka",
+    "zrodla": [
+      {
+        "adres": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8914174/fullTextXML (https://pmc.ncbi.nlm.nih.gov/articles/PMC8914174/)",
         "tytul": "Pharmacokinetics of Caffeine: A Systematic Analysis of Reported Data for Application in Metabolic Phenotyping and Liver Function Testing",
-        "autor_lub_wydawca": "Grzegorzewski J. i in., Frontiers in Pharmacology 2022 (PMC8914174)",
-        "url_lub_isbn": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8914174/fullTextXML (https://pmc.ncbi.nlm.nih.gov/articles/PMC8914174/)",
-        "cytat_doslowny": "use of oral contraceptives have been shown to influence caffeine pharmacokinetics, as have pregnancy, obesity, alcohol consumption, and the coadministrations of drugs",
+        "wydawca": "Grzegorzewski J. i in., Frontiers in Pharmacology 2022 (PMC8914174)",
+        "cytat": "use of oral contraceptives have been shown to influence caffeine pharmacokinetics, as have pregnancy, obesity, alcohol consumption, and the coadministrations of drugs",
+        "odczyt": "2026-11-14",
+        "szczebel": 2,
         "cytaty_dodatkowe": [
           "For caffeine which is predominantly metabolized by the liver, various liver diseases result in a strong reduction in caffeine clearance."
-        ],
-        "data_dostepu": "2026-11-14"
-      },
-      "przeglad": null,
-      "przeglad_status": "czeka na przegląd człowieka"
-    },
-    {
-      "id": "APPLE-1.4.1-LEKARZ",
-      "tekst": "Wytyczne App Review 1.4.1: aplikacje mają przypominać użytkownikom o konsultacji z lekarzem obok korzystania z aplikacji i przed decyzjami medycznymi.",
-      "kategoria": "wytyczne-sklepu",
-      "poziom_ryzyka": "sredni",
-      "status": "potwierdzone",
-      "zrodlo": {
-        "tier": 1,
+        ]
+      }
+    ],
+    "status": "potwierdzone",
+    "uproszczenie": null,
+    "krytyczne": true,
+    "przeglad": null,
+    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)"
+  },
+  {
+    "id": "APPLE-1.4.1-LEKARZ",
+    "twierdzenie": "Wytyczne App Review 1.4.1: aplikacje mają przypominać użytkownikom o konsultacji z lekarzem obok korzystania z aplikacji i przed decyzjami medycznymi.",
+    "kategoria": "wytyczne-sklepu",
+    "zrodla": [
+      {
+        "adres": "https://developer.apple.com/app-store/review/guidelines/",
         "tytul": "App Review Guidelines",
-        "autor_lub_wydawca": "Apple",
-        "url_lub_isbn": "https://developer.apple.com/app-store/review/guidelines/",
-        "cytat_doslowny": "Apps should remind users to check with a doctor in addition to using the app and before making medical decisions.",
-        "data_dostepu": "2026-11-14"
+        "wydawca": "Apple",
+        "cytat": "Apps should remind users to check with a doctor in addition to using the app and before making medical decisions.",
+        "odczyt": "2026-11-14",
+        "szczebel": 1
       }
-    },
-    {
-      "id": "NEHLIG-CYP1A2-2018",
-      "tekst": "Około 95% kofeiny ulega metabolizmowi wątrobowemu przez enzym CYP1A2, a okres półtrwania eliminacji u dorosłych wynosi średnio 3-7 godzin z dużą zmiennością osobniczą.",
-      "kategoria": "zdrowie-farmakokinetyka",
-      "poziom_ryzyka": "wysoki",
-      "zrodlo": {
-        "tier": 1,
+    ],
+    "status": "potwierdzone",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "wazne_do": "2027-05-14"
+  },
+  {
+    "id": "NEHLIG-CYP1A2-2018",
+    "twierdzenie": "Około 95% kofeiny ulega metabolizmowi wątrobowemu przez enzym CYP1A2, a okres półtrwania eliminacji u dorosłych wynosi średnio 3-7 godzin z dużą zmiennością osobniczą.",
+    "kategoria": "zdrowie-farmakokinetyka",
+    "zrodla": [
+      {
+        "adres": "https://doi.org/10.1124/pr.117.014407",
         "tytul": "Interindividual Differences in Caffeine Metabolism and Factors Driving Caffeine Consumption",
-        "autor_lub_wydawca": "Astrid Nehlig, Pharmacological Reviews, 2018, 70(2), 384–411",
-        "url_lub_isbn": "https://doi.org/10.1124/pr.117.014407",
-        "cytat_doslowny": "Caffeine is almost completely metabolized by the liver, with only 1–5% excreted unchanged in urine. More than 95% of caffeine clearance is mediated by CYP1A2.",
-        "data_dostepu": "2026-10-24"
-      },
-      "przeglad": null,
-      "przeglad_status": "czeka na przegląd człowieka (stan projektu: przegląd człowieka; zapis „PRZEGLĄD_ZASTĘPCZY_AI” z 2026-10-24 unieważniony 2026-11-14 — brak osoby i skrótu przejrzanej wersji zdań)",
-      "status": "otwarte",
-      "uwagi_2026_11_14": "[DO USTALENIA] Pełny tekst niedostępny (Europe PMC: PMID 29514871, brak PMC; doi → Elsevier bez treści). Nieużywany w zastrzeżeniu ekranu od 2026-11-14; zakres t½ z EFSA-T12-ZAKRES."
-    },
-    {
-      "id": "DRAKE-SLEEP-2013",
-      "tekst": "400 mg kofeiny podane 0, 3 lub 6 godzin przed snem zakłóca sen; nawet 6 godzin przed snem skraca sen o ponad 1 godzinę (pomiar w domu, n=12). Badanie nie podaje progu bezpiecznego stężenia.",
-      "kategoria": "zdrowie-sen",
-      "poziom_ryzyka": "wysoki",
-      "zrodlo": {
-        "tier": 1,
+        "wydawca": "Astrid Nehlig, Pharmacological Reviews, 2018, 70(2), 384–411",
+        "cytat": "Caffeine is almost completely metabolized by the liver, with only 1–5% excreted unchanged in urine. More than 95% of caffeine clearance is mediated by CYP1A2.",
+        "odczyt": "2026-10-24",
+        "szczebel": 2
+      }
+    ],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": true,
+    "przeglad": null,
+    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)",
+    "uwagi": "[DO USTALENIA] Pełny tekst niedostępny (Europe PMC: PMID 29514871, brak PMC; doi → Elsevier bez treści). Nieużywany w zastrzeżeniu ekranu od 2026-11-14; zakres t½ z EFSA-T12-ZAKRES."
+  },
+  {
+    "id": "DRAKE-SLEEP-2013",
+    "twierdzenie": "400 mg kofeiny podane 0, 3 lub 6 godzin przed snem zakłóca sen; nawet 6 godzin przed snem skraca sen o ponad 1 godzinę (pomiar w domu, n=12). Badanie nie podaje progu bezpiecznego stężenia.",
+    "kategoria": "zdrowie-sen",
+    "zrodla": [
+      {
+        "adres": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3805807/ (doi:10.5664/jcsm.3170)",
         "tytul": "Caffeine Effects on Sleep Taken 0, 3, or 6 Hours before Going to Bed",
-        "autor_lub_wydawca": "Christopher Drake, Timothy Roehrs, John Shambroom, Thomas Roth, Journal of Clinical Sleep Medicine, 2013, 9(11), 1195–1200",
-        "url_lub_isbn": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3805807/ (doi:10.5664/jcsm.3170)",
-        "cytat_doslowny": "Even at 6 hours, caffeine reduced sleep by more than 1 hour.",
-        "data_dostepu": "2026-11-14"
-      },
-      "przeglad": null,
-      "przeglad_status": "czeka na przegląd człowieka (stan projektu: przegląd człowieka; zapis „PRZEGLĄD_ZASTĘPCZY_AI” z 2026-10-24 unieważniony 2026-11-14 — brak osoby i skrótu przejrzanej wersji zdań)"
-    },
-    {
-      "id": "SEN-PROG-25MG",
-      "tekst": "[WYCOFANE 2026-11-14] Poziom kofeiny poniżej 25 mg o porze snu nie zaburza fazy NREM (BRD C4 D-03).",
-      "kategoria": "zdrowie-sen",
-      "poziom_ryzyka": "wysoki",
-      "status": "wycofane",
-      "uzasadnienie": "Źródło przypisane (Drake 2013, PMC3805807, odczyt 2026-11-14) bada wyłącznie 400 mg i nie zawiera progu: grep '25 ?mg|threshold|NREM' → 0. Żadne przeczytane źródło szczebla 1–3 nie podaje progu. Próg, ocena „bezpieczne” i „bezpieczna godzina” usunięte z aplikacji (M1-audytor-generalny-015, DEC-05 a); zostaje neutralny szacunek z zastrzeżeniem.",
-      "zrodlo": null
-    },
-    {
-      "id": "EFSA-SEN-100MG",
-      "tekst": "EFSA: pojedyncza dawka 100 mg kofeiny (ok. 1,4 mg/kg m.c.) może wpływać na długość i przebieg snu u niektórych dorosłych, zwłaszcza spożyta tuż przed snem.",
-      "kategoria": "zdrowie-sen",
-      "poziom_ryzyka": "wysoki",
-      "status": "potwierdzone",
-      "zrodlo": {
-        "tier": 3,
+        "wydawca": "Christopher Drake, Timothy Roehrs, John Shambroom, Thomas Roth, Journal of Clinical Sleep Medicine, 2013, 9(11), 1195–1200",
+        "cytat": "Even at 6 hours, caffeine reduced sleep by more than 1 hour.",
+        "odczyt": "2026-11-14",
+        "szczebel": 2
+      }
+    ],
+    "status": "potwierdzone",
+    "uproszczenie": null,
+    "krytyczne": true,
+    "przeglad": null,
+    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)"
+  },
+  {
+    "id": "SEN-PROG-25MG",
+    "twierdzenie": "[WYCOFANE 2026-11-14] Poziom kofeiny poniżej 25 mg o porze snu nie zaburza fazy NREM (BRD C4 D-03).",
+    "kategoria": "zdrowie-sen",
+    "zrodla": [],
+    "status": "wycofane",
+    "uproszczenie": null,
+    "krytyczne": true,
+    "przeglad": null,
+    "uwagi": "Źródło przypisane (Drake 2013, PMC3805807, odczyt 2026-11-14) bada wyłącznie 400 mg i nie zawiera progu: grep '25 ?mg|threshold|NREM' → 0. Żadne przeczytane źródło szczebla 1–3 nie podaje progu. Próg, ocena „bezpieczne” i „bezpieczna godzina” usunięte z aplikacji (M1-audytor-generalny-015, DEC-05 a); zostaje neutralny szacunek z zastrzeżeniem.",
+    "nastepca": null
+  },
+  {
+    "id": "EFSA-SEN-100MG",
+    "twierdzenie": "EFSA: pojedyncza dawka 100 mg kofeiny (ok. 1,4 mg/kg m.c.) może wpływać na długość i przebieg snu u niektórych dorosłych, zwłaszcza spożyta tuż przed snem.",
+    "kategoria": "zdrowie-sen",
+    "zrodla": [
+      {
+        "adres": "https://www.efsa.europa.eu/sites/default/files/corporate_publications/files/efsaexplainscaffeine150527.pdf",
         "tytul": "EFSA explains risk assessment: Caffeine (2015)",
-        "autor_lub_wydawca": "European Food Safety Authority (EFSA)",
-        "url_lub_isbn": "https://www.efsa.europa.eu/sites/default/files/corporate_publications/files/efsaexplainscaffeine150527.pdf",
-        "cytat_doslowny": "Single doses of 100mg (about 1.4mg/kg bw) of caffeine may affect sleep duration and patterns in some adults, particularly when consumed close to bedtime.",
-        "data_dostepu": "2026-11-14",
-        "uwagi": "Opis EFSA pochodny opinii EFSA Journal 2015;13(5):4102 (szczebel 1, niedostępna: HTTP 403 w dniu odczytu); jedno źródło."
-      },
-      "przeglad": null,
-      "przeglad_status": "czeka na przegląd człowieka (stan projektu: przegląd człowieka; zapis „PRZEGLĄD_ZASTĘPCZY_AI” z 2026-10-24 unieważniony 2026-11-14 — brak osoby i skrótu przejrzanej wersji zdań)"
-    },
-    {
-      "id": "SCA-GOLDENCUP-EY",
-      "tekst": "Optymalna ekstrakcja (Extraction Yield) w Złotym Pucharze SCA mieści się w zakresie 18.0% – 22.0% przy TDS 1.15% – 1.45%.",
-      "kategoria": "parzenie-kawa",
-      "poziom_ryzyka": "sredni",
-      "zrodlo": {
-        "tier": 2,
+        "wydawca": "European Food Safety Authority (EFSA)",
+        "cytat": "Single doses of 100mg (about 1.4mg/kg bw) of caffeine may affect sleep duration and patterns in some adults, particularly when consumed close to bedtime.",
+        "odczyt": "2026-11-14",
+        "szczebel": 1,
+        "uwagi": "Dokument EFSA opisujący opinię EFSA Journal 2015;13(5):4102 (źródło pochodne — szczebel oryginału 1 wg BRD C4 §1); opinia: HTTP 403 w dniu odczytu."
+      }
+    ],
+    "status": "potwierdzone",
+    "uproszczenie": null,
+    "krytyczne": true,
+    "przeglad": null,
+    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)"
+  },
+  {
+    "id": "SCA-GOLDENCUP-EY",
+    "twierdzenie": "Optymalna ekstrakcja (Extraction Yield) w Złotym Pucharze SCA mieści się w zakresie 18.0% – 22.0% przy TDS 1.15% – 1.45%.",
+    "kategoria": "parzenie-kawa",
+    "zrodla": [
+      {
+        "adres": "https://sca.coffee/research/coffee-standards",
         "tytul": "SCA Golden Cup Standard & Coffee Brewing Handbook",
-        "autor_lub_wydawca": "Specialty Coffee Association (SCA)",
-        "url_lub_isbn": "https://sca.coffee/research/coffee-standards",
-        "cytat_doslowny": "Coffee shall exhibit a brew strength, measured in Total Dissolved Solids (TDS) of 1.15 to 1.35 percent, resulting from a solubles extraction yield of 18 to 22 percent.",
-        "data_dostepu": "2026-10-24"
+        "wydawca": "Specialty Coffee Association (SCA)",
+        "cytat": "Coffee shall exhibit a brew strength, measured in Total Dissolved Solids (TDS) of 1.15 to 1.35 percent, resulting from a solubles extraction yield of 18 to 22 percent.",
+        "odczyt": "2026-10-24",
+        "szczebel": 1
       }
-    },
-    {
-      "id": "SCA-WATER-STD",
-      "tekst": "Standard wody SCA definiuje docelową twardość ogólną 68 ppm CaCO3 (zakres 50-175 ppm), zasadowość 40 ppm CaCO3 (zakres 40-70 ppm) oraz TDS 150 ppm (zakres 75-250 ppm) przy pH 7.0.",
-      "kategoria": "woda",
-      "poziom_ryzyka": "sredni",
-      "zrodlo": {
-        "tier": 2,
+    ],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "uwagi": "[DO USTALENIA] Do sprawdzenia: strona https://sca.coffee/research/coffee-standards (odczyt 2026-11-14) nie zawiera cytatu ani zakresów; standardy SCA tylko dla członków. Cytat (TDS 1,15–1,35%) przeczy własnemu „twierdzeniu” (1,15–1,45%)."
+  },
+  {
+    "id": "SCA-WATER-STD",
+    "twierdzenie": "Standard wody SCA definiuje docelową twardość ogólną 68 ppm CaCO3 (zakres 50-175 ppm), zasadowość 40 ppm CaCO3 (zakres 40-70 ppm) oraz TDS 150 ppm (zakres 75-250 ppm) przy pH 7.0.",
+    "kategoria": "woda",
+    "zrodla": [
+      {
+        "adres": "https://sca.coffee/research/coffee-standards",
         "tytul": "SCA Water Quality Standard",
-        "autor_lub_wydawca": "Specialty Coffee Association (SCA)",
-        "url_lub_isbn": "https://sca.coffee/research/coffee-standards",
-        "cytat_doslowny": "Target Total Hardness 68 mg/L as CaCO3 (acceptable range 50-175 mg/L), Total Alkalinity 40 mg/L as CaCO3 (acceptable range 40-70 mg/L), pH 7.0 (acceptable range 6.5-7.5).",
-        "data_dostepu": "2026-10-24"
+        "wydawca": "Specialty Coffee Association (SCA)",
+        "cytat": "Target Total Hardness 68 mg/L as CaCO3 (acceptable range 50-175 mg/L), Total Alkalinity 40 mg/L as CaCO3 (acceptable range 40-70 mg/L), pH 7.0 (acceptable range 6.5-7.5).",
+        "odczyt": "2026-10-24",
+        "szczebel": 1
       }
-    },
-    {
-      "id": "BH-WATER-2016",
-      "tekst": "Według przewodnika Barista Hustle koncentraty powstają z 1,68 g wodorowęglanu sodu i 2,45 g soli Epsom, każdy rozpuszczony w 1 L wody demineralizowanej; daje to roztwory o KH i GH ok. 1000 ppm (jako CaCO3), więc 1 g koncentratu w 1 L gotowej wody dodaje ok. 1 ppm.",
-      "kategoria": "woda",
-      "poziom_ryzyka": "sredni",
-      "zrodlo": {
-        "tier": 4,
+    ],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "uwagi": "[DO USTALENIA] Do sprawdzenia: strona SCA (odczyt 2026-11-14) nie zawiera standardu wody."
+  },
+  {
+    "id": "BH-WATER-2016",
+    "twierdzenie": "Według przewodnika Barista Hustle koncentraty powstają z 1,68 g wodorowęglanu sodu i 2,45 g soli Epsom, każdy rozpuszczony w 1 L wody demineralizowanej; daje to roztwory o KH i GH ok. 1000 ppm (jako CaCO3), więc 1 g koncentratu w 1 L gotowej wody dodaje ok. 1 ppm.",
+    "kategoria": "woda",
+    "zrodla": [
+      {
+        "adres": "https://www.baristahustle.com/diy-water-recipes-redux/",
         "tytul": "DIY Water Recipes Redux",
-        "autor_lub_wydawca": "Matt Perger, Barista Hustle",
-        "url_lub_isbn": "https://www.baristahustle.com/diy-water-recipes-redux/",
-        "cytat_doslowny": "Dissolve 1.68g of sodium bicarbonate in 1L of deionised water. This creates a solution with a KH (as CaCO3) as close as we can get to 1000ppm.",
-        "data_dostepu": "2026-11-14",
+        "wydawca": "Matt Perger, Barista Hustle",
+        "cytat": "Dissolve 1.68g of sodium bicarbonate in 1L of deionised water. This creates a solution with a KH (as CaCO3) as close as we can get to 1000ppm.",
+        "odczyt": "2026-11-14",
+        "szczebel": 4,
         "cytaty_dodatkowe": [
           "Dissolve 2.45g of Epsom salts in 1L of deionised water. This creates a solution with a GH (as CaCO3) of 1000 ppm.",
           "each ml of concentrate in your final 1L will add 1ppm of hardness"
         ],
         "uwagi": "Przewodnik (szczebel 4): jedno źródło, atrybucja w treści („według Barista Hustle”). Wartość 1 ppm na 1 g/L to rachunek: 1000 ppm × 1 g / 1000 g."
-      },
-      "status": "potwierdzone",
-      "wielkosc": "koncentrat_bh_ppm_na_g_na_l",
-      "wartosc": 1,
-      "jednostka": "ppm/(g/L)"
-    },
-    {
-      "id": "HENDON-WATER-2015",
-      "tekst": "Kationy magnezu (Mg2+) i wapnia (Ca2+) ułatwiają ekstrakcję związków smakowych kawy, podczas gdy jony wodorowęglanowe buforują kwasowość naparu.",
-      "kategoria": "woda",
-      "poziom_ryzyka": "sredni",
-      "zrodlo": {
-        "tier": 3,
+      }
+    ],
+    "status": "potwierdzone",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "jedno_zrodlo": true,
+    "wielkosc": "koncentrat_bh_ppm_na_g_na_l",
+    "wartosc": 1,
+    "jednostka": "ppm/(g/L)"
+  },
+  {
+    "id": "HENDON-WATER-2015",
+    "twierdzenie": "Kationy magnezu (Mg2+) i wapnia (Ca2+) ułatwiają ekstrakcję związków smakowych kawy, podczas gdy jony wodorowęglanowe buforują kwasowość naparu.",
+    "kategoria": "woda",
+    "zrodla": [
+      {
+        "adres": "ISBN 978-0993252600",
         "tytul": "Water for Coffee: Science Story Manual",
-        "autor_lub_wydawca": "Christopher H. Hendon & Maxwell Colonna-Dashwood, 2015",
-        "url_lub_isbn": "ISBN 978-0993252600",
-        "cytat_doslowny": "Divalent cations Mg2+ and Ca2+ extract more flavorful compounds than monovalent cations, while bicarbonate modulates perceived acidity.",
-        "data_dostepu": "2026-10-24"
+        "wydawca": "Christopher H. Hendon & Maxwell Colonna-Dashwood, 2015",
+        "cytat": "Divalent cations Mg2+ and Ca2+ extract more flavorful compounds than monovalent cations, while bicarbonate modulates perceived acidity.",
+        "odczyt": "2026-10-24",
+        "szczebel": 3
       }
-    },
-    {
-      "id": "ASTILL-TEA-2001",
-      "tekst": "Zawartość kofeiny w liściach Camellia sinensis wynosi 2.0-4.5% s.m., a krótkie ekstrakcje Gongfu Cha uwalniają frakcję kofeiny zależną od temperatury i powierzchni liścia.",
-      "kategoria": "herbata-ekstrakcja",
-      "poziom_ryzyka": "sredni",
-      "zrodlo": {
-        "tier": 1,
+    ],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "jedno_zrodlo": true,
+    "uwagi": "[DO USTALENIA] Do sprawdzenia: książka (ISBN) nieodczytana 2026-11-14."
+  },
+  {
+    "id": "ASTILL-TEA-2001",
+    "twierdzenie": "Zawartość kofeiny w liściach Camellia sinensis wynosi 2.0-4.5% s.m., a krótkie ekstrakcje Gongfu Cha uwalniają frakcję kofeiny zależną od temperatury i powierzchni liścia.",
+    "kategoria": "herbata-ekstrakcja",
+    "zrodla": [
+      {
+        "adres": "https://doi.org/10.1021/jf010759+",
         "tytul": "Factors Affecting the Caffeine and Polyphenol Contents of Black and Green Tea Infusions",
-        "autor_lub_wydawca": "C. Astill, M. R. Birch, C. Dacombe, P. G. Humphrey, P. T. Martin, J. Agric. Food Chem. 2001, 49(11), 5340–5347",
-        "url_lub_isbn": "https://doi.org/10.1021/jf010759+",
-        "cytat_doslowny": "Caffeine levels in tea leaves typically range between 20 and 45 mg/g dry matter, with extraction kinetics strongly dependent on water temperature and leaf geometry.",
-        "data_dostepu": "2026-10-24"
-      },
-      "status": "otwarte",
-      "uwagi_2026_11_14": "[DO USTALENIA] Cytat „Caffeine levels in tea leaves typically range between 20 and 45 mg/g…” nie występuje w abstrakcie (PMID 11714326, odczyt 2026-11-14); pełny tekst niedostępny."
-    },
-    {
-      "id": "WCR-VARIETIES",
-      "tekst": "Odmiany botaniczne Coffea arabica (m.in. Bourbon, Typica, Geisha, SL28) charakteryzują się odmienną genetyką, profilem sensorycznym i podatnością na rdzę liściową.",
-      "kategoria": "botanika-kawa",
-      "poziom_ryzyka": "sredni",
-      "zrodlo": {
-        "tier": 2,
-        "tytul": "Arabica Coffee Varieties Catalog",
-        "autor_lub_wydawca": "World Coffee Research (WCR)",
-        "url_lub_isbn": "https://varieties.worldcoffeeresearch.org/",
-        "cytat_doslowny": "Distinct genetic lineages of Coffea arabica exhibit specific agronomic traits, bean morphologies, and cup quality potentials.",
-        "data_dostepu": "2026-10-24"
+        "wydawca": "C. Astill, M. R. Birch, C. Dacombe, P. G. Humphrey, P. T. Martin, J. Agric. Food Chem. 2001, 49(11), 5340–5347",
+        "cytat": "Caffeine levels in tea leaves typically range between 20 and 45 mg/g dry matter, with extraction kinetics strongly dependent on water temperature and leaf geometry.",
+        "odczyt": "2026-10-24",
+        "szczebel": 2
       }
+    ],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "uwagi": "[DO USTALENIA] Cytat „Caffeine levels in tea leaves typically range between 20 and 45 mg/g…” nie występuje w abstrakcie (PMID 11714326, odczyt 2026-11-14); pełny tekst niedostępny."
+  },
+  {
+    "id": "WCR-VARIETIES",
+    "twierdzenie": "Odmiany botaniczne Coffea arabica (m.in. Bourbon, Typica, Geisha, SL28) charakteryzują się odmienną genetyką, profilem sensorycznym i podatnością na rdzę liściową.",
+    "kategoria": "botanika-kawa",
+    "zrodla": [
+      {
+        "adres": "https://varieties.worldcoffeeresearch.org/",
+        "tytul": "Arabica Coffee Varieties Catalog",
+        "wydawca": "World Coffee Research (WCR)",
+        "cytat": "Distinct genetic lineages of Coffea arabica exhibit specific agronomic traits, bean morphologies, and cup quality potentials.",
+        "odczyt": "2026-10-24",
+        "szczebel": 1
+      }
+    ],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "uwagi": "[DO USTALENIA] Do sprawdzenia: cytat ogólny niesprawdzony dosłownie w katalogu WCR (audyt 2026-11-11 czytał katalog PDF dla wybranych odmian)."
+  },
+  {
+    "id": "KAWA-KOFEINA-MG-G",
+    "twierdzenie": "[DO USTALENIA] Zawartość kofeiny w kawie: arabika 12,0 mg/g, robusta 22,0 mg/g (wartości w estimateCoffeeCaffeineMg).",
+    "kategoria": "zdrowie-kofeina",
+    "zrodla": [],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "wielkosc": "kofeina_mg_na_g_kawy",
+    "wartosc": {
+      "arabica": 12.0,
+      "robusta": 22.0
     },
-    {
-      "id": "KAWA-KOFEINA-MG-G",
-      "tekst": "[DO USTALENIA] Zawartość kofeiny w kawie: arabika 12,0 mg/g, robusta 22,0 mg/g (wartości w estimateCoffeeCaffeineMg).",
-      "kategoria": "zdrowie-kofeina",
-      "poziom_ryzyka": "sredni",
-      "status": "otwarte",
-      "wielkosc": "kofeina_mg_na_g_kawy",
-      "wartosc": {
-        "arabica": 12.0,
-        "robusta": 22.0
-      },
-      "jednostka": "mg/g",
-      "uwagi": "Olechno i in. 2021 (https://pmc.ncbi.nlm.nih.gov/articles/PMC8228209/, odczyt 2026-11-14) podaje dla ZIELONEGO ziarna „caffeine (0.9–1.2% and 1.6–2.4%)” (arabika, robusta): 12 mg/g to górna granica arabiki, 22 mg/g mieści się w zakresie robusty, ale źródło nie dotyczy kawy palonej. Brak przeczytanego źródła dla kawy palonej → otwarte. BRD C4 D-01 cytował pracę o herbacie (Astill 2001)."
-    },
-    {
-      "id": "KAWA-WYDAJNOSC-EKSTRAKCJI",
-      "tekst": "[DO USTALENIA] Udział kofeiny przechodzący do naparu: filtr 0,88, espresso 0,75, immersja 0,85, cold brew 0,92.",
-      "kategoria": "zdrowie-kofeina",
-      "poziom_ryzyka": "sredni",
-      "status": "otwarte",
-      "wielkosc": "kofeina_wydajnosc_ekstrakcji",
-      "jednostka": "ułamek",
-      "uwagi": "Brak źródła w BRD i rejestrze; nie znaleziono źródła 2026-11-14."
-    },
-    {
-      "id": "HERBATA-KOFEINA-3PROC",
-      "tekst": "[DO USTALENIA] Liście herbaty zawierają 3,0% kofeiny w suchej masie (estimateTotalLeafCaffeineMg).",
-      "kategoria": "zdrowie-kofeina",
-      "poziom_ryzyka": "sredni",
-      "status": "otwarte",
-      "wielkosc": "herbata_kofeina_proc_sm",
-      "wartosc": 3.0,
-      "jednostka": "%",
-      "uwagi": "Przypisane źródło ASTILL-TEA-2001: abstrakt (Europe PMC, PMID 11714326, odczyt 2026-11-14) nie zawiera zakresu „20 and 45 mg/g”; pełny tekst płatny (ACS) — niedostępny."
-    },
-    {
-      "id": "HERBATA-FRAKCJE-ZALAN",
-      "tekst": "[DO USTALENIA] Frakcja kofeiny n-tego zalania Gongfu = 0,40 × 0,55^(n−1).",
-      "kategoria": "zdrowie-kofeina",
-      "poziom_ryzyka": "sredni",
-      "status": "otwarte",
-      "wielkosc": "herbata_frakcja_zalania",
-      "uwagi": "BRD RD-19 i dawny komentarz w kodzie podawały 45/30/15/10% — sprzeczne ze wzorem; źródło „Monografie chemii herbaty” bez adresu. Brak przeczytanego źródła."
-    },
-    {
-      "id": "HERBATA-SZYBKIE-45MG",
-      "tekst": "[DO USTALENIA] Szybkie dodanie herbaty liściastej: 45 mg na 5 g.",
-      "kategoria": "zdrowie-kofeina",
-      "poziom_ryzyka": "sredni",
-      "status": "otwarte",
-      "wielkosc": "herbata_kofeina_szybkie_dodanie_5g",
-      "wartosc": 45,
-      "jednostka": "mg",
-      "uwagi": "Gongfu dla 5 g, 1. zalanie liczy 5 × 1000 × 0,03 × 0,40 = 60 mg (ta sama wielkość, inna wartość). EFSA explains 2015 (rysunek s. 3, odczyt 2026-11-14): filiżanka czarnej herbaty 220 ml ≈ 50 mg — bez masy liści, więc nie rozstrzyga. Do ujednolicenia po źródle (przekazanie 08)."
-    },
-    {
-      "id": "WODA-MUSZYNIANKA-MINERALIZACJA",
-      "tekst": "Producent podaje mineralizację Muszynianki ok. 2000 mg/l.",
-      "kategoria": "woda",
-      "poziom_ryzyka": "niski",
-      "status": "potwierdzone",
-      "wielkosc": "muszynianka_mineralizacja",
-      "wartosc": 2000,
-      "jednostka": "mg/l",
-      "zrodlo": {
-        "tier": 3,
+    "jednostka": "mg/g",
+    "uwagi": "Olechno i in. 2021 (https://pmc.ncbi.nlm.nih.gov/articles/PMC8228209/, odczyt 2026-11-14) podaje dla ZIELONEGO ziarna „caffeine (0.9–1.2% and 1.6–2.4%)” (arabika, robusta): 12 mg/g to górna granica arabiki, 22 mg/g mieści się w zakresie robusty, ale źródło nie dotyczy kawy palonej. Brak przeczytanego źródła dla kawy palonej → otwarte. BRD C4 D-01 cytował pracę o herbacie (Astill 2001)."
+  },
+  {
+    "id": "KAWA-WYDAJNOSC-EKSTRAKCJI",
+    "twierdzenie": "[DO USTALENIA] Udział kofeiny przechodzący do naparu: filtr 0,88, espresso 0,75, immersja 0,85, cold brew 0,92.",
+    "kategoria": "zdrowie-kofeina",
+    "zrodla": [],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "wielkosc": "kofeina_wydajnosc_ekstrakcji",
+    "jednostka": "ułamek",
+    "uwagi": "Brak źródła w BRD i rejestrze; nie znaleziono źródła 2026-11-14."
+  },
+  {
+    "id": "HERBATA-KOFEINA-3PROC",
+    "twierdzenie": "[DO USTALENIA] Liście herbaty zawierają 3,0% kofeiny w suchej masie (estimateTotalLeafCaffeineMg).",
+    "kategoria": "zdrowie-kofeina",
+    "zrodla": [],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "wielkosc": "herbata_kofeina_proc_sm",
+    "wartosc": 3.0,
+    "jednostka": "%",
+    "uwagi": "Przypisane źródło ASTILL-TEA-2001: abstrakt (Europe PMC, PMID 11714326, odczyt 2026-11-14) nie zawiera zakresu „20 and 45 mg/g”; pełny tekst płatny (ACS) — niedostępny."
+  },
+  {
+    "id": "HERBATA-FRAKCJE-ZALAN",
+    "twierdzenie": "[DO USTALENIA] Frakcja kofeiny n-tego zalania Gongfu = 0,40 × 0,55^(n−1).",
+    "kategoria": "zdrowie-kofeina",
+    "zrodla": [],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "wielkosc": "herbata_frakcja_zalania",
+    "uwagi": "BRD RD-19 i dawny komentarz w kodzie podawały 45/30/15/10% — sprzeczne ze wzorem; źródło „Monografie chemii herbaty” bez adresu. Brak przeczytanego źródła."
+  },
+  {
+    "id": "HERBATA-SZYBKIE-45MG",
+    "twierdzenie": "[DO USTALENIA] Szybkie dodanie herbaty liściastej: 45 mg na 5 g.",
+    "kategoria": "zdrowie-kofeina",
+    "zrodla": [],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "wielkosc": "herbata_kofeina_szybkie_dodanie_5g",
+    "wartosc": 45,
+    "jednostka": "mg",
+    "uwagi": "Gongfu dla 5 g, 1. zalanie liczy 5 × 1000 × 0,03 × 0,40 = 60 mg (ta sama wielkość, inna wartość). EFSA explains 2015 (rysunek s. 3, odczyt 2026-11-14): filiżanka czarnej herbaty 220 ml ≈ 50 mg — bez masy liści, więc nie rozstrzyga. Do ujednolicenia po źródle (przekazanie 08)."
+  },
+  {
+    "id": "WODA-MUSZYNIANKA-MINERALIZACJA",
+    "twierdzenie": "Producent podaje mineralizację Muszynianki ok. 2000 mg/l.",
+    "kategoria": "woda",
+    "zrodla": [
+      {
+        "adres": "https://muszynianka.pl/",
         "tytul": "Muszynianka — strona producenta",
-        "autor_lub_wydawca": "Muszynianka (producent)",
-        "url_lub_isbn": "https://muszynianka.pl/",
-        "cytat_doslowny": "Wysoka mineralizacja: ~2000 mg/l naturalnych składników mineralnych",
-        "data_dostepu": "2026-11-14",
+        "wydawca": "Muszynianka (producent)",
+        "cytat": "Wysoka mineralizacja: ~2000 mg/l naturalnych składników mineralnych",
+        "odczyt": "2026-11-14",
+        "szczebel": 3,
         "uwagi": "Jedno źródło; fakt zmienny (etykieta) — termin przeglądu 2027-11-14. Skład jonów (Ca, Mg, HCO3) nie jest podany w tekście strony, więc GH/KH aplikacji pozostają otwarte. Dawny wpis łączył dwie marki („Muszynianka / Cechini”) z TDS 1400."
-      },
-      "wazne_do": "2027-11-14"
-    },
-    {
-      "id": "WODY-BUTELKOWANE-SKLADY",
-      "tekst": "[DO USTALENIA] Składy (TDS, GH, KH) i werdykty 10 wód butelkowanych w BOTTLED_WATER_BENCHMARKS.",
-      "kategoria": "woda",
-      "poziom_ryzyka": "sredni",
-      "status": "otwarte",
-      "uwagi": "Brak źródła i daty odczytu etykiet dla marek (poza mineralizacją Muszynianki). Zdanie „Oficjalna woda cuppingowa mistrzostw baristów (WBC)” usunięte 2026-11-14 (fakt zmienny bez źródła). Rekomendacja audytu (b) — usunąć marki — to zmiana funkcji: decyzja właściciela/03."
-    }
-  ]
-}
+      }
+    ],
+    "status": "potwierdzone",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "jedno_zrodlo": true,
+    "wielkosc": "muszynianka_mineralizacja",
+    "wartosc": 2000,
+    "jednostka": "mg/l",
+    "wazne_do": "2027-11-14"
+  },
+  {
+    "id": "WODY-BUTELKOWANE-SKLADY",
+    "twierdzenie": "[DO USTALENIA] Składy (TDS, GH, KH) i werdykty 10 wód butelkowanych w BOTTLED_WATER_BENCHMARKS.",
+    "kategoria": "woda",
+    "zrodla": [],
+    "status": "otwarte",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null,
+    "uwagi": "Brak źródła i daty odczytu etykiet dla marek (poza mineralizacją Muszynianki). Zdanie „Oficjalna woda cuppingowa mistrzostw baristów (WBC)” usunięte 2026-11-14 (fakt zmienny bez źródła). Rekomendacja audytu (b) — usunąć marki — to zmiana funkcji: decyzja właściciela/03."
+  }
+]

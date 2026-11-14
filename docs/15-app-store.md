@@ -43,10 +43,10 @@ Wieloetapowy asystent prowadzący przez każdy etap parzenia: od blooming (prein
 Dedykowany tracker wielokrotnych infuzji dla herbat wulong, puerh, zielonych, białych i czarnych. Automatyczna progresja czasu kolejnych zalań i notatki sensoryczne dla każdego naparu.
 
 • SPIŻARNIA ZIAREN I LIŚCI
-Śledź zapasy kawy i herbaty. Monitoruj datę palenia, okno odgazowania CO₂ (Degassing) oraz szczyt świeżości sensorycznej (Peak Flavor: 7–35 dni po wypale).
+Śledź zapasy kawy i herbaty. Monitoruj datę palenia i liczbę dni od wypału.
 
 • KALKULATORY BARISTY I CHEMIA WODY
-Precyzyjne narzędzia: dwukierunkowy kalkulator proporcji (Brew Ratio), kalkulator wydajności ekstrakcji TDS / Extraction Yield (EY%) zgodny ze standardem SCA Golden Cup oraz receptury mineralizacji wody Barista Hustle (koncentraty Buffer i Hardness).
+Precyzyjne narzędzia: dwukierunkowy kalkulator proporcji (Brew Ratio), kalkulator wydajności ekstrakcji TDS / Extraction Yield (EY%) oraz mineralizacja wody koncentratami według przepisu Barista Hustle (1,68 g sody i 2,45 g soli Epsom na 1 L).
 
 • MONITOR KOFEINY
 Śledź dobowe spożycie kofeiny i szacunek kofeiny w organizmie o porze snu według modelu eliminacji z ustawianym czasem półtrwania. To szacunek informacyjny, nie ocena snu.
@@ -73,10 +73,10 @@ Multi-step guidance for every brewing stage: blooming, pulse pours, continuous p
 Dedicated multi-infusion tracker for oolongs, pu-erhs, green, white, and black teas. Automatic steep duration progression and per-infusion sensory tasting logs.
 
 • BEAN & TEA LEAF PANTRY
-Keep track of your coffee beans and whole-leaf teas. Monitor roast dates, CO₂ degassing windows, and peak flavor extraction periods (7–35 days post-roast).
+Keep track of your coffee beans and whole-leaf teas. Monitor roast dates and days since roast.
 
 • BARISTA TOOLS & WATER CHEMISTRY
-Professional dial-in calculators: bidirectional Brew Ratio calculator, TDS / Extraction Yield (EY%) calculation following SCA Golden Cup standards, and Barista Hustle water mineralization concentrate mixing (Buffer & Hardness).
+Professional dial-in calculators: bidirectional Brew Ratio calculator, TDS / Extraction Yield (EY%) calculation, and water mineralization with concentrates following the Barista Hustle recipe (1.68 g baking soda and 2.45 g Epsom salt per 1 L).
 
 • CAFFEINE TRACKER
 Track your daily caffeine intake and an estimate of the caffeine in your body at bedtime from an elimination model with an adjustable half-life. It is an informational estimate, not a sleep assessment.
@@ -89,6 +89,18 @@ Health Disclaimer: Caffeine level estimates are for information only, apply to h
 
 Nominative Fair Use Notice: All product and company names, brewer types, and grinder models (such as V60, AeroPress, Chemex, Comandante, etc.) are trademarks or registered trademarks of their respective holders. Use of them does not imply any affiliation with or endorsement by them.
 ```
+
+---
+
+### Twierdzenia dziedzinowe opisu (rejestr `rejestr.json`, M1-audytor-generalny-019)
+Każde zdanie z faktem dziedzinowym w opisie PL i EN wskazuje twierdzenie ze statusem „potwierdzone”. Zdanie bez twierdzenia wypada z opisu do czasu źródła (dotąd usunięte: okno świeżości w dniach po wypale, ochrona fazy snu, zgodność kalkulatora EY ze standardem SCA).
+
+| Zdanie (PL / EN) | Twierdzenie |
+|---|---|
+| Koncentraty: 1,68 g sody i 2,45 g soli Epsom na 1 L / 1.68 g baking soda and 2.45 g Epsom salt per 1 L | [T:BH-WATER-2016] |
+| Szacunek kofeiny z modelu eliminacji z ustawianym czasem półtrwania / elimination model with an adjustable half-life | [T:EFSA-T12-ZAKRES] |
+| Zastrzeżenie: błędny w ciąży, przy chorobach wątroby, lekach / wrong during pregnancy, with liver disease, medication | [T:GRZEG-PK-CZYNNIKI,EFSA-T12-ZAKRES] |
+| Zastrzeżenie: konsultacja z lekarzem / check with a doctor | [T:APPLE-1.4.1-LEKARZ] |
 
 ---
 

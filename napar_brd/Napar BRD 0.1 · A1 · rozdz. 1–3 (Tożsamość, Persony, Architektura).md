@@ -39,7 +39,7 @@ Każde wymaganie funkcjonalne i techniczne w całym projekcie musi być w 100% z
 
 ## **2. Problem rynkowy i dowody empiryczne**
 
-Analiza ponad 3 500 recenzji czołowych aplikacji baristycznych i herbacianych w App Store (Filtru, Beanconqueror, Brew Timer, Mister Barista, Acaia, Tea Time) ujawnia krytyczne braki na rynku:
+Analiza ponad 3 500 recenzji czołowych aplikacji baristycznych i herbacianych w App Store (Filtru, Beanconqueror, Brew Timer, Mister Barista, Acaia, Tea Time) ujawnia krytyczne braki na rynku: *[DO USTALENIA 2026-11-14, M1-audytor-generalny-019: brak źródła, adresu i daty — 01-odkrywanie-012]*
 
 1. **Agresywna i droga monetyzacja:** Aplikacje żądają 30–60 USD rocznie za prosty stoper z bazą danych, co budzi wściekłość użytkowników domowych (*„Płacić 50 dolarów rocznie za stoper do kawy to absurd”*).
 2. **Zawodna obsługa zegarka Apple Watch:** Recenzje wskazują na nagminne usypianie aplikacji na zegarku w trakcie parzenia, gubienie sekund i brak wibracji haptycznych (*„Aplikacja na zegarku zamyka się dokładnie wtedy, gdy leję wodę”*).

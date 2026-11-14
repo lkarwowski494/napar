@@ -821,7 +821,7 @@ describe('M1-audytor-generalny-018: wartości i etykiety zgodne z przeczytanym �
       expect(d).not.toMatch(/500 ?g/);
       expect(d).toMatch(/1 ?L/);
     }
-    expect(byId.get('BH-WATER-2016')?.zrodlo?.cytat_doslowny).toMatch(/1L of deionised water/);
+    expect(byId.get('BH-WATER-2016')?.zrodla?.[0]?.cytat).toMatch(/1L of deionised water/);
   });
 
   test('06-tresci-010: Muszynianka zgodna z producentem (~2000 mg/l), bez łączenia z inną wodą; bez niepotwierdzonego „oficjalna woda WBC”', () => {
@@ -884,5 +884,54 @@ describe('M1-audytor-generalny-018: wartości i etykiety zgodne z przeczytanym �
     expect(sour.grindAdjustment).toBe('finer');
     const [astr] = diagnoseExtractionTaste({ isAstringent: true });
     expect(astr.grindAdjustment).toBe('coarser');
+  });
+});
+
+describe('M1-audytor-generalny-019: rejestr twierdzeń w formacie roli, szczeble według BRD C4 §1, opis sklepu z ID (06-tresci-008, 06-tresci-014, 01-odkrywanie-005, 01-odkrywanie-012, 10-wydanie-006, 02-monetyzacja-007)', () => {
+  const rejestr = JSON.parse(readFileSync(join(root, 'rejestr.json'), 'utf8'));
+
+  test('06-tresci-014: rejestr przechodzi walidator kontrole-tresci (źródła, szczeble, jedna wartość wielkości); przegląd człowieka jeszcze czeka', async () => {
+    expect(Array.isArray(rejestr)).toBe(true);
+    const { spawnSync } = require('node:child_process');
+    const run = spawnSync(
+      process.execPath,
+      ['--input-type=module', '-e', "import { sprawdzRejestr } from './scripts/kontrole-tresci.mjs'; import { readFileSync } from 'node:fs'; const u = []; const b = sprawdzRejestr(JSON.parse(readFileSync('rejestr.json', 'utf8')), [], { przedPrzegladem: true }, u); console.log(JSON.stringify({ b, u }));"],
+      { cwd: root, encoding: 'utf8' },
+    );
+    expect(run.status).toBe(0);
+    const { b: bledy, u: uwagi } = JSON.parse(run.stdout) as { b: string[]; u: string[] };
+    expect(bledy).toEqual([]);
+    // Bez przeglądu człowieka każde potwierdzone twierdzenie krytyczne daje uwagę — po przeglądzie zmienić na przedPrzegladem: false.
+    expect(uwagi.every((u) => /krytyczne bez przeglądu człowieka/.test(u))).toBe(true);
+    for (const t of rejestr) {
+      expect([t.id, typeof t.twierdzenie, Array.isArray(t.zrodla), ['robocze', 'potwierdzone', 'otwarte', 'sprzeczne', 'wycofane'].includes(t.status), typeof t.krytyczne])
+        .toEqual([t.id, 'string', true, true, 'boolean']);
+    }
+  });
+
+  test('06-tresci-014: szczeble zgodne z hierarchią projektu (SCA, WCR, EFSA = 1; literatura recenzowana = 2; przewodnik = 4 z oznaczeniem jednego źródła)', () => {
+    const tier = (id: string) => rejestr.find((t: any) => t.id === id)?.zrodla?.[0]?.szczebel;
+    for (const id of ['SCA-GOLDENCUP-EY', 'SCA-WATER-STD', 'WCR-VARIETIES', 'EFSA-CAFF-2015', 'EFSA-T12-ZAKRES', 'EFSA-SEN-100MG']) expect([id, tier(id)]).toEqual([id, 1]);
+    for (const id of ['NEHLIG-CYP1A2-2018', 'DRAKE-SLEEP-2013', 'ASTILL-TEA-2001', 'GRZEG-PK-CZYNNIKI']) expect([id, tier(id)]).toEqual([id, 2]);
+    const bh = rejestr.find((t: any) => t.id === 'BH-WATER-2016');
+    expect(bh.zrodla[0].szczebel).toBe(4);
+    expect(bh.jedno_zrodlo).toBe(true);
+  });
+
+  test('10-wydanie-006 / 01-odkrywanie-005: każde twierdzenie dziedzinowe opisu sklepu PL/EN ma ID potwierdzonego twierdzenia; bez 7–35 dni, NREM i „SCA Golden Cup” bez źródła', () => {
+    const store = readFileSync(join(root, 'docs/15-app-store.md'), 'utf8');
+    expect(store).not.toMatch(/7–35|7-35|NREM|Golden Cup/);
+    const ids = [...store.matchAll(/\[T:([^\]]+)\]/g)].flatMap((m) => m[1].split(',').map((s) => s.trim()));
+    expect(ids.length).toBeGreaterThanOrEqual(4);
+    for (const id of ids) expect([id, rejestr.find((t: any) => t.id === id)?.status]).toEqual([id, 'potwierdzone']);
+  });
+
+  test('01-odkrywanie-012 / 02-monetyzacja-007: liczby rynkowe i cenowe bez źródła w BRD i dokumentach są oznaczone [DO USTALENIA]', () => {
+    const files = readdirSync(join(root, 'napar_brd')).map((f) => join('napar_brd', f)).concat(['docs/MONETIZATION_AND_KITCHEN_UX.md']);
+    const lines = files.flatMap((f) => readFileSync(join(root, f), 'utf8').split('\n'));
+    for (const re of [/3 500 recenzji/, /35 mld USD/, /5\.99 \$\/mies/, /29 subskrypcji rocznych/, /18 zł w kawiarni/]) {
+      const hit = lines.filter((l) => re.test(l));
+      expect([String(re), hit.length > 0 && hit.every((l) => /DO USTALENIA/.test(l))]).toEqual([String(re), true]);
+    }
   });
 });
