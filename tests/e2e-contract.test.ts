@@ -65,6 +65,20 @@ test('każdy selektor tekstowy scenariusza istnieje w słowniku PL, a każdy id 
   expect(missing).toEqual([]);
 });
 
+test('scenariusze nie stukają w etykiety zakładek ukrytych z paska (href: null)', () => {
+  const layout = fs.readFileSync(path.join(root, 'app/(tabs)/_layout.tsx'), 'utf8');
+  const hidden = [...layout.matchAll(/name="([a-z]+)"\s*options=\{\{\s*href:\s*null/g)].map((m) => m[1]);
+  const tabs: Record<string, string> = translations.pl.tabs;
+  const hiddenLabels = hidden.map((n) => tabs[n]).filter(Boolean);
+  const bad: string[] = [];
+  for (const f of flows) {
+    const body = fs.readFileSync(path.join(maestroDir, f), 'utf8');
+    for (const label of hiddenLabels) if (new RegExp(`tapOn:\\s*"${label}"`).test(body)) bad.push(`${f}: ${label}`);
+  }
+  expect(hidden.length).toBeGreaterThan(0);
+  expect(bad).toEqual([]);
+});
+
 test('jest scenariusz z wynikiem w danych (paczka zapisana w spiżarni) i sprawdzenie danych po ponownej instalacji', () => {
   const all = flows.map((f) => fs.readFileSync(path.join(maestroDir, f), 'utf8')).join('\n');
   expect(all).toMatch(/inputText:\s*"E2E Kenia"/);
