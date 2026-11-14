@@ -647,3 +647,70 @@ describe('M1-audytor-generalny-009: wersja darmowa bez zakupów (DEC-01 a)', () 
     expect(hits(/Apps4Brew Pass|Napar Pro|subskrypc|subscription|Przywróć Zakupy|Restore Purchases|okres próbny|free trial/i, files)).toEqual([]);
   });
 });
+
+describe('M1-audytor-generalny-015: bez progu „bezpiecznego dla snu” i „bezpiecznej godziny” (DEC-05 a; 06-tresci-001, 01-odkrywanie-004)', () => {
+  const caffeineUiFiles = [
+    'app/(tabs)/caffeine.tsx',
+    'src/components/caffeine/BedtimeCurfewCard.tsx',
+    'src/core/caffeine-chart.tsx',
+    'src/components/settings/CaffeineSettingsCard.tsx',
+  ];
+  const localeFiles = readdirSync(join(root, 'locales'))
+    .filter((f) => f.endsWith('.json'))
+    .map((f) => join('locales', f));
+  const grepFiles = (re: RegExp, files: string[]): string[] =>
+    files.flatMap((f) =>
+      readFileSync(join(root, f), 'utf8')
+        .split('\n')
+        .flatMap((line, i) => (re.test(line) ? [`${f}:${i + 1}: ${line.trim()}`] : [])),
+    );
+  const flatten = (o: any, p = ''): Array<[string, string]> =>
+    Object.entries(o).flatMap(([k, v]) => (v && typeof v === 'object' ? flatten(v, `${p}${k}.`) : [[`${p}${k}`, String(v)] as [string, string]]));
+
+  test('06-tresci-001: ekran Kofeina, wykres i ustawienia nie mają progu 25 mg, NREM ani „bezpiecznej godziny”', () => {
+    expect(
+      grepFiles(/Próg bezpiecze|BEZPIECZNA GODZINA|Safe level for restorative|NREM|\b25(\.0)?\s?mg|thresholdMg|isSafeForSleep|curfewTime|HoursUntilSafe/i, caffeineUiFiles),
+    ).toEqual([]);
+  });
+
+  test('06-tresci-001: żaden tekst PL ani EN (słowniki i pliki locales) nie nazywa poziomu kofeiny przed snem „bezpiecznym” ani progiem NREM', () => {
+    const texts = [...flatten(translations.pl), ...flatten(translations.en)].filter(([k]) => /^(caffeine|settings\.bedtime)/.test(k));
+    expect(texts.length).toBeGreaterThan(5);
+    expect(texts.filter(([, v]) => /bezpieczn|safe|NREM|curfew|próg|threshold|25 mg/i.test(v))).toEqual([]);
+    expect(grepFiles(/Safe level for restorative|NREM|25 mg|curfew/i, localeFiles)).toEqual([]);
+  });
+
+  test('06-tresci-001: kod domenowy nie ma progu snu ani godziny granicznej', () => {
+    const src = readFileSync(join(root, 'src/core/domain-rules.ts'), 'utf8');
+    expect(src).not.toMatch(/safeThresholdMg|isSafeForSleep|calculateHoursUntilSafeCaffeine|evaluateBedtimeCaffeine/);
+  });
+
+  test('06-tresci-001: karta pory snu pokazuje neutralny szacunek — ten sam wygląd na granicy dawnego progu (24,9 / 25 / 25,1 mg)', () => {
+    const { BedtimeCurfewCard } = require('../src/components/caffeine/BedtimeCurfewCard');
+    const render = (mg: number) => {
+      let tree: any;
+      act(() => {
+        tree = renderer.create(
+          <BedtimeCurfewCard bedtimeHour={23} onBedtimeChange={() => {}} halfLifeHours={5} onHalfLifeChange={() => {}} bedtimeMg={mg} />,
+        );
+      });
+      const json = JSON.stringify(tree.toJSON());
+      act(() => tree.unmount());
+      return json;
+    };
+    const outs = [24.9, 25, 25.1].map(render);
+    for (const [i, out] of outs.entries()) {
+      expect(out).not.toMatch(/✓|⚠|bezpieczn|BEZPIECZN|NREM|curfew/i);
+      expect(out).toContain(String([24.9, 25, 25.1][i]));
+    }
+    const shape = (s: string) => s.replace(/2[45](\.\d)?/g, 'X');
+    expect(shape(outs[0])).toBe(shape(outs[1]));
+    expect(shape(outs[1])).toBe(shape(outs[2]));
+  });
+
+  test('06-tresci-001: estimateBedtimeCaffeineMg sumuje kofeinę z modelu bez oceny', () => {
+    const { estimateBedtimeCaffeineMg } = require('../src/core/domain-rules');
+    expect(estimateBedtimeCaffeineMg([{ doseMg: 100, hoursUntilBedtime: 10 }], 5)).toBe(25);
+    expect(estimateBedtimeCaffeineMg([{ doseMg: 100, hoursUntilBedtime: 5 }, { doseMg: 50, hoursUntilBedtime: 0 }], 5)).toBe(100);
+  });
+});

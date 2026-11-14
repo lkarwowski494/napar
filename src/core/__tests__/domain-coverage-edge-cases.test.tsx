@@ -208,7 +208,6 @@ describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
           <CaffeineCurveChart
             logs={[]}
             bedtimeHour={2}
-            thresholdMg={25}
           />
         );
       });

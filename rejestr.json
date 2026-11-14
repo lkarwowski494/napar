@@ -40,22 +40,48 @@
     },
     {
       "id": "DRAKE-SLEEP-2013",
-      "tekst": "Spożycie 400 mg kofeiny na 0, 3 lub 6 godzin przed snem powoduje istotne zakłócenia snu i skrócenie całkowitego czasu snu o ponad 1 godzinę.",
+      "tekst": "400 mg kofeiny podane 0, 3 lub 6 godzin przed snem zakłóca sen; nawet 6 godzin przed snem skraca sen o ponad 1 godzinę (pomiar w domu, n=12). Badanie nie podaje progu bezpiecznego stężenia.",
       "kategoria": "zdrowie-sen",
       "poziom_ryzyka": "wysoki",
       "zrodlo": {
         "tier": 1,
         "tytul": "Caffeine Effects on Sleep Taken 0, 3, or 6 Hours before Going to Bed",
         "autor_lub_wydawca": "Christopher Drake, Timothy Roehrs, John Shambroom, Thomas Roth, Journal of Clinical Sleep Medicine, 2013, 9(11), 1195–1200",
-        "url_lub_isbn": "https://doi.org/10.5664/jcsm.3170",
-        "cytat_doslowny": "Caffeine taken 6 hours before bedtime produced disruptive effects on sleep, resulting in a reduction in total sleep time by more than 1 hour.",
-        "data_dostepu": "2026-10-24"
+        "url_lub_isbn": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3805807/ (doi:10.5664/jcsm.3170)",
+        "cytat_doslowny": "Even at 6 hours, caffeine reduced sleep by more than 1 hour.",
+        "data_dostepu": "2026-11-14"
       },
       "przeglad": {
         "kto": "PRZEGLĄD_ZASTĘPCZY_AI (wymaga zatwierdzenia właściciela)",
         "data": "2026-10-24",
         "sha": "f07796f0a54093c19d76c88ade8516e091e0410d"
       }
+    },
+    {
+      "id": "SEN-PROG-25MG",
+      "tekst": "[WYCOFANE 2026-11-14] Poziom kofeiny poniżej 25 mg o porze snu nie zaburza fazy NREM (BRD C4 D-03).",
+      "kategoria": "zdrowie-sen",
+      "poziom_ryzyka": "wysoki",
+      "status": "wycofane",
+      "uzasadnienie": "Źródło przypisane (Drake 2013, PMC3805807, odczyt 2026-11-14) bada wyłącznie 400 mg i nie zawiera progu: grep '25 ?mg|threshold|NREM' → 0. Żadne przeczytane źródło szczebla 1–3 nie podaje progu. Próg, ocena „bezpieczne” i „bezpieczna godzina” usunięte z aplikacji (M1-audytor-generalny-015, DEC-05 a); zostaje neutralny szacunek z zastrzeżeniem.",
+      "zrodlo": null
+    },
+    {
+      "id": "EFSA-SEN-100MG",
+      "tekst": "EFSA: pojedyncza dawka 100 mg kofeiny (ok. 1,4 mg/kg m.c.) może wpływać na długość i przebieg snu u niektórych dorosłych, zwłaszcza spożyta tuż przed snem.",
+      "kategoria": "zdrowie-sen",
+      "poziom_ryzyka": "wysoki",
+      "status": "potwierdzone",
+      "zrodlo": {
+        "tier": 3,
+        "tytul": "EFSA explains risk assessment: Caffeine (2015)",
+        "autor_lub_wydawca": "European Food Safety Authority (EFSA)",
+        "url_lub_isbn": "https://www.efsa.europa.eu/sites/default/files/corporate_publications/files/efsaexplainscaffeine150527.pdf",
+        "cytat_doslowny": "Single doses of 100mg (about 1.4mg/kg bw) of caffeine may affect sleep duration and patterns in some adults, particularly when consumed close to bedtime.",
+        "data_dostepu": "2026-11-14",
+        "uwagi": "Opis EFSA pochodny opinii EFSA Journal 2015;13(5):4102 (szczebel 1, niedostępna: HTTP 403 w dniu odczytu); jedno źródło."
+      },
+      "przeglad": null
     },
     {
       "id": "SCA-GOLDENCUP-EY",

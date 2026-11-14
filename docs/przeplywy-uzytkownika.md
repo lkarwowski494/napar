@@ -317,7 +317,7 @@ Gdy napar wyszedł zbyt kwaśny, gorzki lub wodnisty i szukasz deterministycznej
 ### Przepływ 8: Monitor Kofeiny i Kalkulator Bezpiecznego Snu (`app/(tabs)/caffeine.tsx`)
 
 #### 1. Kiedy używasz
-Gdy chcesz sprawdzić, ile aktywnej kofeiny krąży obecnie w Twoim krwiobiegu (według modelu rozpadu wykładniczego $t_{1/2}$), o której godzinie przypada *Caffeine Curfew* (ostatnia bezpieczna filiżanka przed snem) oraz jaki jest dobowy bilans względem limitu EFSA (400 mg).
+Gdy chcesz sprawdzić, ile aktywnej kofeiny krąży obecnie w Twoim krwiobiegu (według modelu rozpadu wykładniczego $t_{1/2}$), ile kofeiny szacunkowo zostanie w organizmie o porze snu (bez progu i oceny snu, DEC-05 a) oraz jaki jest dobowy bilans względem limitu EFSA (400 mg).
 
 #### 2. Sekwencja kroków (1 → 2 → 3 → 4)
 
@@ -336,7 +336,7 @@ Gdy chcesz sprawdzić, ile aktywnej kofeiny krąży obecnie w Twoim krwiobiegu (
                                      v
 +-------------------------------------------------------------------------+
 | [3. WYNIK / PRZELICZENIE] Krzywa farmakokinetyczna i prognoza na sen    |
-| Wyliczenie aktualnych mg, godziny Curfew i resztkowej kofeiny o 23:00   |
+| Wyliczenie aktualnych mg i szacowanej kofeiny o 23:00 (bez progu)       |
 +------------------------------------+------------------------------------+
                                      |
                                      v

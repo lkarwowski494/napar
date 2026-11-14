@@ -59,7 +59,7 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
 6. **⚡ Monitor Kofeiny, Kalkulator Snu & Apple HealthKit (BR-KOF-001 do BR-KOF-004):**
    - Model jedno-kompartmentowej eliminacji kofeiny w organizmie. [Wdrożone]
    - **Personalizacja Metabolizmu Kofeiny (D-02):** Regulacja indywidualnego czasu półtrwania kofeiny $t_{1/2}$ w zakresie 3.0h – 8.0h (domyślnie 5.0h) z zapisem w SQLite. [Wdrożone]
-   - **Kalkulator Snu i Godzina Odcięcia (Bedtime Curfew — BR-KOF-003):** Prognoza stężenia kofeiny o wybranej godzinie snu (próg bezpieczny dla fazy głębokiej NREM $\le 25\,\text{mg}$) z persystencją godziny snu. [Wdrożone]
+   - **Szacunek kofeiny o porze snu (BR-KOF-003):** Szacowana ilość kofeiny w organizmie o wybranej godzinie snu z persystencją godziny snu, bez progu i oceny „bezpieczne” (M1-audytor-generalny-015, DEC-05 a: źródło nie podaje progu 25 mg). [Wdrożone]
    - **Integracja z Apple HealthKit (BR-KOF-002, Z-096):** Architektura i model danych eksportu spożytej kofeiny (HKQuantityTypeIdentifierDietaryCaffeine) z oknem zgody i trybem offline.
    - Dobowy bilans kofeiny w relacji do normy EFSA (400 mg). [Wdrożone]
 7. **⚙️ Ustawienia, Kopia Zapasowa i Jednostki:**

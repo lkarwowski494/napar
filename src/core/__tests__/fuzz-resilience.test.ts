@@ -3,7 +3,7 @@
 // Chaos injection, corrupted input payloads, boundary mutations & state machine fuzzing
 // ============================================================================
 
-import { calculateBrewRatio, calculateLiquidYield, calculateExtractionYield, calculateRemainingCaffeineMg, calculateHoursUntilSafeCaffeine, calculateCaffeineDecay } from '../domain-rules';
+import { calculateBrewRatio, calculateLiquidYield, calculateExtractionYield, calculateRemainingCaffeineMg, calculateCaffeineDecay } from '../domain-rules';
 import {
   calculateWaterMinerals,
 
@@ -223,14 +223,6 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       }
     }
 
-    // calculateHoursUntilSafeCaffeine
-    for (const mg of extremeMg) {
-      const hours = calculateHoursUntilSafeCaffeine(mg as any);
-      expect(typeof hours).toBe('number');
-      expect(!Number.isNaN(hours)).toBe(true);
-      expect(hours).toBeGreaterThanOrEqual(0);
-      expect(Object.is(hours, -0)).toBe(false);
-    }
   });
 
   test('Chaos 9: Fuzzing kalkulatora kosztów kawy z mutacjami brzegowymi (TASK-P61-12-NIE)', () => {

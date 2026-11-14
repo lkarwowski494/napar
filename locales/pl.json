@@ -471,13 +471,15 @@
     "halfLifeTitle": "Metabolizm kofeiny (t₁/₂)",
     "halfLifeDesc": "Czas półtrwania (3.0h–8.0h). Domyślnie 5.0h (standard EFSA).",
     "bedtimeTitle": "Godzina Pójścia Spać",
-    "bedtimeCurfew": "Limit Spożycia Przed Snem",
-    "safeAtBedtime": "Orientacyjny próg niskiego wpływu na sen (< 25 mg)",
-    "riskAtBedtime": "Uwaga: podwyższony poziom kofeiny przed snem może wydłużać zasypianie wg EFSA",
     "logDoseBtn": "+ Zarejestruj Dawkę",
     "activeCaffeineTitle": "AKTYWNA KOFEINA W KRWIOBIEGU",
     "dailyTotalLabel": "Dobowy bilans: {current} mg / {max} mg (EFSA 2015)",
-    "efsaDisclaimer": "Limit dzienny (EFSA 2015): 400 mg dla zdrowych dorosłych (maks. 200 mg w jednej dawce) · 200 mg w ciąży i podczas laktacji."
+    "efsaDisclaimer": "Limit dzienny (EFSA 2015): 400 mg dla zdrowych dorosłych (maks. 200 mg w jednej dawce) · 200 mg w ciąży i podczas laktacji.",
+    "bedtimeCardTitle": "Kofeina o porze snu",
+    "bedtimeEarlierA11y": "Wcześniejsza godzina snu",
+    "bedtimeLaterA11y": "Późniejsza godzina snu",
+    "bedtimeEstimate": "Szacowana kofeina w organizmie o {hour}:00: {mg} mg",
+    "bedtimeEstimateNote": "To szacunek z modelu eliminacji, nie ocena snu. EFSA: pojedyncza dawka 100 mg może wpływać na długość i przebieg snu u niektórych dorosłych, zwłaszcza wypita tuż przed snem."
   },
   "sensory": {
     "title": "Wykres Sensoryki SCA (Spider Graph)",
@@ -519,7 +521,7 @@
     "caffeineHalfLifeTitle": "Czas Półtrwania Kofeiny (t₁/₂)",
     "caffeineHalfLifeDesc": "Wskaźnik klirensu wątrobowego (3.0h–8.0h, domyślnie 5.0h wg EFSA).",
     "bedtimeHourTitle": "Docelowa Godzina Snu",
-    "bedtimeHourDesc": "Używana do kalkulacji nocnego curfew i progu 25 mg dla fazy NREM.",
+    "bedtimeHourDesc": "Używana do szacunku kofeiny w organizmie o porze snu.",
     "decreaseHalfLife": "Zmniejsz czas półtrwania",
     "increaseHalfLife": "Zwiększ czas półtrwania",
     "earlierBedtime": "Wcześniejsza godzina snu",

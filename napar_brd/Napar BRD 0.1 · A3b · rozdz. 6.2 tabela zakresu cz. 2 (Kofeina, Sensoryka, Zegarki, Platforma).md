@@ -10,7 +10,7 @@ Zakres funkcjonalny Z-091 do Z-180.
 | **Z-092** | KOFEINA | Obliczanie kofeiny w herbacie | Model wieloetapowej ekstrakcji kofeiny w kolejnych zalaniach liści Camellia sinensis. | MUST | MVP |
 | **Z-093** | KOFEINA | Wykres stężenia w organizmie | Wizualizacja krzywej eliminacji kofeiny w czasie ($t_{1/2} = 5.0\,\text{h}$) od momentu spożycia. | MUST | MVP |
 | **Z-094** | KOFEINA | Predykcja stężenia przed snem | Obliczenie szacowanego poziomu kofeiny o zadeklarowanej porze snu użytkownika (np. 23:00). | MUST | MVP |
-| **Z-095** | KOFEINA | Wskaźnik bezpiecznej godziny (Curfew) | Informacja: *„Aby stężenie spadło poniżej 25mg przed snem, ostatnią filiżankę wypij do 16:30”*. | SHOULD | MVP |
+| **Z-095** | KOFEINA | Wskaźnik bezpiecznej godziny (Curfew) | Informacja: *„Aby stężenie spadło poniżej 25mg przed snem, ostatnią filiżankę wypij do 16:30”*. | WYCOFANE 2026-11-14 (DEC-05 a: brak źródła progu 25 mg) | — |
 | **Z-096** | KOFEINA | Zapis do Apple HealthKit | Eksport wartości w gramach/miligramach do parametru `HKQuantityTypeIdentifierDietaryCaffeine`. | MUST | MVP |
 | **Z-097** | KOFEINA | Dzienny bilans kofeiny | Podsumowanie dobowe w relacji do maksymalnej dawki bezpiecznej EFSA (400 mg dla zdrowego dorosłego). | MUST | MVP |
 | **Z-101** | SENSORYKA | Szybka ocena w gwiazdkach | Skala 1–5 gwiazdek dla szybkiego podsumowania filiżanki w 2 sekundy. | MUST | MVP |

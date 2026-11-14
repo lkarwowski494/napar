@@ -17,7 +17,7 @@ Zgodnie z decyzjami architektonicznymi `DEC-01 (a)` oraz `DEC-06 (a)`, wersja 1.
 | **Ceremonia Gongfu Cha** | `BR-PARZ-030..045` | Stoper ceremonii herbaty, pamięć numeru zalania, automatyczne wydłużanie czasu infuzji (+5s/+10s), profile parzenia herbaty. | Pełne poszanowanie kultury herbaty bez tworzenia osobnej aplikacji (obrona przed Apple 4.3a). |
 | **Spiżarnia i Świeżość Ziaren** | `BR-MAG-001..020` | Rejestr paczek ziaren i liści, wskaźnik degassing window (dni od wypału: 0–6 dni przelew, 0–13 dni espresso), odliczanie zużytej wagi. | Zapobiega parzeniu zbyt świeżej kawy po wypale i marnowaniu surowca. |
 | **Dial-in Doctor (Kompas)** | `BR-KALK-001..015` | Deterministyczny doradca mielenia i temperatury na podstawie objawów sensorycznych (kwasowość, gorycz, ściąganie). | Matematyka zamiast halucynujących modeli językowych (zero AI slop, funkcja Pro WTP-1). |
-| **Kofeina i Okno Snu** | `BR-KOF-001..016` | Farmakokinetyka eliminacji ($t_{1/2}=5,	ext{h}$), bezpieczny próg przed snem ($\le 25,	ext{mg}$ / $< 50,	ext{mg}$), 100% lokalny rejestr w SQLite. | Ochrona fazy snu głębokiego NREM u osób pijących kawę po południu. |
+| **Kofeina i Okno Snu** | `BR-KOF-001..016` | Farmakokinetyka eliminacji ($t_{1/2}=5,	ext{h}$), szacunek kofeiny o porze snu bez progu (DEC-05 a), 100% lokalny rejestr w SQLite. | Informacja o szacowanej kofeinie w organizmie wieczorem, bez oceny snu. |
 | **Chemia Wody i Minerały** | `BR-KALK-020..032` | Kalkulator twardości ogólnej (GH) i zasadowości (KH), receptury koncentratów Barista Hustle (Buffer / Hardness). | 98.5% naparu to woda; poprawna mineralizacja decyduje o ekstrakcji kwasów owocowych (Pro WTP-1). |
 | **Wymiana Receptur Offline** | `BR-PARZ-050..055` | Generowanie i skanowanie kodów QR z recepturami parzenia bez użycia Internetu. | Działa w piwnicy, schronisku górskim i kawiarni bez sieci. |
 | **Powiadomienia i Zegar Delta** | `BR-ZEG-006..010` | Niezależny zegar delta Date.now() z nasłuchem AppState oraz powiadomienia o etapach parzenia. | Precyzyjny pomiar czasu parzenia nawet po zminimalizowaniu aplikacji. |
@@ -63,7 +63,7 @@ Każda funkcja posiada jawną trasę, przypisanie do warstwy darmowej (WTP-0) lu
 | **F-14** | Dziennik parzeń i notatki sensoryczne | `app/(tabs)/journal.tsx` | WTP-0 (Darmowy) | 105 | Historia parzeń, ocen i parametrów zawsze czytelna (Read-Only). |
 | **F-15** | Wskaźnik okna odgazowania (Degassing) | `app/(tabs)/beans.tsx` | WTP-0 (Darmowy) | 90 | Chroni przed parzeniem zbyt świeżo wypalonej kawy. |
 | **F-16** | Monitor kofeiny i model eliminacji | `app/(tabs)/caffeine.tsx` | WTP-0 (Darmowy) | 85 | Farmakokinetyka jedno-kompartmentowa z klirensem wątrobowym. |
-| **F-17** | Kalkulator okna snu i wieczornego curfew | `app/(tabs)/caffeine.tsx` | WTP-0 (Darmowy) | 80 | Informuje o optymalnym czasie na ostatnią filiżankę kawy. |
+| **F-17** | Szacunek kofeiny o porze snu | `app/(tabs)/caffeine.tsx` | WTP-0 (Darmowy) | 80 | Pokazuje szacowaną kofeinę w organizmie o porze snu (bez progu i „bezpiecznej godziny”, DEC-05 a). |
 | **F-18** | Szybkie dodawanie naparów z kompendium | `app/(tabs)/caffeine.tsx` | WTP-0 (Darmowy) | 70 | Jedno kliknięcie dodaje V60, espresso lub herbatę. |
 | **F-19** | Sensoryczny kompas Dial-in Doctor | `app/(tabs)/dialin.tsx` | WTP-1 (Pro) | 95 | Deterministyczna diagnoza kwasowości, goryczy i ściągania. |
 | **F-20** | Baza przemiału młynków światowych | `app/(tabs)/dialin.tsx` | WTP-1 (Pro) | 85 | Nastawy klików dla Comandante, 1Zpresso, Wilfa, Timemore. |

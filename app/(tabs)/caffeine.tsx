@@ -1,6 +1,6 @@
 // ============================================================================
 // Napar (Steepwise) — Monitor Kofeiny i Kalkulator Snu (Caffeine & Sleep Curfew)
-// Kinetyka eliminacji (t1/2 = 5.0h), próg bezpiecznego snu i dobowy bilans EFSA
+// Kinetyka eliminacji (t1/2), szacunek kofeiny o porze snu (bez progu, DEC-05 a) i dobowy bilans EFSA
 // ============================================================================
 
 import React, { useState, useEffect } from 'react';
@@ -23,9 +23,7 @@ import {
 import { CaffeineLog } from '../../src/core/database-schema';
 import {
   calculateRemainingCaffeineMg,
-  evaluateBedtimeCaffeine,
-  calculateHoursUntilSafeCaffeine,
-  estimateCoffeeCaffeineMg,
+  estimateBedtimeCaffeineMg,
 } from '../../src/core/domain-rules';
 import { CaffeineCurveChart } from '../../src/core/caffeine-chart';
 import { theme } from '../../src/core/theme';
@@ -126,16 +124,7 @@ export default function CaffeineScreen() {
     };
   });
 
-  const bedtimeEval = evaluateBedtimeCaffeine(intakesForEvaluation, 25.0, halfLifeHours);
-
-  // Curfew (godzina graniczna dla nowej filiżanki 140mg)
-  const standardV60Mg = Math.round(estimateCoffeeCaffeineMg(18, 'arabica', 'filter'));
-  const hoursUntilSafe = calculateHoursUntilSafeCaffeine(standardV60Mg, 25.0, halfLifeHours);
-  const curfewDate = new Date(targetBedtime.getTime() - hoursUntilSafe * 3600 * 1000);
-  const curfewTimeString = `${curfewDate.getHours().toString().padStart(2, '0')}:${curfewDate
-    .getMinutes()
-    .toString()
-    .padStart(2, '0')}`;
+  const bedtimeMg = estimateBedtimeCaffeineMg(intakesForEvaluation, halfLifeHours);
 
   const handleQuickAdd = (name: string, type: 'coffee' | 'tea', doseG: number, mg: number) => {
     const consumedAt = new Date().toISOString();
@@ -199,18 +188,16 @@ export default function CaffeineScreen() {
       <CaffeineCurveChart
         logs={logs}
         bedtimeHour={bedtimeHour}
-        thresholdMg={25.0}
         halfLifeHours={halfLifeHours}
       />
 
-      {/* Kalkulator Godziny Snu (Bedtime Curfew) */}
+      {/* Szacunek kofeiny o porze snu (bez progu i oceny) */}
       <BedtimeCurfewCard
         bedtimeHour={bedtimeHour}
         onBedtimeChange={handleBedtimeChange}
         halfLifeHours={halfLifeHours}
         onHalfLifeChange={handleHalfLifeChange}
-        bedtimeEval={bedtimeEval}
-        curfewTimeString={curfewTimeString}
+        bedtimeMg={bedtimeMg}
       />
 
       {/* Historia dzisiejszych dawek */}

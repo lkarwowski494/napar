@@ -48,8 +48,8 @@ Dedykowany tracker wielokrotnych infuzji dla herbat wulong, puerh, zielonych, bi
 • KALKULATORY BARISTY I CHEMIA WODY
 Precyzyjne narzędzia: dwukierunkowy kalkulator proporcji (Brew Ratio), kalkulator wydajności ekstrakcji TDS / Extraction Yield (EY%) zgodny ze standardem SCA Golden Cup oraz receptury mineralizacji wody Barista Hustle (koncentraty Buffer i Hardness).
 
-• MONITOR KOFEINY I GODZINA SNU (CURFEW)
-Śledź dobowe spożycie kofeiny z uwzględnieniem czasu półtrwania i klirensu wątrobowego. Kalkulator wieczornego curfew podpowiada, kiedy wypić ostatnią filiżankę, by chronić głęboki sen NREM.
+• MONITOR KOFEINY
+Śledź dobowe spożycie kofeiny i szacunek kofeiny w organizmie o porze snu według modelu eliminacji z ustawianym czasem półtrwania. To szacunek informacyjny, nie ocena snu.
 
 • 100% PRYWATNOŚCI I OFFLINE-FIRST
 Zero logowania, zero chmury, zero analityki i trackerów reklamowych. Pełny eksport i import bazy danych w formacie JSON oraz eksport historii parzeń do CSV.
@@ -78,8 +78,8 @@ Keep track of your coffee beans and whole-leaf teas. Monitor roast dates, CO₂ 
 • BARISTA TOOLS & WATER CHEMISTRY
 Professional dial-in calculators: bidirectional Brew Ratio calculator, TDS / Extraction Yield (EY%) calculation following SCA Golden Cup standards, and Barista Hustle water mineralization concentrate mixing (Buffer & Hardness).
 
-• CAFFEINE TRACKER & BEDTIME CURFEW
-Monitor daily caffeine intake modeled with single-compartment elimination kinetics. The Bedtime Curfew calculator suggests your optimal cut-off hour to preserve restorative NREM sleep.
+• CAFFEINE TRACKER
+Track your daily caffeine intake and an estimate of the caffeine in your body at bedtime from an elimination model with an adjustable half-life. It is an informational estimate, not a sleep assessment.
 
 • 100% PRIVATE & OFFLINE-FIRST
 No account creation, no cloud servers, no third-party trackers, and no advertisements. Full local JSON database backup/restore and CSV journal export.

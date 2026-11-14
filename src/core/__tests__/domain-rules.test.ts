@@ -9,8 +9,7 @@ import {
   estimateTotalLeafCaffeineMg,
   estimateTeaInfusionCaffeineMg,
   calculateRemainingCaffeineMg,
-  evaluateBedtimeCaffeine,
-  calculateHoursUntilSafeCaffeine,
+  estimateBedtimeCaffeineMg,
   diagnoseExtractionTaste,
   calculateBatchScaling,
   calculateCaffeineDecay,
@@ -196,29 +195,19 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(calculateCaffeineDecay(100.0, 5.0, -5.0)).toBe(0);
     });
 
-    it('evaluates bedtime safety accurately', () => {
-      // 120mg consumed 10h before bed -> 30mg remaining (above 25mg threshold)
-      const unsafe = evaluateBedtimeCaffeine([{ doseMg: 120, hoursUntilBedtime: 10 }], 25.0);
-      expect(unsafe.isSafeForSleep).toBe(false);
-      expect(unsafe.messageEn).toContain('exceeds the 25 mg threshold');
-
-      // 120mg consumed 15h before bed -> 15mg remaining (safe)
-      const safe = evaluateBedtimeCaffeine([{ doseMg: 120, hoursUntilBedtime: 15 }], 25.0);
-      expect(safe.isSafeForSleep).toBe(true);
-      expect(safe.messageEn).toContain('is within the low sleep disruption threshold');
+    it('estimateBedtimeCaffeineMg sumuje kofeinę o porze snu z modelu eliminacji (bez progu)', () => {
+      // 120 mg 10 h przed snem przy t1/2 = 5 h -> 30 mg
+      expect(estimateBedtimeCaffeineMg([{ doseMg: 120, hoursUntilBedtime: 10 }])).toBe(30.0);
+      // 120 mg 15 h przed snem -> 15 mg
+      expect(estimateBedtimeCaffeineMg([{ doseMg: 120, hoursUntilBedtime: 15 }], 5.0)).toBe(15.0);
 
       // TASK-P12-03-ZAK: Odporność na nullish intakes i elementy z NaN/ujemnymi wartościami
-      const nullEval = evaluateBedtimeCaffeine(null as any);
-      expect(nullEval.isSafeForSleep).toBe(true);
-      expect(nullEval.totalRemainingMg).toBe(0);
-
-      const invalidEval = evaluateBedtimeCaffeine([null as any, { doseMg: 100, hoursUntilBedtime: NaN }] as any);
-      expect(invalidEval.totalRemainingMg).toBe(0);
-    });
-
-    it('calculates hours until safe threshold (100mg to 25mg = exactly 2 half-lives = 10h)', () => {
-      const hours = calculateHoursUntilSafeCaffeine(100.0, 25.0, 5.0);
-      expect(hours).toBe(10.0);
+      expect(estimateBedtimeCaffeineMg(null as any)).toBe(0);
+      expect(estimateBedtimeCaffeineMg([null as any, { doseMg: 100, hoursUntilBedtime: NaN }] as any)).toBe(0);
+      // niepoprawny t1/2 -> domyślne 5 h; t1/2 ograniczony do 24 h
+      expect(estimateBedtimeCaffeineMg([{ doseMg: 100, hoursUntilBedtime: 5 }], NaN)).toBe(50.0);
+      expect(estimateBedtimeCaffeineMg([{ doseMg: 100, hoursUntilBedtime: 24 }], 48)).toBe(50.0);
+      expect(estimateBedtimeCaffeineMg([7 as any])).toBe(0);
     });
 
     it('calculates Gongfu Cha decaying tea caffeine per infusion', () => {
@@ -329,11 +318,6 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(calculateRemainingCaffeineMg(100, 5, 0)).toBe(0);
     });
 
-    it('calculateHoursUntilSafeCaffeine returns 0 when dose is already safe', () => {
-      expect(calculateHoursUntilSafeCaffeine(20, 25)).toBe(0);
-      expect(calculateHoursUntilSafeCaffeine(25, 25)).toBe(0);
-    });
-
     it('diagnoseExtractionTaste handles isTooIntense, isAstringent, and empty input', () => {
       const intense = diagnoseExtractionTaste({ isTooIntense: true });
       expect(intense.length).toBe(1);
@@ -400,9 +384,6 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(estimateTeaInfusionCaffeineMg(100, NaN)).toBe(0);
       expect(calculateRemainingCaffeineMg(NaN, 2)).toBe(0);
       expect(calculateRemainingCaffeineMg(100, NaN)).toBe(0);
-      expect(calculateHoursUntilSafeCaffeine(NaN)).toBe(0);
-      expect(calculateHoursUntilSafeCaffeine(100, NaN)).toBe(0);
-      expect(calculateHoursUntilSafeCaffeine(100, 25, Infinity)).toBe(0);
       expect(() => calculateBatchScaling(NaN, 250, 2)).toThrow();
       expect(() => calculateBatchScaling(15, NaN, 2)).toThrow();
       const scaledWithNanServings = calculateBatchScaling(15, 250, NaN);
@@ -521,15 +502,10 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
     });
   });
 
-  describe('TASK-P30-03-ZAK: evaluateBedtimeCaffeine defensywnie obsluguje puste i uszkodzone intakes oraz stringi', () => {
-    it('zwraca bezpieczny status i 0 mg dla pustej tablicy intakes lub null', () => {
-      const resEmpty = evaluateBedtimeCaffeine([]);
-      expect(resEmpty.totalRemainingMg).toBe(0);
-      expect(resEmpty.isSafeForSleep).toBe(true);
-
-      const resNull = evaluateBedtimeCaffeine(null as any);
-      expect(resNull.totalRemainingMg).toBe(0);
-      expect(resNull.isSafeForSleep).toBe(true);
+  describe('TASK-P30-03-ZAK: estimateBedtimeCaffeineMg defensywnie obsluguje puste i uszkodzone intakes oraz stringi', () => {
+    it('zwraca 0 mg dla pustej tablicy intakes lub null', () => {
+      expect(estimateBedtimeCaffeineMg([])).toBe(0);
+      expect(estimateBedtimeCaffeineMg(null as any)).toBe(0);
     });
 
     it('parsuje stringi dla dawek i godzin oraz chroni przed ujemnymi/NaN', () => {
@@ -538,9 +514,7 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
         { doseMg: -20, hoursUntilBedtime: 2 }, // ignorowane
         { doseMg: NaN, hoursUntilBedtime: 1 }, // ignorowane
       ];
-      const res = evaluateBedtimeCaffeine(intakes, 25.0, 5.0);
-      expect(res.totalRemainingMg).toBe(50.0);
-      expect(res.isSafeForSleep).toBe(false);
+      expect(estimateBedtimeCaffeineMg(intakes, 5.0)).toBe(50.0);
     });
   });
 
@@ -564,19 +538,12 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
     });
   });
 
-  describe('TASK-P32-03-ZAK: calculateRemainingCaffeineMg i calculateHoursUntilSafeCaffeine parsuja stringi i chronia przed -0', () => {
+  describe('TASK-P32-03-ZAK: calculateRemainingCaffeineMg parsuje stringi i chronia przed -0', () => {
     it('calculateRemainingCaffeineMg parsuje numeryczne stringi i chroni przed -0', () => {
       // 100mg po 5h przy half-life 5h = 50.0mg
       expect(calculateRemainingCaffeineMg('100' as any, '5' as any, '5' as any)).toBe(50.0);
       expect(calculateRemainingCaffeineMg(0, 0)).toBe(0);
       expect(Object.is(calculateRemainingCaffeineMg(0, 0), -0)).toBe(false);
-    });
-
-    it('calculateHoursUntilSafeCaffeine parsuje numeryczne stringi i chroni przed -0', () => {
-      // 100mg do progu 25mg przy t1/2 = 5h -> 10.0h
-      expect(calculateHoursUntilSafeCaffeine('100' as any, '25' as any, '5' as any)).toBe(10.0);
-      expect(calculateHoursUntilSafeCaffeine(20, 25)).toBe(0);
-      expect(Object.is(calculateHoursUntilSafeCaffeine(20, 25), -0)).toBe(false);
     });
   });
 
@@ -596,11 +563,9 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(Object.is(estimateTotalLeafCaffeineMg('-0'), -0)).toBe(false);
     });
 
-    it('calculateRemainingCaffeineMg i calculateHoursUntilSafeCaffeine obsluguja jednostki i przecinki', () => {
+    it('calculateRemainingCaffeineMg obsluguje jednostki i przecinki', () => {
       // 100,0 mg po 5,0 h przy t1/2 = 5,0 h -> 50.0 mg
       expect(calculateRemainingCaffeineMg('100,0 mg', '5,0 h', '5,0 h')).toBe(50.0);
-      // 100,0 mg do progu 25,0 mg przy t1/2 = 5,0 h -> 10.0 h
-      expect(calculateHoursUntilSafeCaffeine('100,0 mg', '25,0 mg', '5,0 h')).toBe(10.0);
     });
 
     it('calculateCaffeineDecay parsuje stringi z przecinkami i chroni przed -0', () => {

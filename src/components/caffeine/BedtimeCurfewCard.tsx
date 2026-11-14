@@ -1,24 +1,20 @@
 // ============================================================================
 // Napar (Steepwise) — BedtimeCurfewCard Component
-// Bedtime Curfew & Caffeine Elimination Kinetics (t1/2) Card
+// Szacunek kofeiny o porze snu i czas półtrwania (t1/2) — bez progu i oceny snu (M1-audytor-generalny-015, DEC-05 a)
 // ============================================================================
 
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
-import { estimateCoffeeCaffeineMg } from '../../core/domain-rules';
+import { useTranslation } from '../../core/i18n';
 
 interface BedtimeCurfewCardProps {
   bedtimeHour: number;
   onBedtimeChange: (hour: number) => void;
   halfLifeHours: number;
   onHalfLifeChange: (halfLife: number) => void;
-  bedtimeEval: {
-    totalRemainingMg: number;
-    isSafeForSleep: boolean;
-    messagePl: string;
-  };
-  curfewTimeString: string;
+  /** Szacowana kofeina w organizmie o porze snu (mg) — wynik modelu, bez oceny */
+  bedtimeMg: number;
 }
 
 export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
@@ -26,20 +22,20 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
   onBedtimeChange,
   halfLifeHours,
   onHalfLifeChange,
-  bedtimeEval,
-  curfewTimeString,
+  bedtimeMg,
 }) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.curfewCard}>
       <View style={styles.curfewHeader}>
-        <Text style={styles.curfewTitle}>Predykcja Jakości Snu</Text>
+        <Text style={styles.curfewTitle}>{t.caffeine.bedtimeCardTitle}</Text>
         <View style={styles.bedtimeStepper}>
           <Pressable
             testID="bedtime-dec-btn"
             style={styles.hourBtn}
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel="Wcześniejsza godzina snu"
+            accessibilityLabel={t.caffeine.bedtimeEarlierA11y}
             onPress={() => onBedtimeChange(bedtimeHour - 1)}
           >
             <Text style={styles.hourBtnText}>−</Text>
@@ -50,7 +46,7 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
             style={styles.hourBtn}
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel="Późniejsza godzina snu"
+            accessibilityLabel={t.caffeine.bedtimeLaterA11y}
             onPress={() => onBedtimeChange(bedtimeHour + 1)}
           >
             <Text style={styles.hourBtnText}>+</Text>
@@ -95,29 +91,13 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
         </View>
       </View>
 
-      <View
-        style={[
-          styles.curfewVerdictBadge,
-          bedtimeEval.isSafeForSleep
-            ? styles.curfewVerdictSafe
-            : styles.curfewVerdictDanger,
-        ]}
-      >
-        <Text style={styles.curfewVerdictText}>
-          {bedtimeEval.isSafeForSleep ? '✓ ' : '⚠ '}Poziom kofeiny o {bedtimeHour}:00: {bedtimeEval.totalRemainingMg} mg
+      <View style={styles.estimateBox} testID="bedtime-estimate">
+        <Text style={styles.estimateText}>
+          {t.caffeine.bedtimeEstimate.replace('{hour}', String(bedtimeHour)).replace('{mg}', String(bedtimeMg))}
         </Text>
       </View>
 
-      <Text style={styles.curfewDescription}>
-        {bedtimeEval.messagePl} Próg bezpieczeństwa dla fazy NREM wynosi 25 mg.
-      </Text>
-
-      <View style={styles.curfewAdviceBox}>
-        <Text style={styles.curfewAdviceLabel}>BEZPIECZNA GODZINA (CURFEW)</Text>
-        <Text style={styles.curfewAdviceVal}>
-          Ostatni przelew ({Math.round(estimateCoffeeCaffeineMg(18, 'arabica', 'filter'))} mg) wypij do {curfewTimeString}
-        </Text>
-      </View>
+      <Text style={styles.curfewDescription}>{t.caffeine.bedtimeEstimateNote}</Text>
     </View>
   );
 };
@@ -191,24 +171,17 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     marginTop: 2,
   },
-  curfewVerdictBadge: {
+  estimateBox: {
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 8,
-  },
-  curfewVerdictSafe: {
-    backgroundColor: 'rgba(42, 123, 98, 0.15)',
+    backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
-    borderColor: theme.colors.emerald,
+    borderColor: theme.colors.border,
   },
-  curfewVerdictDanger: {
-    backgroundColor: 'rgba(217, 83, 79, 0.15)',
-    borderWidth: 1,
-    borderColor: theme.colors.danger,
-  },
-  curfewVerdictText: {
+  estimateText: {
     fontSize: 14,
     fontWeight: '700',
     color: theme.colors.textPrimary,
@@ -217,25 +190,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: theme.colors.textSecondary,
     lineHeight: 18,
-    marginBottom: 12,
-  },
-  curfewAdviceBox: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  curfewAdviceLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: theme.colors.textMuted,
-    letterSpacing: 0.5,
-    marginBottom: 4,
-  },
-  curfewAdviceVal: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: theme.colors.copper,
+    marginBottom: 0,
   },
 });

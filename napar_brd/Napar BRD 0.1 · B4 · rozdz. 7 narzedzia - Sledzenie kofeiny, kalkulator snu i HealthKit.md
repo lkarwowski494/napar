@@ -22,6 +22,7 @@
 * **Priorytet:** MUST | **Etap:** MVP
 
 ### **BR-KOF-003: Krzywa eliminacji kofeiny i kalkulator okna snu (Sleep Curfew)**
+> **Errata 2026-11-14 (M1-audytor-generalny-015, DEC-05 a):** kryteria 1–3 wycofane — próg 25 mg, ocena „bezpiecznie dla snu” i godzina graniczna nie mają źródła (Drake 2013 bada 400 mg i nie podaje progu; rejestr `SEN-PROG-25MG`: wycofane). Obowiązuje: szacunek kofeiny w organizmie o porze snu bez progu i oceny, z zastrzeżeniem.
 * **Opis:** Farmakokinetyczny wykres stężenia kofeiny we krwi w czasie z uwzględnieniem czasu półtrwania ($t_{1/2} = 5.0\,\text{h}$).
 * **Kryteria akceptacji:**
   1. Użytkownik definiuje w ustawieniach planowaną godzinę snu (np. 23:00) oraz maksymalny dopuszczalny próg kofeiny (domyślnie 25 mg).

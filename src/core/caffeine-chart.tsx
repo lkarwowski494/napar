@@ -1,6 +1,6 @@
 // ============================================================================
 // Napar (Steepwise) — Wykres Kinetyki Kofeiny (Caffeine Elimination Curve)
-// Model jedno-kompartmentowy (t1/2 = 5.0h) z zaznaczeniem progu snu NREM (25 mg)
+// Model jedno-kompartmentowy z zaznaczeniem pory snu (bez progu snu — M1-audytor-generalny-015, DEC-05 a)
 // ============================================================================
 
 import React from 'react';
@@ -21,14 +21,12 @@ import { theme } from './theme';
 interface CaffeineChartProps {
   logs: CaffeineLog[];
   bedtimeHour: number; // np. 23 (23:00)
-  thresholdMg?: number; // domyślnie 25.0 mg
   halfLifeHours?: number; // domyślnie 5.0h
 }
 
 export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
   logs,
   bedtimeHour,
-  thresholdMg = 25.0,
   halfLifeHours = 5.0,
 }) => {
   const screenWidth = Dimensions.get('window').width;
@@ -107,9 +105,6 @@ export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
   const lastX = getX(startHour + totalHours);
   areaD += ` L ${lastX.toFixed(1)} ${paddingTop + innerHeight} Z`;
 
-  // Położenie linii progu snu (25 mg)
-  const thresholdY = getY(thresholdMg);
-
   // Położenie linii godziny snu (bedtime)
   let bedtimeOffset = bedtimeHour;
   if (bedtimeOffset < startHour) {
@@ -141,26 +136,6 @@ export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
           stroke={theme.colors.border}
           strokeWidth="1"
         />
-
-        {/* Linia progu snu 25 mg */}
-        <Line
-          x1={paddingLeft}
-          y1={thresholdY}
-          x2={paddingLeft + innerWidth}
-          y2={thresholdY}
-          stroke={theme.colors.danger}
-          strokeDasharray="4 4"
-          strokeWidth="1.2"
-        />
-        <SvgText
-          x={paddingLeft + 4}
-          y={thresholdY - 4}
-          fill={theme.colors.danger}
-          fontSize="9"
-          fontWeight="600"
-        >
-          Próg NREM (25 mg)
-        </SvgText>
 
         {/* Pionowa linia pory snu */}
         {bedtimeX <= paddingLeft + innerWidth && (

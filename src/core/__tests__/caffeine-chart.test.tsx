@@ -26,7 +26,6 @@ describe('CaffeineCurveChart Component', () => {
         <CaffeineCurveChart
           logs={mockLogs}
           bedtimeHour={23}
-          thresholdMg={25.0}
         />
       );
     });
@@ -36,7 +35,7 @@ describe('CaffeineCurveChart Component', () => {
 
     const str = JSON.stringify(json);
     expect(str).toContain('Krzywa Stężenia Kofeiny');
-    expect(str).toContain('Próg NREM (25 mg)');
+    expect(str).not.toMatch(/NREM|25 mg/); // próg snu usunięty (M1-audytor-generalny-015, DEC-05 a)
     expect(str).toContain('Sen (23:00)');
   });
 
@@ -47,7 +46,6 @@ describe('CaffeineCurveChart Component', () => {
         <CaffeineCurveChart
           logs={[]}
           bedtimeHour={22}
-          thresholdMg={25.0}
         />
       );
     });

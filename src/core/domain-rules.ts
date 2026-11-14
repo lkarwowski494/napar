@@ -18,14 +18,6 @@ export interface RestingWindowResult {
   badgeColor: 'amber' | 'green' | 'blue' | 'gray';
 }
 
-export interface BedtimeCaffeineEvaluation {
-  totalRemainingMg: number;
-  safeThresholdMg: number;
-  isSafeForSleep: boolean;
-  messagePl: string;
-  messageEn?: string;
-}
-
 export interface TasteDiagnosis {
   issue: string;
   issueEn?: string;
@@ -333,78 +325,30 @@ export function calculateRemainingCaffeineMg(
 }
 
 /**
- * RD-20: Obliczenie stężenia kofeiny przed snem [T:DRAKE-SLEEP-2013]
+ * RD-20: Szacunek kofeiny w organizmie o porze snu — suma modelu eliminacji (RD-17) dla dawek z dnia.
+ * Bez progu i bez oceny snu: źródło przypisane progowi 25 mg (Drake 2013) go nie podaje
+ * (M1-audytor-generalny-015, DEC-05 a; rejestr SEN-PROG-25MG: wycofane).
  */
-export function evaluateBedtimeCaffeine(
+export function estimateBedtimeCaffeineMg(
   intakes: Array<{ doseMg: number; hoursUntilBedtime: number }>,
-  safeThresholdMg = 25.0,
   halfLifeHours = 5.0
-): BedtimeCaffeineEvaluation {
-  const safeIntakes = Array.isArray(intakes) ? intakes.filter(Boolean) : [];
-  const safeThreshold = Number.isFinite(safeThresholdMg) && safeThresholdMg >= 0 ? Math.min(1000, safeThresholdMg) : 25.0;
-  const safeHalfLife = Number.isFinite(halfLifeHours) && halfLifeHours > 0 ? Math.min(24, halfLifeHours) : 5.0;
+): number {
+  const validIntakes = Array.isArray(intakes) ? intakes.filter(Boolean) : [];
+  const halfLife = Number.isFinite(halfLifeHours) && halfLifeHours > 0 ? Math.min(24, halfLifeHours) : 5.0;
 
   let totalRemaining = 0;
-
-  for (const intake of safeIntakes) {
+  for (const intake of validIntakes) {
     if (intake && typeof intake === 'object') {
       const parsedHours = parseNumeric(intake.hoursUntilBedtime);
       const parsedDose = parseNumeric(intake.doseMg);
       if (!isNaN(parsedHours) && parsedHours >= 0 && !isNaN(parsedDose) && parsedDose > 0) {
-        totalRemaining += calculateRemainingCaffeineMg(parsedDose, parsedHours, safeHalfLife);
+        totalRemaining += calculateRemainingCaffeineMg(parsedDose, parsedHours, halfLife);
       }
     }
   }
 
-  totalRemaining = Number(totalRemaining.toFixed(1));
-  if (Object.is(totalRemaining, -0) || totalRemaining < 0) totalRemaining = 0;
-  const isSafeForSleep = totalRemaining <= safeThreshold;
-
-  let messagePl: string;
-  let messageEn: string;
-  if (isSafeForSleep) {
-    messagePl = `Szacowany poziom kofeiny o porze snu (${totalRemaining} mg) mieści się w orientacyjnym progu niskiego wpływu na sen.`;
-    messageEn = `Estimated bedtime caffeine level (${totalRemaining} mg) is within the low sleep disruption threshold.`;
-  } else {
-    messagePl = `Poziom kofeiny (${totalRemaining} mg) przekracza próg ${safeThreshold} mg — ryzyko spłycenia snu.`;
-    messageEn = `Bedtime caffeine level (${totalRemaining} mg) exceeds the ${safeThreshold} mg threshold — risk of light sleep.`;
-  }
-
-  return {
-    totalRemainingMg: totalRemaining,
-    safeThresholdMg: safeThreshold,
-    isSafeForSleep,
-    messagePl,
-    messageEn,
-  };
-}
-
-/**
- * RD-21: Oblicza minimalną liczbę godzin przed snem, po której można wypić daną dawkę
- */
-export function calculateHoursUntilSafeCaffeine(
-  doseMg: number | string,
-  safeThresholdMg: number | string = 25.0,
-  halfLifeHours: number | string = 5.0
-): number {
-  const parsedDose = parseNumeric(doseMg);
-  const parsedThreshold = parseNumeric(safeThresholdMg);
-  const parsedHalfLife = parseNumeric(halfLifeHours);
-
-  if (
-    isNaN(parsedDose) ||
-    isNaN(parsedThreshold) ||
-    isNaN(parsedHalfLife) ||
-    parsedDose <= parsedThreshold ||
-    parsedThreshold <= 0 ||
-    parsedHalfLife <= 0
-  ) {
-    return 0;
-  }
-  const hours = parsedHalfLife * (Math.log(parsedDose / parsedThreshold) / Math.log(2));
-  let result = Number(hours.toFixed(1));
-  if (Object.is(result, -0) || result <= 0) result = 0;
-  return result;
+  const result = Number(totalRemaining.toFixed(1));
+  return Object.is(result, -0) || result < 0 ? 0 : result;
 }
 
 export interface TasteDiagnosis {

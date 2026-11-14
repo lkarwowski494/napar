@@ -471,13 +471,15 @@
     "halfLifeTitle": "Caffeine Metabolism (t₁/₂)",
     "halfLifeDesc": "Half-life (3.0h–8.0h). Default 5.0h (EFSA standard).",
     "bedtimeTitle": "Target Bedtime",
-    "bedtimeCurfew": "Bedtime Sleep Curfew",
-    "safeAtBedtime": "Safe level for restorative NREM sleep (< 25 mg)",
-    "riskAtBedtime": "Notice: Elevated caffeine close to bedtime may increase sleep latency per EFSA",
     "logDoseBtn": "+ Log Caffeine Dose",
     "activeCaffeineTitle": "ACTIVE CAFFEINE IN BLOODSTREAM",
     "dailyTotalLabel": "Daily total: {current} mg / {max} mg (EFSA 2015)",
-    "efsaDisclaimer": "Daily limit (EFSA 2015): 400 mg for healthy adults (max 200 mg single dose) · 200 mg during pregnancy & lactation."
+    "efsaDisclaimer": "Daily limit (EFSA 2015): 400 mg for healthy adults (max 200 mg single dose) · 200 mg during pregnancy & lactation.",
+    "bedtimeCardTitle": "Caffeine at bedtime",
+    "bedtimeEarlierA11y": "Earlier bedtime",
+    "bedtimeLaterA11y": "Later bedtime",
+    "bedtimeEstimate": "Estimated caffeine in your body at {hour}:00: {mg} mg",
+    "bedtimeEstimateNote": "This is an estimate from an elimination model, not a sleep assessment. EFSA: a single 100 mg dose may affect sleep duration and patterns in some adults, particularly when consumed close to bedtime."
   },
   "sensory": {
     "title": "SCA Sensory Spider Graph",
@@ -519,7 +521,7 @@
     "caffeineHalfLifeTitle": "Caffeine Half-Life (t₁/₂)",
     "caffeineHalfLifeDesc": "Hepatic clearance indicator (3.0h–8.0h, default 5.0h per EFSA).",
     "bedtimeHourTitle": "Target Bedtime",
-    "bedtimeHourDesc": "Used for bedtime curfew calculations and the 25 mg NREM sleep threshold.",
+    "bedtimeHourDesc": "Used to estimate caffeine in your body at bedtime.",
     "decreaseHalfLife": "Decrease half-life",
     "increaseHalfLife": "Increase half-life",
     "earlierBedtime": "Earlier bedtime",

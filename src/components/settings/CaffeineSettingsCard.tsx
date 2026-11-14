@@ -76,7 +76,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               {t.settings.bedtimeHourTitle || 'Docelowa Godzina Snu'}
             </Text>
             <Text style={styles.actionSubtitle}>
-              {t.settings.bedtimeHourDesc || 'Używana do kalkulacji nocnego curfew i progu 25 mg dla fazy NREM.'}
+              {t.settings.bedtimeHourDesc || 'Używana do szacunku kofeiny w organizmie o porze snu.'}
             </Text>
           </View>
           <View
