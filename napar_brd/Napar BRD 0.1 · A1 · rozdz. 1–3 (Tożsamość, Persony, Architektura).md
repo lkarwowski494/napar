@@ -25,7 +25,7 @@ Każde wymaganie funkcjonalne i techniczne w całym projekcie musi być w 100% z
 | **ZP-05** | **Determinizm zamiast generatywnego AI.** | Porady baristyczne i sensoryczne wynikają ze zweryfikowanych reguł chemii i fizyki płynów, a nie z halucynacji LLM. |
 | **ZP-06** | **Dane użytkownika nigdy nie giną.** | Magazyn ziaren, notatki degustacyjne i historia parzeń są automatycznie zabezpieczane w prywatnym iCloud Drive użytkownika. |
 | **ZP-07** | **Kopia zapasowa i eksport zawsze bezpłatne.** | Eksport do otwartego formatu JSON/CSV jest dostępny dla każdego, bez konieczności płacenia subskrypcji (zgodność z Apple 4.10). |
-| **ZP-08** | **Uczciwy i przejrzysty model cenowy.** | Brak ukrytych płatności. Darmowy rdzeń pozwala parzyć bezterminowo. Wersja Pro w cenie „tańszej niż espresso” (0,99 € mies. / 14,99 € raz na zawsze). |
+| **ZP-08** | **Uczciwy i przejrzysty model cenowy.** | Brak ukrytych płatności. Wersja 1.0 całkowicie darmowa (DEC-41, 2026-11-13); dawne ceny Pro to hipoteza H-MON-01 (A2 5.1). |
 | **ZP-09** | **Szacunek dla kultury specialty i autorów.** | Nazwy metod, palarni i receptury mistrzów są prezentowane z należytym uznaniem autorstwa, bez zawłaszczania cudzej twórczości. |
 | **ZP-10** | **Prywatność „Data Not Collected”.** | Zero zewnętrznych bibliotek analitycznych (Firebase, Meta, Adjust). Jedyna telemetria to natywne narzędzia Apple Store Connect opt-in. |
 | **ZP-11** | **Dostępność jest fundamentem, nie dodatkiem.** | Pełna obsługa VoiceOver, Dynamic Type (skalowanie czcionek dla seniorów), wysoki kontrast i haptyka dla osób niedowidzących. |

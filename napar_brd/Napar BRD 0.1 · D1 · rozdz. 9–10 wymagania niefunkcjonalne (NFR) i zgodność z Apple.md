@@ -27,7 +27,7 @@
 
 | Wytyczna | Wymóg Apple | Realizacja w Naparze | Ryzyko |
 | :--- | :--- | :--- | :--- |
-| **3.1.2(a)** | Wartość ciągła przy subskrypcjach | Regularne aktualizacje profili ziaren, sezonowe receptury, zaawansowane narzędzia analizy snu i kofeiny. Dostępny zakup jednorazowy Lifetime. | Niskie |
+| **3.1.2(a)** | Wartość ciągła przy subskrypcjach (nie dotyczy 1.0: brak subskrypcji, DEC-41) | Regularne aktualizacje profili ziaren, sezonowe receptury, zaawansowane narzędzia analizy snu i kofeiny. Dostępny zakup jednorazowy Lifetime. | Niskie |
 | **4.3(a)** | Zakaz tworzenia klonów i spamu | Połączenie Kawy i Herbaty w jedną unikalną aplikację Napar; brak dublowania aplikacji w sklepie. | Bardzo niskie |
 | **4.3(b)** | Wymóg bogatej funkcjonalności | Aplikacja nie jest prostym minutnikiem: zawiera Dial-in Doctora, koło smaków SCA, model farmakokinetyczny kofeiny, Live Activity i watchOS. | Niskie |
 | **5.1.1** | Ochrona danych i prywatność | Pełne działanie lokalne; brak wymogu podawania e-maila, brak rejestracji konta; status „Data Not Collected”. | Zerowe |

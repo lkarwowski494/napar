@@ -36,7 +36,7 @@ Zakres funkcjonalny Z-091 do Z-180.
 | **Z-151** | DANE | Kopia zapasowa w iCloud Drive | Automatyczny eksport i synchronizacja pliku bazy w prywatnym folderze użytkownika. | MUST | MVP |
 | **Z-152** | DANE | Eksport danych do JSON / CSV | Pełny, bezpłatny eksport całej historii parzeń i magazynu w otwartym formacie. | MUST | MVP |
 | **Z-160** | MONET | StoreKit 2 (Subskrypcja + Lifetime) | Natywna obsługa zakupów wewnątrz aplikacji Apple StoreKit 2. | MUST | MVP |
-| **Z-161** | MONET | Family Sharing | Obsługa współdzielenia zakupionej subskrypcji lub zakupu dożywotniego w rodzinie. | MUST | MVP |
+| **Z-161** | MONET | Family Sharing | Obsługa współdzielenia zakupionej subskrypcji lub zakupu dożywotniego w rodzinie. Poza 1.0 (DEC-41, ER-01 w 00c). | MUST | MVP |
 | **Z-170** | DOST | Pełne wsparcie VoiceOver | Semantyczne etykiety dla każdego elementu interfejsu i odczyt głosowy timera. | MUST | MVP |
 | **Z-171** | DOST | Dynamic Type | Prawidłowe skalowanie wszystkich tekstów do największych rozmiarów dostępności. | MUST | MVP |
 | **Z-180** | I18N | Lokalizacja w 35 językach | Tłumaczenie interfejsu i jednostek na 35 rynków App Store. | MUST | MVP |

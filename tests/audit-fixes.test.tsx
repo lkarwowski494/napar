@@ -650,4 +650,17 @@ describe('M1-audytor-generalny-009: wersja darmowa bez zakupów (DEC-01 a)', () 
     expect(hits(/\bcanCreate\b|onRequirePaywall|showPaywall|ShowPaywall|isHistoryReadOnly|recordBrew\b/)).toEqual([]);
   });
 
+  test('02-monetyzacja-005 / 01-odkrywanie-010: dokumenty projektu nie obiecują okresu próbnego, cen ani Pro', () => {
+    const docs = ['README.md', 'docs/MONETIZATION_AND_KITCHEN_UX.md', 'docs/project-rules.md', 'docs/to-be.md', 'docs/przeplywy-uzytkownika.md'];
+    expect(
+      hits(/Free Trial|okres(ie)? próbn|\$0\.99|\$4\.99|\$14\.99|9,99 zł|59,99 zł|129,99 zł|Apps4BrewPassModal|restorePurchases|app-access\.ts|NaparStoreKit/i, docs),
+    ).toEqual([]);
+  });
+
+  test('10-wydanie-005 / 10-wydanie-002: opis sklepu i strony bez zakupów, gdy paywalla nie ma w buildzie', () => {
+    const files = ['docs/15-app-store.md', 'site/terms.html', 'site/support.html', 'site/index.html', 'site/privacy.html'].filter((f) =>
+      existsSync(join(root, f)),
+    );
+    expect(hits(/Apps4Brew Pass|Napar Pro|subskrypc|subscription|Przywróć Zakupy|Restore Purchases|okres próbny|free trial/i, files)).toEqual([]);
+  });
 });

@@ -20,13 +20,16 @@
 | **Tea Time / Steeped** | iOS | Różne | Prymitywne minutniki kuchenne, brak pamięci wielokrotnych zalań Gongfu Cha, brak integracji kofeinowej. |
 
 ### **4.3 Luka rynkowa Naparu**
-Napar celuje w unikalną niszę: **eleganckie, natywne narzędzie o zerowym tarciu (brak konta), łączące parzenie przelewowe kawy, ceremonialne parzenie herbaty, deterministyczną pomoc w mieleniu (Dial-in Doctor) oraz monitoring kofeiny w cenie dostępnej dla każdego (0,99 € / 14,99 €).**
+Napar celuje w unikalną niszę: **eleganckie, natywne narzędzie o zerowym tarciu (brak konta), łączące parzenie przelewowe kawy, ceremonialne parzenie herbaty, deterministyczną pomoc w mieleniu (Dial-in Doctor) oraz monitoring kofeiny — w wersji 1.0 za darmo (DEC-41).**
 
 ---
 
 ## **5. Model przychodu i ekonomia jednostkowa**
 
-### **5.1 Siatka cenowa (Zasada Apps4Brew: „Tańsze niż espresso”)**
+### **5.0 Model wersji 1.0 (DEC-41, 2026-11-13)**
+Wersja 1.0 jest całkowicie darmowa: bez zakupów w aplikacji, okresu próbnego, bramek i ekranu zakupu (ER-01 w 00c). Sekcje 5.1–5.2 niżej to hipoteza H-MON-01 z wersji BRD 0.1, zachowana jako historia; nie są decyzją i nie obowiązują w 1.0. Ceny wybiera się z progów App Store i potwierdza danymi rynku (rola 02), zanim powstanie model płatny.
+
+### **5.1 H-MON-01 (hipoteza, nie decyzja): dawna siatka cenowa („Tańsze niż espresso”)**
 
 | Plan | Cena EUR (Strefa Euro) | Cena PLN (Polska) | Cena USD (USA) | Mechanizm i charakterystyka |
 | :--- | :--- | :--- | :--- | :--- |
@@ -35,7 +38,7 @@ Napar celuje w unikalną niszę: **eleganckie, natywne narzędzie o zerowym tarc
 | **Pro Roczny** | **4,99 €** | **19,99 zł** | **4.99 $** | Rekomendowany wybór; rabat ~58% w stosunku do planu miesięcznego; 14 dni darmowego okresu próbnego. |
 | **Pro Dożywotni** | **14,99 €** | **59,99 zł** | **14.99 $** | Zakup jednorazowy (Non-consuming IAP); pełna wersja na zawsze + Family Sharing. |
 
-### **5.2 Ekonomia jednostkowa i próg rentowności (Break-even point)**
+### **5.2 H-MON-01 (hipoteza): ekonomia jednostkowa i próg rentowności (Break-even point)**
 * **Koszt krańcowy per użytkownik:** **0,00 USD** (brak API w chmurze, brak serwerów).
 * **Roczny koszt stały:** 99,00 USD (opłata Apple Developer Program).
 * **Przychód netto dewelopera z 1 subskrypcji rocznej (19,99 zł):**

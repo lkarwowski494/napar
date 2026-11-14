@@ -30,6 +30,13 @@ Identyfikacja potencjalnych kolizji pojęciowych, ryzyk interpretacyjnych wytycz
 
 ---
 
+### **ER-01 (2026-11-13): Model przychodu BRD 0.1 zastąpiony wersją darmową (DEC-41)**
+* **Kolizja:** BRD 0.1 ustalał subskrypcję, zakup dożywotni, 14-dniowy okres próbny, Family Sharing i ceny (A2 5.1, 00 START, DEC-11, DEC-12, BR-ZAK-001, Z-161) bez słów właściciela i daty; kod miał zakup-atrapę bez StoreKit.
+* **Rozstrzygnięcie:** DEC-41 (a): wersja 1.0 całkowicie darmowa. Ceny i okres próbny z BRD 0.1 to hipoteza H-MON-01 (A2 5.1), nie decyzja. BR-ZAK-001, Z-161, KPI konwersji (A4), RYZ-06 i wiersz 3.1.2(a) (D1) nie dotyczą 1.0. SPRZ-01 („w ramach jednego zakupu”, „uzasadnia subskrypcję”) czytać bez zakupu.
+* **Powrót:** model płatny wymaga nowej decyzji właściciela z opcjami roli 02, prawdziwego StoreKit (transakcje sklepu jako źródło dostępu) i ADR biblioteki z rolą 05.
+
+---
+
 ### **SPRZ-05: Pomiary TDS i refraktometria**
 * **Kolizja:** Wskaźnik Extraction Yield (EY %) wymaga znajomości TDS (Total Dissolved Solids), który mierzy się drogim refraktometrem optycznym (np. VST, DiFluid), którego 95% użytkowników domowych nie posiada.
 * **Rozstrzygnięcie:** Pole TDS w dzienniku jest **opcjonalne**. Jeśli użytkownik nie posiada refraktometru, aplikacja szacuje optymalną ekstrakcję na podstawie dozy, czasu spływu, stopnia zmielenia i oceny sensorycznej w module Dial-in Doctor.

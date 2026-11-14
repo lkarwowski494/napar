@@ -11,8 +11,8 @@ Zgodnie z Zasadą Produktu ZP-10 („Data Not Collected”) aplikacja nie zawier
 | **Współczynnik konwersji strony produktu** | App Store Connect Analytics | **> 4.5%** | Odsetek użytkowników odwiedzających kartę aplikacji, którzy decydują się na pobranie. |
 | **Retencja D1 (Dzień 1)** | App Store Connect Opt-in | **> 45%** | Świadczy o natychmiastowej użyteczności i braku barier wejścia (brak rejestracji konta). |
 | **Retencja D30 (Dzień 30)** | App Store Connect Opt-in | **> 20%** | Potwierdzenie, że Napar stał się codziennym rytuałem użytkownika. |
-| **Konwersja z okresu próbnego (Trial -> Paid)** | App Store Connect Subscriptions | **> 12%** | Odsetek osób, które po 14 dniach decydują się na płatną subskrypcję roczną lub zakup Lifetime. |
-| **Udział zakupu dożywotniego (Lifetime Share)** | App Store Connect Sales | **25–35%** | Zdrowy udział użytkowników preferujących jednorazową opłatę zamiast subskrypcji. |
+| **Konwersja z okresu próbnego (Trial -> Paid)** (nie dotyczy 1.0: DEC-41) | App Store Connect Subscriptions | **> 12%** | Odsetek osób, które po 14 dniach decydują się na płatną subskrypcję roczną lub zakup Lifetime. |
+| **Udział zakupu dożywotniego (Lifetime Share)** (nie dotyczy 1.0: DEC-41) | App Store Connect Sales | **25–35%** | Zdrowy udział użytkowników preferujących jednorazową opłatę zamiast subskrypcji. |
 | **Wskaźnik bezawaryjności (Crash-free rate)** | Xcode Organizer Crashlytics | **> 99.8%** | Gwarancja bezwzględnej stabilności timera i bazy danych. |
 | **Średnia ocena w sklepie** | App Store Reviews | **> 4.7★** | Dowód wysokiego zadowolenia ze spokoju i jakości aplikacji. |
 

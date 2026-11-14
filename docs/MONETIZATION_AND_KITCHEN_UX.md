@@ -1,38 +1,22 @@
-# Napar (Steepwise) — Kitchen-Proof UX & Model Monetyzacji „Cheaper than Espresso”
+# Napar (Steepwise) — Kitchen-Proof UX i model wersji 1.0
 
 ## 1. Wstęp i Cel Architektoniczny
 Aplikacja **Napar (Steepwise)** została zaprojektowana i zoptymalizowana pod kątem standardów **Apps4Brew Studio**:
 - Oceny 4.9★ w App Store i Google Play.
 - 100% Offline-First (wbudowana baza SQLite w bezpiecznym katalogu `/Library/SQLite`, zero trackerów telemetrycznych).
 - Ergonomia kuchenna („Kitchen-Proof” & „Dirty Thumb” controls $\ge 48\text{–}56\,\text{pt}$).
-- Model biznesowy „Taniej niż espresso” ($0.99 / $4.99 / $14.99) z bezwzględną gwarancją darmowej historii Read-Only.
+- Wersja 1.0 całkowicie darmowa (sekcja 2).
 
 ---
 
-## 2. Model Monetyzacji „Cheaper than Espresso”
+## 2. Model wersji 1.0: całkowicie darmowa (2026-11-13)
 
-### Zasada Braku Sztucznego Podziału na Free i Pro
-- W aplikacji **nie ma** sztucznie zablokowanych funkcji rzemieślniczych ani etykietek „tylko w PRO”.
-- W okresie próbnym (**Free Trial: 7 dni lub 3 pełne parzenia**) użytkownik ma dostęp do **100% możliwości aplikacji**:
-  - Wszystkie nastawy młynków (Comandante, Timemore, 1Zpresso, Fellow Ode, Baratza, Wilfa, Kinu, Mazzer, Mahlkönig).
-  - Pełna chemia i remineralizacja wody (Barista Hustle 80/40, SCA Standard, Melbourne Soft, Rao Wonder Water, Hendrick Hendon).
-  - Wymiana receptur przez kody QR i deep linki `napar://`.
-  - Dial-in Doctor (1-tap autodiagnoza i korekta mielenia/temperatury).
-  - Zaawansowany wykres sensoryki SCA (Spider Graph) i hierarchiczne koło smaków.
-  - Monitor kinetyki kofeiny z kalkulatorem półtrwania ($t_{1/2}$) i progiem snu NREM.
+Decyzja DEC-01 audytu M1 (wybór a, właściciel 2026-11-13: „Wszystko według rekomendacji”): wersja 1.0 jest całkowicie darmowa. Jedyne źródło tej zasady w kodzie to brak modułu dostępu; trwałą kontrolę trzyma `tests/audit-fixes.test.tsx` (blok „M1-audytor-generalny-009”).
 
-### Polityka Cenowa
-- **$0.99 USD / miesiąc** (~4,49 zł) — mikro-subskrypcja na start.
-- **$4.99 USD / rok** (~22,99 zł) — **główna rekomendowana oferta** (mniej niż 2 zł na miesiąc!).
-- **$14.99 USD Lifetime** (~69,99 zł) — zakup jednorazowy raz na zawsze, z obsługą chmury rodzinnej (Family Sharing).
-
-### Zasada Żelaznej Ochrony Ocen 4.9★: Historia Zawsze Read-Only
-- Po zakończeniu okresu próbnego i braku aktywnej subskrypcji aplikacja **odcina wyłącznie funkcje tworzenia i aktywnego działania**:
-  - Rozpoczęcie nowej sesji parzenia (`[ ROZPOCZNIJ PARZENIE ]` natychmiast wyświetla modal `Apps4BrewPassModal`).
-  - Tworzenie nowych receptur autorskich.
-- **Dziennik Parzeń i Notatki Degustacyjne pozostają ZAWSZE w 100% bezpłatne i czytelne (Read-Only):**
-  - Użytkownik nigdy nie traci dostępu do swoich archiwalnych parzeń, ocen, parametrów mielenia i ulubionych profili smakowych.
-  - Eliminuje to negatywne recenzje („twórcy zabrali moje notatki po trialu”).
+- Brak zakupów w aplikacji, ekranu planów, okresu próbnego, licznika parzeń i bramek: każda funkcja (parzenie, Gongfu, spiżarnia, kofeina, kreator i import receptur, Dial-in Doctor, chemia wody, dziennik, eksport) działa bez ograniczeń.
+- Dane użytkownika nigdy nie są płatne: odczyt, eksport i kopia zapasowa zawsze dostępne.
+- Aplikacja jest kanałem sprzedaży portfela Apps4Brew (kierunek właściciela 2026-11-11).
+- Model płatny po 1.0 (subskrypcja, zakup jednorazowy albo napiwek) wymaga nowej decyzji właściciela z opcjami roli 02, prawdziwego StoreKit (transakcje sklepu jako źródło dostępu, przywracanie ze sklepu) i ADR biblioteki z rolą 05. Dawne ceny z BRD 0.1 to hipoteza H-MON-01, nie decyzja.
 
 ---
 
@@ -71,8 +55,7 @@ Główny ekran parzenia (`app/(tabs)/index.tsx`) został zdekomponowany na wyspe
 - **Pokrycie testowe:** $\ge 97\%$ we wszystkich modułach (44 zestawy testowe, 379 testów jednostkowych i integracyjnych — 100% pass).
 - **i18n:** Pełna symetria 362 kluczy w językach PL i EN (`npm run check:i18n`).
 - **TypeScript:** 100% czystości typu w trybie ścisłym (`npm run typecheck`).
-- **Anty-exploit:** `restorePurchases()` weryfikuje faktyczny dowód zakupu w bazie SQLite (`has_verified_purchase`), uniemożliwiając darmowe rozdawnictwo licencji Lifetime.
 - **Unit Converter:** Globalna integracja przeliczników metrycznych i imperialnych (`formatDoseWeight`, `formatWaterWeight`, `formatTemperature`) w UI (Spiżarnia, Stoper, Karty Parzenia, Receptury, Ustawienia, Gongfu Cha, Monitor Kofeiny i Dial-in Doctor).
-- **Gongfu Cha & Timer Audio:** Prawdziwy dzwonek kuchenny WAV (`playTimerChime`) zintegrowany ze stoperem Gongfu Cha (ostrzeżenie przed końcem i zakończenie ekstrakcji), zabezpieczenie trialu `canCreate` oraz automatyczny backup całego stanu aplikacji po zakończeniu sesji (`autoBackup`).
+- **Gongfu Cha & Timer Audio:** Prawdziwy dzwonek kuchenny WAV (`playTimerChime`) zintegrowany ze stoperem Gongfu Cha (ostrzeżenie przed końcem i zakończenie ekstrakcji) oraz automatyczny backup całego stanu aplikacji po zakończeniu sesji (`autoBackup`).
 
 

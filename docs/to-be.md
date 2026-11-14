@@ -17,7 +17,7 @@ W architekturze pierwotnej (As-Is) główny ekran warsztatowy `app/(tabs)/index.
 6. `ShareRecipeModal`
 7. `ImportRecipeModal`
 8. `QrScannerModal`
-9. `Apps4BrewPassModal`
+9. ekran zakupu (usunięty 13.11.2026: wersja 1.0 darmowa)
 10. `OnboardingModal`
 
 ### Skutki w Środowisku Rzeczywistym (Kitchen / Barista Environment):
@@ -81,8 +81,7 @@ Poniższa tabela przedstawia formalne wyliczenie redukcji liczby kliknięć, cza
 
 ### Modale Dozwolone (Strict Whitelist):
 W aplikacji pozostają wyłącznie modale o charakterze asynchronicznym lub systemowym, niemające wpływu na krytyczny cykl parzenia:
-1. `Apps4BrewPassModal`: Transakcje StoreKit IAP (wymóg platformowy Apple).
-2. `QrScannerModal`: Wykorzystanie kamery systemowej do skanowania kodu receptury.
-3. `OnboardingModal`: Jednorazowe powitanie przy pierwszym uruchomieniu aplikacji.
+1. `QrScannerModal`: Wykorzystanie kamery systemowej do skanowania kodu receptury.
+2. `OnboardingModal`: Jednorazowe powitanie przy pierwszym uruchomieniu aplikacji.
 
 Wszystkie pozostałe procesy operacyjne zostały zintegrowane bezpośrednio w strukturę widoku jako karty P16.

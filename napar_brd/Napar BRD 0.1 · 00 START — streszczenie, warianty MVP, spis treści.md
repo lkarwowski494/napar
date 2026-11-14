@@ -34,7 +34,7 @@
 ### **Co to jest Napar**
 **Napar** to kieszonkowy asystent i dziennik dla miłośników kawy specialty oraz herbaty rzemieślniczej. Łączy precyzyjny, wieloetapowy stoper parzenia (drip V60, Chemex, Aeropress, French Press, espresso, Gongfu Cha) z cyfrowym magazynem ziaren/liści, notatnikiem sensorycznym (koło smaków SCA), deterministycznym doradcą mielenia i ekstrakcji (**Dial-in Doctor**) oraz zaawansowanym monitorem kofeiny sprzężonym z Apple Health i kalkulatorem wpływu na sen.
 
-Aplikacja działa **całkowicie offline, bez rejestracji konta, bez serwerów zewnętrznych i bez reklam**, w 35 językach, z pełnym wsparciem dla Apple Watch, Live Activity i Dynamic Island. Zgodnie z etosem Apps4Brew kosztuje **mniej niż jedno espresso miesięcznie** (0,99 €) albo dostępna jest w jednorazowym zakupie dożywotnim (14,99 €).
+Aplikacja działa **całkowicie offline, bez rejestracji konta, bez serwerów zewnętrznych i bez reklam**, w 35 językach, z pełnym wsparciem dla Apple Watch, Live Activity i Dynamic Island. Wersja 1.0 jest całkowicie darmowa (DEC-41, 2026-11-13); dawne ceny to hipoteza H-MON-01 (A2 5.1).
 
 ### **Dla kogo (Persony główne)**
 * **Michał (30 lat, programista):** codziennie rano parzy kawę w dripperze V60 lub Aeropressie; potrzebuje dokładnego stopera z sygnalizacją kolejnych zalań na Apple Watch (nie chce brać mokrymi rękami telefonu do ręki) oraz możliwości zapisania profilu mielenia pod konkretną paczkę ziaren.
@@ -51,10 +51,8 @@ Aplikacja działa **całkowicie offline, bez rejestracji konta, bez serwerów ze
 6. **Etyka prywatności „Data Not Collected”:** Wszystkie notatki, rejestr ziaren, parametry zdrowotne kofeiny i historia parzeń pozostają wyłącznie na urządzeniu użytkownika i w jego prywatnym iCloud Drive.
 
 ### **Model przychodu (Półka Apps4Brew)**
-* **Subskrypcja:** 0,99 € miesięcznie / 4,99 € rocznie (w Polsce: 3,99 zł miesięcznie / 19,99 zł rocznie).
-* **Zakup dożywotni (Lifetime):** 14,99 € jednorazowo (w Polsce: 59,99 zł).
-* **Darmowy rdzeń (Free Core):** Pełny stoper parzenia, 3 receptury bazowe (V60, Aeropress, Gongfu Cha), podręczny kalkulator ratio oraz rejestr do 3 paczek ziaren.
-* **14-dniowy okres próbny (Trial):** Dostęp do pełnej wersji Pro (Dial-in Doctor, nielimitowany magazyn, zaawansowane koło smaków, śledzenie kofeiny i okna snu, synchronizacja Apple Watch).
+* **Wersja 1.0 całkowicie darmowa (DEC-41, 2026-11-13):** bez zakupów w aplikacji, okresu próbnego, bramek i ekranu zakupu; wszystkie funkcje dostępne. Aplikacja jest kanałem sprzedaży portfela Apps4Brew (słowa właściciela 2026-11-11 w DEC-41).
+* **Dawna siatka cen i okres próbny:** hipoteza **H-MON-01** (A2, 5.1), nie decyzja; model płatny po 1.0 wymaga nowej decyzji z prawdziwym StoreKit (ER-01 w 00c).
 * **Koszt krańcowy:** 0,00 USD / użytkownika miesięcznie (brak zewnętrznych serwerów, brak chmurowych API).
 
 ### **Liczby dokumentu**
@@ -87,4 +85,4 @@ Aplikacja działa **całkowicie offline, bez rejestracji konta, bez serwerów ze
    - iPhone z iOS 18+ (testy Live Activity i Dynamic Island).
    - Apple Watch z watchOS 11+ (weryfikacja działania w tle i haptyki timera).
    - Czajnik i dripper do weryfikacji manualnej w realnych warunkach kuchennych.
-4. **Zgoda na model cenowy Apps4Brew:** Akceptacja siatki cen 0,99 € / 4,99 € / 14,99 € (w Polsce 3,99 zł / 19,99 zł / 59,99 zł).
+4. **Model cenowy Apps4Brew:** wersja 1.0 darmowa (DEC-41, 2026-11-13); dawna siatka cen to hipoteza H-MON-01 (A2, 5.1).

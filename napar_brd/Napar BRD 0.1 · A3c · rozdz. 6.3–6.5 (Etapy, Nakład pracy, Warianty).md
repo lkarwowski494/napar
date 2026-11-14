@@ -41,7 +41,7 @@ Jednostka: 1 dzień pracy agenta (pełne opracowanie, testy jednostkowe, snapsho
 | **Kofeina & Apple HealthKit** | Farmakokinetyka $t_{1/2}$, okno snu, zapis do HealthKit, autoryzacja uprawnień | 2.5 dni |
 | **Dial-in Doctor & Sensoryka** | Deterministyczny kompas ekstrakcji, ocena balansu smaku, szybki dziennik | 2.0 dni |
 | **Kalkulatory (Ratio, TDS, Woda)** | Matematyka ekstrakcji, mineralizacja wody | 1.5 dni |
-| **Monetyzacja & Dostępność** | StoreKit 2, trial 14 dni, Family Sharing, VoiceOver, Dynamic Type, 35 języków | 3.5 dni |
+| **Monetyzacja & Dostępność** | VoiceOver, Dynamic Type, 35 języków (StoreKit 2, okres próbny i Family Sharing poza 1.0: DEC-41, ER-01 w 00c) | 3.5 dni |
 | **Razem (Nakład sumaryczny):** | — | **25.0 dni pracy agenta** |
 
 *Przy 2 równoległych strumieniach prac kalendarzowy czas wdrożenia wynosi **ok. 2.5–3 tygodnie**.*

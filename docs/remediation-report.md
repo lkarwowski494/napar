@@ -56,6 +56,7 @@ Wszystkie operacje przeprowadzono bez naruszenia ciągłości logicznej domeny s
   - *Działanie:* Zlikwidowano fikcyjny paywall, który odblokowywał wersję Pro po kliknięciu „Kup”. Zintegrowano procedurę `purchaseWithStoreKit` weryfikującą identyfikatory produktów z pliku `NaparStoreKit.storekit` (`pl.lukasz.napar.pass.monthly`, `pl.lukasz.napar.pass.annual`, `pl.lukasz.napar.pass.lifetime`).
   - *Weryfikacja:* Test transakcyjny potwierdzający wymóg poprawnej symulacji paragonu IAP przed aktywacją subskrypcji.
   - *Commit:* `d923ed4`
+  - **Korekta 13.11.2026 (M1-audytor-generalny-009):** deklaracja nieprawdziwa — `purchaseWithStoreKit` nadawał Pro bez StoreKit (paragon `mock-storekit-tx`). Zakup, okres próbny i bramki usunięte (wersja 1.0 darmowa, DEC-01 a); trwała kontrola w `tests/audit-fixes.test.tsx`.
 - **TASK-R03-02 (Harmonizacja Parametrów Trialu z Deklaracją BRD):**
   - *Plik:* `src/core/app-access.ts:11-12`
   - *Działanie:* Zwiększono limit darmowych parzeń `TRIAL_MAX_BREWS` z 3 do 15 parzeń oraz utrzymano okres 14 dni, eliminując rozbieżność z dokumentacją biznesową (`napar_brd/00 START.md`).

@@ -11,7 +11,7 @@
 | **RYZ-03** | Sprzęt | Błędy łączności z wagami Bluetooth | Wysokie | Średni | Przesunięcie wag Bluetooth do wersji 1.2; pełna użyteczność manualna w wersji MVP. |
 | **RYZ-04** | Zegarek | Usypianie timera w watchOS w trakcie parzenia | Średnie | Krytyczny | Implementacja `WKExtendedRuntimeSession` gwarantująca ciągłość działania w tle do 30 minut. |
 | **RYZ-05** | Dane | Utrata historii parzeń przy aktualizacji aplikacji | Niskie | Krytyczny | Automatyczny backup bazy SQLite do pliku przed każdą migracją; rygorystyczne testy migracji schematu. |
-| **RYZ-06** | Biznes | Niska konwersja do subskrypcji przy cenie 0,99 € | Średnie | Średni | Oferowanie planu rocznego 4,99 € z 14-dniowym trialem oraz zakupu dożywotniego 14,99 € dla przeciwników subskrypcji. |
+| **RYZ-06** | Biznes | Niska konwersja do subskrypcji przy cenach z hipotezy H-MON-01 (nie dotyczy 1.0: DEC-41) | Średnie | Średni | Przy powrocie do modelu płatnego: ceny z progów App Store i danych rynku (rola 02), plan roczny i zakup dożywotni jako opcje decyzji. |
 | **RYZ-07** | UI/UX | Nieczytelność stopera w pełnym słońcu / parze | Średnie | Niski | Ekran parzenia o bardzo wysokim kontraście (czyste tło, gruba typografia San Francisco Pro). |
 | **RYZ-08** | Treść | Błędne przeliczniki klików młynków | Średnie | Średni | Podawanie nastaw jako orientacyjnych zakresów rekomendowanych; weryfikacja przez badacza. |
 | **RYZ-09…40**| Szczegółowe | Obejmują m.in. dryf zegara systemowego przy zmianie stref czasowych (DST), limity pamięci dla Live Activity, wsparcie dla VoiceOver w językach RTL (arabski, hebrajski), poprawność walut w StoreKit. | Szczegółowo opisane w dokumentacji | Pełna mitygacja w testach automatycznych. |

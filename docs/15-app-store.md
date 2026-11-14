@@ -107,7 +107,7 @@ Nominative Fair Use Notice: All product and company names, brewer types, and gri
 
 ## 4. Digital Services Act (DSA Trader Status dla UE)
 
-Zgodnie z rozporządzeniem Parlamentu Europejskiego i Rady (UE) 2022/2065 (Digital Services Act, art. 30) dla aplikacji oferujących opcjonalne zakupy cyfrowe (Apps4Brew Pass) na terenie Unii Europejskiej:
+Deklaracja statusu przedsiębiorcy (trader) zgodnie z rozporządzeniem (UE) 2022/2065 (Digital Services Act, art. 30). Wersja 1.0 jest bezpłatna i nie oferuje zakupów w aplikacji; czy status trader jest wymagany dla darmowej aplikacji, rozstrzyga rola 10 z właścicielem [DO USTALENIA]:
 
 * **Status podmiotu w App Store Connect:** Trader (Przedsiębiorca)
 * **Nazwa podmiotu prawnego:** Apps4Brew Studio

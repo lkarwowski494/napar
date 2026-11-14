@@ -44,7 +44,8 @@ Właściciel: Łukasz
 
 ## 3. Rejestr kluczowych decyzji (Dziennik Decyzji)
 
-- **16.10.2026** — *Model biznesowy:* Apps4Brew Pass ($0.99/msc, $4.99/rok z 14-dniowym darmowym trialem, $14.99 lifetime). Gwarancja nielimitowanego i bezpłatnego dostępu Read-Only do historii parzeń i notatek po wygaśnięciu okresu próbnego.
+- **16.10.2026** — *Model biznesowy:* subskrypcja i zakup dożywotni z okresem próbnym (bez słów właściciela; zakup w kodzie był atrapą bez StoreKit). Zastąpione wpisem z 13.11.2026.
+- **13.11.2026** — *Model wersji 1.0:* całkowicie darmowa, bez zakupów w aplikacji, okresu próbnego, bramek i ekranu zakupu (DEC-01 audytu M1, wybór a; właściciel: „Wszystko według rekomendacji”). Odrzucone: prawdziwy StoreKit w 1.0. Powód: kierunek właściciela z 11.11.2026 („może udostępnimy za darmo i zrobimy z tego kanał sprzedaży”) i ryzyko 3.1.1. Zależy od: model płatny po 1.0 wymaga nowej decyzji i StoreKit.
 - **16.10.2026** — *Wydanie TestFlight:* Zbudowano i wdrożono build `v1.0.0-b1006` przez GitHub Actions (`#38963552448`).
 - **16.10.2026** — *Design System rodziny:* Wydzielono standard frontendu `@apps4craft/ui` do niezależnego repozytorium `https://github.com/lkarwowski494/apps4craft-ui`.
 - **17.10.2026** — *Eliminacja emotikonów i safe-area:* Pełny purge emotikonów z klawiatury we wszystkich ekranach i komponentach; wdrożenie wektorów SVG (`CraftIcons.tsx`); dynamiczne marginesy tab baru eliminujące ucinanie na iPhone'ach z Home Indicator.

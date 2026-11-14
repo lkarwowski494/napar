@@ -25,7 +25,7 @@
   2. Przywrócenie danych z pliku JSON na nowym urządzeniu trwa poniżej 1 sekundy.
 * **Priorytet:** MUST | **Etap:** MVP
 
-### **BR-ZAK-001: Integracja ze StoreKit 2 i Family Sharing**
+### **BR-ZAK-001: Integracja ze StoreKit 2 i Family Sharing** (poza 1.0: DEC-41, ER-01 w 00c)
 * **Opis:** Obsługa zakupów subskrypcyjnych (miesiąc/rok) oraz zakupu dożywotniego za pośrednictwem natywnego API Apple StoreKit 2.
 * **Kryteria akceptacji:**
   1. Obsługa 14-dniowego darmowego okresu próbnego dla planu rocznego.

@@ -67,12 +67,9 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - **📢 Dostępność i Sygnały (VoiceOver & Haptyka — BR-DOST-001, DEC-13):** Konfiguracja komunikatów głosowych czytnika ekranu oraz sygnałów wibracyjnych z natychmiastowym zapisem w SQLite. [Wdrożone]
    - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite. [Wdrożone]
    - Eksport i import bazy w formacie JSON oraz eksport do arkuszy CSV (Dziennik i Spiżarnia). [Wdrożone]
-   - **💎 Model Monetyzacji „Taniej niż espresso” (Apps4Brew Pass):**
-     - **Cennik:** $0.99 USD / mies., $4.99 USD / rok (oferta z trialem), $14.99 USD Lifetime (jednorazowo z Chmurą rodzinną).
-     - **Zero podziału Free/Pro:** Podstawowy stoper parzenia, kalkulator ratio, asystent kroków oraz odczyt/eksport historii parzeń są bezterminowo darmowe (WTP-0). W 14-dniowym okresie próbnym użytkownik testuje 100% funkcji Napar Pro (WTP-1: >3 paczki w spiżarni, receptury custom, chemia wody, Dial-in Doctor).
-     - **Gwarancja Historii Read-Only (Ochrona 4.9★):** Po wygaśnięciu trialu stoper i parzenie pozostają w 100% darmowe, a blokowane są jedynie zaawansowane narzędzia Pro, a cała historia, Dziennik i notatki pozostają ZAWSZE bezpłatne i czytelne w 100% offline. [Wdrożone]
+   - **Model wersji 1.0: całkowicie darmowa (DEC-01 audytu M1, wybór a, 2026-11-13).** Bez zakupów w aplikacji, okresu próbnego, bramek i ekranu zakupu; wszystkie funkcje dostępne. Model płatny po 1.0 wymaga nowej decyzji i prawdziwego StoreKit. [Wdrożone]
 8. **⌚ Ekosystem Apple (Plany na wydanie v1.2 — DEC-01):**
-   - Natywny mostek ActivityKit (Live Activity na ekranie blokady i Dynamic Island), StoreKit IAP oraz aplikacja Apple Watch zaplanowane są na wydanie natywne w Xcode (v1.2).
+   - Natywny mostek ActivityKit (Live Activity na ekranie blokady i Dynamic Island) oraz aplikacja Apple Watch zaplanowane są na wydanie natywne w Xcode (v1.2).
 
 ---
 
@@ -154,7 +151,6 @@ napar/
 │       └── caffeine.tsx        # Monitor Kofeiny, Wykres Kinetyki i Kalkulator Snu
 ├── src/
 │   ├── components/
-│   │   ├── Apps4BrewPassModal.tsx # Paywall "Cheaper than Espresso" ($0.99 / $4.99 / $14.99)
 │   │   └── brew/               # Zdekomponowane moduły Kitchen-Proof:
 │   │       ├── BrewHeader.tsx           # Kliki młynka na samej górze, wybór receptury i ziarna
 │   │       ├── BrewQuickPrepCard.tsx    # Karta 1-Tap "Do drippera na wagę", steppery 44-52pt
@@ -162,7 +158,6 @@ napar/
 │   │       ├── BrewProAccordion.tsx     # Akordeon rzemieślniczy: woda, TDS, radar sensoryczny
 │   │       └── BrewFinishModal.tsx      # Arkusz degustacyjny, Dial-in Doctor i ekonomia
 │   └── core/                   # Czysta logika biznesowa i persystencja
-│       ├── app-access.ts       # Silnik dostępu Apps4Brew Pass, trial 100% i Read-Only history
 │       ├── domain-rules.ts     # Deterministyczne reguły RD-01…RD-30
 │       ├── recipes-data.ts     # 24 wzorcowe receptury specialty i herbaty
 │       ├── knowledge-data.ts   # Kompendium wiedzy o odmianach, obróbkach, terroir i herbatach
@@ -190,7 +185,6 @@ napar/
 │       ├── confirm.ts          # Zabezpieczenia sesji parzenia przed przerwaniem
 │       ├── theme.ts            # Tokeny stylistyczne (Apps4Brew artisanal)
 │       └── __tests__/          # 44 zestawy testowe (379 testów, 100% pass, >97% pokrycia)
-├── NaparStoreKit.storekit      # Konfiguracja Xcode StoreKit Testing ($0.99 / $4.99 / $14.99)
 ├── scripts/
 │   ├── check-i18n.mjs          # Bramka CI weryfikująca 100% symetrii PL/EN
 │   └── ci/                     # Skrypty automatyzacji budowania i wysyłki TestFlight

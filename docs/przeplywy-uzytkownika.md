@@ -33,7 +33,7 @@ Przy pierwszym uruchomieniu aplikacji po instalacji (gdy flaga `welcome_complete
                                      |
                                      v
 +-------------------------------------------------------------------------+
-| [3. WYNIK / PRZELICZENIE] Prezentacja zasad domeny i modelu Pass        |
+| [3. WYNIK / PRZELICZENIE] Prezentacja zasad domeny                      |
 | Dostosowanie domyślnego profilu (np. V60 vs Gaiwan) i limitu 50 parzeń  |
 +------------------------------------+------------------------------------+
                                      |
@@ -51,7 +51,7 @@ Przy pierwszym uruchomieniu aplikacji po instalacji (gdy flaga `welcome_complete
 
 #### 3. Wskazanie tarć poznawczych (Friction Points)
 - **Brak powrotu do przewodnika po zamknięciu:** Po jednorazowym zamknięciu modala powitalnego użytkownik nie ma w nagłówku aplikacji przycisku `[🧭 Jak działa aplikacja?]`, który przypominałby strukturę ekranów i Złote Zasady ekstrakcji.
-- **Zbyt długi tekst w modalu startowym:** Połączenie wyboru preferencji z opisem modelu subskrypcyjnego i manifestem prywatności na jednym ekranie wydłuża czas do pierwszego parzenia (*Time-to-First-Brew*).
+- **Zbyt długi tekst w modalu startowym:** Połączenie wyboru preferencji z manifestem prywatności na jednym ekranie wydłuża czas do pierwszego parzenia (*Time-to-First-Brew*).
 
 ---
 
@@ -356,10 +356,10 @@ Gdy chcesz sprawdzić, ile aktywnej kofeiny krąży obecnie w Twoim krwiobiegu (
 
 ---
 
-### Przepływ 9: Ustawienia, Kopia Zapasowa i Apps4Brew Pass (`app/settings.tsx`)
+### Przepływ 9: Ustawienia i Kopia Zapasowa (`app/settings.tsx`)
 
 #### 1. Kiedy używasz
-Gdy chcesz zmienić język (PL/EN), system jednostek (metryczny/imperialny), domyślny młynek, wyeksportować lub zaimportować pełną kopię zapasową JSON/CSV albo zarządzać dostępem Apps4Brew Pass.
+Gdy chcesz zmienić język (PL/EN), system jednostek (metryczny/imperialny), domyślny młynek, wyeksportować lub zaimportować pełną kopię zapasową JSON/CSV (wersja 1.0 jest darmowa, bez zakupów).
 
 #### 2. Sekwencja kroków (1 → 2 → 3 → 4)
 
@@ -384,7 +384,7 @@ Gdy chcesz zmienić język (PL/EN), system jednostek (metryczny/imperialny), dom
                                      v
 +-------------------------------------------------------------------------+
 | [4. EGZEKUCJA / ZAPIS] Zapis w SQLite i odświeżenie kontekstów UI       |
-| Natychmiastowa aktualizacja jednostek, języka i statusu subskrypcji     |
+| Natychmiastowa aktualizacja jednostek i języka                          |
 +-------------------------------------------------------------------------+
 ```
 

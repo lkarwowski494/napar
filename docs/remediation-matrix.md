@@ -35,6 +35,8 @@
 | **TASK-R10-02** | Rola 10 (Architekt Testów) | WYKONANIE | **P2** | `stryker.config.json` | Rozszerzyć zakres testów mutacyjnych Stryker o pliki `database.ts`, `app-access.ts` i `backup.ts`. | Raport mutacyjny obejmujący kluczowe serwisy domenowe. | 🟢 **ROZWIĄZANE** (`cf1009f`) |
 | **TASK-R11-01** | Rola 11 (Forensic QA) | WYKONANIE | **P1** | `tests/airplane-mode.test.ts` | Oprogramować zautomatyzowany test sprawdzający działanie wszystkich funkcji w całkowitej izolacji od sieci (`fetch = undefined`). | Test trybu samolotowego przechodzący exit code 0. | 🟢 **ROZWIĄZANE** (`cf1009f`) |
 
+>**TASK-R03-01 — korekta 13.11.2026 (M1-audytor-generalny-009):** deklaracja nieprawdziwa — `purchaseWithStoreKit` nadawał Pro bez StoreKit (paragon `mock-storekit-tx`). Zakup, okres próbny i bramki usunięte (wersja 1.0 darmowa, DEC-01 a); trwała kontrola w `tests/audit-fixes.test.tsx`.
+
 ---
 
 ## 2. Podsumowanie Wdrożenia Sztafety Naprawczej
