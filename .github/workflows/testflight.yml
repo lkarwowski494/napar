@@ -21,7 +21,7 @@ env:
   APP_SCHEME: 'Napar'
   APP_DIR: 'Napar'
   BUNDLE_ID: 'pl.lukasz.napar'
-  BUILD_BASE: '1000'
+  # Baza numeru buildu: jedno źródło w app.json (expo.ios.buildNumber) — M1-audytor-generalny-014.
 
 jobs:
   build:
@@ -87,6 +87,7 @@ jobs:
             echo "::error::Nieprawidłowy format wersji w app.json: '$VERSION' (wymagane X.Y lub X.Y.Z)"
             exit 1
           fi
+          BUILD_BASE=$(node -p "require('./app.json').expo.ios.buildNumber")
           BUILD_NUMBER=$((BUILD_BASE + GITHUB_RUN_NUMBER))
           if ! [[ "$BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
             echo "::error::Nieprawidłowy numer buildu: '$BUILD_NUMBER'"

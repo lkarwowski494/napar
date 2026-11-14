@@ -11,7 +11,7 @@
 | :--- | :--- | :--- |
 | **Aplikacja** | Napar (Steepwise) | Rodzina Apps4Craft (`trening` + `organizer`) |
 | **Wersja w `app.json`** | `1.0.0` | SemVer |
-| **Bazowy numer buildu** | `10` | Zgodny z `testflight.yml` (`BUILD_BASE + GITHUB_RUN_NUMBER`) |
+| **Bazowy numer buildu** | `app.json` → `expo.ios.buildNumber` (= `android.versionCode`) | `testflight.yml` czyta bazę z `app.json`: numer = baza + `GITHUB_RUN_NUMBER`; tag `vX.Y.Z-bNNNN` |
 | **Bundle Identifier** | `pl.lukasz.napar` | iOS App Store |
 | **Architektura danych** | SQLite + Podwójna pula kopii | 10 kopii automatycznych ($P_{\text{auto}}$) + 10 ratunkowych ($P_{\text{safe}}$) |
 | **Klucze i18n** | stan: `npm run check:i18n` | symetria PL / EN (`scripts/check-i18n.mjs`) |

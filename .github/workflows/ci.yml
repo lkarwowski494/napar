@@ -54,3 +54,28 @@ jobs:
 
       - name: Budżety czasu CPU (raport, nie bramka)
         run: npm run test:perf
+
+  secrets:
+    # M1-audytor-generalny-014: skan sekretów (gitleaks) w przypiętej wersji; brak binarki = błąd skryptu.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Instalacja gitleaks (przypięta wersja)
+        env:
+          GITLEAKS_VERSION: '8.21.2'
+        run: |
+          mkdir -p "$HOME/bin"
+          curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar xz -C "$HOME/bin" gitleaks
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Skan sekretów w zakresie zmian
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then BASE_SHA="$(git rev-list --max-parents=0 HEAD | tail -1)"; fi
+          bash .github/scripts/gitleaks-range.sh "$BASE_SHA" "$GITHUB_SHA"

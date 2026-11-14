@@ -15,7 +15,7 @@
     "ios": {
       "bundleIdentifier": "pl.lukasz.napar",
       "appleTeamId": "8NQ9GHY8GF",
-      "buildNumber": "1",
+      "buildNumber": "1000",
       "supportsTablet": false,
       "requireFullScreen": true,
       "privacyManifests": {
@@ -98,7 +98,7 @@
     },
     "android": {
       "package": "pl.lukasz.napar",
-      "versionCode": 1,
+      "versionCode": 1000,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#121214"

@@ -42,9 +42,10 @@ describe('System Contracts: Metadata, Versioning & Security', () => {
     expect(appJson.expo.orientation).toBe('portrait');
     expect(appJson.expo.userInterfaceStyle).toBe('dark');
     expect(appJson.expo.ios.bundleIdentifier).toBe('pl.lukasz.napar');
-    expect(appJson.expo.ios.buildNumber).toBe('1');
+    // M1-audytor-generalny-014: baza numeru buildu (jedno źródło dla TestFlight: BASE + GITHUB_RUN_NUMBER).
+    expect(appJson.expo.ios.buildNumber).toBe('1000');
     expect(appJson.expo.android.package).toBe('pl.lukasz.napar');
-    expect(appJson.expo.android.versionCode).toBe(1);
+    expect(appJson.expo.android.versionCode).toBe(1000);
 
     // Uprawnienia iOS Info.plist (brak naruszeń App Store Guideline 2.5.4 i 5.1.1)
     const infoPlist = appJson.expo.ios.infoPlist;

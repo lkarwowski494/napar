@@ -9,5 +9,7 @@ echo "[gitleaks] Scanning range $BASE_SHA..$HEAD_SHA (with -m flag for merge com
 if command -v gitleaks &> /dev/null; then
   gitleaks detect --source . --log-opts="-m --first-parent ${BASE_SHA}..${HEAD_SHA}" -v --config .gitleaks.toml
 else
-  echo "[gitleaks] gitleaks binary not present in runner path; skipped local scan."
+  # M1-audytor-generalny-014: brak binarki to błąd — kontrola, którą da się pominąć, nie jest kontrolą (zasada 21).
+  echo "[gitleaks] BŁĄD: brak gitleaks w PATH; zainstaluj przypiętą wersję (ci.yml, zadanie secrets)." >&2
+  exit 1
 fi
