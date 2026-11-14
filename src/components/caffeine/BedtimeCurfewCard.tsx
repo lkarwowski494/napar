@@ -57,14 +57,8 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
       {/* Metabolizm Kofeiny (t1/2) D-02 */}
       <View style={styles.metabolismRow}>
         <View style={{ flex: 1, paddingRight: 8 }}>
-          <Text style={styles.metabolismTitle}>Metabolizm kofeiny (t₁/₂)</Text>
-          <Text style={styles.metabolismSubtitle}>
-            {halfLifeHours <= 3.5
-              ? 'Szybki metabolizm (orientacyjnie)'
-              : halfLifeHours >= 6.5
-              ? 'Wolny metabolizm (orientacyjnie)'
-              : 'Standardowy metabolizm (EFSA)'}
-          </Text>
+          <Text style={styles.metabolismTitle}>{t.caffeine.halfLifeTitle}</Text>
+          <Text style={styles.metabolismSubtitle}>{t.caffeine.halfLifeNote}</Text>
         </View>
         <View style={styles.bedtimeStepper}>
           <Pressable
@@ -72,7 +66,7 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
             style={styles.hourBtn}
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel="Krótszy czas półtrwania kofeiny"
+            accessibilityLabel={t.settings.decreaseHalfLife}
             onPress={() => onHalfLifeChange(halfLifeHours - 0.5)}
           >
             <Text style={styles.hourBtnText}>−</Text>
@@ -83,7 +77,7 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
             style={styles.hourBtn}
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel="Dłuższy czas półtrwania kofeiny"
+            accessibilityLabel={t.settings.increaseHalfLife}
             onPress={() => onHalfLifeChange(halfLifeHours + 0.5)}
           >
             <Text style={styles.hourBtnText}>+</Text>

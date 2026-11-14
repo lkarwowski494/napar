@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
+import { CAFFEINE_HALF_LIFE_MIN_H, CAFFEINE_HALF_LIFE_MAX_H } from '../../core/domain-rules';
 
 export interface CaffeineSettingsCardProps {
   halfLifeHours: number;
@@ -33,7 +34,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               {t.settings.caffeineHalfLifeTitle || 'Czas Półtrwania Kofeiny (t₁/₂)'}
             </Text>
             <Text style={styles.actionSubtitle}>
-              {t.settings.caffeineHalfLifeDesc || 'Wskaźnik klirensu wątrobowego (3.0h–8.0h, domyślnie 5.0h wg EFSA).'}
+              {t.settings.caffeineHalfLifeDesc || 'Czas półtrwania kofeiny: 2.0–8.0 h (zakres u zdrowych dorosłych wg EFSA). Wartość domyślna aplikacji: 5.0 h.'}
             </Text>
           </View>
           <View
@@ -41,7 +42,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
             style={styles.stepperContainer}
             accessibilityRole="adjustable"
             accessibilityLabel={t.settings.caffeineHalfLifeTitle || 'Czas Półtrwania Kofeiny'}
-            accessibilityValue={{ min: 3.0, max: 8.0, now: halfLifeHours, text: `${halfLifeHours.toFixed(1)} h` }}
+            accessibilityValue={{ min: CAFFEINE_HALF_LIFE_MIN_H, max: CAFFEINE_HALF_LIFE_MAX_H, now: halfLifeHours, text: `${halfLifeHours.toFixed(1)} h` }}
             accessibilityHint={t.settings.caffeineHalfLifeDesc || 'Dostosuj czas półtrwania kofeiny'}
           >
             <Pressable

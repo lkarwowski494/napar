@@ -23,6 +23,7 @@
 ## **2. Rejestr decyzji badacza dziedzinowego (D-01…D-15)**
 
 * **D-01 (Kofeina w Arabice):** Przyjęto wartość uśrednioną 1.2% zawartości kofeiny w suchej masie ziaren gatunku Coffea Arabica (zakres 0.9–1.5% w zależności od terroir i odmiany) [T:ASTILL-TEA-2001].
+  * **[DO USTALENIA 2026-11-14, M1-audytor-generalny-017]** `[T:ASTILL-TEA-2001]` to praca o herbacie, nie o kawie; rejestr `KAWA-KOFEINA-MG-G` (otwarte): Olechno i in. 2021 (PMC8228209) podaje kofeinę w zielonym ziarnie 0,9–1,2% (arabika) i 1,6–2,4% (robusta); brak źródła dla kawy palonej.
 * **D-02 (Czas półtrwania kofeiny):** Przyjęto sztywną wartość domyślną $t_{1/2} = 5.0\,\text{h}$ z możliwością ręcznej regulacji w zakresie 3.0–8.0h w ustawieniach zaawansowanych profilu użytkownika [T:EFSA-CAFF-2015] [T:NEHLIG-CYP1A2-2018].
 * **D-03 (Bezpieczny próg snu):** Przyjęto poziom kofeiny w organizmie poniżej 25 mg jako wartość niezaburzającą fazy głębokiej NREM u przeciętnego dorosłego człowieka [T:DRAKE-SLEEP-2013].
   * **[WYCOFANE 2026-11-14, M1-audytor-generalny-015]** Pełny tekst Drake i in. 2013 (PMC3805807, odczyt 2026-11-14) bada 400 mg podane 0, 3 i 6 h przed snem i nie zawiera progu 25 mg ani słowa „threshold”; próg usunięty z aplikacji (DEC-05 a). Rejestr: `SEN-PROG-25MG` (wycofane).

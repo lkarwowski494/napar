@@ -44,6 +44,7 @@ import {
   revokeHealthKitPermissions,
 } from '../src/core/healthkit';
 import { theme } from '../src/core/theme';
+import { clampCaffeineHalfLifeHours } from '../src/core/domain-rules';
 import { useTranslation } from '../src/core/i18n';
 import { safetyBackup } from '../src/core/backup';
 import { JsonExportModal, JsonImportModal } from '../src/components/settings/JsonBackupModals';
@@ -111,7 +112,7 @@ export default function SettingsScreen() {
   };
 
   const handleHalfLifeChange = (newHours: number) => {
-    const clamped = Number(Math.max(3.0, Math.min(8.0, newHours)).toFixed(1));
+    const clamped = clampCaffeineHalfLifeHours(newHours);
     setHalfLifeHoursState(clamped);
     setCaffeineHalfLife(clamped);
   };

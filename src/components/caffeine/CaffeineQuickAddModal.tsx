@@ -101,6 +101,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel={isEn ? 'Artisan Loose Tea' : 'Herbata liściasta (infuzja)'}
+            // 45 mg / 5 g [T:HERBATA-SZYBKIE-45MG] (otwarte; Gongfu liczy 60 mg dla 1. zalania — do ujednolicenia po źródle)
             onPress={() => onSelectOption(isEn ? 'Artisan Loose Tea' : 'Herbata Gongfu / Liściasta', 'tea', 5, 45)}
           >
             <Text style={styles.quickOptionName}>Herbata liściasta (infuzja)</Text>

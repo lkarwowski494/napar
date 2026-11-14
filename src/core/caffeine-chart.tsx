@@ -116,7 +116,7 @@ export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
     <View style={styles.chartContainer}>
       <View style={styles.headerRow}>
         <Text style={styles.chartTitle}>Krzywa Stężenia Kofeiny (24h)</Text>
-        <Text style={styles.chartSub}>Model t₁/₂ = 5.0h</Text>
+        <Text style={styles.chartSub}>{`Model t₁/₂ = ${halfLifeHours.toFixed(1)} h`}</Text>
       </View>
 
       <Svg width={chartWidth} height={chartHeight}>

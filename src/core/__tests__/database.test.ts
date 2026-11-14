@@ -976,9 +976,9 @@ describe('Napar SQLite Database & Repositories', () => {
     setCaffeineHalfLife(6.5);
     expect(getCaffeineHalfLife()).toBe(6.5);
 
-    // Ograniczenia klamrowe (clamping: 3.0h - 8.0h)
+    // Ograniczenia klamrowe (clamping: 2.0h - 8.0h, EFSA-T12-ZAKRES; M1-audytor-generalny-017)
     setCaffeineHalfLife(1.5);
-    expect(getCaffeineHalfLife()).toBe(3.0);
+    expect(getCaffeineHalfLife()).toBe(2.0);
     setCaffeineHalfLife(10.0);
     expect(getCaffeineHalfLife()).toBe(8.0);
 

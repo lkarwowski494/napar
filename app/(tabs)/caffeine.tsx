@@ -24,6 +24,7 @@ import { CaffeineLog } from '../../src/core/database-schema';
 import {
   calculateRemainingCaffeineMg,
   estimateBedtimeCaffeineMg,
+  clampCaffeineHalfLifeHours,
 } from '../../src/core/domain-rules';
 import { CaffeineCurveChart } from '../../src/core/caffeine-chart';
 import { theme } from '../../src/core/theme';
@@ -70,7 +71,7 @@ export default function CaffeineScreen() {
 
   const handleHalfLifeChange = (newHours: number) => {
     const prev = halfLifeHours;
-    const clamped = Number(Math.max(3.0, Math.min(8.0, newHours)).toFixed(1));
+    const clamped = clampCaffeineHalfLifeHours(newHours);
     setHalfLifeHoursState(clamped);
     try {
       setCaffeineHalfLife(clamped);

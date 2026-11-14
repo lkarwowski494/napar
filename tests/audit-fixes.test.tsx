@@ -753,3 +753,55 @@ describe('M1-audytor-generalny-016: zastrzeżenie medyczne w PL i EN, z lekarzem
     }
   });
 });
+
+describe('M1-audytor-generalny-017: jedna wartość każdej wielkości kofeinowej i twierdzenie w rejestrze (06-tresci-004, 06-tresci-005)', () => {
+  const reg = JSON.parse(readFileSync(join(root, 'rejestr.json'), 'utf8'));
+  const byId = new Map<string, any>((reg.twierdzenia ?? reg).map((t: any) => [t.id, t]));
+
+  test('06-tresci-005: zakres czasu półtrwania ma jedną wartość w src/core równą rejestrowi (EFSA-T12-ZAKRES: 2–8 h)', () => {
+    const dr = require('../src/core/domain-rules');
+    expect(dr.CAFFEINE_HALF_LIFE_MIN_H).toBe(2.0);
+    expect(dr.CAFFEINE_HALF_LIFE_MAX_H).toBe(8.0);
+    expect(dr.clampCaffeineHalfLifeHours(1)).toBe(2.0);
+    expect(dr.clampCaffeineHalfLifeHours(9)).toBe(8.0);
+    expect(dr.clampCaffeineHalfLifeHours(4.25)).toBe(4.3);
+    expect(byId.get('EFSA-T12-ZAKRES')?.status).toBe('potwierdzone');
+    expect(String(byId.get('EFSA-T12-ZAKRES')?.wartosc)).toMatch(/^2–8/);
+    for (const f of ['app/(tabs)/caffeine.tsx', 'app/settings.tsx', 'src/core/database.ts']) {
+      expect([f, readFileSync(join(root, f), 'utf8').match(/Math\.max\(3\.0|val < 3\.0/g)]).toEqual([f, null]);
+    }
+  });
+
+  test('06-tresci-005: teksty PL i EN podają jeden zakres t½ (2–8 h) i nie przypisują domyślnych 5 h EFSA', () => {
+    const tr: any = translations;
+    for (const lang of ['pl', 'en']) {
+      const texts = [tr[lang].caffeine.halfLifeDesc, tr[lang].settings.caffeineHalfLifeDesc, tr[lang].caffeine.halfLifeNote, tr[lang].caffeine.disclaimerText].join(' | ');
+      expect(texts).not.toMatch(/\b3[.,]0 ?h|3–12|3-12|standard EFSA|EFSA standard|5[.,]0 ?h[^.|]*EFSA/);
+      expect(`${tr[lang].caffeine.halfLifeDesc}`).toMatch(/2[.,]0.*8[.,]0/);
+    }
+    const card = readFileSync(join(root, 'src/components/caffeine/BedtimeCurfewCard.tsx'), 'utf8');
+    expect(card).not.toMatch(/Standardowy metabolizm \(EFSA\)|'Krótszy czas|'Dłuższy czas/);
+    const chart = readFileSync(join(root, 'src/core/caffeine-chart.tsx'), 'utf8');
+    expect(chart).not.toMatch(/t₁\/₂ = 5\.0h/);
+  });
+
+  test('06-tresci-004: każdy znacznik [T:…] przy szacunkach kofeiny wskazuje twierdzenie w rejestrze', () => {
+    const src = readFileSync(join(root, 'src/core/domain-rules.ts'), 'utf8');
+    for (const fn of ['estimateCoffeeCaffeineMg', 'estimateTotalLeafCaffeineMg', 'estimateTeaInfusionCaffeineMg', 'calculateRemainingCaffeineMg']) {
+      const at = src.indexOf(`export function ${fn}`);
+      const doc = src.slice(src.lastIndexOf('/**', at), at);
+      const ids = [...doc.matchAll(/\[T:([^\]]+)\]/g)].flatMap((m) => m[1].split(',').map((s) => s.trim()));
+      expect([fn, ids.length > 0]).toEqual([fn, true]);
+      for (const id of ids) expect([fn, id, byId.has(id)]).toEqual([fn, id, true]);
+    }
+    const modal = readFileSync(join(root, 'src/components/caffeine/CaffeineQuickAddModal.tsx'), 'utf8');
+    for (const id of [...modal.matchAll(/\[T:([^\]]+)\]/g)].map((m) => m[1])) expect(byId.has(id)).toBe(true);
+    expect(modal).toMatch(/\[T:HERBATA-SZYBKIE-45MG\]/);
+  });
+
+  test('06-tresci-005: wielkości bez przeczytanego źródła są w rejestrze jako „otwarte” [DO USTALENIA], nie jako potwierdzone', () => {
+    for (const id of ['KAWA-KOFEINA-MG-G', 'KAWA-WYDAJNOSC-EKSTRAKCJI', 'HERBATA-KOFEINA-3PROC', 'HERBATA-FRAKCJE-ZALAN', 'HERBATA-SZYBKIE-45MG']) {
+      expect([id, byId.get(id)?.status]).toEqual([id, 'otwarte']);
+    }
+  });
+});

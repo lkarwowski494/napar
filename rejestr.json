@@ -210,7 +210,9 @@
         "url_lub_isbn": "https://doi.org/10.1021/jf010759+",
         "cytat_doslowny": "Caffeine levels in tea leaves typically range between 20 and 45 mg/g dry matter, with extraction kinetics strongly dependent on water temperature and leaf geometry.",
         "data_dostepu": "2026-10-24"
-      }
+      },
+      "status": "otwarte",
+      "uwagi_2026_11_14": "[DO USTALENIA] Cytat „Caffeine levels in tea leaves typically range between 20 and 45 mg/g…” nie występuje w abstrakcie (PMID 11714326, odczyt 2026-11-14); pełny tekst niedostępny."
     },
     {
       "id": "WCR-VARIETIES",
@@ -225,6 +227,61 @@
         "cytat_doslowny": "Distinct genetic lineages of Coffea arabica exhibit specific agronomic traits, bean morphologies, and cup quality potentials.",
         "data_dostepu": "2026-10-24"
       }
+    },
+    {
+      "id": "KAWA-KOFEINA-MG-G",
+      "tekst": "[DO USTALENIA] Zawartość kofeiny w kawie: arabika 12,0 mg/g, robusta 22,0 mg/g (wartości w estimateCoffeeCaffeineMg).",
+      "kategoria": "zdrowie-kofeina",
+      "poziom_ryzyka": "sredni",
+      "status": "otwarte",
+      "wielkosc": "kofeina_mg_na_g_kawy",
+      "wartosc": {
+        "arabica": 12.0,
+        "robusta": 22.0
+      },
+      "jednostka": "mg/g",
+      "uwagi": "Olechno i in. 2021 (https://pmc.ncbi.nlm.nih.gov/articles/PMC8228209/, odczyt 2026-11-14) podaje dla ZIELONEGO ziarna „caffeine (0.9–1.2% and 1.6–2.4%)” (arabika, robusta): 12 mg/g to górna granica arabiki, 22 mg/g mieści się w zakresie robusty, ale źródło nie dotyczy kawy palonej. Brak przeczytanego źródła dla kawy palonej → otwarte. BRD C4 D-01 cytował pracę o herbacie (Astill 2001)."
+    },
+    {
+      "id": "KAWA-WYDAJNOSC-EKSTRAKCJI",
+      "tekst": "[DO USTALENIA] Udział kofeiny przechodzący do naparu: filtr 0,88, espresso 0,75, immersja 0,85, cold brew 0,92.",
+      "kategoria": "zdrowie-kofeina",
+      "poziom_ryzyka": "sredni",
+      "status": "otwarte",
+      "wielkosc": "kofeina_wydajnosc_ekstrakcji",
+      "jednostka": "ułamek",
+      "uwagi": "Brak źródła w BRD i rejestrze; nie znaleziono źródła 2026-11-14."
+    },
+    {
+      "id": "HERBATA-KOFEINA-3PROC",
+      "tekst": "[DO USTALENIA] Liście herbaty zawierają 3,0% kofeiny w suchej masie (estimateTotalLeafCaffeineMg).",
+      "kategoria": "zdrowie-kofeina",
+      "poziom_ryzyka": "sredni",
+      "status": "otwarte",
+      "wielkosc": "herbata_kofeina_proc_sm",
+      "wartosc": 3.0,
+      "jednostka": "%",
+      "uwagi": "Przypisane źródło ASTILL-TEA-2001: abstrakt (Europe PMC, PMID 11714326, odczyt 2026-11-14) nie zawiera zakresu „20 and 45 mg/g”; pełny tekst płatny (ACS) — niedostępny."
+    },
+    {
+      "id": "HERBATA-FRAKCJE-ZALAN",
+      "tekst": "[DO USTALENIA] Frakcja kofeiny n-tego zalania Gongfu = 0,40 × 0,55^(n−1).",
+      "kategoria": "zdrowie-kofeina",
+      "poziom_ryzyka": "sredni",
+      "status": "otwarte",
+      "wielkosc": "herbata_frakcja_zalania",
+      "uwagi": "BRD RD-19 i dawny komentarz w kodzie podawały 45/30/15/10% — sprzeczne ze wzorem; źródło „Monografie chemii herbaty” bez adresu. Brak przeczytanego źródła."
+    },
+    {
+      "id": "HERBATA-SZYBKIE-45MG",
+      "tekst": "[DO USTALENIA] Szybkie dodanie herbaty liściastej: 45 mg na 5 g.",
+      "kategoria": "zdrowie-kofeina",
+      "poziom_ryzyka": "sredni",
+      "status": "otwarte",
+      "wielkosc": "herbata_kofeina_szybkie_dodanie_5g",
+      "wartosc": 45,
+      "jednostka": "mg",
+      "uwagi": "Gongfu dla 5 g, 1. zalanie liczy 5 × 1000 × 0,03 × 0,40 = 60 mg (ta sama wielkość, inna wartość). EFSA explains 2015 (rysunek s. 3, odczyt 2026-11-14): filiżanka czarnej herbaty 220 ml ≈ 50 mg — bez masy liści, więc nie rozstrzyga. Do ujednolicenia po źródle (przekazanie 08)."
     }
   ]
 }

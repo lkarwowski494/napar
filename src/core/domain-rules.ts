@@ -243,9 +243,10 @@ function parseNumeric(val: unknown): number {
 }
 
 /**
- * RD-17 & RD-18: Estymacja dawki kofeiny w filiżance kawy
- * Średnio 1g suchej Arabiki = 10.5 mg wyekstrahowanej kofeiny w przelewie
- * Robusta = 18.7 mg/g
+ * RD-17 & RD-18: Estymacja dawki kofeiny w filiżance kawy: doza [g] × zawartość [mg/g] × wydajność metody.
+ * Zawartość: arabika 12,0 mg/g, robusta 22,0 mg/g [T:KAWA-KOFEINA-MG-G] (otwarte: Olechno 2021 podaje dla zielonego
+ * ziarna 0,9–1,2% i 1,6–2,4%, brak źródła dla kawy palonej). Wydajność: filtr 0,88, espresso 0,75, immersja 0,85,
+ * cold brew 0,92 [T:KAWA-WYDAJNOSC-EKSTRAKCJI] (otwarte, bez źródła).
  */
 export function estimateCoffeeCaffeineMg(
   doseGrams: number | string,
@@ -272,7 +273,7 @@ export function estimateCoffeeCaffeineMg(
 }
 
 /**
- * Szacuje całkowity ładunek kofeiny w suchych liściach herbaty (3.0% wagi suchej)
+ * Szacuje całkowity ładunek kofeiny w suchych liściach herbaty (3,0% suchej masy) [T:HERBATA-KOFEINA-3PROC] (otwarte)
  */
 export function estimateTotalLeafCaffeineMg(leafDoseGrams: number | string): number {
   const parsedDose = parseNumeric(leafDoseGrams);
@@ -284,7 +285,7 @@ export function estimateTotalLeafCaffeineMg(leafDoseGrams: number | string): num
 
 /**
  * RD-19: Uwalnianie kofeiny w wielokrotnych zalaniach herbaty Gongfu Cha
- * 1 zalanie: 45%, 2 zalanie: 30%, 3 zalanie: 15%, kolejne: 10% łącznie
+ * Frakcja n-tego zalania = 0,40 × 0,55^(n−1) (1.: 40%, 2.: 22%, 3.: 12,1%) [T:HERBATA-FRAKCJE-ZALAN] (otwarte, bez źródła)
  */
 export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number | string, infusionNumber: number | string): number {
   const parsedTotal = parseNumeric(totalLeafCaffeineMg);
@@ -296,7 +297,19 @@ export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number | stri
 }
 
 /**
- * RD-17: Farmakokinetyka eliminacji kofeiny (model jedno-kompartmentowy) [T:EFSA-CAFF-2015] [T:NEHLIG-CYP1A2-2018]
+ * Zakres ustawienia czasu półtrwania kofeiny: 2–8 h u zdrowych dorosłych wg EFSA [T:EFSA-T12-ZAKRES].
+ * Jedno miejsce wartości dla ekranu Kofeina, Ustawień i zapisu w bazie (M1-audytor-generalny-017).
+ */
+export const CAFFEINE_HALF_LIFE_MIN_H = 2.0;
+export const CAFFEINE_HALF_LIFE_MAX_H = 8.0;
+
+/** Ogranicza t½ do zakresu [T:EFSA-T12-ZAKRES] i zaokrągla do 0,1 h. */
+export function clampCaffeineHalfLifeHours(hours: number): number {
+  return Number(Math.max(CAFFEINE_HALF_LIFE_MIN_H, Math.min(CAFFEINE_HALF_LIFE_MAX_H, hours)).toFixed(1));
+}
+
+/**
+ * RD-17: Farmakokinetyka eliminacji kofeiny (model jedno-kompartmentowy, bez fazy wchłaniania — uproszczenie) [T:EFSA-T12-ZAKRES]
  * C(t) = C0 * (1/2)^(t / t1/2)
  */
 export function calculateRemainingCaffeineMg(
