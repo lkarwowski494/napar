@@ -1,0 +1,18 @@
+appId: pl.lukasz.napar
+name: 05 Gongfu Cha — wejście z ekranu parzenia (herbata)
+---
+- launchApp:
+    arguments:
+      AppleLanguages: "(pl)"
+      AppleLocale: "pl_PL"
+- tapOn:
+    id: "app-guide-got-it-btn"
+    optional: true
+- tapOn: "Parzenie"
+- tapOn:
+    id: "beverage-toggle-tea"
+    optional: true
+- tapOn:
+    id: "gongfu-mode-btn"
+- assertVisible: "START INFUZJI"
+- takeScreenshot: 05-gongfu

@@ -1,0 +1,25 @@
+appId: pl.lukasz.napar
+name: 02 Spiżarnia — dodanie paczki i jej widoczność (wynik w danych)
+---
+- launchApp:
+    arguments:
+      AppleLanguages: "(pl)"
+      AppleLocale: "pl_PL"
+- tapOn:
+    id: "app-guide-got-it-btn"
+    optional: true
+- tapOn: "Spiżarnia"
+- tapOn:
+    id: "beans-add-button"
+- tapOn:
+    id: "bean-name-input"
+- inputText: "E2E Kenia"
+- tapOn:
+    id: "bean-weight-input"
+- inputText: "250"
+- hideKeyboard
+- tapOn:
+    id: "save-bean-btn"
+- tapOn: "OK"
+- assertVisible: "E2E Kenia"
+- takeScreenshot: 02-spizarnia-dodaj-paczke

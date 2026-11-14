@@ -1,7 +1,0 @@
-appId: pl.lukasz.napar
-name: 04 Dziennik Naparów i Ocena Sensoryczna
----
-- launchApp
-- tapOn: "Dziennik"
-- assertVisible: "Dziennik Naparów"
-- takeScreenshot: 04-dziennik-parzen

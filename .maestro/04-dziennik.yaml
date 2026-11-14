@@ -1,0 +1,12 @@
+appId: pl.lukasz.napar
+name: 04 Dziennik otwiera się
+---
+- launchApp:
+    arguments:
+      AppleLanguages: "(pl)"
+      AppleLocale: "pl_PL"
+- tapOn:
+    id: "app-guide-got-it-btn"
+    optional: true
+- tapOn: "Dziennik"
+- takeScreenshot: 04-dziennik

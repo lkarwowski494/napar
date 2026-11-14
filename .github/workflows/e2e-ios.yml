@@ -74,11 +74,12 @@ jobs:
           set -o pipefail
           cd ios
           pod install
-          xcodebuild -workspace Napar.xcworkspace -scheme Napar -configuration Debug \
+          # M1-audytor-generalny-012: Release dla symulatora — paczka JS w aplikacji (Debug pomijał ją: SKIP_BUNDLING).
+          xcodebuild -workspace Napar.xcworkspace -scheme Napar -configuration Release \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" \
             2>&1 | tee /tmp/xcodebuild-sim.log
-          APP_PATH="build/Build/Products/Debug-iphonesimulator/Napar.app"
+          APP_PATH="build/Build/Products/Release-iphonesimulator/Napar.app"
           test -d "$APP_PATH" || { echo "::error::Kompilacja .app symulatora nie powiodła się"; exit 1; }
           echo "SIM_APP_PATH=$(pwd)/$APP_PATH" >> "$GITHUB_ENV"
 
@@ -86,7 +87,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-sim-app
-          path: ios/build/Build/Products/Debug-iphonesimulator/Napar.app
+          path: ios/build/Build/Products/Release-iphonesimulator/Napar.app
           retention-days: 14
 
       - name: Boot iOS Simulator with Perl Process Guard
@@ -127,6 +128,9 @@ jobs:
           echo "Booting device: $DEVICE_UDID"
           guard 300 "simctl boot" xcrun simctl boot "$DEVICE_UDID" || true
           guard 300 "bootstatus" xcrun simctl bootstatus "$DEVICE_UDID" -b
+          # Scenariusze używają polskich tekstów interfejsu (kontrakt: tests/e2e-contract.test.ts).
+          xcrun simctl spawn booted defaults write -g AppleLanguages -array pl || true
+          xcrun simctl spawn booted defaults write -g AppleLocale -string pl_PL || true
           guard 120 "install app" xcrun simctl install booted "$SIM_APP_PATH"
 
       - name: Run Maestro Flows with Retry on Driver Failure
@@ -161,36 +165,46 @@ jobs:
             ' "$timeout_sec" "$desc" "$@"
           }
 
+          # M1-audytor-generalny-012: set +e — log każdego scenariusza trafia do CI także przy porażce;
+          # wynik zbiorczy na końcu; zrzuty (takeScreenshot) w artefakcie.
+          set +e
+          mkdir -p /tmp/maestro-out
+          FAILED=0
           run_maestro() {
             local flow="$1"
             echo "::group::Uruchamianie $flow"
-            guard 600 "maestro $flow" maestro test "$flow" > /tmp/maestro.log 2>&1
+            guard 600 "maestro $flow" maestro test --test-output-dir /tmp/maestro-out "$flow" > /tmp/maestro.log 2>&1
             local rc=$?
-            if [ $rc -ne 0 ]; then
-              if grep -qE "iOS driver not ready in time|deviceInfo failed" /tmp/maestro.log; then
-                echo "::warning::Wykryto awarię sterownika XCUITest. Ponawianie 1x po resecie..."
-                sleep 5
-                guard 600 "maestro retry $flow" maestro test "$flow" > /tmp/maestro.log 2>&1
-                rc=$?
-              fi
+            if [ $rc -ne 0 ] && grep -qE "iOS driver not ready in time|deviceInfo failed" /tmp/maestro.log; then
+              echo "::warning::Wykryto awarię sterownika XCUITest. Ponawianie 1x po resecie..."
+              sleep 5
+              guard 600 "maestro retry $flow" maestro test --test-output-dir /tmp/maestro-out "$flow" > /tmp/maestro.log 2>&1
+              rc=$?
             fi
             cat /tmp/maestro.log
             echo "::endgroup::"
-            return $rc
+            if [ $rc -ne 0 ]; then echo "::error::Scenariusz $flow nie przeszedł (kod $rc)"; FAILED=1; fi
           }
 
-          run_maestro .maestro/01-receptura-v60.yaml
-          run_maestro .maestro/02-stoper-zalewania.yaml
-          run_maestro .maestro/03-spizarnia-ziarna.yaml
-          run_maestro .maestro/04-dziennik-parzen.yaml
-          run_maestro .maestro/05-gongfu-cha.yaml
-
-      - name: Live Update Migration Test (Without simctl uninstall)
-        run: |
-          echo "Testowanie aktualizacji na żywo bez deinstalacji..."
-          maestro test .maestro/06-aktualizacja-przygotuj.yaml
+          run_maestro .maestro/01-start.yaml
+          run_maestro .maestro/02-spizarnia-dodaj-paczke.yaml
+          run_maestro .maestro/03-kofeina-szybki-wpis.yaml
+          run_maestro .maestro/04-dziennik.yaml
+          run_maestro .maestro/05-gongfu.yaml
+          run_maestro .maestro/06-aktualizacja-przygotuj.yaml
+          # Dane po ponownej instalacji tego samego buildu (bez deinstalacji): paczka z 02 ma przetrwać.
           xcrun simctl install booted "$SIM_APP_PATH"
-          maestro test .maestro/07-aktualizacja-sprawdz.yaml
+          run_maestro .maestro/07-aktualizacja-sprawdz.yaml
+          exit $FAILED
+
+      - name: Zrzuty i logi scenariuszy Maestro
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-zrzuty
+          path: /tmp/maestro-out
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Diagnostic Base64 Screenshot on Failure
         if: failure()

@@ -1,7 +1,10 @@
 appId: pl.lukasz.napar
-name: 07 Aktualizacja Sprawdź (Weryfikacja integralności danych po aktualizacji)
+name: 07 Po ponownej instalacji (bez deinstalacji) — paczka nadal jest w spiżarni
 ---
-- launchApp
+- launchApp:
+    arguments:
+      AppleLanguages: "(pl)"
+      AppleLocale: "pl_PL"
 - tapOn: "Spiżarnia"
-- assertVisible: "Spiżarnia Ziaren"
-- takeScreenshot: 07-aktualizacja-sprawdz
+- assertVisible: "E2E Kenia"
+- takeScreenshot: 07-po-instalacji

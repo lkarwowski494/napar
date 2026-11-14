@@ -1,0 +1,16 @@
+appId: pl.lukasz.napar
+name: 03 Kofeina — szybki wpis V60
+---
+- launchApp:
+    arguments:
+      AppleLanguages: "(pl)"
+      AppleLocale: "pl_PL"
+- tapOn:
+    id: "app-guide-got-it-btn"
+    optional: true
+- tapOn: "Kofeina"
+- tapOn:
+    id: "quick-add-caffeine-btn"
+- tapOn:
+    id: "caffeine-quick-v60"
+- takeScreenshot: 03-kofeina-szybki-wpis

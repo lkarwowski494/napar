@@ -1,8 +1,10 @@
 appId: pl.lukasz.napar
-name: 06 Aktualizacja Przygotuj (Zapis stanu bazy przed aktualizacją)
+name: 06 Przed ponowną instalacją — paczka z 02 jest w spiżarni
 ---
-- launchApp
-- assertVisible: "Napar"
+- launchApp:
+    arguments:
+      AppleLanguages: "(pl)"
+      AppleLocale: "pl_PL"
 - tapOn: "Spiżarnia"
-- assertVisible: "Spiżarnia Ziaren"
-- takeScreenshot: 06-aktualizacja-przygotuj
+- assertVisible: "E2E Kenia"
+- takeScreenshot: 06-przed-instalacja

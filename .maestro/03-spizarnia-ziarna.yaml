@@ -1,7 +1,0 @@
-appId: pl.lukasz.napar
-name: 03 Spiżarnia Ziaren i Okno Świeżości
----
-- launchApp
-- tapOn: "Spiżarnia"
-- assertVisible: "Spiżarnia Ziaren"
-- takeScreenshot: 03-spizarnia-ziarna

@@ -1,0 +1,13 @@
+appId: pl.lukasz.napar
+name: 01 Start aplikacji z paczką JS (czysty stan)
+---
+- launchApp:
+    clearState: true
+    arguments:
+      AppleLanguages: "(pl)"
+      AppleLocale: "pl_PL"
+- tapOn:
+    id: "app-guide-got-it-btn"
+    optional: true
+- assertVisible: "Parzenie"
+- takeScreenshot: 01-start

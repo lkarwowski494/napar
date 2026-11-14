@@ -542,11 +542,12 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
       const maestroDir = join(root, '.maestro');
       expect(existsSync(maestroDir)).toBe(true);
       const files = readdirSync(maestroDir);
-      expect(files).toContain('01-receptura-v60.yaml');
-      expect(files).toContain('02-stoper-zalewania.yaml');
-      expect(files).toContain('03-spizarnia-ziarna.yaml');
-      expect(files).toContain('04-dziennik-parzen.yaml');
-      expect(files).toContain('05-gongfu-cha.yaml');
+      // M1-audytor-generalny-012: scenariusze z selektorami istniejącymi w aplikacji (kontrakt: tests/e2e-contract.test.ts).
+      expect(files).toContain('01-start.yaml');
+      expect(files).toContain('02-spizarnia-dodaj-paczke.yaml');
+      expect(files).toContain('03-kofeina-szybki-wpis.yaml');
+      expect(files).toContain('04-dziennik.yaml');
+      expect(files).toContain('05-gongfu.yaml');
     });
 
     test('LIVE-02: Przepływy aktualizacji na żywo (06 i 07) testują migrację bez deinstalacji', () => {
