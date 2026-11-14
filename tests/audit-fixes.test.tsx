@@ -805,3 +805,84 @@ describe('M1-audytor-generalny-017: jedna wartość każdej wielkości kofeinowe
     }
   });
 });
+
+describe('M1-audytor-generalny-018: wartości i etykiety zgodne z przeczytanym źródłem (06-tresci-009, -010, -011, -015, -016)', () => {
+  const reg = JSON.parse(readFileSync(join(root, 'rejestr.json'), 'utf8'));
+  const byId = new Map<string, any>((reg.twierdzenia ?? reg).map((t: any) => [t.id, t]));
+
+  test('06-tresci-009: koncentraty Barista Hustle 1,68 g / 2,45 g na 1 L (1000 ppm) — GH 80 / KH 40 w 1 L to 80 g i 40 g', () => {
+    const { calculateWaterMinerals } = require('../src/core/water-chemistry');
+    const r = calculateWaterMinerals(1.0, 80, 40);
+    expect(r.concentrateHardnessGrams).toBe(80);
+    expect(r.concentrateBufferGrams).toBe(40);
+    expect(r.baseWaterGrams).toBe(880);
+    for (const lang of ['pl', 'en'] as const) {
+      const d = (translations as any)[lang].water.methodADesc as string;
+      expect(d).not.toMatch(/500 ?g/);
+      expect(d).toMatch(/1 ?L/);
+    }
+    expect(byId.get('BH-WATER-2016')?.zrodlo?.cytat_doslowny).toMatch(/1L of deionised water/);
+  });
+
+  test('06-tresci-010: Muszynianka zgodna z producentem (~2000 mg/l), bez łączenia z inną wodą; bez niepotwierdzonego „oficjalna woda WBC”', () => {
+    const { BOTTLED_WATER_BENCHMARKS } = require('../src/core/water-chemistry');
+    const m = BOTTLED_WATER_BENCHMARKS.find((b: any) => b.id === 'muszynianka');
+    expect(m.brandName).toBe('Muszynianka');
+    expect(m.tdsPpm).toBe(2000);
+    const all = JSON.stringify(BOTTLED_WATER_BENCHMARKS);
+    expect(all).not.toMatch(/WBC|World Barista Championships|Oficjalna woda|Official cupping/);
+    expect(byId.get('WODA-MUSZYNIANKA-MINERALIZACJA')?.status).toBe('potwierdzone');
+    expect(byId.get('WODY-BUTELKOWANE-SKLADY')?.status).toBe('otwarte');
+  });
+
+  test('06-tresci-011: tryb espresso nie ocenia wyniku etykietą „Złote Okno SCA” / Golden Cup', () => {
+    const { ExtractionYieldTab } = require('../src/components/dialin/ExtractionYieldTab');
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<ExtractionYieldTab language="pl" t={translations.pl} />);
+    });
+    act(() => tree.root.findByProps({ testID: 'ey-mode-espresso' }).props.onPress());
+    const { TextInput } = require('react-native');
+    const [w, d, tds] = tree.root.findAllByType(TextInput);
+    act(() => {
+      w.props.onChangeText('36');
+      d.props.onChangeText('18');
+      tds.props.onChangeText('10'); // EY = 36 × 10 / 18 = 20% — w dawnym kodzie „Złote Okno SCA”
+    });
+    const json = JSON.stringify(tree.toJSON());
+    expect(json).toMatch(/WYDAJNOŚĆ EKSTRAKCJI|%/);
+    expect(json).not.toMatch(/Złote Okno|Golden Cup|SCA/);
+    act(() => tree.root.findByProps({ testID: 'ey-mode-pourover' }).props.onPress());
+    act(() => {
+      w.props.onChangeText('250');
+      d.props.onChangeText('15');
+      tds.props.onChangeText('1.35'); // przelew: EY ≈ 19,8%
+    });
+    expect(JSON.stringify(tree.toJSON())).toMatch(/Złote Okno SCA|Golden Cup/);
+    act(() => tree.unmount());
+  });
+
+  test('06-tresci-015: receptura espresso — liczby w EN równe PL i polom receptury (18 g → 36 g, 1:2, 2–3 bar, 9 bar)', () => {
+    const { MASTER_RECIPES } = require('../src/core/recipes-data');
+    const r = MASTER_RECIPES.find((x: any) => /Espresso — Specialty Double Shot/.test(x.name));
+    const nums = (s: string) => (s.match(/\d+(?:[.,]\d+)?/g) || []).map((n) => n.replace(',', '.')).sort().join(' ');
+    expect(nums(r.nameEn)).toBe(nums(r.name));
+    expect(r.nameEn).toContain(`1:${r.recommendedRatio}`);
+    for (const st of r.steps) {
+      expect(st.nameEn).not.toBe('');
+      expect(st.instructionEn).not.toBe('');
+      expect([st.stepNumber, nums(st.instructionEn)]).toEqual([st.stepNumber, nums(st.instructionPl)]);
+      expect([st.stepNumber, nums(st.nameEn)]).toEqual([st.stepNumber, nums(st.namePl)]);
+    }
+  });
+
+  test('06-tresci-016: diagnoza „kwaśna” (niedoparzenie) nie zawiera „cierpka/astringent” przypisanej przeparzeniu', () => {
+    const { diagnoseExtractionTaste } = require('../src/core/domain-rules');
+    const [sour] = diagnoseExtractionTaste({ isSour: true });
+    expect(sour.issue).not.toMatch(/cierpk/i);
+    expect(sour.issueEn).not.toMatch(/astringent/i);
+    expect(sour.grindAdjustment).toBe('finer');
+    const [astr] = diagnoseExtractionTaste({ isAstringent: true });
+    expect(astr.grindAdjustment).toBe('coarser');
+  });
+});

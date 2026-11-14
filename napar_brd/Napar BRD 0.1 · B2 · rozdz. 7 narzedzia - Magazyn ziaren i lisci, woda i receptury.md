@@ -85,7 +85,7 @@
 
 ### **BR-WODA-002: Dwutorowy kalkulator remineralizacji wody bazowej (RO / Demi)**
 * **Opis:** Automatyczne przeliczanie gramatur koncentratów lub soli suchych dla zadanej objętości wody bazowej (od 0.5L do 18.9L / baniak 5 galonów):
-  - *Metoda A (System Koncentratów Barista Hustle):* Roztwór buforowy A (1.68g NaHCO3 / 500g wody) i roztwór twardości B (2.45g MgSO4 / 500g wody). Zależność liniowa: 1g koncentratu na 1L wody = 2 ppm KH / GH.
+  - *Metoda A (System Koncentratów Barista Hustle):* Roztwór buforowy A (1.68g NaHCO3 / 1 L wody demineralizowanej) i roztwór twardości B (2.45g MgSO4·7H2O / 1 L wody demineralizowanej), po ok. 1000 ppm jako CaCO3. Zależność liniowa: 1g koncentratu na 1L wody = 1 ppm KH / GH. *(Errata 2026-11-14, M1-audytor-generalny-018: wcześniej 500 g i 2 ppm — niezgodne z przepisem BH; rejestr BH-WATER-2016.)*
   - *Metoda B (Suche Sole):* Bezpośrednie odważanie mikrowagą sody oczyszczonej (NaHCO3), soli Epsom (MgSO4·7H2O) oraz chlorku wapnia (CaCl2·2H2O).
 * **Kryteria akceptacji:**
   1. Suwak objętości wody od 0.5L do 20L z natychmiastowym przeliczeniem w czasie < 1 ms.

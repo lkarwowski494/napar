@@ -172,17 +172,26 @@
     },
     {
       "id": "BH-WATER-2016",
-      "tekst": "Receptury DIY Water Barista Hustle wykorzystują koncentraty sody oczyszczonej (1.68 g/L NaHCO3) i soli Epsom (2.45 g/L MgSO4) rozpuszczone w wodzie demineralizowanej.",
+      "tekst": "Według przewodnika Barista Hustle koncentraty powstają z 1,68 g wodorowęglanu sodu i 2,45 g soli Epsom, każdy rozpuszczony w 1 L wody demineralizowanej; daje to roztwory o KH i GH ok. 1000 ppm (jako CaCO3), więc 1 g koncentratu w 1 L gotowej wody dodaje ok. 1 ppm.",
       "kategoria": "woda",
       "poziom_ryzyka": "sredni",
       "zrodlo": {
-        "tier": 2,
+        "tier": 4,
         "tytul": "DIY Water Recipes Redux",
         "autor_lub_wydawca": "Matt Perger, Barista Hustle",
         "url_lub_isbn": "https://www.baristahustle.com/diy-water-recipes-redux/",
-        "cytat_doslowny": "Buffer: 1.68 g sodium bicarbonate into 1000 g DI water. Magnesium hardness: 2.45 g Epsom salt into 1000 g DI water.",
-        "data_dostepu": "2026-10-24"
-      }
+        "cytat_doslowny": "Dissolve 1.68g of sodium bicarbonate in 1L of deionised water. This creates a solution with a KH (as CaCO3) as close as we can get to 1000ppm.",
+        "data_dostepu": "2026-11-14",
+        "cytaty_dodatkowe": [
+          "Dissolve 2.45g of Epsom salts in 1L of deionised water. This creates a solution with a GH (as CaCO3) of 1000 ppm.",
+          "each ml of concentrate in your final 1L will add 1ppm of hardness"
+        ],
+        "uwagi": "Przewodnik (szczebel 4): jedno źródło, atrybucja w treści („według Barista Hustle”). Wartość 1 ppm na 1 g/L to rachunek: 1000 ppm × 1 g / 1000 g."
+      },
+      "status": "potwierdzone",
+      "wielkosc": "koncentrat_bh_ppm_na_g_na_l",
+      "wartosc": 1,
+      "jednostka": "ppm/(g/L)"
     },
     {
       "id": "HENDON-WATER-2015",
@@ -282,6 +291,34 @@
       "wartosc": 45,
       "jednostka": "mg",
       "uwagi": "Gongfu dla 5 g, 1. zalanie liczy 5 × 1000 × 0,03 × 0,40 = 60 mg (ta sama wielkość, inna wartość). EFSA explains 2015 (rysunek s. 3, odczyt 2026-11-14): filiżanka czarnej herbaty 220 ml ≈ 50 mg — bez masy liści, więc nie rozstrzyga. Do ujednolicenia po źródle (przekazanie 08)."
+    },
+    {
+      "id": "WODA-MUSZYNIANKA-MINERALIZACJA",
+      "tekst": "Producent podaje mineralizację Muszynianki ok. 2000 mg/l.",
+      "kategoria": "woda",
+      "poziom_ryzyka": "niski",
+      "status": "potwierdzone",
+      "wielkosc": "muszynianka_mineralizacja",
+      "wartosc": 2000,
+      "jednostka": "mg/l",
+      "zrodlo": {
+        "tier": 3,
+        "tytul": "Muszynianka — strona producenta",
+        "autor_lub_wydawca": "Muszynianka (producent)",
+        "url_lub_isbn": "https://muszynianka.pl/",
+        "cytat_doslowny": "Wysoka mineralizacja: ~2000 mg/l naturalnych składników mineralnych",
+        "data_dostepu": "2026-11-14",
+        "uwagi": "Jedno źródło; fakt zmienny (etykieta) — termin przeglądu 2027-11-14. Skład jonów (Ca, Mg, HCO3) nie jest podany w tekście strony, więc GH/KH aplikacji pozostają otwarte. Dawny wpis łączył dwie marki („Muszynianka / Cechini”) z TDS 1400."
+      },
+      "wazne_do": "2027-11-14"
+    },
+    {
+      "id": "WODY-BUTELKOWANE-SKLADY",
+      "tekst": "[DO USTALENIA] Składy (TDS, GH, KH) i werdykty 10 wód butelkowanych w BOTTLED_WATER_BENCHMARKS.",
+      "kategoria": "woda",
+      "poziom_ryzyka": "sredni",
+      "status": "otwarte",
+      "uwagi": "Brak źródła i daty odczytu etykiet dla marek (poza mineralizacją Muszynianki). Zdanie „Oficjalna woda cuppingowa mistrzostw baristów (WBC)” usunięte 2026-11-14 (fakt zmienny bez źródła). Rekomendacja audytu (b) — usunąć marki — to zmiana funkcji: decyzja właściciela/03."
     }
   ]
 }

@@ -143,9 +143,9 @@ export const BOTTLED_WATER_BENCHMARKS: BottledWaterProfile[] = [
   },
   {
     id: 'muszynianka',
-    brandName: 'Muszynianka / Cechini',
+    brandName: 'Muszynianka',
     originCountry: 'Polska',
-    tdsPpm: 1400,
+    tdsPpm: 2000, // [T:WODA-MUSZYNIANKA-MINERALIZACJA] producent: ~2000 mg/l; GH/KH niżej [T:WODY-BUTELKOWANE-SKLADY] (otwarte)
     estimatedGhPpm: 650,
     estimatedKhPpm: 480,
     suitability: 'NOT_RECOMMENDED',
@@ -204,8 +204,8 @@ export const BOTTLED_WATER_BENCHMARKS: BottledWaterProfile[] = [
     estimatedGhPpm: 80,
     estimatedKhPpm: 60,
     suitability: 'EXCELLENT',
-    verdictPl: 'Oficjalna woda cuppingowa mistrzostw baristów (WBC). Aksamitne body i idealny balans minerałów.',
-    verdictEn: 'Official cupping water of World Barista Championships. Silky body and ideal mineral balance.',
+    verdictPl: 'Aksamitne body i idealny balans minerałów.',
+    verdictEn: 'Silky body and ideal mineral balance.',
   },
   {
     id: 'crystal_geyser',
@@ -244,7 +244,7 @@ export interface WaterCalculationResult {
   waterVolumeLiters: number;
   targetGhPpm: number;
   targetKhPpm: number;
-  // Metoda A: Gotowe butelki koncentratu Barista Hustle (1.68g NaHCO3 / 500g i 2.45g MgSO4 / 500g)
+  // Metoda A: Gotowe butelki koncentratu Barista Hustle (1.68g NaHCO3 / 1 L i 2.45g MgSO4·7H2O / 1 L) [T:BH-WATER-2016]
   concentrateBufferGrams: number;
   concentrateHardnessGrams: number;
   baseWaterGrams: number; // Dopełnienie do 1000g na każdy litr (woda demineralizowana/RO)
@@ -284,11 +284,10 @@ export function calculateWaterMinerals(
   if (Object.is(gh, -0)) gh = 0;
   if (Object.is(kh, -0)) kh = 0;
 
-  // W systemie koncentratów Barista Hustle:
-  // 1g Buffer Concentrate dodany do 1L wody = 2 ppm KH
-  // 1g Hardness Concentrate dodany do 1L wody = 2 ppm GH
-  let concentrateBuffer = Number(((kh / 2.0) * vol).toFixed(1));
-  let concentrateHardness = Number(((gh / 2.0) * vol).toFixed(1));
+  // Koncentraty Barista Hustle [T:BH-WATER-2016]: 1,68 g NaHCO3 i 2,45 g soli Epsom, każda w 1 L wody
+  // demineralizowanej = 1000 ppm (jako CaCO3), więc 1 g koncentratu w 1 L gotowej wody = 1 ppm KH/GH.
+  let concentrateBuffer = Number((kh * vol).toFixed(1));
+  let concentrateHardness = Number((gh * vol).toFixed(1));
   if (Object.is(concentrateBuffer, -0) || concentrateBuffer < 0 || !Number.isFinite(concentrateBuffer)) concentrateBuffer = 0;
   if (Object.is(concentrateHardness, -0) || concentrateHardness < 0 || !Number.isFinite(concentrateHardness)) concentrateHardness = 0;
 

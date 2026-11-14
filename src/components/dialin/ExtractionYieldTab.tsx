@@ -115,26 +115,31 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
               {eyResult.extractionYieldPercent}%
             </Text>
 
-            <View
-              style={[
-                styles.eyRatingBadge,
-                eyResult.rating === 'ideal'
-                  ? styles.eyIdeal
-                  : styles.eyWarning,
-              ]}
-            >
-              <Text style={styles.eyRatingText}>
-                {eyResult.rating === 'ideal'
-                  ? 'Złote Okno SCA (Idealna ekstrakcja)'
-                  : eyResult.rating === 'under'
-                  ? 'Niedoparzenie (< 18%)'
-                  : 'Przeparzenie (> 22%)'}
-              </Text>
-            </View>
+            {/* Ocena SCA (18–22% EY) dotyczy naparu przelewowego; dla espresso tylko wynik EY (M1-audytor-generalny-018, 06-tresci-011) */}
+            {methodMode === 'pourover' && (
+              <>
+              <View
+                style={[
+                  styles.eyRatingBadge,
+                  eyResult.rating === 'ideal'
+                    ? styles.eyIdeal
+                    : styles.eyWarning,
+                ]}
+              >
+                <Text style={styles.eyRatingText}>
+                  {eyResult.rating === 'ideal'
+                    ? 'Złote Okno SCA (Idealna ekstrakcja)'
+                    : eyResult.rating === 'under'
+                    ? 'Niedoparzenie (< 18%)'
+                    : 'Przeparzenie (> 22%)'}
+                </Text>
+              </View>
 
-            <Text style={styles.eyDescriptionText}>
-              {language === 'en' ? eyResult.descriptionEn : eyResult.descriptionPl}
-            </Text>
+              <Text style={styles.eyDescriptionText}>
+                {language === 'en' ? eyResult.descriptionEn : eyResult.descriptionPl}
+              </Text>
+              </>
+            )}
           </View>
         )}
       </View>

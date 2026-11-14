@@ -425,7 +425,7 @@
     "targetKhLabel": "Alkaliczność / Bufor (KH)",
     "waterVolumeLabel": "Objętość wody bazowej (demi / RO)",
     "methodAHeader": "System Koncentratów Barista Hustle",
-    "methodADesc": "Roztwory bazowe: 1.68g NaHCO₃ w 500g wody oraz 2.45g soli Epsom w 500g wody.",
+    "methodADesc": "Roztwory bazowe według Barista Hustle: 1.68g NaHCO₃ w 1 L wody demineralizowanej oraz 2.45g soli Epsom w 1 L wody demineralizowanej (po 1000 ppm).",
     "bufferGrams": "Koncentrat Bufora (A)",
     "hardnessGrams": "Koncentrat Magnezu (B)",
     "methodBHeader": "Bezpośrednie odważenie soli (suche proszki)",

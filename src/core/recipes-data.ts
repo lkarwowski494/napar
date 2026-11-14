@@ -227,7 +227,7 @@ export const MASTER_RECIPES: MasterRecipe[] = [
     type: "COFFEE",
     method: "ESPRESSO",
     name: "Espresso — Specialty Double Shot (1:2)",
-    nameEn: "Modern Espresso — Double Shot (1:2.2)",
+    nameEn: "Espresso — Specialty Double Shot (1:2)",
     author: "WBC Standard Protocol",
     coffeeOrTeaDoseGrams: 18.0,
     waterWeightGrams: 36.0,
@@ -236,8 +236,8 @@ export const MASTER_RECIPES: MasterRecipe[] = [
     grindSettingDescriptionEn: "Fine espresso setting (approx. 9-10 clicks on Comandante)",
     recommendedRatio: 2,
     steps: [
-      { stepNumber: 1, namePl: "Preinfuzja ciśnieniowa", nameEn: "Pre-infusion & Flow", targetWaterGrams: 8.0, durationSeconds: 6, instructionPl: "Preinfuzja pod niskim ciśnieniem (2-3 bary) dla równomiernej saturacji ciastka.", instructionEn: "Engage 9 bar extraction; aim for 40g liquid yield in 27s." },
-      { stepNumber: 2, namePl: "Ekstrakcja główna (9 barów)", nameEn: "", targetWaterGrams: 36.0, durationSeconds: 22, instructionPl: "Pełna ekstrakcja do uzyskania 36g w filiżance o gęstej cremie.", instructionEn: "" },
+      { stepNumber: 1, namePl: "Preinfuzja ciśnieniowa", nameEn: "Pressure pre-infusion", targetWaterGrams: 8.0, durationSeconds: 6, instructionPl: "Preinfuzja pod niskim ciśnieniem (2-3 bary) dla równomiernej saturacji ciastka.", instructionEn: "Low-pressure pre-infusion (2-3 bar) for even saturation of the puck." },
+      { stepNumber: 2, namePl: "Ekstrakcja główna (9 barów)", nameEn: "Main extraction (9 bar)", targetWaterGrams: 36.0, durationSeconds: 22, instructionPl: "Pełna ekstrakcja do uzyskania 36g w filiżance o gęstej cremie.", instructionEn: "Full extraction to 36g in the cup with dense crema." },
     ],
   },
   {

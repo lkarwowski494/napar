@@ -425,7 +425,7 @@
     "targetKhLabel": "Alkalinity / Buffer (KH)",
     "waterVolumeLabel": "Base water volume (demi / RO)",
     "methodAHeader": "Barista Hustle Concentrate System",
-    "methodADesc": "Stock bottles: 1.68g NaHCO₃ in 500g water & 2.45g Epsom salt in 500g water.",
+    "methodADesc": "Stock bottles per Barista Hustle: 1.68g NaHCO₃ in 1 L deionised water & 2.45g Epsom salt in 1 L deionised water (1000 ppm each).",
     "bufferGrams": "Buffer Concentrate (A)",
     "hardnessGrams": "Magnesium Concentrate (B)",
     "methodBHeader": "Direct dry salt weighing",

@@ -398,8 +398,8 @@ export function diagnoseExtractionTaste(params: {
 
   if (params.isSour) {
     diagnoses.push({
-      issue: 'Zbyt kwaśna / cierpka (Niedoparzenie)',
-      issueEn: 'Too sour / astringent (Under-extracted)',
+      issue: 'Zbyt kwaśna (Niedoparzenie)',
+      issueEn: 'Too sour (Under-extracted)',
       recommendationPl: 'Zmiel drobniej (np. -2 kliki na młynku) lub podwyższ temperaturę wody o 2°C, aby zwiększyć ekstrakcję cukrów.',
       recommendationEn: 'Grind finer (e.g. -2 clicks on grinder) or raise water temperature by 2°C to increase sweetness extraction.',
       grindAdjustment: 'finer',

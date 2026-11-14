@@ -30,25 +30,23 @@ describe('Water Chemistry & Mineralization Module', () => {
 
   test('Prawidłowo przelicza koncentraty dla 1.0 litra wody w recepturze 80/40', () => {
     // 1L, GH 80, KH 40
-    // Buffer = (40 / 2) * 1 = 20.0g
-    // Hardness = (80 / 2) * 1 = 40.0g
+    // Koncentraty BH 1000 ppm (1 g / 1 L = 1 ppm; M1-audytor-generalny-018): Buffer = 40 g, Hardness = 80 g
     const res = calculateWaterMinerals(1.0, 80, 40);
     expect(res.waterVolumeLiters).toBe(1.0);
     expect(res.targetGhPpm).toBe(80);
     expect(res.targetKhPpm).toBe(40);
-    expect(res.concentrateBufferGrams).toBe(20.0);
-    expect(res.concentrateHardnessGrams).toBe(40.0);
-    expect(res.baseWaterGrams).toBe(940.0);
+    expect(res.concentrateBufferGrams).toBe(40.0);
+    expect(res.concentrateHardnessGrams).toBe(80.0);
+    expect(res.baseWaterGrams).toBe(880.0);
   });
 
   test('Prawidłowo skaluje koncentraty dla 5.0 litrów wody (bańka RO)', () => {
     // 5L, GH 80, KH 40
-    // Buffer = (40 / 2) * 5 = 100.0g
-    // Hardness = (80 / 2) * 5 = 200.0g
+    // Buffer = 40 * 5 = 200.0g, Hardness = 80 * 5 = 400.0g
     const res = calculateWaterMinerals(5.0, 80, 40);
-    expect(res.concentrateBufferGrams).toBe(100.0);
-    expect(res.concentrateHardnessGrams).toBe(200.0);
-    expect(res.baseWaterGrams).toBe(4700.0);
+    expect(res.concentrateBufferGrams).toBe(200.0);
+    expect(res.concentrateHardnessGrams).toBe(400.0);
+    expect(res.baseWaterGrams).toBe(4400.0);
 
     // Suche sole dla 5L
     // NaHCO3: 40 * 0.00168 * 5 = 0.336g
@@ -59,8 +57,8 @@ describe('Water Chemistry & Mineralization Module', () => {
 
   test('Prawidłowo liczy mineralizację dla miękkiej wody do herbaty (GH 30, KH 15)', () => {
     const res = calculateWaterMinerals(1.0, 30, 15);
-    expect(res.concentrateBufferGrams).toBe(7.5);
-    expect(res.concentrateHardnessGrams).toBe(15.0);
+    expect(res.concentrateBufferGrams).toBe(15.0);
+    expect(res.concentrateHardnessGrams).toBe(30.0);
   });
 
   test('Zwraca poprawną nazwę profilu wody w wybranym języku (z fallbackiem)', () => {
