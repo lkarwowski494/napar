@@ -17,9 +17,11 @@ npm run check:i18n       # Walidacja symetrii i kompletności tłumaczeń PL / E
 npm run check:corpus     # Sprawdzenie zgodności wyroczni numerycznych Python (Coffee + Contrast)
 npm run check:licenses   # Kontrola czystości licencji npm (zakaz GPL / AGPL w produkcji)
 npm run check:matrix     # Kontrola 100% pokrycia macierzy testów AST (docs/22-macierz-testow.md)
-npm run check:native     # Weryfikacja 20 niezmienników projektu iOS na Linuksie/Windowsie
+npm run check:native     # Weryfikacja niezmienników projektu iOS na Linuksie/Windowsie
+npm run check:reachability # Każda deklaracja src/core ma drogę z interfejsu (DEC-02)
 npm run typecheck        # Kontrola typów TypeScript (tsc --noEmit)
-npm run test:coverage    # Testy Jest z wymuszeniem progów 100% w src/core/
+npm run test:coverage    # Testy Jest z progami pokrycia z jest.config.js (zapadka: progi tylko w górę)
+npm run test:perf        # Budżety czasu CPU — informacyjnie, poza bramką (osobne zadanie CI)
 
 # Uruchomienie pojedynczego testu z logowaniem ziarna:
 PROP_SEED=12345 npm test -- tests/domain-properties.test.ts
@@ -31,7 +33,7 @@ PROP_SEED=12345 npm test -- tests/domain-properties.test.ts
 
 1. **Czysta logika domenowa (`BR-TEST-001`, `BR-TEST-002`):**
    * Wszystkie obliczenia (ekstrakcja, woda, timery, jednostki, kopie, parsery) znajdują się w `src/core/`.
-   * W `src/core/` obowiązuje bezwzględny próg **100% linii, gałęzi, funkcji i instrukcji**.
+   * Progi pokrycia ustala `jest.config.js` (zapadka z 2026-11-14, pilnowana testem `tests/quality-gate-contract.test.ts`): wolno je tylko podnosić. Nowy kod w `src/core/` ma pełne testy.
    * Zakaz importowania `react`, `react-native`, `expo-*` do plików w `src/core/`.
 2. **Strażnicy interakcji (`NFR-INT-001`..`016`):**
    * Przycisk „Anuluj” / „Zamknij” zawsze po lewej stronie nagłówka modala (`S1`).

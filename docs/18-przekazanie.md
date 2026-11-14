@@ -14,10 +14,10 @@
 | **Bazowy numer buildu** | `10` | Zgodny z `testflight.yml` (`BUILD_BASE + GITHUB_RUN_NUMBER`) |
 | **Bundle Identifier** | `pl.lukasz.napar` | iOS App Store |
 | **Architektura danych** | SQLite + Podwójna pula kopii | 10 kopii automatycznych ($P_{\text{auto}}$) + 10 ratunkowych ($P_{\text{safe}}$) |
-| **Klucze i18n** | 381 unikalnych kluczy | 100% symetrii PL / EN (`scripts/check-i18n.mjs`) |
-| **Macierz testów AST** | 597/597 elementów (100.0%) | `EKRAN`: 8, `UI`: 57, `TEKST`: 324, `LOGIKA`: 173, `WYMIAR`: 35 |
+| **Klucze i18n** | stan: `npm run check:i18n` | symetria PL / EN (`scripts/check-i18n.mjs`) |
+| **Macierz testów AST** | stan: `npm run check:matrix` | wymaga 100% elementów w 5 kategoriach |
 | **Wyrocznie numeryczne** | Python 3 + `scripts/check-corpus.mjs` | Korpus ekstrakcji kawy i kontrastu motywów (zgodność do 4 miejsc) |
-| **Stan testów Jest** | 63+ zestawy testowe | 100% zielone, zablokowany `act()` i `console.error` |
+| **Stan testów Jest** | stan: `npm run verify` | progi z `jest.config.js`, zablokowany `act()` i `console.error` |
 | **Potok CI/CD** | `ci.yml`, `tests-tz.yml`, `testflight.yml`, `e2e-ios.yml`, `pages.yml` | 100% zgodne z zasadami minimalnych uprawnień |
 
 ---
@@ -35,9 +35,9 @@ npm run check:i18n       # Walidacja symetrii tłumaczeń PL/EN
 npm run check:corpus     # Weryfikacja zgodności z wyroczniami w Pythonie
 npm run check:licenses   # Kontrola czystości licencji (zakaz GPL w prod)
 npm run check:matrix     # Weryfikacja 100% pokrycia macierzy testów AST
-npm run check:native     # Sprawdzenie 20 niezmienników iOS na Linuksie/Windowsie
+npm run check:native     # Sprawdzenie niezmienników iOS na Linuksie/Windowsie
 npm run typecheck        # Kontrola typów TypeScript (tsc --noEmit)
-npm run test:coverage    # Pełny zestaw testów z egzekwowaniem progów 100% w logice
+npm run test:coverage    # Pełny zestaw testów z progami z jest.config.js
 
 # Uruchomienie pojedynczego testu z rejestracją ziarna generatora:
 PROP_SEED=12345 npm test -- tests/domain-properties.test.ts

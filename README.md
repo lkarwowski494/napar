@@ -124,7 +124,7 @@ npm run check:i18n
 # Uruchomienie testów jednostkowych i integracyjnych Jest
 npm test
 
-# Pełna weryfikacja projektu (i18n + typecheck + 100% testów z pokryciem)
+# Pełna weryfikacja projektu (ta sama bramka co CI: kontrole, typecheck, testy z progami z jest.config.js)
 npm run verify
 
 # Uruchomienie aplikacji w środowisku Expo
@@ -184,7 +184,7 @@ napar/
 │       ├── qr-code.tsx         # Generator kodów QR SVG
 │       ├── confirm.ts          # Zabezpieczenia sesji parzenia przed przerwaniem
 │       ├── theme.ts            # Tokeny stylistyczne (Apps4Brew artisanal)
-│       └── __tests__/          # 44 zestawy testowe (379 testów, 100% pass, >97% pokrycia)
+│       └── __tests__/          # Testy jednostkowe logiki (stan: npm run verify)
 ├── scripts/
 │   ├── check-i18n.mjs          # Bramka CI weryfikująca 100% symetrii PL/EN
 │   └── ci/                     # Skrypty automatyzacji budowania i wysyłki TestFlight

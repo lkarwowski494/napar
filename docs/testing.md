@@ -8,20 +8,16 @@ Zgodnie ze standardem wieloperspektywicznego testowania przyjętym w ekosystemie
 Funkcjonalność uznaje się za ukończoną tylko wtedy, gdy:
 1. Posiada pokrycie we wszystkich właściwych dla siebie warstwach testów (tabela poniżej).
 2. `tsc --noEmit` kończy się z zerem błędów.
-3. Wszystkie testy Jest przechodzą w 100% (`npm run verify`).
+3. `npm run verify` kończy się kodem 0 (te same kroki co CI).
 4. Spełnia surowe założenia **Apps4Brew**: 100% offline-first, zerowa telemetria, zerowe logowanie, lokalna baza SQLite i otwartość danych (eksport/import JSON/CSV).
 
 ---
 
 ## Progi Pokrycia Kodu (Coverage Thresholds — Zapadki)
 
-Zgodnie z `jest.config.js`, w projekcie obowiązują twarde progi pokrycia uniemożliwiające regresję:
-
-| Obszar | Linie (Lines) | Funkcje (Funcs) | Instrukcje (Stmts) | Gałęzie (Branch) |
-|---|---|---|---|---|
-| **Globalnie (Cały projekt)** | **≥ 97%** | **≥ 97%** | **≥ 97%** | **≥ 85%** |
-| **`src/core/` (Logika domeny, baza, fizyka)** | **≥ 98%** | **≥ 98%** | **≥ 98%** | **≥ 90%** |
-| **`app/` (Ekrany, modale, routing)** | **≥ 95%** | **≥ 95%** | **≥ 95%** | **≥ 75%** |
+Progi pokrycia są tylko w `jest.config.js` (`coverageThreshold`) — tu nie przepisujemy liczb, bo się rozjeżdżały.
+Od 2026-11-14 to zapadka na zmierzonym stanie (M1-audytor-generalny-011/013, rekomendacja 07-jakosc-004 a): progi wolno tylko podnosić,
+co pilnuje `tests/quality-gate-contract.test.ts`. Pliki, w których obniżono próg przy zapadce, i powód: komentarz w `jest.config.js`.
 
 ---
 
@@ -34,7 +30,7 @@ Zgodnie z `jest.config.js`, w projekcie obowiązują twarde progi pokrycia uniem
 | **3. Testy Własności i Niezmienników (Property-Based)** | `src/core/__tests__/property-based.test.ts` | • Odwracalność matematyczna: `water = dose * ratio` dla losowych liczb zmiennoprzecinkowych<br>• Ścisła monotoniczność EY% względem TDS (`TDS₁ < TDS₂ ⇒ EY₁ < EY₂`)<br>• Zupełność i rozłączność klasyfikacji SCA Golden Cup<br>• Monotoniczność nastaw klików dla wszystkich młynków (`k+1 > k`)<br>• Stabilność round-trip konwertera młynków (`clicks → microns → clicks`)<br>• Liniowość i addytywność koncentratów mineralnych wody (`calc(2×) == 2 × calc(1×)`)<br>• Prawo zachowania masy kofeiny w herbatach Gongfu Cha | Dowód matematycznej poprawności i braku anomalii brzegowych. |
 | **4. Odporność na Chaos i Fuzzing (Chaos/Fuzz)** | `src/core/__tests__/fuzz-resilience.test.ts` | • Skrajne, ujemne, zerowe, NaN i nieskończone wartości w fizyce ekstrakcji<br>• Losowy fuzzer TDS/EY bez rzucania niekontrolowanych wyjątków<br>• Fuzzer stężeń mineralnych wody z ujemnymi i olbrzymimi liczbami<br>• Fuzzer mikronów młynków poza fizyczną skalą z bezpiecznym przycięciem (clamping)<br>• Fuzzer maszyny stanów timera (`BrewTimerEngine`): 1000 losowych zdarzeń w stanach IDLE, RUNNING, PAUSED, FINISHED<br>• Odporność na uszkodzone, puste i ucięte ładunki JSON w imporcie bazy | Aplikacja nigdy nie ulega awarii (crash-free) przy złośliwych lub zniekształconych danych. |
 | **5. Dostępność i Ergonomia (WCAG & Ergonomics)** | `src/core/__tests__/a11y-theme.test.tsx` | • Matematyka luminancji względnej WCAG 2.1 dla ciemnego motywu `baristaDark`<br>• Kontrast tekstu głównego ≥ 7:1 (kryterium AAA)<br>• Kontrast tekstu pomocniczego ≥ 4.5:1 (kryterium AA)<br>• Kontrast akcentów (miedź / szmaragd) ≥ 3:1<br>• Etykiety VoiceOver (`accessibilityLabel`) na stepperach i selektorach<br>• Role dostępności (`accessibilityRole="button"`) na kole sensorycznym<br>• Zgodność siatki Apple HIG (wielokrotności 4pt / 8pt dla paddingów, marginesów i zaokrągleń) | Pełna dostępność dla osób słabowidzących i korzystających z czytników ekranu. |
-| **6. Moduły Domenowe i Logika** | `domain-rules.test.ts`<br>`timer-engine.test.ts`<br>`water-chemistry.test.ts`<br>`grinder-converter.test.ts`<br>`gongfu.test.ts`<br>`i18n.test.ts`<br>`confirm-announce.test.ts` | • Złoty Puchar SCA, wzory ekstrakcji, TDS, EY%<br>• Precyzyjny silnik stopera z kompensacją dryfu czasu rzeczywistego (`Date.now()`)<br>• Chemia wody (SCA target, Rao/Perger, twardość GH/KH, roztwory buforowe)<br>• Mapowanie mikronów 6 czołowych młynków (Comandante, Timemore C2/C3, 1Zpresso JX-Pro/K-Ultra, Fellow Ode 2)<br>• Wielozalewowy rytuał Gongfu Cha (czasy, parzenia, spadek kofeiny)<br>• Odmiana, formatowanie liczb i dat, komunikaty potwierdzeń | 100% pokrycia logiki biznesowej kawy i herbaty. |
+| **6. Moduły Domenowe i Logika** | `domain-rules.test.ts`<br>`timer-engine.test.ts`<br>`water-chemistry.test.ts`<br>`grinder-converter.test.ts`<br>`gongfu.test.ts`<br>`i18n.test.ts`<br>`confirm-announce.test.ts` | • Złoty Puchar SCA, wzory ekstrakcji, TDS, EY%<br>• Precyzyjny silnik stopera z kompensacją dryfu czasu rzeczywistego (`Date.now()`)<br>• Chemia wody (SCA target, Rao/Perger, twardość GH/KH, roztwory buforowe)<br>• Mapowanie mikronów 6 czołowych młynków (Comandante, Timemore C2/C3, 1Zpresso JX-Pro/K-Ultra, Fellow Ode 2)<br>• Wielozalewowy rytuał Gongfu Cha (czasy, parzenia, spadek kofeiny)<br>• Odmiana, formatowanie liczb i dat, komunikaty potwierdzeń | Pokrycie logiki biznesowej kawy i herbaty według progów z `jest.config.js`. |
 | **7. Baza Danych i Stan Globalny** | `database.test.ts`<br>`brew-context.test.tsx` | • Schemat tabel SQLite, migracje, operacje CRUD receptur i dziennika<br>• Integralność referencyjna, kaskadowe usuwanie powiązań<br>• Zapewnienie transakcyjności eksportu/importu bazy<br>• Globalny Context Provider zapobiegający wyciekom pamięci | Integralność danych offline na urządzeniu. |
 | **8. Ekrany UI i Integracje Wizualne** | `brew-screen.test.tsx`<br>`journal-screen.test.tsx`<br>`stash-screen.test.tsx`<br>`dialin-screen.test.tsx`<br>`caffeine-screen.test.tsx`<br>`settings-screen.test.tsx`<br>`gongfu-screen.test.tsx`<br>`recipe-builder.test.tsx`<br>`root-layout.test.tsx`<br>`tabs-layout.test.tsx`<br>`flavor-wheel.test.tsx`<br>`caffeine-chart.test.tsx`<br>`radar-chart.test.tsx` | • Renderowanie komponentów i interakcje użytkownika (kliknięcia, formularze, suwaki)<br>• Dynamiczne aktualizacje stanu stoperów, filtrów i wykresów SVG<br>• Reakcja na błędy formularzy, puste stany (empty states) i potwierdzenia usunięcia<br>• Pełne pokrycie layoutów Expo Router (Root Stack i Dolny Pasek Zakładek) | Płynne, niezawodne działanie interfejsu użytkownika w React Native / Expo. |
 | **9. Wersja darmowa bez zakupów (DEC-01 a)** | `tests/audit-fixes.test.tsx` (M1-audytor-generalny-009) | • Stan `trial_brews_count = 15` i `trial_started_at` sprzed 15 dni → wszystkie akcje (parzenie, Gongfu, spiżarnia, receptury, dziennik) działają bez okna zakupu<br>• Brak biblioteki StoreKit w `package.json` ⇒ w kodzie nie ma stanu uprawnienia Pro ani sztucznego paragonu (trwała kontrola TASK-R03-01) | Darmowa 1.0 nie blokuje użytkownika i nie nadaje Pro poza App Store. |
@@ -48,8 +44,8 @@ Potok CI zdefiniowany w `.github/workflows/ci.yml` wymusza jakość przy każdym
 * **Współbieżność (`concurrency`)**: Anulowanie przestarzałych przebiegów dla tego samego PR (`cancel-in-progress`).
 * **Kroki weryfikacji**:
   1. `npm ci`
-  2. `npm run typecheck` (`tsc --noEmit`)
-  3. `npm run test:coverage -- --ci` (30 zestawów testowych, 287 testów, sprawdzanie progów pokrycia zapadkowego, zero-telemetria, budżety CPU).
+  2. `npm run verify` — kontrole (i18n, licencje, wyrocznie, macierz, osiągalność, natywne), `tsc --noEmit` i `test:coverage -- --ci` z progami z `jest.config.js`.
+  3. Osobne zadanie `perf` (informacyjnie, nie blokuje): `npm run test:perf` — budżety czasu CPU.
 
 ---
 

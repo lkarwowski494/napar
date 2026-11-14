@@ -12,9 +12,9 @@ Przed zgłoszeniem zakończenia pracy nad jakąkolwiek modyfikacją kodu aplikac
 1. **Jakość kodu i typowanie TypeScript (`DEC-01`):**
    * Polecenie `npm run typecheck` kończy się z kodem `0` (zero błędów kompilatora `tsc`).
    * Brak pomijania typów (`any`), brak nieudokumentowanych rzutowań `as unknown as X`.
-2. **Czysta logika i 100% pokrycia testami (`BR-TEST-001`, `BR-TEST-002`):**
+2. **Czysta logika i pokrycie testami (`BR-TEST-001`, `BR-TEST-002`):**
    * Nowe funkcje obliczeniowe, algorytmy i reguły walidacji umieszczone w czystych modułach `src/core/` (bez zależności od Reacta i widoków).
-   * Pokrycie w `src/core/` wynosi bezwzględnie **100% linii, 100% gałęzi, 100% funkcji i 100% instrukcji**.
+   * Pokrycie spełnia progi z `jest.config.js` (zapadka: tylko w górę); nowe funkcje w `src/core/` mają pełne testy.
 3. **Strażnicy interakcji (`NFR-INT-001`..`016`):**
    * Każdy modal posiada przycisk „Anuluj” / „Zamknij” po lewej stronie nagłówka (`S1`).
    * Brak luźnych przycisków zapisu w stopkach formularzy — zapis wyłącznie w prawym rogu nagłówka (`S3`).
@@ -43,9 +43,9 @@ Przed przygotowaniem wydania do App Store Connect i TestFlight:
    * `npm run check:corpus` (wyrocznie numeryczne Python zgodne do 4 miejsc po przecinku)
    * `npm run check:licenses` (zero licencji GPL / AGPL w produkcyjnym drzewie zależności)
    * `npm run check:matrix` (100% pokrycia AST bez luk)
-   * `npm run check:native` (20 niezmienników projektu iOS na Linuksie/Windowsie)
+   * `npm run check:native` (niezmienników projektu iOS na Linuksie/Windowsie)
    * `npm run typecheck` (zero błędów TS)
-   * `npm run test:coverage` (100% testów przechodzi, brak ostrzeżeń `act()` i `console.error`)
+   * `npm run test:coverage` (wszystkie testy przechodzą, progi z `jest.config.js`, brak ostrzeżeń `act()` i `console.error`)
 2. **Bezpieczeństwo i prywatność repozytorium (`NFR-SEC-001`..`015`):**
    * Brak śledzonych kluczy prywatnych, plików `.p8`, `.p12` ani plików `.env`.
    * Skrypt `gitleaks` na pełnym zakresie historii nie wykrywa wycieków sekretów.

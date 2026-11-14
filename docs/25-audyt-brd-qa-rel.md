@@ -74,7 +74,7 @@ Audyt początkowy wykazał, że aplikacja posiada solidne fundamenty domenowe (4
 
 ### Audytor 8: `SEC/NAT/PERF` — Bezpieczeństwo, Natywny iOS i Wydajność
 - **SEC-01 [KRYTYCZNE / Realne]:** Podatność na CSV Formula Injection w `escapeCsvValue` w `src/core/database.ts`. Ciągi zaczynające się od `=`, `+`, `-`, `@` nie są poprzedzane apostrofem `'` (`NFR-SEC-015`, `RD-ENG-10`).
-- **SEC-02 [KRYTYCZNE / Realne]:** Brak weryfikacji konfiguracji natywnej na Linuksie przez `scripts/verify-native.mjs` (kontrola 20 niezmienników iOS, `PrivacyInfo.xcprivacy`, brak kanału alfa w ikonie `1024x1024`, `ITSAppUsesNonExemptEncryption`, `BR-REL-009`, `BR-REL-010`, `RD-ENG-11`).
+- **SEC-02 [KRYTYCZNE / Realne]:** Brak weryfikacji konfiguracji natywnej na Linuksie przez `scripts/verify-native.mjs` (kontrola niezmienników iOS, `PrivacyInfo.xcprivacy`, brak kanału alfa w ikonie `1024x1024`, `ITSAppUsesNonExemptEncryption`, `BR-REL-009`, `BR-REL-010`, `RD-ENG-11`).
 - **SEC-03 [WYSOKIE / Realne]:** Brak testu bezpieczeństwa publicznego repozytorium `tests/public-repo.test.ts` (blokada wywołań sieciowych, zakaz `EXPO_TOKEN`, weryfikacja uprawnień workflow, `NFR-SEC-001`, `NFR-SEC-014`).
 - **SEC-04 [WYSOKIE / Realne]:** Brak statycznych stron `site/` (`index.html`, `privacy.html`, `support.html`) oraz workflowu `pages.yml` wymaganego przez App Store Connect (`BR-REL-019`, `BR-REL-020`).
 - **SEC-05 [WYSOKIE / Realne]:** Brak testu czystości marek konkurentów `brands.contract.test.ts` (`NFR-SEC-011`).
@@ -141,7 +141,7 @@ Po zakończeniu Faz 1–4 przeprowadzona została **Runda 2 Audytu (dogrywka wer
 | **TST-04** | `TST` | WYSOKIE | Brak wyroczni w Pythonie 3 | Skrypty `scripts/gen-*-corpus.py` + `check-corpus.mjs` | `tests/oracle-coffee.test.ts` & `tests/oracle-contrast.test.ts` | **ZAMKNIĘTE** |
 | **TST-05** | `TST` | WYSOKIE | Brak interpretera Maestro w Jest | Wdrożono `tests/maestro-runner.ts` i `tests/maestro-flows.test.ts` | `tests/maestro-flows.test.ts` | **ZAMKNIĘTE** |
 | **SEC-01** | `SEC` | KRYTYCZNE | Podatność CSV Formula Injection | Wdrożono `escapeCsvCell` neutralizujący `=`, `+`, `-`, `@` | `src/core/__tests__/database.test.ts` & `tests/audit-fixes.test.tsx` (`SEC-01`) | **ZAMKNIĘTE** |
-| **SEC-02** | `SEC` | KRYTYCZNE | Brak weryfikacji natywnej na Linuksie | Wdrożono `scripts/verify-native.mjs` (20 niezmienników) | `npm run check:native` | **ZAMKNIĘTE** |
+| **SEC-02** | `SEC` | KRYTYCZNE | Brak weryfikacji natywnej na Linuksie | Wdrożono `scripts/verify-native.mjs` (niezmienników) | `npm run check:native` | **ZAMKNIĘTE** |
 | **SEC-03** | `SEC` | WYSOKIE | Brak testu publicznego repozytorium | Wdrożono `tests/public-repo.test.ts` (zero wywołań sieciowych, tokenów) | `tests/public-repo.test.ts` | **ZAMKNIĘTE** |
 | **SEC-04** | `SEC` | WYSOKIE | Brak stron prawnych `site/` | Utworzono `index.html`, `privacy.html`, `support.html` + `pages.yml` | `tests/public-repo.test.ts` | **ZAMKNIĘTE** |
 | **SEC-05** | `SEC` | WYSOKIE | Brak ochrony przed markami | Wdrożono `tests/brands.contract.test.ts` | `tests/brands.contract.test.ts` | **ZAMKNIĘTE** |
@@ -177,7 +177,7 @@ Po zakończeniu Faz 1–4 przeprowadzona została **Runda 2 Audytu (dogrywka wer
      * `npm run check:licenses` (0 licencji GPL/AGPL w drzewie produkcyjnym),
      * `npm run check:corpus` (wyrocznie Pythona 3 generują zgodne korpusy do 4 miejsc po przecinku),
      * `npm run check:matrix` (**597/597 elementów**, 100.0% pokrycia AST w 5 kategoriach: `EKRAN`, `UI`, `TEKST`, `LOGIKA`, `WYMIAR`),
-     * `npm run check:native` (20 niezmienników natywnego projektu iOS, w tym ikona RGB 1024x1024 bez kanału alfa oraz Privacy Manifests),
+     * `npm run check:native` (niezmienników natywnego projektu iOS, w tym ikona RGB 1024x1024 bez kanału alfa oraz Privacy Manifests),
      * `npm run typecheck` (0 błędów kompilatora TypeScript `tsc`),
      * `npm test` (**66 pakietów testowych, 575 testów przechodzących**, brak ostrzeżeń `act()` i `console.error`).
 3. **Decyzja:** **WYDANIE ZATWIERDZONE (STATUS: READY FOR RELEASE / TESTFLIGHT)**.
