@@ -22,8 +22,7 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - **Wyeksponowana Nastawa Młynka (`BrewHeader`):** Prominentna pigułka z dokładną liczbą klików (np. `Comandante C40: 22 kliki`, `Timemore: 18 klików`) widoczna na samej górze ekranu przed każdym zalaniem.
    - **1-Tap Szybki Start (`BrewQuickPrepCard`):** Karta „Do drippera na wagę” z dużymi stepperami dozy (wysokość 44–52pt), wskaźnikiem wody, temperatury i natychmiastowym rozpoczęciem sesji poniżej 15 sekund.
    - **Batch Scaling (👥 Porcje 1–4 osób):** Automatyczne przeliczanie dozy i wody wraz z dynamiczną rekomendacją przemiału (`+2 kliki grubiej`).
-   - **Focus Mode Stoper (`BrewActiveFocusTimer`):** Cyfrowy zegar z gigantycznymi cyframi (64pt) czytelnymi z odległości 1 metra, wskaźnikiem przepływu `~g/s`, pigułkami korekty w locie (`-10s` / `+10s`) oraz kontrolkami brudnego kciuka (`PAUZA`, `DALEJ ▶`, `WSTECZ`, `RESET`, `WZNÓW`, `ZAPISZ` $\ge 52\,\text{pt}$).
-   - **Progressive Disclosure (`BrewProAccordion`):** Schowany pod eleganckim, zwijanym panelem zaawansowany zestaw rzemieślniczy: chemia wody Barista Hustle / SCA, odczyt refractometru TDS (%) oraz radar sensoryczny SCA.
+   - **Focus Mode Stoper (`BrewActiveFocusTimer`):** Cyfrowy zegar z gigantycznymi cyframi (64pt) czytelnymi z odległości 1 metra, zalecanym tempem zalewania `~g/s`, pigułkami korekty w locie (`-10s` / `+10s`) oraz kontrolkami brudnego kciuka (`PAUZA`, `DALEJ ▶`, `WSTECZ`, `RESET`, `WZNÓW`, `ZAPISZ` $\ge 52\,\text{pt}$).
    - **Karta Degustacyjna & Dial-in Doctor (`BrewFinishModal`):** 1-klikowa autodiagnoza smaku (kwasowość, gorycz, wodnistość) z natychmiastową receptą ratunkową oraz podsumowaniem **Ekonomii Rzemiosła** (koszt domowy vs 18 zł w kawiarni specialty).
    - **Wymiana Receptur Offline (Kody QR SVG & Deep Linki `napar://`):** Szybkie skanowanie aparatem i udostępnianie receptur w 100% offline.
 2. **🫘 Spiżarnia Ziaren & Liści (Stash) & Kompendium Wiedzy:**
@@ -56,11 +55,10 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Dwutorowy kalkulator: roztwory koncentratów płynnych (1g/L = 2 ppm) oraz bezpośrednie odważanie soli suchych ($\text{NaHCO}_3, \text{MgSO}_4, \text{CaCl}_2$). [Wdrożone]
    - Diagnoza chemiczna wody: wykrywanie wad smaku wynikających ze zbyt twardej lub niebuforowanej wody. [Wdrożone]
    - Poradnik i benchmark powszechnie dostępnych wód butelkowanych (Volvic, Żywiecki Kryształ itp.). [Wdrożone]
-6. **⚡ Monitor Kofeiny, Kalkulator Snu & Apple HealthKit (BR-KOF-001 do BR-KOF-004):**
+6. **⚡ Monitor Kofeiny i Kalkulator Snu (BR-KOF-001, BR-KOF-003, BR-KOF-004):**
    - Model jedno-kompartmentowej eliminacji kofeiny w organizmie. [Wdrożone]
    - **Personalizacja Metabolizmu Kofeiny (D-02):** Regulacja indywidualnego czasu półtrwania kofeiny $t_{1/2}$ w zakresie 3.0h – 8.0h (domyślnie 5.0h) z zapisem w SQLite. [Wdrożone]
    - **Szacunek kofeiny o porze snu (BR-KOF-003):** Szacowana ilość kofeiny w organizmie o wybranej godzinie snu z persystencją godziny snu, bez progu i oceny „bezpieczne” (M1-audytor-generalny-015, DEC-05 a: źródło nie podaje progu 25 mg). [Wdrożone]
-   - **Integracja z Apple HealthKit (BR-KOF-002, Z-096):** Architektura i model danych eksportu spożytej kofeiny (HKQuantityTypeIdentifierDietaryCaffeine) z oknem zgody i trybem offline.
    - Dobowy bilans kofeiny w relacji do normy EFSA (400 mg). [Wdrożone]
 7. **⚙️ Ustawienia, Kopia Zapasowa i Jednostki:**
    - **⚖️ Globalny Przełącznik Jednostek (Metric / Imperial — DEC-21 & BR-JEDN-001):** Płynne przełączanie między systemem metrycznym (°C, g, ml) i imperialnym (°F, oz, fl oz) z zachowaniem wewnętrznej precyzji obliczeniowej i trwałą persystencją w SQLite. [Wdrożone]
@@ -68,8 +66,6 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - Wybór domyślnego młynka domowego z trwałą synchronizacją w SQLite. [Wdrożone]
    - Eksport i import bazy w formacie JSON oraz eksport do arkuszy CSV (Dziennik i Spiżarnia). [Wdrożone]
    - **Model wersji 1.0: całkowicie darmowa (DEC-01 audytu M1, wybór a, 2026-11-13).** Bez zakupów w aplikacji, okresu próbnego, bramek i ekranu zakupu; wszystkie funkcje dostępne. Model płatny po 1.0 wymaga nowej decyzji i prawdziwego StoreKit. [Wdrożone]
-8. **⌚ Ekosystem Apple (Plany na wydanie v1.2 — DEC-01):**
-   - Natywny mostek ActivityKit (Live Activity na ekranie blokady i Dynamic Island) oraz aplikacja Apple Watch zaplanowane są na wydanie natywne w Xcode (v1.2).
 
 ---
 
@@ -155,7 +151,6 @@ napar/
 │   │       ├── BrewHeader.tsx           # Kliki młynka na samej górze, wybór receptury i ziarna
 │   │       ├── BrewQuickPrepCard.tsx    # Karta 1-Tap "Do drippera na wagę", steppery 44-52pt
 │   │       ├── BrewActiveFocusTimer.tsx # Stoper Focus Mode, cyfry 64pt, kontrolki brudnego kciuka
-│   │       ├── BrewProAccordion.tsx     # Akordeon rzemieślniczy: woda, TDS, radar sensoryczny
 │   │       └── BrewFinishModal.tsx      # Arkusz degustacyjny, Dial-in Doctor i ekonomia
 │   └── core/                   # Czysta logika biznesowa i persystencja
 │       ├── domain-rules.ts     # Deterministyczne reguły RD-01…RD-30

@@ -341,7 +341,7 @@ Gdy chcesz sprawdzić, ile aktywnej kofeiny krąży obecnie w Twoim krwiobiegu (
                                      |
                                      v
 +-------------------------------------------------------------------------+
-| [4. EGZEKUCJA / ZAPIS] Zapis wpisu w SQLite + opcjonalny HealthKit sync |
+| [4. EGZEKUCJA / ZAPIS] Zapis wpisu w SQLite                             |
 | Aktualizacja wykresu i ostrzeżenia zdrowotnego                          |
 +-------------------------------------------------------------------------+
 ```

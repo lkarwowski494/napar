@@ -989,4 +989,14 @@ describe('M1-audytor-generalny-021: bez przełącznika i obietnic Apple Health d
     expect(grepFiles(/healthKit|Apple Health|HealthKit|\bv1\.[1-9]\b/, localeFiles)).toEqual([]);
   });
 
+  test('11-wzrost-002 / 10-wydanie-004: strona, polityka prywatności i README bez Apple Health i funkcji spoza wersji', () => {
+    expect(publicTexts).toEqual(expect.arrayContaining(['README.md', join('site', 'privacy.html'), join('site', 'index.html')]));
+    expect(grepFiles(HEALTH, publicTexts)).toEqual([]);
+    expect(
+      grepFiles(
+        /czasie rzeczywistym \(g\/s\)|wskaźnikiem przepływu|Przywróć Zakupy|zweryfikowana bezpośrednio w sklepie|odnawiają się automatycznie|Subskrypcje odnawiają|Chmurą rodzinną|\bv1\.[1-9]\b|Live Activity|Dynamic Island|Apple Watch|BrewProAccordion/i,
+        publicTexts,
+      ),
+    ).toEqual([]);
+  });
 });
