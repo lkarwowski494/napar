@@ -1,5 +1,5 @@
 // ============================================================================
-// Napar (Steepwise) — Ustawienia, Kopia Zapasowa i Pro (Apps4Brew)
+// Napar (Steepwise) — Ustawienia i Kopia Zapasowa (Apps4Brew)
 // ZP-02, ZP-06, ZP-07, ZP-08, ZP-10: 100% offline, zero-login, darmowy eksport JSON
 // ============================================================================
 
@@ -46,14 +46,11 @@ import {
 import { theme } from '../src/core/theme';
 import { useTranslation } from '../src/core/i18n';
 import { safetyBackup } from '../src/core/backup';
-import { useAppAccess } from '../src/core/app-access';
-import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
 import { JsonExportModal, JsonImportModal } from '../src/components/settings/JsonBackupModals';
 import { CsvExportModal } from '../src/components/settings/CsvExportModal';
 import { CaffeineSettingsCard } from '../src/components/settings/CaffeineSettingsCard';
 import { DataBackupCard } from '../src/components/settings/DataBackupCard';
 import { GrinderSelectionCard } from '../src/components/settings/GrinderSelectionCard';
-import { PassSettingsCard } from '../src/components/settings/PassSettingsCard';
 import { AppPreferencesCard } from '../src/components/settings/AppPreferencesCard';
 
 export default function SettingsScreen() {
@@ -99,14 +96,6 @@ export default function SettingsScreen() {
   const [healthKitSync, setHealthKitSync] = useState(() => {
     return getHealthKitSyncEnabled();
   });
-  const {
-    status: accessStatus,
-    isSubscribed,
-    subscriptionTier,
-    brewsRemaining,
-    refresh: refreshAccess,
-  } = useAppAccess();
-  const [showPassModal, setShowPassModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showCsvModal, setShowCsvModal] = useState(false);
@@ -202,7 +191,6 @@ export default function SettingsScreen() {
       importDataJson(importJsonText.trim());
       setShowImportModal(false);
       setImportJsonText('');
-      refreshAccess();
       Alert.alert(
         language === 'pl' ? 'Sukces!' : 'Success!',
         language === 'pl' ? 'Dane zostały pomyślnie zaimportowane do Twojej lokalnej bazy.' : 'Data successfully imported to your local database.'
@@ -261,16 +249,6 @@ export default function SettingsScreen() {
         t={t}
       />
 
-      {/* Status Apps4Brew Pass (Pro) */}
-      <PassSettingsCard
-        isSubscribed={isSubscribed}
-        subscriptionTier={subscriptionTier}
-        accessStatus={accessStatus}
-        brewsRemaining={brewsRemaining}
-        onOpenPassModal={() => setShowPassModal(true)}
-        t={t}
-      />
-
       {/* Modale Eksportu / Importu */}
       <JsonExportModal
         visible={showExportModal}
@@ -318,9 +296,9 @@ export default function SettingsScreen() {
           style={styles.infoRow}
           onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/privacy.html')}
           accessibilityRole="link"
-          accessibilityLabel={t.paywall?.privacyLabel || (language === 'pl' ? 'Polityka Prywatności' : 'Privacy Policy')}
+          accessibilityLabel={t.settings.privacyLabel || (language === 'pl' ? 'Polityka Prywatności' : 'Privacy Policy')}
         >
-          <Text style={styles.infoLabel}>{t.paywall?.privacyLabel || (language === 'pl' ? 'Polityka Prywatności' : 'Privacy Policy')}</Text>
+          <Text style={styles.infoLabel}>{t.settings.privacyLabel || (language === 'pl' ? 'Polityka Prywatności' : 'Privacy Policy')}</Text>
           <Text style={[styles.infoValue, { color: theme.colors.copper }]}>{language === 'pl' ? 'Otwórz ↗' : 'Open ↗'}</Text>
         </Pressable>
         <View style={styles.divider} />
@@ -328,9 +306,9 @@ export default function SettingsScreen() {
           style={styles.infoRow}
           onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/terms.html')}
           accessibilityRole="link"
-          accessibilityLabel={t.paywall?.eulaLabel || (language === 'pl' ? 'Regulamin (EULA)' : 'Terms of Service (EULA)')}
+          accessibilityLabel={t.settings.eulaLabel || (language === 'pl' ? 'Regulamin (EULA)' : 'Terms of Service (EULA)')}
         >
-          <Text style={styles.infoLabel}>{t.paywall?.eulaLabel || (language === 'pl' ? 'Regulamin (EULA)' : 'Terms of Service (EULA)')}</Text>
+          <Text style={styles.infoLabel}>{t.settings.eulaLabel || (language === 'pl' ? 'Regulamin (EULA)' : 'Terms of Service (EULA)')}</Text>
           <Text style={[styles.infoValue, { color: theme.colors.copper }]}>{language === 'pl' ? 'Otwórz ↗' : 'Open ↗'}</Text>
         </Pressable>
         <View style={styles.divider} />
@@ -354,18 +332,6 @@ export default function SettingsScreen() {
           <Text style={[styles.infoValue, { color: theme.colors.copper }]}>{language === 'pl' ? 'Wystaw ocenę ↗' : 'Write review ↗'}</Text>
         </Pressable>
       </View>
-
-      {/* Apps4Brew Pass Paywall Modal */}
-      <Apps4BrewPassModal
-        visible={showPassModal}
-        onClose={() => setShowPassModal(false)}
-        onPurchaseSuccess={() => {
-          refreshAccess();
-        }}
-        onSubscribed={() => {
-          refreshAccess();
-        }}
-      />
     </ScrollView>
   );
 }

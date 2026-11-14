@@ -26,7 +26,6 @@ import {
 import { formatBrewTimeMinutesSeconds, formatCostPerCup, formatFlowRateProfile, formatExtractionPressure } from '../unit-converter';
 import { normSearch, rankSearchResults, filterBySearchFacets, calculateSearchTermCoverage } from '../search-utils';
 import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot, CumulativeWaterPoint } from '../timer-engine';
-import { calculateLifetimeBreakEven, evaluateUpsellTrigger, evaluateCustomRecipeLimit } from '../app-access';
 import { generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, generateExtractionTroubleshootingGuide, predictGrindProfileByProcessAndRoast, evaluateChannelingRisk } from '../bpr-engine';
 import { auditBackupRelationalIntegrity, detectBackupDuplicates } from '../backup';
 import { recommendBrewMethodsForOrigin } from '../knowledge-data';
@@ -463,7 +462,7 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     expect(ms).toBeLessThan(80);
   });
 
-  test('Budżet 18: 10 000 obliczeń wskaźników różnorodności (calculateStashDiversity), opłacalności (calculateLifetimeBreakEven) i adaptacji BPR (< 80 ms)', () => {
+  test('Budżet 18: 10 000 obliczeń wskaźników różnorodności (calculateStashDiversity) i adaptacji BPR (< 80 ms)', () => {
     // 1. Poprawność biznesowa
     const sampleStash = [
       { id: 'b1', name: 'Kenya', type: 'coffee' as const, origin: 'Kenya', process: 'Washed', roasterOrProducer: 'Hard Beans', remainingWeightGrams: 200, initialWeightGrams: 250, flavorNotes: [], isFavorite: false, isArchived: false, createdAt: '', updatedAt: '' },
@@ -473,10 +472,6 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     const diversity = calculateStashDiversity(sampleStash);
     expect(diversity.diversityScore).toBeGreaterThanOrEqual(60);
 
-    const breakEven = calculateLifetimeBreakEven(149.99, 9.99, 49.99);
-    expect(typeof breakEven.isLifetimeRecommended).toBe('boolean');
-    expect(breakEven.breakEvenMonthsVsMonthly).toBeGreaterThan(0);
-
     const adj = generateAdaptiveRecipeAdjustment('V60', { isTooSour: true });
     expect(adj.recommendedGrindDeltaClicks).toBe(-2);
 
@@ -484,7 +479,6 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     const ms = measureCpuMs(() => {
       for (let i = 0; i < 10000; i++) {
         calculateStashDiversity(sampleStash);
-        calculateLifetimeBreakEven(150 + (i % 20), 50 + (i % 10), 10);
         generateAdaptiveRecipeAdjustment('V60', { isTooSour: (i % 2) === 0 });
       }
     });
@@ -527,11 +521,8 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     expect(ms).toBeLessThan(150);
   });
 
-  test('TASK-P96-10-WYD: Budżet 20: 10 000 obliczeń triggera upsell, rotacji spiżarni, skali twardości i profilu przepływu (< 150 ms)', () => {
+  test('TASK-P96-10-WYD: Budżet 20: 10 000 obliczeń rotacji spiżarni, skali twardości i profilu przepływu (< 150 ms)', () => {
     // 1. Poprawność biznesowa
-    const upsell = evaluateUpsellTrigger({ brewsCompleted: 15, isSubscribed: false });
-    expect(upsell.shouldShowUpsell).toBe(true);
-
     const inventoryItems = [
       { id: '1', name: 'Ethiopia', initialWeightGrams: 250, remainingWeightGrams: 50, isArchived: false },
       { id: '2', name: 'Kenya', initialWeightGrams: 250, remainingWeightGrams: 250, isArchived: false },
@@ -551,7 +542,6 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     // 2. Budżet wydajnościowy: 10 000 wywołań w pętli < 150 ms
     const ms = measureCpuMs(() => {
       for (let i = 0; i < 10000; i++) {
-        evaluateUpsellTrigger({ brewsCompleted: 10 + (i % 20), isSubscribed: false });
         evaluateStashTurnover(inventoryItems);
         calculateWaterHardnessScale(60 + (i % 100));
         estimateGrindDistributionSpread({ burrType: 'flat', targetMicrons: 500 + (i % 400) });
@@ -651,15 +641,11 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     expect(ms).toBeLessThan(200);
   });
 
-  test('TASK-P103-10-WYD: Budżet 23: 10 000 obliczeń pokrycia wyszukiwania, limitu receptur, rozkładu palenia, ryzyka kanałowania i duplikatów kopii (< 200 ms)', () => {
+  test('TASK-P103-10-WYD: Budżet 23: 10 000 obliczeń pokrycia wyszukiwania, rozkładu palenia, ryzyka kanałowania i duplikatów kopii (< 200 ms)', () => {
     // 1. Poprawność biznesowa
     const searchCoverage = calculateSearchTermCoverage('etiopia washed yirgacheffe', 'Kawa Etiopia Yirgacheffe Washed specialty');
     expect(searchCoverage.tier).toBe('exact_full');
     expect(searchCoverage.coverageRatio).toBe(1.0);
-
-    const recipeLimit = evaluateCustomRecipeLimit(3, { hasProAccess: false });
-    expect(recipeLimit.status).toBe('within_limit');
-    expect(recipeLimit.canCreateNewRecipe).toBe(true);
 
     const stashBeans = [
       { id: '1', brand: 'Roastery', name: 'Ethiopia', roastLevel: 'light', remainingWeightGrams: 200 },
@@ -690,7 +676,6 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     const ms = measureCpuMs(() => {
       for (let i = 0; i < 10000; i++) {
         calculateSearchTermCoverage('ethiopia washed', 'Ethiopia Yirgacheffe Washed');
-        evaluateCustomRecipeLimit(i % 8, { hasProAccess: i % 2 === 0 });
         estimateStashRoastDistribution(stashBeans);
         evaluateChannelingRisk({
           method: 'espresso',

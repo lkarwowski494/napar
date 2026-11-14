@@ -2839,15 +2839,6 @@ export function setHapticsEnabled(enabled: boolean): void {
   setAppSetting('haptics_enabled', Boolean(enabled) ? 'true' : 'false');
 }
 
-export function getIsProUser(): boolean {
-  const val = getAppSetting('is_pro_active', 'false');
-  return val === 'true';
-}
-
-export function setIsProUser(enabled: boolean): void {
-  setAppSetting('is_pro_active', Boolean(enabled) ? 'true' : 'false');
-}
-
 export function getCaffeineHalfLife(): number {
   const val = parseFloat(getAppSetting('caffeine_half_life_hours', '5.0'));
   if (isNaN(val) || val < 3.0 || val > 8.0) {

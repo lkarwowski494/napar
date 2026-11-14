@@ -24,14 +24,6 @@ jest.mock('../healthkit', () => ({
   saveDietaryCaffeineSample: jest.fn().mockResolvedValue({ success: true }),
 }));
 
-jest.mock('../app-access', () => ({
-  useAppAccess: jest.fn(() => ({
-    canCreate: true,
-    isHistoryReadOnly: false,
-    refresh: jest.fn(),
-  })),
-}));
-
 describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
   const mockLogs: CaffeineLog[] = [
     {

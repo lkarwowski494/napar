@@ -45,7 +45,6 @@ import {
   setCaffeineHalfLife,
   getBedtimeHour,
   setBedtimeHour,
-  setIsProUser,
 } from '../database';
 import { BrewTimerEngine } from '../timer-engine';
 import { wInKeep } from '../unit-converter';
@@ -77,7 +76,6 @@ import {
   announceStart,
   announceFinish,
 } from '../announce';
-import { getAppAccessState } from '../app-access';
 import { getCraftTheme, CRAFT_APPS } from '../craft-suite-theme';
 import {
   buildDynamicIslandPayload,
@@ -283,18 +281,7 @@ describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
     });
   });
 
-  describe('app-access and craft-suite-theme', () => {
-    test('subscription tier fallback and pro tier reading', () => {
-      setIsProUser(true);
-      setAppSetting('subscription_tier', 'none');
-      const st1 = getAppAccessState();
-      expect(st1.subscriptionTier).toBe('lifetime');
-
-      setAppSetting('subscription_tier', 'annual');
-      const st2 = getAppAccessState();
-      expect(st2.subscriptionTier).toBe('annual');
-    });
-
+  describe('craft-suite-theme', () => {
     test('getCraftTheme handles fallback to napar', () => {
       expect(getCraftTheme()).toBe(CRAFT_APPS.napar);
       expect(getCraftTheme('invalid' as any)).toBe(CRAFT_APPS.napar);

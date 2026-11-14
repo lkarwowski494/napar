@@ -120,7 +120,6 @@ import {
 } from '../knowledge-data';
 import { groupActionsByDate, getActionScheduleCounts, searchProactiveActions, getProactiveActionById, calculateActionPriorityScore, rankActionsByPriority, summarizeBprActionFeed, detectBrewingHabitDrift, generateAdaptiveRecipeAdjustment, evaluateRecipeComplexity, calculateBrewConsistencyIndex, generateExtractionTroubleshootingGuide, predictGrindProfileByProcessAndRoast } from '../bpr-engine';
 import { filterBackupEnvelope, diffBackupEnvelopes, mergeBackupEnvelopes, getBackupRecordCounts, isBackupEmpty, validateBackupEnvelopeIntegrity, sanitizeBackupEnvelope, estimateBackupFileSize, compareBackupVersions, generateBackupMigrationPlan, calculateBackupHealthScore, compactBackupEnvelope, auditBackupRelationalIntegrity, computeBackupChecksum } from '../backup';
-import { getSubscriptionBadgeInfo, getPaywallCallToAction, formatSubscriptionDiscount, calculateSubscriptionSavings, evaluateTrialStatus, calculateLifetimeBreakEven, compareSubscriptionPlans, evaluateUpsellTrigger, evaluateFeatureEntitlement } from '../app-access';
 import { importDataJson, filterInventoryItems, calculateInventorySummary, getLowStockInventoryItems, calculateInventoryTotalValue, calculateBeanFreshness, calculateInventoryUsageRate, calculateBeanRestingReadiness, calculateStashDiversity, estimateRemainingBrews, evaluateStashTurnover, calculateStashDepletionForecast, calculateStashCostEfficiency } from '../database';
 import { extractSearchSnippet, suggestSearchCorrections, calculateSearchRelevanceScore, filterSearchEntriesByTags, filterBySearchFacets, parseSearchQuery, highlightSearchMatches } from '../search-utils';
 
@@ -618,7 +617,7 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
     }
   });
 
-  test('Chaos 14: Fuzzing getSubscriptionBadgeInfo, filterInventoryItems, getActionScheduleCounts, diffBackupEnvelopes, getKnowledgeSummaryCounts, calculateHardnessRatio, filterGrinders, formatExtractionYield, calculateStepWaterIncrement, evaluateBrewMatrix (TASK-P73-12-NIE)', () => {
+  test('Chaos 14: Fuzzing filterInventoryItems, getActionScheduleCounts, diffBackupEnvelopes, getKnowledgeSummaryCounts, calculateHardnessRatio, filterGrinders, formatExtractionYield, calculateStepWaterIncrement, evaluateBrewMatrix (TASK-P73-12-NIE)', () => {
     const corruptInputs = [
       -100000, -1, -0, 0, 0.0001, 1.33, 15.5, 250, 10000, NaN, Infinity, -Infinity,
       '', '   ', '\uFEFFtest', '20,5%', '1.5', 'invalid', null, undefined,
@@ -626,13 +625,6 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
     ];
 
     for (const val of corruptInputs) {
-      // 1. getSubscriptionBadgeInfo
-      const badge = getSubscriptionBadgeInfo(val as any, val as any);
-      expect(typeof badge).toBe('object');
-      expect(typeof badge.badgeLabel).toBe('string');
-      expect(typeof badge.badgeVariant).toBe('string');
-      expect(typeof badge.isPro).toBe('boolean');
-
       // 2. filterInventoryItems
       const invFiltered = filterInventoryItems(val as any, val as any);
       expect(Array.isArray(invFiltered)).toBe(true);
@@ -818,7 +810,7 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
     }
   });
 
-  test('Chaos 17: Fuzzing evaluatePourOverRatio, evaluateWaterAlkalinity, estimateGrindDistribution, formatParticleSize, getCoffeeProcessGuide, BrewTimerEngine.calculateStepTimeWindow, extractSearchSnippet, getPaywallCallToAction, isBackupEmpty, getProactiveActionById, getLowStockInventoryItems (TASK-P80-12-NIE)', () => {
+  test('Chaos 17: Fuzzing evaluatePourOverRatio, evaluateWaterAlkalinity, estimateGrindDistribution, formatParticleSize, getCoffeeProcessGuide, BrewTimerEngine.calculateStepTimeWindow, extractSearchSnippet, isBackupEmpty, getProactiveActionById, getLowStockInventoryItems (TASK-P80-12-NIE)', () => {
     const corruptInputs = [
       -100000, -1, -0, 0, 0.0001, 15.0, 40.0, 150, 750, 2000, 10000, NaN, Infinity, -Infinity,
       '', '   ', '\uFEFFtest', '750 µm', '0.75 mm', '40 ppm', 'invalid', null, undefined,
@@ -868,12 +860,6 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       const snippet = extractSearchSnippet(val as any, val as any);
       expect(typeof snippet).toBe('string');
 
-      // 8. getPaywallCallToAction
-      const cta = getPaywallCallToAction(val as any);
-      expect(typeof cta).toBe('object');
-      expect(typeof cta.titlePl).toBe('string');
-      expect(typeof cta.urgency).toBe('string');
-
       // 9. isBackupEmpty
       const emptyCheck = isBackupEmpty(val as any);
       expect(typeof emptyCheck).toBe('boolean');
@@ -888,7 +874,7 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
     }
   });
 
-  test('Chaos 18: Fuzzing calculateBurrSpeedImpact, calculateMagnesiumCalciumRatio, getCoffeeOriginGuide, validateBackupEnvelopeIntegrity, calculateActionPriorityScore, calculateInventoryTotalValue, formatSubscriptionDiscount, suggestSearchCorrections (TASK-P82-12-NIE)', () => {
+  test('Chaos 18: Fuzzing calculateBurrSpeedImpact, calculateMagnesiumCalciumRatio, getCoffeeOriginGuide, validateBackupEnvelopeIntegrity, calculateActionPriorityScore, calculateInventoryTotalValue, suggestSearchCorrections (TASK-P82-12-NIE)', () => {
     const chaoticInputs: any[] = [
       null,
       undefined,
@@ -949,19 +935,13 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof invValue.estimatedTotalValuePln).toBe('number');
       expect(typeof invValue.formattedTotalValuePln).toBe('string');
 
-      // 7. formatSubscriptionDiscount
-      const discountInfo = formatSubscriptionDiscount(val as any, val as any);
-      expect(typeof discountInfo).toBe('object');
-      expect(typeof discountInfo.hasDiscount).toBe('boolean');
-      expect(typeof discountInfo.discountPercent).toBe('number');
-
       // 8. suggestSearchCorrections
       const corrections = suggestSearchCorrections(val as any, val as any);
       expect(Array.isArray(corrections)).toBe(true);
     }
   });
 
-  test('Chaos 19: Fuzzing calculateResidualAlkalinity, estimateGrindDuration, formatPressureWithUnit, formatAltitude, evaluateAeroPressRatio, evaluateFrenchPressRatio, getCoffeeRoastLevelGuide, sanitizeBackupEnvelope, calculateSubscriptionSavings, calculateBeanFreshness, rankActionsByPriority, calculateSearchRelevanceScore (TASK-P85-12-NIE)', () => {
+  test('Chaos 19: Fuzzing calculateResidualAlkalinity, estimateGrindDuration, formatPressureWithUnit, formatAltitude, evaluateAeroPressRatio, evaluateFrenchPressRatio, getCoffeeRoastLevelGuide, sanitizeBackupEnvelope, calculateBeanFreshness, rankActionsByPriority, calculateSearchRelevanceScore (TASK-P85-12-NIE)', () => {
     const chaoticInputs: any[] = [
       null,
       undefined,
@@ -1033,12 +1013,6 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
         expect(err instanceof Error).toBe(true);
       }
 
-      // 9. calculateSubscriptionSavings
-      const savings = calculateSubscriptionSavings(val as any, val as any);
-      expect(typeof savings).toBe('object');
-      expect(typeof savings.savedAmountPln).toBe('number');
-      expect(typeof savings.savingsPercent).toBe('number');
-
       // 10. calculateBeanFreshness
       const freshness = calculateBeanFreshness(val as any, val as any);
       expect(typeof freshness).toBe('object');
@@ -1058,7 +1032,7 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
     }
   });
 
-  test('Chaos 20: Fuzzing estimateBackupFileSize, getCoffeeAltitudeGuide, calculateSulfateToChlorideRatio, formatGrinderDialSetting, formatBrewTimeMinutesSeconds, evaluateMokaPotRatio, summarizeBprActionFeed, calculateInventoryUsageRate, evaluateTrialStatus, filterSearchEntriesByTags (TASK-P87-12-NIE)', () => {
+  test('Chaos 20: Fuzzing estimateBackupFileSize, getCoffeeAltitudeGuide, calculateSulfateToChlorideRatio, formatGrinderDialSetting, formatBrewTimeMinutesSeconds, evaluateMokaPotRatio, summarizeBprActionFeed, calculateInventoryUsageRate, filterSearchEntriesByTags (TASK-P87-12-NIE)', () => {
     const chaoticInputs: any[] = [
       null,
       undefined,
@@ -1132,13 +1106,6 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof usageRate.dailyConsumptionGrams).toBe('number');
       expect(typeof usageRate.estimatedDaysRemaining).toBe('number');
       expect(typeof usageRate.category).toBe('string');
-
-      // 9. evaluateTrialStatus
-      const trialStatus = evaluateTrialStatus(val as any, val as any, val as any);
-      expect(typeof trialStatus).toBe('object');
-      expect(typeof trialStatus.status).toBe('string');
-      expect(typeof trialStatus.daysRemaining).toBe('number');
-      expect(typeof trialStatus.isExpired).toBe('boolean');
 
       // 10. filterSearchEntriesByTags
       const filteredTags = filterSearchEntriesByTags(val as any, val as any, val as any, val as any);
@@ -1236,7 +1203,7 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
     }
   });
 
-  test('Chaos 22: Fuzzing evaluateCuppingRatio, compareCoffeeProcesses, evaluateLimescaleRisk, estimateGrinderRetention, formatStashWeight, generateBackupMigrationPlan, calculateStashDiversity, calculateLifetimeBreakEven, generateAdaptiveRecipeAdjustment (TASK-P92-12-NIE)', () => {
+  test('Chaos 22: Fuzzing evaluateCuppingRatio, compareCoffeeProcesses, evaluateLimescaleRisk, estimateGrinderRetention, formatStashWeight, generateBackupMigrationPlan, calculateStashDiversity, generateAdaptiveRecipeAdjustment (TASK-P92-12-NIE)', () => {
     const chaosVectors = [
       -1000000, -99.99, -1, -0, 0, 0.0001, 1, 15, 80, 150, 720, 1000, 100000,
       NaN, Infinity, -Infinity,
@@ -1295,12 +1262,6 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof stashDiv).toBe('object');
       expect(typeof stashDiv.diversityScore).toBe('number');
       expect(typeof stashDiv.rating).toBe('string');
-
-      // 8. calculateLifetimeBreakEven
-      const breakEven = calculateLifetimeBreakEven(val as any, val as any, val as any);
-      expect(typeof breakEven).toBe('object');
-      expect(typeof breakEven.isLifetimeRecommended).toBe('boolean');
-      expect(typeof breakEven.breakEvenMonthsVsMonthly).toBe('number');
 
       // 9. generateAdaptiveRecipeAdjustment
       const adaptAdj = generateAdaptiveRecipeAdjustment(val as any, val as any);
@@ -1379,11 +1340,6 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof brews).toBe('object');
       expect(typeof brews.estimatedTotalBrews).toBe('number');
 
-      // 8. compareSubscriptionPlans
-      const plans = compareSubscriptionPlans(val as any);
-      expect(typeof plans).toBe('object');
-      expect(Array.isArray(plans.plans)).toBe(true);
-
       // 9. filterBySearchFacets
       const filtered = filterBySearchFacets(val as any, val as any, val as any);
       expect(Array.isArray(filtered)).toBe(true);
@@ -1396,7 +1352,7 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
     }
   });
 
-  test('Chaos 24: Fuzzing evaluateUpsellTrigger, evaluateStashTurnover, calculateBrewConsistencyIndex, compactBackupEnvelope, compareCoffeeOrigins, calculateWaterHardnessScale, estimateGrindDistributionSpread, formatFlowRateProfile, evaluateChemexRatio, parseSearchQuery (TASK-P97-12-NIE)', () => {
+  test('Chaos 24: Fuzzing evaluateStashTurnover, calculateBrewConsistencyIndex, compactBackupEnvelope, compareCoffeeOrigins, calculateWaterHardnessScale, estimateGrindDistributionSpread, formatFlowRateProfile, evaluateChemexRatio, parseSearchQuery (TASK-P97-12-NIE)', () => {
     const chaoticValues: any[] = [
       null,
       undefined,
@@ -1422,12 +1378,6 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
     ];
 
     for (const val of chaoticValues) {
-      // 1. evaluateUpsellTrigger
-      const upsell = evaluateUpsellTrigger(val);
-      expect(typeof upsell).toBe('object');
-      expect(typeof upsell.shouldShowUpsell).toBe('boolean');
-      expect(typeof upsell.urgency).toBe('string');
-
       // 2. evaluateStashTurnover
       const turnover = evaluateStashTurnover(val);
       expect(typeof turnover).toBe('object');
@@ -1487,7 +1437,7 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
     }
   });
 
-  test('TASK-P99-12-NIE: Chaos 25: Fuzzing 10 nowych funkcji domenowych (Switch, Alkalinity, BurrCalibration, Pressure, TeaComp, Troubleshooting, RelationalAudit, FeatureEntitlement, StashForecast, HighlightMatches)', () => {
+  test('TASK-P99-12-NIE: Chaos 25: Fuzzing 9 funkcji domenowych (Switch, Alkalinity, BurrCalibration, Pressure, TeaComp, Troubleshooting, RelationalAudit, StashForecast, HighlightMatches)', () => {
     const chaoticPayloads: any[] = [
       null,
       undefined,
@@ -1558,12 +1508,6 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       expect(typeof auditRel).toBe('object');
       expect(typeof auditRel.isFullyConsistent).toBe('boolean');
       expect(Array.isArray(auditRel.orphans)).toBe(true);
-
-      // 8. evaluateFeatureEntitlement
-      const entitle = evaluateFeatureEntitlement(val, val);
-      expect(typeof entitle).toBe('object');
-      expect(typeof entitle.isEntitled).toBe('boolean');
-      expect(typeof entitle.requiresPro).toBe('boolean');
 
       // 9. calculateStashDepletionForecast
       const forecast = calculateStashDepletionForecast(val, val);

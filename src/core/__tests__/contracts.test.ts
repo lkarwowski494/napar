@@ -252,35 +252,3 @@ describe('Kontrakt Edukacyjny: Baza Wiedzy Specialty (Knowledge Base)', () => {
     expect(TEA_CATEGORIES.length).toBe(6);
   });
 });
-
-describe('Kontrakt Monetyzacji & StoreKit (Cheaper than Espresso)', () => {
-  test('NaparStoreKit.storekit zawiera poprawne identyfikatory produktów i ceny zgodne z polityką cenową', () => {
-    const storeKitPath = path.join(rootDir, 'NaparStoreKit.storekit');
-    expect(fs.existsSync(storeKitPath)).toBe(true);
-
-    const storeKitConfig = JSON.parse(fs.readFileSync(storeKitPath, 'utf-8'));
-    expect(storeKitConfig.identifier).toBe('NaparStoreKit');
-
-    // Produkt Lifetime (Non-Consumable)
-    const lifetimeProd = storeKitConfig.products.find((p: any) => p.productID === 'pl.lukasz.napar.lifetime');
-    expect(lifetimeProd).toBeDefined();
-    expect(lifetimeProd.displayPrice).toBe('14.99');
-    expect(lifetimeProd.familyShareable).toBe(true);
-
-    // Subskrypcje (Miesięczna i Roczna)
-    const subGroup = storeKitConfig.subscriptionGroups[0];
-    expect(subGroup).toBeDefined();
-
-    const monthlySub = subGroup.subscriptions.find((s: any) => s.productID === 'pl.lukasz.napar.monthly');
-    expect(monthlySub).toBeDefined();
-    expect(monthlySub.displayPrice).toBe('0.99');
-    expect(monthlySub.recurringSubscriptionPeriod).toBe('P1M');
-
-    const annualSub = subGroup.subscriptions.find((s: any) => s.productID === 'pl.lukasz.napar.annual');
-    expect(annualSub).toBeDefined();
-    expect(annualSub.displayPrice).toBe('4.99');
-    expect(annualSub.recurringSubscriptionPeriod).toBe('P1Y');
-  });
-});
-
-

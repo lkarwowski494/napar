@@ -614,10 +614,40 @@ describe('M1-audytor-generalny-009: wersja darmowa bez zakupów (DEC-01 a)', () 
         .split('\n')
         .flatMap((line, i) => (re.test(line) ? [`${f}:${i + 1}: ${line.trim()}`] : [])),
     );
+  const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+  const deps = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) };
+  const hasStoreKitLib = ['expo-iap', 'react-native-iap', 'react-native-purchases'].some((d) => d in deps);
+
+  test('02-monetyzacja-001 / TASK-R03-01: brak atrapy zakupu i zapisu Pro w kodzie produkcyjnym', () => {
+    expect(prodFiles.length).toBeGreaterThan(50);
+    expect(
+      hits(/mock-storekit|valid-receipt-signature|purchaseWithStoreKit|activateSubscription|verifyAndActivateStoreKitPurchase|setIsProUser|is_pro_active|has_verified_purchase|Apps4BrewPassModal|PassSettingsCard/),
+    ).toEqual([]);
+  });
+
+  test('02-monetyzacja-001: bez biblioteki StoreKit w package.json nie ma żadnego stanu uprawnienia', () => {
+    if (hasStoreKitLib) return; // model płatny wymaga nowej decyzji i testów adaptera sklepu
+    expect(hits(/\b(isPro|isProUser|isSubscribed|subscriptionTier|subscription_tier|restorePurchases|useAppAccess)\b/)).toEqual([]);
+    expect(existsSync(join(root, 'src/core/app-access.ts'))).toBe(false);
+    expect(existsSync(join(root, 'NaparStoreKit.storekit'))).toBe(false);
+  });
+
+  test('02-monetyzacja-002: brak okresu próbnego liczonego w aplikacji', () => {
+    expect(hits(/trial_started_at|trial_brews_count|trial_max_|TRIAL_DURATION_DAYS|TRIAL_MAX_BREWS/)).toEqual([]);
+  });
+
+  test('02-monetyzacja-003: słowniki i komponenty bez cen planów i ofert „za darmo”', () => {
+    const localeFiles = readdirSync(join(root, 'locales'))
+      .filter((f) => f.endsWith('.json'))
+      .map((f) => join('locales', f));
+    const files = [...localeFiles, 'src/core/i18n.tsx', ...prodFiles.filter((f) => f.startsWith(join('src', 'components')))];
+    expect(hits(/\d+[,.]\d{2}\s?zł|[$€]\s?\d|dni za darmo|day free trial|NAJLEPSZA WARTOŚĆ|BEST VALUE/i, files)).toEqual([]);
+    expect((translations.pl as any).paywall).toBeUndefined();
+    expect((translations.en as any).paywall).toBeUndefined();
+  });
 
   test('02-monetyzacja-004 / 02-monetyzacja-006: brak bramek tworzenia i trybu tylko do odczytu', () => {
-    // Moduł dostępu i ekran zakupu znikają w następnym commicie (02-monetyzacja-001); tu liczą się ekrany.
-    const screens = prodFiles.filter((f) => !/app-access\.ts$|Apps4BrewPassModal|PassSettingsCard/.test(f));
-    expect(hits(/\bcanCreate\b|onRequirePaywall|showPaywall|ShowPaywall|isHistoryReadOnly|recordBrew\b/, screens)).toEqual([]);
+    expect(hits(/\bcanCreate\b|onRequirePaywall|showPaywall|ShowPaywall|isHistoryReadOnly|recordBrew\b/)).toEqual([]);
   });
+
 });

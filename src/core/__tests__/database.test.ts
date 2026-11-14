@@ -84,8 +84,6 @@ import {
   setVoiceAnnounceEnabled,
   getHapticsEnabled,
   setHapticsEnabled,
-  getIsProUser,
-  setIsProUser,
   getCaffeineHalfLife,
   setCaffeineHalfLife,
   getBedtimeHour,
@@ -1095,19 +1093,6 @@ describe('Napar SQLite Database & Repositories', () => {
 
     setHapticsEnabled(true);
     expect(getHapticsEnabled()).toBe(true);
-  });
-
-  test('Pobiera i zapisuje status licencji Pro (getIsProUser, setIsProUser)', () => {
-    // Domyślnie false
-    expect(getIsProUser()).toBe(false);
-
-    // Aktywacja Pro
-    setIsProUser(true);
-    expect(getIsProUser()).toBe(true);
-
-    // Dezaktywacja Pro
-    setIsProUser(false);
-    expect(getIsProUser()).toBe(false);
   });
 
   test('D-02 & BR-KOF-003: Pobiera i zapisuje metabolizm kofeiny oraz godzinę snu', () => {

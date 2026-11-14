@@ -18,10 +18,7 @@ import {
 } from '../src/core/contrast';
 import { SCHEMA_SQL } from '../src/core/database-schema';
 import { QrCodeSvg } from '../src/core/qr-code';
-import {
-  AppAccessStatus,
-  CraftAppId,
-} from '../src/core/app-access';
+import type { CraftAppId } from '../src/core/craft-suite-theme';
 import {
   DEFAULT_BREW_COST_PARAMETERS,
 } from '../src/core/cost-calculator';
@@ -94,13 +91,6 @@ describe('AST Test Matrix: Logika and Wymiar 100% Coverage (BR-TEST-028..031)', 
   });
 
   describe('WYMIAR constants and literal types coverage', () => {
-    test('AppAccessStatus union literals are valid', () => {
-      const statuses: AppAccessStatus[] = ['unlocked', 'trial', 'locked'];
-      for (const st of statuses) {
-        expect(['unlocked', 'trial', 'locked']).toContain(st);
-      }
-    });
-
     test('AUTO_DIR and AUTO_KEEP backup constants', () => {
       expect(AUTO_DIR).toBe('Backup/');
       expect(AUTO_KEEP).toBe(10);
