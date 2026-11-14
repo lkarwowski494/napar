@@ -35,8 +35,6 @@ import { theme } from '../src/core/theme';
 import { confirmAction } from '../src/core/confirm';
 import { announce } from '../src/core/announce';
 import { useTranslation } from '../src/core/i18n';
-import { useAppAccess } from '../src/core/app-access';
-import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
 import { autoBackup } from '../src/core/backup';
 import { playTimerChime } from '../src/core/timer-audio';
 import { GongfuSessionSetup } from '../src/components/gongfu/GongfuSessionSetup';
@@ -47,8 +45,6 @@ import { runSave } from '../lib/save-feedback';
 export default function GongfuScreen() {
   const router = useRouter();
   const { t, language } = useTranslation();
-  const { canCreate, recordBrew, refresh } = useAppAccess();
-  const [showPaywall, setShowPaywall] = useState(false);
   const unitSystem = getUnitSystem();
 
   // Stan sesji
@@ -155,10 +151,6 @@ export default function GongfuScreen() {
   }, [isSteeping, t.gongfu.pourNow]);
 
   const handleStartSteep = () => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
     targetEndMsRef.current = Date.now() + targetSeconds * 1000;
     setRemainingSeconds(targetSeconds);
     setSteepFinished(false);
@@ -193,10 +185,6 @@ export default function GongfuScreen() {
   };
 
   const handleFinishAndSaveSession = () => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
     if (session.infusions.length === 0) {
       Alert.alert(t.gongfu.modeTitle, 'Przeprowadź przynajmniej jedno zalanie przed zapisem sesji.');
       return;
@@ -250,7 +238,6 @@ export default function GongfuScreen() {
         );
         if (!saved) return;
 
-        recordBrew();
         try {
           void autoBackup(buildBackupState());
         } catch {
@@ -320,12 +307,6 @@ export default function GongfuScreen() {
           t={t}
         />
       </ScrollView>
-      <Apps4BrewPassModal
-        visible={showPaywall}
-        onClose={() => setShowPaywall(false)}
-        onPurchaseSuccess={refresh}
-        onSubscribed={refresh}
-      />
     </SafeAreaView>
   );
 }

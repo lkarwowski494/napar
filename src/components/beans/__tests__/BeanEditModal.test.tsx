@@ -37,7 +37,6 @@ describe('BeanEditModal Component', () => {
   };
 
   const mockOnClose = jest.fn();
-  const mockOnRequirePaywall = jest.fn();
   const mockOnSaved = jest.fn();
   const mockOnDeleted = jest.fn();
 
@@ -55,8 +54,6 @@ describe('BeanEditModal Component', () => {
           visible={true}
           item={mockItem}
           onClose={mockOnClose}
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onSaved={mockOnSaved}
           onDeleted={mockOnDeleted}
         />
@@ -81,8 +78,6 @@ describe('BeanEditModal Component', () => {
           visible={true}
           item={mockItem}
           onClose={mockOnClose}
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onSaved={mockOnSaved}
           onDeleted={mockOnDeleted}
         />
@@ -102,34 +97,6 @@ describe('BeanEditModal Component', () => {
     expect(mockOnClose).toHaveBeenCalled();
   });
 
-  test('Ograniczenie darmowego planu otwiera paywall (canCreate: false)', () => {
-    let tree: renderer.ReactTestRenderer;
-    renderer.act(() => {
-      tree = renderer.create(
-        <BeanEditModal
-          visible={true}
-          item={mockItem}
-          onClose={mockOnClose}
-          canCreate={false}
-          onRequirePaywall={mockOnRequirePaywall}
-          onSaved={mockOnSaved}
-          onDeleted={mockOnDeleted}
-        />
-      );
-    });
-
-    const root = tree!.root;
-    const saveBtn = root.findByProps({ accessibilityLabel: 'Zapisz zmiany' });
-    expect(saveBtn).toBeDefined();
-
-    renderer.act(() => {
-      saveBtn.props.onPress();
-    });
-
-    expect(mockOnRequirePaywall).toHaveBeenCalled();
-    expect(mockOnClose).toHaveBeenCalled();
-  });
-
   test('Oznaczenie paczki jako zużytej zeruje pozostałą gramaturę i archiwizuje', () => {
     let tree: renderer.ReactTestRenderer;
     renderer.act(() => {
@@ -138,8 +105,6 @@ describe('BeanEditModal Component', () => {
           visible={true}
           item={mockItem}
           onClose={mockOnClose}
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onSaved={mockOnSaved}
           onDeleted={mockOnDeleted}
         />
@@ -172,8 +137,6 @@ describe('BeanEditModal Component', () => {
           visible={true}
           item={mockItem}
           onClose={mockOnClose}
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onSaved={mockOnSaved}
           onDeleted={mockOnDeleted}
         />
@@ -203,8 +166,6 @@ describe('BeanEditModal Component', () => {
           visible={true}
           item={mockItem}
           onClose={mockOnClose}
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onSaved={mockOnSaved}
           onDeleted={mockOnDeleted}
         />
@@ -241,8 +202,6 @@ describe('BeanEditModal Component', () => {
           visible={true}
           item={mockItem}
           onClose={mockOnClose}
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onSaved={mockOnSaved}
           onDeleted={mockOnDeleted}
         />
@@ -277,8 +236,6 @@ describe('BeanEditModal Component', () => {
           visible={true}
           item={mockItem}
           onClose={mockOnClose}
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onSaved={mockOnSaved}
           onDeleted={mockOnDeleted}
         />
@@ -317,8 +274,6 @@ describe('BeanEditModal Component', () => {
           visible={true}
           item={mockItem}
           onClose={mockOnClose}
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onSaved={mockOnSaved}
           onDeleted={mockOnDeleted}
         />

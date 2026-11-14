@@ -31,8 +31,6 @@ import { CaffeineCurveChart } from '../../src/core/caffeine-chart';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
 import { getHealthKitSyncEnabled } from '../../src/core/healthkit';
-import { useAppAccess } from '../../src/core/app-access';
-import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { BedtimeCurfewCard } from '../../src/components/caffeine/BedtimeCurfewCard';
 import { CaffeineLogList } from '../../src/components/caffeine/CaffeineLogList';
 import { CaffeineQuickAddModal } from '../../src/components/caffeine/CaffeineQuickAddModal';
@@ -40,8 +38,6 @@ import { runSave } from '../../lib/save-feedback';
 
 export default function CaffeineScreen() {
   const { t, language } = useTranslation();
-  const { canCreate, isHistoryReadOnly, refresh } = useAppAccess();
-  const [showPaywall, setShowPaywall] = useState(false);
   const unitSystem = getUnitSystem();
   const [logs, setLogs] = useState<CaffeineLog[]>([]);
   const [bedtimeHour, setBedtimeHourState] = useState(() => {
@@ -142,11 +138,6 @@ export default function CaffeineScreen() {
     .padStart(2, '0')}`;
 
   const handleQuickAdd = (name: string, type: 'coffee' | 'tea', doseG: number, mg: number) => {
-    if (!canCreate) {
-      setShowQuickAddModal(false);
-      setShowPaywall(true);
-      return;
-    }
     const consumedAt = new Date().toISOString();
     const log: CaffeineLog = {
       id: `caff-${Date.now()}`,
@@ -171,17 +162,6 @@ export default function CaffeineScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Read-Only Status Banner when trial expired */}
-      {isHistoryReadOnly && (
-        <View style={styles.readOnlyBanner}>
-          <Text style={styles.readOnlyBannerText}>
-            {t.caffeine.readOnlyNotice || (language === 'pl'
-              ? 'Tryb Tylko do Odczytu — Twoja historia kofeiny jest bezpieczna. Nowe wpisy wymagają Apps4Brew Pass.'
-              : 'Read-Only Mode — Your caffeine logs are secure. New entries require Apps4Brew Pass.')}
-          </Text>
-        </View>
-      )}
-
       {/* Karta Stężenia Kofeiny Teraz */}
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>
@@ -238,10 +218,6 @@ export default function CaffeineScreen() {
         logs={logs}
         unitSystem={unitSystem}
         onQuickAddPress={() => {
-          if (!canCreate) {
-            setShowPaywall(true);
-            return;
-          }
           setShowQuickAddModal(true);
         }}
         onDeleteLog={handleDeleteLog}
@@ -262,14 +238,6 @@ export default function CaffeineScreen() {
           Informacja edukacyjna — nie stanowi porady medycznej ani diagnozy. Szacunki oparte na modelu jednokompartmentowym I rzędu (t₁/₂ = 3–12 h); rzeczywisty metabolizm zależy m.in. od aktywności enzymu CYP1A2, ciąży, leków i wrażliwości receptorów adenozynowych. Przed decyzjami zdrowotnymi skonsultuj się z lekarzem. Źródła: EFSA NDA Panel (2015, doi:10.2903/j.efsa.2015.4102); Nehlig (2018, doi:10.1124/pr.117.014407); Drake et al. (2013, doi:10.5664/jcsm.3170).
         </Text>
       </View>
-
-      {/* Apps4Brew Pass Paywall Modal */}
-      <Apps4BrewPassModal
-        visible={showPaywall}
-        onClose={() => setShowPaywall(false)}
-        onPurchaseSuccess={refresh}
-        onSubscribed={refresh}
-      />
     </ScrollView>
   );
 }
@@ -347,21 +315,5 @@ const styles = StyleSheet.create({
   },
   efsaProgressFill: {
     height: '100%',
-  },
-  readOnlyBanner: {
-    backgroundColor: 'rgba(78, 159, 61, 0.12)',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: theme.borderRadius.md,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(78, 159, 61, 0.3)',
-  },
-  readOnlyBannerText: {
-    fontSize: 12,
-    color: '#2e7d32',
-    fontWeight: '600',
-    lineHeight: 16,
-    textAlign: 'center',
   },
 });

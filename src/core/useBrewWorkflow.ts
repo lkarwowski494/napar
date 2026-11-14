@@ -34,7 +34,6 @@ import {
 } from './recipe-share';
 import { confirmAction } from './confirm';
 import { calculateBrewCost } from './cost-calculator';
-import { useAppAccess } from './app-access';
 import {
   checkCorruptState,
   dismissCorruptState,
@@ -58,7 +57,6 @@ export function getRecipeName(recipe: AnyRecipe): string {
 export function useBrewWorkflow() {
   const router = useRouter();
   const { t, language } = useTranslation();
-  const { canCreate, isHistoryReadOnly, recordBrew, refresh } = useAppAccess();
   const unitSystem = getUnitSystem();
 
   const brew = useBrew();
@@ -105,7 +103,6 @@ export function useBrewWorkflow() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showQrScanner, setShowQrScanner] = useState(false);
-  const [showPaywallModal, setShowPaywallModal] = useState(false);
   const [corruptState, setCorruptState] = useState<CorruptStateRecovery | null>(null);
 
   // Tasting summary form state
@@ -306,10 +303,6 @@ export function useBrewWorkflow() {
 
   const handleScanQrRecipe = (data: string) => {
     setShowQrScanner(false);
-    if (!canCreate) {
-      setShowPaywallModal(true);
-      return;
-    }
     try {
       const decoded = decodeRecipeFromShareUrl(data);
       if (decoded && decoded.recipe) {
@@ -368,11 +361,6 @@ export function useBrewWorkflow() {
   };
 
   const handleDuplicateRecipe = (r: AnyRecipe) => {
-    if (!canCreate) {
-      setShowRecipeModal(false);
-      setShowPaywallModal(true);
-      return;
-    }
     const cloned = duplicateRecipe(r);
     refreshData();
     Alert.alert(
@@ -414,7 +402,6 @@ export function useBrewWorkflow() {
       t.common
     );
     if (!saved) return;
-    recordBrew();
     setShowFinishModal(false);
     resetTimer();
     Alert.alert(t.brew.savedSessionTitle || 'Zapisano!', t.brew.savedSessionDesc || 'Sesja parzenia została utrwalona w Twoim Dzienniku.');
@@ -450,9 +437,6 @@ export function useBrewWorkflow() {
     t,
     language,
     unitSystem,
-    canCreate,
-    isHistoryReadOnly,
-    refresh,
     recipe,
     selectedInventoryItem,
     doseGrams,
@@ -504,8 +488,6 @@ export function useBrewWorkflow() {
     setShowImportModal,
     showQrScanner,
     setShowQrScanner,
-    showPaywallModal,
-    setShowPaywallModal,
     corruptState,
     handleDismissCorrupt,
     showOnboarding,

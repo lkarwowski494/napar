@@ -20,10 +20,8 @@ import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems, getU
 import { BrewSession, InventoryItem } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
-import { useAppAccess } from '../../src/core/app-access';
 import { confirmAction } from '../../src/core/confirm';
-import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
-import { JournalIcon, ShieldIcon } from '../../src/components/icons/CraftIcons';
+import { JournalIcon } from '../../src/components/icons/CraftIcons';
 import { JournalSessionCard } from '../../src/components/journal/JournalSessionCard';
 import { JournalAnalyticsView } from '../../src/components/journal/JournalAnalyticsView';
 import { ProactiveCalendarCard } from '../../src/components/journal/ProactiveCalendarCard';
@@ -49,7 +47,6 @@ export default function JournalScreen() {
   const setWaterProfile = brewCtx?.setWaterProfile ?? (() => {});
   const beveragePreference = brewCtx?.beveragePreference ?? 'both';
   const { t, language } = useTranslation();
-  const { canCreate, isHistoryReadOnly, refresh } = useAppAccess();
   const [unitSystem] = useState<'metric' | 'imperial'>(() => {
     try {
       return getUnitSystem();
@@ -62,7 +59,6 @@ export default function JournalScreen() {
   const [viewMode, setViewMode] = useState<'sessions' | 'analytics'>('sessions');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterType, setFilterType] = useState<'all' | 'coffee' | 'tea' | 'high_rated'>('all');
-  const [showPaywall, setShowPaywall] = useState(false);
 
   useEffect(() => {
     if (beveragePreference === 'coffee' && filterType === 'tea') {
@@ -112,11 +108,6 @@ export default function JournalScreen() {
   };
 
   const handleExecuteProactiveAction = (action: ProactiveActionItem) => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
-
     try {
       const userRecipes = getRecipes();
       const allRecipes = [...userRecipes, ...MASTER_RECIPES];
@@ -152,11 +143,6 @@ export default function JournalScreen() {
   };
 
   const handleBrewAgain = (session: BrewSession) => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
-
     try {
       const userRecipes = getRecipes();
       const allRecipes = [...userRecipes, ...MASTER_RECIPES];
@@ -266,14 +252,6 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
         </Text>
       </View>
 
-      {isHistoryReadOnly && (
-        <View style={styles.readOnlyBanner} testID="journal-readonly-banner">
-          <ShieldIcon size={14} color="#D49B42" />
-          <Text style={[styles.readOnlyText, { marginLeft: 8 }]}>
-            {t.paywall.historyNotice}
-          </Text>
-        </View>
-      )}
 
       {/* 14-dniowy Proaktywny Kalendarz i Harmonogram Akcji 1-Tap (BPR Pillar 5) */}
       <ProactiveCalendarCard
@@ -366,14 +344,6 @@ Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
       {viewMode === 'analytics' && (
         <JournalAnalyticsView analyticsData={analyticsData} t={t} />
       )}
-
-      {/* Apps4Brew Pass Paywall Modal */}
-      <Apps4BrewPassModal
-        visible={showPaywall}
-        onClose={() => setShowPaywall(false)}
-        onPurchaseSuccess={refresh}
-        onSubscribed={refresh}
-      />
     </ScrollView>
   );
 }
@@ -382,23 +352,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,
-  },
-  readOnlyBanner: {
-    backgroundColor: 'rgba(78, 159, 61, 0.12)',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
-    borderRadius: theme.borderRadius.md,
-  },
-  readOnlyText: {
-    color: '#2e7d32',
-    fontSize: 12,
-    fontWeight: '600',
-    flex: 1,
   },
   content: {
     padding: theme.spacing.md,

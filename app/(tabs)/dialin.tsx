@@ -18,8 +18,6 @@ import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
 import { getUnitSystem, getBeveragePreference } from '../../src/core/database';
 import { useBrew } from '../../src/core/brew-context';
-import { useAppAccess } from '../../src/core/app-access';
-import { Apps4BrewPassModal } from '../../src/components/Apps4BrewPassModal';
 import { WaterChemistryTab } from '../../src/components/dialin/WaterChemistryTab';
 import { ExtractionYieldTab } from '../../src/components/dialin/ExtractionYieldTab';
 import { BrewRatioTab } from '../../src/components/dialin/BrewRatioTab';
@@ -42,15 +40,8 @@ export default function DialInScreen() {
     }
   })();
   const [activeTab, setActiveTab] = useState<'doctor' | 'ratio' | 'ey' | 'water'>('doctor');
-  const [showPaywallModal, setShowPaywallModal] = useState(false);
-  const { canCreate, isSubscribed } = useAppAccess();
 
   const handleSelectTab = (tab: 'doctor' | 'ratio' | 'ey' | 'water') => {
-    // Pro Gate WTP-1 (DEC-03): Doctor and Water require active subscription or active trial
-    if ((tab === 'doctor' || tab === 'water') && !canCreate && !isSubscribed) {
-      setShowPaywallModal(true);
-      return;
-    }
     setActiveTab(tab);
   };
 
@@ -298,10 +289,6 @@ export default function DialInScreen() {
         </View>
         <Text style={styles.caffeineWorkshopArrow}>→</Text>
       </Pressable>
-      <Apps4BrewPassModal
-        visible={showPaywallModal}
-        onClose={() => setShowPaywallModal(false)}
-      />
     </ScrollView>
   );
 }

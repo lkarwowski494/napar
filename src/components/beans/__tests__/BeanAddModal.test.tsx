@@ -15,7 +15,6 @@ jest.mock('../../../core/database', () => ({
 
 describe('BeanAddModal Component', () => {
   const mockOnClose = jest.fn();
-  const mockOnRequirePaywall = jest.fn();
   const mockOnOpenCompendium = jest.fn();
   const mockOnSaved = jest.fn();
 
@@ -33,8 +32,6 @@ describe('BeanAddModal Component', () => {
           visible={true}
           onClose={mockOnClose}
           beveragePreference="both"
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onOpenCompendium={mockOnOpenCompendium}
           onSaved={mockOnSaved}
         />
@@ -78,8 +75,6 @@ describe('BeanAddModal Component', () => {
           visible={true}
           onClose={mockOnClose}
           beveragePreference="both"
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onOpenCompendium={mockOnOpenCompendium}
           onSaved={mockOnSaved}
         />
@@ -108,8 +103,6 @@ describe('BeanAddModal Component', () => {
           visible={true}
           onClose={mockOnClose}
           beveragePreference="coffee"
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onOpenCompendium={mockOnOpenCompendium}
           onSaved={mockOnSaved}
         />
@@ -143,8 +136,6 @@ describe('BeanAddModal Component', () => {
           visible={true}
           onClose={mockOnClose}
           beveragePreference="both"
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onOpenCompendium={mockOnOpenCompendium}
           onSaved={mockOnSaved}
         />
@@ -169,8 +160,6 @@ describe('BeanAddModal Component', () => {
           visible={true}
           onClose={mockOnClose}
           beveragePreference="both"
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onOpenCompendium={mockOnOpenCompendium}
           onSaved={mockOnSaved}
         />
@@ -190,8 +179,6 @@ describe('BeanAddModal Component', () => {
           visible={true}
           onClose={mockOnClose}
           beveragePreference="both"
-          canCreate={true}
-          onRequirePaywall={mockOnRequirePaywall}
           onOpenCompendium={mockOnOpenCompendium}
           onSaved={mockOnSaved}
         />

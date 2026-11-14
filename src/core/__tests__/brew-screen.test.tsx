@@ -10,7 +10,6 @@ import { BrewProvider } from '../brew-context';
 import { QrScannerModal } from '../QrScannerModal';
 import { encodeRecipeToShareUrl } from '../recipe-share';
 import { MASTER_RECIPES } from '../recipes-data';
-import { resetTrialForTesting, setTrialExpiredForTesting } from '../app-access';
 
 jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
 jest.spyOn(Alert, 'alert').mockImplementation(() => {});
@@ -153,6 +152,17 @@ const mockDb: any = {
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => mockDb),
 }));
+
+// DEC-01 (a): dawny stan „po okresie próbnym” (15 parzeń, start sprzed 15 dni) zapisany w app_settings.
+// Wersja darmowa ignoruje te klucze; testy sprawdzają, że nic nie jest zablokowane.
+const simulateOldTrialEnd = () => {
+  mockDb.app_settings.set('trial_brews_count', '15');
+  mockDb.app_settings.set('trial_started_at', new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString());
+  mockDb.app_settings.set('is_pro_active', 'false');
+};
+const clearOldTrialSettings = () => {
+  ['trial_brews_count', 'trial_started_at', 'is_pro_active'].forEach((k) => mockDb.app_settings.delete(k));
+};
 
 describe('BrewScreen UI Integration', () => {
   beforeEach(() => {
@@ -1397,9 +1407,9 @@ describe('BrewScreen UI Integration', () => {
     expect(str).toContain('Oszczędność vs kawiarnia');
   });
 
-  test('Wygasły trial (trial_expired): Pozwala parzyć kawę (DEC-02: stoper i parzenie darmowe na zawsze) i uruchamia stoper', () => {
+  test('02-monetyzacja-006 (DEC-01 a): po 15 parzeniach i 15 dniach parzenie kawy uruchamia stoper', () => {
     act(() => {
-      setTrialExpiredForTesting();
+      simulateOldTrialEnd();
     });
 
     let tree: any;
@@ -1419,19 +1429,19 @@ describe('BrewScreen UI Integration', () => {
       startBtn?.props.onPress();
     });
 
-    // Zgodnie z DEC-02 parzenie jest bezpłatne — stoper startuje bez paywalla
+    // Wersja darmowa: stoper startuje bez ekranu zakupu
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('PAUZA');
 
     // Reset dla kolejnych testów
     act(() => {
-      resetTrialForTesting();
+      clearOldTrialSettings();
     });
   });
 
-  test('Aktywny trial: Pozwala rozpocząć parzenie i uruchamia stoper', () => {
+  test('Świeża instalacja: Pozwala rozpocząć parzenie i uruchamia stoper', () => {
     act(() => {
-      resetTrialForTesting();
+      clearOldTrialSettings();
     });
 
     let tree: any;
@@ -1455,9 +1465,9 @@ describe('BrewScreen UI Integration', () => {
     expect(str).toContain('PAUZA');
   });
 
-  test('Wygasły trial: Ekran główny wyświetla baner Tryb Tylko do Odczytu', () => {
+  test('02-monetyzacja-004 (DEC-01 a): po 15 parzeniach i 15 dniach ekran główny nie ma banera Tryb Tylko do Odczytu', () => {
     act(() => {
-      setTrialExpiredForTesting();
+      simulateOldTrialEnd();
     });
 
     let tree: any;
@@ -1470,17 +1480,17 @@ describe('BrewScreen UI Integration', () => {
     });
 
     const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('Tryb Tylko do Odczytu');
-    expect(str).toContain('Twoje receptury i historia są bezpieczne');
+    expect(str).not.toContain('Tryb Tylko do Odczytu');
+    expect(str).not.toContain('Apps4Brew Pass');
 
     act(() => {
-      resetTrialForTesting();
+      clearOldTrialSettings();
     });
   });
 
-  test('Wygasły trial: Próba duplikowania receptury w modalu blokuje akcję i otwiera Apps4BrewPassModal', () => {
+  test('02-monetyzacja-006 (DEC-01 a): po 15 parzeniach i 15 dniach duplikowanie receptury w modalu zapisuje kopię, bez ekranu zakupu', () => {
     act(() => {
-      setTrialExpiredForTesting();
+      simulateOldTrialEnd();
     });
 
     let tree: any;
@@ -1503,22 +1513,23 @@ describe('BrewScreen UI Integration', () => {
     const dupBtns = tree.root.findAll((n: any) => n.props?.accessibilityLabel?.includes('Duplikuj recepturę'));
     expect(dupBtns.length).toBeGreaterThan(0);
 
+    mockDb.runSync.mockClear();
     act(() => {
       dupBtns[0].props.onPress();
     });
 
     const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('APPS4BREW PASS');
-    expect(str).toContain('/ rok');
+    expect(str).not.toContain('APPS4BREW PASS');
+    expect(mockDb.runSync.mock.calls.some(([q]: [string]) => q.includes('INTO recipes'))).toBe(true);
 
     act(() => {
-      resetTrialForTesting();
+      clearOldTrialSettings();
     });
   });
 
-  test('Wygasły trial: Próba kliknięcia Import w modalu receptur otwiera Apps4BrewPassModal', () => {
+  test('02-monetyzacja-006 (DEC-01 a): po 15 parzeniach i 15 dniach Import w modalu receptur otwiera pole importu, bez ekranu zakupu', () => {
     act(() => {
-      setTrialExpiredForTesting();
+      simulateOldTrialEnd();
     });
 
     let tree: any;
@@ -1546,10 +1557,11 @@ describe('BrewScreen UI Integration', () => {
     });
 
     const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('APPS4BREW PASS');
+    expect(str).not.toContain('APPS4BREW PASS');
+    expect(tree.root.findAllByProps({ testID: 'import-recipe-input' }).length).toBeGreaterThan(0);
 
     act(() => {
-      resetTrialForTesting();
+      clearOldTrialSettings();
     });
   });
 
@@ -1678,9 +1690,9 @@ describe('BrewScreen UI Integration', () => {
 
     mockDb.recipes.delete('rec-tea-test');
 
-    // Sprawdź blokadę paywalla na przycisku Krok 4 przy wygasłym trialu
+    // Krok 4 po dawnym końcu okresu próbnego otwiera procedurę (wersja darmowa)
     act(() => {
-      setTrialExpiredForTesting();
+      simulateOldTrialEnd();
     });
     let expiredTree: any;
     act(() => {
@@ -1694,7 +1706,7 @@ describe('BrewScreen UI Integration', () => {
       expiredTree.root.findByProps({ testID: 'open-procedure-modal-btn' }).props.onPress();
     });
     act(() => {
-      resetTrialForTesting();
+      clearOldTrialSettings();
     });
   });
 });

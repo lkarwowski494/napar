@@ -6,19 +6,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
-import { ShieldIcon } from '../icons/CraftIcons';
 import { CorruptStateRecovery } from '../../core/backup';
 
 interface BrewBannersProps {
   corruptState: CorruptStateRecovery | null;
-  isHistoryReadOnly: boolean;
   language: 'pl' | 'en';
   onDismissCorrupt: () => void;
 }
 
 export const BrewBanners: React.FC<BrewBannersProps> = ({
   corruptState,
-  isHistoryReadOnly,
   language,
   onDismissCorrupt,
 }) => {
@@ -54,17 +51,6 @@ export const BrewBanners: React.FC<BrewBannersProps> = ({
         </View>
       )}
 
-      {/* Read-Only Status Banner when trial expired */}
-      {isHistoryReadOnly && (
-        <View style={styles.readOnlyBanner}>
-          <ShieldIcon size={16} color={theme.colors.copper} />
-          <Text style={styles.readOnlyBannerText}>
-            {language === 'pl'
-              ? 'Tryb Tylko do Odczytu — Twoje receptury i historia są bezpieczne. Parzenie i edycja wymagają Apps4Brew Pass.'
-              : 'Read-Only Mode — Your recipes and history are safe. Brewing and editing require Apps4Brew Pass.'}
-          </Text>
-        </View>
-      )}
 
       {/* Stały baner "Złote Zasady" domeny (BPR Pillar 2) */}
       <View style={styles.goldenRulesBanner} testID="golden-rules-banner">
@@ -93,24 +79,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     lineHeight: 16,
     fontWeight: '600',
-  },
-  readOnlyBanner: {
-    backgroundColor: 'rgba(217, 119, 54, 0.12)',
-    borderRadius: theme.borderRadius.md,
-    padding: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.copper,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  readOnlyBannerText: {
-    color: theme.colors.copper,
-    fontSize: 12,
-    lineHeight: 18,
-    fontWeight: '600',
-    flex: 1,
   },
   corruptBanner: {
     backgroundColor: '#7F1D1D',

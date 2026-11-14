@@ -23,8 +23,6 @@ import { theme } from '../src/core/theme';
 import { confirmAction } from '../src/core/confirm';
 import { announce } from '../src/core/announce';
 import { useTranslation } from '../src/core/i18n';
-import { useAppAccess } from '../src/core/app-access';
-import { Apps4BrewPassModal } from '../src/components/Apps4BrewPassModal';
 import { RecipeBasicInfoCard } from '../src/components/recipe-builder/RecipeBasicInfoCard';
 import { RecipeParamsCard } from '../src/components/recipe-builder/RecipeParamsCard';
 import { RecipeStepEditor } from '../src/components/recipe-builder/RecipeStepEditor';
@@ -35,7 +33,6 @@ export default function RecipeBuilderScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { t, language } = useTranslation();
-  const { canCreate, refresh } = useAppAccess();
   const [unitSystem] = useState<'metric' | 'imperial'>(() => {
     try {
       return getUnitSystem();
@@ -43,7 +40,6 @@ export default function RecipeBuilderScreen() {
       return 'metric';
     }
   });
-  const [showPaywall, setShowPaywall] = useState(false);
 
   const isEditing = Boolean(id);
 
@@ -181,11 +177,6 @@ export default function RecipeBuilderScreen() {
   };
 
   const handleSave = () => {
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
-
     const trimmedName = name.trim();
     if (!trimmedName) {
       Alert.alert(t.recipeBuilder.titleNew, t.recipeBuilder.fillRequired);
@@ -223,10 +214,6 @@ export default function RecipeBuilderScreen() {
 
   const handleDelete = () => {
     if (!id) return;
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
     confirmAction({
       title: t.recipeBuilder.deleteRecipeConfirmTitle,
       message: t.recipeBuilder.deleteRecipeConfirmMsg,
@@ -242,10 +229,6 @@ export default function RecipeBuilderScreen() {
 
   const handleDuplicate = () => {
     if (!id) return;
-    if (!canCreate) {
-      setShowPaywall(true);
-      return;
-    }
     const existing = getRecipeById(id);
     if (!existing) return;
     const cloned = duplicateRecipe(existing);
@@ -363,12 +346,6 @@ export default function RecipeBuilderScreen() {
           </>
         )}
       </ScrollView>
-      <Apps4BrewPassModal
-        visible={showPaywall}
-        onClose={() => setShowPaywall(false)}
-        onPurchaseSuccess={refresh}
-        onSubscribed={refresh}
-      />
     </SafeAreaView>
   );
 }

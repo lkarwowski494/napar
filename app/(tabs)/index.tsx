@@ -32,8 +32,6 @@ export default function BrewScreen() {
     t,
     language,
     unitSystem,
-    canCreate,
-    isHistoryReadOnly,
     recipe,
     selectedInventoryItem,
     doseGrams,
@@ -74,7 +72,6 @@ export default function BrewScreen() {
     setShowShareModal,
     setShowImportModal,
     setShowQrScanner,
-    setShowPaywallModal,
     corruptState,
     handleDismissCorrupt,
     recentFiveStarSession,
@@ -96,7 +93,6 @@ export default function BrewScreen() {
       {/* Banery systemowe i Złote Zasady domeny */}
       <BrewBanners
         corruptState={corruptState}
-        isHistoryReadOnly={isHistoryReadOnly}
         language={language}
         onDismissCorrupt={handleDismissCorrupt}
       />
@@ -147,11 +143,6 @@ export default function BrewScreen() {
         }}
         onDuplicateRecipe={handleDuplicateRecipe}
         onEditRecipe={(id) => {
-          if (!canCreate) {
-            setShowRecipeModal(false);
-            setShowPaywallModal(true);
-            return;
-          }
           setShowRecipeModal(false);
           router.push({
             pathname: '/recipe-builder',
@@ -159,11 +150,6 @@ export default function BrewScreen() {
           });
         }}
         onAddCustomRecipe={() => {
-          if (!canCreate) {
-            setShowRecipeModal(false);
-            setShowPaywallModal(true);
-            return;
-          }
           setShowRecipeModal(false);
           router.push('/recipe-builder');
         }}
@@ -172,19 +158,9 @@ export default function BrewScreen() {
           router.push('/gongfu');
         }}
         onOpenImport={() => {
-          if (!canCreate) {
-            setShowRecipeModal(false);
-            setShowPaywallModal(true);
-            return;
-          }
           setShowImportModal(true);
         }}
         onOpenQrScanner={() => {
-          if (!canCreate) {
-            setShowRecipeModal(false);
-            setShowPaywallModal(true);
-            return;
-          }
           setShowQrScanner(true);
         }}
         unitSystem={unitSystem}

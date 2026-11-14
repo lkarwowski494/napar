@@ -582,3 +582,42 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
     });
   });
 });
+
+// ============================================================================
+// M1-audytor-generalny-009 · DEC-01 (a) z 2026-11-13: wersja 1.0 całkowicie darmowa.
+// Trwała kontrola TASK-R03-01 (atrapa zakupu wróciła po deklarowanej naprawie):
+// w kodzie produkcyjnym nie ma ekranu zakupu, okresu próbnego, bramek ani nadania Pro
+// poza StoreKit. Dlaczego statycznie: atrapa przeszła wszystkie testy zachowania,
+// bo testy wołały ją jak prawdziwy zakup.
+// ============================================================================
+describe('M1-audytor-generalny-009: wersja darmowa bez zakupów (DEC-01 a)', () => {
+  const PROD_DIRS = ['app', 'src', 'lib'];
+  const listProd = (dir: string): string[] => {
+    const abs = join(root, dir);
+    if (!existsSync(abs)) return [];
+    const out: string[] = [];
+    for (const e of readdirSync(abs, { withFileTypes: true })) {
+      const rel = join(dir, e.name);
+      if (e.isDirectory()) {
+        if (e.name === '__tests__' || e.name === 'node_modules') continue;
+        out.push(...listProd(rel));
+      } else if (/\.(ts|tsx|js|mjs)$/.test(e.name) && !/\.test\./.test(e.name)) {
+        out.push(rel);
+      }
+    }
+    return out;
+  };
+  const prodFiles = PROD_DIRS.flatMap(listProd);
+  const hits = (re: RegExp, files: string[] = prodFiles): string[] =>
+    files.flatMap((f) =>
+      readFileSync(join(root, f), 'utf8')
+        .split('\n')
+        .flatMap((line, i) => (re.test(line) ? [`${f}:${i + 1}: ${line.trim()}`] : [])),
+    );
+
+  test('02-monetyzacja-004 / 02-monetyzacja-006: brak bramek tworzenia i trybu tylko do odczytu', () => {
+    // Moduł dostępu i ekran zakupu znikają w następnym commicie (02-monetyzacja-001); tu liczą się ekrany.
+    const screens = prodFiles.filter((f) => !/app-access\.ts$|Apps4BrewPassModal|PassSettingsCard/.test(f));
+    expect(hits(/\bcanCreate\b|onRequirePaywall|showPaywall|ShowPaywall|isHistoryReadOnly|recordBrew\b/, screens)).toEqual([]);
+  });
+});

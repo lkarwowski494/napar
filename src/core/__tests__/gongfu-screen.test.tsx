@@ -301,8 +301,9 @@ describe('GongfuScreen Component', () => {
     expect(txSpy.mock.calls[0][2]?.brewSessionId).toBe(txSpy.mock.calls[0][0].id);
   });
 
-  test('W trybie wygasłego trialu próba rozpoczęcia parzenia Gongfu Cha otwiera Paywall', () => {
+  test('02-monetyzacja-004/006 (DEC-01 a): po 15 parzeniach i 15 dniach start Gongfu uruchamia stoper, bez ekranu zakupu', () => {
     mockDb.settings.set('trial_brews_count', '15');
+    mockDb.settings.set('trial_started_at', new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString());
     mockDb.settings.set('is_pro_active', 'false');
 
     let tree: any;
@@ -310,22 +311,13 @@ describe('GongfuScreen Component', () => {
       tree = renderer.create(<GongfuScreen />);
     });
 
-    const startBtn = tree.root.findByProps({ testID: 'gongfu-start-btn' });
-    expect(startBtn).toBeDefined();
-
     renderer.act(() => {
-      startBtn.props.onPress();
+      tree.root.findByProps({ testID: 'gongfu-start-btn' }).props.onPress();
     });
 
-    // Paywall modal powinien się otworzyć
-    const planAnnualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
-    expect(planAnnualBtn).toBeDefined();
-
-    // Zamknij paywall
-    const closeBtn = tree.root.findByProps({ testID: 'close-paywall-btn' });
-    renderer.act(() => {
-      closeBtn.props.onPress();
-    });
+    expect(tree.root.findAllByProps({ testID: 'plan-annual-btn' })).toHaveLength(0);
+    // Stoper ruszył: przycisk startu zniknął (w trakcie parzenia jest licznik zamiast startu).
+    expect(tree.root.findAllByProps({ testID: 'gongfu-start-btn' })).toHaveLength(0);
 
     mockDb.settings.clear();
   });

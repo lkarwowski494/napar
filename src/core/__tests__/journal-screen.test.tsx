@@ -323,13 +323,16 @@ describe('JournalScreen Integration', () => {
     });
   });
 
-  test('W trybie Read-Only (po trialu) wyświetla się baner ochrony historii, a Powtórz Parzenie otwiera paywall', () => {
+  test('02-monetyzacja-004 / 03-zakres-002 (DEC-01 a): po 15 parzeniach i 15 dniach dziennik nie ma banera tylko do odczytu, a Powtórz Parzenie przechodzi do parzenia', () => {
     const { getAppSetting } = require('../database');
+    const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
     getAppSetting.mockImplementation((key: string, def: string) => {
       if (key === 'trial_brews_count') return '15';
+      if (key === 'trial_started_at') return fifteenDaysAgo;
       if (key === 'is_pro_active') return 'false';
       return def;
     });
+    mockNavigate.mockClear();
 
     let tree: any;
     act(() => {
@@ -340,25 +343,14 @@ describe('JournalScreen Integration', () => {
       );
     });
 
-    // Weryfikacja obecności banera informującego o Read-Only
-    const readOnlyBanner = tree.root.findByProps({ testID: 'journal-readonly-banner' });
-    expect(readOnlyBanner).toBeDefined();
+    expect(tree.root.findAllByProps({ testID: 'journal-readonly-banner' })).toHaveLength(0);
 
-    // Kliknięcie Powtórz Parzenie przy wygasłym trialu
-    const brewAgainBtn = tree.root.findByProps({ testID: 'brew-again-btn-sess-1' });
     act(() => {
-      brewAgainBtn.props.onPress();
+      tree.root.findByProps({ testID: 'brew-again-btn-sess-1' }).props.onPress();
     });
 
-    // Paywall modal powinien się pojawić z planami
-    const annualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
-    expect(annualBtn).toBeDefined();
-
-    // Zamknij paywall
-    const closeBtn = tree.root.findByProps({ testID: 'close-paywall-btn' });
-    act(() => {
-      closeBtn.props.onPress();
-    });
+    expect(tree.root.findAllByProps({ testID: 'plan-annual-btn' })).toHaveLength(0);
+    expect(mockNavigate).toHaveBeenCalledWith('/');
 
     getAppSetting.mockImplementation(() => null);
   });

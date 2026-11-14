@@ -535,43 +535,47 @@ describe('Custom Recipe Builder & Persistence', () => {
     mockSearchParams = {};
   });
 
-  test('W trybie wygasłego trialu próba zapisu nowej receptury wyświetla Paywall zamiast zapisu', () => {
+  test('02-monetyzacja-004 (DEC-01 a): po 15 parzeniach i 15 dniach zapis i duplikowanie receptury działają bez ekranu zakupu', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
     mockDb.settings.set('trial_brews_count', '15');
+    mockDb.settings.set('trial_started_at', new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString());
     mockDb.settings.set('is_pro_active', 'false');
 
     let tree: any;
     renderer.act(() => {
       tree = renderer.create(<RecipeBuilderScreen />);
     });
-
-    const saveBtn = tree.root.findByProps({ testID: 'recipe-builder-save-btn' });
-    expect(saveBtn).toBeDefined();
-
     renderer.act(() => {
-      saveBtn.props.onPress();
+      tree.root.findByProps({ testID: 'recipe-builder-save-btn' }).props.onPress();
     });
+    // Zapis przechodzi do walidacji formularza (pusta nazwa), a nie do ekranu zakupu.
+    expect(alertSpy).toHaveBeenCalledWith('Nowa Receptura', 'Wypełnij nazwę i dodaj przynajmniej jeden krok parzenia.');
+    expect(tree.root.findAllByProps({ testID: 'plan-annual-btn' })).toHaveLength(0);
 
-    // Paywall modal powinien się otworzyć
-    const planAnnualBtn = tree.root.findByProps({ testID: 'plan-annual-btn' });
-    expect(planAnnualBtn).toBeDefined();
-
-    // Zamknij paywall
-    const closeBtn = tree.root.findByProps({ testID: 'close-paywall-btn' });
-    renderer.act(() => {
-      closeBtn.props.onPress();
+    saveRecipe({
+      id: 'recipe-to-clone',
+      name: 'V60 Original Hoffmann',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 95,
+      recommendedRatio: 16.67,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-10T10:00:00Z',
     });
-
-    // Próba duplikowania w trybie wygasłego trialu
     mockSearchParams = { id: 'recipe-to-clone' };
     let treeEdit: any;
     renderer.act(() => {
       treeEdit = renderer.create(<RecipeBuilderScreen />);
     });
-    const dupBtn = findPressableWithText(treeEdit.root, 'Duplikuj jako nową');
     renderer.act(() => {
-      dupBtn?.props.onPress();
+      findPressableWithText(treeEdit.root, 'Duplikuj jako nową')?.props.onPress();
     });
-    expect(treeEdit.root.findByProps({ testID: 'plan-annual-btn' })).toBeDefined();
+    expect(alertSpy).toHaveBeenCalledWith('Zduplikowano', expect.stringContaining('V60 Original Hoffmann (Kopia)'));
+    expect(treeEdit.root.findAllByProps({ testID: 'plan-annual-btn' })).toHaveLength(0);
 
     mockSearchParams = {};
     mockDb.settings.clear();

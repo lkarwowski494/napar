@@ -11,7 +11,6 @@ import { ShareRecipeModal } from './ShareRecipeModal';
 import { ImportRecipeModal } from './ImportRecipeModal';
 import { InventorySelectModal } from './InventorySelectModal';
 import { QrScannerModal } from '../../core/QrScannerModal';
-import { Apps4BrewPassModal } from '../Apps4BrewPassModal';
 import { OnboardingModal } from '../OnboardingModal';
 import { useBrewWorkflow } from '../../core/useBrewWorkflow';
 
@@ -34,8 +33,6 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     resetTimer,
     selectRecipe,
     refreshData,
-    refresh,
-    canCreate,
     showProcedureModal,
     setShowProcedureModal,
     showFinishModal,
@@ -48,8 +45,6 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     setShowImportModal,
     showQrScanner,
     setShowQrScanner,
-    showPaywallModal,
-    setShowPaywallModal,
     showInventoryModal,
     setShowInventoryModal,
     allInventory,
@@ -185,11 +180,6 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
       <ImportRecipeModal
         visible={showImportModal}
         onClose={() => setShowImportModal(false)}
-        canCreate={canCreate}
-        onRequirePaywall={() => {
-          setShowImportModal(false);
-          setShowPaywallModal(true);
-        }}
         onImportSuccess={(importedRecipe) => {
           refreshData();
           selectRecipe(importedRecipe as any);
@@ -218,19 +208,6 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         t={t}
       />
 
-      {/* Apps4Brew Pass Paywall Modal */}
-      <Apps4BrewPassModal
-        visible={showPaywallModal}
-        onClose={() => setShowPaywallModal(false)}
-        onPurchaseSuccess={() => {
-          setShowPaywallModal(false);
-          refresh();
-        }}
-        onSubscribed={() => {
-          setShowPaywallModal(false);
-          refresh();
-        }}
-      />
 
       {/* Onboarding Modal */}
       <OnboardingModal

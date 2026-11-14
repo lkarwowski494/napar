@@ -22,8 +22,6 @@ export interface BeanEditModalProps {
   item: InventoryItem | null;
   onClose: () => void;
   beveragePreference?: 'coffee' | 'tea' | 'both';
-  canCreate: boolean;
-  onRequirePaywall: () => void;
   onSaved: () => void;
   onDeleted: () => void;
 }
@@ -33,8 +31,6 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
   item,
   onClose,
   beveragePreference,
-  canCreate,
-  onRequirePaywall,
   onSaved,
   onDeleted,
 }) => {
@@ -88,11 +84,6 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
   const handleSaveEdit = () => {
     if (!item) return;
-    if (!canCreate) {
-      onClose();
-      onRequirePaywall();
-      return;
-    }
     if (!editName.trim()) {
       Alert.alert(t.common?.error || 'Błąd', t.stash?.nameError || 'Podaj nazwę kawy lub herbaty.');
       return;
@@ -143,11 +134,6 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
   const handleMarkAsFinished = () => {
     if (!item) return;
-    if (!canCreate) {
-      onClose();
-      onRequirePaywall();
-      return;
-    }
     const updatedItem: InventoryItem = {
       ...item,
       remainingWeightGrams: 0,
