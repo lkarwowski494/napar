@@ -34,7 +34,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
               {t.settings.caffeineHalfLifeTitle || 'Czas Półtrwania Kofeiny (t₁/₂)'}
             </Text>
             <Text style={styles.actionSubtitle}>
-              {t.settings.caffeineHalfLifeDesc || 'Czas półtrwania kofeiny: 2.0–8.0 h (zakres u zdrowych dorosłych wg EFSA). Wartość domyślna aplikacji: 5.0 h.'}
+              {t.settings.caffeineHalfLifeDesc || 'Czas półtrwania kofeiny: 2.0–8.0 h (zakres u zdrowych dorosłych wg EFSA). Wartość domyślna aplikacji: 4.0 h.'}
             </Text>
           </View>
           <View

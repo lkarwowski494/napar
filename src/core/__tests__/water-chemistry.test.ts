@@ -51,8 +51,8 @@ describe('Water Chemistry & Mineralization Module', () => {
     // Suche sole dla 5L
     // NaHCO3: 40 * 0.00168 * 5 = 0.336g
     expect(res.dryBakingSodaNaHCO3Grams).toBeCloseTo(0.336, 3);
-    // MgSO4: 80 * 0.002465 * 5 = 0.986g
-    expect(res.dryEpsomSaltMgSO4Grams).toBeCloseTo(0.986, 3);
+    // MgSO4: 80 * 0.00245 * 5 = 0.98g [T:BH-WATER-2016] (M1-audytor-generalny-018)
+    expect(res.dryEpsomSaltMgSO4Grams).toBeCloseTo(0.98, 3);
   });
 
   test('Prawidłowo liczy mineralizację dla miękkiej wody do herbaty (GH 30, KH 15)', () => {

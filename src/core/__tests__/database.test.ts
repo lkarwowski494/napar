@@ -968,8 +968,8 @@ describe('Napar SQLite Database & Repositories', () => {
   });
 
   test('D-02 & BR-KOF-003: Pobiera i zapisuje metabolizm kofeiny oraz godzinę snu', () => {
-    // Domyślne wartości
-    expect(getCaffeineHalfLife()).toBe(5.0);
+    // Domyślne wartości (t½ 4 h [T:EFSA-T12-ZAKRES], M1-audytor-generalny-017)
+    expect(getCaffeineHalfLife()).toBe(4.0);
     expect(getBedtimeHour()).toBe(23);
 
     // Zmiana czasu półtrwania (np. 6.5h)
@@ -1324,7 +1324,7 @@ describe('Napar SQLite Database & Repositories', () => {
   test('TASK-P26-05-ARC: setCaffeineHalfLife, setBedtimeHour oraz setBeveragePreference chronią przed NaN i błędnymi wartościami', () => {
     initDatabase(mockDb as any);
     setCaffeineHalfLife(NaN as any);
-    expect(getCaffeineHalfLife()).toBe(5.0);
+    expect(getCaffeineHalfLife()).toBe(4.0); // domyślne 4 h (M1-audytor-generalny-017)
 
     setBedtimeHour(NaN as any);
     expect(getBedtimeHour()).toBe(23);

@@ -181,9 +181,10 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
 
     it('calculates caffeine decay using 5h half-life model', () => {
       const initial = 120.0;
-      expect(calculateRemainingCaffeineMg(initial, 5.0)).toBe(60.0);
-      expect(calculateRemainingCaffeineMg(initial, 10.0)).toBe(30.0);
-      expect(calculateRemainingCaffeineMg(initial, 15.0)).toBe(15.0);
+      // M1-audytor-generalny-017: domyślny t½ to 4 h [T:EFSA-T12-ZAKRES]; model 5 h podany jawnie.
+      expect(calculateRemainingCaffeineMg(initial, 5.0, 5.0)).toBe(60.0);
+      expect(calculateRemainingCaffeineMg(initial, 10.0, 5.0)).toBe(30.0);
+      expect(calculateRemainingCaffeineMg(initial, 15.0, 5.0)).toBe(15.0);
     });
 
     it('TASK-P13-03-ZAK: calculateCaffeineDecay wylicza spadek stężenia i chroni przed NaN, ujemnymi godzinami oraz zerowym t_half', () => {
@@ -197,15 +198,15 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
 
     it('estimateBedtimeCaffeineMg sumuje kofeinę o porze snu z modelu eliminacji (bez progu)', () => {
       // 120 mg 10 h przed snem przy t1/2 = 5 h -> 30 mg
-      expect(estimateBedtimeCaffeineMg([{ doseMg: 120, hoursUntilBedtime: 10 }])).toBe(30.0);
+      expect(estimateBedtimeCaffeineMg([{ doseMg: 120, hoursUntilBedtime: 10 }], 5.0)).toBe(30.0);
       // 120 mg 15 h przed snem -> 15 mg
       expect(estimateBedtimeCaffeineMg([{ doseMg: 120, hoursUntilBedtime: 15 }], 5.0)).toBe(15.0);
 
       // TASK-P12-03-ZAK: Odporność na nullish intakes i elementy z NaN/ujemnymi wartościami
       expect(estimateBedtimeCaffeineMg(null as any)).toBe(0);
       expect(estimateBedtimeCaffeineMg([null as any, { doseMg: 100, hoursUntilBedtime: NaN }] as any)).toBe(0);
-      // niepoprawny t1/2 -> domyślne 5 h; t1/2 ograniczony do 24 h
-      expect(estimateBedtimeCaffeineMg([{ doseMg: 100, hoursUntilBedtime: 5 }], NaN)).toBe(50.0);
+      // niepoprawny t1/2 -> domyślne 4 h [T:EFSA-T12-ZAKRES] (M1-audytor-generalny-017); t1/2 ograniczony do 24 h
+      expect(estimateBedtimeCaffeineMg([{ doseMg: 100, hoursUntilBedtime: 4 }], NaN)).toBe(50.0);
       expect(estimateBedtimeCaffeineMg([{ doseMg: 100, hoursUntilBedtime: 24 }], 48)).toBe(50.0);
       expect(estimateBedtimeCaffeineMg([7 as any])).toBe(0);
     });

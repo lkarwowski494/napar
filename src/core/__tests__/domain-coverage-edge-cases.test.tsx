@@ -76,13 +76,13 @@ describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
   describe('database caffeine and bedtime clamping', () => {
     test('handles invalid half life values gracefully', () => {
       setAppSetting('caffeine_half_life_hours', 'NaN');
-      expect(getCaffeineHalfLife()).toBe(5.0);
+      expect(getCaffeineHalfLife()).toBe(4.0); // domyślne 4 h [T:EFSA-T12-ZAKRES], M1-audytor-generalny-017
 
       setAppSetting('caffeine_half_life_hours', '1.0');
-      expect(getCaffeineHalfLife()).toBe(5.0);
+      expect(getCaffeineHalfLife()).toBe(4.0); // domyślne 4 h [T:EFSA-T12-ZAKRES], M1-audytor-generalny-017
 
       setAppSetting('caffeine_half_life_hours', '9.5');
-      expect(getCaffeineHalfLife()).toBe(5.0);
+      expect(getCaffeineHalfLife()).toBe(4.0); // domyślne 4 h [T:EFSA-T12-ZAKRES], M1-audytor-generalny-017
 
       setCaffeineHalfLife(6.5);
       expect(getCaffeineHalfLife()).toBe(6.5);

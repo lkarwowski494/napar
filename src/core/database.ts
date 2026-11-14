@@ -21,7 +21,7 @@ import {
   SCHEMA_SQL,
 } from './database-schema';
 import { MASTER_RECIPES } from './recipes-data';
-import { CAFFEINE_HALF_LIFE_MIN_H, CAFFEINE_HALF_LIFE_MAX_H, clampCaffeineHalfLifeHours } from './domain-rules';
+import { CAFFEINE_HALF_LIFE_MIN_H, CAFFEINE_HALF_LIFE_MAX_H, DEFAULT_CAFFEINE_HALF_LIFE_H, clampCaffeineHalfLifeHours } from './domain-rules';
 
 export interface InventoryRow {
   id: string;
@@ -1554,15 +1554,15 @@ export function setHapticsEnabled(enabled: boolean): void {
 }
 
 export function getCaffeineHalfLife(): number {
-  const val = parseFloat(getAppSetting('caffeine_half_life_hours', '5.0'));
+  const val = parseFloat(getAppSetting('caffeine_half_life_hours', String(DEFAULT_CAFFEINE_HALF_LIFE_H)));
   if (isNaN(val) || val < CAFFEINE_HALF_LIFE_MIN_H || val > CAFFEINE_HALF_LIFE_MAX_H) {
-    return 5.0;
+    return DEFAULT_CAFFEINE_HALF_LIFE_H;
   }
   return Number(val.toFixed(1));
 }
 
 export function setCaffeineHalfLife(hours: number): void {
-  const safeHours = typeof hours === 'number' && Number.isFinite(hours) ? hours : 5.0;
+  const safeHours = typeof hours === 'number' && Number.isFinite(hours) ? hours : DEFAULT_CAFFEINE_HALF_LIFE_H;
   const clamped = clampCaffeineHalfLifeHours(safeHours);
   setAppSetting('caffeine_half_life_hours', clamped.toFixed(1));
 }

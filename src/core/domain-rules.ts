@@ -300,6 +300,8 @@ export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number | stri
  * Zakres ustawienia czasu półtrwania kofeiny: 2–8 h u zdrowych dorosłych wg EFSA [T:EFSA-T12-ZAKRES].
  * Jedno miejsce wartości dla ekranu Kofeina, Ustawień i zapisu w bazie (M1-audytor-generalny-017).
  */
+/** Domyślny czas półtrwania: średnia u zdrowych dorosłych wg EFSA [T:EFSA-T12-ZAKRES] (M1-audytor-generalny-017, przekazanie 06→08). */
+export const DEFAULT_CAFFEINE_HALF_LIFE_H = 4.0;
 export const CAFFEINE_HALF_LIFE_MIN_H = 2.0;
 export const CAFFEINE_HALF_LIFE_MAX_H = 8.0;
 
@@ -315,7 +317,7 @@ export function clampCaffeineHalfLifeHours(hours: number): number {
 export function calculateRemainingCaffeineMg(
   initialDoseMg: number | string,
   hoursPassed: number | string,
-  halfLifeHours: number | string = 5.0
+  halfLifeHours: number | string = DEFAULT_CAFFEINE_HALF_LIFE_H
 ): number {
   const parsedDose = parseNumeric(initialDoseMg);
   const parsedHours = parseNumeric(hoursPassed);
@@ -344,10 +346,10 @@ export function calculateRemainingCaffeineMg(
  */
 export function estimateBedtimeCaffeineMg(
   intakes: Array<{ doseMg: number; hoursUntilBedtime: number }>,
-  halfLifeHours = 5.0
+  halfLifeHours = DEFAULT_CAFFEINE_HALF_LIFE_H
 ): number {
   const validIntakes = Array.isArray(intakes) ? intakes.filter(Boolean) : [];
-  const halfLife = Number.isFinite(halfLifeHours) && halfLifeHours > 0 ? Math.min(24, halfLifeHours) : 5.0;
+  const halfLife = Number.isFinite(halfLifeHours) && halfLifeHours > 0 ? Math.min(24, halfLifeHours) : DEFAULT_CAFFEINE_HALF_LIFE_H;
 
   let totalRemaining = 0;
   for (const intake of validIntakes) {
@@ -553,7 +555,7 @@ export function calculateBatchScaling(
 export function calculateCaffeineDecay(
   initialMg: number | string,
   elapsedHours: number | string,
-  halfLifeHours: number | string = 5.0
+  halfLifeHours: number | string = DEFAULT_CAFFEINE_HALF_LIFE_H
 ): number {
   const pInitial = parseNumeric(initialMg);
   const pElapsed = parseNumeric(elapsedHours);

@@ -445,7 +445,7 @@ describe('SettingsScreen Component', () => {
     let str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Metabolizm Kofeiny & Sen (D-02)');
     expect(str).toContain('Czas Półtrwania Kofeiny (t₁/₂)');
-    expect(str).toContain('"5.0","h"'); // wartość t½ (opis nie podaje już „5.0h wg EFSA”, M1-audytor-generalny-017)
+    expect(str).toContain('"4.0","h"'); // domyślny t½ 4 h [T:EFSA-T12-ZAKRES] (M1-audytor-generalny-017)
     expect(str).toContain('Docelowa Godzina Snu');
     expect(str).toContain('23:00');
 
@@ -457,7 +457,7 @@ describe('SettingsScreen Component', () => {
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO app_settings'),
-      ['caffeine_half_life_hours', '5.5']
+      ['caffeine_half_life_hours', '4.5'] // od domyślnych 4 h [T:EFSA-T12-ZAKRES] (M1-audytor-generalny-017)
     );
 
     // Kliknij '-' dla czasu półtrwania
@@ -468,7 +468,7 @@ describe('SettingsScreen Component', () => {
 
     expect(mockDb.runSync).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO app_settings'),
-      ['caffeine_half_life_hours', '5.0']
+      ['caffeine_half_life_hours', '4.0']
     );
 
     // Kliknij '+' dla godziny snu

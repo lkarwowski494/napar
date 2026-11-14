@@ -15,19 +15,19 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 import { CaffeineLog } from './database-schema';
-import { calculateRemainingCaffeineMg } from './domain-rules';
+import { calculateRemainingCaffeineMg, DEFAULT_CAFFEINE_HALF_LIFE_H } from './domain-rules';
 import { theme } from './theme';
 
 interface CaffeineChartProps {
   logs: CaffeineLog[];
   bedtimeHour: number; // np. 23 (23:00)
-  halfLifeHours?: number; // domyślnie 5.0h
+  halfLifeHours?: number; // domyślnie DEFAULT_CAFFEINE_HALF_LIFE_H (4 h, EFSA)
 }
 
 export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
   logs,
   bedtimeHour,
-  halfLifeHours = 5.0,
+  halfLifeHours = DEFAULT_CAFFEINE_HALF_LIFE_H,
 }) => {
   const screenWidth = Dimensions.get('window').width;
   const chartWidth = Math.max(280, screenWidth - 64);

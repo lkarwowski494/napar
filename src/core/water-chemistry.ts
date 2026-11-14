@@ -296,8 +296,8 @@ export function calculateWaterMinerals(
   let dryNaHCO3 = Number((kh * 0.00168 * vol).toFixed(3));
   if (Object.is(dryNaHCO3, -0) || dryNaHCO3 < 0 || !Number.isFinite(dryNaHCO3)) dryNaHCO3 = 0;
 
-  // MgSO4*7H2O: 1 ppm GH = 0.002465 g soli Epsom na 1L
-  let dryMgSO4 = Number((gh * 0.002465 * vol).toFixed(3));
+  // MgSO4*7H2O: 2,45 g na 1 L = 1000 ppm GH, czyli 0.00245 g na 1 ppm na 1 L [T:BH-WATER-2016] (M1-audytor-generalny-018)
+  let dryMgSO4 = Number((gh * 0.00245 * vol).toFixed(3));
   if (Object.is(dryMgSO4, -0) || dryMgSO4 < 0 || !Number.isFinite(dryMgSO4)) dryMgSO4 = 0;
 
   // CaCl2*2H2O (wapń): 1 ppm GH = 0.00147 g na 1L
