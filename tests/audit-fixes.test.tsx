@@ -1077,3 +1077,53 @@ describe('M1-audytor-generalny-023: trwała kontrola adresów strony i domeny ko
     }
   });
 });
+
+describe('M1-audytor-generalny-023: polityka prywatności PL i EN spełnia 5.1.1(i) i zgadza się z danymi wersji (10-wydanie-010)', () => {
+  const { SCHEMA_SQL } = require('../src/core/database-schema');
+  const pages = { pl: 'site/privacy.html', en: 'site/en/privacy.html' } as const;
+  const read = (f: string) => (existsSync(join(root, f)) ? readFileSync(join(root, f), 'utf8') : '');
+  // Tabela bazy → jak polityka nazywa te dane (PL, EN). Nowa tabela bez wpisu = test czerwony:
+  // polityka musi zostać uzupełniona razem ze schematem.
+  const CATEGORIES: Record<string, [RegExp, RegExp]> = {
+    inventory_items: [/spiżarni/i, /pantry/i],
+    recipes: [/receptur/i, /recipes/i],
+    brew_sessions: [/historia parzeń/i, /brew history/i],
+    caffeine_logs: [/dziennik kofeiny/i, /caffeine log/i],
+    app_settings: [/ustawienia aplikacji/i, /app settings/i],
+  };
+
+  test('10-wydanie-010: polityka istnieje po polsku i po angielsku, strony linkują do siebie', () => {
+    expect(read(pages.pl)).toMatch(/<html lang="pl">/);
+    expect(read(pages.en)).toMatch(/<html lang="en">/);
+    expect(read(pages.pl)).toContain('href="en/privacy.html"');
+    expect(read(pages.en)).toContain('href="../privacy.html"');
+    const { privacyPolicyUrl, SITE_BASE_URL } = require('../src/core/app-identity');
+    expect(privacyPolicyUrl('en')).toBe(`${SITE_BASE_URL}en/privacy.html`);
+    expect(privacyPolicyUrl('pl')).toBe(`${SITE_BASE_URL}privacy.html`);
+  });
+
+  test('10-wydanie-010: polityka wymienia każdą kategorię danych z bazy (tabele SCHEMA_SQL) w obu językach', () => {
+    const tables = [...String(SCHEMA_SQL).matchAll(/CREATE TABLE IF NOT EXISTS (\w+)/g)].map((m) => m[1]);
+    expect(tables.length).toBeGreaterThanOrEqual(5);
+    expect(tables.filter((t) => !CATEGORIES[t])).toEqual([]);
+    const missing = tables.flatMap((t) =>
+      ([0, 1] as const).flatMap((i) => (CATEGORIES[t][i].test(read(i === 0 ? pages.pl : pages.en)) ? [] : [`${t}:${i === 0 ? 'pl' : 'en'}`])),
+    );
+    expect(missing).toEqual([]);
+  });
+
+  test('10-wydanie-010: polityka opisuje przechowywanie, kopie w Backup/, usuwanie danych i cofnięcie zgody na aparat', () => {
+    const pl = read(pages.pl);
+    const en = read(pages.en);
+    for (const re of [/Przechowywanie/, /Usuwanie danych/, /Backup\//, /10 najnowszych/, /usunięcie aplikacji/i, /cofnąć/i, /aparat/i]) expect([String(re), re.test(pl)]).toEqual([String(re), true]);
+    for (const re of [/Retention/, /Deleting your data/, /Backup\//, /10 most recent/, /deleting the app/i, /revoke/i, /camera/i]) expect([String(re), re.test(en)]).toEqual([String(re), true]);
+  });
+
+  test('10-wydanie-010: polityka nie myli manifestu PrivacyInfo.xcprivacy z etykietą App Store i nie wymienia nieistniejących integracji', () => {
+    for (const html of [read(pages.pl), read(pages.en)]) {
+      expect(html.length).toBeGreaterThan(1000);
+      expect(html.split('\n').filter((l) => /PrivacyInfo\.xcprivacy/.test(l) && /Data Not Collected/.test(l))).toEqual([]);
+      expect(html).not.toMatch(/HealthKit|Apple Health|iCloud sync|synchronizac/i);
+    }
+  });
+});

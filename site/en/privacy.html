@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Napar (Steepwise) | Apps4Brew Studio</title>
+  <meta name="description" content="Privacy policy of Napar (Steepwise) version 1.0: what the app stores on your device, how long it keeps it and how to delete it.">
+  <link rel="alternate" hreflang="pl" href="../privacy.html">
+  <style>
+    :root {
+      --bg: #121214;
+      --card-bg: #1c1c1f;
+      --accent: #c86a28;
+      --accent-gold: #e5a96a;
+      --text: #f4efea;
+      --text-muted: #a09c96;
+      --border: #2e2e34;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f9f8f6;
+        --card-bg: #ffffff;
+        --accent: #b05a1e;
+        --accent-gold: #c2884a;
+        --text: #1a1a1c;
+        --text-muted: #6b6864;
+        --border: #e2dfda;
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      padding: 40px 24px 24px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2.2rem;
+      letter-spacing: -0.03em;
+    }
+    .date {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+    h2 {
+      color: var(--accent-gold);
+      margin-top: 32px;
+      font-size: 1.35rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    p, li {
+      color: var(--text-muted);
+    }
+    strong {
+      color: var(--text);
+    }
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    th {
+      color: var(--text);
+    }
+    a {
+      color: var(--accent-gold);
+    }
+    footer a {
+      color: var(--accent-gold);
+      text-decoration: none;
+      margin: 0 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Napar (Steepwise) Privacy Policy</h1>
+    <div class="date">Applies to version 1.0 for iPhone · effective 14 November 2026 · <a href="../privacy.html">Wersja polska</a></div>
+  </header>
+
+  <main class="container">
+    <h2>1. Summary</h2>
+    <p><strong>Napar (Steepwise)</strong> is made by Apps4Brew Studio. The app needs no account or sign-in and <strong>does not collect data</strong>: nothing you enter is sent to us or to anyone else. There is no server, no analytics, no ads and no tracking. Everything this policy describes stays on your device until you share or delete it yourself.</p>
+
+    <h2>2. What the app stores on your device</h2>
+    <p>You enter this data, or the app calculates it from your entries. It is used only to make the app work (lists, calculations, charts, journal); we do not use it for advertising, analytics or profiling.</p>
+    <table>
+      <tr><th>Data</th><th>What it contains</th></tr>
+      <tr><td>Pantry</td><td>coffees and teas you add: name, roaster or producer, origin, dates, weight, flavour notes, rating</td></tr>
+      <tr><td>Your recipes</td><td>name, method, ratio, temperature, grind, steps, optionally author and description</td></tr>
+      <tr><td>Brew history</td><td>date, method, brew parameters, time, rating, flavour notes, measurements (e.g. TDS), notes</td></tr>
+      <tr><td>Caffeine log</td><td>drink, time you had it, dose and estimated caffeine in mg</td></tr>
+      <tr><td>App settings</td><td>language, theme, units, default grinder, caffeine half-life, bedtime, sounds and haptics</td></tr>
+    </table>
+    <p>The privacy manifest inside the app bundle (<code>PrivacyInfo.xcprivacy</code>) declares no tracking (<code>NSPrivacyTracking = false</code>) and lists no collected data types.</p>
+
+    <h2>3. Camera (QR codes)</h2>
+    <p>The app asks for camera access only to scan recipe QR codes. The image is analysed live on the device; the app does not save photos or recordings. You can revoke access at any time in iOS: Settings → Napar → Camera. Without it, only QR scanning stops working.</p>
+
+    <h2>4. Sharing and export</h2>
+    <p>Data leaves the app only when you do it yourself: exporting a backup (JSON) or a spreadsheet (CSV), sharing a recipe (QR code or link), a tasting note or a calendar entry. You choose the destination in the system share sheet; from then on the chosen app or recipient handles that data.</p>
+
+    <h2>5. Retention</h2>
+    <ul>
+      <li><strong>The database</strong> is kept in the app’s private folder on your device until you delete the entries or the app.</li>
+      <li><strong>Automatic backups:</strong> after you save a brew, the app writes a copy of all data (a JSON file) to the <code>Backup/</code> folder in the app’s documents. The 10 most recent copies are kept; the app deletes older ones itself.</li>
+      <li><strong>Safety backups:</strong> before an import, the app writes a separate copy to <code>Backup/</code>; the 10 most recent of these are kept too.</li>
+      <li><strong>Recovery files:</strong> if the app detects damaged data, it secures it in a <code>state_corrupt_…json</code> file in <code>Backup/</code>; in safe mode you can save a copy of the database to the <code>kopie-ratunkowe/</code> folder. These files stay until you delete them.</li>
+      <li>You can see the app’s documents (<code>Backup/</code>, <code>kopie-ratunkowe/</code>) in the Files app: On My iPhone → Napar.</li>
+      <li>If you back up your iPhone (iCloud or a computer), iOS may include the app’s data. You manage that backup in iOS settings; we have no access to it.</li>
+    </ul>
+
+    <h2>6. Deleting your data</h2>
+    <ul>
+      <li>Delete pantry items, your recipes, brew history and caffeine log entries in the app.</li>
+      <li>Delete backup files in the Files app: On My iPhone → Napar → <code>Backup/</code> and <code>kopie-ratunkowe/</code>.</li>
+      <li>Deleting the app from your iPhone removes its database, settings and the files in the app’s folder.</li>
+      <li>Files you exported or shared earlier are deleted wherever you saved them.</li>
+    </ul>
+    <p>We keep no copy of your data, so there is nothing to request from us for access or deletion: all of it is on your device.</p>
+
+    <h2>7. Contact and changes</h2>
+    <p>Questions about privacy or the app: see the <a href="../support.html">Support</a> page. If what the app stores changes, we will update this policy and the date at the top before releasing the new version.</p>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Apps4Brew Studio. All rights reserved.</p>
+    <p>
+      <a href="../index.html">Home</a> |
+      <a href="privacy.html">Privacy Policy</a> |
+      <a href="../support.html">Support</a> |
+      <a href="../privacy.html">Polityka Prywatności (PL)</a>
+    </p>
+  </footer>
+</body>
+</html>

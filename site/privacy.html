@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Polityka Prywatności — Napar (Steepwise) | Apps4Brew Studio</title>
-  <meta name="description" content="Polityka Prywatności aplikacji Napar (Steepwise). 100% offline, brak kont, brak trackerów reklamowych, zero danych przesyłanych do serwerów zewnętrznych.">
+  <meta name="description" content="Polityka prywatności aplikacji Napar (Steepwise) w wersji 1.0: jakie dane zapisuje aplikacja na Twoim urządzeniu, jak długo je przechowuje i jak je usunąć.">
+  <link rel="alternate" hreflang="en" href="en/privacy.html">
   <style>
     :root {
       --bg: #121214;
@@ -73,6 +74,24 @@
       color: var(--text-muted);
       font-size: 0.9rem;
     }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    th {
+      color: var(--text);
+    }
+    a {
+      color: var(--accent-gold);
+    }
     footer a {
       color: var(--accent-gold);
       text-decoration: none;
@@ -83,26 +102,52 @@
 <body>
   <header>
     <h1>Polityka Prywatności aplikacji Napar (Steepwise)</h1>
-    <div class="date">Wersja obowiązująca od: 14 listopada 2026 r.</div>
+    <div class="date">Dotyczy wersji 1.0 na iPhone · obowiązuje od 14 listopada 2026 r. · <a href="en/privacy.html">English version</a></div>
   </header>
 
   <main class="container">
-    <h2>1. Filozofia 100% Prywatności i Działania Offline</h2>
-    <p>Aplikacja <strong>Napar (Steepwise)</strong>, stworzona przez Apps4Brew Studio, została zaprojektowana w oparciu o fundamentalną zasadę pełnej suwerenności danych użytkownika. Aplikacja nie wymaga zakładania konta, podawania adresu e-mail ani logowania przez usługi społecznościowe.</p>
-    <p>Wszystkie Twoje receptury, wpisy w dzienniku degustacyjnym, zawartość spiżarni ziaren, historia parzeń oraz notatki są zapisywane <strong>wyłącznie w lokalnej bazie danych SQLite na Twoim urządzeniu</strong>.</p>
+    <h2>1. W skrócie</h2>
+    <p>Aplikację <strong>Napar (Steepwise)</strong> tworzy Apps4Brew Studio. Aplikacja nie wymaga konta ani logowania i <strong>nie zbiera danych</strong>: nie wysyła niczego, co w niej zapiszesz, do nas ani do nikogo innego. Nie ma serwera, analityki, reklam ani śledzenia. Wszystko, co opisuje ta polityka, zostaje na Twoim urządzeniu, dopóki sam tego nie udostępnisz albo nie usuniesz.</p>
 
-    <h2>2. Brak Zewnętrznych Serwerów i Trackerów</h2>
-    <p>Aplikacja nie posiada własnego serwera zbierającego dane i nie przesyła żadnych informacji telemetrycznych, diagnostycznych ani analitycznych. W kodzie aplikacji nie znajdują się biblioteki analityczne ani reklamowe stron trzecich (takie jak Google Analytics, Firebase Analytics, Meta SDK czy Sentry).</p>
-    <p>Zgodnie z wymogami firmy Apple, plik konfiguracyjny <code>PrivacyInfo.xcprivacy</code> deklaruje: <code>NSPrivacyTracking = false</code> oraz zerowe zbieranie danych osobowych (<em>Data Not Collected</em>).</p>
+    <h2>2. Jakie dane aplikacja zapisuje na urządzeniu</h2>
+    <p>Dane wpisujesz Ty albo aplikacja wylicza je z Twoich wpisów. Służą wyłącznie do działania funkcji aplikacji (lista, obliczenia, wykresy, dziennik); nie używamy ich do reklamy, analityki ani profilowania.</p>
+    <table>
+      <tr><th>Rodzaj danych</th><th>Co zawiera</th></tr>
+      <tr><td>Spiżarnia</td><td>kawy i herbaty, które dodasz: nazwa, palarnia lub producent, pochodzenie, daty, waga, nuty smakowe, ocena</td></tr>
+      <tr><td>Własne receptury</td><td>nazwa, metoda, proporcje, temperatura, mielenie, kroki, opcjonalnie autor i opis</td></tr>
+      <tr><td>Historia parzeń</td><td>data, metoda, parametry parzenia, czas, ocena, nuty smakowe, pomiary (np. TDS), notatki</td></tr>
+      <tr><td>Dziennik kofeiny</td><td>napój, czas wypicia, dawka i szacowana ilość kofeiny w mg</td></tr>
+      <tr><td>Ustawienia aplikacji</td><td>język, motyw, jednostki, domyślny młynek, czas półtrwania kofeiny, godzina snu, dźwięki i wibracje</td></tr>
+    </table>
+    <p>Manifest prywatności w pakiecie aplikacji (plik <code>PrivacyInfo.xcprivacy</code>) deklaruje brak śledzenia (<code>NSPrivacyTracking = false</code>) i nie wymienia żadnych zbieranych typów danych.</p>
 
-    <h2>3. Dostęp do Aparatu (Kody QR)</h2>
-    <p>Aparat fotograficzny jest wykorzystywany wyłącznie w celach lokalnego skanowania kodów QR receptur udostępnionych przez innych baristów. Obraz z kamery jest przetwarzany w czasie rzeczywistym w pamięci urządzenia i nie jest nigdzie zapisywany ani przesyłany.</p>
+    <h2>3. Aparat (kody QR)</h2>
+    <p>Aplikacja prosi o dostęp do aparatu tylko po to, żeby zeskanować kod QR z recepturą. Obraz jest analizowany na bieżąco na urządzeniu; aplikacja nie zapisuje zdjęć ani nagrań. Zgodę możesz w każdej chwili cofnąć w iOS: Ustawienia → Napar → Aparat. Bez niej nie działa tylko skanowanie kodów QR.</p>
 
-    <h2>4. Eksport i Kopie Zapasowe</h2>
-    <p>W każdej chwili masz prawo wyeksportować całą historię swoich danych do otwartego formatu JSON lub plików arkusza CSV. Wszystkie operacje eksportu i importu odbywają się całkowicie lokalnie w piaskownicy aplikacji.</p>
+    <h2>4. Udostępnianie i eksport</h2>
+    <p>Dane opuszczają aplikację tylko wtedy, gdy sam to zrobisz: eksport kopii (JSON) lub arkusza (CSV), udostępnienie receptury (kod QR lub link), notatki degustacyjnej albo wpisu do kalendarza. Miejsce docelowe wybierasz w systemowym oknie udostępniania; od tej chwili tymi danymi zarządza wybrana aplikacja lub odbiorca.</p>
 
-    <h2>5. Kontakt</h2>
-    <p>W razie jakichkolwiek pytań dotyczących polityki prywatności lub działania aplikacji, prosimy o kontakt za pośrednictwem strony <a href="support.html">Wsparcia Technicznego</a>.</p>
+    <h2>5. Przechowywanie</h2>
+    <ul>
+      <li><strong>Baza danych</strong> jest w prywatnym katalogu aplikacji na urządzeniu i zostaje tam, dopóki nie usuniesz wpisów albo aplikacji.</li>
+      <li><strong>Kopie automatyczne:</strong> po zapisaniu parzenia aplikacja zapisuje kopię wszystkich danych (plik JSON) w katalogu <code>Backup/</code> w dokumentach aplikacji. Zostaje 10 najnowszych kopii; starsze aplikacja usuwa sama.</li>
+      <li><strong>Kopie bezpieczeństwa:</strong> przed importem danych aplikacja zapisuje osobną kopię w <code>Backup/</code>; z nich także zostaje 10 najnowszych.</li>
+      <li><strong>Pliki ratunkowe:</strong> gdy aplikacja wykryje uszkodzone dane, zabezpiecza je w pliku <code>state_corrupt_…json</code> w <code>Backup/</code>; w trybie awaryjnym możesz zapisać kopię bazy w katalogu <code>kopie-ratunkowe/</code>. Te pliki zostają, dopóki ich nie usuniesz.</li>
+      <li>Dokumenty aplikacji (<code>Backup/</code>, <code>kopie-ratunkowe/</code>) widzisz w aplikacji Pliki: Na moim iPhonie → Napar.</li>
+      <li>Jeśli robisz kopię zapasową iPhone’a (iCloud lub komputer), iOS może objąć nią dane aplikacji. Tą kopią zarządzasz w ustawieniach iOS; my nie mamy do niej dostępu.</li>
+    </ul>
+
+    <h2>6. Usuwanie danych</h2>
+    <ul>
+      <li>Pozycje spiżarni, własne receptury, wpisy historii parzeń i dziennika kofeiny usuniesz w aplikacji.</li>
+      <li>Pliki kopii usuniesz w aplikacji Pliki: Na moim iPhonie → Napar → <code>Backup/</code> i <code>kopie-ratunkowe/</code>.</li>
+      <li>Usunięcie aplikacji z iPhone’a usuwa jej bazę, ustawienia i pliki w katalogu aplikacji.</li>
+      <li>Pliki, które wcześniej wyeksportowałeś lub udostępniłeś, usuwasz tam, gdzie je zapisałeś.</li>
+    </ul>
+    <p>Nie przechowujemy żadnej kopii Twoich danych, więc nie musisz prosić nas o ich usunięcie ani o dostęp do nich: masz je w całości na swoim urządzeniu.</p>
+
+    <h2>7. Kontakt i zmiany</h2>
+    <p>Pytania o prywatność lub działanie aplikacji: strona <a href="support.html">Wsparcia Technicznego</a>. Gdy zmieni się to, jakie dane zapisuje aplikacja, zaktualizujemy tę politykę i datę na górze strony przed wydaniem nowej wersji.</p>
   </main>
 
   <footer>
@@ -110,7 +155,8 @@
     <p>
       <a href="index.html">Strona Główna</a> |
       <a href="privacy.html">Polityka Prywatności</a> |
-      <a href="support.html">Wsparcie Techniczne</a>
+      <a href="support.html">Wsparcie Techniczne</a> |
+      <a href="en/privacy.html">Privacy Policy (EN)</a>
     </p>
   </footer>
 </body>
