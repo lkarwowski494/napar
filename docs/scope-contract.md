@@ -35,7 +35,7 @@ Zgodnie z Zasadą Słoika (Jar Principle), Zasadą Anty-Kombajnu oraz DEC-01, po
 | **KILL-03** | Czaty LLM i asystenci generatywni | **NIGDY** | Ryzyko halucynacji baristycznych (U2). Zastąpione deterministycznym kompasem Dial-in Doctor. |
 | **KILL-04** | Automatyczne zamawianie ziaren ze sklepów e-commerce | **v2.0+** | Zbędny bloat komercyjny marnujący uwagę rzemieślnika. |
 | **KILL-05** | Rozpoznawanie etykiet kawy przez chmurowy aparat OCR | **v1.2** | Wymagałoby zewnętrznego serwera. W v1.0 wprowadzono predefiniowane kompendium odmian i regionów. |
-| **KILL-06** | ActivityKit Live Activity & Dynamic Island | **v1.2** | Brak natywnego targetu WidgetKit w repozytorium Expo; odłożone do dev-client v1.2 per DEC-01. |
+| **KILL-06** | ActivityKit Live Activity & Dynamic Island | **v1.2** | Brak natywnego targetu WidgetKit w repozytorium Expo; odłożone do dev-client v1.2 per DEC-01. Kod `src/core/live-activity.ts` (bez wywołania z UI) usunięty 2026-11-13 (ZM-01, DEC-02); powrót z historii git (commit `9f04c7b`). |
 | **KILL-07** | Aplikacja na Apple Watch z haptyką | **v1.2** | Wymaga natywnego projektu SwiftUI watchOS; odłożone do v1.2 per DEC-01. |
 | **KILL-08** | Apple HealthKit Dietary Caffeine bridge | **v1.2** | Wymaga natywnego mostka HealthKit z uprawnieniami iOS; w v1.0 dane zapisywane wyłącznie w lokalnym SQLite. |
 
@@ -81,3 +81,16 @@ Każda funkcja posiada jawną trasę, przypisanie do warstwy darmowej (WTP-0) lu
 2. **Tryb Samolotowy Zero-Network:** 100% funkcji dostępnych bez połączenia internetowego.
 3. **Czysta Domena:** W `src/core/` obowiązuje wysokie pokrycie testami i zero zależności od React Native.
 4. **WCAG AAA:** Minimalny kontrast 7:1 dla tekstu operacyjnego i brak pastelowych gradientów AI Slop.
+
+---
+
+## 5. Bramka zmian zakresu (ZM) — od 2026-11-13
+
+Każda zmiana zakresu po zatwierdzeniu kontraktu (nowa funkcja, wycięcie, ukrycie) ma wiersz ZM z wynikiem bramki i decyzją właściciela z datą. *Dlaczego:* pętle audytu P32–P105 dopisały do `src/core` około 64% funkcji bez wejścia z interfejsu i bez decyzji zakresu (03-zakres-003).
+
+**Reguła mechaniczna (DEC-02):** każda deklaracja w `src/core` ma drogę z `app/` albo `src/components/`. Pilnuje jej `npm run check:reachability` (`scripts/check-reachability.mjs`, krok `npm run verify`) i test `tests/core-reachability.test.ts` (uruchamiany także przez CI w `test:coverage`). Funkcja używana tylko przez testy nie jest osiągalna. Wyjątek wymaga wpisu w `scripts/reachability-exceptions.json` z powodem i wiersza ZM poniżej. *Dlaczego:* kontrolę, którą agent może pominąć, wymusza test, nie zdanie w dokumencie.
+
+| ID | Data | Prośba (kto, skąd) | Bramka: praca i dowód · intuicyjność · koszt · co wypada | Decyzja (ID, słowa właściciela) |
+|---|---|---|---|---|
+| ZM-01 | 2026-11-13 | usunąć funkcje `src/core` bez drogi z interfejsu (audyt M1 2026-11-11: 03-zakres-003, 01-odkrywanie-016, 05-architekt-013, 08-programista-010) | żadna praca J ani BR nie ma wejścia do tych funkcji (0 wywołań z `app/` i `src/components/`) · nic nie znika z ekranów · koszt: przegląd jednego dużego diffu; zysk: mniej kodu pod progiem 100% i budżety czasu CI bez martwych funkcji · wypada 487 deklaracji (254 funkcje, 222 typy, 11 stałych; ok. 15,4 tys. linii), w tym cały `live-activity.ts` (KILL-06); dane użytkownika bez zmian (schemat, migracje, kopie i import nie są dotknięte) | DEC-02 wybór (a), 2026-11-13: „Wszystko według rekomendacji” („usunąć nieosiągalne funkcje razem z ich testami i budżetami czasu; bramka zmian zakresu dla nowych”). Wyjątki: 9 deklaracji wyroczni (`contrast.ts`, `calculateCaffeineDecay`, `ppmCaCO3ToDegreesDH`) z powodem w `scripts/reachability-exceptions.json`. |
+
