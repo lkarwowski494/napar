@@ -1000,3 +1000,80 @@ describe('M1-audytor-generalny-021: bez przełącznika i obietnic Apple Health d
     ).toEqual([]);
   });
 });
+
+describe('M1-audytor-generalny-023: adresy polityki, regulaminu i wsparcia z jednego miejsca; bez adresu w nieistniejącej domenie (DEC-07 a; 10-wydanie-001)', () => {
+  const listSite = (dir: string): string[] =>
+    readdirSync(join(root, dir), { withFileTypes: true }).flatMap((e) =>
+      e.isDirectory() ? listSite(join(dir, e.name)) : /\.html$/.test(e.name) ? [join(dir, e.name)] : [],
+    );
+  const siteFiles = listSite('site');
+  const scan = (re: RegExp, files: string[]): string[] =>
+    files.flatMap((f) =>
+      readFileSync(join(root, f), 'utf8')
+        .split('\n')
+        .flatMap((line, i) => (re.test(line) ? [`${f}:${i + 1}`] : [])),
+    );
+
+  test('10-wydanie-001: żaden plik aplikacji, strony ani metadanych sklepu nie podaje adresu w domenie apps4brew.pl', () => {
+    const files = ['app/settings.tsx', 'docs/15-app-store.md', ...siteFiles];
+    expect(scan(/apps4brew\.pl/i, files)).toEqual([]);
+  });
+
+  test('10-wydanie-001: adres e-mail kontaktu ma jedno miejsce (SUPPORT_EMAIL); bez adresu od właściciela strona nie pokazuje żadnego e-maila', () => {
+    const identity = require('../src/core/app-identity');
+    expect(identity.SUPPORT_EMAIL).toBeNull();
+    expect(readFileSync(join(root, 'src/core/app-identity.ts'), 'utf8')).toContain('[DO USTALENIA: adres od właściciela]');
+    expect(scan(/[\w.+-]+@[\w-]+\.[a-z]{2,}/i, siteFiles)).toEqual([]);
+    expect(readFileSync(join(root, 'site/support.html'), 'utf8')).toContain('[DO USTALENIA: adres od właściciela]');
+    expect(readFileSync(join(root, 'docs/15-app-store.md'), 'utf8')).toContain('[DO USTALENIA: adres od właściciela]');
+    expect(identity.supportMailtoUrl('wsparcie@przyklad.test')).toBe('mailto:wsparcie@przyklad.test');
+  });
+
+  test('10-wydanie-001: adresy strony produktu tylko w app-identity.ts; Ustawienia otwierają politykę, regulamin i wsparcie z tych stałych', () => {
+    const identity = require('../src/core/app-identity');
+    expect(scan(/github\.io|mailto:/, ['app/settings.tsx'])).toEqual([]);
+    const { default: SettingsScreen } = require('../app/settings');
+    const Linking = require('expo-linking');
+    const spy = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+    let tree: any;
+    act(() => {
+      tree = renderer.create(<SettingsScreen />);
+    });
+    const press = (label: RegExp) => {
+      const row = tree.root.find(
+        (n: any) => n.props.accessibilityRole === 'link' && label.test(String(n.props.accessibilityLabel ?? '')) && typeof n.props.onPress === 'function',
+      );
+      act(() => {
+        row.props.onPress();
+      });
+    };
+    press(/Polityka Prywatności/);
+    press(/Regulamin/);
+    press(/Kontakt i Wsparcie/);
+    act(() => tree.unmount());
+    expect(spy.mock.calls.map((c: any[]) => c[0])).toEqual([identity.privacyPolicyUrl('pl'), identity.TERMS_URL, identity.SUPPORT_URL]);
+    expect(identity.privacyPolicyUrl('pl')).toBe('https://lkarwowski494.github.io/napar/privacy.html');
+    expect(identity.TERMS_URL).toBe('https://lkarwowski494.github.io/napar/terms.html');
+    expect(identity.SUPPORT_URL).toBe('https://lkarwowski494.github.io/napar/support.html');
+    spy.mockRestore();
+  });
+});
+
+describe('M1-audytor-generalny-023: trwała kontrola adresów strony i domeny kontaktu (10-wydanie-001)', () => {
+  test('site-check.yml sprawdza co tydzień i po wdrożeniu Pages wszystkie strony z app-identity.ts oraz MX adresu kontaktu', () => {
+    const wf = readFileSync(join(root, '.github/workflows/site-check.yml'), 'utf8');
+    expect(wf).toMatch(/schedule:/);
+    expect(wf).toMatch(/workflow_run:/);
+    expect(wf).toContain('src/core/app-identity.ts');
+    expect(wf).toContain('type=MX');
+    const identity = readFileSync(join(root, 'src/core/app-identity.ts'), 'utf8');
+    const pages = [...identity.matchAll(/^\/\/ site-check: (.+)$/gm)].map((m) => m[1]);
+    expect(pages).toEqual(expect.arrayContaining(['privacy.html', 'terms.html', 'support.html']));
+    for (const p of pages) expect(existsSync(join(root, 'site', p))).toBe(true);
+    // Każdy adres strony otwierany z app-identity.ts jest na liście kontroli.
+    const { TERMS_URL, SUPPORT_URL, SITE_BASE_URL, privacyPolicyUrl } = require('../src/core/app-identity');
+    for (const url of [TERMS_URL, SUPPORT_URL, privacyPolicyUrl('pl'), privacyPolicyUrl('en')]) {
+      expect(pages).toContain(String(url).replace(SITE_BASE_URL, ''));
+    }
+  });
+});

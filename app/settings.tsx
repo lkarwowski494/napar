@@ -47,10 +47,19 @@ import { CaffeineSettingsCard } from '../src/components/settings/CaffeineSetting
 import { DataBackupCard } from '../src/components/settings/DataBackupCard';
 import { GrinderSelectionCard } from '../src/components/settings/GrinderSelectionCard';
 import { AppPreferencesCard } from '../src/components/settings/AppPreferencesCard';
-import { APP_STORE_ID, appStoreReviewUrl } from '../src/core/app-identity';
+import {
+  APP_STORE_ID,
+  appStoreReviewUrl,
+  privacyPolicyUrl,
+  TERMS_URL,
+  SUPPORT_URL,
+  SUPPORT_EMAIL,
+  supportMailtoUrl,
+} from '../src/core/app-identity';
 
 export default function SettingsScreen() {
   const storeId = APP_STORE_ID;
+  const supportEmail = SUPPORT_EMAIL;
   const { t, language, setLanguage } = useTranslation();
 
   let brewCtx: any = null;
@@ -280,7 +289,7 @@ export default function SettingsScreen() {
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
-          onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/privacy.html')}
+          onPress={() => Linking.openURL(privacyPolicyUrl(language === 'en' ? 'en' : 'pl'))}
           accessibilityRole="link"
           accessibilityLabel={t.settings.privacyLabel || (language === 'pl' ? 'Polityka Prywatności' : 'Privacy Policy')}
         >
@@ -290,7 +299,7 @@ export default function SettingsScreen() {
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
-          onPress={() => Linking.openURL('https://lkarwowski494.github.io/napar/terms.html')}
+          onPress={() => Linking.openURL(TERMS_URL)}
           accessibilityRole="link"
           accessibilityLabel={t.settings.eulaLabel || (language === 'pl' ? 'Regulamin (EULA)' : 'Terms of Service (EULA)')}
         >
@@ -300,12 +309,15 @@ export default function SettingsScreen() {
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
-          onPress={() => Linking.openURL('mailto:kontakt@apps4brew.pl')}
+          onPress={() => Linking.openURL(supportEmail ? supportMailtoUrl(supportEmail) : SUPPORT_URL)}
           accessibilityRole="link"
           accessibilityLabel={language === 'pl' ? 'Kontakt i Wsparcie' : 'Contact & Support'}
         >
           <Text style={styles.infoLabel}>{language === 'pl' ? 'Kontakt i Wsparcie' : 'Contact & Support'}</Text>
-          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>kontakt@apps4brew.pl ↗</Text>
+          {/* M1-audytor-generalny-023: adres e-mail tylko z SUPPORT_EMAIL (app-identity.ts); bez niego strona wsparcia. */}
+          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>
+            {supportEmail ? `${supportEmail} ↗` : language === 'pl' ? 'Otwórz ↗' : 'Open ↗'}
+          </Text>
         </Pressable>
         {/* M1-audytor-generalny-022: link oceny tylko przy prawdziwym Apple ID (app-identity.ts). */}
         {storeId && (

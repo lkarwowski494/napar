@@ -1,0 +1,61 @@
+name: Kontrola strony produktu i adresu kontaktu
+
+# M1-audytor-generalny-023 (10-wydanie-001): trwała kontrola, że adresy polityki prywatności,
+# regulaminu i wsparcia, które otwiera aplikacja, odpowiadają (App Review 5.1.1(i), 1.5, 2.1(a)),
+# a domena adresu e-mail kontaktu ma rekord MX. Adresy i e-mail czyta z jednego źródła:
+# src/core/app-identity.ts. Czerwony przebieg = krok właściciela (Pages albo adres e-mail).
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_run:
+    workflows: ['Deploy GitHub Pages (Static site/)']
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Adresy strony z app-identity.ts zwracają 200
+        run: |
+          set -u
+          FILE=src/core/app-identity.ts
+          BASE=$(sed -nE "s/^export const SITE_BASE_URL = '([^']+)';/\1/p" "$FILE")
+          test -n "$BASE" || { echo "::error::Brak SITE_BASE_URL w $FILE"; exit 1; }
+          PAGES=$(sed -nE 's/^\/\/ site-check: (.+)$/\1/p' "$FILE")
+          FAIL=0
+          for p in "" $PAGES; do
+            if curl -fsSI --retry 3 --retry-delay 10 --max-time 20 "$BASE$p" > /dev/null; then
+              echo "200: $BASE$p"
+            else
+              echo "::error::Adres nie odpowiada 200: $BASE$p (czy GitHub Pages jest włączone?)"
+              FAIL=1
+            fi
+          done
+          exit $FAIL
+
+      - name: Adres e-mail kontaktu ustawiony i domena ma rekord MX
+        if: always()
+        run: |
+          set -u
+          FILE=src/core/app-identity.ts
+          EMAIL=$(sed -nE "s/^export const SUPPORT_EMAIL: string \| null = '([^']+)';/\1/p" "$FILE")
+          if [ -z "$EMAIL" ]; then
+            echo "::error::SUPPORT_EMAIL w $FILE jest pusty [DO USTALENIA: adres od właściciela]"
+            exit 1
+          fi
+          DOMAIN="${EMAIL#*@}"
+          curl -fsS --max-time 20 "https://dns.google/resolve?name=${DOMAIN}&type=MX" \
+            | jq -e '.Status == 0 and ((.Answer // []) | length > 0)' > /dev/null \
+            || { echo "::error::Domena $DOMAIN nie ma rekordu MX"; exit 1; }
+          echo "MX: $DOMAIN"

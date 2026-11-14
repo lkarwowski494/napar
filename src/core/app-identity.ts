@@ -9,3 +9,30 @@ export const APP_STORE_ID: string | null = null;
 export function appStoreReviewUrl(id: string): string {
   return `https://apps.apple.com/app/id${encodeURIComponent(id)}?action=write-review`;
 }
+
+// ============================================================================
+// Strona produktu i kontakt (M1-audytor-generalny-023; 10-wydanie-001, DEC-07 a)
+// Strona: GitHub Pages z katalogu site/ (włączenie Pages w ustawieniach repo to krok właściciela).
+// ============================================================================
+
+// Strony sprawdzane przez .github/workflows/site-check.yml (po jednej w linii, względem SITE_BASE_URL):
+// site-check: privacy.html
+// site-check: terms.html
+// site-check: support.html
+export const SITE_BASE_URL = 'https://lkarwowski494.github.io/napar/';
+export const TERMS_URL = `${SITE_BASE_URL}terms.html`;
+export const SUPPORT_URL = `${SITE_BASE_URL}support.html`;
+
+/** Polityka prywatności w języku interfejsu (dziś jedna strona PL; wersja EN: 10-wydanie-010). */
+export function privacyPolicyUrl(_lang: 'pl' | 'en'): string {
+  return `${SITE_BASE_URL}privacy.html`;
+}
+
+// [DO USTALENIA: adres od właściciela] — DEC-07 a: działający adres e-mail właściciela, wpisany tu
+// i w site/support.html (miejsce oznaczone tym samym znacznikiem) oraz w docs/15-app-store.md.
+// Do tego czasu null: Ustawienia zamiast wiadomości e-mail otwierają stronę wsparcia (SUPPORT_URL).
+export const SUPPORT_EMAIL: string | null = null;
+
+export function supportMailtoUrl(email: string): string {
+  return `mailto:${email}`;
+}
