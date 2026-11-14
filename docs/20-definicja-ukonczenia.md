@@ -43,7 +43,7 @@ Przed przygotowaniem wydania do App Store Connect i TestFlight:
    * `npm run check:corpus` (wyrocznie numeryczne Python zgodne do 4 miejsc po przecinku)
    * `npm run check:licenses` (zero licencji GPL / AGPL w produkcyjnym drzewie zależności)
    * `npm run check:matrix` (100% pokrycia AST bez luk)
-   * `npm run check:native` (niezmienników projektu iOS na Linuksie/Windowsie)
+   * `npm run check:native` (kontrola niezmienników projektu iOS na Linuksie/Windowsie)
    * `npm run typecheck` (zero błędów TS)
    * `npm run test:coverage` (wszystkie testy przechodzą, progi z `jest.config.js`, brak ostrzeżeń `act()` i `console.error`)
 2. **Bezpieczeństwo i prywatność repozytorium (`NFR-SEC-001`..`015`):**
