@@ -18,7 +18,6 @@ import {
 } from '../src/core/contrast';
 import { SCHEMA_SQL } from '../src/core/database-schema';
 import { QrCodeSvg } from '../src/core/qr-code';
-import type { CraftAppId } from '../src/core/craft-suite-theme';
 import {
   DEFAULT_BREW_COST_PARAMETERS,
 } from '../src/core/cost-calculator';
@@ -106,12 +105,6 @@ describe('AST Test Matrix: Logika and Wymiar 100% Coverage (BR-TEST-028..031)', 
       expect(DEFAULT_BREW_COST_PARAMETERS).toHaveProperty('waterSaltsCostPerLiter');
     });
 
-    test('CraftAppId union literals are valid', () => {
-      const apps: CraftAppId[] = ['napar', 'piekarz', 'sloik', 'masarz', 'ferment'];
-      for (const a of apps) {
-        expect(['napar', 'piekarz', 'sloik', 'masarz', 'ferment']).toContain(a);
-      }
-    });
 
     test('SCHEMA_SQL defines table creation queries', () => {
       expect(typeof SCHEMA_SQL).toBe('string');
