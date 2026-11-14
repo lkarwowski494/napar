@@ -5,7 +5,7 @@
 **Data audytu:** 2026-10-18  
 **Zrealizowano przez:** Rola 17: Koordynator Napraw Sztafety (Autonomous Remediation Orchestrator)  
 **Data zakończenia napraw:** 2026-10-18  
-**Projekt:** Napar (Steepwise) — `lkarwowski494/napar`  
+**Projekt:** Napar — `lkarwowski494/napar`  
 **Gałąź robocza:** `remediation/supreme-audit-fixes`  
 **Status Końcowy:** 🟢 **100% ZREALIZOWANE (18/18 ZADAŃ ROZWIĄZANYCH, 0 REGRESJI)**
 

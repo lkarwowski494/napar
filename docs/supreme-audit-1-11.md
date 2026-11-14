@@ -1,4 +1,4 @@
-# Raport Audytu Generalnego Sztafety (Role 1–11) · Napar (Steepwise)
+# Raport Audytu Generalnego Sztafety (Role 1–11) · Napar
 
 **Identyfikator inspekcji:** `SUPREME-AUDIT-NAPAR-2026-10-18`  
 **Instancja audytorska:** Rola 16: AD-HOC Naczelny Inspektor Rzemiosła i Jakości (Supreme Forensic Auditor 1–11)  
@@ -442,7 +442,7 @@
 
 ### 🔴 STATUS: CONDITIONAL REJECTED (WARUNKOWO ZABLOKOWANY)
 
-Aplikacja **Napar (Steepwise)** posiada wybitną logikę domenową, znakomicie zbadane podstawy naukowe i wzorcową kulturę testów matematycznych (PBT fast-check, CI 7 stref czasowych).  
+Aplikacja **Napar** posiada wybitną logikę domenową, znakomicie zbadane podstawy naukowe i wzorcową kulturę testów matematycznych (PBT fast-check, CI 7 stref czasowych).  
 Jednakże ze względu na **5 Krytycznych Blokad P0** (w szczególności: fikcyjny paywall bez natywnego StoreKit grożący natychmiastowym odrzuceniem przez Apple, brak `PRAGMA busy_timeout = 5000;`, brak transakcji atomowych, plagę `any` w warstwie danych i brak 33 z 35 zadeklarowanych języków):
 
 > **Aplikacja NIE MOŻE zostać opublikowana w App Store w bieżącym stanie.**  

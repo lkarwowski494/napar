@@ -6,7 +6,7 @@
     "timestamp": "2026-10-26T19:02:08.523Z",
     "supportedLocalesCount": 35
   },
-  "appName": "Steepwise",
+  "appName": "Napar",
   "appTagline": "Artisan coffee & tea brewing assistant",
   "common": {
     "cancel": "Cancel",
@@ -554,7 +554,7 @@
   },
   "onboarding": {
     "welcomeEyebrow": "APPS4CRAFT STUDIO · 100% OFFLINE",
-    "welcomeTitle": "Welcome to Steepwise",
+    "welcomeTitle": "Welcome to Napar",
     "welcomeSubtitle": "Personalize your ritual. The app will tailor the interface, stash, and calculators strictly to what you actually brew.",
     "choosePrompt": "What fills your daily brew ritual?",
     "coffeeOnlyTitle": "Specialty Coffee Only",

@@ -173,6 +173,7 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         shareUrl={shareUrl}
         waterTempCelsius={waterTempCelsius}
         unitSystem={unitSystem}
+        language={language}
         t={t}
       />
 

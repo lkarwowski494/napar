@@ -43,7 +43,7 @@ describe('BPR To-Be Components & Screens Coverage', () => {
         <AppGuideModal visible={true} onClose={onClose} language="en" />
       );
     });
-    expect(JSON.stringify(tree!.toJSON())).toContain('How Steepwise Works');
+    expect(JSON.stringify(tree!.toJSON())).toContain('How Napar Works');
   });
 
   it('renders ProcedureModal with auto-parsed duration, step navigation, and Finish & Save CTA', () => {

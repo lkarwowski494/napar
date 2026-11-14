@@ -111,7 +111,7 @@ export function AppGuideModal({
             <View style={styles.headerTitleRow}>
               <CompassIcon size={18} color={theme.colors.copper} />
               <Text style={styles.title}>
-                {isEn ? 'How Steepwise Works' : 'Jak działa aplikacja?'}
+                {isEn ? 'How Napar Works' : 'Jak działa aplikacja?'}
               </Text>
             </View>
             <Pressable

@@ -1,4 +1,4 @@
-# Dziennik Przekazania i Rejestr Decyzji — Napar (Steepwise)
+# Dziennik Przekazania i Rejestr Decyzji — Napar
 
 > Żywy dokument inżynieryjny aktualizowany po każdej sesji i przed każdym wydaniem (`BR-REL-018`).
 > Stan na dzień: 17.10.2026.
@@ -9,7 +9,7 @@
 
 | Parametr | Wartość | Uwagi |
 | :--- | :--- | :--- |
-| **Aplikacja** | Napar (Steepwise) | Rodzina Apps4Craft (`trening` + `organizer`) |
+| **Aplikacja** | Napar | Rodzina Apps4Craft (`trening` + `organizer`) |
 | **Wersja w `app.json`** | `1.0.0` | SemVer |
 | **Bazowy numer buildu** | `app.json` → `expo.ios.buildNumber` (= `android.versionCode`) | `testflight.yml` czyta bazę z `app.json`: numer = baza + `GITHUB_RUN_NUMBER`; tag `vX.Y.Z-bNNNN` |
 | **Bundle Identifier** | `pl.lukasz.napar` | iOS App Store |

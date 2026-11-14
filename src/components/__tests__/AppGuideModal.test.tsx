@@ -58,7 +58,7 @@ describe('AppGuideModal Component', () => {
     });
 
     const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('How Steepwise Works');
+    expect(str).toContain('How Napar Works');
     expect(str).toContain('GOLDEN RULES OF EXTRACTION');
     expect(str).toContain('MAIN PROCESS (1 → 2 → 3 → 4)');
     expect(str).toContain('BOTTOM NAVIGATION TABS');

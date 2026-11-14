@@ -335,7 +335,7 @@ if (staleExceptions.length > 0) {
 // ==========================================
 // 6. Generate docs/22-macierz-testow.md
 // ==========================================
-let md = `# Macierz Testów (AST Coverage Matrix) — NAPAR (STEEPWISE)\n\n`;
+let md = `# Macierz Testów (AST Coverage Matrix) — NAPAR\n\n`;
 md += `Wygenerowano automatycznie przez \`scripts/test-matrix.mjs\` zgodnie z wymaganiami **BR-TEST-028..031**.\n`;
 md += `Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i opisy \`test\`/\`describe\`).\n\n`;
 

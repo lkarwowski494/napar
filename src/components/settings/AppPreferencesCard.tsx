@@ -68,11 +68,11 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
           onPress={() => onSetLanguage('en')}
           accessibilityRole="radio"
           accessibilityState={{ selected: language === 'en' }}
-          accessibilityLabel="English (Steepwise)"
+          accessibilityLabel="English (Napar)"
           accessibilityHint="Sets interface language to English"
         >
           <Text style={[styles.langTabText, language === 'en' && styles.langTabTextActive]}>
-            English (Steepwise)
+            English (Napar)
           </Text>
         </Pressable>
       </View>
@@ -253,7 +253,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
         <Text style={styles.manifestoBody}>
           {language === 'pl'
             ? 'Napar nie wymaga logowania, nie łączy się z żadnym zewnętrznym serwerem i nie zbiera Twoich danych (etykieta „Data Not Collected”). Cała spiżarnia, dziennik i kalkulatory działają w 100% lokalnie na Twoim urządzeniu.'
-            : 'Steepwise requires no login, connects to no external servers, and collects zero data (Apple "Data Not Collected" badge). Your stash, journal, and calculators run 100% locally on your device.'}
+            : 'Napar requires no login, connects to no external servers, and collects zero data (Apple "Data Not Collected" badge). Your stash, journal, and calculators run 100% locally on your device.'}
         </Text>
       </View>
     </>

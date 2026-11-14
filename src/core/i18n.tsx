@@ -1,7 +1,7 @@
 // ============================================================================
 // Napar — System Internacjonalizacji (i18n)
 // 100% Offline-first, Zero tracking, Zero external deps (Pure React Context)
-// Obsługa: 'pl' (Napar) oraz 'en' (Steepwise)
+// Obsługa: 'pl' oraz 'en' (nazwa w obu językach: Napar — 11-wzrost-007)
 // ============================================================================
 
 import React, { createContext, useContext, useState } from 'react';
@@ -602,7 +602,7 @@ export const translations = {
     },
   },
   en: {
-    appName: 'Steepwise',
+    appName: 'Napar',
     appTagline: 'Artisan coffee & tea brewing assistant',
     common: {
       cancel: 'Cancel',
@@ -1169,7 +1169,7 @@ export const translations = {
     },
     onboarding: {
       welcomeEyebrow: 'APPS4CRAFT STUDIO · 100% OFFLINE',
-      welcomeTitle: 'Welcome to Steepwise',
+      welcomeTitle: 'Welcome to Napar',
       welcomeSubtitle: 'Personalize your ritual. The app will tailor the interface, stash, and calculators strictly to what you actually brew.',
       choosePrompt: 'What fills your daily brew ritual?',
       coffeeOnlyTitle: 'Specialty Coffee Only',

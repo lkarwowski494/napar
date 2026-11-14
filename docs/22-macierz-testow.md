@@ -1,4 +1,4 @@
-# Macierz Testów (AST Coverage Matrix) — NAPAR (STEEPWISE)
+# Macierz Testów (AST Coverage Matrix) — NAPAR
 
 Wygenerowano automatycznie przez `scripts/test-matrix.mjs` zgodnie z wymaganiami **BR-TEST-028..031**.
 Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i opisy `test`/`describe`).

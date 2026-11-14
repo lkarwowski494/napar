@@ -1,4 +1,4 @@
-# Raport z Audytu Przedwydaniowego BRD-QA-REL 1.0 (Runda 1): Napar (Steepwise)
+# Raport z Audytu Przedwydaniowego BRD-QA-REL 1.0 (Runda 1): Napar
 
 **Data audytu:** 17 października 2026 r.  
 **Wersja:** `v1.0.0` (commit `d8521c5`)  
@@ -170,7 +170,7 @@ Po zakończeniu Faz 1–4 przeprowadzona została **Runda 2 Audytu (dogrywka wer
 
 ## 5. Orzeczenie Końcowe i Certyfikat Zgodności
 
-1. **Standard:** Aplikacja **Napar (Steepwise)** została w pełni dostosowana do studyjnego standardu **Role-Model (`trening` + `organizer`)** opisanego w dokumencie `BRD-QA-REL 1.0`.
+1. **Standard:** Aplikacja **Napar** została w pełni dostosowana do studyjnego standardu **Role-Model (`trening` + `organizer`)** opisanego w dokumencie `BRD-QA-REL 1.0`.
 2. **Kryteria Jakościowe:**
    * Wszystkie bramki jakościowe `npm run verify` przechodzą w 100% na zielono:
      * `npm run check:i18n` (381/381 kluczy, 100% symetrii PL/EN),

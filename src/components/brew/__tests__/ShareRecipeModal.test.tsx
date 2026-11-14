@@ -53,4 +53,25 @@ describe('ShareRecipeModal Component', () => {
     expect(shareBtn.props.accessibilityHint).toBeDefined();
     expect(copyBtn.props.accessibilityHint).toBeDefined();
   });
+
+  test('11-wzrost-007: wiadomość udostępnienia zależy od języka interfejsu, nie od nazwy aplikacji', () => {
+    const { Share } = require('react-native');
+    const spy = jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' } as any);
+    for (const [language, tr, expected] of [
+      ['en', translations.en, 'brew recipe in Napar'],
+      ['pl', translations.pl, 'receptura parzenia w Napar'],
+    ] as const) {
+      spy.mockClear();
+      let tree: renderer.ReactTestRenderer;
+      act(() => {
+        tree = renderer.create(<ShareRecipeModal {...defaultProps} t={tr} language={language} />);
+      });
+      act(() => {
+        tree!.root.findByProps({ testID: 'share-link-btn' }).props.onPress();
+      });
+      const message = (spy.mock.calls[0][0] as { message: string }).message;
+      expect(message).toContain(expected);
+    }
+    spy.mockRestore();
+  });
 });

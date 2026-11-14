@@ -3,7 +3,7 @@
 **Wygenerowano przez:** Rola 17: Koordynator Napraw Sztafety (Autonomous Remediation Orchestrator)  
 **Identyfikator audytu źródłowego:** `SUPREME-AUDIT-NAPAR-2026-10-18` (Rola 16)  
 **Data sporządzenia raportu:** 2026-10-18  
-**Aplikacja:** Napar (Steepwise) — `lkarwowski494/napar`  
+**Aplikacja:** Napar — `lkarwowski494/napar`  
 **Wersja:** 1.0.0 (Build 1)  
 **Gałąź robocza:** `remediation/supreme-audit-fixes`  
 **Status Końcowy Programu:** 🟢 **100% WYKORZENIONE USTERKI — PEŁNE ZEZWOLENIE NA PUBLIKACJĘ (RELEASE READY)**
@@ -184,7 +184,7 @@ d923ed4 fix(phase-1): resolve discovery, BRD, UX, monetization, and scope defect
 ### 🟢 STATUS: APPROVED FOR PRODUCTION (BEZWZGLĘDNE ZEZWOLENIE NA PUBLIKACJĘ)
 
 Wszystkie wady strategiczne (Płaszczyzna A) oraz usterki wykonawcze (Płaszczyzna B) zidentyfikowane podczas Naczelnego Audytu Sądowego 1–11 zostały trwale i bezstratnie wyeliminowane.  
-Aplikacja **Napar (Steepwise) v1.0.0 (Build 1)** spełnia najwyższe standardy inżynierii oprogramowania iOS, rzemiosła specialty coffee, pełnej prywatności (Zero-Telemetry, Data Not Collected) oraz wytycznych Apple Human Interface Guidelines i App Store Review Guidelines.
+Aplikacja **Napar v1.0.0 (Build 1)** spełnia najwyższe standardy inżynierii oprogramowania iOS, rzemiosła specialty coffee, pełnej prywatności (Zero-Telemetry, Data Not Collected) oraz wytycznych Apple Human Interface Guidelines i App Store Review Guidelines.
 
 Aplikacja jest gotowa do natychmiastowego zgłoszenia do recenzji w **Apple App Store**.
 

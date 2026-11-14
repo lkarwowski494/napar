@@ -1,7 +1,7 @@
 # Napar — Kitchen-Proof UX i model wersji 1.0
 
 ## 1. Wstęp i Cel Architektoniczny
-Aplikacja **Napar (Steepwise)** została zaprojektowana i zoptymalizowana pod kątem standardów **Apps4Brew Studio**:
+Aplikacja **Napar** została zaprojektowana i zoptymalizowana pod kątem standardów **Apps4Brew Studio**:
 - Oceny 4.9★ w App Store i Google Play.
 - 100% Offline-First (wbudowana baza SQLite w bezpiecznym katalogu `/Library/SQLite`, zero trackerów telemetrycznych).
 - Ergonomia kuchenna („Kitchen-Proof” & „Dirty Thumb” controls $\ge 48\text{–}56\,\text{pt}$).

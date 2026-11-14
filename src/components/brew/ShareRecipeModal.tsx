@@ -15,6 +15,7 @@ import { QrCodeSvg } from '../../core/qr-code';
 import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../core/unit-converter';
 import { MasterRecipe } from '../../core/recipes-data';
 import { SavedRecipe } from '../../core/database-schema';
+import type { SupportedLanguage } from '../../core/i18n';
 
 export interface ShareRecipeModalProps {
   visible: boolean;
@@ -24,6 +25,8 @@ export interface ShareRecipeModalProps {
   waterTempCelsius: number;
   unitSystem: 'metric' | 'imperial';
   t: any;
+  /** Język wiadomości udostępnienia (11-wzrost-007: nazwa aplikacji jest ta sama w obu językach). */
+  language?: SupportedLanguage;
 }
 
 export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
@@ -34,6 +37,7 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
   waterTempCelsius,
   unitSystem,
   t,
+  language = 'pl',
 }) => {
   return (
     <Modal visible={visible} animationType="slide">
@@ -85,8 +89,8 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
               onPress={() => {
                 Share.share({
                   title: recipe.name,
-                  message: t?.appName === 'Steepwise'
-                    ? `${recipe.name} — brew recipe in Steepwise:\n${shareUrl}`
+                  message: language === 'en'
+                    ? `${recipe.name} — brew recipe in Napar:\n${shareUrl}`
                     : `${recipe.name} — receptura parzenia w Napar:\n${shareUrl}`,
                   url: shareUrl,
                 });

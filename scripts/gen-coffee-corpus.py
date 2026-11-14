@@ -38,7 +38,7 @@ def main():
         "metadata": {
             "generator": "scripts/gen-coffee-corpus.py",
             "version": "1.0",
-            "description": "Domain calculation oracle corpus for Napar (Steepwise)"
+            "description": "Domain calculation oracle corpus for Napar"
         },
         "extraction_yield": [],
         "water_hardness": [],

@@ -1,5 +1,5 @@
 {
-  "appName": "Steepwise",
+  "appName": "Napar",
   "appTagline": "Assistent voor specialty coffee en ambachtelijke thee",
   "common": {
     "cancel": "Annuleren",
@@ -547,7 +547,7 @@
   },
   "onboarding": {
     "welcomeEyebrow": "APPS4CRAFT STUDIO · 100% OFFLINE",
-    "welcomeTitle": "Welcome to Steepwise",
+    "welcomeTitle": "Welcome to Napar",
     "welcomeSubtitle": "Personalize your ritual. The app will tailor the interface, stash, and calculators strictly to what you actually brew.",
     "choosePrompt": "What fills your daily brew ritual?",
     "coffeeOnlyTitle": "Specialty Coffee Only",

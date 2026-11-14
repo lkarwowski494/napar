@@ -1,4 +1,4 @@
-# Napar (Steepwise) ☕🍵
+# Napar ☕🍵
 
 > **„Parz uważnie, smakuj głęboko — Twoja codzienna chwila rzemiosła.”**
 

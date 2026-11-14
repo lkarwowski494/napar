@@ -100,9 +100,9 @@ describe('i18n System', () => {
     expect(translations.pl.favorites.quickBrew).toBe('Szybkie parzenie');
   });
 
-  test('Nazwa aplikacji to Napar po polsku i Steepwise po angielsku', () => {
+  test('Nazwa aplikacji to Napar po polsku i po angielsku (11-wzrost-007)', () => {
     expect(translations.pl.appName).toBe('Napar');
-    expect(translations.en.appName).toBe('Steepwise');
+    expect(translations.en.appName).toBe('Napar');
   });
 
   test('Klucze parzenia zawierają instrukcje dla minutnika', () => {
@@ -154,7 +154,7 @@ describe('i18n System', () => {
       contextValue.setLanguage('en');
     });
     expect(contextValue.language).toBe('en');
-    expect(contextValue.t.appName).toBe('Steepwise');
+    expect(contextValue.t.appName).toBe('Napar');
     expect(getAppSetting('app_language')).toBe('en');
 
     renderer.act(() => {

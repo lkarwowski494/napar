@@ -38,7 +38,7 @@ describe('AppPreferencesCard Component', () => {
 
     // 1. Wybór języka
     const langPl = tree.root.findByProps({ accessibilityLabel: 'Polski (Napar)' });
-    const langEn = tree.root.findByProps({ accessibilityLabel: 'English (Steepwise)' });
+    const langEn = tree.root.findByProps({ accessibilityLabel: 'English (Napar)' });
     expect(langPl.props.accessibilityRole).toBe('radio');
     expect(langPl.props.accessibilityState).toEqual({ selected: true });
     expect(langEn.props.accessibilityRole).toBe('radio');

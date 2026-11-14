@@ -646,7 +646,7 @@ export function generateActionIcsContent(
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    `PRODID:-//Apps4Brew Studio//Napar Steepwise//${isEn ? 'EN' : 'PL'}`,
+    `PRODID:-//Apps4Brew Studio//Napar//${isEn ? 'EN' : 'PL'}`,
     'BEGIN:VEVENT',
     `UID:${actionId}@napar.apps4brew.studio`,
     `DTSTAMP:${dtStamp}`,

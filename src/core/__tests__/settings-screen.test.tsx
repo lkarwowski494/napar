@@ -73,7 +73,7 @@ describe('SettingsScreen Component', () => {
     const str = JSON.stringify(json);
 
     expect(str).toContain('Polski (Napar)');
-    expect(str).toContain('English (Steepwise)');
+    expect(str).toContain('English (Napar)');
     expect(str).toContain('FILOZOFIA APPS4BREW');
     expect(str).toContain('Eksportuj Kopię Zapasową (JSON)');
     expect(str).toContain('Importuj Kopię z Pliku JSON');
@@ -94,7 +94,7 @@ describe('SettingsScreen Component', () => {
     });
 
     // 1. Przełącz na język angielski
-    const enBtn = findPressableWithText(tree.root, 'English (Steepwise)');
+    const enBtn = findPressableWithText(tree.root, 'English (Napar)');
     expect(enBtn).toBeTruthy();
 
     renderer.act(() => {
@@ -103,7 +103,7 @@ describe('SettingsScreen Component', () => {
 
     let str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Language');
-    expect(str).toContain('Steepwise requires no login');
+    expect(str).toContain('Napar requires no login');
 
     // 2. Przełącz z powrotem na polski
     const plBtn = findPressableWithText(tree.root, 'Polski (Napar)');

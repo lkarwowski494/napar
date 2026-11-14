@@ -1,6 +1,6 @@
 # Kontrakt Zakresu MVP v1.0 i Rejestr Wyciętych Funkcji (Scope Contract & Kill List)
 
-**Aplikacja:** Napar (Steepwise) — Apps4Brew Studio  
+**Aplikacja:** Napar — Apps4Brew Studio  
 **Wersja:** 1.0.0 (Freeze Lock)  
 **Status:** ZATWIERDZONY (Zgodny z DEC-01..DEC-09, DEC-06 opcja a, Standardem BRD-QA-REL 1.0)  
 **Data wejścia w życie:** 2026-10-24  

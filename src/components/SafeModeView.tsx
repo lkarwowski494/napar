@@ -84,7 +84,7 @@ const MESSAGES = {
     prepDb: 'Preparing database for export...',
     noDbTitle: 'File Not Found',
     noDbDesc: 'SQLite database file was not found on disk.',
-    dbShareTitle: 'Rescue export of SQLite database (Steepwise)',
+    dbShareTitle: 'Rescue export of SQLite database (Napar)',
     dbExported: (c: RescueCounts) =>
       `A verified copy of the database is in the Files app, in the Napar › kopie-ratunkowe folder. Sessions: ${c.sessions} · Caffeine entries: ${c.caffeineLogs} · Packs: ${c.inventory} · Custom recipes: ${c.customRecipes}`,
     rawSaved:

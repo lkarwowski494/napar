@@ -1,4 +1,4 @@
-# Przepływy Użytkownika i Audyt BPR · Napar (Steepwise)
+# Przepływy Użytkownika i Audyt BPR · Napar
 
 **Dokument:** Architektura Procesów Produktowych (As-Is & To-Be BPR)  
 **Standard:** Apps4Brew Studio · Lean UX & Business Process Reengineering  

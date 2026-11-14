@@ -197,7 +197,7 @@ export default function JournalScreen() {
     const tagsStr = session.flavorTags && session.flavorTags.length > 0 ? `\nNuty: ${session.flavorTags.join(', ')}` : '';
     const notesStr = session.notes ? `\nNotatki: "${session.notes}"` : '';
 
-    const shareMessage = `${title} — Napar (Steepwise)
+    const shareMessage = `${title} — Napar
 Data: ${formattedDate}${bean}
 Doza: ${session.doseGrams}g | Woda: ${session.waterGrams}g | Temp: ${session.waterTempCelsius}°C
 Czas parzenia: ${formatSeconds(session.totalTimeSeconds)}${ratingStr}${balanceStr}${eyStr}${tagsStr}${notesStr}

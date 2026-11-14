@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "private": true,
-  "description": "Napar (Steepwise) — Apps4Brew: asystent parzenia kawy specialty i herbaty rzemieślniczej, sensoryka i monitor kofeiny",
+  "description": "Napar — Apps4Brew: asystent parzenia kawy specialty i herbaty rzemieślniczej, sensoryka i monitor kofeiny",
   "scripts": {
     "start": "expo start",
     "test": "jest",

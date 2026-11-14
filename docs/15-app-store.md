@@ -1,4 +1,4 @@
-# Karta Produktu App Store Connect & Google Play — Napar (Steepwise)
+# Karta Produktu App Store Connect & Google Play — Napar
 
 > Standard wydawniczy App Store zgodny z BRD-QA-REL 1.0 (`BR-REL-021`), App Store Review Guidelines oraz Digital Services Act.
 
@@ -32,7 +32,7 @@
 
 ### Opis — Polski (pl-PL, $\le 4000$ zn.)
 ```text
-Napar (Steepwise) to rzemieślniczy asystent parzenia kawy specialty i herbaty tradycyjnej, zaprojektowany z myślą o pasjonatach domowego parzenia, baristach i herbacianych rytuałach. Aplikacja działa w 100% offline — Twoje dane, receptury i notatki sensoryczne pozostają wyłącznie na Twoim urządzeniu.
+Napar to rzemieślniczy asystent parzenia kawy specialty i herbaty tradycyjnej, zaprojektowany z myślą o pasjonatach domowego parzenia, baristach i herbacianych rytuałach. Aplikacja działa w 100% offline — Twoje dane, receptury i notatki sensoryczne pozostają wyłącznie na Twoim urządzeniu.
 
 KLUCZOWE FUNKCJE:
 
@@ -62,7 +62,7 @@ Klauzula nominative fair use: Wszelkie nazwy urządzeń, akcesoriów i marek (ta
 
 ### Description — English (en-US, $\le 4000$ chars)
 ```text
-Napar (Steepwise) is an artisanal companion for specialty coffee and traditional tea brewing, crafted for home baristas and tea enthusiasts. Built 100% offline-first — your brew logs, custom recipes, and tasting notes remain strictly on your private device.
+Napar is an artisanal companion for specialty coffee and traditional tea brewing, crafted for home baristas and tea enthusiasts. Built 100% offline-first — your brew logs, custom recipes, and tasting notes remain strictly on your private device.
 
 KEY FEATURES:
 
@@ -158,7 +158,7 @@ Deklaracja dostępności aplikacji w karcie App Store Connect:
 
 ### Polski:
 ```text
-Wydanie testowe Napar (Steepwise) v1.0.0:
+Wydanie testowe Napar v1.0.0:
 1. Przetestuj stoper zalewania dla drippera V60 i aeropressu.
 2. Dodaj nowe ziarno do spiżarni z wagą i profilem palenia.
 3. Wypróbuj kalkulator wody i przelicznik jednostek (g / oz).
@@ -168,7 +168,7 @@ Aplikacja działa w 100% offline, dane pozostają wyłącznie na Twoim urządzen
 
 ### English:
 ```text
-Napar (Steepwise) TestFlight beta v1.0.0:
+Napar TestFlight beta v1.0.0:
 1. Test the interval pour-over timer for V60 and AeroPress.
 2. Log new beans in the pantry with roast profile and weight.
 3. Check the water mineralization calculator and unit conversion (g/oz).

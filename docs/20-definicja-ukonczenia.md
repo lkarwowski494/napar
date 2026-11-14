@@ -1,4 +1,4 @@
-# Definicja Ukończenia (Definition of Done) — Napar (Steepwise)
+# Definicja Ukończenia (Definition of Done) — Napar
 
 > Standard ukończenia prac programistycznych i wydawniczych studia zgodny z BRD-QA-REL 1.0 (`BR-REL-017`).
 > Żadne zadanie, naprawa błędu ani wydanie wersji nie mogą zostać uznane za zakończone bez spełnienia poniższych kryteriów.
