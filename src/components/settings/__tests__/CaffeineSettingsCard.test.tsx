@@ -11,13 +11,12 @@ describe('CaffeineSettingsCard Component', () => {
   const t = translations.pl;
   const mockOnHalfLifeChange = jest.fn();
   const mockOnBedtimeChange = jest.fn();
-  const mockOnToggleHealthKit = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('Renderuje nastawy metabolizmu kofeiny, czas półtrwania, porę snu i przełącznik HealthKit', () => {
+  test('Renderuje nastawy metabolizmu kofeiny, czas półtrwania, porę snu bez przełącznika Apple Health (DEC-04 a)', () => {
     let tree: renderer.ReactTestRenderer;
     renderer.act(() => {
       tree = renderer.create(
@@ -26,15 +25,13 @@ describe('CaffeineSettingsCard Component', () => {
           onHalfLifeChange={mockOnHalfLifeChange}
           bedtimeHour={23}
           onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={true}
-          onToggleHealthKit={mockOnToggleHealthKit}
           t={t}
         />
       );
     });
 
     const root = tree!.root;
-    expect(root.findByProps({ testID: 'toggle-healthkit-btn' })).toBeDefined();
+    expect(root.findAllByProps({ testID: 'toggle-healthkit-btn' })).toHaveLength(0);
     expect(root.findByProps({ accessibilityLabel: 'Zmniejsz czas półtrwania' })).toBeDefined();
     expect(root.findByProps({ accessibilityLabel: 'Zwiększ czas półtrwania' })).toBeDefined();
     expect(root.findByProps({ accessibilityLabel: 'Wcześniejsza godzina snu' })).toBeDefined();
@@ -50,8 +47,6 @@ describe('CaffeineSettingsCard Component', () => {
           onHalfLifeChange={mockOnHalfLifeChange}
           bedtimeHour={23}
           onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={false}
-          onToggleHealthKit={mockOnToggleHealthKit}
           t={t}
         />
       );
@@ -81,8 +76,6 @@ describe('CaffeineSettingsCard Component', () => {
           onHalfLifeChange={mockOnHalfLifeChange}
           bedtimeHour={23}
           onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={false}
-          onToggleHealthKit={mockOnToggleHealthKit}
           t={t}
         />
       );
@@ -103,30 +96,6 @@ describe('CaffeineSettingsCard Component', () => {
     expect(mockOnBedtimeChange).toHaveBeenCalledWith(24);
   });
 
-  test('Przełącza synchronizację Apple HealthKit', () => {
-    let tree: renderer.ReactTestRenderer;
-    renderer.act(() => {
-      tree = renderer.create(
-        <CaffeineSettingsCard
-          halfLifeHours={5.0}
-          onHalfLifeChange={mockOnHalfLifeChange}
-          bedtimeHour={23}
-          onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={false}
-          onToggleHealthKit={mockOnToggleHealthKit}
-          t={t}
-        />
-      );
-    });
-
-    const root = tree!.root;
-    const hkBtn = root.findByProps({ testID: 'toggle-healthkit-btn' });
-
-    renderer.act(() => {
-      hkBtn.props.onPress();
-    });
-    expect(mockOnToggleHealthKit).toHaveBeenCalled();
-  });
 
   test('TASK-P6-04-STU: Renderuje zlokalizowane etykiety accessibilityLabel w trybie angielskim', () => {
     let tree: renderer.ReactTestRenderer;
@@ -137,8 +106,6 @@ describe('CaffeineSettingsCard Component', () => {
           onHalfLifeChange={mockOnHalfLifeChange}
           bedtimeHour={23}
           onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={true}
-          onToggleHealthKit={mockOnToggleHealthKit}
           t={translations.en}
         />
       );
@@ -159,8 +126,6 @@ describe('CaffeineSettingsCard Component', () => {
           onHalfLifeChange={mockOnHalfLifeChange}
           bedtimeHour={23}
           onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={true}
-          onToggleHealthKit={mockOnToggleHealthKit}
           t={t}
         />
       );
@@ -175,28 +140,6 @@ describe('CaffeineSettingsCard Component', () => {
     expect(bedtimeStepper.props.accessibilityHint).toBe(t.settings.bedtimeHourDesc);
   });
 
-  test('TASK-P26-04-STU: toggle-healthkit-btn deklaruje accessibilityState checked oraz accessibilityHint', () => {
-    let tree: renderer.ReactTestRenderer;
-    renderer.act(() => {
-      tree = renderer.create(
-        <CaffeineSettingsCard
-          halfLifeHours={5.0}
-          onHalfLifeChange={mockOnHalfLifeChange}
-          bedtimeHour={23}
-          onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={true}
-          onToggleHealthKit={mockOnToggleHealthKit}
-          t={t}
-        />
-      );
-    });
-
-    const root = tree!.root;
-    const hkBtn = root.findByProps({ testID: 'toggle-healthkit-btn' });
-    expect(hkBtn.props.accessibilityRole).toBe('switch');
-    expect(hkBtn.props.accessibilityState).toEqual({ checked: true });
-    expect(hkBtn.props.accessibilityHint).toBe(t.settings.healthKitSubtitle);
-  });
 
   test('TASK-P27-04-STU: przyciski steppera godziny snu posiadają accessibilityHint', () => {
     let tree: renderer.ReactTestRenderer;
@@ -207,8 +150,6 @@ describe('CaffeineSettingsCard Component', () => {
           onHalfLifeChange={mockOnHalfLifeChange}
           bedtimeHour={23}
           onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={false}
-          onToggleHealthKit={mockOnToggleHealthKit}
           t={t}
         />
       );
@@ -230,8 +171,6 @@ describe('CaffeineSettingsCard Component', () => {
           onHalfLifeChange={mockOnHalfLifeChange}
           bedtimeHour={23}
           onBedtimeChange={mockOnBedtimeChange}
-          healthKitSync={false}
-          onToggleHealthKit={mockOnToggleHealthKit}
           t={t}
         />
       );

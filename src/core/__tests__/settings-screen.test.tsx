@@ -494,37 +494,6 @@ describe('SettingsScreen Component', () => {
     );
   });
 
-  test('BR-KOF-002: Przełącza synchronizację z Apple HealthKit w Ustawieniach', () => {
-    let tree: any;
-    renderer.act(() => {
-      tree = renderer.create(
-        <LanguageProvider>
-          <SettingsScreen />
-        </LanguageProvider>
-      );
-    });
-
-    const hkBtn = tree.root.findByProps({ testID: 'toggle-healthkit-btn' });
-    expect(hkBtn).toBeTruthy();
-
-    renderer.act(() => {
-      hkBtn.props.onPress();
-    });
-
-    expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT INTO app_settings'),
-      ['healthkit_sync_enabled', 'true']
-    );
-
-    renderer.act(() => {
-      hkBtn.props.onPress();
-    });
-
-    expect(mockDb.runSync).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT INTO app_settings'),
-      ['healthkit_sync_enabled', 'false']
-    );
-  });
 
   test('Przełącza preferencje naparów (Kawa i herbata / Tylko kawa / Tylko herbata)', () => {
     let tree: any;
@@ -575,5 +544,4 @@ describe('SettingsScreen Component', () => {
     );
   });
 });
-
 

@@ -37,12 +37,6 @@ import {
   buildBackupState,
 } from '../src/core/database';
 import { useBrew } from '../src/core/brew-context';
-import {
-  getHealthKitSyncEnabled,
-  setHealthKitSyncEnabled,
-  requestHealthKitPermissions,
-  revokeHealthKitPermissions,
-} from '../src/core/healthkit';
 import { theme } from '../src/core/theme';
 import { clampCaffeineHalfLifeHours } from '../src/core/domain-rules';
 import { useTranslation } from '../src/core/i18n';
@@ -96,9 +90,6 @@ export default function SettingsScreen() {
   const [bedtimeHour, setBedtimeHourState] = useState(() => {
     return getBedtimeHour();
   });
-  const [healthKitSync, setHealthKitSync] = useState(() => {
-    return getHealthKitSyncEnabled();
-  });
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showCsvModal, setShowCsvModal] = useState(false);
@@ -106,12 +97,6 @@ export default function SettingsScreen() {
   const [exportedJsonText, setExportedJsonText] = useState('');
   const [importJsonText, setImportJsonText] = useState('');
   const [exportedCsvText, setExportedCsvText] = useState('');
-
-  const handleToggleHealthKit = () => {
-    const next = !healthKitSync;
-    setHealthKitSync(next);
-    setHealthKitSyncEnabled(next);
-  };
 
   const handleHalfLifeChange = (newHours: number) => {
     const clamped = clampCaffeineHalfLifeHours(newHours);
@@ -230,8 +215,6 @@ export default function SettingsScreen() {
         onHalfLifeChange={handleHalfLifeChange}
         bedtimeHour={bedtimeHour}
         onBedtimeChange={handleBedtimeChange}
-        healthKitSync={healthKitSync}
-        onToggleHealthKit={handleToggleHealthKit}
         t={t}
       />
 

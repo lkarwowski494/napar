@@ -8,26 +8,26 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | Kategoria | Łącznie | Pokryte | Pokrycie % | Status |
 | :--- | :---: | :---: | :---: | :---: |
 | **EKRAN** | 9 | 9 | **100.0%** | ✅ POKRYTE |
-| **UI** | 97 | 97 | **100.0%** | ✅ POKRYTE |
-| **TEKST** | 452 | 452 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 171 | 171 | **100.0%** | ✅ POKRYTE |
+| **UI** | 95 | 95 | **100.0%** | ✅ POKRYTE |
+| **TEKST** | 451 | 451 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 167 | 167 | **100.0%** | ✅ POKRYTE |
 | **WYMIAR** | 39 | 39 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **768** | Pokrytych: **768** | Brakujących: **0**
+Łącznie elementów: **761** | Pokrytych: **761** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
 | Kategoria | Nazwa elementu | Plik źródłowy | Status | Pliki testowe |
 | :--- | :--- | :--- | :---: | :--- |
 | `EKRAN` | `/(tabs)/beans` | `app/(tabs)/beans.tsx` | ✅ | tests/interaction-guards.test.ts, tests/save-feedback.test.tsx |
-| `EKRAN` | `/(tabs)/caffeine` | `app/(tabs)/caffeine.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
-| `EKRAN` | `/(tabs)/dialin` | `app/(tabs)/dialin.tsx` | ✅ | src/components/__tests__/AppGuideModal.test.tsx, src/core/__tests__/i18n.test.ts |
-| `EKRAN` | `/(tabs)/index` | `app/(tabs)/index.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/public-repo.test.ts |
+| `EKRAN` | `/(tabs)/caffeine` | `app/(tabs)/caffeine.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `EKRAN` | `/(tabs)/dialin` | `app/(tabs)/dialin.tsx` | ✅ | tests/audit-fixes.test.tsx, src/components/__tests__/AppGuideModal.test.tsx |
+| `EKRAN` | `/(tabs)/index` | `app/(tabs)/index.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/components-reachability.test.ts |
 | `EKRAN` | `/(tabs)/journal` | `app/(tabs)/journal.tsx` | ✅ | tests/interaction-guards.test.ts, tests/rescue-sqlite.test.ts |
-| `EKRAN` | `/(tabs)/settings` | `app/(tabs)/settings.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
+| `EKRAN` | `/(tabs)/settings` | `app/(tabs)/settings.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `EKRAN` | `/gongfu` | `app/gongfu.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/data-layer-sqlite.test.ts |
 | `EKRAN` | `/recipe-builder` | `app/recipe-builder.tsx` | ✅ | tests/save-feedback.test.tsx, src/core/__tests__/brew-screen.test.tsx |
-| `EKRAN` | `/settings` | `app/settings.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
+| `EKRAN` | `/settings` | `app/settings.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `appName` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `appTagline` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `UI` | `common.cancel` | `src/core/i18n.tsx` | ✅ | tests/close-button-guard.test.tsx, tests/recipe-select-inline.test.tsx |
@@ -56,12 +56,12 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `UI` | `common.invalidValueDesc` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, tests/save-feedback.test.tsx |
 | `UI` | `common.coffeeBeans` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, tests/save-feedback.test.tsx |
 | `UI` | `common.looseLeafTea` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, tests/save-feedback.test.tsx |
-| `TEKST` | `tabs.brew` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
-| `TEKST` | `tabs.beans` | `src/core/i18n.tsx` | ✅ | tests/interaction-guards.test.ts, tests/save-feedback.test.tsx |
-| `TEKST` | `tabs.journal` | `src/core/i18n.tsx` | ✅ | tests/interaction-guards.test.ts, tests/rescue-sqlite.test.ts |
-| `TEKST` | `tabs.dialin` | `src/core/i18n.tsx` | ✅ | tests/save-feedback.test.tsx, src/components/__tests__/AppGuideModal.test.tsx |
-| `TEKST` | `tabs.caffeine` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
-| `TEKST` | `tabs.settings` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
+| `TEKST` | `tabs.brew` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `tabs.beans` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/e2e-contract.test.ts |
+| `TEKST` | `tabs.journal` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/e2e-contract.test.ts |
+| `TEKST` | `tabs.dialin` | `src/core/i18n.tsx` | ✅ | tests/audit-fixes.test.tsx, tests/e2e-contract.test.ts |
+| `TEKST` | `tabs.caffeine` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
+| `TEKST` | `tabs.settings` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `brew.recipe` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `brew.chooseRecipe` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
 | `TEKST` | `brew.customRecipe` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
@@ -74,7 +74,7 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `brew.water` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `brew.ratio` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `brew.temp` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
-| `TEKST` | `brew.grind` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
+| `TEKST` | `brew.grind` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/audit-fixes.test.tsx |
 | `TEKST` | `brew.timerReady` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
 | `TEKST` | `brew.pourRateTarget` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
 | `TEKST` | `brew.startBrew` | `src/core/i18n.tsx` | ✅ | tests/airplane-mode.test.ts, tests/data-layer-sqlite.test.ts |
@@ -320,4 +320,4 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `stash.weightLabelMetric` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/__tests__/AppGuideModal.test.tsx |
 | `TEKST` | `stash.weightLabelImperial` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/__tests__/AppGuideModal.test.tsx |
 
-*(... i 468 kolejnych elementów w pełnym wykazie)*
+*(... i 461 kolejnych elementów w pełnym wykazie)*

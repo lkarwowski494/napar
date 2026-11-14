@@ -42,7 +42,6 @@ module.exports = {
     './src/core/contrast.ts': { statements: 97, branches: 77, functions: 100, lines: 97 },
     './src/core/theme.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/search-utils.ts': { statements: 95, branches: 94, functions: 100, lines: 100 },
-    './src/core/healthkit.ts': { statements: 90, branches: 85, functions: 100, lines: 90 },
     './src/core/announce.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './app/': {
       statements: 85,

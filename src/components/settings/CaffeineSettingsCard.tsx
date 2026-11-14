@@ -8,8 +8,6 @@ export interface CaffeineSettingsCardProps {
   onHalfLifeChange: (newHours: number) => void;
   bedtimeHour: number;
   onBedtimeChange: (newHour: number) => void;
-  healthKitSync: boolean;
-  onToggleHealthKit: () => void;
   t: any;
 }
 
@@ -18,8 +16,6 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
   onHalfLifeChange,
   bedtimeHour,
   onBedtimeChange,
-  healthKitSync,
-  onToggleHealthKit,
   t,
 }) => {
   return (
@@ -111,41 +107,6 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
             </Pressable>
           </View>
         </View>
-
-        <View style={styles.divider} />
-
-        {/* BR-KOF-002: Apple HealthKit Integration */}
-        <View style={styles.actionRow}>
-          <View style={{ flex: 1, paddingRight: 10 }}>
-            <Text style={styles.actionTitle}>
-              {`${t.settings.healthKitTitle || 'Synchronizuj Kofeinę z Apple Health'} (v1.2)`}
-            </Text>
-            <Text style={styles.actionSubtitle}>
-              {t.settings.healthKitSubtitle || 'Automatycznie zapisuj spożytą kofeinę (Dietary Caffeine) w aplikacji Zdrowie bez wysyłania danych na zewnątrz.'}
-            </Text>
-          </View>
-          <Pressable
-            testID="toggle-healthkit-btn"
-            style={[
-              styles.toggleBtn,
-              healthKitSync && styles.toggleBtnActive,
-            ]}
-            onPress={onToggleHealthKit}
-            accessibilityRole="switch"
-            accessibilityState={{ checked: Boolean(healthKitSync) }}
-            accessibilityHint={t.settings.healthKitSubtitle || 'Włącza lub wyłącza synchronizację z Apple Health'}
-            accessibilityLabel={`${t.settings.healthKitTitle}: ${healthKitSync ? t.settings.enabled : t.settings.disabled}`}
-          >
-            <Text
-              style={[
-                styles.toggleBtnText,
-                healthKitSync && styles.toggleBtnTextActive,
-              ]}
-            >
-              {healthKitSync ? t.settings.enabled : t.settings.disabled}
-            </Text>
-          </Pressable>
-        </View>
       </View>
     </View>
   );
@@ -218,26 +179,5 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     minWidth: 46,
     textAlign: 'center',
-  },
-  toggleBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  toggleBtnActive: {
-    backgroundColor: theme.colors.copperMuted,
-    borderColor: theme.colors.copper,
-  },
-  toggleBtnText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-  },
-  toggleBtnTextActive: {
-    color: theme.colors.copperLight,
-    fontWeight: '700',
   },
 });

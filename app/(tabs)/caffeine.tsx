@@ -29,7 +29,6 @@ import {
 import { CaffeineCurveChart } from '../../src/core/caffeine-chart';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
-import { getHealthKitSyncEnabled } from '../../src/core/healthkit';
 import { BedtimeCurfewCard } from '../../src/components/caffeine/BedtimeCurfewCard';
 import { CaffeineLogList } from '../../src/components/caffeine/CaffeineLogList';
 import { CaffeineQuickAddModal } from '../../src/components/caffeine/CaffeineQuickAddModal';
@@ -138,8 +137,6 @@ export default function CaffeineScreen() {
       caffeineMg: mg,
     };
     if (!runSave(() => logCaffeine(log), t.common)) return;
-
-    // HealthKit deferred to v1.2 (DEC-01)
 
     loadLogs();
     setShowQuickAddModal(false);

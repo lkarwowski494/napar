@@ -935,3 +935,58 @@ describe('M1-audytor-generalny-019: rejestr twierdzeń w formacie roli, szczeble
     }
   });
 });
+
+describe('M1-audytor-generalny-021: bez przełącznika i obietnic Apple Health do czasu wdrożenia (DEC-04 a; 03-zakres-004, 06-tresci-006, 01-odkrywanie-015, 11-wzrost-002, 10-wydanie-004)', () => {
+  const HEALTH = /Apple Health|HealthKit|aplikacji Zdrowie|Dietary Caffeine|healthkit/i;
+  const listDir = (dir: string, ext: RegExp): string[] => {
+    const abs = join(root, dir);
+    if (!existsSync(abs)) return [];
+    return readdirSync(abs, { withFileTypes: true }).flatMap((e) => {
+      const rel = join(dir, e.name);
+      if (e.isDirectory()) return e.name === '__tests__' || e.name === 'node_modules' ? [] : listDir(rel, ext);
+      return ext.test(e.name) && !/\.test\./.test(e.name) ? [rel] : [];
+    });
+  };
+  const grepFiles = (re: RegExp, files: string[]): string[] =>
+    files.flatMap((f) =>
+      readFileSync(join(root, f), 'utf8')
+        .split('\n')
+        .flatMap((line, i) => (re.test(line) ? [`${f}:${i + 1}: ${line.trim()}`] : [])),
+    );
+  const flatten = (o: any, p = ''): Array<[string, string]> =>
+    Object.entries(o).flatMap(([k, v]) => (v && typeof v === 'object' ? flatten(v, `${p}${k}.`) : [[`${p}${k}`, String(v)] as [string, string]]));
+  const prodFiles = ['app', 'src', 'lib'].flatMap((d) => listDir(d, /\.(ts|tsx|js|mjs)$/));
+  const publicTexts = ['README.md', ...listDir('site', /\.html$/)];
+
+  test('03-zakres-004 / 06-tresci-006: Ustawienia kofeiny bez przełącznika toggle-healthkit-btn i bez tekstu Apple Health ani „(v1.2)”', () => {
+    const { CaffeineSettingsCard } = require('../src/components/settings/CaffeineSettingsCard');
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <CaffeineSettingsCard halfLifeHours={4} onHalfLifeChange={() => {}} bedtimeHour={23} onBedtimeChange={() => {}} t={translations.pl} />,
+      );
+    });
+    expect(tree.root.findAll((n: any) => n.props && n.props.testID === 'toggle-healthkit-btn')).toEqual([]);
+    const out = JSON.stringify(tree.toJSON());
+    act(() => tree.unmount());
+    expect(out).toContain('Metabolizm');
+    expect(out).not.toMatch(HEALTH);
+    expect(out).not.toMatch(/\(v1\.\d\)/);
+  });
+
+  test('03-zakres-004 / 01-odkrywanie-015: kod produkcyjny nie ma mostka HealthKit ani ustawienia synchronizacji', () => {
+    expect(prodFiles.length).toBeGreaterThan(50);
+    expect(existsSync(join(root, 'src/core/healthkit.ts'))).toBe(false);
+    expect(grepFiles(/healthkit|HealthKit|healthKitSync|toggle-healthkit-btn|saveDietaryCaffeineSample/, prodFiles)).toEqual([]);
+  });
+
+  test('03-zakres-004: żaden tekst UI (PL, EN i pliki locales) nie wspomina Apple Health ani nie zapowiada wersji „(v1.2)”', () => {
+    const texts = [...flatten(translations.pl), ...flatten(translations.en)];
+    expect(texts.length).toBeGreaterThan(500);
+    expect(texts.filter(([k, v]) => HEALTH.test(k) || HEALTH.test(v) || /\bv1\.[1-9]\b/.test(v))).toEqual([]);
+    const localeFiles = listDir('locales', /\.json$/);
+    expect(localeFiles.length).toBeGreaterThan(30);
+    expect(grepFiles(/healthKit|Apple Health|HealthKit|\bv1\.[1-9]\b/, localeFiles)).toEqual([]);
+  });
+
+});
