@@ -17,29 +17,6 @@ export interface QrCodeSvgProps {
 }
 
 /**
- * Zwraca dwuwymiarową macierz logiczną modułów QR kodu
- */
-export function generateQrMatrix(
-  value: string,
-  errorCorrectionLevel: 'L' | 'M' | 'Q' | 'H' = 'M'
-): { size: number; modules: boolean[][] } {
-  const text = typeof value === 'string' && value.trim() ? value : 'napar://empty';
-  const qr = QRCode.create(text, { errorCorrectionLevel });
-  const size = qr.modules.size;
-  const matrix: boolean[][] = [];
-
-  for (let r = 0; r < size; r++) {
-    const row: boolean[] = [];
-    for (let c = 0; c < size; c++) {
-      row.push(Boolean(qr.modules.get(r, c)));
-    }
-    matrix.push(row);
-  }
-
-  return { size, modules: matrix };
-}
-
-/**
  * Komponent wektorowy SVG renderujący ostry kod QR w dowolnej rozdzielczości
  */
 export const QrCodeSvg: React.FC<QrCodeSvgProps> = ({

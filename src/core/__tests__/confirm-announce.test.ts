@@ -1,18 +1,18 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { Alert, AccessibilityInfo } from 'react-native';
-import { cancelButton, okButton, confirmAction } from '../confirm';
+import { cancelButton,  confirmAction } from '../confirm';
 import {
   announce,
-  useAnnounce,
+
   formatStepAnnouncement,
   formatCountdownAnnouncement,
-  formatStartAnnouncement,
+
   formatFinishAnnouncement,
   announceStep,
   announceCountdown,
   announceFinish,
-  announceStart,
+
 } from '../announce';
 
 describe('Confirm & Announce helpers', () => {
@@ -30,12 +30,6 @@ describe('Confirm & Announce helpers', () => {
     expect(btnWithCallback.onPress).toBe(onCancelMock);
     btnWithCallback.onPress!();
     expect(onCancelMock).toHaveBeenCalled();
-  });
-
-  test('okButton tworzy przycisk ze stylem cancel i etykietą OK', () => {
-    const btn = okButton();
-    expect(btn.text).toBe('OK');
-    expect(btn.style).toBe('cancel');
   });
 
   test('confirmAction wywołuje Alert.alert z przyciskiem Anuluj i przyciskiem akcji', () => {
@@ -75,27 +69,6 @@ describe('Confirm & Announce helpers', () => {
     expect(() => announce('Test error')).not.toThrow();
   });
 
-  test('useAnnounce wywołuje announce tylko wtedy, gdy przekazano tekst', () => {
-    const announceSpy = jest
-      .spyOn(AccessibilityInfo, 'announceForAccessibility')
-      .mockImplementation(() => {});
-
-    const TestComponent: React.FC<{ msg?: string | null }> = ({ msg }) => {
-      useAnnounce(msg);
-      return null;
-    };
-
-    renderer.act(() => {
-      renderer.create(React.createElement(TestComponent, { msg: null }));
-    });
-    expect(announceSpy).not.toHaveBeenCalled();
-
-    renderer.act(() => {
-      renderer.create(React.createElement(TestComponent, { msg: 'Komunikat głosowy' }));
-    });
-    expect(announceSpy).toHaveBeenCalledWith('Komunikat głosowy');
-  });
-
   test('formatStepAnnouncement generuje prawidłowe komunikaty w PL i EN', () => {
     // PL z instrukcją
     const plWithInstr = formatStepAnnouncement(1, 4, 'Preinfuzja', 50, 45, 'Zalewaj spiralnie.', 'pl');
@@ -104,6 +77,9 @@ describe('Confirm & Announce helpers', () => {
     // PL bez instrukcji
     const plNoInstr = formatStepAnnouncement(2, 4, 'Zalanie 1', 120, 30, undefined, 'pl');
     expect(plNoInstr).toBe('Krok 2 z 4: Zalanie 1. Cel wody: 120 g. Czas trwania: 30 sekund.');
+
+    // Domyślny język (PL) — pokrycie przejęte z usuniętego testu formatStartAnnouncement (DEC-02)
+    expect(formatStepAnnouncement(2, 4, 'Zalanie 1', 120, 30)).toBe(plNoInstr);
 
     // EN z instrukcją
     const enWithInstr = formatStepAnnouncement(1, 4, 'Bloom', 50, 45, 'Pour spiral.', 'en');
@@ -117,15 +93,6 @@ describe('Confirm & Announce helpers', () => {
   test('formatCountdownAnnouncement generuje poprawne komunikaty odliczania w PL i EN', () => {
     expect(formatCountdownAnnouncement(3, 'pl')).toBe('3 sekundy do końca etapu.');
     expect(formatCountdownAnnouncement(3, 'en')).toBe('3 seconds remaining in this step.');
-  });
-
-  test('formatStartAnnouncement generuje poprawne zapowiedzi startu w PL i EN', () => {
-    expect(formatStartAnnouncement('V60 4:6', 20, 300, 'pl')).toBe(
-      'Rozpoczęto parzenie V60 4:6. Doza: 20 g, woda: 300 g.'
-    );
-    expect(formatStartAnnouncement('V60 4:6', 20, 300, 'en')).toBe(
-      'Started brewing V60 4:6. Dose: 20 g, water: 300 g.'
-    );
   });
 
   test('formatFinishAnnouncement generuje poprawne zapowiedzi finiszu w PL i EN dla różnych czasów', () => {
@@ -157,13 +124,10 @@ describe('Confirm & Announce helpers', () => {
     expect(formatFinishAnnouncement('Drip', 120)).toBe(
       'Parzenie Drip zakończone. Całkowity czas: 2 min 0 s. Smacznego!'
     );
-    expect(formatStartAnnouncement('V60', 15, 250)).toBe(
-      'Rozpoczęto parzenie V60. Doza: 15 g, woda: 250 g.'
-    );
     expect(formatCountdownAnnouncement(3)).toBe('3 sekundy do końca etapu.');
   });
 
-  test('announceStep, announceCountdown, announceFinish, announceStart wywołują AccessibilityInfo', () => {
+  test('announceStep, announceCountdown, announceFinish wywołują AccessibilityInfo', () => {
     const announceSpy = jest
       .spyOn(AccessibilityInfo, 'announceForAccessibility')
       .mockImplementation(() => {});
@@ -187,11 +151,6 @@ describe('Confirm & Announce helpers', () => {
       'Parzenie V60 zakończone. Całkowity czas: 3 min 0 s. Smacznego!'
     );
 
-    announceStart('Kalita Wave', 18, 300);
-    expect(announceSpy).toHaveBeenCalledWith(
-      'Rozpoczęto parzenie Kalita Wave. Doza: 18 g, woda: 300 g.'
-    );
-
     // Wersje angielskie
     announceStep(1, 3, 'Bloom', 60, 45, 'Pour spiral', 'en');
     expect(announceSpy).toHaveBeenCalledWith(
@@ -204,11 +163,6 @@ describe('Confirm & Announce helpers', () => {
     announceFinish('V60', 180, 'en');
     expect(announceSpy).toHaveBeenCalledWith(
       'Brewing of V60 finished. Total time: 3 min 0 s. Enjoy your cup!'
-    );
-
-    announceStart('V60', 15, 250, 'en');
-    expect(announceSpy).toHaveBeenCalledWith(
-      'Started brewing V60. Dose: 15 g, water: 250 g.'
     );
   });
 });

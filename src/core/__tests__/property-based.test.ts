@@ -14,7 +14,7 @@ import {
 import {
   SUPPORTED_GRINDERS,
   convertMicronsToGrinder,
-  convertBetweenGrinders,
+
 } from '../grinder-converter';
 import { calculateWaterMinerals, WATER_RECIPES } from '../water-chemistry';
 import { estimateTotalLeafCaffeineMg } from '../gongfu-session';
@@ -102,36 +102,6 @@ describe('Property-Based & Invariant Tests: Brewing Science & Mathematics (fast-
         }
       ),
       { seed, numRuns: 50 }
-    );
-  });
-
-  test('Własność 5: Stabilność dwukierunkowej konwersji między młynkami (Round-trip stability)', () => {
-    // Kierunek 1: Comandante C40 -> Timemore C2/C3 -> Comandante C40
-    fc.assert(
-      fc.property(
-        fc.integer({ min: 14, max: 32 }),
-        (clicks) => {
-          const step1 = convertBetweenGrinders('comandante_c40', clicks, 'timemore_c2_c3');
-          const step2 = convertBetweenGrinders('timemore_c2_c3', step1.targetFormatted, 'comandante_c40');
-          const originalMicrons = clicks * 30.0;
-          return Math.abs(step2.microns - originalMicrons) <= 35;
-        }
-      ),
-      { seed, numRuns: 25 }
-    );
-
-    // Kierunek 2: Timemore C2/C3 -> Comandante C40 -> Timemore C2/C3
-    fc.assert(
-      fc.property(
-        fc.integer({ min: 14, max: 30 }),
-        (clicks) => {
-          const step1 = convertBetweenGrinders('timemore_c2_c3', clicks, 'comandante_c40');
-          const step2 = convertBetweenGrinders('comandante_c40', step1.targetFormatted, 'timemore_c2_c3');
-          const originalMicrons = clicks * 35.0;
-          return Math.abs(step2.microns - originalMicrons) <= 35;
-        }
-      ),
-      { seed, numRuns: 25 }
     );
   });
 

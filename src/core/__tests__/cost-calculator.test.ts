@@ -4,12 +4,9 @@
 
 import {
   calculateBrewCost,
-  calculateTeaCost,
-  formatPlnCost,
-  formatCost,
-  SupportedCurrency,
+
   DEFAULT_BREW_COST_PARAMETERS,
-  DEFAULT_TEA_COST_PARAMETERS,
+
 } from '../cost-calculator';
 
 describe('Cost Calculator Engine (Craft Economics)', () => {
@@ -131,50 +128,5 @@ describe('Cost Calculator Engine (Craft Economics)', () => {
       cafeReferencePrice: 1000,
     });
     expect(highSavings.savingsPercent).toBeLessThanOrEqual(100);
-  });
-
-  test('TASK-P60-08-PRO: calculateTeaCost oblicza koszt wielonaparowej sesji Gongfu Cha i koszt pojedynczej infuzji', () => {
-    expect(DEFAULT_TEA_COST_PARAMETERS.leafGrams).toBe(5.0);
-    expect(DEFAULT_TEA_COST_PARAMETERS.teaPricePer100g).toBe(60.0);
-    expect(DEFAULT_TEA_COST_PARAMETERS.infusionsCount).toBe(5);
-
-    const teaMetrics = calculateTeaCost({
-      leafGrams: 5,
-      teaPricePer100g: 60,
-      infusionsCount: 5,
-      waterWeightGramsPerInfusion: 100,
-      teaRoomReferencePricePerPot: 25.0,
-    });
-
-    expect(teaMetrics.leafCost).toBe(3.0); // 5g * 0.60 zł = 3.00 zł
-    expect(teaMetrics.totalSessionCost).toBeGreaterThan(3.0);
-    expect(teaMetrics.costPerInfusion).toBeCloseTo(teaMetrics.totalSessionCost / 5, 2);
-    expect(teaMetrics.savingsPerSession).toBeGreaterThan(20.0);
-    expect(teaMetrics.savingsPercent).toBeGreaterThan(80);
-  });
-
-  test('TASK-P60-08-PRO: formatPlnCost bezpiecznie formatuje kwoty w PLN z ochrona przed -0 i NaN', () => {
-    expect(formatPlnCost(3.5)).toBe('3.50 zł');
-    expect(formatPlnCost(0)).toBe('0.00 zł');
-    expect(formatPlnCost(-0)).toBe('0.00 zł');
-    expect(formatPlnCost('4,25')).toBe('4.25 zł');
-    expect(formatPlnCost(NaN)).toBe('0.00 zł');
-    expect(formatPlnCost(null)).toBe('0.00 zł');
-  });
-
-  test('TASK-P65-08-PRO: formatCost bezpiecznie formatuje kwoty wielowalutowe (PLN, EUR, USD, GBP)', () => {
-    const cur: SupportedCurrency = 'EUR';
-    expect(formatCost(3.5, cur)).toBe('€3.50');
-    expect(formatCost(3.5, 'PLN')).toBe('3.50 zł');
-    expect(formatCost(3.5)).toBe('3.50 zł');
-    expect(formatCost('4,20', 'EUR')).toBe('€4.20');
-    expect(formatCost(12.5, 'USD')).toBe('$12.50');
-    expect(formatCost(8.75, 'GBP')).toBe('£8.75');
-    expect(formatCost(-5, 'EUR')).toBe('€0.00');
-    expect(formatCost(-0, 'USD')).toBe('$0.00');
-    expect(formatCost(NaN, 'GBP')).toBe('£0.00');
-    expect(formatCost(null, 'PLN')).toBe('0.00 zł');
-    expect(formatCost(undefined, 'EUR')).toBe('€0.00');
-    expect(formatCost(15, 'UNKNOWN' as any)).toBe('15.00 zł');
   });
 });

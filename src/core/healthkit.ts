@@ -5,7 +5,6 @@
 // Apps4Brew Studio — 100% Offline-First, Zero Telemetry.
 // ============================================================================
 
-import { Platform } from 'react-native';
 import { getAppSetting, setAppSetting } from './database';
 
 export const HK_QUANTITY_TYPE_DIETARY_CAFFEINE = 'HKQuantityTypeIdentifierDietaryCaffeine';
@@ -25,21 +24,6 @@ export interface HealthKitSaveResult {
   error?: string;
 }
 
-export type HealthKitAuthorizationStatus =
-  | 'not_determined'
-  | 'authorized'
-  | 'denied'
-  | 'unavailable';
-
-/**
- * Sprawdza czy HealthKit jest dostępny w bieżącym wydaniu aplikacji.
- * Zgodnie z decyzją architektoniczną DEC-01 (opcja a) natywny mostek
- * HealthKit został odłożony do wydania v1.2.
- */
-export function isHealthKitAvailable(): boolean {
-  return false;
-}
-
 /**
  * Zwraca preferencję synchronizacji HealthKit zapisaną w SQLite.
  */
@@ -52,16 +36,6 @@ export function getHealthKitSyncEnabled(): boolean {
  */
 export function setHealthKitSyncEnabled(enabled: boolean): void {
   setAppSetting('healthkit_sync_enabled', enabled ? 'true' : 'false');
-}
-
-/**
- * Zwraca status autoryzacji HealthKit.
- */
-export function getHealthKitAuthorizationStatus(): HealthKitAuthorizationStatus {
-  if (!isHealthKitAvailable()) {
-    return 'unavailable';
-  }
-  return 'not_determined';
 }
 
 /**

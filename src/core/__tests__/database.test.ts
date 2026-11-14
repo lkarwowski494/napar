@@ -7,62 +7,19 @@ import {
   createPreMigrationBackup,
   getInventoryItems,
   getInventoryItemById,
-  getInventoryTotalWeight,
-  getInventoryLowStockItems,
-  getInventoryOutOfStockItems,
-  sortInventoryItems,
-  getSortedInventoryItems,
-  InventorySortOption,
-  filterInventoryItems,
-  InventoryFilterCriteria,
-  filterBrewSessions,
-  BrewSessionFilterCriteria,
-  calculateInventorySummary,
-  InventorySummary,
-  getLowStockInventoryItems,
-  calculateInventoryTotalValue,
-  InventoryTotalValueResult,
-  calculateBeanFreshness,
-  BeanFreshnessAnalysis,
-  BeanFreshnessPhase,
-  calculateInventoryUsageRate,
-  InventoryUsageRateAnalysis,
-  InventoryUsageRateCategory,
-  calculateBeanRestingReadiness,
-  BeanRestingReadinessAnalysis,
-  BeanRestingStatus,
-  calculateStashDiversity,
-  StashDiversityAnalysis,
-  StashDiversityRating,
-  estimateRemainingBrews,
-  StashBrewsEstimate,
-  evaluateStashTurnover,
-  StashTurnoverAnalysis,
-  calculateStashDepletionForecast,
-  StashDepletionForecast,
-  StashDepletionUrgency,
-  calculateStashCostEfficiency,
-  StashCostEfficiencyReport,
-  StashCostEfficiencyTier,
-  estimateStashRoastDistribution,
-  StashRoastDistributionReport,
-  DominantRoastProfile,
-  calculateStashFreshnessIndex,
-  StashFreshnessReport,
-  BeanFreshnessStage,
+
   saveInventoryItem,
   deductInventoryWeight,
-  deductBeansForBrew,
+
   deleteInventoryItem,
   getRecipes,
   getRecipeById,
   saveRecipe,
-  toggleRecipeFavorite,
-  updateRecipeFavorite,
+
   duplicateRecipe,
   deleteRecipe,
   getBrewSessions,
-  getBrewSessionById,
+
   saveBrewSession,
   recordBrewSessionTransaction,
   deleteBrewSession,
@@ -73,7 +30,7 @@ import {
   importDataJson,
   exportSessionsCsv,
   exportInventoryCsv,
-  exportCustomRecipesCsv,
+
   escapeCsvValue,
   escapeCsvCell,
   getAppSetting,
@@ -88,8 +45,7 @@ import {
   setCaffeineHalfLife,
   getBedtimeHour,
   setBedtimeHour,
-  getHealthKitSyncEnabled,
-  setHealthKitSyncEnabled,
+
   getDatabase,
   getHasCompletedOnboarding,
   setHasCompletedOnboarding,
@@ -98,6 +54,9 @@ import {
   DataValidationError,
 } from '../database';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog, SCHEMA_SQL } from '../database-schema';
+
+// Odczyt kontrolny sesji w testach zapisu (getBrewSessionById usunięte decyzją DEC-02: bez wywołania z UI).
+const readSession = (id: string) => getBrewSessions().find((s) => s.id === id) ?? null;
 
 // Mock expo-sqlite with in-memory SQLite emulation
 const mockDb: any = {
@@ -285,7 +244,7 @@ describe('Napar SQLite Database & Repositories', () => {
     const initialCreatedAt = first.createdAt;
 
     // Oznacz jako ulubiony
-    updateRecipeFavorite(first.id, true);
+    mockDb.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [1, first.id]);
     expect(getRecipeById(first.id)?.isFavorite).toBe(true);
 
     // Ponowny seeding (symulacja aktualizacji aplikacji)
@@ -355,35 +314,8 @@ describe('Napar SQLite Database & Repositories', () => {
     items = getInventoryItems();
     expect(items[0].remainingWeightGrams).toBe(232);
 
-    // Zadanie N3: deductBeansForBrew alias
-    deductBeansForBrew('bean-1', 12);
-    items = getInventoryItems();
-    expect(items[0].remainingWeightGrams).toBe(220);
-
     deleteInventoryItem('bean-1');
     expect(getInventoryItems().length).toBe(0);
-  });
-
-  test('Zarządzanie ulubionymi recepturami (toggleRecipeFavorite)', () => {
-    const recipe: SavedRecipe = {
-      id: 'rec-fav-1',
-      name: 'Aeropress Inverted',
-      beverageType: 'COFFEE',
-      method: 'Aeropress',
-      doseGrams: 15,
-      waterGrams: 200,
-      waterTempCelsius: 85,
-      recommendedRatio: 13.3,
-      stepsJson: '[]',
-      isCustom: true,
-      isFavorite: false,
-      createdAt: '2026-10-10T10:00:00Z',
-    };
-    saveRecipe(recipe);
-    expect(getRecipes().length).toBe(1);
-    const toggled = toggleRecipeFavorite('rec-fav-1');
-    expect(toggled).toBe(true);
-    expect(getRecipes()[0].isFavorite).toBe(true);
   });
 
   test('Duplikowanie receptury tworzy nową recepturę autorską ze statusem isCustom=true', () => {
@@ -450,12 +382,6 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(clonedMin.waterTempCelsius).toBe(93);
   });
 
-  test('toggleRecipeFavorite zwraca false gdy receptura nie istnieje', () => {
-    expect(toggleRecipeFavorite('non-existent-rec-id')).toBe(false);
-    expect(toggleRecipeFavorite('')).toBe(false);
-    expect(toggleRecipeFavorite(null as any)).toBe(false);
-  });
-
   test('TASK-P12-05-ARC: duplicateRecipe, deleteRecipe oraz updateRecipeFavorite zabezpieczone przed null/pustym id', () => {
     expect(() => duplicateRecipe(null as any)).toThrow('Nieprawidłowa receptura do duplikacji');
     expect(() => duplicateRecipe(undefined as any)).toThrow('Nieprawidłowa receptura do duplikacji');
@@ -463,9 +389,6 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(() => deleteRecipe('')).not.toThrow();
     expect(() => deleteRecipe('   ')).not.toThrow();
     expect(() => deleteRecipe(null as any)).not.toThrow();
-
-    expect(() => updateRecipeFavorite('', true)).not.toThrow();
-    expect(() => updateRecipeFavorite(null as any, true)).not.toThrow();
   });
 
   test('getCaffeineLogs filtruje według sinceIso', () => {
@@ -593,7 +516,7 @@ describe('Napar SQLite Database & Repositories', () => {
 
     recordBrewSessionTransaction(session, { itemId: 'bean-tx-1', doseGrams: 18.5 });
 
-    const savedSess = getBrewSessionById('sess-tx-1');
+    const savedSess = readSession('sess-tx-1');
     expect(savedSess).not.toBeNull();
     expect(savedSess?.doseGrams).toBe(18.5);
 
@@ -831,53 +754,6 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(notFound).toBeNull();
   });
 
-  test('getBrewSessionById pobiera sesję lub zwraca null gdy brak', () => {
-    const sessionToSave: BrewSession = {
-      id: 'sess-get-test',
-      recipeName: 'V60 Sweet Bloom',
-      beverageType: 'COFFEE',
-      method: 'V60',
-      doseGrams: 15,
-      waterGrams: 250,
-      waterTempCelsius: 93,
-      totalTimeSeconds: 165,
-      flavorTags: [],
-      brewedAt: new Date().toISOString(),
-    };
-    saveBrewSession(sessionToSave);
-
-    const session = getBrewSessionById('sess-get-test');
-    expect(session).not.toBeNull();
-    expect(session?.recipeName).toBe('V60 Sweet Bloom');
-
-    const notFound = getBrewSessionById('non-existent-sess-999');
-    expect(notFound).toBeNull();
-  });
-
-  test('updateRecipeFavorite jawnie aktualizuje flagę isFavorite', () => {
-    const recipe: SavedRecipe = {
-      id: 'rec-fav-test',
-      name: 'Test Fav Recipe',
-      beverageType: 'COFFEE',
-      method: 'V60',
-      doseGrams: 15,
-      waterGrams: 250,
-      waterTempCelsius: 93,
-      recommendedRatio: 16.6,
-      stepsJson: '[]',
-      isCustom: true,
-      isFavorite: false,
-      createdAt: new Date().toISOString(),
-    };
-    saveRecipe(recipe);
-
-    updateRecipeFavorite('rec-fav-test', true);
-    expect(getRecipeById('rec-fav-test')?.isFavorite).toBe(true);
-
-    updateRecipeFavorite('rec-fav-test', false);
-    expect(getRecipeById('rec-fav-test')?.isFavorite).toBe(false);
-  });
-
   test('deleteRecipe usuwa receptury własne (is_custom=1), ale chroni wzorcowe (is_custom=0)', () => {
     initDatabase(mockDb as any);
     // 1. Zapisz recepturę własną
@@ -912,12 +788,12 @@ describe('Napar SQLite Database & Repositories', () => {
       flavorTags: [],
       brewedAt: '2026-10-25T10:00:00.000Z',
     });
-    expect(getBrewSessionById('sess-with-custom-rec')?.recipeId).toBe('rec-custom-del');
+    expect(readSession('sess-with-custom-rec')?.recipeId).toBe('rec-custom-del');
 
     // 2. Usuń recepturę własną - powinna zostać usunięta, a w sesji recipeId zresetowane do null (TASK-P6-05-ARC)
     deleteRecipe('rec-custom-del');
     expect(mockDb.recipes.has('rec-custom-del')).toBe(false);
-    expect(getBrewSessionById('sess-with-custom-rec')?.recipeId).toBeUndefined();
+    expect(readSession('sess-with-custom-rec')?.recipeId).toBeUndefined();
     expect(mockDb.sessions.get('sess-with-custom-rec').recipe_id).toBeNull();
 
     // 3. Próba usunięcia receptury wzorcowej Hoffmann V60 (is_custom=0)
@@ -931,10 +807,6 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(getInventoryItemById('')).toBeNull();
     expect(getInventoryItemById('   ')).toBeNull();
     expect(getInventoryItemById(null as any)).toBeNull();
-
-    expect(getBrewSessionById('')).toBeNull();
-    expect(getBrewSessionById('   ')).toBeNull();
-    expect(getBrewSessionById(null as any)).toBeNull();
 
     expect(() => deleteBrewSession('')).not.toThrow();
     expect(() => deleteBrewSession('   ')).not.toThrow();
@@ -1020,7 +892,7 @@ describe('Napar SQLite Database & Repositories', () => {
       brewed_at: '2026-10-15T12:00:00Z',
     });
 
-    const session = getBrewSessionById('corrupted-sess');
+    const session = readSession('corrupted-sess');
     expect(session).not.toBeNull();
     expect(session?.flavorTags).toEqual([]);
     expect(session?.sensory).toBeUndefined();
@@ -1053,7 +925,7 @@ describe('Napar SQLite Database & Repositories', () => {
       sensory_scores_json: '"string-instead-of-object"',
       brewed_at: '2026-10-15T12:00:00Z',
     });
-    const malformedSess = getBrewSessionById('malformed-types-sess');
+    const malformedSess = readSession('malformed-types-sess');
     expect(malformedSess?.flavorTags).toEqual([]);
     expect(malformedSess?.sensory).toBeUndefined();
   });
@@ -1129,16 +1001,6 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(getBedtimeHour()).toBe(23);
   });
 
-  test('BR-KOF-002: Pobiera i zapisuje flagę synchronizacji HealthKit w bazie', () => {
-    expect(getHealthKitSyncEnabled()).toBe(false);
-
-    setHealthKitSyncEnabled(true);
-    expect(getHealthKitSyncEnabled()).toBe(true);
-
-    setHealthKitSyncEnabled(false);
-    expect(getHealthKitSyncEnabled()).toBe(false);
-  });
-
   test('getDatabase zwraca instancję bazy danych', () => {
     const db = getDatabase();
     expect(db).toBeDefined();
@@ -1212,11 +1074,11 @@ describe('Napar SQLite Database & Repositories', () => {
 
     // M1-audytor-generalny-008: zła dawka/woda/temperatura blokuje zapis zamiast zamieniać się na 15/250/92.
     expect(() => saveBrewSession(brokenSession)).toThrow(DataValidationError);
-    expect(getBrewSessionById('session-invalid-boundary')).toBeNull();
+    expect(readSession('session-invalid-boundary')).toBeNull();
 
     // Pozostała sanityzacja (czas ujemny, ocena poza skalą) przy poprawnych liczbach parzenia.
     saveBrewSession({ ...brokenSession, doseGrams: 15, waterGrams: 250, waterTempCelsius: 92 });
-    const retrieved = getBrewSessionById('session-invalid-boundary');
+    const retrieved = readSession('session-invalid-boundary');
     expect(retrieved).not.toBeNull();
     expect(retrieved!.doseGrams).toBe(15);
     expect(retrieved!.waterGrams).toBe(250);
@@ -1513,7 +1375,7 @@ describe('Napar SQLite Database & Repositories', () => {
       flavorTags: [],
     };
     saveBrewSession(brokenSession);
-    const retrieved = getBrewSessionById('sess-invalid-metrics');
+    const retrieved = readSession('sess-invalid-metrics');
     expect(retrieved).not.toBeNull();
     expect(retrieved?.tdsPercentage).toBeUndefined();
     expect(retrieved?.extractionYieldPercentage).toBeUndefined();
@@ -1544,7 +1406,7 @@ describe('Napar SQLite Database & Repositories', () => {
       sensory_scores_json: null,
       brewed_at: '2026-10-26T12:00:00Z',
     });
-    const fromCorrupted = getBrewSessionById('corrupted-metrics-row');
+    const fromCorrupted = readSession('corrupted-metrics-row');
     expect(fromCorrupted).not.toBeNull();
     expect(fromCorrupted?.tdsPercentage).toBeUndefined();
     expect(fromCorrupted?.extractionYieldPercentage).toBeUndefined();
@@ -1683,7 +1545,7 @@ describe('Napar SQLite Database & Repositories', () => {
     };
     saveBrewSession(stringParamSession);
 
-    const saved = getBrewSessionById('sess-string-params');
+    const saved = readSession('sess-string-params');
     expect(saved).not.toBeNull();
     expect(saved?.doseGrams).toBe(18.5);
     expect(saved?.waterGrams).toBe(300);
@@ -1815,7 +1677,7 @@ describe('Napar SQLite Database & Repositories', () => {
     };
     saveBrewSession(sessionWithMessyFields);
 
-    const saved = getBrewSessionById('sess-messy-fields');
+    const saved = readSession('sess-messy-fields');
     expect(saved).not.toBeNull();
     expect(saved?.recipeId).toBeUndefined();
     expect(saved?.inventoryItemId).toBeUndefined();
@@ -1965,7 +1827,7 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(added?.beverageType).toBe('tea');
   });
 
-  test('TASK-P45-05-ARC: updateRecipeFavorite rygorystycznie koercuje wartosci i saveRecipe obcina author, description oraz grindSizeDescription', () => {
+  test('TASK-P45-05-ARC: saveRecipe obcina author, description oraz grindSizeDescription', () => {
     initDatabase(mockDb as any);
     const testRecipeId = 'rec-p45-arc';
     saveRecipe({
@@ -1991,20 +1853,6 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(saved?.author).toBe('A'.repeat(100));
     expect(saved?.description).toBe('D'.repeat(1000));
     expect(saved?.grindSizeDescription).toBe('G'.repeat(200));
-
-    // Test updateRecipeFavorite with string 'false' -> must be 0 (false), NOT 1 (truthy)
-    updateRecipeFavorite(testRecipeId, 'false' as any);
-    expect(getRecipeById(testRecipeId)?.isFavorite).toBe(false);
-
-    // String 'true' or 1 -> true
-    updateRecipeFavorite(testRecipeId, 'true' as any);
-    expect(getRecipeById(testRecipeId)?.isFavorite).toBe(true);
-
-    updateRecipeFavorite(testRecipeId, 0 as any);
-    expect(getRecipeById(testRecipeId)?.isFavorite).toBe(false);
-
-    updateRecipeFavorite(testRecipeId, 1 as any);
-    expect(getRecipeById(testRecipeId)?.isFavorite).toBe(true);
   });
 
   test('TASK-P46-05-ARC: saveBrewSession sanityzuje recipeName, method, beverageType oraz inventoryItemName', () => {
@@ -2024,7 +1872,7 @@ describe('Napar SQLite Database & Repositories', () => {
       brewedAt: '2026-10-26T16:00:00Z',
     });
 
-    const saved = getBrewSessionById(testSessionId);
+    const saved = readSession(testSessionId);
     expect(saved).toBeDefined();
     expect(saved?.recipeName).toBe('R'.repeat(200));
     expect(saved?.method).toBe('M'.repeat(50));
@@ -2151,7 +1999,7 @@ describe('Napar SQLite Database & Repositories', () => {
       brewedAt: '2026-10-26T20:00:00Z',
     });
 
-    const savedSession = getBrewSessionById(sessionId);
+    const savedSession = readSession(sessionId);
     expect(savedSession).toBeDefined();
     expect(savedSession?.doseGrams).toBe(18.5);
     expect(savedSession?.waterGrams).toBe(250.5);
@@ -2440,1038 +2288,5 @@ describe('Napar SQLite Database & Repositories', () => {
     setAppSetting('\uFEFFapp_theme_mode', 'dark');
     expect(getAppSetting('\uFEFFapp_theme_mode')).toBe('dark');
     expect(getAppSetting('app_theme_mode')).toBe('dark');
-  });
-
-  test('TASK-P61-03-ZAK: exportCustomRecipesCsv generuje plik CSV z autorskimi recepturami i zabezpiecza przed Formula Injection', () => {
-    const customRecipe: SavedRecipe = {
-      id: 'rec-csv-test-1',
-      name: '=cmd|V60 3-Pour Artisan',
-      beverageType: 'COFFEE',
-      isCustom: true,
-      method: 'V60',
-      author: 'Barista Champion',
-      description: 'Zbalansowany przelew, 3 równe zalania',
-      doseGrams: 15,
-      waterGrams: 250,
-      waterTempCelsius: 93,
-      recommendedRatio: 16.67,
-      grindSizeDescription: '22 kliki Comandante',
-      stepsJson: JSON.stringify([
-        { name: 'Preinfuzja', durationSeconds: 45, waterGrams: 50 },
-        { name: 'Główne zalanie', durationSeconds: 60, waterGrams: 150 },
-        { name: 'Dobicie', durationSeconds: 45, waterGrams: 250 },
-      ]),
-      isFavorite: true,
-      createdAt: '2026-10-27T07:00:00Z',
-    };
-    saveRecipe(customRecipe);
-
-    const csv = exportCustomRecipesCsv();
-    expect(csv).toContain('id,name,beverage_type,method,author');
-    expect(csv).toContain('rec-csv-test-1');
-    expect(csv).toContain('Barista Champion');
-    expect(csv).toContain('"\'=cmd|V60 3-Pour Artisan"'); // Formula injection neutralization
-  });
-
-  test('TASK-P64-03-ZAK: getInventoryTotalWeight zlicza mase kawy i herbaty z zabezpieczeniem przed ujemnymi i nieprawidlowymi wartosciami', () => {
-    initDatabase(mockDb as any);
-    mockDb.inventory.clear();
-
-    // Pusta spiżarnia -> same zera
-    expect(getInventoryTotalWeight()).toEqual({ coffeeGrams: 0, teaGrams: 0, totalGrams: 0 });
-
-    // Dodanie kawy (250g) i herbaty (100g)
-    const coffee: InventoryItem = {
-      id: 'bean-total-1',
-      name: 'Kenya Nyeri',
-      type: 'coffee',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 200,
-      flavorNotes: ['porzeczka'],
-      isArchived: false,
-      isFavorite: false,
-      createdAt: '2026-10-27T08:00:00Z',
-      updatedAt: '2026-10-27T08:00:00Z',
-    };
-    const tea: InventoryItem = {
-      id: 'tea-total-1',
-      name: 'Gyokuro',
-      type: 'tea',
-      initialWeightGrams: 100,
-      remainingWeightGrams: 80,
-      flavorNotes: ['umami'],
-      isArchived: false,
-      isFavorite: false,
-      createdAt: '2026-10-27T08:00:00Z',
-      updatedAt: '2026-10-27T08:00:00Z',
-    };
-    saveInventoryItem(coffee);
-    saveInventoryItem(tea);
-
-    const stats = getInventoryTotalWeight();
-    expect(stats.coffeeGrams).toBe(200);
-    expect(stats.teaGrams).toBe(80);
-    expect(stats.totalGrams).toBe(280);
-
-    // Pozycja zarchiwizowana
-    const archivedCoffee: InventoryItem = {
-      id: 'bean-archived-1',
-      name: 'Old Blend',
-      type: 'coffee',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 50,
-      flavorNotes: [],
-      isArchived: true,
-      isFavorite: false,
-      createdAt: '2026-10-27T08:00:00Z',
-      updatedAt: '2026-10-27T08:00:00Z',
-    };
-    saveInventoryItem(archivedCoffee);
-
-    expect(getInventoryTotalWeight(false).totalGrams).toBe(280);
-    expect(getInventoryTotalWeight(true).totalGrams).toBe(330);
-    expect(getInventoryTotalWeight(true).coffeeGrams).toBe(250);
-  });
-
-  test('TASK-P66-03-ZAK: getInventoryLowStockItems i getInventoryOutOfStockItems filtruja zapasy na wyczerpaniu i puste', () => {
-    initDatabase(mockDb as any);
-    mockDb.inventory.clear();
-
-    const lowStockBean: InventoryItem = {
-      id: 'bean-low-1',
-      name: 'Ethiopia Yirgacheffe',
-      type: 'coffee',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 25, // <= 30g
-      flavorNotes: [],
-      isArchived: false,
-      isFavorite: false,
-      createdAt: '2026-10-27T08:00:00Z',
-      updatedAt: '2026-10-27T08:00:00Z',
-    };
-
-    const normalBean: InventoryItem = {
-      id: 'bean-norm-1',
-      name: 'Colombia Huila',
-      type: 'coffee',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 150, // > 30g
-      flavorNotes: [],
-      isArchived: false,
-      isFavorite: false,
-      createdAt: '2026-10-27T08:00:00Z',
-      updatedAt: '2026-10-27T08:00:00Z',
-    };
-
-    const emptyBean: InventoryItem = {
-      id: 'bean-empty-1',
-      name: 'Finished Espresso',
-      type: 'coffee',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 0, // out of stock
-      flavorNotes: [],
-      isArchived: false,
-      isFavorite: false,
-      createdAt: '2026-10-27T08:00:00Z',
-      updatedAt: '2026-10-27T08:00:00Z',
-    };
-
-    saveInventoryItem(lowStockBean);
-    saveInventoryItem(normalBean);
-    saveInventoryItem(emptyBean);
-
-    // Low stock: tylko bean-low-1 (0 < rem <= 30)
-    const lowStock = getInventoryLowStockItems(30);
-    expect(lowStock.length).toBe(1);
-    expect(lowStock[0].id).toBe('bean-low-1');
-
-    // Niestandardowy próg (np. 15g)
-    const lowStock15 = getInventoryLowStockItems(15);
-    expect(lowStock15.length).toBe(0);
-
-    // Out of stock: tylko bean-empty-1 (rem <= 0)
-    const outOfStock = getInventoryOutOfStockItems();
-    expect(outOfStock.length).toBe(1);
-    expect(outOfStock[0].id).toBe('bean-empty-1');
-  });
-
-  test('TASK-P68-03-ZAK: sortInventoryItems i getSortedInventoryItems sortuja pozycje spizarni', () => {
-    const opt: InventorySortOption = 'roast_date_desc';
-    expect(opt).toBe('roast_date_desc');
-
-    const bFresh: InventoryItem = {
-      id: 'b-fresh',
-      name: 'Kenya Nyeri',
-      type: 'coffee',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 100,
-      roastOrHarvestDate: '2026-10-20',
-      rating: 4.8,
-      isArchived: false,
-      isFavorite: true,
-      flavorNotes: [],
-      createdAt: '2026-10-20T08:00:00Z',
-      updatedAt: '2026-10-20T08:00:00Z',
-    };
-
-    const bOld: InventoryItem = {
-      id: 'b-old',
-      name: 'Brazil Santos',
-      type: 'coffee',
-      initialWeightGrams: 1000,
-      remainingWeightGrams: 500,
-      roastOrHarvestDate: '2026-09-01',
-      rating: 4.0,
-      isArchived: false,
-      isFavorite: false,
-      flavorNotes: [],
-      createdAt: '2026-09-01T08:00:00Z',
-      updatedAt: '2026-09-01T08:00:00Z',
-    };
-
-    const bNoDate: InventoryItem = {
-      id: 'b-nodate',
-      name: 'Artisan Blend',
-      type: 'coffee',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 25,
-      rating: 4.5,
-      isArchived: false,
-      isFavorite: false,
-      flavorNotes: [],
-      createdAt: '2026-10-01T08:00:00Z',
-      updatedAt: '2026-10-01T08:00:00Z',
-    };
-
-    const items = [bOld, bNoDate, bFresh];
-
-    // 1. roast_date_desc (najświeższe pierwsze)
-    const sortedFresh = sortInventoryItems(items, 'roast_date_desc');
-    expect(sortedFresh[0].id).toBe('b-fresh');
-    expect(sortedFresh[1].id).toBe('b-old');
-    expect(sortedFresh[2].id).toBe('b-nodate');
-
-    // 2. remaining_desc (najwięcej pozostało)
-    const sortedRem = sortInventoryItems(items, 'remaining_desc');
-    expect(sortedRem[0].id).toBe('b-old'); // 500g
-    expect(sortedRem[1].id).toBe('b-fresh'); // 100g
-    expect(sortedRem[2].id).toBe('b-nodate'); // 25g
-
-    // 3. remaining_asc (najmniej pozostało)
-    const sortedRemAsc = sortInventoryItems(items, 'remaining_asc');
-    expect(sortedRemAsc[0].id).toBe('b-nodate'); // 25g
-    expect(sortedRemAsc[2].id).toBe('b-old'); // 500g
-
-    // 4. name_asc (alfabetycznie)
-    const sortedName = sortInventoryItems(items, 'name_asc');
-    expect(sortedName[0].name).toBe('Artisan Blend');
-    expect(sortedName[1].name).toBe('Brazil Santos');
-    expect(sortedName[2].name).toBe('Kenya Nyeri');
-
-    // 5. rating_desc (najwyższa ocena)
-    const sortedRating = sortInventoryItems(items, 'rating_desc');
-    expect(sortedRating[0].id).toBe('b-fresh'); // 4.8
-    expect(sortedRating[1].id).toBe('b-nodate'); // 4.5
-    expect(sortedRating[2].id).toBe('b-old'); // 4.0
-
-    // 6. getSortedInventoryItems z bazy danych
-    initDatabase(mockDb as any);
-    mockDb.inventory.clear();
-    mockDb.inventory.set(bFresh.id, { ...bFresh, is_favorite: 1, is_archived: 0, remaining_weight_g: 100 });
-    mockDb.inventory.set(bOld.id, { ...bOld, is_favorite: 0, is_archived: 0, remaining_weight_g: 500 });
-    const fromDb = getSortedInventoryItems('remaining_desc');
-    expect(fromDb.length).toBe(2);
-    expect(fromDb[0].id).toBe('b-old');
-
-    // 7. Bezpieczeństwo null/undefined
-    expect(sortInventoryItems(null as any)).toEqual([]);
-    expect(sortInventoryItems([null as any, bFresh])).toBeDefined();
-  });
-
-  test('TASK-P71-03-ZAK: filterInventoryItems filtruje i wyszukuje pozycje magazynowe', () => {
-    const item1: InventoryItem = {
-      id: 'inv-1',
-      name: 'Ethiopia Yirgacheffe Washed',
-      type: 'coffee',
-      roasterOrProducer: 'Hard Beans',
-      origin: 'Ethiopia',
-      roastOrHarvestDate: '2026-10-01',
-      roastProfile: 'light',
-      process: 'washed',
-      variety: 'Heirloom',
-      initialWeightGrams: 250,
-      remainingWeightGrams: 180,
-      flavorNotes: ['jasmine', 'bergamot', 'peach'],
-      rating: 4.8,
-      isFavorite: true,
-      isArchived: false,
-      createdAt: '2026-10-01T10:00:00Z',
-      updatedAt: '2026-10-01T10:00:00Z',
-    };
-
-    const item2: InventoryItem = {
-      id: 'inv-2',
-      name: 'Brazil Cerrado Natural',
-      type: 'coffee',
-      roasterOrProducer: 'Coffeedesk',
-      origin: 'Brazil',
-      roastOrHarvestDate: '2026-09-15',
-      roastProfile: 'medium-dark',
-      process: 'natural',
-      variety: 'Bourbon',
-      initialWeightGrams: 1000,
-      remainingWeightGrams: 0,
-      flavorNotes: ['chocolate', 'nuts', 'caramel'],
-      rating: 4.0,
-      isFavorite: false,
-      isArchived: false,
-      createdAt: '2026-09-15T10:00:00Z',
-      updatedAt: '2026-09-15T10:00:00Z',
-    };
-
-    const item3: InventoryItem = {
-      id: 'inv-3',
-      name: 'Gyokuro Saemidori',
-      type: 'tea',
-      roasterOrProducer: 'Uji Producer',
-      origin: 'Japan',
-      roastOrHarvestDate: '2026-05-10',
-      initialWeightGrams: 50,
-      remainingWeightGrams: 35,
-      flavorNotes: ['umami', 'sweetness', 'spinach'],
-      rating: 4.9,
-      isFavorite: true,
-      isArchived: false,
-      createdAt: '2026-05-10T10:00:00Z',
-      updatedAt: '2026-05-10T10:00:00Z',
-    };
-
-    const allItems = [item1, item2, item3];
-
-    // 1. Filtrowanie po typie
-    const criteriaType: InventoryFilterCriteria = { type: 'coffee' };
-    const onlyCoffee = filterInventoryItems(allItems, criteriaType);
-    expect(onlyCoffee.length).toBe(2);
-    expect(onlyCoffee.every((i) => i.type === 'coffee')).toBe(true);
-
-    // 2. Filtrowanie po zapytaniu tekstowym (query)
-    const criteriaQuery: InventoryFilterCriteria = { query: 'yirgacheffe' };
-    const matchQuery = filterInventoryItems(allItems, criteriaQuery);
-    expect(matchQuery.length).toBe(1);
-    expect(matchQuery[0].id).toBe('inv-1');
-
-    // 3. Filtrowanie ulubionych (onlyFavorites)
-    const criteriaFav: InventoryFilterCriteria = { onlyFavorites: true };
-    const favItems = filterInventoryItems(allItems, criteriaFav);
-    expect(favItems.length).toBe(2);
-    expect(favItems.every((i) => i.isFavorite)).toBe(true);
-
-    // 4. Filtrowanie na stanie (inStockOnly)
-    const criteriaStock: InventoryFilterCriteria = { inStockOnly: true };
-    const inStock = filterInventoryItems(allItems, criteriaStock);
-    expect(inStock.length).toBe(2);
-    expect(inStock.some((i) => i.id === 'inv-2')).toBe(false);
-
-    // 5. Minimalna ocena (minRating)
-    const criteriaRating: InventoryFilterCriteria = { minRating: 4.5 };
-    const highRated = filterInventoryItems(allItems, criteriaRating);
-    expect(highRated.length).toBe(2);
-    expect(highRated.some((i) => i.id === 'inv-2')).toBe(false);
-
-    // 6. Odporność na null/undefined
-    expect(filterInventoryItems(null as any)).toEqual([]);
-    expect(filterInventoryItems([null as any, item1])).toHaveLength(1);
-  });
-
-  test('TASK-P73-03-ZAK: filterBrewSessions filtruje sesje parzenia po kryteriach', () => {
-    const ses1: BrewSession = {
-      id: 'ses-1',
-      recipeId: 'rec-1',
-      recipeName: 'V60 Kasuya 4:6',
-      inventoryItemId: 'inv-1',
-      inventoryItemName: 'Ethiopia Yirgacheffe',
-      beverageType: 'COFFEE',
-      method: 'V60',
-      doseGrams: 20,
-      waterGrams: 300,
-      waterTempCelsius: 92,
-      totalTimeSeconds: 210,
-      rating: 5,
-      flavorTags: ['floral', 'bergamot'],
-      brewedAt: '2026-10-27T08:00:00Z',
-    };
-
-    const ses2: BrewSession = {
-      id: 'ses-2',
-      recipeId: 'rec-2',
-      recipeName: 'AeroPress Inverted',
-      beverageType: 'COFFEE',
-      method: 'AeroPress',
-      doseGrams: 15,
-      waterGrams: 200,
-      waterTempCelsius: 85,
-      totalTimeSeconds: 120,
-      rating: 4,
-      flavorTags: ['chocolate'],
-      brewedAt: '2026-10-25T10:00:00Z',
-    };
-
-    const ses3: BrewSession = {
-      id: 'ses-3',
-      beverageType: 'TEA',
-      method: 'Gaiwan',
-      doseGrams: 5,
-      waterGrams: 100,
-      waterTempCelsius: 80,
-      totalTimeSeconds: 30,
-      rating: 4.5,
-      flavorTags: ['umami'],
-      brewedAt: '2026-10-26T14:00:00Z',
-    };
-
-    const allSessions = [ses1, ses2, ses3];
-
-    // 1. Filtrowanie po typie naparu (beverageType)
-    const criteriaType: BrewSessionFilterCriteria = { beverageType: 'COFFEE' };
-    const coffeeSessions: BrewSession[] = filterBrewSessions(allSessions, criteriaType);
-    expect(coffeeSessions.length).toBe(2);
-    expect(coffeeSessions.every((s) => s.beverageType === 'COFFEE')).toBe(true);
-
-    // 2. Filtrowanie po metodzie (method)
-    const criteriaMethod: BrewSessionFilterCriteria = { method: 'v60' };
-    const v60Sessions = filterBrewSessions(allSessions, criteriaMethod);
-    expect(v60Sessions.length).toBe(1);
-    expect(v60Sessions[0].id).toBe('ses-1');
-
-    // 3. Filtrowanie po minimalnej ocenie (minRating)
-    const criteriaRating: BrewSessionFilterCriteria = { minRating: 4.5 };
-    const highRated = filterBrewSessions(allSessions, criteriaRating);
-    expect(highRated.length).toBe(2);
-    expect(highRated.some((s) => s.id === 'ses-2')).toBe(false);
-
-    // 4. Filtrowanie po haśle tekstowym (query)
-    const criteriaQuery: BrewSessionFilterCriteria = { query: 'yirgacheffe' };
-    const querySessions = filterBrewSessions(allSessions, criteriaQuery);
-    expect(querySessions.length).toBe(1);
-    expect(querySessions[0].id).toBe('ses-1');
-
-    // 5. Filtrowanie po dacie (sinceIso)
-    const criteriaDate: BrewSessionFilterCriteria = { sinceIso: '2026-10-27T00:00:00Z' };
-    const recentSessions = filterBrewSessions(allSessions, criteriaDate);
-    expect(recentSessions.length).toBe(1);
-    expect(recentSessions[0].id).toBe('ses-1');
-
-    // 6. Odporność na null/undefined
-    expect(filterBrewSessions(null as any)).toEqual([]);
-    expect(filterBrewSessions([null as any, ses1])).toHaveLength(1);
-  });
-
-  test('TASK-P76-03-ZAK: calculateInventorySummary agreguje stan spiżarni i chroni przed -0/NaN', () => {
-    const items = [
-      {
-        id: '1',
-        name: 'Ethiopia Washed',
-        type: 'coffee' as const,
-        remainingWeightGrams: 200,
-        initialWeightGrams: 250,
-        isFavorite: true,
-      },
-      {
-        id: '2',
-        name: 'Panama Geisha',
-        type: 'coffee' as const,
-        remainingWeightGrams: 0,
-        initialWeightGrams: 100,
-        isFavorite: false,
-      },
-      {
-        id: '3',
-        name: 'Sencha Green Tea',
-        type: 'tea' as const,
-        remainingWeightGrams: 50.5,
-        initialWeightGrams: 100,
-        isFavorite: true,
-      },
-      {
-        id: '4',
-        name: 'Corrupt Item',
-        type: 'coffee' as const,
-        remainingWeightGrams: -10,
-        initialWeightGrams: 100,
-        isFavorite: false,
-      },
-    ] as any[];
-
-    const summary: InventorySummary = calculateInventorySummary(items);
-    expect(summary.totalItems).toBe(4);
-    expect(summary.totalWeightGrams).toBe(250.5);
-    expect(summary.coffeeItemsCount).toBe(3);
-    expect(summary.teaItemsCount).toBe(1);
-    expect(summary.coffeeWeightGrams).toBe(200);
-    expect(summary.teaWeightGrams).toBe(50.5);
-    expect(summary.inStockCount).toBe(2);
-    expect(summary.outOfStockCount).toBe(2);
-    expect(summary.favoritesCount).toBe(2);
-
-    // Odporność na null/undefined/pustą tablicę
-    const emptySummary = calculateInventorySummary(null);
-    expect(emptySummary.totalItems).toBe(0);
-    expect(emptySummary.totalWeightGrams).toBe(0);
-    expect(emptySummary.inStockCount).toBe(0);
-  });
-
-  test('TASK-P78-03-ZAK: getLowStockInventoryItems filtruje i sortuje pozycje z niskim stanem', () => {
-    const items = [
-      { id: '1', name: 'Pełna paczka', remainingWeightGrams: 250 },
-      { id: '2', name: 'Kończąca się Kenya', remainingWeightGrams: 35 },
-      { id: '3', name: 'Ostatnie parzenie', remainingWeightGrams: 15 },
-      { id: '4', name: 'Pusta paczka', remainingWeightGrams: 0 },
-      { id: '5', name: 'Wartość tekstowa', remainingWeightGrams: '45,0' },
-      { id: '6', name: 'Wartość ujemna', remainingWeightGrams: -10 },
-    ] as any[];
-
-    // 1. Domyślny próg 50 g
-    const lowDefault = getLowStockInventoryItems(items);
-    expect(lowDefault.length).toBe(3);
-    expect(lowDefault[0].id).toBe('3');
-    expect(lowDefault[1].id).toBe('2');
-    expect(lowDefault[2].id).toBe('5');
-
-    // 2. Własny próg (np. 30 g)
-    const low30 = getLowStockInventoryItems(items, 30);
-    expect(low30.length).toBe(1);
-    expect(low30[0].id).toBe('3');
-
-    // 3. Odporność na null, undefined i puste tablice
-    expect(getLowStockInventoryItems(null)).toEqual([]);
-    expect(getLowStockInventoryItems([])).toEqual([]);
-    expect(getLowStockInventoryItems(items, -100)).toHaveLength(3);
-  });
-
-  test('TASK-P80-03-ZAK: calculateInventoryTotalValue wylicza sumaryczną wartość i stan magazynu', () => {
-    const items = [
-      { id: '1', name: 'Kolumbia Geisha', remainingWeightGrams: 200, initialWeightGrams: 250, price: 100 }, // (200/250)*100 = 80 zł
-      { id: '2', name: 'Etiopia Yirgacheffe', remainingWeightGrams: 250, initialWeightGrams: 250, price: 60 }, // 60 zł
-      { id: '3', name: 'Brak ceny - szacunek z kg', remainingWeightGrams: 500 }, // 0.5 kg * 160 zł/kg = 80 zł
-      { id: '4', name: 'Pusta paczka', remainingWeightGrams: 0, price: 50 }, // 0 g -> 0 zł
-    ] as any[];
-
-    // 1. Standardowe obliczenie
-    const result: InventoryTotalValueResult = calculateInventoryTotalValue(items, 160);
-    expect(result.totalItemsCount).toBe(4);
-    expect(result.inStockItemsCount).toBe(3);
-    expect(result.totalRemainingWeightGrams).toBe(950);
-    expect(result.estimatedTotalValuePln).toBe(220); // 80 + 60 + 80 = 220 zł
-    expect(result.averageValuePerPackagePln).toBeCloseTo(73.33, 1);
-    expect(result.formattedTotalValuePln).toBe('220,00 zł');
-
-    // 2. Własny szacunek ceny za kg
-    const customRate = calculateInventoryTotalValue([{ remainingWeightGrams: 1000 }] as any, 200);
-    expect(customRate.estimatedTotalValuePln).toBe(200);
-
-    // 3. Odporność na null, puste tablice i zera
-    const emptyResult = calculateInventoryTotalValue(null);
-    expect(emptyResult.totalItemsCount).toBe(0);
-    expect(emptyResult.inStockItemsCount).toBe(0);
-    expect(emptyResult.estimatedTotalValuePln).toBe(0);
-    expect(emptyResult.formattedTotalValuePln).toBe('0,00 zł');
-  });
-
-  test('TASK-P83-03-ZAK: calculateBeanFreshness analizuje fazy świeżości i odgazowania kawy', () => {
-    const fixedNow = new Date('2026-10-27T12:00:00Z');
-
-    // 1. Faza odgazowywania (degassing) - 3 dni po paleniu
-    const degassing: BeanFreshnessAnalysis = calculateBeanFreshness('2026-10-24T12:00:00Z', fixedNow);
-    const phaseCheck: BeanFreshnessPhase = degassing.phase;
-    expect(phaseCheck).toBe('degassing');
-    expect(degassing.daysSinceRoast).toBe(3);
-    expect(degassing.phaseLabelPl).toContain('Odgazowywanie');
-    expect(degassing.recommendationPl).toContain('preinfuzji');
-    expect(degassing.recommendationEn).toContain('bloom');
-
-    // 2. Szczyt smaku (peak flavor) - 14 dni po paleniu
-    const peak = calculateBeanFreshness('2026-10-13T12:00:00Z', fixedNow);
-    expect(peak.phase).toBe('peak');
-    expect(peak.freshnessScore).toBe(100);
-    expect(peak.phaseLabelPl).toContain('Szczyt smaku');
-
-    // 3. Stabilna jakość (optimal) - 45 dni po paleniu
-    const optimal = calculateBeanFreshness('2026-09-12T12:00:00Z', fixedNow);
-    expect(optimal.phase).toBe('optimal');
-    expect(optimal.freshnessScore).toBeGreaterThanOrEqual(80);
-
-    // 4. Starzenie ziaren (aging) - 75 dni po paleniu
-    const aging = calculateBeanFreshness('2026-08-13T12:00:00Z', fixedNow);
-    expect(aging.phase).toBe('aging');
-
-    // 5. Przeleżała kawa (past_peak) - 120 dni po paleniu
-    const pastPeak = calculateBeanFreshness('2026-06-29T12:00:00Z', fixedNow);
-    expect(pastPeak.phase).toBe('past_peak');
-    expect(pastPeak.recommendationPl).toContain('cold brew');
-
-    // 6. Odporność na brak daty, null, stringi niepoprawne
-    const missing = calculateBeanFreshness(null);
-    expect(missing.phase).toBe('unknown');
-    expect(missing.daysSinceRoast).toBeNull();
-    expect(missing.phaseLabelPl).toBe('Brak daty palenia');
-
-    const invalid = calculateBeanFreshness('not-a-date');
-    expect(invalid.phase).toBe('unknown');
-    expect(invalid.phaseLabelPl).toBe('Nieprawidłowa data');
-  });
-
-  test('TASK-P85-03-ZAK: calculateInventoryUsageRate analizuje tempo zużycia kawy i wylicza rezerwę dni', () => {
-    // 1. Umiarkowane tempo (500g przy 25g dziennie -> 20 dni, 2.9 tyg., moderate)
-    const moderate: InventoryUsageRateAnalysis = calculateInventoryUsageRate(500, 25);
-    const catCheck: InventoryUsageRateCategory = moderate.category;
-    expect(catCheck).toBe('moderate');
-    expect(moderate.totalRemainingGrams).toBe(500);
-    expect(moderate.dailyConsumptionGrams).toBe(25);
-    expect(moderate.estimatedDaysRemaining).toBe(20);
-    expect(moderate.estimatedWeeksRemaining).toBe(2.9);
-    expect(moderate.categoryLabelPl).toContain('Umiarkowane');
-    expect(moderate.categoryLabelEn).toContain('Moderate');
-    expect(moderate.advicePl).toContain('optymalna rotacja');
-
-    // 2. Niskie tempo (250g przy 10g dziennie -> slow)
-    const slow = calculateInventoryUsageRate('250,0', '10');
-    expect(slow.category).toBe('slow');
-    expect(slow.estimatedDaysRemaining).toBe(25);
-    expect(slow.categoryLabelPl).toBe('Niskie zużycie');
-
-    // 3. Szybkie tempo (1000g przy 50g dziennie -> fast)
-    const fast = calculateInventoryUsageRate(1000, 50);
-    expect(fast.category).toBe('fast');
-    expect(fast.estimatedDaysRemaining).toBe(20);
-
-    // 4. Bardzo wysokie tempo / biurowe (1500g przy 100g dziennie -> excessive)
-    const excessive = calculateInventoryUsageRate(1500, 100);
-    expect(excessive.category).toBe('excessive');
-
-    // 5. Pusty stan magazynu (0g)
-    const empty = calculateInventoryUsageRate(0, 30);
-    expect(empty.totalRemainingGrams).toBe(0);
-    expect(empty.estimatedDaysRemaining).toBe(0);
-    expect(empty.estimatedWeeksRemaining).toBe(0);
-
-    // 6. Odporność na null, stringi, liczby ujemne i -0
-    const fallback = calculateInventoryUsageRate(null as any, -20);
-    expect(fallback.totalRemainingGrams).toBe(0);
-    expect(fallback.dailyConsumptionGrams).toBe(30);
-    expect(fallback.estimatedDaysRemaining).toBe(0);
-  });
-
-  test('TASK-P88-03-ZAK: calculateBeanRestingReadiness analizuje gotowość ziaren w zależności od obróbki i metody parzenia', () => {
-    const fixedNow = new Date('2026-10-27T12:00:00Z');
-
-    // 1. Kawa myta (washed) pod filtr, palona 3 dni temu (2026-10-24) -> zbyt świeża (odgazowanie)
-    const tooFreshWashed: BeanRestingReadinessAnalysis = calculateBeanRestingReadiness(
-      '2026-10-24T12:00:00Z',
-      'washed',
-      'filter',
-      fixedNow
-    );
-    const statusCheck: BeanRestingStatus = tooFreshWashed.status;
-    expect(statusCheck).toBe('too_fresh_degassing');
-    expect(tooFreshWashed.daysSinceRoast).toBe(3);
-    expect(tooFreshWashed.processType).toBe('washed');
-    expect(tooFreshWashed.brewMethodCategory).toBe('filter');
-    expect(tooFreshWashed.minimumRestDays).toBe(7);
-    expect(tooFreshWashed.readinessScore).toBeLessThan(70);
-    expect(tooFreshWashed.statusLabelPl).toContain('zbyt świeża');
-
-    // 2. Kawa myta pod filtr w szczycie smaku (14 dni temu = 2026-10-13) -> peak_flavor
-    const peakWashed = calculateBeanRestingReadiness(
-      '2026-10-13T12:00:00Z',
-      'washed',
-      'filter',
-      fixedNow
-    );
-    expect(peakWashed.status).toBe('peak_flavor');
-    expect(peakWashed.readinessScore).toBe(100);
-    expect(peakWashed.statusLabelPl).toContain('Optymalny szczyt');
-
-    // 3. Kawa naturalna (natural / honey) pod espresso, palona 10 dni temu -> zbyt świeża pod espresso (wymaga min 16 dni)
-    const naturalEspresso = calculateBeanRestingReadiness(
-      '2026-10-17T12:00:00Z',
-      'natural',
-      'espresso',
-      fixedNow
-    );
-    expect(naturalEspresso.processType).toBe('natural_honey');
-    expect(naturalEspresso.brewMethodCategory).toBe('espresso');
-    expect(naturalEspresso.minimumRestDays).toBe(16);
-    expect(naturalEspresso.status).toBe('too_fresh_degassing');
-
-    // 4. Kawa anaerobowa (anaerobic) pod espresso, palona 30 dni temu -> peak_flavor (wymaga min 20 dni, peak 25-55)
-    const anaerobicEspresso = calculateBeanRestingReadiness(
-      '2026-09-27T12:00:00Z',
-      'anaerobic',
-      'espresso',
-      fixedNow
-    );
-    expect(anaerobicEspresso.processType).toBe('anaerobic_experimental');
-    expect(anaerobicEspresso.status).toBe('peak_flavor');
-
-    // 5. Kawa stara (120 dni temu) -> past_peak
-    const oldBeans = calculateBeanRestingReadiness(
-      '2026-06-29T12:00:00Z',
-      'washed',
-      'filter',
-      fixedNow
-    );
-    expect(oldBeans.status).toBe('past_peak');
-    expect(oldBeans.readinessScore).toBeLessThan(50);
-
-    // 6. Odporność na brak daty i nieprawidłowe wartości
-    const fallback = calculateBeanRestingReadiness(null, null, null, fixedNow);
-    expect(fallback.daysSinceRoast).toBeNull();
-    expect(fallback.status).toBe('ready_to_brew');
-    expect(fallback.readinessScore).toBe(70);
-  });
-
-  it('TASK-P90-03-ZAK: calculateStashDiversity ocenia różnorodność terroir, obróbek i palarni w spiżarni', () => {
-    // 1. Zróżnicowana kolekcja specialty (Etiopia, Kolumbia, Kenia, Panama; myta, natural, beztlenowa; kawa + herbata)
-    const richStash = [
-      { id: '1', name: 'Ethiopia Washed', type: 'coffee', origin: 'Ethiopia', process: 'Washed', roaster: 'Hard Beans', remainingWeightGrams: 250 },
-      { id: '2', name: 'Colombia Anaerobic', type: 'coffee', origin: 'Colombia', process: 'Anaerobic', roaster: 'Coffea Circulor', remainingWeightGrams: 200 },
-      { id: '3', name: 'Kenya Nyeri', type: 'coffee', origin: 'Kenya', process: 'Washed', roaster: 'Tim Wendelboe', remainingWeightGrams: 250 },
-      { id: '4', name: 'Panama Geisha Natural', type: 'coffee', origin: 'Panama', process: 'Natural', roaster: 'DAK', remainingWeightGrams: 100 },
-      { id: '5', name: 'Gyokuro Uji', type: 'tea', origin: 'Japan', process: 'Steamed', roaster: 'Ippodo', remainingWeightGrams: 50 },
-    ] as any[];
-
-    const connoisseur: StashDiversityAnalysis = calculateStashDiversity(richStash);
-    const ratingCheck: StashDiversityRating = connoisseur.rating;
-    expect(ratingCheck).toBe('connoisseur');
-    expect(connoisseur.diversityScore).toBeGreaterThanOrEqual(80);
-    expect(connoisseur.distinctOriginsCount).toBe(5);
-    expect(connoisseur.distinctProcessesCount).toBeGreaterThanOrEqual(3);
-    expect(connoisseur.distinctRoastersCount).toBe(5);
-    expect(connoisseur.coffeeCount).toBe(4);
-    expect(connoisseur.teaCount).toBe(1);
-    expect(connoisseur.totalWeightGrams).toBe(850);
-    expect(connoisseur.ratingLabelPl).toContain('konesera');
-    expect(connoisseur.insightsPl).toContain('terroir');
-
-    // 2. Monokultura (tylko 1 paczka kawy)
-    const singleBag = [
-      { id: '1', name: 'Brazil Cerrado', type: 'coffee', origin: 'Brazil', process: 'Natural', roaster: 'Local', remainingWeightGrams: 250 },
-    ] as any[];
-    const mono = calculateStashDiversity(singleBag);
-    expect(mono.rating).toBe('monoculture');
-    expect(mono.diversityScore).toBeLessThanOrEqual(35);
-    expect(mono.distinctOriginsCount).toBe(1);
-
-    // 3. Pusta spiżarnia lub null
-    const empty = calculateStashDiversity([]);
-    expect(empty.diversityScore).toBe(0);
-    expect(empty.rating).toBe('monoculture');
-    expect(empty.totalItems).toBe(0);
-
-    const fromNull = calculateStashDiversity(null);
-    expect(fromNull.diversityScore).toBe(0);
-    expect(fromNull.rating).toBe('monoculture');
-  });
-
-  it('TASK-P92-03-ZAK: estimateRemainingBrews wylicza liczbę pozostałych parzeń i dni zapasu w spiżarni', () => {
-    // 1. Zwykły inwentarz: 300g kawy (15g doza -> 20 parzeń) + 20g herbaty (4g doza -> 5 parzeń) = 25 parzeń; przy 2 parzeniach/dzień = 12 dni
-    const items = [
-      { id: '1', name: 'Ethiopia', type: 'coffee', remainingWeightGrams: 200, isArchived: false },
-      { id: '2', name: 'Colombia', type: 'coffee', remainingWeightGrams: 100, isArchived: false },
-      { id: '3', name: 'Sencha', type: 'tea', remainingWeightGrams: 20, isArchived: false },
-      { id: '4', name: 'Empty', type: 'coffee', remainingWeightGrams: 0, isArchived: false },
-      { id: '5', name: 'Archived', type: 'coffee', remainingWeightGrams: 100, isArchived: true },
-    ] as any[];
-
-    const estimate: StashBrewsEstimate = estimateRemainingBrews(items, {
-      coffeeDoseGrams: 15,
-      teaDoseGrams: 4,
-      brewsPerDay: 2,
-    });
-
-    expect(estimate.totalRemainingWeightGrams).toBe(320);
-    expect(estimate.coffeeBrewsRemaining).toBe(20);
-    expect(estimate.teaBrewsRemaining).toBe(5);
-    expect(estimate.estimatedTotalBrews).toBe(25);
-    expect(estimate.estimatedDaysRemaining).toBe(12);
-    expect(estimate.averageDoseGrams).toBeCloseTo(12.8, 1);
-    expect(estimate.summaryPl).toContain('25 parzeń');
-    expect(estimate.summaryEn).toContain('25 brews');
-
-    // 2. Domyślne parametry (15g kawa, 4g herbata, 2 parzenia/dzień)
-    const defaultEstimate = estimateRemainingBrews(items);
-    expect(defaultEstimate.estimatedTotalBrews).toBe(25);
-    expect(defaultEstimate.estimatedDaysRemaining).toBe(12);
-
-    // 3. Pusty inwentarz / null
-    const emptyEstimate = estimateRemainingBrews([]);
-    expect(emptyEstimate.estimatedTotalBrews).toBe(0);
-    expect(emptyEstimate.estimatedDaysRemaining).toBe(0);
-    expect(emptyEstimate.totalRemainingWeightGrams).toBe(0);
-    expect(emptyEstimate.summaryPl).toContain('Brak dostępnych zapasów');
-
-    const nullEstimate = estimateRemainingBrews(null);
-    expect(nullEstimate.estimatedTotalBrews).toBe(0);
-  });
-
-  it('TASK-P95-03-ZAK: evaluateStashTurnover analizuje wskaźniki rotacji, zużycia i wyczerpania paczek w spiżarni', () => {
-    const items = [
-      { id: '1', name: 'Ethiopia', initialWeightGrams: 250, remainingWeightGrams: 50, isArchived: false },
-      { id: '2', name: 'Colombia', initialWeightGrams: 250, remainingWeightGrams: 0, isArchived: false },
-      { id: '3', name: 'Kenya', initialWeightGrams: 250, remainingWeightGrams: 250, isArchived: false },
-      { id: '4', name: 'Old Brazil', initialWeightGrams: 250, remainingWeightGrams: 0, isArchived: true },
-    ] as any[];
-
-    const turnover: StashTurnoverAnalysis = evaluateStashTurnover(items);
-    expect(turnover.totalItems).toBe(4);
-    expect(turnover.activeItemsCount).toBe(2); // items 1, 3
-    expect(turnover.depletedItemsCount).toBe(2); // items 2, 4
-    expect(turnover.archivedItemsCount).toBe(1); // item 4
-    expect(turnover.totalInitialWeightGrams).toBe(1000);
-    expect(turnover.totalRemainingWeightGrams).toBe(300);
-    expect(turnover.totalConsumedWeightGrams).toBe(700);
-    expect(turnover.consumptionPercent).toBe(70);
-    expect(turnover.depletionRatePercent).toBe(50);
-    expect(turnover.summaryPl).toContain('700g');
-    expect(turnover.summaryEn).toBeDefined();
-
-    // Pusty inwentarz / null
-    const empty = evaluateStashTurnover([]);
-    expect(empty.totalItems).toBe(0);
-    expect(empty.consumptionPercent).toBe(0);
-    expect(empty.summaryPl).toContain('Brak pozycji');
-
-    const nullTurnover = evaluateStashTurnover(null);
-    expect(nullTurnover.totalItems).toBe(0);
-  });
-
-  it('TASK-P97-03-ZAK: calculateStashDepletionForecast prognozuje datę wyczerpania i pilność uzupełnienia zapasów', () => {
-    const items = [
-      { id: '1', name: 'Ethiopia', remainingWeightGrams: 150, isArchived: false },
-      { id: '2', name: 'Kenya', remainingWeightGrams: 150, isArchived: false },
-      { id: '3', name: 'Empty', remainingWeightGrams: 0, isArchived: false },
-      { id: '4', name: 'Archived', remainingWeightGrams: 200, isArchived: true },
-    ] as any[];
-
-    // 300g łącznie przy 30g/dzień -> 10 dni, data ref: 2026-11-01 -> wyczerpanie: 2026-11-11
-    const forecast: StashDepletionForecast = calculateStashDepletionForecast(items, {
-      dailyConsumptionGrams: 30,
-      referenceDateIso: '2026-11-01T08:00:00.000Z',
-    });
-    const testUrgency: StashDepletionUrgency = forecast.urgency;
-    expect(testUrgency).toBe('adequate');
-    expect(forecast.totalRemainingWeightGrams).toBe(300);
-    expect(forecast.activeItemCount).toBe(2);
-    expect(forecast.estimatedDaysRemaining).toBe(10);
-    expect(forecast.projectedDepletionDateIso).toBe('2026-11-11');
-    expect(forecast.summaryPl).toContain('10 dni');
-    expect(forecast.summaryEn).toBeDefined();
-
-    // Niski stan zapasów (< 3 dni) -> critical
-    const critical = calculateStashDepletionForecast(
-      [{ id: '1', remainingWeightGrams: 50, isArchived: false }] as any,
-      { dailyConsumptionGrams: 30, referenceDateIso: '2026-11-01T08:00:00.000Z' }
-    );
-    expect(critical.estimatedDaysRemaining).toBe(1);
-    expect(critical.urgency).toBe('critical');
-
-    // Pusty inwentarz
-    const empty = calculateStashDepletionForecast([]);
-    expect(empty.estimatedDaysRemaining).toBe(0);
-    expect(empty.urgency).toBe('critical');
-    expect(empty.summaryPl).toContain('Brak zapasów');
-
-    const nullForecast = calculateStashDepletionForecast(null);
-    expect(nullForecast.estimatedDaysRemaining).toBe(0);
-  });
-
-  test('TASK-P100-03-ZAK: calculateStashCostEfficiency analizuje efektywność kosztową spiżarni i segment cenowy', () => {
-    const items = [
-      {
-        id: '1',
-        name: 'Brazil Santos',
-        initialWeightGrams: 250,
-        remainingWeightGrams: 200,
-        price: 35, // 14 zł / 100g -> value
-        isArchived: false,
-      },
-      {
-        id: '2',
-        name: 'Panama Geisha',
-        initialWeightGrams: 100,
-        remainingWeightGrams: 100,
-        price: 80, // 80 zł / 100g -> ultra_premium
-        isArchived: false,
-      },
-      {
-        id: '3',
-        name: 'Archived Empty',
-        initialWeightGrams: 250,
-        remainingWeightGrams: 0,
-        price: 45,
-        isArchived: true,
-      },
-    ] as any[];
-
-    // Wycena: Brazil: 35 * (200/250) = 28 PLN. Geisha: 80 PLN. Razem: 108 PLN dla 300g -> 36 PLN / 100g -> specialty
-    const report: StashCostEfficiencyReport = calculateStashCostEfficiency(items, { standardDoseGrams: 15 });
-    const testTier: StashCostEfficiencyTier = report.tier;
-    expect(testTier).toBe('specialty');
-    expect(report.totalItemsCount).toBe(2);
-    expect(report.totalRemainingWeightGrams).toBe(300);
-    expect(report.totalEstimatedValuePln).toBe(108);
-    expect(report.averageCostPer100gPln).toBe(36);
-    expect(report.estimatedCostPerCupPln).toBe(5.4); // 36 * 0.15 = 5.4 PLN
-    expect(report.mostAffordableItemName).toBe('Brazil Santos');
-    expect(report.mostAffordableCostPer100g).toBe(14);
-    expect(report.mostPremiumItemName).toBe('Panama Geisha');
-    expect(report.mostPremiumCostPer100g).toBe(80);
-    expect(report.summaryPl).toContain('36.00 zł/100g');
-    expect(report.summaryEn).toBeDefined();
-
-    // Pusta spiżarnia
-    const emptyReport = calculateStashCostEfficiency([]);
-    expect(emptyReport.totalItemsCount).toBe(0);
-    expect(emptyReport.totalEstimatedValuePln).toBe(0);
-    expect(emptyReport.tier).toBe('value');
-    expect(emptyReport.summaryPl).toContain('pusta');
-
-    // Odporność na null
-    const nullReport = calculateStashCostEfficiency(null);
-    expect(nullReport.totalItemsCount).toBe(0);
-  });
-
-  test('TASK-P102-03-ZAK: estimateStashRoastDistribution wyznacza rozkład stopni palenia kaw w spiżarni', () => {
-    const items = [
-      {
-        id: '1',
-        name: 'Ethiopia Yirgacheffe',
-        roastLevel: 'light',
-        remainingWeightGrams: 200,
-        isArchived: false,
-      },
-      {
-        id: '2',
-        name: 'Kenya Nyeri',
-        roastLevel: 'jasne (nordic)',
-        remainingWeightGrams: 300,
-        isArchived: false,
-      },
-      {
-        id: '3',
-        name: 'Brazil Cerrado',
-        roastLevel: 'medium',
-        remainingWeightGrams: 250,
-        isArchived: false,
-      },
-      {
-        id: '4',
-        name: 'Italian Espresso',
-        roastLevel: 'dark',
-        remainingWeightGrams: 250,
-        isArchived: false,
-      },
-      {
-        id: '5',
-        name: 'Old Empty Bag',
-        roastLevel: 'light',
-        remainingWeightGrams: 0,
-        isArchived: false,
-      },
-      {
-        id: '6',
-        name: 'Archived Bag',
-        roastLevel: 'medium',
-        remainingWeightGrams: 500,
-        isArchived: true,
-      },
-    ] as any[];
-
-    // 1. Spiżarnia z różnymi profilami: 500g jasnej, 250g średniej, 250g ciemnej = 1000g
-    const dist = estimateStashRoastDistribution(items);
-    expect(dist.totalActiveBags).toBe(4);
-    expect(dist.totalGrams).toBe(1000);
-    expect(dist.lightGrams).toBe(500);
-    expect(dist.mediumGrams).toBe(250);
-    expect(dist.darkGrams).toBe(250);
-    expect(dist.lightPercent).toBe(50);
-    expect(dist.mediumPercent).toBe(25);
-    expect(dist.darkPercent).toBe(25);
-    expect(dist.dominantProfile).toBe('balanced');
-    const profileType: DominantRoastProfile = dist.dominantProfile;
-    expect(profileType).toBe('balanced');
-    expect(dist.summaryPl).toContain('50%');
-
-    // 2. Spiżarnia zdominowana przez jasne palenie (>= 60%)
-    const lightItems = [
-      { id: '1', name: 'Ethiopia', roastLevel: 'light', remainingWeightGrams: 800 },
-      { id: '2', name: 'Brazil', roastLevel: 'medium', remainingWeightGrams: 200 },
-    ] as any[];
-    const lightDist = estimateStashRoastDistribution(lightItems);
-    expect(lightDist.dominantProfile).toBe('light');
-
-    // 3. Pusta spiżarnia i null
-    const emptyDist = estimateStashRoastDistribution([]);
-    expect(emptyDist.totalActiveBags).toBe(0);
-    expect(emptyDist.dominantProfile).toBe('empty');
-
-    const fallbackNull = estimateStashRoastDistribution(null);
-    expect(fallbackNull.totalGrams).toBe(0);
-    expect(fallbackNull.dominantProfile).toBe('empty');
-    const distResult: StashRoastDistributionReport = fallbackNull;
-    expect(distResult.summaryEn).toBeTruthy();
-  });
-
-  test('TASK-P104-03-ZAK: calculateStashFreshnessIndex szacuje świeżość kawy z typami StashFreshnessReport i BeanFreshnessStage', () => {
-    const baseDate = new Date('2026-10-20T12:00:00Z');
-
-    // 1. Kawa świeżo palona w fazie degassing (3 dni temu, zaworek)
-    const degassing = calculateStashFreshnessIndex('2026-10-17T12:00:00Z', {
-      packaging: 'valve_bag',
-      currentDate: baseDate,
-    });
-    const stageType: BeanFreshnessStage = degassing.stage;
-    expect(stageType).toBe('degassing');
-    expect(degassing.daysSinceRoast).toBe(3);
-    expect(degassing.packaging).toBe('valve_bag');
-    expect(degassing.freshnessScore).toBe(80);
-    expect(degassing.advisoryPl).toContain('odgazowywanie');
-
-    // 2. Szczyt bukietu (Peak Flavor, 14 dni temu)
-    const peak = calculateStashFreshnessIndex('2026-10-06T12:00:00Z', {
-      packaging: 'valve_bag',
-      currentDate: baseDate,
-    });
-    expect(peak.stage).toBe('peak');
-    expect(peak.freshnessScore).toBe(100);
-    expect(peak.daysSinceRoast).toBe(14);
-    expect(peak.advisoryEn).toContain('Peak Flavor');
-
-    // 3. Kawa zamrożona (60 dni od palenia, ale zamrożona) -> peak/optimal, wysoki wynik
-    const frozen = calculateStashFreshnessIndex('2026-08-20T12:00:00Z', {
-      packaging: 'frozen',
-      currentDate: baseDate,
-    });
-    expect(frozen.packaging).toBe('frozen');
-    expect(frozen.freshnessScore).toBe(95);
-    expect(frozen.recommendedUseBeforeDays).toBe(365);
-    expect(frozen.advisoryPl).toContain('zamrożona');
-
-    // 4. Otwarta paczka od 30 dni -> stale
-    const staleOpen = calculateStashFreshnessIndex('2026-09-20T12:00:00Z', {
-      packaging: 'open',
-      currentDate: baseDate,
-    });
-    expect(staleOpen.packaging).toBe('open');
-    expect(staleOpen.stage).toBe('stale');
-    expect(staleOpen.freshnessScore).toBeLessThanOrEqual(40);
-
-    // 5. Brak daty palenia i wartości null
-    const noDate = calculateStashFreshnessIndex(null, null);
-    expect(noDate.daysSinceRoast).toBeNull();
-    expect(noDate.stage).toBe('unknown');
-    expect(noDate.freshnessScore).toBe(50);
-    const reportType: StashFreshnessReport = noDate;
-    expect(reportType.summaryEn).toBeTruthy();
   });
 });

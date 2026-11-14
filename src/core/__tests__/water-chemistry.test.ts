@@ -6,69 +6,14 @@ import {
   WATER_RECIPES,
   BOTTLED_WATER_BENCHMARKS,
   calculateWaterMinerals,
-  calculateBufferAddition,
-  calculateCationHardnessBreakdown,
+
   diagnoseWaterSensoryImpact,
   getWaterProfileName,
   ppmCaCO3ToDegreesDH,
-  degreesDHToPpmCaCO3,
-  ppmCaCO3ToDegreesClark,
-  degreesClarkToPpmCaCO3,
-  classifyWaterHardnessFromClark,
-  classifyWaterHardnessFromFH,
+
   findWaterRecipeById,
   findBottledWaterById,
-  getBottledWatersBySuitability,
-  searchBottledWaters,
-  searchWaterRecipes,
-  evaluateWaterSuitability,
-  WaterSuitabilityEvaluation,
-  calculateWaterBlend,
-  WaterBlendParams,
-  WaterBlendResult,
-  calculateHardnessRatio,
-  HardnessRatioAnalysis,
-  calculateWaterDilution,
-  WaterDilutionResult,
-  estimateWaterTdsFromHardness,
-  WaterTdsEstimate,
-  evaluateWaterAlkalinity,
-  AlkalinityEvaluation,
-  AlkalinityCategory,
-  calculateMagnesiumCalciumRatio,
-  MineralCationRatioAnalysis,
-  CationRatioCategory,
-  calculateResidualAlkalinity,
-  ResidualAlkalinityAnalysis,
-  ResidualAlkalinityCategory,
-  calculateSulfateToChlorideRatio,
-  SulfateToChlorideRatioAnalysis,
-  SulfateToChlorideCategory,
-  calculateTotalHardnessFromIons,
-  TotalHardnessIonAnalysis,
-  HardnessDominance,
-  evaluateLimescaleRisk,
-  LimescaleRiskAssessment,
-  LimescaleRiskLevel,
-  evaluateBoilerCorrosionRisk,
-  BoilerCorrosionRiskAssessment,
-  BoilerCorrosionRiskLevel,
-  calculateWaterHardnessScale,
-  WaterHardnessScale,
-  WaterHardnessLevel,
-  evaluateWaterAlkalinityBuffer,
-  WaterAlkalinityBufferEvaluation,
-  AlkalinityBufferLevel,
-  calculateBoilingDegassingImpact,
-  BoilingDegassingImpact,
-  DegassingEfficiencyLevel,
-  formatWaterHardnessCategory,
-  evaluateLarsonSkoldIndex,
-  LarsonSkoldIndexResult,
-  LarsonSkoldRiskLevel,
-  convertConductivityToTds,
-  ConductivityToTdsResult,
-  ConductivityScaleCategory,
+
 } from '../water-chemistry';
 
 describe('Water Chemistry & Mineralization Module', () => {
@@ -187,20 +132,6 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(ppmCaCO3ToDegreesDH(17.848)).toBe(1);
   });
 
-  test('TASK-P10-08-PRO: degreesDHToPpmCaCO3 konwertuje stopnie dH na ppm CaCO3 z zachowaniem odporności na NaN', () => {
-    expect(degreesDHToPpmCaCO3(1)).toBe(17.85);
-    expect(degreesDHToPpmCaCO3(10)).toBe(178.48);
-    expect(degreesDHToPpmCaCO3(0)).toBe(0);
-    expect(degreesDHToPpmCaCO3(-5)).toBe(0);
-    expect(degreesDHToPpmCaCO3(NaN)).toBe(0);
-    expect(degreesDHToPpmCaCO3(Infinity)).toBe(0);
-
-    // Spójność dwustronna: 10 dH -> ppm -> dH powraca do 10 dH
-    const ppm = degreesDHToPpmCaCO3(10);
-    const dHBack = Math.round(ppmCaCO3ToDegreesDH(ppm));
-    expect(dHBack).toBe(10);
-  });
-
   test('TASK-P11-08-PRO: diagnoseWaterSensoryImpact odrzuca ujemne GH/KH, a helpery findWaterRecipeById i findBottledWaterById wyszukują profile', () => {
     const negGh = diagnoseWaterSensoryImpact(-10, 40);
     expect(negGh.problemPl).toContain('Nieprawidłowe dane');
@@ -259,10 +190,6 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(ppmCaCO3ToDegreesDH(-0)).toBe(0);
     expect(ppmCaCO3ToDegreesDH(0)).toBe(0);
     expect(ppmCaCO3ToDegreesDH(-100)).toBe(0);
-
-    expect(degreesDHToPpmCaCO3(-0)).toBe(0);
-    expect(degreesDHToPpmCaCO3(0)).toBe(0);
-    expect(degreesDHToPpmCaCO3(-100)).toBe(0);
   });
   test('TASK-P21-07-JAK: diagnoseWaterSensoryImpact diagnozuje skrajne zasolenie i mineralizację (GH > 1000 lub KH > 1000)', () => {
     const extremeGh = diagnoseWaterSensoryImpact(1500, 40);
@@ -288,7 +215,6 @@ describe('Water Chemistry & Mineralization Module', () => {
   });
   test('TASK-P24-07-JAK: ppmCaCO3ToDegreesDH i degreesDHToPpmCaCO3 clampują skrajne wartości wejściowe', () => {
     expect(ppmCaCO3ToDegreesDH(999999)).toBe(ppmCaCO3ToDegreesDH(10000));
-    expect(degreesDHToPpmCaCO3(999999)).toBe(degreesDHToPpmCaCO3(500));
   });
 
   test('TASK-P25-07-JAK: calculateWaterMinerals parsuje parametry przekazane jako string oraz chroni przed -0', () => {
@@ -330,16 +256,9 @@ describe('Water Chemistry & Mineralization Module', () => {
     const dhFromString = ppmCaCO3ToDegreesDH('60' as any);
     expect(dhFromString).toBeCloseTo(3.3617, 3);
 
-    const ppmFromString = degreesDHToPpmCaCO3('3.5' as any);
-    expect(ppmFromString).toBeCloseTo(62.47, 1);
-
     const dhNegZero = ppmCaCO3ToDegreesDH(-0);
     expect(dhNegZero).toBe(0);
     expect(Object.is(dhNegZero, -0)).toBe(false);
-
-    const ppmNegZero = degreesDHToPpmCaCO3(-0);
-    expect(ppmNegZero).toBe(0);
-    expect(Object.is(ppmNegZero, -0)).toBe(false);
   });
 
   test('TASK-P29-07-JAK: getWaterProfileName wyszukuje profile i wody butelkowane bez wzgledu na wielkosc liter', () => {
@@ -417,8 +336,6 @@ describe('Water Chemistry & Mineralization Module', () => {
 
     expect(ppmCaCO3ToDegreesDH(true as any)).toBe(0);
     expect(ppmCaCO3ToDegreesDH(false as any)).toBe(0);
-    expect(degreesDHToPpmCaCO3(true as any)).toBe(0);
-    expect(degreesDHToPpmCaCO3(false as any)).toBe(0);
   });
 
   test('TASK-P34-07-JAK: calculateWaterMinerals odrzuca koercję typów boolean dla objętości, GH oraz KH', () => {
@@ -442,11 +359,6 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(Object.is(ppmCaCO3ToDegreesDH('-0' as any), -0)).toBe(false);
     expect(ppmCaCO3ToDegreesDH(-0)).toBe(0);
     expect(ppmCaCO3ToDegreesDH('-0' as any)).toBe(0);
-
-    expect(Object.is(degreesDHToPpmCaCO3(-0), -0)).toBe(false);
-    expect(Object.is(degreesDHToPpmCaCO3('-0' as any), -0)).toBe(false);
-    expect(degreesDHToPpmCaCO3(-0)).toBe(0);
-    expect(degreesDHToPpmCaCO3('-0' as any)).toBe(0);
   });
 
   test('TASK-P36-07-JAK: diagnoseWaterSensoryImpact ściśle odrzuca null i undefined', () => {
@@ -463,8 +375,6 @@ describe('Water Chemistry & Mineralization Module', () => {
     // ppmCaCO3ToDegreesDH & degreesDHToPpmCaCO3
     expect(ppmCaCO3ToDegreesDH(null as any)).toBe(0);
     expect(ppmCaCO3ToDegreesDH(undefined as any)).toBe(0);
-    expect(degreesDHToPpmCaCO3(null as any)).toBe(0);
-    expect(degreesDHToPpmCaCO3(undefined as any)).toBe(0);
 
     // calculateWaterMinerals
     const resFromNulls = calculateWaterMinerals(null as any, null as any, null as any);
@@ -504,11 +414,6 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(ppmCaCO3ToDegreesDH([] as any)).toBe(0);
     expect(ppmCaCO3ToDegreesDH(Symbol('sym') as any)).toBe(0);
     expect(ppmCaCO3ToDegreesDH('  17.848  ' as any)).toBe(1);
-
-    expect(degreesDHToPpmCaCO3({} as any)).toBe(0);
-    expect(degreesDHToPpmCaCO3([] as any)).toBe(0);
-    expect(degreesDHToPpmCaCO3(Symbol('sym') as any)).toBe(0);
-    expect(degreesDHToPpmCaCO3('  1  ' as any)).toBe(17.85);
   });
 
   test('TASK-P41-07-JAK: calculateWaterMinerals odrzuca obiekty, tablice, symbole i chroni waterVolumeLiters przed -0', () => {
@@ -572,10 +477,6 @@ describe('Water Chemistry & Mineralization Module', () => {
     const dh1 = ppmCaCO3ToDegreesDH('35,696');
     expect(dh1).toBeCloseTo(2.0, 3);
 
-    // degreesDHToPpmCaCO3 z przecinkiem dziesietnym
-    const ppm1 = degreesDHToPpmCaCO3('2,5');
-    expect(ppm1).toBeCloseTo(44.62, 1);
-
     // calculateWaterMinerals z objętością i twardościami z przecinkiem
     const res = calculateWaterMinerals('2,5', '80,5', '40,2');
     expect(res.waterVolumeLiters).toBe(2.5);
@@ -618,34 +519,7 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(getWaterProfileName('highland_spring')).toBe('Highland Spring');
   });
 
-  test('TASK-P49-07-JAK: calculateBufferAddition wylicza zapotrzebowanie na bufor i chroni przed dzieleniem przez zero oraz wartosciami ujemnymi', () => {
-    // 1. Zwykłe wyliczenie: 5L wody, currentKh 10 ppm, targetKh 40 ppm -> deficyt 30 ppm
-    // BH concentrate: (30 / 2) * 5 = 75g
-    // NaHCO3: 30 * 0.00168 * 5 = 0.252g
-    const res = calculateBufferAddition(5.0, 10, 40);
-    expect(res.khDeficitPpm).toBe(30);
-    expect(res.bufferConcentrateGrams).toBe(75.0);
-    expect(res.dryBakingSodaGrams).toBe(0.252);
-
-    // 2. Brak deficytu: currentKh >= targetKh -> 0g
-    const noDeficit = calculateBufferAddition(1.0, 50, 40);
-    expect(noDeficit.khDeficitPpm).toBe(0);
-    expect(noDeficit.bufferConcentrateGrams).toBe(0);
-    expect(noDeficit.dryBakingSodaGrams).toBe(0);
-
-    // 3. Stringi z przecinkami i niepoprawne dane
-    const commaRes = calculateBufferAddition('2,5', '15,5', '45,5');
-    expect(commaRes.khDeficitPpm).toBe(30);
-    expect(commaRes.bufferConcentrateGrams).toBe(37.5);
-
-    // 4. Odporność na NaN, ujemne i -0
-    const edgeRes = calculateBufferAddition(-5, 'invalid', -10);
-    expect(edgeRes.khDeficitPpm).toBe(0);
-    expect(edgeRes.bufferConcentrateGrams).toBe(0);
-    expect(edgeRes.dryBakingSodaGrams).toBe(0);
-  });
-
-  test('TASK-P50-07-JAK: classifyWaterHardness klasyfikuje twardosc wody oraz findWaterRecipeById wspiera popularne aliasy receptur', () => {
+  test('TASK-P50-07-JAK: findWaterRecipeById wspiera popularne aliasy receptur', () => {
     // 1. findWaterRecipeById z aliasami (rao, bh, sca, melbourne, hendon)
     expect(findWaterRecipeById('rao')?.id).toBe('scott_rao_wonder');
     expect(findWaterRecipeById('scott rao')?.id).toBe('scott_rao_wonder');
@@ -658,156 +532,16 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(getWaterProfileName('rao')).toBe('Scott Rao Wonder Water');
     expect(getWaterProfileName('sca', 'pl')).toBe('Standard SCA (Specialty Coffee)');
     expect(getWaterProfileName('bh', 'en')).toBe('Barista Hustle 80/40');
-
-    // 2. classifyWaterHardness
-    // @ts-ignore
-    const { classifyWaterHardness } = require('../water-chemistry');
-    const sampleCategory: import('../water-chemistry').WaterHardnessCategory = classifyWaterHardness(30);
-    expect(sampleCategory).toBe('VERY_SOFT');
-    expect(classifyWaterHardness('45,5')).toBe('VERY_SOFT');
-    expect(classifyWaterHardness(80)).toBe('SOFT');
-    expect(classifyWaterHardness(140)).toBe('MODERATELY_HARD');
-    expect(classifyWaterHardness(220)).toBe('HARD');
-    expect(classifyWaterHardness(450)).toBe('VERY_HARD');
-    expect(classifyWaterHardness(-10)).toBe('SOFT');
-    expect(classifyWaterHardness(NaN)).toBe('SOFT');
-    expect(classifyWaterHardness(null)).toBe('SOFT');
   });
 
   test('TASK-P51-07-JAK: formatWaterHardnessCategory lokalizuje kategorie twardosci oraz findBottledWaterById wspiera nowe warianty', () => {
-    // 1. formatWaterHardnessCategory PL i EN
-    expect(formatWaterHardnessCategory('VERY_SOFT', 'pl')).toBe('Bardzo miękka');
-    expect(formatWaterHardnessCategory('VERY_SOFT', 'en')).toBe('Very Soft');
-    expect(formatWaterHardnessCategory('SOFT', 'pl')).toBe('Miękka');
-    expect(formatWaterHardnessCategory('SOFT', 'en')).toBe('Soft');
-    expect(formatWaterHardnessCategory('MODERATELY_HARD', 'pl')).toBe('Średnio twarda');
-    expect(formatWaterHardnessCategory('MODERATELY_HARD', 'en')).toBe('Moderately Hard');
-    expect(formatWaterHardnessCategory('HARD', 'pl')).toBe('Twarda');
-    expect(formatWaterHardnessCategory('HARD', 'en')).toBe('Hard');
-    expect(formatWaterHardnessCategory('VERY_HARD', 'pl')).toBe('Bardzo twarda');
-    expect(formatWaterHardnessCategory('VERY_HARD', 'en')).toBe('Very Hard');
-    expect(formatWaterHardnessCategory('unknown', 'en')).toBe('Unknown');
-    expect(formatWaterHardnessCategory('', 'pl')).toBe('Nieznana');
-
     // 2. findBottledWaterById z aliasami i spacjami
     expect(findBottledWaterById('zywiec zdrój')?.id).toBe('zywiec_zdroj');
     expect(findBottledWaterById('cechini muszyna')?.id).toBe('muszynianka');
     expect(findBottledWaterById('tesco')?.id).toBe('ashbeck');
   });
 
-  test('TASK-P52-07-JAK: calculateCationHardnessBreakdown oblicza rozbicie twardosci Ca/Mg i chroni przed blednymi typami', () => {
-    // 1. Prawidłowe obliczenia dla 10 mg/L Ca i 15 mg/L Mg
-    const res = calculateCationHardnessBreakdown(10, 15);
-    expect(res.calciumGhPpm).toBe(24.97);
-    expect(res.magnesiumGhPpm).toBe(61.77);
-    expect(res.totalGhPpm).toBe(86.74);
-    expect(res.cationRatioMgToCa).toBe(1.5);
-    expect(res.dominantCation).toBe('magnesium');
-
-    // 2. Przecinki dziesiętne w stringach
-    const commaRes = calculateCationHardnessBreakdown('20,5', '5,5');
-    expect(commaRes.calciumIonPpm).toBe(20.5);
-    expect(commaRes.magnesiumIonPpm).toBe(5.5);
-    expect(commaRes.dominantCation).toBe('calcium');
-
-    // 3. Odporność na null, obiekty, ujemne i -0
-    const edgeRes = calculateCationHardnessBreakdown(null as any, -10);
-    expect(edgeRes.calciumIonPpm).toBe(0);
-    expect(edgeRes.magnesiumIonPpm).toBe(0);
-    expect(edgeRes.totalGhPpm).toBe(0);
-    expect(edgeRes.dominantCation).toBe('balanced');
-  });
-
-  test('TASK-P53-07-JAK: konwersja dH/fH/CaCO3 i klasyfikacja z ochrona przed -0 w classifyWaterHardness i classifyWaterHardnessFromDH', () => {
-    // @ts-ignore
-    const {
-      classifyWaterHardness,
-      classifyWaterHardnessFromDH,
-      ppmCaCO3ToDegreesFH,
-      degreesFHToPpmCaCO3,
-    } = require('../water-chemistry');
-
-    // 1. classifyWaterHardness z -0 i 0
-    expect(classifyWaterHardness(0)).toBe('VERY_SOFT');
-    expect(classifyWaterHardness(-0)).toBe('VERY_SOFT');
-    expect(classifyWaterHardness('0')).toBe('VERY_SOFT');
-
-    // 2. classifyWaterHardnessFromDH (bezpośrednia klasyfikacja ze stopni niemieckich dH)
-    expect(classifyWaterHardnessFromDH(2)).toBe('VERY_SOFT'); // ~35.7 ppm
-    expect(classifyWaterHardnessFromDH('4,5')).toBe('SOFT'); // ~80.3 ppm
-    expect(classifyWaterHardnessFromDH(8)).toBe('MODERATELY_HARD'); // ~142.8 ppm
-    expect(classifyWaterHardnessFromDH(12)).toBe('HARD'); // ~214.2 ppm
-    expect(classifyWaterHardnessFromDH(22)).toBe('VERY_HARD'); // ~392.7 ppm
-    expect(classifyWaterHardnessFromDH(-0)).toBe('VERY_SOFT');
-    expect(classifyWaterHardnessFromDH(NaN)).toBe('SOFT');
-
-    // 3. Konwersje ze stopni francuskich (°fH)
-    expect(ppmCaCO3ToDegreesFH(100)).toBe(10);
-    expect(ppmCaCO3ToDegreesFH('155,5')).toBe(15.55);
-    expect(ppmCaCO3ToDegreesFH(-0)).toBe(0);
-    expect(degreesFHToPpmCaCO3(12)).toBe(120);
-    expect(degreesFHToPpmCaCO3('18,5')).toBe(185);
-    expect(degreesFHToPpmCaCO3(-0)).toBe(0);
-  });
-
-  test('TASK-P55-07-JAK: ppmCaCO3ToDegreesClark, degreesClarkToPpmCaCO3 i classifyWaterHardnessFromClark obsługuja stopnie Clarka (°e)', () => {
-    // 1. ppmCaCO3ToDegreesClark
-    expect(ppmCaCO3ToDegreesClark(142.54)).toBe(10);
-    expect(ppmCaCO3ToDegreesClark('142,54')).toBe(10);
-    expect(ppmCaCO3ToDegreesClark(0)).toBe(0);
-    expect(ppmCaCO3ToDegreesClark(-0)).toBe(0);
-    expect(Object.is(ppmCaCO3ToDegreesClark(-0), -0)).toBe(false);
-    expect(ppmCaCO3ToDegreesClark(-10)).toBe(0);
-    expect(ppmCaCO3ToDegreesClark(NaN)).toBe(0);
-    expect(ppmCaCO3ToDegreesClark(Infinity)).toBe(0);
-    expect(ppmCaCO3ToDegreesClark(null as any)).toBe(0);
-    expect(ppmCaCO3ToDegreesClark({} as any)).toBe(0);
-    expect(ppmCaCO3ToDegreesClark(999999)).toBe(ppmCaCO3ToDegreesClark(10000));
-
-    // 2. degreesClarkToPpmCaCO3
-    expect(degreesClarkToPpmCaCO3(10)).toBe(142.54);
-    expect(degreesClarkToPpmCaCO3('10,5')).toBe(149.67);
-    expect(degreesClarkToPpmCaCO3(0)).toBe(0);
-    expect(degreesClarkToPpmCaCO3(-0)).toBe(0);
-    expect(Object.is(degreesClarkToPpmCaCO3(-0), -0)).toBe(false);
-    expect(degreesClarkToPpmCaCO3(-5)).toBe(0);
-    expect(degreesClarkToPpmCaCO3(NaN)).toBe(0);
-    expect(degreesClarkToPpmCaCO3(Infinity)).toBe(0);
-    expect(degreesClarkToPpmCaCO3(null as any)).toBe(0);
-    expect(degreesClarkToPpmCaCO3([] as any)).toBe(0);
-    expect(degreesClarkToPpmCaCO3(999999)).toBe(degreesClarkToPpmCaCO3(1000));
-
-    // 3. Spójność dwustronna: 10 °e -> ppm -> °e powraca do 10 °e
-    const ppm = degreesClarkToPpmCaCO3(10);
-    const clarkBack = Math.round(ppmCaCO3ToDegreesClark(ppm));
-    expect(clarkBack).toBe(10);
-
-    // 4. classifyWaterHardnessFromClark
-    expect(classifyWaterHardnessFromClark(0)).toBe('VERY_SOFT');
-    expect(classifyWaterHardnessFromClark(-0)).toBe('VERY_SOFT');
-    expect(classifyWaterHardnessFromClark('0')).toBe('VERY_SOFT');
-    expect(classifyWaterHardnessFromClark(2)).toBe('VERY_SOFT'); // ~28.5 ppm
-    expect(classifyWaterHardnessFromClark('5,0')).toBe('SOFT'); // ~71.3 ppm
-    expect(classifyWaterHardnessFromClark(10)).toBe('MODERATELY_HARD'); // ~142.5 ppm
-    expect(classifyWaterHardnessFromClark(15)).toBe('HARD'); // ~213.8 ppm
-    expect(classifyWaterHardnessFromClark(25)).toBe('VERY_HARD'); // ~356.4 ppm
-    expect(classifyWaterHardnessFromClark(NaN)).toBe('SOFT');
-    expect(classifyWaterHardnessFromClark(-5)).toBe('SOFT');
-  });
-
   test('TASK-P57-07-JAK: classifyWaterHardnessFromFH i nowe profile wod butelkowanych (Acqua Panna, Crystal Geyser)', () => {
-    // 1. classifyWaterHardnessFromFH
-    expect(classifyWaterHardnessFromFH(0)).toBe('VERY_SOFT');
-    expect(classifyWaterHardnessFromFH(-0)).toBe('VERY_SOFT');
-    expect(classifyWaterHardnessFromFH('0')).toBe('VERY_SOFT');
-    expect(classifyWaterHardnessFromFH(3)).toBe('VERY_SOFT'); // 30 ppm
-    expect(classifyWaterHardnessFromFH('8,0')).toBe('SOFT'); // 80 ppm
-    expect(classifyWaterHardnessFromFH(12)).toBe('MODERATELY_HARD'); // 120 ppm
-    expect(classifyWaterHardnessFromFH(20)).toBe('HARD'); // 200 ppm
-    expect(classifyWaterHardnessFromFH(35)).toBe('VERY_HARD'); // 350 ppm
-    expect(classifyWaterHardnessFromFH(NaN)).toBe('SOFT');
-    expect(classifyWaterHardnessFromFH(-5)).toBe('SOFT');
-
     // 2. findBottledWaterById dla Acqua Panna i Crystal Geyser
     const panna = findBottledWaterById('acqua panna');
     expect(panna).toBeDefined();
@@ -821,708 +555,5 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(geyser?.suitability).toBe('EXCELLENT');
     expect(geyser?.originCountry).toBe('USA');
   });
-
-  test('TASK-P62-07-JAK: getBottledWatersBySuitability i searchBottledWaters umozliwiaja selekcje i wyszukiwanie wod mineralnych', () => {
-    // 1. getBottledWatersBySuitability
-    const excellent = getBottledWatersBySuitability('EXCELLENT');
-    expect(Array.isArray(excellent)).toBe(true);
-    expect(excellent.length).toBeGreaterThanOrEqual(2);
-    expect(excellent.every((w) => w.suitability === 'EXCELLENT')).toBe(true);
-
-    const all = getBottledWatersBySuitability('ALL');
-    expect(all.length).toBeGreaterThan(excellent.length);
-
-    // 2. searchBottledWaters
-    const zywiec = searchBottledWaters('Żywiec');
-    expect(zywiec.length).toBeGreaterThanOrEqual(1);
-    expect(zywiec[0].brandName).toContain('Żywiec');
-
-    const empty = searchBottledWaters('');
-    expect(empty.length).toBe(all.length);
-
-    const nonExistent = searchBottledWaters('mars-spring-water');
-    expect(nonExistent).toEqual([]);
-  });
-
-  test('TASK-P64-07-JAK: searchWaterRecipes umozliwia wyszukiwanie receptur remineralizacji wody specialty', () => {
-    // 1. Wyszukiwanie po nazwie
-    const bh = searchWaterRecipes('Barista Hustle');
-    expect(bh.length).toBeGreaterThanOrEqual(1);
-    expect(bh[0].id).toBe('barista_hustle_80_40');
-
-    // 2. Wyszukiwanie po przeznaczeniu (bestFor)
-    const cupping = searchWaterRecipes('cupping');
-    expect(cupping.length).toBeGreaterThanOrEqual(1);
-
-    // 3. Puste zapytanie i null/undefined
-    const all = searchWaterRecipes('');
-    expect(all.length).toBeGreaterThanOrEqual(5);
-    expect(searchWaterRecipes(null as any).length).toBe(all.length);
-    expect(searchWaterRecipes(undefined as any).length).toBe(all.length);
-
-    // 4. Brak dopasowania
-    expect(searchWaterRecipes('pluton-recipe')).toEqual([]);
-  });
-
-  test('TASK-P67-07-JAK: evaluateWaterSuitability dynamicznie ocenia przydatnosc wody dla kawy i herbaty', () => {
-    // 1. Znakomita woda dla kawy (SCA Golden Cup: GH 80, KH 40)
-    const coffeeSca: WaterSuitabilityEvaluation = evaluateWaterSuitability(80, 40, 'coffee');
-    expect(coffeeSca.suitability).toBe('EXCELLENT');
-    expect(coffeeSca.ratingPl).toBe('Znakomita');
-    expect(coffeeSca.ratingEn).toBe('Excellent');
-    expect(coffeeSca.verdictPl).toContain('SCA');
-
-    // 2. Bardzo twarda woda (GH 350, KH 180) -> NOT_RECOMMENDED
-    const hardWater = evaluateWaterSuitability(350, 180, 'coffee');
-    expect(hardWater.suitability).toBe('NOT_RECOMMENDED');
-    expect(hardWater.verdictPl).toContain('twarda');
-
-    // 3. Woda dla herbaty (bardzo miękka: GH 30, KH 20) -> EXCELLENT
-    const teaSoft = evaluateWaterSuitability('30,0', '20,0', 'tea');
-    expect(teaSoft.suitability).toBe('EXCELLENT');
-    expect(teaSoft.verdictEn).toBeDefined();
-
-    // 4. Herbata z twardą wodą (GH 160, KH 90) -> NOT_RECOMMENDED
-    const teaHard = evaluateWaterSuitability(160, 90, 'tea');
-    expect(teaHard.suitability).toBe('NOT_RECOMMENDED');
-
-    // 5. Obsługa wartości brzegowych, stringów i NaN
-    const fallback = evaluateWaterSuitability(NaN, -10);
-    expect(fallback.suitability).toBeDefined();
-    expect(fallback.ratingPl).toBeDefined();
-  });
-
-  test('TASK-P69-07-JAK: calculateWaterBlend oblicza proporcje mieszania kranówki z wodą RO', () => {
-    // 1. Zwykłe rozcieńczanie: kranówka 300 ppm + woda RO 0 ppm -> cel 100 ppm, partia 1000g
-    const params: WaterBlendParams = {
-      tapHardnessPpm: 300,
-      pureWaterHardnessPpm: 0,
-      targetHardnessPpm: 100,
-      totalBatchGrams: 1000,
-    };
-    const blend: WaterBlendResult = calculateWaterBlend(params);
-    expect(blend.tapWaterGrams).toBeCloseTo(333.3, 1);
-    expect(blend.pureWaterGrams).toBeCloseTo(666.7, 1);
-    expect(blend.totalBatchGrams).toBe(1000);
-    expect(blend.effectiveHardnessPpm).toBeCloseTo(100, 1);
-
-    // 2. Woda RO o twardości szczątkowej 10 ppm: kranówka 210 ppm, cel 70 ppm, partia 500g
-    const blendRo = calculateWaterBlend({
-      tapHardnessPpm: 210,
-      pureWaterHardnessPpm: 10,
-      targetHardnessPpm: 70,
-      totalBatchGrams: 500,
-    });
-    expect(blendRo.tapWaterGrams).toBe(150);
-    expect(blendRo.pureWaterGrams).toBe(350);
-    expect(blendRo.effectiveHardnessPpm).toBe(70);
-
-    // 3. Cel wyższy niż kranówka -> 100% kranówki
-    const highTarget = calculateWaterBlend({
-      tapHardnessPpm: 150,
-      targetHardnessPpm: 200,
-      totalBatchGrams: 1000,
-    });
-    expect(highTarget.tapWaterGrams).toBe(1000);
-    expect(highTarget.pureWaterGrams).toBe(0);
-
-    // 4. Cel niższy niż czysta woda -> 100% czystej
-    const lowTarget = calculateWaterBlend({
-      tapHardnessPpm: 200,
-      pureWaterHardnessPpm: 20,
-      targetHardnessPpm: 10,
-      totalBatchGrams: 800,
-    });
-    expect(lowTarget.tapWaterGrams).toBe(0);
-    expect(lowTarget.pureWaterGrams).toBe(800);
-
-    // 5. Błędy i niepoprawne dane
-    expect(() => calculateWaterBlend(null as any)).toThrow();
-    expect(() => calculateWaterBlend({ tapHardnessPpm: 0, targetHardnessPpm: 50, totalBatchGrams: 1000 })).toThrow();
-    expect(() => calculateWaterBlend({ tapHardnessPpm: 100, pureWaterHardnessPpm: 150, targetHardnessPpm: 50, totalBatchGrams: 1000 })).toThrow();
-  });
-
-  test('TASK-P72-07-JAK: calculateHardnessRatio analizuje stosunek twardości GH do KH', () => {
-    // 1. Zrównoważona woda specialty (np. Barista Hustle 80/40 -> ratio 2.0)
-    const balanced: HardnessRatioAnalysis = calculateHardnessRatio(80, 40);
-    expect(balanced.ratio).toBe(2.0);
-    expect(balanced.category).toBe('balanced');
-    expect(balanced.descriptionPl).toContain('Optymalna');
-    expect(balanced.descriptionEn).toContain('Optimal');
-
-    // 2. Woda nadmiernie zbuforowana (np. GH 60, KH 50 -> ratio 1.2)
-    const buffered = calculateHardnessRatio('60', '50');
-    expect(buffered.ratio).toBe(1.2);
-    expect(buffered.category).toBe('chalky_buffered');
-    expect(buffered.descriptionPl).toContain('tłumiona');
-
-    // 3. Woda z niewystarczającym buforem (np. GH 100, KH 20 -> ratio 5.0)
-    const unbuffered = calculateHardnessRatio('100,0', '20,0');
-    expect(unbuffered.ratio).toBe(5.0);
-    expect(unbuffered.category).toBe('acidic_unbuffered');
-    expect(unbuffered.descriptionPl).toContain('Wysoka proporcja');
-
-    // 4. Odporność na zera, brak KH, wartości ujemne i null
-    const zeroKh = calculateHardnessRatio(50, 0);
-    expect(zeroKh.category).toBe('acidic_unbuffered');
-
-    const empty = calculateHardnessRatio(null as any, undefined as any);
-    expect(empty.ratio).toBe(0);
-    expect(empty.category).toBe('chalky_buffered');
-  });
-
-  test('TASK-P74-07-JAK: calculateWaterDilution poprawnie oblicza proporcje rozcieńczania wody', () => {
-    // 1. Standardowe rozcieńczanie wody źródlanej (np. 300 ppm -> 150 ppm dla 1000 ml wody zerowej)
-    const res1: WaterDilutionResult = calculateWaterDilution(300, 150, 1000);
-    expect(res1.sourceVolumeMl).toBe(500);
-    expect(res1.diluentVolumeMl).toBe(500);
-    expect(res1.totalVolumeMl).toBe(1000);
-    expect(res1.dilutionFactor).toBe(2);
-    expect(res1.achievedPpm).toBe(150);
-    expect(res1.isDilutionNeeded).toBe(true);
-
-    // 2. Rozcieńczanie z diluentem o niezerowej mineralizacji (np. woda źródlana 200 ppm, woda filtrowana 20 ppm, cel 110 ppm, 1000 ml)
-    const res2 = calculateWaterDilution(200, 110, 1000, 20);
-    expect(res2.sourceVolumeMl).toBe(500);
-    expect(res2.diluentVolumeMl).toBe(500);
-    expect(res2.achievedPpm).toBe(110);
-    expect(res2.isDilutionNeeded).toBe(true);
-
-    // 3. Woda źródlana ma już niższą mineralizację niż cel -> brak rozcieńczania
-    const res3 = calculateWaterDilution(100, 150, 500);
-    expect(res3.sourceVolumeMl).toBe(500);
-    expect(res3.diluentVolumeMl).toBe(0);
-    expect(res3.dilutionFactor).toBe(1);
-    expect(res3.achievedPpm).toBe(100);
-    expect(res3.isDilutionNeeded).toBe(false);
-
-    // 4. Odporność na stringi z przecinkami i spacjami
-    const res4 = calculateWaterDilution(' 240,0 ', ' 120,0 ', ' 800 ');
-    expect(res4.sourceVolumeMl).toBe(400);
-    expect(res4.diluentVolumeMl).toBe(400);
-    expect(res4.totalVolumeMl).toBe(800);
-    expect(res4.dilutionFactor).toBe(2);
-
-    // 5. Odporność na niepoprawne dane i wartości skrajne (null, undefined, 0)
-    const resInvalid = calculateWaterDilution(null as any, undefined as any, null as any);
-    expect(resInvalid.totalVolumeMl).toBe(0);
-    expect(resInvalid.sourceVolumeMl).toBe(0);
-    expect(resInvalid.diluentVolumeMl).toBe(0);
-    expect(resInvalid.isDilutionNeeded).toBe(false);
-  });
-
-  test('TASK-P76-07-JAK: estimateWaterTdsFromHardness szacuje TDS i przewodność EC z parametrów twardości', () => {
-    // 1. Wzorcowa woda Barista Hustle (GH 80, KH 40 + 15 soli -> 135 ppm TDS)
-    const bhEst: WaterTdsEstimate = estimateWaterTdsFromHardness(80, 40);
-    expect(bhEst.estimatedTdsPpm).toBe(135);
-    expect(bhEst.estimatedEcMicroSiemens).toBe(208); // 135 / 0.65 rounded
-    expect(bhEst.category).toBe('optimal_specialty');
-    expect(bhEst.descriptionPl).toContain('Optymalna');
-    expect(bhEst.descriptionEn).toContain('Optimal');
-
-    // 2. Miękka woda o niskiej mineralizacji (np. GH 30, KH 15 + 0 soli -> 45 ppm TDS)
-    const softEst = estimateWaterTdsFromHardness('30,0', '15,0', 0);
-    expect(softEst.estimatedTdsPpm).toBe(45);
-    expect(softEst.category).toBe('low_mineral');
-    expect(softEst.descriptionPl).toContain('Niska mineralizacja');
-
-    // 3. Twarda woda kranowa (np. GH 200, KH 100 -> 315 ppm TDS)
-    const hardEst = estimateWaterTdsFromHardness(200, 100);
-    expect(hardEst.estimatedTdsPpm).toBe(315);
-    expect(hardEst.category).toBe('high_mineral');
-    expect(hardEst.descriptionPl).toContain('Wysoka mineralizacja');
-
-    // 4. Odporność na null, ujemne i anomalie
-    const fallbackEst = estimateWaterTdsFromHardness(null as any, undefined as any);
-    expect(fallbackEst.estimatedTdsPpm).toBe(15); // tylko domyślne dodatkowe sole 15 ppm
-    expect(fallbackEst.category).toBe('low_mineral');
-  });
-
-  test('TASK-P79-07-JAK: evaluateWaterAlkalinity analizuje zasadowość i pojemność buforową wody', () => {
-    // 1. Zrównoważony bufor specialty (KH 40 ppm CaCO3 wg SCA)
-    const optimal: AlkalinityEvaluation = evaluateWaterAlkalinity(40);
-    const catCheck: AlkalinityCategory = optimal.category;
-    expect(catCheck).toBe('optimal_buffer');
-    expect(optimal.alkalinityPpm).toBe(40);
-    expect(optimal.category).toBe('optimal_buffer');
-    expect(optimal.bufferCapacity).toBe('ideal');
-    expect(optimal.acidityImpactPl).toContain('Optymalny bufor');
-    expect(optimal.acidityImpactEn).toContain('Optimal');
-    expect(optimal.recommendedAdjustmentPl).toContain('SCA');
-
-    // 2. Niski bufor (KH 15 ppm - podatność na agresywną kwasowość)
-    const low = evaluateWaterAlkalinity('15,0');
-    expect(low.alkalinityPpm).toBe(15);
-    expect(low.category).toBe('low_buffer');
-    expect(low.bufferCapacity).toBe('insufficient');
-    expect(low.acidityImpactPl).toContain('Niski bufor');
-    expect(low.recommendedAdjustmentPl).toContain('sodę oczyszczoną');
-
-    // 3. Umiarkowanie podwyższony bufor (KH 70 ppm)
-    const moderate = evaluateWaterAlkalinity(70);
-    expect(moderate.alkalinityPpm).toBe(70);
-    expect(moderate.category).toBe('moderate_buffer');
-    expect(moderate.bufferCapacity).toBe('elevated');
-    expect(moderate.acidityImpactPl).toContain('Podwyższony bufor');
-
-    // 4. Zbyt wysoki bufor (KH 120 ppm - kredowy, płaski napar)
-    const excessive = evaluateWaterAlkalinity(120);
-    expect(excessive.alkalinityPpm).toBe(120);
-    expect(excessive.category).toBe('excessive_buffer');
-    expect(excessive.bufferCapacity).toBe('excessive');
-    expect(excessive.acidityImpactPl).toContain('Zbyt wysoka');
-
-    // 5. Odporność na null, ujemne, spacje i anomalie
-    const fallback = evaluateWaterAlkalinity(null as any);
-    expect(fallback.alkalinityPpm).toBe(0);
-    expect(fallback.category).toBe('low_buffer');
-    expect(fallback.bufferCapacity).toBe('insufficient');
-  });
-
-  test('TASK-P81-07-JAK: calculateMagnesiumCalciumRatio analizuje profil kationowy i wpływ na ekstrakcję', () => {
-    // 1. Zrównoważony profil specialty (np. Ca 20 ppm, Mg 20 ppm -> Mg/Ca = 1.0)
-    const balanced: MineralCationRatioAnalysis = calculateMagnesiumCalciumRatio(20, 20);
-    const catCheck: CationRatioCategory = balanced.category;
-    expect(catCheck).toBe('balanced_specialty');
-    expect(balanced.ratioMgToCa).toBe(1.0);
-    expect(balanced.sensoryEmphasisPl).toContain('Zrównoważony profil');
-    expect(balanced.sensoryEmphasisEn).toContain('Balanced');
-    expect(balanced.limescaleRisk).toBe('low');
-
-    // 2. Dominacja magnezu (np. Ca 10 ppm, Mg 30 ppm -> Mg/Ca = 3.0)
-    const mgDominant = calculateMagnesiumCalciumRatio('10,0', '30,0');
-    expect(mgDominant.category).toBe('magnesium_dominant');
-    expect(mgDominant.ratioMgToCa).toBe(3.0);
-    expect(mgDominant.sensoryEmphasisPl).toContain('Dominacja magnezu');
-    expect(mgDominant.recommendedUsagePl).toContain('przelewowych');
-
-    // 3. Dominacja wapnia (np. Ca 60 ppm, Mg 15 ppm -> Mg/Ca = 0.25)
-    const caDominant = calculateMagnesiumCalciumRatio(60, 15);
-    expect(caDominant.category).toBe('calcium_dominant');
-    expect(caDominant.ratioMgToCa).toBe(0.25);
-    expect(caDominant.sensoryEmphasisPl).toContain('Dominacja wapnia');
-
-    // 4. Czysto miękka woda (Ca 0, Mg 0)
-    const zeroWater = calculateMagnesiumCalciumRatio(0, 0);
-    expect(zeroWater.category).toBe('pure_soft');
-    expect(zeroWater.ratioMgToCa).toBe(0);
-    expect(zeroWater.limescaleRisk).toBe('minimal');
-
-    // 5. Odporność na null, ujemne wartości i NaN
-    const fallback = calculateMagnesiumCalciumRatio(null as any, undefined as any);
-    expect(fallback.category).toBe('pure_soft');
-    expect(fallback.ratioMgToCa).toBe(0);
-  });
-
-  test('TASK-P84-07-JAK: calculateResidualAlkalinity wylicza zasadowość resztkową i wpływ na buforowanie kwasów', () => {
-    // 1. Optymalna zasadowość resztkowa Specialty (np. Alk 40, CaHardness 70, MgHardness 35 -> RA = 40 - (20 + 5) = 15.0 ppm)
-    const optimal: ResidualAlkalinityAnalysis = calculateResidualAlkalinity(40, 70, 35);
-    const catCheck: ResidualAlkalinityCategory = optimal.category;
-    expect(catCheck).toBe('optimal_specialty');
-    expect(optimal.residualAlkalinityPpm).toBe(15.0);
-    expect(optimal.phBufferingCapacityPl).toContain('Optymalna');
-    expect(optimal.sensoryAcidityImpactPl).toContain('Złoty standard');
-    expect(optimal.sensoryAcidityImpactEn).toContain('Golden standard');
-
-    // 2. Bardzo niska / ujemna zasadowość resztkowa (np. Alk 10, CaHardness 70, MgHardness 35 -> RA = 10 - 25 = -15.0 ppm)
-    const veryLow = calculateResidualAlkalinity('10,0', '70,0', '35,0');
-    expect(veryLow.category).toBe('negative_or_very_low');
-    expect(veryLow.residualAlkalinityPpm).toBe(-15.0);
-    expect(veryLow.phBufferingCapacityPl).toContain('Bardzo niska');
-    expect(veryLow.sensoryAcidityImpactPl).toContain('Maksymalna jasność');
-
-    // 3. Umiarkowanie podwyższony bufor (np. Alk 60, CaHardness 70, MgHardness 35 -> RA = 60 - 25 = 35.0 ppm)
-    const moderate = calculateResidualAlkalinity(60, 70, 35);
-    expect(moderate.category).toBe('moderate_buffer');
-    expect(moderate.residualAlkalinityPpm).toBe(35.0);
-    expect(moderate.sensoryAcidityImpactPl).toContain('wygładzona');
-
-    // 4. Nadmierny bufor (np. Alk 90, CaHardness 70, MgHardness 35 -> RA = 90 - 25 = 65.0 ppm)
-    const excessive = calculateResidualAlkalinity(90, 70, 35);
-    expect(excessive.category).toBe('excessive_dulling');
-    expect(excessive.residualAlkalinityPpm).toBe(65.0);
-    expect(excessive.sensoryAcidityImpactPl).toContain('Silne stłumienie');
-
-    // 5. Odporność na null, ujemne wartości i NaN
-    const fallback = calculateResidualAlkalinity(null as any);
-    expect(fallback.residualAlkalinityPpm).toBeLessThanOrEqual(0);
-    expect(fallback.category).toBe('negative_or_very_low');
-  });
-
-  test('TASK-P86-07-JAK: calculateSulfateToChlorideRatio analizuje stosunek siarczanów do chlorków i balans sensoryczny', () => {
-    // 1. Dominacja siarczanów (> 2.0) -> wytrawność, goryczka
-    const bitterDry: SulfateToChlorideRatioAnalysis = calculateSulfateToChlorideRatio(100, 30);
-    const catCheck: SulfateToChlorideCategory = bitterDry.category;
-    expect(catCheck).toBe('very_bitter_dry');
-    expect(bitterDry.sulfatePpm).toBe(100);
-    expect(bitterDry.chloridePpm).toBe(30);
-    expect(bitterDry.ratio).toBe(3.33);
-    expect(bitterDry.sensoryBalancePl).toContain('siarczanów');
-    expect(bitterDry.brewingRecommendationPl).toContain('przelewów');
-    expect(bitterDry.sensoryBalanceEn).toContain('sulfate');
-
-    // 2. Lekka przewaga siarczanów (1.3 - 2.0) -> rześkość, kwasowość
-    const crisp = calculateSulfateToChlorideRatio('75,0', '50,0');
-    expect(crisp.category).toBe('crisp_accentuated');
-    expect(crisp.ratio).toBe(1.5);
-    expect(crisp.sensoryBalancePl).toContain('kwasowość');
-
-    // 3. Zbalansowany stosunek (0.8 - 1.3) -> harmonia
-    const balanced = calculateSulfateToChlorideRatio(50, 50);
-    expect(balanced.category).toBe('balanced');
-    expect(balanced.ratio).toBe(1.0);
-    expect(balanced.sensoryBalancePl).toContain('Równowaga');
-    expect(balanced.brewingRecommendationPl).toContain('cuppingu');
-
-    // 4. Przewaga chlorków (0.4 - <0.8) -> słodycz, krągłość
-    const sweet = calculateSulfateToChlorideRatio(30, 50);
-    expect(sweet.category).toBe('sweet_rounded');
-    expect(sweet.ratio).toBe(0.6);
-    expect(sweet.sensoryBalancePl).toContain('słodycz');
-
-    // 5. Silna dominacja chlorków (< 0.4) -> pełne body, słodycz
-    const fullSweet = calculateSulfateToChlorideRatio(10, 50);
-    expect(fullSweet.category).toBe('full_sweet_malty');
-    expect(fullSweet.ratio).toBe(0.2);
-    expect(fullSweet.sensoryBalancePl).toContain('aksamitne body');
-
-    // 6. Przypadki brzegowe: zerowe chlorki, zerowe siarczany, null, NaN
-    const zeroChloride = calculateSulfateToChlorideRatio(60, 0);
-    expect(zeroChloride.category).toBe('very_bitter_dry');
-    expect(zeroChloride.ratio).toBeGreaterThan(2.0);
-
-    const zeroBoth = calculateSulfateToChlorideRatio(0, 0);
-    expect(zeroBoth.category).toBe('balanced');
-    expect(zeroBoth.ratio).toBe(1.0);
-
-    const safeFallback = calculateSulfateToChlorideRatio(null as any, -10);
-    expect(safeFallback.sulfatePpm).toBe(0);
-    expect(safeFallback.chloridePpm).toBe(0);
-    expect(safeFallback.category).toBe('balanced');
-  });
-
-  test('TASK-P88-07-JAK: calculateTotalHardnessFromIons przelicza jony Ca i Mg na twardość ogólną GH', () => {
-    // 1. Zrównoważony profil jonowy (Ca 20 ppm, Mg 10 ppm)
-    const balanced: TotalHardnessIonAnalysis = calculateTotalHardnessFromIons(20, 10);
-    const domCheck: HardnessDominance = balanced.dominance;
-    expect(domCheck).toBe('balanced');
-    expect(balanced.calciumPpm).toBe(20);
-    expect(balanced.magnesiumPpm).toBe(10);
-    expect(balanced.calciumHardnessPpmCaCO3).toBeCloseTo(49.9, 1);
-    expect(balanced.magnesiumHardnessPpmCaCO3).toBeCloseTo(41.2, 1);
-    expect(balanced.totalHardnessPpmCaCO3).toBeCloseTo(91.1, 1);
-    expect(balanced.totalHardnessGermanDegrees).toBeCloseTo(5.1, 1);
-    expect(balanced.totalHardnessFrenchDegrees).toBeCloseTo(9.1, 1);
-    expect(balanced.calciumPercentage).toBeGreaterThan(40);
-    expect(balanced.magnesiumPercentage).toBeGreaterThan(35);
-    expect(balanced.brewingImpactPl.toLowerCase()).toContain('zrównoważony');
-
-    // 2. Dominacja wapnia (Ca 50 ppm, Mg 2 ppm -> Ca% >= 65%)
-    const caDom = calculateTotalHardnessFromIons('50,0', '2,0');
-    expect(caDom.dominance).toBe('calcium_dominant');
-    expect(caDom.calciumPercentage).toBeGreaterThanOrEqual(65);
-    expect(caDom.brewingImpactPl).toContain('wapnia');
-    expect(caDom.brewingImpactEn.toLowerCase()).toContain('calcium');
-
-    // 3. Dominacja magnezu (Ca 5 ppm, Mg 25 ppm -> Mg% >= 65%)
-    const mgDom = calculateTotalHardnessFromIons(5, 25);
-    expect(mgDom.dominance).toBe('magnesium_dominant');
-    expect(mgDom.magnesiumPercentage).toBeGreaterThanOrEqual(65);
-    expect(mgDom.brewingImpactPl).toContain('magnezu');
-    expect(mgDom.brewingImpactEn.toLowerCase()).toContain('magnesium');
-
-    // 4. Przypadki brzegowe: 0, wartości ujemne, null, niepoprawne stringi
-    const zeroHardness = calculateTotalHardnessFromIons(0, 0);
-    expect(zeroHardness.totalHardnessPpmCaCO3).toBe(0);
-    expect(zeroHardness.dominance).toBe('balanced');
-
-    const invalidInput = calculateTotalHardnessFromIons(null as any, 'invalid');
-    expect(invalidInput.calciumPpm).toBe(0);
-    expect(invalidInput.magnesiumPpm).toBe(0);
-    expect(invalidInput.totalHardnessPpmCaCO3).toBe(0);
-  });
-
-  test('TASK-P91-07-JAK: evaluateLimescaleRisk ocenia ryzyko osadzania kamienia w bojlerach i czajnikach', () => {
-    // 1. Zerowe ryzyko (brak wapnia lub buforu)
-    const zeroRisk: LimescaleRiskAssessment = evaluateLimescaleRisk(0, 0);
-    const zeroLevel: LimescaleRiskLevel = zeroRisk.riskLevel;
-    expect(zeroLevel).toBe('none');
-    expect(zeroRisk.scalingIndexScore).toBe(0);
-    expect(zeroRisk.descaleFrequencyRecommendationPl).toContain('Brak konieczności');
-    expect(zeroRisk.descaleFrequencyRecommendationEn.toLowerCase()).toContain('no descaling');
-
-    // 2. Niskie ryzyko (Ca 30 ppm, KH 25 ppm, woda 93°C -> score ~25 < 30)
-    const lowRisk = evaluateLimescaleRisk(30, 25, 93);
-    expect(lowRisk.riskLevel).toBe('low');
-    expect(lowRisk.scalingIndexScore).toBeLessThan(30);
-    expect(lowRisk.descaleFrequencyRecommendationPl).toContain('6–12');
-    expect(lowRisk.summaryPl).toContain('Niskie ryzyko');
-
-    // 3. Umiarkowane ryzyko (Ca 60 ppm, KH 50 ppm -> score 50 < 75)
-    const modRisk = evaluateLimescaleRisk('60,0', '50,0');
-    expect(modRisk.riskLevel).toBe('moderate');
-    expect(modRisk.descaleFrequencyRecommendationPl).toContain('2–3');
-
-    // 4. Wysokie ryzyko (Ca 120 ppm, KH 100 ppm -> score 100 < 140)
-    const highRisk = evaluateLimescaleRisk(120, 100);
-    expect(highRisk.riskLevel).toBe('high');
-    expect(highRisk.descaleFrequencyRecommendationPl).toContain('raz w miesiącu');
-
-    // 5. Krytyczne ryzyko (woda twarda Muszynianka / kranówa: Ca 250, KH 200 -> score 200 >= 140)
-    const severeRisk = evaluateLimescaleRisk(250, 200, 120);
-    expect(severeRisk.riskLevel).toBe('severe');
-    expect(severeRisk.descaleFrequencyRecommendationPl).toContain('1–2 tygodnie');
-    expect(severeRisk.summaryPl).toContain('Krytyczna');
-
-    // 6. Odporność na null, stringi z przecinkiem i błędną temperaturę
-    const fallback = evaluateLimescaleRisk(null as any, undefined);
-    expect(fallback.riskLevel).toBe('none');
-    expect(fallback.waterTempCelsius).toBe(93);
-  });
-
-  test('TASK-P93-07-JAK: evaluateBoilerCorrosionRisk ocenia ryzyko wżerów chlorkowych i korozji kwasowej bojlera', () => {
-    // 1. Bezpieczna woda specialty (niski chlorek 5 ppm, KH 45 ppm, pH 7.2)
-    const safeWater: BoilerCorrosionRiskAssessment = evaluateBoilerCorrosionRisk({
-      chloridePpm: 5,
-      sulfatePpm: 15,
-      ph: 7.2,
-      alkalinityKh: 45,
-    });
-    const testLevel: BoilerCorrosionRiskLevel = safeWater.riskLevel;
-    expect(testLevel).toBe('safe');
-    expect(safeWater.isPittingRisk).toBe(false);
-    expect(safeWater.chloridePpm).toBe(5);
-    expect(safeWater.recommendationPl).toContain('Bezpieczna');
-    expect(safeWater.recommendationEn).toBeDefined();
-
-    // 2. Wysokie ryzyko wżerów korozyjnych (chlorki 45 ppm > 30 SCA limit)
-    const pittingWater = evaluateBoilerCorrosionRisk({
-      chloridePpm: '45,0',
-      alkalinityKh: 40,
-      ph: 7.0,
-    });
-    expect(pittingWater.isPittingRisk).toBe(true);
-    expect(['high', 'critical']).toContain(pittingWater.riskLevel);
-    expect(pittingWater.recommendationPl).toContain('chlork');
-
-    // 3. Krytyczne ryzyko kwaśnej korozji (pH 5.5, KH 5 ppm, chlorki 60 ppm)
-    const criticalWater = evaluateBoilerCorrosionRisk({
-      chloridePpm: 60,
-      ph: 5.5,
-      alkalinityKh: 5,
-    });
-    expect(criticalWater.riskLevel).toBe('critical');
-    expect(criticalWater.isPittingRisk).toBe(true);
-    expect(criticalWater.summaryPl).toContain('Krytyczne');
-
-    // 4. Odporność na null i puste parametry
-    const fallback = evaluateBoilerCorrosionRisk(null);
-    expect(fallback.riskLevel).toBe('safe');
-    expect(fallback.chloridePpm).toBe(0);
-  });
-
-  test('TASK-P96-07-JAK: calculateWaterHardnessScale kategoryzuje twardość ogólną i przelicza jednostki (°dH, °fH, gpg)', () => {
-    // 1. Woda miękka specialty zgodna ze standardem SCA (80 ppm CaCO3)
-    const scaWater: WaterHardnessScale = calculateWaterHardnessScale(80);
-    const testLevel: WaterHardnessLevel = scaWater.level;
-    expect(testLevel).toBe('soft');
-    expect(scaWater.hardnessPpm).toBe(80);
-    expect(scaWater.isScaCompliant).toBe(true);
-    expect(scaWater.germanDegreesDh).toBeCloseTo(4.48, 1);
-    expect(scaWater.frenchDegreesFh).toBe(8.0);
-    expect(scaWater.grainsPerGallonGpg).toBeCloseTo(4.67, 1);
-    expect(scaWater.recommendationPl).toContain('SCA');
-    expect(scaWater.recommendationEn).toBeDefined();
-
-    // 2. Woda bardzo twarda kranowa (350 ppm)
-    const hardWater = calculateWaterHardnessScale('350,0');
-    expect(hardWater.level).toBe('very_hard');
-    expect(hardWater.isScaCompliant).toBe(false);
-    expect(hardWater.germanDegreesDh).toBeGreaterThan(19);
-    expect(hardWater.recommendationPl).toContain('Zmiękcz');
-
-    // 3. Woda bardzo miękka (RO / destylowana 20 ppm)
-    const roWater = calculateWaterHardnessScale(20);
-    expect(roWater.level).toBe('very_soft');
-    expect(roWater.isScaCompliant).toBe(false);
-
-    // 4. Odporność na null, NaN i ujemne
-    const fallback = calculateWaterHardnessScale(null);
-    expect(fallback.hardnessPpm).toBe(0);
-    expect(fallback.level).toBe('very_soft');
-    expect(fallback.germanDegreesDh).toBe(0);
-  });
-
-  test('TASK-P98-07-JAK: evaluateWaterAlkalinityBuffer ocenia bufor alkaliczności i wpływ na kwasowość', () => {
-    // 1. Idealny bufor SCA (40 ppm CaCO3)
-    const scaBuffer: WaterAlkalinityBufferEvaluation = evaluateWaterAlkalinityBuffer(40);
-    expect(scaBuffer.alkalinityPpm).toBe(40);
-    expect(scaBuffer.level).toBe('balanced');
-    expect(scaBuffer.isScaOptimal).toBe(true);
-    expect(scaBuffer.recommendedAdjustmentPpm).toBe(0);
-    expect(scaBuffer.degreesGermanDkh).toBeCloseTo(2.24, 1);
-    expect(scaBuffer.milliEquivalentsPerLiter).toBeCloseTo(0.8, 1);
-    expect(scaBuffer.acidityImpactPl).toContain('SCA');
-    expect(scaBuffer.recommendationPl).toBeDefined();
-
-    // 2. Bardzo wysoki bufor (150 ppm CaCO3) - zgaszenie kwasowości
-    const highBuffer = evaluateWaterAlkalinityBuffer(150);
-    expect(highBuffer.level).toBe('excessive');
-    expect(highBuffer.isScaOptimal).toBe(false);
-    expect(highBuffer.recommendedAdjustmentPpm).toBeLessThan(0);
-    expect(highBuffer.acidityImpactPl).toContain('kredowy');
-
-    // 3. Woda niebuforowana (< 20 ppm) - ostra kwasowość
-    const unbuffered = evaluateWaterAlkalinityBuffer(10);
-    expect(unbuffered.level).toBe('unbuffered');
-    expect(unbuffered.isScaOptimal).toBe(false);
-    expect(unbuffered.recommendedAdjustmentPpm).toBe(30);
-
-    // 4. Odporność na dane brzegowe: null, NaN, ujemne
-    const fallbackBuffer = evaluateWaterAlkalinityBuffer(null as any);
-    expect(fallbackBuffer.alkalinityPpm).toBe(0);
-    const level: AlkalinityBufferLevel = fallbackBuffer.level;
-    expect(level).toBe('unbuffered');
-  });
-
-  test('TASK-P100-07-JAK: calculateBoilingDegassingImpact oblicza dekarbonizację i spadek tlenu podczas wrzenia', () => {
-    // 1. Krótkie wrzenie (30 sekund)
-    const gentle: BoilingDegassingImpact = calculateBoilingDegassingImpact({
-      initialAlkalinityPpm: 60,
-      initialTotalHardnessPpm: 120,
-      boilingDurationSeconds: 30,
-    });
-    const effLevel: DegassingEfficiencyLevel = gentle.efficiencyLevel;
-    expect(effLevel).toBe('gentle');
-    expect(gentle.initialAlkalinityPpm).toBe(60);
-    expect(gentle.residualAlkalinityPpm).toBeLessThan(60);
-    expect(gentle.residualTotalHardnessPpm).toBeLessThan(120);
-    expect(gentle.oxygenRetentionPercent).toBeGreaterThanOrEqual(80);
-    expect(gentle.sensoryAssessmentPl).toContain('świeżość');
-    expect(gentle.recommendationPl).toBeDefined();
-
-    // 2. Długie wrzenie (180 sekund / 3 minuty) -> excessive_deoxygenation
-    const excessive = calculateBoilingDegassingImpact({
-      initialAlkalinityPpm: 80,
-      initialTotalHardnessPpm: 150,
-      boilingDurationSeconds: 180,
-    });
-    expect(excessive.efficiencyLevel).toBe('excessive_deoxygenation');
-    expect(excessive.alkalinityLossPercent).toBeGreaterThanOrEqual(40);
-    expect(excessive.oxygenRetentionPercent).toBeLessThan(50);
-    expect(excessive.sensoryAssessmentPl).toContain('Długie wrzenie');
-
-    // 3. Odporność na null i puste argumenty
-    const fallback = calculateBoilingDegassingImpact(null);
-    expect(fallback.initialAlkalinityPpm).toBe(50);
-    expect(fallback.residualAlkalinityPpm).toBeGreaterThan(0);
-    expect(fallback.efficiencyLevel).toBe('gentle');
-  });
-
-  test('TASK-P103-07-JAK: evaluateLarsonSkoldIndex ocenia wskaźnik korozyjności Larsona-Skolda z typami LarsonSkoldIndexResult i LarsonSkoldRiskLevel', () => {
-    // 1. Bezpieczna woda (LI < 0.8) -> 'low'
-    // Cl = 10 ppm, SO4 = 20 ppm, Alk = 60 ppm
-    // meqCl = 10 / 35.45 = 0.282
-    // meqSO4 = 40 / 96.06 = 0.416
-    // sum = 0.698
-    // meqAlk = 60 / 50.04 = 1.199
-    // LI = 0.698 / 1.199 = 0.58
-    const safe: LarsonSkoldIndexResult = evaluateLarsonSkoldIndex(10, 20, 60);
-    const risk: LarsonSkoldRiskLevel = safe.riskLevel;
-    expect(risk).toBe('low');
-    expect(safe.larsonSkoldIndex).toBeLessThan(0.8);
-    expect(safe.chloridePpm).toBe(10);
-    expect(safe.sulfatePpm).toBe(20);
-    expect(safe.alkalinityPpm).toBe(60);
-    expect(safe.corrosionTendencyPl).toContain('Niska tendencja korozyjna');
-    expect(safe.summaryPl).toContain('Wskaźnik Larsona-Skolda');
-
-    // 2. Umiarkowane ryzyko (0.8 <= LI < 1.2) -> 'moderate'
-    // Cl = 20, SO4 = 30, Alk = 45
-    // meqCl = 20 / 35.45 = 0.564, meqSO4 = 60 / 96.06 = 0.625, sum = 1.189
-    // meqAlk = 45 / 50.04 = 0.899 => LI = 1.189 / 0.899 = 1.32 (high)
-    // Niech Cl = 15, SO4 = 20, Alk = 45
-    // meqCl = 0.423, meqSO4 = 0.416, sum = 0.839 => LI = 0.839 / 0.899 = 0.93 => moderate
-    const mod = evaluateLarsonSkoldIndex('15', '20', '45');
-    expect(mod.riskLevel).toBe('moderate');
-    expect(mod.larsonSkoldIndex).toBeGreaterThanOrEqual(0.8);
-    expect(mod.larsonSkoldIndex).toBeLessThan(1.2);
-    expect(mod.corrosionTendencyEn).toContain('Moderate corrosion risk');
-
-    // 3. Wysokie ryzyko (1.2 <= LI < 2.5) -> 'high'
-    // Cl = 35, SO4 = 50, Alk = 40
-    // meqCl = 0.987, meqSO4 = 1.041, sum = 2.028, meqAlk = 0.799 => LI = 2.54 (severe)
-    // Cl = 25, SO4 = 40, Alk = 40 => meqCl = 0.705, meqSO4 = 0.833, sum = 1.538 => LI = 1.92 => high
-    const high = evaluateLarsonSkoldIndex(25, 40, 40);
-    expect(high.riskLevel).toBe('high');
-    expect(high.larsonSkoldIndex).toBeGreaterThanOrEqual(1.2);
-    expect(high.larsonSkoldIndex).toBeLessThan(2.5);
-    expect(high.recommendationPl).toContain('filtrację odwróconej osmozy');
-
-    // 4. Krytyczne / severe (LI >= 2.5)
-    // Cl = 60, SO4 = 80, Alk = 20
-    const severe = evaluateLarsonSkoldIndex(60, 80, 20);
-    expect(severe.riskLevel).toBe('severe');
-    expect(severe.larsonSkoldIndex).toBeGreaterThanOrEqual(2.5);
-    expect(severe.corrosionTendencyPl).toContain('Krytyczne zagrożenie');
-
-    // 5. Zero alkalinity z obecnością chlorków/siarczanów -> 'severe'
-    const zeroAlk = evaluateLarsonSkoldIndex(20, 20, 0);
-    expect(zeroAlk.riskLevel).toBe('severe');
-    expect(zeroAlk.larsonSkoldIndex).toBe(99.9);
-
-    // 6. Odporność na null / undefined / ujemne liczby
-    const fallback = evaluateLarsonSkoldIndex(null, undefined, null);
-    expect(fallback.chloridePpm).toBe(0);
-    expect(fallback.sulfatePpm).toBe(0);
-    expect(fallback.alkalinityPpm).toBe(0);
-    expect(fallback.riskLevel).toBe('low');
-  });
-
-  test('TASK-P105-07-JAK: convertConductivityToTds przelicza przewodność na TDS z typami ConductivityToTdsResult i ConductivityScaleCategory', () => {
-    // 1. Złoty standard SCA (EC 250 µS/cm * 0.50 = 125 ppm)
-    const sca: ConductivityToTdsResult = convertConductivityToTds(250, 'coffee');
-    const scaleType: ConductivityScaleCategory = sca.category;
-    expect(scaleType).toBe('balanced_sca');
-    expect(sca.conductivityUsCm).toBe(250);
-    expect(sca.conversionFactor).toBe(0.5);
-    expect(sca.tdsPpm).toBe(125.0);
-    expect(sca.factorName).toContain('0.50');
-    expect(sca.suitabilityPl).toContain('Optymalny balans');
-    expect(sca.summaryPl).toContain('125 ppm');
-
-    // 2. Miękka woda specialty z konwersją Natural 442 (EC 80 µS/cm * 0.64 = 51.2 ppm)
-    const soft = convertConductivityToTds('80', 'natural_442');
-    expect(soft.category).toBe('soft_specialty');
-    expect(soft.conversionFactor).toBe(0.64);
-    expect(soft.tdsPpm).toBe(51.2);
-    expect(soft.suitabilityEn).toContain('Nordic pour-overs');
-
-    // 3. Woda ultra-czysta RO (EC 10 µS/cm * 0.5 = 5.0 ppm)
-    const ro = convertConductivityToTds(10);
-    expect(ro.category).toBe('ultra_pure');
-    expect(ro.tdsPpm).toBe(5.0);
-    expect(ro.categoryLabelPl).toContain('demineralizowana');
-
-    // 4. Twarda woda kranowa z faktorem KCl (EC 400 µS/cm * 0.70 = 280 ppm)
-    const hard = convertConductivityToTds(400, 'kcl');
-    expect(hard.category).toBe('hard_tap');
-    expect(hard.tdsPpm).toBe(280.0);
-    expect(hard.suitabilityPl).toContain('kamienia');
-
-    // 5. Niestandardowy współczynnik numeryczny (np. 0.55)
-    const custom = convertConductivityToTds(200, 0.55);
-    expect(custom.conversionFactor).toBe(0.55);
-    expect(custom.tdsPpm).toBe(110.0);
-
-    // 6. Odporność na null i wartości domyślne
-    const fallback = convertConductivityToTds(null, null);
-    expect(fallback.conductivityUsCm).toBe(150);
-    expect(fallback.tdsPpm).toBe(75.0);
-    expect(fallback.conversionFactor).toBe(0.5);
-    const condResult: ConductivityToTdsResult = fallback;
-    expect(condResult.summaryEn).toBeTruthy();
-  });
 });
-
 

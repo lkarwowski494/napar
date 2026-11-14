@@ -14,7 +14,6 @@ import {
   RECIPE_SHARE_PROTOCOL,
   RECIPE_SHARE_WEB_URL,
 } from '../recipe-share';
-import { generateQrMatrix } from '../qr-code';
 import { MASTER_RECIPES } from '../recipes-data';
 import { SavedRecipe } from '../database-schema';
 
@@ -132,30 +131,6 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
     ).toBeNull();
   });
 
-  test('TASK-P6-11-WZR: generateQrMatrix obsługuje pusty string i spacje bez rzucania błędem', () => {
-    const emptyResult = generateQrMatrix('');
-    expect(emptyResult.size).toBeGreaterThan(0);
-    expect(emptyResult.modules.length).toBe(emptyResult.size);
-
-    const whitespaceResult = generateQrMatrix('   \n\t  ');
-    expect(whitespaceResult.size).toBeGreaterThan(0);
-    expect(whitespaceResult.modules.length).toBe(whitespaceResult.size);
-  });
-
-  test('Generuje poprawną macierz modułów kodu QR dla URL receptury (generateQrMatrix)', () => {
-    const shareUrl = encodeRecipeToShareUrl(sampleSavedRecipe);
-    const qrResult = generateQrMatrix(shareUrl);
-
-    expect(qrResult.size).toBeGreaterThanOrEqual(25);
-    expect(qrResult.modules.length).toBe(qrResult.size);
-    expect(qrResult.modules[0].length).toBe(qrResult.size);
-
-    // Wzorce pozycyjne (Finder patterns) w rogach muszą być obecne
-    expect(qrResult.modules[0][0]).toBe(true);
-    expect(qrResult.modules[0][6]).toBe(true);
-    expect(qrResult.modules[6][0]).toBe(true);
-  });
-
   test('utf8ToBase64 i base64ToUtf8 działają poprawnie w środowisku bez globalnego Buffer', () => {
     const origBuffer = global.Buffer;
     try {
@@ -202,10 +177,10 @@ describe('Offline Recipe Sharing & QR Code Module (DEC-20)', () => {
   test('TASK-P4-11-WZR: normalizeBase64 radzi sobie z URL-Safe base64, spacjami z komunikatorów i brakiem paddingu', () => {
     const originalJson = JSON.stringify({ v: 1, n: 'Matcha / Special + Roast', b: 'TEA', m: 'Chasen', d: 2, w: 70, t: 80, r: 35, s: [] });
     const standardB64 = Buffer.from(originalJson, 'utf-8').toString('base64');
-    
+
     // Stwórz wariant URL-Safe (- zamiast +, _ zamiast /, bez paddingu =)
     const urlSafeB64 = standardB64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    
+
     // Stwórz wariant ze spacjami zamiast plusów (np. gdy komunikator lub url decoder zamienił + na spacji)
     const spacedB64 = standardB64.replace(/\+/g, ' ');
 

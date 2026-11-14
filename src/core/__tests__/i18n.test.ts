@@ -29,22 +29,7 @@ const mockDb: any = {
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => mockDb),
 }));
-import {
-  detectSystemLanguage,
-  translations,
-  SupportedLanguage,
-  LanguageProvider,
-  useTranslation,
-  getCurrentTranslations,
-  pluralPl,
-  plural,
-  getPluralCategory,
-  formatTemplate,
-  formatWcagRating,
-  formatBrewTime,
-  formatBrewDurationText,
-  formatRelativeDays,
-} from '../i18n';
+import { detectSystemLanguage, translations, LanguageProvider, useTranslation, getCurrentTranslations, pluralPl, formatTemplate } from '../i18n';
 import { getAppSetting } from '../database';
 
 describe('i18n System', () => {
@@ -212,50 +197,6 @@ describe('i18n System', () => {
       expect(pluralPl(101, one, few, many)).toBe(many);
       expect(pluralPl(112, one, few, many)).toBe(many);
     });
-
-    test('plural() obsługuje poprawnie zarówno język PL jak i EN', () => {
-      // PL
-      expect(plural('pl', 1, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekunda');
-      expect(plural('pl', 3, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekundy');
-      expect(plural('pl', 12, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekund');
-      expect(plural('pl', 22, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekundy');
-
-      // EN
-      expect(plural('en', 1, { one: 'second', other: 'seconds' })).toBe('second');
-      expect(plural('en', 0, { one: 'second', other: 'seconds' })).toBe('seconds');
-      expect(plural('en', 2, { one: 'second', other: 'seconds' })).toBe('seconds');
-      expect(plural('en', 25, { one: 'second', other: 'seconds' })).toBe('seconds');
-    });
-    test('getPluralCategory fallback w środowisku bez Intl.PluralRules (Hermes)', () => {
-      const originalPluralRules = (Intl as any).PluralRules;
-      try {
-        (Intl as any).PluralRules = undefined;
-        expect(getPluralCategory('pl', 1)).toBe('one');
-        expect(getPluralCategory('pl', 2)).toBe('few');
-        expect(getPluralCategory('pl', 5)).toBe('many');
-        expect(getPluralCategory('pl', 12)).toBe('many');
-        expect(getPluralCategory('pl', 22)).toBe('few');
-        expect(getPluralCategory('en', 1)).toBe('one');
-        expect(getPluralCategory('en', 2)).toBe('other');
-
-        // Test gdy rzuca wyjątek
-        (Intl as any).PluralRules = jest.fn(() => { throw new Error('Hermes fallback simulation'); });
-        expect(getPluralCategory('pl', 22)).toBe('few');
-      } finally {
-        (Intl as any).PluralRules = originalPluralRules;
-      }
-    });
-
-    test('plural() fallback gałęzi gdy brakuje specyficznych formularzy', () => {
-      // category few ale podano tylko many
-      expect(plural('pl', 2, { one: 'sekunda', many: 'sekund' })).toBe('sekund');
-      // category many ale podano tylko few
-      expect(plural('pl', 5, { one: 'sekunda', few: 'sekundy' })).toBe('sekundy');
-      // brak few i many, tylko other
-      expect(plural('pl', 5, { one: 'sekunda', other: 'inny' })).toBe('inny');
-      // tylko one
-      expect(plural('pl', 5, { one: 'sekunda' })).toBe('sekunda');
-    });
   });
   test('TASK-P5-09-LOK: formatTemplate wielokrotnie podstawia tokeny w szablonie', () => {
     expect(formatTemplate('', { name: 'V60' })).toBe('');
@@ -263,14 +204,6 @@ describe('i18n System', () => {
     expect(formatTemplate('{dose}g kawy na {water}g wody (ratio {dose}:{water})', { dose: 15, water: 250 }))
       .toBe('15g kawy na 250g wody (ratio 15:250)');
     expect(formatTemplate('Brak tokenow', { foo: 'bar' })).toBe('Brak tokenow');
-  });
-
-  test('getPluralCategory wylicza reguły liczby mnogiej', () => {
-    expect(getPluralCategory('pl', 1)).toBe('one');
-    expect(getPluralCategory('pl', 2)).toBe('few');
-    expect(getPluralCategory('pl', 5)).toBe('many');
-    expect(getPluralCategory('en', 1)).toBe('one');
-    expect(getPluralCategory('en', 2)).toBe('other');
   });
 
   test('TASK-P8-09-LOK: Klucze methodsLabel i particleRangeDesc są zdefiniowane i zsynchronizowane', () => {
@@ -439,79 +372,5 @@ describe('i18n System', () => {
     expect(pluralPl('2,5' as any, 'klik', 'kliki', 'klików')).toBe('kliki');
     expect(pluralPl(-0, 'klik', 'kliki', 'klików')).toBe('klików');
     expect(pluralPl(NaN, 'klik', 'kliki', 'klików')).toBe('klików');
-
-    expect(plural('pl', '1' as any, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekunda');
-    expect(plural('pl', '3' as any, { one: 'sekunda', few: 'sekundy', many: 'sekund' })).toBe('sekundy');
-    expect(plural('en', '1' as any, { one: 'second', other: 'seconds' })).toBe('second');
-    expect(plural('en', '5' as any, { one: 'second', other: 'seconds' })).toBe('seconds');
-  });
-
-  test('TASK-P58-09-LOK: formatWcagRating poprawnie ocenia i formatuje orzeczenia WCAG w PL i EN', () => {
-    // Normal text (progi 4.5:1 dla AA, 7.0:1 dla AAA)
-    expect(formatWcagRating(7.5, false, 'pl')).toContain('AAA');
-    expect(formatWcagRating(7.5, false, 'en')).toContain('AAA');
-    expect(formatWcagRating(5.0, false, 'pl')).toContain('AA');
-    expect(formatWcagRating(5.0, false, 'en')).toContain('AA');
-    expect(formatWcagRating(3.5, false, 'pl')).toContain('Niezgodny');
-    expect(formatWcagRating(3.5, false, 'en')).toContain('Fail');
-
-    // Large text (progi 3.0:1 dla AA, 4.5:1 dla AAA)
-    expect(formatWcagRating(5.0, true, 'pl')).toContain('AAA');
-    expect(formatWcagRating(3.5, true, 'pl')).toContain('AA');
-    expect(formatWcagRating(2.5, true, 'pl')).toContain('Niezgodny');
-  });
-
-  test('TASK-P60-09-LOK: formatBrewTime parsuje sekundy w formacie MM:SS z ochrona przed -0, NaN i znakami nieliczbowymi', () => {
-    expect(formatBrewTime(0)).toBe('00:00');
-    expect(formatBrewTime(-0)).toBe('00:00');
-    expect(formatBrewTime(65)).toBe('01:05');
-    expect(formatBrewTime(150)).toBe('02:30');
-    expect(formatBrewTime('185,5')).toBe('03:05');
-    expect(formatBrewTime('90 s')).toBe('01:30');
-    expect(formatBrewTime(-15)).toBe('00:00');
-    expect(formatBrewTime(NaN)).toBe('00:00');
-    expect(formatBrewTime(null as any)).toBe('00:00');
-    expect(formatBrewTime(undefined as any)).toBe('00:00');
-  });
-
-  test('TASK-P60-09-LOK: formatBrewDurationText formatuje czytelny czas w PL i EN', () => {
-    expect(formatBrewDurationText(45, 'pl')).toBe('45 s');
-    expect(formatBrewDurationText(45, 'en')).toBe('45s');
-    expect(formatBrewDurationText(120, 'pl')).toBe('2 min');
-    expect(formatBrewDurationText(120, 'en')).toBe('2m');
-    expect(formatBrewDurationText(155, 'pl')).toBe('2 min 35 s');
-    expect(formatBrewDurationText(155, 'en')).toBe('2m 35s');
-    expect(formatBrewDurationText('90,5', 'pl')).toBe('1 min 30 s');
-    expect(formatBrewDurationText(0, 'pl')).toBe('0 s');
-    expect(formatBrewDurationText(-0, 'en')).toBe('0s');
-    expect(formatBrewDurationText(NaN, 'pl')).toBe('0 s');
-  });
-
-  test('TASK-P65-09-LOK: formatRelativeDays czytelnie formatuje dni relatywne w PL i EN', () => {
-    // 0 -> Dziś / Today
-    expect(formatRelativeDays(0, 'pl')).toBe('Dziś');
-    expect(formatRelativeDays(0, 'en')).toBe('Today');
-    expect(formatRelativeDays(-0, 'pl')).toBe('Dziś');
-    expect(formatRelativeDays(NaN, 'pl')).toBe('Dziś');
-    expect(formatRelativeDays(null, 'en')).toBe('Today');
-    expect(formatRelativeDays(undefined, 'pl')).toBe('Dziś');
-
-    // 1 -> Jutro / Tomorrow
-    expect(formatRelativeDays(1, 'pl')).toBe('Jutro');
-    expect(formatRelativeDays('1', 'en')).toBe('Tomorrow');
-
-    // -1 -> Wczoraj / Yesterday
-    expect(formatRelativeDays(-1, 'pl')).toBe('Wczoraj');
-    expect(formatRelativeDays('-1', 'en')).toBe('Yesterday');
-
-    // > 1 -> Za X dni / In X days
-    expect(formatRelativeDays(3, 'pl')).toBe('Za 3 dni');
-    expect(formatRelativeDays(14, 'en')).toBe('In 14 days');
-    expect(formatRelativeDays('5.2', 'pl')).toBe('Za 5 dni');
-
-    // < -1 -> X dni temu / X days ago
-    expect(formatRelativeDays(-4, 'pl')).toBe('4 dni temu');
-    expect(formatRelativeDays(-21, 'en')).toBe('21 days ago');
-    expect(formatRelativeDays('-7.8', 'pl')).toBe('8 dni temu');
   });
 });

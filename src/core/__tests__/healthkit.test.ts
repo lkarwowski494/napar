@@ -14,15 +14,14 @@ jest.mock('expo-sqlite', () => ({
 
 import { Platform } from 'react-native';
 import {
-  isHealthKitAvailable,
   getHealthKitSyncEnabled,
   setHealthKitSyncEnabled,
-  getHealthKitAuthorizationStatus,
+
   requestHealthKitPermissions,
   revokeHealthKitPermissions,
   saveDietaryCaffeineSample,
   HK_QUANTITY_TYPE_DIETARY_CAFFEINE,
-  HealthKitAuthorizationStatus,
+
 } from '../healthkit';
 import * as databaseModule from '../database';
 
@@ -44,14 +43,6 @@ describe('Apple HealthKit Dietary Caffeine Bridge (BR-KOF-002 & DEC-01)', () => 
     jest.restoreAllMocks();
   });
 
-  test('isHealthKitAvailable zwraca false w v1.0 zgodnie z DEC-01', () => {
-    Platform.OS = 'ios';
-    expect(isHealthKitAvailable()).toBe(false);
-
-    Platform.OS = 'android';
-    expect(isHealthKitAvailable()).toBe(false);
-  });
-
   test('Pobiera i zapisuje preferencję synchronizacji HealthKit', () => {
     expect(getHealthKitSyncEnabled()).toBe(false);
 
@@ -60,14 +51,6 @@ describe('Apple HealthKit Dietary Caffeine Bridge (BR-KOF-002 & DEC-01)', () => 
 
     setHealthKitSyncEnabled(false);
     expect(getHealthKitSyncEnabled()).toBe(false);
-  });
-
-  test('Zwraca status uprawnień: unavailable w v1.0 bez natywnego mostka', () => {
-    Platform.OS = 'android';
-    expect(getHealthKitAuthorizationStatus()).toBe('unavailable');
-
-    Platform.OS = 'ios';
-    expect(getHealthKitAuthorizationStatus()).toBe('unavailable');
   });
 
   test('requestHealthKitPermissions zwraca false w v1.0 bez natywnego modułu', async () => {
@@ -115,10 +98,5 @@ describe('Apple HealthKit Dietary Caffeine Bridge (BR-KOF-002 & DEC-01)', () => 
     expect(res.quantityType).toBe(HK_QUANTITY_TYPE_DIETARY_CAFFEINE);
     expect(res.sampleId).toBeUndefined();
     expect(res.error).toContain('DEC-01');
-  });
-
-  test('HealthKitAuthorizationStatus typ definiuje stany autoryzacji', () => {
-    const status: HealthKitAuthorizationStatus = getHealthKitAuthorizationStatus();
-    expect(['not_determined', 'authorized', 'denied', 'unavailable']).toContain(status);
   });
 });

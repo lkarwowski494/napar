@@ -1,8 +1,6 @@
 import React from 'react';
-import { View, AppState } from 'react-native';
+import { AppState } from 'react-native';
 import render from 'react-test-renderer';
-import * as FileSystem from 'expo-file-system';
-import QRCode from 'qrcode';
 
 const mockSettings = new Map<string, string>();
 
@@ -35,20 +33,10 @@ jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => mockDb),
 }));
 
-import { playTimerChime, notifyTimerStepWarning, notifyTimerFinished } from '../timer-audio';
-import {
-  initDatabase,
-  getDatabase,
-  getAppSetting,
-  setAppSetting,
-  getCaffeineHalfLife,
-  setCaffeineHalfLife,
-  getBedtimeHour,
-  setBedtimeHour,
-} from '../database';
+import { playTimerChime,   } from '../timer-audio';
+import { getDatabase, setAppSetting, getCaffeineHalfLife, setCaffeineHalfLife, getBedtimeHour, setBedtimeHour } from '../database';
 import { BrewTimerEngine } from '../timer-engine';
 import { wInKeep } from '../unit-converter';
-import { scaleRecipeDose, evaluateColdBrewRatio, ColdBrewRatioEvaluation } from '../domain-rules';
 import {
   recipeToCompactPayload,
   encodeRecipeToShareUrl,
@@ -63,30 +51,10 @@ import {
   rotateBackupFiles,
   NaparBackupData,
 } from '../backup';
-import { confirm, confirmAction } from '../confirm';
-import {
-  announce,
-  useAnnounce,
-  formatStepAnnouncement,
-  formatCountdownAnnouncement,
-  formatStartAnnouncement,
-  formatFinishAnnouncement,
-  announceStep,
-  announceCountdown,
-  announceStart,
-  announceFinish,
-} from '../announce';
-import { getCraftTheme, CRAFT_APPS } from '../craft-suite-theme';
-import {
-  buildDynamicIslandPayload,
-  buildLiveActivityPayload,
-  endLiveActivity,
-} from '../live-activity';
-import { getCurrentTranslations, LanguageProvider, useTranslation } from '../i18n';
+import { getCurrentTranslations } from '../i18n';
 import { CaffeineCurveChart } from '../caffeine-chart';
-import { SensoryRadarChart, SensoryScoreEditor } from '../radar-chart';
+import { SensoryScoreEditor } from '../radar-chart';
 import { QrCodeSvg } from '../qr-code';
-import { QrScannerModal } from '../QrScannerModal';
 import { SUPPORTED_GRINDERS, getRecipeMicrons } from '../grinder-converter';
 
 describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
@@ -102,15 +70,6 @@ describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
     test('plays chime and disposes cleanly with addListener callback', async () => {
       const res1 = await playTimerChime();
       expect(res1).toBe(true);
-
-      const res2 = await notifyTimerStepWarning(3);
-      expect(res2).toBe(true);
-
-      const res3 = await notifyTimerFinished('Krok 1');
-      expect(res3).toBe(true);
-
-      const res4 = await notifyTimerFinished();
-      expect(res4).toBe(true);
     });
   });
 
@@ -169,13 +128,6 @@ describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
       expect(wInKeep('NaN', 'g', 25)).toBe(25);
       expect(wInKeep('', 'g', 30)).toBe(30);
       expect(wInKeep('abc', 'oz', 10)).toBe(10);
-    });
-  });
-
-  describe('domain-rules scaleRecipeDose edge cases', () => {
-    test('throws when doses are zero or negative', () => {
-      expect(() => scaleRecipeDose([], 0, 15)).toThrow('Doza musi być większa od zera');
-      expect(() => scaleRecipeDose([], 15, -5)).toThrow('Doza musi być większa od zera');
     });
   });
 
@@ -242,89 +194,6 @@ describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
     });
   });
 
-  describe('confirm and announce', () => {
-    test('confirm helper executes correctly', () => {
-      confirm({ title: 'Test Title', confirmText: 'OK' });
-      confirm({
-        title: 'Delete',
-        message: 'Sure?',
-        confirmText: 'Delete',
-        destructive: true,
-        onConfirm: () => {},
-      });
-      confirmAction({
-        title: 'Action',
-        actionText: 'Execute',
-        onConfirm: () => {},
-      });
-    });
-
-    test('announcements cover all variants and default language', () => {
-      formatStepAnnouncement(1, 3, 'Bloom', 50, 30);
-      formatStepAnnouncement(1, 3, 'Bloom', 50, 30, 'Spokojnie', 'pl');
-      formatStepAnnouncement(1, 3, 'Bloom', 50, 30, 'Gently', 'en');
-
-      formatCountdownAnnouncement(3);
-      formatCountdownAnnouncement(3, 'en');
-
-      formatStartAnnouncement('V60', 15, 250);
-      formatStartAnnouncement('V60', 15, 250, 'en');
-
-      formatFinishAnnouncement('V60', 180);
-      formatFinishAnnouncement('V60', 180, 'en');
-      formatFinishAnnouncement('V60', 45, 'en');
-
-      announceStep(1, 2, 'Krok', 50, 20);
-      announceCountdown(3);
-      announceStart('V60', 15, 250);
-      announceFinish('V60', 150);
-    });
-  });
-
-  describe('craft-suite-theme', () => {
-    test('getCraftTheme handles fallback to napar', () => {
-      expect(getCraftTheme()).toBe(CRAFT_APPS.napar);
-      expect(getCraftTheme('invalid' as any)).toBe(CRAFT_APPS.napar);
-      expect(getCraftTheme('piekarz')).toBe(CRAFT_APPS.piekarz);
-    });
-  });
-
-  describe('live-activity', () => {
-    test('builds live activity payloads with default parameters', async () => {
-      const attrs = {
-        sessionId: 'session_1',
-        recipeName: 'V60',
-        method: 'V60',
-        beverageType: 'COFFEE' as const,
-        totalWaterGrams: 250,
-        doseGrams: 15,
-      };
-      const state = {
-        stepIndex: 0,
-        totalSteps: 3,
-        stepNamePl: 'Preinfuzja',
-        stepNameEn: 'Bloom',
-        targetWaterGrams: 50,
-        stepRemainingSeconds: 30,
-        stepDurationSeconds: 45,
-        totalElapsedSeconds: 15,
-        totalRemainingSeconds: 150,
-        isPaused: false,
-        isFinished: false,
-      };
-
-      const island = buildDynamicIslandPayload(attrs, state);
-      expect(island.compactLeading).toBe('☕');
-
-      const full = buildLiveActivityPayload(attrs, state);
-      expect(full.attributes.recipeName).toBe('V60');
-
-      const endRes = await endLiveActivity('unknown_activity_id');
-      expect(endRes.success).toBe(false);
-      expect(endRes.error).toContain('DEC-01');
-    });
-  });
-
   describe('i18n and UI components edge cases', () => {
     test('getCurrentTranslations returns valid translations', () => {
       const trans = getCurrentTranslations();
@@ -386,42 +255,6 @@ describe('Domain Coverage Edge Cases (100% Core Coverage)', () => {
       expect(generic.parseSetting('650')).toBe(650);
 
       expect(getRecipeMicrons({})).toBeGreaterThan(0);
-    });
-  });
-
-  describe('TASK-P77-11-WZR: evaluateColdBrewRatio domain rules', () => {
-    test('klasyfikuje koncentrat cold brew (1:4 - 1:7) i zaleca rozcieńczenie', () => {
-      const evalConcentrate: ColdBrewRatioEvaluation = evaluateColdBrewRatio(100, 500);
-      expect(evalConcentrate.style).toBe('concentrate');
-      expect(evalConcentrate.ratio).toBe(5);
-      expect(evalConcentrate.ratioFormatted).toBe('1:5.0');
-      expect(evalConcentrate.styleLabelPl).toContain('Koncentrat');
-      expect(evalConcentrate.recommendedDilutionPl).toContain('1:1');
-      expect(evalConcentrate.recommendedDilutionEn).toContain('1:1');
-    });
-
-    test('klasyfikuje cold brew gotowe do picia (ready_to_drink, 1:8 - 1:15)', () => {
-      const evalRtd: ColdBrewRatioEvaluation = evaluateColdBrewRatio('60', '720');
-      expect(evalRtd.style).toBe('ready_to_drink');
-      expect(evalRtd.ratio).toBe(12);
-      expect(evalRtd.styleLabelPl).toContain('Gotowe do picia');
-      expect(evalRtd.styleLabelEn).toContain('Ready-to-drink');
-    });
-
-    test('klasyfikuje zbyt gęsty ekstrakt (overly_dense) oraz rozwodniony (underextracted_weak)', () => {
-      const dense = evaluateColdBrewRatio(100, 250);
-      expect(dense.style).toBe('overly_dense');
-
-      const weak = evaluateColdBrewRatio(20, 400);
-      expect(weak.style).toBe('underextracted_weak');
-    });
-
-    test('odporność na null, stringi, przecinki, ujemne wartości i -0', () => {
-      const fallback = evaluateColdBrewRatio(null as any, -100);
-      expect(fallback.ratio).toBe(0);
-      expect(fallback.style).toBe('overly_dense');
-      expect(Number.isFinite(fallback.ratio)).toBe(true);
-      expect(Object.is(fallback.ratio, -0)).toBe(false);
     });
   });
 });

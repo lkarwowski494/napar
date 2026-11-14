@@ -15,12 +15,6 @@ export const cancelButton = (onPress?: () => void): CancelBtn => ({
   ...(onPress ? { onPress } : {}),
 });
 
-/** Przycisk „OK” dla okien informacyjnych */
-export const okButton = (): CancelBtn => ({
-  text: getCurrentTranslations().common.ok,
-  style: 'cancel',
-});
-
 /** Pytanie z dwoma przyciskami: „Anuluj” + akcja (destructive — czerwona) */
 export function confirmAction({
   title,
@@ -45,31 +39,5 @@ export function confirmAction({
       onPress: onConfirm,
     },
   ]);
-}
-
-/** Standardowy helper S5 confirm({ title, message, confirmText, destructive, onConfirm, onCancel }) */
-export function confirm({
-  title,
-  message,
-  confirmText,
-  destructive = false,
-  onConfirm,
-  onCancel,
-}: {
-  title: string;
-  message?: string;
-  confirmText: string;
-  destructive?: boolean;
-  onConfirm?: () => void;
-  onCancel?: () => void;
-}) {
-  confirmAction({
-    title,
-    message,
-    actionText: confirmText,
-    destructive,
-    onConfirm: onConfirm || (() => {}),
-    onCancel,
-  });
 }
 

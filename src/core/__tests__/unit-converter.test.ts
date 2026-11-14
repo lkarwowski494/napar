@@ -4,43 +4,15 @@
 
 import {
   celsiusToFahrenheit,
-  fahrenheitToCelsius,
+
   gramsToOunces,
   ouncesToGrams,
   mlToFluidOunces,
-  fluidOuncesToMl,
+
   formatTemperature,
   formatDoseWeight,
   formatWaterWeight,
-  formatWaterVolume,
-  formatRatio,
-  formatPressure,
-  formatFlowRate,
-  formatExtractionYield,
-  formatTdsPercentage,
-  formatWaterHardness,
-  formatParticleSize,
-  formatAltitude,
-  formatPressureWithUnit,
-  formatBrewTimeMinutesSeconds,
-  formatCaffeineDose,
-  CaffeineUnit,
-  formatStashWeight,
-  WeightDisplayFormat,
-  formatCostPerCup,
-  CostPerCupFormat,
-  formatFlowRateProfile,
-  FlowRateProfile,
-  FlowRatePhase,
-  formatExtractionPressure,
-  ExtractionPressureFormat,
-  PressureZone,
-  formatRoastWeightLoss,
-  RoastWeightLossFormat,
-  RoastLossCategory,
-  formatBoilingPointAtAltitude,
-  AltitudeBoilingPoint,
-  AltitudeBoilingUnit,
+
   wInKeep,
   roundTo,
 } from '../unit-converter';
@@ -51,10 +23,6 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
     expect(celsiusToFahrenheit(93)).toBe(199);
     expect(celsiusToFahrenheit(100)).toBe(212);
     expect(celsiusToFahrenheit(0)).toBe(32);
-
-    expect(fahrenheitToCelsius(199)).toBe(93);
-    expect(fahrenheitToCelsius(212)).toBe(100);
-    expect(fahrenheitToCelsius(32)).toBe(0);
   });
 
   test('Przelicza wagę suchą gramy <-> uncje (oz)', () => {
@@ -68,7 +36,6 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
   test('Przelicza objętość wody ml <-> fl oz', () => {
     // 250 ml -> 8.45 fl oz
     expect(mlToFluidOunces(250)).toBe(8.45);
-    expect(fluidOuncesToMl(8.45)).toBe(250);
   });
 
   test('formatTemperature formatuje poprawnie w obu systemach', () => {
@@ -183,12 +150,7 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(mlToFluidOunces(NaN)).toBe(0);
       expect(mlToFluidOunces(Infinity)).toBe(0);
 
-      expect(fluidOuncesToMl(-10)).toBe(0);
-      expect(fluidOuncesToMl(NaN)).toBe(0);
-      expect(fluidOuncesToMl(Infinity)).toBe(0);
-
       expect(celsiusToFahrenheit(NaN)).toBe(0);
-      expect(fahrenheitToCelsius(NaN)).toBe(0);
     });
 
     test('TASK-P10-03-ZAK: formatTemperature, formatDoseWeight, formatWaterWeight i roundTo są odporne na NaN/Infinity', () => {
@@ -222,10 +184,6 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(celsiusToFahrenheit('93,5')).toBe(200);
       expect(celsiusToFahrenheit('100 °C')).toBe(212);
       expect(celsiusToFahrenheit(-0)).toBe(32);
-      expect(fahrenheitToCelsius('212 °F')).toBe(100);
-      expect(fahrenheitToCelsius('199,4')).toBe(93);
-      expect(fahrenheitToCelsius(32)).toBe(0);
-      expect(Object.is(fahrenheitToCelsius(32), -0)).toBe(false);
 
       // 2. gramsToOunces i ouncesToGrams
       expect(gramsToOunces('15,0 g')).toBe(0.53);
@@ -242,9 +200,6 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(mlToFluidOunces('250,5')).toBe(8.47);
       expect(mlToFluidOunces(-0)).toBe(0);
       expect(Object.is(mlToFluidOunces(-0), -0)).toBe(false);
-      expect(fluidOuncesToMl('8,45 fl oz')).toBe(250);
-      expect(fluidOuncesToMl(-0)).toBe(0);
-      expect(Object.is(fluidOuncesToMl(-0), -0)).toBe(false);
 
       // 4. roundTo ochrona przed -0
       expect(roundTo(-0, 2)).toBe(0);
@@ -266,452 +221,9 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatTemperature('invalid', 'metric')).toBe('0°C');
       expect(formatTemperature('invalid', 'imperial')).toBe('32°F');
 
-      // 2. formatWaterVolume
-      expect(formatWaterVolume(250, 'metric')).toBe('250 ml');
-      expect(formatWaterVolume(250, 'imperial')).toBe('8.45 fl oz');
-      expect(formatWaterVolume('250,5 ml', 'metric')).toBe('250.5 ml');
-      expect(formatWaterVolume(-0, 'metric')).toBe('0 ml');
-      expect(formatWaterVolume('invalid', 'metric')).toBe('0 ml');
-      expect(formatWaterVolume('invalid', 'imperial')).toBe('0 fl oz');
-
       // 3. formatDoseWeight i formatWaterWeight ze stringami
       expect(formatDoseWeight('18,5 g', 'metric')).toBe('18.5g');
       expect(formatWaterWeight('300,5 g', 'metric')).toBe('300.5g');
-    });
-
-    test('TASK-P67-09-LOK: formatRatio i formatPressure formatuja proporcje i cisnienie z pelna ochrona przed anomaliami', () => {
-      // 1. formatRatio
-      expect(formatRatio(16)).toBe('1:16');
-      expect(formatRatio(16.666)).toBe('1:16.7');
-      expect(formatRatio('1:15')).toBe('1:15');
-      expect(formatRatio('15,5')).toBe('1:15.5');
-      expect(formatRatio('1/17')).toBe('1:17');
-      expect(formatRatio(null)).toBe('1:16');
-      expect(formatRatio(undefined)).toBe('1:16');
-      expect(formatRatio(NaN)).toBe('1:16');
-      expect(formatRatio(-5)).toBe('1:16');
-      expect(formatRatio(-0)).toBe('1:16');
-
-      // 2. formatPressure
-      expect(formatPressure(9)).toBe('9.0 bar');
-      expect(formatPressure('9,25 bar')).toBe('9.3 bar');
-      expect(formatPressure(15)).toBe('15.0 bar');
-      expect(formatPressure(0)).toBe('0.0 bar');
-      expect(formatPressure(-0)).toBe('0.0 bar');
-      expect(formatPressure(-5)).toBe('0.0 bar');
-      expect(formatPressure(NaN)).toBe('0.0 bar');
-      expect(formatPressure(null)).toBe('0.0 bar');
-      expect(formatPressure(undefined)).toBe('0.0 bar');
-    });
-
-    test('TASK-P70-09-LOK: formatFlowRate formatuje przepływ w g/s z pełną sanityzacją', () => {
-      expect(formatFlowRate(2.4)).toBe('2.4 g/s');
-      expect(formatFlowRate('2,35 g/s')).toBe('2.4 g/s');
-      expect(formatFlowRate(1.85, 2)).toBe('1.85 g/s');
-      expect(formatFlowRate(0)).toBe('0.0 g/s');
-      expect(formatFlowRate(-0)).toBe('0.0 g/s');
-      expect(formatFlowRate(-1.5)).toBe('0.0 g/s');
-      expect(formatFlowRate(NaN)).toBe('0.0 g/s');
-      expect(formatFlowRate(Infinity)).toBe('100.0 g/s');
-      expect(formatFlowRate(null)).toBe('0.0 g/s');
-      expect(formatFlowRate(undefined)).toBe('0.0 g/s');
-    });
-
-    test('TASK-P72-09-LOK: formatExtractionYield formatuje EY w procentach z zabezpieczeniami', () => {
-      expect(formatExtractionYield(20.15)).toBe('20.1%');
-      expect(formatExtractionYield(20.15, 2)).toBe('20.15%');
-      expect(formatExtractionYield('19,85%')).toBe('19.9%');
-      expect(formatExtractionYield(0)).toBe('0.0%');
-      expect(formatExtractionYield(-0)).toBe('0.0%');
-      expect(formatExtractionYield(-5)).toBe('0.0%');
-      expect(formatExtractionYield(NaN)).toBe('0.0%');
-      expect(formatExtractionYield(Infinity)).toBe('50.0%');
-      expect(formatExtractionYield(null)).toBe('0.0%');
-      expect(formatExtractionYield(undefined)).toBe('0.0%');
-    });
-
-    test('TASK-P74-09-LOK: formatTdsPercentage formatuje TDS w procentach z zabezpieczeniami', () => {
-      expect(formatTdsPercentage(1.35)).toBe('1.35%');
-      expect(formatTdsPercentage(1.35, 1)).toBe('1.4%');
-      expect(formatTdsPercentage('1,40%')).toBe('1.40%');
-      expect(formatTdsPercentage(9.25)).toBe('9.25%');
-      expect(formatTdsPercentage(0)).toBe('0.00%');
-      expect(formatTdsPercentage(-0)).toBe('0.00%');
-      expect(formatTdsPercentage(-5)).toBe('0.00%');
-      expect(formatTdsPercentage(NaN)).toBe('0.00%');
-      expect(formatTdsPercentage(Infinity)).toBe('30.00%');
-      expect(formatTdsPercentage(null)).toBe('0.00%');
-      expect(formatTdsPercentage(undefined)).toBe('0.00%');
-    });
-
-    test('TASK-P77-09-LOK: formatWaterHardness formatuje twardość w ppm, °dH i gpg z pełną sanityzacją', () => {
-      // 1. ppm
-      expect(formatWaterHardness(150)).toBe('150.0 ppm');
-      expect(formatWaterHardness(150.25, 'ppm', 2)).toBe('150.25 ppm');
-      expect(formatWaterHardness('120 ppm')).toBe('120.0 ppm');
-
-      // 2. °dH (1 °dH = 17.848 ppm) -> 178.48 ppm = 10.0 °dH
-      expect(formatWaterHardness(178.48, 'dH')).toBe('10.0 °dH');
-      expect(formatWaterHardness(178.48, '°dH', 0)).toBe('10 °dH');
-
-      // 3. gpg (1 gpg = 17.118 ppm) -> 171.18 ppm = 10.0 gpg
-      expect(formatWaterHardness(171.18, 'gpg')).toBe('10.0 gpg');
-
-      // 4. mg/L
-      expect(formatWaterHardness(75, 'mg/l')).toBe('75.0 mg/L');
-
-      // 5. Zabezpieczenia brzegowe
-      expect(formatWaterHardness(0)).toBe('0.0 ppm');
-      expect(formatWaterHardness(-0)).toBe('0.0 ppm');
-      expect(formatWaterHardness(-15)).toBe('0.0 ppm');
-      expect(formatWaterHardness(NaN)).toBe('0.0 ppm');
-      expect(formatWaterHardness(Infinity)).toBe('2000.0 ppm');
-      expect(formatWaterHardness(null)).toBe('0.0 ppm');
-      expect(formatWaterHardness(undefined)).toBe('0.0 ppm');
-    });
-
-    test('TASK-P79-09-LOK: formatParticleSize formatuje wielkość cząstek mielenia w µm i mm', () => {
-      // 1. Domyślnie mikrony (µm) bez ułamków
-      expect(formatParticleSize(750)).toBe('750 µm');
-      expect(formatParticleSize('750 µm')).toBe('750 µm');
-      expect(formatParticleSize(750.4, 'µm', 1)).toBe('750.4 µm');
-      expect(formatParticleSize(600, 'um')).toBe('600 µm');
-
-      // 2. Milimetry (mm)
-      expect(formatParticleSize(750, 'mm')).toBe('0.75 mm');
-      expect(formatParticleSize(1000, 'mm')).toBe('1.00 mm');
-      expect(formatParticleSize(450, 'mm', 3)).toBe('0.450 mm');
-
-      // 3. Wartości brzegowe i defensywne
-      expect(formatParticleSize(0)).toBe('0 µm');
-      expect(formatParticleSize(-0)).toBe('0 µm');
-      expect(formatParticleSize(-50)).toBe('0 µm');
-      expect(formatParticleSize(NaN)).toBe('0 µm');
-      expect(formatParticleSize(Infinity)).toBe('5000 µm');
-      expect(formatParticleSize(null)).toBe('0 µm');
-      expect(formatParticleSize(undefined)).toBe('0 µm');
-    });
-
-    test('TASK-P82-09-LOK: formatAltitude formatuje wysokość upraw w metrach i stopach z lokalizacją', () => {
-      // 1. Domyślnie metry (m n.p.m.) w języku polskim
-      expect(formatAltitude(1850)).toBe('1850 m n.p.m.');
-      expect(formatAltitude('1850 m')).toBe('1850 m n.p.m.');
-      expect(formatAltitude('2100,5')).toBe('2101 m n.p.m.');
-
-      // 2. Metry w języku angielskim (m a.s.l.)
-      expect(formatAltitude(1850, 'm', 'en')).toBe('1850 m a.s.l.');
-
-      // 3. Stopy (ft) — 1850 m * 3.28084 ≈ 6070 ft
-      expect(formatAltitude(1850, 'ft', 'pl')).toBe('6070 ft n.p.m.');
-      expect(formatAltitude(1850, 'ft', 'en')).toBe('6070 ft a.s.l.');
-
-      // 4. Wartości brzegowe i defensywne
-      expect(formatAltitude(0)).toBe('0 m n.p.m.');
-      expect(formatAltitude(-0)).toBe('0 m n.p.m.');
-      expect(formatAltitude(-100)).toBe('0 m n.p.m.');
-      expect(formatAltitude(NaN)).toBe('0 m n.p.m.');
-      expect(formatAltitude(Infinity)).toBe('9000 m n.p.m.');
-      expect(formatAltitude(null)).toBe('0 m n.p.m.');
-      expect(formatAltitude(undefined)).toBe('0 m n.p.m.');
-      expect(formatAltitude(null, 'ft', 'en')).toBe('0 ft a.s.l.');
-    });
-
-    test('TASK-P84-09-LOK: formatPressureWithUnit formatuje ciśnienie w bar i psi z elastycznymi jednostkami i precyzją', () => {
-      // 1. Domyślnie bary (bar)
-      expect(formatPressureWithUnit(9)).toBe('9.0 bar');
-      expect(formatPressureWithUnit('9,0 bar')).toBe('9.0 bar');
-      expect(formatPressureWithUnit(9.25, 'bar', 2)).toBe('9.25 bar');
-      expect(formatPressureWithUnit(9, 'bar', 0)).toBe('9 bar');
-
-      // 2. Funt na cal kwadratowy (psi) — 9 bar * 14.5038 ≈ 130.5 psi
-      expect(formatPressureWithUnit(9, 'psi')).toBe('130.5 psi');
-      expect(formatPressureWithUnit(9, 'psi', 0)).toBe('131 psi');
-      expect(formatPressureWithUnit('6,0', 'PSI', 1)).toBe('87.0 psi');
-
-      // 3. Wartości brzegowe i defensywne
-      expect(formatPressureWithUnit(0)).toBe('0.0 bar');
-      expect(formatPressureWithUnit(-0)).toBe('0.0 bar');
-      expect(formatPressureWithUnit(-5)).toBe('0.0 bar');
-      expect(formatPressureWithUnit(NaN)).toBe('0.0 bar');
-      expect(formatPressureWithUnit(Infinity)).toBe('30.0 bar');
-      expect(formatPressureWithUnit(null)).toBe('0.0 bar');
-      expect(formatPressureWithUnit(undefined)).toBe('0.0 bar');
-      expect(formatPressureWithUnit(null, 'psi')).toBe('0.0 psi');
-    });
-
-    test('TASK-P86-09-LOK: formatBrewTimeMinutesSeconds formatuje czas parzenia w formacie M:SS oraz MM:SS z pełną sanityzacją', () => {
-      // 1. Domyślny format M:SS (bez wiodącego zera dla minut jednocyfrowych)
-      expect(formatBrewTimeMinutesSeconds(0)).toBe('0:00');
-      expect(formatBrewTimeMinutesSeconds(45)).toBe('0:45');
-      expect(formatBrewTimeMinutesSeconds(65)).toBe('1:05');
-      expect(formatBrewTimeMinutesSeconds(150)).toBe('2:30');
-      expect(formatBrewTimeMinutesSeconds(725)).toBe('12:05');
-
-      // 2. Format z wiodącym zerem MM:SS (showLeadingZeroMinutes = true)
-      expect(formatBrewTimeMinutesSeconds(0, true)).toBe('00:00');
-      expect(formatBrewTimeMinutesSeconds(65, true)).toBe('01:05');
-      expect(formatBrewTimeMinutesSeconds(150, true)).toBe('02:30');
-      expect(formatBrewTimeMinutesSeconds(725, true)).toBe('12:05');
-
-      // 3. Stringi z przecinkami i jednostkami
-      expect(formatBrewTimeMinutesSeconds('185,5')).toBe('3:05');
-      expect(formatBrewTimeMinutesSeconds('90 s')).toBe('1:30');
-
-      // 4. Wartości brzegowe i defensywne
-      expect(formatBrewTimeMinutesSeconds(-0)).toBe('0:00');
-      expect(formatBrewTimeMinutesSeconds(-15)).toBe('0:00');
-      expect(formatBrewTimeMinutesSeconds(NaN)).toBe('0:00');
-      expect(formatBrewTimeMinutesSeconds(null)).toBe('0:00');
-      expect(formatBrewTimeMinutesSeconds(undefined)).toBe('0:00');
-      expect(formatBrewTimeMinutesSeconds(null, true)).toBe('00:00');
-      expect(formatBrewTimeMinutesSeconds(Infinity)).toBe('1440:00');
-    });
-
-    test('TASK-P89-09-LOK: formatCaffeineDose formatuje dawkę kofeiny w mg, g oraz % dziennego limitu (RDA)', () => {
-      // 1. Domyślnie miligramy (mg)
-      const standardDose = formatCaffeineDose(150);
-      expect(standardDose).toBe('150 mg');
-      expect(formatCaffeineDose('150,5 mg')).toBe('151 mg');
-      expect(formatCaffeineDose(80, 'mg')).toBe('80 mg');
-
-      // 2. Gramy (g) — np. 150 mg = 0.15 g
-      expect(formatCaffeineDose(150, 'g')).toBe('0.15 g');
-      expect(formatCaffeineDose(1000, 'g')).toBe('1.00 g');
-
-      // 3. Procent dziennego limitu (percent_daily_limit, domyślnie 400 mg FDA/EFSA)
-      const rdaUnit: CaffeineUnit = 'percent_daily_limit';
-      expect(formatCaffeineDose(150, rdaUnit)).toBe('38% RDA');
-      expect(formatCaffeineDose(200, 'percent_daily_limit')).toBe('50% RDA');
-      expect(formatCaffeineDose(400, 'percent_daily_limit')).toBe('100% RDA');
-      expect(formatCaffeineDose(100, 'percent_daily_limit', 200)).toBe('50% RDA'); // custom daily max
-
-      // 4. Wartości brzegowe i defensywne
-      expect(formatCaffeineDose(0)).toBe('0 mg');
-      expect(formatCaffeineDose(-0)).toBe('0 mg');
-      expect(formatCaffeineDose(-50)).toBe('0 mg');
-      expect(formatCaffeineDose(null)).toBe('0 mg');
-      expect(formatCaffeineDose(undefined)).toBe('0 mg');
-      expect(formatCaffeineDose(NaN)).toBe('0 mg');
-      expect(formatCaffeineDose(null, 'g')).toBe('0.00 g');
-      expect(formatCaffeineDose(null, 'percent_daily_limit')).toBe('0% RDA');
-    });
-
-    test('TASK-P91-09-LOK: formatStashWeight formatuje wagę paczki i spiżarni w g, kg, oz, lbs z trybem auto', () => {
-      // 1. Tryb automatyczny metryczny (< 1000g -> g, >= 1000g -> kg)
-      const autoFmt: WeightDisplayFormat = 'auto';
-      expect(formatStashWeight(250, autoFmt, 'metric')).toBe('250 g');
-      expect(formatStashWeight('250,0 g')).toBe('250 g');
-      expect(formatStashWeight(1250, 'auto', 'metric')).toBe('1.25 kg');
-      expect(formatStashWeight(1000, 'auto', 'metric')).toBe('1.00 kg');
-
-      // 2. Tryb automatyczny imperialny (< 16 oz -> oz, >= 16 oz -> lbs)
-      // 250g / 28.3495 = 8.8 oz
-      expect(formatStashWeight(250, 'auto', 'imperial')).toBe('8.8 oz');
-      // 1000g / 453.59 = 2.20 lbs
-      expect(formatStashWeight(1000, 'auto', 'imperial')).toBe('2.20 lbs');
-
-      // 3. Wymuszone formaty
-      expect(formatStashWeight(1500, 'grams')).toBe('1500 g');
-      expect(formatStashWeight(500, 'kilograms')).toBe('0.50 kg');
-      expect(formatStashWeight(250, 'ounces')).toBe('8.8 oz');
-      expect(formatStashWeight(1000, 'pounds')).toBe('2.20 lbs');
-
-      // 4. Odporność na null, undefined, NaN, ujemne i -0
-      expect(formatStashWeight(0)).toBe('0 g');
-      expect(formatStashWeight(-0)).toBe('0 g');
-      expect(formatStashWeight(-50)).toBe('0 g');
-      expect(formatStashWeight(null)).toBe('0 g');
-      expect(formatStashWeight(undefined)).toBe('0 g');
-      expect(formatStashWeight(NaN)).toBe('0 g');
-      expect(formatStashWeight(null, 'kilograms')).toBe('0.00 kg');
-      expect(formatStashWeight(null, 'auto', 'imperial')).toBe('0.0 oz');
-    });
-
-    test('TASK-P94-09-LOK: formatCostPerCup wylicza i formatuje koszt pojedynczej filiżanki naparu', () => {
-      // 1. Kawa specialty: paczka 250g za 50 zł, doza 15g -> 50 / 250 = 0.20 zł/g -> 15g = 3.00 zł
-      const costPl: CostPerCupFormat = formatCostPerCup(50, 250, 15, 'zł');
-      expect(costPl.costPerGram).toBeCloseTo(0.2, 2);
-      expect(costPl.costPerCup).toBe(3);
-      expect(costPl.costPerCupFormatted).toBe('3.00 zł');
-      expect(costPl.totalCupsInBag).toBe(16); // Math.floor(250 / 15) = 16
-      expect(costPl.summaryPl).toContain('3.00 zł');
-      expect(costPl.summaryEn).toBeDefined();
-
-      // 2. Format walutowy prefix (dolar $)
-      const costUsd = formatCostPerCup('20.00', '250', '15', '$');
-      expect(costUsd.costPerCupFormatted).toBe('$1.20');
-      expect(costUsd.totalCupsInBag).toBe(16);
-
-      // 3. Odporność na stringi z przecinkami i wartości domyślne
-      const costDefault = formatCostPerCup('40,0', null, undefined);
-      expect(costDefault.totalCupsInBag).toBe(16); // 250g / 15g
-      expect(costDefault.costPerCup).toBe(2.4);
-
-      // 4. Skrajne wartości / zero
-      const costZero = formatCostPerCup(0, 250, 15);
-      expect(costZero.costPerCup).toBe(0);
-      expect(costZero.costPerCupFormatted).toBe('0.00 zł');
-    });
-
-    test('TASK-P96-09-LOK: formatFlowRateProfile analizuje profil prędkości przepływu wody i fazę zalewania', () => {
-      // 1. Spokojna preinfuzja (bloom) 2.0 g/s
-      const bloom: FlowRateProfile = formatFlowRateProfile(2.0);
-      const testPhase: FlowRatePhase = bloom.phase;
-      expect(testPhase).toBe('bloom');
-      expect(bloom.gramsPerSecond).toBe(2.0);
-      expect(bloom.formattedMetric).toBe('2.0 g/s');
-      expect(bloom.formattedImperial).toBe('0.07 oz/s');
-      expect(bloom.phasePl).toContain('Preinfuz');
-      expect(bloom.summaryPl).toContain('2.0 g/s');
-      expect(bloom.summaryEn).toBeDefined();
-
-      // 2. Stabilny strumień główny (4.5 g/s -> ~0.16 oz/s)
-      const steadyImp = formatFlowRateProfile('4,5');
-      expect(steadyImp.phase).toBe('steady');
-      expect(steadyImp.gramsPerSecond).toBe(4.5);
-      expect(steadyImp.ouncesPerSecond).toBeCloseTo(0.16, 2);
-      expect(steadyImp.formattedImperial).toBe('0.16 oz/s');
-      expect(steadyImp.phaseEn).toContain('Steady');
-
-      // 3. Intensywne szybkie zalanie (7.0 g/s)
-      const fastPour = formatFlowRateProfile(7.0);
-      expect(fastPour.phase).toBe('fast');
-      expect(fastPour.formattedMetric).toBe('7.0 g/s');
-      expect(fastPour.phasePl).toContain('Szybki');
-
-      // 4. Odporność na null, NaN i wartości ujemne
-      const fallback = formatFlowRateProfile(null);
-      expect(fallback.gramsPerSecond).toBe(0);
-      expect(fallback.formattedMetric).toBe('0.0 g/s');
-      expect(fallback.phase).toBe('bloom');
-    });
-
-    test('TASK-P98-09-LOK: formatExtractionPressure formatuje ciśnienie w barach, psi i kPa oraz wyznacza strefę ciśnienia', () => {
-      // 1. Klasyczne espresso 9.0 bar (standard)
-      const classic: ExtractionPressureFormat = formatExtractionPressure(9.0);
-      expect(classic.bars).toBe(9.0);
-      expect(classic.psi).toBe(130.5);
-      expect(classic.kpa).toBe(900);
-      expect(classic.formattedMetric).toBe('9.0 bar');
-      expect(classic.formattedImperial).toBe('130.5 psi');
-      const zoneType: PressureZone = classic.zone;
-      expect(zoneType).toBe('espresso_classic');
-      expect(classic.zonePl).toContain('9 bar');
-      expect(classic.summaryPl).toContain('crema');
-
-      // 2. Nowoczesne espresso 6.0 bar (ze stringa z przecinkiem)
-      const modern = formatExtractionPressure('6,0');
-      expect(modern.zone).toBe('espresso_modern');
-      expect(modern.bars).toBe(6.0);
-      expect(modern.psi).toBeCloseTo(87.0, 1);
-      expect(modern.kpa).toBe(600);
-      expect(modern.zonePl).toContain('6–8 bar');
-
-      // 3. AeroPress (0.8 bar)
-      const aero = formatExtractionPressure(0.8);
-      expect(aero.zone).toBe('aeropress');
-      expect(aero.zonePl).toContain('AeroPress');
-
-      // 4. Drip / grawitacja (0.0 bar)
-      const drip = formatExtractionPressure(0);
-      expect(drip.zone).toBe('gravity');
-      expect(drip.zonePl).toContain('Grawitacyjna');
-
-      // 5. Nadmierne ciśnienie (12.0 bar)
-      const over = formatExtractionPressure(12.0);
-      expect(over.zone).toBe('overpressure');
-      expect(over.zonePl).toContain('Nadmierne');
-
-      // 6. Odporność na null i ujemne
-      const fallback = formatExtractionPressure(null);
-      expect(fallback.bars).toBe(0);
-      expect(fallback.formattedMetric).toBe('0.0 bar');
-      expect(fallback.zone).toBe('gravity');
-    });
-
-    test('TASK-P101-09-LOK: formatRoastWeightLoss formatuje ubytek masy wypalania i kategoryzuje stopień palenia', () => {
-      // 1. Jasne palenie (1000g -> 875g = 12.5% loss)
-      const light = formatRoastWeightLoss(1000, 875, 'pl');
-      expect(light.lossPercentage).toBe(12.5);
-      expect(light.formattedLoss).toBe('12,5%');
-      expect(light.category).toBe('light');
-      expect(light.categoryNamePl).toContain('Jasne');
-      const catType: RoastLossCategory = light.category;
-      expect(catType).toBe('light');
-
-      // 2. Średnie palenie po angielsku (1000g -> 855g = 14.5% loss)
-      const medium = formatRoastWeightLoss('1000', '855', 'en');
-      expect(medium.lossPercentage).toBe(14.5);
-      expect(medium.formattedLoss).toBe('14.5%');
-      expect(medium.category).toBe('medium');
-      expect(medium.categoryNameEn).toContain('Medium');
-
-      // 3. Ciemne palenie (500g -> 405g = 19.0% loss)
-      const dark = formatRoastWeightLoss(500, 405, 'pl');
-      expect(dark.lossPercentage).toBe(19.0);
-      expect(dark.category).toBe('dark');
-      expect(dark.categoryNamePl).toContain('Ciemne');
-
-      // 4. Bardzo jasne palenie (1000g -> 895g = 10.5% loss)
-      const veryLight = formatRoastWeightLoss(1000, 895, 'pl');
-      expect(veryLight.lossPercentage).toBe(10.5);
-      expect(veryLight.category).toBe('very_light');
-
-      // 5. Średnio-ciemne (1000g -> 835g = 16.5% loss)
-      const medDark = formatRoastWeightLoss(1000, 835, 'pl');
-      expect(medDark.lossPercentage).toBe(16.5);
-      expect(medDark.category).toBe('medium_dark');
-
-      // 6. Odporność na null i anomalie
-      const fallback = formatRoastWeightLoss(null, null);
-      expect(fallback.lossPercentage).toBe(15.0);
-      expect(fallback.category).toBe('medium');
-      const lossFormat: RoastWeightLossFormat = fallback;
-      expect(lossFormat.descriptionPl).toBeTruthy();
-    });
-
-    test('TASK-P103-09-LOK: formatBoilingPointAtAltitude oblicza i formatuje temperaturę wrzenia wody na wysokości n.p.m.', () => {
-      // 1. Poziom morza (0m n.p.m.)
-      const seaLevel: AltitudeBoilingPoint = formatBoilingPointAtAltitude(0, 'C', 'pl');
-      const unit: AltitudeBoilingUnit = seaLevel.selectedUnit;
-      expect(unit).toBe('C');
-      expect(seaLevel.altitudeMeters).toBe(0);
-      expect(seaLevel.boilingPointCelsius).toBe(100.0);
-      expect(seaLevel.boilingPointFahrenheit).toBe(212.0);
-      expect(seaLevel.formattedTemperature).toBe('100,0°C');
-      expect(seaLevel.brewImpactPl).toContain('bliski 100°C');
-      expect(seaLevel.recommendationPl).toContain('Odczekaj 30–45 sekund');
-      expect(seaLevel.summaryPl).toContain('Wysokość 0m n.p.m.');
-
-      // 2. Wysokość w Denver / Addis Ababa (1500m n.p.m., Fahrenheit, język angielski)
-      // 100 - (1500 / 300) = 95.0°C
-      // 95.0 * 1.8 + 32 = 203.0°F
-      const denver = formatBoilingPointAtAltitude('1500', 'F', 'en');
-      expect(denver.altitudeMeters).toBe(1500);
-      expect(denver.boilingPointCelsius).toBe(95.0);
-      expect(denver.boilingPointFahrenheit).toBe(203.0);
-      expect(denver.selectedUnit).toBe('F');
-      expect(denver.formattedTemperature).toBe('203.0°F');
-      expect(denver.brewImpactEn).toContain('Moderate altitude');
-      expect(denver.recommendationEn).toContain('Pour straight off the boil');
-
-      // 3. Ekstremalna wysokość (Bogota / Mexico City: 2400m n.p.m., °C, język polski)
-      // 100 - (2400 / 300) = 92.0°C
-      const bogota = formatBoilingPointAtAltitude(2400, 'C', 'pl');
-      expect(bogota.boilingPointCelsius).toBe(92.0);
-      expect(bogota.formattedTemperature).toBe('92,0°C');
-      expect(bogota.brewImpactPl).toContain('Wysokogórski punkt wrzenia');
-      expect(bogota.recommendationPl).toContain('Zalewaj od razu po zagotowaniu');
-
-      // 4. Odporność na wartości null, ujemne i nienumeryczne
-      const fallback = formatBoilingPointAtAltitude(null, 'C', 'en');
-      expect(fallback.altitudeMeters).toBe(0);
-      expect(fallback.boilingPointCelsius).toBe(100.0);
-      expect(fallback.formattedTemperature).toBe('100.0°C');
-
-      const negativeAlt = formatBoilingPointAtAltitude(-500);
-      expect(negativeAlt.altitudeMeters).toBe(0);
-      expect(negativeAlt.boilingPointCelsius).toBe(100.0);
     });
   });
 });

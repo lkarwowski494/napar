@@ -6,10 +6,6 @@
 // ============================================================================
 
 import { createAudioPlayer, AudioPlayer } from 'expo-audio';
-import * as Haptics from 'expo-haptics';
-import { announce } from './announce';
-import { getCurrentTranslations, formatTemplate } from './i18n';
-import { getHapticsEnabled } from './database';
 
 let soundInstance: AudioPlayer | null = null;
 let cleanupTimer: any = null;
@@ -96,52 +92,4 @@ export async function playTimerChime(): Promise<boolean> {
   } catch {
     return false;
   }
-}
-
-/**
- * Triggered at 3 seconds before step end (Apps4Brew T-014 / BR-ZEG-002).
- */
-export async function notifyTimerStepWarning(secondsLeft = 3): Promise<boolean> {
-  const safeSeconds = Number.isFinite(secondsLeft) && secondsLeft > 0 ? Math.round(secondsLeft) : 3;
-  // 1. Accessibility announcement (i18n localized)
-  const t = getCurrentTranslations();
-  const template = t.common.timerStepWarning || 'Pozostały {seconds} sekundy do końca zalania';
-  announce(formatTemplate(template, { seconds: safeSeconds }));
-
-  // 2. Haptic warning
-  if (getHapticsEnabled()) {
-    try {
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    } catch {
-      // Ignore in non-native / test environments
-    }
-  }
-
-  // 3. Audio chime
-  return await playTimerChime();
-}
-
-/**
- * Triggered when a timer step or entire session finishes.
- */
-export async function notifyTimerFinished(stepName?: string): Promise<boolean> {
-  const safeStepName = typeof stepName === 'string' && stepName.trim() ? stepName.trim() : undefined;
-  // 1. Accessibility announcement (i18n localized)
-  const t = getCurrentTranslations();
-  const message = safeStepName
-    ? formatTemplate(t.common.stepFinished || 'Krok ukończony: {step}', { step: safeStepName })
-    : (t.common.brewingFinished || 'Parzenie zakończone!');
-  announce(message);
-
-  // 2. Haptic success
-  if (getHapticsEnabled()) {
-    try {
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch {
-      // Ignore in non-native / test environments
-    }
-  }
-
-  // 3. Audio chime
-  return await playTimerChime();
 }

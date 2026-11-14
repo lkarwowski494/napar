@@ -8,8 +8,7 @@ import * as announceModule from '../announce';
 import {
   playTimerChime,
   stopTimerChime,
-  notifyTimerStepWarning,
-  notifyTimerFinished,
+
   CHIME_AUDIO_DATA_URI,
 } from '../timer-audio';
 
@@ -59,43 +58,6 @@ describe('Timer Audio & Chime Engine', () => {
     expect(success).toBe(false);
   });
 
-  test('notifyTimerStepWarning anonsuje VoiceOver, wywołuje haptykę i odtwarza dźwięk', async () => {
-    const success = await notifyTimerStepWarning(3);
-    expect(success).toBe(true);
-    expect(announceSpy).toHaveBeenCalledWith('Pozostały 3 sekundy do końca zalania');
-    expect(Haptics.notificationAsync).toHaveBeenCalledWith(Haptics.NotificationFeedbackType.Warning);
-    expect(createAudioPlayer).toHaveBeenCalled();
-    expect(mockPlay).toHaveBeenCalled();
-  });
-
-  test('notifyTimerFinished anonsuje sukces, wywołuje haptykę success i odtwarza dźwięk', async () => {
-    const success = await notifyTimerFinished('Preinfuzja');
-    expect(success).toBe(true);
-    expect(announceSpy).toHaveBeenCalledWith('Krok ukończony: Preinfuzja');
-    expect(Haptics.notificationAsync).toHaveBeenCalledWith(Haptics.NotificationFeedbackType.Success);
-    expect(createAudioPlayer).toHaveBeenCalled();
-    expect(mockPlay).toHaveBeenCalled();
-  });
-
-  test('notifyTimerFinished bez nazwy kroku anonsuje domyślny koniec', async () => {
-    await notifyTimerFinished();
-    expect(announceSpy).toHaveBeenCalledWith('Parzenie zakończone!');
-  });
-
-  test('TASK-P12-12-NIE: sanityzuje secondsLeft i stepName przed anonsowaniem syntezy mowy', async () => {
-    await notifyTimerStepWarning(NaN);
-    expect(announceSpy).toHaveBeenCalledWith('Pozostały 3 sekundy do końca zalania');
-
-    await notifyTimerStepWarning(-2);
-    expect(announceSpy).toHaveBeenCalledWith('Pozostały 3 sekundy do końca zalania');
-
-    await notifyTimerFinished('   ');
-    expect(announceSpy).toHaveBeenCalledWith('Parzenie zakończone!');
-
-    await notifyTimerFinished(null as any);
-    expect(announceSpy).toHaveBeenCalledWith('Parzenie zakończone!');
-  });
-
   test('CHIME_AUDIO_DATA_URI zawiera prawidłowy plik audio RIFF WAV z rzeczywistymi próbkami PCM', () => {
     expect(CHIME_AUDIO_DATA_URI.startsWith('data:audio/wav;base64,')).toBe(true);
     const base64Data = CHIME_AUDIO_DATA_URI.replace('data:audio/wav;base64,', '');
@@ -105,6 +67,13 @@ describe('Timer Audio & Chime Engine', () => {
     expect(buffer.slice(12, 16).toString('ascii')).toBe('fmt ');
     // Dane PCM muszą zawierać rzeczywiste próbki audio (> 1000 bajtów)
     expect(buffer.length).toBeGreaterThan(1000);
+  });
+
+  test('playTimerChime wywołane ponownie zwalnia poprzedni odtwarzacz (pokrycie przejęte z usuniętych testów notifyTimer*, DEC-02)', async () => {
+    await playTimerChime();
+    mockRemove.mockClear();
+    await playTimerChime();
+    expect(mockRemove).toHaveBeenCalled();
   });
 
   test('stopTimerChime zatrzymuje instancję i usuwa zasób odtwarzacza (TASK-P6-08-PRO)', async () => {

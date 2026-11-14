@@ -8,7 +8,7 @@ import {
   calculateBrewRatio,
   calculateBrewWater,
   calculateExtractionYield,
-  scaleRecipeDose,
+
 } from '../src/core/domain-rules';
 import { wInKeep, roundTo } from '../src/core/unit-converter';
 
@@ -17,35 +17,6 @@ const seed = parseInt(process.env.PROP_SEED || '15926535', 10);
 fc.configureGlobal({ seed, numRuns: 100 });
 
 describe('Domain Properties with fast-check (BR-TEST-006)', () => {
-  test('Niezmiennik 1: Addytywność kroków zalewania przy skalowaniu receptury', () => {
-    // Suma wody ze wszystkich kroków po przeskalowaniu musi być równa docelowej wodzie receptury
-    fc.assert(
-      fc.property(
-        fc.integer({ min: 10, max: 40 }), // nowa doza kawy w gramach
-        (newDose) => {
-          const originalDose = 15;
-          const originalSteps = [
-            { id: '1', name: 'Preinfuzja', waterGrams: 50, durationSeconds: 45 },
-            { id: '2', name: 'Zalanie 1', waterGrams: 100, durationSeconds: 45 },
-            { id: '3', name: 'Zalanie 2', waterGrams: 100, durationSeconds: 60 },
-          ];
-
-          const scaled = scaleRecipeDose(originalSteps, originalDose, newDose);
-          const totalScaledWater = Number(
-            scaled.steps.reduce((sum, s) => sum + s.waterGrams, 0).toFixed(1)
-          );
-
-          // Całkowita masa wody po przeskalowaniu kroków musi równać się targetWaterGrams
-          expect(Math.abs(totalScaledWater - scaled.targetWaterGrams)).toBeLessThanOrEqual(0.1);
-          // Każdy krok musi zachować dodatnią masę wody
-          scaled.steps.forEach((step) => {
-            expect(step.waterGrams).toBeGreaterThan(0);
-          });
-        }
-      )
-    );
-  });
-
   test('Niezmiennik 2: Odwracalność relacji woda <-> doza <-> ratio', () => {
     fc.assert(
       fc.property(

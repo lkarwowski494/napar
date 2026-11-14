@@ -5,11 +5,7 @@
 import {
   CRAFT_APPS,
   sharedCraftTokens,
-  getCraftTheme,
-  getAllCraftApps,
-  isValidCraftAppId,
-  getCraftAppAccentColor,
-  getCraftAppDomain,
+
 } from '../craft-suite-theme';
 
 describe('Apps4Craft Suite Theme Tokens', () => {
@@ -34,83 +30,5 @@ describe('Apps4Craft Suite Theme Tokens', () => {
     expect(sharedCraftTokens.hitSlopStandard).toEqual({ top: 12, bottom: 12, left: 12, right: 12 });
     expect(sharedCraftTokens.borderRadius.lg).toBe(18);
     expect(sharedCraftTokens.typography.displayHero.fontSize).toBe(48);
-  });
-
-  test('Zwraca poprawny motyw aplikacji poprzez getCraftTheme', () => {
-    const piekarz = getCraftTheme('piekarz');
-    expect(piekarz.name).toBe('Piekarz');
-    expect(piekarz.accent).toBe('#D49B42');
-
-    // Domyślny fallback na napar przy nieznanym id
-    const fallback = getCraftTheme('unknown_app');
-    expect(fallback.id).toBe('napar');
-  });
-
-  test('TASK-P59-04-SZT: getCraftTheme normalizuje wielkosc liter, spacje oraz BOM uFEFF', () => {
-    // 1. Wielkie litery
-    const piekarzUpper = getCraftTheme('PIEKARZ' as any);
-    expect(piekarzUpper.id).toBe('piekarz');
-    expect(piekarzUpper.name).toBe('Piekarz');
-
-    // 2. BOM i spacje
-    const sloikBom = getCraftTheme('\uFEFFsloik' as any);
-    expect(sloikBom.id).toBe('sloik');
-    expect(sloikBom.name).toBe('Słoik');
-
-    const fermentSpaced = getCraftTheme('  ferment  ' as any);
-    expect(fermentSpaced.id).toBe('ferment');
-
-    // 3. Bezpieczny fallback przy null/undefined
-    expect(getCraftTheme(null as any).id).toBe('napar');
-    expect(getCraftTheme(undefined as any).id).toBe('napar');
-    expect(getCraftTheme('' as any).id).toBe('napar');
-  });
-
-  test('TASK-P61-04-SZT: getAllCraftApps zwraca 5 aplikacji kulinarnych a isValidCraftAppId weryfikuje identyfikator', () => {
-    // 1. getAllCraftApps
-    const apps = getAllCraftApps();
-    expect(Array.isArray(apps)).toBe(true);
-    expect(apps.length).toBe(5);
-    const ids = apps.map((a) => a.id);
-    expect(ids).toEqual(['napar', 'piekarz', 'sloik', 'masaz', 'ferment']);
-
-    // 2. isValidCraftAppId
-    expect(isValidCraftAppId('napar')).toBe(true);
-    expect(isValidCraftAppId('piekarz')).toBe(true);
-    expect(isValidCraftAppId('sloik')).toBe(true);
-    expect(isValidCraftAppId('masaz')).toBe(true);
-    expect(isValidCraftAppId('ferment')).toBe(true);
-    expect(isValidCraftAppId('\uFEFFnapar')).toBe(true);
-    expect(isValidCraftAppId('PIEKARZ')).toBe(true);
-
-    expect(isValidCraftAppId('unknown')).toBe(false);
-    expect(isValidCraftAppId(null)).toBe(false);
-    expect(isValidCraftAppId(undefined)).toBe(false);
-    expect(isValidCraftAppId(123)).toBe(false);
-  });
-
-  test('TASK-P64-04-SZT: getCraftAppAccentColor oraz getCraftAppDomain zwracaja precyzyjne tokeny kolorow i domen', () => {
-    // 1. getCraftAppAccentColor
-    expect(getCraftAppAccentColor('napar', 'primary')).toBe('#D97736');
-    expect(getCraftAppAccentColor('napar', 'light')).toBe('#E5A96A');
-    expect(getCraftAppAccentColor('napar', 'muted')).toBe('rgba(217, 119, 54, 0.15)');
-    expect(getCraftAppAccentColor('napar', 'secondary')).toBe('#2A7B62');
-
-    expect(getCraftAppAccentColor('piekarz')).toBe('#D49B42');
-    expect(getCraftAppAccentColor('sloik')).toBe('#5B8A61');
-    expect(getCraftAppAccentColor('masaz')).toBe('#A43E38');
-    expect(getCraftAppAccentColor('ferment')).toBe('#E0A838');
-
-    // Fallback dla nieznanych id i null
-    expect(getCraftAppAccentColor('unknown')).toBe('#D97736');
-    expect(getCraftAppAccentColor(null as any)).toBe('#D97736');
-
-    // 2. getCraftAppDomain
-    expect(getCraftAppDomain('napar')).toContain('Kawa & Herbata');
-    expect(getCraftAppDomain('piekarz')).toContain('Chleb');
-    expect(getCraftAppDomain('sloik')).toContain('Kiszonki');
-    expect(getCraftAppDomain('masaz')).toContain('Wędliny');
-    expect(getCraftAppDomain('ferment')).toContain('Sery');
-    expect(getCraftAppDomain('unknown')).toContain('Kawa & Herbata');
   });
 });

@@ -3,7 +3,6 @@
 // Komunikaty głosowe w treści poprzez natywne announceForAccessibility
 // ============================================================================
 
-import { useEffect } from 'react';
 import { AccessibilityInfo } from 'react-native';
 import { pluralPl } from './i18n';
 
@@ -14,12 +13,6 @@ export const announce = (text: string): void => {
     // brak VoiceOver lub środowisko testowe
   }
 };
-
-export function useAnnounce(text: string | null | undefined): void {
-  useEffect(() => {
-    if (text) announce(text);
-  }, [text]);
-}
 
 /**
  * Formatuje komunikat zapowiedzi etapu parzenia dla czytnika ekranu (VoiceOver / TalkBack).
@@ -54,21 +47,6 @@ export function formatCountdownAnnouncement(
   }
   const secWord = pluralPl(secondsRemaining, 'sekunda', 'sekundy', 'sekund');
   return `${secondsRemaining} ${secWord} do końca etapu.`;
-}
-
-/**
- * Formatuje komunikat rozpoczęcia sesji.
- */
-export function formatStartAnnouncement(
-  recipeName: string,
-  doseGrams: number,
-  waterGrams: number,
-  language: 'pl' | 'en' = 'pl'
-): string {
-  if (language === 'en') {
-    return `Started brewing ${recipeName}. Dose: ${doseGrams} g, water: ${waterGrams} g.`;
-  }
-  return `Rozpoczęto parzenie ${recipeName}. Doza: ${doseGrams} g, woda: ${waterGrams} g.`;
 }
 
 /**
@@ -135,18 +113,5 @@ export function announceFinish(
   language: 'pl' | 'en' = 'pl'
 ): void {
   const msg = formatFinishAnnouncement(recipeName, totalSeconds, language);
-  announce(msg);
-}
-
-/**
- * Natychmiastowa zapowiedź rozpoczęcia parzenia.
- */
-export function announceStart(
-  recipeName: string,
-  doseGrams: number,
-  waterGrams: number,
-  language: 'pl' | 'en' = 'pl'
-): void {
-  const msg = formatStartAnnouncement(recipeName, doseGrams, waterGrams, language);
   announce(msg);
 }

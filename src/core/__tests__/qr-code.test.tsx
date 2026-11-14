@@ -5,21 +5,9 @@
 
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { QrCodeSvg, generateQrMatrix } from '../qr-code';
+import { QrCodeSvg,  } from '../qr-code';
 
 describe('Offline Vector QR Code (QrCodeSvg & generateQrMatrix)', () => {
-  test('generateQrMatrix tworzy poprawną macierz kwadratową modułów', () => {
-    const res = generateQrMatrix('napar://r/test-recipe');
-    expect(res.size).toBeGreaterThan(0);
-    expect(res.modules.length).toBe(res.size);
-    expect(res.modules[0].length).toBe(res.size);
-    expect(typeof res.modules[0][0]).toBe('boolean');
-
-    // Obsługa pustego tekstu
-    const emptyRes = generateQrMatrix('');
-    expect(emptyRes.size).toBeGreaterThan(0);
-  });
-
   test('QrCodeSvg renderuje komponent wektorowy SVG z zadanymi właściwościami', () => {
     let tree: renderer.ReactTestRenderer;
     act(() => {

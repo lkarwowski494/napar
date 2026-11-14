@@ -198,7 +198,7 @@ describe('Zapis rodzica nie kasuje dzieci (M1-audytor-generalny-002; 05-architek
     expect(count(db, 'SELECT COUNT(*) AS c FROM caffeine_logs')).toBe(3);
     db.saveBrewSession({ ...session(1), notes: 'poprawka notatki' });
     expect(count(db, 'SELECT COUNT(*) AS c FROM caffeine_logs')).toBe(3);
-    expect(db.getBrewSessionById('s1')?.notes).toBe('poprawka notatki');
+    expect(db.getBrewSessions().find((s: any) => s.id === 's1')?.notes).toBe('poprawka notatki');
     sqlite.__closeAll();
   });
 
@@ -379,7 +379,7 @@ describe('Import odrzuca nowszy format i złe typy bez zapisu (M1-audytor-genera
     dst.db.importDataJson(file);
     expect(dst.db.getInventoryItemById('imp-b1')?.origin).toBe('Huila');
     expect(dst.db.getRecipeById('r-own')?.name).toBe('Moja V60');
-    expect(dst.db.getBrewSessionById('imp-s1')?.sensory).toEqual({ acidity: 3, sweetness: 4, body: 3, clarity: 4, finish: 3 });
+    expect(dst.db.getBrewSessions().find((s: any) => s.id === 'imp-s1')?.sensory).toEqual({ acidity: 3, sweetness: 4, body: 3, clarity: 4, finish: 3 });
     expect(count(dst.db, 'SELECT COUNT(*) AS c FROM caffeine_logs')).toBe(1);
     dst.sqlite.__closeAll();
   });
@@ -535,7 +535,7 @@ describe('Brak zostaje brakiem, zła liczba blokuje zapis (M1-audytor-generalny-
       `INSERT INTO brew_sessions (id, beverage_type, method, dose_g, water_g, water_temp_c, total_time_seconds, brewed_at)
        VALUES ('raw', 'COFFEE', 'V60', 0, 0, 0, 0, '2026-11-01T08:00:00.000Z')`
     );
-    const s = db.getBrewSessionById('raw');
+    const s = db.getBrewSessions().find((s: any) => s.id === 'raw');
     expect([s?.doseGrams, s?.waterGrams, s?.waterTempCelsius]).toEqual([0, 0, 0]);
     sqlite.__closeAll();
   });

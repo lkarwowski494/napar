@@ -8,7 +8,7 @@ import renderer from 'react-test-renderer';
 import { View, Text } from 'react-native';
 import {
   isRecipeTea,
-  getRecipeName,
+
   useBrewWorkflow,
   AnyRecipe,
 } from '../src/core/useBrewWorkflow';
@@ -73,9 +73,6 @@ describe('Workflow & Analytics Test Matrix Validation', () => {
 
     expect(isRecipeTea(coffeeRecipe)).toBe(false);
     expect(isRecipeTea(teaRecipe)).toBe(true);
-
-    expect(getRecipeName(coffeeRecipe)).toBe('V60 Classic');
-    expect(getRecipeName(teaRecipe)).toBe('Sencha Green');
 
     // Walidacja typu AnyRecipe w kodzie
     const anyRec: AnyRecipe = coffeeRecipe;

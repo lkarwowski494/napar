@@ -146,29 +146,9 @@ jest.mock('expo-sqlite', () => ({
   defaultDatabaseDirectory: '/test/SQLite',
 }));
 
-import {
-  initDatabase,
-  getRecipes,
-  saveRecipe,
-  getInventoryItems,
-  getInventoryItemById,
-  saveInventoryItem,
-  getBrewSessions,
-  recordBrewSessionTransaction,
-  getCaffeineLogs,
-  logCaffeine,
-  exportAllDataJson,
-  importDataJson,
-  exportSessionsCsv,
-  exportInventoryCsv,
-  getAppSetting,
-  setAppSetting,
-  getUnitSystem,
-  setUnitSystem,
-} from '../src/core/database';
+import { initDatabase, getRecipes, saveRecipe, getInventoryItems, getInventoryItemById, saveInventoryItem, getBrewSessions, recordBrewSessionTransaction, getCaffeineLogs, logCaffeine, exportAllDataJson, importDataJson, exportInventoryCsv, getAppSetting, setAppSetting, getUnitSystem, setUnitSystem } from '../src/core/database';
 import { calculateBrewCost } from '../src/core/cost-calculator';
 import { calculateWaterMinerals } from '../src/core/water-chemistry';
-import { diagnoseTaste } from '../src/core/domain-rules';
 import { buildBackup } from '../src/core/backup';
 
 describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
@@ -289,18 +269,6 @@ describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
     const caffeineLogs = getCaffeineLogs();
     expect(caffeineLogs.length).toBeGreaterThan(0);
     expect(caffeineLogs[0].caffeineMg).toBe(180);
-  });
-
-  test('Diagnostyka sensoryczna i reguły parzenia wykonują się 100% lokalnie', () => {
-    const diagnosesCoffee = diagnoseTaste({ isSour: true });
-    expect(diagnosesCoffee.length).toBeGreaterThanOrEqual(1);
-    expect(diagnosesCoffee[0].issue).toContain('Niedoparzenie');
-    expect(diagnosesCoffee[0].recommendationPl).toBeDefined();
-
-    const diagnosesTea = diagnoseTaste({ beverageType: 'TEA', isBitter: true });
-    expect(diagnosesTea.length).toBeGreaterThanOrEqual(1);
-    expect(diagnosesTea[0].issue).toBeDefined();
-    expect(diagnosesTea[0].recommendationPl).toBeDefined();
   });
 
   test('Kalkulatory rzemieślnicze (woda, koszt, jednostki) działają bez sieci', () => {

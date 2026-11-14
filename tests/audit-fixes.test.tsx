@@ -13,13 +13,7 @@ import { join } from 'node:path';
 import { wInKeep, roundTo } from '../src/core/unit-converter';
 import { remainingTimerSec } from '../src/core/timer-engine';
 import { escapeCsvCell } from '../src/core/database';
-import {
-  saveBackupSafely,
-  rotateBackupFiles,
-  SAFETY_RE,
-  protectCorruptState,
-  listCorruptStates,
-} from '../src/core/backup';
+import { rotateBackupFiles, SAFETY_RE } from '../src/core/backup';
 import { normSearch } from '../src/core/search-utils';
 import {
   calculateBrewRatio,
@@ -34,7 +28,7 @@ import {
   CloseButton,
   Btn,
 } from '../src/components/ui';
-import { confirm, confirmAction } from '../src/core/confirm';
+import {  confirmAction } from '../src/core/confirm';
 import { translations } from '../src/core/i18n';
 
 const root = process.cwd();
@@ -87,18 +81,6 @@ describe('KROK 3: Testy regresyjne znalezisk audytu 10 ról (BR-REL-016)', () =>
         btn.props.onPress();
       });
       expect(closed).toBe(true);
-    });
-
-    test('UI-03: Porzucenie brudnego formularza wymaga potwierdzenia użytkownika', () => {
-      let confirmed = false;
-      confirm({
-        title: 'Odrzucić zmiany?',
-        message: 'Niezapisane parametry receptury zostaną utracone.',
-        confirmText: 'Odrzuć',
-        destructive: true,
-        onConfirm: () => { confirmed = true; },
-      });
-      expect(typeof confirm).toBe('function');
     });
 
     test('UI-04: confirm.ts unika niejednoznacznych etykiet Nie/Wróć (S5)', () => {

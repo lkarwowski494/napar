@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { normSearch, matchesSearch } from '../src/core/search-utils';
-import { confirm, confirmAction } from '../src/core/confirm';
+import {  confirmAction } from '../src/core/confirm';
 
 const root = process.cwd();
 
@@ -69,9 +69,6 @@ describe('Interaction Guards S1..S16 (NFR-INT-001..016)', () => {
       const content = fs.readFileSync(file, 'utf8');
       expect(content).not.toMatch(/text:\s*['"](Nie|Tak|Wróć|Wroc)['"]/);
     }
-
-    // confirmAction i confirm eksportowane poprawnie
-    expect(typeof confirm).toBe('function');
     expect(typeof confirmAction).toBe('function');
   });
 

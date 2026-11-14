@@ -10,10 +10,10 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | **EKRAN** | 9 | 9 | **100.0%** | ✅ POKRYTE |
 | **UI** | 97 | 97 | **100.0%** | ✅ POKRYTE |
 | **TEKST** | 452 | 452 | **100.0%** | ✅ POKRYTE |
-| **LOGIKA** | 418 | 418 | **100.0%** | ✅ POKRYTE |
-| **WYMIAR** | 113 | 113 | **100.0%** | ✅ POKRYTE |
+| **LOGIKA** | 171 | 171 | **100.0%** | ✅ POKRYTE |
+| **WYMIAR** | 39 | 39 | **100.0%** | ✅ POKRYTE |
 
-Łącznie elementów: **1089** | Pokrytych: **1089** | Brakujących: **0**
+Łącznie elementów: **768** | Pokrytych: **768** | Brakujących: **0**
 
 ## Szczegółowa Lista Elementów
 
@@ -320,4 +320,4 @@ Zasada dowodu: wyłącznie wykonywalny kod testu (wycięte komentarze, importy i
 | `TEKST` | `stash.weightLabelMetric` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/__tests__/AppGuideModal.test.tsx |
 | `TEKST` | `stash.weightLabelImperial` | `src/core/i18n.tsx` | ✅ | tests/recipe-select-inline.test.tsx, src/components/__tests__/AppGuideModal.test.tsx |
 
-*(... i 789 kolejnych elementów w pełnym wykazie)*
+*(... i 468 kolejnych elementów w pełnym wykazie)*

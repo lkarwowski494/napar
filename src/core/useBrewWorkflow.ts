@@ -12,7 +12,7 @@ import {
   getRecipes,
   getInventoryItems,
   getBrewSessions,
-  toggleRecipeFavorite,
+
   saveRecipe,
   duplicateRecipe,
   getUnitSystem,
@@ -48,10 +48,6 @@ export function isRecipeTea(recipe: AnyRecipe): boolean {
     return recipe.beverageType === 'TEA';
   }
   return recipe.type === 'TEA';
-}
-
-export function getRecipeName(recipe: AnyRecipe): string {
-  return recipe.name;
 }
 
 export function useBrewWorkflow() {

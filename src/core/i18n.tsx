@@ -4,8 +4,7 @@
 // Obsługa: 'pl' (Napar) oraz 'en' (Steepwise)
 // ============================================================================
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-
+import React, { createContext, useContext, useState } from 'react';
 
 export type SupportedLanguage = 'pl' | 'en';
 
@@ -1293,36 +1292,6 @@ function parseCount(count: number | string | any): number {
 }
 
 /**
- * Wykrywa kategorię liczby mnogiej zgodnie z regułami CLDR / Intl.PluralRules.
- * Posiada wbudowany bezpieczny fallback dla środowiska Hermes / braku pełnego Intl.
- */
-export function getPluralCategory(
-  lang: string,
-  count: number | string
-): 'zero' | 'one' | 'two' | 'few' | 'many' | 'other' {
-  const parsed = parseCount(count);
-  const num = isNaN(parsed) ? 0 : parsed;
-  try {
-    if (typeof Intl !== 'undefined' && typeof Intl.PluralRules === 'function') {
-      return new Intl.PluralRules(lang).select(num) as any;
-    }
-  } catch {
-    // bezpieczny fallback dla Hermesa
-  }
-
-  const abs = Math.abs(Math.floor(num));
-  if (typeof lang === 'string' && lang.toLowerCase().startsWith('pl')) {
-    const n = abs % 100;
-    const n10 = n % 10;
-    if (abs === 1) return 'one';
-    if (n10 >= 2 && n10 <= 4 && (n < 12 || n > 14)) return 'few';
-    return 'many';
-  }
-
-  return abs === 1 ? 'one' : 'other';
-}
-
-/**
  * Polska odmiana gramatyczna liczebników (RD-ENG-09, NFR-I18N-007).
  * Dla n = |x| mod 100, n10 = n mod 10:
  * - jeśli |x| === 1 -> one (np. 1 seria, 1 sekunda, 1 klik)
@@ -1338,23 +1307,6 @@ export function pluralPl(count: number | string, one: string, few: string, many:
   if (abs === 1) return one;
   if (n10 >= 2 && n10 <= 4 && (n < 12 || n > 14)) return few;
   return many;
-}
-
-/**
- * Uniwersalny helper pluralizacji dla języków aplikacji ('pl' | 'en') oparty o Intl.PluralRules
- */
-export function plural(
-  lang: SupportedLanguage,
-  count: number | string,
-  forms: { one: string; few?: string; many?: string; other?: string; zero?: string; two?: string }
-): string {
-  const category = getPluralCategory(lang, count);
-  if (forms[category]) {
-    return forms[category]!;
-  }
-  if (category === 'few' && forms.many) return forms.many;
-  if (category === 'many' && forms.few) return forms.few;
-  return forms.other ?? forms.many ?? forms.few ?? forms.one;
 }
 
 /**
@@ -1376,120 +1328,4 @@ export function formatTemplate(template: string, params: Record<string, string |
     result = result.split(`{${key}}`).join(strVal);
   }
   return result;
-}
-
-/**
- * Zwraca sformatowane i zlokalizowane orzeczenie dostępności kontrastu WCAG 2.1
- */
-export function formatWcagRating(
-  ratio: number,
-  isLargeText = false,
-  lang: SupportedLanguage | string = 'pl'
-): string {
-  const cleanLang = typeof lang === 'string' && lang.toLowerCase().startsWith('pl') ? 'pl' : 'en';
-  const safeRatio = Number.isFinite(ratio) ? Math.max(0, ratio) : 0;
-  const thresholdAAA = isLargeText ? 4.5 : 7.0;
-  const thresholdAA = isLargeText ? 3.0 : 4.5;
-
-  if (safeRatio >= thresholdAAA) {
-    return cleanLang === 'pl' ? 'WCAG AAA (Znakomity)' : 'WCAG AAA (Enhanced)';
-  }
-  if (safeRatio >= thresholdAA) {
-    return cleanLang === 'pl' ? 'WCAG AA (Zgodny)' : 'WCAG AA (Pass)';
-  }
-  return cleanLang === 'pl' ? 'Niezgodny (Fail)' : 'Fail';
-}
-
-/**
- * Formatuje sekundy do postaci MM:SS (np. 150 -> '02:30'), z obsługą stringów ('90s', '185,5'),
- * zabezpieczeniem przed -0, wartościami ujemnymi, NaN i wartościami powyżej 86400s (24h).
- */
-export function formatBrewTime(seconds: number | string | undefined | null): string {
-  if (seconds === undefined || seconds === null) return '00:00';
-  const rawSec =
-    typeof seconds === 'number'
-      ? seconds
-      : typeof seconds === 'string'
-      ? parseFloat(seconds.replace(/\uFEFF/g, '').replace(',', '.'))
-      : 0;
-  const safeSec =
-    Number.isFinite(rawSec) && rawSec >= 0 && !Object.is(rawSec, -0)
-      ? Math.min(86400, Math.floor(rawSec))
-      : 0;
-  const mins = Math.floor(safeSec / 60);
-  const secs = safeSec % 60;
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
-
-/**
- * Formatuje czytelny czas parzenia (np. '2 min 30 s' w PL, '2m 30s' w EN).
- */
-export function formatBrewDurationText(
-  seconds: number | string | undefined | null,
-  lang: SupportedLanguage | string = 'pl'
-): string {
-  const isPolish = typeof lang === 'string' && lang.toLowerCase().startsWith('pl');
-  if (seconds === undefined || seconds === null) {
-    return isPolish ? '0 s' : '0s';
-  }
-  const rawSec =
-    typeof seconds === 'number'
-      ? seconds
-      : typeof seconds === 'string'
-      ? parseFloat(seconds.replace(/\uFEFF/g, '').replace(',', '.'))
-      : 0;
-  const safeSec =
-    Number.isFinite(rawSec) && rawSec >= 0 && !Object.is(rawSec, -0)
-      ? Math.min(86400, Math.floor(rawSec))
-      : 0;
-  const mins = Math.floor(safeSec / 60);
-  const secs = safeSec % 60;
-
-  if (mins === 0) {
-    return isPolish ? `${secs} s` : `${secs}s`;
-  }
-  if (secs === 0) {
-    return isPolish ? `${mins} min` : `${mins}m`;
-  }
-  return isPolish ? `${mins} min ${secs} s` : `${mins}m ${secs}s`;
-}
-
-/**
- * Formatuje liczbę dni względem dzisiaj do czytelnej postaci (np. 'Dziś', 'Jutro', 'Za 3 dni', '4 dni temu' w PL,
- * 'Today', 'Tomorrow', 'In 3 days', '4 days ago' w EN/innych).
- * Obsługuje stringi ('5.2', '-3'), chroni przed -0, NaN, null, undefined.
- */
-export function formatRelativeDays(
-  daysOffset: number | string | undefined | null,
-  lang: SupportedLanguage | string = 'pl'
-): string {
-  const isPolish = typeof lang === 'string' && lang.toLowerCase().startsWith('pl');
-  if (daysOffset === undefined || daysOffset === null) {
-    return isPolish ? 'Dziś' : 'Today';
-  }
-  const rawDays =
-    typeof daysOffset === 'number'
-      ? daysOffset
-      : typeof daysOffset === 'string'
-      ? parseFloat(daysOffset.replace(/\uFEFF/g, '').replace(',', '.'))
-      : 0;
-  const safeDays =
-    Number.isFinite(rawDays) && !Object.is(rawDays, -0)
-      ? Math.max(-36500, Math.min(36500, Math.round(rawDays)))
-      : 0;
-
-  if (safeDays === 0) {
-    return isPolish ? 'Dziś' : 'Today';
-  }
-  if (safeDays === 1) {
-    return isPolish ? 'Jutro' : 'Tomorrow';
-  }
-  if (safeDays === -1) {
-    return isPolish ? 'Wczoraj' : 'Yesterday';
-  }
-  if (safeDays > 1) {
-    return isPolish ? `Za ${safeDays} dni` : `In ${safeDays} days`;
-  }
-  const absDays = Math.abs(safeDays);
-  return isPolish ? `${absDays} dni temu` : `${absDays} days ago`;
 }
