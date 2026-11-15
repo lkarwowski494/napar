@@ -9,7 +9,7 @@
 | **RYZ-01** | Apple | Odrzucenie wg 4.3(b) jako „prosty stoper” | Średnie | Krytyczny | Wersja 1.0 zawiera Dial-in Doctora, koło smaków SCA, model kofeiny z HealthKit, Live Activity i Apple Watch. |
 | **RYZ-02** | Apple | Odrzucenie kofeiny jako porady medycznej (1.4.1/5.1.1) | Niskie | Wysoki | Transparentne klauzule informacyjne; powołanie się wyłącznie na dane statystyczne EFSA/FDA; brak diagnoz medycznych. |
 | **RYZ-03** | Sprzęt | Błędy łączności z wagami Bluetooth | Wysokie | Średni | Przesunięcie wag Bluetooth do wersji 1.2; pełna użyteczność manualna w wersji MVP. |
-| **RYZ-04** | Zegarek | Usypianie timera w watchOS w trakcie parzenia | Średnie | Krytyczny | Implementacja `WKExtendedRuntimeSession` gwarantująca ciągłość działania w tle do 30 minut. |
+| **RYZ-04** | Zegarek | Usypianie timera w watchOS w trakcie parzenia | Średnie | Krytyczny | Implementacja `WKExtendedRuntimeSession` gwarantująca ciągłość działania w tle do 30 minut. Nie dotyczy 1.0 (KILL-07, ER-03 w 00c). |
 | **RYZ-05** | Dane | Utrata historii parzeń przy aktualizacji aplikacji | Niskie | Krytyczny | Automatyczny backup bazy SQLite do pliku przed każdą migracją; rygorystyczne testy migracji schematu. |
 | **RYZ-06** | Biznes | Niska konwersja do subskrypcji przy cenach z hipotezy H-MON-01 (nie dotyczy 1.0: DEC-41) | Średnie | Średni | Przy powrocie do modelu płatnego: ceny z progów App Store i danych rynku (rola 02), plan roczny i zakup dożywotni jako opcje decyzji. |
 | **RYZ-07** | UI/UX | Nieczytelność stopera w pełnym słońcu / parze | Średnie | Niski | Ekran parzenia o bardzo wysokim kontraście (czyste tło, gruba typografia San Francisco Pro). |

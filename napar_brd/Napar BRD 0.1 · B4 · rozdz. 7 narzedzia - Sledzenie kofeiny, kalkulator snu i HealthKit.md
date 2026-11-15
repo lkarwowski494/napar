@@ -14,6 +14,7 @@
 * **Priorytet:** MUST | **Etap:** MVP
 
 ### **BR-KOF-002: Zapis do Apple HealthKit (Dietary Caffeine)**
+* **Status: wycofane z 1.0** (2026-11-13, DEC-04 audytu M1 (a); KILL-08, odłożone do v1.2; ER-03 w 00c). W 1.0 dane kofeiny tylko w lokalnym SQLite.
 * **Opis:** Zapisanie spożytej dawki kofeiny bezpośrednio w systemowej bazie Apple Health jako próbki ilościowej typu `HKQuantityTypeIdentifierDietaryCaffeine`.
 * **Kryteria akceptacji:**
   1. Aplikacja prosi o uprawnienie zapisu do HealthKit w przejrzystym oknie kontekstowym, wyjaśniając korzyści.

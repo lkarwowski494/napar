@@ -10,7 +10,7 @@
 
 ### **9.2 Wydajność i responsywność (NFR-WYD)**
 * **NFR-WYD-001:** Czas zimnego startu aplikacji (Cold launch) na urządzeniach od iPhone 12 w górę wynosi poniżej 400 ms do pełnej interaktywności.
-* **NFR-WYD-002:** Zużycie pamięci RAM w trakcie aktywnej sesji parzenia z animowanym Live Activity nie przekracza 45 MB.
+* **NFR-WYD-002:** Zużycie pamięci RAM w trakcie aktywnej sesji parzenia z animowanym Live Activity nie przekracza 45 MB. *(Nie dotyczy 1.0: Live Activity poza 1.0, KILL-06; ER-03 w 00c.)*
 * **NFR-WYD-003:** Timer nie wykazuje dryfu czasowego większego niż 10 ms na 10 minut pracy.
 
 ### **9.3 Dostępność (NFR-DOST)**
@@ -19,7 +19,7 @@
 
 ### **9.4 Prywatność i bezpieczeństwo (NFR-BEZP)**
 * **NFR-BEZP-001:** Privacy Manifest (`PrivacyInfo.xcprivacy`) deklaruje brak gromadzenia danych śledzących (`NSPrivacyTracking = false`).
-* **NFR-BEZP-002:** Dane Apple HealthKit (kofeina) nigdy nie są kopiowane poza piaskownicę aplikacji i chronione są kluczem szyfrującym urządzenia (Data Protection Class A).
+* **NFR-BEZP-002:** Dane Apple HealthKit (kofeina) nigdy nie są kopiowane poza piaskownicę aplikacji i chronione są kluczem szyfrującym urządzenia (Data Protection Class A). *(Nie dotyczy 1.0: brak HealthKit, KILL-08; ER-03 w 00c.)*
 
 ---
 
@@ -31,4 +31,4 @@
 | **4.3(a)** | Zakaz tworzenia klonów i spamu | Połączenie Kawy i Herbaty w jedną unikalną aplikację Napar; brak dublowania aplikacji w sklepie. | Bardzo niskie |
 | **4.3(b)** | Wymóg bogatej funkcjonalności | Aplikacja nie jest prostym minutnikiem: zawiera Dial-in Doctora, koło smaków SCA, model farmakokinetyczny kofeiny, Live Activity i watchOS. | Niskie |
 | **5.1.1** | Ochrona danych i prywatność | Pełne działanie lokalne; brak wymogu podawania e-maila, brak rejestracji konta; status „Data Not Collected”. | Zerowe |
-| **5.1.2(i)** | Ochrona danych zdrowotnych | Zapis do HealthKit wyłącznie za jawną zgodą użytkownika; brak wysyłania danych kofeiny na zewnętrzne serwery. | Zerowe |
+| **5.1.2(i)** | Ochrona danych zdrowotnych (nie dotyczy 1.0: brak HealthKit, KILL-08; ER-03 w 00c) | Zapis do HealthKit wyłącznie za jawną zgodą użytkownika; brak wysyłania danych kofeiny na zewnętrzne serwery. | Zerowe |

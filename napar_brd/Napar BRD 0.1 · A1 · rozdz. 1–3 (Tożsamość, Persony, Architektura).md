@@ -23,7 +23,7 @@ Każde wymaganie funkcjonalne i techniczne w całym projekcie musi być w 100% z
 | **ZP-03** | **Zero serwerów i zero AI w chmurze.** | Wszystkie algorytmy (w tym Dial-in Doctor) działają deterministycznie na urządzeniu. Koszt krańcowy = 0. Aplikacja działa w schronisku górskim bez zasięgu. |
 | **ZP-04** | **Bez reklam i bez banerów.** | Aplikacja rzemieślnicza to przestrzeń spokoju i skupienia. Reklamy niszczą estetykę i budzą irytację użytkownika. |
 | **ZP-05** | **Determinizm zamiast generatywnego AI.** | Porady baristyczne i sensoryczne wynikają ze zweryfikowanych reguł chemii i fizyki płynów, a nie z halucynacji LLM. |
-| **ZP-06** | **Dane użytkownika nigdy nie giną.** | Magazyn ziaren, notatki degustacyjne i historia parzeń są automatycznie zabezpieczane w prywatnym iCloud Drive użytkownika. |
+| **ZP-06** | **Dane użytkownika nigdy nie giną.** | Magazyn ziaren, notatki degustacyjne i historia parzeń są automatycznie zabezpieczane w prywatnym iCloud Drive użytkownika. Część iCloud Drive nierozstrzygnięta (ER-05 w 00c); w 1.0 kopie lokalne na urządzeniu i eksport JSON. |
 | **ZP-07** | **Kopia zapasowa i eksport zawsze bezpłatne.** | Eksport do otwartego formatu JSON/CSV jest dostępny dla każdego, bez konieczności płacenia subskrypcji (zgodność z Apple 4.10). |
 | **ZP-08** | **Uczciwy i przejrzysty model cenowy.** | Brak ukrytych płatności. Wersja 1.0 całkowicie darmowa (DEC-41, 2026-11-13); dawne ceny Pro to hipoteza H-MON-01 (A2 5.1). |
 | **ZP-09** | **Szacunek dla kultury specialty i autorów.** | Nazwy metod, palarni i receptury mistrzów są prezentowane z należytym uznaniem autorstwa, bez zawłaszczania cudzej twórczości. |
@@ -31,8 +31,8 @@ Każde wymaganie funkcjonalne i techniczne w całym projekcie musi być w 100% z
 | **ZP-11** | **Dostępność jest fundamentem, nie dodatkiem.** | Pełna obsługa VoiceOver, Dynamic Type (skalowanie czcionek dla seniorów), wysoki kontrast i haptyka dla osób niedowidzących. |
 | **ZP-12** | **Ścisła zgodność z fizyką i nauką.** | Wzory na Brew Ratio, TDS, Yield i kinetykę kofeiny bazują na literaturze Specialty Coffee Association (SCA), World Coffee Research i EFSA. |
 | **ZP-13** | **Spokojny, rzemieślniczy język.** | Interfejs nie krzyczy, nie stosuje mechanizmów uzależniających (brak toxic streaks, agresywnych powiadomień push). |
-| **ZP-14** | **Ręce na czajniku (Hands-free brewing).** | Informowanie o kolejnych krokach poprzez subtelną haptykę Apple Watch i czytelne Live Activity, aby użytkownik nie musiał dotykać telefonu mokrymi dłońmi. |
-| **ZP-15** | **Przenośność i czysta architektura.** | Modułowy kod Swift/SwiftUI, niezależny od zewnętrznych frameworków, gotowy do współdzielenia z rdzeniem portfolio Apps4Brew. |
+| **ZP-14** | **Ręce na czajniku (Hands-free brewing).** | Informowanie o kolejnych krokach poprzez subtelną haptykę Apple Watch i czytelne Live Activity, aby użytkownik nie musiał dotykać telefonu mokrymi dłońmi. Apple Watch i Live Activity nie dotyczy 1.0 (KILL-07, KILL-06; ER-03 w 00c); w 1.0 dźwięk i wibracja telefonu na pierwszym planie oraz ekran bez wygaszania. |
+| **ZP-15** | **Przenośność i czysta architektura.** | Modułowy kod Swift/SwiftUI (ER-04 w 00c: kod 1.0 w TypeScript na Expo / React Native), niezależny od zewnętrznych frameworków, gotowy do współdzielenia z rdzeniem portfolio Apps4Brew. |
 | **ZP-16** | **Zero kosztów stałych infrastruktury.** | Żadnych baz danych PostgreSQL w chmurze, żadnych instancji AWS. Projekt ma zerowy koszt utrzymania poza opłatą Apple Developer. |
 
 ---

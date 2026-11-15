@@ -11,7 +11,7 @@ Zakres funkcjonalny Z-091 do Z-180.
 | **Z-093** | KOFEINA | Wykres stężenia w organizmie | Wizualizacja krzywej eliminacji kofeiny w czasie ($t_{1/2} = 5.0\,\text{h}$) od momentu spożycia. | MUST | MVP |
 | **Z-094** | KOFEINA | Predykcja stężenia przed snem | Obliczenie szacowanego poziomu kofeiny o zadeklarowanej porze snu użytkownika (np. 23:00). | MUST | MVP |
 | **Z-095** | KOFEINA | Wskaźnik bezpiecznej godziny (Curfew) | Informacja: *„Aby stężenie spadło poniżej 25mg przed snem, ostatnią filiżankę wypij do 16:30”*. | WYCOFANE 2026-11-14 (DEC-05 a: brak źródła progu 25 mg) | — |
-| **Z-096** | KOFEINA | Zapis do Apple HealthKit | Eksport wartości w gramach/miligramach do parametru `HKQuantityTypeIdentifierDietaryCaffeine`. | MUST | MVP |
+| **Z-096** | KOFEINA | Zapis do Apple HealthKit | Eksport wartości w gramach/miligramach do parametru `HKQuantityTypeIdentifierDietaryCaffeine`. | WYCOFANE z 1.0 2026-11-13 (DEC-04 audytu M1 (a); KILL-08, ER-03) | 1.2 |
 | **Z-097** | KOFEINA | Dzienny bilans kofeiny | Podsumowanie dobowe w relacji do maksymalnej dawki bezpiecznej EFSA (400 mg dla zdrowego dorosłego). | MUST | MVP |
 | **Z-101** | SENSORYKA | Szybka ocena w gwiazdkach | Skala 1–5 gwiazdek dla szybkiego podsumowania filiżanki w 2 sekundy. | MUST | MVP |
 | **Z-102** | SENSORYKA | Balans bazowy: Kwasowość, Słodycz, Gorycz | Trzy suwaki w skali 1–5 do oceny podstawowych filarów smaku naparu. | MUST | MVP |
@@ -21,22 +21,22 @@ Zakres funkcjonalny Z-091 do Z-180.
 | **Z-111** | DIAL-IN | Diagnoza: Kawa gorzka / ściągająca / sucha | System podpowiada: przeparzenie (over-extraction) lub channeling -> zmiel grubiej, obniż temperaturę. | MUST | MVP |
 | **Z-112** | DIAL-IN | Diagnoza: Płaska, mdła, wodnista | System podpowiada: zbyt niska doza lub zbyt gruby przemiał -> zwiększ dozę lub zmiel drobniej. | MUST | MVP |
 | **Z-113** | DIAL-IN | Asystent herbaty: Cierpkość i gorycz | Podpowiedź: obniż temperaturę wody o 5–10°C lub skróć czas parzenia. | MUST | MVP |
-| **Z-120** | WATCH | Niezależny stoper na watchOS | Autonomiczna sesja parzenia na zegarku z synchronizacją z telefonem. | MUST | MVP |
-| **Z-121** | WATCH | Wibracja haptyczna przed zalaniem | Wyraziste uderzenie haptyczne na 3s przed startem kolejnej dozy wody. | MUST | MVP |
-| **Z-122** | WATCH | Komplikacja tarczy zegarka | Komplikacja z szybkim skrótem do rozpoczęcia porannego parzenia. | SHOULD | MVP |
-| **Z-123** | WATCH | Obsługa cyfrowej koronki (Digital Crown) | Płynna regulacja czasu parzenia lub dozy za pomocą koronki Apple Watch. | SHOULD | 1.1 |
-| **Z-130** | SYSTEM | Live Activity na ekranie blokady | Ciągły podgląd stopera, aktualnego zalania i docelowej wagi na ekranie blokady iOS. | MUST | MVP |
-| **Z-131** | SYSTEM | Dynamic Island | Miniaturka timera i animacja zalania w Dynamic Island na iPhone 14 Pro+. | MUST | MVP |
-| **Z-132** | SYSTEM | Interaktywny widżet ekranu początkowego | Widżet z podglądem poziomu kofeiny w organizmie oraz skrótem do parzenia. | SHOULD | MVP |
+| **Z-120** | WATCH | Niezależny stoper na watchOS | Autonomiczna sesja parzenia na zegarku z synchronizacją z telefonem. | WYCOFANE z 1.0 2026-10-24 (KILL-07, ER-03) | 1.2 |
+| **Z-121** | WATCH | Wibracja haptyczna przed zalaniem | Wyraziste uderzenie haptyczne na 3s przed startem kolejnej dozy wody. | WYCOFANE z 1.0 2026-10-24 (KILL-07, ER-03) | 1.2 |
+| **Z-122** | WATCH | Komplikacja tarczy zegarka | Komplikacja z szybkim skrótem do rozpoczęcia porannego parzenia. | WYCOFANE z 1.0 2026-10-24 (KILL-07, ER-03) | 1.2 |
+| **Z-123** | WATCH | Obsługa cyfrowej koronki (Digital Crown) | Płynna regulacja czasu parzenia lub dozy za pomocą koronki Apple Watch. | ODŁOŻONE 2026-10-24 (KILL-07, ER-03) | 1.2 |
+| **Z-130** | SYSTEM | Live Activity na ekranie blokady | Ciągły podgląd stopera, aktualnego zalania i docelowej wagi na ekranie blokady iOS. | WYCOFANE z 1.0 2026-10-24 (KILL-06, ER-03) | 1.2 |
+| **Z-131** | SYSTEM | Dynamic Island | Miniaturka timera i animacja zalania w Dynamic Island na iPhone 14 Pro+. | WYCOFANE z 1.0 2026-10-24 (KILL-06, ER-03) | 1.2 |
+| **Z-132** | SYSTEM | Interaktywny widżet ekranu początkowego | Widżet z podglądem poziomu kofeiny w organizmie oraz skrótem do parzenia. | SHOULD; nierozstrzygnięte (ER-05) | MVP |
 | **Z-133** | SYSTEM | Skróty Siri (Siri Shortcuts) | Komenda głosowa: *„Hej Siri, parz poranną kawę”* uruchamia zdefiniowaną domyślną recepturę. | COULD | 1.1 |
 | **Z-140** | KALK | Kalkulator Brew Ratio | Dwukierunkowy przelicznik: podaj dozę -> oblicz wodę; podaj wodę -> oblicz dozę. | MUST | MVP |
 | **Z-141** | KALK | Kalkulator TDS i Extraction Yield | Obliczanie wydajności ekstrakcji ($EY = (\text{Waga naparu} \times \text{TDS}) / \text{Doza}$). | SHOULD | MVP |
 | **Z-142** | KALK | Baza nastaw młynków | Konwersja opisowa i kliki dla popularnych modeli (Comandante, Timemore, Fellow). | SHOULD | 1.1 |
-| **Z-150** | DANE | Lokalna baza danych SQLite/SwiftData | Wszystkie dane przechowywane lokalnie w piaskownicy aplikacji. | MUST | MVP |
-| **Z-151** | DANE | Kopia zapasowa w iCloud Drive | Automatyczny eksport i synchronizacja pliku bazy w prywatnym folderze użytkownika. | MUST | MVP |
+| **Z-150** | DANE | Lokalna baza danych SQLite/SwiftData (ER-04: w 1.0 expo-sqlite) | Wszystkie dane przechowywane lokalnie w piaskownicy aplikacji. | MUST | MVP |
+| **Z-151** | DANE | Kopia zapasowa w iCloud Drive | Automatyczny eksport i synchronizacja pliku bazy w prywatnym folderze użytkownika. | MUST; nierozstrzygnięte (ER-05) | MVP |
 | **Z-152** | DANE | Eksport danych do JSON / CSV | Pełny, bezpłatny eksport całej historii parzeń i magazynu w otwartym formacie. | MUST | MVP |
 | **Z-160** | MONET | StoreKit 2 (Subskrypcja + Lifetime) | Natywna obsługa zakupów wewnątrz aplikacji Apple StoreKit 2. | MUST | MVP |
 | **Z-161** | MONET | Family Sharing | Obsługa współdzielenia zakupionej subskrypcji lub zakupu dożywotniego w rodzinie. Poza 1.0 (DEC-41, ER-01 w 00c). | MUST | MVP |
 | **Z-170** | DOST | Pełne wsparcie VoiceOver | Semantyczne etykiety dla każdego elementu interfejsu i odczyt głosowy timera. | MUST | MVP |
 | **Z-171** | DOST | Dynamic Type | Prawidłowe skalowanie wszystkich tekstów do największych rozmiarów dostępności. | MUST | MVP |
-| **Z-180** | I18N | Lokalizacja w 35 językach | Tłumaczenie interfejsu i jednostek na 35 rynków App Store. | MUST | MVP |
+| **Z-180** | I18N | Lokalizacja w 35 językach | Tłumaczenie interfejsu i jednostek na 35 rynków App Store. | WYCOFANE z 1.0 2026-11-13 (DEC-03 audytu M1 (a): w 1.0 polski i angielski; ER-03) | — |

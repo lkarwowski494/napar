@@ -3,6 +3,7 @@
 ---
 
 ### **BR-ZEG-001: Autonomiczna sesja parzenia na watchOS**
+* **Status: wycofane z 1.0** (KILL-07, odłożone do v1.2; kontrakt zakresu 2026-10-24; ER-03 w 00c).
 * **Opis:** Pełna, samodzielna aplikacja na Apple Watch umożliwiająca uruchomienie receptury, śledzenie etapów zalania i zakończenie sesji bez konieczności trzymania iPhone'a w dłoni.
 * **Kryteria akceptacji:**
   1. Aplikacja zegarkowa działa w tle w trakcie aktywnej sesji parzenia (użycie sesji `WKExtendedRuntimeSession`).
@@ -10,6 +11,7 @@
 * **Priorytet:** MUST | **Etap:** MVP
 
 ### **BR-ZEG-002: Wzorzec haptyczny na nadgarstku (Haptic cues)**
+* **Status: wycofane z 1.0** (KILL-07, odłożone do v1.2; kontrakt zakresu 2026-10-24; ER-03 w 00c).
 * **Opis:** Unikalne impulsy Taptic Engine zegarka informujące o:
   - 3 sekundy do zalania: 2 delikatne puknięcia (`WKHapticType.directionUp`).
   - Start zalania: 1 mocne uderzenie (`WKHapticType.start`).
@@ -17,6 +19,7 @@
 * **Priorytet:** MUST | **Etap:** MVP
 
 ### **BR-ZEG-003: Live Activity na zablokowanym ekranie iPhone'a**
+* **Status: wycofane z 1.0** (KILL-06, odłożone do v1.2; kontrakt zakresu 2026-10-24; kod usunięty 2026-11-13, ZM-01; ER-03 w 00c).
 * **Opis:** Integracja z frameworkiem ActivityKit. Aktywny widżet na zablokowanym ekranie prezentujący:
   - Aktualną fazę parzenia (np. *„Zalanie 2 z 3”*).
   - Odliczanie czasu fazy i czasu całkowitego.
@@ -24,12 +27,14 @@
 * **Priorytet:** MUST | **Etap:** MVP
 
 ### **BR-ZEG-004: Wsparcie dla Dynamic Island (iPhone 14 Pro+)**
+* **Status: wycofane z 1.0** (KILL-06, odłożone do v1.2; kontrakt zakresu 2026-10-24; kod usunięty 2026-11-13, ZM-01; ER-03 w 00c).
 * **Opis:** Kompaktowy widok w Dynamic Island podczas korzystania z innych aplikacji (np. czytanie wiadomości w trakcie parzenia kawy):
   - Tryb zwinięty: ikona filiżanki + czas uciekający.
   - Tryb rozwinięty (przytrzymanie): pełny podgląd gramatury i przycisk pauzy.
 * **Priorytet:** MUST | **Etap:** MVP
 
 ### **BR-ZEG-005: Widżety ekranu początkowego iOS (WidgetKit)**
+* **Status: nierozstrzygnięte** — widżetów nie ma w kodzie, a lista odcięć ich nie wymienia; decyzja zakresu: rola 03 (ER-05 w 00c).
 * **Opis:**
   1. Widżet mały (Small): poziom kofeiny w organizmie w czasie rzeczywistym + czas do zera kofeiny.
   2. Widżet średni (Medium): stan kofeiny + szybki przycisk rozpoczęcia parzenia ulubionej porannej kawy.

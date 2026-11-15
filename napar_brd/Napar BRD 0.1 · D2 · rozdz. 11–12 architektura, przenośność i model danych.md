@@ -4,9 +4,9 @@
 
 ## **11. Architektura techniczna i przenośność**
 
-* **Stos technologiczny:** Swift 6, SwiftUI, SwiftData / SQLite (GRDB.swift jako silnik deterministyczny), ActivityKit, WidgetKit, WatchKit, HealthKit.
+* **Stos technologiczny:** Swift 6, SwiftUI, SwiftData / SQLite (GRDB.swift jako silnik deterministyczny), ActivityKit, WidgetKit, WatchKit, HealthKit. *(Errata ER-04 w 00c: stos 1.0 to Expo / React Native w TypeScript z `expo-sqlite`; ActivityKit, WidgetKit, WatchKit i HealthKit poza 1.0 — ER-03, ER-05.)*
 * **Wzorzec architektoniczny:** MVVM + Clean Architecture z podziałem na domeny (`Domain`, `Data`, `Presentation`).
-* **Zasada przenośności (ZP-15):** Identyfikatory zakupu IAP i kontenery App Group posiadają unikalny prefiks `group.com.apps4brew.napar`, co umożliwia bezproblemowy transfer aplikacji pomiędzy kontami deweloperskimi bez naruszania integralności danych.
+* **Zasada przenośności (ZP-15):** Identyfikatory zakupu IAP i kontenery App Group posiadają unikalny prefiks `group.com.apps4brew.napar` (ZASTĄPIONE 2026-11-13: identyfikator aplikacji `pl.lukasz.napar`, DEC-12 audytu M1 (a), ER-02 w 00c; App Group ani zakupów w 1.0 nie ma), co umożliwia bezproblemowy transfer aplikacji pomiędzy kontami deweloperskimi bez naruszania integralności danych.
 
 ---
 

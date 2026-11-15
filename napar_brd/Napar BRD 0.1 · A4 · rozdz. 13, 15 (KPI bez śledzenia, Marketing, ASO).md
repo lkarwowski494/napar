@@ -27,7 +27,7 @@ Zgodnie z Zasadą Produktu ZP-10 („Data Not Collected”) aplikacja nie zawier
 
 * **Tytuł aplikacji (PL):** `Napar: Kawa, Herbata i Timer` (29 znaków)
 * **Podtytuł (PL):** `V60, Gongfu, kofeina i waga` (29 znaków)
-* **Tytuł aplikacji (US/Global):** `Steepwise: Coffee, Tea & Timer` (30 znaków)
+* **Tytuł aplikacji (US/Global):** `Steepwise: Coffee, Tea & Timer` (30 znaków) *(ZASTĄPIONE 2026-11-13: DEC-06 audytu M1 (a), „Napar” bez nazwy angielskiej; ER-03 w 00c)*
 * **Podtytuł (US/Global):** `Pour-over, Gongfu & Caffeine` (29 znaków)
 
 #### **Słowa kluczowe (Keywords Field - 100 znaków):**

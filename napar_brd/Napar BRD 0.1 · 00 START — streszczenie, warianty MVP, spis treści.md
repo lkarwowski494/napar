@@ -1,6 +1,7 @@
 # **Napar — Wymagania biznesowe (BRD), wersja robocza 0.1, 15.10.2026**
 
 **Status:** wersja robocza do akceptacji właściciela. Sprawy produktowe czekają na Twoje decyzje (sekcja 4, DEC-01…DEC-40). Sprawy merytoryczne (fizyka ekstrakcji, chemia wody, koło sensoryczne SCA/WCE, metabolizm kofeiny) rozstrzyga badacz według hierarchii źródeł. Każdą taką decyzję możesz zawetować.  
+**Stan 2026-11-15:** BRD 0.1 to dokument historyczny z erratą (DEC-10 audytu M1 (a)). Zakres 1.0 wyznacza `docs/scope-contract.md`; identyfikator aplikacji, funkcje wycięte z 1.0, zmiana stosu i wymagania bez decyzji — errata 00c (ER-01…ER-05).  
 **Autor:** analityk biznesowy (koordynujący) studia Apps4Brew. Części A–D napisali analitycy produktu i badacz dziedzinowy.
 
 ---
@@ -17,7 +18,7 @@
 | **A** | 1–6, 13, 15 | Wizja i 16 zasad produktu (ZP-01…16), problem i dowody rynkowe, persony P1–P6 i sytuacje SYT-01…15, analiza rynku i konkurencji, model przychodu, tabela zakresu Z-001…Z-180 z etapami, nakład pracy agentów, KPI bez śledzenia, marketing i ASO. |
 | **B** | 7 (narzędzia) | Wymagania funkcjonalne narzędzi (BR-PARZ, BR-MAG, BR-DZIEN, BR-KOF, BR-ZEG, BR-KALK): asystent i timery parzenia, magazyn ziaren i liści, dziennik sensoryczny, estymator kofeiny i okna snu, Apple Watch, Live Activity i widżety, kalkulatory ekstrakcji, dane, zakupy, dostępność. |
 | **C** | 7 (nauka), 8, 8.P | Moduł nauki i sensoryki: Dial-in Doctor (kompas ekstrakcji), koło smaków SCA/WCE. Reguły dziedzinowe RD-01…RD-30 (Brew Ratio, TDS, Extraction Yield, absorpcja wody, parametry wody GH/KH, farmakokinetyka kofeiny, parzenie Gongfu Cha) wraz z kompletnymi wektorami testowymi. Proces weryfikacji treści i rejestr decyzji badacza D-01…D-20. |
-| **D** | 9–12, 14, 16 | Wymagania niefunkcjonalne (NFR-OFF, NFR-I18N, NFR-DOST, NFR-WYD, NFR-BEZP, NFR-ZEG itd.), zgodność z wytycznymi Apple App Store (3.1.2, 4.3(a)/(b), 5.1.1, HealthKit), architektura techniczna offline-first, schemat bazy SQLite/SwiftData, rejestr 40 ryzyk (RYZ-01…RYZ-40) oraz warunki wdrożeniowe. |
+| **D** | 9–12, 14, 16 | Wymagania niefunkcjonalne (NFR-OFF, NFR-I18N, NFR-DOST, NFR-WYD, NFR-BEZP, NFR-ZEG itd.), zgodność z wytycznymi Apple App Store (3.1.2, 4.3(a)/(b), 5.1.1, HealthKit), architektura techniczna offline-first, schemat bazy SQLite/SwiftData (ER-04 w 00c: w 1.0 expo-sqlite), rejestr 40 ryzyk (RYZ-01…RYZ-40) oraz warunki wdrożeniowe. |
 
 ### **Oznaczenia identyfikatorów**
 * **BR-xxx-nnn**: wymaganie funkcjonalne (np. `BR-PARZ-001`, `BR-KOF-005`). Każde posiada mierzalne kryteria akceptacji, personę, priorytet (**MUST / SHOULD / COULD**) i etap (**MVP / 1.1 / 1.2 / 2.x / badanie / nigdy**).
@@ -34,7 +35,7 @@
 ### **Co to jest Napar**
 **Napar** to kieszonkowy asystent i dziennik dla miłośników kawy specialty oraz herbaty rzemieślniczej. Łączy precyzyjny, wieloetapowy stoper parzenia (drip V60, Chemex, Aeropress, French Press, espresso, Gongfu Cha) z cyfrowym magazynem ziaren/liści, notatnikiem sensorycznym (koło smaków SCA), deterministycznym doradcą mielenia i ekstrakcji (**Dial-in Doctor**) oraz zaawansowanym monitorem kofeiny sprzężonym z Apple Health i kalkulatorem wpływu na sen.
 
-Aplikacja działa **całkowicie offline, bez rejestracji konta, bez serwerów zewnętrznych i bez reklam**, w 35 językach, z pełnym wsparciem dla Apple Watch, Live Activity i Dynamic Island. Wersja 1.0 jest całkowicie darmowa (DEC-41, 2026-11-13); dawne ceny to hipoteza H-MON-01 (A2 5.1).
+Aplikacja działa **całkowicie offline, bez rejestracji konta, bez serwerów zewnętrznych i bez reklam**, w 35 językach, z pełnym wsparciem dla Apple Watch, Live Activity i Dynamic Island *(errata ER-03 w 00c: wersja 1.0 po polsku i angielsku, bez Apple Watch, Live Activity, Dynamic Island i Apple Health)*. Wersja 1.0 jest całkowicie darmowa (DEC-41, 2026-11-13); dawne ceny to hipoteza H-MON-01 (A2 5.1).
 
 ### **Dla kogo (Persony główne)**
 * **Michał (30 lat, programista):** codziennie rano parzy kawę w dripperze V60 lub Aeropressie; potrzebuje dokładnego stopera z sygnalizacją kolejnych zalań na Apple Watch (nie chce brać mokrymi rękami telefonu do ręki) oraz możliwości zapisania profilu mielenia pod konkretną paczkę ziaren.
@@ -80,9 +81,9 @@ Aplikacja działa **całkowicie offline, bez rejestracji konta, bez serwerów ze
 ## **4. Warunki wstępne po stronie Właściciela**
 
 1. **Konto Apple Developer:** Aktywny program organizacji lub indywidualny z opłaconym rocznym dostępem (99 USD).
-2. **Uprawnienia HealthKit:** Aktywacja capability `HealthKit` w profilu provisioning z deklaracją zapisu `HKQuantityTypeIdentifierDietaryCaffeine`.
+2. **Uprawnienia HealthKit** *(nie dotyczy 1.0: KILL-08, ER-03 w 00c — capability nie włączać)*: Aktywacja capability `HealthKit` w profilu provisioning z deklaracją zapisu `HKQuantityTypeIdentifierDietaryCaffeine`.
 3. **Sprzęt testowy:**
-   - iPhone z iOS 18+ (testy Live Activity i Dynamic Island).
-   - Apple Watch z watchOS 11+ (weryfikacja działania w tle i haptyki timera).
+   - iPhone z iOS 18+ (testy Live Activity i Dynamic Island — nie dotyczy 1.0: KILL-06).
+   - Apple Watch z watchOS 11+ (weryfikacja działania w tle i haptyki timera — nie dotyczy 1.0: KILL-07).
    - Czajnik i dripper do weryfikacji manualnej w realnych warunkach kuchennych.
 4. **Model cenowy Apps4Brew:** wersja 1.0 darmowa (DEC-41, 2026-11-13); dawna siatka cen to hipoteza H-MON-01 (A2, 5.1).

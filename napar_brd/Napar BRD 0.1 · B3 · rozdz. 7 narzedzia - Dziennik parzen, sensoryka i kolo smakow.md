@@ -26,7 +26,7 @@
 ### **BR-DZIEN-004: Historia i filtrowanie dziennika**
 * **Opis:** Przeglądanie historii parzeń z możliwością filtrowania wg: metody, konkretnego ziarna, oceny (tylko 4★+) oraz zakresu dat.
 * **Kryteria akceptacji:**
-  1. Płynne przewijanie listy 500+ wpisów bez opóźnień (SwiftUI lazy loading).
+  1. Płynne przewijanie listy 500+ wpisów bez opóźnień (SwiftUI lazy loading; w 1.0 lista React Native, ER-04 w 00c).
   2. Kliknięcie w historyczną sesję pozwala wybrać opcję *„Parz ponownie z tymi samymi parametrami”*.
 * **Priorytet:** MUST | **Etap:** MVP
 

@@ -58,5 +58,5 @@ Zakres Naparu dzieli się na 6 głównych domen funkcjonalnych:
 2. **MAG (Magazyn surowców):** ziarna kawy, liście herbaty, woda mineralna, zarządzanie świeżością (resting).
 3. **DZIEN (Dziennik i Sensoryka):** rejestr sesji, ewaluacja smaku, interaktywne koło SCA/WCE.
 4. **KOF (Kofeina i Zdrowie):** farmakokinetyka kofeiny, okno snu, synchronizacja z Apple Health.
-5. **ZEG (Apple Watch i Ekosystem):** aplikacja watchOS, Live Activity, Dynamic Island, widżety.
+5. **ZEG (Apple Watch i Ekosystem):** aplikacja watchOS, Live Activity, Dynamic Island, widżety *(poza 1.0: KILL-06, KILL-07; widżety nierozstrzygnięte — ER-03, ER-05 w 00c)*.
 6. **KALK (Kalkulatory i Narzędzia):** Brew Ratio, TDS/Extraction Yield, mineralizacja wody, młynki.

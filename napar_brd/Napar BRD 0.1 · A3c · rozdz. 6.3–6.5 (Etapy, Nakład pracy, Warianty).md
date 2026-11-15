@@ -4,6 +4,8 @@
 
 ## **6.3 Harmonogram etapów wydań**
 
+> **Errata 2026-11-15 (ER-03, ER-05 w 00c):** w wersji 1.0 nie ma zapisu do Apple HealthKit (KILL-08), aplikacji Apple Watch (KILL-07), Live Activity i Dynamic Island (KILL-06), StoreKit 2 (ER-01) ani 35 języków (DEC-03 audytu M1 (a): polski i angielski); kopia w iCloud Drive nierozstrzygnięta (ER-05). Zakres 1.0 wyznacza `docs/scope-contract.md`.
+
 * **Wersja 1.0 (MVP):**
   - Kompletny silnik parzenia kawy (V60, Aeropress, Chemex, French Press) i herbaty (Gongfu Cha, Western).
   - Baza 24 sprawdzonych receptur mistrzowskich (kawa specialty i herbata rzemieślnicza).
@@ -33,7 +35,7 @@ Jednostka: 1 dzień pracy agenta (pełne opracowanie, testy jednostkowe, snapsho
 
 | Blok zadaniowy | Zakres | Nakład (MVP wariant b+) |
 | :--- | :--- | :---: |
-| **Fundament & Baza Danych** | Architektura offline-first, schemat SwiftData/SQLite, migracje, eksport/import JSON | 3.0 dni |
+| **Fundament & Baza Danych** | Architektura offline-first, schemat SwiftData/SQLite (ER-04: w 1.0 expo-sqlite), migracje, eksport/import JSON | 3.0 dni |
 | **Silnik Timera & Metody** | Precyzyjny stoper, obsługa zalań, pauzy, ochrona przed uśpieniem, receptury bazowe | 4.0 dni |
 | **Apple Watch (watchOS)** | Niezależna aplikacja zegarkowa, synchronizacja w tle, haptyka Taptic Engine | 3.5 dni |
 | **Live Activity & Dynamic Island** | ActivityKit widget, aktualizacje stanu parzenia, lockscreen UI | 2.5 dni |

@@ -19,6 +19,7 @@
 * **Priorytet:** SHOULD | **Etap:** MVP
 
 ### **BR-DANE-001: Kopia zapasowa w iCloud Drive i darmowy eksport JSON**
+* **Status: część iCloud Drive nierozstrzygnięta** — kodu kopii do iCloud Drive nie ma, decyzji zakresu też (ER-05 w 00c); eksport i import JSON/CSV (kryteria 1–2) obowiązują w 1.0.
 * **Opis:** Pełne bezpieczeństwo danych użytkownika. Baza SQLite automatycznie tworzy zaszyfrowany plik kopii zapasowej w dedykowanym folderze iCloud Drive użytkownika.
 * **Kryteria akceptacji:**
   1. Eksport całej bazy do otwartego formatu JSON i CSV jest w 100% bezpłatny i nielimitowany (ZP-07).

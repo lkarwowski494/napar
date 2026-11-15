@@ -1866,3 +1866,99 @@ describe('M1-audytor-generalny-039: raporty audytów poza repo, funkcje tylko pr
     expect(readFileSync(join(root, 'docs/scope-contract.md'), 'utf8')).toMatch(/## 5\. Bramka zmian zakresu \(ZM\)/);
   });
 });
+
+describe('M1-audytor-generalny-037: BRD zgodne z decyzjami — identyfikator aplikacji i funkcje wycięte z 1.0 (DEC-12 a; 01-odkrywanie-011)', () => {
+  // BRD 0.1 to dokument historyczny z erratą (DEC-10 a). Test pilnuje, żeby errata nadążała za decyzjami:
+  // identyfikator aplikacji jeden w app.json, potoku, E2E i BRD; każda pozycja listy odcięć (KILL) i decyzja audytu,
+  // która wycina funkcję, ma wiersz w erracie z datą, a jej wymagania w BRD mają status; zmiana stosu ma wpis ER.
+  const brdDir = join(root, 'napar_brd');
+  const brd = readdirSync(brdDir)
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => ({ f, lines: readFileSync(join(brdDir, f), 'utf8').split('\n') }));
+  const errata = brd.find((b) => / 00c /.test(b.f))!.lines;
+  const expo = JSON.parse(readFileSync(join(root, 'app.json'), 'utf8')).expo;
+  const APP_ID: string = expo.ios.bundleIdentifier;
+  const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const sekcja = (id: string) => {
+    const od = errata.findIndex((l) => new RegExp(`^#{2,4}\\s+\\**${id}\\b`).test(l));
+    if (od < 0) return '';
+    const doL = errata.findIndex((l, i) => i > od && /^#{1,4}\s/.test(l));
+    return errata.slice(od, doL < 0 ? undefined : doL).join('\n');
+  };
+  // Definicja ID w BRD: nagłówek wymagania (blok do następnego nagłówka), punkt „* **NFR-…:**” albo wiersz tabeli „| **ID** |”.
+  const definicja = (id: string): string | undefined => {
+    for (const { lines } of brd) {
+      const h = lines.findIndex((l) => new RegExp(`^#{2,4}\\s+\\**${esc(id)}\\b`).test(l));
+      if (h >= 0) {
+        const k = lines.findIndex((l, i) => i > h && /^#{1,4}\s/.test(l));
+        return lines.slice(h, k < 0 ? undefined : k).join('\n');
+      }
+      const w = lines.find((l) => new RegExp(`^(\\* \\*\\*${esc(id)}:\\*\\*|\\| \\*\\*${esc(id)}\\*\\* \\|)`).test(l));
+      if (w) return w;
+    }
+    return undefined;
+  };
+
+  test('identyfikator aplikacji ten sam w app.json, potoku TestFlight, E2E i BRD (errata ER-02)', () => {
+    expect(APP_ID).toMatch(/^[a-z][a-z0-9]*(\.[a-z0-9]+)+$/);
+    expect(expo.android.package).toBe(APP_ID);
+    for (const wf of ['testflight.yml', 'e2e-ios.yml']) {
+      const m = readFileSync(join(root, '.github', 'workflows', wf), 'utf8').match(/BUNDLE_ID:\s*'([^']+)'/);
+      expect([wf, m?.[1]]).toEqual([wf, APP_ID]);
+    }
+    expect(readFileSync(join(root, '.maestro', 'config.yaml'), 'utf8')).toMatch(new RegExp(`^appId: ${esc(APP_ID)}$`, 'm'));
+    // Każdy identyfikator w stylu odwróconej domeny „….napar” w BRD to identyfikator z app.json,
+    // chyba że wiersz oznacza go jako zastąpiony erratą.
+    const obce = brd.flatMap(({ f, lines }) =>
+      lines.flatMap((l, i) =>
+        [...l.matchAll(/\b(?:[a-z][a-z0-9-]*\.)+napar\b/g)]
+          .map((m) => m[0].replace(/^group\./, ''))
+          .filter((id) => id !== APP_ID && !/ZASTĄPION/.test(l))
+          .map((id) => `${f}:${i + 1}: ${id}`),
+      ),
+    );
+    expect(obce).toEqual([]);
+    const er02 = sekcja('ER-02');
+    expect(er02).toContain(APP_ID);
+    expect(er02).toMatch(/DEC-12 audytu/);
+  });
+
+  test('każda pozycja listy odcięć (KILL) i decyzja audytu wycinająca funkcję ma wiersz erraty z datą, a wymagania BRD status (ER-03)', () => {
+    const kontrakt = readFileSync(join(root, 'docs', 'scope-contract.md'), 'utf8');
+    const kills = [...kontrakt.matchAll(/^\| \*\*(KILL-\d{2})\*\* \|/gm)].map((m) => m[1]);
+    expect(kills.length).toBeGreaterThanOrEqual(9);
+    const wiersze = errata
+      .filter((l) => /^\| (KILL-\d{2}|DEC-\d{2} audytu|bez decyzji) \|/.test(l))
+      .map((l) => l.split('|').map((c) => c.trim()));
+    const klucze = wiersze.map((k) => k[1]);
+    expect(kills.filter((k) => !klucze.includes(k))).toEqual([]);
+    expect(klucze).toEqual(expect.arrayContaining(['DEC-03 audytu', 'DEC-06 audytu', 'DEC-12 audytu', 'bez decyzji']));
+    const braki: string[] = [];
+    for (const kol of wiersze) {
+      const klucz = kol[1];
+      const tekst = kol.slice(2).join(' | ');
+      if (klucz !== 'bez decyzji' && !/\d{4}-\d{2}-\d{2}/.test(tekst)) braki.push(`${klucz}: brak daty decyzji`);
+      const ids = [
+        ...(tekst.match(/\b(?:BR|NFR)-[A-Z]+-\d{3}\b|\bZP?-\d{2,3}\b/g) || []),
+        ...[...tekst.matchAll(/\bBRD (DEC-\d{2})\b/g)].map((m) => m[1]),
+      ];
+      const znacznik = klucz === 'bez decyzji' ? 'ER-05' : klucz;
+      for (const id of ids) {
+        const def = definicja(id);
+        if (!def) braki.push(`${klucz}: ${id} nie istnieje w BRD`);
+        else if (!/wycofan|ZASTĄPION|ODŁOŻON|nie dotyczy 1\.0|nierozstrzygnię/i.test(def) || !def.includes(znacznik))
+          braki.push(`${klucz}: ${id} bez statusu z odwołaniem ${znacznik}`);
+      }
+    }
+    expect(braki).toEqual([]);
+  });
+
+  test('zmiana stosu (Swift → Expo / React Native) ma wpis ER-04 przy każdym wymaganiu stosu Swift', () => {
+    expect(sekcja('ER-04')).toMatch(/Expo/);
+    // Errata 00c opisuje samą kolizję, więc jej nie skanujemy.
+    const bez = brd.filter(({ f }) => !/ 00c /.test(f)).flatMap(({ f, lines }) =>
+      lines.flatMap((l, i) => (/\bSwift(UI|Data)?\b|GRDB|WatchKit/.test(l) && !/ER-04/.test(l) ? [`${f}:${i + 1}`] : [])),
+    );
+    expect(bez).toEqual([]);
+  });
+});
