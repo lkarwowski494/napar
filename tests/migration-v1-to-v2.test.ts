@@ -86,37 +86,6 @@ describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
     let userVersion = 1;
     const executedQueries: string[] = [];
 
-    const v1Inventory = [
-      {
-        id: 'bean-v1-01',
-        name: 'Panama Geisha Hacienda La Esmeralda',
-        type: 'coffee',
-        initial_weight_g: 250,
-        remaining_weight_g: 190,
-        is_favorite: 1,
-        is_archived: 0,
-        created_at: '2026-01-15T10:00:00Z',
-        updated_at: '2026-01-15T10:00:00Z',
-      },
-    ];
-
-    const v1Recipes = [
-      {
-        id: 'rec-v1-01',
-        name: 'V60 Hoffman 1-Cup',
-        beverage_type: 'COFFEE',
-        method: 'v60',
-        dose_g: 15,
-        water_g: 250,
-        water_temp_c: 96,
-        recommended_ratio: 16.67,
-        steps_json: '[]',
-        is_custom: 1,
-        is_favorite: 1,
-        created_at: '2026-01-15T10:00:00Z',
-      },
-    ];
-
     const v1Sessions = [
       {
         id: 'sess-v1-01',
@@ -186,11 +155,8 @@ describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
     // 4. Weryfikacja podniesienia wersji schematu do v3
     expect(userVersion).toBe(3);
 
-    // 5. Gwarancja nienaruszalności danych pierwotnych v1
-    expect(v1Inventory[0].name).toBe('Panama Geisha Hacienda La Esmeralda');
-    expect(v1Inventory[0].remaining_weight_g).toBe(190);
-    expect(v1Recipes[0].dose_g).toBe(15);
-    expect(v1Sessions[0].rating).toBe(5);
+    // M1-audytor-generalny-043 (07-jakosc-007): usunięto dawny krok 5 — sprawdzał stałe zdefiniowane w teście,
+    // które nie trafiały do bazy. Zachowanie danych v1 sprawdza test „Fizyczna migracja” na prawdziwym pliku.
   });
 
   test('Rollback transakcji: błąd w trakcie migracji nie uszkadza bazy i cofa stan', () => {
@@ -221,46 +187,41 @@ describe('SQLite Physical Migration Engine (TASK-R10-01: v1.0 -> v3.0)', () => {
     expect(rolledBack).toBe(true);
   });
 
-  test('Fizyczna migracja pliku fixtures/napar-v1.0.db przez SQLite podnosi wersję do v3 bez utraty danych', () => {
-    const { DatabaseSync } = require('node:sqlite');
-    const tmpDbPath = path.join(__dirname, 'fixtures', 'napar-migration-test.db');
-    if (fs.existsSync(tmpDbPath)) fs.unlinkSync(tmpDbPath);
-    fs.copyFileSync(fixturePath, tmpDbPath);
-
+  test('Fizyczna migracja pliku fixtures/napar-v1.0.db przez initDatabase podnosi wersję do v3 bez utraty danych', () => {
+    // M1-audytor-generalny-043 (07-jakosc-007): dawniej test przepisywał SQL migracji zamiast wołać initDatabase,
+    // więc regresja w kodzie migracji przechodziła. Teraz prawdziwe initDatabase na kopii fixture v1 (node:sqlite).
+    const sqlite = require('expo-sqlite');
+    const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'napar-mig-v1-'));
+    fs.copyFileSync(fixturePath, path.join(workDir, 'napar.db'));
+    const db = sqlite.openDatabaseSync('napar.db', {}, workDir);
     try {
-      const db = new DatabaseSync(tmpDbPath);
+      const tables = ['inventory_items', 'recipes', 'brew_sessions', 'caffeine_logs'];
+      const count = (t: string) => db.getFirstSync(`SELECT COUNT(*) AS c FROM ${t}`).c as number;
+      const before = Object.fromEntries(tables.map((t) => [t, count(t)]));
+      expect(db.getFirstSync('PRAGMA user_version').user_version).toBe(1);
+      const sessionBefore = db.getFirstSync('SELECT * FROM brew_sessions WHERE id = ?', ['sess-v1-01']);
+      expect(sessionBefore).not.toBeNull();
 
-      // Sprawdź stan wyjściowy v1
-      const initialVer = db.prepare('PRAGMA user_version').get().user_version;
-      expect(initialVer).toBe(1);
+      initDatabase(db);
 
-      // Symulacja kroków migracji initDatabase
-      db.exec('PRAGMA wal_checkpoint(TRUNCATE);');
-      db.exec('BEGIN TRANSACTION;');
-      db.exec('ALTER TABLE brew_sessions ADD COLUMN sensory_scores_json TEXT;');
-      db.exec('ALTER TABLE brew_sessions ADD COLUMN water_profile TEXT;');
-      db.exec('CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL);');
-      db.exec('PRAGMA user_version = 3;');
-      db.exec('COMMIT;');
+      expect(db.getFirstSync('PRAGMA user_version').user_version).toBe(3);
+      expect(db.getFirstSync('PRAGMA integrity_check').integrity_check).toBe('ok');
+      const cols = db.getAllSync('PRAGMA table_info(brew_sessions)').map((c: any) => c.name);
+      expect(cols).toEqual(expect.arrayContaining(['sensory_scores_json', 'water_profile']));
+      expect(db.getFirstSync("SELECT COUNT(*) AS c FROM sqlite_master WHERE type = 'table' AND name = 'app_settings'").c).toBe(1);
 
-      // Weryfikacja po migracji
-      const finalVer = db.prepare('PRAGMA user_version').get().user_version;
-      expect(finalVer).toBe(3);
-
-      const check = db.prepare('PRAGMA integrity_check').get().integrity_check;
-      expect(check).toBe('ok');
-
-      const recipe = db.prepare('SELECT * FROM recipes WHERE id = ?').get('rec-v1-01');
-      expect(recipe).toBeDefined();
+      // Wiersze v1 zachowane 1:1 (receptury: dochodzą tylko wzorcowe).
+      expect(count('inventory_items')).toBe(before.inventory_items);
+      expect(count('brew_sessions')).toBe(before.brew_sessions);
+      expect(count('caffeine_logs')).toBe(before.caffeine_logs);
+      expect(count('recipes')).toBeGreaterThanOrEqual(before.recipes);
+      const recipe = db.getFirstSync('SELECT * FROM recipes WHERE id = ?', ['rec-v1-01']);
       expect(recipe.name).toBe('V60 Hoffman 1-Cup');
-
-      const session = db.prepare('SELECT * FROM brew_sessions WHERE id = ?').get('sess-v1-01');
-      expect(session).toBeDefined();
-      expect(session.recipe_name).toBe('V60 Hoffman 1-Cup');
-
-      db.close();
+      const sessionAfter = db.getFirstSync('SELECT * FROM brew_sessions WHERE id = ?', ['sess-v1-01']);
+      for (const [k, v] of Object.entries(sessionBefore)) expect(sessionAfter[k]).toEqual(v);
     } finally {
-      if (fs.existsSync(tmpDbPath)) fs.unlinkSync(tmpDbPath);
+      db.closeSync();
+      fs.rmSync(workDir, { recursive: true, force: true });
     }
   });
 });

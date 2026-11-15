@@ -17,9 +17,11 @@ export interface MaestroCommand {
   tapOn?: string;
   inputText?: string;
   takeScreenshot?: string;
-  scrollUntilVisible?: { element: string };
-  swipe?: any;
+  scrollUntilVisible?: string;
+  hideKeyboard?: boolean;
   back?: boolean;
+  /** Polecenie spoza listy obsługiwanych — walidator je odrzuca. */
+  unknown?: string;
 }
 
 export interface MaestroFlow {
@@ -29,8 +31,15 @@ export interface MaestroFlow {
   rawPath: string;
 }
 
+const FLAG_COMMANDS = ['launchApp', 'back', 'hideKeyboard'] as const;
+const TEXT_COMMANDS = ['assertVisible', 'assertNotVisible', 'tapOn', 'inputText', 'takeScreenshot', 'scrollUntilVisible'] as const;
+
+const unquote = (v: string) => v.trim().replace(/^["']|["']$/g, '');
+
 /**
- * Robust zero-dependency Maestro YAML parser
+ * Parser YAML Maestro bez zależności. M1-audytor-generalny-043 (07-jakosc-007): każde polecenie
+ * najwyższego poziomu („- nazwa…”) daje jeden element listy — nieznane nie znikają po cichu,
+ * a cel podany w bloku zagnieżdżonym (id:/text:, też element.id dla scrollUntilVisible) jest odczytywany.
  */
 export function parseMaestroYaml(content: string, rawPath: string = ''): MaestroFlow {
   const lines = content.split('\n');
@@ -39,6 +48,24 @@ export function parseMaestroYaml(content: string, rawPath: string = ''): Maestro
   const commands: MaestroCommand[] = [];
 
   let inBody = false;
+  let current: { key: string; inline: string; nested: string[] } | null = null;
+  const flush = () => {
+    if (!current) return;
+    const { key, inline, nested } = current;
+    if ((FLAG_COMMANDS as readonly string[]).includes(key)) {
+      commands.push({ [key]: true } as MaestroCommand);
+    } else if ((TEXT_COMMANDS as readonly string[]).includes(key)) {
+      let value = unquote(inline);
+      if (!value) {
+        const target = nested.map((l) => l.match(/^(?:id|text):\s*(.+)$/)).find(Boolean);
+        value = target ? unquote(target[1]) : '';
+      }
+      commands.push({ [key]: value } as MaestroCommand);
+    } else {
+      commands.push({ unknown: key });
+    }
+    current = null;
+  };
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
@@ -55,29 +82,18 @@ export function parseMaestroYaml(content: string, rawPath: string = ''): Maestro
       } else if (line.startsWith('name:')) {
         name = line.replace('name:', '').trim();
       }
-    } else {
-      if (line.startsWith('- launchApp')) {
-        commands.push({ launchApp: true });
-      } else if (line.startsWith('- back')) {
-        commands.push({ back: true });
-      } else if (line.startsWith('- assertVisible:')) {
-        const val = line.replace('- assertVisible:', '').trim().replace(/^["']|["']$/g, '');
-        commands.push({ assertVisible: val });
-      } else if (line.startsWith('- assertNotVisible:')) {
-        const val = line.replace('- assertNotVisible:', '').trim().replace(/^["']|["']$/g, '');
-        commands.push({ assertNotVisible: val });
-      } else if (line.startsWith('- tapOn:')) {
-        const val = line.replace('- tapOn:', '').trim().replace(/^["']|["']$/g, '');
-        commands.push({ tapOn: val });
-      } else if (line.startsWith('- takeScreenshot:')) {
-        const val = line.replace('- takeScreenshot:', '').trim().replace(/^["']|["']$/g, '');
-        commands.push({ takeScreenshot: val });
-      } else if (line.startsWith('- inputText:')) {
-        const val = line.replace('- inputText:', '').trim().replace(/^["']|["']$/g, '');
-        commands.push({ inputText: val });
-      }
+      continue;
+    }
+
+    const top = rawLine.match(/^- ([A-Za-z]+)\s*(?::\s*(.*))?$/);
+    if (top) {
+      flush();
+      current = { key: top[1], inline: top[2] ?? '', nested: [] };
+    } else if (current) {
+      current.nested.push(line);
     }
   }
+  flush();
 
   return {
     appId,
@@ -109,27 +125,19 @@ export function validateMaestroFlowSyntax(
   let commandCount = 0;
 
   for (const step of flow.commands) {
-    if (step.launchApp) {
-      commandCount++;
-    } else if (step.assertVisible) {
-      const textToFind = step.assertVisible;
-      if (!textToFind || typeof textToFind !== 'string' || textToFind.trim().length === 0) {
-        throw new Error('[Maestro-Validator] Invalid assertVisible text in ' + flow.rawPath);
-      }
-      commandCount++;
-    } else if (step.tapOn) {
-      const target = step.tapOn;
-      if (!target || typeof target !== 'string' || target.trim().length === 0) {
-        throw new Error('[Maestro-Validator] Invalid tapOn target in ' + flow.rawPath);
-      }
-      commandCount++;
-    } else if (step.takeScreenshot) {
-      commandCount++;
-    } else if (step.inputText) {
-      commandCount++;
-    } else {
-      commandCount++;
+    if (step.unknown) {
+      throw new Error(`[Maestro-Validator] Unknown command "${step.unknown}" in ${flow.rawPath}`);
     }
+    const key = Object.keys(step)[0];
+    if ((TEXT_COMMANDS as readonly string[]).includes(key)) {
+      const value = (step as Record<string, unknown>)[key];
+      if (typeof value !== 'string' || value.trim().length === 0) {
+        throw new Error(`[Maestro-Validator] Invalid ${key} target in ${flow.rawPath}`);
+      }
+    } else if (!(FLAG_COMMANDS as readonly string[]).includes(key)) {
+      throw new Error(`[Maestro-Validator] Empty command in ${flow.rawPath}`);
+    }
+    commandCount++;
   }
 
   return {

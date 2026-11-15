@@ -155,21 +155,39 @@ describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
   const originalFetch = global.fetch;
   const originalWebSocket = (global as any).WebSocket;
   const originalXHR = (global as any).XMLHttpRequest;
+  const originalBeacon = global.navigator ? (global.navigator as any).sendBeacon : undefined;
+
+  // M1-audytor-generalny-043 (07-jakosc-007): szpiedzy zamiast `undefined`. Dawny test sprawdzał tylko,
+  // że sam ustawił `undefined`; teraz każde wywołanie sieci z przepływów jest zapisane (i rzuca),
+  // a afterEach wymaga zera wywołań — także wtedy, gdy kod połknąłby wyjątek.
+  const networkCalls: string[] = [];
+  const spy = (label: string) =>
+    jest.fn((...args: unknown[]) => {
+      networkCalls.push(`${label}(${String(args[0] ?? '')})`);
+      throw new Error(`Zero-Network: wywołano ${label}`);
+    });
 
   beforeAll(() => {
     // Całkowite odcięcie sieci — tryb samolotowy (zero-network)
-    (global as any).fetch = undefined;
-    (global as any).WebSocket = undefined;
-    (global as any).XMLHttpRequest = undefined;
+    (global as any).fetch = spy('fetch');
+    (global as any).WebSocket = spy('WebSocket');
+    (global as any).XMLHttpRequest = spy('XMLHttpRequest');
     if (global.navigator) {
-      (global.navigator as any).sendBeacon = undefined;
+      (global.navigator as any).sendBeacon = spy('navigator.sendBeacon');
     }
+  });
+
+  afterEach(() => {
+    expect(networkCalls).toEqual([]);
   });
 
   afterAll(() => {
     global.fetch = originalFetch;
     (global as any).WebSocket = originalWebSocket;
     (global as any).XMLHttpRequest = originalXHR;
+    if (global.navigator) {
+      (global.navigator as any).sendBeacon = originalBeacon;
+    }
   });
 
   beforeEach(() => {
@@ -181,10 +199,17 @@ describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
     initDatabase();
   });
 
-  test('Gwarancja Zero-Network: globalne interfejsy sieciowe są wyłączone', () => {
-    expect(global.fetch).toBeUndefined();
-    expect((global as any).WebSocket).toBeUndefined();
-    expect((global as any).XMLHttpRequest).toBeUndefined();
+  test('Gwarancja Zero-Network: start bazy, odczyt ustawień, eksport i kopia nie wołają sieci', () => {
+    // initDatabase w beforeEach; tu pełny cykl danych użytkownika bez interakcji z siecią.
+    setAppSetting('zero_network_probe', '1');
+    expect(getAppSetting('zero_network_probe')).toBe('1');
+    expect(exportAllDataJson()).toContain('"version": 1');
+    expect(typeof exportInventoryCsv()).toBe('string');
+    buildBackup({ inventory: getInventoryItems(true), customRecipes: [], sessions: [], caffeineLogs: [] });
+    expect((global.fetch as unknown as jest.Mock).mock.calls).toHaveLength(0);
+    expect(((global as any).WebSocket as jest.Mock).mock.calls).toHaveLength(0);
+    expect(((global as any).XMLHttpRequest as jest.Mock).mock.calls).toHaveLength(0);
+    expect(networkCalls).toEqual([]);
   });
 
   test('Operacje bazodanowe SQLite działają w 100% offline bez opóźnień sieciowych', () => {
