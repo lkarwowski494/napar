@@ -22,7 +22,7 @@ Zakres funkcjonalny Z-001 do Z-090. Przypisanie etapów: **MVP**, **1.1**, **1.2
 | **Z-014** | METODY | Profil: French Press | Metoda głębokiej infuzji (James Hoffmann French Press technique) z długim opadaniem cząstek. | MUST | MVP |
 | **Z-015** | METODY | Profil: Kalita Wave / Flat Bottom | Parzenie z płaskim dnem; równomierna ekstrakcja z mniejszą liczbą zalań. | SHOULD | MVP |
 | **Z-016** | METODY | Profil: Espresso | Receptura ciśnieniowa: doza sucha, uzysk w filiżance, czas preinfuzji i ekstrakcji głównej. | SHOULD | MVP |
-| **Z-017** | METODY | Profil: Cold Brew | Timer długoczasowy (12–24h) z powiadomieniem lokalnym po zakończeniu maceracji. | COULD | 1.1 |
+| **Z-017** | METODY | Profil: Cold Brew | Timer długoczasowy (12–24h) z powiadomieniem lokalnym po zakończeniu maceracji. **Status: odłożone do v1.2 razem z KILL-09** (powiadomienia poza 1.0, D-008; ER-03 w 00c). | COULD | 1.1 |
 | **Z-018** | METODY | Profil: Syfon / Vacuum Pot | Kontrola czasu gotowania dolnego naczynia i czasu infuzji górnej. | COULD | 1.2 |
 | **Z-019** | HERBATA | Profil: Gongfu Cha | Licznik wielokrotnych infuzji (do 15 zalań); automatyczne wydłużanie czasu kolejnego parzenia. | MUST | MVP |
 | **Z-020** | HERBATA | Profil: Parzenie zachodnie (Western) | Jednorazowa infuzja dużej objętości (300–500ml) z czasem 2–5 min. | MUST | MVP |
