@@ -1,0 +1,9 @@
+#!/bin/sh
+# Hook przed pushem — M1-audytor-generalny-043 (07-jakosc-013).
+# Uruchamia pełną bramkę jakości (ta sama co w CI); czerwona bramka blokuje push.
+# Instalacja: `npm install` / `npm ci` (skrypt prepare → scripts/install-git-hooks.mjs ustawia core.hooksPath).
+# Świadome pominięcie (np. push samej dokumentacji w awarii): git push --no-verify — z opisem powodu w commicie.
+set -e
+cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+echo "[pre-push] npm run verify (pełna bramka, kilka minut)…" >&2
+npm run verify

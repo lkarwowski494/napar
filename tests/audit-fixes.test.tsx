@@ -2464,3 +2464,51 @@ describe('M1-audytor-generalny-043: granice liczb, których aplikacja uczy, piln
     expect(src).not.toMatch(/isSafeForSleep|safeThreshold/);
   });
 });
+
+describe('M1-audytor-generalny-043: hook przed pushem uruchamia pełną bramkę npm run verify (07-jakosc-013)', () => {
+  const root = join(__dirname, '..');
+  const hook = join(root, '.githooks', 'pre-push');
+
+  test('hook istnieje, jest wykonywalny i woła `npm run verify`; prepare ustawia core.hooksPath = .githooks', () => {
+    expect(existsSync(hook)).toBe(true);
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { statSync } = require('node:fs');
+    expect(statSync(hook).mode & 0o111).not.toBe(0);
+    expect(readFileSync(hook, 'utf8')).toMatch(/^npm run verify\b/m);
+    const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+    expect(pkg.scripts.prepare).toBe('node scripts/install-git-hooks.mjs');
+    const installer = readFileSync(join(root, 'scripts', 'install-git-hooks.mjs'), 'utf8');
+    expect(installer).toContain("'core.hooksPath', '.githooks'");
+  });
+
+  test('hook blokuje push, gdy bramka jest czerwona, i przepuszcza, gdy zielona', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { spawnSync } = require('node:child_process');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { mkdtempSync, writeFileSync, chmodSync, rmSync } = require('node:fs');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { tmpdir } = require('node:os');
+    const bin = mkdtempSync(join(tmpdir(), 'napar-hook-'));
+    try {
+      const runWith = (code: number) => {
+        // atrapa npm zapisuje argumenty i zwraca zadany kod (np. czerwony typecheck w verify)
+        writeFileSync(join(bin, 'npm'), `#!/bin/sh\necho "$@" > "${bin}/args"\nexit ${code}\n`);
+        chmodSync(join(bin, 'npm'), 0o755);
+        return spawnSync('sh', [hook, 'origin', 'https://example.invalid/repo.git'], {
+          cwd: root,
+          input: '',
+          env: { ...process.env, PATH: `${bin}:${process.env.PATH}` },
+          encoding: 'utf8',
+        });
+      };
+      const red = runWith(1);
+      expect(red.status).not.toBe(0);
+      expect(readFileSync(join(bin, 'args'), 'utf8').trim()).toBe('run verify');
+      const green = runWith(0);
+      expect(green.status).toBe(0);
+    } finally {
+      rmSync(bin, { recursive: true, force: true });
+    }
+  });
+});
+

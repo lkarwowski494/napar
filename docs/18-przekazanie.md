@@ -29,6 +29,8 @@ Wszystkie komendy uruchamiane są z poziomu głównego katalogu repozytorium:
 ```bash
 # Główna brama jakościowa (wszystkie kontrole przed pushem i wydaniem):
 npm run verify
+# Hook przed pushem (.githooks/pre-push) uruchamia ją przy każdym `git push`; instaluje go `npm install`/`npm ci`
+# (skrypt prepare ustawia core.hooksPath = .githooks; poza CI). Pominięcie tylko świadome: git push --no-verify.
 
 # Pojedyncze kontrole składowe:
 npm run check:i18n       # Walidacja symetrii tłumaczeń PL/EN
