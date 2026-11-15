@@ -162,8 +162,11 @@ jobs:
         env:
           CI: '1'
           NODE_ENV: production
+          # 12-niezawodnosc-008: react-native-xcode.sh składa mapę źródeł Hermesa do tej ścieżki (archiwum niżej).
+          SOURCEMAP_FILE: ${{ runner.temp }}/sourcemaps/main.jsbundle.map
         run: |
           set -o pipefail
+          mkdir -p "$(dirname "$SOURCEMAP_FILE")"
           xcodebuild archive \
             -workspace "ios/$APP_SCHEME.xcworkspace" \
             -scheme "$APP_SCHEME" \
@@ -182,6 +185,7 @@ jobs:
             tail -80 /tmp/xcodebuild-archive.log
             exit 1
           fi
+          test -s "$SOURCEMAP_FILE" || echo "::warning::Brak mapy źródeł JS ($SOURCEMAP_FILE) — stos JS z raportu awarii nie da się zmapować"
 
       - name: Prepare App Store Connect API Key (.p8) after pod install & archive
         env:
@@ -299,6 +303,7 @@ jobs:
         with:
           name: hermes-sourcemaps-dsym-${{ github.run_number }}
           path: |
+            ${{ runner.temp }}/sourcemaps/main.jsbundle.map
             ${{ runner.temp }}/${{ env.APP_SCHEME }}.xcarchive/dSYMs
           retention-days: 30
 
