@@ -15,6 +15,7 @@ import { formatTemplate } from '../../core/i18n';
 import { decodeRecipeFromShareUrl } from '../../core/recipe-share';
 import { saveRecipe } from '../../core/database';
 import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../core/unit-converter';
+import { ModalHeader } from '../ui';
 
 export interface ImportRecipeModalProps {
   visible: boolean;
@@ -51,19 +52,14 @@ export const ImportRecipeModal: React.FC<ImportRecipeModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide">
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-        <View style={styles.modalHeader}>
+        <ModalHeader
+          onClose={onClose}
+          closeLabel={t.common.close}
+          closeTestID="close-import-modal-btn"
+          style={styles.modalHeader}
+        >
           <Text style={styles.modalTitle}>{t.brew.importModalTitle}</Text>
-          <Pressable
-            testID="close-import-modal-btn"
-            style={styles.modalCloseBtn}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel={t.common.close}
-          >
-            <Text style={styles.modalCloseText}>{t.common.close}</Text>
-          </Pressable>
-        </View>
+        </ModalHeader>
         <ScrollView contentContainerStyle={{ padding: 16 }}>
           <Text style={styles.modalSub}>{t.brew.importModalDesc}</Text>
           <TextInput
@@ -138,23 +134,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     marginBottom: 16,
     lineHeight: 18,
-  },
-  modalCloseBtn: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseText: {
-    fontSize: 14,
-    color: theme.colors.copper,
-    fontWeight: '700',
   },
   importTextInput: {
     backgroundColor: theme.colors.bgCard,

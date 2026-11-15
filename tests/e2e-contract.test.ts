@@ -27,7 +27,7 @@ function codeTestIds(): Set<string> {
       if (e.isDirectory()) {
         if (!['__tests__', 'node_modules'].includes(e.name)) walk(p);
       } else if (/\.tsx?$/.test(e.name)) {
-        for (const m of fs.readFileSync(p, 'utf8').matchAll(/testID=["{`']+([A-Za-z0-9_-]+)/g)) ids.add(m[1]);
+        for (const m of fs.readFileSync(p, 'utf8').matchAll(/\b(?:testID|closeTestID|saveTestID)=["{`']+([A-Za-z0-9_-]+)/g)) ids.add(m[1]);
       }
     }
   };

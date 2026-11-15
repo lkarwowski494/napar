@@ -16,6 +16,7 @@ import { saveInventoryItem, deleteInventoryItem, getUnitSystem } from '../../cor
 import { gramsToOunces, ouncesToGrams, roundTo } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
 import { runSave } from '../../../lib/save-feedback';
+import { ModalHeader } from '../ui';
 
 export interface BeanEditModalProps {
   visible: boolean;
@@ -169,21 +170,18 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-        <View style={styles.modalHeader}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.modalTitle}>{t.stash?.editTitle || 'Edytuj Paczkę'}</Text>
-            <Text style={styles.modalHeaderSub}>{t.stash.editSubtitle}</Text>
-          </View>
-          <Pressable
-            style={styles.modalCloseBtn}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel={t.common.cancel}
-          >
-            <Text style={styles.modalCloseText}>{t.common.cancel}</Text>
-          </Pressable>
-        </View>
+        <ModalHeader
+          onClose={onClose}
+          closeLabel={t.common.cancel}
+          onSave={handleSaveEdit}
+          saveLabel={t.stash?.saveChanges || 'Zapisz zmiany'}
+          saveDisabled={!editName.trim()}
+          saveTestID="save-bean-edit-btn"
+          style={styles.modalHeader}
+        >
+          <Text style={styles.modalTitle}>{t.stash?.editTitle || 'Edytuj Paczkę'}</Text>
+          <Text style={styles.modalHeaderSub}>{t.stash.editSubtitle}</Text>
+        </ModalHeader>
 
         <ScrollView style={styles.formScroll}>
           {/* Typ: Kawa vs Herbata — widoczny wyłącznie gdy preferencja to 'both' */}
@@ -386,18 +384,6 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           </View>
 
           <Pressable
-            testID="save-bean-edit-btn"
-            style={[styles.saveSubmitBtn, !editName.trim() && { opacity: 0.5 }]}
-            onPress={handleSaveEdit}
-            disabled={!editName.trim()}
-            accessibilityRole="button"
-            accessibilityState={{ disabled: !editName.trim() }}
-            accessibilityLabel={t.stash?.saveChanges || 'Zapisz zmiany'}
-          >
-            <Text style={styles.saveSubmitText}>{t.stash?.saveChanges || 'Zapisz zmiany'}</Text>
-          </Pressable>
-
-          <Pressable
             testID="mark-finished-btn"
             style={styles.markFinishedBtn}
             onPress={handleMarkAsFinished}
@@ -446,23 +432,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.textMuted,
     marginTop: 2,
-  },
-  modalCloseBtn: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseText: {
-    fontSize: 14,
-    color: theme.colors.copper,
-    fontWeight: '700',
   },
   formScroll: {
     flex: 1,
@@ -567,20 +536,6 @@ const styles = StyleSheet.create({
   },
   starIconActive: {
     color: '#FFD700',
-  },
-  saveSubmitBtn: {
-    minHeight: 44,
-    backgroundColor: theme.colors.copper,
-    paddingVertical: 16,
-    borderRadius: theme.borderRadius.md,
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 12,
-  },
-  saveSubmitText: {
-    color: theme.colors.onAccent,
-    fontSize: 16,
-    fontWeight: '700',
   },
   markFinishedBtn: {
     minHeight: 44,

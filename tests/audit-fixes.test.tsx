@@ -2286,3 +2286,59 @@ describe('M1-audytor-generalny-044: wyrocznia ze źródeł, check:corpus porówn
     expect(readFileSync(join(root, 'scripts/check-corpus.mjs'), 'utf8')).toMatch(/--check/);
   });
 });
+
+// M1-audytor-generalny-041 · 04-studio-projektowe-012 (+ N1 przeglądu partii 4): wspólny ModalHeader.
+// Pełny strażnik wszystkich modali: tests/close-button-guard.test.tsx. Tu regresja na prawdziwym formularzu.
+describe('M1-audytor-generalny-041: formularz podsumowania parzenia — „Pomiń” po lewej, zapis w prawym rogu nagłówka (04-studio-projektowe-012)', () => {
+  test('pierwszy przycisk nagłówka wywołuje onSkip, ostatni onSave; w treści nie ma drugiego zapisu', () => {
+    const { BrewFinishModal } = require('../src/components/brew/BrewFinishModal');
+    const { LanguageProvider } = require('../src/core/i18n');
+    const { DEFAULT_SENSORY_PROFILE } = require('../src/core/radar-chart');
+    const calls: string[] = [];
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <BrewFinishModal
+            visible
+            totalElapsedSeconds={180}
+            waterGrams={250}
+            rating={4}
+            onChangeRating={() => undefined}
+            tasteBalance="balanced"
+            onChangeTasteBalance={() => undefined}
+            sensoryProfile={DEFAULT_SENSORY_PROFILE}
+            onChangeSensoryProfile={() => undefined}
+            selectedTags={[]}
+            onToggleTag={() => undefined}
+            waterProfile="none"
+            onChangeWaterProfile={() => undefined}
+            tdsInput=""
+            onChangeTdsInput={() => undefined}
+            notes=""
+            onChangeNotes={() => undefined}
+            brewCost={{ coffeeCost: 0, waterCost: 0, electricityKwh: 0, energyCost: 0, filterCost: 0, totalHomeCost: 0, cafePrice: 0, savingsPerCup: 0, savingsPercent: 0 }}
+            onSkip={() => calls.push('skip')}
+            onSave={() => calls.push('save')}
+          />
+        </LanguageProvider>,
+      );
+    });
+    const header = tree!.root.findByProps({ testID: 'modal-header' });
+    const ids = header
+      .findAll((n) => typeof n.type !== 'string' && n.props.accessibilityRole === 'button' && !!n.props.testID)
+      .map((n) => n.props.testID)
+      .filter((id: string, i: number, arr: string[]) => arr.indexOf(id) === i);
+    expect(ids).toEqual(['finish-skip-btn', 'finish-save-btn']);
+    const press = (id: string) => {
+      const b = header.findAll((n) => typeof n.type !== 'string' && n.props.testID === id)[0];
+      act(() => b.props.onPress());
+    };
+    press('finish-skip-btn');
+    press('finish-save-btn');
+    expect(calls).toEqual(['skip', 'save']);
+    // Jedyny przycisk zapisu w całym modalu to ten w nagłówku.
+    const saves = tree!.root.findAll((n) => typeof n.type !== 'string' && n.props.testID === 'finish-save-btn');
+    expect(saves.every((n) => header.findAll((m) => m === n).length > 0)).toBe(true);
+  });
+});

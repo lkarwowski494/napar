@@ -26,6 +26,7 @@ import {
 import { FlavorWheelPicker } from '../../core/flavor-wheel-picker';
 import { WATER_RECIPES } from '../../core/water-chemistry';
 import { CompassIcon, StarIcon } from '../icons/CraftIcons';
+import { ModalHeader } from '../ui';
 
 interface BrewFinishModalProps {
   visible: boolean;
@@ -126,11 +127,21 @@ export function BrewFinishModal({
     <Modal visible={visible} animationType="slide" transparent={true}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
+          <ModalHeader
+            onClose={onSkip}
+            closeLabel={t.brew?.skipBtn || 'Pomiń'}
+            closeTestID="finish-skip-btn"
+            onSave={onSave}
+            saveLabel={t.brew?.saveToJournalBtn || 'Zapisz w Dzienniku'}
+            saveTestID="finish-save-btn"
+            style={styles.sheetHeader}
+          >
+            <Text style={styles.modalTitle}>{t.brew?.finishModalTitle || 'Zakończono Parzenie!'}</Text>
+          </ModalHeader>
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 24 }}
           >
-            <Text style={styles.modalTitle}>{t.brew?.finishModalTitle || 'Zakończono Parzenie!'}</Text>
             <Text style={styles.modalSub}>
               {(t.brew?.finishTimeWater || (language === 'pl' ? 'Czas: {time} · Woda: {water}g' : 'Time: {time} · Water: {water}g'))
                 .replace('{time}', formatTime(totalElapsedSeconds))
@@ -356,28 +367,6 @@ export function BrewFinishModal({
                 </Text>
               </Text>
             </View>
-
-            {/* Przyciski Pomiń / Zapisz */}
-            <View style={styles.finishButtonsRow}>
-              <Pressable
-                testID="finish-skip-btn"
-                style={styles.finishCancelBtn}
-                onPress={onSkip}
-                accessibilityRole="button"
-                accessibilityLabel={t.brew?.skipBtn || 'Pomiń'}
-              >
-                <Text style={styles.finishCancelText}>{t.brew?.skipBtn || 'Pomiń'}</Text>
-              </Pressable>
-              <Pressable
-                testID="finish-save-btn"
-                style={styles.finishSaveBtn}
-                onPress={onSave}
-                accessibilityRole="button"
-                accessibilityLabel={t.brew?.saveToJournalBtn || 'Zapisz w Dzienniku'}
-              >
-                <Text style={styles.finishSaveText}>{t.brew?.saveToJournalBtn || 'Zapisz w Dzienniku'}</Text>
-              </Pressable>
-            </View>
           </ScrollView>
         </View>
       </View>
@@ -400,8 +389,13 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     maxHeight: '90%',
   },
+  sheetHeader: {
+    paddingHorizontal: 0,
+    paddingTop: 0,
+    marginBottom: 12,
+  },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '700',
     color: theme.colors.textPrimary,
     textAlign: 'center',
@@ -595,35 +589,5 @@ const styles = StyleSheet.create({
   finishCostSavingsBold: {
     fontWeight: '700',
     color: '#4CAF50',
-  },
-  finishButtonsRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  finishCancelBtn: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.bgCardSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 52,
-  },
-  finishCancelText: {
-    color: theme.colors.textSecondary,
-    fontWeight: '600',
-  },
-  finishSaveBtn: {
-    flex: 2,
-    paddingVertical: 14,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.copper,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 52,
-  },
-  finishSaveText: {
-    color: theme.colors.onAccent,
-    fontWeight: '700',
   },
 });

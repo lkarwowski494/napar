@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { theme } from './theme';
 import { CameraIcon } from '../components/icons/CraftIcons';
+import { ModalHeader } from '../components/ui';
 
 export interface QrScannerModalProps {
   visible: boolean;
@@ -64,19 +65,15 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide">
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Pressable
-            testID="qr-scanner-close-btn"
-            style={styles.closeBtn}
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel={isEn ? "Close scanner" : "Zamknij skaner"}
-          >
-            <Text style={styles.closeBtnText}>{isEn ? "Cancel" : "Anuluj"}</Text>
-          </Pressable>
+        <ModalHeader
+          onClose={onClose}
+          closeLabel={isEn ? "Cancel" : "Anuluj"}
+          closeAccessibilityLabel={isEn ? "Close scanner" : "Zamknij skaner"}
+          closeTestID="qr-scanner-close-btn"
+          style={styles.header}
+        >
           <Text style={styles.headerTitle}>{qrTitle}</Text>
-          <View style={{ width: 60 }} />
-        </View>
+        </ModalHeader>
 
         {!permission?.granted ? (
           <View style={styles.permissionBox}>
@@ -156,16 +153,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     color: '#FFFFFF',
-  },
-  closeBtn: {
-    minHeight: 44,
-    minWidth: 60,
-    justifyContent: 'center',
-  },
-  closeBtnText: {
-    fontSize: 16,
-    color: theme.colors.copper,
-    fontWeight: '600',
   },
   permissionBox: {
     flex: 1,

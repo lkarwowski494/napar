@@ -24,6 +24,7 @@ import { parseStepDurationSeconds } from '../../core/bpr-engine';
 import { formatWaterWeight } from '../../core/unit-converter';
 import { translations } from '../../core/i18n';
 import type { TimerStatus } from '../../core/timer-engine';
+import { ModalHeader } from '../ui';
 
 export interface ProcedureModalProps {
   visible: boolean;
@@ -154,28 +155,20 @@ export function ProcedureModal({
         testID="procedure-modal"
       >
         {/* Górny pasek Asystenta Procedury */}
-        <View style={styles.topHeader}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.eyebrow}>
-              {assistantTitle}
-            </Text>
-            <Text style={styles.recipeTitle} numberOfLines={1}>
-              {recipeName}
-            </Text>
-          </View>
-          <Pressable
-            testID="procedure-close-btn"
-            style={styles.abortBtn}
-            onPress={onClose}
-            hitSlop={10}
-            accessibilityRole="button"
-            accessibilityLabel={isEn ? 'Exit procedure' : 'Zamknij asystenta procedury'}
-          >
-            <Text style={styles.abortBtnText}>
-              {isEn ? 'Close' : 'Zamknij'}
-            </Text>
-          </Pressable>
-        </View>
+        <ModalHeader
+          onClose={onClose}
+          closeLabel={isEn ? 'Close' : 'Zamknij'}
+          closeAccessibilityLabel={isEn ? 'Exit procedure' : 'Zamknij asystenta procedury'}
+          closeTestID="procedure-close-btn"
+          style={styles.topHeader}
+        >
+          <Text style={styles.eyebrow}>
+            {assistantTitle}
+          </Text>
+          <Text style={styles.recipeTitle} numberOfLines={1}>
+            {recipeName}
+          </Text>
+        </ModalHeader>
 
         {/* Pasek postępu kroków (1 .. N) */}
         <View
@@ -480,19 +473,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: theme.colors.textPrimary,
     marginTop: 2,
-  },
-  abortBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: theme.borderRadius.sm,
-    backgroundColor: theme.colors.bgCard,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  abortBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: theme.colors.textSecondary,
   },
   progressTrackRow: {
     flexDirection: 'row',

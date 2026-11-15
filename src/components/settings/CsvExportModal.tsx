@@ -2,14 +2,13 @@ import React from 'react';
 import {
   Text,
   StyleSheet,
-  Pressable,
   Modal,
   TextInput,
-  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
 import { useTranslation } from '../../core/i18n';
+import { ModalHeader } from '../ui';
 
 export interface CsvExportModalProps {
   visible: boolean;
@@ -28,18 +27,13 @@ export const CsvExportModal: React.FC<CsvExportModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide">
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-        <View style={styles.modalHeader}>
+        <ModalHeader
+          onClose={onClose}
+          closeLabel={t.common.close}
+          style={styles.modalHeader}
+        >
           <Text style={styles.modalTitle}>{title}</Text>
-          <Pressable
-            style={styles.modalCloseBtn}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel={t.common.close}
-          >
-            <Text style={styles.modalCloseText}>{t.common.close}</Text>
-          </Pressable>
-        </View>
+        </ModalHeader>
         <Text style={styles.modalSub}>
           {t.settings.csvModalDesc}
         </Text>
@@ -79,23 +73,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     marginBottom: 16,
     lineHeight: 18,
-  },
-  modalCloseBtn: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseText: {
-    fontSize: 14,
-    color: theme.colors.copper,
-    fontWeight: '700',
   },
   jsonTextInput: {
     flex: 1,

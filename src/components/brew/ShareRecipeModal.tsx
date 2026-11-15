@@ -16,6 +16,7 @@ import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../co
 import { MasterRecipe } from '../../core/recipes-data';
 import { SavedRecipe } from '../../core/database-schema';
 import type { SupportedLanguage } from '../../core/i18n';
+import { ModalHeader } from '../ui';
 
 export interface ShareRecipeModalProps {
   visible: boolean;
@@ -42,19 +43,14 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide">
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-        <View style={styles.modalHeader}>
+        <ModalHeader
+          onClose={onClose}
+          closeLabel={t.common.close}
+          closeTestID="close-share-modal-btn"
+          style={styles.modalHeader}
+        >
           <Text style={styles.modalTitle}>{t.brew.qrModalTitle}</Text>
-          <Pressable
-            testID="close-share-modal-btn"
-            style={styles.modalCloseBtn}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel={t.common.close}
-          >
-            <Text style={styles.modalCloseText}>{t.common.close}</Text>
-          </Pressable>
-        </View>
+        </ModalHeader>
         <ScrollView contentContainerStyle={{ padding: 20, alignItems: 'center' }}>
           <Text style={[styles.modalSub, { textAlign: 'center', marginBottom: 16 }]}>
             {t.brew.qrModalDesc}
@@ -147,23 +143,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     marginBottom: 16,
     lineHeight: 18,
-  },
-  modalCloseBtn: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseText: {
-    fontSize: 14,
-    color: theme.colors.copper,
-    fontWeight: '700',
   },
   qrCard: {
     backgroundColor: '#FFFFFF',

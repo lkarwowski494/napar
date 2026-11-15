@@ -1,6 +1,6 @@
 // ============================================================================
 // Napar — Common UI Components (S1..S16, NFR-INT-001..016)
-// Komponenty interfejsu użytkownika: NumInput, Field, Empty, Missing, Btn, SearchField, SwipeRow
+// Komponenty interfejsu użytkownika: NumInput, Field, Empty, Missing, Btn, SearchField, SwipeRow, ModalHeader
 // ============================================================================
 
 import React from 'react';
@@ -343,6 +343,96 @@ export const CloseButton: React.FC<CloseButtonProps> = ({
   );
 };
 
+// ----------------------------------------------------------------------------
+// S1 + S3 (NFR-INT-001/003), M1-audytor-generalny-041: ModalHeader — wspólny nagłówek modala.
+// Lewy róg: „Anuluj”/„Zamknij” (zawsze). Środek: tytuł. Prawy róg: „Zapisz” (tylko formularze).
+// Pilnowane przez tests/close-button-guard.test.tsx: każdy <Modal> w app/ i src/ go używa.
+// ----------------------------------------------------------------------------
+export interface ModalHeaderProps {
+  onClose: () => void;
+  closeLabel: string;
+  closeAccessibilityLabel?: string;
+  closeAccessibilityHint?: string;
+  closeTestID?: string;
+  title?: string;
+  subtitle?: string;
+  /** Własna treść środka nagłówka (zastępuje title/subtitle). */
+  children?: React.ReactNode;
+  onSave?: () => void;
+  saveLabel?: string;
+  saveAccessibilityLabel?: string;
+  saveAccessibilityHint?: string;
+  saveTestID?: string;
+  saveDisabled?: boolean;
+  /** Zapis ogłaszany czytnikowi jako niedostępny, ale klikalny (np. komunikat walidacji po naciśnięciu). */
+  saveAnnouncedDisabled?: boolean;
+  testID?: string;
+  style?: StyleProp<ViewStyle>;
+}
+
+const MODAL_HEADER_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 };
+
+export const ModalHeader: React.FC<ModalHeaderProps> = ({
+  onClose,
+  closeLabel,
+  closeAccessibilityLabel,
+  closeAccessibilityHint,
+  closeTestID,
+  title,
+  subtitle,
+  children,
+  onSave,
+  saveLabel,
+  saveAccessibilityLabel,
+  saveAccessibilityHint,
+  saveTestID,
+  saveDisabled,
+  saveAnnouncedDisabled,
+  testID = 'modal-header',
+  style,
+}) => (
+  <View testID={testID} style={[styles.modalHeader, style]}>
+    <Pressable
+      testID={closeTestID}
+      onPress={onClose}
+      hitSlop={MODAL_HEADER_HIT_SLOP}
+      accessibilityRole="button"
+      accessibilityLabel={closeAccessibilityLabel ?? closeLabel}
+      accessibilityHint={closeAccessibilityHint}
+      style={[styles.modalHeaderBtn, styles.modalHeaderBtnLeft]}
+    >
+      <Text style={styles.modalHeaderCloseText}>{closeLabel}</Text>
+    </Pressable>
+    <View style={styles.modalHeaderCenter}>
+      {children ?? (
+        <>
+          {!!title && (
+            <Text style={styles.modalHeaderTitle} accessibilityRole="header">
+              {title}
+            </Text>
+          )}
+          {!!subtitle && <Text style={styles.modalHeaderSubtitle}>{subtitle}</Text>}
+        </>
+      )}
+    </View>
+    {onSave ? (
+      <Pressable
+        testID={saveTestID}
+        onPress={onSave}
+        disabled={saveDisabled}
+        hitSlop={MODAL_HEADER_HIT_SLOP}
+        accessibilityRole="button"
+        accessibilityLabel={saveAccessibilityLabel ?? saveLabel}
+        accessibilityHint={saveAccessibilityHint}
+        accessibilityState={{ disabled: !!(saveDisabled || saveAnnouncedDisabled) }}
+        style={[styles.modalHeaderBtn, styles.modalHeaderBtnRight, saveDisabled && styles.btnDisabled]}
+      >
+        <Text style={styles.modalHeaderSaveText}>{saveLabel}</Text>
+      </Pressable>
+    ) : null}
+  </View>
+);
+
 const styles = StyleSheet.create({
   fieldContainer: {
     marginBottom: 16,
@@ -564,5 +654,52 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontSize: 18,
     fontWeight: '700',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  modalHeaderBtn: {
+    minHeight: 44,
+    minWidth: 44,
+    justifyContent: 'center',
+    flexShrink: 1,
+    maxWidth: '40%',
+  },
+  modalHeaderBtnLeft: {
+    alignItems: 'flex-start',
+  },
+  modalHeaderBtnRight: {
+    alignItems: 'flex-end',
+  },
+  modalHeaderCloseText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  modalHeaderSaveText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.copper,
+    textAlign: 'right',
+  },
+  modalHeaderCenter: {
+    flex: 1,
+    minWidth: 0,
+  },
+  modalHeaderTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  modalHeaderSubtitle: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginTop: 2,
   },
 });

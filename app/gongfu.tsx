@@ -5,11 +5,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  View,
-  Text,
   StyleSheet,
   ScrollView,
-  Pressable,
   Alert,
   AppState,
 } from 'react-native';
@@ -41,6 +38,7 @@ import { GongfuSessionSetup } from '../src/components/gongfu/GongfuSessionSetup'
 import { GongfuActiveInfusion } from '../src/components/gongfu/GongfuActiveInfusion';
 import { GongfuInfusionHistory } from '../src/components/gongfu/GongfuInfusionHistory';
 import { runSave } from '../lib/save-feedback';
+import { ModalHeader } from '../src/components/ui';
 
 export default function GongfuScreen() {
   const router = useRouter();
@@ -288,21 +286,14 @@ export default function GongfuScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={8}
-          style={styles.closeBtn}
-          accessibilityRole="button"
-          accessibilityLabel={t.common.close}
-        >
-          <Text style={styles.closeBtnText}>{t.common.close}</Text>
-        </Pressable>
-        <Text style={styles.headerTitle}>{t.gongfu.modeTitle}</Text>
-        <Pressable onPress={handleFinishAndSaveSession} hitSlop={8} style={styles.finishBtn} accessibilityRole="button" accessibilityLabel={t.common.save}>
-          <Text style={styles.finishBtnText}>{t.common.save}</Text>
-        </Pressable>
-      </View>
+      <ModalHeader
+        onClose={() => router.back()}
+        closeLabel={t.common.close}
+        title={t.gongfu.modeTitle}
+        onSave={handleFinishAndSaveSession}
+        saveLabel={t.common.save}
+        style={styles.header}
+      />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -368,38 +359,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
     backgroundColor: theme.colors.bgCard,
-  },
-  closeBtn: {
-    padding: 4,
-    minHeight: 48,
-    minWidth: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  closeBtnText: {
-    color: theme.colors.textSecondary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-  },
-  finishBtn: {
-    backgroundColor: theme.colors.emerald,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 8,
-    minHeight: 48,
-    minWidth: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  finishBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 14,
   },
   scrollContent: {
     padding: 16,

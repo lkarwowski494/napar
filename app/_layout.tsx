@@ -5,9 +5,9 @@
 // ============================================================================
 
 import React, { useState, useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar, View, ActivityIndicator } from 'react-native';
+import { StatusBar, View, ActivityIndicator, Pressable, Text } from 'react-native';
 import { LanguageProvider, useTranslation } from '../src/core/i18n';
 import { BrewProvider } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
@@ -21,6 +21,24 @@ function StartupSuccessNotifier() {
     void recordStartupSuccess();
   }, []);
   return null;
+}
+
+// M1-audytor-generalny-041 (S1): natywny nagłówek modala ustawień ma „Zamknij” po lewej.
+function ModalCloseHeaderButton() {
+  const router = useRouter();
+  const { t } = useTranslation();
+  return (
+    <Pressable
+      testID="settings-close-btn"
+      onPress={() => router.back()}
+      hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel={t.common.close}
+      style={{ minHeight: 44, minWidth: 44, justifyContent: 'center' }}
+    >
+      <Text style={{ fontSize: 16, fontWeight: '600', color: theme.colors.textSecondary }}>{t.common.close}</Text>
+    </Pressable>
+  );
 }
 
 function RootStack() {
@@ -47,6 +65,7 @@ function RootStack() {
         options={{
           presentation: 'modal',
           title: language === 'en' ? 'Settings & Backup' : 'Ustawienia i Kopia',
+          headerLeft: () => <ModalCloseHeaderButton />,
         }}
       />
       <Stack.Screen

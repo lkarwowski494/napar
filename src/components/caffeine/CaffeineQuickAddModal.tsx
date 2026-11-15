@@ -9,6 +9,7 @@ import { formatDoseWeight } from '../../core/unit-converter';
 import { estimateCoffeeCaffeineMg } from '../../core/domain-rules';
 import { theme } from '../../core/theme';
 import { translations } from '../../core/i18n';
+import { ModalHeader } from '../ui';
 
 interface CaffeineQuickAddModalProps {
   visible: boolean;
@@ -35,9 +36,16 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
     <Modal visible={visible} animationType="fade" transparent={true}>
       <View style={styles.modalOverlay} testID="caffeine-quick-modal">
         <View style={styles.modalCard}>
-          <Text style={styles.modalCardTitle}>
-            {isEn ? 'Quick Log Caffeine' : 'Szybkie dodanie kofeiny'}
-          </Text>
+          <ModalHeader
+            onClose={onClose}
+            closeLabel={isEn ? 'Cancel' : 'Anuluj'}
+            closeTestID="caffeine-quick-cancel-btn"
+            style={styles.modalCardHeader}
+          >
+            <Text style={styles.modalCardTitle}>
+              {isEn ? 'Quick Log Caffeine' : 'Szybkie dodanie kofeiny'}
+            </Text>
+          </ModalHeader>
 
           {(() => {
             const v60Mg = Math.round(estimateCoffeeCaffeineMg(18, 'arabica', 'filter'));
@@ -109,17 +117,6 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
             <Text style={styles.quickOptionName}>{tc.quickLooseTeaLabel}</Text>
             <Text style={styles.quickOptionMg}>~45 mg ({formatDoseWeight(5, unitSystem)})</Text>
           </Pressable>
-
-          <Pressable
-            testID="caffeine-quick-cancel-btn"
-            style={styles.modalCancelBtn}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={isEn ? 'Cancel' : 'Anuluj'}
-            onPress={onClose}
-          >
-            <Text style={styles.modalCancelText}>{isEn ? 'Cancel' : 'Anuluj'}</Text>
-          </Pressable>
         </View>
       </View>
     </Modal>
@@ -143,12 +140,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
   },
+  modalCardHeader: {
+    paddingHorizontal: 0,
+    paddingTop: 0,
+    marginBottom: theme.spacing.md,
+  },
   modalCardTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.lg,
-    textAlign: 'center',
   },
   quickOption: {
     backgroundColor: theme.colors.bgCardSecondary,
@@ -167,16 +167,6 @@ const styles = StyleSheet.create({
   quickOptionMg: {
     fontSize: 12,
     color: theme.colors.copper,
-    fontWeight: '600',
-  },
-  modalCancelBtn: {
-    marginTop: 8,
-    padding: 12,
-    alignItems: 'center',
-  },
-  modalCancelText: {
-    color: theme.colors.textSecondary,
-    fontSize: 14,
     fontWeight: '600',
   },
 });

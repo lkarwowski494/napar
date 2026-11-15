@@ -17,6 +17,7 @@ import { ouncesToGrams } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
 import { KnowledgeTemplate } from './BeanCompendiumModal';
 import { runSave } from '../../../lib/save-feedback';
+import { ModalHeader } from '../ui';
 
 export interface BeanAddModalProps {
   visible: boolean;
@@ -133,19 +134,19 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-        <View style={styles.modalHeader}>
+        <ModalHeader
+          onClose={onClose}
+          closeLabel={t.common?.cancel || 'Anuluj'}
+          closeAccessibilityHint={t.common?.modalClose || 'Zamknij okno'}
+          onSave={handleAddItem}
+          saveLabel={t.stash?.saveToStash || 'Zapisz w Spiżarni'}
+          saveAccessibilityHint={t.common?.saveSuccess || 'Zapisuje nową paczkę w spiżarni'}
+          saveAnnouncedDisabled={!name.trim()}
+          saveTestID="save-bean-btn"
+          style={styles.modalHeader}
+        >
           <Text style={styles.modalTitle}>{t.stash?.addTitle || 'Dodaj do Spiżarni'}</Text>
-          <Pressable
-            style={styles.modalCloseBtn}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel={t.common?.cancel || 'Anuluj'}
-            accessibilityHint={t.common?.modalClose || 'Zamknij okno'}
-          >
-            <Text style={styles.modalCloseText}>{t.common?.cancel || 'Anuluj'}</Text>
-          </Pressable>
-        </View>
+        </ModalHeader>
 
         <ScrollView style={styles.formScroll}>
           {/* Typ: Kawa vs Herbata — widoczny wyłącznie gdy preferencja to 'both' */}
@@ -301,19 +302,6 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             onChangeText={setNotesStr}
             maxLength={500}
           />
-
-          <Pressable
-            testID="save-bean-btn"
-            accessibilityRole="button"
-            accessibilityState={{ disabled: !name.trim() }}
-            accessibilityLabel={t.stash?.saveToStash || 'Zapisz w Spiżarni'}
-            accessibilityHint={t.common?.saveSuccess || 'Zapisuje nową paczkę w spiżarni'}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            style={styles.saveSubmitBtn}
-            onPress={handleAddItem}
-          >
-            <Text style={styles.saveSubmitText}>{t.stash?.saveToStash || 'Zapisz w Spiżarni'}</Text>
-          </Pressable>
         </ScrollView>
       </SafeAreaView>
     </Modal>
@@ -339,23 +327,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: theme.colors.textPrimary,
-  },
-  modalCloseBtn: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseText: {
-    fontSize: 14,
-    color: theme.colors.copper,
-    fontWeight: '700',
   },
   formScroll: {
     flex: 1,
@@ -421,18 +392,5 @@ const styles = StyleSheet.create({
   },
   formRow: {
     flexDirection: 'row',
-  },
-  saveSubmitBtn: {
-    backgroundColor: theme.colors.copper,
-    paddingVertical: 16,
-    borderRadius: theme.borderRadius.md,
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 40,
-  },
-  saveSubmitText: {
-    color: theme.colors.onAccent,
-    fontSize: 16,
-    fontWeight: '700',
   },
 });

@@ -5,7 +5,6 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  View,
   Text,
   StyleSheet,
   ScrollView,
@@ -14,7 +13,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Field } from '../src/components/ui';
+import { Field, ModalHeader } from '../src/components/ui';
 import { getRecipeById, saveRecipe, deleteRecipe, duplicateRecipe, getUnitSystem } from '../src/core/database';
 import { SavedRecipe } from '../src/core/database-schema';
 import { RecipeStep } from '../src/core/recipes-data';
@@ -239,29 +238,15 @@ export default function RecipeBuilderScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <Pressable
-          onPress={handleClose}
-          hitSlop={8}
-          style={styles.headerBtn}
-          accessibilityRole="button"
-          accessibilityLabel={t.common.cancel}
-        >
-          <Text style={styles.headerBtnText}>{t.common.cancel}</Text>
-        </Pressable>
-        <Text style={styles.headerTitle}>
-          {isEditing ? t.recipeBuilder.titleEdit : t.recipeBuilder.titleNew}
-        </Text>
-        <Pressable
-          onPress={handleSave}
-          hitSlop={8}
-          style={styles.saveBtn}
-          accessibilityRole="button"
-          accessibilityLabel={t.common.save}
-        >
-          <Text style={styles.saveBtnText}>{t.common.save}</Text>
-        </Pressable>
-      </View>
+      <ModalHeader
+        onClose={handleClose}
+        closeLabel={t.common.cancel}
+        title={isEditing ? t.recipeBuilder.titleEdit : t.recipeBuilder.titleNew}
+        onSave={handleSave}
+        saveLabel={t.common.save}
+        saveTestID="recipe-builder-save-btn"
+        style={styles.header}
+      />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -312,17 +297,6 @@ export default function RecipeBuilderScreen() {
           t={t}
         />
 
-        {/* Przycisk zapisu */}
-        <Pressable
-          testID="recipe-builder-save-btn"
-          style={styles.mainSaveBtn}
-          onPress={handleSave}
-          accessibilityRole="button"
-          accessibilityLabel={t.recipeBuilder.saveRecipeBtn}
-        >
-          <Text style={styles.mainSaveBtnText}>{t.recipeBuilder.saveRecipeBtn}</Text>
-        </Pressable>
-
         {/* Akcje dodatkowe: Duplikuj / Usuń w trybie edycji */}
         {isEditing && (
           <>
@@ -365,55 +339,9 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.colors.border,
     backgroundColor: theme.colors.bgCard,
   },
-  headerBtn: {
-    padding: 6,
-    minHeight: 48,
-    minWidth: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerBtnText: {
-    color: theme.colors.textSecondary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-  },
-  saveBtn: {
-    backgroundColor: theme.colors.copper,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    minHeight: 48,
-    minWidth: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveBtnText: {
-    color: theme.colors.onAccent,
-    fontWeight: '700',
-    fontSize: 14,
-  },
   scrollContent: {
     padding: 16,
     paddingBottom: 40,
-  },
-  mainSaveBtn: {
-    backgroundColor: theme.colors.copper,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginBottom: 12,
-    minHeight: 48,
-    justifyContent: 'center',
-  },
-  mainSaveBtnText: {
-    color: theme.colors.onAccent,
-    fontWeight: '700',
-    fontSize: 16,
   },
   duplicateBtn: {
     backgroundColor: theme.colors.bgCardSecondary,

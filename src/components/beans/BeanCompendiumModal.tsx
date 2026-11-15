@@ -17,6 +17,7 @@ import {
   searchCoffeeOrigins,
   searchTeaCategories,
 } from '../../core/knowledge-data';
+import { ModalHeader } from '../ui';
 
 export interface KnowledgeTemplate {
   name: string;
@@ -63,22 +64,15 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
       <SafeAreaView style={styles.compendiumModalContainer} edges={['top', 'bottom', 'left', 'right']}>
-        <View style={styles.modalHeader}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.modalTitle}>{t.stash?.compendium || (isEn ? 'Knowledge Compendium' : 'Kompendium Wiedzy')}</Text>
-            <Text style={styles.compendiumHeaderSub}>{t.stash?.compendiumSubtitle || (isEn ? 'Botanical varieties, processes, terroir and tea' : 'Odmiany botaniczne, obróbki, terroir i herbaty')}</Text>
-          </View>
-          <Pressable
-            testID="compendium-close-button"
-            style={styles.modalCloseBtn}
-            onPress={onClose}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            accessibilityRole="button"
-            accessibilityLabel={t.common?.close || (isEn ? 'Close' : 'Zamknij')}
-          >
-            <Text style={styles.modalCloseText}>{t.common?.close || (isEn ? 'Close' : 'Zamknij')}</Text>
-          </Pressable>
-        </View>
+        <ModalHeader
+          onClose={onClose}
+          closeLabel={t.common?.close || (isEn ? 'Close' : 'Zamknij')}
+          closeTestID="compendium-close-button"
+          style={styles.modalHeader}
+        >
+          <Text style={styles.modalTitle}>{t.stash?.compendium || (isEn ? 'Knowledge Compendium' : 'Kompendium Wiedzy')}</Text>
+          <Text style={styles.compendiumHeaderSub}>{t.stash?.compendiumSubtitle || (isEn ? 'Botanical varieties, processes, terroir and tea' : 'Odmiany botaniczne, obróbki, terroir i herbaty')}</Text>
+        </ModalHeader>
 
         {/* Wyszukiwarka */}
         <View style={styles.compendiumSearchBox}>
@@ -312,23 +306,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.textMuted,
     marginTop: 2,
-  },
-  modalCloseBtn: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseText: {
-    fontSize: 14,
-    color: theme.colors.copper,
-    fontWeight: '700',
   },
   compendiumSearchBox: {
     marginBottom: 12,

@@ -24,6 +24,7 @@ import {
   LabIcon,
   SettingsIcon,
 } from './icons/CraftIcons';
+import { ModalHeader } from './ui';
 
 export interface AppGuideModalProps {
   visible: boolean;
@@ -110,26 +111,20 @@ export function AppGuideModal({
     <Modal visible={visible} animationType="slide" transparent={true}>
       <View style={styles.overlay} testID="app-guide-modal">
         <SafeAreaView style={styles.sheet} edges={['top', 'bottom', 'left', 'right']}>
-          <View style={styles.header}>
+          <ModalHeader
+            onClose={onClose}
+            closeLabel={isEn ? 'Close' : 'Zamknij'}
+            closeAccessibilityLabel={isEn ? 'Close guide' : 'Zamknij przewodnik'}
+            closeTestID="app-guide-close-btn"
+            style={styles.header}
+          >
             <View style={styles.headerTitleRow}>
               <CompassIcon size={18} color={theme.colors.copper} />
               <Text style={styles.title}>
                 {isEn ? 'How Napar Works' : 'Jak działa aplikacja?'}
               </Text>
             </View>
-            <Pressable
-              testID="app-guide-close-btn"
-              style={styles.closeBtn}
-              onPress={onClose}
-              hitSlop={10}
-              accessibilityRole="button"
-              accessibilityLabel={isEn ? 'Close guide' : 'Zamknij przewodnik'}
-            >
-              <Text style={styles.closeBtnText}>
-                {isEn ? 'Close' : 'Zamknij'}
-              </Text>
-            </Pressable>
-          </View>
+          </ModalHeader>
 
           <ScrollView
             showsVerticalScrollIndicator={false}
@@ -214,6 +209,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 0,
+    paddingTop: 0,
     paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
@@ -227,19 +224,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '800',
     color: theme.colors.textPrimary,
-  },
-  closeBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: theme.borderRadius.sm,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  closeBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: theme.colors.copper,
   },
   content: {
     paddingVertical: 14,

@@ -60,11 +60,11 @@ describe('BeanAddModal Component', () => {
     expect(compendiumBtn.props.accessibilityRole).toBe('button');
     expect(compendiumBtn.props.hitSlop).toEqual({ top: 8, bottom: 8, left: 8, right: 8 });
 
-    // Przycisk zapisu
+    // Przycisk zapisu — od M1-audytor-generalny-041 w prawym rogu wspólnego ModalHeader (hitSlop nagłówka 12 pt)
     const saveBtn = root.findByProps({ testID: 'save-bean-btn' });
     expect(saveBtn).toBeDefined();
     expect(saveBtn.props.accessibilityRole).toBe('button');
-    expect(saveBtn.props.hitSlop).toEqual({ top: 8, bottom: 8, left: 8, right: 8 });
+    expect(saveBtn.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 });
   });
 
   test('Przełącza wybrany typ z kawy na herbatę po kliknięciu', () => {

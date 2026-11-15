@@ -13,6 +13,7 @@ import { theme } from '../../core/theme';
 import { CopyIcon, EditIcon } from '../icons/CraftIcons';
 import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../core/unit-converter';
 import { normSearch, matchesSearch } from '../../core/search-utils';
+import { ModalHeader } from '../ui';
 
 export interface RecipeSelectModalProps {
   visible: boolean;
@@ -209,20 +210,15 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
 
   const innerContent = (
     <>
-      <View style={styles.modalHeader}>
+      <ModalHeader
+        onClose={onClose}
+        closeLabel={t?.common?.close || (isEn ? 'Close' : 'Zamknij')}
+        closeAccessibilityHint={t?.common?.closeHint || (isEn ? 'Closes recipe selection' : 'Zamyka okno wyboru receptury')}
+        closeTestID="close-recipe-modal-btn"
+        style={styles.modalHeader}
+      >
         <Text style={styles.modalTitle} testID="recipe-modal-title">{t?.brew?.chooseRecipe || 'Wybierz recepturę'}</Text>
-        <Pressable
-          testID="close-recipe-modal-btn"
-          style={styles.modalCloseBtn}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          onPress={onClose}
-          accessibilityRole="button"
-          accessibilityLabel={t?.common?.close || (isEn ? 'Close' : 'Zamknij')}
-          accessibilityHint={t?.common?.closeHint || (isEn ? 'Closes recipe selection' : 'Zamyka okno wyboru receptury')}
-        >
-          <Text style={styles.modalCloseText}>{t?.common?.close || (isEn ? 'Close' : 'Zamknij')}</Text>
-        </Pressable>
-      </View>
+      </ModalHeader>
       <ScrollView style={inline ? styles.inlineScrollView : undefined} nestedScrollEnabled={inline}>
         {/* Wyszukiwarka receptur (BPR Pillar 3) */}
           <View style={styles.searchBox}>
@@ -530,23 +526,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: theme.colors.textPrimary,
-  },
-  modalCloseBtn: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseText: {
-    fontSize: 14,
-    color: theme.colors.copper,
-    fontWeight: '700',
   },
   recipeFilterTabsRow: {
     flexDirection: 'row',

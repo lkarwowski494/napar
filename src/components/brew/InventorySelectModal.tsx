@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
 import { InventoryItem } from '../../core/database-schema';
+import { ModalHeader } from '../ui';
 
 export interface InventorySelectModalProps {
   visible: boolean;
@@ -39,26 +40,23 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
   );
 
   const innerContent = (
+    <>
+    <ModalHeader
+      onClose={onClose}
+      closeLabel={t?.common?.close || (isEn ? 'Close' : 'Zamknij')}
+      closeAccessibilityHint={t?.common?.closeHint || (isEn ? 'Closes stash item selection' : 'Zamyka okno wyboru ze spiżarni')}
+      closeTestID="close-inventory-modal-btn"
+    >
+      <Text style={styles.modalTitle}>
+        {t?.brew?.selectInventoryTitle || (isEn ? 'Select from Stash' : 'Wybierz ze Spiżarni')}
+      </Text>
+    </ModalHeader>
     <ScrollView
       style={inline ? styles.inlineScrollView : undefined}
       nestedScrollEnabled={inline}
       accessibilityRole="radiogroup"
       accessibilityLabel={t?.brew?.selectInventoryTitle || (isEn ? 'Select from Stash' : 'Wybierz ze Spiżarni')}
     >
-      <Text style={styles.modalTitle}>
-        {t?.brew?.selectInventoryTitle || (isEn ? 'Select from Stash' : 'Wybierz ze Spiżarni')}
-      </Text>
-      <Pressable
-        testID="close-inventory-modal-btn"
-        style={styles.modalCloseBtn}
-        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        onPress={onClose}
-        accessibilityRole="button"
-        accessibilityLabel={t?.common?.close || (isEn ? 'Close' : 'Zamknij')}
-        accessibilityHint={t?.common?.closeHint || (isEn ? 'Closes stash item selection' : 'Zamyka okno wyboru ze spiżarni')}
-      >
-        <Text style={styles.modalCloseText}>{t?.common?.close || (isEn ? 'Close' : 'Zamknij')}</Text>
-      </Pressable>
 
       <Pressable
         testID="inventory-option-unassigned"
@@ -121,6 +119,7 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
         })
       )}
     </ScrollView>
+    </>
   );
 
   if (inline) {
@@ -167,25 +166,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.textPrimary,
     marginBottom: 12,
-  },
-  modalCloseBtn: {
-    alignSelf: 'flex-end',
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  modalCloseText: {
-    fontSize: 14,
-    color: theme.colors.copper,
-    fontWeight: '700',
   },
   recipeOptionItem: {
     backgroundColor: theme.colors.bgCard,
