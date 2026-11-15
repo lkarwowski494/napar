@@ -7,14 +7,14 @@
 ### **4.1 Wielkość i dynamika rynku specialty coffee & tea**
 * **Rynek kawy specialty:** Wartość globalna przekracza 35 mld USD, ze średniorocznym wzrostem (CAGR) na poziomie 11.3%. W Europie Zachodniej i Północnej ponad 28% konsumentów kawy deklaruje przygotowywanie kawy metodami alternatywnymi w domu co najmniej raz w tygodniu. *[DO USTALENIA 2026-11-14, M1-audytor-generalny-019: brak źródła, adresu i daty — 01-odkrywanie-012]*
 * **Rynek herbaty rzemieślniczej:** Renesans herbat single-origin, herbat białych, zielonych japońskich (sencha, gyokuro, matcha) oraz tradycyjnego chińskiego parzenia Gongfu Cha. Dynamicznie rosnący segment młodych dorosłych (18–35 lat) poszukujących rytuału uważności (mindfulness) i alternatywy dla napojów energetycznych.
-* **Segment przecięcia (Kawa + Herbata):** Z badań ankietowych w społecznościach r/Coffee i r/tea wynika, że aż 42% entuzjastów alternatywnego parzenia kawy regularnie parzy herbaty sypane wysokiej jakości.
+* **Segment przecięcia (Kawa + Herbata):** Z badań ankietowych w społecznościach r/Coffee i r/tea wynika, że aż 42% entuzjastów alternatywnego parzenia kawy regularnie parzy herbaty sypane wysokiej jakości. *[bez źródła — liczba nie jest dowodem; ER-06 w 00c]*
 
 ### **4.2 Bezpośrednia i pośrednia konkurencja**
 
 | Aplikacja | Platformy | Model cenowy | Główne wady według recenzji użytkowników |
 | :--- | :--- | :--- | :--- |
 | **Filtru Coffee** | iOS / watchOS | Subskrypcja 5.99 $/mies. lub 39.99 $/rok | Bardzo wysoka cena, przeładowany interfejs, częste błędy synchronizacji z Apple Watch, całkowity brak wsparcia dla herbaty. | *[DO USTALENIA 2026-11-14, M1-audytor-generalny-019: cena bez daty odczytu; nieaktualne przy 1.0 za darmo (DEC-01 a) — 02-monetyzacja-007]*
-| **Beanconqueror** | iOS / Android | Open-source / Darmowa | Ogromny próg wejścia, skomplikowany, inżynierski interfejs odstraszający 80% początkujących, brak natywnego Live Activity. |
+| **Beanconqueror** | iOS / Android | Open-source / Darmowa | Ogromny próg wejścia, skomplikowany, inżynierski interfejs odstraszający 80% początkujących, brak natywnego Live Activity. *[„80%” bez źródła; recenzja z 2025-11-02 przeczy ocenie: „Beanconqueror is the most intuitive and the best” — ER-06 w 00c]* |
 | **Coffee Guru** | iOS / Android | Reklamy + IAP | Przestarzały design, irytujące reklamy w trakcie parzenia, brak zapisu ziaren, brak herbaty. |
 | **Brew Timer** | iOS / Android | Jednorazowo / Reklamy | Brak zaawansowanej sensoryki, brak Dial-in Doctora, brak integracji z Apple Health. |
 | **Tea Time / Steeped** | iOS | Różne | Prymitywne minutniki kuchenne, brak pamięci wielokrotnych zalań Gongfu Cha, brak integracji kofeinowej. |

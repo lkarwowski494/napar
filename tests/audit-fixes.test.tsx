@@ -2180,4 +2180,33 @@ describe('M1-audytor-generalny-038: kontrakt zakresu w formacie roli 03 ze ślad
       if (w.Decyzja === 'NIE') for (const p of w['Gdzie w kodzie'].match(/`([^`]+\.tsx?)`/g) ?? []) if (existsSync(join(root, p.slice(1, -1)))) bledy.push(`${id} (NIE): kod ${p} istnieje`);
     expect(bledy).toEqual([]);
   });
+
+  test('03-zakres-010: każda funkcja MVP ma dowód R, B, W albo podłogę; R wskazuje źródło z adresem, datą odczytu i cytatem; bez kolumny RICE', () => {
+    const zr = tabele(sekcja(1)).find((t) => ['Źródło', 'Adres', 'Odczyt', 'Cytat'].every((k) => t.nagl.includes(k)));
+    expect(zr).toBeDefined();
+    const zrodla = new Map(zr!.wiersze.map((w) => [w['Źródło'], w]));
+    const bledy: string[] = [];
+    for (const [id, w] of zrodla) {
+      if (!/^Ź-\d{2}$/.test(id)) bledy.push(`${id}: ID poza formatem Ź-nn`);
+      if (!/https:\/\/apps\.apple\.com\/\S+/.test(w.Adres)) bledy.push(`${id}: bez adresu`);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(w.Odczyt)) bledy.push(`${id}: bez daty odczytu`);
+      if (!/„[^”]{12,}”/.test(w.Cytat)) bledy.push(`${id}: bez cytatu`);
+    }
+    for (const [id, w] of funkcje) {
+      if (w.Decyzja !== 'MVP') continue;
+      const d = w['Dowód wartości'];
+      if (!/^(R|B|W|podłoga)\b/.test(d)) bledy.push(`${id}: dowód „${d}” bez poziomu R, B, W albo podłogi`);
+      if (/^R\b/.test(d)) {
+        const ref = d.match(/Ź-\d{2}/g) ?? [];
+        if (!ref.length) bledy.push(`${id}: R bez źródła Ź-nn`);
+        for (const r of ref) if (!zrodla.has(r)) bledy.push(`${id}: nieznane źródło ${r}`);
+      }
+    }
+    for (const t of tabele(kontrakt)) if (t.nagl.some((n) => /RICE/i.test(n))) bledy.push(`kolumna ${t.nagl.find((n) => /RICE/i.test(n))}`);
+    // Liczby rynkowe BRD bez źródła nie udają dowodu: wiersze A2 z „42%” i „80%” mają adnotację erraty ER-06.
+    const a2 = brd.find(({ f }) => / A2 /.test(f))!.lines;
+    for (const l of a2.filter((x) => /\b(42|80)%/.test(x))) if (!/bez źródła.*ER-06/.test(l)) bledy.push(`A2: ${l.slice(0, 60)}… bez adnotacji ER-06`);
+    expect(bledy).toEqual([]);
+  });
 });
+
