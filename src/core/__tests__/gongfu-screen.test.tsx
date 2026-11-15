@@ -448,10 +448,10 @@ describe('GongfuScreen — zapis sesji jedną transakcją i komunikat przy błę
     expect(mockRouterBack).not.toHaveBeenCalled();
   });
 
-  // M1-audytor-generalny-026 (04-studio-projektowe-001): trwającą infuzję da się zatrzymać.
-  test.each(['pl', 'en'] as const)('026 (%s): w trakcie parzenia jest przycisk „Zatrzymaj” z rolą; zatrzymanie kończy odliczanie i zapisuje rzeczywisty czas', (lang) => {
+  // M1-audytor-generalny-026 (04-studio-projektowe-001): trwającą infuzję można wstrzymać i wznowić (test planu);
+  // wstrzymaną można też zakończyć — zapis z rzeczywistym czasem (także w pierwszej sekundzie, nie pełny cel).
+  const renderGongfu = (lang: 'pl' | 'en') => {
     mockDb.settings.set('app_language', lang);
-    const t = translations[lang];
     jest.setSystemTime(new Date('2026-11-15T10:00:00Z'));
     let tree: any;
     renderer.act(() => {
@@ -464,34 +464,70 @@ describe('GongfuScreen — zapis sesji jedną transakcją i komunikat przy błę
     renderer.act(() => {
       tree.root.findByProps({ testID: 'gongfu-start-btn' }).props.onPress();
     });
-    const stop = tree.root.findAll((n: any) => n.props.testID === 'gongfu-stop-btn' && typeof n.props.onPress === 'function');
-    expect(stop).toHaveLength(1);
-    expect(stop[0].props.accessibilityRole).toBe('button');
-    expect(stop[0].props.accessibilityLabel).toBe(t.gongfu.stopSteep);
-    expect(stop[0].props.accessibilityHint).toBe(t.gongfu.stopSteepHint);
+    return tree;
+  };
+  const btn = (tree: any, id: string) => tree.root.findAll((n: any) => n.props.testID === id && typeof n.props.onPress === 'function');
+  const countdown = (tree: any) => tree.root.findAll((n: any) => n.props.testID === 'gongfu-countdown-display' && typeof n.type === 'string')[0];
+  const shown = (tree: any) => countdown(tree).children.filter((c: any) => typeof c === 'string' || typeof c === 'number').join('');
 
+  test.each(['pl', 'en'] as const)('026 (%s): wstrzymanie zatrzymuje odliczanie, wznowienie je kontynuuje', (lang) => {
+    const t = translations[lang];
+    const tree = renderGongfu(lang);
+    const pause = btn(tree, 'gongfu-pause-btn');
+    expect(pause).toHaveLength(1);
+    expect(pause[0].props.accessibilityRole).toBe('button');
+    expect(pause[0].props.accessibilityLabel).toBe(t.gongfu.pauseSteep);
     renderer.act(() => {
       jest.advanceTimersByTime(10000);
     });
-    (require('expo-haptics').notificationAsync as jest.Mock).mockClear();
+    const H = require('expo-haptics');
+    (H.notificationAsync as jest.Mock).mockClear();
     renderer.act(() => {
-      stop[0].props.onPress();
+      pause[0].props.onPress();
     });
-    // Odliczanie stoi: po kolejnych 30 s nic się nie dzieje, nie ma sygnału „gotowe”.
+    const afterPause = shown(tree);
     renderer.act(() => {
-      jest.advanceTimersByTime(30000);
+      jest.advanceTimersByTime(60000);
     });
-    expect(require('expo-haptics').notificationAsync).not.toHaveBeenCalled();
-    expect(tree.root.findAll((n: any) => n.props.testID === 'gongfu-stop-btn')).toHaveLength(0);
+    expect(shown(tree)).toBe(afterPause);
+    expect(H.notificationAsync).not.toHaveBeenCalled();
+    const resume = btn(tree, 'gongfu-resume-btn');
+    expect(resume).toHaveLength(1);
+    expect(resume[0].props.accessibilityLabel).toBe(t.gongfu.resumeSteep);
+    expect(btn(tree, 'gongfu-end-btn')).toHaveLength(1);
+    renderer.act(() => {
+      resume[0].props.onPress();
+    });
+    expect(btn(tree, 'gongfu-pause-btn')).toHaveLength(1);
+    renderer.act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+    expect(shown(tree)).not.toBe(afterPause);
+    mockDb.settings.clear();
+  });
 
+  test.each([
+    ['po 10 s', 10000, 10],
+    ['w pierwszej sekundzie', 300, 1],
+  ] as const)('026: wstrzymana infuzja zakończona %s zapisuje rzeczywisty czas, nie pełny cel', (_n, ms, expected) => {
+    const t = translations.pl;
+    const tree = renderGongfu('pl');
+    renderer.act(() => {
+      jest.advanceTimersByTime(ms);
+    });
+    renderer.act(() => {
+      btn(tree, 'gongfu-pause-btn')[0].props.onPress();
+    });
+    renderer.act(() => {
+      btn(tree, 'gongfu-end-btn')[0].props.onPress();
+    });
     const record = tree.root.findAll((n: any) => typeof n.props.onPress === 'function' && n.findAll((c: any) => c.props.children === t.gongfu.nextInfusion).length > 0);
-    expect(record.length).toBeGreaterThan(0);
     renderer.act(() => {
       record[0].props.onPress();
     });
     const history = tree.root.findByType(GongfuInfusionHistory);
     expect(history.props.session.infusions).toHaveLength(1);
-    expect(history.props.session.infusions[0].durationSeconds).toBe(10);
+    expect(history.props.session.infusions[0].durationSeconds).toBe(expected);
     mockDb.settings.clear();
   });
 

@@ -77,6 +77,9 @@ export default function GongfuScreen() {
   const [currentRating, setCurrentRating] = useState<number>(5);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const pausedLeftMsRef = useRef<number | null>(null);
+  const endedEarlySecondsRef = useRef<number | null>(null);
   const targetEndMsRef = useRef<number | null>(null);
 
   // Wczytanie spiżarni herbat
@@ -158,14 +161,32 @@ export default function GongfuScreen() {
     signalHaptic('medium');
   };
 
-  // M1-audytor-generalny-026: zatrzymanie trwającej infuzji — bez sygnału „gotowe”; czas zapisu = czas rzeczywisty.
-  const handleStopSteep = () => {
+  // M1-audytor-generalny-026: wstrzymanie, wznowienie i zakończenie trwającej infuzji (test planu: wstrzymać i wznowić).
+  // Czas liczony w ms z zegara delta; zakończenie przed czasem zapisuje rzeczywisty czas (min. 1 s), nie pełny cel.
+  const handlePauseSteep = () => {
     const end = targetEndMsRef.current;
-    const left = end ? Math.max(0, Math.ceil((end - Date.now()) / 1000)) : remainingSeconds;
+    const leftMs = end ? Math.max(0, end - Date.now()) : remainingSeconds * 1000;
+    pausedLeftMsRef.current = leftMs;
     targetEndMsRef.current = null;
     if (timerRef.current) clearInterval(timerRef.current);
-    setRemainingSeconds(left);
+    setRemainingSeconds(Math.ceil(leftMs / 1000));
     setIsSteeping(false);
+    setIsPaused(true);
+  };
+
+  const handleResumeSteep = () => {
+    const leftMs = pausedLeftMsRef.current ?? remainingSeconds * 1000;
+    pausedLeftMsRef.current = null;
+    targetEndMsRef.current = Date.now() + leftMs;
+    setIsPaused(false);
+    setIsSteeping(true);
+  };
+
+  const handleEndSteep = () => {
+    const leftMs = pausedLeftMsRef.current ?? remainingSeconds * 1000;
+    pausedLeftMsRef.current = null;
+    endedEarlySecondsRef.current = Math.max(1, Math.round((targetSeconds * 1000 - leftMs) / 1000));
+    setIsPaused(false);
     setSteepFinished(true);
   };
 
@@ -178,7 +199,9 @@ export default function GongfuScreen() {
 
   const handleRecordCurrentInfusion = () => {
     targetEndMsRef.current = null;
-    const actualSteep = targetSeconds - remainingSeconds > 0 ? targetSeconds - remainingSeconds : targetSeconds;
+    const early = endedEarlySecondsRef.current;
+    endedEarlySecondsRef.current = null;
+    const actualSteep = early ?? (targetSeconds - remainingSeconds > 0 ? targetSeconds - remainingSeconds : targetSeconds);
     const updated = recordGongfuInfusion(session, {
       durationSeconds: actualSteep,
       waterTempCelsius: parseFloat(waterTempCelsius) || 96,
@@ -309,7 +332,10 @@ export default function GongfuScreen() {
           steepFinished={steepFinished}
           onAdjustTime={handleAdjustTime}
           onStartSteep={handleStartSteep}
-          onStopSteep={handleStopSteep}
+          isPaused={isPaused}
+          onPauseSteep={handlePauseSteep}
+          onResumeSteep={handleResumeSteep}
+          onEndSteep={handleEndSteep}
           currentNotes={currentNotes}
           onChangeCurrentNotes={setCurrentNotes}
           onRecordCurrentInfusion={handleRecordCurrentInfusion}

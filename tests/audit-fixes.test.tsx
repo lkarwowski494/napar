@@ -1684,7 +1684,9 @@ describe('M1-audytor-generalny-033: interfejs EN bez polskich tekstów; kontrola
           steepFinished={steepFinished}
           onAdjustTime={noop}
           onStartSteep={noop}
-          onStopSteep={noop}
+          onPauseSteep={noop}
+          onResumeSteep={noop}
+          onEndSteep={noop}
           currentNotes=""
           onChangeCurrentNotes={noop}
           onRecordCurrentInfusion={noop}

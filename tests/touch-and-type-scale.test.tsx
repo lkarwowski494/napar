@@ -61,7 +61,9 @@ describe('M1-audytor-generalny-029: cyfry stoperów przy dużej czcionce (04-stu
           steepFinished={false}
           onAdjustTime={jest.fn()}
           onStartSteep={jest.fn()}
-          onStopSteep={jest.fn()}
+          onPauseSteep={jest.fn()}
+          onResumeSteep={jest.fn()}
+          onEndSteep={jest.fn()}
           currentNotes=""
           onChangeCurrentNotes={jest.fn()}
           onRecordCurrentInfusion={jest.fn()}

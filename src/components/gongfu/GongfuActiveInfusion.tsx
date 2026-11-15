@@ -17,8 +17,11 @@ interface GongfuActiveInfusionProps {
   steepFinished: boolean;
   onAdjustTime: (delta: number) => void;
   onStartSteep: () => void;
-  /** M1-audytor-generalny-026: kończy trwającą infuzję przed czasem. */
-  onStopSteep: () => void;
+  /** M1-audytor-generalny-026: wstrzymanie / wznowienie / zakończenie trwającej infuzji. */
+  isPaused?: boolean;
+  onPauseSteep: () => void;
+  onResumeSteep: () => void;
+  onEndSteep: () => void;
   currentNotes: string;
   onChangeCurrentNotes: (text: string) => void;
   onRecordCurrentInfusion: () => void;
@@ -33,7 +36,10 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
   steepFinished,
   onAdjustTime,
   onStartSteep,
-  onStopSteep,
+  isPaused = false,
+  onPauseSteep,
+  onResumeSteep,
+  onEndSteep,
   currentNotes,
   onChangeCurrentNotes,
   onRecordCurrentInfusion,
@@ -83,7 +89,7 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
       </View>
 
       {/* Główny Przycisk Parzenia */}
-      {!isSteeping && !steepFinished && (
+      {!isSteeping && !steepFinished && !isPaused && (
         <Pressable testID="gongfu-start-btn" style={styles.startBtn} onPress={onStartSteep} accessibilityRole="button" accessibilityLabel={t.gongfu.startSteep}>
           <Text style={styles.startBtnText}>{t.gongfu.startSteep}</Text>
         </Pressable>
@@ -93,14 +99,38 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
         <View style={styles.steepingActiveBox}>
           <Text style={styles.steepingActiveText}>{t.gongfu.steepingBanner}</Text>
           <Pressable
-            testID="gongfu-stop-btn"
+            testID="gongfu-pause-btn"
             style={styles.stopBtn}
-            onPress={onStopSteep}
+            onPress={onPauseSteep}
             accessibilityRole="button"
-            accessibilityLabel={t.gongfu.stopSteep}
-            accessibilityHint={t.gongfu.stopSteepHint}
+            accessibilityLabel={t.gongfu.pauseSteep}
+            accessibilityHint={t.gongfu.pauseSteepHint}
           >
-            <Text style={styles.stopBtnText}>{t.gongfu.stopSteep}</Text>
+            <Text style={styles.stopBtnText}>{t.gongfu.pauseSteep}</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {isPaused && (
+        <View style={styles.steepingActiveBox}>
+          <Pressable
+            testID="gongfu-resume-btn"
+            style={styles.stopBtn}
+            onPress={onResumeSteep}
+            accessibilityRole="button"
+            accessibilityLabel={t.gongfu.resumeSteep}
+          >
+            <Text style={styles.stopBtnText}>{t.gongfu.resumeSteep}</Text>
+          </Pressable>
+          <Pressable
+            testID="gongfu-end-btn"
+            style={styles.stopBtn}
+            onPress={onEndSteep}
+            accessibilityRole="button"
+            accessibilityLabel={t.gongfu.endSteep}
+            accessibilityHint={t.gongfu.endSteepHint}
+          >
+            <Text style={styles.stopBtnText}>{t.gongfu.endSteep}</Text>
           </Pressable>
         </View>
       )}
