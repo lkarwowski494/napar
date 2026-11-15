@@ -1,10 +1,6 @@
 {
   "$comment": "Wyjątki kontroli osiągalności src/core (scripts/check-reachability.mjs, DEC-02 2026-11-13). Klucz: plik#nazwa, wartość: powód. Nowy wpis tylko z decyzją zakresu (docs/scope-contract.md, tabela ZM).",
-  "src/core/contrast.ts#parseColor": "Narzędzie wyroczni WCAG (check:corpus, tests/oracle-contrast.test.ts): sprawdza kontrast kolorów motywu (NFR-A11Y), sam motyw jest osiągalny. Nie jest funkcją aplikacji.",
   "src/core/contrast.ts#parseHexColor": "Narzędzie wyroczni WCAG, jak parseColor.",
-  "src/core/contrast.ts#sRgbChannelLuminance": "Narzędzie wyroczni WCAG, jak parseColor.",
-  "src/core/contrast.ts#getRelativeLuminance": "Narzędzie wyroczni WCAG, jak parseColor.",
-  "src/core/contrast.ts#getContrastRatio": "Narzędzie wyroczni WCAG: wywołuje je tests/oracle-contrast.test.ts względem korpusu Python.",
   "src/core/contrast.ts#isWcagPassAA": "Narzędzie wyroczni WCAG, jak parseColor.",
   "src/core/contrast.ts#isWcagPassAAA": "Narzędzie wyroczni WCAG, jak parseColor.",
   "src/core/domain-rules.ts#calculateCaffeineDecay": "Wyrocznia Python (check:corpus, BR-TEST-011/012, tests/oracle-coffee.test.ts). Aplikacja liczy kofeinę przez calculateRemainingCaffeineMg (zaokrąglenie 0,1 mg); przepięcie wyroczni na funkcję osiągalną to zadanie dla 07/08 (03-zakres fix 2026-11-13).",

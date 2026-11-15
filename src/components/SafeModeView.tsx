@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPrimaryText: {
-    color: '#FFFFFF',
+    color: '#121214', // 028: onAccent (bez importu motywu w trybie awaryjnym); biały na #D97736 = 3,16:1
     fontSize: 15,
     fontWeight: '600',
   },

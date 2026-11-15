@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   restingOptimalText: {
-    color: theme.colors.emerald,
+    color: theme.colors.emeraldLight, // 028: emerald jako tekst 3,33:1
   },
   restingFreshText: {
     color: theme.colors.copper,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   archiveEmptyBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontSize: 11,
     fontWeight: '700',
   },
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   brewActionText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontSize: 12,
     fontWeight: '700',
   },

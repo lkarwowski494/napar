@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: theme.colors.bgCard,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
   },
   teaTypeChipActive: {
     backgroundColor: 'rgba(42, 123, 98, 0.2)',

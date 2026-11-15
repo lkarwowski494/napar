@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.bgCard,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     borderRadius: theme.borderRadius.md,
     padding: 14,
     color: theme.colors.textPrimary,

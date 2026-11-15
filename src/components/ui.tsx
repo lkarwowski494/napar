@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCardSecondary,
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     color: theme.colors.textPrimary,
     fontSize: 16,
     paddingHorizontal: 12,
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontSize: 15,
     fontWeight: '700',
   },

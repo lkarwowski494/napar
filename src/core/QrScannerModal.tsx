@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   permissionBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontWeight: '700',
     fontSize: 15,
   },

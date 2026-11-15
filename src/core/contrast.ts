@@ -115,3 +115,11 @@ export function isWcagPassAAA(color1: string, color2: string, isLargeText: boole
   const threshold = isLargeText ? 4.5 : 7.0;
   return ratio >= threshold;
 }
+
+/**
+ * M1-audytor-generalny-028: kolor tekstu czytelniejszy na danym tle — jasny (#FFFFFF) albo ciemny (#121214).
+ * Dla teł o zmiennym kolorze (np. kategorie koła smaków), gdzie stały biały tekst spada poniżej 4,5:1.
+ */
+export function readableTextOn(background: string): string {
+  return getContrastRatio('#FFFFFF', background) >= getContrastRatio('#121214', background) ? '#FFFFFF' : '#121214';
+}

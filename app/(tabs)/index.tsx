@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   bprStepBadgeText: {
     fontSize: 11,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
   },
   bprStepTitle: {
     fontSize: 11,

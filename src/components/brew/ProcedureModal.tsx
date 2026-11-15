@@ -300,7 +300,7 @@ export function ProcedureModal({
                 accessibilityRole="button"
                 accessibilityLabel={isRunning ? (isEn ? 'Pause' : 'Pauza') : (isEn ? 'Resume' : 'Wznów')}
               >
-                <Text style={styles.pauseResumeBtnText}>
+                <Text style={[styles.pauseResumeBtnText, !isRunning && styles.pauseResumeBtnTextPaused]}>
                   {isRunning
                     ? isEn
                       ? '⏸ Pause'
@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
   targetWaterLabel: {
     fontSize: 11,
     fontWeight: '800',
-    color: theme.colors.copper,
+    color: theme.colors.copperLight,
     letterSpacing: 0.6,
   },
   targetWaterValue: {
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCardSecondary,
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     paddingHorizontal: 11,
     paddingVertical: 9,
   },
@@ -624,10 +624,14 @@ const styles = StyleSheet.create({
   pauseResumeBtnPaused: {
     backgroundColor: theme.colors.emerald,
   },
+  // 028: wstrzymany = tło emerald, na nim biały (5,11:1); w biegu = miedź z onAccent (5,92:1)
+  pauseResumeBtnTextPaused: {
+    color: theme.colors.white,
+  },
   pauseResumeBtnText: {
     fontSize: 13,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
   },
   resetStepBtn: {
     paddingVertical: 6,
@@ -676,7 +680,7 @@ const styles = StyleSheet.create({
   primaryNextBtnText: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
   },
   pausedActionsRow: {
     flexDirection: 'row',

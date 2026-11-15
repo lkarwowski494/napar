@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   shareActionBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontSize: 14,
     fontWeight: '700',
   },

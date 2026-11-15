@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
   favoriteChip: {
     backgroundColor: theme.colors.bgCard,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     borderRadius: theme.borderRadius.md,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     marginBottom: 10,
     minHeight: 52,
   },
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     minHeight: 52,
   },
   gongfuBanner: {

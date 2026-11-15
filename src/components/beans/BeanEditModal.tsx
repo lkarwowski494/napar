@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: theme.colors.bgCard,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     borderRadius: theme.borderRadius.md,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -540,7 +540,7 @@ const styles = StyleSheet.create({
   },
   starIcon: {
     fontSize: 26,
-    color: theme.colors.border,
+    color: theme.colors.borderStrong,
   },
   starIconActive: {
     color: '#FFD700',
@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   saveSubmitText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontSize: 16,
     fontWeight: '700',
   },

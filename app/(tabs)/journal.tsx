@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   clearSearchText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontSize: 12,
     fontWeight: '700',
   },

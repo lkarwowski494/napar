@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   saveBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontWeight: '700',
     fontSize: 14,
   },
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   mainSaveBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontWeight: '700',
     fontSize: 16,
   },

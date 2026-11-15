@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   recipeFilterTabTextActive: {
-    color: theme.colors.copper,
+    color: theme.colors.copperLight,
     fontWeight: '700',
   },
   modalActionButtonsRow: {
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addCustomRecipeBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontWeight: '700',
     fontSize: 13,
   },
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCard,
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     paddingHorizontal: 12,
     paddingRight: 36,
     paddingVertical: 10,
@@ -728,7 +728,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.sm,
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     alignItems: 'center',
   },
   subsetChipActive: {
@@ -741,7 +741,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
   subsetChipTextActive: {
-    color: theme.colors.copper,
+    color: theme.colors.copperLight,
     fontWeight: '800',
   },
   categoryGroupSection: {

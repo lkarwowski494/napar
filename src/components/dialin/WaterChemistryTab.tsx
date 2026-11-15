@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.sm,
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
   },
   volumeChipActive: {
     backgroundColor: theme.colors.copperMuted,
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCardSecondary,
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     paddingHorizontal: 12,
     paddingVertical: 8,
     color: theme.colors.textPrimary,

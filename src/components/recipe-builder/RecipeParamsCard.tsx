@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   ratioValue: {
-    color: theme.colors.copper,
+    color: theme.colors.copperLight,
     fontWeight: '800',
     fontSize: 15,
   },

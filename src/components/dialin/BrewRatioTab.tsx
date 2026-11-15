@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
   directionBtnTextActive: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontWeight: '700',
   },
   inputTitle: {
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCardSecondary,
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     paddingHorizontal: 14,
     paddingVertical: 12,
     color: theme.colors.textPrimary,
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
   },
   ratioChipActive: {
     backgroundColor: theme.colors.copperMuted,

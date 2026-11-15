@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addStepBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontSize: 12,
     fontWeight: '700',
   },

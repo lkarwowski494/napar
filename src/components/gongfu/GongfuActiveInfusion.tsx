@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   recordNextBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontWeight: '800',
     fontSize: 14,
   },

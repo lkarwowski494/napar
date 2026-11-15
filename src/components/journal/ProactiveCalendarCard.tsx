@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.sm,
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
   },
   clearDateText: {
     fontSize: 10,
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
   modeBtnTextActive: {
-    color: theme.colors.copper,
+    color: theme.colors.copperLight,
     fontWeight: '800',
   },
   actionsList: {
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
   executeOneTapText: {
     fontSize: 12,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
   },
   icsExportBtn: {
     paddingHorizontal: 12,

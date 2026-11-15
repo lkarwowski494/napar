@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginRight: 8,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
   },
   grindCategoryChipActive: {
     backgroundColor: theme.colors.copperMuted,

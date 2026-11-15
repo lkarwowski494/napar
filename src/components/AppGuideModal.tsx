@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   stepBadgeText: {
     fontSize: 12,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
   },
   stepTitle: {
     fontSize: 13,
@@ -342,6 +342,6 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
   },
 });

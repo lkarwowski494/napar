@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SCA_FLAVOR_WHEEL, FlavorCategory } from './flavor-wheel-data';
 import { theme } from './theme';
+import { readableTextOn } from './contrast';
 
 export interface FlavorWheelPickerProps {
   selectedDescriptors: string[];
@@ -121,6 +122,8 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                         style={[
                           styles.descriptorText,
                           isSelected && styles.descriptorTextSelected,
+                          // 028: kolor tekstu dobrany do koloru kategorii (biały na miedzi/czerwieni < 4,5:1)
+                          isSelected && { color: readableTextOn(activeCategory.color) },
                         ]}
                       >
                         {desc}
@@ -211,7 +214,7 @@ const styles = StyleSheet.create({
   descriptorChip: {
     backgroundColor: theme.colors.bgCard,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: theme.borderRadius.sm,
@@ -221,7 +224,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
   },
   descriptorTextSelected: {
-    color: '#FFFFFF',
     fontWeight: '700',
   },
 });

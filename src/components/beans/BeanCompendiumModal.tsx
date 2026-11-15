@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
   compendiumSearchInput: {
     backgroundColor: theme.colors.bgCard,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     borderRadius: theme.borderRadius.md,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
   },
   badgeText: {
     fontSize: 11,
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   compUseBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontSize: 12,
     fontWeight: '700',
   },

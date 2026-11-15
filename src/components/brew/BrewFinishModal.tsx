@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
   },
   starIcon: {
     fontSize: 32,
-    color: theme.colors.border,
+    color: theme.colors.borderStrong,
   },
   starActive: {
     color: '#FFD700',
@@ -451,7 +451,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
   },
   balanceChipActive: {
     backgroundColor: theme.colors.copperMuted,
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
   balanceChipTextActive: {
-    color: theme.colors.copper,
+    color: theme.colors.copperLight,
     fontWeight: '600',
   },
   doctorAdviceCard: {
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     backgroundColor: theme.colors.bgCardSecondary,
   },
   waterChipActive: {
@@ -540,7 +540,7 @@ const styles = StyleSheet.create({
   tdsTextInput: {
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     borderRadius: theme.borderRadius.sm,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCardSecondary,
     borderRadius: theme.borderRadius.md,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     padding: 12,
     color: theme.colors.textPrimary,
     fontSize: 13,
@@ -615,7 +615,7 @@ const styles = StyleSheet.create({
     minHeight: 52,
   },
   finishSaveText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontWeight: '700',
   },
 });

@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkIndicatorText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontSize: 11,
     fontWeight: '800',
   },
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
   submitBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontWeight: '700',
     fontSize: 16,
     letterSpacing: 0.5,

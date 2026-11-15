@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: theme.colors.bgCard,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     borderRadius: theme.borderRadius.md,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   saveSubmitText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontSize: 16,
     fontWeight: '700',
   },

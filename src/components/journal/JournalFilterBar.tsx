@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
     minHeight: 36,
     justifyContent: 'center',
   },
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   filterChipTextActive: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontWeight: '700',
   },
 });

@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
   cardActionBtnText: {
     fontSize: 11,
     fontWeight: '600',
-    color: theme.colors.copper,
+    color: theme.colors.copperLight,
   },
   cardActionBtnSecondary: {
     backgroundColor: theme.colors.bgCardSecondary,

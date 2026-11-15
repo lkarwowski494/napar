@@ -35,6 +35,8 @@ export const theme = {
     bgCard: '#1C1C1F',
     bgCardSecondary: '#242428',
     border: '#2E2E34',
+    // M1-audytor-generalny-028: obrys elementów interfejsu (pola, chipy, puste gwiazdki) ≥ 3:1 na bg, bgCard i bgCardSecondary
+    borderStrong: '#76767F',
     borderLight: '#3E3E46',
     
     // Akcenty rzemieślnicze
@@ -49,9 +51,11 @@ export const theme = {
     
     // Teksty
     white: '#FFFFFF',
+    // M1-audytor-generalny-028: tekst na wypełnionej miedzi i czerwieni (5,92:1 na copper; biały dawał 3,16:1)
+    onAccent: '#121214',
     textPrimary: '#F4EFEA',
     textSecondary: '#A09C96',
-    textMuted: '#8C8884',
+    textMuted: '#96928E', // 028: było #8C8884 (4,40:1 na bgCardSecondary)
     
     // Statusy i świeżość (Resting window)
     statusPeak: '#4E9F3D',
@@ -60,7 +64,7 @@ export const theme = {
     statusStable: '#3D84A8',
     statusAging: '#787880',
     
-    danger: '#D9534F',
+    danger: '#E5605B', // 028: było #D9534F (4,29:1 jako tekst na bgCard)
     dangerMuted: 'rgba(217, 83, 79, 0.15)',
   },
   spacing: {

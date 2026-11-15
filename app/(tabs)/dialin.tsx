@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
   },
   segmentBtnTextActive: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontWeight: '700',
   },
   sectionHeader: {

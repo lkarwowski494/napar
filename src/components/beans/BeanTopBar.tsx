@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCardSecondary,
     marginRight: 8,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.borderStrong,
   },
   filterChipActive: {
     backgroundColor: theme.colors.copper,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   filterChipTextActive: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontWeight: '700',
   },
   compendiumButton: {
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.full,
   },
   addButtonText: {
-    color: '#FFFFFF',
+    color: theme.colors.onAccent,
     fontSize: 12,
     fontWeight: '700',
   },
