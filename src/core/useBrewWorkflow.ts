@@ -377,6 +377,9 @@ export function useBrewWorkflow() {
 
   useEffect(() => {
     if (snapshot.status === 'finished') {
+      // Przegląd p4 (P1, po M1-audytor-generalny-025): najpierw zamknij ekran kroków — iOS nie pokaże
+      // okna oceny jako drugiego modalu z tego samego kontrolera i parzenia nie dałoby się zapisać.
+      setShowProcedureModal(false);
       setShowFinishModal(true);
     }
   }, [snapshot.status]);

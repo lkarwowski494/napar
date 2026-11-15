@@ -1804,3 +1804,49 @@ function findPressableWithText(root: any, text: string) {
   }
   return curr;
 }
+
+// ============================================================================
+// Przegląd ścieżek wrażliwych partii 4 (P1, regresja po M1-audytor-generalny-025):
+// koniec ostatniego kroku przy otwartym ekranie kroków otwierał okno oceny jako DRUGI modal.
+// Na iOS ten sam kontroler nie prezentuje dwóch modali naraz — okno oceny się nie pokazywało
+// i pełnego parzenia nie dało się zapisać. Przy stanie „finished” widoczne ma być tylko okno oceny.
+// ============================================================================
+describe('M1-audytor-generalny-025 (przegląd p4): koniec parzenia na ekranie kroków', () => {
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
+
+  test('po ostatnim kroku ekran kroków się zamyka, widoczne jest tylko okno oceny, zapis raz', () => {
+    const { ProcedureModal } = require('../../components/brew/ProcedureModal');
+    const { BrewFinishModal } = require('../../components/brew/BrewFinishModal');
+    const dbmod = require('../database');
+    const spy = jest.spyOn(dbmod, 'recordBrewSessionTransaction');
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>,
+      );
+    });
+    act(() => {
+      tree.root.findByProps({ testID: 'open-procedure-modal-btn' }).props.onPress();
+    });
+    act(() => {
+      tree.root.findAll((n: any) => n.props.testID === 'procedure-start-btn' && n.props.onPress)[0].props.onPress();
+    });
+    for (let i = 0; i < 120; i++) {
+      act(() => {
+        jest.advanceTimersByTime(10000);
+      });
+    }
+    expect(tree.root.findByType(ProcedureModal).props.visible).toBe(false);
+    expect(tree.root.findByType(BrewFinishModal).props.visible).toBe(true);
+    const save = tree.root.findAll((n: any) => n.props.testID === 'finish-save-btn' && n.props.onPress);
+    expect(save.length).toBeGreaterThan(0);
+    act(() => {
+      save[0].props.onPress();
+    });
+    expect(spy).toHaveBeenCalledTimes(1);
+    spy.mockRestore();
+  });
+});
