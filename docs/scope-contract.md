@@ -10,7 +10,7 @@
 ## 1. Główna praca, pętla główna i funkcje 1.0
 
 - Główna praca: J-01 (BRD 00c, ER-06) — zaparzyć dziś dobrą kawę specialty albo herbatę liściastą bez liczenia w głowie, a gdy wyszła źle, wiedzieć, co zmienić następnym razem.
-- Pętla główna: F-27, F-22, F-20 (przepis i młynek) → F-28, F-04 (ziarna, doza i woda) → F-01, F-02 (kawa) albo F-06 (herbata) → F-14, F-29 (zapis i ocena) → F-19 (korekta) → F-14 (powtórz z dziennika); przekrojowo F-13 (dostępność).
+- Pętla główna: F-26 (pierwsze uruchomienie) → F-27, F-22, F-20 (przepis i młynek) → F-28, F-04 (ziarna, doza i woda) → F-01, F-02 (kawa) albo F-06 (herbata) → F-14, F-29 (zapis i ocena) → F-19 (korekta) → F-14 (powtórz z dziennika); przekrojowo F-13 (dostępność).
 
 Decyzje: `MVP` (1.0), `PÓŹNIEJ` (wartość jest, poza 1.0; „Powrót:”), `TEST` (tylko hipoteza; „Test:”), `NIE` (powód i „Powrót:”). Podłoga: kontrola bezpieczeństwa, dostęp do własnych danych albo obowiązek prawny, które wypadają tylko razem z funkcją. WTP: 1.0 jest darmowa w całości (D-001), więc kolumny WTP nie ma.
 
@@ -18,18 +18,19 @@ Decyzje: `MVP` (1.0), `PÓŹNIEJ` (wartość jest, poza 1.0; „Powrót:”), `T
 |---|---|---|---|---|---|---|---|---|---|
 | F-01 | Prowadzony stoper parzenia: start przyciskiem „Rozpocznij parzenie”, pauza, wznowienie, korekta ±10 i ±60 s, reset z potwierdzeniem; ekran nie gaśnie; po powrocie do aplikacji czas dogania znaczniki | MVP | BR-PARZ-001, BR-PARZ-004, BR-PARZ-006 | — | Na ekranie kroków jeden wyróżniony przycisk startu; czas rusza dopiero nim. wynik: brak (przejście poznawcze roli 04 nieodbyte) | — | — | `src/components/brew/ProcedureModal.tsx`, `src/core/timer-engine.ts` | Rdzeń pętli. D-013: jeden ekran prowadzenia, bez cichego startu. Dryf czasu: NFR-WYD-003. |
 | F-02 | Asystent Parzenia i Timery: kroki zalania z celem wody kroku i paskiem postępu, sygnał dźwięku i wibracji przy zmianie etapu na pierwszym planie | MVP | BR-PARZ-002, BR-PARZ-003 | — | Nazwa i cel wody bieżącego kroku widoczne bez przewijania; następny krok ogłoszony dźwiękiem i wibracją. wynik: brak | — | F-01 | `src/components/brew/ProcedureModal.tsx`, `src/core/signals.ts` | Przy zablokowanym ekranie albo w innej aplikacji etap mija bez sygnału (KILL-09, D-008). |
-| F-04 | Doza, woda i proporcja przeliczane w obie strony na ekranie Parzenie; ten sam przelicznik w Warsztacie → Ratio | MVP | BR-KALK-001 | — | Zmiana dozy od razu zmienia wodę przy stałej proporcji; przyciski − i + przy liczbach. wynik: brak | — | — | `src/components/brew/BrewQuickPrepCard.tsx`, `src/components/dialin/BrewRatioTab.tsx` | Krok pętli przed stoperem. |
+| F-04 | Doza, woda i proporcja przeliczane w obie strony na ekranie Parzenie, porcje 1–4 (skalowanie przepisu); ten sam przelicznik w Warsztacie → Ratio | MVP | BR-KALK-001 | — | Zmiana dozy od razu zmienia wodę przy stałej proporcji; przyciski − i + przy liczbach. wynik: brak | — | — | `src/components/brew/BrewQuickPrepCard.tsx`, `src/components/dialin/BrewRatioTab.tsx` | Krok pętli przed stoperem. |
 | F-06 | Gongfu: kolejne zalania herbaty z wydłużaniem czasu, pauza, wznowienie i zakończenie z rzeczywistym czasem | MVP | BR-PARZ-005 | — | Wejście przyciskiem Gongfu w nagłówku ekranu Parzenie; numer zalania i czas widoczne na stoperze. wynik: brak | — | — | `app/gongfu.tsx`, `src/core/gongfu-session.ts` | Herbata jest częścią J-01; jedna aplikacja dla kawy i herbaty (BRD DEC-03). |
 | F-10 | Dane użytkownika: eksport i import JSON, eksport CSV, kopie rotacyjne (pule automatyczna i ratunkowa po 10 plików), zrzut stanu przy błędzie bazy z banerem, tryb awaryjny po pętli awarii | MVP | BR-DANE-001 (eksport i import; część „iCloud Drive”: F-38 w §3) | — | Ustawienia → sekcja danych z przyciskami eksportu i importu; baner po błędzie mówi, gdzie leży zrzut. wynik: brak | dane: odczyt, eksport, import, kopia | — | `src/components/settings/DataBackupCard.tsx`, `src/core/backup.ts`, `src/components/SafeModeView.tsx` | Zasada zerowej utraty danych (CLAUDE.md §2 pkt 6). Eksport CSV z ochroną przed formułami. |
 | F-12 | Język (PL, EN) i jednostki (metryczne albo imperialne: °C/°F, g/oz); domyślnie z regionu urządzenia | MVP | BR-JEDN-001 | — | Ustawienia → Preferencje: dwa przełączniki z nazwami w języku użytkownika; zmiana widoczna od razu w pętli. wynik: brak | — | — | `src/components/settings/AppPreferencesCard.tsx`, `lib/region-units.ts` | D-003: w 1.0 polski i angielski (Z-180). D-015: zadanie 034 (°F w trybie imperialnym w głównym przepływie). |
 | F-13 | Dostępność: etykiety i role VoiceOver, zapowiedź etapów stopera, haptyka, wyłączniki dźwięku, wibracji i głosu | MVP | BR-DOST-001 | — | Każdy element dotykowy ma etykietę VoiceOver; wyłączniki w Ustawieniach → Preferencje. wynik: brak | prawo: CLAUDE.md §2 pkt 4 (NFR-DOST-001, NFR-DOST-002) | F-01 | `lib/announce.ts`, `src/components/settings/AppPreferencesCard.tsx` | D-015: zadania 028–031 (kontrast, cele dotykowe, dźwięk, VoiceOver). |
-| F-14 | Dziennik: automatyczny zapis sesji z oceną i notatką, historia z filtrem, „Parz ponownie”, usuwanie wpisu z potwierdzeniem | MVP | BR-DZIEN-001, BR-DZIEN-002, BR-DZIEN-004 | — | Po zakończeniu parzenia okno oceny otwiera się samo; wpis widać od razu w zakładce Dziennik. wynik: brak | dane: odczyt historii, usunięcie z potwierdzeniem (`lib/confirm.ts`) | F-01 | `src/components/brew/BrewFinishModal.tsx`, `app/(tabs)/journal.tsx` | Zapis i powrót do udanego naparu zamykają pętlę. |
+| F-14 | Dziennik: automatyczny zapis sesji z oceną i notatką, historia z filtrem, „Parz ponownie” w dzienniku i baner „Powtórz ostatni napar” na ekranie Parzenie, usuwanie wpisu z potwierdzeniem | MVP | BR-DZIEN-001, BR-DZIEN-002, BR-DZIEN-004 | — | Po zakończeniu parzenia okno oceny otwiera się samo; wpis widać od razu w zakładce Dziennik. wynik: brak | dane: odczyt historii, usunięcie z potwierdzeniem (`lib/confirm.ts`) | F-01 | `src/components/brew/BrewFinishModal.tsx`, `app/(tabs)/journal.tsx` | Zapis i powrót do udanego naparu zamykają pętlę. |
 | F-16 | Kofeina: dziennik spożycia (z parzenia i szybkie dodanie), licznik dobowy, krzywa stężenia w ciągu dnia | MVP | BR-KOF-001, BR-KOF-004 | — | Wejście z Warsztatu kartą „Kofeina” (zakładka ukryta, 03-zakres-009); szybkie dodanie jednym dotknięciem. wynik: brak | bezpieczeństwo: zastrzeżenie medyczne w słownikach PL i EN, bez porad ponad źródła (D-005) | — | `app/(tabs)/caffeine.tsx`, `src/core/caffeine-chart.tsx` | D-005: zostaje szacunek z zastrzeżeniem; D-004: bez Apple Health (KILL-08). |
 | F-17 | Szacunek kofeiny w organizmie o porze snu, bez progu i oceny; czas półtrwania 4 h, do zmiany w zakresie 2–8 h | MVP | BR-KOF-003 | — | Karta na ekranie Kofeina pokazuje liczbę mg o wybranej godzinie snu i zastrzeżenie. wynik: brak | bezpieczeństwo: szacunek bez progu i bez oceny snu (D-005) | F-16 | `src/components/caffeine/BedtimeCurfewCard.tsx` | D-005 (wybór a, rozstrzygnięty źródłami). |
 | F-19 | Dial-in Doctor: porada jednej zmiany po ocenie smaku w oknie zapisu, stałe wskazówki na ekranie Parzenie, Warsztat → Doctor | MVP | H-01 (BRD C1 bez BR; ER-06) | — | W oknie zapisu cztery przyciski smaku („kwaśna”, „gorzka”, „słaba”, „zbalansowana”) i jedna porada. wynik: brak | — | F-14 | `src/components/brew/BrewFinishModal.tsx`, `src/components/brew/BrewBanners.tsx`, `app/(tabs)/dialin.tsx` | Korekta następnego parzenia to druga połowa J-01. Algorytm deterministyczny (BRD DEC-07, KILL-03). |
 | F-20 | Młynek: wybór młynka, nastawa w klikach przy przepisie, przelicznik nastaw między młynkami | MVP | BR-MLYNEK-001 | — | Pigułka „MŁYNEK” na ekranie Parzenie otwiera listę młynków; nastawa widoczna przy przepisie. wynik: brak | — | — | `src/components/brew/GrinderSelectModal.tsx`, `src/components/dialin/GrinderConverterCard.tsx`, `src/core/grinder-converter.ts` | Nastawa młynka to parametr przepisu. |
 | F-22 | Własne przepisy: kreator przepisu wieloetapowego | MVP | H-02 (bez BR; ER-06) | — | Wejście z wyboru przepisu; zapis w prawym rogu nagłówka. wynik: brak | — | F-27 | `app/recipe-builder.tsx` | Własny przepis jest źródłem przepisu w pętli. |
-| F-27 | Biblioteka 24 przepisów bazowych | MVP | BR-MAG-005 | — | Przycisk zmiany przepisu w nagłówku ekranu Parzenie; lista z nazwą metody. wynik: brak | — | — | `src/core/recipes-data.ts`, `src/components/brew/RecipeSelectModal.tsx` | Pierwszy krok pętli (BRD DEC-06). |
+| F-26 | Pierwsze uruchomienie: jedno pytanie „kawa, herbata czy oba”; przełącznik Kawa/Herbata na ekranie Parzenie; preferencja napoju i przewodnik „Jak działa aplikacja?” w Ustawieniach | MVP | H-03 (bez BR; ER-06) | — | Jedno pytanie z trzema przyciskami przed pierwszym ekranem; potem od razu ekran Parzenie. wynik: brak | — | — | `src/components/OnboardingModal.tsx`, `src/components/brew/BrewHeader.tsx`, `src/components/AppGuideModal.tsx` | Wejście do pętli. Przewodnik z Ustawień: D-015 (zadanie 031). |
+| F-27 | Biblioteka 24 przepisów bazowych i ulubione przepisy (pigułki na ekranie Parzenie) | MVP | BR-MAG-005 | — | Przycisk zmiany przepisu w nagłówku ekranu Parzenie; lista z nazwą metody. wynik: brak | — | — | `src/core/recipes-data.ts`, `src/components/brew/RecipeSelectModal.tsx` | Pierwszy krok pętli (BRD DEC-06). |
 | F-28 | Magazyn ziaren i herbat: kartoteka paczek, odliczanie dozy po parzeniu, archiwum, usuwanie paczki z potwierdzeniem | MVP | BR-MAG-001, BR-MAG-003, BR-MAG-004 | — | Wybór paczki na ekranie Parzenie; ubytek widoczny po zapisie w zakładce Spiżarnia. wynik: brak | dane: usunięcie z potwierdzeniem (`lib/confirm.ts`) | — | `app/(tabs)/beans.tsx`, `src/components/brew/InventorySelectModal.tsx` | Opcjonalny krok pętli: parzenie działa też bez paczki. |
 | F-29 | Profil sensoryczny przy zapisie: koło smaków i wykres radarowy, także w karcie wpisu dziennika | MVP | BR-DZIEN-003 | — | Koło smaków w oknie zapisu, wybór dotknięciem; pole można pominąć. wynik: brak | — | F-14 | `src/core/flavor-wheel-picker.tsx`, `src/core/radar-chart.tsx` | Część zapisu wyniku w pętli. |
 | F-34 | Zakupy w aplikacji (StoreKit 2, Family Sharing) | PÓŹNIEJ | BR-ZAK-001 | — | — | — | — | brak kodu (usunięty 2026-11-13) | D-001: 1.0 całkowicie darmowa, kod zakupów usunięty (ER-01). Powrót: decyzja właściciela o modelu płatnym (wariant z D-014: wcześni użytkownicy zachowują pełny dostęp), prawdziwy StoreKit z testem zakupu i przywrócenia na urządzeniu, nowy wiersz ZM. |
@@ -66,7 +67,76 @@ Funkcje działające w kodzie albo wymagane przez BRD, dla których nie ma decyz
 | F-38 | Kopia zapasowa w iCloud Drive | BR-DANE-001 (część „iCloud Drive”; ER-05) | brak kodu | dane chronią kopie lokalne i eksport (F-10) | (a) PÓŹNIEJ (v1.2) — kopia poza telefonem tylko przez eksport; (b) MVP — moduł natywny i testy na urządzeniu przed wydaniem | (a) |
 | F-39 | Widżety ekranu początkowego | BR-ZEG-005 (ER-05) | brak kodu | brak | (a) PÓŹNIEJ razem z KILL-06 (natywny target WidgetKit); (b) NIE — bez widżetów na stałe | (a) |
 | F-40 | Kompendium wiedzy: odmiany, obróbka, regiony kawy, rodzaje herbaty | BR-WIEDZA-001, BR-WIEDZA-002 | `src/components/beans/BeanCompendiumModal.tsx`, `src/core/knowledge-data.ts` | do uzupełnienia (rynek: encyklopedia herbat) | (a) MVP poza pętlą (treść; źródła sprawdza rola 06); (b) PÓŹNIEJ — mniej treści do utrzymania | (a) |
+| F-31 | Karta kosztu parzenia w oknie zapisu (koszt naparu wobec kawiarni) | brak BR | `src/components/brew/BrewFinishModal.tsx`, `src/core/cost-calculator.ts` | brak w linii bazowej; liczy z wartości domyślnych, nie z danych użytkownika | (a) NIE: karta usunięta z okna zapisu (zadanie roli 08; danych użytkownika nie ma, więc bez migracji) — prostszy zapis; (b) TEST: ukryta do rozmów z 3–5 osobami — decyzja później | (a) |
+| F-32 | Kalendarz 14 dni z harmonogramem akcji i eksportem zdarzeń do kalendarza (plik ICS) w Dzienniku | brak BR | `src/components/journal/ProactiveCalendarCard.tsx` | brak w linii bazowej; inny rytm niż J-01 | (a) NIE: karta usunięta z Dziennika (zadanie roli 08; akcje liczone z sesji, bez osobnych danych) — mniej treści nad historią; (b) TEST: ukryta do rozmów — decyzja później | (a) |
+| F-33 | Udostępnienie wpisu dziennika jako tekstu (notatka degustacyjna) | brak BR (ER dla roli 01) | `app/(tabs)/journal.tsx` | do uzupełnienia (rynek: dzielenie się notatkami) | (a) MVP poza pętlą, BR do dopisania przez rolę 01; (b) NIE — mniej przycisków na karcie wpisu | (a) |
+| F-41 | Prośba o ocenę w App Store (link w Ustawieniach) | brak BR | `app/settings.tsx` | ocena w sklepie zasila dowód R po wydaniu | (a) MVP: link widoczny dopiero, gdy aplikacja ma identyfikator w sklepie; (b) NIE do pierwszych recenzji | (a) |
 
+### Inwentarz funkcji w kodzie (stan 2026-11-15)
+
+Źródło: `inwentarz.mjs` roli 03 i przegląd ekranów. Test bloku „M1-audytor-generalny-038” sprawdza, że każdy ekran w `app/`, każde wywołanie linku, udostępniania, aparatu i ukryta zakładka mają tu wiersz, a kotwica istnieje w pliku. Nowy element bez wiersza czerwieni `npm run verify`.
+
+| Rodzaj | Gdzie | Kotwica | Co | F-nn |
+|---|---|---|---|---|
+| trasa | `app/(tabs)/index.tsx` | `open-procedure-modal-btn` | ekran Parzenie, wejście do kroków | F-02 |
+| element | `app/(tabs)/index.tsx` | `quick-rebrew-banner` | baner „Powtórz ostatni napar” | F-14 |
+| element | `src/components/brew/BrewHeader.tsx` | `beverage-toggle-coffee` | przełącznik Kawa/Herbata | F-26 |
+| element | `src/components/brew/BrewHeader.tsx` | `favoriteRecipes` | ulubione przepisy | F-27 |
+| element | `src/components/brew/BrewHeader.tsx` | `change-recipe-btn` | zmiana przepisu | F-27 |
+| element | `src/components/brew/BrewHeader.tsx` | `grinder-pill-btn` | wybór młynka | F-20 |
+| element | `src/components/brew/BrewHeader.tsx` | `open-inventory-modal-btn` | wybór paczki | F-28 |
+| element | `src/components/brew/BrewHeader.tsx` | `share-recipe-btn` | udostępnij przepis | F-08 |
+| element | `src/components/brew/BrewHeader.tsx` | `gongfu-mode-btn` | wejście do Gongfu | F-06 |
+| element | `src/components/brew/BrewQuickPrepCard.tsx` | `batch-chips-group` | porcje 1–4 | F-04 |
+| element | `src/components/brew/BrewQuickPrepCard.tsx` | `ratio-chips-group` | proporcja | F-04 |
+| element | `src/components/brew/ProcedureModal.tsx` | `procedure-start-btn` | „Rozpocznij parzenie” | F-01 |
+| element | `src/components/brew/BrewBanners.tsx` | `golden-rules-banner` | stałe wskazówki korekty | F-19 |
+| element | `src/components/brew/BrewBanners.tsx` | `corrupt-state-banner` | baner po błędzie bazy | F-10 |
+| okno zapisu | `src/components/brew/BrewFinishModal.tsx` | `star-rating-row` | ocena | F-14 |
+| okno zapisu | `src/components/brew/BrewFinishModal.tsx` | `doctor-advice-sour` | porada Dial-in Doctor | F-19 |
+| okno zapisu | `src/components/brew/BrewFinishModal.tsx` | `FlavorWheelPicker` | koło smaków | F-29 |
+| okno zapisu | `src/components/brew/BrewFinishModal.tsx` | `water-chips-row` | wybór wody | F-21 |
+| okno zapisu | `src/components/brew/BrewFinishModal.tsx` | `tds-input` | pole TDS | F-05 |
+| okno zapisu | `src/components/brew/BrewFinishModal.tsx` | `finish-cost-card` | karta kosztu parzenia | F-31 |
+| okno | `src/components/brew/BrewModalsContainer.tsx` | `OnboardingModal` | pierwsze uruchomienie | F-26 |
+| okno | `src/components/brew/BrewModalsContainer.tsx` | `ImportRecipeModal` | import przepisu z linku | F-08 |
+| udostępnianie | `src/components/brew/ShareRecipeModal.tsx` | `Share.share` | link do przepisu | F-08 |
+| uprawnienie (aparat) | `src/core/QrScannerModal.tsx` | `useCameraPermissions` | skaner QR | F-08 |
+| trasa | `app/gongfu.tsx` | `GongfuActiveInfusion` | Gongfu | F-06 |
+| trasa | `app/recipe-builder.tsx` | `recipe-builder-save-btn` | kreator przepisu | F-22 |
+| trasa | `app/(tabs)/beans.tsx` | `BeanCompendiumModal` | Spiżarnia | F-28 |
+| element | `src/components/beans/BeanTopBar.tsx` | `compendium-open-button` | kompendium wiedzy | F-40 |
+| element | `src/components/beans/BeanItemCard.tsx` | `evaluateRestingWindow` | okno odgazowania | F-15 |
+| element | `src/components/beans/BeanEditModal.tsx` | `delete-pack-btn` | usunięcie paczki | F-28 |
+| trasa | `app/(tabs)/journal.tsx` | `journal-tab-sessions` | Dziennik | F-14 |
+| element | `app/(tabs)/journal.tsx` | `journal-tab-analytics` | analityka | F-30 |
+| element | `app/(tabs)/journal.tsx` | `ProactiveCalendarCard` | kalendarz akcji | F-32 |
+| udostępnianie | `app/(tabs)/journal.tsx` | `Share.share` | udostępnij wpis | F-33 |
+| udostępnianie | `src/components/journal/ProactiveCalendarCard.tsx` | `Share.share` | eksport ICS | F-32 |
+| trasa | `app/(tabs)/dialin.tsx` | `BrewRatioTab` | Warsztat → Ratio | F-04 |
+| element | `app/(tabs)/dialin.tsx` | `ExtractionYieldTab` | Warsztat → EY | F-05 |
+| element | `app/(tabs)/dialin.tsx` | `WaterChemistryTab` | Warsztat → Woda | F-21 |
+| element | `app/(tabs)/dialin.tsx` | `open-caffeine-from-workshop` | wejście do Kofeiny | F-16 |
+| element | `src/components/dialin/BrewRatioTab.tsx` | `GrinderConverterCard` | przelicznik młynków | F-20 |
+| ukryta zakładka | `app/(tabs)/_layout.tsx` | `href: null` | zakładka Kofeina bez ikony | F-16 |
+| trasa | `app/(tabs)/caffeine.tsx` | `CaffeineCurveChart` | Kofeina | F-16 |
+| element | `app/(tabs)/caffeine.tsx` | `BedtimeCurfewCard` | szacunek o porze snu | F-17 |
+| trasa | `app/settings.tsx` | `DataBackupCard` | Ustawienia, dane | F-10 |
+| element | `app/settings.tsx` | `settings-open-guide-btn` | przewodnik | F-26 |
+| element | `app/settings.tsx` | `GrinderSelectionCard` | domyślny młynek | F-20 |
+| element | `app/settings.tsx` | `CaffeineSettingsCard` | półtrwanie i pora snu | F-17 |
+| link | `app/settings.tsx` | `privacyPolicyUrl` | polityka prywatności | prawne (D-007) |
+| link | `app/settings.tsx` | `TERMS_URL` | regulamin | prawne (D-007) |
+| link | `app/settings.tsx` | `supportMailtoUrl` | kontakt | prawne (D-007) |
+| link | `app/settings.tsx` | `appStoreReviewUrl` | ocena w App Store | F-41 |
+| trasa | `app/(tabs)/settings.tsx` | `SettingsScreen` | zakładka Ustawienia (ten sam ekran co `app/settings.tsx`) | techniczne |
+| element | `src/components/settings/AppPreferencesCard.tsx` | `language-radiogroup` | język | F-12 |
+| element | `src/components/settings/AppPreferencesCard.tsx` | `unit-system-radiogroup` | jednostki | F-12 |
+| element | `src/components/settings/AppPreferencesCard.tsx` | `beverage-preference-radiogroup` | preferencja napoju | F-26 |
+| element | `src/components/settings/AppPreferencesCard.tsx` | `toggle-voice-btn` | głos i dźwięk, wibracje | F-13 |
+| element | `src/components/settings/DataBackupCard.tsx` | `export-csv-sessions-btn` | eksport CSV | F-10 |
+| ekran | `app/_layout.tsx` | `SafeModeView` | tryb awaryjny | F-10 |
+| udostępnianie | `src/components/SafeModeView.tsx` | `from 'expo-sharing'` | eksport danych w trybie awaryjnym | F-10 |
 ---
 
 ## 4. Podłogi i niezmienniki wydania 1.0

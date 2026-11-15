@@ -2134,4 +2134,50 @@ describe('M1-audytor-generalny-038: kontrakt zakresu w formacie roli 03 ze ślad
     expect(sekcja(1)).not.toMatch(/powiadomie/i);
     expect(sekcja(2)).toMatch(/^\| \*\*KILL-09\*\* \|.*D-008/m);
   });
+
+  test('03-zakres-006: każdy element inwentarza funkcji z kodu (trasy, zakładki, linki, udostępnianie, aparat, elementy pętli) ma F-nn w kontrakcie', () => {
+    const tabInw = tabele(sekcja(3)).find((t) => ['Rodzaj', 'Gdzie', 'Kotwica', 'F-nn'].every((k) => t.nagl.includes(k)));
+    expect(tabInw).toBeDefined();
+    const wiersze = tabInw!.wiersze.map((w) => ({ ...w, plik: w.Gdzie.replace(/`/g, ''), kotwica: w.Kotwica.replace(/`/g, '') }));
+    const bledy: string[] = [];
+    const czytaj = (p: string) => (existsSync(join(root, p)) ? readFileSync(join(root, p), 'utf8') : '');
+    for (const w of wiersze) {
+      const kod = czytaj(w.plik);
+      if (!kod) bledy.push(`${w.plik}: brak pliku`);
+      else if (!kod.includes(w.kotwica)) bledy.push(`${w.plik}: brak kotwicy ${w.kotwica}`);
+      for (const f of w['F-nn'].match(/\bF-\d{2}\b/g) ?? []) if (!funkcje.has(f) && !bezDecyzji.has(f)) bledy.push(`${w.plik}: ${f} bez wiersza w §1 ani §3`);
+      if (!/\bF-\d{2}\b/.test(w['F-nn']) && !/^(techniczne|prawne)/.test(w['F-nn'])) bledy.push(`${w.plik} ${w.kotwica}: bez F-nn`);
+    }
+    // Trasy: każdy ekran w app/ (poza _layout) ma wiersz.
+    const trasy: string[] = [];
+    const chodz = (d: string) => {
+      for (const f of readdirSync(join(root, d), { withFileTypes: true })) {
+        if (f.isDirectory()) chodz(`${d}/${f.name}`);
+        else if (/\.tsx$/.test(f.name) && f.name !== '_layout.tsx') trasy.push(`${d}/${f.name}`);
+      }
+    };
+    chodz('app');
+    for (const t of trasy) if (!wiersze.some((w) => w.plik === t)) bledy.push(`${t}: trasa bez wiersza inwentarza`);
+    // Linki, udostępnianie, aparat, ukryte zakładki: każda linia z takim wywołaniem ma wiersz z kotwicą z tej linii.
+    const WZORCE = /Linking\.openURL|Share\.share|useCameraPermissions\(|from 'expo-sharing'|href: null/;
+    const pliki: string[] = [];
+    const zbierz = (d: string) => {
+      for (const f of readdirSync(join(root, d), { withFileTypes: true })) {
+        if (f.isDirectory()) { if (f.name !== '__tests__') zbierz(`${d}/${f.name}`); }
+        else if (/\.tsx?$/.test(f.name)) pliki.push(`${d}/${f.name}`);
+      }
+    };
+    ['app', 'src', 'lib'].forEach(zbierz);
+    for (const p of pliki)
+      czytaj(p).split('\n').forEach((l, i) => {
+        if (WZORCE.test(l) && !wiersze.some((w) => w.plik === p && l.includes(w.kotwica))) bledy.push(`${p}:${i + 1}: bez wiersza inwentarza`);
+      });
+    // Elementy pętli głównej wskazane w audycie (03-zakres-006) mają wiersz.
+    for (const k of ['batch-chips-group', 'quick-rebrew-banner', 'favoriteRecipes', 'finish-cost-card', 'ProactiveCalendarCard', 'OnboardingModal'])
+      if (!wiersze.some((w) => w.kotwica === k)) bledy.push(`${k}: element pętli bez wiersza`);
+    // Funkcja z decyzją NIE nie ma kodu.
+    for (const [id, w] of funkcje)
+      if (w.Decyzja === 'NIE') for (const p of w['Gdzie w kodzie'].match(/`([^`]+\.tsx?)`/g) ?? []) if (existsSync(join(root, p.slice(1, -1)))) bledy.push(`${id} (NIE): kod ${p} istnieje`);
+    expect(bledy).toEqual([]);
+  });
 });
