@@ -621,9 +621,11 @@ describe('M1-audytor-generalny-009: wersja darmowa bez zakupów (DEC-01 a)', () 
   });
 
   test('02-monetyzacja-003: słowniki i komponenty bez cen planów i ofert „za darmo”', () => {
-    const localeFiles = readdirSync(join(root, 'locales'))
+    // M1-audytor-generalny-032: zamiast usuniętych klonów locales/*.json — teksty systemowe expo.locales.
+    const localeFiles = readdirSync(join(root, 'locales', 'native'))
       .filter((f) => f.endsWith('.json'))
-      .map((f) => join('locales', f));
+      .map((f) => join('locales', 'native', f));
+    expect(localeFiles).toHaveLength(2);
     const files = [...localeFiles, 'src/core/i18n.tsx', ...prodFiles.filter((f) => f.startsWith(join('src', 'components')))];
     expect(hits(/\d+[,.]\d{2}\s?zł|[$€]\s?\d|dni za darmo|day free trial|NAJLEPSZA WARTOŚĆ|BEST VALUE/i, files)).toEqual([]);
     expect((translations.pl as any).paywall).toBeUndefined();
@@ -656,9 +658,10 @@ describe('M1-audytor-generalny-015: bez progu „bezpiecznego dla snu” i „be
     'src/core/caffeine-chart.tsx',
     'src/components/settings/CaffeineSettingsCard.tsx',
   ];
-  const localeFiles = readdirSync(join(root, 'locales'))
+  // M1-audytor-generalny-032: zamiast usuniętych klonów locales/*.json — teksty systemowe expo.locales.
+  const localeFiles = readdirSync(join(root, 'locales', 'native'))
     .filter((f) => f.endsWith('.json'))
-    .map((f) => join('locales', f));
+    .map((f) => join('locales', 'native', f));
   const grepFiles = (re: RegExp, files: string[]): string[] =>
     files.flatMap((f) =>
       readFileSync(join(root, f), 'utf8')
@@ -986,7 +989,7 @@ describe('M1-audytor-generalny-021: bez przełącznika i obietnic Apple Health d
     expect(texts.length).toBeGreaterThan(500);
     expect(texts.filter(([k, v]) => HEALTH.test(k) || HEALTH.test(v) || /\bv1\.[1-9]\b/.test(v))).toEqual([]);
     const localeFiles = listDir('locales', /\.json$/);
-    expect(localeFiles.length).toBeGreaterThan(30);
+    expect(localeFiles.sort()).toEqual([join('locales', 'native', 'en.json'), join('locales', 'native', 'pl.json')]); // 032: klony usunięte
     expect(grepFiles(/healthKit|Apple Health|HealthKit|\bv1\.[1-9]\b/, localeFiles)).toEqual([]);
   });
 
@@ -1477,5 +1480,63 @@ describe('M1-audytor-generalny-031: każdy element dotykowy ma rolę i etykietę
     });
     expect(tree!.root.findAll((n) => n.props.testID === 'caffeine-over-limit')).toHaveLength(0);
     spy.mockRestore();
+  });
+});
+
+describe('M1-audytor-generalny-032: deklarowane języki = słowniki ładowane przez aplikację; prośba o aparat w PL i EN (DEC-03 a; 09-lokalizacja-003, 01-odkrywanie-003, 10-wydanie-016, 09-lokalizacja-005)', () => {
+  const expo = JSON.parse(readFileSync(join(root, 'app.json'), 'utf8')).expo;
+  const loaded = Object.keys(translations).sort();
+  const locPlugin = expo.plugins.find((p: unknown) => Array.isArray(p) && p[0] === 'expo-localization');
+  const declared = locPlugin?.[1]?.supportedLocales;
+  const perPlatform = (s: unknown): { ios: string[]; android: string[] } =>
+    Array.isArray(s) ? { ios: s, android: s } : ((s ?? { ios: [], android: [] }) as { ios: string[]; android: string[] });
+  const walkFiles = (rel: string): string[] =>
+    !existsSync(join(root, rel))
+      ? []
+      : readdirSync(join(root, rel), { withFileTypes: true }).flatMap((e) =>
+          e.isDirectory() ? walkFiles(join(rel, e.name)) : [join(rel, e.name)],
+        );
+
+  test('09-lokalizacja-003 / 01-odkrywanie-003: supportedLocales (iOS i Android) i CFBundleLocalizations = języki słowników i18n', () => {
+    expect(loaded).toEqual(['en', 'pl']);
+    const { ios, android } = perPlatform(declared);
+    expect([...ios].sort()).toEqual(loaded);
+    expect([...android].sort()).toEqual(loaded);
+    expect([...expo.ios.infoPlist.CFBundleLocalizations].sort()).toEqual(loaded);
+    expect(expo.ios.infoPlist.CFBundleAllowMixedLocalizations).toBe(true);
+  });
+
+  test('10-wydanie-016: expo.locales ma plik każdego języka z nazwą pod ikoną i tekstem każdej prośby o uprawnienie', () => {
+    expect(Object.keys(expo.locales ?? {}).sort()).toEqual(loaded);
+    const base = expo.ios.infoPlist;
+    const usage = Object.keys(base).filter((k) => /^NS\w+UsageDescription$/.test(k));
+    expect(usage).toEqual(['NSCameraUsageDescription']);
+    const files: Record<string, { ios: Record<string, string> }> = Object.fromEntries(
+      loaded.map((l) => [l, JSON.parse(readFileSync(join(root, expo.locales[l]), 'utf8'))]),
+    );
+    for (const l of loaded) {
+      expect(Object.keys(files[l]).sort()).toEqual(['ios']);
+      expect(files[l].ios.CFBundleDisplayName).toBe(base.CFBundleDisplayName);
+      for (const k of usage) expect(files[l].ios[k].trim().length).toBeGreaterThan(20);
+    }
+    // EN = tekst bazowy Info.plist i pluginu expo-camera; PL jest własnym tekstem, nie kopią EN.
+    const camPlugin = expo.plugins.find((p: unknown) => Array.isArray(p) && p[0] === 'expo-camera');
+    expect(files.en.ios.NSCameraUsageDescription).toBe(base.NSCameraUsageDescription);
+    expect(files.en.ios.NSCameraUsageDescription).toBe(camPlugin[1].cameraPermission);
+    expect(files.pl.ios.NSCameraUsageDescription).not.toBe(files.en.ios.NSCameraUsageDescription);
+    expect(files.pl.ios.NSCameraUsageDescription).toMatch(/aparat/);
+  });
+
+  test('09-lokalizacja-005: bez sklonowanych słowników i ich generatora; rejestr języków = supportedLocales', () => {
+    const localeFiles = walkFiles('locales').sort();
+    expect(localeFiles).toEqual(loaded.map((l) => join(expo.locales?.[l] ?? `locales/${l}.json`)).sort());
+    expect(existsSync(join(root, 'scripts/generate-locales.mjs'))).toBe(false);
+    const register = readFileSync(join(root, 'docs/lokalizacja/jezyki.md'), 'utf8');
+    const rows = register
+      .split('\n')
+      .map((line) => line.match(/^\|\s*`?([a-z]{2}(?:-[A-Za-z]+)?)`?\s*\|/)?.[1])
+      .filter((x): x is string => Boolean(x));
+    expect(rows.sort()).toEqual(loaded);
+    expect(register).toMatch(/DEC-03/);
   });
 });

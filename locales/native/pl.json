@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Napar",
+    "NSCameraUsageDescription": "Napar potrzebuje dostępu do aparatu, aby skanować kody QR z recepturami kawy i herbaty."
+  }
+}

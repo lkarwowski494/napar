@@ -40,17 +40,19 @@ test('nazwa „Steepwise” nie występuje w aplikacji, na stronie ani w metadan
   expect(hits).toEqual([]);
 });
 
-test('appName w każdej lokalizacji i w i18n jest zgodny z CFBundleDisplayName', () => {
+// M1-audytor-generalny-032 (DEC-03 a): sklonowane słowniki locales/*.json usunięte; nazwa pod ikoną
+// w każdym języku pochodzi z plików expo.locales (ios.CFBundleDisplayName), a w interfejsie z `translations`.
+test('appName w każdym słowniku i18n i nazwa pod ikoną w każdym pliku expo.locales są zgodne z CFBundleDisplayName', () => {
   const appJson = JSON.parse(fs.readFileSync(path.join(root, 'app.json'), 'utf8'));
   const display = appJson.expo.ios.infoPlist.CFBundleDisplayName;
   expect(display).toBe('Napar');
   expect(appJson.expo.name).toBe(display);
-  expect(translations.pl.appName).toBe(display);
-  expect(translations.en.appName).toBe(display);
-  const dir = path.join(root, 'locales');
-  const wrong = fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith('.json'))
-    .filter((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')).appName !== display);
+  const langs = Object.keys(translations).sort();
+  expect(langs).toEqual(['en', 'pl']);
+  for (const l of langs) expect((translations as Record<string, { appName: string }>)[l].appName).toBe(display);
+  expect(Object.keys(appJson.expo.locales).sort()).toEqual(langs);
+  const wrong = Object.entries(appJson.expo.locales as Record<string, string>).filter(
+    ([, rel]) => JSON.parse(fs.readFileSync(path.join(root, rel), 'utf8')).ios?.CFBundleDisplayName !== display,
+  );
   expect(wrong).toEqual([]);
 });

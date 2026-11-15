@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Napar",
+    "NSCameraUsageDescription": "Napar requires camera access to scan coffee and tea recipe QR codes."
+  }
+}

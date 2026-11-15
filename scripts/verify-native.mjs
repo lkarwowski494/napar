@@ -230,14 +230,14 @@ try {
   // Weryfikacja flag lokalizacyjnych i pełnoekranowych w infoPlist (TASK-P13-10-WYD)
   check(
     appJson.ios?.infoPlist?.CFBundleAllowMixedLocalizations === true,
-    'app.json -> expo.ios.infoPlist musi mieć CFBundleAllowMixedLocalizations: true (wymóg lokalizacji 35 języków)'
+    'app.json -> expo.ios.infoPlist musi mieć CFBundleAllowMixedLocalizations: true (teksty systemowe z expo.locales)'
   );
   check(
     appJson.ios?.infoPlist?.UIRequiresFullScreen === true,
     'app.json -> expo.ios.infoPlist musi mieć UIRequiresFullScreen: true'
   );
 
-  // Weryfikacja CFBundleDisplayName, android.package i 35 języków CFBundleLocalizations (TASK-P14-10-WYD)
+  // Weryfikacja CFBundleDisplayName, android.package i CFBundleLocalizations (TASK-P14-10-WYD; M1-audytor-generalny-032)
   check(
     appJson.ios?.infoPlist?.CFBundleDisplayName === 'Napar',
     `app.json -> expo.ios.infoPlist.CFBundleDisplayName musi być równe 'Napar' (otrzymano '${appJson.ios?.infoPlist?.CFBundleDisplayName}')`
@@ -248,8 +248,8 @@ try {
   );
   const localizations = appJson.ios?.infoPlist?.CFBundleLocalizations;
   check(
-    Array.isArray(localizations) && localizations.length === 35 && localizations.includes('pl') && localizations.includes('en'),
-    `app.json -> expo.ios.infoPlist.CFBundleLocalizations musi zawierać dokładnie 35 języków, w tym 'pl' i 'en' (otrzymano ${localizations?.length})`
+    Array.isArray(localizations) && localizations.length === 2 && localizations.includes('pl') && localizations.includes('en'),
+    `app.json -> expo.ios.infoPlist.CFBundleLocalizations musi zawierać dokładnie 'pl' i 'en' (DEC-03 a; otrzymano ${localizations})`
   );
 
   // Weryfikacja obecności krytycznych pluginów bazodanowych i nawigacyjnych (TASK-P26-10-WYD)
@@ -312,16 +312,24 @@ try {
   const localizationPlugin = appJson.plugins?.find(
     (p) => Array.isArray(p) && p[0] === 'expo-localization'
   );
-  const supportedLocales = localizationPlugin && localizationPlugin[1]?.supportedLocales;
+  // DEC-03 a (M1-audytor-generalny-032): system i sklep dostają tylko PL i EN — języki, których
+  // słowniki aplikacja ładuje. Pełne porównanie z `translations` robi check:i18n (scripts/check-i18n.mjs).
+  const declared = localizationPlugin && localizationPlugin[1]?.supportedLocales;
+  const perPlatform = Array.isArray(declared) ? { ios: declared, android: declared } : declared || {};
+  for (const platform of ['ios', 'android']) {
+    const list = perPlatform[platform];
+    check(
+      Array.isArray(list) && list.length === 2 && list.includes('pl') && list.includes('en'),
+      `app.json -> expo.plugins expo-localization supportedLocales.${platform} musi deklarować dokładnie 'pl' i 'en' (otrzymano ${list})`
+    );
+  }
   check(
-    Array.isArray(supportedLocales) &&
-      supportedLocales.length === 35 &&
-      supportedLocales.includes('pl') &&
-      supportedLocales.includes('en'),
-    `app.json -> expo.plugins expo-localization musi deklarować 35 języków, w tym 'pl' i 'en' (otrzymano ${supportedLocales?.length})`
+    localizationPlugin && localizationPlugin[1]?.supportsRTL === false,
+    'app.json -> expo-localization musi mieć supportsRTL: false (brak języka RTL w zestawie)'
   );
 
-  // Weryfikacja 1:1 spójności supportedLocales z CFBundleLocalizations i plikami locales/*.json (TASK-P27-10-WYD)
+  // Weryfikacja 1:1 spójności supportedLocales z CFBundleLocalizations i plikami expo.locales (TASK-P27-10-WYD)
+  const supportedLocales = perPlatform.ios;
   if (Array.isArray(supportedLocales) && Array.isArray(localizations)) {
     const missingInPlugin = localizations.filter((l) => !supportedLocales.includes(l));
     const missingInPlist = supportedLocales.filter((l) => !localizations.includes(l));
@@ -330,11 +338,26 @@ try {
       `app.json -> expo-localization supportedLocales musi być w 100% tożsame z CFBundleLocalizations (różnice: +${missingInPlugin.join(',')}/-${missingInPlist.join(',')})`
     );
     for (const loc of supportedLocales) {
+      const rel = appJson.locales?.[loc];
+      const file = rel && join(root, rel);
       check(
-        existsSync(join(root, `locales/${loc}.json`)),
-        `app.json -> expo-localization deklaruje język '${loc}', ale brak pliku locales/${loc}.json`
+        Boolean(file && existsSync(file)),
+        `app.json -> expo-localization deklaruje język '${loc}', ale expo.locales.${loc} nie wskazuje istniejącego pliku (otrzymano '${rel}')`
       );
+      if (file && existsSync(file)) {
+        const ios = JSON.parse(readFileSync(file, 'utf8')).ios || {};
+        check(
+          ios.CFBundleDisplayName === appJson.ios?.infoPlist?.CFBundleDisplayName,
+          `${rel} -> ios.CFBundleDisplayName musi być równe CFBundleDisplayName z app.json (otrzymano '${ios.CFBundleDisplayName}')`
+        );
+        check(
+          typeof ios.NSCameraUsageDescription === 'string' && ios.NSCameraUsageDescription.trim().length > 0,
+          `${rel} -> ios.NSCameraUsageDescription musi być niepustym tekstem prośby o aparat w języku '${loc}'`
+        );
+      }
     }
+    const extra = Object.keys(appJson.locales || {}).filter((l) => !supportedLocales.includes(l));
+    check(extra.length === 0, `app.json -> expo.locales ma języki spoza supportedLocales: ${extra.join(',')}`);
   }
 
   const ver = appJson.version;
@@ -779,6 +802,26 @@ try {
         check(
           pbx.includes('TARGETED_DEVICE_FAMILY = "1";') || pbx.includes('TARGETED_DEVICE_FAMILY = 1;'),
           'project.pbxproj musi mieć TARGETED_DEVICE_FAMILY = "1" (tylko iPhone)'
+        );
+      }
+
+      // M1-audytor-generalny-032 (10-wydanie-016): wygenerowany projekt ma InfoPlist.strings każdego
+      // języka z app.json expo.locales, z tekstem prośby o aparat z pliku tego języka.
+      const plistLocs = [...plist.matchAll(/<key>CFBundleLocalizations<\/key>\s*<array>([\s\S]*?)<\/array>/g)]
+        .flatMap((m) => [...m[1].matchAll(/<string>([^<]+)<\/string>/g)].map((x) => x[1]))
+        .sort();
+      const appLocs = Object.keys(appJson.locales || {}).sort();
+      check(
+        plistLocs.join(',') === appLocs.join(','),
+        `Info.plist CFBundleLocalizations [${plistLocs}] musi równać się językom expo.locales [${appLocs}]`
+      );
+      for (const loc of appLocs) {
+        const stringsPath = join(iosDir, iosScheme, 'Supporting', `${loc}.lproj`, 'InfoPlist.strings');
+        const want = JSON.parse(readFileSync(join(root, appJson.locales[loc]), 'utf8')).ios?.NSCameraUsageDescription;
+        const got = existsSync(stringsPath) ? readFileSync(stringsPath, 'utf8') : '';
+        check(
+          Boolean(want) && got.includes(`NSCameraUsageDescription = "${want}";`),
+          `${loc}.lproj/InfoPlist.strings musi mieć NSCameraUsageDescription z ${appJson.locales[loc]}`
         );
       }
     }

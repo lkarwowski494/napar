@@ -57,41 +57,8 @@
         "CFBundleAllowMixedLocalizations": true,
         "NSCameraUsageDescription": "Napar requires camera access to scan coffee and tea recipe QR codes.",
         "CFBundleLocalizations": [
-          "en",
           "pl",
-          "de",
-          "fr",
-          "es",
-          "it",
-          "pt-BR",
-          "pt-PT",
-          "nl",
-          "sv",
-          "da",
-          "no",
-          "fi",
-          "cs",
-          "sk",
-          "hu",
-          "ro",
-          "bg",
-          "el",
-          "tr",
-          "ru",
-          "uk",
-          "ja",
-          "ko",
-          "zh-Hans",
-          "zh-Hant",
-          "id",
-          "ms",
-          "th",
-          "vi",
-          "ar",
-          "he",
-          "hi",
-          "hr",
-          "ca"
+          "en"
         ],
         "CFBundleDisplayName": "Napar"
       }
@@ -109,6 +76,10 @@
         "android.permission.WAKE_LOCK"
       ]
     },
+    "locales": {
+      "pl": "./locales/native/pl.json",
+      "en": "./locales/native/en.json"
+    },
     "plugins": [
       "expo-router",
       "expo-sqlite",
@@ -122,43 +93,17 @@
       [
         "expo-localization",
         {
-          "supportedLocales": [
-            "en",
-            "pl",
-            "de",
-            "fr",
-            "es",
-            "it",
-            "pt-BR",
-            "pt-PT",
-            "nl",
-            "sv",
-            "da",
-            "no",
-            "fi",
-            "cs",
-            "sk",
-            "hu",
-            "ro",
-            "bg",
-            "el",
-            "tr",
-            "ru",
-            "uk",
-            "ja",
-            "ko",
-            "zh-Hans",
-            "zh-Hant",
-            "id",
-            "ms",
-            "th",
-            "vi",
-            "ar",
-            "he",
-            "hi",
-            "hr",
-            "ca"
-          ]
+          "supportedLocales": {
+            "ios": [
+              "pl",
+              "en"
+            ],
+            "android": [
+              "pl",
+              "en"
+            ]
+          },
+          "supportsRTL": false
         }
       ]
     ]
