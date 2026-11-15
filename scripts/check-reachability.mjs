@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Kontrola osiągalności src/core (DEC-02, M1-audytor-generalny-010).
+ * Kontrola osiągalności src/core (DEC-02, M1-audytor-generalny-010)
+ * oraz src/data, src/platform, src/hooks (M1-audytor-generalny-045).
  *
  * Każda deklaracja najwyższego poziomu w src/core (funkcja, stała, klasa, typ,
  * interfejs, enum) musi mieć drogę z interfejsu: odwołanie z pliku w app/ albo
@@ -40,7 +41,10 @@ function walk(dir) {
 const ROOT_DIRS = ['app', 'src/components'];
 const files = [...walk(join(root, 'app')), ...walk(join(root, 'src')), ...walk(join(root, 'lib'))];
 const isRootFile = (f) => ROOT_DIRS.some((d) => rel(f).startsWith(`${d}/`));
-const isCore = (f) => rel(f).startsWith('src/core/');
+// M1-audytor-generalny-045: warstwy wydzielone z src/core (adaptery platformy, zapis, hooki React)
+// podlegają tej samej bramce co src/core.
+const GATED = ['src/core/', 'src/data/', 'src/platform/', 'src/hooks/'];
+const isGated = (file) => GATED.some((d) => file.startsWith(d));
 
 const cfg = ts.readConfigFile(join(root, 'tsconfig.json'), ts.sys.readFile);
 const parsed = ts.parseJsonConfigFileContent(cfg.config, ts.sys, root);
@@ -144,7 +148,7 @@ const exPath = join(root, 'scripts', 'reachability-exceptions.json');
 const exceptions = existsSync(exPath) ? JSON.parse(readFileSync(exPath, 'utf8')) : {};
 delete exceptions.$comment;
 
-const core = [...units.entries()].filter(([, u]) => u.file.startsWith('src/core/'));
+const core = [...units.entries()].filter(([, u]) => isGated(u.file));
 const unreachable = core.filter(([k]) => !reached.has(k));
 const errors = [];
 for (const [k, u] of unreachable) {
@@ -163,7 +167,7 @@ if (listAll) for (const [k, u] of unreachable) console.log(`${u.file}\t${u.line}
 for (const e of errors) console.log(e);
 const fns = core.filter(([, u]) => u.kind === 'funkcja');
 console.log(
-  `src/core: ${core.length} deklaracji (${fns.length} funkcji), osiągalne ${core.length - unreachable.length}, ` +
+  `src/{core,data,platform,hooks}: ${core.length} deklaracji (${fns.length} funkcji), osiągalne ${core.length - unreachable.length}, ` +
   `nieosiągalne ${unreachable.length} (wyjątki ${unreachable.length - errors.filter((e) => e.startsWith('NIEOSIĄGALNE')).length}); ` +
   `pliki bez żadnej osiągalnej deklaracji: ${deadFiles.length ? deadFiles.join(', ') : 'brak'}`,
 );

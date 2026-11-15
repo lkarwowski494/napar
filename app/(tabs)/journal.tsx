@@ -16,18 +16,18 @@ import {
 import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
-import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems, getUnitSystem } from '../../src/core/database';
+import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems, getUnitSystem } from '../../src/data/database';
 import { BrewSession, InventoryItem } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { useTranslation, formatTemplate } from '../../src/core/i18n';
 import { formatTemperature } from '../../src/core/unit-converter';
-import { confirmAction } from '../../src/core/confirm';
+import { confirmAction } from '../../src/platform/confirm';
 import { JournalIcon } from '../../src/components/icons/CraftIcons';
 import { JournalSessionCard } from '../../src/components/journal/JournalSessionCard';
 import { JournalAnalyticsView } from '../../src/components/journal/JournalAnalyticsView';
 import { ProactiveCalendarCard } from '../../src/components/journal/ProactiveCalendarCard';
 import { JournalFilterBar } from '../../src/components/journal/JournalFilterBar';
-import { useJournalAnalytics } from '../../src/core/useJournalAnalytics';
+import { useJournalAnalytics } from '../../src/hooks/useJournalAnalytics';
 import { ProactiveActionItem } from '../../src/core/bpr-engine';
 import { runSave } from '../../lib/save-feedback';
 

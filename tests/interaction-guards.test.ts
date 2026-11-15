@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { normSearch, matchesSearch } from '../src/core/search-utils';
-import {  confirmAction } from '../src/core/confirm';
+import {  confirmAction } from '../src/platform/confirm';
 
 const root = process.cwd();
 

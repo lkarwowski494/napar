@@ -9,7 +9,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { evaluateRestingWindow } from '../src/core/domain-rules';
-import { localISODate } from '../src/core/backup';
+import { localISODate } from '../src/data/backup';
 import { generateActionIcsContent } from '../src/core/bpr-engine';
 
 /** Chwila w czasie lokalnym procesu (miesiąc 1–12). */

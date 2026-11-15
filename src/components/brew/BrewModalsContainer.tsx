@@ -12,7 +12,7 @@ import { ImportRecipeModal } from './ImportRecipeModal';
 import { InventorySelectModal } from './InventorySelectModal';
 import { QrScannerModal } from '../../core/QrScannerModal';
 import { OnboardingModal } from '../OnboardingModal';
-import { useBrewWorkflow } from '../../core/useBrewWorkflow';
+import { useBrewWorkflow } from '../../hooks/useBrewWorkflow';
 
 interface BrewModalsContainerProps {
   workflow: ReturnType<typeof useBrewWorkflow>;

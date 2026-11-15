@@ -1,6 +1,6 @@
 // ============================================================================
 // Warstwa danych na prawdziwym SQLite (node:sqlite) — M1-audytor-generalny-001 (08-programista-008)
-// Testy wołają kod produkcyjny z src/core/database.ts przez adapter expo-sqlite
+// Testy wołają kod produkcyjny z src/data/database.ts przez adapter expo-sqlite
 // z tests/support/expo-sqlite-node.js. Kaskady, klucze obce i transakcje są prawdziwe.
 // ============================================================================
 
@@ -10,7 +10,7 @@ import path from 'path';
 
 jest.mock('expo-sqlite', () => require('./support/expo-sqlite-node').createExpoSqliteMock());
 
-type DbModule = typeof import('../src/core/database');
+type DbModule = typeof import('../src/data/database');
 type SqliteMock = {
   __setNextPath: (p: string) => void;
   __closeAll: () => void;
@@ -26,7 +26,7 @@ function loadDatabase(dbPath = ':memory:'): { db: DbModule; sqlite: SqliteMock }
   jest.isolateModules(() => {
     sqlite = require('expo-sqlite');
     sqlite.__setNextPath(dbPath);
-    db = require('../src/core/database');
+    db = require('../src/data/database');
   });
   return { db, sqlite };
 }
@@ -280,7 +280,7 @@ describe('Kopie i eksport są kompletne (M1-audytor-generalny-003; 05-architekt-
 
   test('kopie automatyczne i kopia przed importem nie biorą danych z list ekranowych z limitem', () => {
     const root = path.join(__dirname, '..');
-    const sites = ['src/core/brew-context.tsx', 'app/gongfu.tsx', 'app/settings.tsx', 'src/core/database.ts'];
+    const sites = ['src/core/brew-context.tsx', 'app/gongfu.tsx', 'app/settings.tsx', 'src/data/database.ts'];
     const offending: string[] = [];
     for (const rel of sites) {
       fs.readFileSync(path.join(root, rel), 'utf8').split('\n').forEach((line, i) => {

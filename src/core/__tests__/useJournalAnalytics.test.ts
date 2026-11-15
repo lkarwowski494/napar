@@ -3,7 +3,7 @@
 // TASK-P12-07-JAK
 // ============================================================================
 
-import { computeJournalAnalytics } from '../useJournalAnalytics';
+import { computeJournalAnalytics } from '../../hooks/useJournalAnalytics';
 import { BrewSession } from '../database-schema';
 
 describe('useJournalAnalytics / computeJournalAnalytics', () => {

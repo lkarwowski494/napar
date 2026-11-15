@@ -14,13 +14,13 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Field, ModalHeader } from '../src/components/ui';
-import { getRecipeById, saveRecipe, deleteRecipe, duplicateRecipe, getUnitSystem } from '../src/core/database';
+import { getRecipeById, saveRecipe, deleteRecipe, duplicateRecipe, getUnitSystem } from '../src/data/database';
 import { SavedRecipe } from '../src/core/database-schema';
 import { RecipeStep } from '../src/core/recipes-data';
 import { calculateBrewRatio } from '../src/core/domain-rules';
 import { theme } from '../src/core/theme';
-import { confirmAction } from '../src/core/confirm';
-import { announce } from '../src/core/announce';
+import { confirmAction } from '../src/platform/confirm';
+import { announce } from '../src/platform/announce';
 import { useTranslation, formatTemplate } from '../src/core/i18n';
 import { RecipeBasicInfoCard } from '../src/components/recipe-builder/RecipeBasicInfoCard';
 import { RecipeParamsCard } from '../src/components/recipe-builder/RecipeParamsCard';

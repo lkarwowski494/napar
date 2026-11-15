@@ -4,8 +4,8 @@
 // ============================================================================
 
 import { useMemo } from 'react';
-import { BrewSession } from './database-schema';
-import { SensoryProfile } from './radar-chart';
+import { BrewSession } from '../core/database-schema';
+import { SensoryProfile } from '../core/radar-chart';
 
 export interface JournalAnalyticsResult {
   totalBrews: number;

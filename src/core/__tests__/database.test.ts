@@ -52,7 +52,7 @@ import {
   getBeveragePreference,
   setBeveragePreference,
   DataValidationError,
-} from '../database';
+} from '../../data/database';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog, SCHEMA_SQL } from '../database-schema';
 
 // Odczyt kontrolny sesji w testach zapisu (getBrewSessionById usunięte decyzją DEC-02: bez wywołania z UI).

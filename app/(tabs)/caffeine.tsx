@@ -19,7 +19,7 @@ import {
   getCaffeineHalfLife,
   setCaffeineHalfLife,
   getUnitSystem,
-} from '../../src/core/database';
+} from '../../src/data/database';
 import { CaffeineLog } from '../../src/core/database-schema';
 import {
   calculateRemainingCaffeineMg,
@@ -33,7 +33,7 @@ import { BedtimeCurfewCard } from '../../src/components/caffeine/BedtimeCurfewCa
 import { CaffeineLogList } from '../../src/components/caffeine/CaffeineLogList';
 import { CaffeineQuickAddModal } from '../../src/components/caffeine/CaffeineQuickAddModal';
 import { runSave } from '../../lib/save-feedback';
-import { announce } from '../../src/core/announce';
+import { announce } from '../../src/platform/announce';
 
 export default function CaffeineScreen() {
   const { t, language } = useTranslation();

@@ -12,9 +12,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
-import { saveInventoryItem, getUnitSystem } from '../../core/database';
+import { saveInventoryItem, getUnitSystem } from '../../data/database';
 import { ouncesToGrams } from '../../core/unit-converter';
-import { localISODate } from '../../core/backup';
+import { localISODate } from '../../data/backup';
 import { InventoryItem } from '../../core/database-schema';
 import { KnowledgeTemplate } from './BeanCompendiumModal';
 import { runSave } from '../../../lib/save-feedback';

@@ -1,1 +1,1 @@
-export * from '../src/core/announce';
+export * from '../src/platform/announce';

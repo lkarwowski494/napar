@@ -5,10 +5,10 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import CaffeineScreen from '../../../app/(tabs)/caffeine';
-import * as database from '../database';
+import * as database from '../../data/database';
 import { CaffeineLog } from '../database-schema';
 
-jest.mock('../database', () => ({
+jest.mock('../../data/database', () => ({
   getCaffeineLogs: jest.fn(),
   logCaffeine: jest.fn(),
   deleteCaffeineLog: jest.fn(),

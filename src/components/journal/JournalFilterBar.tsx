@@ -7,7 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SearchField } from '../ui';
 import { theme } from '../../core/theme';
-import { BeveragePreference } from '../../core/database';
+import { BeveragePreference } from '../../data/database';
 
 interface JournalFilterBarProps {
   searchQuery: string;

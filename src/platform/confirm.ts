@@ -4,7 +4,7 @@
 // ============================================================================
 
 import { Alert } from 'react-native';
-import { getCurrentTranslations } from './i18n';
+import { getCurrentTranslations } from '../core/i18n';
 
 export type CancelBtn = { text: string; style: 'cancel'; onPress?: () => void };
 

@@ -4,7 +4,7 @@
 // ============================================================================
 
 import { AccessibilityInfo } from 'react-native';
-import { pluralPl } from './i18n';
+import { pluralPl } from '../core/i18n';
 
 export const announce = (text: string): void => {
   try {

@@ -146,10 +146,10 @@ jest.mock('expo-sqlite', () => ({
   defaultDatabaseDirectory: '/test/SQLite',
 }));
 
-import { initDatabase, getRecipes, saveRecipe, getInventoryItems, getInventoryItemById, saveInventoryItem, getBrewSessions, recordBrewSessionTransaction, getCaffeineLogs, logCaffeine, exportAllDataJson, importDataJson, exportInventoryCsv, getAppSetting, setAppSetting, getUnitSystem, setUnitSystem } from '../src/core/database';
+import { initDatabase, getRecipes, saveRecipe, getInventoryItems, getInventoryItemById, saveInventoryItem, getBrewSessions, recordBrewSessionTransaction, getCaffeineLogs, logCaffeine, exportAllDataJson, importDataJson, exportInventoryCsv, getAppSetting, setAppSetting, getUnitSystem, setUnitSystem } from '../src/data/database';
 import { calculateBrewCost } from '../src/core/cost-calculator';
 import { calculateWaterMinerals } from '../src/core/water-chemistry';
-import { buildBackup } from '../src/core/backup';
+import { buildBackup } from '../src/data/backup';
 
 describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
   const originalFetch = global.fetch;

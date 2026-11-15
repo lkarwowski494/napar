@@ -7,7 +7,7 @@
 
 import { InventoryItem, BrewSession } from './database-schema';
 import { pluralPl } from './i18n';
-import { localISODate } from './backup';
+import { localISODate } from '../data/backup';
 
 export interface CalendarDayItem {
   dateIso: string; // YYYY-MM-DD

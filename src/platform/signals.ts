@@ -6,7 +6,7 @@
 // ============================================================================
 
 import * as Haptics from 'expo-haptics';
-import { getHapticsEnabled } from './database';
+import { getHapticsEnabled } from '../data/database';
 
 export type HapticSignal = 'light' | 'medium' | 'success';
 

@@ -37,13 +37,13 @@ import {
   getBeveragePreference,
   setBeveragePreference,
   buildBackupState,
-} from '../src/core/database';
+} from '../src/data/database';
 import { useBrew } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
 import { AppGuideModal } from '../src/components/AppGuideModal';
 import { clampCaffeineHalfLifeHours } from '../src/core/domain-rules';
 import { useTranslation } from '../src/core/i18n';
-import { safetyBackup } from '../src/core/backup';
+import { safetyBackup } from '../src/data/backup';
 import { JsonExportModal, JsonImportModal } from '../src/components/settings/JsonBackupModals';
 import { CsvExportModal } from '../src/components/settings/CsvExportModal';
 import { CaffeineSettingsCard } from '../src/components/settings/CaffeineSettingsCard';

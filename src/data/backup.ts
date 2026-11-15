@@ -6,7 +6,7 @@
 // ============================================================================
 
 import * as FileSystem from 'expo-file-system/legacy';
-import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from './database-schema';
+import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog } from '../core/database-schema';
 
 export const SCHEMA_VERSION = 1;
 export const AUTO_DIR = 'Backup/';

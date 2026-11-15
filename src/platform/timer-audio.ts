@@ -6,7 +6,7 @@
 // ============================================================================
 
 import { createAudioPlayer, AudioPlayer } from 'expo-audio';
-import { getSoundEnabled } from './database';
+import { getSoundEnabled } from '../data/database';
 
 let soundInstance: AudioPlayer | null = null;
 let cleanupTimer: any = null;

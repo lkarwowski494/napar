@@ -14,9 +14,9 @@ jest.mock('expo-haptics', () => ({
 
 import * as Audio from 'expo-audio';
 import * as Haptics from 'expo-haptics';
-import * as db from '../src/core/database';
-import { playTimerChime } from '../src/core/timer-audio';
-import { signalHaptic, type HapticSignal } from '../src/core/signals';
+import * as db from '../src/data/database';
+import { playTimerChime } from '../src/platform/timer-audio';
+import { signalHaptic, type HapticSignal } from '../src/platform/signals';
 import SettingsScreen from '../app/settings';
 
 describe('M1-audytor-generalny-030: dźwięk i wibracje według ustawień (04-studio-projektowe-006)', () => {
@@ -81,6 +81,6 @@ describe('M1-audytor-generalny-030: dźwięk i wibracje według ustawień (04-st
       .filter((f) => /from 'expo-haptics'|require\('expo-haptics'\)/.test(fs.readFileSync(f, 'utf8')))
       .map((f) => path.relative(root, f))
       .sort();
-    expect(hits).toEqual(['src/core/signals.ts', 'src/core/timer-engine.ts']);
+    expect(hits).toEqual(['src/platform/signals.ts', 'src/platform/timer-platform.ts']);
   });
 });

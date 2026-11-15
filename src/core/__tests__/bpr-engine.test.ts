@@ -7,7 +7,7 @@ import {
   escapeIcsText,
 } from '../bpr-engine';
 import { InventoryItem, BrewSession } from '../database-schema';
-import { localISODate } from '../backup';
+import { localISODate } from '../../data/backup';
 
 describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar', () => {
   describe('parseStepDurationSeconds', () => {

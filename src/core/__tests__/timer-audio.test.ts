@@ -4,13 +4,13 @@
 
 import { createAudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
-import * as announceModule from '../announce';
+import * as announceModule from '../../platform/announce';
 import {
   playTimerChime,
   stopTimerChime,
 
   CHIME_AUDIO_DATA_URI,
-} from '../timer-audio';
+} from '../../platform/timer-audio';
 
 const mockPlay = jest.fn();
 const mockRemove = jest.fn();

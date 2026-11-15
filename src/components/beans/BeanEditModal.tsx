@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme, withAlpha } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
-import { saveInventoryItem, deleteInventoryItem, getUnitSystem } from '../../core/database';
+import { saveInventoryItem, deleteInventoryItem, getUnitSystem } from '../../data/database';
 import { gramsToOunces, ouncesToGrams, roundTo } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
 import { runSave } from '../../../lib/save-feedback';

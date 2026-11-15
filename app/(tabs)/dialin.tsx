@@ -16,7 +16,7 @@ import { diagnoseExtractionTaste } from '../../src/core/domain-rules';
 import { CaffeineIcon } from '../../src/components/icons/CraftIcons';
 import { theme } from '../../src/core/theme';
 import { useTranslation } from '../../src/core/i18n';
-import { getUnitSystem, getBeveragePreference } from '../../src/core/database';
+import { getUnitSystem, getBeveragePreference } from '../../src/data/database';
 import { useBrew } from '../../src/core/brew-context';
 import { WaterChemistryTab } from '../../src/components/dialin/WaterChemistryTab';
 import { ExtractionYieldTab } from '../../src/components/dialin/ExtractionYieldTab';

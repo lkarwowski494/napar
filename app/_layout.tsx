@@ -11,9 +11,9 @@ import { StatusBar, View, ActivityIndicator, Pressable, Text } from 'react-nativ
 import { LanguageProvider, useTranslation } from '../src/core/i18n';
 import { BrewProvider } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
-import { crashLoopGuard, recordStartupSuccess } from '../src/core/startup-guard';
+import { crashLoopGuard, recordStartupSuccess } from '../src/data/startup-guard';
 import { SafeModeView, type SafeModeReason } from '../src/components/SafeModeView';
-import { openDatabaseAtStartup, setDefaultUnitSystem } from '../src/core/database';
+import { openDatabaseAtStartup, setDefaultUnitSystem } from '../src/data/database';
 import { regionUnitSystem } from '../lib/region-units';
 
 function StartupSuccessNotifier() {

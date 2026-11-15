@@ -6,7 +6,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { BrewProvider, useBrew } from '../brew-context';
 import { MASTER_RECIPES } from '../recipes-data';
-import * as databaseModule from '../database';
+import * as databaseModule from '../../data/database';
 import { SavedRecipe } from '../database-schema';
 
 const settingsStore = new Map<string, string>();

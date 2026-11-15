@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
 import { formatTemplate } from '../../core/i18n';
 import { decodeRecipeFromShareUrl } from '../../core/recipe-share';
-import { saveRecipe } from '../../core/database';
+import { saveRecipe } from '../../data/database';
 import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../core/unit-converter';
 import { ModalHeader } from '../ui';
 

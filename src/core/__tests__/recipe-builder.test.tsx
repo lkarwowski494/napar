@@ -79,8 +79,8 @@ jest.mock('expo-router', () => ({
 }));
 
 import RecipeBuilderScreen from '../../../app/recipe-builder';
-import * as databaseModule from '../database';
-import { saveRecipe, deleteRecipe, getRecipeById } from '../database';
+import * as databaseModule from '../../data/database';
+import { saveRecipe, deleteRecipe, getRecipeById } from '../../data/database';
 import { SavedRecipe } from '../database-schema';
 import { calculateBrewRatio } from '../domain-rules';
 

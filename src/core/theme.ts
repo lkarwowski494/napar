@@ -3,7 +3,7 @@
 // Calm, artisanal aesthetic (Apps4Brew: warm copper, tea emerald, deep slate)
 // ============================================================================
 
-import { Platform } from 'react-native';
+import { MONOSPACE_FONT_FAMILY } from '../platform/fonts';
 
 /**
  * M1-audytor-generalny-042: kolor tokenu z przezroczystością — `withAlpha(theme.colors.copper, 0.12)`
@@ -147,9 +147,9 @@ export const theme = {
       fontVariant: ['tabular-nums'] as any,
       color: '#F4EFEA',
     },
-    monospace: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }) as string,
+    monospace: MONOSPACE_FONT_FAMILY,
     code: {
-      fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }) as string,
+      fontFamily: MONOSPACE_FONT_FAMILY,
       fontSize: 12,
       color: '#F4EFEA',
     },

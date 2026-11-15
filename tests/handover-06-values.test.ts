@@ -7,7 +7,7 @@ import { calculateWaterMinerals } from '../src/core/water-chemistry';
 test('[EFSA-T12-ZAKRES] domyślny czas półtrwania to średnia EFSA ok. 4 h (było 5 h)', () => {
   expect(DEFAULT_CAFFEINE_HALF_LIFE_H).toBe(4.0);
   expect(calculateRemainingCaffeineMg(100, 4)).toBeCloseTo(50, 5);
-  const { getCaffeineHalfLife } = require('../src/core/database');
+  const { getCaffeineHalfLife } = require('../src/data/database');
   expect(getCaffeineHalfLife()).toBe(4.0);
 });
 

@@ -7,9 +7,9 @@ import renderer from 'react-test-renderer';
 import { Alert } from 'react-native';
 import { BeanEditModal } from '../BeanEditModal';
 import { InventoryItem } from '../../../core/database-schema';
-import * as database from '../../../core/database';
+import * as database from '../../../data/database';
 
-jest.mock('../../../core/database', () => ({
+jest.mock('../../../data/database', () => ({
   saveInventoryItem: jest.fn(),
   deleteInventoryItem: jest.fn(),
   getUnitSystem: jest.fn(() => 'metric'),

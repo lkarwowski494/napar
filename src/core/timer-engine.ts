@@ -3,11 +3,15 @@
 // Deterministic active brew timer, pour rate calculator, haptics and awake lock
 // ============================================================================
 
-import * as Haptics from 'expo-haptics';
-import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { AppState, AppStateStatus, NativeEventSubscription } from 'react-native';
 import { RecipeStep } from './recipes-data';
-import { playTimerChime, stopTimerChime } from './timer-audio';
+import { playTimerChime, stopTimerChime } from '../platform/timer-audio';
+import {
+  activateTimerKeepAwake,
+  addAppActiveListener,
+  deactivateTimerKeepAwake,
+  triggerTimerHaptic,
+  TimerAppStateSubscription,
+} from '../platform/timer-platform';
 
 export type TimerStatus = 'idle' | 'running' | 'paused' | 'finished';
 
@@ -87,7 +91,7 @@ export class BrewTimerEngine {
   private pausedRemainingMs: number | null = null;
   private totalStartAtMs: number | null = null;
   private pausedTotalElapsedMs = 0;
-  private appStateSubscription: NativeEventSubscription | null = null;
+  private appStateSubscription: TimerAppStateSubscription | null = null;
 
   /**
    * Oblicza sumaryczny czas trwania receptury w sekundach bez alokacji stanu silnika.
@@ -454,7 +458,7 @@ export class BrewTimerEngine {
     this.status = 'running';
     this.setupAppStateListener();
     try {
-      activateKeepAwakeAsync();
+      activateTimerKeepAwake();
     } catch {
       // expo-keep-awake safe fallback
     }
@@ -479,7 +483,7 @@ export class BrewTimerEngine {
     this.removeAppStateListener();
     this.clearInterval();
     try {
-      deactivateKeepAwake();
+      deactivateTimerKeepAwake();
     } catch {
       // safe fallback
     }
@@ -504,7 +508,7 @@ export class BrewTimerEngine {
     this.totalStartAtMs = null;
     this.pausedTotalElapsedMs = 0;
     try {
-      deactivateKeepAwake();
+      deactivateTimerKeepAwake();
     } catch {
       // safe fallback
     }
@@ -570,7 +574,7 @@ export class BrewTimerEngine {
     this.pausedRemainingMs = null;
     this.totalStartAtMs = null;
     try {
-      deactivateKeepAwake();
+      deactivateTimerKeepAwake();
     } catch {
       // safe fallback
     }
@@ -591,7 +595,7 @@ export class BrewTimerEngine {
     this.callbacks = {};
     this.steps = [];
     try {
-      deactivateKeepAwake();
+      deactivateTimerKeepAwake();
     } catch {
       // safe fallback
     }
@@ -600,13 +604,11 @@ export class BrewTimerEngine {
   private setupAppStateListener(): void {
     if (this.appStateSubscription) return;
     try {
-      if (typeof AppState?.addEventListener === 'function') {
-        this.appStateSubscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
-          if (nextState === 'active' && this.status === 'running') {
-            this.syncWithRealTime();
-          }
-        });
-      }
+      this.appStateSubscription = addAppActiveListener(() => {
+        if (this.status === 'running') {
+          this.syncWithRealTime();
+        }
+      });
     } catch {
       // safe fallback for non-react-native environments
     }
@@ -751,13 +753,7 @@ export class BrewTimerEngine {
   private triggerHaptic(type: 'start' | 'step' | 'warning' | 'finish'): void {
     if (!this.hapticsEnabled) return;
     try {
-      if (type === 'start' || type === 'step') {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      } else if (type === 'warning') {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      } else if (type === 'finish') {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      }
+      triggerTimerHaptic(type);
     } catch {
       // Haptics safe fallback for web / unsupported devices
     }

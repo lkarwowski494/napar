@@ -7,7 +7,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useBrew } from './brew-context';
+import { useBrew } from '../core/brew-context';
 import {
   getRecipes,
   getInventoryItems,
@@ -19,26 +19,26 @@ import {
   getHasCompletedOnboarding,
   setHasCompletedOnboarding,
   BeveragePreference,
-} from './database';
-import { MASTER_RECIPES, MasterRecipe } from './recipes-data';
-import { InventoryItem, SavedRecipe, BrewSession } from './database-schema';
-import { useTranslation } from './i18n';
+} from '../data/database';
+import { MASTER_RECIPES, MasterRecipe } from '../core/recipes-data';
+import { InventoryItem, SavedRecipe, BrewSession } from '../core/database-schema';
+import { useTranslation } from '../core/i18n';
 import {
   DEFAULT_SENSORY_PROFILE,
   SensoryProfile,
-} from './radar-chart';
-import { calculateBatchScaling } from './domain-rules';
+} from '../core/radar-chart';
+import { calculateBatchScaling } from '../core/domain-rules';
 import {
   encodeRecipeToShareUrl,
   decodeRecipeFromShareUrl,
-} from './recipe-share';
-import { confirmAction } from './confirm';
-import { calculateBrewCost } from './cost-calculator';
+} from '../core/recipe-share';
+import { confirmAction } from '../platform/confirm';
+import { calculateBrewCost } from '../core/cost-calculator';
 import {
   checkCorruptState,
   dismissCorruptState,
   CorruptStateRecovery,
-} from './backup';
+} from '../data/backup';
 import { runSave } from '../../lib/save-feedback';
 
 export type AnyRecipe = SavedRecipe | MasterRecipe;

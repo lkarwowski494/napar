@@ -12,7 +12,7 @@ jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => mockDb),
 }));
 
-jest.mock('../../../src/core/startup-guard', () => ({
+jest.mock('../../data/startup-guard', () => ({
   crashLoopGuard: {
     recordStartupAttempt: jest.fn().mockResolvedValue({ crashCount: 0, shouldEnterSafeMode: false }),
     resetCrashCount: jest.fn().mockResolvedValue(undefined),
@@ -55,8 +55,8 @@ describe('RootLayout', () => {
 
 // M1-audytor-generalny-005/011: ścieżki trybu awaryjnego w RootLayout (przyczyna, ponowna próba).
 describe('RootLayout — tryb awaryjny', () => {
-  const guard = require('../../../src/core/startup-guard').crashLoopGuard;
-  const db = require('../../../src/core/database');
+  const guard = require('../../data/startup-guard').crashLoopGuard;
+  const db = require('../../data/database');
 
   async function render() {
     let tree: renderer.ReactTestRenderer | undefined;

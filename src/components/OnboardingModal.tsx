@@ -14,7 +14,7 @@ import {
   AccessibilityInfo,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BeveragePreference } from '../core/database';
+import { BeveragePreference } from '../data/database';
 import { useTranslation } from '../core/i18n';
 import { theme, withAlpha } from '../core/theme';
 import {

@@ -4,8 +4,8 @@
 
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
-import { importDataJson } from '../database';
-import { buildBackup, localISODate, stampOf, parseAndValidateBackup, autoBackup, safetyBackup, NaparBackupData, SCHEMA_VERSION, saveCorruptState, checkCorruptState, dismissCorruptState, rotateBackupFiles, AUTO_RE, SAFETY_RE } from '../backup';
+import { importDataJson } from '../../data/database';
+import { buildBackup, localISODate, stampOf, parseAndValidateBackup, autoBackup, safetyBackup, NaparBackupData, SCHEMA_VERSION, saveCorruptState, checkCorruptState, dismissCorruptState, rotateBackupFiles, AUTO_RE, SAFETY_RE } from '../../data/backup';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => ({

@@ -4,7 +4,7 @@
 
 import { BrewTimerEngine, TimerSnapshot, remainingTimerSec } from '../timer-engine';
 import { RecipeStep } from '../recipes-data';
-import * as timerAudioModule from '../timer-audio';
+import * as timerAudioModule from '../../platform/timer-audio';
 
 // Mock expo modules
 jest.mock('expo-haptics', () => ({

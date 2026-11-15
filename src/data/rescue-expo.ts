@@ -5,8 +5,8 @@
 
 import * as SQLite from 'expo-sqlite';
 import * as FileSystem from 'expo-file-system/legacy';
-import { dbDirectory } from './db-path';
-import type { OpenRescueDb, RescueContext, RescueFs } from './rescue';
+import { dbDirectory } from '../core/db-path';
+import type { OpenRescueDb, RescueContext, RescueFs } from '../core/rescue';
 
 export const DB_NAME = 'napar.db';
 export const RESCUE_DIR_NAME = 'kopie-ratunkowe';

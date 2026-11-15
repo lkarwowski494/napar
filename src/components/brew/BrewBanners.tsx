@@ -6,7 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
-import { CorruptStateRecovery } from '../../core/backup';
+import { CorruptStateRecovery } from '../../data/backup';
 import { formatTemperatureDelta, UnitSystem } from '../../core/unit-converter';
 
 interface BrewBannersProps {

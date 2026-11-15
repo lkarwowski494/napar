@@ -57,7 +57,7 @@ describe('runSave (M1-audytor-generalny-007, -008)', () => {
 describe('Okno zakończenia parzenia przy błędzie zapisu (M1-audytor-generalny-007; 05-architekt-011)', () => {
   test('M1-audytor-generalny-008: parzenie bez wpisanego mielenia zapisuje mielenie jako brak, nie rekomendację młynka', () => {
     const { BrewProvider } = require('../src/core/brew-context');
-    const databaseModule = require('../src/core/database');
+    const databaseModule = require('../src/data/database');
     jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
     const tx = jest.spyOn(databaseModule, 'recordBrewSessionTransaction').mockImplementation(() => undefined);
     const { useBrew } = require('../src/core/brew-context');
@@ -85,9 +85,9 @@ describe('Okno zakończenia parzenia przy błędzie zapisu (M1-audytor-generalny
   });
 
   test('zapis rzuca: okno zostaje otwarte z notatką, bez „Zapisano!”', () => {
-    const { useBrewWorkflow } = require('../src/core/useBrewWorkflow');
+    const { useBrewWorkflow } = require('../src/hooks/useBrewWorkflow');
     const { BrewProvider } = require('../src/core/brew-context');
-    const databaseModule = require('../src/core/database');
+    const databaseModule = require('../src/data/database');
     const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
     jest.spyOn(databaseModule, 'recordBrewSessionTransaction').mockImplementation(() => {
       throw new Error('database or disk is full');
@@ -132,7 +132,7 @@ test('trwała kontrola: zapisy i usunięcia danych w handlerach UI przechodzą p
     'app/recipe-builder.tsx',
     'src/components/beans/BeanEditModal.tsx',
     'src/components/beans/BeanAddModal.tsx',
-    'src/core/useBrewWorkflow.ts',
+    'src/hooks/useBrewWorkflow.ts',
   ];
   const unguarded: string[] = [];
   for (const rel of files) {

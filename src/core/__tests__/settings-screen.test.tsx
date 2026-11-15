@@ -35,7 +35,7 @@ jest.mock('expo-sqlite', () => ({
 
 import { LanguageProvider } from '../i18n';
 import SettingsScreen from '../../../app/settings';
-import * as databaseModule from '../database';
+import * as databaseModule from '../../data/database';
 
 const findPressableWithText = (root: any, text: string) => {
   const nodes = root.findAll((n: any) => {

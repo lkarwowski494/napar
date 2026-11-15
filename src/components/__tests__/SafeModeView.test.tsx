@@ -60,7 +60,7 @@ describe('SafeModeView Component (TASK-R12-02 / DEC-07)', () => {
 });
 
 // M1-audytor-generalny-004: ekran używa sprawdzonej kopii (rescue.ts); reset bez kopii jest wstrzymany.
-jest.mock('../../core/rescue-expo', () => ({
+jest.mock('../../data/rescue-expo', () => ({
   deviceRescueContext: jest.fn(() => ({ dbPath: '/x/Library/SQLite/napar.db', rescueDir: '/x/Documents/kopie-ratunkowe' })),
   pathToUri: (p: string) => `file://${p}`,
 }));

@@ -11,7 +11,7 @@ import {
   SAFETY_RE,
   AUTO_DIR,
   AUTO_KEEP,
-} from '../src/core/backup';
+} from '../src/data/backup';
 import {
   parseHexColor,
   sRgbChannelLuminance,

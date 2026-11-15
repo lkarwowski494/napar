@@ -1,6 +1,6 @@
 import { saveCorruptState, parseAndValidateBackup, SCHEMA_VERSION as BACKUP_SCHEMA_VERSION } from './backup';
-import { parseImportCollections } from './import-validation';
-import { DataValidationError } from './validation-error';
+import { parseImportCollections } from '../core/import-validation';
+import { DataValidationError } from '../core/validation-error';
 
 export { DataValidationError };
 import type { NaparBackupData } from './backup';
@@ -10,7 +10,7 @@ import type { NaparBackupData } from './backup';
 
 import * as SQLite from 'expo-sqlite';
 import * as FileSystem from 'expo-file-system/legacy';
-import { dbDirectory } from './db-path';
+import { dbDirectory } from '../core/db-path';
 import { uriToPath } from './rescue-expo';
 import {
   InventoryItem,
@@ -19,9 +19,9 @@ import {
   CaffeineLog,
   SensoryProfile,
   SCHEMA_SQL,
-} from './database-schema';
-import { MASTER_RECIPES } from './recipes-data';
-import { CAFFEINE_HALF_LIFE_MIN_H, CAFFEINE_HALF_LIFE_MAX_H, DEFAULT_CAFFEINE_HALF_LIFE_H, clampCaffeineHalfLifeHours } from './domain-rules';
+} from '../core/database-schema';
+import { MASTER_RECIPES } from '../core/recipes-data';
+import { CAFFEINE_HALF_LIFE_MIN_H, CAFFEINE_HALF_LIFE_MAX_H, DEFAULT_CAFFEINE_HALF_LIFE_H, clampCaffeineHalfLifeHours } from '../core/domain-rules';
 
 export interface InventoryRow {
   id: string;

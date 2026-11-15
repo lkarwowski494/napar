@@ -13,7 +13,7 @@ import { DatabaseSync } from 'node:sqlite';
 jest.unmock('expo-file-system');
 jest.mock('expo-sqlite', () => require('./support/expo-sqlite-node').createExpoSqliteMock());
 
-type DbModule = typeof import('../src/core/database');
+type DbModule = typeof import('../src/data/database');
 type SqliteMock = {
   __setNextPath: (p: string) => void;
   __closeAll: () => void;
@@ -33,7 +33,7 @@ function loadDatabase(dbPath: string): { db: DbModule; sqlite: SqliteMock } {
   jest.isolateModules(() => {
     sqlite = require('expo-sqlite');
     sqlite.__setNextPath(dbPath);
-    db = require('../src/core/database');
+    db = require('../src/data/database');
   });
   return { db, sqlite };
 }
@@ -68,9 +68,9 @@ afterEach(() => {
 
 describe('Strażnik pętli startu (M1-audytor-generalny-005; 12-niezawodnosc-003)', () => {
   function guard() {
-    let g!: typeof import('../src/core/startup-guard');
+    let g!: typeof import('../src/data/startup-guard');
     jest.isolateModules(() => {
-      g = require('../src/core/startup-guard');
+      g = require('../src/data/startup-guard');
     });
     return g.crashLoopGuard;
   }
@@ -190,13 +190,13 @@ describe('Start z błędem bazy → tryb awaryjny z przyczyną (M1-audytor-gener
     r.sqlite.__failOn(/ADD COLUMN sensory_scores_json/);
     expect(r.db.openDatabaseAtStartup()).toEqual(expect.objectContaining({ ok: false, reason: 'database' }));
     r.sqlite.__clearFailures();
-    const okResult: import('../src/core/database').StartupDatabaseResult = r.db.openDatabaseAtStartup();
+    const okResult: import('../src/data/database').StartupDatabaseResult = r.db.openDatabaseAtStartup();
     expect(okResult).toEqual({ ok: true });
     r.sqlite.__closeAll();
   });
 
   test('SAFE_MODE_THRESHOLD to 3 starty', () => {
-    const g = require('../src/core/startup-guard');
+    const g = require('../src/data/startup-guard');
     expect(g.SAFE_MODE_THRESHOLD).toBe(3);
   });
 });

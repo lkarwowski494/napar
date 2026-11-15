@@ -6,9 +6,9 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { Alert } from 'react-native';
 import { BeanAddModal } from '../BeanAddModal';
-import * as database from '../../../core/database';
+import * as database from '../../../data/database';
 
-jest.mock('../../../core/database', () => ({
+jest.mock('../../../data/database', () => ({
   saveInventoryItem: jest.fn(),
   getUnitSystem: jest.fn(() => 'metric'),
 }));

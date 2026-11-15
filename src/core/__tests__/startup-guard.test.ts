@@ -2,7 +2,7 @@
 // Napar — Unit Tests: Startup Crash Loop Guard (TASK-R12-01)
 // ============================================================================
 
-import { crashLoopGuard, recordStartupSuccess } from '../startup-guard';
+import { crashLoopGuard, recordStartupSuccess } from '../../data/startup-guard';
 import * as FileSystem from 'expo-file-system/legacy';
 
 // Atrapa legacy z jest.setup.js (pliki w pamięci po ścieżce); guard importuje 'expo-file-system/legacy' (M1-audytor-generalny-005).

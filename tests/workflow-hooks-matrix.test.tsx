@@ -11,11 +11,11 @@ import {
 
   useBrewWorkflow,
   AnyRecipe,
-} from '../src/core/useBrewWorkflow';
+} from '../src/hooks/useBrewWorkflow';
 import {
   computeJournalAnalytics,
   useJournalAnalytics,
-} from '../src/core/useJournalAnalytics';
+} from '../src/hooks/useJournalAnalytics';
 import { KNOWLEDGE_LOCALES } from '../src/core/knowledge-locales';
 import { BrewProvider } from '../src/core/brew-context';
 import { BrewSession } from '../src/core/database-schema';

@@ -1,1 +1,1 @@
-export * from '../src/core/confirm';
+export * from '../src/platform/confirm';

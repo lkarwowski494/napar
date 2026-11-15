@@ -18,7 +18,7 @@ import {
   getInventoryItems,
   saveInventoryItem,
   getUnitSystem,
-} from '../../src/core/database';
+} from '../../src/data/database';
 import { InventoryItem } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { BeansIcon } from '../../src/components/icons/CraftIcons';

@@ -12,8 +12,8 @@ import { join } from 'node:path';
 // Importy logiki i komponentów
 import { wInKeep, roundTo } from '../src/core/unit-converter';
 import { remainingTimerSec, BrewTimerEngine } from '../src/core/timer-engine';
-import { escapeCsvCell } from '../src/core/database';
-import { rotateBackupFiles, SAFETY_RE } from '../src/core/backup';
+import { escapeCsvCell } from '../src/data/database';
+import { rotateBackupFiles, SAFETY_RE } from '../src/data/backup';
 import { normSearch } from '../src/core/search-utils';
 import {
   calculateBrewRatio,
@@ -29,7 +29,7 @@ import {
   CloseButton,
   Btn,
 } from '../src/components/ui';
-import {  confirmAction } from '../src/core/confirm';
+import {  confirmAction } from '../src/platform/confirm';
 import { translations } from '../src/core/i18n';
 import { ProcedureModal } from '../src/components/brew/ProcedureModal';
 
@@ -772,7 +772,7 @@ describe('M1-audytor-generalny-017: jedna wartość każdej wielkości kofeinowe
     expect(dr.clampCaffeineHalfLifeHours(4.25)).toBe(4.3);
     expect(byId.get('EFSA-T12-ZAKRES')?.status).toBe('potwierdzone');
     expect(String(byId.get('EFSA-T12-ZAKRES')?.wartosc)).toMatch(/^2–8/);
-    for (const f of ['app/(tabs)/caffeine.tsx', 'app/settings.tsx', 'src/core/database.ts']) {
+    for (const f of ['app/(tabs)/caffeine.tsx', 'app/settings.tsx', 'src/data/database.ts']) {
       expect([f, readFileSync(join(root, f), 'utf8').match(/Math\.max\(3\.0|val < 3\.0/g)]).toEqual([f, null]);
     }
   });
@@ -1170,13 +1170,14 @@ describe('M1-audytor-generalny-035: kontrakt zakresu 1.0 bez powiadomień o etap
     expect(deps['expo-notifications']).toBeUndefined();
     expect(appJson.expo.ios.infoPlist.UIBackgroundModes).toBeUndefined();
     expect(appJson.expo.android.permissions ?? []).not.toContain('android.permission.POST_NOTIFICATIONS');
-    const engine = readFileSync(join(root, 'src/core/timer-engine.ts'), 'utf8');
+    // 045: wywołania platformy timera (keep-awake, wibracje) wydzielone do src/platform/timer-platform.ts
+    const engine = ['src/core/timer-engine.ts', 'src/platform/timer-platform.ts'].map((f) => readFileSync(join(root, f), 'utf8')).join('\n');
     const gongfu = readFileSync(join(root, 'app/gongfu.tsx'), 'utf8');
     for (const src of [engine, gongfu]) {
       expect(src).not.toMatch(/expo-notifications|scheduleNotification/);
       expect(src).toMatch(/activateKeepAwakeAsync\(\)/);
       expect(src).toMatch(/playTimerChime\(\)/);
-      // 030: Gongfu wibruje przez signalHaptic (src/core/signals.ts, sprawdza ustawienie „Wibracje”)
+      // 030: Gongfu wibruje przez signalHaptic (src/platform/signals.ts, sprawdza ustawienie „Wibracje”)
       expect(src).toMatch(/Haptics\.(impact|notification)Async|signalHaptic\('/);
       expect(src).toMatch(/AppState\.addEventListener\('change'/);
     }
@@ -1387,8 +1388,8 @@ describe('M1-audytor-generalny-026: start parzenia tylko przez strażnika „ma�
         if (/(^|[^\w.])startTimer\(\)/.test(line)) calls.push(`${nodePath.relative(root, f)}:${i + 1}`);
       });
     }
-    expect(calls.every((c) => c.startsWith('src/core/useBrewWorkflow.ts:'))).toBe(true);
-    const wf = nodeFs.readFileSync(nodePath.join(root, 'src/core/useBrewWorkflow.ts'), 'utf8');
+    expect(calls.every((c) => c.startsWith('src/hooks/useBrewWorkflow.ts:'))).toBe(true);
+    const wf = nodeFs.readFileSync(nodePath.join(root, 'src/hooks/useBrewWorkflow.ts'), 'utf8');
     const body = wf.slice(wf.indexOf('const handleStartTimer = () => {'), wf.indexOf('const handleScanQrRecipe'));
     expect(body).toMatch(/remainingWeightGrams < doseGrams/);
     expect((wf.match(/(^|[^\w.])startTimer\(\)/gm) ?? []).length).toBe((body.match(/(^|[^\w.])startTimer\(\)/gm) ?? []).length);
@@ -1458,7 +1459,7 @@ describe('M1-audytor-generalny-031: każdy element dotykowy ma rolę i etykietę
   });
 
   test('04-studio-projektowe-009: powyżej 400 mg dziennie jest tekst ostrzeżenia z rolą alert, nie tylko kolor paska', () => {
-    const db = require('../src/core/database');
+    const db = require('../src/data/database');
     const now = Date.now();
     const logs = [
       { id: 'a', beverageName: 'Espresso', beverageType: 'coffee', consumedAt: new Date(now - 3600e3).toISOString(), doseGrams: 18, caffeineMg: 250 },
@@ -1549,7 +1550,7 @@ describe('M1-audytor-generalny-032: deklarowane języki = słowniki ładowane pr
 // ============================================================================
 describe('M1-audytor-generalny-033: interfejs EN bez polskich tekstów; kontrola tekstów poza słownikiem', () => {
   const { execFileSync } = jest.requireActual('child_process') as typeof import('child_process');
-  const db = require('../src/core/database');
+  const db = require('../src/data/database');
   const { LanguageProvider, pluralPl } = require('../src/core/i18n');
   const PL_DIACRITICS = /[ąćęłńóśźż]/i;
   const PL_WORDS = /\b(RECEPTURA|SPIŻARNIA|MŁYNEK|UDOSTĘPNIJ|Kawa|Herbata|Trwa|Cel:|Dodaj|Brak|Kod QR|PARZENIE|Wybierz|Domyślna)\b/;
@@ -1718,7 +1719,7 @@ describe('M1-audytor-generalny-033: interfejs EN bez polskich tekstów; kontrola
   });
 
   test('09-lokalizacja-007: liczba mnoga PL wg CLDR dla zapowiedzi odliczania — 1/2/5/22/25/1.5', () => {
-    const { formatCountdownAnnouncement } = require('../src/core/announce');
+    const { formatCountdownAnnouncement } = require('../src/platform/announce');
     const forms = (n: number) => pluralPl(n, 'sekunda', 'sekundy', 'sekund');
     expect([1, 2, 5, 22, 25, 1.5].map(forms)).toEqual(['sekunda', 'sekundy', 'sekund', 'sekundy', 'sekund', 'sekundy']);
     expect(pluralPl(2.5, 'sekunda', 'sekundy', 'sekund', 'sekundy (ułamek)')).toBe('sekundy (ułamek)');

@@ -1818,7 +1818,7 @@ describe('M1-audytor-generalny-025 (przegląd p4): koniec parzenia na ekranie kr
   test('po ostatnim kroku ekran kroków się zamyka, widoczne jest tylko okno oceny, zapis raz', () => {
     const { ProcedureModal } = require('../../components/brew/ProcedureModal');
     const { BrewFinishModal } = require('../../components/brew/BrewFinishModal');
-    const dbmod = require('../database');
+    const dbmod = require('../../data/database');
     const spy = jest.spyOn(dbmod, 'recordBrewSessionTransaction');
     let tree: any;
     act(() => {

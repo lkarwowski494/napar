@@ -33,8 +33,8 @@ jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => mockDb),
 }));
 
-import { playTimerChime,   } from '../timer-audio';
-import { getDatabase, setAppSetting, getCaffeineHalfLife, setCaffeineHalfLife, getBedtimeHour, setBedtimeHour } from '../database';
+import { playTimerChime,   } from '../../platform/timer-audio';
+import { getDatabase, setAppSetting, getCaffeineHalfLife, setCaffeineHalfLife, getBedtimeHour, setBedtimeHour } from '../../data/database';
 import { BrewTimerEngine } from '../timer-engine';
 import { wInKeep } from '../unit-converter';
 import {
@@ -50,7 +50,7 @@ import {
   safetyBackup,
   rotateBackupFiles,
   NaparBackupData,
-} from '../backup';
+} from '../../data/backup';
 import { getCurrentTranslations } from '../i18n';
 import { CaffeineCurveChart } from '../caffeine-chart';
 import { SensoryScoreEditor } from '../radar-chart';

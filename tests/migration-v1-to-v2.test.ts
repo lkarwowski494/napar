@@ -6,7 +6,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { initDatabase, createPreMigrationBackup } from '../src/core/database';
+import { initDatabase, createPreMigrationBackup } from '../src/data/database';
 
 // M1-audytor-generalny-005: kopia przed migracją jest prawdziwym plikiem sprawdzanym osobnym połączeniem,
 // więc weryfikację kopii wykonuje node:sqlite, a katalog dokumentów to katalog tymczasowy.

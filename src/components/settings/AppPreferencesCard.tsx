@@ -6,7 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
-import { BeveragePreference } from '../../core/database';
+import { BeveragePreference } from '../../data/database';
 import { CheckIcon } from '../icons/CraftIcons';
 import {
   formatTemperature,

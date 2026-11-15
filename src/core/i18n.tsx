@@ -1493,7 +1493,7 @@ const LanguageContext = createContext<LanguageContextType>({
 
 function getStoredLanguage(): SupportedLanguage | null {
   try {
-    const db = require('./database');
+    const db = require('../data/database');
     if (db && typeof db.getAppSetting === 'function') {
       const persisted = db.getAppSetting('app_language', '');
       if (persisted === 'pl' || persisted === 'en') {
@@ -1508,7 +1508,7 @@ function getStoredLanguage(): SupportedLanguage | null {
 
 function persistLanguage(lang: SupportedLanguage): void {
   try {
-    const db = require('./database');
+    const db = require('../data/database');
     if (db && typeof db.setAppSetting === 'function') {
       db.setAppSetting('app_language', lang);
     }

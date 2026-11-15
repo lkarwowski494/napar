@@ -21,7 +21,7 @@ import {
   generateActionIcsContent,
 } from '../../core/bpr-engine';
 import { InventoryItem, BrewSession } from '../../core/database-schema';
-import { localISODate } from '../../core/backup';
+import { localISODate } from '../../data/backup';
 
 export interface ProactiveCalendarCardProps {
   inventory: InventoryItem[];

@@ -49,7 +49,13 @@ test('progi pokrycia nie spadają poniżej zapadki z 2026-11-14', () => {
   const ratchet: Record<string, Partial<Record<'statements' | 'branches' | 'functions' | 'lines', number>>> = {
     global: { statements: 85, branches: 75, functions: 88, lines: 85 },
     // Bez budżetów czasu (poza bramką) pokrycie src/core to 93,38% / 94,91% — testy czasu wykonywały kod bez testów funkcjonalnych.
-    './src/core/': { statements: 93, branches: 85, functions: 95, lines: 94 },
+    './src/core/': { statements: 93, branches: 87, functions: 98, lines: 94 },
+    // M1-audytor-generalny-045: warstwy wydzielone z src/core (2026-11-15) — ten sam próg co src/core.
+    './src/platform/': { statements: 93, branches: 85, functions: 95, lines: 94 },
+    './src/platform/announce.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
+    './src/data/': { statements: 93, branches: 85, functions: 95, lines: 94 },
+    './src/hooks/useJournalAnalytics.ts': { statements: 100, branches: 94, functions: 100, lines: 100 },
+    './src/hooks/useBrewWorkflow.ts': { statements: 89, branches: 63, functions: 92, lines: 90 },
     './src/core/water-chemistry.ts': { statements: 91, branches: 89, functions: 100, lines: 100 },
     './src/core/cost-calculator.ts': { statements: 96, branches: 98, functions: 100, lines: 100 },
     './src/core/contrast.ts': { statements: 97, branches: 77, functions: 100, lines: 97 },

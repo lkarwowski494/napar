@@ -16,9 +16,9 @@ import {
 } from 'react-native';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system/legacy';
-import { crashLoopGuard } from '../core/startup-guard';
+import { crashLoopGuard } from '../data/startup-guard';
 import { createRescueExport, resetDatabaseSafely, type RescueCounts } from '../core/rescue';
-import { deviceRescueContext, pathToUri } from '../core/rescue-expo';
+import { deviceRescueContext, pathToUri } from '../data/rescue-expo';
 import { detectSystemLanguage } from '../core/i18n';
 
 export type SafeModeReason = 'crash-loop' | 'database' | 'too-new';

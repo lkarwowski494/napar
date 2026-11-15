@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { Alert, AccessibilityInfo } from 'react-native';
-import { cancelButton,  confirmAction } from '../confirm';
+import { cancelButton,  confirmAction } from '../../platform/confirm';
 import {
   announce,
 
@@ -13,7 +13,7 @@ import {
   announceCountdown,
   announceFinish,
 
-} from '../announce';
+} from '../../platform/announce';
 
 describe('Confirm & Announce helpers', () => {
   beforeEach(() => {

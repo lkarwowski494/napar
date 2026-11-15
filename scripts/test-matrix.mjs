@@ -32,8 +32,12 @@ function getFiles(dir, ext = ['.ts', '.tsx']) {
 }
 
 const appFiles = getFiles(join(root, 'app')).filter((f) => !f.includes('_layout') && !f.includes('__tests__'));
+// M1-audytor-generalny-045: warstwy wydzielone z src/core (zapis, adaptery platformy, hooki React).
 const srcDomainFiles = [
   ...getFiles(join(root, 'src', 'core')),
+  ...getFiles(join(root, 'src', 'data')),
+  ...getFiles(join(root, 'src', 'platform')),
+  ...getFiles(join(root, 'src', 'hooks')),
 ].filter((f) => !f.includes('__tests__') && !f.endsWith('.d.ts'));
 
 const compFiles = getFiles(join(root, 'src', 'components')).filter((f) => !f.includes('__tests__'));

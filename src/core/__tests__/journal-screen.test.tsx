@@ -8,7 +8,7 @@ import { Alert, Share } from 'react-native';
 import renderer, { act } from 'react-test-renderer';
 import JournalScreen from '../../../app/(tabs)/journal';
 import { BrewProvider } from '../brew-context';
-import { getBrewSessions, deleteBrewSession } from '../database';
+import { getBrewSessions, deleteBrewSession } from '../../data/database';
 
 const mockPush = jest.fn();
 const mockNavigate = jest.fn();
@@ -23,7 +23,7 @@ jest.mock('expo-router', () => ({
 
 jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
 
-jest.mock('../database', () => ({
+jest.mock('../../data/database', () => ({
   getBrewSessions: jest.fn(),
   deleteBrewSession: jest.fn(),
   getRecipes: jest.fn(() => []),
@@ -326,7 +326,7 @@ describe('JournalScreen Integration', () => {
   });
 
   test('02-monetyzacja-004 / 03-zakres-002 (DEC-01 a): po 15 parzeniach i 15 dniach dziennik nie ma banera tylko do odczytu, a Powtórz Parzenie przechodzi do parzenia', () => {
-    const { getAppSetting } = require('../database');
+    const { getAppSetting } = require('../../data/database');
     const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
     getAppSetting.mockImplementation((key: string, def: string) => {
       if (key === 'trial_brews_count') return '15';
@@ -358,7 +358,7 @@ describe('JournalScreen Integration', () => {
   });
 
   test('BPR Pillar 5: 1-Tap Execute z Harmonogramu Akcji w JournalScreen ładuje parametry i nawiguje do Parzenia', () => {
-    const { getInventoryItems, getAppSetting } = require('../database');
+    const { getInventoryItems, getAppSetting } = require('../../data/database');
     getInventoryItems.mockImplementation(() => [
       {
         id: 'inv-peak-1',
@@ -422,7 +422,7 @@ describe('JournalScreen Integration', () => {
 
   // M1-audytor-generalny-033 (09-lokalizacja-008): tekst udostępniania w języku interfejsu, temperatura wg jednostek.
   test('09-lokalizacja-008: udostępnienie wpisu w EN i jednostkach imperialnych — bez polskich słów, temperatura w °F', () => {
-    const { getAppSetting, getUnitSystem } = require('../database');
+    const { getAppSetting, getUnitSystem } = require('../../data/database');
     const { LanguageProvider } = require('../i18n');
     getAppSetting.mockImplementation((key: string, def: string) => (key === 'app_language' ? 'en' : def));
     getUnitSystem.mockReturnValue('imperial');

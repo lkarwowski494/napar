@@ -30,7 +30,7 @@ jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => mockDb),
 }));
 import { detectSystemLanguage, translations, LanguageProvider, useTranslation, getCurrentTranslations, pluralPl, formatTemplate } from '../i18n';
-import { getAppSetting } from '../database';
+import { getAppSetting } from '../../data/database';
 
 describe('i18n System', () => {
   test('Wykrywa język systemowy lub domyślny fallback', () => {

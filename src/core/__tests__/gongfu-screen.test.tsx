@@ -71,7 +71,7 @@ import { GongfuInfusionHistory } from '../../components/gongfu/GongfuInfusionHis
 import { createGongfuSession } from '../gongfu-session';
 import { translations, LanguageProvider } from '../i18n';
 import { Alert } from 'react-native';
-import * as databaseModule from '../database';
+import * as databaseModule from '../../data/database';
 
 describe('GongfuScreen Component', () => {
   beforeEach(() => {

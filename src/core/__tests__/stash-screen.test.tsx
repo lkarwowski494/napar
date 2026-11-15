@@ -24,7 +24,7 @@ jest.mock('expo-sqlite', () => ({
 
 import { BrewProvider } from '../brew-context';
 import BeansScreen from '../../../app/(tabs)/beans';
-import * as databaseModule from '../database';
+import * as databaseModule from '../../data/database';
 
 const mockItems: any[] = [
   {

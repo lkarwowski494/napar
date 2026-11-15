@@ -25,15 +25,15 @@ import {
   getInventoryItems,
   getUnitSystem,
   buildBackupState,
-} from '../src/core/database';
+} from '../src/data/database';
 import { InventoryItem, BrewSession, CaffeineLog } from '../src/core/database-schema';
 import { theme } from '../src/core/theme';
-import { confirmAction } from '../src/core/confirm';
-import { announce } from '../src/core/announce';
+import { confirmAction } from '../src/platform/confirm';
+import { announce } from '../src/platform/announce';
 import { useTranslation, formatTemplate } from '../src/core/i18n';
-import { autoBackup } from '../src/core/backup';
-import { playTimerChime } from '../src/core/timer-audio';
-import { signalHaptic } from '../src/core/signals';
+import { autoBackup } from '../src/data/backup';
+import { playTimerChime } from '../src/platform/timer-audio';
+import { signalHaptic } from '../src/platform/signals';
 import { GongfuSessionSetup } from '../src/components/gongfu/GongfuSessionSetup';
 import { GongfuActiveInfusion } from '../src/components/gongfu/GongfuActiveInfusion';
 import { GongfuInfusionHistory } from '../src/components/gongfu/GongfuInfusionHistory';
