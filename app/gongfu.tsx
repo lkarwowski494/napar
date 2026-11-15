@@ -158,6 +158,17 @@ export default function GongfuScreen() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
+  // M1-audytor-generalny-026: zatrzymanie trwającej infuzji — bez sygnału „gotowe”; czas zapisu = czas rzeczywisty.
+  const handleStopSteep = () => {
+    const end = targetEndMsRef.current;
+    const left = end ? Math.max(0, Math.ceil((end - Date.now()) / 1000)) : remainingSeconds;
+    targetEndMsRef.current = null;
+    if (timerRef.current) clearInterval(timerRef.current);
+    setRemainingSeconds(left);
+    setIsSteeping(false);
+    setSteepFinished(true);
+  };
+
   const handleAdjustTime = (delta: number) => {
     const updated = Math.max(3, targetSeconds + delta);
     setTargetSeconds(updated);
@@ -294,6 +305,7 @@ export default function GongfuScreen() {
           steepFinished={steepFinished}
           onAdjustTime={handleAdjustTime}
           onStartSteep={handleStartSteep}
+          onStopSteep={handleStopSteep}
           currentNotes={currentNotes}
           onChangeCurrentNotes={setCurrentNotes}
           onRecordCurrentInfusion={handleRecordCurrentInfusion}

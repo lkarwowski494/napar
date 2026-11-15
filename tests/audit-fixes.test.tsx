@@ -1358,3 +1358,36 @@ describe('M1-audytor-generalny-027: postęp parzenia nazywa to, co mierzy (04-st
     expect(track.props.accessibilityValue).toEqual({ min: 1, max: 2, now: 2 });
   });
 });
+
+// ============================================================================
+// M1-audytor-generalny-026 · 04-studio-projektowe-001: wejście przez asystenta nie omija potwierdzenia „mało ziaren”.
+// Jedyną drogą do startTimer() jest handleStartTimer (useBrewWorkflow) ze sprawdzeniem paczki; ekran kroków dostaje
+// właśnie ten handler. Zatrzymanie infuzji Gongfu: src/core/__tests__/gongfu-screen.test.tsx (blok 026).
+// ============================================================================
+describe('M1-audytor-generalny-026: start parzenia tylko przez strażnika „mało ziaren” (04-studio-projektowe-001)', () => {
+  const nodeFs = jest.requireActual('fs') as typeof import('fs');
+  const nodePath = jest.requireActual('path') as typeof import('path');
+  const root = nodePath.join(__dirname, '..');
+  const walk = (dir: string): string[] =>
+    nodeFs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+      const p = nodePath.join(dir, e.name);
+      if (e.isDirectory()) return ['__tests__', 'node_modules'].includes(e.name) ? [] : walk(p);
+      return /\.(ts|tsx)$/.test(e.name) ? [p] : [];
+    });
+
+  test('startTimer() woła tylko handleStartTimer w useBrewWorkflow, a ekran kroków dostaje handleStartTimer', () => {
+    const calls: string[] = [];
+    for (const f of ['app', 'src', 'lib'].map((d) => nodePath.join(root, d)).filter((d) => nodeFs.existsSync(d)).flatMap(walk)) {
+      nodeFs.readFileSync(f, 'utf8').split('\n').forEach((line, i) => {
+        if (/(^|[^\w.])startTimer\(\)/.test(line)) calls.push(`${nodePath.relative(root, f)}:${i + 1}`);
+      });
+    }
+    expect(calls.every((c) => c.startsWith('src/core/useBrewWorkflow.ts:'))).toBe(true);
+    const wf = nodeFs.readFileSync(nodePath.join(root, 'src/core/useBrewWorkflow.ts'), 'utf8');
+    const body = wf.slice(wf.indexOf('const handleStartTimer = () => {'), wf.indexOf('const handleScanQrRecipe'));
+    expect(body).toMatch(/remainingWeightGrams < doseGrams/);
+    expect((wf.match(/(^|[^\w.])startTimer\(\)/gm) ?? []).length).toBe((body.match(/(^|[^\w.])startTimer\(\)/gm) ?? []).length);
+    const modals = nodeFs.readFileSync(nodePath.join(root, 'src/components/brew/BrewModalsContainer.tsx'), 'utf8');
+    expect(modals).toMatch(/onStart=\{handleStartTimer\}/);
+  });
+});

@@ -69,7 +69,7 @@ import GongfuScreen from '../../../app/gongfu';
 import { GongfuSessionSetup } from '../../components/gongfu/GongfuSessionSetup';
 import { GongfuInfusionHistory } from '../../components/gongfu/GongfuInfusionHistory';
 import { createGongfuSession } from '../gongfu-session';
-import { translations } from '../i18n';
+import { translations, LanguageProvider } from '../i18n';
 import { Alert } from 'react-native';
 import * as databaseModule from '../database';
 
@@ -446,5 +446,52 @@ describe('GongfuScreen — zapis sesji jedną transakcją i komunikat przy błę
     const titles = (Alert.alert as jest.Mock).mock.calls.map((c) => c[0]);
     expect(titles).toContain(translations.pl.common.saveErrorTitle);
     expect(mockRouterBack).not.toHaveBeenCalled();
+  });
+
+  // M1-audytor-generalny-026 (04-studio-projektowe-001): trwającą infuzję da się zatrzymać.
+  test.each(['pl', 'en'] as const)('026 (%s): w trakcie parzenia jest przycisk „Zatrzymaj” z rolą; zatrzymanie kończy odliczanie i zapisuje rzeczywisty czas', (lang) => {
+    mockDb.settings.set('app_language', lang);
+    const t = translations[lang];
+    jest.setSystemTime(new Date('2026-11-15T10:00:00Z'));
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <GongfuScreen />
+        </LanguageProvider>
+      );
+    });
+    renderer.act(() => {
+      tree.root.findByProps({ testID: 'gongfu-start-btn' }).props.onPress();
+    });
+    const stop = tree.root.findAll((n: any) => n.props.testID === 'gongfu-stop-btn' && typeof n.props.onPress === 'function');
+    expect(stop).toHaveLength(1);
+    expect(stop[0].props.accessibilityRole).toBe('button');
+    expect(stop[0].props.accessibilityLabel).toBe(t.gongfu.stopSteep);
+    expect(stop[0].props.accessibilityHint).toBe(t.gongfu.stopSteepHint);
+
+    renderer.act(() => {
+      jest.advanceTimersByTime(10000);
+    });
+    (require('expo-haptics').notificationAsync as jest.Mock).mockClear();
+    renderer.act(() => {
+      stop[0].props.onPress();
+    });
+    // Odliczanie stoi: po kolejnych 30 s nic się nie dzieje, nie ma sygnału „gotowe”.
+    renderer.act(() => {
+      jest.advanceTimersByTime(30000);
+    });
+    expect(require('expo-haptics').notificationAsync).not.toHaveBeenCalled();
+    expect(tree.root.findAll((n: any) => n.props.testID === 'gongfu-stop-btn')).toHaveLength(0);
+
+    const record = tree.root.findAll((n: any) => typeof n.props.onPress === 'function' && n.findAll((c: any) => c.props.children === t.gongfu.nextInfusion).length > 0);
+    expect(record.length).toBeGreaterThan(0);
+    renderer.act(() => {
+      record[0].props.onPress();
+    });
+    const history = tree.root.findByType(GongfuInfusionHistory);
+    expect(history.props.session.infusions).toHaveLength(1);
+    expect(history.props.session.infusions[0].durationSeconds).toBe(10);
+    mockDb.settings.clear();
   });
 });

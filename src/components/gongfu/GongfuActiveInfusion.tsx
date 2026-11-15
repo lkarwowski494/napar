@@ -16,6 +16,8 @@ interface GongfuActiveInfusionProps {
   steepFinished: boolean;
   onAdjustTime: (delta: number) => void;
   onStartSteep: () => void;
+  /** M1-audytor-generalny-026: kończy trwającą infuzję przed czasem. */
+  onStopSteep: () => void;
   currentNotes: string;
   onChangeCurrentNotes: (text: string) => void;
   onRecordCurrentInfusion: () => void;
@@ -30,6 +32,7 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
   steepFinished,
   onAdjustTime,
   onStartSteep,
+  onStopSteep,
   currentNotes,
   onChangeCurrentNotes,
   onRecordCurrentInfusion,
@@ -77,6 +80,16 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
       {isSteeping && (
         <View style={styles.steepingActiveBox}>
           <Text style={styles.steepingActiveText}>PARZENIE W TOKU</Text>
+          <Pressable
+            testID="gongfu-stop-btn"
+            style={styles.stopBtn}
+            onPress={onStopSteep}
+            accessibilityRole="button"
+            accessibilityLabel={t.gongfu.stopSteep}
+            accessibilityHint={t.gongfu.stopSteepHint}
+          >
+            <Text style={styles.stopBtnText}>{t.gongfu.stopSteep}</Text>
+          </Pressable>
         </View>
       )}
 
@@ -102,6 +115,24 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
 };
 
 const styles = StyleSheet.create({
+  stopBtn: {
+    marginTop: 12,
+    minHeight: 44,
+    minWidth: 44,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: theme.colors.textPrimary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stopBtnText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: theme.colors.textPrimary,
+    letterSpacing: 0.5,
+  },
   timerCard: {
     backgroundColor: theme.colors.bgCard,
     borderRadius: 16,
