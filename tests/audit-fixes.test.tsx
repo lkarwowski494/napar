@@ -11,7 +11,7 @@ import { join } from 'node:path';
 
 // Importy logiki i komponentów
 import { wInKeep, roundTo } from '../src/core/unit-converter';
-import { remainingTimerSec } from '../src/core/timer-engine';
+import { remainingTimerSec, BrewTimerEngine } from '../src/core/timer-engine';
 import { escapeCsvCell } from '../src/core/database';
 import { rotateBackupFiles, SAFETY_RE } from '../src/core/backup';
 import { normSearch } from '../src/core/search-utils';
@@ -19,6 +19,7 @@ import {
   calculateBrewRatio,
   calculateBrewWater,
   estimateTeaInfusionCaffeineMg,
+  calculateExtractionYield,
 } from '../src/core/domain-rules';
 import { NumInput } from '../src/components/ui/NumInput';
 import {
@@ -2403,5 +2404,63 @@ describe('M1-audytor-generalny-042: ekrany i komponenty bez literałów kolorów
       .filter((f) => !(f in COLOR_LITERAL_EXCEPTIONS))
       .flatMap((f) => scan(readFileSync(join(root042, f), 'utf8')).map((h) => `${f}:${h}`));
     expect(bad).toEqual([]);
+  });
+});
+
+describe('M1-audytor-generalny-043: granice liczb, których aplikacja uczy, pilnowane wektorami granicznymi (07-jakosc-005)', () => {
+  // 07-jakosc-016: źródło (BRD RD-03, cytat SCA) nie rozstrzyga, czy 18,00 % i 22,00 % należą do zakresu
+  // „ideal” (korpus: EY-DEF-11/12 z expectedRating null, rejestr SCA-GOLDENCUP-EY otwarte). Te testy NIE
+  // przesądzają faktu — pilnują DZISIEJSZEGO zachowania kodu na granicy (granice włącznie), żeby każda
+  // zmiana `<`/`<=` albo `>`/`>=` była świadoma (czerwony test + decyzja), a nie przypadkowa.
+  test('RD-03 [M1]: EY = 18,00 % (TDS 1,35 %, napar 200 g, doza 15 g) → dziś „ideal”; 17,99 % → „under”', () => {
+    const at = calculateExtractionYield(200, 1.35, 15);
+    expect(at.extractionYieldPercent).toBe(18);
+    expect(at.rating).toBe('ideal');
+    const below = calculateExtractionYield(199.9, 1.35, 15);
+    expect(below.extractionYieldPercent).toBe(17.99);
+    expect(below.rating).toBe('under');
+  });
+
+  test('RD-03: EY = 22,00 % (TDS 1,5 %, napar 220 g, doza 15 g) → dziś „ideal”; 22,01 % → „over”', () => {
+    const at = calculateExtractionYield(220, 1.5, 15);
+    expect(at.extractionYieldPercent).toBe(22);
+    expect(at.rating).toBe('ideal');
+    const above = calculateExtractionYield(220.1, 1.5, 15);
+    expect(above.extractionYieldPercent).toBe(22.01);
+    expect(above.rating).toBe('over');
+  });
+
+  test('D-05 [M4]: remainingTimerSec zaokrągla w górę — ułamek sekundy to jeszcze 1 s, nie 0', () => {
+    expect(remainingTimerSec(10_000, 9_001)).toBe(1);
+    expect(remainingTimerSec(10_000, 9_999)).toBe(1);
+    expect(remainingTimerSec(10_000, 8_500)).toBe(2);
+    expect(remainingTimerSec(10_000, 10_000)).toBe(0);
+  });
+
+  test('D-05 [M4]: etap 30 s nie kończy się po 29,5 s (przejście do kolejnego zalania dopiero po pełnym czasie)', () => {
+    jest.useFakeTimers();
+    try {
+      const engine = new BrewTimerEngine([
+        { stepNumber: 1, namePl: 'Bloom', targetWaterGrams: 50, durationSeconds: 30, instructionPl: 'Zalej 50 g' },
+        { stepNumber: 2, namePl: 'Zalanie', targetWaterGrams: 250, durationSeconds: 60, instructionPl: 'Zalej do 250 g' },
+      ] as any);
+      engine.start();
+      jest.advanceTimersByTime(29_500);
+      engine.syncWithRealTime();
+      expect(engine.getSnapshot().currentStepIndex).toBe(0);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(1);
+      jest.advanceTimersByTime(600);
+      engine.syncWithRealTime();
+      expect(engine.getSnapshot().currentStepIndex).toBe(1);
+      engine.destroy();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test('RD-20 [M2]: mutacja nie ma już celu — próg 25 mg „bezpieczny dla snu” usunięty (M1-audytor-generalny-015)', () => {
+    // Szacunek kofeiny o porze snu jest neutralną liczbą bez progu; pilnujemy, że progu nie ma (powrót wymaga decyzji D-005).
+    const src = readFileSync(join(__dirname, '..', 'src', 'core', 'domain-rules.ts'), 'utf8');
+    expect(src).not.toMatch(/isSafeForSleep|safeThreshold/);
   });
 });
