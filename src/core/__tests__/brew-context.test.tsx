@@ -436,11 +436,16 @@ describe('BrewContext & BrewProvider', () => {
       return null;
     };
 
+    // M1-audytor-generalny-033 (09-lokalizacja-002): język zapowiedzi = język interfejsu z LanguageProvider
+    // (jak w app/_layout.tsx), nie osobny odczyt app_language z bazy z domyślnym 'pl'.
+    const { LanguageProvider } = require('../i18n');
     renderer.act(() => {
       renderer.create(
-        <BrewProvider>
-          <Consumer />
-        </BrewProvider>
+        <LanguageProvider>
+          <BrewProvider>
+            <Consumer />
+          </BrewProvider>
+        </LanguageProvider>
       );
     });
 
@@ -586,5 +591,46 @@ describe('BrewContext & BrewProvider', () => {
       })
     );
     recordSpy.mockRestore();
+  });
+
+  // M1-audytor-generalny-033 (09-lokalizacja-002): sonda z dowodu roli odwrócona — zapowiedzi w języku interfejsu.
+  test('09-lokalizacja-002: brak app_language i system en-US → pierwsza zapowiedź VoiceOver zaczyna się od „Step 1”', () => {
+    const { LanguageProvider } = require('../i18n');
+    settingsStore.delete('app_language');
+    jest.useFakeTimers();
+    const announceSpy = jest
+      .spyOn(require('react-native').AccessibilityInfo, 'announceForAccessibility')
+      .mockImplementation(() => {});
+    databaseModule.setVoiceAnnounceEnabled(true);
+    settingsStore.delete('app_language');
+    const realIntl = Intl.DateTimeFormat;
+    // @ts-ignore — system en-US
+    Intl.DateTimeFormat = () => ({ resolvedOptions: () => ({ locale: 'en-US' }) });
+    let brewData: any;
+    const Consumer = () => {
+      brewData = useBrew();
+      return null;
+    };
+    try {
+      renderer.act(() => {
+        renderer.create(
+          <LanguageProvider>
+            <BrewProvider>
+              <Consumer />
+            </BrewProvider>
+          </LanguageProvider>
+        );
+      });
+    } finally {
+      // @ts-ignore
+      Intl.DateTimeFormat = realIntl;
+    }
+    expect(settingsStore.has('app_language')).toBe(false);
+    renderer.act(() => {
+      brewData.startTimer();
+    });
+    expect(String(announceSpy.mock.calls[0]?.[0])).toMatch(/^Step 1/);
+    announceSpy.mockRestore();
+    jest.useRealTimers();
   });
 });

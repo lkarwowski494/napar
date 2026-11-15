@@ -120,7 +120,7 @@ export const translations = {
       totalTimeLabel: 'CAŁKOWITY CZAS',
       totalTimeAccessibility: 'Całkowity czas',
       stepBadge: 'Krok {current} z {total}',
-      stepAccessibility: 'Krok {current} z {total}: {stepName}. Cel wody: {water} gramów, pozostało {seconds} sekund.',
+      stepAccessibility: 'Krok {current} z {total}: {stepName}. Cel wody: {water} gramów, pozostało {seconds} {secondsWord}.',
       subTime10Accessibility: 'Odejmij 10 sekund',
       addTime10Accessibility: 'Dodaj 10 sekund',
       pourUpTo: 'Zalej do',
@@ -722,7 +722,7 @@ export const translations = {
       totalTimeLabel: 'TOTAL TIME',
       totalTimeAccessibility: 'Total time',
       stepBadge: 'Step {current} of {total}',
-      stepAccessibility: 'Step {current} of {total}: {stepName}. Target water: {water} grams, {seconds} seconds remaining.',
+      stepAccessibility: 'Step {current} of {total}: {stepName}. Target water: {water} grams, {seconds} {secondsWord} remaining.',
       subTime10Accessibility: 'Subtract 10 seconds',
       addTime10Accessibility: 'Add 10 seconds',
       pourUpTo: 'Pour up to',
@@ -1330,16 +1330,19 @@ function parseCount(count: number | string | any): number {
 }
 
 /**
- * Polska odmiana gramatyczna liczebników (RD-ENG-09, NFR-I18N-007).
- * Dla n = |x| mod 100, n10 = n mod 10:
- * - jeśli |x| === 1 -> one (np. 1 seria, 1 sekunda, 1 klik)
- * - jeśli n10 in {2, 3, 4} i n not in {12, 13, 14} -> few (np. 2 serie, 22 serie, 104 serie)
- * - inaczej -> many (np. 0 serii, 5 serii, 12 serii, 21 serii, 112 serii)
+ * Polska odmiana gramatyczna liczebników wg CLDR (RD-ENG-09, NFR-I18N-007; 09-lokalizacja-007).
+ * Liczby całkowite, i = |x|, n = i mod 100, n10 = i mod 10:
+ * - i === 1 -> one (1 sekunda, 1 klik)
+ * - n10 in {2, 3, 4} i n not in {12, 13, 14} -> few (2 sekundy, 22 sekundy, 104 serie)
+ * - inaczej -> many (0 sekund, 5 sekund, 12 sekund, 21 sekund, 25 sekund)
+ * Ułamki (1,5; 2,5) -> other: dopełniacz liczby pojedynczej („1,5 sekundy”); domyślnie forma few,
+ * która dla tego typu rzeczowników jest identyczna (sekundy, minuty, godziny); inne słowa podają `other`.
  */
-export function pluralPl(count: number | string, one: string, few: string, many: string): string {
+export function pluralPl(count: number | string, one: string, few: string, many: string, other: string = few): string {
   const parsed = parseCount(count);
   if (isNaN(parsed)) return many;
-  const abs = Math.abs(Math.floor(parsed));
+  if (!Number.isInteger(parsed)) return other;
+  const abs = Math.abs(parsed);
   const n = abs % 100;
   const n10 = n % 10;
   if (abs === 1) return one;

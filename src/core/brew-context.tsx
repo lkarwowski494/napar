@@ -18,6 +18,7 @@ import {
   estimateTotalLeafCaffeineMg,
 } from './domain-rules';
 import { getRecommendedGrindForRecipe } from './grinder-converter';
+import { useTranslation } from './i18n';
 
 export interface BrewContextType {
   recipe: SavedRecipe | MasterRecipe;
@@ -179,13 +180,18 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [snapshot, setSnapshot] = useState<TimerSnapshot>(defaultInitialSnapshot);
   const engineRef = useRef<BrewTimerEngine | null>(null);
+  // M1-audytor-generalny-033 (09-lokalizacja-002): zapowiedzi VoiceOver w języku interfejsu — to samo
+  // źródło co useTranslation(), także gdy język pochodzi z systemu i nie ma zapisanego app_language.
+  const { language: uiLanguage } = useTranslation();
+  const uiLanguageRef = useRef(uiLanguage);
+  uiLanguageRef.current = uiLanguage;
 
   useEffect(() => {
     const engine = new BrewTimerEngine(scaledSteps, {
       onTick: (snap) => setSnapshot(snap),
       onStepChange: (stepIndex, step) => {
         if (getVoiceAnnounceEnabled()) {
-          const lang = (getAppSetting('app_language', 'pl') as 'pl' | 'en') || 'pl';
+          const lang = uiLanguageRef.current;
           const stepName = lang === 'en' ? (step.nameEn || step.namePl) : step.namePl;
           const stepInstr = lang === 'en' ? (step.instructionEn || step.instructionPl) : step.instructionPl;
           announceStep(
@@ -201,13 +207,13 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       },
       onWarning: (remaining) => {
         if (getVoiceAnnounceEnabled()) {
-          const lang = (getAppSetting('app_language', 'pl') as 'pl' | 'en') || 'pl';
+          const lang = uiLanguageRef.current;
           announceCountdown(remaining, lang);
         }
       },
       onFinish: () => {
         if (getVoiceAnnounceEnabled()) {
-          const lang = (getAppSetting('app_language', 'pl') as 'pl' | 'en') || 'pl';
+          const lang = uiLanguageRef.current;
           const totalSecs = engineRef.current?.getSnapshot().totalElapsedSeconds || 0;
           announceFinish(recipe.name, totalSecs, lang);
         }
