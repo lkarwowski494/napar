@@ -190,6 +190,8 @@ Workflow wydawniczy `.github/workflows/testflight.yml` wymaga 4 poufnych paramet
 | `ASC_ISSUER_ID` | UUID wystawcy z App Store Connect | `69a6de70-…-47e3a6200fd6` |
 | `ASC_KEY_P8_BASE64` | Zawartość pliku `AuthKey_*.p8` zakodowana w Base64 | `LS0tLS1CRUdJTi...` |
 
+Warunek wysyłki (DEC-11 a, od 2026-11-15): zadanie `gate` w `testflight.yml` przepuszcza tylko commit z zielonym ostatnim przebiegiem `ci.yml` i `e2e-ios.yml` na tym samym SHA; każdy wysłany build ma wiersz w `docs/wydanie/dziennik.md`.
+
 ---
 
 ## 9. Plan Wydania Produkcyjnego i Procedura Wycofania (Phased Release & Rollback)

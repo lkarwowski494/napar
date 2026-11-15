@@ -1757,3 +1757,89 @@ describe('M1-audytor-generalny-033: interfejs EN bez polskich tekstów; kontrola
     for (const x of [...exc.tokeny, ...exc.teksty, ...exc.pliki]) expect(String(x.powod).length).toBeGreaterThan(5);
   });
 });
+
+// ============================================================================
+// M1-audytor-generalny-036 · 10-wydanie-008 (DEC-11 a): wysyłka do TestFlight tylko przy zielonym
+// CI i E2E na tym samym commicie; dziennik wydań wiąże wersję, build i SHA.
+// ============================================================================
+describe('M1-audytor-generalny-036: TestFlight tylko przy zielonym CI i E2E na tym samym SHA (DEC-11 a; 10-wydanie-008)', () => {
+  const { spawnSync, execFileSync } = jest.requireActual('child_process') as typeof import('child_process');
+  const { mkdtempSync, writeFileSync, chmodSync, rmSync } = jest.requireActual('fs') as typeof import('fs');
+  const { tmpdir } = jest.requireActual('os') as typeof import('os');
+  const SHA = 'c71a71a7aa2dcdff004bb66930ce9512631e1f3f';
+  const gate = join(root, '.github/scripts/require-green-runs.mjs');
+  const run = (path: string, conclusion: string | null, created: string, status = 'completed', sha = SHA) => ({
+    id: Date.parse(created), path, head_sha: sha, status, conclusion, created_at: created, html_url: `run-${path}-${created}`,
+  });
+  const CI = '.github/workflows/ci.yml';
+  const E2E = '.github/workflows/e2e-ios.yml';
+
+  /** Uruchamia bramkę z atrapą `gh`, która zwraca podane przebiegi. */
+  const runGate = (runs: object[]) => {
+    const dir = mkdtempSync(join(tmpdir(), 'gate-'));
+    try {
+      writeFileSync(join(dir, 'runs.json'), JSON.stringify({ total_count: runs.length, workflow_runs: runs }));
+      writeFileSync(join(dir, 'gh'), `#!/bin/sh\ncat "${join(dir, 'runs.json')}"\n`);
+      chmodSync(join(dir, 'gh'), 0o755);
+      return spawnSync(process.execPath, [gate, 'lkarwowski494/napar', SHA], {
+        encoding: 'utf8',
+        env: { PATH: `${dir}:/usr/bin:/bin` },
+      });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  };
+
+  test('bramka odrzuca SHA z czerwonym E2E (stan buildu b1028) i przepuszcza oba zielone', () => {
+    const red = runGate([run(CI, 'success', '2026-10-24T14:18:11Z'), run(E2E, 'failure', '2026-10-24T14:18:11Z')]);
+    expect(red.status).toBe(1);
+    expect(red.stderr).toMatch(/E2E iOS \(Maestro\).*completed\/failure/);
+    expect(red.stderr).toMatch(/Wysyłka do TestFlight zablokowana/);
+    const green = runGate([run(CI, 'success', '2026-10-24T14:18:11Z'), run(E2E, 'success', '2026-10-24T14:18:11Z')]);
+    expect(green.status).toBe(0);
+  });
+
+  test('bramka odrzuca brak przebiegu, przebieg w toku, czerwone CI i przebiegi innego SHA', () => {
+    expect(runGate([run(CI, 'success', '2026-10-24T14:18:11Z')]).status).toBe(1);
+    expect(runGate([run(CI, 'success', '2026-10-24T14:18:11Z'), run(E2E, null, '2026-10-24T14:18:11Z', 'in_progress')]).status).toBe(1);
+    expect(runGate([run(CI, 'failure', '2026-10-24T14:18:11Z'), run(E2E, 'success', '2026-10-24T14:18:11Z')]).status).toBe(1);
+    const other = 'f'.repeat(40);
+    expect(runGate([run(CI, 'success', '2026-10-24T14:18:11Z', 'completed', other), run(E2E, 'success', '2026-10-24T14:18:11Z', 'completed', other)]).status).toBe(1);
+  });
+
+  test('decyduje ostatni przebieg danego workflowu na tym SHA', () => {
+    const ci = run(CI, 'success', '2026-10-24T14:18:11Z');
+    expect(runGate([ci, run(E2E, 'failure', '2026-10-24T14:18:11Z'), run(E2E, 'success', '2026-10-25T09:00:00Z')]).status).toBe(0);
+    expect(runGate([ci, run(E2E, 'success', '2026-10-24T14:18:11Z'), run(E2E, 'failure', '2026-10-25T09:00:00Z')]).status).toBe(1);
+  });
+
+  test('testflight.yml: zadanie bramki (actions: read) uruchamia skrypt na GITHUB_SHA, a archiwizacja czeka na nie', () => {
+    const tf = readFileSync(join(root, '.github/workflows/testflight.yml'), 'utf8');
+    const jobsPart = tf.slice(tf.indexOf('\njobs:'));
+    const jobs: Record<string, string> = {};
+    const parts = jobsPart.split(/\n {2}(?=[\w-]+:\s*\n)/).slice(1);
+    for (const p of parts) jobs[p.slice(0, p.indexOf(':'))] = p;
+    expect(jobs.gate).toBeDefined();
+    expect(jobs.gate).toMatch(/actions:\s*read/);
+    expect(jobs.gate).toMatch(/node \.github\/scripts\/require-green-runs\.mjs "\$GITHUB_REPOSITORY" "\$GITHUB_SHA"/);
+    expect(jobs.gate).toMatch(/GH_TOKEN:\s*\$\{\{\s*github\.token\s*\}\}/);
+    expect(jobs.build).toMatch(/needs:\s*gate/);
+    // ochrona main zostaje (DEC-11 a): build tylko z commitu, który jest przodkiem origin/main
+    expect(jobs.build).toMatch(/git merge-base --is-ancestor "\$GITHUB_SHA" origin\/main/);
+  });
+
+  test('docs/wydanie/dziennik.md: kolumny wersja, build, SHA, werdykt 07; wiersz dla każdego tagu v*-b*', () => {
+    const log = readFileSync(join(root, 'docs/wydanie/dziennik.md'), 'utf8');
+    expect(log).toMatch(/\| Data \| Wersja \| Build \| SHA \| CI \| E2E \| Werdykt 07 \| Kanał \| Decyzje \| Zgody właściciela \(słowa, data\) \| Wynik \|/);
+    let tags: string[] = [];
+    try {
+      tags = execFileSync('git', ['tag', '-l', 'v*-b*'], { cwd: root, encoding: 'utf8' }).split('\n').filter(Boolean);
+    } catch {
+      tags = [];
+    }
+    for (const t of ['v1.0.0-b1003', 'v1.0.0-b1028', ...tags]) {
+      const [, ver, build] = /^v(.+)-b(\d+)$/.exec(t)!;
+      expect(log).toMatch(new RegExp(`\\| ${ver.replace(/\./g, '\\.')} \\| ${build} \\| [0-9a-f]{7,40} \\|`));
+    }
+  });
+});

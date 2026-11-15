@@ -24,8 +24,28 @@ env:
   # Baza numeru buildu: jedno źródło w app.json (expo.ios.buildNumber) — M1-audytor-generalny-014.
 
 jobs:
+  gate:
+    # M1-audytor-generalny-036 (DEC-11 a): wysyłka tylko przy zielonym CI i E2E na tym samym commicie.
+    name: CI i E2E zielone na tym SHA
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Wymagaj zielonego CI i E2E na GITHUB_SHA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/require-green-runs.mjs "$GITHUB_REPOSITORY" "$GITHUB_SHA"
+
   build:
     name: Archive & Upload (.ipa -> TestFlight)
+    needs: gate
     runs-on: macos-26
     environment: production
     timeout-minutes: 90
