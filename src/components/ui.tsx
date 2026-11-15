@@ -457,11 +457,11 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   fieldInputError: {
-    borderColor: '#DC2626',
+    borderColor: theme.colors.error,
   },
   fieldErrorText: {
     fontSize: 12,
-    color: '#DC2626',
+    color: theme.colors.error,
     marginTop: 4,
   },
   emptyContainer: {
@@ -564,10 +564,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   btnDanger: {
-    backgroundColor: '#DC2626',
+    backgroundColor: theme.colors.error,
   },
   btnTextPrimary: {
-    color: '#FFFFFF',
+    color: theme.colors.white,
     fontSize: 15,
     fontWeight: '700',
   },
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   btnTextDanger: {
-    color: '#FFFFFF',
+    color: theme.colors.white,
     fontSize: 15,
     fontWeight: '700',
   },
@@ -633,13 +633,13 @@ const styles = StyleSheet.create({
   swipeRowDeleteBtn: {
     minWidth: 44,
     minHeight: 44,
-    backgroundColor: '#DC2626',
+    backgroundColor: theme.colors.error,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 12,
   },
   swipeRowDeleteText: {
-    color: '#FFFFFF',
+    color: theme.colors.white,
     fontSize: 16,
     fontWeight: '700',
   },

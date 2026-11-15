@@ -7,7 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
 import { formatDoseWeight } from '../../core/unit-converter';
 import { estimateCoffeeCaffeineMg } from '../../core/domain-rules';
-import { theme } from '../../core/theme';
+import { theme, withAlpha } from '../../core/theme';
 import { translations } from '../../core/i18n';
 import { ModalHeader } from '../ui';
 
@@ -126,7 +126,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: withAlpha(theme.colors.black, 0.7),
     justifyContent: 'center',
     alignItems: 'center',
     padding: theme.spacing.lg,

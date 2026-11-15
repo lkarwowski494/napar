@@ -2342,3 +2342,66 @@ describe('M1-audytor-generalny-041: formularz podsumowania parzenia — „Pomi�
     expect(saves.every((n) => header.findAll((m) => m === n).length > 0)).toBe(true);
   });
 });
+
+// M1-audytor-generalny-042 · 04-studio-projektowe-014, 08-programista-012: kolory tylko z modułu motywu.
+// Statyczny skan app/, src/components/ i plików .tsx w src/core/ (bez __tests__ i theme.ts): żadnych literałów
+// #RGB/#RGBA/#RRGGBB/#RRGGBBAA, rgb()/rgba() z liczbami ani nazw kolorów CSS w propsach stylu. 'transparent',
+// 'none' i withAlpha(token, a) są dozwolone. Komentarze pomijane. Wyjątki — tylko z nazwą pliku i powodem:
+const COLOR_LITERAL_EXCEPTIONS: Record<string, string> = {
+  'src/components/SafeModeView.tsx':
+    'tryb awaryjny celowo bez importu motywu i reszty aplikacji (ma się wyrenderować, gdy moduły aplikacji zawiodą)',
+};
+describe('M1-audytor-generalny-042: ekrany i komponenty bez literałów kolorów poza modułem motywu (04-studio-projektowe-014, 08-programista-012)', () => {
+  const root042 = join(__dirname, '..');
+  const walk042 = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+      const p = join(dir, e.name);
+      if (e.isDirectory()) return ['__tests__', 'node_modules'].includes(e.name) ? [] : walk042(p);
+      return /\.tsx?$/.test(e.name) && !/\.d\.ts$/.test(e.name) ? [p] : [];
+    });
+  const files042 = [
+    ...walk042(join(root042, 'app')),
+    ...walk042(join(root042, 'src', 'components')),
+    ...walk042(join(root042, 'src', 'core')).filter((f) => f.endsWith('.tsx')),
+  ]
+    .map((f) => f.slice(root042.length + 1).split('\\').join('/'))
+    .filter((f) => f !== 'src/core/theme.ts');
+  const CSS_NAMES =
+    'white|black|red|green|blue|gray|grey|yellow|orange|gold|silver|purple|pink|brown|navy|teal|maroon|olive|lime|aqua|cyan|magenta|fuchsia|crimson|tomato|coral|salmon|khaki|beige|ivory|indigo|violet|lightgray|lightgrey|darkgray|darkgrey|dimgray|whitesmoke|gainsboro';
+  const RULES: [string, RegExp][] = [
+    ['hex', /['"`]#(?:[0-9A-Fa-f]{3,4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})['"`]/g],
+    ['rgb()', /\brgba?\(\s*\d/g],
+    ['nazwa CSS', new RegExp(`\\b\\w*(?:[cC]olor|fill|stroke|tint)\\s*[:=]\\s*\\{?\\s*['"\`](?:${CSS_NAMES})['"\`]`, 'gi')],
+  ];
+  const stripComments = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/.*$/gm, '$1');
+  const scan = (src: string): string[] => {
+    const out: string[] = [];
+    stripComments(src).split('\n').forEach((line, i) => {
+      for (const [name, re] of RULES) for (const m of line.matchAll(re)) out.push(`${i + 1}: ${name} ${m[0].trim()}`);
+    });
+    return out;
+  };
+
+  test('skaner widzi każdy rodzaj literału (kontrola samego testu)', () => {
+    expect(scan("a: { color: '#FFF', b: '#12AB34', c: '#12AB34CC' }")).toHaveLength(3);
+    expect(scan("x: 'rgba(0, 0, 0, 0.7)', y: 'rgb(1,2,3)'")).toHaveLength(2);
+    expect(scan("color: 'white', <X tintColor=\"gold\" />")).toHaveLength(2);
+    expect(scan("color: theme.colors.white, bg: 'transparent', f: withAlpha(theme.colors.copper, 0.1) // '#FFFFFF'")).toEqual([]);
+    expect(scan("{ id: 'white', labelPl: 'Biała' }")).toEqual([]);
+  });
+
+  test('wyjątki istnieją i mają powód', () => {
+    for (const [f, why] of Object.entries(COLOR_LITERAL_EXCEPTIONS)) {
+      expect(existsSync(join(root042, f))).toBe(true);
+      expect(why.length).toBeGreaterThan(20);
+    }
+  });
+
+  test('brak literałów kolorów w app/, src/components/ i src/core/*.tsx', () => {
+    expect(files042.length).toBeGreaterThan(50);
+    const bad = files042
+      .filter((f) => !(f in COLOR_LITERAL_EXCEPTIONS))
+      .flatMap((f) => scan(readFileSync(join(root042, f), 'utf8')).map((h) => `${f}:${h}`));
+    expect(bad).toEqual([]);
+  });
+});

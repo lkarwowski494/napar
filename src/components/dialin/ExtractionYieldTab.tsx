@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
 import { calculateExtractionYield, calculateLiquidYield } from '../../core/domain-rules';
-import { theme } from '../../core/theme';
+import { theme, withAlpha } from '../../core/theme';
 
 export interface ExtractionYieldTabProps {
   language: string;
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   modeBtnActive: {
     borderColor: theme.colors.copper,
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    backgroundColor: theme.colors.copperMuted,
   },
   modeBtnText: {
     color: theme.colors.textMuted,
@@ -241,10 +241,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   eyIdeal: {
-    backgroundColor: 'rgba(78, 159, 61, 0.2)',
+    backgroundColor: withAlpha(theme.colors.statusPeak, 0.2),
   },
   eyWarning: {
-    backgroundColor: 'rgba(217, 119, 6, 0.2)',
+    backgroundColor: withAlpha(theme.colors.warning, 0.2),
   },
   eyRatingText: {
     fontSize: 12,

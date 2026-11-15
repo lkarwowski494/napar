@@ -7,6 +7,7 @@ import React, { useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 import QRCode from 'qrcode';
+import { theme } from './theme';
 
 export interface QrCodeSvgProps {
   value: string;
@@ -22,8 +23,8 @@ export interface QrCodeSvgProps {
 export const QrCodeSvg: React.FC<QrCodeSvgProps> = ({
   value,
   size = 200,
-  color = '#000000',
-  backgroundColor = '#FFFFFF',
+  color = theme.colors.black,
+  backgroundColor = theme.colors.white,
   testID,
 }) => {
   const safeSize = typeof size === 'number' && Number.isFinite(size) && size > 0 ? size : 200;

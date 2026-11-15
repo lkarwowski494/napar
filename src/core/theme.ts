@@ -5,6 +5,17 @@
 
 import { Platform } from 'react-native';
 
+/**
+ * M1-audytor-generalny-042: kolor tokenu z przezroczystością — `withAlpha(theme.colors.copper, 0.12)`
+ * daje `rgba(217, 119, 54, 0.12)`. Ekrany nie wpisują liczb rgba() same.
+ */
+export function withAlpha(hex: string, alpha: number): string {
+  const h = hex.replace('#', '');
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h.slice(0, 6);
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16));
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 export const theme = {
   lightColors: {
     bg: '#FBF9F6',
@@ -66,6 +77,34 @@ export const theme = {
     
     danger: '#E5605B', // 028: było #D9534F (4,29:1 jako tekst na bgCard)
     dangerMuted: 'rgba(217, 83, 79, 0.15)',
+
+    // M1-audytor-generalny-042 (04-studio-projektowe-014): kolory dotąd wpisane literałami w ekranach.
+    // Wartości przeniesione 1:1 (bez scalania odcieni) — kontrast ekranów bez zmian; pary tekstowe
+    // sprawdza tests/contrast-tokens.test.ts.
+    black: '#000000', // cień, tło podglądu aparatu, moduły kodu QR
+    copperBrand: '#C86A28', // miedź ikony aplikacji (ikony nawigacji, tła kart wyboru napoju)
+    accentWarm: '#E5A96A', // ikony statystyk dziennika (kofeina, ocena)
+    rating: '#FFD700', // aktywne gwiazdki i odznaka oceny
+    favorite: '#E5A93C', // aktywne „ulubione” ziarna
+    success: '#4CAF50', // porada „idealny balans”, oszczędność kosztu
+    successBright: '#4ADE80', // stan ziarna w kompendium, przycisk Gongfu
+    warning: '#D97706', // ekstrakcja poza zakresem (tło z przezroczystością)
+    error: '#DC2626', // błąd pola, przycisk niszczący, obrys banera odzysku
+    errorBannerBg: '#7F1D1D', // tło banera uszkodzonego stanu
+    errorBannerAction: '#991B1B', // przycisk na banerze uszkodzonego stanu
+    errorBannerTitle: '#FEE2E2', // tytuł na banerze uszkodzonego stanu
+    errorBannerText: '#FECACA', // opis na banerze uszkodzonego stanu
+    dangerIcon: '#D9534F', // domyślny kolor ikon kosza i płomienia, tła ostrzeżeń (baza dangerMuted)
+    dangerBright: '#EF4444', // tło przycisku usuwania paczki (z przezroczystością)
+    neutralTint: '#646464', // odznaka „po oknie odpoczynku” (z przezroczystością)
+  },
+  // Kolory rodziny aplikacji Apps4Craft (emblematy w CraftIcons) — barwy marek, nie stany interfejsu.
+  familyColors: {
+    napar: '#C86A28',
+    piekarz: '#D49B42',
+    sloik: '#5B8A61',
+    masaz: '#A43E38',
+    ferment: '#E0A838',
   },
   spacing: {
     xs: 4,

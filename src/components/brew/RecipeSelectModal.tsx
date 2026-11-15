@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.copper,
     padding: theme.spacing.md,
     marginVertical: theme.spacing.sm,
-    shadowColor: '#000',
+    shadowColor: theme.colors.black,
     shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 4,
@@ -577,13 +577,13 @@ const styles = StyleSheet.create({
     flex: 1.5,
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
-    borderColor: '#4ade80',
+    borderColor: theme.colors.successBright,
     paddingVertical: 12,
     borderRadius: theme.borderRadius.sm,
     alignItems: 'center',
   },
   gongfuModalBtnText: {
-    color: '#4ade80',
+    color: theme.colors.successBright,
     fontWeight: '700',
     fontSize: 13,
   },
@@ -654,7 +654,7 @@ const styles = StyleSheet.create({
     color: theme.colors.border,
   },
   favToggleIconActive: {
-    color: '#FFD700',
+    color: theme.colors.rating,
   },
   duplicateRecipeBtn: {
     padding: 6,

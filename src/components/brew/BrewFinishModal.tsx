@@ -14,7 +14,7 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
-import { theme } from '../../core/theme';
+import { theme, withAlpha } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
 import { formatTemperatureDelta, UnitSystem } from '../../core/unit-converter';
 import { BrewCostMetrics } from '../../core/cost-calculator';
@@ -252,7 +252,7 @@ export function BrewFinishModal({
             {tasteBalance === 'balanced' && (
               <View style={[styles.doctorAdviceCard, styles.doctorAdviceSuccess]} testID="doctor-advice-balanced">
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                  <StarIcon size={14} color="#4CAF50" filled />
+                  <StarIcon size={14} color={theme.colors.success} filled />
                   <Text style={styles.doctorTitleSuccess}>{t.brew?.doctorBalancedTitle || 'Idealny Balans:'}</Text>
                 </View>
                 <Text style={styles.doctorText}>
@@ -377,7 +377,7 @@ export function BrewFinishModal({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: withAlpha(theme.colors.black, 0.7),
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     color: theme.colors.borderStrong,
   },
   starActive: {
-    color: '#FFD700',
+    color: theme.colors.rating,
   },
   balanceRow: {
     flexDirection: 'row',
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   doctorAdviceCard: {
-    backgroundColor: 'rgba(217, 119, 54, 0.12)',
+    backgroundColor: withAlpha(theme.colors.copper, 0.12),
     borderWidth: 1,
     borderColor: theme.colors.copper,
     borderRadius: theme.borderRadius.md,
@@ -476,8 +476,8 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   doctorAdviceSuccess: {
-    backgroundColor: 'rgba(76, 175, 80, 0.12)',
-    borderColor: '#4CAF50',
+    backgroundColor: withAlpha(theme.colors.success, 0.12),
+    borderColor: theme.colors.success,
   },
   doctorTitle: {
     fontSize: 13,
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
   doctorTitleSuccess: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#4CAF50',
+    color: theme.colors.success,
     marginBottom: 4,
   },
   doctorText: {
@@ -588,6 +588,6 @@ const styles = StyleSheet.create({
   },
   finishCostSavingsBold: {
     fontWeight: '700',
-    color: '#4CAF50',
+    color: theme.colors.success,
   },
 });

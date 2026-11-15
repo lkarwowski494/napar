@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.copper,
     padding: theme.spacing.md,
     marginVertical: theme.spacing.sm,
-    shadowColor: '#000',
+    shadowColor: theme.colors.black,
     shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 4,

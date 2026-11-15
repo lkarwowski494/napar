@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   toggleBtnActive: {
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    backgroundColor: theme.colors.copperMuted,
     borderColor: theme.colors.copper,
   },
   toggleBtnText: {

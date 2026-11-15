@@ -690,6 +690,6 @@ const styles = StyleSheet.create({
   finishSaveBtnText: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: theme.colors.white,
   },
 });

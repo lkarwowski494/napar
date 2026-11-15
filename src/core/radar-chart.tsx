@@ -6,7 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Svg, { Polygon, Line, Circle, Text as SvgText } from 'react-native-svg';
-import { theme } from './theme';
+import { theme, withAlpha } from './theme';
 
 export interface SensoryProfile {
   acidity: number; // 1 - 5
@@ -95,7 +95,7 @@ export const SensoryRadarChart: React.FC<SensoryRadarChartProps> = ({
           <Polygon
             key={`level-${level}`}
             points={getLevelPolygonPoints(level)}
-            fill={level === 5 ? 'rgba(255, 255, 255, 0.02)' : 'none'}
+            fill={level === 5 ? withAlpha(theme.colors.white, 0.02) : 'none'}
             stroke={theme.colors.border}
             strokeWidth={level === 5 ? '1.5' : '1'}
             strokeDasharray={level < 5 ? '2,2' : undefined}
@@ -121,7 +121,7 @@ export const SensoryRadarChart: React.FC<SensoryRadarChartProps> = ({
         {/* Data Polygon Fill & Outline */}
         <Polygon
           points={dataPolygonPointsString}
-          fill="rgba(217, 119, 54, 0.35)"
+          fill={withAlpha(theme.colors.copper, 0.35)}
           stroke={theme.colors.copper}
           strokeWidth="2.5"
         />

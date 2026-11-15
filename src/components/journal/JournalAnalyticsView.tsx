@@ -35,19 +35,19 @@ export function JournalAnalyticsView({ analyticsData, t }: JournalAnalyticsViewP
         </View>
 
         <View style={styles.statCard}>
-          <View style={styles.statIconBox}><DropletIcon size={20} color="#3D84A8" /></View>
+          <View style={styles.statIconBox}><DropletIcon size={20} color={theme.colors.statusStable} /></View>
           <Text style={styles.statValue}>{`${analyticsData.totalWaterLiters} L`}</Text>
           <Text style={styles.statLabel}>{t.journal.statTotalWater}</Text>
         </View>
 
         <View style={styles.statCard}>
-          <View style={styles.statIconBox}><LightningIcon size={20} color="#E5A96A" /></View>
+          <View style={styles.statIconBox}><LightningIcon size={20} color={theme.colors.accentWarm} /></View>
           <Text style={styles.statValue}>{`${analyticsData.totalCaffeineMg} mg`}</Text>
           <Text style={styles.statLabel}>{t.journal.statTotalCaffeine}</Text>
         </View>
 
         <View style={styles.statCard}>
-          <View style={styles.statIconBox}><StarIcon size={20} color="#E5A96A" filled /></View>
+          <View style={styles.statIconBox}><StarIcon size={20} color={theme.colors.accentWarm} filled /></View>
           <Text style={styles.statValue}>{`${analyticsData.avgRating}`}</Text>
           <Text style={styles.statLabel}>{t.journal.statAvgRating}</Text>
         </View>

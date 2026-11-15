@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
-import { theme } from '../../core/theme';
+import { theme, withAlpha } from '../../core/theme';
 import { formatTemperature, UnitSystem } from '../../core/unit-converter';
 import { useTranslation, formatTemplate } from '../../core/i18n';
 import { InventoryItem } from '../../core/database-schema';
@@ -311,12 +311,12 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   beverageToggleBtnActiveCoffee: {
-    backgroundColor: 'rgba(200, 106, 40, 0.16)',
+    backgroundColor: withAlpha(theme.colors.copperBrand, 0.16),
     borderWidth: 1,
     borderColor: theme.colors.copper,
   },
   beverageToggleBtnActiveTea: {
-    backgroundColor: 'rgba(42, 123, 98, 0.18)',
+    backgroundColor: withAlpha(theme.colors.emerald, 0.18),
     borderWidth: 1,
     borderColor: theme.colors.emerald,
   },
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     maxWidth: 160,
   },
   favoriteChipActive: {
-    backgroundColor: 'rgba(217, 119, 54, 0.12)',
+    backgroundColor: withAlpha(theme.colors.copper, 0.12),
     borderColor: theme.colors.copper,
   },
   favoriteChipText: {
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: 'rgba(217, 119, 54, 0.1)',
+    backgroundColor: withAlpha(theme.colors.copper, 0.1),
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     minHeight: 52,
   },
   gongfuBanner: {
-    backgroundColor: 'rgba(42, 123, 98, 0.12)',
+    backgroundColor: withAlpha(theme.colors.emerald, 0.12),
     borderWidth: 1,
     borderColor: theme.colors.emerald,
     borderRadius: theme.borderRadius.md,

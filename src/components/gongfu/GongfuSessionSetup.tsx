@@ -8,7 +8,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Field, NumInput } from '../ui';
 import { GongfuTeaType } from '../../core/gongfu-session';
 import { gramsToOunces, mlToFluidOunces, celsiusToFahrenheit } from '../../core/unit-converter';
-import { theme } from '../../core/theme';
+import { theme, withAlpha } from '../../core/theme';
 
 export interface GongfuSessionSetupProps {
   teaType: GongfuTeaType;
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.borderStrong,
   },
   teaTypeChipActive: {
-    backgroundColor: 'rgba(42, 123, 98, 0.2)',
+    backgroundColor: withAlpha(theme.colors.emerald, 0.2),
     borderColor: theme.colors.emerald,
   },
   teaTypeChipText: {

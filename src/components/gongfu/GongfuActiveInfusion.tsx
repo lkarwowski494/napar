@@ -247,13 +247,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   startBtnText: {
-    color: '#FFFFFF',
+    color: theme.colors.white,
     fontSize: 16,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   steepingActiveBox: {
-    backgroundColor: 'rgba(42, 123, 98, 0.15)',
+    backgroundColor: theme.colors.emeraldMuted,
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 18,

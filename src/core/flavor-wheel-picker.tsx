@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SCA_FLAVOR_WHEEL, FlavorCategory } from './flavor-wheel-data';
-import { theme } from './theme';
+import { theme, withAlpha } from './theme';
 import { readableTextOn } from './contrast';
 
 export interface FlavorWheelPickerProps {
@@ -70,7 +70,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                 styles.categoryTab,
                 isActive && {
                   borderColor: cat.color,
-                  backgroundColor: 'rgba(255,255,255,0.08)',
+                  backgroundColor: withAlpha(theme.colors.white, 0.08),
                 },
               ]}
               onPress={() => setActiveCategoryId(cat.id)}

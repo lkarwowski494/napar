@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   },
   compCardHealth: {
     fontSize: 12,
-    color: '#4ade80',
+    color: theme.colors.successBright,
     marginBottom: 8,
     fontStyle: 'italic',
   },

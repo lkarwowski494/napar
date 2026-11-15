@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { theme } from '../../core/theme';
+import { theme, withAlpha } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
 import { saveInventoryItem, deleteInventoryItem, getUnitSystem } from '../../core/database';
 import { gramsToOunces, ouncesToGrams, roundTo } from '../../core/unit-converter';
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
     color: theme.colors.borderStrong,
   },
   starIconActive: {
-    color: '#FFD700',
+    color: theme.colors.rating,
   },
   markFinishedBtn: {
     minHeight: 44,
@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
   },
   deletePackBtn: {
     minHeight: 44,
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: withAlpha(theme.colors.dangerBright, 0.1),
     borderWidth: 1,
     borderColor: theme.colors.danger,
     paddingVertical: 14,

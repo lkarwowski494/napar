@@ -14,7 +14,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { theme } from '../core/theme';
+import { theme, withAlpha } from '../core/theme';
 import { translations } from '../core/i18n';
 import {
   CompassIcon,
@@ -191,7 +191,7 @@ export function AppGuideModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.82)',
+    backgroundColor: withAlpha(theme.colors.black, 0.82),
     justifyContent: 'flex-end',
   },
   sheet: {

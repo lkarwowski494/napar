@@ -6,6 +6,7 @@
 
 import React from 'react';
 import Svg, { Path, Circle, Rect, G } from 'react-native-svg';
+import { theme } from '../../core/theme';
 
 export interface IconProps {
   size?: number;
@@ -14,7 +15,7 @@ export interface IconProps {
 }
 
 /** 1. Parzenie / Rytuał: Elegancki Dripper Pour-Over */
-export function BrewIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function BrewIcon({ size = 24, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {/* Korpus drippera stożkowego V60 */}
@@ -46,7 +47,7 @@ export function BrewIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: I
 }
 
 /** 2. Spiżarnia / Surowce: Ziarno Kawy & Liść Herbaty */
-export function BeansIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function BeansIcon({ size = 24, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {/* Zarys ziarna kawy */}
@@ -69,7 +70,7 @@ export function BeansIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: 
 }
 
 /** 3. Dziennik / Kronika: Notatnik Degustacji ze wstążką */
-export function JournalIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function JournalIcon({ size = 24, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -97,7 +98,7 @@ export function JournalIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }
 }
 
 /** 4. Warsztat / Laboratorium: Kompas Dial-in i Pomiary */
-export function LabIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function LabIcon({ size = 24, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Circle
@@ -120,7 +121,7 @@ export function LabIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: Ic
 }
 
 /** 5. Kofeina & Metabolizm Snu: Fala energii i półtrwania */
-export function CaffeineIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function CaffeineIcon({ size = 24, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -135,7 +136,7 @@ export function CaffeineIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 
 }
 
 /** Ustawienia i Narzędzia */
-export function SettingsIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function SettingsIcon({ size = 24, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -144,14 +145,14 @@ export function SettingsIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 
         strokeWidth={strokeWidth}
         strokeLinecap="round"
       />
-      <Circle cx="8" cy="7" r="2.5" fill="#1C1C1F" stroke={color} strokeWidth={strokeWidth} />
-      <Circle cx="16" cy="17" r="2.5" fill="#1C1C1F" stroke={color} strokeWidth={strokeWidth} />
+      <Circle cx="8" cy="7" r="2.5" fill={theme.colors.bgCard} stroke={color} strokeWidth={strokeWidth} />
+      <Circle cx="16" cy="17" r="2.5" fill={theme.colors.bgCard} stroke={color} strokeWidth={strokeWidth} />
     </Svg>
   );
 }
 
 /** Młynek / Kliki (Grinder Burrs) */
-export function GrinderIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function GrinderIcon({ size = 20, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Circle cx="12" cy="12" r="8" stroke={color} strokeWidth={strokeWidth} />
@@ -167,7 +168,7 @@ export function GrinderIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }
 }
 
 /** Start / Play */
-export function PlayIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function PlayIcon({ size = 24, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -182,7 +183,7 @@ export function PlayIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: I
 }
 
 /** Pause */
-export function PauseIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function PauseIcon({ size = 24, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Rect x="6" y="5" width="4" height="14" rx="1.5" fill={color} />
@@ -192,7 +193,7 @@ export function PauseIcon({ size = 24, color = '#F4EFEA', strokeWidth = 1.75 }: 
 }
 
 /** Next / Forward */
-export function NextStepIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function NextStepIcon({ size = 20, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -207,7 +208,7 @@ export function NextStepIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 
 }
 
 /** Previous / Back */
-export function PrevStepIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function PrevStepIcon({ size = 20, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -222,7 +223,7 @@ export function PrevStepIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 
 }
 
 /** Reset / Restart */
-export function ResetIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function ResetIcon({ size = 20, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -237,7 +238,7 @@ export function ResetIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: 
 }
 
 /** Share / QR Code */
-export function QrIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function QrIcon({ size = 20, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Rect x="3.5" y="3.5" width="6" height="6" rx="1" stroke={color} strokeWidth={strokeWidth} />
@@ -252,7 +253,7 @@ export function QrIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: Ico
 }
 
 /** Ulubione (Star) */
-export function StarIcon({ size = 18, color = '#D97736', filled = false, strokeWidth = 1.75 }: IconProps & { filled?: boolean }) {
+export function StarIcon({ size = 18, color = theme.colors.copper, filled = false, strokeWidth = 1.75 }: IconProps & { filled?: boolean }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? color : 'none'}>
       <Path
@@ -271,7 +272,7 @@ export function StarIcon({ size = 18, color = '#D97736', filled = false, strokeW
 // ============================================================================
 
 /** ☕ 1. Napar — Ekstrakcja Kawy Specialty i Herbaty Rzemieślniczej */
-export function NaparAppIcon({ size = 28, color = '#C86A28', strokeWidth = 1.75 }: IconProps) {
+export function NaparAppIcon({ size = 28, color = theme.familyColors.napar, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {/* Dripper stożkowy V60 z uchwytem */}
@@ -299,7 +300,7 @@ export function NaparAppIcon({ size = 28, color = '#C86A28', strokeWidth = 1.75 
 }
 
 /** 🥖 2. Piekarz — Chleb Rzemieślniczy, Zakwas i Piekarska Hydratacja */
-export function PiekarzAppIcon({ size = 28, color = '#D49B42', strokeWidth = 1.75 }: IconProps) {
+export function PiekarzAppIcon({ size = 28, color = theme.familyColors.piekarz, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {/* Bochenek chleba boule (okrągły bochen na zakwasie) */}
@@ -326,7 +327,7 @@ export function PiekarzAppIcon({ size = 28, color = '#D49B42', strokeWidth = 1.7
 }
 
 /** 🫙 3. Słoik — Kiszonki, Solanki, Octy i Fermentacja Warzyw */
-export function SloikAppIcon({ size = 28, color = '#5B8A61', strokeWidth = 1.75 }: IconProps) {
+export function SloikAppIcon({ size = 28, color = theme.familyColors.sloik, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {/* Korpus słoika Weck z zaokrąglonymi ramionami */}
@@ -356,7 +357,7 @@ export function SloikAppIcon({ size = 28, color = '#5B8A61', strokeWidth = 1.75 
 }
 
 /** 🥩 4. Masaż — Wędliny, Sezonowanie, Peklosól i Wędzenie */
-export function MasazAppIcon({ size = 28, color = '#A43E38', strokeWidth = 1.75 }: IconProps) {
+export function MasazAppIcon({ size = 28, color = theme.familyColors.masaz, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {/* Kawałek dojrzewającego mięsa / szynki */}
@@ -382,7 +383,7 @@ export function MasazAppIcon({ size = 28, color = '#A43E38', strokeWidth = 1.75 
 }
 
 /** 🧀 5. Ferment — Sery Rzemieślnicze, Skrzep, Dojrzewalnia i pH */
-export function FermentAppIcon({ size = 28, color = '#E0A838', strokeWidth = 1.75 }: IconProps) {
+export function FermentAppIcon({ size = 28, color = theme.familyColors.ferment, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {/* Krąg sera w rzucie z góry/izometrycznym */}
@@ -416,7 +417,7 @@ export function FermentAppIcon({ size = 28, color = '#E0A838', strokeWidth = 1.7
 }
 
 /** 👑 6. Herb Rodziny Apps4Craft Studio */
-export function CraftFamilyEmblem({ size = 32, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function CraftFamilyEmblem({ size = 32, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {/* Zewnętrzna rzemieślnicza tarcza (squircle) */}
@@ -438,13 +439,13 @@ export function CraftFamilyEmblem({ size = 32, color = '#F4EFEA', strokeWidth = 
         opacity={0.6}
       />
       {/* Rdzeń tarczy */}
-      <Circle cx="12" cy="12" r="2.2" stroke={color} strokeWidth={strokeWidth} fill="#121214" />
+      <Circle cx="12" cy="12" r="2.2" stroke={color} strokeWidth={strokeWidth} fill={theme.colors.bg} />
     </Svg>
   );
 }
 
 /** 7. Nawigacja Wstecz (Chevron Back) */
-export function ChevronBackIcon({ size = 24, color = '#F4EFEA', strokeWidth = 2 }: IconProps) {
+export function ChevronBackIcon({ size = 24, color = theme.colors.textPrimary, strokeWidth = 2 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -459,7 +460,7 @@ export function ChevronBackIcon({ size = 24, color = '#F4EFEA', strokeWidth = 2 
 }
 
 /** 8. Zamknięcie (Close X) */
-export function CloseIcon({ size = 24, color = '#F4EFEA', strokeWidth = 2 }: IconProps) {
+export function CloseIcon({ size = 24, color = theme.colors.textPrimary, strokeWidth = 2 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -474,7 +475,7 @@ export function CloseIcon({ size = 24, color = '#F4EFEA', strokeWidth = 2 }: Ico
 }
 
 /** 9. Znacznik Potwierdzenia (Checkmark) */
-export function CheckIcon({ size = 20, color = '#4E9F3D', strokeWidth = 2 }: IconProps) {
+export function CheckIcon({ size = 20, color = theme.colors.sage, strokeWidth = 2 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -489,7 +490,7 @@ export function CheckIcon({ size = 20, color = '#4E9F3D', strokeWidth = 2 }: Ico
 }
 
 /** 10. Liść Herbaty (Tea Leaf) */
-export function TeaLeafIcon({ size = 24, color = '#2A7B62', strokeWidth = 1.75 }: IconProps) {
+export function TeaLeafIcon({ size = 24, color = theme.colors.emerald, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -510,7 +511,7 @@ export function TeaLeafIcon({ size = 24, color = '#2A7B62', strokeWidth = 1.75 }
 }
 
 /** 11. Kropla Wody (Droplet) */
-export function DropletIcon({ size = 20, color = '#3D84A8', strokeWidth = 1.75 }: IconProps) {
+export function DropletIcon({ size = 20, color = theme.colors.statusStable, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -525,7 +526,7 @@ export function DropletIcon({ size = 20, color = '#3D84A8', strokeWidth = 1.75 }
 }
 
 /** 12. Błyskawica / Kofeina (Lightning) */
-export function LightningIcon({ size = 20, color = '#E5A96A', strokeWidth = 1.75 }: IconProps) {
+export function LightningIcon({ size = 20, color = theme.colors.accentWarm, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -540,7 +541,7 @@ export function LightningIcon({ size = 20, color = '#E5A96A', strokeWidth = 1.75
 }
 
 /** 13. Kompas / Sensor (Compass) */
-export function CompassIcon({ size = 20, color = '#C86A28', strokeWidth = 1.75 }: IconProps) {
+export function CompassIcon({ size = 20, color = theme.colors.copperBrand, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth={strokeWidth} />
@@ -555,7 +556,7 @@ export function CompassIcon({ size = 20, color = '#C86A28', strokeWidth = 1.75 }
 }
 
 /** 14. Kosz / Usuń (Trash) */
-export function TrashIcon({ size = 20, color = '#D9534F', strokeWidth = 1.75 }: IconProps) {
+export function TrashIcon({ size = 20, color = theme.colors.dangerIcon, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -570,7 +571,7 @@ export function TrashIcon({ size = 20, color = '#D9534F', strokeWidth = 1.75 }: 
 }
 
 /** 15. Archiwizuj / Paczka (Archive Box) */
-export function ArchiveIcon({ size = 20, color = '#A09C96', strokeWidth = 1.75 }: IconProps) {
+export function ArchiveIcon({ size = 20, color = theme.colors.textSecondary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -585,7 +586,7 @@ export function ArchiveIcon({ size = 20, color = '#A09C96', strokeWidth = 1.75 }
 }
 
 /** 16. Księga / Kompendium (Book) */
-export function BookIcon({ size = 20, color = '#C86A28', strokeWidth = 1.75 }: IconProps) {
+export function BookIcon({ size = 20, color = theme.colors.copperBrand, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -600,7 +601,7 @@ export function BookIcon({ size = 20, color = '#C86A28', strokeWidth = 1.75 }: I
 }
 
 /** 17. Aparat / Skaner QR (Camera) */
-export function CameraIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function CameraIcon({ size = 20, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -616,7 +617,7 @@ export function CameraIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }:
 }
 
 /** 18. Kopiuj / Duplikuj (Copy) */
-export function CopyIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function CopyIcon({ size = 20, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Rect x="9" y="9" width="13" height="13" rx="2" stroke={color} strokeWidth={strokeWidth} />
@@ -631,7 +632,7 @@ export function CopyIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: I
 }
 
 /** 19. Edytuj / Ołówek (Edit) */
-export function EditIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: IconProps) {
+export function EditIcon({ size = 20, color = theme.colors.textPrimary, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -653,7 +654,7 @@ export function EditIcon({ size = 20, color = '#F4EFEA', strokeWidth = 1.75 }: I
 }
 
 /** 20. Ogień / Podnieś Temperaturę (Flame) */
-export function FlameIcon({ size = 20, color = '#D9534F', strokeWidth = 1.75 }: IconProps) {
+export function FlameIcon({ size = 20, color = theme.colors.dangerIcon, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -668,7 +669,7 @@ export function FlameIcon({ size = 20, color = '#D9534F', strokeWidth = 1.75 }: 
 }
 
 /** 21. Śnieżynka / Obniż Temperaturę (Snowflake) */
-export function SnowflakeIcon({ size = 20, color = '#3D84A8', strokeWidth = 1.75 }: IconProps) {
+export function SnowflakeIcon({ size = 20, color = theme.colors.statusStable, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -683,7 +684,7 @@ export function SnowflakeIcon({ size = 20, color = '#3D84A8', strokeWidth = 1.75
 }
 
 /** 22. Tarcza Bezpieczeństwa / Offline (Shield) */
-export function ShieldIcon({ size = 20, color = '#4E9F3D', strokeWidth = 1.75 }: IconProps) {
+export function ShieldIcon({ size = 20, color = theme.colors.sage, strokeWidth = 1.75 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path

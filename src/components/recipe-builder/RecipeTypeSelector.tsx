@@ -91,11 +91,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   typeTabActiveCoffee: {
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    backgroundColor: theme.colors.copperMuted,
     borderColor: theme.colors.copper,
   },
   typeTabActiveTea: {
-    backgroundColor: 'rgba(42, 123, 98, 0.15)',
+    backgroundColor: theme.colors.emeraldMuted,
     borderColor: theme.colors.emerald,
   },
   typeTabText: {

@@ -16,7 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BeveragePreference } from '../core/database';
 import { useTranslation } from '../core/i18n';
-import { theme } from '../core/theme';
+import { theme, withAlpha } from '../core/theme';
 import {
   NaparAppIcon,
   BrewIcon,
@@ -102,7 +102,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
                   </Text>
                   {selectedPref === 'coffee' && (
                     <View style={styles.checkIndicator}>
-                      <CheckIcon size={12} color="#FFFFFF" strokeWidth={2.5} />
+                      <CheckIcon size={12} color={theme.colors.white} strokeWidth={2.5} />
                     </View>
                   )}
                 </View>
@@ -132,7 +132,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
                   </Text>
                   {selectedPref === 'tea' && (
                     <View style={[styles.checkIndicator, { backgroundColor: theme.colors.emerald }]}>
-                      <CheckIcon size={12} color="#FFFFFF" strokeWidth={2.5} />
+                      <CheckIcon size={12} color={theme.colors.white} strokeWidth={2.5} />
                     </View>
                   )}
                 </View>
@@ -162,7 +162,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
                   </Text>
                   {selectedPref === 'both' && (
                     <View style={styles.checkIndicator}>
-                      <CheckIcon size={12} color="#FFFFFF" strokeWidth={2.5} />
+                      <CheckIcon size={12} color={theme.colors.white} strokeWidth={2.5} />
                     </View>
                   )}
                 </View>
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: theme.colors.black,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
     shadowRadius: 16,
@@ -275,15 +275,15 @@ const styles = StyleSheet.create({
   },
   prefCardActiveCoffee: {
     borderColor: theme.colors.copper,
-    backgroundColor: 'rgba(200, 106, 40, 0.08)',
+    backgroundColor: withAlpha(theme.colors.copperBrand, 0.08),
   },
   prefCardActiveTea: {
     borderColor: theme.colors.emerald,
-    backgroundColor: 'rgba(42, 123, 98, 0.08)',
+    backgroundColor: withAlpha(theme.colors.emerald, 0.08),
   },
   prefCardActiveBoth: {
     borderColor: theme.colors.copper,
-    backgroundColor: 'rgba(200, 106, 40, 0.08)',
+    backgroundColor: withAlpha(theme.colors.copperBrand, 0.08),
   },
   cardIconBox: {
     width: 44,
@@ -295,13 +295,13 @@ const styles = StyleSheet.create({
     marginRight: 14,
   },
   cardIconBoxActiveCoffee: {
-    backgroundColor: 'rgba(200, 106, 40, 0.18)',
+    backgroundColor: withAlpha(theme.colors.copperBrand, 0.18),
   },
   cardIconBoxActiveTea: {
-    backgroundColor: 'rgba(42, 123, 98, 0.18)',
+    backgroundColor: withAlpha(theme.colors.emerald, 0.18),
   },
   cardIconBoxActiveBoth: {
-    backgroundColor: 'rgba(200, 106, 40, 0.18)',
+    backgroundColor: withAlpha(theme.colors.copperBrand, 0.18),
   },
   cardContent: {
     flex: 1,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { BrewSession } from '../../core/database-schema';
-import { theme } from '../../core/theme';
+import { theme, withAlpha } from '../../core/theme';
 import { SensoryRadarChart } from '../../core/radar-chart';
 import { getWaterProfileName } from '../../core/water-chemistry';
 import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../core/unit-converter';
@@ -232,13 +232,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   ratingBadge: {
-    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    backgroundColor: withAlpha(theme.colors.rating, 0.15),
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: theme.borderRadius.sm,
   },
   ratingText: {
-    color: '#FFD700',
+    color: theme.colors.rating,
     fontWeight: '700',
     fontSize: 14,
   },

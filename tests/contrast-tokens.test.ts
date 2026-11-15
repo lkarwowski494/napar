@@ -4,7 +4,7 @@
 // Próg 7:1 z docs/scope-contract.md nie jest tu sprawdzany — to osobna decyzja właściciela (raport M2).
 import fs from 'fs';
 import path from 'path';
-import { theme } from '../src/core/theme';
+import { theme, withAlpha } from '../src/core/theme';
 import { getContrastRatio, readableTextOn } from '../src/core/contrast';
 import { SCA_FLAVOR_WHEEL as FLAVOR_WHEEL } from '../src/core/flavor-wheel-data';
 
@@ -33,12 +33,26 @@ const TEXT: [string, string, string][] = [
   ['onAccent / copper (przyciski główne)', c.onAccent, c.copper],
   ['onAccent / danger (przycisk wypełniony)', c.onAccent, c.danger],
   ['white / emerald', c.white, c.emerald],
+  // M1-audytor-generalny-042: tokeny przeniesione z literałów ekranów (wartości bez zmian).
+  ['rating (gwiazdki) / bgCard', c.rating, c.bgCard],
+  ['rating / odznaka oceny (rating 15% na bgCard)', c.rating, over(withAlpha(c.rating, 0.15), c.bgCard)],
+  ['favorite / bgCard', c.favorite, c.bgCard],
+  ['success / bgCard', c.success, c.bgCard],
+  ['success / porada „balans” (success 12% na bgCard)', c.success, over(withAlpha(c.success, 0.12), c.bgCard)],
+  ['successBright / bgCard', c.successBright, c.bgCard],
+  ['successBright / bgCardSecondary', c.successBright, c.bgCardSecondary],
+  ['white / error (przycisk niszczący)', c.white, c.error],
+  ['errorBannerTitle / errorBannerBg', c.errorBannerTitle, c.errorBannerBg],
+  ['errorBannerText / errorBannerBg', c.errorBannerText, c.errorBannerBg],
+  ['white / errorBannerAction', c.white, c.errorBannerAction],
+  ['accentWarm (ikony statystyk) / bgCardSecondary', c.accentWarm, c.bgCardSecondary],
 ];
 const UI: [string, string, string][] = [
   ['borderStrong / bgCard (obrys pola, chipa)', c.borderStrong, c.bgCard],
   ['borderStrong / bgCardSecondary', c.borderStrong, c.bgCardSecondary],
   ['borderStrong / bg', c.borderStrong, c.bg],
   ['pusta gwiazdka (borderStrong) / bgCard', c.borderStrong, c.bgCard],
+  ['error (obrys pola z błędem) / bgCard', c.error, c.bgCard],
 ];
 
 describe('M1-audytor-generalny-028: kontrast tokenów motywu (04-studio-projektowe-003)', () => {
@@ -75,6 +89,21 @@ const stylesOf = (s: string): Map<string, string> => {
 const prop = (body: string, key: string): string | undefined => body.match(new RegExp(`\\b${key}: *([^,\\n]+)`))?.[1].trim();
 const COPPER = /^(theme\.colors\.copper|'#D97736')$/i;
 const WHITE = /^('#FFFFFF'|'#FFF'|theme\.colors\.white)$/i;
+
+describe('M1-audytor-generalny-042: withAlpha — przezroczystość z tokenu zamiast liczb rgba() w ekranach', () => {
+  test('daje te same wartości, które ekrany miały wpisane literałami', () => {
+    expect(withAlpha(c.copper, 0.12)).toBe('rgba(217, 119, 54, 0.12)');
+    expect(withAlpha(c.copperBrand, 0.08)).toBe('rgba(200, 106, 40, 0.08)');
+    expect(withAlpha('#000', 0.7)).toBe('rgba(0, 0, 0, 0.7)');
+    expect(withAlpha('#FFFFFF80', 0.1)).toBe('rgba(255, 255, 255, 0.1)');
+    expect(withAlpha(c.copper, 0.15)).toBe(c.copperMuted);
+    expect(withAlpha(c.emerald, 0.15)).toBe(c.emeraldMuted);
+  });
+  test('kolory rodziny aplikacji są w motywie (emblematy CraftIcons)', () => {
+    expect(theme.familyColors.napar).toBe(c.copperBrand);
+    for (const v of Object.values(theme.familyColors)) expect(v).toMatch(/^#[0-9A-F]{6}$/);
+  });
+});
 
 describe('M1-audytor-generalny-028: style ekranów', () => {
   test('tekst na przycisku wypełnionym miedzią nie jest biały (3,16:1)', () => {

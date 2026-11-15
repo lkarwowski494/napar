@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { theme } from './theme';
+import { theme, withAlpha } from './theme';
 import { CameraIcon } from '../components/icons/CraftIcons';
 import { ModalHeader } from '../components/ui';
 
@@ -138,7 +138,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: theme.colors.black,
   },
   header: {
     height: 56,
@@ -147,12 +147,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
+    borderBottomColor: withAlpha(theme.colors.white, 0.1),
   },
   headerTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: theme.colors.white,
   },
   permissionBox: {
     flex: 1,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: withAlpha(theme.colors.black, 0.3),
   },
   viewfinder: {
     width: 250,
@@ -242,11 +242,11 @@ const styles = StyleSheet.create({
   hintText: {
     marginTop: 30,
     fontSize: 15,
-    color: '#FFFFFF',
+    color: theme.colors.white,
     fontWeight: '600',
     textAlign: 'center',
     paddingHorizontal: 20,
-    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowColor: withAlpha(theme.colors.black, 0.8),
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },

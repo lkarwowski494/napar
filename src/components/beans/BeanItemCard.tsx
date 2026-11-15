@@ -8,7 +8,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { InventoryItem } from '../../core/database-schema';
 import { evaluateRestingWindow } from '../../core/domain-rules';
 import { formatDoseWeight } from '../../core/unit-converter';
-import { theme } from '../../core/theme';
+import { theme, withAlpha } from '../../core/theme';
 import { useTranslation } from '../../core/i18n';
 
 interface BeanItemCardProps {
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
   },
   favIconActive: {
-    color: '#E5A93C',
+    color: theme.colors.favorite,
   },
   restingBadge: {
     alignSelf: 'flex-start',
@@ -221,19 +221,19 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   restingOptimal: {
-    backgroundColor: 'rgba(42, 123, 98, 0.15)',
+    backgroundColor: theme.colors.emeraldMuted,
     borderWidth: 1,
-    borderColor: 'rgba(42, 123, 98, 0.3)',
+    borderColor: withAlpha(theme.colors.emerald, 0.3),
   },
   restingFresh: {
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    backgroundColor: theme.colors.copperMuted,
     borderWidth: 1,
-    borderColor: 'rgba(217, 119, 54, 0.3)',
+    borderColor: withAlpha(theme.colors.copper, 0.3),
   },
   restingPast: {
-    backgroundColor: 'rgba(100, 100, 100, 0.15)',
+    backgroundColor: withAlpha(theme.colors.neutralTint, 0.15),
     borderWidth: 1,
-    borderColor: 'rgba(100, 100, 100, 0.3)',
+    borderColor: withAlpha(theme.colors.neutralTint, 0.3),
   },
   restingText: {
     fontSize: 11,
@@ -269,12 +269,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   flavorChip: {
-    backgroundColor: 'rgba(217, 119, 54, 0.08)',
+    backgroundColor: withAlpha(theme.colors.copper, 0.08),
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(217, 119, 54, 0.2)',
+    borderColor: withAlpha(theme.colors.copper, 0.2),
   },
   flavorText: {
     fontSize: 11,
@@ -282,9 +282,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   emptyStashBanner: {
-    backgroundColor: 'rgba(217, 83, 79, 0.1)',
+    backgroundColor: withAlpha(theme.colors.dangerIcon, 0.1),
     borderWidth: 1,
-    borderColor: 'rgba(217, 83, 79, 0.3)',
+    borderColor: withAlpha(theme.colors.dangerIcon, 0.3),
     borderRadius: 8,
     padding: 10,
     marginBottom: 12,

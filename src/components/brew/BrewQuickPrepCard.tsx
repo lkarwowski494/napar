@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { theme } from '../../core/theme';
+import { theme, withAlpha } from '../../core/theme';
 import { useTranslation } from '../../core/i18n';
 import {
   formatDoseWeight,
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
   batchBadge: {
-    backgroundColor: 'rgba(217, 119, 54, 0.12)',
+    backgroundColor: withAlpha(theme.colors.copper, 0.12),
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   batchChipActive: {
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    backgroundColor: theme.colors.copperMuted,
     borderColor: theme.colors.copper,
   },
   batchChipText: {
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   ratioChipActive: {
-    backgroundColor: 'rgba(217, 119, 54, 0.15)',
+    backgroundColor: theme.colors.copperMuted,
     borderColor: theme.colors.copper,
   },
   ratioChipText: {
