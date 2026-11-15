@@ -54,6 +54,9 @@ PROP_SEED=12345 npm test -- tests/domain-properties.test.ts
 6. **Ochrona danych i kopie zapasowe (`BR-TEST-022`, `BR-TEST-023`):**
    * Dwie rozdzielne pule po 10 plików: automatyczne $P_{\text{auto}}$ oraz ratunkowe $P_{\text{safe}}$ z sufiksem `-2`.
    * Błędy bazy lub zapisu chronione zrzutem do `state_corrupt_<ts>.json` z banerem odzysku.
+7. **Zakres tylko przez bramkę zmian (`docs/scope-contract.md` §5, DEC-09 a):**
+   * Zakaz dodawania funkcji (deklaracji w `src/core/`, ekranów, ustawień) bez wiersza ZM z wynikiem bramki zmian zakresu i decyzją właściciela z datą. *Dlaczego:* pętle audytu P32–P105 dopisywały funkcje bez decyzji zakresu (SYS-01).
+   * Raporty i plany audytów nie trafiają do repozytorium (`audit/` w `.gitignore`).
 
 ---
 

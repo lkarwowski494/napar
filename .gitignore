@@ -12,6 +12,9 @@ coverage/
 .secrets/
 __pycache__/
 
+# Raporty i plany audytów poza repozytorium (DEC-09 a, M1-audytor-generalny-039)
+audit/
+
 # Bezpieczeństwo: sekrety i certyfikaty nigdy w repozytorium
 .env*
 *.p8

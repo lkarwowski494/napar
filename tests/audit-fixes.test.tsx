@@ -1843,3 +1843,26 @@ describe('M1-audytor-generalny-036: TestFlight tylko przy zielonym CI i E2E na t
     }
   });
 });
+
+// ============================================================================
+// M1-audytor-generalny-039 (DEC-09 a): raporty poprzednich pętli audytu poza drzewem publicznego repo;
+// CLAUDE.md zakazuje dodawania funkcji bez bramki zmian zakresu.
+// ============================================================================
+describe('M1-audytor-generalny-039: raporty audytów poza repo, funkcje tylko przez bramkę zmian zakresu (DEC-09 a)', () => {
+  const { execFileSync } = jest.requireActual('child_process') as typeof import('child_process');
+
+  test('git ls-files nie zwraca audit/ ani raportów poprzednich pętli; audit/ jest w .gitignore', () => {
+    const tracked = execFileSync('git', ['ls-files', '--', 'audit', 'PROMPT-AUDYT-NAPAR.md', 'AUDYT_JAKOSCI_I_WYDAN_NAPAR.md', 'docs/supreme-audit-1-11.md', 'docs/remediation-matrix.md', 'docs/remediation-report.md'], { cwd: root, encoding: 'utf8' });
+    expect(tracked.trim()).toBe('');
+    const ignore = readFileSync(join(root, '.gitignore'), 'utf8').split('\n').map((l) => l.trim());
+    expect(ignore).toContain('audit/');
+    expect(() => execFileSync('git', ['check-ignore', '-q', '--no-index', 'audit/M1-x/raport.md'], { cwd: root })).not.toThrow();
+  });
+
+  test('CLAUDE.md zakazuje dodawania funkcji bez wiersza ZM bramki zmian zakresu (docs/scope-contract.md §5)', () => {
+    const claude = readFileSync(join(root, 'CLAUDE.md'), 'utf8');
+    expect(claude).toMatch(/Zakaz dodawania funkcji[^\n]*bez wiersza ZM[^\n]*bramk[^\n]*zmian zakresu/);
+    expect(claude).toMatch(/docs\/scope-contract\.md/);
+    expect(readFileSync(join(root, 'docs/scope-contract.md'), 'utf8')).toMatch(/## 5\. Bramka zmian zakresu \(ZM\)/);
+  });
+});
