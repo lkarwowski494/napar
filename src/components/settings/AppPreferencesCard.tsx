@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    minHeight: 36,
+    minHeight: 44, // 029: było 36
     minWidth: 48,
     alignItems: 'center',
     justifyContent: 'center',

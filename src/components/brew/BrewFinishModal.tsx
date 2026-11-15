@@ -147,6 +147,7 @@ export function BrewFinishModal({
                 <Pressable
                   key={s}
                   testID={`star-rating-${s}`}
+                  style={styles.starBtn}
                   onPress={() => onChangeRating(s)}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: safeRating >= s }}
@@ -429,8 +430,15 @@ const styles = StyleSheet.create({
   starRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 12,
+    gap: 4,
     marginBottom: 10,
+  },
+  // 029: pole dotyku gwiazdki 44×44 (glif 32 pt miał ok. 30 pt)
+  starBtn: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   starIcon: {
     fontSize: 32,
@@ -446,6 +454,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   balanceChip: {
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: theme.borderRadius.full,

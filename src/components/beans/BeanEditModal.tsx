@@ -456,6 +456,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   typeBtn: {
+    minHeight: 44,
     flex: 1,
     paddingVertical: 12,
     borderRadius: theme.borderRadius.md,
@@ -508,6 +509,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   quickWeightBtn: {
+    minHeight: 44,
     flex: 1,
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
@@ -536,6 +538,10 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   starBtn: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 4,
   },
   starIcon: {
@@ -546,6 +552,7 @@ const styles = StyleSheet.create({
     color: '#FFD700',
   },
   saveSubmitBtn: {
+    minHeight: 44,
     backgroundColor: theme.colors.copper,
     paddingVertical: 16,
     borderRadius: theme.borderRadius.md,
@@ -559,6 +566,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   markFinishedBtn: {
+    minHeight: 44,
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
     borderColor: theme.colors.copper,
@@ -573,6 +581,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   deletePackBtn: {
+    minHeight: 44,
     backgroundColor: 'rgba(239, 68, 68, 0.1)',
     borderWidth: 1,
     borderColor: theme.colors.danger,

@@ -44,9 +44,16 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
         {t.gongfu.infusionNumber} #{nextInfusionNum}
       </Text>
 
-      <Text style={styles.timerCountdown}>
+      <Text
+        style={styles.timerCountdown}
+        testID="gongfu-countdown-display"
+        // 029: cyfry 72 pt rosną najwyżej ×1,3; jeden wiersz
+        maxFontSizeMultiplier={1.3}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
         {remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}
-        <Text style={styles.secondsUnit}>s</Text>
+        <Text style={styles.secondsUnit} maxFontSizeMultiplier={1.3}>s</Text>
       </Text>
 
       {/* Przyciski korekty czasu +/- 5s */}

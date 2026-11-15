@@ -253,7 +253,14 @@ export function ProcedureModal({
                 : b.procedurePausedStatus}
             </Text>
 
-            <Text style={styles.giantClock} testID="procedure-countdown-display">
+            <Text
+              style={styles.giantClock}
+              testID="procedure-countdown-display"
+              // 029: cyfry 64 pt rosną najwyżej ×1,3 (AX5 = ×3,571 łamał czas na 3 wiersze)
+              maxFontSizeMultiplier={1.3}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
               {formatClock(localRemaining)}
             </Text>
 
