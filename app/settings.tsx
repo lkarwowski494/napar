@@ -27,6 +27,8 @@ import {
   setVoiceAnnounceEnabled,
   getHapticsEnabled,
   setHapticsEnabled,
+  getSoundEnabled,
+  setSoundEnabled,
   getCaffeineHalfLife,
   setCaffeineHalfLife,
   getBedtimeHour,
@@ -93,6 +95,7 @@ export default function SettingsScreen() {
   const [haptics, setHaptics] = useState<boolean>(() => {
     return getHapticsEnabled();
   });
+  const [sound, setSound] = useState<boolean>(() => getSoundEnabled());
   const [halfLifeHours, setHalfLifeHoursState] = useState(() => {
     return getCaffeineHalfLife();
   });
@@ -139,6 +142,12 @@ export default function SettingsScreen() {
     const next = !haptics;
     setHaptics(next);
     setHapticsEnabled(next);
+  };
+
+  const handleToggleSound = () => {
+    const next = !sound;
+    setSound(next);
+    setSoundEnabled(next);
   };
 
   const handleExport = () => {
@@ -216,6 +225,8 @@ export default function SettingsScreen() {
         onToggleVoiceAnnounce={handleToggleVoiceAnnounce}
         haptics={haptics}
         onToggleHaptics={handleToggleHaptics}
+        sound={sound}
+        onToggleSound={handleToggleSound}
       />
 
       {/* Metabolizm Kofeiny & Sen (D-02 & BR-KOF-003) */}

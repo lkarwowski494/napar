@@ -540,3 +540,19 @@ describe('Brak zostaje brakiem, zła liczba blokuje zapis (M1-audytor-generalny-
     sqlite.__closeAll();
   });
 });
+
+// M1-audytor-generalny-030 (04-studio-projektowe-006): ustawienie „Dźwięk” stopera w app_settings.
+describe('M1-audytor-generalny-030: ustawienie dźwięku na prawdziwym SQLite', () => {
+  test('domyślnie włączone; zapis false wyłącza i przetrwa odczyt', () => {
+    const { db, sqlite } = loadDatabase(':memory:');
+    db.getDatabase();
+    expect(db.getSoundEnabled()).toBe(true);
+    db.setSoundEnabled(false);
+    expect(db.getAppSetting('sound_enabled', '')).toBe('false');
+    expect(db.getSoundEnabled()).toBe(false);
+    db.setSoundEnabled(true);
+    expect(db.getSoundEnabled()).toBe(true);
+    sqlite.__closeAll();
+  });
+});
+

@@ -26,6 +26,9 @@ interface AppPreferencesCardProps {
   onToggleVoiceAnnounce: () => void;
   haptics: boolean;
   onToggleHaptics: () => void;
+  /** M1-audytor-generalny-030: dzwonek obu stoperów */
+  sound: boolean;
+  onToggleSound: () => void;
 }
 
 export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
@@ -40,6 +43,8 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
   onToggleVoiceAnnounce,
   haptics,
   onToggleHaptics,
+  sound,
+  onToggleSound,
 }) => {
   return (
     <>
@@ -241,6 +246,27 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
           >
             <Text style={[styles.toggleBtnText, haptics && styles.toggleBtnTextActive]}>
               {haptics ? t.settings.enabled : t.settings.disabled}
+            </Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.actionRow}>
+          <View style={{ flex: 1, paddingRight: theme.spacing.sm }}>
+            <Text style={styles.actionTitle}>{t.settings.soundTitle}</Text>
+            <Text style={styles.actionSubtitle}>{t.settings.soundDesc}</Text>
+          </View>
+          <Pressable
+            testID="toggle-sound-btn"
+            style={[styles.toggleBtn, sound && styles.toggleBtnActive]}
+            onPress={onToggleSound}
+            accessibilityRole="switch"
+            accessibilityLabel={t.settings.soundTitle}
+            accessibilityState={{ checked: sound }}
+          >
+            <Text style={[styles.toggleBtnText, sound && styles.toggleBtnTextActive]}>
+              {sound ? t.settings.enabled : t.settings.disabled}
             </Text>
           </Pressable>
         </View>

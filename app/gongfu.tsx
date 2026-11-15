@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import {
   GongfuSession,
@@ -37,6 +36,7 @@ import { announce } from '../src/core/announce';
 import { useTranslation } from '../src/core/i18n';
 import { autoBackup } from '../src/core/backup';
 import { playTimerChime } from '../src/core/timer-audio';
+import { signalHaptic } from '../src/core/signals';
 import { GongfuSessionSetup } from '../src/components/gongfu/GongfuSessionSetup';
 import { GongfuActiveInfusion } from '../src/components/gongfu/GongfuActiveInfusion';
 import { GongfuInfusionHistory } from '../src/components/gongfu/GongfuInfusionHistory';
@@ -129,7 +129,7 @@ export default function GongfuScreen() {
         targetEndMsRef.current = null;
         setIsSteeping(false);
         setSteepFinished(true);
-        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        signalHaptic('success');
         void playTimerChime();
         announce(t.gongfu.pourNow);
       }
@@ -155,7 +155,7 @@ export default function GongfuScreen() {
     setRemainingSeconds(targetSeconds);
     setSteepFinished(false);
     setIsSteeping(true);
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    signalHaptic('medium');
   };
 
   // M1-audytor-generalny-026: zatrzymanie trwającej infuzji — bez sygnału „gotowe”; czas zapisu = czas rzeczywisty.
@@ -173,7 +173,7 @@ export default function GongfuScreen() {
     const updated = Math.max(3, targetSeconds + delta);
     setTargetSeconds(updated);
     setRemainingSeconds(updated);
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    signalHaptic('light');
   };
 
   const handleRecordCurrentInfusion = () => {
@@ -192,7 +192,7 @@ export default function GongfuScreen() {
     const nextRec = getRecommendedGongfuSteepSeconds(teaType, updated.infusions.length + 1);
     setTargetSeconds(nextRec);
     setRemainingSeconds(nextRec);
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    signalHaptic('light');
   };
 
   const handleFinishAndSaveSession = () => {

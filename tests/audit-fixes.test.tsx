@@ -1172,7 +1172,8 @@ describe('M1-audytor-generalny-035: kontrakt zakresu 1.0 bez powiadomień o etap
       expect(src).not.toMatch(/expo-notifications|scheduleNotification/);
       expect(src).toMatch(/activateKeepAwakeAsync\(\)/);
       expect(src).toMatch(/playTimerChime\(\)/);
-      expect(src).toMatch(/Haptics\.(impact|notification)Async/);
+      // 030: Gongfu wibruje przez signalHaptic (src/core/signals.ts, sprawdza ustawienie „Wibracje”)
+      expect(src).toMatch(/Haptics\.(impact|notification)Async|signalHaptic\('/);
       expect(src).toMatch(/AppState\.addEventListener\('change'/);
     }
   });

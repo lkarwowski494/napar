@@ -1553,6 +1553,15 @@ export function setHapticsEnabled(enabled: boolean): void {
   setAppSetting('haptics_enabled', Boolean(enabled) ? 'true' : 'false');
 }
 
+// M1-audytor-generalny-030: ustawienie „Dźwięk” dla obu stoperów (domyślnie włączone).
+export function getSoundEnabled(): boolean {
+  return getAppSetting('sound_enabled', 'true') !== 'false';
+}
+
+export function setSoundEnabled(enabled: boolean): void {
+  setAppSetting('sound_enabled', Boolean(enabled) ? 'true' : 'false');
+}
+
 export function getCaffeineHalfLife(): number {
   const val = parseFloat(getAppSetting('caffeine_half_life_hours', String(DEFAULT_CAFFEINE_HALF_LIFE_H)));
   if (isNaN(val) || val < CAFFEINE_HALF_LIFE_MIN_H || val > CAFFEINE_HALF_LIFE_MAX_H) {

@@ -31,6 +31,7 @@ jest.mock('../database', () => ({
   getAppSetting: jest.fn(() => null),
   setAppSetting: jest.fn(),
   getHapticsEnabled: jest.fn(() => true),
+  getSoundEnabled: jest.fn(() => true),
   setHapticsEnabled: jest.fn(),
   getVoiceAnnounceEnabled: jest.fn(() => true),
   setVoiceAnnounceEnabled: jest.fn(),

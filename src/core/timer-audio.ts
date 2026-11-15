@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { createAudioPlayer, AudioPlayer } from 'expo-audio';
+import { getSoundEnabled } from './database';
 
 let soundInstance: AudioPlayer | null = null;
 let cleanupTimer: any = null;
@@ -36,6 +37,8 @@ export function stopTimerChime(): void {
 }
 
 export async function playTimerChime(): Promise<boolean> {
+  // M1-audytor-generalny-030: jedno sprawdzenie ustawienia „Dźwięk” dla stopera parzenia i Gongfu
+  if (!getSoundEnabled()) return false;
   try {
     if (soundInstance) {
       try {

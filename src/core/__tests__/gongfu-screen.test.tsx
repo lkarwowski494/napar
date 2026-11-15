@@ -494,4 +494,26 @@ describe('GongfuScreen — zapis sesji jedną transakcją i komunikat przy błę
     expect(history.props.session.infusions[0].durationSeconds).toBe(10);
     mockDb.settings.clear();
   });
+
+  // M1-audytor-generalny-030 (04-studio-projektowe-006): Gongfu respektuje wyłączone wibracje.
+  test('030: przy wyłączonych wibracjach start, korekta i koniec infuzji nie wibrują', () => {
+    mockDb.settings.set('haptics_enabled', 'false');
+    jest.setSystemTime(new Date('2026-11-15T10:00:00Z'));
+    const H = require('expo-haptics');
+    (H.impactAsync as jest.Mock).mockClear();
+    (H.notificationAsync as jest.Mock).mockClear();
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<GongfuScreen />);
+    });
+    renderer.act(() => {
+      tree.root.findByProps({ testID: 'gongfu-start-btn' }).props.onPress();
+    });
+    renderer.act(() => {
+      jest.advanceTimersByTime(120000);
+    });
+    expect(H.impactAsync).not.toHaveBeenCalled();
+    expect(H.notificationAsync).not.toHaveBeenCalled();
+    mockDb.settings.clear();
+  });
 });

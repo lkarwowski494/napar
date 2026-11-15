@@ -8,7 +8,7 @@ import { MasterRecipe, RecipeStep, MASTER_RECIPES } from './recipes-data';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog, SensoryProfile } from './database-schema';
 import { BrewTimerEngine, TimerSnapshot } from './timer-engine';
 import { announceStep, announceCountdown, announceFinish } from './announce';
-import { recordBrewSessionTransaction, getAppSetting, setAppSetting, getVoiceAnnounceEnabled, getHapticsEnabled, BeveragePreference, getBeveragePreference, setBeveragePreference as setBeveragePreferenceDb, buildBackupState } from './database';
+import { recordBrewSessionTransaction, getAppSetting, setAppSetting, getVoiceAnnounceEnabled, getHapticsEnabled, getSoundEnabled, BeveragePreference, getBeveragePreference, setBeveragePreference as setBeveragePreferenceDb, buildBackupState } from './database';
 import { autoBackup } from './backup';
 import {
   calculateExtractionYield,
@@ -215,6 +215,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     engine.setHapticsEnabled(getHapticsEnabled());
+    engine.setSoundEnabled(getSoundEnabled());
     engineRef.current = engine;
     setSnapshot(engine.getSnapshot());
 
@@ -243,11 +244,13 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const startTimer = () => {
     engineRef.current?.setHapticsEnabled(getHapticsEnabled());
+    engineRef.current?.setSoundEnabled(getSoundEnabled());
     engineRef.current?.start();
   };
   const pauseTimer = () => engineRef.current?.pause();
   const resumeTimer = () => {
     engineRef.current?.setHapticsEnabled(getHapticsEnabled());
+    engineRef.current?.setSoundEnabled(getSoundEnabled());
     engineRef.current?.resume();
   };
   const resetTimer = () => engineRef.current?.reset();

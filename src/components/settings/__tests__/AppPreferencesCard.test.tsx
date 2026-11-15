@@ -16,6 +16,8 @@ describe('AppPreferencesCard Component', () => {
     onToggleVoiceAnnounce: jest.fn(),
     haptics: true,
     onToggleHaptics: jest.fn(),
+    sound: true,
+    onToggleSound: jest.fn(),
   };
 
   test('TASK-P30-04-STU: kontenery wyboru jezyka, naparow i jednostek deklaruja radiogroup, role radio oraz accessibilityState', () => {
