@@ -1,6 +1,6 @@
 {
   "_opis": "Zapadka M1-audytor-generalny-033: liczba dwujęzycznych wyborów pl/en (isEn ? … : …, language === … ? … : …), polskich zapasów t.x || … i danych *Pl w pliku. Wolno tylko maleć; aktualizacja: npm run check:i18n -- --update-baseline.",
-  "razem": 611,
+  "razem": 607,
   "pliki": {
     "app/_layout.tsx": 1,
     "app/(tabs)/_layout.tsx": 11,
@@ -18,7 +18,7 @@
     "src/components/beans/BeanItemCard.tsx": 17,
     "src/components/beans/BeanTopBar.tsx": 12,
     "src/components/brew/BrewBanners.tsx": 5,
-    "src/components/brew/BrewFinishModal.tsx": 46,
+    "src/components/brew/BrewFinishModal.tsx": 42,
     "src/components/brew/BrewQuickPrepCard.tsx": 23,
     "src/components/brew/GrinderSelectModal.tsx": 4,
     "src/components/brew/InventorySelectModal.tsx": 25,

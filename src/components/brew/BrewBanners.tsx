@@ -7,16 +7,20 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 import { CorruptStateRecovery } from '../../core/backup';
+import { formatTemperatureDelta, UnitSystem } from '../../core/unit-converter';
 
 interface BrewBannersProps {
   corruptState: CorruptStateRecovery | null;
   language: 'pl' | 'en';
+  /** M1-audytor-generalny-034 */
+  unitSystem?: UnitSystem;
   onDismissCorrupt: () => void;
 }
 
 export const BrewBanners: React.FC<BrewBannersProps> = ({
   corruptState,
   language,
+  unitSystem = 'metric',
   onDismissCorrupt,
 }) => {
   return (
@@ -56,8 +60,8 @@ export const BrewBanners: React.FC<BrewBannersProps> = ({
       <View style={styles.goldenRulesBanner} testID="golden-rules-banner">
         <Text style={styles.goldenRulesBannerText} numberOfLines={2}>
           {language === 'en'
-            ? 'Golden Rules: Sour/thin → grind finer (2 clicks) or raise temp 2°C · Bitter/dry → grind coarser (2 clicks) · Peak: 7–35d.'
-            : 'Złote Zasady: Kwaśna/płaska → drobniej o 2 kliki lub wyższa temp. o 2°C · Gorzka/sucha → grubiej o 2 kliki · Peak: 7–35 dni.'}
+            ? `Golden Rules: Sour/thin → grind finer (2 clicks) or raise temp ${formatTemperatureDelta(2, unitSystem)} · Bitter/dry → grind coarser (2 clicks) · Peak: 7–35d.`
+            : `Złote Zasady: Kwaśna/płaska → drobniej o 2 kliki lub wyższa temp. o ${formatTemperatureDelta(2, unitSystem)} · Gorzka/sucha → grubiej o 2 kliki · Peak: 7–35 dni.`}
         </Text>
       </View>
     </>

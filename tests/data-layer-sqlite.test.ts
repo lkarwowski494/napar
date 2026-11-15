@@ -556,3 +556,18 @@ describe('M1-audytor-generalny-030: ustawienie dźwięku na prawdziwym SQLite', 
   });
 });
 
+// M1-audytor-generalny-034 (09-lokalizacja-004): domyślny system jednostek z regionu bez zapisu do bazy.
+describe('M1-audytor-generalny-034: domyślny system jednostek', () => {
+  test('bez zapisanego ustawienia getUnitSystem zwraca domyślny z regionu; zapis użytkownika wygrywa', () => {
+    const { db, sqlite } = loadDatabase(':memory:');
+    db.getDatabase();
+    expect(db.getUnitSystem()).toBe('metric');
+    db.setDefaultUnitSystem('imperial');
+    expect(db.getUnitSystem()).toBe('imperial');
+    expect(db.getAppSetting('unit_system', '')).toBe('');
+    db.setUnitSystem('metric');
+    expect(db.getUnitSystem()).toBe('metric');
+    sqlite.__closeAll();
+  });
+});
+

@@ -173,3 +173,17 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
   }
   return roundTo(xIn / cu, 2);
 }
+
+/**
+ * M1-audytor-generalny-034: różnica temperatur (np. „+2°C” w poradach) w jednostkach ustawienia.
+ * Różnica, nie temperatura: 2°C = 3,6°F → zaokrąglone do pełnego stopnia (4°F).
+ */
+export function formatTemperatureDelta(deltaCelsius: number, unitSystem: UnitSystem = 'metric'): string {
+  if (unitSystem === 'imperial') return `${Math.round((deltaCelsius * 9) / 5)}°F`;
+  return `${deltaCelsius}°C`;
+}
+
+/** M1-audytor-generalny-034: godzina (HH:MM) według języka aplikacji. */
+export function formatClockTime(iso: string, language: 'pl' | 'en'): string {
+  return new Date(iso).toLocaleTimeString(language === 'pl' ? 'pl-PL' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+}

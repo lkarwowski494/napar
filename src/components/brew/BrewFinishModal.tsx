@@ -15,7 +15,8 @@ import {
   TextInput,
 } from 'react-native';
 import { theme } from '../../core/theme';
-import { useTranslation } from '../../core/i18n';
+import { useTranslation, formatTemplate } from '../../core/i18n';
+import { formatTemperatureDelta, UnitSystem } from '../../core/unit-converter';
 import { BrewCostMetrics } from '../../core/cost-calculator';
 import {
   SensoryProfile,
@@ -46,6 +47,8 @@ interface BrewFinishModalProps {
   onChangeNotes: (notes: string) => void;
   brewCost: BrewCostMetrics;
   language?: 'pl' | 'en';
+  /** M1-audytor-generalny-034: jednostka różnicy temperatury w poradach */
+  unitSystem?: UnitSystem;
   onSkip: () => void;
   onSave: () => void;
 }
@@ -72,6 +75,7 @@ export function BrewFinishModal({
   language: propLanguage,
   onSkip,
   onSave,
+  unitSystem = 'metric',
 }: BrewFinishModalProps) {
   const { t, language: contextLang } = useTranslation();
   const language = propLanguage || contextLang || 'pl';
@@ -202,10 +206,7 @@ export function BrewFinishModal({
                   <Text style={styles.doctorTitle}>{t.brew?.doctorRecipeTitle || 'Recepta Dial-in Doctor:'}</Text>
                 </View>
                 <Text style={styles.doctorText}>
-                  {t.brew?.doctorSourAdvice ||
-                    (language === 'en'
-                      ? 'Too sour (under-extracted)? Next time: grind finer by 2 clicks or raise water temperature by +2°C.'
-                      : 'Za kwaśna (niedoparzenie)? Następnym razem: zmiel drobniej o 2 kliki lub podnieś temperaturę wody o +2°C.')}
+                  {formatTemplate(t.brew.doctorSourAdvice, { delta: formatTemperatureDelta(2, unitSystem) })}
                 </Text>
               </View>
             )}
@@ -217,10 +218,7 @@ export function BrewFinishModal({
                   <Text style={styles.doctorTitle}>{t.brew?.doctorRecipeTitle || 'Recepta Dial-in Doctor:'}</Text>
                 </View>
                 <Text style={styles.doctorText}>
-                  {t.brew?.doctorBitterAdvice ||
-                    (language === 'en'
-                      ? 'Too bitter / astringent (over-extracted)? Next time: grind coarser by 2 clicks or lower water temperature by -2°C.'
-                      : 'Za gorzka / ściągająca (przeparzenie)? Następnym razem: zmiel grubiej o 2 kliki lub obniż temperaturę wody o -2°C.')}
+                  {formatTemplate(t.brew.doctorBitterAdvice, { delta: formatTemperatureDelta(2, unitSystem) })}
                 </Text>
               </View>
             )}

@@ -7,6 +7,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../core/theme';
+import { formatTemperature, UnitSystem } from '../../core/unit-converter';
 import { useTranslation, formatTemplate } from '../../core/i18n';
 import { InventoryItem } from '../../core/database-schema';
 import {
@@ -19,6 +20,8 @@ interface BrewHeaderProps {
   recipe: any;
   selectedInventoryItem: InventoryItem | null;
   waterTempCelsius: number;
+  /** M1-audytor-generalny-034: jednostki temperatury z ustawień */
+  unitSystem?: UnitSystem;
   grinderRecommendation: {
     grinderName: string;
     formatted: string;
@@ -41,6 +44,7 @@ export function BrewHeader({
   recipe,
   selectedInventoryItem,
   waterTempCelsius,
+  unitSystem = 'metric',
   grinderRecommendation,
   favoriteRecipes = [],
   isRunning = false,
@@ -212,7 +216,7 @@ export function BrewHeader({
             {recipe.name}
           </Text>
           <Text style={styles.selectorSub}>
-            {recipe.method} · {waterTempCelsius}°C
+            {recipe.method} · {formatTemperature(waterTempCelsius, unitSystem)}
           </Text>
         </Pressable>
 

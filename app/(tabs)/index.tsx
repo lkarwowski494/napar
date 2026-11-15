@@ -91,6 +91,7 @@ export default function BrewScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Banery systemowe i Złote Zasady domeny */}
       <BrewBanners
+        unitSystem={unitSystem}
         corruptState={corruptState}
         language={language}
         onDismissCorrupt={handleDismissCorrupt}
@@ -112,6 +113,7 @@ export default function BrewScreen() {
         recipe={recipe}
         selectedInventoryItem={selectedInventoryItem}
         waterTempCelsius={waterTempCelsius}
+        unitSystem={unitSystem}
         grinderRecommendation={grinderRecommendation}
         favoriteRecipes={favoriteRecipes}
         isRunning={isRunning || isPaused}

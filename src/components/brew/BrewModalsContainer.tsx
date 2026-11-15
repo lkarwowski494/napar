@@ -136,6 +136,7 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
       {/* Modal Podsumowania Parzenia (Karta Degustacyjna & Dial-in Doctor) */}
       <BrewFinishModal
         visible={showFinishModal}
+        unitSystem={unitSystem}
         totalElapsedSeconds={snapshot.totalElapsedSeconds}
         waterGrams={waterGrams}
         rating={rating}

@@ -13,7 +13,8 @@ import { BrewProvider } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
 import { crashLoopGuard, recordStartupSuccess } from '../src/core/startup-guard';
 import { SafeModeView, type SafeModeReason } from '../src/components/SafeModeView';
-import { openDatabaseAtStartup } from '../src/core/database';
+import { openDatabaseAtStartup, setDefaultUnitSystem } from '../src/core/database';
+import { regionUnitSystem } from '../lib/region-units';
 
 function StartupSuccessNotifier() {
   useEffect(() => {
@@ -65,6 +66,9 @@ function RootStack() {
     </Stack>
   );
 }
+
+// M1-audytor-generalny-034: domyślny system jednostek z regionu (bez zapisu; zapisane ustawienie wygrywa)
+setDefaultUnitSystem(regionUnitSystem());
 
 export default function RootLayout() {
   const [isSafeMode, setIsSafeMode] = useState<boolean>(false);

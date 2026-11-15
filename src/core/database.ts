@@ -1525,8 +1525,15 @@ export function setAppSetting(key: string, value: any): void {
   }
 }
 
+// M1-audytor-generalny-034: domyślny system jednostek z regionu urządzenia (ustawiany przy starcie z app/_layout.tsx);
+// bez zapisu do bazy — zapisane ustawienie użytkownika zawsze wygrywa.
+let defaultUnitSystem: 'metric' | 'imperial' = 'metric';
+export function setDefaultUnitSystem(unit: 'metric' | 'imperial'): void {
+  defaultUnitSystem = unit === 'imperial' ? 'imperial' : 'metric';
+}
+
 export function getUnitSystem(): 'metric' | 'imperial' {
-  const val = getAppSetting('unit_system', 'metric');
+  const val = getAppSetting('unit_system', defaultUnitSystem);
   return val === 'imperial' ? 'imperial' : 'metric';
 }
 

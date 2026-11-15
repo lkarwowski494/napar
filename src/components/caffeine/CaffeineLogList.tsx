@@ -6,7 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { CaffeineLog } from '../../core/database-schema';
-import { formatDoseWeight } from '../../core/unit-converter';
+import { formatDoseWeight, formatClockTime } from '../../core/unit-converter';
 import { theme } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
 
@@ -23,7 +23,7 @@ export const CaffeineLogList: React.FC<CaffeineLogListProps> = ({
   onQuickAddPress,
   onDeleteLog,
 }) => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   return (
     <>
       <View style={styles.listHeaderRow}>
@@ -45,10 +45,7 @@ export const CaffeineLogList: React.FC<CaffeineLogListProps> = ({
         </View>
       ) : (
         logs.map((item) => {
-          const timeStr = new Date(item.consumedAt).toLocaleTimeString('pl-PL', {
-            hour: '2-digit',
-            minute: '2-digit',
-          });
+          const timeStr = formatClockTime(item.consumedAt, language); // 034: wg języka aplikacji
           return (
             <View key={item.id} style={styles.logItem}>
               <View style={{ flex: 1 }}>
