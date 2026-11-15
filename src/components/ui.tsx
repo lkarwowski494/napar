@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
   },
   fieldErrorText: {
     fontSize: 12,
-    color: theme.colors.error,
+    color: theme.colors.danger, // 028/042: error #DC2626 jako tekst = 3,52:1; danger = 4,98:1
     marginTop: 4,
   },
   emptyContainer: {

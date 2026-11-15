@@ -140,3 +140,27 @@ describe('M1-audytor-generalny-028: style ekranów', () => {
     expect(bad).toEqual([]);
   });
 });
+
+// Uzupełnienie M1-audytor-generalny-028 (wykryte przy 042): każdy kolor tekstu z tokenu w stylach ekranów,
+// użyty jako `color:` na karcie, ma ≥ 4,5:1 na bgCard (tekst błędu pola miał #DC2626 = 3,52:1).
+describe('M1-audytor-generalny-028 (uzupełnienie): kolory tekstu z tokenów ≥ 4,5:1 na bgCard', () => {
+  test('styl tekstu ≥ 4,5:1, glif (…Icon) ≥ 3:1 na bgCard (poza tekstem na wypełnieniu)', () => {
+    const bad: string[] = [];
+    for (const f of files) {
+      const st = stylesOf(fs.readFileSync(f, 'utf8'));
+      for (const [name, body] of st) {
+        const col = prop(body, 'color')?.match(/^theme\.colors\.(\w+)$/)?.[1];
+        if (!col || prop(body, 'backgroundColor')) continue;
+        // tekst na wypełnionym przycisku/plakietce sprawdza test par (onAccent, white na emerald)
+        if (['onAccent', 'white', 'black'].includes(col)) continue;
+        const base = name.replace(/(Text|Label|Txt|Title|Icon|Value)(Active|Selected)?$/, '$2');
+        const filled = [...st].some(([n, b]) => n !== name && (n === base || n.startsWith(base)) && /^theme\.colors\.(copper|emerald|danger|error|success|warning)\b/.test(prop(b, 'backgroundColor') ?? ''));
+        if (filled) continue;
+        const ratio = getContrastRatio(c[col], c.bgCard);
+        const min = /Icon$/.test(name) ? 3 : 4.5; // glif (gwiazdka, serce) = element interfejsu, 3:1 (WCAG 1.4.11)
+        if (ratio < min) bad.push(`${path.relative(root, f)}: ${name} (${col} ${ratio.toFixed(2)}:1)`);
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+});
