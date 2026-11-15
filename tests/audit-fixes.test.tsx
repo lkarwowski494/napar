@@ -1288,3 +1288,73 @@ describe('M1-audytor-generalny-025: jeden ekran prowadzenia, wejście bez cicheg
     expect(container).toMatch(/onStart=\{handleStartTimer\}/);
   });
 });
+
+// ============================================================================
+// M1-audytor-generalny-027 · 04-studio-projektowe-002: postęp czasu kroku nie może udawać ekstrakcji.
+// Dawny miernik „EKSTRAKCJA & PRZEPŁYW” (BrewActiveFocusTimer) pokazywał ułamek czasu kroku jako ekstrakcję
+// i VoiceOver czytał „Postęp ekstrakcji”. Ekran zniknął w 025 (d2a9b52); te testy pilnują, żeby nazwa nie wróciła.
+// ============================================================================
+describe('M1-audytor-generalny-027: postęp parzenia nazywa to, co mierzy (04-studio-projektowe-002)', () => {
+  const nodeFs = jest.requireActual('fs') as typeof import('fs');
+  const nodePath = jest.requireActual('path') as typeof import('path');
+  const root = nodePath.join(__dirname, '..');
+  const walk = (dir: string): string[] =>
+    nodeFs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+      const p = nodePath.join(dir, e.name);
+      if (e.isDirectory()) return ['__tests__', 'node_modules'].includes(e.name) ? [] : walk(p);
+      return /\.(ts|tsx)$/.test(e.name) ? [p] : [];
+    });
+
+  test('kod produkcyjny nie opisuje postępu czasu jako ekstrakcji (etykieta ani zapowiedź VoiceOver)', () => {
+    const banned = /Postęp ekstrakcji|Extraction progress|EKSTRAKCJA\s*&\s*PRZEPŁYW|EXTRACTION\s*&\s*FLOW|DripperExtractionGauge/i;
+    const hits: string[] = [];
+    for (const f of ['app', 'src', 'lib'].map((d) => nodePath.join(root, d)).filter((d) => nodeFs.existsSync(d)).flatMap(walk)) {
+      nodeFs.readFileSync(f, 'utf8').split('\n').forEach((line, i) => {
+        if (banned.test(line)) hits.push(`${nodePath.relative(root, f)}:${i + 1}`);
+      });
+    }
+    expect(hits).toEqual([]);
+  });
+
+  test.each(['pl', 'en'] as const)('pasek postępu na ekranie kroków (%s) mówi „krok N z M” i ma tę samą wartość', (lang) => {
+    const steps = [
+      { stepNumber: 1, namePl: 'Bloom', nameEn: 'Bloom', durationSeconds: 45, targetWaterGrams: 50, instructionPl: 'Zalej 50 g.', instructionEn: 'Pour 50 g.' },
+      { stepNumber: 2, namePl: 'Zalanie', nameEn: 'Pour', durationSeconds: 60, targetWaterGrams: 250, instructionPl: 'Dolej do 250 g.', instructionEn: 'Pour to 250 g.' },
+    ];
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(
+        <ProcedureModal
+          visible
+          recipeName="V60"
+          steps={steps}
+          currentStepIndex={1}
+          status="running"
+          isRunning
+          stepRemainingSeconds={30}
+          totalElapsedSeconds={75}
+          unitSystem="metric"
+          language={lang}
+          t={translations[lang]}
+          onStart={jest.fn()}
+          onReset={jest.fn()}
+          onPauseResume={jest.fn()}
+          onAdjustTimeSeconds={jest.fn()}
+          onResetCurrentStep={jest.fn()}
+          onPrevStep={jest.fn()}
+          onNextStep={jest.fn()}
+          onFinishAndSave={jest.fn()}
+          onClose={jest.fn()}
+        />,
+      );
+    });
+    const bars = tree!.root.findAll((n) => n.props.accessibilityRole === 'progressbar' && typeof n.type === 'string');
+    expect(bars.length).toBeGreaterThan(0);
+    for (const b of bars) {
+      expect(String(b.props.accessibilityLabel)).not.toMatch(/ekstrakc|extraction/i);
+    }
+    const track = tree!.root.findAll((n) => n.props.testID === 'procedure-progress-track' && typeof n.type === 'string')[0];
+    expect(track.props.accessibilityLabel).toBe(lang === 'en' ? 'Step 2 of 2' : 'Krok 2 z 2');
+    expect(track.props.accessibilityValue).toEqual({ min: 1, max: 2, now: 2 });
+  });
+});
