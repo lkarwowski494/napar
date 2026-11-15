@@ -53,7 +53,7 @@
   2. Po zakończeniu lub anulowaniu sesji blokada wygaszania jest natychmiast zdejmowana, aby chronić baterię.
 * **Priorytet:** MUST | **Etap:** MVP
 
-### **BR-MŁYNEK-001: Integracja młynka domowego i przelicznik mikronów/klików**
+### **BR-MLYNEK-001: Integracja młynka domowego i przelicznik mikronów/klików** (dawniej BR-MŁYNEK-001; ER-06)
 * **Opis:** Asystent parzenia oraz ekran Ustawień integrują selektor domowego młynka użytkownika z obsługą wiodących konstrukcji specialty: Comandante C40 MK3/MK4 (krok 30 µm), Timemore Chestnut C2/C3 (krok 35 µm), 1Zpresso K-Ultra/K-Max (krok 20 µm), Fellow Ode Gen 2 (krok 40 µm), Baratza Encore (krok 28 µm), Kingrinder K6 (krok 16 µm).
 * **Persona:** Michał (P1), Maciej (P3).
 * **Kryteria akceptacji:**

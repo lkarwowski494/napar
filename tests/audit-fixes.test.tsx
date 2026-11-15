@@ -1962,3 +1962,176 @@ describe('M1-audytor-generalny-037: BRD zgodne z decyzjami — identyfikator apl
     expect(bez).toEqual([]);
   });
 });
+
+// ============================================================================
+// M1-audytor-generalny-038 · D-010 (DEC-10 audytu M1 (a), 2026-11-13): kontrakt zakresu od nowa po naprawach.
+// Trwała kontrola kontraktu w npm run verify (port reguł zakres.mjs roli 03 i ślad do BRD 0.1 z erratą).
+// Dlaczego: stary kontrakt powoływał się na ok. 100 nieistniejących BR, nie miał pętli głównej ani pól zasady 18.
+// ============================================================================
+describe('M1-audytor-generalny-038: kontrakt zakresu w formacie roli 03 ze śladem do BRD i decyzji (D-010)', () => {
+  const kontrakt = readFileSync(join(root, 'docs', 'scope-contract.md'), 'utf8');
+  const rejestrPath = join(root, 'docs', 'decyzje.md');
+  const rejestr = existsSync(rejestrPath) ? readFileSync(rejestrPath, 'utf8') : '';
+  const brdDir = join(root, 'napar_brd');
+  const brd = readdirSync(brdDir)
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => ({ f, lines: readFileSync(join(brdDir, f), 'utf8').split('\n') }));
+  const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const kom = (l: string) => l.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+  type Wiersz = Record<string, string>;
+  const tabele = (tekst: string) => {
+    const l = tekst.split('\n');
+    const out: { nagl: string[]; wiersze: Wiersz[] }[] = [];
+    for (let i = 0; i < l.length - 1; i++) {
+      if (!l[i].trim().startsWith('|') || !/^\s*\|[\s:|-]+\|\s*$/.test(l[i + 1])) continue;
+      const nagl = kom(l[i]);
+      const wiersze: Wiersz[] = [];
+      for (i += 2; i < l.length && l[i].trim().startsWith('|'); i++) {
+        const k = kom(l[i]);
+        wiersze.push(Object.fromEntries(nagl.map((n, x) => [n, k[x] ?? ''])));
+      }
+      out.push({ nagl, wiersze });
+    }
+    return out;
+  };
+  const sekcja = (nr: number) => {
+    const od = kontrakt.search(new RegExp(`^## ${nr}\\. `, 'm'));
+    if (od < 0) return '';
+    const reszta = kontrakt.slice(od);
+    const doL = reszta.slice(1).search(/^## \d+\. /m);
+    return doL < 0 ? reszta : reszta.slice(0, doL + 1);
+  };
+  const pusty = (s?: string) => !s || /^(—|-|brak)$/i.test(s.trim());
+  const RE_BR = /\bBR-[A-Z]{2,6}-\d{3}\b/g;
+  const KOLUMNY_F = ['ID', 'Funkcja', 'Decyzja', 'Wymagania', 'Dowód wartości', 'Intuicyjność', 'Podłoga', 'Zależy od', 'Gdzie w kodzie', 'Uzasadnienie'];
+  const tabF = tabele(sekcja(1)).find((t) => KOLUMNY_F.every((k) => t.nagl.includes(k)));
+  const funkcje = new Map((tabF?.wiersze ?? []).map((w) => [w.ID, w]));
+  const tabBez = tabele(sekcja(3)).find((t) => t.nagl.includes('ID') && t.nagl.includes('Opcje dla właściciela'));
+  const bezDecyzji = new Map((tabBez?.wiersze ?? []).map((w) => [w.ID, w]));
+  const petla = (kontrakt.match(/^- Pętla główna:.*$/m)?.[0] ?? '').match(/\bF-\d{2}\b/g) ?? [];
+  // Definicja ID w BRD 0.1: nagłówek (także pogrubiony), punkt „* **ID:**” albo wiersz tabeli „| **ID** |”.
+  const wBrd = (id: string) =>
+    brd.some(({ lines }) =>
+      lines.some((l) => new RegExp(`^(#{1,6}\\s+\\**${esc(id)}\\b|\\* \\*\\*${esc(id)}:\\*\\*|\\| \\*\\*${esc(id)}\\*\\* \\|)`).test(l)),
+    );
+  // BR obowiązujące: nagłówek BR bez „Status: wycofane” w bloku (jak wymaganiaBrd w zakres.mjs); wycofane z 1.0 są na liście odcięć.
+  const brWBrd: string[] = [];
+  const brWycofane: string[] = [];
+  for (const { lines } of brd) {
+    let br: string | null = null;
+    for (const l of lines) {
+      const n = l.match(/^#{1,6}\s+\**(BR-[A-Z]+-\d{3})\b/);
+      if (n) brWBrd.push((br = n[1]));
+      else if (/^#{1,6}\s/.test(l)) br = null;
+      else if (br && /Status:\**\s*wycofane/i.test(l) && !brWycofane.includes(br)) brWycofane.push(br);
+    }
+  }
+
+  test('03-zakres-005: kontrakt ma główną pracę J, pętlę główną i tabelę F-nn z polami zasady 18 i warunkiem powrotu', () => {
+    expect(kontrakt).toMatch(/^- Główna praca: J-01 /m);
+    expect(petla.length).toBeGreaterThan(0);
+    expect(tabF).toBeDefined();
+    const bledy: string[] = [];
+    for (const [id, w] of funkcje) {
+      const b = (s: string) => bledy.push(`${id}: ${s}`);
+      if (!/^F-\d{2}$/.test(id)) b('ID poza formatem F-nn');
+      if (bezDecyzji.has(id)) b('ID także w tabeli funkcji bez decyzji');
+      if (!['MVP', 'PÓŹNIEJ', 'TEST', 'NIE'].includes(w.Decyzja)) b(`decyzja „${w.Decyzja}”`);
+      if (!RE_BR.test(w.Wymagania) && !/\bH-\d{2}\b/.test(w.Wymagania)) b('bez BR ani H');
+      RE_BR.lastIndex = 0;
+      if (['MVP', 'TEST'].includes(w.Decyzja) && pusty(w['Intuicyjność'])) b('bez kryterium intuicyjności');
+      if (['NIE', 'PÓŹNIEJ'].includes(w.Decyzja) && !/Powrót:\s*\S/.test(w.Uzasadnienie)) b('bez „Powrót:”');
+      if (w.Decyzja === 'TEST' && !/Test:\s*\S/.test(w.Uzasadnienie)) b('bez „Test:”');
+      if (w.Decyzja === 'MVP' && !petla.includes(id) && pusty(w['Podłoga']) && !/\bD-\d{3}\b/.test(w.Uzasadnienie)) b('MVP poza pętlą bez podłogi i decyzji D-nnn');
+      for (const z of w['Zależy od'].match(/\bF-\d{2}\b/g) ?? []) {
+        if (!funkcje.has(z)) b(`zależy od nieznanej ${z}`);
+        else if (w.Decyzja === 'MVP' && funkcje.get(z)!.Decyzja !== 'MVP') b(`MVP zależy od ${z} (${funkcje.get(z)!.Decyzja})`);
+      }
+      if (w.Decyzja === 'MVP')
+        for (const p of w['Gdzie w kodzie'].match(/`([^`]+\.(?:tsx?|mjs|json))`/g) ?? []) if (!existsSync(join(root, p.slice(1, -1)))) b(`brak pliku ${p}`);
+    }
+    for (const id of petla) if (funkcje.get(id)?.Decyzja !== 'MVP') bledy.push(`pętla główna: ${id} nie jest MVP`);
+    // Lista odcięć: każda pozycja ma wersję docelową, warunek powrotu i decyzję (D-nnn) z datą.
+    const kills = sekcja(2).split('\n').filter((l) => /^\| \*\*KILL-\d{2}\*\* \|/.test(l));
+    expect(kills.length).toBeGreaterThanOrEqual(9);
+    for (const l of kills) {
+      const id = l.match(/KILL-\d{2}/)![0];
+      if (!/Powrót:\s*\S/.test(l)) bledy.push(`${id}: bez „Powrót:”`);
+      if (!/\bD-\d{3}\b/.test(l) || !/\d{4}-\d{2}-\d{2}/.test(l)) bledy.push(`${id}: bez decyzji D-nnn z datą`);
+    }
+    // Funkcje bez decyzji: co najmniej dwie opcje i rekomendacja (decyduje właściciel).
+    for (const [id, w] of bezDecyzji) {
+      if ((w['Opcje dla właściciela'].match(/\([a-d]\)/g) ?? []).length < 2) bledy.push(`${id}: mniej niż dwie opcje`);
+      if (pusty(w.Rekomendacja)) bledy.push(`${id}: bez rekomendacji`);
+    }
+    expect(bledy).toEqual([]);
+  });
+
+  test('03-zakres-005: każde ID w kontrakcie istnieje — BR, NFR, Z, ZP, RD, ER, J, H w BRD; D-nnn w docs/decyzje.md; F, KILL i ZM w kontrakcie', () => {
+    const bledy: string[] = [];
+    const ids = new Set(kontrakt.match(/\b(?:BR-[A-Z]+-\d{3}|NFR-[A-Z]+-\d{3}|ZP-\d{2}|Z-\d{3}|RD-\d{2}|ER-\d{2}|J-\d{2}|H-\d{2})\b/g) ?? []);
+    // Wyjątek: ID przytoczone jako nieistniejące (np. historia w KILL-09 i ZM-03).
+    const przytoczone = new Set([...kontrakt.matchAll(/\b([A-Z]+-[A-Z]*-?\d{2,3})\.\.\d{2,3}`?,? (?:których nie ma w BRD|nie istnieją w BRD)/g)].map((m) => m[1]));
+    for (const id of ids) if (!wBrd(id) && !przytoczone.has(id)) bledy.push(`${id} nie istnieje w BRD`);
+    for (const m of kontrakt.matchAll(/\bBRD (DEC-\d{2})\b/g)) if (!wBrd(m[1])) bledy.push(`BRD ${m[1]} nie istnieje w 00b`);
+    for (const id of new Set(kontrakt.match(/\bD-\d{3}\b/g) ?? [])) if (!new RegExp(`^\\| ${id} \\|`, 'm').test(rejestr)) bledy.push(`${id} nie istnieje w docs/decyzje.md`);
+    // „DEC-nn” bez przedrostka „BRD” to decyzja audytu M1: rejestr ma ją jako D-0nn.
+    for (const m of kontrakt.matchAll(/(?<!BRD )\bDEC-(\d{2})\b/g))
+      if (!new RegExp(`^\\| D-0${m[1]} \\|.*DEC-${m[1]} audytu M1`, 'm').test(rejestr)) bledy.push(`DEC-${m[1]} bez wiersza D-0${m[1]} w rejestrze`);
+    const zdefF = new Set([...funkcje.keys(), ...bezDecyzji.keys()]);
+    for (const id of new Set(kontrakt.match(/\bF-\d{2}\b/g) ?? [])) if (!zdefF.has(id) && !new RegExp(`${id}[^|\\n]*wycofan`).test(kontrakt)) bledy.push(`${id} bez wiersza`);
+    const kills = new Set([...kontrakt.matchAll(/^\| \*\*(KILL-\d{2})\*\* \|/gm)].map((m) => m[1]));
+    for (const id of new Set(kontrakt.match(/\bKILL-\d{2}\b/g) ?? [])) if (!kills.has(id)) bledy.push(`${id} bez wiersza listy odcięć`);
+    const zm = new Set([...kontrakt.matchAll(/^\| (ZM-\d{2}) \|/gm)].map((m) => m[1]));
+    for (const id of new Set(kontrakt.match(/\bZM-\d{2}\b/g) ?? [])) if (!zm.has(id)) bledy.push(`${id} bez wiersza bramki zmian`);
+    expect(bledy).toEqual([]);
+  });
+
+  test('03-zakres-005: każde BR z BRD ma dokładnie jedną decyzję (wiersz F-nn) albo wiersz funkcji bez decyzji', () => {
+    expect(brWBrd.length).toBeGreaterThanOrEqual(40);
+    const gdzie = new Map<string, string[]>();
+    for (const [id, w] of funkcje) for (const r of w.Wymagania.match(RE_BR) ?? []) gdzie.set(r, [...(gdzie.get(r) ?? []), id]);
+    const czeka = new Set([...bezDecyzji.values()].flatMap((w) => w.Wymagania.match(RE_BR) ?? []));
+    const bledy: string[] = [];
+    for (const [r, ids] of gdzie) {
+      if (ids.length > 1) bledy.push(`${r} w kilku funkcjach: ${ids.join(', ')}`);
+      if (!brWBrd.includes(r) || brWycofane.includes(r)) bledy.push(`${r} w tabeli funkcji, a nie w BRD albo wycofane`);
+    }
+    for (const r of brWBrd) if (!brWycofane.includes(r) && !gdzie.has(r) && !czeka.has(r)) bledy.push(`${r} z BRD bez decyzji zakresu`);
+    // Wycofane z 1.0: wiersz listy odcięć wymienia BR.
+    const kill = sekcja(2);
+    for (const r of brWycofane) if (!new RegExp(`^\\| \\*\\*KILL-\\d{2}\\*\\* \\|.*\\b${r}\\b`, 'm').test(kill)) bledy.push(`${r} wycofane bez wiersza KILL`);
+    expect(bledy).toEqual([]);
+  });
+
+  test('03-zakres-005: kontrakt zgodny z decyzjami D-001…D-008 (DEC-01…DEC-08 audytu M1)', () => {
+    for (let n = 1; n <= 8; n++) expect(rejestr).toMatch(new RegExp(`^\\| D-00${n} \\| 2026-11-13 \\|.*DEC-0${n} audytu M1`, 'm'));
+    expect(kontrakt).not.toMatch(/ZATWIERDZONY/);
+    const f = (id: string) => funkcje.get(id) ?? {};
+    const mvp = [...funkcje.values()].filter((w) => w.Decyzja === 'MVP').map((w) => w.Funkcja).join('\n');
+    // D-001: 1.0 darmowa — bez warstwy płatnej; zakupy w aplikacji później.
+    expect(kontrakt).not.toMatch(/WTP-[12X]|(?<!\p{L})Pro(?!\p{L})/u);
+    expect(f('F-34').Decyzja).toBe('PÓŹNIEJ');
+    expect(f('F-34').Uzasadnienie).toMatch(/D-001/);
+    // D-002: bramka zmian i reguła osiągalności.
+    expect(sekcja(5)).toMatch(/^\| ZM-01 \|/m);
+    expect(sekcja(5)).toMatch(/check:reachability/);
+    // D-003: język polski i angielski.
+    expect(f('F-12').Uzasadnienie).toMatch(/D-003/);
+    expect(f('F-12').Funkcja).toMatch(/PL.*EN/);
+    expect(kontrakt).not.toMatch(/\b35 (języków|lokalizacji)/);
+    // D-004: Apple Health tylko na liście odcięć (żadna funkcja MVP go nie obiecuje).
+    expect(mvp).not.toMatch(/HealthKit|Apple Health/);
+    expect(sekcja(2)).toMatch(/^\| \*\*KILL-08\*\* \|.*BR-KOF-002.*D-004/m);
+    // D-005: szacunek kofeiny o porze snu bez progu i oceny.
+    expect(f('F-17').Uzasadnienie).toMatch(/D-005/);
+    expect(kontrakt).not.toMatch(/25\s?mg|bezpieczn\w* (godzin|dla snu)/i);
+    // D-006: nazwa „Napar” bez nazwy angielskiej.
+    expect(kontrakt).not.toMatch(new RegExp(['Steep', 'wise'].join(''))); // nazwa złożona, by test nazwy jej nie liczył
+    // D-007: adresy kontaktu i stron prawnych z jednego miejsca.
+    expect(kontrakt).toMatch(/D-007/);
+    // D-008: bez powiadomień o etapach w 1.0.
+    expect(sekcja(1)).not.toMatch(/powiadomie/i);
+    expect(sekcja(2)).toMatch(/^\| \*\*KILL-09\*\* \|.*D-008/m);
+  });
+});

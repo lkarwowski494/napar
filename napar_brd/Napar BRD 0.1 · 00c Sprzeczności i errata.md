@@ -83,3 +83,14 @@ Identyfikacja potencjalnych kolizji pojęciowych, ryzyk interpretacyjnych wytycz
 |---|---|---|---|---|
 | bez decyzji | kopia zapasowa w iCloud Drive | — | BR-DANE-001, Z-151, ZP-06 | eksport i import JSON obowiązują |
 | bez decyzji | widżety ekranu początkowego | — | BR-ZEG-005, Z-132 | — |
+
+### ER-06 (2026-11-15): Kontrakt zakresu od nowa — główna praca, hipotezy wartości, ID tylko ASCII (D-010)
+* **Kolizja:** kontrakt zakresu z 2026-10-24 powoływał się na zakresy BR, których BRD nie definiuje (np. BR-PARZ-030…045, BR-KALK-020…032), i nie przypisywał BR do funkcji. BRD nie ma pracy użytkownika (J) ani hipotez wartości (H). Dial-in Doctor (C1) i kreator własnych przepisów działają w aplikacji bez BR. ID młynka zawierało literę spoza ASCII, więc narzędzia i testy rozpoznające ID wzorcem `[A-Z]` go nie widziały.
+* **Rozstrzygnięcie:** D-010 w `docs/decyzje.md` (DEC-10 audytu M1 (a), 2026-11-13). Kontrakt `docs/scope-contract.md` z 2026-11-15 przypisuje każde BR do jednej funkcji F-nn albo do tabeli funkcji bez decyzji (decyduje właściciel). Pracę J-01 i hipotezy H-01…H-02 zapisuje rola 03 do przeglądu roli 01; BR z kryteriami dla funkcji opartych na H pisze rola 01 (ER dla roli 01). ID młynka: BR-MLYNEK-001 (nagłówek w B1; dawny zapis z literą Ł). Treść wymagań bez zmian.
+* **Kontrola:** `tests/audit-fixes.test.tsx`, blok „M1-audytor-generalny-038”: każde ID z kontraktu istnieje w BRD albo w rejestrze decyzji, a każde BR ma w kontrakcie jedną decyzję albo wiersz „bez decyzji”.
+
+| ID | Treść | Dowód (odczyt 2026-11-11) | Status |
+|---|---|---|---|
+| **J-01** | Zaparzyć dziś dobrą kawę specialty albo herbatę liściastą bez liczenia w głowie, a gdy wyszła źle, wiedzieć, co zmienić następnym razem. | linia bazowa audytu M1: opisy Filtru Coffee, Timer.Coffee, Beanconqueror i MyTeaPal w App Store | praca do potwierdzenia przez właściciela |
+| **H-01** | Jedna konkretna korekta jednego parametru po ocenie parzenia (Dial-in Doctor, C1) pomaga trafić następnym razem. | Filtru Coffee, „Co nowego” 5.0: Dial In przeniesiony do zapisu parzenia | hipoteza; BR do napisania (rola 01) |
+| **H-02** | Użytkownik chce zapisać własny przepis wieloetapowy i parzyć według niego jak według przepisu z biblioteki. | Timer.Coffee, opis w App Store: „Create & Share Recipes” | hipoteza; BR do napisania (rola 01) |
