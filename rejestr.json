@@ -402,5 +402,78 @@
     "krytyczne": false,
     "przeglad": null,
     "uwagi": "Brak źródła i daty odczytu etykiet dla marek (poza mineralizacją Muszynianki). Zdanie „Oficjalna woda cuppingowa mistrzostw baristów (WBC)” usunięte 2026-11-14 (fakt zmienny bez źródła). Rekomendacja audytu (b) — usunąć marki — to zmiana funkcji: decyzja właściciela/03."
+  },
+  {
+    "id": "WCAG21-KONTRAST",
+    "twierdzenie": "WCAG 2.1 (W3C): luminancja względna koloru sRGB L = 0.2126·R + 0.7152·G + 0.0722·B, gdzie kanał c = C8bit/255 linearyzowany jako c/12.92 dla c ≤ 0.04045, inaczej ((c+0.055)/1.055)^2.4; współczynnik kontrastu = (L1 + 0.05)/(L2 + 0.05) (L1 jaśniejszy), w zakresie od 1 do 21; tekst zwykły co najmniej 4.5:1 (1.4.3, AA), 7:1 (1.4.6, AAA), tekst duży co najmniej 3:1.",
+    "kategoria": "dostepnosc-kontrast",
+    "zrodla": [
+      {
+        "adres": "https://www.w3.org/TR/WCAG21/",
+        "tytul": "Web Content Accessibility Guidelines (WCAG) 2.1, W3C Recommendation 06 May 2025",
+        "wydawca": "World Wide Web Consortium (W3C)",
+        "cytat": "if RsRGB <= 0.04045 then R = RsRGB/12.92 else R = ((RsRGB+0.055)/1.055) ^ 2.4",
+        "odczyt": "2026-11-15",
+        "szczebel": 1,
+        "cytaty_dodatkowe": [
+          "For the sRGB colorspace, the relative luminance of a color is defined as L = 0.2126 * R + 0.7152 * G + 0.0722 * B",
+          "contrast ratio (L1 + 0.05) / (L2 + 0.05), where L1 is the relative luminance of the lighter of the colors, and L2 is the relative luminance of the darker of the colors.",
+          "Contrast ratios can range from 1 to 21 (commonly written 1:1 to 21:1).",
+          "visual presentation of text and images of text has a contrast ratio of at least 4.5:1",
+          "visual presentation of text and images of text has a contrast ratio of at least 7:1",
+          "Large-scale text and images of large-scale text have a contrast ratio of at least 3:1"
+        ],
+        "uwagi": "Odczyt surowego tekstu (curl + usunięcie znaczników HTML, grep), M1-audytor-generalny-044. Wyrocznia: scripts/gen-theme-contrast-corpus.py."
+      }
+    ],
+    "status": "potwierdzone",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null
+  },
+  {
+    "id": "CIAAW-MASY-ATOMOWE",
+    "twierdzenie": "Standardowe masy atomowe CIAAW: Ca 40.078(4); C [12.0096, 12.0116]; O [15.99903, 15.99977] (przedziały dla pierwiastków o zmiennym składzie izotopowym).",
+    "kategoria": "woda",
+    "zrodla": [
+      {
+        "adres": "https://www.ciaaw.org/atomic-weights.htm",
+        "tytul": "Standard Atomic Weights",
+        "wydawca": "IUPAC Commission on Isotopic Abundances and Atomic Weights (CIAAW)",
+        "cytat": "20 Ca calcium 40.078(4)",
+        "odczyt": "2026-11-15",
+        "szczebel": 1,
+        "cytaty_dodatkowe": [
+          "6 C carbon [12.0096, 12.0116]",
+          "8 O oxygen [15.999 03, 15.999 77]"
+        ],
+        "uwagi": "Odczyt surowego tekstu (curl + grep), M1-audytor-generalny-044. Używane do przeliczenia °dH na ppm CaCO3 jako przedział (scripts/gen-coffee-corpus.py)."
+      }
+    ],
+    "status": "potwierdzone",
+    "uproszczenie": null,
+    "krytyczne": false,
+    "przeglad": null
+  },
+  {
+    "id": "BMLUK-STOPIEN-DH",
+    "twierdzenie": "Według austriackiego ministerstwa (BMLUK) jeden stopień twardości niemieckiej (1 °dH) odpowiada 10 mg równoważnika CaO (albo 7,15 mg jonów wapnia); w wyroczni przyjęto „na litr wody” i 1 ppm = 1 mg/L.",
+    "kategoria": "woda",
+    "zrodla": [
+      {
+        "adres": "https://www.bmluk.gv.at/themen/wasser/wasserqualitaet/grundwasser/karte_haerte_GW2017.html",
+        "tytul": "Gesamthärte der oberflächennahen Grundwässer in Österreich",
+        "wydawca": "Bundesministerium für Land- und Forstwirtschaft, Klima- und Umweltschutz, Regionen und Wasserwirtschaft (BMLUK)",
+        "cytat": "Ein Grad deutscher Härte (1 ° dH ) entspricht einer Menge von 10 mg Calciumoxyd ( CaO )-Äquivalenten oder einer Menge von 7,15 mg gelöster Calcium-Ionen.",
+        "odczyt": "2026-11-15",
+        "szczebel": 3,
+        "uwagi": "Serwis instytucji (szczebel 3): jedno źródło. Cytat nie podaje objętości — „na litr” to założenie wyroczni, nazwane. Norma DIN z definicją nieodczytana: [DO USTALENIA]. Odczyt surowego tekstu (curl + grep), M1-audytor-generalny-044."
+      }
+    ],
+    "status": "potwierdzone",
+    "uproszczenie": "Założenie: 10 mg CaO na litr; ppm CaCO3 = mg/L.",
+    "krytyczne": false,
+    "przeglad": null,
+    "jedno_zrodlo": true
   }
 ]
