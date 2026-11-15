@@ -1127,3 +1127,52 @@ describe('M1-audytor-generalny-023: polityka prywatności PL i EN spełnia 5.1.1
     }
   });
 });
+
+describe('M1-audytor-generalny-035: kontrakt zakresu 1.0 bez powiadomień o etapach parzenia, których kod nie ma (DEC-08 a; 05-architekt-008, 03-zakres-008)', () => {
+  const contract = readFileSync(join(root, 'docs/scope-contract.md'), 'utf8');
+  const section = (start: RegExp, end: RegExp): string => {
+    const from = contract.search(start);
+    const rest = contract.slice(from);
+    const to = rest.slice(1).search(end);
+    return from < 0 ? '' : to < 0 ? rest : rest.slice(0, to + 1);
+  };
+  const scopeIn = section(/^## 1\. /m, /^## 2\. /m);
+  const killList = section(/^## 2\. /m, /^## 3\. /m);
+  const zmGate = section(/^## 5\. /m, /^## 6\. /m);
+  const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+  const appJson = JSON.parse(readFileSync(join(root, 'app.json'), 'utf8'));
+  const deps = { ...(pkg.dependencies ?? {}), ...(pkg.devDependencies ?? {}) };
+
+  test('05-architekt-008 / 03-zakres-008: zakres 1.0 nie obiecuje powiadomień o etapach ani nieistniejących BR-ZEG-006..010', () => {
+    expect(scopeIn).toContain('Asystent Parzenia i Timery');
+    expect(scopeIn).not.toMatch(/powiadomie/i);
+    expect(scopeIn).not.toMatch(/BR-ZEG-0(0[6-9]|10)/);
+  });
+
+  test('05-architekt-008: powiadomienia etapów są na liście odcięć z warunkiem powrotu, a zmiana ma wiersz ZM z DEC-08', () => {
+    const kill = killList.split('\n').find((l) => /^\| \*\*KILL-09\*\*/.test(l)) ?? '';
+    expect(kill).toMatch(/[Pp]owiadomienia lokalne o etapach parzenia/);
+    expect(kill).toMatch(/Powrót:/);
+    expect(kill).toContain('expo-notifications');
+    const zm = zmGate.split('\n').find((l) => /^\| ZM-03 \|/.test(l)) ?? '';
+    expect(zm).toContain('DEC-08 wybór (a)');
+    expect(zm).toContain('05-architekt-008');
+    expect(zm).toContain('03-zakres-008');
+  });
+
+  test('05-architekt-008: kod zgodny z kontraktem — bez powiadomień i trybów tła; zostaje ekran bez wygaszania, dźwięk i wibracja na pierwszym planie', () => {
+    // Powrót powiadomień wymaga wiersza ZM i zmiany kontraktu razem z zależnością.
+    expect(deps['expo-notifications']).toBeUndefined();
+    expect(appJson.expo.ios.infoPlist.UIBackgroundModes).toBeUndefined();
+    expect(appJson.expo.android.permissions ?? []).not.toContain('android.permission.POST_NOTIFICATIONS');
+    const engine = readFileSync(join(root, 'src/core/timer-engine.ts'), 'utf8');
+    const gongfu = readFileSync(join(root, 'app/gongfu.tsx'), 'utf8');
+    for (const src of [engine, gongfu]) {
+      expect(src).not.toMatch(/expo-notifications|scheduleNotification/);
+      expect(src).toMatch(/activateKeepAwakeAsync\(\)/);
+      expect(src).toMatch(/playTimerChime\(\)/);
+      expect(src).toMatch(/Haptics\.(impact|notification)Async/);
+      expect(src).toMatch(/AppState\.addEventListener\('change'/);
+    }
+  });
+});
