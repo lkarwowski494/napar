@@ -131,14 +131,21 @@ Deklaracja statusu przedsiębiorcy (trader) zgodnie z rozporządzeniem (UE) 2022
 
 ## 5. Accessibility Nutrition Labels (Dostępność Apple)
 
-Deklaracja dostępności aplikacji w karcie App Store Connect:
+Deklaracje dla wersji 1.0.0 w App Store Connect (*App Accessibility*). Zasada (10-wydanie-009, M1-audytor-generalny-040): w ASC zaznaczamy **tylko** wiersze ze statusem `tak`; każdy taki wiersz wskazuje test, który sprawdza cechę w kodzie. `nieocenione` znaczy: testy automatyczne są warunkiem koniecznym, ale Apple wymaga, żeby wspólne zadania dało się wykonać z daną funkcją systemu — to sprawdza się na urządzeniu (krok właściciela, potem ocena roli 04). Do tego czasu tej cechy nie deklarujemy. Etykiety są dobrowolne; brak deklaracji nie blokuje wydania, a deklaracja sprzeczna z aplikacją może (wytyczna 2.3). Kontrola: `tests/audit-fixes.test.tsx`, blok „M1-audytor-generalny-040”.
 
-| Cecha dostępności | Status | Implementacja techniczna |
-| :--- | :---: | :--- |
-| **VoiceOver (Czytnik ekranu)** | Wspierane | Wszystkie przyciski stopera, selektory i pola posiadają semantyczne `accessibilityLabel` i `accessibilityHint`. |
-| **Dynamic Type (Skalowanie tekstu)** | Wspierane | Teksty UI i etykiety dostosowują się do preferencji wielkości tekstu w systemie iOS. |
-| **Sufficient Contrast (Wysoki kontrast)** | Wspierane | Kontrast elementów kluczowych spełnia normy WCAG 2.1 AA/AAA na ciemnym tle rzemieślniczym. |
-| **Reduced Motion (Ograniczenie ruchu)** | Wspierane | Aplikacja respektuje systemową flagę redukcji ruchu, wyłączając przejścia modalne i pulsowanie. |
+Wspólne zadania do próby na urządzeniu: pierwsze uruchomienie → wybór przepisu → „Pokaż kroki parzenia” → „Rozpocznij parzenie” → zapis z oceną → wpis w Dzienniku; dodanie paczki w Spiżarni; eksport kopii w Ustawieniach.
+
+| Etykieta Apple | Deklaracja w ASC | Dowód (test lub próba) |
+| :--- | :--- | :--- |
+| **VoiceOver** | nieocenione — wymaga próby na urządzeniu (krok właściciela) | Warunek konieczny spełniony w kodzie: `tests/audit-fixes.test.tsx` › „04-studio-projektowe-007: każdy Pressable/Touchable w app/ i src/ ma accessibilityRole i accessibilityLabel”; `src/core/__tests__/confirm-announce.test.ts` › „announceStep, announceCountdown, announceFinish wywołują AccessibilityInfo”. Brak przejścia wspólnych zadań z włączonym VoiceOver. |
+| **Voice Control** | nieocenione — wymaga próby na urządzeniu (krok właściciela) | Etykiety jak wyżej; sterowania głosem nie sprawdzono. |
+| **Larger Text** | nieocenione — wymaga próby na urządzeniu (krok właściciela) | W kodzie nie ma `allowFontScaling={false}`; odliczanie stoperów ma celowy limit powiększenia: `tests/touch-and-type-scale.test.tsx` › „ekran kroków: odliczanie ma maxFontSizeMultiplier ≤ 1,5 i jeden wiersz”. Apple wymaga powiększenia tekstu co najmniej o 200 %; układu przy największym rozmiarze (AX5) nie sprawdzono na urządzeniu. |
+| **Dark Interface** | tak | Aplikacja ma wyłącznie ciemny interfejs: `src/core/__tests__/contracts.test.ts` › „Kontrakt Konfiguracji Expo: produkcyjne metadane, ciemny motyw, uprawnienia i zero-telemetria” (`userInterfaceStyle: dark`); kolory tekstu na ciemnym tle: `tests/contrast-tokens.test.ts` › „tekst %s ≥ 4,5:1”. |
+| **Differentiate Without Color Alone** | nieocenione — wymaga próby na urządzeniu (krok właściciela) | Jeden przypadek sprawdzony: `tests/audit-fixes.test.tsx` › „04-studio-projektowe-009: powyżej 400 mg dziennie jest tekst ostrzeżenia z rolą alert, nie tylko kolor paska”. Pozostałych ekranów nie oceniono. |
+| **Sufficient Contrast** | tak | Domyślny wygląd spełnia WCAG AA: `tests/contrast-tokens.test.ts` › „tekst %s ≥ 4,5:1”, „element interfejsu %s ≥ 3:1” oraz „styl tekstu ≥ 4,5:1, glif (…Icon) ≥ 3:1 na bgCard (poza tekstem na wypełnieniu)”. |
+| **Reduced Motion** | nie | Flagę systemową „Ogranicz ruch” respektuje 1 z 17 modali (`OnboardingModal`); pozostałe wjeżdżają animacją `slide` albo `fade`. Zgodność zdania z kodem: `tests/audit-fixes.test.tsx` › „10-wydanie-009: Reduced Motion — zdanie o modalach zgodne z kodem”. Powrót: ocena roli 04 według kryteriów Apple (nie każda animacja jest problemem). |
+| **Captions** | nie dotyczy | Aplikacja nie ma treści wideo ani audio z mową. |
+| **Audio Descriptions** | nie dotyczy | Aplikacja nie ma treści wideo. |
 
 ---
 
@@ -175,6 +182,9 @@ Napar TestFlight beta v1.0.0:
 4. Verify local JSON backup export in Settings.
 100% offline, privacy-first, zero analytics.
 ```
+
+### Notatki dla App Review (*Notes for Review*)
+Treść pola *App Review Information → Notes* dla wersji 1.0.0 jest w `docs/wydanie/app-review-notes.md` (po angielsku, poniżej 4000 B): brak konta i zakupów, główny przepływ parzenie → ocena → Dziennik, import przepisu z kodu QR lub linku bez drugiego urządzenia, tryb awaryjny bazy. Przed wysłaniem do przeglądu: zaktualizować plik do wersji z `app.json` i wpisać adres kontaktowy (DEC-07). Kontrola: `tests/audit-fixes.test.tsx`, blok „M1-audytor-generalny-040” (10-wydanie-011).
 
 ---
 

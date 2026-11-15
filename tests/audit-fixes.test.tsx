@@ -2513,3 +2513,113 @@ describe('M1-audytor-generalny-043: hook przed pushem uruchamia pełną bramkę 
   });
 });
 
+
+describe('M1-audytor-generalny-040: deklaracje dostępności z dowodem; notatki dla App Review (10-wydanie-009, 10-wydanie-011)', () => {
+  const store = () => readFileSync(join(root, 'docs/15-app-store.md'), 'utf8');
+  const NOTES = 'docs/wydanie/app-review-notes.md';
+  const APPLE_LABELS = [
+    'VoiceOver',
+    'Voice Control',
+    'Larger Text',
+    'Dark Interface',
+    'Differentiate Without Color Alone',
+    'Sufficient Contrast',
+    'Reduced Motion',
+    'Captions',
+    'Audio Descriptions',
+  ];
+  const STATUSES = ['tak', 'nie', 'nieocenione — wymaga próby na urządzeniu (krok właściciela)', 'nie dotyczy'];
+  /** Wiersze tabeli z sekcji 5 (Accessibility Nutrition Labels): etykieta → { status, reszta wiersza }. */
+  const a11yRows = () => {
+    const sec = store().split(/^## /m).find((s) => s.startsWith('5. Accessibility Nutrition Labels')) ?? '';
+    const rows = new Map<string, { status: string; text: string }>();
+    for (const line of sec.split('\n')) {
+      const m = line.match(/^\|\s*\*\*([^*]+)\*\*[^|]*\|\s*([^|]+?)\s*\|(.*)\|\s*$/);
+      if (m) rows.set(m[1].trim(), { status: m[2].trim(), text: m[3] });
+    }
+    return rows;
+  };
+  /** Odsyłacze `plik.test.ts` › „tytuł”, „tytuł” …: każdy cytat po pliku (do następnego pliku) to tytuł testu z tego pliku. */
+  const testRefs = (text: string) => {
+    const parts = text.split(/`((?:tests|src)\/[^`]+\.test\.tsx?)`/);
+    const out: { file: string; title: string }[] = [];
+    for (let i = 1; i < parts.length; i += 2) {
+      if (!/^\s*›/.test(parts[i + 1])) continue;
+      for (const m of parts[i + 1].matchAll(/„([^”]+)”/g)) out.push({ file: parts[i], title: m[1] });
+    }
+    return out;
+  };
+  /** Modale w app/ i src/: ile ma animationType zależne od systemowej flagi ograniczenia ruchu. */
+  const modalMotion = () => {
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+        const p = join(dir, e.name);
+        if (e.isDirectory()) return ['__tests__', 'node_modules'].includes(e.name) ? [] : walk(p);
+        return /\.tsx$/.test(e.name) ? [p] : [];
+      });
+    const tags = ['app', 'src'].flatMap((d) => walk(join(root, d))).flatMap((f) => readFileSync(f, 'utf8').match(/<Modal\s[^>]*>/g) ?? []);
+    return { total: tags.length, respects: tags.filter((t) => /animationType=\{[^}]*reduceMotion/i.test(t)).length };
+  };
+
+  test('10-wydanie-009: tabela ma każdą etykietę Apple i tylko dozwolone statusy; bez „Wspierane” z wymagań', () => {
+    const rows = a11yRows();
+    expect([...rows.keys()].sort()).toEqual([...APPLE_LABELS].sort());
+    for (const [label, r] of rows) expect([label, STATUSES.includes(r.status)]).toEqual([label, true]);
+    expect(store()).not.toMatch(/\|\s*Wspierane\s*\|/);
+  });
+
+  test('10-wydanie-009: każda deklaracja „tak” wskazuje istniejący test z istniejącym tytułem; każdy odsyłacz w tabeli istnieje', () => {
+    const rows = a11yRows();
+    const yes = [...rows].filter(([, r]) => r.status === 'tak');
+    for (const [label, r] of yes) expect([label, testRefs(r.text).length > 0]).toEqual([label, true]);
+    for (const [label, r] of rows) {
+      for (const ref of testRefs(r.text)) {
+        const ok = existsSync(join(root, ref.file)) && readFileSync(join(root, ref.file), 'utf8').includes(ref.title);
+        expect([label, ref.file, ref.title, ok]).toEqual([label, ref.file, ref.title, true]);
+      }
+    }
+  });
+
+  test('10-wydanie-009: Reduced Motion — zdanie o modalach zgodne z kodem; „tak” tylko, gdy każdy modal respektuje flagę', () => {
+    const { total, respects } = modalMotion();
+    expect(total).toBeGreaterThan(0);
+    const row = a11yRows().get('Reduced Motion');
+    expect(row?.text).toContain(`${respects} z ${total} modali`);
+    if (respects < total) expect(row?.status).not.toBe('tak');
+    expect(store()).not.toMatch(/wyłączając przejścia modalne/);
+  });
+
+  test('10-wydanie-011: notatki dla App Review istnieją, opisują wersję z app.json, mieszczą się w 4000 B i prowadzą przez główny przepływ, QR i tryb awaryjny', () => {
+    expect(existsSync(join(root, NOTES))).toBe(true);
+    const file = readFileSync(join(root, NOTES), 'utf8');
+    const app = JSON.parse(readFileSync(join(root, 'app.json'), 'utf8')).expo;
+    const notes = file.match(/```text\n([\s\S]*?)\n```/)?.[1] ?? '';
+    expect(Buffer.byteLength(notes, 'utf8')).toBeGreaterThan(500);
+    expect(Buffer.byteLength(notes, 'utf8')).toBeLessThan(4000);
+    expect(notes).toContain(`Napar ${app.version}`);
+    const en = translations.en;
+    for (const s of [en.brew.openStepsBtn, en.brew.startBrewBtn, en.brew.saveToJournalBtn, en.tabs.journal, en.journal.brewAgain, en.brew.sharePillEyebrow, en.brew.qrShareLink, en.brew.importRecipe, en.common.howItWorks]) {
+      expect([s, notes.includes(s)]).toEqual([s, true]);
+    }
+    expect(notes).toMatch(/offline/i);
+    expect(notes).toMatch(/no account/i);
+    expect(notes).toMatch(/Polish and English/);
+    expect(notes).toMatch(/safe mode/i);
+    expect(notes).toContain('[DO USTALENIA: adres od właściciela]');
+    expect(store()).toContain(NOTES);
+  });
+
+  test('10-wydanie-011: notatki bez zakazanych twierdzeń i bez wymyślonego adresu; zaprzeczenia zgodne z kodem', () => {
+    const file = readFileSync(join(root, NOTES), 'utf8');
+    // nazwę cudzej aplikacji (11-wzrost-007) pilnuje tests/brand-name.test.ts — skanuje też docs/wydanie/
+    for (const re of [/apple health|healthkit/i, /subscri|subskrypc|trial|paywall|premium|okres próbny/i, /\b35\b/, /[a-z0-9._-]+@[a-z0-9-]+\.[a-z]/i]) {
+      expect([String(re), re.test(file)]).toEqual([String(re), false]);
+    }
+    const app = JSON.parse(readFileSync(join(root, 'app.json'), 'utf8')).expo;
+    expect(app.ios.infoPlist.CFBundleLocalizations).toEqual(['pl', 'en']);
+    expect(app.ios.infoPlist.NSCameraUsageDescription).toMatch(/QR/);
+    const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+    const deps = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies });
+    expect(deps.filter((d) => /notifications|iap|purchases|storekit|healthkit/i.test(d))).toEqual([]);
+  });
+});
