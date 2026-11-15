@@ -16,7 +16,7 @@
 | **Architektura danych** | SQLite + Podwójna pula kopii | 10 kopii automatycznych ($P_{\text{auto}}$) + 10 ratunkowych ($P_{\text{safe}}$) |
 | **Klucze i18n** | stan: `npm run check:i18n` | symetria PL / EN (`scripts/check-i18n.mjs`) |
 | **Macierz testów AST** | stan: `npm run check:matrix` | wymaga 100% elementów w 5 kategoriach |
-| **Wyrocznie numeryczne** | Python 3 + `scripts/check-corpus.mjs` | Korpus ekstrakcji kawy i kontrastu motywów (zgodność do 4 miejsc) |
+| **Wyrocznie numeryczne** | Python 3 + `scripts/check-corpus.mjs` (tryb `--check`, nie zapisuje plików) | Wektory ze źródeł: BRD RD-03/RD-17 (plik:linia z cytatem) i rejestr.json (W3C, CIAAW, BMLUK); regeneracja `npm run gen:corpus` (M1-audytor-generalny-044) |
 | **Stan testów Jest** | stan: `npm run verify` | progi z `jest.config.js`, zablokowany `act()` i `console.error` |
 | **Potok CI/CD** | `ci.yml`, `tests-tz.yml`, `testflight.yml`, `e2e-ios.yml`, `pages.yml` | 100% zgodne z zasadami minimalnych uprawnień |
 
@@ -32,7 +32,7 @@ npm run verify
 
 # Pojedyncze kontrole składowe:
 npm run check:i18n       # Walidacja symetrii tłumaczeń PL/EN
-npm run check:corpus     # Weryfikacja zgodności z wyroczniami w Pythonie
+npm run check:corpus     # Wyrocznie ze źródeł: porównanie z tests/fixtures bez zapisu (regeneracja: npm run gen:corpus)
 npm run check:licenses   # Kontrola czystości licencji (zakaz GPL w prod)
 npm run check:matrix     # Weryfikacja 100% pokrycia macierzy testów AST
 npm run check:native     # Sprawdzenie niezmienników iOS na Linuksie/Windowsie
@@ -54,7 +54,7 @@ PROP_SEED=12345 npm test -- tests/domain-properties.test.ts
 * **`D-05` (Odporność stoperów na usypianie systemu):** Wszystkie timery oparto o stały punkt docelowy w czasie `remainingTimerSec(endAtMs, nowMs)` zamiast dekrementacji interwałowej `setInterval(-1)`.
 * **`D-06` (Ochrona przed wstrzykiwaniem formuł CSV):** Wszystkie pola eksportu CSV rozpoczynające się od `=, +, -, @` są neutralizowane apostrofem wiodącym `escapeCsvCell()`.
 * **`D-07` (Własnościowe testy z gwarantowanym krokiem początkowym):** W generatorach `fast-check` zapewniono obecność co najmniej jednej akcji otwierającej (np. tworzenie ziarna lub receptury) przed operacjami edycji/usuwania.
-* **`D-08` (Wyrocznie numeryczne w niezależnym języku):** Skrypty `scripts/gen-coffee-corpus.py` oraz `scripts/gen-theme-contrast-corpus.py` generują matematyczne korpusy wzorcowe, sprawdzane testami w Jest.
+* **`D-08` (Wyrocznie numeryczne ze źródeł):** Skrypty `scripts/gen-coffee-corpus.py` oraz `scripts/gen-theme-contrast-corpus.py` liczą wektory z definicji zapisanych w BRD i w `rejestr.json` (fractions/Decimal, nie kod aplikacji); każdy wektor ma pole `zrodla`, a rozbieżność kodu ze źródłem oznacza się polem `znany_rozjazd` z ID znaleziska. `check:corpus` pada przy ręcznej zmianie wartości w fixture (M1-audytor-generalny-044).
 * **`D-09` (16 strażników interakcji S1–S16):** Wszystkie formularze, modale, listy i potwierdzenia podlegają rygorystycznym regułom UX studia (`tests/interaction-guards.test.ts`).
 * **`D-10` (Hermetyczny skaner macierzy testów AST):** `scripts/test-matrix.mjs` parsuje kod TypeScript AST, automatycznie oczyszczając komentarze, importy i nagłówki testów przed weryfikacją dowodu pokrycia.
 * **`D-11` (Scenariusze Maestro na granicy stref czasowych):** Wszystkie przepływy `.maestro/*.yaml` są weryfikowane w Jest pod symulacją poniedziałku, niedzieli oraz przejścia przez północ (23:55 UTC).

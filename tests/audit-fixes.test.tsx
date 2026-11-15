@@ -2210,3 +2210,79 @@ describe('M1-audytor-generalny-038: kontrakt zakresu w formacie roli 03 ze ślad
   });
 });
 
+
+describe('M1-audytor-generalny-044: wyrocznia ze źródeł, check:corpus porównuje zamiast nadpisywać (07-jakosc-010)', () => {
+  const { spawnSync } = require('node:child_process');
+  const { mkdtempSync, mkdirSync, cpSync, writeFileSync, rmSync } = require('node:fs');
+  const { tmpdir } = require('node:os');
+  const kopie = [
+    'scripts/check-corpus.mjs', 'scripts/gen-coffee-corpus.py', 'scripts/gen-theme-contrast-corpus.py', 'rejestr.json', 'src/core/theme.ts',
+    'tests/fixtures/coffee-corpus.json', 'tests/fixtures/theme-contrast-corpus.json',
+    'napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md',
+    'napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md',
+  ];
+  const kopia = () => {
+    const d = mkdtempSync(join(tmpdir(), 'napar-corpus-'));
+    for (const f of kopie) { mkdirSync(join(d, f, '..'), { recursive: true }); cpSync(join(root, f), join(d, f)); }
+    return d;
+  };
+  const uruchom = (d: string) => spawnSync(process.execPath, ['scripts/check-corpus.mjs'], { cwd: d, encoding: 'utf8' });
+
+  test('07-jakosc-010: kopia repo przechodzi check:corpus (kontrola testu)', () => {
+    const d = kopia();
+    try { expect(uruchom(d).status).toBe(0); } finally { rmSync(d, { recursive: true, force: true }); }
+  });
+
+  test('07-jakosc-010: ręczna zmiana wartości w fixture → check:corpus kod 1, a plik zostaje niezmieniony', () => {
+    const d = kopia();
+    try {
+      const p = join(d, 'tests/fixtures/coffee-corpus.json');
+      const c = JSON.parse(readFileSync(p, 'utf8'));
+      c.extraction_yield[0].expectedExtractionYieldPercent = 25.0;
+      const zmieniony = JSON.stringify(c, null, 2) + '\n';
+      writeFileSync(p, zmieniony);
+      const r = uruchom(d);
+      expect(r.status).toBe(1);
+      expect(r.stderr + r.stdout).toMatch(/różni się od wyroczni/);
+      expect(readFileSync(p, 'utf8')).toBe(zmieniony);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+  });
+
+  test('07-jakosc-010: zmiana koloru motywu bez regeneracji korpusu → check:corpus kod 1', () => {
+    const d = kopia();
+    try {
+      const p = join(d, 'src/core/theme.ts');
+      writeFileSync(p, readFileSync(p, 'utf8').replace("danger: '#E5605B'", "danger: '#D9534F'"));
+      expect(uruchom(d).status).toBe(1);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+  });
+
+  test('07-jakosc-010: cytat BRD zniknął z wskazanej linii albo źródło w rejestrze niepotwierdzone → check:corpus kod 1', () => {
+    const d = kopia();
+    try {
+      const p = join(d, kopie[7]);
+      writeFileSync(p, readFileSync(p, 'utf8').replace('= 297.0 / 15.0 = 19.80', '= 297.0 / 15.0 = 19.90'));
+      const r = uruchom(d);
+      expect(r.status).toBe(1);
+      expect(r.stderr + r.stdout).toMatch(/cytat nie stoi/);
+    } finally { rmSync(d, { recursive: true, force: true }); }
+    const d2 = kopia();
+    try {
+      const p = join(d2, 'rejestr.json');
+      const reg = JSON.parse(readFileSync(p, 'utf8'));
+      reg.find((t: any) => t.id === 'WCAG21-KONTRAST').status = 'otwarte';
+      writeFileSync(p, JSON.stringify(reg, null, 2) + '\n');
+      expect(uruchom(d2).status).toBe(1);
+    } finally { rmSync(d2, { recursive: true, force: true }); }
+  });
+
+  test('07-jakosc-010: każdy wektor korpusu ma źródło; generatory nie zawierają kopii kolorów motywu ani progów z kodu bez źródła', () => {
+    for (const f of ['tests/fixtures/coffee-corpus.json', 'tests/fixtures/theme-contrast-corpus.json']) {
+      const c = JSON.parse(readFileSync(join(root, f), 'utf8'));
+      for (const v of Object.values(c).filter(Array.isArray).flat() as any[]) expect([v.id, (v.zrodla ?? []).length > 0]).toEqual([v.id, true]);
+    }
+    const gen = readFileSync(join(root, 'scripts/gen-theme-contrast-corpus.py'), 'utf8');
+    expect(gen).not.toMatch(/theme_colors\s*=\s*\{/);
+    expect(readFileSync(join(root, 'scripts/check-corpus.mjs'), 'utf8')).toMatch(/--check/);
+  });
+});

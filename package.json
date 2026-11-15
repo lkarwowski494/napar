@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "check:i18n": "node scripts/check-i18n.mjs",
     "check:corpus": "node scripts/check-corpus.mjs",
+    "gen:corpus": "node scripts/check-corpus.mjs --write",
     "check:licenses": "node scripts/licenses.mjs",
     "check:matrix": "node scripts/test-matrix.mjs --check",
     "check:native": "node scripts/verify-native.mjs",

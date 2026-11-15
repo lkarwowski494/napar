@@ -1,108 +1,248 @@
 {
   "metadata": {
     "generator": "scripts/gen-theme-contrast-corpus.py",
-    "standard": "WCAG 2.1 relative luminance & contrast ratio (RD-ENG-02)"
+    "version": "2.0",
+    "standard": "WCAG 2.1, https://www.w3.org/TR/WCAG21/ (odczyt 2026-11-15; rejestr WCAG21-KONTRAST)",
+    "kolory": "src/core/theme.ts, theme.colors (wejście, czytane przy każdym przebiegu)",
+    "tolerancja": 5.0001000000000005e-05
   },
   "canonical_rd_vectors": [
     {
+      "id": "WCAG-ZAKRES-21",
       "color1": "#FFFFFF",
       "color2": "#000000",
       "contrastRatio": 21.0,
-      "passAA": true,
-      "passAAA": true
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "wartość ze źródła („Contrast ratios can range from 1 to 21”)"
     },
     {
+      "id": "WCAG-ZAKRES-1",
       "color1": "#767676",
-      "color2": "#FFFFFF",
-      "contrastRatio": 4.5422,
-      "passAA": true,
-      "passAAA": false
+      "color2": "#767676",
+      "contrastRatio": 1.0,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "wartość ze źródła („Contrast ratios can range from 1 to 21”)"
     },
     {
-      "color1": "#777777",
-      "color2": "#FFFFFF",
-      "contrastRatio": 4.4781,
-      "passAA": false,
-      "passAAA": false
+      "id": "WCAG-DEF-01",
+      "foregroundHex": "#767676",
+      "backgroundHex": "#FFFFFF",
+      "contrastRatio": 4.542224959605254,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": false,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
     },
     {
-      "color1": "#9CA3AF",
-      "color2": "#F3F4F6",
-      "contrastRatio": 2.307,
-      "passAA": false,
-      "passAAA": false
+      "id": "WCAG-DEF-02",
+      "foregroundHex": "#777777",
+      "backgroundHex": "#FFFFFF",
+      "contrastRatio": 4.4780894535772156,
+      "passAA_NormalText": false,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": false,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
+    },
+    {
+      "id": "WCAG-DEF-03",
+      "foregroundHex": "#9CA3AF",
+      "backgroundHex": "#F3F4F6",
+      "contrastRatio": 2.3069573454381738,
+      "passAA_NormalText": false,
+      "passAA_LargeTextOrUI": false,
+      "passAAA_NormalText": false,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
+    },
+    {
+      "id": "WCAG-DEF-04",
+      "foregroundHex": "#0A0A0A",
+      "backgroundHex": "#FFFFFF",
+      "contrastRatio": 19.79814571052481,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": true,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
+    },
+    {
+      "id": "WCAG-DEF-05",
+      "foregroundHex": "#0B0B0B",
+      "backgroundHex": "#FFFFFF",
+      "contrastRatio": 19.682627652657427,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": true,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
     }
   ],
   "theme_pairs": [
     {
+      "id": "MOTYW-textPrimary-bg",
       "foregroundName": "textPrimary",
-      "foregroundHex": "#F4EFEA",
       "backgroundName": "bg",
-      "backgroundHex": "#121214",
-      "contrastRatio": 16.3776,
-      "passAA_NormalText": true,
-      "passAA_LargeTextOrUI": true,
-      "passAAA_NormalText": true
-    },
-    {
-      "foregroundName": "textPrimary",
       "foregroundHex": "#F4EFEA",
-      "backgroundName": "bgCard",
-      "backgroundHex": "#1C1C1F",
-      "contrastRatio": 14.8805,
+      "backgroundHex": "#121214",
+      "contrastRatio": 16.37762630712719,
       "passAA_NormalText": true,
       "passAA_LargeTextOrUI": true,
-      "passAAA_NormalText": true
+      "passAAA_NormalText": true,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
     },
     {
+      "id": "MOTYW-textPrimary-bgCard",
+      "foregroundName": "textPrimary",
+      "backgroundName": "bgCard",
+      "foregroundHex": "#F4EFEA",
+      "backgroundHex": "#1C1C1F",
+      "contrastRatio": 14.880497705908907,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": true,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
+    },
+    {
+      "id": "MOTYW-textSecondary-bgCard",
       "foregroundName": "textSecondary",
-      "foregroundHex": "#A09C96",
       "backgroundName": "bgCard",
+      "foregroundHex": "#A09C96",
       "backgroundHex": "#1C1C1F",
-      "contrastRatio": 6.2258,
+      "contrastRatio": 6.225805660253202,
       "passAA_NormalText": true,
       "passAA_LargeTextOrUI": true,
-      "passAAA_NormalText": false
+      "passAAA_NormalText": false,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
     },
     {
+      "id": "MOTYW-textMuted-bgCard",
+      "foregroundName": "textMuted",
+      "backgroundName": "bgCard",
+      "foregroundHex": "#96928E",
+      "backgroundHex": "#1C1C1F",
+      "contrastRatio": 5.504059177585662,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": false,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
+    },
+    {
+      "id": "MOTYW-textMuted-bgCardSecondary",
+      "foregroundName": "textMuted",
+      "backgroundName": "bgCardSecondary",
+      "foregroundHex": "#96928E",
+      "backgroundHex": "#242428",
+      "contrastRatio": 5.006580847911933,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": false,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
+    },
+    {
+      "id": "MOTYW-copperLight-bg",
       "foregroundName": "copperLight",
+      "backgroundName": "bg",
       "foregroundHex": "#E88B4D",
-      "backgroundName": "bg",
       "backgroundHex": "#121214",
-      "contrastRatio": 7.3341,
+      "contrastRatio": 7.334094053548508,
       "passAA_NormalText": true,
       "passAA_LargeTextOrUI": true,
-      "passAAA_NormalText": true
+      "passAAA_NormalText": true,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
     },
     {
+      "id": "MOTYW-emeraldLight-bg",
       "foregroundName": "emeraldLight",
+      "backgroundName": "bg",
       "foregroundHex": "#3AA584",
-      "backgroundName": "bg",
       "backgroundHex": "#121214",
-      "contrastRatio": 6.1435,
+      "contrastRatio": 6.143529182847157,
       "passAA_NormalText": true,
       "passAA_LargeTextOrUI": true,
-      "passAAA_NormalText": false
+      "passAAA_NormalText": false,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
     },
     {
+      "id": "MOTYW-danger-bg",
       "foregroundName": "danger",
-      "foregroundHex": "#D9534F",
       "backgroundName": "bg",
+      "foregroundHex": "#E5605B",
       "backgroundHex": "#121214",
-      "contrastRatio": 4.7228,
+      "contrastRatio": 5.484788949312462,
       "passAA_NormalText": true,
       "passAA_LargeTextOrUI": true,
-      "passAAA_NormalText": false
+      "passAAA_NormalText": false,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
     },
     {
-      "foregroundName": "textPrimary",
-      "foregroundHex": "#F4EFEA",
+      "id": "MOTYW-danger-bgCard",
+      "foregroundName": "danger",
+      "backgroundName": "bgCard",
+      "foregroundHex": "#E5605B",
+      "backgroundHex": "#1C1C1F",
+      "contrastRatio": 4.983407720209181,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": false,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
+    },
+    {
+      "id": "MOTYW-onAccent-copper",
+      "foregroundName": "onAccent",
       "backgroundName": "copper",
+      "foregroundHex": "#121214",
       "backgroundHex": "#D97736",
-      "contrastRatio": 2.7673,
-      "passAA_NormalText": false,
-      "passAA_LargeTextOrUI": false,
-      "passAAA_NormalText": false
+      "contrastRatio": 5.918278415559181,
+      "passAA_NormalText": true,
+      "passAA_LargeTextOrUI": true,
+      "passAAA_NormalText": false,
+      "zrodla": [
+        "rejestr:WCAG21-KONTRAST"
+      ],
+      "metoda": "rachunek z definicji W3C (Decimal)"
     }
   ]
 }

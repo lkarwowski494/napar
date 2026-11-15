@@ -1,307 +1,1039 @@
 {
   "metadata": {
     "generator": "scripts/gen-coffee-corpus.py",
-    "version": "1.0",
-    "description": "Domain calculation oracle corpus for Napar"
+    "version": "2.0",
+    "description": "Wyrocznia ze źródeł (M1-audytor-generalny-044, 07-jakosc-010): wartości z BRD albo z rejestru twierdzeń, rachunek z definicji innym narzędziem niż kod",
+    "tolerancje": {
+      "extractionYieldPercent": 0.0050000010000000004,
+      "degreesDH": 5.0001000000000005e-05,
+      "remainingMg": 5.0001000000000005e-05
+    },
+    "ppmCaCO3NaStopienDH": {
+      "min": 17.847156159578383,
+      "max": 17.848792759966024
+    }
   },
   "extraction_yield": [
     {
-      "waterGrams": 220.0,
+      "id": "EY-BRD-RD03-1",
+      "beverageGrams": 220.0,
       "tdsPercent": 1.35,
       "coffeeDoseGrams": 15.0,
       "expectedExtractionYieldPercent": 19.8,
-      "expectedRating": "ideal"
+      "expectedRating": "ideal",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:35",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:36"
+      ],
+      "metoda": "wartość ze źródła",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
     },
     {
-      "waterGrams": 200.0,
+      "id": "EY-BRD-RD03-2",
+      "beverageGrams": 300.0,
+      "tdsPercent": 1.0,
+      "coffeeDoseGrams": 20.0,
+      "expectedExtractionYieldPercent": 15.0,
+      "expectedRating": "under",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:37"
+      ],
+      "metoda": "wartość ze źródła",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
+    },
+    {
+      "id": "EY-DEF-01",
+      "beverageGrams": 200.0,
       "tdsPercent": 1.2,
       "coffeeDoseGrams": 12.0,
       "expectedExtractionYieldPercent": 20.0,
-      "expectedRating": "ideal"
+      "expectedRating": "ideal",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
     },
     {
-      "waterGrams": 300.0,
+      "id": "EY-DEF-02",
+      "beverageGrams": 300.0,
       "tdsPercent": 1.45,
       "coffeeDoseGrams": 18.0,
-      "expectedExtractionYieldPercent": 24.1667,
-      "expectedRating": "over"
+      "expectedExtractionYieldPercent": 24.166666666666668,
+      "expectedRating": "over",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
     },
     {
-      "waterGrams": 500.0,
+      "id": "EY-DEF-03",
+      "beverageGrams": 500.0,
       "tdsPercent": 1.1,
       "coffeeDoseGrams": 30.0,
-      "expectedExtractionYieldPercent": 18.3333,
-      "expectedRating": "ideal"
+      "expectedExtractionYieldPercent": 18.333333333333332,
+      "expectedRating": "ideal",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
     },
     {
-      "waterGrams": 150.0,
+      "id": "EY-DEF-04",
+      "beverageGrams": 150.0,
       "tdsPercent": 1.8,
       "coffeeDoseGrams": 10.0,
       "expectedExtractionYieldPercent": 27.0,
-      "expectedRating": "over"
+      "expectedRating": "over",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
     },
     {
-      "waterGrams": 250.0,
+      "id": "EY-DEF-05",
+      "beverageGrams": 250.0,
       "tdsPercent": 0.9,
       "coffeeDoseGrams": 15.0,
       "expectedExtractionYieldPercent": 15.0,
-      "expectedRating": "under"
+      "expectedRating": "under",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
     },
     {
-      "waterGrams": 250.0,
+      "id": "EY-DEF-06",
+      "beverageGrams": 250.0,
       "tdsPercent": 1.6,
       "coffeeDoseGrams": 15.0,
-      "expectedExtractionYieldPercent": 26.6667,
-      "expectedRating": "over"
+      "expectedExtractionYieldPercent": 26.666666666666668,
+      "expectedRating": "over",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
     },
     {
-      "waterGrams": 350.0,
+      "id": "EY-DEF-07",
+      "beverageGrams": 350.0,
       "tdsPercent": 1.25,
       "coffeeDoseGrams": 20.0,
       "expectedExtractionYieldPercent": 21.875,
-      "expectedRating": "ideal"
+      "expectedRating": "ideal",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
     },
     {
-      "waterGrams": 240.0,
+      "id": "EY-DEF-08",
+      "beverageGrams": 240.0,
       "tdsPercent": 1.5,
       "coffeeDoseGrams": 15.0,
       "expectedExtractionYieldPercent": 24.0,
-      "expectedRating": "over"
+      "expectedRating": "over",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
     },
     {
-      "waterGrams": 400.0,
+      "id": "EY-DEF-09",
+      "beverageGrams": 400.0,
       "tdsPercent": 1.38,
       "coffeeDoseGrams": 25.0,
       "expectedExtractionYieldPercent": 22.08,
-      "expectedRating": "over"
+      "expectedRating": "over",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
+    },
+    {
+      "id": "EY-DEF-10",
+      "beverageGrams": 36.0,
+      "tdsPercent": 9.5,
+      "coffeeDoseGrams": 18.0,
+      "expectedExtractionYieldPercent": 19.0,
+      "expectedRating": "ideal",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
+    },
+    {
+      "id": "EY-DEF-11",
+      "beverageGrams": 200.0,
+      "tdsPercent": 1.35,
+      "coffeeDoseGrams": 15.0,
+      "expectedExtractionYieldPercent": 18.0,
+      "expectedRating": null,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)",
+      "do_ustalenia_ocena": "granica 18/22 % (±0,005): BRD RD-03 i cytat SCA nie mówią, czy granica należy do zakresu ani czy ocenia się wynik zaokrąglony"
+    },
+    {
+      "id": "EY-DEF-12",
+      "beverageGrams": 220.0,
+      "tdsPercent": 1.5,
+      "coffeeDoseGrams": 15.0,
+      "expectedExtractionYieldPercent": 22.0,
+      "expectedRating": null,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)",
+      "do_ustalenia_ocena": "granica 18/22 % (±0,005): BRD RD-03 i cytat SCA nie mówią, czy granica należy do zakresu ani czy ocenia się wynik zaokrąglony"
+    },
+    {
+      "id": "EY-DEF-13",
+      "beverageGrams": 199.0,
+      "tdsPercent": 1.35,
+      "coffeeDoseGrams": 15.0,
+      "expectedExtractionYieldPercent": 17.91,
+      "expectedRating": "under",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
+    },
+    {
+      "id": "EY-DEF-14",
+      "beverageGrams": 221.0,
+      "tdsPercent": 1.5,
+      "coffeeDoseGrams": 15.0,
+      "expectedExtractionYieldPercent": 22.1,
+      "expectedRating": "over",
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:32",
+        "brd:napar_brd/Napar BRD 0.1 · C2 · rozdz. 8 reguly dziedzinowe - RD-01…RD-16 (ekstrakcja, ratio, TDS, woda).md:30"
+      ],
+      "metoda": "rachunek z definicji (fractions)",
+      "uwaga": "[DO USTALENIA] potwierdzenie zakresu 18–22 % u źródła SCA (rejestr SCA-GOLDENCUP-EY: otwarte)"
     }
   ],
   "water_hardness": [
     {
-      "ppmCaCO3": 0.0,
-      "expectedDegreesDH": 0.0
-    },
-    {
+      "id": "DH-DEF-01",
       "ppmCaCO3": 17.848,
-      "expectedDegreesDH": 1.0
+      "expectedDegreesDHMin": 0.9999555846730541,
+      "expectedDegreesDHMax": 1.0000472815060324,
+      "zrodla": [
+        "rejestr:BMLUK-STOPIEN-DH",
+        "rejestr:CIAAW-MASY-ATOMOWE"
+      ],
+      "metoda": "rachunek z definicji: °dH = ppm / (10 mg CaO × M(CaCO3)/M(CaO)), przedział z mas CIAAW (fractions)"
     },
     {
+      "id": "DH-DEF-02",
       "ppmCaCO3": 50.0,
-      "expectedDegreesDH": 2.8014
+      "expectedDegreesDHMin": 2.8013099077573234,
+      "expectedDegreesDHMax": 2.8015667904135824,
+      "zrodla": [
+        "rejestr:BMLUK-STOPIEN-DH",
+        "rejestr:CIAAW-MASY-ATOMOWE"
+      ],
+      "metoda": "rachunek z definicji: °dH = ppm / (10 mg CaO × M(CaCO3)/M(CaO)), przedział z mas CIAAW (fractions)"
     },
     {
+      "id": "DH-DEF-03",
+      "ppmCaCO3": 68.0,
+      "expectedDegreesDHMin": 3.8097814745499594,
+      "expectedDegreesDHMax": 3.8101308349624716,
+      "zrodla": [
+        "rejestr:BMLUK-STOPIEN-DH",
+        "rejestr:CIAAW-MASY-ATOMOWE"
+      ],
+      "metoda": "rachunek z definicji: °dH = ppm / (10 mg CaO × M(CaCO3)/M(CaO)), przedział z mas CIAAW (fractions)"
+    },
+    {
+      "id": "DH-DEF-04",
       "ppmCaCO3": 80.0,
-      "expectedDegreesDH": 4.4823
+      "expectedDegreesDHMin": 4.482095852411717,
+      "expectedDegreesDHMax": 4.482506864661731,
+      "zrodla": [
+        "rejestr:BMLUK-STOPIEN-DH",
+        "rejestr:CIAAW-MASY-ATOMOWE"
+      ],
+      "metoda": "rachunek z definicji: °dH = ppm / (10 mg CaO × M(CaCO3)/M(CaO)), przedział z mas CIAAW (fractions)"
     },
     {
+      "id": "DH-DEF-05",
       "ppmCaCO3": 120.0,
-      "expectedDegreesDH": 6.7234
+      "expectedDegreesDHMin": 6.723143778617576,
+      "expectedDegreesDHMax": 6.723760296992597,
+      "zrodla": [
+        "rejestr:BMLUK-STOPIEN-DH",
+        "rejestr:CIAAW-MASY-ATOMOWE"
+      ],
+      "metoda": "rachunek z definicji: °dH = ppm / (10 mg CaO × M(CaCO3)/M(CaO)), przedział z mas CIAAW (fractions)"
     },
     {
+      "id": "DH-DEF-06",
       "ppmCaCO3": 150.0,
-      "expectedDegreesDH": 8.4043
+      "expectedDegreesDHMin": 8.40392972327197,
+      "expectedDegreesDHMax": 8.404700371240747,
+      "zrodla": [
+        "rejestr:BMLUK-STOPIEN-DH",
+        "rejestr:CIAAW-MASY-ATOMOWE"
+      ],
+      "metoda": "rachunek z definicji: °dH = ppm / (10 mg CaO × M(CaCO3)/M(CaO)), przedział z mas CIAAW (fractions)"
     },
     {
+      "id": "DH-DEF-07",
+      "ppmCaCO3": 175.0,
+      "expectedDegreesDHMin": 9.80458467715063,
+      "expectedDegreesDHMax": 9.805483766447537,
+      "zrodla": [
+        "rejestr:BMLUK-STOPIEN-DH",
+        "rejestr:CIAAW-MASY-ATOMOWE"
+      ],
+      "metoda": "rachunek z definicji: °dH = ppm / (10 mg CaO × M(CaCO3)/M(CaO)), przedział z mas CIAAW (fractions)"
+    },
+    {
+      "id": "DH-DEF-08",
       "ppmCaCO3": 200.0,
-      "expectedDegreesDH": 11.2057
+      "expectedDegreesDHMin": 11.205239631029293,
+      "expectedDegreesDHMax": 11.20626716165433,
+      "zrodla": [
+        "rejestr:BMLUK-STOPIEN-DH",
+        "rejestr:CIAAW-MASY-ATOMOWE"
+      ],
+      "metoda": "rachunek z definicji: °dH = ppm / (10 mg CaO × M(CaCO3)/M(CaO)), przedział z mas CIAAW (fractions)"
     },
     {
+      "id": "DH-DEF-09",
       "ppmCaCO3": 300.0,
-      "expectedDegreesDH": 16.8086
+      "expectedDegreesDHMin": 16.80785944654394,
+      "expectedDegreesDHMax": 16.809400742481493,
+      "zrodla": [
+        "rejestr:BMLUK-STOPIEN-DH",
+        "rejestr:CIAAW-MASY-ATOMOWE"
+      ],
+      "metoda": "rachunek z definicji: °dH = ppm / (10 mg CaO × M(CaCO3)/M(CaO)), przedział z mas CIAAW (fractions)"
     }
   ],
   "caffeine_decay": [
     {
-      "initialMg": 80.0,
-      "elapsedHours": 0.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 80.0
-    },
-    {
-      "initialMg": 80.0,
-      "elapsedHours": 1.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 69.644
-    },
-    {
-      "initialMg": 80.0,
-      "elapsedHours": 2.5,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 56.5685
-    },
-    {
-      "initialMg": 80.0,
-      "elapsedHours": 5.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 40.0
-    },
-    {
-      "initialMg": 80.0,
-      "elapsedHours": 7.5,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 28.2843
-    },
-    {
-      "initialMg": 80.0,
-      "elapsedHours": 10.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 20.0
-    },
-    {
-      "initialMg": 80.0,
-      "elapsedHours": 15.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 10.0
-    },
-    {
-      "initialMg": 80.0,
-      "elapsedHours": 24.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 2.8717
-    },
-    {
-      "initialMg": 120.0,
-      "elapsedHours": 0.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 120.0
-    },
-    {
-      "initialMg": 120.0,
-      "elapsedHours": 1.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 104.4661
-    },
-    {
-      "initialMg": 120.0,
-      "elapsedHours": 2.5,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 84.8528
-    },
-    {
+      "id": "KOF-BRD-RD17-1",
       "initialMg": 120.0,
       "elapsedHours": 5.0,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 60.0
+      "expectedRemainingMg": 60.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:12"
+      ],
+      "metoda": "wartość ze źródła"
     },
     {
-      "initialMg": 120.0,
-      "elapsedHours": 7.5,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 42.4264
-    },
-    {
+      "id": "KOF-BRD-RD17-2",
       "initialMg": 120.0,
       "elapsedHours": 10.0,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 30.0
+      "expectedRemainingMg": 30.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:13"
+      ],
+      "metoda": "wartość ze źródła"
     },
     {
+      "id": "KOF-BRD-RD17-3",
       "initialMg": 120.0,
       "elapsedHours": 15.0,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 15.0
+      "expectedRemainingMg": 15.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:14"
+      ],
+      "metoda": "wartość ze źródła"
     },
     {
+      "id": "KOF-DEF-01",
+      "initialMg": 80.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 80.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-02",
+      "initialMg": 80.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 56.568542494923804,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-03",
+      "initialMg": 80.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 33.63585661014858,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-04",
+      "initialMg": 80.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 5.946035575013605,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-05",
+      "initialMg": 80.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 0.01953125,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-06",
+      "initialMg": 120.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 120.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-07",
+      "initialMg": 120.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 84.8528137423857,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-08",
+      "initialMg": 120.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 50.453784915222876,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-09",
+      "initialMg": 120.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 8.919053362520408,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-10",
       "initialMg": 120.0,
       "elapsedHours": 24.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 4.3076
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 0.029296875,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
     },
     {
-      "initialMg": 160.0,
+      "id": "KOF-DEF-11",
+      "initialMg": 200.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 200.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-12",
+      "initialMg": 200.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 141.4213562373095,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-13",
+      "initialMg": 200.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 84.08964152537145,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-14",
+      "initialMg": 200.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 14.865088937534013,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-15",
+      "initialMg": 200.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 2.0,
+      "expectedRemainingMg": 0.048828125,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-16",
+      "initialMg": 80.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 80.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-17",
+      "initialMg": 80.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 67.27171322029716,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-18",
+      "initialMg": 80.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 51.87358218604039,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-19",
+      "initialMg": 80.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 21.810154653305155,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-20",
+      "initialMg": 80.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 1.25,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-21",
+      "initialMg": 120.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 120.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-22",
+      "initialMg": 120.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 100.90756983044575,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-23",
+      "initialMg": 120.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 77.81037327906058,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-24",
+      "initialMg": 120.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 32.71523197995773,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-25",
+      "initialMg": 120.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 1.875,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-26",
+      "initialMg": 200.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 200.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-27",
+      "initialMg": 200.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 168.1792830507429,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-28",
+      "initialMg": 200.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 129.68395546510098,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-29",
+      "initialMg": 200.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 54.52538663326288,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-30",
+      "initialMg": 200.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 4.0,
+      "expectedRemainingMg": 3.125,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-31",
+      "initialMg": 80.0,
       "elapsedHours": 0.0,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 160.0
+      "expectedRemainingMg": 80.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
     },
     {
-      "initialMg": 160.0,
+      "id": "KOF-DEF-32",
+      "initialMg": 80.0,
       "elapsedHours": 1.0,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 139.2881
+      "expectedRemainingMg": 69.64404506368993,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
     },
     {
-      "initialMg": 160.0,
+      "id": "KOF-DEF-33",
+      "initialMg": 80.0,
       "elapsedHours": 2.5,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 113.1371
+      "expectedRemainingMg": 56.568542494923804,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
     },
     {
-      "initialMg": 160.0,
-      "elapsedHours": 5.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 80.0
-    },
-    {
-      "initialMg": 160.0,
+      "id": "KOF-DEF-34",
+      "initialMg": 80.0,
       "elapsedHours": 7.5,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 56.5685
+      "expectedRemainingMg": 28.284271247461902,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
     },
     {
-      "initialMg": 160.0,
-      "elapsedHours": 10.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 40.0
-    },
-    {
-      "initialMg": 160.0,
-      "elapsedHours": 15.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 20.0
-    },
-    {
-      "initialMg": 160.0,
+      "id": "KOF-DEF-35",
+      "initialMg": 80.0,
       "elapsedHours": 24.0,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 5.7435
+      "expectedRemainingMg": 2.8717458874925876,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
     },
     {
+      "id": "KOF-DEF-36",
+      "initialMg": 120.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 120.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-37",
+      "initialMg": 120.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 104.4660675955349,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-38",
+      "initialMg": 120.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 84.8528137423857,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-39",
+      "initialMg": 120.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 42.42640687119285,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-40",
+      "initialMg": 120.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 5.0,
+      "expectedRemainingMg": 4.307618831238881,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-41",
       "initialMg": 200.0,
       "elapsedHours": 0.0,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 200.0
+      "expectedRemainingMg": 200.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
     },
     {
+      "id": "KOF-DEF-42",
       "initialMg": 200.0,
       "elapsedHours": 1.0,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 174.1101
+      "expectedRemainingMg": 174.11011265922482,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
     },
     {
+      "id": "KOF-DEF-43",
       "initialMg": 200.0,
       "elapsedHours": 2.5,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 141.4214
+      "expectedRemainingMg": 141.4213562373095,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
     },
     {
-      "initialMg": 200.0,
-      "elapsedHours": 5.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 100.0
-    },
-    {
+      "id": "KOF-DEF-44",
       "initialMg": 200.0,
       "elapsedHours": 7.5,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 70.7107
+      "expectedRemainingMg": 70.71067811865476,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
     },
     {
-      "initialMg": 200.0,
-      "elapsedHours": 10.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 50.0
-    },
-    {
-      "initialMg": 200.0,
-      "elapsedHours": 15.0,
-      "halfLifeHours": 5.0,
-      "expectedRemainingMg": 25.0
-    },
-    {
+      "id": "KOF-DEF-45",
       "initialMg": 200.0,
       "elapsedHours": 24.0,
       "halfLifeHours": 5.0,
-      "expectedRemainingMg": 7.1794
+      "expectedRemainingMg": 7.179364718731469,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-46",
+      "initialMg": 80.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 80.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-47",
+      "initialMg": 80.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 73.36032345637369,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-48",
+      "initialMg": 80.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 64.41961327797017,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-49",
+      "initialMg": 80.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 41.77095129709655,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-50",
+      "initialMg": 80.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 10.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-51",
+      "initialMg": 120.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 120.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-52",
+      "initialMg": 120.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 110.04048518456055,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-53",
+      "initialMg": 120.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 96.62941991695526,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-54",
+      "initialMg": 120.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 62.65642694564483,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-55",
+      "initialMg": 120.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 15.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-56",
+      "initialMg": 200.0,
+      "elapsedHours": 0.0,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 200.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-57",
+      "initialMg": 200.0,
+      "elapsedHours": 1.0,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 183.40080864093426,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-58",
+      "initialMg": 200.0,
+      "elapsedHours": 2.5,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 161.04903319492544,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-59",
+      "initialMg": 200.0,
+      "elapsedHours": 7.5,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 104.42737824274138,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
+    },
+    {
+      "id": "KOF-DEF-60",
+      "initialMg": 200.0,
+      "elapsedHours": 24.0,
+      "halfLifeHours": 8.0,
+      "expectedRemainingMg": 25.0,
+      "zrodla": [
+        "brd:napar_brd/Napar BRD 0.1 · C3 · rozdz. 8 reguly dziedzinowe - RD-17…RD-30 (metabolizm kofeiny, Gongfu, wektory).md:9"
+      ],
+      "metoda": "rachunek z definicji (Decimal, postać e^(−ln2·t/t½))"
     }
   ]
 }
