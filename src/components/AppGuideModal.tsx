@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../core/theme';
+import { translations } from '../core/i18n';
 import {
   CompassIcon,
   BrewIcon,
@@ -36,6 +37,8 @@ export function AppGuideModal({
   language = 'pl',
 }: AppGuideModalProps) {
   const isEn = language === 'en';
+  // M1-audytor-generalny-025 (DEC-13 a): krok 4 opisuje start stopera dopiero przyciskiem „Rozpocznij parzenie”.
+  const brewT = translations[isEn ? 'en' : 'pl'].brew;
 
   const steps = isEn
     ? [
@@ -56,8 +59,8 @@ export function AppGuideModal({
         },
         {
           num: '4',
-          title: 'Step 4: Step-by-Step Procedure Assistant',
-          desc: 'Open ProcedureModal — the timer automatically parses step time and starts counting down upon entering each step.',
+          title: brewT.guideStep4Title,
+          desc: brewT.guideStep4Desc,
         },
       ]
     : [
@@ -78,8 +81,8 @@ export function AppGuideModal({
         },
         {
           num: '4',
-          title: 'Krok 4: Asystent Procedury Krok po Kroku',
-          desc: 'Otwórz pełnoekranowy ProcedureModal — stoper sam parsuje czas z opisu kroku i automatycznie rusza po wejściu w krok.',
+          title: brewT.guideStep4Title,
+          desc: brewT.guideStep4Desc,
         },
       ];
 

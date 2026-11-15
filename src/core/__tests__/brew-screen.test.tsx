@@ -188,8 +188,9 @@ describe('BrewScreen UI Integration', () => {
 
     const str = JSON.stringify(json);
     expect(str).toContain('V60 — Metoda 4:6');
-    expect(str).toContain('ROZPOCZNIJ PARZENIE');
-    expect(str).toContain('00:00');
+    // M1-audytor-generalny-025: ekran główny ma wejście do kroków, bez drugiego stopera.
+    expect(str).toContain('Pokaż kroki parzenia');
+    expect(str).not.toContain('ROZPOCZNIJ PARZENIE');
     expect(str).toContain('Porcje');
     expect(str).toContain('1 os.');
     expect(str).toContain('2 os.');
@@ -235,6 +236,9 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
+    // M1-audytor-generalny-025 (DEC-13 a): start tylko na ekranie kroków parzenia.
+    openSteps(tree);
+
     // 1. Kliknij START (ROZPOCZNIJ PARZENIE)
     const startText = tree.root.findAll((node: any) => {
       return node.props && node.props.children === 'ROZPOCZNIJ PARZENIE';
@@ -252,37 +256,21 @@ describe('BrewScreen UI Integration', () => {
 
     // Po starcie pojawia się przycisk PAUZA
     let str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('PAUZA');
+    expect(str).toContain('⏸ Pauza');
 
-    // 2. Kliknij PAUZA
-    const pauseText = tree.root.findAll((node: any) => {
-      return node.props && node.props.children === 'PAUZA';
-    })[0];
-    let pauseBtn = pauseText.parent;
-    while (pauseBtn && !pauseBtn.props.onPress) {
-      pauseBtn = pauseBtn.parent;
-    }
-
+    // 2. Kliknij Pauza
     act(() => {
-      pauseBtn.props.onPress();
+      pressById(tree, 'procedure-pause-resume-btn');
     });
 
-    // Po pauzie pojawia się WZNÓW
+    // Po pauzie pojawia się Wznów oraz Zapisz
     str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('WZNÓW');
+    expect(str).toContain('▶ Wznów');
     expect(str).toContain('Zapisz');
 
     // 3. Kliknij Zapisz (otwiera modal karty degustacyjnej)
-    const saveText = tree.root.findAll((node: any) => {
-      return node.props && node.props.children === 'Zapisz';
-    })[0];
-    let saveBtn = saveText.parent;
-    while (saveBtn && !saveBtn.props.onPress) {
-      saveBtn = saveBtn.parent;
-    }
-
     act(() => {
-      saveBtn.props.onPress();
+      pressById(tree, 'save-brew-btn');
     });
 
     // Modal podsumowania parzenia otwarty
@@ -383,20 +371,21 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
+    // M1-audytor-generalny-025 (DEC-13 a): start tylko na ekranie kroków parzenia.
+    openSteps(tree);
+
     // Start -> Pauza -> Zapisz (otwarcie finish modala)
     const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
     act(() => {
       startBtn.props.onPress();
     });
 
-    const pauseBtn = findPressableWithText(tree.root, 'PAUZA');
     act(() => {
-      pauseBtn.props.onPress();
+      pressById(tree, 'procedure-pause-resume-btn');
     });
 
-    const saveBtn = findPressableWithText(tree.root, 'Zapisz');
     act(() => {
-      saveBtn.props.onPress();
+      pressById(tree, 'save-brew-btn');
     });
 
     expect(JSON.stringify(tree.toJSON())).toContain('Zakończono Parzenie!');
@@ -408,9 +397,10 @@ describe('BrewScreen UI Integration', () => {
       skipBtn.props.onPress();
     });
 
-    // Modal zamknięty, stoper zresetowany do stanu idle
+    // Modal zamknięty, stoper zresetowany do stanu idle (wejście znów „Pokaż kroki parzenia”)
     const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('ROZPOCZNIJ PARZENIE');
+    expect(str).toContain('Pokaż kroki parzenia');
+    expect(str).not.toContain('Zakończono Parzenie!');
   });
 
   test('Wprowadzenie profilu balansu (Za kwaśna, Za gorzka, Wodnista), TDS oraz tagu smaku', () => {
@@ -423,15 +413,18 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
+    // M1-audytor-generalny-025 (DEC-13 a): start tylko na ekranie kroków parzenia.
+    openSteps(tree);
+
     // Start -> Pauza -> Zapisz
     act(() => {
       findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE')?.props.onPress();
     });
     act(() => {
-      findPressableWithText(tree.root, 'PAUZA')?.props.onPress();
+      pressById(tree, 'procedure-pause-resume-btn');
     });
     act(() => {
-      findPressableWithText(tree.root, 'Zapisz')?.props.onPress();
+      pressById(tree, 'save-brew-btn');
     });
 
     // Przetestuj kliknięcie profili balansu: Za kwaśna, Za gorzka, Wodnista
@@ -658,6 +651,9 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
+    // M1-audytor-generalny-025 (DEC-13 a): start tylko na ekranie kroków parzenia.
+    openSteps(tree);
+
     // Rozpocznij parzenie
     act(() => {
       findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE')?.props.onPress();
@@ -667,21 +663,17 @@ describe('BrewScreen UI Integration', () => {
     let str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Zalanie 1 (Preinfuzja)');
 
-    // Kliknij Dalej ▶ -> krok 2
-    const nextBtn = findPressableWithText(tree.root, 'Dalej ▶');
-    expect(nextBtn).toBeDefined();
+    // Kliknij Następny krok ▶ -> krok 2
     act(() => {
-      nextBtn.props.onPress();
+      pressById(tree, 'procedure-next-step-btn');
     });
 
     str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Zalanie 2');
 
     // Kliknij ◀ Wstecz -> krok 1
-    const prevBtn = findPressableWithText(tree.root, '◀ Wstecz');
-    expect(prevBtn).toBeDefined();
     act(() => {
-      prevBtn.props.onPress();
+      pressById(tree, 'procedure-prev-step-btn');
     });
 
     str = JSON.stringify(tree.toJSON());
@@ -690,18 +682,18 @@ describe('BrewScreen UI Integration', () => {
     // Przejdź przez wszystkie kroki aż do ostatniego
     for (let i = 0; i < 4; i++) {
       act(() => {
-        findPressableWithText(tree.root, 'Dalej ▶')?.props.onPress();
+        if (tree.root.findAll((n: any) => n.props.testID === 'procedure-next-step-btn').length > 0) {
+          pressById(tree, 'procedure-next-step-btn');
+        }
       });
     }
 
     str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('Zakończ ▶');
+    expect(str).toContain('✓ Zakończ i zapisz');
 
-    // Kliknij Zakończ ▶
-    const finishStepBtn = findPressableWithText(tree.root, 'Zakończ ▶');
-    expect(finishStepBtn).toBeDefined();
+    // Kliknij ✓ Zakończ i zapisz na ostatnim kroku
     act(() => {
-      finishStepBtn.props.onPress();
+      pressById(tree, 'procedure-finish-save-btn');
     });
 
     str = JSON.stringify(tree.toJSON());
@@ -1078,21 +1070,18 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
+    // M1-audytor-generalny-025 (DEC-13 a): start tylko na ekranie kroków parzenia.
+    openSteps(tree);
+
     // Rozpocznij i zapauzuj, aby otworzyć modal zapisu
     const startText = tree.root.findAll((node: any) => node.props && node.props.children === 'ROZPOCZNIJ PARZENIE')[0];
     let startBtn = startText.parent;
     while (startBtn && !startBtn.props.onPress) startBtn = startBtn.parent;
     act(() => startBtn.props.onPress());
 
-    const pauseText = tree.root.findAll((node: any) => node.props && node.props.children === 'PAUZA')[0];
-    let pauseBtn = pauseText.parent;
-    while (pauseBtn && !pauseBtn.props.onPress) pauseBtn = pauseBtn.parent;
-    act(() => pauseBtn.props.onPress());
+    act(() => pressById(tree, 'procedure-pause-resume-btn'));
 
-    const saveText = tree.root.findAll((node: any) => node.props && node.props.children === 'Zapisz')[0];
-    let saveBtn = saveText.parent;
-    while (saveBtn && !saveBtn.props.onPress) saveBtn = saveBtn.parent;
-    act(() => saveBtn.props.onPress());
+    act(() => pressById(tree, 'save-brew-btn'));
 
     // Wybierz profil wody z chipa
     const waterChip = tree.root.findByProps({ testID: 'water-chip-melbourne_soft' });
@@ -1117,6 +1106,9 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
+    // M1-audytor-generalny-025 (DEC-13 a): start tylko na ekranie kroków parzenia.
+    openSteps(tree);
+
     // Start timera
     const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
     act(() => startBtn.props.onPress());
@@ -1127,12 +1119,10 @@ describe('BrewScreen UI Integration', () => {
     });
 
     // Pauza
-    const pauseBtn = findPressableWithText(tree.root, 'PAUZA');
-    act(() => pauseBtn.props.onPress());
+    act(() => pressById(tree, 'procedure-pause-resume-btn'));
 
     // Próba zresetowania stopera wywołuje Alert.alert z potwierdzeniem
-    const resetBtn = findPressableWithText(tree.root, 'Reset');
-    act(() => resetBtn.props.onPress());
+    act(() => pressById(tree, 'reset-brew-btn'));
 
     expect(alertSpy).toHaveBeenCalledWith(
       expect.stringContaining('Zresetować'),
@@ -1149,7 +1139,7 @@ describe('BrewScreen UI Integration', () => {
       act(() => confirmResetBtn.onPress!());
     }
 
-    // Start ponownie, aby przetestować zmianę receptury
+    // Start ponownie (ekran kroków wrócił do stanu „gotowy”), aby przetestować zmianę receptury
     const startAgainBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
     act(() => startAgainBtn.props.onPress());
     act(() => {
@@ -1226,31 +1216,40 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
+    // M1-audytor-generalny-025 (DEC-13 a): start tylko na ekranie kroków parzenia.
+    openSteps(tree);
+
     // Rozpocznij parzenie
     act(() => {
       findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE')?.props.onPress();
     });
 
-    // Sprawdź przycisk +10s
-    const plus10Btn = findPressableWithText(tree.root, '+10s');
-    expect(plus10Btn).toBeTruthy();
+    const countdown = () => tree.root.findAll((n: any) => n.props.testID === 'procedure-countdown-display')[0].props.children;
+
+    // Sprawdź przycisk +10 s na ekranie kroków
     act(() => {
-      plus10Btn?.props.onPress();
+      pressById(tree, 'procedure-add-10-btn');
     });
 
     // Czas trwania etapu wydłużył się
-    let str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('"55"'); // 45s + 10s = 55s
+    expect(countdown()).toBe('00:55'); // 45s + 10s = 55s
 
-    // Sprawdź przycisk -10s
-    const minus10Btn = findPressableWithText(tree.root, '-10s');
-    expect(minus10Btn).toBeTruthy();
+    // Sprawdź przycisk -10 s
     act(() => {
-      minus10Btn?.props.onPress();
+      pressById(tree, 'procedure-sub-10-btn');
     });
 
-    str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('"45"'); // powrót do 45s
+    expect(countdown()).toBe('00:45'); // powrót do 45s
+
+    // ↺ Resetuj krok przywraca czas kroku po korekcie (+1 min → czas z opisu kroku)
+    act(() => {
+      pressById(tree, 'procedure-add-60-btn');
+    });
+    expect(countdown()).toBe('01:45');
+    act(() => {
+      pressById(tree, 'procedure-reset-step-btn');
+    });
+    expect(countdown()).toBe('00:45');
   });
 
   test('Ostrzeżenie o małej ilości ziaren w paczce (Zadanie N3)', () => {
@@ -1296,6 +1295,9 @@ describe('BrewScreen UI Integration', () => {
     act(() => {
       beanOption?.props.onPress();
     });
+
+    // M1-audytor-generalny-025 (DEC-13 a): start tylko na ekranie kroków parzenia.
+    openSteps(tree);
 
     // Naciśnij start timer
     const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
@@ -1378,6 +1380,9 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
+    // M1-audytor-generalny-025 (DEC-13 a): start tylko na ekranie kroków parzenia.
+    openSteps(tree);
+
     // Rozpocznij parzenie
     const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
     expect(startBtn).toBeTruthy();
@@ -1386,17 +1391,13 @@ describe('BrewScreen UI Integration', () => {
     });
 
     // Wstrzymaj parzenie
-    const pauseBtn = findPressableWithText(tree.root, 'PAUZA');
-    expect(pauseBtn).toBeTruthy();
     act(() => {
-      pauseBtn?.props.onPress();
+      pressById(tree, 'procedure-pause-resume-btn');
     });
 
     // Kliknij "Zapisz" do arkusza degustacyjnego
-    const saveBtn = findPressableWithText(tree.root, 'Zapisz');
-    expect(saveBtn).toBeTruthy();
     act(() => {
-      saveBtn?.props.onPress();
+      pressById(tree, 'save-brew-btn');
     });
 
     // Sprawdź czy finish-cost-card jest wyrenderowana
@@ -1422,6 +1423,9 @@ describe('BrewScreen UI Integration', () => {
     });
 
     // Próba kliknięcia ROZPOCZNIJ PARZENIE
+    // M1-audytor-generalny-025 (DEC-13 a): start tylko na ekranie kroków parzenia.
+    openSteps(tree);
+
     const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
     expect(startBtn).toBeTruthy();
 
@@ -1431,7 +1435,7 @@ describe('BrewScreen UI Integration', () => {
 
     // Wersja darmowa: stoper startuje bez ekranu zakupu
     const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('PAUZA');
+    expect(str).toContain('⏸ Pauza');
 
     // Reset dla kolejnych testów
     act(() => {
@@ -1453,6 +1457,9 @@ describe('BrewScreen UI Integration', () => {
       );
     });
 
+    // M1-audytor-generalny-025 (DEC-13 a): start tylko na ekranie kroków parzenia.
+    openSteps(tree);
+
     const startBtn = findPressableWithText(tree.root, 'ROZPOCZNIJ PARZENIE');
     expect(startBtn).toBeTruthy();
 
@@ -1462,7 +1469,7 @@ describe('BrewScreen UI Integration', () => {
 
     // Po starcie stoper przechodzi w tryb running z przyciskiem PAUZA
     const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('PAUZA');
+    expect(str).toContain('⏸ Pauza');
   });
 
   test('02-monetyzacja-004 (DEC-01 a): po 15 parzeniach i 15 dniach ekran główny nie ma banera Tryb Tylko do Odczytu', () => {
@@ -1603,6 +1610,11 @@ describe('BrewScreen UI Integration', () => {
 
     expect(JSON.stringify(tree.toJSON())).toContain('ASYSTENT PROCEDURY');
 
+    // M1-audytor-generalny-025 (DEC-13 a): wejście nie uruchamia stopera; start osobnym przyciskiem.
+    act(() => {
+      pressById(tree, 'procedure-start-btn');
+    });
+
     act(() => {
       tree.root.findByProps({ testID: 'procedure-pause-resume-btn' }).props.onPress();
     });
@@ -1634,6 +1646,54 @@ describe('BrewScreen UI Integration', () => {
     act(() => {
       finishBtns[0].props.onPress();
     });
+  });
+
+  test('M1-audytor-generalny-025 (DEC-13 a): „Pokaż kroki parzenia” otwiera bieżący krok bez startu stopera; czas rusza dopiero po „Rozpocznij parzenie”', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <BrewScreen />
+        </BrewProvider>
+      );
+    });
+
+    // Jeden ekran prowadzenia: na ekranie głównym nie ma drugiego stopera.
+    expect(tree.root.findAll((n: any) => n.props.testID === 'active-focus-timer')).toHaveLength(0);
+
+    const entry = tree.root.findByProps({ testID: 'open-procedure-modal-btn' });
+    expect(entry.props.accessibilityLabel).toBe('Pokaż kroki parzenia');
+    expect(entry.props.accessibilityHint).toContain('Rozpocznij parzenie');
+    act(() => {
+      entry.props.onPress();
+    });
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    // Ekran kroku w stanie „gotowy”: stoper stoi, jedyną akcją czasu jest Start.
+    expect(tree.root.findAll((n: any) => n.props.testID === 'procedure-modal').length).toBeGreaterThan(0);
+    expect(tree.root.findAll((n: any) => n.props.testID === 'procedure-pause-resume-btn')).toHaveLength(0);
+    const start = tree.root.findAll((n: any) => n.props.testID === 'procedure-start-btn' && n.props.onPress);
+    expect(start).toHaveLength(1);
+    expect(JSON.stringify(tree.toJSON())).toContain('Całkowity czas parzenia: 00:00');
+
+    act(() => {
+      start[0].props.onPress();
+    });
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+    expect(tree.root.findAll((n: any) => n.props.testID === 'procedure-pause-resume-btn').length).toBeGreaterThan(0);
+    expect(JSON.stringify(tree.toJSON())).not.toContain('Całkowity czas parzenia: 00:00');
+
+    // Po zamknięciu ekranu kroku przycisk wejścia mówi, że parzenie trwa.
+    act(() => {
+      tree.root.findByProps({ testID: 'procedure-close-btn' }).props.onPress();
+    });
+    const back = tree.root.findByProps({ testID: 'open-procedure-modal-btn' });
+    expect(back.props.accessibilityLabel).toBe('Wróć do parzenia');
+    expect(back.props.accessibilityHint).toMatch(/[Ss]toper biegnie/);
   });
 
   test('BPR Krok 1: Wyszukiwarka receptur, filtr podzbiorów oraz zwijanie kategorii w RecipeSelectModal', () => {
@@ -1710,6 +1770,20 @@ describe('BrewScreen UI Integration', () => {
     });
   });
 });
+
+// M1-audytor-generalny-025 (DEC-13 a): jeden ekran prowadzenia parzenia (ProcedureModal);
+// stoper startuje dopiero na nim, przyciskiem „Rozpocznij parzenie”.
+function pressById(tree: any, testID: string) {
+  const target = tree.root.findAll((n: any) => n.props.testID === testID && typeof n.props.onPress === 'function')[0];
+  if (!target) throw new Error(`Brak przycisku ${testID}`);
+  target.props.onPress();
+}
+
+function openSteps(tree: any) {
+  act(() => {
+    pressById(tree, 'open-procedure-modal-btn');
+  });
+}
 
 function findPressableWithText(root: any, text: string) {
   const match = root.findAll((node: any) => {

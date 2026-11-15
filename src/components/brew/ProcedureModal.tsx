@@ -1,8 +1,9 @@
 // ============================================================================
 // Napar — ProcedureModal (Asystent Procedury Krok po Kroku)
-// Zero-Click Context Tools:
+// Jedyny ekran prowadzenia parzenia (M1-audytor-generalny-025, DEC-13 a):
+// - Otwiera się w stanie „gotowy”: stoper stoi, jedyną akcją czasu jest „Rozpocznij parzenie”
 // - Automatycznie parsuje czas z opisu kroku (parseStepDurationSeconds)
-// - Automatycznie uruchamia stoper odliczający przy wejściu w krok
+// - Po starcie kolejne kroki odliczają się same; po wstrzymaniu: Reset i Zapisz
 // - Szybkie korekty czasu (-1 min, -10 s, Pauza/Wznów, +10 s, +1 min, Reset)
 // - Na ostatnim kroku jednoznaczne CTA "Zakończ i zapisz"
 // ============================================================================
@@ -21,6 +22,8 @@ import { theme } from '../../core/theme';
 import { RecipeStep } from '../../core/recipes-data';
 import { parseStepDurationSeconds } from '../../core/bpr-engine';
 import { formatWaterWeight } from '../../core/unit-converter';
+import { translations } from '../../core/i18n';
+import type { TimerStatus } from '../../core/timer-engine';
 
 export interface ProcedureModalProps {
   visible: boolean;
@@ -28,11 +31,17 @@ export interface ProcedureModalProps {
   steps: RecipeStep[];
   currentStepIndex: number;
   isRunning: boolean;
+  /** Stan stopera; bez niego ekran traktuje „nie biegnie” jak wstrzymanie (zgodność wsteczna). */
+  status?: TimerStatus;
   stepRemainingSeconds: number;
   totalElapsedSeconds: number;
   unitSystem: 'metric' | 'imperial';
   language?: 'pl' | 'en' | string;
   onPauseResume: () => void;
+  /** Start parzenia ze stanu „gotowy” (ten sam start co dawniej na ekranie głównym). */
+  onStart?: () => void;
+  /** Reset całej sesji po wstrzymaniu (z potwierdzeniem po stronie wołającego). */
+  onReset?: () => void;
   onAdjustTimeSeconds: (deltaSeconds: number) => void;
   onResetCurrentStep: (parsedDurationSeconds: number) => void;
   onPrevStep: () => void;
@@ -48,12 +57,15 @@ export function ProcedureModal({
   steps,
   currentStepIndex,
   isRunning,
+  status,
   stepRemainingSeconds,
   totalElapsedSeconds,
   unitSystem,
   language = 'pl',
   t,
   onPauseResume,
+  onStart,
+  onReset,
   onAdjustTimeSeconds,
   onResetCurrentStep,
   onPrevStep,
@@ -63,6 +75,10 @@ export function ProcedureModal({
 }: ProcedureModalProps) {
   const cleanLang = typeof language === 'string' ? language.trim().toLowerCase() : 'pl';
   const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
+  const b = { ...translations[isEn ? 'en' : 'pl'].brew, ...(t?.brew ?? {}) };
+  const timerStatus: TimerStatus = status ?? (isRunning ? 'running' : 'paused');
+  const isIdle = timerStatus === 'idle';
+  const isPausedState = timerStatus === 'paused';
   const filteredSteps = Array.isArray(steps) ? steps.filter(Boolean) : [];
   const safeSteps: RecipeStep[] =
     filteredSteps.length > 0
@@ -227,16 +243,14 @@ export function ProcedureModal({
             </Text>
           </View>
 
-          {/* Zero-Click Context Timer — uruchamiany automatycznie po wejściu w krok */}
+          {/* Stoper kroku — rusza dopiero po „Rozpocznij parzenie”; potem kolejne kroki odliczają się same */}
           <View style={styles.timerCard}>
-            <Text style={styles.timerStatusLabel}>
-              {isRunning
-                ? isEn
-                  ? '● AUTO-TIMER RUNNING'
-                  : '● STOPER KROKU AKTYWNY (AUTO-START)'
-                : isEn
-                ? '⏸ TIMER PAUSED'
-                : '⏸ STOPER WSTRZYMANY'}
+            <Text style={styles.timerStatusLabel} testID="procedure-timer-status">
+              {isIdle
+                ? b.procedureReadyStatus
+                : isRunning
+                ? b.procedureRunningStatus
+                : b.procedurePausedStatus}
             </Text>
 
             <Text style={styles.giantClock} testID="procedure-countdown-display">
@@ -247,7 +261,9 @@ export function ProcedureModal({
               {elapsedText}
             </Text>
 
-            {/* Przyciski szybkiej korekty czasu (-1 min, -10 s, Pauza/Wznów, +10 s, +1 min, Reset) */}
+            {/* Przyciski szybkiej korekty czasu (-1 min, -10 s, Pauza/Wznów, +10 s, +1 min, Reset) — dopiero po starcie */}
+            {!isIdle && (
+            <>
             <View style={styles.quickAdjustRow}>
               <Pressable
                 testID="procedure-sub-60-btn"
@@ -334,11 +350,55 @@ export function ProcedureModal({
                   : `↺ Resetuj krok (${parsedDurationSec}s)`}
               </Text>
             </Pressable>
+
+            {/* Po wstrzymaniu: reset całej sesji albo zapis (dawniej tylko na drugim stoperze ekranu głównego) */}
+            {isPausedState && (
+              <View style={styles.pausedActionsRow}>
+                {onReset && (
+                  <Pressable
+                    testID="reset-brew-btn"
+                    style={[styles.secondaryNavBtn, styles.pausedActionBtn]}
+                    onPress={onReset}
+                    accessibilityRole="button"
+                    accessibilityLabel={b.resetTimerAccessibility}
+                    accessibilityHint={b.resetTimerHint}
+                  >
+                    {/* Pełna nazwa odróżnia reset sesji od „Resetuj krok” tuż wyżej */}
+                    <Text style={styles.secondaryNavBtnText}>{b.resetTimerAccessibility}</Text>
+                  </Pressable>
+                )}
+                <Pressable
+                  testID="save-brew-btn"
+                  style={[styles.secondaryNavBtn, styles.pausedActionBtn]}
+                  onPress={onFinishAndSave}
+                  accessibilityRole="button"
+                  accessibilityLabel={b.saveSessionAccessibility}
+                  accessibilityHint={b.saveSessionHint}
+                >
+                  <Text style={styles.secondaryNavBtnText}>{b.saveSessionBtn}</Text>
+                </Pressable>
+              </View>
+            )}
+            </>
+            )}
           </View>
         </ScrollView>
 
         {/* Dolny pasek nawigacji po krokach (Poprzedni / Następny lub Zakończ i zapisz) */}
         <View style={styles.bottomFooter}>
+          {isIdle ? (
+            <Pressable
+              testID="procedure-start-btn"
+              style={styles.primaryNextBtn}
+              onPress={onStart}
+              accessibilityRole="button"
+              accessibilityLabel={b.startBrewAccessibility}
+              accessibilityHint={b.startBrewHint}
+            >
+              <Text style={styles.primaryNextBtnText}>{b.startBrewBtn}</Text>
+            </Pressable>
+          ) : (
+          <>
           <Pressable
             testID="procedure-prev-step-btn"
             style={[
@@ -379,6 +439,8 @@ export function ProcedureModal({
                 {isEn ? '✓ Finish & Save' : '✓ Zakończ i zapisz'}
               </Text>
             </Pressable>
+          )}
+          </>
           )}
         </View>
       </SafeAreaView>
@@ -615,6 +677,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '900',
     color: '#FFFFFF',
+  },
+  pausedActionsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 12,
+    alignSelf: 'stretch',
+  },
+  pausedActionBtn: {
+    flex: 1,
+    minHeight: 44,
   },
   finishSaveBtn: {
     flex: 1,

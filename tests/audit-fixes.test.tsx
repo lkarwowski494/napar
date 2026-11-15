@@ -30,6 +30,7 @@ import {
 } from '../src/components/ui';
 import {  confirmAction } from '../src/core/confirm';
 import { translations } from '../src/core/i18n';
+import { ProcedureModal } from '../src/components/brew/ProcedureModal';
 
 const root = process.cwd();
 
@@ -1174,5 +1175,116 @@ describe('M1-audytor-generalny-035: kontrakt zakresu 1.0 bez powiadomień o etap
       expect(src).toMatch(/Haptics\.(impact|notification)Async/);
       expect(src).toMatch(/AppState\.addEventListener\('change'/);
     }
+  });
+});
+
+// M1-audytor-generalny-025 · DEC-13 (a) z 2026-11-13: jeden ekran prowadzenia parzenia.
+// Wejście do kroków nie uruchamia stopera; czas rusza dopiero przyciskiem „Rozpocznij parzenie”.
+// Dlaczego: dawny przycisk „Otwórz asystenta” po cichu startował stoper, a ekran główny miał drugi stoper.
+// ============================================================================
+describe('M1-audytor-generalny-025: jeden ekran prowadzenia, wejście bez cichego startu stopera (DEC-13 a; 04-studio-projektowe-001)', () => {
+  const steps = [
+    { stepNumber: 1, namePl: 'Bloom', nameEn: 'Bloom', durationSeconds: 45, targetWaterGrams: 50, instructionPl: 'Zalej 50 g i odczekaj 45 sekund.', instructionEn: 'Pour 50 g and wait 45 seconds.' },
+    { stepNumber: 2, namePl: 'Zalanie', nameEn: 'Pour', durationSeconds: 60, targetWaterGrams: 250, instructionPl: 'Dolej do 250 g.', instructionEn: 'Pour to 250 g.' },
+  ];
+  const handlers = () => ({
+    onStart: jest.fn(),
+    onReset: jest.fn(),
+    onPauseResume: jest.fn(),
+    onAdjustTimeSeconds: jest.fn(),
+    onResetCurrentStep: jest.fn(),
+    onPrevStep: jest.fn(),
+    onNextStep: jest.fn(),
+    onFinishAndSave: jest.fn(),
+    onClose: jest.fn(),
+  });
+  const render = (status: 'idle' | 'running' | 'paused', language: 'pl' | 'en', h = handlers()) => {
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(
+        <ProcedureModal
+          visible
+          recipeName="V60"
+          steps={steps}
+          currentStepIndex={0}
+          status={status}
+          isRunning={status === 'running'}
+          stepRemainingSeconds={45}
+          totalElapsedSeconds={0}
+          unitSystem="metric"
+          language={language}
+          t={translations[language]}
+          {...h}
+        />,
+      );
+    });
+    return { tree: tree!, h };
+  };
+  const byId = (tree: renderer.ReactTestRenderer, id: string) => tree.root.findAll((n) => n.props.testID === id && typeof n.props.onPress === 'function');
+
+  test.each(['pl', 'en'] as const)('04-studio-projektowe-001 (%s): w stanie „gotowy” jedyną akcją czasu jest przycisk Start z rolą i zapowiedzią', (lang) => {
+    const { tree, h } = render('idle', lang);
+    const b = translations[lang].brew as any;
+    const start = byId(tree, 'procedure-start-btn');
+    expect(start).toHaveLength(1);
+    expect(start[0].props.accessibilityRole).toBe('button');
+    expect(start[0].props.accessibilityLabel).toBe(b.startBrewAccessibility);
+    expect(start[0].props.accessibilityHint).toBe(b.startBrewHint);
+    expect(JSON.stringify(tree.toJSON())).toContain(b.startBrewBtn);
+    expect(JSON.stringify(tree.toJSON())).toContain(b.procedureReadyStatus);
+    // Przed startem nie ma pauzy, korekt czasu ani przejścia do następnego kroku (każde z nich wznawiało stoper).
+    for (const id of ['procedure-pause-resume-btn', 'procedure-next-step-btn', 'procedure-add-10-btn', 'procedure-reset-step-btn']) {
+      expect(byId(tree, id)).toHaveLength(0);
+    }
+    act(() => start[0].props.onPress());
+    expect(h.onStart).toHaveBeenCalledTimes(1);
+    expect(h.onPauseResume).not.toHaveBeenCalled();
+  });
+
+  test('04-studio-projektowe-001: po wstrzymaniu ekran prowadzenia ma Reset i Zapisz (dawniej tylko drugi stoper)', () => {
+    const { tree, h } = render('paused', 'pl');
+    const b = translations.pl.brew as any;
+    expect(byId(tree, 'procedure-start-btn')).toHaveLength(0);
+    const reset = byId(tree, 'reset-brew-btn');
+    const save = byId(tree, 'save-brew-btn');
+    expect(reset[0].props.accessibilityLabel).toBe(b.resetTimerAccessibility);
+    expect(save[0].props.accessibilityLabel).toBe(b.saveSessionAccessibility);
+    // Reset sesji ma pełną nazwę, inną niż „Resetuj krok” w tej samej karcie.
+    expect(JSON.stringify(tree.toJSON())).toContain(b.resetTimerAccessibility);
+    act(() => reset[0].props.onPress());
+    act(() => save[0].props.onPress());
+    expect(h.onReset).toHaveBeenCalledTimes(1);
+    expect(h.onFinishAndSave).toHaveBeenCalledTimes(1);
+  });
+
+  test('04-studio-projektowe-001: przycisk wejścia nazywa to, co robi, w PL i EN (słownik), bez symbolu odtwarzania', () => {
+    const pl = translations.pl.brew as any;
+    const en = translations.en.brew as any;
+    expect(pl.openStepsBtn).toBe('Pokaż kroki parzenia');
+    expect(en.openStepsBtn).toBe('Show brew steps');
+    expect(pl.openStepsHint).toContain(pl.startBrewAccessibility);
+    expect(en.openStepsHint).toContain(en.startBrewAccessibility);
+    for (const v of [pl.openStepsBtn, en.openStepsBtn, pl.returnToBrewBtn, en.returnToBrewBtn]) {
+      expect(v).not.toMatch(/▶|asystent|assistant/i);
+    }
+    expect(pl.returnToBrewRunningHint).toMatch(/stoper/i);
+    expect(en.returnToBrewRunningHint).toMatch(/timer/i);
+    // Przewodnik po aplikacji opisuje ten sam przycisk i nie obiecuje auto-startu.
+    expect(pl.guideStep4Desc).toContain(pl.openStepsBtn);
+    expect(pl.guideStep4Desc).toContain(pl.startBrewAccessibility);
+    expect(en.guideStep4Desc).toContain(en.openStepsBtn);
+    expect(en.guideStep4Desc).toContain(en.startBrewAccessibility);
+    const guide = readFileSync(join(root, 'src/components/AppGuideModal.tsx'), 'utf8');
+    expect(guide).not.toMatch(/automatycznie rusza|starts counting down upon entering/);
+  });
+
+  test('04-studio-projektowe-001: jeden ekran prowadzenia — bez drugiego stopera na ekranie głównym i bez startu przy wejściu', () => {
+    expect(existsSync(join(root, 'src/components/brew/BrewActiveFocusTimer.tsx'))).toBe(false);
+    const brew = readFileSync(join(root, 'app/(tabs)/index.tsx'), 'utf8');
+    expect(brew).not.toMatch(/BrewActiveFocusTimer|startTimer\(/);
+    expect(brew).toMatch(/testID="open-procedure-modal-btn"/);
+    // Start z ekranu prowadzenia idzie przez to samo potwierdzenie „mało ziaren” co dawny start.
+    const container = readFileSync(join(root, 'src/components/brew/BrewModalsContainer.tsx'), 'utf8');
+    expect(container).toMatch(/onStart=\{handleStartTimer\}/);
   });
 });

@@ -20,7 +20,6 @@ import { useBrewWorkflow } from '../../src/core/useBrewWorkflow';
 import { BrewBanners } from '../../src/components/brew/BrewBanners';
 import { BrewHeader } from '../../src/components/brew/BrewHeader';
 import { BrewQuickPrepCard } from '../../src/components/brew/BrewQuickPrepCard';
-import { BrewActiveFocusTimer } from '../../src/components/brew/BrewActiveFocusTimer';
 import { RecipeSelectModal } from '../../src/components/brew/RecipeSelectModal';
 import { InventorySelectModal } from '../../src/components/brew/InventorySelectModal';
 import { BrewModalsContainer } from '../../src/components/brew/BrewModalsContainer';
@@ -38,15 +37,8 @@ export default function BrewScreen() {
     waterGrams,
     waterTempCelsius,
     grindSetting,
-    snapshot,
     setDoseGrams,
     setWaterGrams,
-    startTimer,
-    pauseTimer,
-    resumeTimer,
-    nextStep,
-    previousStep,
-    adjustStepDuration,
     waterProfile,
     setWaterProfile,
     grinderRecommendation,
@@ -66,7 +58,6 @@ export default function BrewScreen() {
     setShowRecipeModal,
     showInventoryModal,
     setShowInventoryModal,
-    setShowFinishModal,
     setShowProcedureModal,
     setShowGrinderModal,
     setShowShareModal,
@@ -76,17 +67,25 @@ export default function BrewScreen() {
     handleDismissCorrupt,
     recentFiveStarSession,
     handleQuickReBrew,
-    handleStartTimer,
     tdsInput,
     setTdsInput,
     servings,
     handleServingsChange,
     batchScaling,
-    handleResetWithConfirm,
     isRunning,
     isPaused,
     refreshData,
   } = workflow;
+
+  // M1-audytor-generalny-025 (DEC-13 a): jeden ekran prowadzenia (ProcedureModal).
+  // Wejście tylko go otwiera; stoper rusza dopiero przyciskiem „Rozpocznij parzenie” na tym ekranie.
+  const brewInProgress = isRunning || isPaused;
+  const entryLabel = brewInProgress ? t.brew.returnToBrewBtn : t.brew.openStepsBtn;
+  const entryHint = isRunning
+    ? t.brew.returnToBrewRunningHint
+    : isPaused
+    ? t.brew.returnToBrewPausedHint
+    : t.brew.openStepsHint;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -249,44 +248,14 @@ export default function BrewScreen() {
       <Pressable
         testID="open-procedure-modal-btn"
         style={styles.openProcedureCta}
-        onPress={() => {
-          if (!isRunning && !isPaused) {
-            startTimer();
-          }
-          setShowProcedureModal(true);
-        }}
+        onPress={() => setShowProcedureModal(true)}
         accessibilityRole="button"
-        accessibilityLabel={
-          language === 'en'
-            ? 'Open Step-by-Step Procedure Assistant'
-            : 'Otwórz Asystenta Procedury Krok po Kroku'
-        }
+        accessibilityLabel={entryLabel}
+        accessibilityHint={entryHint}
       >
-        <Text style={styles.openProcedureCtaTitle}>
-          {language === 'en'
-            ? '▶ OPEN STEP-BY-STEP PROCEDURE ASSISTANT'
-            : '▶ OTWÓRZ ASYSTENTA PROCEDURY KROK PO KROKU'}
-        </Text>
-        <Text style={styles.openProcedureCtaSub}>
-          {language === 'en'
-            ? 'Auto-parsed step timer · Full screen · 1-Tap Finish & Save'
-            : 'Auto-stoper z opisu kroku · Pełny ekran · Zakończ i zapisz'}
-        </Text>
+        <Text style={styles.openProcedureCtaTitle}>{entryLabel}</Text>
+        <Text style={styles.openProcedureCtaSub}>{entryHint}</Text>
       </Pressable>
-
-      {/* Główny Stoper Focus Mode: Zoptymalizowany pod 1 metr */}
-      <BrewActiveFocusTimer
-        snapshot={snapshot}
-        onStart={handleStartTimer}
-        onPause={pauseTimer}
-        onResume={resumeTimer}
-        onReset={handleResetWithConfirm}
-        onNextStep={nextStep}
-        onPreviousStep={previousStep}
-        onAdjustStepDuration={adjustStepDuration}
-        onFinish={() => setShowFinishModal(true)}
-      />
-
 
       {/* Wszystkie modale obwodowe */}
       <BrewModalsContainer workflow={workflow} />

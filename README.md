@@ -22,7 +22,7 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - **Wyeksponowana Nastawa Młynka (`BrewHeader`):** Prominentna pigułka z dokładną liczbą klików (np. `Comandante C40: 22 kliki`, `Timemore: 18 klików`) widoczna na samej górze ekranu przed każdym zalaniem.
    - **1-Tap Szybki Start (`BrewQuickPrepCard`):** Karta „Do drippera na wagę” z dużymi stepperami dozy (wysokość 44–52pt), wskaźnikiem wody, temperatury i natychmiastowym rozpoczęciem sesji poniżej 15 sekund.
    - **Batch Scaling (👥 Porcje 1–4 osób):** Automatyczne przeliczanie dozy i wody wraz z dynamiczną rekomendacją przemiału (`+2 kliki grubiej`).
-   - **Focus Mode Stoper (`BrewActiveFocusTimer`):** Cyfrowy zegar z gigantycznymi cyframi (64pt) czytelnymi z odległości 1 metra, zalecanym tempem zalewania `~g/s`, pigułkami korekty w locie (`-10s` / `+10s`) oraz kontrolkami brudnego kciuka (`PAUZA`, `DALEJ ▶`, `WSTECZ`, `RESET`, `WZNÓW`, `ZAPISZ` $\ge 52\,\text{pt}$).
+   - **Kroki parzenia (`ProcedureModal`, jeden ekran prowadzenia — DEC-13 a):** „Pokaż kroki parzenia” otwiera bieżący krok na pełnym ekranie w stanie „gotowy”; stoper rusza dopiero po „Rozpocznij parzenie”. W trakcie: duży zegar kroku, korekty `-1 min` / `-10 s` / `+10 s` / `+1 min`, pauza i wznowienie, a po wstrzymaniu Reset i Zapisz.
    - **Karta Degustacyjna & Dial-in Doctor (`BrewFinishModal`):** 1-klikowa autodiagnoza smaku (kwasowość, gorycz, wodnistość) z natychmiastową receptą ratunkową oraz podsumowaniem **Ekonomii Rzemiosła** (koszt domowy vs 18 zł w kawiarni specialty).
    - **Wymiana Receptur Offline (Kody QR SVG & Deep Linki `napar://`):** Szybkie skanowanie aparatem i udostępnianie receptur w 100% offline.
 2. **🫘 Spiżarnia Ziaren & Liści (Stash) & Kompendium Wiedzy:**
@@ -150,7 +150,7 @@ napar/
 │   │   └── brew/               # Zdekomponowane moduły Kitchen-Proof:
 │   │       ├── BrewHeader.tsx           # Kliki młynka na samej górze, wybór receptury i ziarna
 │   │       ├── BrewQuickPrepCard.tsx    # Karta 1-Tap "Do drippera na wagę", steppery 44-52pt
-│   │       ├── BrewActiveFocusTimer.tsx # Stoper Focus Mode, cyfry 64pt, kontrolki brudnego kciuka
+│   │       ├── ProcedureModal.tsx       # Jedyny ekran prowadzenia: bieżący krok, stoper ruszający po „Rozpocznij parzenie”
 │   │       └── BrewFinishModal.tsx      # Arkusz degustacyjny, Dial-in Doctor i ekonomia
 │   └── core/                   # Czysta logika biznesowa i persystencja
 │       ├── domain-rules.ts     # Deterministyczne reguły RD-01…RD-30

@@ -117,8 +117,9 @@ describe('TASK-R07-01: Lean BPR P16 Inline Selection (De-Modalization)', () => {
       );
     });
 
-    // Przed otwarciem: stoper jest widoczny
-    expect(tree.root.findByProps({ testID: 'active-focus-timer' })).toBeDefined();
+    // Przed otwarciem: wejście do parzenia jest widoczne (M1-audytor-generalny-025: jeden ekran prowadzenia,
+    // stoper żyje w ekranie kroków, na ekranie głównym zostaje przycisk wejścia)
+    expect(tree.root.findAll((n: any) => n.props.testID === 'open-procedure-modal-btn').length).toBeGreaterThan(0);
 
     // Otwórz selektor receptury (inline)
     const recipeCard = tree.root.findByProps({ testID: 'change-recipe-btn' });
@@ -129,8 +130,8 @@ describe('TASK-R07-01: Lean BPR P16 Inline Selection (De-Modalization)', () => {
     // Po otwarciu selektora receptury: panel inline jest wyrenderowany
     expect(tree.root.findByProps({ testID: 'recipe-select-inline-panel' })).toBeDefined();
 
-    // Kluczowa cecha P16: Stoper NIE zniknął z ekranu, nadal jest w drzewie i dostępny pod palcem
-    expect(tree.root.findByProps({ testID: 'active-focus-timer' })).toBeDefined();
+    // Kluczowa cecha P16: wejście do parzenia NIE zniknęło z ekranu, nadal jest w drzewie i dostępne pod palcem
+    expect(tree.root.findAll((n: any) => n.props.testID === 'open-procedure-modal-btn').length).toBeGreaterThan(0);
   });
 
   test('TASK-P19-01-ODK: RecipeSelectModal subset filter chips posiadają accessibilityRole="tab" i poprawne accessibilityState', () => {

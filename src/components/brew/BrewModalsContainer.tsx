@@ -31,6 +31,8 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     previousStep,
     nextStep,
     resetTimer,
+    handleStartTimer,
+    handleResetWithConfirm,
     selectRecipe,
     refreshData,
     showProcedureModal,
@@ -93,11 +95,14 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         steps={stepsList}
         currentStepIndex={snapshot.currentStepIndex}
         isRunning={isRunning}
+        status={snapshot.status}
         stepRemainingSeconds={snapshot.stepRemainingSeconds}
         totalElapsedSeconds={snapshot.totalElapsedSeconds}
         unitSystem={unitSystem}
         language={language}
         t={t}
+        onStart={handleStartTimer}
+        onReset={handleResetWithConfirm}
         onPauseResume={() => {
           if (isRunning) {
             pauseTimer();
