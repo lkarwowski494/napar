@@ -90,6 +90,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
                 selectedPref === 'coffee' && styles.prefCardActiveCoffee,
               ]}
               onPress={() => setSelectedPref('coffee')}
+              accessibilityLabel={t.onboarding.coffeeOnlyTitle}
             >
               <View style={[styles.cardIconBox, selectedPref === 'coffee' && styles.cardIconBoxActiveCoffee]}>
                 <BrewIcon size={22} color={selectedPref === 'coffee' ? theme.colors.copper : theme.colors.textMuted} />
@@ -119,6 +120,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
                 selectedPref === 'tea' && styles.prefCardActiveTea,
               ]}
               onPress={() => setSelectedPref('tea')}
+              accessibilityLabel={t.onboarding.teaOnlyTitle}
             >
               <View style={[styles.cardIconBox, selectedPref === 'tea' && styles.cardIconBoxActiveTea]}>
                 <TeaLeafIcon size={22} color={selectedPref === 'tea' ? theme.colors.emerald : theme.colors.textMuted} />
@@ -148,6 +150,7 @@ export function OnboardingModal({ visible, onComplete }: OnboardingModalProps) {
                 selectedPref === 'both' && styles.prefCardActiveBoth,
               ]}
               onPress={() => setSelectedPref('both')}
+              accessibilityLabel={t.onboarding.bothTitle}
             >
               <View style={[styles.cardIconBox, selectedPref === 'both' && styles.cardIconBoxActiveBoth]}>
                 <CraftFamilyEmblem size={22} color={selectedPref === 'both' ? theme.colors.copper : theme.colors.textMuted} />

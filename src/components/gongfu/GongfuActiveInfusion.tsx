@@ -62,6 +62,8 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
           style={styles.adjustBtn}
           onPress={() => onAdjustTime(-5)}
           disabled={isSteeping}
+          accessibilityRole="button"
+          accessibilityLabel={t.gongfu.subSeconds}
         >
           <Text style={styles.adjustBtnText}>{t.gongfu.subSeconds}</Text>
         </Pressable>
@@ -72,6 +74,8 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
           style={styles.adjustBtn}
           onPress={() => onAdjustTime(5)}
           disabled={isSteeping}
+          accessibilityRole="button"
+          accessibilityLabel={t.gongfu.addSeconds}
         >
           <Text style={styles.adjustBtnText}>{t.gongfu.addSeconds}</Text>
         </Pressable>
@@ -79,7 +83,7 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
 
       {/* Główny Przycisk Parzenia */}
       {!isSteeping && !steepFinished && (
-        <Pressable testID="gongfu-start-btn" style={styles.startBtn} onPress={onStartSteep}>
+        <Pressable testID="gongfu-start-btn" style={styles.startBtn} onPress={onStartSteep} accessibilityRole="button" accessibilityLabel={t.gongfu.startSteep}>
           <Text style={styles.startBtnText}>{t.gongfu.startSteep}</Text>
         </Pressable>
       )}
@@ -112,6 +116,8 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
           <Pressable
             style={styles.recordNextBtn}
             onPress={onRecordCurrentInfusion}
+            accessibilityRole="button"
+            accessibilityLabel={t.gongfu.nextInfusion}
           >
             <Text style={styles.recordNextBtnText}>{t.gongfu.nextInfusion}</Text>
           </Pressable>

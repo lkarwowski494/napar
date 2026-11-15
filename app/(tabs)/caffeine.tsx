@@ -33,6 +33,7 @@ import { BedtimeCurfewCard } from '../../src/components/caffeine/BedtimeCurfewCa
 import { CaffeineLogList } from '../../src/components/caffeine/CaffeineLogList';
 import { CaffeineQuickAddModal } from '../../src/components/caffeine/CaffeineQuickAddModal';
 import { runSave } from '../../lib/save-feedback';
+import { announce } from '../../src/core/announce';
 
 export default function CaffeineScreen() {
   const { t, language } = useTranslation();
@@ -147,6 +148,14 @@ export default function CaffeineScreen() {
     loadLogs();
   };
 
+  const overLimit = totalConsumedTodayMg > 400;
+  const [wasOverLimit, setWasOverLimit] = useState(overLimit);
+  useEffect(() => {
+    // Zapowiedź VoiceOver tylko przy przejściu przez próg (nie przy każdym renderze)
+    if (overLimit && !wasOverLimit) announce(t.caffeine.overLimitWarning);
+    if (overLimit !== wasOverLimit) setWasOverLimit(overLimit);
+  }, [overLimit, wasOverLimit, t.caffeine.overLimitWarning]);
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Karta Stężenia Kofeiny Teraz */}
@@ -165,6 +174,18 @@ export default function CaffeineScreen() {
         <Text style={styles.efsaNoteText}>
           {t.caffeine.efsaDisclaimer}
         </Text>
+
+        {/* M1-audytor-generalny-031 (04-studio-projektowe-009): przekroczenie nie tylko kolorem paska */}
+        {overLimit && (
+          <Text
+            testID="caffeine-over-limit"
+            style={styles.overLimitText}
+            accessibilityRole="alert"
+            accessibilityLabel={t.caffeine.overLimitWarning}
+          >
+            {`⚠ ${t.caffeine.overLimitWarning}`}
+          </Text>
+        )}
 
         <View style={styles.efsaProgressBar}>
           <View
@@ -286,6 +307,12 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     fontSize: 11,
     lineHeight: 16,
+  },
+  overLimitText: {
+    marginTop: 8,
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.danger,
   },
   efsaProgressBar: {
     width: '100%',

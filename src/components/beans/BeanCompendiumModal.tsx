@@ -102,6 +102,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={[styles.compTabBtn, compendiumTab === 'varieties' && styles.compTabBtnActive]}
                 onPress={() => setCompendiumTab('varieties')}
+                accessibilityLabel={isEn ? `Varieties (${filteredVarieties.length})` : `Odmiany (${filteredVarieties.length})`}
               >
                 <Text style={[styles.compTabText, compendiumTab === 'varieties' && styles.compTabTextActive]}>
                   {isEn ? `Varieties (${filteredVarieties.length})` : `Odmiany (${filteredVarieties.length})`}
@@ -114,6 +115,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={[styles.compTabBtn, compendiumTab === 'processes' && styles.compTabBtnActive]}
                 onPress={() => setCompendiumTab('processes')}
+                accessibilityLabel={isEn ? `Processes (${filteredProcesses.length})` : `Obróbki (${filteredProcesses.length})`}
               >
                 <Text style={[styles.compTabText, compendiumTab === 'processes' && styles.compTabTextActive]}>
                   {isEn ? `Processes (${filteredProcesses.length})` : `Obróbki (${filteredProcesses.length})`}
@@ -126,6 +128,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 style={[styles.compTabBtn, compendiumTab === 'origins' && styles.compTabBtnActive]}
                 onPress={() => setCompendiumTab('origins')}
+                accessibilityLabel={isEn ? `Terroir (${filteredOrigins.length})` : `Terroir (${filteredOrigins.length})`}
               >
                 <Text style={[styles.compTabText, compendiumTab === 'origins' && styles.compTabTextActive]}>
                   {isEn ? `Terroir (${filteredOrigins.length})` : `Terroir (${filteredOrigins.length})`}
@@ -141,6 +144,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               style={[styles.compTabBtn, compendiumTab === 'tea' && styles.compTabBtnActive]}
               onPress={() => setCompendiumTab('tea')}
+              accessibilityLabel={isEn ? `Teas (${filteredTeas.length})` : `Herbaty (${filteredTeas.length})`}
             >
               <Text style={[styles.compTabText, compendiumTab === 'tea' && styles.compTabTextActive]}>
                 {isEn ? `Teas (${filteredTeas.length})` : `Herbaty (${filteredTeas.length})`}

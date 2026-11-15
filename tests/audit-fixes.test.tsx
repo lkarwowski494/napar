@@ -1392,3 +1392,90 @@ describe('M1-audytor-generalny-026: start parzenia tylko przez strażnika „ma�
     expect(modals).toMatch(/onStart=\{handleStartTimer\}/);
   });
 });
+
+// ============================================================================
+// M1-audytor-generalny-031 · 04-studio-projektowe-007, -008, -009: VoiceOver, przewodnik, limit kofeiny.
+// ============================================================================
+describe('M1-audytor-generalny-031: każdy element dotykowy ma rolę i etykietę; przewodnik z Ustawień; limit nie tylko kolorem', () => {
+  const nodeFs = jest.requireActual('fs') as typeof import('fs');
+  const nodePath = jest.requireActual('path') as typeof import('path');
+  const root = nodePath.join(__dirname, '..');
+  const walk = (dir: string): string[] =>
+    nodeFs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+      const p = nodePath.join(dir, e.name);
+      if (e.isDirectory()) return ['__tests__', 'node_modules'].includes(e.name) ? [] : walk(p);
+      return /\.tsx$/.test(e.name) ? [p] : [];
+    });
+  /** Otwierające tagi elementów dotykowych z uwzględnieniem nawiasów klamrowych. */
+  const touchTags = (src: string): { line: number; text: string }[] => {
+    const out: { line: number; text: string }[] = [];
+    for (const m of src.matchAll(/<(Pressable|TouchableOpacity|TouchableHighlight)\b/g)) {
+      let depth = 0;
+      let j = (m.index ?? 0) + m[0].length;
+      for (; j < src.length; j++) {
+        const ch = src[j];
+        if (ch === '{') depth++;
+        else if (ch === '}') depth--;
+        else if (ch === '>' && depth === 0) break;
+      }
+      if (j >= src.length) continue;
+      out.push({ line: src.slice(0, m.index).split('\n').length, text: src.slice(m.index, j + 1) });
+    }
+    return out;
+  };
+
+  test('04-studio-projektowe-007: każdy Pressable/Touchable w app/ i src/ ma accessibilityRole i accessibilityLabel', () => {
+    const bad: string[] = [];
+    for (const f of ['app', 'src'].map((d) => nodePath.join(root, d)).flatMap(walk)) {
+      for (const tag of touchTags(nodeFs.readFileSync(f, 'utf8'))) {
+        if (tag.text.includes('{...')) continue; // propsy przekazywane dalej (komponenty bazowe w ui.tsx)
+        if (!/accessibilityRole=/.test(tag.text) || !/accessibilityLabel=/.test(tag.text)) bad.push(`${nodePath.relative(root, f)}:${tag.line}`);
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+
+  test('04-studio-projektowe-008: przewodnik „Jak działa aplikacja?” otwiera się z Ustawień', () => {
+    const Settings = require('../app/settings').default;
+    const { AppGuideModal } = require('../src/components/AppGuideModal');
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(<Settings />);
+    });
+    const btn = tree!.root.findAll((n) => n.props.testID === 'settings-open-guide-btn' && typeof n.props.onPress === 'function');
+    expect(btn).toHaveLength(1);
+    expect(btn[0].props.accessibilityRole).toBe('button');
+    expect(btn[0].props.accessibilityLabel).toBe(translations.pl.common.howItWorks);
+    expect(tree!.root.findByType(AppGuideModal).props.visible).toBe(false);
+    act(() => {
+      btn[0].props.onPress();
+    });
+    expect(tree!.root.findByType(AppGuideModal).props.visible).toBe(true);
+  });
+
+  test('04-studio-projektowe-009: powyżej 400 mg dziennie jest tekst ostrzeżenia z rolą alert, nie tylko kolor paska', () => {
+    const db = require('../src/core/database');
+    const now = Date.now();
+    const logs = [
+      { id: 'a', beverageName: 'Espresso', beverageType: 'coffee', consumedAt: new Date(now - 3600e3).toISOString(), doseGrams: 18, caffeineMg: 250 },
+      { id: 'b', beverageName: 'V60', beverageType: 'coffee', consumedAt: new Date(now - 1800e3).toISOString(), doseGrams: 15, caffeineMg: 200 },
+    ];
+    const spy = jest.spyOn(db, 'getCaffeineLogs').mockReturnValue(logs);
+    const Caffeine = require('../app/(tabs)/caffeine').default;
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(<Caffeine />);
+    });
+    const warn = tree!.root.findAll((n) => n.props.testID === 'caffeine-over-limit' && typeof n.type === 'string');
+    expect(warn).toHaveLength(1);
+    expect(warn[0].props.accessibilityRole).toBe('alert');
+    expect(warn[0].props.accessibilityLabel).toBe(translations.pl.caffeine.overLimitWarning);
+    spy.mockReturnValue(logs.slice(0, 1));
+    act(() => {
+      tree!.unmount();
+      tree = renderer.create(<Caffeine />);
+    });
+    expect(tree!.root.findAll((n) => n.props.testID === 'caffeine-over-limit')).toHaveLength(0);
+    spy.mockRestore();
+  });
+});

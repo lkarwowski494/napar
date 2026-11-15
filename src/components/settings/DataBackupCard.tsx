@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
+import { useTranslation } from '../../core/i18n';
 
 export interface DataBackupCardProps {
   onExportJson: () => void;
@@ -17,8 +18,10 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
   onImportJson,
   onExportSessionsCsv,
   onExportInventoryCsv,
-  t,
+  t: tProp,
 }) => {
+  const { t: tContext } = useTranslation();
+  const t = tProp ?? tContext;
   const handleOpenImport = onOpenImportJson || onImportJson || (() => {});
   return (
     <View>
@@ -28,9 +31,11 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
           testID="export-json-btn"
           style={styles.actionRow}
           onPress={onExportJson}
+          accessibilityRole="button"
+          accessibilityLabel={t.settings.backupExportJsonTitle}
         >
           <View style={{ flex: 1 }}>
-            <Text style={styles.actionTitle}>Eksportuj Kopię Zapasową (JSON)</Text>
+            <Text style={styles.actionTitle}>{t.settings.backupExportJsonTitle}</Text>
             <Text style={styles.actionSubtitle}>
               Pobierz pełną historię parzeń, spiżarnię i notatki w otwartym formacie
             </Text>
@@ -44,9 +49,11 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
           testID="import-json-btn"
           style={styles.actionRow}
           onPress={handleOpenImport}
+          accessibilityRole="button"
+          accessibilityLabel={t.settings.backupImportJsonTitle}
         >
           <View style={{ flex: 1 }}>
-            <Text style={styles.actionTitle}>Importuj Kopię z Pliku JSON</Text>
+            <Text style={styles.actionTitle}>{t.settings.backupImportJsonTitle}</Text>
             <Text style={styles.actionSubtitle}>
               Przywróć stan spiżarni i sesji z wcześniejszej kopii zapasowej
             </Text>
@@ -60,9 +67,11 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
           testID="export-csv-sessions-btn"
           style={styles.actionRow}
           onPress={onExportSessionsCsv}
+          accessibilityRole="button"
+          accessibilityLabel={t.settings.backupExportSessionsCsvTitle}
         >
           <View style={{ flex: 1 }}>
-            <Text style={styles.actionTitle}>Eksportuj Dziennik (CSV)</Text>
+            <Text style={styles.actionTitle}>{t.settings.backupExportSessionsCsvTitle}</Text>
             <Text style={styles.actionSubtitle}>
               Arkusz kalkulacyjny (Excel, Google Sheets) z historią zaparzeń i sensoryką
             </Text>
@@ -72,9 +81,9 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
 
         <View style={styles.divider} />
 
-        <Pressable style={styles.actionRow} onPress={onExportInventoryCsv}>
+        <Pressable style={styles.actionRow} onPress={onExportInventoryCsv} accessibilityRole="button" accessibilityLabel={t.settings.backupExportInventoryCsvTitle}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.actionTitle}>Eksportuj Spiżarnię (CSV)</Text>
+            <Text style={styles.actionTitle}>{t.settings.backupExportInventoryCsvTitle}</Text>
             <Text style={styles.actionSubtitle}>
               Zestawienie paczek ziaren, herbat, palarni, dat palenia i zapasów
             </Text>

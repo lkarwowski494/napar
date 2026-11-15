@@ -250,19 +250,19 @@ export const SafeModeView: React.FC<SafeModeViewProps> = ({ onRetry, language, r
         {loading ? <ActivityIndicator size="large" color="#D97736" style={styles.loader} /> : null}
 
         <View style={styles.actions}>
-          <Pressable style={styles.btnPrimary} onPress={handleExportDb} disabled={loading}>
+          <Pressable style={styles.btnPrimary} onPress={handleExportDb} disabled={loading} accessibilityRole="button" accessibilityLabel={m.btnExportDb}>
             <Text style={styles.btnPrimaryText}>{m.btnExportDb}</Text>
           </Pressable>
 
-          <Pressable style={styles.btnSecondary} onPress={handleExportLatestJson} disabled={loading}>
+          <Pressable style={styles.btnSecondary} onPress={handleExportLatestJson} disabled={loading} accessibilityRole="button" accessibilityLabel={m.btnExportJson}>
             <Text style={styles.btnSecondaryText}>{m.btnExportJson}</Text>
           </Pressable>
 
-          <Pressable style={styles.btnRetry} onPress={onRetry} disabled={loading}>
+          <Pressable style={styles.btnRetry} onPress={onRetry} disabled={loading} accessibilityRole="button" accessibilityLabel={m.btnRetry}>
             <Text style={styles.btnRetryText}>{m.btnRetry}</Text>
           </Pressable>
 
-          <Pressable style={styles.btnDanger} onPress={handleResetDb} disabled={loading}>
+          <Pressable style={styles.btnDanger} onPress={handleResetDb} disabled={loading} accessibilityRole="button" accessibilityLabel={m.btnResetDb}>
             <Text style={styles.btnDangerText}>{m.btnResetDb}</Text>
           </Pressable>
         </View>

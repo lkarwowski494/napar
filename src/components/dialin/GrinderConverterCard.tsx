@@ -37,6 +37,7 @@ export const GrinderConverterCard: React.FC<GrinderConverterCardProps> = ({ lang
               selectedGrindCategoryId === cat.id && styles.grindCategoryChipActive,
             ]}
             onPress={() => setSelectedGrindCategoryId(cat.id)}
+            accessibilityLabel={language === 'pl' ? cat.namePl : cat.nameEn}
           >
             <Text
               style={[

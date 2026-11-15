@@ -192,17 +192,23 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
               <Pressable
                 style={[styles.typeBtn, editType === 'coffee' && styles.typeBtnActive]}
                 onPress={() => setEditType('coffee')}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: editType === 'coffee' }}
+                accessibilityLabel={t.common.coffeeBeans}
               >
                 <Text style={[styles.typeBtnText, editType === 'coffee' && styles.typeBtnTextActive]}>
-                  Kawa ziarnista
+                  {t.common.coffeeBeans}
                 </Text>
               </Pressable>
               <Pressable
                 style={[styles.typeBtn, editType === 'tea' && styles.typeBtnActive]}
                 onPress={() => setEditType('tea')}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: editType === 'tea' }}
+                accessibilityLabel={t.common.looseLeafTea}
               >
                 <Text style={[styles.typeBtnText, editType === 'tea' && styles.typeBtnTextActive]}>
-                  Herbata liściasta
+                  {t.common.looseLeafTea}
                 </Text>
               </Pressable>
             </View>
@@ -314,6 +320,8 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 testID="quick-weight-minus-18"
                 style={styles.quickWeightBtn}
                 onPress={() => handleAdjustRemainingWeight(isImperial ? -0.5 : -15)}
+                accessibilityRole="button"
+                accessibilityLabel={isImperial ? '-0.5 oz' : '-15 g'}
               >
                 <Text style={styles.quickWeightBtnText}>{isImperial ? '-0.5 oz' : '-15 g'}</Text>
               </Pressable>
@@ -321,6 +329,8 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 testID="quick-weight-minus-18"
                 style={styles.quickWeightBtn}
                 onPress={() => handleAdjustRemainingWeight(isImperial ? -0.6 : -18)}
+                accessibilityRole="button"
+                accessibilityLabel={isImperial ? '-0.6 oz' : '-18 g'}
               >
                 <Text style={styles.quickWeightBtnText}>{isImperial ? '-0.6 oz' : '-18 g'}</Text>
               </Pressable>
@@ -328,14 +338,18 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 testID="quick-weight-minus-18"
                 style={styles.quickWeightBtn}
                 onPress={() => handleAdjustRemainingWeight(isImperial ? 0.5 : 15)}
+                accessibilityRole="button"
+                accessibilityLabel={isImperial ? '+0.5 oz' : '+15 g'}
               >
                 <Text style={styles.quickWeightBtnText}>{isImperial ? '+0.5 oz' : '+15 g'}</Text>
               </Pressable>
               <Pressable
                 style={[styles.quickWeightBtn, styles.quickWeightZeroBtn]}
                 onPress={() => setEditRemainingWeight('0')}
+                accessibilityRole="button"
+                accessibilityLabel={`${isImperial ? '0 oz' : '0 g'} (${t.stash.emptyPackLabel})`}
               >
-                <Text style={styles.quickWeightZeroText}>{isImperial ? '0 oz (pusta)' : '0 g (pusta)'}</Text>
+                <Text style={styles.quickWeightZeroText}>{`${isImperial ? '0 oz' : '0 g'} (${t.stash.emptyPackLabel})`}</Text>
               </Pressable>
             </View>
           </View>
@@ -360,6 +374,9 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 onPress={() => setEditRating(editRating === star ? undefined : star)}
                 hitSlop={8}
                 style={styles.starBtn}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: (editRating || 0) >= star }}
+                accessibilityLabel={(t.brew?.starRatingLabel || 'Ocena {rating} z 5').replace('{rating}', String(star))}
               >
                 <Text style={[styles.starIcon, (editRating || 0) >= star && styles.starIconActive]}>
                   ★

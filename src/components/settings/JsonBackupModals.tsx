@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
+import { useTranslation } from '../../core/i18n';
 
 export interface JsonExportModalProps {
   visible: boolean;
@@ -72,6 +73,7 @@ export const JsonImportModal: React.FC<JsonImportModalProps> = ({
   onImport,
   onConfirmImport,
 }) => {
+  const { t } = useTranslation();
   const textValue = jsonText !== undefined ? jsonText : (importJsonText || '');
   const handleChangeText = onChangeJsonText || onChangeImportJsonText || (() => {});
   const handleConfirm = onConfirmImport || onImport || (() => {});
@@ -101,8 +103,8 @@ export const JsonImportModal: React.FC<JsonImportModalProps> = ({
           value={textValue}
           onChangeText={handleChangeText}
         />
-        <Pressable style={styles.submitImportBtn} onPress={handleConfirm}>
-          <Text style={styles.submitImportBtnText}>Zaimportuj i Zastąp Dane</Text>
+        <Pressable style={styles.submitImportBtn} onPress={handleConfirm} accessibilityRole="button" accessibilityLabel={t.settings.importReplaceBtn}>
+          <Text style={styles.submitImportBtnText}>{t.settings.importReplaceBtn}</Text>
         </Pressable>
       </SafeAreaView>
     </Modal>

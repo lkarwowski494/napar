@@ -195,6 +195,9 @@ export default function DialInScreen() {
                   selectedIssue === issue.id && styles.issueCardActive,
                 ]}
                 onPress={() => setSelectedIssue(issue.id)}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: selectedIssue === issue.id }}
+                accessibilityLabel={issue.title}
               >
                 <Text style={styles.issueTitle}>{issue.title}</Text>
                 <Text style={styles.issueDesc}>{issue.desc}</Text>

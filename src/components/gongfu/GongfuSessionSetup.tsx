@@ -73,6 +73,9 @@ export const GongfuSessionSetup: React.FC<GongfuSessionSetupProps> = ({
               key={item.id}
               style={[styles.teaTypeChip, isActive && styles.teaTypeChipActive]}
               onPress={() => onSelectTeaType(item.id)}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: isActive }}
+              accessibilityLabel={label}
             >
               <Text
                 style={[

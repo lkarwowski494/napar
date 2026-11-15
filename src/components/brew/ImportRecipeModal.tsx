@@ -97,6 +97,8 @@ export const ImportRecipeModal: React.FC<ImportRecipeModalProps> = ({
                 style={styles.confirmImportBtn}
                 onPress={handleConfirmImport}
                 testID="confirm-import-btn"
+                accessibilityRole="button"
+                accessibilityLabel={t.brew.importActionBtn}
               >
                 <Text style={styles.confirmImportBtnText}>
                   {t.brew.importActionBtn}

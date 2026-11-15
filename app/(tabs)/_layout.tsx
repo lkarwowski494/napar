@@ -3,9 +3,8 @@
 // Apps4Craft Studio: Minimalist vector icons, warm artisanal aesthetic.
 // ============================================================================
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs } from 'expo-router';
-import { Pressable, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../src/core/theme';
 import {
@@ -15,30 +14,11 @@ import {
   LabIcon,
   CaffeineIcon,
   SettingsIcon,
-  CompassIcon,
 } from '../../src/components/icons/CraftIcons';
-import { AppGuideModal } from '../../src/components/AppGuideModal';
 import { useTranslation } from '../../src/core/i18n';
 
-function AppGuideHeaderButton({ onOpen, label }: { onOpen: () => void; label: string }) {
-  return (
-    <Pressable
-      testID="header-guide-btn"
-      hitSlop={10}
-      style={styles.headerGuideButton}
-      onPress={onOpen}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-    >
-      <CompassIcon size={14} color={theme.colors.copper} />
-      <Text style={styles.headerGuideButtonText}>{label}</Text>
-    </Pressable>
-  );
-}
-
 export default function TabLayout() {
-  const { t, language } = useTranslation();
-  const [showGuideModal, setShowGuideModal] = useState(false);
+  const { t } = useTranslation();
 
   let insets = { bottom: 0, top: 0, left: 0, right: 0 };
   try {
@@ -166,32 +146,7 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
-      <AppGuideModal
-        visible={showGuideModal}
-        onClose={() => setShowGuideModal(false)}
-        language={language}
-      />
     </>
   );
 }
 
-const styles = StyleSheet.create({
-  headerGuideButton: {
-    marginRight: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: theme.borderRadius.sm,
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.copper,
-    flexDirection: 'row',
-    gap: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerGuideButtonText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: theme.colors.copper,
-  },
-});

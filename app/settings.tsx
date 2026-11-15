@@ -40,6 +40,7 @@ import {
 } from '../src/core/database';
 import { useBrew } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
+import { AppGuideModal } from '../src/components/AppGuideModal';
 import { clampCaffeineHalfLifeHours } from '../src/core/domain-rules';
 import { useTranslation } from '../src/core/i18n';
 import { safetyBackup } from '../src/core/backup';
@@ -105,6 +106,8 @@ export default function SettingsScreen() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showCsvModal, setShowCsvModal] = useState(false);
+  // M1-audytor-generalny-031 (04-studio-projektowe-008): przewodnik po aplikacji dostępny z Ustawień
+  const [showGuide, setShowGuide] = useState(false);
   const [csvModalTitle, setCsvModalTitle] = useState('');
   const [exportedJsonText, setExportedJsonText] = useState('');
   const [importJsonText, setImportJsonText] = useState('');
@@ -330,6 +333,17 @@ export default function SettingsScreen() {
             {supportEmail ? `${supportEmail} ↗` : language === 'pl' ? 'Otwórz ↗' : 'Open ↗'}
           </Text>
         </Pressable>
+        <View style={styles.divider} />
+        <Pressable
+          testID="settings-open-guide-btn"
+          style={styles.infoRow}
+          onPress={() => setShowGuide(true)}
+          accessibilityRole="button"
+          accessibilityLabel={t.common.howItWorks}
+        >
+          <Text style={styles.infoLabel}>{t.common.howItWorks}</Text>
+          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>›</Text>
+        </Pressable>
         {/* M1-audytor-generalny-022: link oceny tylko przy prawdziwym Apple ID (app-identity.ts). */}
         {storeId && (
           <>
@@ -346,6 +360,7 @@ export default function SettingsScreen() {
           </>
         )}
       </View>
+      <AppGuideModal visible={showGuide} onClose={() => setShowGuide(false)} language={language} />
     </ScrollView>
   );
 }

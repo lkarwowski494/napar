@@ -328,6 +328,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 accessibilityRole="tab"
                 accessibilityState={{ selected: categoryFilter === 'ALL' }}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityLabel={`${t?.brew?.all || (isEn ? 'All' : 'Wszystkie')} (${safeRecipes.filter((r) => r && typeof r === 'object').length})`}
               >
                 <Text
                   style={[
@@ -348,6 +349,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 accessibilityRole="tab"
                 accessibilityState={{ selected: categoryFilter === 'COFFEE' }}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityLabel={`${t?.brew?.coffee || (isEn ? 'Coffee' : 'Kawa')} (${safeRecipes.filter((r) => r && typeof r === 'object' && ('beverageType' in r ? r.beverageType === 'COFFEE' : r.type === 'COFFEE')).length})`}
               >
                 <Text
                   style={[
@@ -368,6 +370,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
                 accessibilityRole="tab"
                 accessibilityState={{ selected: categoryFilter === 'TEA' }}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityLabel={`${t?.brew?.tea || (isEn ? 'Tea' : 'Herbata')} (${safeRecipes.filter((r) => r && typeof r === 'object' && ('beverageType' in r ? r.beverageType === 'TEA' : r.type === 'TEA')).length})`}
               >
                 <Text
                   style={[
@@ -386,6 +389,8 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               testID="add-custom-recipe-btn"
               style={styles.addCustomRecipeBtn}
               onPress={onAddCustomRecipe}
+              accessibilityRole="button"
+              accessibilityLabel={t?.brew?.customRecipe || (isEn ? 'Custom recipe' : 'Receptura autorska')}
             >
               <Text style={styles.addCustomRecipeBtnText}>
                 {t?.brew?.customRecipe || (isEn ? 'Custom recipe' : 'Receptura autorska')}
@@ -409,6 +414,8 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
               style={styles.importRecipeModalBtn}
               onPress={onOpenImport}
               testID="import-recipe-btn"
+              accessibilityRole="button"
+              accessibilityLabel={t?.brew?.importRecipe || (isEn ? 'Import' : 'Importuj')}
             >
               <Text style={styles.importRecipeModalBtnText}>
                 {t?.brew?.importRecipe || (isEn ? 'Import' : 'Importuj')}
