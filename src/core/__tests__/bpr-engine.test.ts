@@ -7,6 +7,7 @@ import {
   escapeIcsText,
 } from '../bpr-engine';
 import { InventoryItem, BrewSession } from '../database-schema';
+import { localISODate } from '../backup';
 
 describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar', () => {
   describe('parseStepDurationSeconds', () => {
@@ -337,8 +338,9 @@ describe('BPR Engine — Zero-Click Duration Parser & Proactive 14-Day Calendar'
       expect(escapeIcsText(true as any)).toBe('');
     });
 
-    it('TASK-P40-03-ZAK: generateActionIcsContent uzywa biezacej daty UTC ISO jako dynamicznego fallbacku', () => {
-      const todayIso = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    // 07-jakosc-008 (M1-audytor-generalny-043): fallback to lokalna data użytkownika, nie data UTC.
+    it('TASK-P40-03-ZAK: generateActionIcsContent uzywa biezacej lokalnej daty kalendarzowej jako dynamicznego fallbacku', () => {
+      const todayIso = localISODate().replace(/-/g, '');
       const actionWithoutDate: any = {
         id: 'action-fallback-date',
         titlePl: 'Sesja dzisiejsza',

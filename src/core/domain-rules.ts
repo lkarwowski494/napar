@@ -155,11 +155,33 @@ export function calculateExtractionYield(
 }
 
 /**
+ * 07-jakosc-008: numer lokalnego dnia kalendarzowego (dni od 1970-01-01, bez czasu i strefy).
+ * „YYYY-MM-DD” to data z kalendarza użytkownika (nie północ UTC); Date i inne napisy — ich
+ * lokalna data. Różnica dwóch numerów nie zależy od przejść czasu letniego. NaN = zła data.
+ */
+function localCalendarDayNumber(input: Date | string): number {
+  if (typeof input === 'string') {
+    const m = input.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) {
+      const y = Number(m[1]);
+      const mo = Number(m[2]) - 1;
+      const d = Number(m[3]);
+      const utc = new Date(Date.UTC(y, mo, d));
+      if (utc.getUTCFullYear() !== y || utc.getUTCMonth() !== mo || utc.getUTCDate() !== d) return NaN;
+      return utc.getTime() / 86400000;
+    }
+  }
+  const date = new Date(input);
+  if (!Number.isFinite(date.getTime())) return NaN;
+  return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000;
+}
+
+/**
  * RD-07: Wskaźnik świeżości i okna degustacyjnego (Resting Window)
- * Dni od daty palenia:
- * 1-5: odgazowywanie CO2
- * 6-30: okno szczytowe (peak)
- * 31-60: stabilna dojrzałość
+ * Lokalne dni kalendarzowe od daty palenia (07-jakosc-008):
+ * 0-6: odgazowywanie CO2
+ * 7-35: okno szczytowe (peak)
+ * 36-60: stabilna dojrzałość
  * >60: utrata lotnych aromatów (aging)
  */
 export function evaluateRestingWindow(roastDateInput: Date | string, currentDateInput?: Date | string): RestingWindowResult {
@@ -172,12 +194,9 @@ export function evaluateRestingWindow(roastDateInput: Date | string, currentDate
       badgeColor: 'gray',
     };
   }
-  const roastDate = new Date(roastDateInput);
-  const now = currentDateInput ? new Date(currentDateInput) : new Date();
-
-  const roastTime = roastDate.getTime();
-  const nowTime = now.getTime();
-  if (!Number.isFinite(roastTime) || !Number.isFinite(nowTime)) {
+  const roastDay = localCalendarDayNumber(roastDateInput);
+  const nowDay = localCalendarDayNumber(currentDateInput ? currentDateInput : new Date());
+  if (!Number.isFinite(roastDay) || !Number.isFinite(nowDay)) {
     return {
       daysSinceRoast: 0,
       stage: 'degassing',
@@ -187,9 +206,9 @@ export function evaluateRestingWindow(roastDateInput: Date | string, currentDate
     };
   }
 
-  const diffTime = Math.max(0, nowTime - roastTime);
-  const rawDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  const daysSinceRoast = Object.is(rawDays, -0) || rawDays <= 0 ? 0 : rawDays;
+  // Lokalne dni kalendarzowe (07-jakosc-008): etap zmienia się o północy użytkownika, nie o północy UTC.
+  const rawDays = nowDay - roastDay;
+  const daysSinceRoast = rawDays <= 0 ? 0 : rawDays;
 
   if (daysSinceRoast <= 6) {
     return {

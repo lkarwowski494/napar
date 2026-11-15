@@ -21,6 +21,7 @@ import {
   generateActionIcsContent,
 } from '../../core/bpr-engine';
 import { InventoryItem, BrewSession } from '../../core/database-schema';
+import { localISODate } from '../../core/backup';
 
 export interface ProactiveCalendarCardProps {
   inventory: InventoryItem[];
@@ -39,7 +40,8 @@ export function ProactiveCalendarCard({
 }: ProactiveCalendarCardProps) {
   const isEn = language === 'en';
   const refIso = useMemo(
-    () => referenceDateIso || new Date().toISOString(),
+    // 07-jakosc-008: dzień odniesienia = lokalna data użytkownika (nie dzień UTC z toISOString).
+    () => referenceDateIso || localISODate(),
     [referenceDateIso]
   );
 

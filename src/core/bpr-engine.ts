@@ -7,6 +7,7 @@
 
 import { InventoryItem, BrewSession } from './database-schema';
 import { pluralPl } from './i18n';
+import { localISODate } from './backup';
 
 export interface CalendarDayItem {
   dateIso: string; // YYYY-MM-DD
@@ -620,7 +621,8 @@ export function generateActionIcsContent(
   const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
   const rawDateStr = typeof action.dateIso === 'string' && action.dateIso.trim() ? action.dateIso.trim() : '';
   const dateMatch = rawDateStr.match(/^(\d{4}-\d{2}-\d{2})/);
-  const todayIso = new Date().toISOString().slice(0, 10);
+  // 07-jakosc-008: „dziś” to lokalny dzień kalendarzowy użytkownika, nie data UTC.
+  const todayIso = localISODate();
   let rawDate = dateMatch ? dateMatch[1] : todayIso;
   if (isNaN(new Date(rawDate).getTime())) {
     rawDate = todayIso;

@@ -14,6 +14,7 @@ import { theme } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
 import { saveInventoryItem, getUnitSystem } from '../../core/database';
 import { ouncesToGrams } from '../../core/unit-converter';
+import { localISODate } from '../../core/backup';
 import { InventoryItem } from '../../core/database-schema';
 import { KnowledgeTemplate } from './BeanCompendiumModal';
 import { runSave } from '../../../lib/save-feedback';
@@ -47,7 +48,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
   const [origin, setOrigin] = useState('');
   const [variety, setVariety] = useState('');
   const [process, setProcess] = useState('');
-  const [roastDate, setRoastDate] = useState(new Date().toISOString().slice(0, 10));
+  const [roastDate, setRoastDate] = useState(() => localISODate());
   const [roastProfile, setRoastProfile] = useState('light');
   const [initialWeight, setInitialWeight] = useState(isImperial ? '8.8' : '250');
   const [notesStr, setNotesStr] = useState('');
@@ -68,7 +69,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
       setOrigin(presetTemplate.origin || '');
       setVariety(presetTemplate.variety || '');
       setProcess(presetTemplate.process || '');
-      setRoastDate(new Date().toISOString().slice(0, 10));
+      setRoastDate(localISODate());
       setRoastProfile('light');
       setInitialWeight(isImperial ? '8.8' : '250');
       setNotesStr((presetTemplate.notes || []).join(', '));
@@ -82,7 +83,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
     setOrigin('');
     setVariety('');
     setProcess('');
-    setRoastDate(new Date().toISOString().slice(0, 10));
+    setRoastDate(localISODate());
     setRoastProfile('light');
     setInitialWeight('250');
     setNotesStr('');
