@@ -19,7 +19,8 @@ import { MASTER_RECIPES } from '../../src/core/recipes-data';
 import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems, getUnitSystem } from '../../src/core/database';
 import { BrewSession, InventoryItem } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
-import { useTranslation } from '../../src/core/i18n';
+import { useTranslation, formatTemplate } from '../../src/core/i18n';
+import { formatTemperature } from '../../src/core/unit-converter';
 import { confirmAction } from '../../src/core/confirm';
 import { JournalIcon } from '../../src/components/icons/CraftIcons';
 import { JournalSessionCard } from '../../src/components/journal/JournalSessionCard';
@@ -187,35 +188,42 @@ export default function JournalScreen() {
     }
   };
 
+  // M1-audytor-generalny-033 (09-lokalizacja-008): tekst udostępniania w języku interfejsu,
+  // temperatura wg ustawienia jednostek (formatTemperature).
   const handleShareSession = (session: BrewSession) => {
-    const formattedDate = formatDateTime(session.brewedAt);
+    const j = t.journal;
     const title = session.recipeName || session.method;
-    const bean = session.inventoryItemName ? `\nZiarno: ${session.inventoryItemName}` : '';
-    const ratingStr = session.rating ? `\nOcena: ${session.rating.toFixed(1)}/5` : '';
-    const balanceStr = session.tasteBalance ? `\nBalans: ${session.tasteBalance}` : '';
-    const eyStr = session.extractionYieldPercentage ? ` (EY: ${session.extractionYieldPercentage.toFixed(1)}%)` : '';
-    const tagsStr = session.flavorTags && session.flavorTags.length > 0 ? `\nNuty: ${session.flavorTags.join(', ')}` : '';
-    const notesStr = session.notes ? `\nNotatki: "${session.notes}"` : '';
-
-    const shareMessage = `${title} — Napar
-Data: ${formattedDate}${bean}
-Doza: ${session.doseGrams}g | Woda: ${session.waterGrams}g | Temp: ${session.waterTempCelsius}°C
-Czas parzenia: ${formatSeconds(session.totalTimeSeconds)}${ratingStr}${balanceStr}${eyStr}${tagsStr}${notesStr}
-
-Parz uważnie, smakuj głęboko — 100% offline craft coffee.`;
+    const lines = [
+      `${title} — Napar`,
+      formatTemplate(j.shareDate, { date: formatDateTime(session.brewedAt) }),
+      session.inventoryItemName ? formatTemplate(j.shareBean, { name: session.inventoryItemName }) : '',
+      formatTemplate(j.shareParams, {
+        dose: `${session.doseGrams}g`,
+        water: `${session.waterGrams}g`,
+        temp: formatTemperature(session.waterTempCelsius, unitSystem),
+      }),
+      formatTemplate(j.shareBrewTime, { time: formatSeconds(session.totalTimeSeconds) }) +
+        (session.extractionYieldPercentage ? ` (EY: ${session.extractionYieldPercentage.toFixed(1)}%)` : ''),
+    ];
+    if (session.rating) lines.push(formatTemplate(j.shareRating, { rating: session.rating.toFixed(1) }));
+    if (session.tasteBalance) lines.push(formatTemplate(j.shareBalance, { balance: session.tasteBalance }));
+    if (session.flavorTags && session.flavorTags.length > 0) lines.push(formatTemplate(j.shareFlavorTags, { tags: session.flavorTags.join(', ') }));
+    if (session.notes) lines.push(formatTemplate(j.shareNotes, { notes: session.notes }));
+    const shareMessage = `${lines.filter(Boolean).join('\n')}\n\n${j.shareFooter}`;
 
     Share.share({
-      title: `${title} · Notatka degustacyjna`,
+      title: formatTemplate(j.shareTitle, { title }),
       message: shareMessage,
     });
   };
 
   const formatDateTime = (iso: string) => {
     const d = new Date(iso);
-    return `${d.toLocaleDateString(language === 'pl' ? 'pl-PL' : 'en-US')} o ${d.toLocaleTimeString(language === 'pl' ? 'pl-PL' : 'en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })}`;
+    const locale = language === 'pl' ? 'pl-PL' : 'en-US';
+    return formatTemplate(t.journal.shareDateTime, {
+      date: d.toLocaleDateString(locale),
+      time: d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }),
+    });
   };
 
   const formatSeconds = (sec: number) => {

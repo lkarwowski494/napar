@@ -37,6 +37,7 @@ jest.mock('../database', () => ({
   setVoiceAnnounceEnabled: jest.fn(),
   getBeveragePreference: jest.fn(() => 'both'),
   setBeveragePreference: jest.fn(),
+  getUnitSystem: jest.fn(() => 'metric'),
 }));
 
 const mockSessions = [
@@ -417,6 +418,40 @@ describe('JournalScreen Integration', () => {
 
     getAppSetting.mockImplementation(() => null);
     getInventoryItems.mockImplementation(() => []);
+  });
+
+  // M1-audytor-generalny-033 (09-lokalizacja-008): tekst udostępniania w języku interfejsu, temperatura wg jednostek.
+  test('09-lokalizacja-008: udostępnienie wpisu w EN i jednostkach imperialnych — bez polskich słów, temperatura w °F', () => {
+    const { getAppSetting, getUnitSystem } = require('../database');
+    const { LanguageProvider } = require('../i18n');
+    getAppSetting.mockImplementation((key: string, def: string) => (key === 'app_language' ? 'en' : def));
+    getUnitSystem.mockReturnValue('imperial');
+    (getBrewSessions as jest.Mock).mockReturnValue([
+      { ...mockSessions[0], flavorTags: ['peach', 'jasmine'], notes: 'Sweet finish', tasteBalance: 'balanced' },
+    ]);
+    (Share.share as jest.Mock).mockClear();
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <LanguageProvider>
+          <BrewProvider>
+            <JournalScreen />
+          </BrewProvider>
+        </LanguageProvider>
+      );
+    });
+    act(() => {
+      tree.root.findByProps({ testID: 'share-session-btn-sess-1' }).props.onPress();
+    });
+    const { title, message } = (Share.share as jest.Mock).mock.calls[0][0];
+    const text = `${title}\n${message}`;
+    expect(text).not.toMatch(/[ąćęłńóśźż]/i);
+    expect(text).not.toMatch(/\b(Doza|Woda|Czas|Ziarno|Ocena|Balans|Nuty|Notatki|Data|Parz|Notatka| o )\b/);
+    expect(text).toMatch(/Dose: 15g \| Water: 250g \| Temp: 199(\.4)?°F/);
+    expect(text).not.toMatch(/°C/);
+    expect(title).toBe('V60 Hoffmann · Tasting note');
+    getAppSetting.mockImplementation(() => null);
+    getUnitSystem.mockReturnValue('metric');
   });
 });
 
