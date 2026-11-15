@@ -33,7 +33,7 @@ import { InventoryItem, BrewSession, CaffeineLog } from '../src/core/database-sc
 import { theme } from '../src/core/theme';
 import { confirmAction } from '../src/core/confirm';
 import { announce } from '../src/core/announce';
-import { useTranslation } from '../src/core/i18n';
+import { useTranslation, formatTemplate } from '../src/core/i18n';
 import { autoBackup } from '../src/core/backup';
 import { playTimerChime } from '../src/core/timer-audio';
 import { signalHaptic } from '../src/core/signals';
@@ -197,13 +197,13 @@ export default function GongfuScreen() {
 
   const handleFinishAndSaveSession = () => {
     if (session.infusions.length === 0) {
-      Alert.alert(t.gongfu.modeTitle, 'Przeprowadź przynajmniej jedno zalanie przed zapisem sesji.');
+      Alert.alert(t.gongfu.modeTitle, t.gongfu.minOneInfusionMsg);
       return;
     }
 
     confirmAction({
       title: t.gongfu.finishSession,
-      message: `Zapisujesz sesję ${teaName} z ${session.infusions.length} zalaniami (łącznie ~${session.totalCaffeineMg} mg kofeiny).`,
+      message: formatTemplate(t.gongfu.finishSessionMsg, { tea: teaName, count: session.infusions.length, mg: session.totalCaffeineMg }),
       actionText: t.common.save,
       onConfirm: () => {
         // M1-audytor-generalny-008: zła liczba blokuje zapis (DataValidationError → komunikat w runSave), bez 7 g / 96 °C.
@@ -221,11 +221,14 @@ export default function GongfuScreen() {
           waterGrams: session.vesselCapacityMl,
           waterTempCelsius: parseFloat(waterTempCelsius.replace(',', '.')),
           totalTimeSeconds: totalDuration,
-          flavorTags: ['Gongfu Cha', `${session.infusions.length} infuzji`],
+          flavorTags: ['Gongfu Cha', formatTemplate(t.gongfu.infusionCountTag, { count: session.infusions.length })],
           caffeineContentMg: session.totalCaffeineMg,
-          notes: `Sesja Gongfu Cha: ${session.infusions.length} zalań. ${session.infusions
-            .map((inf) => `#${inf.infusionNumber}: ${inf.durationSeconds}s${inf.notes ? ` (${inf.notes})` : ''}`)
-            .join('; ')}`,
+          notes: formatTemplate(t.gongfu.sessionNotes, {
+            count: session.infusions.length,
+            details: session.infusions
+              .map((inf) => `#${inf.infusionNumber}: ${inf.durationSeconds}s${inf.notes ? ` (${inf.notes})` : ''}`)
+              .join('; '),
+          }),
           infusionNumber: session.infusions.length,
           brewedAt: new Date().toISOString(),
         };
@@ -294,6 +297,7 @@ export default function GongfuScreen() {
           waterTempCelsius={waterTempCelsius}
           onChangeWaterTemp={setWaterTempCelsius}
           unitSystem={unitSystem}
+          language={language}
           t={t}
         />
 
@@ -316,6 +320,7 @@ export default function GongfuScreen() {
           session={session}
           nextInfusionNum={nextInfusionNum}
           leafDoseGrams={leafDoseGrams}
+          language={language}
           t={t}
         />
       </ScrollView>

@@ -7,6 +7,7 @@ import {
   diagnoseWaterSensoryImpact,
 } from '../../core/water-chemistry';
 import { theme } from '../../core/theme';
+import { formatTemplate } from '../../core/i18n';
 
 export interface WaterChemistryTabProps {
   language: string;
@@ -139,11 +140,11 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
           ]}
           hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
           accessibilityRole="button"
-          accessibilityLabel="Własny profil (Custom GH / KH)"
+          accessibilityLabel={t.water.customProfile}
           accessibilityState={{ selected: isCustomWater }}
           onPress={() => setIsCustomWater(true)}
         >
-          <Text style={styles.waterRecipeName}>Własny profil (Custom GH / KH)</Text>
+          <Text style={styles.waterRecipeName}>{t.water.customProfile}</Text>
           {isCustomWater && (
             <View style={styles.customWaterInputsRow}>
               <View style={{ flex: 1 }}>
@@ -172,7 +173,7 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
       {/* KARTA METODY A: SYSTEM KONCENTRATÓW BARISTA HUSTLE */}
       <View style={styles.methodCard}>
         <View style={styles.methodHeaderBadge}>
-          <Text style={styles.methodBadgeText}>REKOMENDOWANA METODA A</Text>
+          <Text style={styles.methodBadgeText}>{t.water.recommendedMethodA}</Text>
         </View>
         <Text style={styles.methodTitle}>{t.water.methodAHeader}</Text>
         <Text style={styles.methodDesc}>{t.water.methodADesc}</Text>
@@ -183,7 +184,7 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
             <Text style={styles.concentrateValue}>
               {waterCalc.concentrateBufferGrams} g
             </Text>
-            <Text style={styles.concentrateSub}>KH {waterCalc.targetKhPpm} ppm (bufor)</Text>
+            <Text style={styles.concentrateSub}>{formatTemplate(t.water.concentrateKhSub, { ppm: waterCalc.targetKhPpm })}</Text>
           </View>
 
           <View style={styles.concentrateBox}>
@@ -191,7 +192,7 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
             <Text style={styles.concentrateValue}>
               {waterCalc.concentrateHardnessGrams} g
             </Text>
-            <Text style={styles.concentrateSub}>GH {waterCalc.targetGhPpm} ppm (magnez)</Text>
+            <Text style={styles.concentrateSub}>{formatTemplate(t.water.concentrateGhSub, { ppm: waterCalc.targetGhPpm })}</Text>
           </View>
         </View>
 
@@ -204,7 +205,7 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
       <View style={[styles.methodCard, { marginTop: 12 }]}>
         <Text style={styles.methodTitle}>{t.water.methodBHeader}</Text>
         <Text style={styles.methodDesc}>
-          Ważenie suchych soli prosto do {waterCalc.waterVolumeLiters}L wody:
+          {formatTemplate(t.water.dryMethodDesc, { liters: waterCalc.waterVolumeLiters })}
         </Text>
 
         <View style={styles.drySaltRow}>
@@ -218,7 +219,7 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
         </View>
 
         <View style={styles.drySaltRow}>
-          <Text style={styles.drySaltName}>{t.water.dryCalcium} (opcja)</Text>
+          <Text style={styles.drySaltName}>{formatTemplate(t.water.optionalSalt, { name: t.water.dryCalcium })}</Text>
           <Text style={styles.drySaltAmount}>{waterCalc.dryCalciumChlorideCaCl2Grams} g</Text>
         </View>
       </View>

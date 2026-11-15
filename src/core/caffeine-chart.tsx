@@ -17,6 +17,7 @@ import Svg, {
 import { CaffeineLog } from './database-schema';
 import { calculateRemainingCaffeineMg, DEFAULT_CAFFEINE_HALF_LIFE_H } from './domain-rules';
 import { theme } from './theme';
+import { useTranslation, formatTemplate } from './i18n';
 
 interface CaffeineChartProps {
   logs: CaffeineLog[];
@@ -29,6 +30,7 @@ export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
   bedtimeHour,
   halfLifeHours = DEFAULT_CAFFEINE_HALF_LIFE_H,
 }) => {
+  const { t } = useTranslation();
   const screenWidth = Dimensions.get('window').width;
   const chartWidth = Math.max(280, screenWidth - 64);
   const chartHeight = 150;
@@ -115,8 +117,8 @@ export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
   return (
     <View style={styles.chartContainer}>
       <View style={styles.headerRow}>
-        <Text style={styles.chartTitle}>Krzywa Stężenia Kofeiny (24h)</Text>
-        <Text style={styles.chartSub}>{`Model t₁/₂ = ${halfLifeHours.toFixed(1)} h`}</Text>
+        <Text style={styles.chartTitle}>{t.caffeine.chartTitle}</Text>
+        <Text style={styles.chartSub}>{formatTemplate(t.caffeine.chartHalfLifeModel, { hours: halfLifeHours.toFixed(1) })}</Text>
       </View>
 
       <Svg width={chartWidth} height={chartHeight}>
@@ -156,7 +158,7 @@ export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
               fontSize="9"
               fontWeight="700"
             >
-              {`Sen (${bedtimeHour}:00)`}
+              {formatTemplate(t.caffeine.chartBedtimeMarker, { hour: bedtimeHour })}
             </SvgText>
           </>
         )}

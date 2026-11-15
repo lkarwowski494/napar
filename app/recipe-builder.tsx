@@ -22,7 +22,7 @@ import { calculateBrewRatio } from '../src/core/domain-rules';
 import { theme } from '../src/core/theme';
 import { confirmAction } from '../src/core/confirm';
 import { announce } from '../src/core/announce';
-import { useTranslation } from '../src/core/i18n';
+import { useTranslation, formatTemplate } from '../src/core/i18n';
 import { RecipeBasicInfoCard } from '../src/components/recipe-builder/RecipeBasicInfoCard';
 import { RecipeParamsCard } from '../src/components/recipe-builder/RecipeParamsCard';
 import { RecipeStepEditor } from '../src/components/recipe-builder/RecipeStepEditor';
@@ -121,7 +121,7 @@ export default function RecipeBuilderScreen() {
     };
 
     setSteps([...steps, newStep]);
-    announce(`Dodano krok ${nextNumber}`);
+    announce(formatTemplate(t.recipeBuilder.stepAddedAnnounce, { number: nextNumber }));
   };
 
   const handleRemoveStep = (index: number) => {
@@ -137,7 +137,7 @@ export default function RecipeBuilderScreen() {
         namePl: s.namePl.startsWith('Zalanie') ? `Zalanie ${idx + 1}` : s.namePl,
       }));
     setSteps(filtered);
-    announce(`Usunięto krok`);
+    announce(t.recipeBuilder.stepRemovedAnnounce);
   };
 
   const handleUpdateStep = (
@@ -233,7 +233,7 @@ export default function RecipeBuilderScreen() {
     if (!existing) return;
     const cloned = duplicateRecipe(existing);
     announce(t.recipeBuilder.duplicateBtn);
-    Alert.alert('Zduplikowano', `Utworzono kopię: "${cloned.name}"`);
+    Alert.alert(t.recipeBuilder.duplicatedTitle, formatTemplate(t.recipeBuilder.duplicatedMsg, { name: cloned.name }));
     router.back();
   };
 

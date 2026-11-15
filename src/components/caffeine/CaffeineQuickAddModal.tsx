@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
 import { formatDoseWeight } from '../../core/unit-converter';
 import { estimateCoffeeCaffeineMg } from '../../core/domain-rules';
 import { theme } from '../../core/theme';
+import { translations } from '../../core/i18n';
 
 interface CaffeineQuickAddModalProps {
   visible: boolean;
@@ -28,6 +29,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
     return null;
   }
   const isEn = language === 'en';
+  const tc = (isEn ? translations.en : translations.pl).caffeine;
 
   return (
     <Modal visible={visible} animationType="fade" transparent={true}>
@@ -52,7 +54,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
                   accessibilityLabel={isEn ? 'Filter / Drip (V60, Chemex)' : 'Przelew / Drip (V60, Chemex)'}
                   onPress={() => onSelectOption(isEn ? 'Filter Coffee (V60 / Drip)' : 'Kawa przelewowa (V60 / Drip)', 'coffee', 18, v60Mg)}
                 >
-                  <Text style={styles.quickOptionName}>Przelew / Drip (V60, Chemex)</Text>
+                  <Text style={styles.quickOptionName}>{tc.quickFilterLabel}</Text>
                   <Text style={styles.quickOptionMg}>~{v60Mg} mg ({formatDoseWeight(18, unitSystem)})</Text>
                 </Pressable>
 
@@ -64,7 +66,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
                   accessibilityLabel={isEn ? 'Double Espresso (Doppio)' : 'Podwójne Espresso (Doppio)'}
                   onPress={() => onSelectOption(isEn ? 'Double Espresso' : 'Podwójne Espresso', 'coffee', 18, doubleEspressoMg)}
                 >
-                  <Text style={styles.quickOptionName}>Podwójne Espresso (Doppio)</Text>
+                  <Text style={styles.quickOptionName}>{tc.quickDoubleEspressoLabel}</Text>
                   <Text style={styles.quickOptionMg}>~{doubleEspressoMg} mg ({formatDoseWeight(18, unitSystem)})</Text>
                 </Pressable>
 
@@ -76,7 +78,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
                   accessibilityLabel={isEn ? 'Single Espresso' : 'Pojedyncze Espresso'}
                   onPress={() => onSelectOption(isEn ? 'Single Espresso' : 'Pojedyncze Espresso', 'coffee', 9, singleEspressoMg)}
                 >
-                  <Text style={styles.quickOptionName}>Pojedyncze Espresso</Text>
+                  <Text style={styles.quickOptionName}>{tc.quickSingleEspressoLabel}</Text>
                   <Text style={styles.quickOptionMg}>~{singleEspressoMg} mg ({formatDoseWeight(9, unitSystem)})</Text>
                 </Pressable>
 
@@ -104,7 +106,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
             // 45 mg / 5 g [T:HERBATA-SZYBKIE-45MG] (otwarte; Gongfu liczy 60 mg dla 1. zalania — do ujednolicenia po źródle)
             onPress={() => onSelectOption(isEn ? 'Artisan Loose Tea' : 'Herbata Gongfu / Liściasta', 'tea', 5, 45)}
           >
-            <Text style={styles.quickOptionName}>Herbata liściasta (infuzja)</Text>
+            <Text style={styles.quickOptionName}>{tc.quickLooseTeaLabel}</Text>
             <Text style={styles.quickOptionMg}>~45 mg ({formatDoseWeight(5, unitSystem)})</Text>
           </Pressable>
 

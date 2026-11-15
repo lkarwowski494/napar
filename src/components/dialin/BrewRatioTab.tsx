@@ -7,6 +7,7 @@ import {
 } from '../../core/domain-rules';
 import { formatDoseWeight, formatWaterWeight } from '../../core/unit-converter';
 import { theme } from '../../core/theme';
+import { formatTemplate } from '../../core/i18n';
 import { GrinderConverterCard } from './GrinderConverterCard';
 
 export interface BrewRatioTabProps {
@@ -193,7 +194,7 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
               key={item.r}
               testID={`ratio-chip-${item.r}`}
               accessibilityRole="button"
-              accessibilityLabel={`Proporcja ${item.label}`}
+              accessibilityLabel={formatTemplate(t.dialin.ratioChipA11y, { ratio: item.label })}
               accessibilityState={{ selected: ratioVal === item.r }}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               style={[

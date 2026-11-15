@@ -72,7 +72,7 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
             <Text style={styles.inputTitle}>
               {methodMode === 'pourover'
                 ? t.dialin?.eyWaterInput || 'Woda zalana (g)'
-                : 'Uzysk espresso / Yield (g)'}
+                : t.dialin.eyEspressoYieldInput}
             </Text>
             <TextInput
               style={styles.calcInput}
@@ -110,7 +110,7 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
 
         {eyResult && (
           <View style={styles.eyResultBox}>
-            <Text style={styles.resultLabel}>WYDAJNOŚĆ EKSTRAKCJI (EY)</Text>
+            <Text style={styles.resultLabel}>{t.dialin.eyResultLabel}</Text>
             <Text style={styles.eyLargeNumber}>
               {eyResult.extractionYieldPercent}%
             </Text>
@@ -128,10 +128,10 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
               >
                 <Text style={styles.eyRatingText}>
                   {eyResult.rating === 'ideal'
-                    ? 'Złote Okno SCA (Idealna ekstrakcja)'
+                    ? t.dialin.eyRatingIdeal
                     : eyResult.rating === 'under'
-                    ? 'Niedoparzenie (< 18%)'
-                    : 'Przeparzenie (> 22%)'}
+                    ? t.dialin.eyRatingUnder
+                    : t.dialin.eyRatingOver}
                 </Text>
               </View>
 

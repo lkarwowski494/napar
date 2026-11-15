@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Field, NumInput } from '../ui';
 import { theme } from '../../core/theme';
+import { formatTemplate, translations } from '../../core/i18n';
 import { formatTemperature, formatDoseWeight, formatWaterWeight, gramsToOunces, mlToFluidOunces, celsiusToFahrenheit } from '../../core/unit-converter';
 
 interface RecipeParamsCardProps {
@@ -140,7 +141,7 @@ export const RecipeParamsCard: React.FC<RecipeParamsCardProps> = ({
       <View
         style={styles.ratioBadge}
         accessibilityRole="summary"
-        accessibilityLabel={`${calculatedRatio}: 1 do ${safeRatio}`}
+        accessibilityLabel={formatTemplate((t?.recipeBuilder ?? translations.pl.recipeBuilder).ratioBadgeA11y, { ratio: calculatedRatio, safe: safeRatio })}
         testID="recipe-ratio-badge"
       >
         <Text style={styles.ratioBadgeText}>

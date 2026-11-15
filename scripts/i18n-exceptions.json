@@ -1,0 +1,151 @@
+{
+  "_opis": "Wyjątki skanu tekstów w scripts/check-i18n.mjs (M1-audytor-generalny-033). Każdy wpis ma powód. tokeny: nazwy własne, jednostki i skróty usuwane z tekstu przed sprawdzeniem, czy zostały litery (całe słowa). teksty: dokładny tekst w pliku, który zostaje poza słownikiem. pliki: pliki poza skanem.",
+  "komentarze": "Komentarze w kodzie nie są tekstem interfejsu: parser AST (@babel/core) ich nie zwraca, więc nie wymagają wpisów.",
+  "pliki": [
+    {
+      "plik": "src/core/i18n.tsx",
+      "powod": "słownik translations.pl / translations.en — źródło tekstów, sprawdzane symetrią kluczy"
+    }
+  ],
+  "tokeny": [
+    {
+      "token": "g",
+      "powod": "jednostka masy (gram), ta sama w PL i EN"
+    },
+    {
+      "token": "mg",
+      "powod": "jednostka masy (miligram)"
+    },
+    {
+      "token": "s",
+      "powod": "jednostka czasu (sekunda), symbol SI"
+    },
+    {
+      "token": "min",
+      "powod": "jednostka czasu (minuta), symbol"
+    },
+    {
+      "token": "h",
+      "powod": "jednostka czasu (godzina), symbol SI"
+    },
+    {
+      "token": "L",
+      "powod": "jednostka objętości (litr), symbol SI"
+    },
+    {
+      "token": "µm",
+      "powod": "jednostka długości (mikrometr), symbol SI"
+    },
+    {
+      "token": "ppm",
+      "powod": "jednostka stężenia (części na milion)"
+    },
+    {
+      "token": "°C",
+      "powod": "jednostka temperatury (034: tryb imperialny poza zakresem)"
+    },
+    {
+      "token": "CaCO₃",
+      "powod": "wzór chemiczny (węglan wapnia)"
+    },
+    {
+      "token": "GH",
+      "powod": "skrót twardości ogólnej wody (general hardness), branżowy w PL i EN"
+    },
+    {
+      "token": "KH",
+      "powod": "skrót twardości węglanowej (carbonate hardness), branżowy w PL i EN"
+    },
+    {
+      "token": "TDS",
+      "powod": "skrót Total Dissolved Solids, branżowy w PL i EN"
+    },
+    {
+      "token": "EY",
+      "powod": "skrót Extraction Yield, branżowy w PL i EN"
+    },
+    {
+      "token": "QR",
+      "powod": "nazwa standardu kodu QR"
+    },
+    {
+      "token": "CSV",
+      "powod": "nazwa formatu pliku"
+    },
+    {
+      "token": "JSON",
+      "powod": "nazwa formatu pliku"
+    },
+    {
+      "token": "ics",
+      "powod": "rozszerzenie pliku kalendarza (.ics)"
+    },
+    {
+      "token": "AeroPress",
+      "powod": "nazwa własna metody / urządzenia"
+    },
+    {
+      "token": "V60",
+      "powod": "nazwa własna metody / drippera"
+    },
+    {
+      "token": "Chemex",
+      "powod": "nazwa własna metody / urządzenia"
+    },
+    {
+      "token": "Napar",
+      "powod": "nazwa aplikacji (11-wzrost-007)"
+    },
+    {
+      "token": "Apps4Brew",
+      "powod": "nazwa własna studia"
+    },
+    {
+      "token": "oz",
+      "powod": "jednostka masy w trybie imperialnym (uncja)"
+    },
+    {
+      "token": "fl oz",
+      "powod": "jednostka objętości w trybie imperialnym (uncja płynu)"
+    },
+    {
+      "token": "ml",
+      "powod": "jednostka objętości (mililitr)"
+    },
+    {
+      "token": "°F",
+      "powod": "jednostka temperatury w trybie imperialnym"
+    },
+    {
+      "token": "YYYY-MM-DD",
+      "powod": "maska formatu daty ISO 8601 w polu wpisu (format, nie tekst; format dat to 034)"
+    }
+  ],
+  "teksty": [
+    {
+      "plik": "app/settings.tsx",
+      "tekst": "1.0.0 (Build 1)",
+      "powod": "numer wersji i kompilacji (liczby, nie tekst; źródło wersji poza zakresem 033)"
+    },
+    {
+      "plik": "app/settings.tsx",
+      "tekst": "Apps4Brew Specialty Portfolio",
+      "powod": "nazwa własna portfolio studia, ta sama w PL i EN"
+    },
+    {
+      "plik": "src/components/settings/AppPreferencesCard.tsx",
+      "tekst": "Polski (Napar)",
+      "powod": "nazwa języka we własnym języku (endonim) — ta sama w interfejsie PL i EN, by użytkownik znalazł swój język"
+    },
+    {
+      "plik": "src/components/settings/AppPreferencesCard.tsx",
+      "tekst": "English (Napar)",
+      "powod": "nazwa języka we własnym języku (endonim) — ta sama w interfejsie PL i EN"
+    },
+    {
+      "plik": "src/components/settings/JsonBackupModals.tsx",
+      "tekst": "{\"version\": 1, ...}",
+      "powod": "przykład formatu JSON w polu wklejania (składnia pliku, nie tekst interfejsu)"
+    }
+  ]
+}

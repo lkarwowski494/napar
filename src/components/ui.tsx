@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { theme } from '../core/theme';
+import { useTranslation } from '../core/i18n';
 import { NumInput, NumInputProps } from './ui/NumInput';
 
 export { NumInput, NumInputProps };
@@ -104,11 +105,15 @@ export interface MissingProps {
 }
 
 export const Missing: React.FC<MissingProps> = ({
-  title = 'Nie znaleziono rekordu',
-  message = 'Wybrany element nie istnieje lub został wcześniej usunięty.',
-  backLabel = 'Wróć',
+  title: titleProp,
+  message: messageProp,
+  backLabel: backLabelProp,
   onBack,
 }) => {
+  const { t } = useTranslation();
+  const title = titleProp ?? t.common.missingTitle;
+  const message = messageProp ?? t.common.missingMessage;
+  const backLabel = backLabelProp ?? t.common.goBack;
   const router = useRouter();
 
   const handleBack = () => {
@@ -225,11 +230,13 @@ export interface SearchFieldProps {
 export const SearchField: React.FC<SearchFieldProps> = ({
   value,
   onChangeText,
-  placeholder = 'Szukaj...',
+  placeholder: placeholderProp,
   onClear,
   style,
   testID = 'search-field',
 }) => {
+  const { t } = useTranslation();
+  const placeholder = placeholderProp ?? t.common.searchPlaceholder;
   const handleClear = () => {
     onChangeText('');
     if (onClear) onClear();
@@ -255,7 +262,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({
           style={styles.searchClearBtn}
           onPress={handleClear}
           accessibilityRole="button"
-          accessibilityLabel="Wyczyść wyszukiwanie"
+          accessibilityLabel={t.brew.clearSearch}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <Text style={styles.searchClearText}>×</Text>
@@ -278,9 +285,11 @@ export interface SwipeRowProps {
 export const SwipeRow: React.FC<SwipeRowProps> = ({
   children,
   onDelete,
-  deleteLabel = 'Usuń',
+  deleteLabel: deleteLabelProp,
   style,
 }) => {
+  const { t } = useTranslation();
+  const deleteLabel = deleteLabelProp ?? t.common.delete;
   return (
     <View
       style={[styles.swipeRowContainer, style]}

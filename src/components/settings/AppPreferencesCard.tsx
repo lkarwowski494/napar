@@ -62,7 +62,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
           accessibilityRole="radio"
           accessibilityState={{ selected: language === 'pl' }}
           accessibilityLabel="Polski (Napar)"
-          accessibilityHint="Ustawia język interfejsu na polski"
+          accessibilityHint={t.settings.languagePlHint}
         >
           <Text style={[styles.langTabText, language === 'pl' && styles.langTabTextActive]}>
             Polski (Napar)
@@ -74,7 +74,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
           accessibilityRole="radio"
           accessibilityState={{ selected: language === 'en' }}
           accessibilityLabel="English (Napar)"
-          accessibilityHint="Sets interface language to English"
+          accessibilityHint={t.settings.languageEnHint}
         >
           <Text style={[styles.langTabText, language === 'en' && styles.langTabTextActive]}>
             English (Napar)
@@ -170,7 +170,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
           accessibilityRole="radio"
           accessibilityState={{ selected: unitSystem === 'metric' }}
           accessibilityLabel={t.settings.unitMetric}
-          accessibilityHint="Ustawia jednostki metryczne (gramy, mililitry, stopnie Celsjusza)"
+          accessibilityHint={t.settings.unitsMetricHint}
         >
           <Text style={[styles.langTabText, unitSystem === 'metric' && styles.langTabTextActive]}>
             {t.settings.unitMetric}
@@ -183,7 +183,7 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
           accessibilityRole="radio"
           accessibilityState={{ selected: unitSystem === 'imperial' }}
           accessibilityLabel={t.settings.unitImperial}
-          accessibilityHint="Sets imperial units (ounces, fluid ounces, degrees Fahrenheit)"
+          accessibilityHint={t.settings.unitsImperialHint}
         >
           <Text style={[styles.langTabText, unitSystem === 'imperial' && styles.langTabTextActive]}>
             {t.settings.unitImperial}
@@ -274,8 +274,8 @@ export const AppPreferencesCard: React.FC<AppPreferencesCardProps> = ({
 
       {/* Karta Filozofii Apps4Brew */}
       <View style={styles.manifestoCard}>
-        <Text style={styles.manifestoBadge}>FILOZOFIA APPS4BREW</Text>
-        <Text style={styles.manifestoTitle}>Prywatność i Rzemiosło</Text>
+        <Text style={styles.manifestoBadge}>{t.settings.manifestoBadge}</Text>
+        <Text style={styles.manifestoTitle}>{t.settings.manifestoTitle}</Text>
         <Text style={styles.manifestoBody}>
           {language === 'pl'
             ? 'Napar nie wymaga logowania, nie łączy się z żadnym zewnętrznym serwerem i nie zbiera Twoich danych (etykieta „Data Not Collected”). Cała spiżarnia, dziennik i kalkulatory działają w 100% lokalnie na Twoim urządzeniu.'

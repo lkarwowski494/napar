@@ -231,6 +231,7 @@ export default function CaffeineScreen() {
       <CaffeineQuickAddModal
         visible={showQuickAddModal}
         unitSystem={unitSystem}
+        language={language}
         onClose={() => setShowQuickAddModal(false)}
         onSelectOption={handleQuickAdd}
       />

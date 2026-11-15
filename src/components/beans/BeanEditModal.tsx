@@ -149,12 +149,12 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
   const handleDeleteItem = () => {
     if (!item) return;
     Alert.alert(
-      'Usunąć paczkę?',
-      `Czy na pewno chcesz bezpowrotnie usunąć "${item.name}" ze spiżarni?`,
+      t.stash.deletePackConfirmTitle,
+      formatTemplate(t.stash.deletePackNamedMsg, { name: item.name }),
       [
-        { text: 'Anuluj', style: 'cancel' },
+        { text: t.common.cancel, style: 'cancel' },
         {
-          text: 'Usuń',
+          text: t.common.delete,
           style: 'destructive',
           onPress: () => {
             if (!runSave(() => deleteInventoryItem(item.id), t.common)) return;
@@ -172,16 +172,16 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
         <View style={styles.modalHeader}>
           <View style={{ flex: 1 }}>
             <Text style={styles.modalTitle}>{t.stash?.editTitle || 'Edytuj Paczkę'}</Text>
-            <Text style={styles.modalHeaderSub}>Koryguj wagę, parametry lub zarchiwizuj</Text>
+            <Text style={styles.modalHeaderSub}>{t.stash.editSubtitle}</Text>
           </View>
           <Pressable
             style={styles.modalCloseBtn}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             onPress={onClose}
             accessibilityRole="button"
-            accessibilityLabel="Anuluj"
+            accessibilityLabel={t.common.cancel}
           >
-            <Text style={styles.modalCloseText}>Anuluj</Text>
+            <Text style={styles.modalCloseText}>{t.common.cancel}</Text>
           </Pressable>
         </View>
 
@@ -218,7 +218,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           <TextInput
             testID="bean-edit-name-input"
             style={styles.textInput}
-            placeholder="np. Etiopia Yirgacheffe Washed"
+            placeholder={t.stash.namePlaceholder}
             placeholderTextColor={theme.colors.textMuted}
             value={editName}
             onChangeText={setEditName}
@@ -229,7 +229,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           <TextInput
             testID="bean-edit-roaster-input"
             style={styles.textInput}
-            placeholder="np. Hard Beans, Coffeedesk, Wuyi Star"
+            placeholder={t.stash.roasterPlaceholder}
             placeholderTextColor={theme.colors.textMuted}
             value={editRoaster}
             onChangeText={setEditRoaster}
@@ -240,7 +240,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           <TextInput
             testID="bean-edit-origin-input"
             style={styles.textInput}
-            placeholder="np. Yirgacheffe, Etiopia"
+            placeholder={t.stash.originPlaceholder}
             placeholderTextColor={theme.colors.textMuted}
             value={editOrigin}
             onChangeText={setEditOrigin}
@@ -253,7 +253,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
               <TextInput
                 testID="bean-edit-variety-input"
                 style={styles.textInput}
-                placeholder="np. Geisha, SL28, Bourbon"
+                placeholder={t.stash.varietyPlaceholder}
                 placeholderTextColor={theme.colors.textMuted}
                 value={editVariety}
                 onChangeText={setEditVariety}
@@ -265,7 +265,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
               <TextInput
                 testID="bean-edit-process-input"
                 style={styles.textInput}
-                placeholder="np. Washed, Natural, Honey"
+                placeholder={t.stash.processPlaceholder}
                 placeholderTextColor={theme.colors.textMuted}
                 value={editProcess}
                 onChangeText={setEditProcess}
@@ -288,7 +288,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
               />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.inputLabel}>{isImperial ? 'Waga początkowa (oz)' : 'Waga początkowa (g)'}</Text>
+              <Text style={styles.inputLabel}>{isImperial ? t.stash.initialWeightImperial : t.stash.initialWeightMetric}</Text>
               <TextInput
                 testID="bean-edit-initial-weight-input"
                 style={styles.textInput}
@@ -304,11 +304,11 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
 
           {/* Pozostała waga z szybkimi przyciskami korekty (BR-MAG-004) */}
           <View style={styles.weightEditSection}>
-            <Text style={styles.inputLabel}>{isImperial ? 'Pozostała waga w paczce (oz) *' : 'Pozostała waga w paczce (g) *'}</Text>
+            <Text style={styles.inputLabel}>{isImperial ? t.stash.remainingWeightImperial : t.stash.remainingWeightMetric}</Text>
             <TextInput
               testID="bean-edit-remaining-weight-input"
               style={styles.textInput}
-              placeholder={isImperial ? '6.3' : 'np. 180'}
+              placeholder={isImperial ? '6.3' : t.stash.remainingWeightPlaceholder}
               placeholderTextColor={theme.colors.textMuted}
               keyboardType="numeric"
               value={editRemainingWeight}
@@ -358,7 +358,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           <TextInput
             testID="bean-edit-notes-input"
             style={styles.textInput}
-            placeholder="np. jaśmin, brzoskwinia, bergamotka"
+            placeholder={t.stash.notesPlaceholder}
             placeholderTextColor={theme.colors.textMuted}
             value={editNotesStr}
             onChangeText={setEditNotesStr}
@@ -366,7 +366,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           />
 
           {/* Ocena paczki */}
-          <Text style={styles.inputLabel}>Ocena paczki (1-5)</Text>
+          <Text style={styles.inputLabel}>{t.stash.packRatingLabel}</Text>
           <View style={styles.starRow}>
             {[1, 2, 3, 4, 5].map((star) => (
               <Pressable
@@ -412,9 +412,9 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             style={styles.deletePackBtn}
             onPress={handleDeleteItem}
             accessibilityRole="button"
-            accessibilityLabel="Usuń paczkę ze spiżarni"
+            accessibilityLabel={t.stash.deletePackFromStash}
           >
-            <Text style={styles.deletePackText}>Usuń paczkę ze spiżarni</Text>
+            <Text style={styles.deletePackText}>{t.stash.deletePackFromStash}</Text>
           </Pressable>
         </ScrollView>
       </SafeAreaView>

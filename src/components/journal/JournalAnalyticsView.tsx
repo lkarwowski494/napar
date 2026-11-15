@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '../../core/theme';
+import { formatTemplate } from '../../core/i18n';
 import { SensoryRadarChart, SensoryProfile } from '../../core/radar-chart';
 import { StarIcon, BrewIcon, DropletIcon, LightningIcon } from '../icons/CraftIcons';
 
@@ -56,7 +57,7 @@ export function JournalAnalyticsView({ analyticsData, t }: JournalAnalyticsViewP
       <View style={styles.analyticsSection}>
         <Text style={styles.analyticsSectionTitle}>{t.journal.methodDistributionTitle}</Text>
         {analyticsData.methodsList.length === 0 ? (
-          <Text style={styles.analyticsEmptyText}>Brak zarejestrowanych sesji</Text>
+          <Text style={styles.analyticsEmptyText}>{t.journal.analyticsEmpty}</Text>
         ) : (
           analyticsData.methodsList.map((m) => (
             <View key={m.method} style={styles.methodBarRow}>
@@ -79,8 +80,8 @@ export function JournalAnalyticsView({ analyticsData, t }: JournalAnalyticsViewP
         <Text style={styles.analyticsSectionTitle}>{t.journal.sensoryAverageTitle}</Text>
         <Text style={styles.analyticsSectionSub}>
           {analyticsData.sensoryCount > 0
-            ? `${t.journal.sensoryAverageDesc} (${analyticsData.sensoryCount} sesji)`
-            : 'Brak sesji z zanotowanym profilem sensorycznym'}
+            ? formatTemplate(t.journal.sensorySessionCount, { desc: t.journal.sensoryAverageDesc, count: analyticsData.sensoryCount })
+            : t.journal.sensoryNoProfile}
         </Text>
 
         {analyticsData.avgSensory && (
@@ -88,19 +89,19 @@ export function JournalAnalyticsView({ analyticsData, t }: JournalAnalyticsViewP
             <SensoryRadarChart profile={analyticsData.avgSensory} size={220} />
             <View style={styles.sensoryScoresSummary}>
               <Text style={styles.sensoryScorePill}>
-                {`Kwasowość: ${analyticsData.avgSensory.acidity}`}
+                {`${t.sensory.acidity}: ${analyticsData.avgSensory.acidity}`}
               </Text>
               <Text style={styles.sensoryScorePill}>
-                {`Słodycz: ${analyticsData.avgSensory.sweetness}`}
+                {`${t.sensory.sweetness}: ${analyticsData.avgSensory.sweetness}`}
               </Text>
               <Text style={styles.sensoryScorePill}>
-                {`Ciało: ${analyticsData.avgSensory.body}`}
+                {`${t.sensory.body}: ${analyticsData.avgSensory.body}`}
               </Text>
               <Text style={styles.sensoryScorePill}>
-                {`Czystość: ${analyticsData.avgSensory.clarity}`}
+                {`${t.sensory.clarity}: ${analyticsData.avgSensory.clarity}`}
               </Text>
               <Text style={styles.sensoryScorePill}>
-                {`Finisz: ${analyticsData.avgSensory.finish}`}
+                {`${t.sensory.finish}: ${analyticsData.avgSensory.finish}`}
               </Text>
             </View>
           </View>
@@ -129,15 +130,15 @@ export function JournalAnalyticsView({ analyticsData, t }: JournalAnalyticsViewP
         <View style={styles.balanceGrid}>
           <View style={styles.balanceItem}>
             <Text style={styles.balanceCount}>{analyticsData.balanceCounts.balanced || 0}</Text>
-            <Text style={styles.balanceLabel}>Zbalansowana</Text>
+            <Text style={styles.balanceLabel}>{t.brew.tasteBalanced}</Text>
           </View>
           <View style={styles.balanceItem}>
             <Text style={styles.balanceCount}>{analyticsData.balanceCounts.sour || 0}</Text>
-            <Text style={styles.balanceLabel}>Kwaśna</Text>
+            <Text style={styles.balanceLabel}>{t.journal.balanceSour}</Text>
           </View>
           <View style={styles.balanceItem}>
             <Text style={styles.balanceCount}>{analyticsData.balanceCounts.bitter || 0}</Text>
-            <Text style={styles.balanceLabel}>Gorzka</Text>
+            <Text style={styles.balanceLabel}>{t.journal.balanceBitter}</Text>
           </View>
         </View>
       </View>

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
+import { formatTemplate } from '../../core/i18n';
 import { decodeRecipeFromShareUrl } from '../../core/recipe-share';
 import { saveRecipe } from '../../core/database';
 import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../core/unit-converter';
@@ -41,9 +42,9 @@ export const ImportRecipeModal: React.FC<ImportRecipeModalProps> = ({
       setImportUrlInput('');
       setImportParsedRecipe(null);
       onClose();
-      Alert.alert('Sukces!', t.brew.importSuccess);
+      Alert.alert(t.brew.importSuccessTitle, t.brew.importSuccess);
     } catch {
-      Alert.alert('Błąd', t.brew.importError);
+      Alert.alert(t.common.error, t.brew.importError);
     }
   };
 
@@ -91,7 +92,7 @@ export const ImportRecipeModal: React.FC<ImportRecipeModalProps> = ({
                 {formatTemperature(importParsedRecipe.recipe.waterTempCelsius, unitSystem)}
               </Text>
               <Text style={styles.importPreviewStepsCount}>
-                Liczba kroków parzenia: {importParsedRecipe.originalSteps.length}
+                {formatTemplate(t.brew.importStepCount, { count: importParsedRecipe.originalSteps.length })}
               </Text>
               <Pressable
                 style={styles.confirmImportBtn}

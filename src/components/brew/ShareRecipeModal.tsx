@@ -85,7 +85,7 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
               style={styles.shareActionBtn}
               accessibilityRole="button"
               accessibilityLabel={t.brew.qrShareLink}
-              accessibilityHint="Otwiera arkusz udostępniania linku do receptury w komunikatorach lub poczcie"
+              accessibilityHint={t.brew.qrShareLinkHint}
               onPress={() => {
                 Share.share({
                   title: recipe.name,
@@ -106,7 +106,7 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
               style={[styles.shareActionBtn, styles.shareActionBtnSecondary]}
               accessibilityRole="button"
               accessibilityLabel={t.brew.qrCopyLink}
-              accessibilityHint="Kopiuje link receptury do schowka systemowego"
+              accessibilityHint={t.brew.qrCopyLinkHint}
               onPress={() => {
                 Alert.alert(t.brew?.qrCopied || 'Link receptury', shareUrl);
               }}

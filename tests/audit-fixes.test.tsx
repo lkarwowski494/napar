@@ -1540,3 +1540,218 @@ describe('M1-audytor-generalny-032: deklarowane języki = słowniki ładowane pr
     expect(register).toMatch(/DEC-03/);
   });
 });
+
+// ============================================================================
+// M1-audytor-generalny-033 · 09-lokalizacja-001, -002, -006, -007, -008, 04-studio-projektowe-010,
+// 08-programista-009: przy języku EN główne ekrany, zapowiedzi i udostępnianie bez polskich tekstów;
+// check:i18n czerwieni się na tekście poza słownikiem.
+// ============================================================================
+describe('M1-audytor-generalny-033: interfejs EN bez polskich tekstów; kontrola tekstów poza słownikiem', () => {
+  const { execFileSync } = jest.requireActual('child_process') as typeof import('child_process');
+  const db = require('../src/core/database');
+  const { LanguageProvider, pluralPl } = require('../src/core/i18n');
+  const PL_DIACRITICS = /[ąćęłńóśźż]/i;
+  const PL_WORDS = /\b(RECEPTURA|SPIŻARNIA|MŁYNEK|UDOSTĘPNIJ|Kawa|Herbata|Trwa|Cel:|Dodaj|Brak|Kod QR|PARZENIE|Wybierz|Domyślna)\b/;
+
+  /** Teksty widoczne i czytane przez VoiceOver: dzieci tekstowe + accessibilityLabel/Hint + placeholder. */
+  const spoken = (tree: renderer.ReactTestRenderer): string[] => {
+    const out: string[] = [];
+    const walk = (n: unknown): void => {
+      if (n == null) return;
+      if (typeof n === 'string') {
+        out.push(n);
+        return;
+      }
+      if (Array.isArray(n)) {
+        n.forEach(walk);
+        return;
+      }
+      const node = n as { props?: Record<string, unknown>; children?: unknown[] };
+      for (const k of ['accessibilityLabel', 'accessibilityHint', 'placeholder', 'title']) {
+        if (typeof node.props?.[k] === 'string') out.push(node.props[k] as string);
+      }
+      (node.children ?? []).forEach(walk);
+    };
+    walk(tree.toJSON());
+    return out;
+  };
+  const polishIn = (tree: renderer.ReactTestRenderer) =>
+    spoken(tree).filter((s) => PL_DIACRITICS.test(s) || PL_WORDS.test(s));
+  const realGetAppSetting = db.getAppSetting;
+  const renderEn = (el: React.ReactElement): renderer.ReactTestRenderer => {
+    // Język interfejsu EN (wybór w Ustawieniach), jak LanguageProvider czyta go z bazy.
+    jest.spyOn(db, 'getAppSetting').mockImplementation((...args: unknown[]) =>
+      args[0] === 'app_language' ? 'en' : realGetAppSetting(...args),
+    );
+    let tree: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(<LanguageProvider>{el}</LanguageProvider>);
+    });
+    return tree!;
+  };
+  afterEach(() => {
+    (db.getAppSetting as jest.Mock).mockRestore?.();
+  });
+
+  const item = {
+    id: 'bean-033',
+    name: 'Ethiopia Guji',
+    type: 'coffee' as const,
+    roasterOrProducer: 'Roaster',
+    origin: 'Ethiopia',
+    roastOrHarvestDate: '2026-11-01',
+    roastProfile: 'light',
+    process: 'washed',
+    variety: 'Heirloom',
+    initialWeightGrams: 250,
+    remainingWeightGrams: 180,
+    flavorNotes: ['peach'],
+    rating: 4,
+    isFavorite: false,
+    isArchived: false,
+    createdAt: '2026-11-01T10:00:00Z',
+    updatedAt: '2026-11-01T10:00:00Z',
+  };
+
+  test('09-lokalizacja-001 / 04-studio-projektowe-010: BrewHeader w EN (kawa i herbata) bez polskich tekstów', () => {
+    const { BrewHeader } = require('../src/components/brew/BrewHeader');
+    const { MASTER_RECIPES } = require('../src/core/recipes-data');
+    const coffee = MASTER_RECIPES.find((r: { type: string }) => r.type === 'COFFEE');
+    const tea = MASTER_RECIPES.find((r: { type: string }) => r.type === 'TEA');
+    const noop = () => {};
+    for (const [recipe, inv] of [[coffee, item], [tea, null], [coffee, null]] as const) {
+      const tree = renderEn(
+        <BrewHeader
+          recipe={recipe}
+          selectedInventoryItem={inv}
+          waterTempCelsius={93}
+          grinderRecommendation={{ grinderName: 'Comandante C40', formatted: '24 clicks' }}
+          favoriteRecipes={[coffee]}
+          beverageType={recipe.type}
+          onBeverageTypeChange={noop}
+          onSelectRecipe={noop}
+          onOpenRecipeModal={noop}
+          onOpenInventoryModal={noop}
+          onOpenGrinderModal={noop}
+          onOpenShareModal={noop}
+          onNavigateToGongfu={noop}
+        />,
+      );
+      expect(polishIn(tree)).toEqual([]);
+    }
+  });
+
+  test('09-lokalizacja-001: ekran kofeiny z listą porcji i oknem szybkiego dodania w EN bez polskich tekstów', () => {
+    const now = Date.now();
+    const logs = [
+      { id: 'c1', beverageName: 'Espresso', beverageType: 'coffee', consumedAt: new Date(now - 3600e3).toISOString(), doseGrams: 18, caffeineMg: 120 },
+    ];
+    const spy = jest.spyOn(db, 'getCaffeineLogs').mockReturnValue(logs);
+    const Caffeine = require('../app/(tabs)/caffeine').default;
+    expect(polishIn(renderEn(<Caffeine />))).toEqual([]);
+    spy.mockReturnValue([]);
+    expect(polishIn(renderEn(<Caffeine />))).toEqual([]);
+    spy.mockRestore();
+    const { CaffeineQuickAddModal } = require('../src/components/caffeine/CaffeineQuickAddModal');
+    expect(polishIn(renderEn(<CaffeineQuickAddModal visible unitSystem="metric" language="en" onClose={() => {}} onSelectOption={() => {}} />))).toEqual([]);
+  });
+
+  test('09-lokalizacja-001: spiżarnia (pusta i z kartą paczki) w EN bez polskich tekstów', () => {
+    const { BeanItemCard } = require('../src/components/beans/BeanItemCard');
+    const noop = () => {};
+    expect(
+      polishIn(renderEn(<BeanItemCard item={item} unitSystem="metric" language="en" onToggleFavorite={noop} onToggleArchive={noop} onSelectForBrew={noop} onOpenEdit={noop} />)),
+    ).toEqual([]);
+    const { BrewProvider } = require('../src/core/brew-context');
+    const Beans = require('../app/(tabs)/beans').default;
+    const spy = jest.spyOn(db, 'getInventoryItems').mockReturnValue([]);
+    expect(polishIn(renderEn(<BrewProvider><Beans /></BrewProvider>))).toEqual([]);
+    spy.mockReturnValue([item]);
+    expect(polishIn(renderEn(<BrewProvider><Beans /></BrewProvider>))).toEqual([]);
+    spy.mockRestore();
+  });
+
+  test('04-studio-projektowe-010: GongfuActiveInfusion w EN (przed, w trakcie i po zalaniu) bez polskich tekstów', () => {
+    const { GongfuActiveInfusion } = require('../src/components/gongfu/GongfuActiveInfusion');
+    const noop = () => {};
+    for (const [isSteeping, steepFinished] of [[false, false], [true, false], [false, true]]) {
+      const tree = renderEn(
+        <GongfuActiveInfusion
+          nextInfusionNum={2}
+          remainingSeconds={12}
+          targetSeconds={20}
+          isSteeping={isSteeping}
+          steepFinished={steepFinished}
+          onAdjustTime={noop}
+          onStartSteep={noop}
+          onStopSteep={noop}
+          currentNotes=""
+          onChangeCurrentNotes={noop}
+          onRecordCurrentInfusion={noop}
+          t={translations.en}
+        />,
+      );
+      expect(polishIn(tree)).toEqual([]);
+    }
+  });
+
+  test('09-lokalizacja-001 / 09-lokalizacja-002: zakładka Parzenie i ekran Gongfu w EN — bez polskich znaków (także nastawa młynka i opis mielenia)', () => {
+    const { BrewProvider } = require('../src/core/brew-context');
+    const Brew = require('../app/(tabs)/index').default;
+    const Gongfu = require('../app/gongfu').default;
+    for (const Screen of [Brew, Gongfu]) {
+      const texts = spoken(renderEn(<BrewProvider><Screen /></BrewProvider>));
+      expect(texts.filter((s) => PL_DIACRITICS.test(s))).toEqual([]);
+    }
+  });
+
+  test('09-lokalizacja-001: okno udostępniania receptury w EN bez polskich tekstów', () => {
+    const { ShareRecipeModal } = require('../src/components/brew/ShareRecipeModal');
+    const { MASTER_RECIPES } = require('../src/core/recipes-data');
+    const tree = renderEn(
+      <ShareRecipeModal visible onClose={() => {}} recipe={MASTER_RECIPES[0]} shareUrl="napar://recipe?v=1&d=x" waterTempCelsius={93} unitSystem="metric" t={translations.en} language="en" />,
+    );
+    expect(polishIn(tree)).toEqual([]);
+  });
+
+  test('09-lokalizacja-007: liczba mnoga PL wg CLDR dla zapowiedzi odliczania — 1/2/5/22/25/1.5', () => {
+    const { formatCountdownAnnouncement } = require('../src/core/announce');
+    const forms = (n: number) => pluralPl(n, 'sekunda', 'sekundy', 'sekund');
+    expect([1, 2, 5, 22, 25, 1.5].map(forms)).toEqual(['sekunda', 'sekundy', 'sekund', 'sekundy', 'sekund', 'sekundy']);
+    expect(pluralPl(2.5, 'sekunda', 'sekundy', 'sekund', 'sekundy (ułamek)')).toBe('sekundy (ułamek)');
+    expect(pluralPl('1,5', 'sekunda', 'sekundy', 'sekund')).toBe('sekundy');
+    expect([1, 2, 5, 22, 25, 1.5].map((n) => formatCountdownAnnouncement(n, 'pl'))).toEqual([
+      '1 sekunda do końca etapu.',
+      '2 sekundy do końca etapu.',
+      '5 sekund do końca etapu.',
+      '22 sekundy do końca etapu.',
+      '25 sekund do końca etapu.',
+      '1.5 sekundy do końca etapu.',
+    ]);
+    // Etykieta kroku (klucz brew.stepAccessibility): forma słowa z liczby, nie stałe „sekund”.
+    expect(translations.pl.brew.stepAccessibility).toContain('{secondsWord}');
+    expect(translations.en.brew.stepAccessibility).toContain('{secondsWord}');
+  });
+
+  test('09-lokalizacja-001 / -006: check:i18n przechodzi na kodzie aplikacji i czerwieni się na tekście poza słownikiem', () => {
+    const script = join(root, 'scripts/check-i18n.mjs');
+    expect(execFileSync(process.execPath, [script], { cwd: root, encoding: 'utf8' })).toMatch(/Skan tekstów/);
+    let out = '';
+    let code = 0;
+    try {
+      execFileSync(process.execPath, [script, '--extra', 'tests/fixtures/i18n-literal-fixture.tsx'], { cwd: root, encoding: 'utf8', stdio: 'pipe' });
+    } catch (e) {
+      const err = e as { status: number; stderr: string };
+      code = err.status;
+      out = err.stderr;
+    }
+    expect(code).toBe(1);
+    expect(out).toMatch(/tests\/fixtures\/i18n-literal-fixture\.tsx:8 \[polskie znaki\] „Zapisz paczkę”/);
+    expect(out).toMatch(/tests\/fixtures\/i18n-literal-fixture\.tsx:9 \[tekst poza słownikiem\] „Receptura dnia”/);
+    expect(out).toMatch(/tests\/fixtures\/i18n-literal-fixture\.tsx: 1 > 0 \(lista bazowa\)/);
+    const baseline = JSON.parse(readFileSync(join(root, 'scripts/i18n-baseline.json'), 'utf8'));
+    expect(baseline.razem).toBe(Object.values(baseline.pliki as Record<string, number>).reduce((a, b) => a + b, 0));
+    const exc = JSON.parse(readFileSync(join(root, 'scripts/i18n-exceptions.json'), 'utf8'));
+    for (const x of [...exc.tokeny, ...exc.teksty, ...exc.pliki]) expect(String(x.powod).length).toBeGreaterThan(5);
+  });
+});

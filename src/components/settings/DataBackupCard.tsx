@@ -25,7 +25,7 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
   const handleOpenImport = onOpenImportJson || onImportJson || (() => {});
   return (
     <View>
-      <Text style={styles.sectionTitle}>Twoje Dane (ZP-06 & ZP-07)</Text>
+      <Text style={styles.sectionTitle}>{t.settings.backupSectionTitle}</Text>
       <View style={styles.cardGroup}>
         <Pressable
           testID="export-json-btn"
@@ -37,7 +37,7 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
           <View style={{ flex: 1 }}>
             <Text style={styles.actionTitle}>{t.settings.backupExportJsonTitle}</Text>
             <Text style={styles.actionSubtitle}>
-              Pobierz pełną historię parzeń, spiżarnię i notatki w otwartym formacie
+              {t.settings.backupExportJsonDesc}
             </Text>
           </View>
           <Text style={styles.actionArrow}>↗</Text>
@@ -55,7 +55,7 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
           <View style={{ flex: 1 }}>
             <Text style={styles.actionTitle}>{t.settings.backupImportJsonTitle}</Text>
             <Text style={styles.actionSubtitle}>
-              Przywróć stan spiżarni i sesji z wcześniejszej kopii zapasowej
+              {t.settings.backupImportJsonDesc}
             </Text>
           </View>
           <Text style={styles.actionArrow}>↙</Text>
@@ -73,7 +73,7 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
           <View style={{ flex: 1 }}>
             <Text style={styles.actionTitle}>{t.settings.backupExportSessionsCsvTitle}</Text>
             <Text style={styles.actionSubtitle}>
-              Arkusz kalkulacyjny (Excel, Google Sheets) z historią zaparzeń i sensoryką
+              {t.settings.backupExportSessionsCsvDesc}
             </Text>
           </View>
           <Text style={styles.actionArrow}>CSV</Text>
@@ -85,7 +85,7 @@ export const DataBackupCard: React.FC<DataBackupCardProps> = ({
           <View style={{ flex: 1 }}>
             <Text style={styles.actionTitle}>{t.settings.backupExportInventoryCsvTitle}</Text>
             <Text style={styles.actionSubtitle}>
-              Zestawienie paczek ziaren, herbat, palarni, dat palenia i zapasów
+              {t.settings.backupExportInventoryCsvDesc}
             </Text>
           </View>
           <Text style={styles.actionArrow}>CSV</Text>

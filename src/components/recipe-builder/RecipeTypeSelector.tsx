@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
+import { useTranslation } from '../../core/i18n';
 
 interface RecipeTypeSelectorProps {
   beverageType: 'COFFEE' | 'TEA';
@@ -20,11 +21,12 @@ export const RecipeTypeSelector: React.FC<RecipeTypeSelectorProps> = ({
   coffeeLabel,
   teaLabel,
 }) => {
+  const { t } = useTranslation();
   return (
     <View
       style={styles.typeSelectorRow}
       accessibilityRole="radiogroup"
-      accessibilityLabel="Wybór typu naparu / Beverage type selection"
+      accessibilityLabel={t.recipeBuilder.typeSelectorA11y}
       testID="recipe-type-selector"
     >
       <Pressable
@@ -36,7 +38,7 @@ export const RecipeTypeSelector: React.FC<RecipeTypeSelectorProps> = ({
         accessibilityRole="radio"
         accessibilityState={{ selected: beverageType === 'COFFEE' }}
         accessibilityLabel={coffeeLabel}
-        accessibilityHint="Przełącza parametry i metody na profil kawowy / Switches to coffee brewing profile"
+        accessibilityHint={t.recipeBuilder.typeCoffeeHint}
       >
         <Text
           style={[
@@ -56,7 +58,7 @@ export const RecipeTypeSelector: React.FC<RecipeTypeSelectorProps> = ({
         accessibilityRole="radio"
         accessibilityState={{ selected: beverageType === 'TEA' }}
         accessibilityLabel={teaLabel}
-        accessibilityHint="Przełącza parametry i metody na profil herbaciany / Switches to tea brewing profile"
+        accessibilityHint={t.recipeBuilder.typeTeaHint}
       >
         <Text
           style={[

@@ -76,7 +76,7 @@ export function JournalSessionCard({
           </Text>
         </View>
         <View style={styles.metricItem}>
-          <Text style={styles.metricLabel}>TEMP</Text>
+          <Text style={styles.metricLabel}>{t.journal.tempMetricLabel}</Text>
           <Text style={styles.metricVal}>{formatTemperature(session.waterTempCelsius, unitSystem)}</Text>
         </View>
         {session.caffeineContentMg && (

@@ -7,7 +7,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme } from '../../core/theme';
-import { useTranslation } from '../../core/i18n';
+import { useTranslation, formatTemplate } from '../../core/i18n';
 import { InventoryItem } from '../../core/database-schema';
 import {
   GrinderIcon,
@@ -84,7 +84,7 @@ export function BrewHeader({
             onPress={() => onBeverageTypeChange('COFFEE')}
             accessibilityRole="tab"
             accessibilityState={{ selected: currentBeverageType === 'COFFEE' }}
-            accessibilityLabel="Kategoria Kawa"
+            accessibilityLabel={t.brew.beverageCoffeeA11y}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Text
@@ -93,7 +93,7 @@ export function BrewHeader({
                 currentBeverageType === 'COFFEE' && styles.beverageToggleTextActiveCoffee,
               ]}
             >
-              Kawa Specialty
+              {t.brew.beverageCoffeeLabel}
             </Text>
           </Pressable>
 
@@ -106,7 +106,7 @@ export function BrewHeader({
             onPress={() => onBeverageTypeChange('TEA')}
             accessibilityRole="tab"
             accessibilityState={{ selected: currentBeverageType === 'TEA' }}
-            accessibilityLabel="Kategoria Herbata"
+            accessibilityLabel={t.brew.beverageTeaA11y}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Text
@@ -115,7 +115,7 @@ export function BrewHeader({
                 currentBeverageType === 'TEA' && styles.beverageToggleTextActiveTea,
               ]}
             >
-              Herbata Rzemieślnicza
+              {t.brew.beverageTeaLabel}
             </Text>
           </Pressable>
         </View>
@@ -150,7 +150,7 @@ export function BrewHeader({
                     selected: isSelected,
                     ...(isRunning ? { disabled: true } : {}),
                   }}
-                  accessibilityLabel={`Ulubiony przepis: ${fav.name}, metoda ${fav.method}, doza ${favDose}g`}
+                  accessibilityLabel={formatTemplate(t.brew.favoriteRecipeA11y, { name: fav.name, method: fav.method, dose: favDose })}
                 >
                   <Text
                     style={[
@@ -179,13 +179,13 @@ export function BrewHeader({
           onPress={onOpenGrinderModal}
           accessibilityRole="button"
           accessibilityState={{ disabled: isRunning }}
-          accessibilityLabel={`Młynek: ${grinderRecommendation.grinderName}, nastawa ${grinderRecommendation.formatted}`}
+          accessibilityLabel={formatTemplate(t.brew.grinderPillA11y, { grinder: grinderRecommendation.grinderName, setting: grinderRecommendation.formatted })}
         >
         <View style={styles.pillIconBox}>
           <GrinderIcon size={18} color={theme.colors.copper} />
         </View>
         <View style={{ flex: 1, marginLeft: 10 }}>
-          <Text style={styles.pillEyebrow}>MŁYNEK</Text>
+          <Text style={styles.pillEyebrow}>{t.brew.grinderPillEyebrow}</Text>
           <Text style={styles.pillValue} numberOfLines={1}>
             {grinderRecommendation.grinderName.split(' ')[0]}:{' '}
             <Text style={{ color: theme.colors.copper, fontWeight: '700' }}>
@@ -205,9 +205,9 @@ export function BrewHeader({
           onPress={onOpenRecipeModal}
           accessibilityRole="button"
           accessibilityState={{ disabled: isRunning }}
-          accessibilityLabel={`Wybrany przepis: ${recipe.name}`}
+          accessibilityLabel={formatTemplate(t.brew.recipePillA11y, { name: recipe.name })}
         >
-          <Text style={styles.selectorEyebrow}>RECEPTURA</Text>
+          <Text style={styles.selectorEyebrow}>{t.brew.recipePillEyebrow}</Text>
           <Text style={styles.selectorValue} numberOfLines={1}>
             {recipe.name}
           </Text>
@@ -225,21 +225,21 @@ export function BrewHeader({
           onPress={onOpenInventoryModal}
           accessibilityRole="button"
           accessibilityState={{ disabled: isRunning }}
-          accessibilityLabel="Wybierz ziarna ze spiżarni"
+          accessibilityLabel={t.brew.stashPillA11y}
           accessibilityHint={
             selectedInventoryItem
-              ? `${selectedInventoryItem.name}, pozostało ${selectedInventoryItem.remainingWeightGrams}g`
+              ? formatTemplate(t.brew.stashPillHint, { name: selectedInventoryItem.name, weight: selectedInventoryItem.remainingWeightGrams })
               : undefined
           }
         >
-          <Text style={styles.selectorEyebrow}>SPIŻARNIA</Text>
+          <Text style={styles.selectorEyebrow}>{t.brew.stashPillEyebrow}</Text>
           <Text style={styles.selectorValue} numberOfLines={1}>
-            {selectedInventoryItem ? selectedInventoryItem.name : 'Wybierz ziarno...'}
+            {selectedInventoryItem ? selectedInventoryItem.name : t.brew.stashPillEmpty}
           </Text>
           <Text style={styles.selectorSub}>
             {selectedInventoryItem
-              ? `${selectedInventoryItem.remainingWeightGrams}g w paczce`
-              : 'Domyślna doza'}
+              ? formatTemplate(t.brew.stashPillRemaining, { weight: selectedInventoryItem.remainingWeightGrams })
+              : t.brew.stashPillDefaultDose}
           </Text>
         </Pressable>
       </View>
@@ -251,16 +251,16 @@ export function BrewHeader({
           onPress={onOpenShareModal}
           accessibilityRole="button"
           accessibilityState={{ disabled: isRunning }}
-          accessibilityLabel="Udostępnij recepturę przez kod QR"
+          accessibilityLabel={t.brew.sharePillA11y}
           testID="share-recipe-btn"
         >
           <View style={styles.pillIconBox}>
             <QrIcon size={16} color={theme.colors.copper} />
           </View>
           <View style={{ flex: 1, marginLeft: 10 }}>
-            <Text style={styles.pillEyebrow}>UDOSTĘPNIJ</Text>
+            <Text style={styles.pillEyebrow}>{t.brew.sharePillEyebrow}</Text>
             <Text style={styles.pillValue} numberOfLines={1}>
-              Kod QR / Link
+              {t.brew.sharePillValue}
             </Text>
           </View>
           <Text style={styles.pillArrow}>↗</Text>
@@ -274,10 +274,10 @@ export function BrewHeader({
           style={styles.gongfuBanner}
           onPress={onNavigateToGongfu}
           accessibilityRole="button"
-          accessibilityLabel="Przejdź do trybu wieloetapowego parzenia Gongfu Cha"
+          accessibilityLabel={t.brew.gongfuModeA11y}
         >
           <Text style={styles.gongfuBannerText}>
-            Przejdź do Trybu Wielokrotnych Zalań (Gongfu Cha Tracker) →
+            {t.brew.gongfuModeBanner}
           </Text>
         </Pressable>
       )}

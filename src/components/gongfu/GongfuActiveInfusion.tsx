@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Field } from '../ui';
 import { theme } from '../../core/theme';
+import { formatTemplate } from '../../core/i18n';
 
 interface GongfuActiveInfusionProps {
   nextInfusionNum: number;
@@ -68,7 +69,7 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
           <Text style={styles.adjustBtnText}>{t.gongfu.subSeconds}</Text>
         </Pressable>
         <Text style={styles.targetLabel}>
-          {isSteeping ? 'Trwa parzenie...' : `Cel: ${targetSeconds}s`}
+          {isSteeping ? t.gongfu.steepingInProgress : formatTemplate(t.gongfu.targetSeconds, { seconds: targetSeconds })}
         </Text>
         <Pressable
           style={styles.adjustBtn}
@@ -90,7 +91,7 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
 
       {isSteeping && (
         <View style={styles.steepingActiveBox}>
-          <Text style={styles.steepingActiveText}>PARZENIE W TOKU</Text>
+          <Text style={styles.steepingActiveText}>{t.gongfu.steepingBanner}</Text>
           <Pressable
             testID="gongfu-stop-btn"
             style={styles.stopBtn}

@@ -22,23 +22,24 @@ export const JsonExportModal: React.FC<JsonExportModalProps> = ({
   onClose,
   exportedJsonText,
 }) => {
+  const { t } = useTranslation();
   return (
     <Modal visible={visible} animationType="slide">
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>Kopia Zapasowa (JSON)</Text>
+          <Text style={styles.modalTitle}>{t.settings.jsonExportModalTitle}</Text>
           <Pressable
             style={styles.modalCloseBtn}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             onPress={onClose}
             accessibilityRole="button"
-            accessibilityLabel="Zamknij"
+            accessibilityLabel={t.common.close}
           >
-            <Text style={styles.modalCloseText}>Zamknij</Text>
+            <Text style={styles.modalCloseText}>{t.common.close}</Text>
           </Pressable>
         </View>
         <Text style={styles.modalSub}>
-          Poniższy kod JSON zawiera wszystkie Twoje wpisy ze spiżarni, historię parzeń oraz logi kofeiny. Możesz go skopiować i bezpiecznie zapisać:
+          {t.settings.jsonExportModalDesc}
         </Text>
         <TextInput
           style={styles.jsonTextInput}
@@ -81,19 +82,19 @@ export const JsonImportModal: React.FC<JsonImportModalProps> = ({
     <Modal visible={visible} animationType="slide">
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>Importuj Dane JSON</Text>
+          <Text style={styles.modalTitle}>{t.settings.jsonImportModalTitle}</Text>
           <Pressable
             style={styles.modalCloseBtn}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             onPress={onClose}
             accessibilityRole="button"
-            accessibilityLabel="Anuluj"
+            accessibilityLabel={t.common.cancel}
           >
-            <Text style={styles.modalCloseText}>Anuluj</Text>
+            <Text style={styles.modalCloseText}>{t.common.cancel}</Text>
           </Pressable>
         </View>
         <Text style={styles.modalSub}>
-          Wklej poniżej treść pliku JSON z kopią zapasową aplikacji Napar:
+          {t.settings.jsonImportModalDesc}
         </Text>
         <TextInput
           style={styles.jsonTextInput}

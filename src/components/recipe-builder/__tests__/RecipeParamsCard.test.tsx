@@ -44,7 +44,8 @@ describe('RecipeParamsCard Component (TASK-P31-04-STU)', () => {
     });
 
     const ratioBadge = treeEn.root.findByProps({ testID: 'recipe-ratio-badge' });
-    expect(ratioBadge.props.accessibilityLabel).toContain('Calculated ratio: 1 do 16.7');
+    // M1-audytor-generalny-033: EN etykieta bez polskiego „do” (09-lokalizacja-001).
+    expect(ratioBadge.props.accessibilityLabel).toContain('Calculated ratio: 1 to 16.7');
     expect(JSON.stringify(treeEn.toJSON())).toContain('Calculated ratio');
   });
 

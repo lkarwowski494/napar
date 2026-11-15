@@ -143,16 +143,15 @@ export default function BeansScreen() {
             </View>
             <Text style={styles.emptyTitle}>{t.stash?.emptyTitle || 'Twoja spiżarnia jest pusta'}</Text>
             <Text style={styles.emptySub}>
-              Dodaj swoją pierwszą kawę ziarnistą lub herbatę liściastą, aby śledzić świeżość,
-              odmiany botaniczne i wagę.
+              {t.stash.emptyDesc}
             </Text>
             <Pressable
               style={styles.emptyBtn}
               onPress={handleOpenAdd}
               accessibilityRole="button"
-              accessibilityLabel="+ Dodaj pierwszą paczkę"
+              accessibilityLabel={t.stash.emptyAddFirstBtn}
             >
-              <Text style={styles.emptyBtnText}>+ Dodaj pierwszą paczkę</Text>
+              <Text style={styles.emptyBtnText}>{t.stash.emptyAddFirstBtn}</Text>
             </Pressable>
           </View>
         ) : (

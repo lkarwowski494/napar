@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
+import { useTranslation } from '../../core/i18n';
 
 export interface CsvExportModalProps {
   visible: boolean;
@@ -23,6 +24,7 @@ export const CsvExportModal: React.FC<CsvExportModalProps> = ({
   title,
   csvText,
 }) => {
+  const { t } = useTranslation();
   return (
     <Modal visible={visible} animationType="slide">
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
@@ -33,13 +35,13 @@ export const CsvExportModal: React.FC<CsvExportModalProps> = ({
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             onPress={onClose}
             accessibilityRole="button"
-            accessibilityLabel="Zamknij"
+            accessibilityLabel={t.common.close}
           >
-            <Text style={styles.modalCloseText}>Zamknij</Text>
+            <Text style={styles.modalCloseText}>{t.common.close}</Text>
           </Pressable>
         </View>
         <Text style={styles.modalSub}>
-          Oto wygenerowany arkusz CSV zgodny ze standardem RFC 4180 (kodowanie UTF-8). Możesz go skopiować do Notatnika, Numbers lub Excela:
+          {t.settings.csvModalDesc}
         </Text>
         <TextInput
           style={styles.jsonTextInput}

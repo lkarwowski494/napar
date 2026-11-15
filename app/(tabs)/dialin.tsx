@@ -86,7 +86,7 @@ export default function DialInScreen() {
       <View style={styles.segmentBar}>
         <Pressable
           accessibilityRole="tab"
-          accessibilityLabel="Dial-in Doctor"
+          accessibilityLabel={t.dialin.title}
           accessibilityState={{ selected: activeTab === 'doctor' }}
           style={[styles.segmentBtn, activeTab === 'doctor' && styles.segmentBtnActive]}
           onPress={() => handleSelectTab('doctor')}
@@ -97,13 +97,13 @@ export default function DialInScreen() {
               activeTab === 'doctor' && styles.segmentBtnTextActive,
             ]}
           >
-            Dial-in Doctor
+            {t.dialin.title}
           </Text>
         </Pressable>
 
         <Pressable
           accessibilityRole="tab"
-          accessibilityLabel="Ratio"
+          accessibilityLabel={t.dialin.tabRatio}
           accessibilityState={{ selected: activeTab === 'ratio' }}
           style={[styles.segmentBtn, activeTab === 'ratio' && styles.segmentBtnActive]}
           onPress={() => handleSelectTab('ratio')}
@@ -114,13 +114,13 @@ export default function DialInScreen() {
               activeTab === 'ratio' && styles.segmentBtnTextActive,
             ]}
           >
-            Ratio & Uzysk
+            {t.dialin.tabRatio}
           </Text>
         </Pressable>
 
         <Pressable
           accessibilityRole="tab"
-          accessibilityLabel="Ekstrakcja EY"
+          accessibilityLabel={t.dialin.tabEyA11y}
           accessibilityState={{ selected: activeTab === 'ey' }}
           style={[styles.segmentBtn, activeTab === 'ey' && styles.segmentBtnActive]}
           onPress={() => handleSelectTab('ey')}
@@ -137,7 +137,7 @@ export default function DialInScreen() {
 
         <Pressable
           accessibilityRole="tab"
-          accessibilityLabel="Woda SCA"
+          accessibilityLabel={t.water.tabTitle}
           accessibilityState={{ selected: activeTab === 'water' }}
           style={[styles.segmentBtn, activeTab === 'water' && styles.segmentBtnActive]}
           onPress={() => handleSelectTab('water')}

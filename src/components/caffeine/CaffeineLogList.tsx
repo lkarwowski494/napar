@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { CaffeineLog } from '../../core/database-schema';
 import { formatDoseWeight } from '../../core/unit-converter';
 import { theme } from '../../core/theme';
+import { useTranslation, formatTemplate } from '../../core/i18n';
 
 interface CaffeineLogListProps {
   logs: CaffeineLog[];
@@ -22,24 +23,25 @@ export const CaffeineLogList: React.FC<CaffeineLogListProps> = ({
   onQuickAddPress,
   onDeleteLog,
 }) => {
+  const { t } = useTranslation();
   return (
     <>
       <View style={styles.listHeaderRow}>
-        <Text style={styles.listTitle}>Dzisiejsze Porcje Kofeiny</Text>
+        <Text style={styles.listTitle}>{t.caffeine.logListTitle}</Text>
         <Pressable
           testID="quick-add-caffeine-btn"
           style={styles.quickAddBtn}
           accessibilityRole="button"
-          accessibilityLabel="+ Dodaj porcję kofeiny"
+          accessibilityLabel={t.caffeine.quickAddA11y}
           onPress={onQuickAddPress}
         >
-          <Text style={styles.quickAddBtnText}>+ Dodaj</Text>
+          <Text style={styles.quickAddBtnText}>{t.caffeine.quickAddBtn}</Text>
         </Pressable>
       </View>
 
       {logs.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Brak zarejestrowanych porcji dzisiaj.</Text>
+          <Text style={styles.emptyText}>{t.caffeine.logListEmpty}</Text>
         </View>
       ) : (
         logs.map((item) => {
@@ -52,7 +54,7 @@ export const CaffeineLogList: React.FC<CaffeineLogListProps> = ({
               <View style={{ flex: 1 }}>
                 <Text style={styles.logName}>{item.beverageName}</Text>
                 <Text style={styles.logMeta}>
-                  {timeStr} · {formatDoseWeight(item.doseGrams, unitSystem)} suszu
+                  {formatTemplate(t.caffeine.logItemMeta, { time: timeStr, dose: formatDoseWeight(item.doseGrams, unitSystem) })}
                 </Text>
               </View>
               <Text style={styles.logMg}>{Math.round(item.caffeineMg)} mg</Text>
@@ -62,7 +64,7 @@ export const CaffeineLogList: React.FC<CaffeineLogListProps> = ({
                 style={styles.logDeleteBtn}
                 hitSlop={8}
                 accessibilityRole="button"
-                accessibilityLabel={`Usuń wpis kofeiny: ${item.beverageName}`}
+                accessibilityLabel={formatTemplate(t.caffeine.deleteLogA11y, { name: item.beverageName })}
               >
                 <Text style={styles.logDeleteText}>✕</Text>
               </Pressable>

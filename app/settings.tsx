@@ -159,7 +159,7 @@ export default function SettingsScreen() {
       setExportedJsonText(json);
       setShowExportModal(true);
     } catch (e: any) {
-      Alert.alert('Nie udało się wyeksportować', e?.message || 'Nie udało się wyeksportować danych.');
+      Alert.alert(t.settings.exportErrorTitle, e?.message || t.settings.exportErrorDesc);
     }
   };
 
@@ -170,7 +170,7 @@ export default function SettingsScreen() {
       setCsvModalTitle(language === 'pl' ? 'Eksport Dziennika (CSV)' : 'Journal Export (CSV)');
       setShowCsvModal(true);
     } catch (e: any) {
-      Alert.alert('Nie udało się wyeksportować', e?.message || 'Nie udało się wyeksportować danych.');
+      Alert.alert(t.settings.exportErrorTitle, e?.message || t.settings.exportErrorDesc);
     }
   };
 
@@ -181,7 +181,7 @@ export default function SettingsScreen() {
       setCsvModalTitle(language === 'pl' ? 'Eksport Spiżarni (CSV)' : 'Stash Export (CSV)');
       setShowCsvModal(true);
     } catch (e: any) {
-      Alert.alert('Nie udało się wyeksportować', e?.message || 'Nie udało się wyeksportować danych.');
+      Alert.alert(t.settings.exportErrorTitle, e?.message || t.settings.exportErrorDesc);
     }
   };
 
@@ -298,7 +298,7 @@ export default function SettingsScreen() {
         <View style={styles.divider} />
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>{language === 'pl' ? 'Zgodność licencyjna' : 'License'}</Text>
-          <Text style={styles.infoValue}>Proprietary (Apps4Brew)</Text>
+          <Text style={styles.infoValue}>{t.settings.licenseValue}</Text>
         </View>
         <View style={styles.divider} />
         <Pressable

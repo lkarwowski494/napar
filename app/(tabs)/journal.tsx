@@ -256,7 +256,7 @@ export default function JournalScreen() {
         <Text style={styles.headerTitle}>{t.journal.title}</Text>
         <Text style={styles.headerSub}>
           {t.journal.totalBrews}: {relevantSessions.length}
-          {filteredSessions.length !== relevantSessions.length ? ` (widoczne: ${filteredSessions.length})` : ''}
+          {filteredSessions.length !== relevantSessions.length ? ` (${formatTemplate(t.journal.visibleCount, { count: filteredSessions.length })})` : ''}
         </Text>
       </View>
 
@@ -276,7 +276,7 @@ export default function JournalScreen() {
           onPress={() => setViewMode('sessions')}
           testID="journal-tab-sessions"
           accessibilityRole="button"
-          accessibilityLabel="Przełącz na listę sesji"
+          accessibilityLabel={t.journal.switchToSessionsA11y}
         >
           <Text style={[styles.viewModeTabText, viewMode === 'sessions' && styles.viewModeTabTextActive]}>
             {`${t.journal.sessionsTab} (${relevantSessions.length})`}
@@ -287,7 +287,7 @@ export default function JournalScreen() {
           onPress={() => setViewMode('analytics')}
           testID="journal-tab-analytics"
           accessibilityRole="button"
-          accessibilityLabel="Przełącz na analitykę i trendy"
+          accessibilityLabel={t.journal.switchToAnalyticsA11y}
         >
           <Text style={[styles.viewModeTabText, viewMode === 'analytics' && styles.viewModeTabTextActive]}>
             {t.journal.analyticsTab}
@@ -324,9 +324,9 @@ export default function JournalScreen() {
                   setFilterType('all');
                 }}
                 accessibilityRole="button"
-                accessibilityLabel="Wyczyść filtry"
+                accessibilityLabel={t.journal.clearFilters}
               >
-                <Text style={styles.clearSearchText}>Wyczyść filtry</Text>
+                <Text style={styles.clearSearchText}>{t.journal.clearFilters}</Text>
               </Pressable>
             </View>
           ) : (

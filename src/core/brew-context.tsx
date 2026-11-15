@@ -90,6 +90,11 @@ const defaultInitialSnapshot: TimerSnapshot = {
 const BrewContext = createContext<BrewContextType | undefined>(undefined);
 
 export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // M1-audytor-generalny-033 (09-lokalizacja-002): język interfejsu — jedno źródło dla zapowiedzi,
+  // nastawy młynka i opisu mielenia (także gdy język pochodzi z systemu, bez zapisanego app_language).
+  const { language: uiLanguage } = useTranslation();
+  const masterGrind = (r: MasterRecipe) =>
+    uiLanguage === 'en' ? r.grindSettingDescriptionEn || r.grindSettingDescriptionPl : r.grindSettingDescriptionPl;
   const [beveragePreference, setBeveragePreferenceState] = useState<BeveragePreference>(() => {
     try {
       return typeof getBeveragePreference === 'function' ? getBeveragePreference() : 'both';
@@ -111,7 +116,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const initialDose = 'doseGrams' in recipe ? recipe.doseGrams : recipe.coffeeOrTeaDoseGrams;
   const initialWater = 'waterGrams' in recipe ? recipe.waterGrams : recipe.waterWeightGrams;
   const initialTemp = 'waterTempCelsius' in recipe ? recipe.waterTempCelsius : recipe.waterTemperatureCelsius;
-  const initialGrind = 'grindSizeDescription' in recipe ? (recipe.grindSizeDescription || '') : (recipe as MasterRecipe).grindSettingDescriptionPl;
+  const initialGrind = 'grindSizeDescription' in recipe ? (recipe.grindSizeDescription || '') : masterGrind(recipe as MasterRecipe);
 
   const [doseGrams, setDoseGrams] = useState<number>(initialDose);
   const [waterGrams, setWaterGrams] = useState<number>(initialWater);
@@ -150,8 +155,8 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const grinderRecommendation = useMemo(() => {
-    return getRecommendedGrindForRecipe(recipe, grinderId);
-  }, [recipe, grinderId]);
+    return getRecommendedGrindForRecipe(recipe, grinderId, uiLanguage);
+  }, [recipe, grinderId, uiLanguage]);
 
   // Parsuj kroki przepisu
   const originalSteps = useMemo<RecipeStep[]>(() => {
@@ -180,9 +185,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [snapshot, setSnapshot] = useState<TimerSnapshot>(defaultInitialSnapshot);
   const engineRef = useRef<BrewTimerEngine | null>(null);
-  // M1-audytor-generalny-033 (09-lokalizacja-002): zapowiedzi VoiceOver w języku interfejsu — to samo
-  // źródło co useTranslation(), także gdy język pochodzi z systemu i nie ma zapisanego app_language.
-  const { language: uiLanguage } = useTranslation();
+  // Zapowiedzi VoiceOver czytają język z ref (silnik stopera tworzony raz na zestaw kroków).
   const uiLanguageRef = useRef(uiLanguage);
   uiLanguageRef.current = uiLanguage;
 
@@ -235,7 +238,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const d = 'doseGrams' in newRecipe ? newRecipe.doseGrams : newRecipe.coffeeOrTeaDoseGrams;
     const w = 'waterGrams' in newRecipe ? newRecipe.waterGrams : newRecipe.waterWeightGrams;
     const t = 'waterTempCelsius' in newRecipe ? newRecipe.waterTempCelsius : newRecipe.waterTemperatureCelsius;
-    const g = 'grindSizeDescription' in newRecipe ? (newRecipe.grindSizeDescription || '') : (newRecipe as MasterRecipe).grindSettingDescriptionPl;
+    const g = 'grindSizeDescription' in newRecipe ? (newRecipe.grindSizeDescription || '') : masterGrind(newRecipe as MasterRecipe);
     setDoseGrams(d);
     setWaterGrams(w);
     setWaterTempCelsius(t);

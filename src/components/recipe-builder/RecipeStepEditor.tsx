@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Field, NumInput } from '../ui';
 import { RecipeStep } from '../../core/recipes-data';
 import { theme } from '../../core/theme';
+import { formatTemplate, translations } from '../../core/i18n';
 
 interface RecipeStepEditorProps {
   steps: RecipeStep[];
@@ -61,7 +62,7 @@ export const RecipeStepEditor: React.FC<RecipeStepEditorProps> = ({
                 style={styles.removeStepBtn}
                 accessibilityRole="button"
                 accessibilityLabel={`${t?.recipeBuilder?.removeStep || 'Usuń krok'} ${stepNum}`}
-                accessibilityHint={`Usuwa krok ${stepNum} z receptury`}
+                accessibilityHint={formatTemplate((t?.recipeBuilder ?? translations.pl.recipeBuilder).removeStepHint, { number: stepNum })}
                 testID={`remove-step-${stepNum}`}
               >
                 <Text style={styles.removeStepBtnText}>✕</Text>
