@@ -96,24 +96,28 @@
   },
   {
     "id": "NEHLIG-CYP1A2-2018",
-    "twierdzenie": "Około 95% kofeiny ulega metabolizmowi wątrobowemu przez enzym CYP1A2, a okres półtrwania eliminacji u dorosłych wynosi średnio 3-7 godzin z dużą zmiennością osobniczą.",
+    "twierdzenie": "Ponad 95% klirensu kofeiny zachodzi przy udziale enzymu CYP1A2 (mniej niż 5% jest wydalane w postaci niezmienionej), a średni czas półtrwania eliminacji u zdrowych dorosłych wynosi ok. 3–6 godzin (zakres 2,3–9,9 h) przy dużej zmienności osobniczej.",
     "kategoria": "zdrowie-farmakokinetyka",
     "zrodla": [
       {
-        "adres": "https://doi.org/10.1124/pr.117.014407",
-        "tytul": "Interindividual Differences in Caffeine Metabolism and Factors Driving Caffeine Consumption",
-        "wydawca": "Astrid Nehlig, Pharmacological Reviews, 2018, 70(2), 384–411",
-        "cytat": "Caffeine is almost completely metabolized by the liver, with only 1–5% excreted unchanged in urine. More than 95% of caffeine clearance is mediated by CYP1A2.",
-        "odczyt": "2026-10-24",
-        "szczebel": 2
+        "adres": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6247400/",
+        "tytul": "The clinical toxicology of caffeine: A review and case study",
+        "wydawca": "Cyril Willson, Toxicology Reports, 2018, 5, 1140–1152 (doi:10.1016/j.toxrep.2018.11.002)",
+        "cytat": "Since it has been estimated that the vast majority (>95%) of caffeine's elimination from plasma is due to CYP1A2-mediated clearance [94]",
+        "odczyt": "2026-11-19",
+        "szczebel": 2,
+        "cytaty_dodatkowe": [
+          "Less than 5% of ingested caffeine is excreted unchanged [54,66,67].",
+          "Similarly and related to clearance, the elimination half-life is variable with an average of approximately 3–6 hours in healthy humans [54,66,67]. However, these values can vary substantially from 2.3 to 9.9 h once again demonstrating significant inter-individual variation [54]."
+        ],
+        "uwagi": "Zastąpiono płatny artykuł Nehlig 2018 (PMID 29514871, brak pełnego tekstu) otwartą pracą przeglądową Willson 2018 (PMC6247400, odczyt 2026-11-19). Zakres t½ używany w aplikacji nadal pochodzi z EFSA-T12-ZAKRES (2–8 h)."
       }
     ],
-    "status": "otwarte",
+    "status": "potwierdzone",
     "uproszczenie": null,
     "krytyczne": true,
     "przeglad": null,
-    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)",
-    "uwagi": "[DO USTALENIA] Pełny tekst niedostępny (Europe PMC: PMID 29514871, brak PMC; doi → Elsevier bez treści). Nieużywany w zastrzeżeniu ekranu od 2026-11-14; zakres t½ z EFSA-T12-ZAKRES."
+    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)"
   },
   {
     "id": "DRAKE-SLEEP-2013",
@@ -170,7 +174,7 @@
   },
   {
     "id": "SCA-GOLDENCUP-EY",
-    "twierdzenie": "Optymalna ekstrakcja (Extraction Yield) w Złotym Pucharze SCA mieści się w zakresie 18.0% – 22.0% przy TDS 1.15% – 1.45%.",
+    "twierdzenie": "Optymalna ekstrakcja (Extraction Yield) w Złotym Pucharze SCA mieści się w zakresie 18.0% – 22.0% przy TDS 1.15% – 1.35%.",
     "kategoria": "parzenie-kawa",
     "zrodla": [
       {
@@ -186,7 +190,7 @@
     "uproszczenie": null,
     "krytyczne": false,
     "przeglad": null,
-    "uwagi": "[DO USTALENIA] Do sprawdzenia: strona https://sca.coffee/research/coffee-standards (odczyt 2026-11-14) nie zawiera cytatu ani zakresów; standardy SCA tylko dla członków. Cytat (TDS 1,15–1,35%) przeczy własnemu „twierdzeniu” (1,15–1,45%)."
+    "uwagi": "[DO USTALENIA] Weryfikacja 2026-11-19: pierwotny standard SCA (szczebel 1) nadal tylko dla członków (nieodczytany bezpośrednio), więc wpis zostaje otwarty. Poprawiono wewnętrzną sprzeczność twierdzenia (TDS 1,15–1,45% → 1,15–1,35%). Źródło wtórne szczebla 2 przeczytane 2026-11-19 — Batali, Ristenpart, Guinard, Sci. Rep. 2020;10:16450 (https://pmc.ncbi.nlm.nih.gov/articles/PMC7536440/) — potwierdza dosłownie: „The chart's central region, which spans TDS values of 1.15–1.35% and PE values of 18–22%, is denoted as “ideal”, and is identified as the Specialty Coffee Association's “Golden Cup Standard”5.” Rekomendacja dla roli 08/właściciela: dostarczyć kopię standardu SCA lub zaakceptować potwierdzenie źródłem szczebla 2 (PMC7536440)."
   },
   {
     "id": "SCA-WATER-STD",
@@ -206,7 +210,7 @@
     "uproszczenie": null,
     "krytyczne": false,
     "przeglad": null,
-    "uwagi": "[DO USTALENIA] Do sprawdzenia: strona SCA (odczyt 2026-11-14) nie zawiera standardu wody."
+    "uwagi": "[DO USTALENIA] Weryfikacja 2026-11-19: pierwotny standard wody SCA (szczebel 1) nadal niedostępny publicznie. Przeczytana 2026-11-19 publikacja szczebla 2 — Birke Rune i in., J. Food Sci. 2026;91(9):e71434 (https://pmc.ncbi.nlm.nih.gov/articles/PMC13579507/) — przytacza standard SCAA (2018) jako: „The SCAA (Specialty Coffee Association of America) standard defines this ideal brewing zone as approximately 17–85 mg/L calcium hardness (expressed as CaCO3) and 40–75 mg/L bicarbonate alkalinity (SCA 2018).”, co ROZBIEGA SIĘ z liczbami w twierdzeniu (68 / 50–175 ppm twardości ogólnej, 40–70 ppm zasadowości). Rekomendacja dla roli 08: zweryfikować oficjalną tabelę SCA Water Standard (edycja 2018 vs starsza SCAA) i ujednolicić zakresy w aplikacji."
   },
   {
     "id": "BH-WATER-2016",
@@ -255,7 +259,7 @@
     "krytyczne": false,
     "przeglad": null,
     "jedno_zrodlo": true,
-    "uwagi": "[DO USTALENIA] Do sprawdzenia: książka (ISBN) nieodczytana 2026-11-14."
+    "uwagi": "[DO USTALENIA] Weryfikacja 2026-11-19: książka (ISBN 978-0993252600) nadal niedostępna do odczytu. Ponadto przeczytana 2026-11-19 praca eksperymentalna szczebla 2 — Birke Rune i in., J. Food Sci. 2026;91(9):e71434 (https://pmc.ncbi.nlm.nih.gov/articles/PMC13579507/) — podważa tezę o wyraźnym wpływie samej twardości Ca2+/Mg2+: „Across all sensory evaluations, water hardness alone produced no marked flavor changes, even when calcium was added at concentrations above those typically found in drinking water. In contrast, bicarbonate had a clear and pronounced effect on the sensory profile across the full tested range.” (oraz cyt. Bratthäll i in. 2024: „calcium and magnesium did not significantly alter the extraction of organic acids in coffee”). Rekomendacja dla roli 08: zniuansować opisy wpływu Ca2+/Mg2+ w UI wody i podkreślić dominującą rolę wodorowęglanów (zasadowości)."
   },
   {
     "id": "ASTILL-TEA-2001",
@@ -275,27 +279,54 @@
     "uproszczenie": null,
     "krytyczne": false,
     "przeglad": null,
-    "uwagi": "[DO USTALENIA] Cytat „Caffeine levels in tea leaves typically range between 20 and 45 mg/g…” nie występuje w abstrakcie (PMID 11714326, odczyt 2026-11-14); pełny tekst niedostępny."
+    "uwagi": "[DO USTALENIA] Weryfikacja 2026-11-19: pełny tekst Astill 2001 nadal za paywallem ACS, a przypisany cytat nie występuje w abstrakcie (PMID 11714326). Przeczytany 2026-11-19 przegląd szczebla 2 — Liu i in., Food Chem. X 2023;20:100998 (https://pmc.ncbi.nlm.nih.gov/articles/PMC10739754/) — potwierdza zakres zawartości kofeiny w liściach: „CAF accounts for 2%–4% of the tea dry weight.”, lecz nie potwierdza kinetyki wielokrotnych zalań Gongfu. Rekomendacja dla roli 08: zastąpić Astill 2001 otwartym źródłem dla zawartości kofeiny (PMC10739754, 2–4% s.m.) i usunąć niepotwierdzoną część o kinetyce Gongfu."
   },
   {
     "id": "WCR-VARIETIES",
-    "twierdzenie": "Odmiany botaniczne Coffea arabica (m.in. Bourbon, Typica, Geisha, SL28) charakteryzują się odmienną genetyką, profilem sensorycznym i podatnością na rdzę liściową.",
+    "twierdzenie": "Odmiany botaniczne Coffea arabica (m.in. Bourbon, Typica, Geisha, SL28) charakteryzują się odmienną genetyką, potencjałem jakości w filiżance na dużych wysokościach i podatnością na rdzę liściową.",
     "kategoria": "botanika-kawa",
     "zrodla": [
       {
-        "adres": "https://varieties.worldcoffeeresearch.org/",
-        "tytul": "Arabica Coffee Varieties Catalog",
+        "adres": "https://varieties.worldcoffeeresearch.org/varieties/bourbon",
+        "tytul": "Arabica Coffee Varieties Catalog — Bourbon",
         "wydawca": "World Coffee Research (WCR)",
-        "cytat": "Distinct genetic lineages of Coffea arabica exhibit specific agronomic traits, bean morphologies, and cup quality potentials.",
-        "odczyt": "2026-10-24",
-        "szczebel": 1
+        "cytat": "One of the most culturally and genetically important C. arabica varieties in the world, known for excellent quality in the cup at the highest altitudes.",
+        "odczyt": "2026-11-19",
+        "szczebel": 1,
+        "uwagi": "Karta odmiany WCR: Genetic Description: Bourbon-Typica group (Bourbon related); Quality potential at high altitude: Very Good; Coffee leaf rust: Low resistance/susceptible."
+      },
+      {
+        "adres": "https://varieties.worldcoffeeresearch.org/varieties/typica",
+        "tytul": "Arabica Coffee Varieties Catalog — Typica",
+        "wydawca": "World Coffee Research (WCR)",
+        "cytat": "One of the most culturally and genetically important C. arabica coffees in the world, with high quality in Central America. Very high susceptibility to coffee leaf rust, well-adapted to the coldest conditions.",
+        "odczyt": "2026-11-19",
+        "szczebel": 1,
+        "uwagi": "Karta odmiany WCR: Genetic Description: Bourbon-Typica group (Typica related); Coffee leaf rust: Low resistance/susceptible."
+      },
+      {
+        "adres": "https://varieties.worldcoffeeresearch.org/varieties/sl28",
+        "tytul": "Arabica Coffee Varieties Catalog — SL28",
+        "wydawca": "World Coffee Research (WCR)",
+        "cytat": "Drought tolerant and very good cup quality potential, but susceptible to major diseases.",
+        "odczyt": "2026-11-19",
+        "szczebel": 1,
+        "uwagi": "Karta odmiany WCR: Genetic Description: Bourbon-Typica group (Bourbon related); Quality potential at high altitude: Exceptional; Coffee leaf rust: Low resistance/susceptible."
+      },
+      {
+        "adres": "https://varieties.worldcoffeeresearch.org/varieties/geisha-panama",
+        "tytul": "Arabica Coffee Varieties Catalog — Geisha (Panama)",
+        "wydawca": "World Coffee Research (WCR)",
+        "cytat": "Panamanian Geisha has exceptionally high quality at high altitudes. The term “Geisha” is often applied to other coffees that do not share the distinct genetics of Panamanian Geisha.",
+        "odczyt": "2026-11-19",
+        "szczebel": 1,
+        "uwagi": "Karta odmiany WCR: Genetic Description: Ethiopian landrace; Quality potential at high altitude: Exceptional; Coffee leaf rust: Intermediate resistance."
       }
     ],
-    "status": "otwarte",
+    "status": "potwierdzone",
     "uproszczenie": null,
     "krytyczne": false,
-    "przeglad": null,
-    "uwagi": "[DO USTALENIA] Do sprawdzenia: cytat ogólny niesprawdzony dosłownie w katalogu WCR (audyt 2026-11-11 czytał katalog PDF dla wybranych odmian)."
+    "przeglad": null
   },
   {
     "id": "KAWA-KOFEINA-MG-G",
@@ -312,7 +343,7 @@
       "robusta": 22.0
     },
     "jednostka": "mg/g",
-    "uwagi": "Olechno i in. 2021 (https://pmc.ncbi.nlm.nih.gov/articles/PMC8228209/, odczyt 2026-11-14) podaje dla ZIELONEGO ziarna „caffeine (0.9–1.2% and 1.6–2.4%)” (arabika, robusta): 12 mg/g to górna granica arabiki, 22 mg/g mieści się w zakresie robusty, ale źródło nie dotyczy kawy palonej. Brak przeczytanego źródła dla kawy palonej → otwarte. BRD C4 D-01 cytował pracę o herbacie (Astill 2001)."
+    "uwagi": "Weryfikacja 2026-11-19 (przeczytane źródła szczebla 2 dla kawy palonej): (1) Liang & Kitts, Molecules 2014;19(11):19180–19208 (https://pmc.ncbi.nlm.nih.gov/articles/PMC6270823/): „The caffeine content in coffee beans ranges between 10 and 12 mg/g in Arabica beans [51] and 19–21 mg/g in Robusta beans [52] and changes only slightly during the roasting process at different temperatures [52].”; (2) Freitas i in., Heliyon 2023;9(9):e19580 (https://pmc.ncbi.nlm.nih.gov/articles/PMC10558851/): „Caffeine contents in roasted and ground coffee samples varied in a wide range from 9.27 mg/g to 33.29 mg/g in Robusta coffee and from 5.55 mg/g to 10.15 mg/g in coffee Arabica”. Rozbieżność z kodem: arabika 12,0 mg/g to górna granica PMC6270823 i powyżej PMC10558851; robusta 22,0 mg/g przekracza typowe 19–21 mg/g w PMC6270823 (choć mieści się w szerokim zakresie PMC10558851). Rekomendacja dla roli 08: rozważyć przyjęcie wartości środkowych z PMC6270823 (np. arabika 11 mg/g, robusta 20 mg/g) z jawnym uproszczeniem/zakresem w UI i aktualizacją testu 06-tresci-005."
   },
   {
     "id": "KAWA-WYDAJNOSC-EKSTRAKCJI",
@@ -325,7 +356,7 @@
     "przeglad": null,
     "wielkosc": "kofeina_wydajnosc_ekstrakcji",
     "jednostka": "ułamek",
-    "uwagi": "Brak źródła w BRD i rejestrze; nie znaleziono źródła 2026-11-14."
+    "uwagi": "Weryfikacja 2026-11-19: brak przeczytanego źródła naukowego szczebla 1–3 potwierdzającego konkretne cztery współczynniki ekstrakcji kofeiny (filtr 0,88, espresso 0,75, immersja 0,85, cold brew 0,92). Rekomendacja dla roli 08: oznaczyć w kodzie i UI jako przybliżoną heurystykę (szacunek orientacyjny) lub zastąpić modelem z udokumentowanych pomiarów laboratoryjnych."
   },
   {
     "id": "HERBATA-KOFEINA-3PROC",
@@ -339,7 +370,7 @@
     "wielkosc": "herbata_kofeina_proc_sm",
     "wartosc": 3.0,
     "jednostka": "%",
-    "uwagi": "Przypisane źródło ASTILL-TEA-2001: abstrakt (Europe PMC, PMID 11714326, odczyt 2026-11-14) nie zawiera zakresu „20 and 45 mg/g”; pełny tekst płatny (ACS) — niedostępny."
+    "uwagi": "Weryfikacja 2026-11-19: przeczytane źródło szczebla 2 — Liu i in., Food Chem. X 2023;20:100998 (https://pmc.ncbi.nlm.nih.gov/articles/PMC10739754/) — podaje dosłownie: „CAF accounts for 2%–4% of the tea dry weight.” Wartość 3,0% w kodzie (estimateTotalLeafCaffeineMg) jest dokładnym środkiem tego przedziału (2–4% s.m.), ale pozostaje jednopunktowym uproszczeniem bez rozróżnienia gatunku/zbioru herbaty; wpis utrzymany jako otwarty do czasu decyzji roli 08 o dopisaniu jawnego uproszczenia i aktualizacji testu 06-tresci-005."
   },
   {
     "id": "HERBATA-FRAKCJE-ZALAN",
@@ -351,7 +382,7 @@
     "krytyczne": false,
     "przeglad": null,
     "wielkosc": "herbata_frakcja_zalania",
-    "uwagi": "BRD RD-19 i dawny komentarz w kodzie podawały 45/30/15/10% — sprzeczne ze wzorem; źródło „Monografie chemii herbaty” bez adresu. Brak przeczytanego źródła."
+    "uwagi": "Weryfikacja 2026-11-19: brak przeczytanego źródła potwierdzającego wzór geometryczny 0,40 × 0,55^(n−1). Ponadto w dokumentacji istnieje wewnętrzna sprzeczność z BRD RD-19 (45/30/15/10%). Rekomendacja dla roli 08: usunąć pozorną precyzję wzoru (albo jawnie oznaczyć w UI jako szacunek orientacyjny i ujednolicić z BRD RD-19)."
   },
   {
     "id": "HERBATA-SZYBKIE-45MG",
@@ -365,7 +396,7 @@
     "wielkosc": "herbata_kofeina_szybkie_dodanie_5g",
     "wartosc": 45,
     "jednostka": "mg",
-    "uwagi": "Gongfu dla 5 g, 1. zalanie liczy 5 × 1000 × 0,03 × 0,40 = 60 mg (ta sama wielkość, inna wartość). EFSA explains 2015 (rysunek s. 3, odczyt 2026-11-14): filiżanka czarnej herbaty 220 ml ≈ 50 mg — bez masy liści, więc nie rozstrzyga. Do ujednolicenia po źródle (przekazanie 08)."
+    "uwagi": "Weryfikacja 2026-11-19: utrzymuje się sprzeczność w kodzie — szybkie dodanie przyjmuje 45 mg na 5 g, podczas gdy Gongfu dla 5 g (1. zalanie) liczy 5 × 1000 × 0,03 × 0,40 = 60 mg (ta sama masa liści, 33% różnicy). EFSA explains 2015 (rysunek s. 3, odczyt 2026-11-14) podaje ok. 50 mg na filiżankę 220 ml czarnej herbaty bez podania masy liści. Rekomendacja dla roli 08: ujednolicić szybkie dodanie z modelem Gongfu albo przejść w szybkim dodaniu na porcję EFSA (50 mg / filiżanka 220 ml) bez deklaracji 5 g."
   },
   {
     "id": "WODA-MUSZYNIANKA-MINERALIZACJA",
@@ -401,7 +432,7 @@
     "uproszczenie": null,
     "krytyczne": false,
     "przeglad": null,
-    "uwagi": "Brak źródła i daty odczytu etykiet dla marek (poza mineralizacją Muszynianki). Zdanie „Oficjalna woda cuppingowa mistrzostw baristów (WBC)” usunięte 2026-11-14 (fakt zmienny bez źródła). Rekomendacja audytu (b) — usunąć marki — to zmiana funkcji: decyzja właściciela/03."
+    "uwagi": "Weryfikacja 2026-11-19 na oficjalnych stronach producentów (5 z 10 marek odczytane, pozostałe 5 — Volvic, Żywiecki Kryształ, Ashbeck, Acqua Panna, Crystal Geyser — niezweryfikowane; przeliczenia GH ≈ 2,497·Ca + 4,118·Mg, KH ≈ 0,820·HCO3 jako ppm CaCO3): (1) Muszynianka (https://muszynianka.pl/skladniki-mineralne/): suma 1954,36 mg/l, Ca 208,0, Mg 128,3, HCO3 1489,0 → GH ≈ 1048 (kod: 650), KH ≈ 1221 (kod: 480); (2) Żywiec Zdrój Niegazowany, ujęcie Pilsko (https://www.zywiec-zdroj.pl/produkty/zywiec-zdroj-niegazowany): suma 213,4 mg/l (kod: 230), Ca 36,3, Mg 5,3, HCO3 121,1 → GH ≈ 112 (kod: 105), KH ≈ 99 (kod: 90); (3) Evian (https://www.evian.com/en_int/products/everyday-range/1l/): Ca 80, Mg 26, HCO3 360 → GH ≈ 307 (kod: 220), KH ≈ 295 (kod: 260); (4) Highland Spring (https://highlandspring.com/product-range/spring-water/): sucha pozostałość 170 mg/L (kod: 140), Ca 40,5, Mg 10,1, HCO3 150 → GH ≈ 143 (kod: 70), KH ≈ 123 (kod: 60); (5) Spa Reine (https://www.spa.be/fr/l-eau-de-spa/une-composition-unique): sucha pozostałość 38 mg/L (kod: 33), brak Ca/Mg/HCO3 na stronie. Rozbieżności GH/KH w kodzie są duże (do >2× dla Muszynianki i Highland Spring). Zdanie „Oficjalna woda cuppingowa mistrzostw baristów (WBC)” usunięte 2026-11-14. Rekomendacja dla roli 08/właściciela: albo usunąć twardo zakodowane marki (opcja b audytu), albo zaktualizować składy wg datowanych etykiet producentów i dodać termin ważności."
   },
   {
     "id": "WCAG21-KONTRAST",
