@@ -1,4 +1,4 @@
-# Koordynacja Napar — stan (aktualizacja 2026-11-19 18:52 UTC)
+# Koordynacja Napar — stan (aktualizacja 2026-11-19 19:40 UTC)
 
 ## Mandat (przepisuj bez zmian; zmienia go tylko właściciel)
 - Tryb decyzji: analogia — od 2026-11-19 10:30 UTC, słowa: „1. Tak 2. Dopracowanie aplikacji. Mysle ze powinnismy zaczac od napraw ktore wskazal audyt a nie zostaly jeszcze zrobione. 3. analogia”
@@ -9,55 +9,54 @@
 - Pułapy kosztu: sesja 10 USD (próg STOP = 13 USD), doba 30 USD (ponad: bez nowych sesji) [OCENA — do kalibracji po pierwszych sesjach; środowisko Antigravity nie raportuje `cost_usd`, mierzymy czas]
 - Koordynator aktywny: `v1/default/jetski_remote_agents_3p/2f459540-3f1f-4d1d-b6a9-942b302be3a0` (od 2026-11-19 10:25 UTC)
 - Środowisko: Linux `6.12.105+`, Node `v24.22.3`, `gh` aktywny, repo `lkarwowski494/napar` (PUBLIC) + `lkarwowski494/prompts` (PRIVATE); brak Playwright i Xcode; delegowanie przez lokalne subagenty (`invoke_subagent`) — nazwany wyjątek od `create_session`.
-- Gałąź robocza: `claude/napar-app-audit-5u19j0` (HEAD `48b2bc4`); gałąź stanu: `koordynacja` (nigdy nie scalana do integracji ani `main`).
+- Gałąź robocza: `main` (HEAD `48b2bc4`, FF z `claude/napar-app-audit-5u19j0`); gałąź stanu: `koordynacja` (nigdy nie scalana do integracji ani `main`).
 
 ## Teraz (3–5 linii)
-- **KAMIEŃ MILOWY OSIĄGNIĘTY:** `E2E iOS (Maestro)` run **`44584722624`** na `claude/napar-app-audit-5u19j0` (`48b2bc4`) zakończony **SUKCESEM — 8/8 PASS** (42m11s); zweryfikowano artefakt `e2e-wykonane` (`wykonane.tsv` z dokładnym SHA `48b2bc46cbfd7fdd61f6be413d0a45c3a327905c` i 8× `PASS`).
-- **`npm run verify` zielony:** kod `0` (`118/118` pakietów, `1298/1298` testów, bramka scenariuszy D-060 zielona, wszystkie recenzje niezależne B2/C2/D2/F2/H2/I2/J2 przyjęte z 0 P0 i 0 P1).
-- **STOP (zasada wspólna 12):** czekamy na wyraźną zgodę właściciela na scalenie `claude/napar-app-audit-5u19j0` (`48b2bc4`) → `main` (oraz ew. weto do `KO-002..004`, decyzję ws. `M1-020` i zgodę na posprzątanie gałęzi tymczasowych `naprawy/*`).
+- **`main` zaktualizowany FF (`491d618..48b2bc4`)** za wyraźną zgodą właściciela (19:39 UTC: „1. WYrazam zgode na scalenie 2. Nie cofaj nic 3. Tak 4. Nie mam”).
+- **Posprzątane gałęzie tymczasowe:** usunięto wszystkie `naprawy/*` z `origin` i lokalnie; potwierdzono `KO-002..004` i zamknięto `M1-020` (brak lokalnej kopii u właściciela).
+- **W toku na `main` @ `48b2bc4`:** `CI` (`44600621311`), `TZ Matrix` (`44600621291`), `Deploy GitHub Pages` (`44600621418`), `iOS — kompilacja` (`44600621295`), `E2E iOS (Maestro)` (`44600621340`).
+- Następny krok: potwierdzić zielone workflowy na `main`, następnie zapytać właściciela o zgodę na kolejny etap (TestFlight 1.0.0 + testy fizyczne `T1`–`T12` / albo dalsze dopracowanie P2 / `rejestr.json` / `jezyki.md`).
 
 ## Sesje
 | Litera | ID | Rola, tryb | Gałąź @ SHA | Kontekst % | Koszt USD | Stan |
 |---|---|---|---|---|---|---|
 | A | `5b8ef1c0509aa4bf52924a24527e5b17` | 07-jakosc, audit | `claude/napar-app-audit-5u19j0` @ `c836267` (odczyt) | — | — | przyjęta (10:41 UTC) |
-| B | `af12d27faaab387fe6368f6fb597f910` | 08-programista, fix | `naprawy/B-zakres-kontakt-ci` @ `1e88b1d` | — | — | przyjęta i scalona FF |
+| B | `af12d27faaab387fe6368f6fb597f910` | 08-programista, fix | `naprawy/B-zakres-kontakt-ci` @ `1e88b1d` | — | — | przyjęta i scalona FF → `main` |
 | B2 | `6bb4689cd0a936abc3d37d2154b2ca08` | recenzent (08 audit) | `naprawy/B-zakres-kontakt-ci` @ `1e88b1d` (odczyt) | — | — | przyjęta (PRZYJĄĆ) |
 | C | `6d79a347175718a536dd27bd68510345` | 07-jakosc, fix (JAK-19) | `naprawy/C-bramka-scenariuszy` @ `ea8f107` | — | — | przyjęta z uwagami (2 P1 → D) |
 | C2 | `a947d8befee927acd3688e5aba62ab61` | recenzent (07 audit) | `naprawy/C-bramka-scenariuszy` @ `ea8f107` (odczyt) | — | — | przyjęta (PRZYJĄĆ Z UWAGAMI) |
-| D | `73b8d32922840bcba788ba3e591daaca` | 07-jakosc, fix (C2 P1 + E2E) | `naprawy/D-e2e-i-bramka` @ `3d12389` | — | — | przyjęta i scalona FF |
+| D | `73b8d32922840bcba788ba3e591daaca` | 07-jakosc, fix (C2 P1 + E2E) | `naprawy/D-e2e-i-bramka` @ `3d12389` | — | — | przyjęta i scalona FF → `main` |
 | D2 | `b4f7bd1b6ecfabb86db3c8dc95b2d018` | recenzent (07 audit) | `naprawy/D-e2e-i-bramka` @ `3d12389` (odczyt) | — | — | przyjęta (PRZYJĄĆ Z UWAGAMI → F) |
-| E | `bd15eab873313e9321aaf92f4d9bd93a` | 06-tresci, fix (REJ-01) | `naprawy/E-tresci-rejestr` @ `00721e8` | — | — | przyjęta i scalona FF |
-| F | `a6c48698b90b7027fa6af21585848b53` | 08-programista, fix (D2, ekrany, wody) | `naprawy/F-a11y-ekrany-wody` @ `70b4d29` | — | — | przyjęta i scalona FF |
+| E | `bd15eab873313e9321aaf92f4d9bd93a` | 06-tresci, fix (REJ-01) | `naprawy/E-tresci-rejestr` @ `00721e8` | — | — | przyjęta i scalona FF → `main` |
+| F | `a6c48698b90b7027fa6af21585848b53` | 08-programista, fix (D2, ekrany, wody) | `naprawy/F-a11y-ekrany-wody` @ `70b4d29` | — | — | przyjęta i scalona FF → `main` |
 | F2 | `52fb202ab2270a4966c797f2fb411d96` | recenzent (08 audit) | `naprawy/F-a11y-ekrany-wody` @ `70b4d29` (odczyt) | — | — | przyjęta (PRZYJĄĆ: 0 P0, 0 P1, 1 P2) |
 | G | `b0cf6b75ad6c9858e7a68b94f8033441` | 07-jakosc, fix (E2E 44521826864) | `naprawy/G-e2e-44521826864` @ `a5a4507` | — | — | scalona FF, recenzja G2: ODRZUCIĆ (P0 → H) |
 | G2 | `0286e043107ba520ed3c6064585f98d8` | recenzent (07 audit) | `70b4d29..a5a4507` (odczyt) | — | — | zakończona (ODRZUCIĆ: P0:1, P1:1, P2:1) |
-| H | `85999b0b86dfd071a14f799315c15923` | 07-jakosc, fix (G2 P0/P1/P2) | `naprawy/H-maestro-regex` @ `e307853` | — | — | przyjęta i scalona FF (verify 0: 118/118, 1293/1293) |
+| H | `85999b0b86dfd071a14f799315c15923` | 07-jakosc, fix (G2 P0/P1/P2) | `naprawy/H-maestro-regex` @ `e307853` | — | — | przyjęta i scalona FF → `main` |
 | H2 | `28bafec46b61008c225f4098681584a8` | recenzent (07 audit) | `a5a4507..e307853` (odczyt) | — | — | zakończona (PRZYJĄĆ Z UWAGAMI: 0 P0, 0 P1, 3 P2) |
-| I | `28f88aa27b0ddc9b661d49afb57eca77` | 07-jakosc, fix (E2E 44532031189) | `naprawy/I-e2e-44532031189` @ `9ace404` | — | — | przyjęta i scalona FF (verify 0: 118/118, 1297/1297) |
+| I | `28f88aa27b0ddc9b661d49afb57eca77` | 07-jakosc, fix (E2E 44532031189) | `naprawy/I-e2e-44532031189` @ `9ace404` | — | — | przyjęta i scalona FF → `main` |
 | I2 | `38528fe0629b0d2ae7fc39066d3c73ec` | recenzent (07+08 audit) | `e307853..9ace404` (odczyt) | — | — | zakończona (PRZYJĄĆ: 0 P0, 0 P1, 2 P2) |
-| J | `e5d1e095a6c11d59316922c0a6ead2a8` | 07-jakosc, fix (E2E 08 Tap OK) | `naprawy/J-e2e-08-ok` @ `48b2bc4` | — | — | przyjęta i scalona FF (verify 0: 118/118, 1298/1298) |
+| J | `e5d1e095a6c11d59316922c0a6ead2a8` | 07-jakosc, fix (E2E 08 Tap OK) | `naprawy/J-e2e-08-ok` @ `48b2bc4` | — | — | przyjęta i scalona FF → `main` |
 | J2 | `6f10130fcba73e2c8601a5a5ec7518cf` | recenzent (08+07 audit) | `9ace404..48b2bc4` (odczyt) | — | — | zakończona (PRZYJĄĆ Z UWAGAMI: 0 P0, 0 P1, 3 P2) |
 
 ## Plan 24 h (UTC)
 | Kiedy | Co | Kto (sesja/rola) | Zależy od | Od właściciela |
 |---|---|---|---|---|
-| teraz | **STOP:** zgoda właściciela na scalenie `claude/napar-app-audit-5u19j0` (`48b2bc4`) → `main` | Właściciel | gotowe (verify 0 + E2E 8/8 PASS) | zgoda na `main` + ew. weto `KO-002..004` + status `M1-020` + zgoda na usunięcie `naprawy/*` |
-| po zgodzie | Scalenie `claude/napar-app-audit-5u19j0` → `main` + weryfikacja zielonego `CI` na `main` | Koordynator | zgoda właściciela | nic |
-| po scaleniu `main` | Build TestFlight 1.0.0 + testy fizyczne `T1`–`T12` / protokół F | Właściciel | zgoda na TestFlight | testy fizyczne na telefonie |
+| 19:39–20:25 | Weryfikacja automatycznych workflowów na `main` @ `48b2bc4` (`CI`, `TZ`, `Pages`, `iOS`, `E2E`) | GitHub Actions / Koordynator | w toku | nic |
+| po zielonym `main` | Wybór kolejnego kroku: build TestFlight 1.0.0 + testy fizyczne `T1`–`T12` / albo pakiet dopracowań P2 (`rejestr.json`, `jezyki.md`, uwagi P2 z F2/H2/I2/J2) | Właściciel + Koordynator | zielone workflowy na `main` | decyzja o kolejnym priorytecie / zgoda na TestFlight |
 
 ## Czeka na właściciela
-- **Działanie zewnętrzne (zasada 12 — STOP):** zgoda na scalenie `claude/napar-app-audit-5u19j0` (`48b2bc4`) → `main` (oraz ew. zgoda na usunięcie 9 tymczasowych gałęzi `naprawy/*`).
-- Do weta (tryb `analogia`, nie blokowało prac): `KO-002` (`support@apps4brew.com`), `KO-003` (`workflow_dispatch` w `ci.yml`), `KO-004` (Scope §3: usunięcie `tds-input`, karty kosztu, kalendarza 14-dniowego/ICS, ukrycie okna odgazowania; zamknięcie 12 pozycji §3 w `D-017..D-020`) — w `docs/koordynacja/decyzje.md`.
-- `[DO USTALENIA]`: treść brakującego zadania `M1-audytor-generalny-020` (brak w repo po usunięciu `audit/` wg D-009).
+- Brak zaległych blokad — wszystkie decyzje `KO-002..004` zatwierdzone, `M1-020` zamknięte (brak lokalnej kopii), `main` scalony.
+- Działanie zewnętrzne na później (zasada 12): zgoda na uruchomienie `TestFlight` (po zielonych workflowach na `main`).
 
 ## Bramka scenariuszy (zasada 22)
-- **ZIELONA statycznie i dynamicznie na `48b2bc4`:** `docs/jakosc/przypadki-uzycia.md` (27 PU: 7 A / 0 B / 20 F), `scripts/sprawdz-scenariusze.mjs`, `testID="ekran:<trasa>"` na wszystkich 9 ekranach `app/`, artefakt `e2e-wykonane` (`wykonane.tsv`: **8/8 PASS** z runu `44584722624`), `--build "$BUILD" --wykonane wykonane.tsv` w `testflight.yml`.
+- **ZIELONA statycznie i dynamicznie na `48b2bc4` (`main`):** `docs/jakosc/przypadki-uzycia.md` (27 PU: 7 A / 0 B / 20 F), `scripts/sprawdz-scenariusze.mjs`, `testID="ekran:<trasa>"` na wszystkich 9 ekranach `app/`, artefakt `e2e-wykonane` (`wykonane.tsv`: **8/8 PASS** z runu `44584722624`; świeży run `44600621340` w toku na `main`), `--build "$BUILD" --wykonane wykonane.tsv` w `testflight.yml`.
 
 ## Przypomnienia
 - Środowisko bez `send_later` / `list_triggers`; kontrola realizowana reaktywnie.
 
 ## Pule numerów decyzji
-- `docs/decyzje.md`: zajęte `D-001`…`D-020` (na `48b2bc4`); następny wolny: `D-021`; KO następny: `KO-005`.
+- `docs/decyzje.md`: zajęte `D-001`…`D-020` (na `main` @ `48b2bc4`); następny wolny: `D-021`; KO następny: `KO-005`.
 
 ## Dziennik (najnowsze na dole; starsze niż 48 h do `dziennik-<RRRR-MM>.md`)
 | UTC | Sesja | Zdarzenie z dowodem (SHA, run, plik) | Następny krok |
@@ -78,4 +77,5 @@
 | 2026-11-19 17:14 | I+I2 | Sesja I (`9ace404`, 8 plików, verify 0: 118/118, 1297/1297) + recenzja I2 (**PRZYJĄĆ**: 0 P0, 0 P1, 2 P2). FF `claude/napar-app-audit-5u19j0` → `9ace404`, start E2E `44575002549`. | Czekać na wynik E2E `44575002549` |
 | 2026-11-19 17:55 | CI | E2E `44575002549` (na `9ace404`): **7/8 PASS** (`01`..`07` przeszły!); jedyny FAIL: `08` (`Tap on "OK"`). | Zlecić Sesję J |
 | 2026-11-19 18:09 | J+J2 | Sesja J (`48b2bc4`, verify 0: 118/118, 1298/1298 — wyniesienie `BrewModalsContainer` poza `ScrollView`) + recenzja J2 (**PRZYJĄĆ Z UWAGAMI**: 0 P0, 0 P1, 3 P2). FF `claude/napar-app-audit-5u19j0` → `48b2bc4`, start E2E `44584722624`. | Czekać na wynik E2E `44584722624` |
-| 2026-11-19 18:51 | CI | **E2E `44584722624` (na `48b2bc4`): SUKCES — 8/8 PASS** (42m11s); artefakt `e2e-wykonane` (`wykonane.tsv`) zweryfikowany. | **STOP:** prośba do właściciela o zgodę na scalenie do `main` |
+| 2026-11-19 18:51 | CI | **E2E `44584722624` (na `48b2bc4`): SUKCES — 8/8 PASS** (42m11s); artefakt `e2e-wykonane` (`wykonane.tsv`) zweryfikowany. | STOP: zgoda właściciela na `main` |
+| 2026-11-19 19:39 | M9 | **Zgoda właściciela:** FF `origin/main` `491d618..48b2bc4`, potwierdzone `KO-002..004`, zamknięte `M1-020`, usunięte tymczasowe gałęzie `naprawy/*`. Uruchomiły się workflowy `main` (`CI` `44600621311`, `TZ` `44600621291`, `Pages` `44600621418`, `iOS` `44600621295`, `E2E` `44600621340`). | Monitorować workflowy na `main` i raportować po zakończeniu |
