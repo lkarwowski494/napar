@@ -1,4 +1,4 @@
-# CLAUDE.md — Przewodnik dla Agentów AI w Repozytorium Napar (Steepwise)
+# CLAUDE.md — Przewodnik dla Agentów AI w Repozytorium Napar
 
 > Standard inżynieryjny studia Apps4Craft zgodny z `BRD-QA-REL 1.0`.
 > Przed zakończeniem jakiegokolwiek zadania przeczytaj i spełnij wymagania z:
