@@ -14,7 +14,7 @@
 ## Teraz (3–5 linii)
 - **Sesje A, B+B2, C+C2, D+D2, E, F+F2 wszystkie przyjęte** — najnowszy zweryfikowany commit to **`70b4d29`** na `origin/naprawy/F-a11y-ekrany-wody` (`npm run verify` kod `0`: 118/118 pakietów, 1289/1289 testów; recenzja F2: **PRZYJĄĆ**, 0 P0, 0 P1, 1 P2).
 - Łącznie od `c836267` dodano **20 zweryfikowanych commitów** (kontakt DEC-07, `workflow_dispatch` w `ci.yml`, Scope §3 `F-05`/`F-15`/`F-31`/`F-32` + `D-017..D-020` + `ZM-05..ZM-08`, bramka D-060 `przypadki-uzycia.md` + `sprawdz-scenariusze.mjs` + `wykonane.tsv`, naprawa onboardingu Maestro, przegląd 12 wpisów `rejestr.json`, naprawa VoiceOver/Maestro `star-rating-row`/`water-chips-row`, `testID="ekran:<trasa>"` na 9 ekranach, korekta 5 wód butelkowanych wg etykiet).
-- W toku: przebieg `E2E iOS (Maestro)` run **`44517342406`** na `claude/napar-app-audit-5u19j0` (`3d12389`).
+- W toku: przebiegi `E2E iOS (Maestro)` — run **`44517342406`** na `claude/napar-app-audit-5u19j0` (`3d12389`) oraz run **`44521826864`** na `naprawy/F-a11y-ekrany-wody` (`70b4d29`).
 - Następny krok: po zakończeniu E2E `44517342406` — FF `claude/napar-app-audit-5u19j0` → `70b4d29`, uruchomienie finalnego E2E na `70b4d29` oraz prośba do właściciela o zgodę na scalenie do `main` (i ew. weto `KO-002..004` + status `M1-audytor-generalny-020`).
 
 ## Sesje
