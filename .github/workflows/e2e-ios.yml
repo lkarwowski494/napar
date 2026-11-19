@@ -168,7 +168,9 @@ jobs:
           # M1-audytor-generalny-012: set +e — log każdego scenariusza trafia do CI także przy porażce;
           # wynik zbiorczy na końcu; zrzuty (takeScreenshot) w artefakcie.
           set +e
-          mkdir -p /tmp/maestro-out
+          mkdir -p /tmp/maestro-out /tmp/maestro-wykonane
+          WYKONANE_FILE="/tmp/maestro-wykonane/wykonane.tsv"
+          printf '%s\n' "$GITHUB_SHA" > "$WYKONANE_FILE"
           FAILED=0
           run_maestro() {
             local flow="$1"
@@ -183,7 +185,12 @@ jobs:
             fi
             cat /tmp/maestro.log
             echo "::endgroup::"
-            if [ $rc -ne 0 ]; then echo "::error::Scenariusz $flow nie przeszedł (kod $rc)"; FAILED=1; fi
+            if [ $rc -eq 0 ]; then
+              printf '%s\tPASS\n' "$flow" >> "$WYKONANE_FILE"
+            else
+              printf '%s\tFAIL\n' "$flow" >> "$WYKONANE_FILE"
+              echo "::error::Scenariusz $flow nie przeszedł (kod $rc)"; FAILED=1
+            fi
           }
 
           run_maestro .maestro/01-start.yaml
@@ -197,9 +204,19 @@ jobs:
           if xcrun simctl install booted "$SIM_APP_PATH"; then
             run_maestro .maestro/07-aktualizacja-sprawdz.yaml
           else
+            printf '%s\tFAIL\n' ".maestro/07-aktualizacja-sprawdz.yaml" >> "$WYKONANE_FILE"
             echo "::error::Ponowna instalacja nie powiodła się — 07 nie sprawdza danych"; FAILED=1
           fi
           exit $FAILED
+
+      - name: Zapisz wynik scenariuszy E2E (wykonane.tsv)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-wykonane
+          path: /tmp/maestro-wykonane/wykonane.tsv
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Zrzuty i logi scenariuszy Maestro
         if: always()

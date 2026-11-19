@@ -58,3 +58,28 @@ describe('testflight.yml archiwizuje mapę źródeł JS i dSYM z buildem', () =>
     expect(tf).not.toMatch(/sentry|bugsnag|crashlytics|datadog/i);
   });
 });
+
+// JAK-19 (D-060, C2 P1-2): e2e-ios.yml zapisuje wykonane.tsv jako artefakt, a testflight.yml
+// egzekwuje pełną bramkę --build "$BUILD" --wykonane wykonane.tsv (nie tylko --statycznie).
+describe('kontrakt bramki scenariuszy D-060: e2e-wykonane i pełny tryb w testflight.yml', () => {
+  const e2e = read('.github/workflows/e2e-ios.yml');
+  const tf = read('.github/workflows/testflight.yml');
+
+  test('e2e-ios.yml zapisuje wykonane.tsv (GITHUB_SHA + PASS/FAIL) i wysyła artefakt e2e-wykonane', () => {
+    expect(e2e).toMatch(/wykonane\.tsv/);
+    expect(e2e).toMatch(/\$GITHUB_SHA/);
+    expect(e2e).toMatch(/\\tPASS/);
+    expect(e2e).toMatch(/\\tFAIL/);
+    expect(e2e).toMatch(/uses: actions\/upload-artifact@v4[\s\S]{0,160}name:\s*e2e-wykonane/);
+  });
+
+  test('testflight.yml pobiera artefakt e2e-wykonane z zielonego e2e-ios.yml i uruchamia --build "$BUILD" --wykonane wykonane.tsv', () => {
+    const gate = tf.slice(tf.indexOf('  gate:'), tf.indexOf('  build:'));
+    expect(gate).toMatch(/git fetch --tags/);
+    expect(gate).toMatch(/gh run list[^\n]*--workflow e2e-ios\.yml[^\n]*--status success/);
+    expect(gate).toMatch(/gh run download[^\n]*-n e2e-wykonane/);
+    expect(gate).toMatch(/node scripts\/sprawdz-scenariusze\.mjs --build "\$BUILD" --wykonane wykonane\.tsv/);
+    expect(gate).not.toMatch(/node scripts\/sprawdz-scenariusze\.mjs --statycznie/);
+  });
+});
+

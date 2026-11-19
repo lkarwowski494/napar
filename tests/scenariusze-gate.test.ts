@@ -262,6 +262,8 @@ describe('JAK-19: bramka scenariuszy użytkownika (scripts/sprawdz-scenariusze.m
     expect(pkg.scripts.verify).toContain('npm run check:scenariusze');
 
     const tf = fs.readFileSync(path.join(REPO_ROOT, '.github', 'workflows', 'testflight.yml'), 'utf8');
-    expect(tf).toMatch(/node scripts\/sprawdz-scenariusze\.mjs --statycznie/);
+    expect(tf).toMatch(/node scripts\/sprawdz-scenariusze\.mjs --build "\$BUILD" --wykonane wykonane\.tsv/);
+    expect(tf).toMatch(/e2e-wykonane/);
+    expect(tf).not.toMatch(/sprawdz-scenariusze\.mjs --statycznie/);
   });
 });

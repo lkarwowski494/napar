@@ -36,15 +36,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: false
-
-      - name: Bramka scenariuszy użytkownika (D-060)
-        run: node scripts/sprawdz-scenariusze.mjs --statycznie
 
       - name: Wymagaj zielonego CI i E2E na GITHUB_SHA
         env:
           GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/require-green-runs.mjs "$GITHUB_REPOSITORY" "$GITHUB_SHA"
+
+      - name: Bramka scenariuszy użytkownika (D-060)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch --tags --force
+          BUILD_BASE=$(node -p "require('./app.json').expo.ios.buildNumber")
+          BUILD=$((BUILD_BASE + GITHUB_RUN_NUMBER))
+          E2E_RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --commit "$GITHUB_SHA" --workflow e2e-ios.yml --status success --json databaseId --jq '.[0].databaseId')
+          if [ -z "$E2E_RUN_ID" ] || [ "$E2E_RUN_ID" = "null" ]; then
+            echo "::error::Brak zielonego przebiegu e2e-ios.yml na $GITHUB_SHA"
+            exit 1
+          fi
+          gh run download "$E2E_RUN_ID" --repo "$GITHUB_REPOSITORY" -n e2e-wykonane
+          test -f wykonane.tsv || { echo "::error::Artefakt e2e-wykonane nie zawiera pliku wykonane.tsv"; exit 1; }
+          node scripts/sprawdz-scenariusze.mjs --build "$BUILD" --wykonane wykonane.tsv
 
   build:
     name: Archive & Upload (.ipa -> TestFlight)
