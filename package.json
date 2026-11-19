@@ -17,8 +17,9 @@
     "check:matrix": "node scripts/test-matrix.mjs --check",
     "check:native": "node scripts/verify-native.mjs",
     "check:reachability": "node scripts/check-reachability.mjs",
-    "check": "npm run check:i18n && npm run check:licenses && npm run check:corpus && npm run check:matrix && npm run check:reachability && npm run check:native && npm run typecheck && npm run test:coverage",
-    "verify": "npm run check:i18n && npm run check:licenses && npm run check:corpus && npm run check:matrix && npm run check:reachability && npm run check:native && npm run typecheck && npm run test:coverage -- --ci",
+    "check:scenariusze": "node scripts/sprawdz-scenariusze.mjs --statycznie",
+    "check": "npm run check:i18n && npm run check:licenses && npm run check:corpus && npm run check:matrix && npm run check:reachability && npm run check:native && npm run check:scenariusze && npm run typecheck && npm run test:coverage",
+    "verify": "npm run check:i18n && npm run check:licenses && npm run check:corpus && npm run check:matrix && npm run check:reachability && npm run check:native && npm run check:scenariusze && npm run typecheck && npm run test:coverage -- --ci",
     "test:perf": "jest -c jest.perf.config.js",
     "test:mutation": "stryker run"
   },

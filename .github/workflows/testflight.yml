@@ -38,6 +38,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Bramka scenariuszy użytkownika (D-060)
+        run: node scripts/sprawdz-scenariusze.mjs --statycznie
+
       - name: Wymagaj zielonego CI i E2E na GITHUB_SHA
         env:
           GH_TOKEN: ${{ github.token }}
