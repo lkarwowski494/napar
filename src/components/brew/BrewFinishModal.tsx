@@ -134,7 +134,6 @@ export function BrewFinishModal({
             <View
               testID="star-rating-row"
               style={styles.starRow}
-              accessible={true}
               accessibilityRole="radiogroup"
               accessibilityLabel={t.brew?.yourRating || 'Twoja Ocena'}
               accessibilityValue={{ min: 1, max: 5, now: safeRating }}
@@ -145,7 +144,7 @@ export function BrewFinishModal({
                   testID={`star-rating-${s}`}
                   style={styles.starBtn}
                   onPress={() => onChangeRating(s)}
-                  accessibilityRole="radio"
+                  accessibilityRole="button"
                   accessibilityState={{ selected: safeRating >= s }}
                   accessibilityValue={{ min: 1, max: 5, now: s }}
                   accessibilityLabel={(t.brew?.starRatingLabel || (language === 'pl' ? 'Ocena {rating} z 5' : 'Rating {rating} of 5')).replace('{rating}', String(s))}
@@ -268,7 +267,6 @@ export function BrewFinishModal({
             <View
               testID="water-chips-row"
               style={styles.waterChipsRow}
-              accessible={true}
               accessibilityRole="radiogroup"
               accessibilityLabel={t.brew?.waterUsedTitle || 'Woda użyta do parzenia'}
             >

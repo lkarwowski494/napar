@@ -147,7 +147,7 @@ describe('BrewFinishModal Component', () => {
 
     const starRow = tree.root.findByProps({ testID: 'star-rating-row' });
     expect(starRow).toBeDefined();
-    expect(starRow.props.accessible).toBe(true);
+    expect(starRow.props.accessible).not.toBe(true);
     expect(starRow.props.accessibilityRole).toBe('radiogroup');
 
     const str = JSON.stringify(tree.toJSON());

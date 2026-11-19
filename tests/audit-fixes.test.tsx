@@ -2725,4 +2725,43 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
     expect(bpr.generateActionIcsContent).toBeUndefined();
     expect(bpr.parseStepDurationSeconds('Odczekaj 45 sekund', 30)).toBe(45);
   });
+
+  test('D2-P1: star-rating-row i water-chips-row w BrewFinishModal nie mają accessible={true}, a gwiazdki 1..5 mają rolę button i etykietę', () => {
+    const { BrewFinishModal } = require('../src/components/brew/BrewFinishModal');
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewFinishModal
+          visible={true}
+          totalElapsedSeconds={180}
+          waterGrams={250}
+          rating={4}
+          onChangeRating={() => {}}
+          tasteBalance="balanced"
+          onChangeTasteBalance={() => {}}
+          sensoryProfile={{ aroma: 7, sweetness: 7, acidity: 7, body: 7, aftertaste: 7 }}
+          onChangeSensoryProfile={() => {}}
+          selectedTags={[]}
+          onToggleTag={() => {}}
+          waterProfile="sca_standard"
+          onChangeWaterProfile={() => {}}
+          notes=""
+          onChangeNotes={() => {}}
+          onSkip={() => {}}
+          onSave={() => {}}
+        />,
+      );
+    });
+    const starRow = tree.root.findByProps({ testID: 'star-rating-row' });
+    expect(starRow.props.accessible).not.toBe(true);
+    const waterRow = tree.root.findByProps({ testID: 'water-chips-row' });
+    expect(waterRow.props.accessible).not.toBe(true);
+    for (const s of [1, 2, 3, 4, 5]) {
+      const star = tree.root.findByProps({ testID: `star-rating-${s}` });
+      expect(star.props.accessibilityRole).toBe('button');
+      expect(typeof star.props.accessibilityLabel).toBe('string');
+      expect(star.props.accessibilityLabel.length).toBeGreaterThan(0);
+    }
+    act(() => tree.unmount());
+  });
 });
