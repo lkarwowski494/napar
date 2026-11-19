@@ -57,7 +57,6 @@ test('progi pokrycia nie spadają poniżej zapadki z 2026-11-14', () => {
     './src/hooks/useJournalAnalytics.ts': { statements: 100, branches: 94, functions: 100, lines: 100 },
     './src/hooks/useBrewWorkflow.ts': { statements: 89, branches: 63, functions: 92, lines: 90 },
     './src/core/water-chemistry.ts': { statements: 91, branches: 89, functions: 100, lines: 100 },
-    './src/core/cost-calculator.ts': { statements: 96, branches: 98, functions: 100, lines: 100 },
     './src/core/contrast.ts': { statements: 97, branches: 77, functions: 100, lines: 97 },
     './src/core/search-utils.ts': { statements: 95, branches: 94, functions: 100, lines: 100 },
     './app/': { statements: 85, branches: 62, functions: 80, lines: 85 },

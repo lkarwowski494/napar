@@ -7,7 +7,6 @@
   "mutate": [
     "src/core/unit-converter.ts",
     "src/core/water-chemistry.ts",
-    "src/core/cost-calculator.ts",
     "src/core/domain-rules.ts",
     "src/core/timer-engine.ts"
   ],

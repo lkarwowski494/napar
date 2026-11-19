@@ -459,13 +459,6 @@ describe('BrewScreen UI Integration', () => {
       });
     }
 
-    // Wpisz odczyt TDS
-    const tdsInput = tree.root.findByProps({ placeholder: 'np. 1.35' });
-    expect(tdsInput).toBeDefined();
-    act(() => {
-      tdsInput.props.onChangeText('1.40');
-    });
-
     // Zapisz w Dzienniku
     const finishSaveBtn = findPressableWithText(tree.root, 'Zapisz w Dzienniku');
     act(() => {
@@ -1400,12 +1393,9 @@ describe('BrewScreen UI Integration', () => {
       pressById(tree, 'save-brew-btn');
     });
 
-    // Sprawdź czy finish-cost-card jest wyrenderowana
-    const costCard = tree.root.findByProps({ testID: 'finish-cost-card' });
-    expect(costCard).toBeTruthy();
-    const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('Ekonomia Rzemiosła');
-    expect(str).toContain('Oszczędność vs kawiarnia');
+    // F-31 (KO-004): karta kosztu parzenia usunięta z okna zapisu
+    expect(tree.root.findAllByProps({ testID: 'finish-cost-card' })).toHaveLength(0);
+    expect(tree.root.findAllByProps({ testID: 'tds-input' })).toHaveLength(0);
   });
 
   test('02-monetyzacja-006 (DEC-01 a): po 15 parzeniach i 15 dniach parzenie kawy uruchamia stoper', () => {

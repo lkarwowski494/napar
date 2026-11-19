@@ -147,7 +147,6 @@ jest.mock('expo-sqlite', () => ({
 }));
 
 import { initDatabase, getRecipes, saveRecipe, getInventoryItems, getInventoryItemById, saveInventoryItem, getBrewSessions, recordBrewSessionTransaction, getCaffeineLogs, logCaffeine, exportAllDataJson, importDataJson, exportInventoryCsv, getAppSetting, setAppSetting, getUnitSystem, setUnitSystem } from '../src/data/database';
-import { calculateBrewCost } from '../src/core/cost-calculator';
 import { calculateWaterMinerals } from '../src/core/water-chemistry';
 import { buildBackup } from '../src/data/backup';
 
@@ -296,14 +295,10 @@ describe('Zero-Network Airplane Mode QA Pass (TASK-R11-01)', () => {
     expect(caffeineLogs[0].caffeineMg).toBe(180);
   });
 
-  test('Kalkulatory rzemieślnicze (woda, koszt, jednostki) działają bez sieci', () => {
+  test('Kalkulatory rzemieślnicze (woda, jednostki) działają bez sieci', () => {
     const waterRecipe = calculateWaterMinerals(5.0, 120, 40);
     expect(waterRecipe.targetKhPpm).toBe(40);
     expect(waterRecipe.concentrateHardnessGrams).toBeGreaterThan(0);
-
-    const cost = calculateBrewCost({ doseGrams: 18, beanPricePerKg: 250 });
-    expect(cost.totalHomeCost).toBeGreaterThan(0);
-    expect(cost.coffeeCost).toBeGreaterThan(0);
 
     setUnitSystem('imperial');
     expect(getUnitSystem()).toBe('imperial');

@@ -19,9 +19,6 @@ import {
 import { SCHEMA_SQL } from '../src/core/database-schema';
 import { QrCodeSvg } from '../src/core/qr-code';
 import {
-  DEFAULT_BREW_COST_PARAMETERS,
-} from '../src/core/cost-calculator';
-import {
   BeveragePreference,
   UnitSystem,
 } from '../src/core/domain-rules';
@@ -91,17 +88,6 @@ describe('AST Test Matrix: Logika and Wymiar 100% Coverage (BR-TEST-028..031)', 
       expect(AUTO_DIR).toBe('Backup/');
       expect(AUTO_KEEP).toBe(10);
     });
-
-    test('DEFAULT_BREW_COST_PARAMETERS contains required keys', () => {
-      expect(DEFAULT_BREW_COST_PARAMETERS).toHaveProperty('beanPricePerKg');
-      expect(DEFAULT_BREW_COST_PARAMETERS).toHaveProperty('cafeReferencePrice');
-      expect(DEFAULT_BREW_COST_PARAMETERS).toHaveProperty('electricityPricePerKwh');
-      expect(DEFAULT_BREW_COST_PARAMETERS).toHaveProperty('filterPaperCost');
-      expect(DEFAULT_BREW_COST_PARAMETERS).toHaveProperty('kettleBoilMinutes');
-      expect(DEFAULT_BREW_COST_PARAMETERS).toHaveProperty('kettlePowerKw');
-      expect(DEFAULT_BREW_COST_PARAMETERS).toHaveProperty('waterSaltsCostPerLiter');
-    });
-
 
     test('SCHEMA_SQL defines table creation queries', () => {
       expect(typeof SCHEMA_SQL).toBe('string');

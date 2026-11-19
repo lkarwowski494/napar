@@ -7,7 +7,6 @@ module.exports = {
   testMatch: [
     '<rootDir>/src/core/__tests__/unit-converter.test.ts',
     '<rootDir>/src/core/__tests__/water-chemistry.test.ts',
-    '<rootDir>/src/core/__tests__/cost-calculator.test.ts',
     '<rootDir>/src/core/__tests__/domain-rules.test.ts',
     '<rootDir>/src/core/__tests__/timer-engine.test.ts',
     '<rootDir>/tests/domain-properties.test.ts',

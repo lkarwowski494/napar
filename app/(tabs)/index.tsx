@@ -67,8 +67,6 @@ export default function BrewScreen() {
     handleDismissCorrupt,
     recentFiveStarSession,
     handleQuickReBrew,
-    tdsInput,
-    setTdsInput,
     servings,
     handleServingsChange,
     batchScaling,

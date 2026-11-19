@@ -22,21 +22,8 @@ describe('BrewFinishModal Component', () => {
     onToggleTag: jest.fn(),
     waterProfile: 'melbourne_soft',
     onChangeWaterProfile: jest.fn(),
-    tdsInput: '1.35',
-    onChangeTdsInput: jest.fn(),
     notes: 'Owocowa kwasowość',
     onChangeNotes: jest.fn(),
-    brewCost: {
-      coffeeCost: 3.2,
-      waterCost: 0.1,
-      electricityKwh: 0.05,
-      energyCost: 0.05,
-      filterCost: 0.25,
-      totalHomeCost: 3.3,
-      cafePrice: 18.0,
-      savingsPerCup: 14.7,
-      savingsPercent: 81.7,
-    },
     onSkip: jest.fn(),
     onSave: jest.fn(),
   };
@@ -53,7 +40,6 @@ describe('BrewFinishModal Component', () => {
     expect(str).toContain('300g');
     expect(str).toContain('Recepta Dial-in Doctor');
     expect(str).toContain('zmiel drobniej o 2 kliki');
-    expect(str).toContain('+14.70 PLN');
   });
 
   test('Dial-in Doctor dostosowuje receptę w zależności od balansu (bitter, weak, balanced)', () => {
@@ -109,17 +95,6 @@ describe('BrewFinishModal Component', () => {
     expect(defaultProps.onSave).toHaveBeenCalled();
   });
 
-  test('TASK-P5-03-ZAK: Renderuje oszczędności w formacie waluty angielskiej bez PLN', () => {
-    let tree: any;
-    act(() => {
-      tree = renderer.create(<BrewFinishModal {...defaultProps} language="en" />);
-    });
-
-    const str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('+$14.70');
-    expect(str).not.toContain('+14.70 PLN');
-  });
-
   test('TASK-P14-01-ODK: Zwraca null gdy visible=false oraz radzi sobie z ujemnym czasem i NaN', () => {
     let treeHidden: any;
     act(() => {
@@ -136,7 +111,7 @@ describe('BrewFinishModal Component', () => {
     expect(JSON.stringify(treeSafeTime.toJSON())).toContain('00:00');
   });
 
-  test('TASK-P40-01-ODK: Semantyczne accessibilityState dla ocen i balansu smaku oraz limity wejść TDS i notatek', () => {
+  test('TASK-P40-01-ODK: Semantyczne accessibilityState dla ocen i balansu smaku oraz limit wejścia notatek', () => {
     let tree: any;
     act(() => {
       tree = renderer.create(<BrewFinishModal {...defaultProps} rating={3} tasteBalance="sour" />);
@@ -154,14 +129,11 @@ describe('BrewFinishModal Component', () => {
     expect(chipBitter.props.accessibilityRole).toBe('radio');
     expect(chipBitter.props.accessibilityState).toEqual({ selected: false });
 
-    const tdsInput = tree.root.findByProps({ testID: 'tds-input' });
-    expect(tdsInput.props.maxLength).toBe(6);
-
     const notesInput = tree.root.findByProps({ testID: 'finish-notes-input' });
     expect(notesInput.props.maxLength).toBe(1000);
   });
 
-  test('TASK-P43-01-ODK: Dostępność starRow jako radiogroup oraz odporność na NaN i wartości ujemne w kosztach i wodzie', () => {
+  test('TASK-P43-01-ODK: Dostępność starRow jako radiogroup oraz odporność na NaN i wartości ujemne w wodzie', () => {
     let tree: any;
     act(() => {
       tree = renderer.create(
@@ -169,17 +141,6 @@ describe('BrewFinishModal Component', () => {
           {...defaultProps}
           waterGrams={NaN as any}
           rating={-1}
-          brewCost={{
-            coffeeCost: NaN as any,
-            waterCost: -0 as any,
-            electricityKwh: 0,
-            energyCost: 0,
-            filterCost: 0,
-            totalHomeCost: undefined as any,
-            cafePrice: 'invalid' as any,
-            savingsPerCup: null as any,
-            savingsPercent: 0,
-          }}
         />
       );
     });
@@ -191,8 +152,6 @@ describe('BrewFinishModal Component', () => {
 
     const str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Woda: 0g');
-    expect(str).toContain('Koszt tego naparu: 0.00 PLN');
-    expect(str).toContain('+0.00 PLN');
   });
 
   test('TASK-P46-01-ODK: accessibilityValue dla ocen gwiazdkowych oraz obsluga przecinka dziesietnego w waterGrams i clampowanie formatTime', () => {
@@ -219,7 +178,7 @@ describe('BrewFinishModal Component', () => {
     expect(str).toContain('Czas: 1440:00');
   });
 
-  test('TASK-P48-01-ODK: Semantyka radiogroup selektora wody, accessibilityHint dla TDS i notatek oraz odpornosc na undefined w notes i selectedTags', () => {
+  test('TASK-P48-01-ODK: Semantyka radiogroup selektora wody, accessibilityHint dla notatek oraz odpornosc na undefined w notes i selectedTags', () => {
     let tree: any;
     act(() => {
       tree = renderer.create(
@@ -239,17 +198,12 @@ describe('BrewFinishModal Component', () => {
     expect(scaChip.props.accessibilityRole).toBe('radio');
     expect(scaChip.props.accessibilityState).toEqual({ selected: true });
 
-    const tdsInput = tree.root.findByProps({ testID: 'tds-input' });
-    expect(tdsInput.props.accessibilityHint).toBeDefined();
-    expect(tdsInput.props.accessibilityHint).toContain('TDS');
-
     const notesInput = tree.root.findByProps({ testID: 'finish-notes-input' });
     expect(notesInput.props.accessibilityHint).toBeDefined();
     expect(notesInput.props.value).toBe('');
   });
 
-  test('TASK-P54-01-ODK: formatTime i safeWater parsują jednostki (125,5 s, 300 ml) a wejścia notatek i TDS sanityzują znaki kontrolne', () => {
-    const mockChangeTds = jest.fn();
+  test('TASK-P54-01-ODK: formatTime i safeWater parsują jednostki (125,5 s, 300 ml) a wejście notatek sanityzuje znaki kontrolne', () => {
     const mockChangeNotes = jest.fn();
 
     let tree: any;
@@ -260,8 +214,6 @@ describe('BrewFinishModal Component', () => {
           totalElapsedSeconds={' 125,5 s ' as any}
           waterGrams={' 320,8 ml ' as any}
           notes={'Złożony napar\x00\x07 z nutami jaśminu'}
-          tdsInput={' 1,35 % '}
-          onChangeTdsInput={mockChangeTds}
           onChangeNotes={mockChangeNotes}
         />
       );
@@ -282,11 +234,5 @@ describe('BrewFinishModal Component', () => {
       notesInput.props.onChangeText('Nowa\x00 notatka\x1F');
     });
     expect(mockChangeNotes).toHaveBeenCalledWith('Nowa notatka');
-
-    const tdsInput = tree.root.findByProps({ testID: 'tds-input' });
-    act(() => {
-      tdsInput.props.onChangeText('1.40\x00');
-    });
-    expect(mockChangeTds).toHaveBeenCalledWith('1.40');
   });
 });

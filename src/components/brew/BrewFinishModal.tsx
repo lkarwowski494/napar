@@ -17,7 +17,6 @@ import {
 import { theme, withAlpha } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
 import { formatTemperatureDelta, UnitSystem } from '../../core/unit-converter';
-import { BrewCostMetrics } from '../../core/cost-calculator';
 import {
   SensoryProfile,
   SensoryRadarChart,
@@ -42,11 +41,8 @@ interface BrewFinishModalProps {
   onToggleTag: (tag: string) => void;
   waterProfile: string;
   onChangeWaterProfile: (id: string) => void;
-  tdsInput: string;
-  onChangeTdsInput: (tds: string) => void;
   notes: string;
   onChangeNotes: (notes: string) => void;
-  brewCost: BrewCostMetrics;
   language?: 'pl' | 'en';
   /** M1-audytor-generalny-034: jednostka różnicy temperatury w poradach */
   unitSystem?: UnitSystem;
@@ -68,11 +64,8 @@ export function BrewFinishModal({
   onToggleTag,
   waterProfile,
   onChangeWaterProfile,
-  tdsInput,
-  onChangeTdsInput,
   notes,
   onChangeNotes,
-  brewCost,
   language: propLanguage,
   onSkip,
   onSave,
@@ -80,7 +73,6 @@ export function BrewFinishModal({
 }: BrewFinishModalProps) {
   const { t, language: contextLang } = useTranslation();
   const language = propLanguage || contextLang || 'pl';
-  const curr = language === 'pl' ? 'PLN' : '$';
 
   if (!visible) return null;
 
@@ -111,17 +103,6 @@ export function BrewFinishModal({
 
   const rawRating = typeof rating === 'number' ? rating : (typeof rating === 'string' ? parseFloat(rating) : 0);
   const safeRating = Number.isFinite(rawRating) && rawRating > 0 && !Object.is(rawRating, -0) ? Math.max(0, Math.min(5, Math.floor(rawRating))) : 0;
-
-  const getSafeNum = (val: unknown, fallback = 0) => {
-    const n = typeof val === 'number' ? val : (typeof val === 'string' ? parseFloat(val) : fallback);
-    return Number.isFinite(n) && !Object.is(n, -0) ? n : fallback;
-  };
-
-  const safeTotalHomeCost = getSafeNum(brewCost?.totalHomeCost, 0).toFixed(2);
-  const safeCoffeeCost = getSafeNum(brewCost?.coffeeCost, 0).toFixed(2);
-  const safeWaterCost = getSafeNum(brewCost?.waterCost, 0).toFixed(2);
-  const safeCafePrice = Math.max(0, Math.round(getSafeNum(brewCost?.cafePrice, 0))).toFixed(0);
-  const safeSavingsPerCup = getSafeNum(brewCost?.savingsPerCup, 0).toFixed(2);
 
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
@@ -312,23 +293,6 @@ export function BrewFinishModal({
               })}
             </View>
 
-            {/* Opcjonalny TDS */}
-            <View style={styles.tdsInputRow}>
-              <Text style={styles.tdsInputLabel}>{t.brew?.tdsLabel || 'Odczyt TDS refractometru (%):'}</Text>
-              <TextInput
-                testID="tds-input"
-                style={styles.tdsTextInput}
-                placeholder={t.brew?.tdsPlaceholder || 'np. 1.35'}
-                placeholderTextColor={theme.colors.textMuted}
-                keyboardType="numeric"
-                maxLength={6}
-                accessibilityLabel={t.brew?.tdsLabel || 'Odczyt TDS refractometru (%)'}
-                accessibilityHint={language === 'en' ? 'Enter refractometer TDS reading in percent' : 'Wprowadź odczyt TDS refractometru w procentach'}
-                value={(tdsInput ?? '').replace(/[\x00-\x1F\x7F]/g, '')}
-                onChangeText={(val) => onChangeTdsInput((val || '').replace(/[\x00-\x1F\x7F]/g, '').slice(0, 6))}
-              />
-            </View>
-
             {/* Notatki baristy */}
             <Text style={styles.sectionLabel}>{t.brew?.baristaNotesTitle || 'Notatki Baristy'}</Text>
             <TextInput
@@ -343,30 +307,6 @@ export function BrewFinishModal({
               accessibilityHint={language === 'en' ? 'Enter tasting notes and sensory feedback' : 'Wprowadź notatki sensoryczne z zaparzonego naparu'}
               multiline
             />
-
-            {/* Ekonomia Rzemiosła (Koszt vs Kawiarnia) */}
-            <View style={styles.finishCostCard} testID="finish-cost-card">
-              <Text style={styles.finishCostTitle}>{t.brew?.craftEconomicsTitle || 'Ekonomia Rzemiosła'}</Text>
-              <Text style={styles.finishCostSubtitle}>
-                {language === 'pl'
-                  ? `Koszt tego naparu: ${safeTotalHomeCost} PLN (ziarna: ${safeCoffeeCost} zł, woda: ${safeWaterCost} zł)`
-                  : (t.brew?.craftCostPerCup || 'Cost of this brew: {total} {curr} (beans: {beans} {curr}, water: {water} {curr})')
-                      .replace('{total}', safeTotalHomeCost)
-                      .replace('{beans}', safeCoffeeCost)
-                      .replace('{water}', safeWaterCost)
-                      .replace(/{curr}/g, curr)}
-              </Text>
-              <Text style={styles.finishCostSavings}>
-                {language === 'pl'
-                  ? `Oszczędność vs kawiarnia specialty (${safeCafePrice} zł): `
-                  : (t.brew?.craftSavingsLabel || `Savings vs cafe cup (${curr}${safeCafePrice}): `) + ' '}
-                <Text style={styles.finishCostSavingsBold}>
-                  {language === 'pl'
-                    ? `+${safeSavingsPerCup} PLN`
-                    : `+${curr}${safeSavingsPerCup}`}
-                </Text>
-              </Text>
-            </View>
           </ScrollView>
         </View>
       </View>
@@ -528,29 +468,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontWeight: '700',
   },
-  tdsInputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 8,
-    marginBottom: 14,
-  },
-  tdsInputLabel: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-  },
-  tdsTextInput: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.borderStrong,
-    borderRadius: theme.borderRadius.sm,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    color: theme.colors.textPrimary,
-    width: 90,
-    textAlign: 'center',
-    fontSize: 14,
-  },
   notesInput: {
     backgroundColor: theme.colors.bgCardSecondary,
     borderRadius: theme.borderRadius.md,
@@ -561,33 +478,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     minHeight: 60,
     marginBottom: 14,
-  },
-  finishCostCard: {
-    backgroundColor: theme.colors.bgCardSecondary,
-    borderRadius: theme.borderRadius.md,
-    padding: 14,
-    marginTop: 6,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  finishCostTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: theme.colors.copper,
-    marginBottom: 4,
-  },
-  finishCostSubtitle: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-    marginBottom: 6,
-  },
-  finishCostSavings: {
-    fontSize: 13,
-    color: theme.colors.textPrimary,
-  },
-  finishCostSavingsBold: {
-    fontWeight: '700',
-    color: theme.colors.success,
   },
 });

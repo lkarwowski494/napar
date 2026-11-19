@@ -42,7 +42,6 @@ module.exports = {
     // Bez progu katalogu: Jest liczy katalog razem z plikami o własnym progu, a useBrewWorkflow go nie spełnia.
     './src/hooks/useBrewWorkflow.ts': { statements: 89, branches: 63, functions: 92, lines: 90 },
     './src/core/water-chemistry.ts': { statements: 91, branches: 89, functions: 100, lines: 100 },
-    './src/core/cost-calculator.ts': { statements: 96, branches: 98, functions: 100, lines: 100 },
     './src/core/gongfu-session.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/recipes-data.ts': { statements: 100, branches: 100, functions: 100, lines: 100 },
     './src/core/knowledge-data.ts': { statements: 95, branches: 85, functions: 100, lines: 95 },

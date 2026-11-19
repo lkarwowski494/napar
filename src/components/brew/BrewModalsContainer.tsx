@@ -69,11 +69,8 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     toggleTag,
     waterProfile,
     setWaterProfile,
-    tdsInput,
-    setTdsInput,
     notes,
     setNotes,
-    brewCost,
     handleFinishSave,
     handleScanQrRecipe,
     t,
@@ -149,11 +146,8 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         onToggleTag={toggleTag}
         waterProfile={waterProfile}
         onChangeWaterProfile={setWaterProfile}
-        tdsInput={tdsInput}
-        onChangeTdsInput={setTdsInput}
         notes={notes}
         onChangeNotes={setNotes}
-        brewCost={brewCost}
         onSkip={() => {
           setShowFinishModal(false);
           resetTimer();

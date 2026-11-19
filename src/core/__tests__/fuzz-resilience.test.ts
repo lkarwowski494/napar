@@ -13,7 +13,6 @@ import {
   convertMicronsToGrinder,
 
 } from '../grinder-converter';
-import { calculateBrewCost,    } from '../cost-calculator';
 import {
   formatTemperature,
 
@@ -223,24 +222,6 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
       }
     }
 
-  });
-
-  test('Chaos 9: Fuzzing kalkulatora kosztów kawy z mutacjami brzegowymi (TASK-P61-12-NIE)', () => {
-    const extremeNumbers = [-5000, -0, 0, 0.001, 15, 250, 1e6, NaN, Infinity, -Infinity];
-
-    for (const dose of extremeNumbers) {
-      for (const price of extremeNumbers) {
-        const brew = calculateBrewCost({
-          doseGrams: dose,
-          beanPricePerKg: price,
-        });
-        expect(Number.isFinite(brew.totalHomeCost)).toBe(true);
-        expect(brew.totalHomeCost).toBeGreaterThanOrEqual(0);
-        expect(Object.is(brew.totalHomeCost, -0)).toBe(false);
-        expect(brew.savingsPercent).toBeLessThanOrEqual(100);
-        expect(brew.savingsPercent).toBeGreaterThanOrEqual(0);
-      }
-    }
   });
 
   test('Chaos 10: Fuzzing modułów konwersji jednostek i przemiału z mutacjami brzegowymi (TASK-P63-12-NIE)', () => {

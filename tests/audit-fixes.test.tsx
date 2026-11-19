@@ -2326,11 +2326,8 @@ describe('M1-audytor-generalny-041: formularz podsumowania parzenia — „Pomi�
             onToggleTag={() => undefined}
             waterProfile="none"
             onChangeWaterProfile={() => undefined}
-            tdsInput=""
-            onChangeTdsInput={() => undefined}
             notes=""
             onChangeNotes={() => undefined}
-            brewCost={{ coffeeCost: 0, waterCost: 0, electricityKwh: 0, energyCost: 0, filterCost: 0, totalHomeCost: 0, cafePrice: 0, savingsPerCup: 0, savingsPercent: 0 }}
             onSkip={() => calls.push('skip')}
             onSave={() => calls.push('save')}
           />
@@ -2643,5 +2640,41 @@ describe('KO-003 (WG-01): workflow_dispatch w ci.yml bez zmiany kontroli ani upr
     const ci = readFileSync(join(root, '.github/workflows/ci.yml'), 'utf8');
     expect(ci).toMatch(/^on:\s*\n[\s\S]*?^\s{2}workflow_dispatch:/m);
     expect(ci).toMatch(/^permissions:\s*\n\s{2}contents:\s*read/m);
+  });
+});
+
+describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkownika (F-05, F-31)', () => {
+  test('F-05 (opcja b) i F-31 (opcja a): BrewFinishModal nie renderuje tds-input ani finish-cost-card; cost-calculator.ts usunięty', () => {
+    const { BrewFinishModal } = require('../src/components/brew/BrewFinishModal');
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewFinishModal
+          visible={true}
+          totalElapsedSeconds={180}
+          waterGrams={250}
+          rating={4}
+          onChangeRating={() => {}}
+          tasteBalance="balanced"
+          onChangeTasteBalance={() => {}}
+          sensoryProfile={{ aroma: 7, sweetness: 7, acidity: 7, body: 7, aftertaste: 7 }}
+          onChangeSensoryProfile={() => {}}
+          selectedTags={[]}
+          onToggleTag={() => {}}
+          waterProfile="sca-golden"
+          onChangeWaterProfile={() => {}}
+          notes=""
+          onChangeNotes={() => {}}
+          onSkip={() => {}}
+          onSave={() => {}}
+        />,
+      );
+    });
+    expect(tree.root.findAllByProps({ testID: 'tds-input' })).toHaveLength(0);
+    expect(tree.root.findAllByProps({ testID: 'finish-cost-card' })).toHaveLength(0);
+    act(() => tree.unmount());
+    expect(existsSync(join(root, 'src/core/cost-calculator.ts'))).toBe(false);
+    // Kalkulator EY w Warsztacie (F-05) zostaje
+    expect(existsSync(join(root, 'src/components/dialin/ExtractionYieldTab.tsx'))).toBe(true);
   });
 });

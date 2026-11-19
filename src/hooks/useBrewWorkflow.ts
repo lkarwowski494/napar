@@ -33,7 +33,6 @@ import {
   decodeRecipeFromShareUrl,
 } from '../core/recipe-share';
 import { confirmAction } from '../platform/confirm';
-import { calculateBrewCost } from '../core/cost-calculator';
 import {
   checkCorruptState,
   dismissCorruptState,
@@ -104,7 +103,6 @@ export function useBrewWorkflow() {
   // Tasting summary form state
   const [rating, setRating] = useState<number>(5);
   const [tasteBalance, setTasteBalance] = useState<string>('balanced');
-  const [tdsInput, setTdsInput] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sensoryProfile, setSensoryProfile] = useState<SensoryProfile>(DEFAULT_SENSORY_PROFILE);
@@ -271,13 +269,6 @@ export function useBrewWorkflow() {
     );
   };
 
-  const brewCost = useMemo(() => {
-    return calculateBrewCost({
-      doseGrams,
-      waterWeightGrams: waterGrams,
-    });
-  }, [doseGrams, waterGrams]);
-
   const handleStartTimer = () => {
     if (
       selectedInventoryItem &&
@@ -385,7 +376,6 @@ export function useBrewWorkflow() {
   }, [snapshot.status]);
 
   const handleFinishSave = () => {
-    const tdsNum = parseFloat(tdsInput);
     // M1-audytor-generalny-007: przy błędzie zapisu okno zakończenia zostaje otwarte z ocenami i notatkami.
     const saved = runSave(
       () =>
@@ -394,7 +384,6 @@ export function useBrewWorkflow() {
           tasteBalance,
           flavorTags: selectedTags,
           sensory: sensoryProfile,
-          tdsPercentage: isNaN(tdsNum) ? undefined : tdsNum,
           notes: notes.trim() || undefined,
           logToCaffeineTracker: true,
         }),
@@ -493,7 +482,6 @@ export function useBrewWorkflow() {
     handleCompleteOnboarding,
     recentFiveStarSession,
     handleQuickReBrew,
-    brewCost,
     handleStartTimer,
     handleScanQrRecipe,
     shareUrl,
@@ -501,8 +489,6 @@ export function useBrewWorkflow() {
     setRating,
     tasteBalance,
     setTasteBalance,
-    tdsInput,
-    setTdsInput,
     notes,
     setNotes,
     selectedTags,
