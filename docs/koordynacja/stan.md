@@ -1,4 +1,4 @@
-# Koordynacja Napar — stan (aktualizacja 2026-11-19 13:36 UTC)
+# Koordynacja Napar — stan (aktualizacja 2026-11-19 16:55 UTC)
 
 ## Mandat (przepisuj bez zmian; zmienia go tylko właściciel)
 - Tryb decyzji: analogia — od 2026-11-19 10:30 UTC, słowa: „1. Tak 2. Dopracowanie aplikacji. Mysle ze powinnismy zaczac od napraw ktore wskazal audyt a nie zostaly jeszcze zrobione. 3. analogia”
@@ -12,10 +12,10 @@
 - Gałąź robocza: `claude/napar-app-audit-5u19j0` (HEAD `e307853`); gałąź stanu: `koordynacja` (nigdy nie scalana do integracji ani `main`).
 
 ## Teraz (3–5 linii)
-- **Gałąź robocza `claude/napar-app-audit-5u19j0` na `e307853`** (FF po przyjętej Sesji H i recenzji H2 `PRZYJĄĆ Z UWAGAMI`: 0 P0, 0 P1, 3 P2; `npm run verify` kod `0`, 118/118 pakietów, 1293/1293 testów).
-- **Sesja H (`e307853`) naprawiła wszystkie znaleziska G2:** ucieknięto nawiasy regex `ekran:\\(tabs\\)/index` w `.maestro/08-pelna-petla.yaml:50`, zaktualizowano kontrakt `tests/e2e-contract.test.ts` do walidacji regex Maestro (TDD) oraz dodano regresyjny test przewijania dla `02-spizarnia-dodaj-paczke.yaml`.
-- **W toku:** `E2E iOS (Maestro)` run **`44532031189`** na `a5a4507` (start 13:17 UTC — kończy się ok. 13:55 UTC; zostawiamy do końca, by zobaczyć wyniki `01..07` i pierwszej części `08`).
-- Następny krok: odbiór wyników `44532031189` → jeśli `01..07` zielone (i tylko `08` padło na naprawionym już `ekran:(tabs)/index`), od razu uruchamiamy czysty run E2E na `e307853`; po zielonym E2E prośba do właściciela o zgodę na scalenie do `main`.
+- **Gałąź robocza `claude/napar-app-audit-5u19j0` na `e307853`** (`npm run verify` kod `0`, 118/118 pakietów, 1293/1293 testów).
+- **Wynik `E2E iOS (Maestro)` run `44532031189` (na `a5a4507`, 13:54 UTC):** **3/8 PASS** (`01`, `04`, `05` przeszły po raz pierwszy!); 5 oblało z 3 konkretnych przyczyn: `02` na `hideKeyboard` (kaskada na `06` i `07`), `03` na `quick-add-caffeine-btn`, `08` na asercji `"E2E pelna petla"` w Dzienniku.
+- **W toku:** **Sesja I (`07-jakosc`, fix)** na `naprawy/I-e2e-44532031189` (analiza artefaktu `maestro-zrzuty` z `44532031189` i naprawa wszystkich 3 przyczyn naraz).
+- Następny krok: odbiór Sesji I + recenzja I2 → FF `claude/napar-app-audit-5u19j0` → czysty run `E2E iOS (Maestro)` (cel: 8/8 PASS) → prośba do właściciela o zgodę na scalenie do `main`.
 
 ## Sesje
 | Litera | ID | Rola, tryb | Gałąź @ SHA | Kontekst % | Koszt USD | Stan |
@@ -34,13 +34,14 @@
 | G2 | `0286e043107ba520ed3c6064585f98d8` | recenzent (07 audit) | `70b4d29..a5a4507` (odczyt) | — | — | zakończona (ODRZUCIĆ: P0:1, P1:1, P2:1) |
 | H | `85999b0b86dfd071a14f799315c15923` | 07-jakosc, fix (G2 P0/P1/P2) | `naprawy/H-maestro-regex` @ `e307853` | — | — | przyjęta i scalona FF (verify 0: 118/118, 1293/1293) |
 | H2 | `28bafec46b61008c225f4098681584a8` | recenzent (07 audit) | `a5a4507..e307853` (odczyt) | — | — | zakończona (PRZYJĄĆ Z UWAGAMI: 0 P0, 0 P1, 3 P2) |
+| I | `28f88aa27b0ddc9b661d49afb57eca77` | 07-jakosc, fix (E2E 44532031189) | `naprawy/I-e2e-44532031189` | — | — | w toku |
 
 ## Plan 24 h (UTC)
 | Kiedy | Co | Kto (sesja/rola) | Zależy od | Od właściciela |
 |---|---|---|---|---|
-| 13:17–14:00 | Przebieg `E2E iOS (Maestro)` na `a5a4507` (run `44532031189`) | GitHub Actions | w toku | nic |
-| po 44532031189 | Czysty przebieg `E2E iOS (Maestro)` na `e307853` (lub poprawka ew. innych błędów z `44532031189`) | Koordynator / GH Actions | koniec `44532031189` | nic |
-| po zielonym E2E | Prośba o zgodę na scalenie `claude/napar-app-audit-5u19j0` → `main` | Koordynator | zielone E2E | zgoda na `main` + ew. weto `KO-002..004` + status `M1-020` |
+| 16:55–17:10 | Naprawa 3 przyczyn z E2E `44532031189` (`02`/`03`/`08`) + recenzja I2 | Sesja I + I2 | w toku | nic |
+| 17:10–17:50 | Czysty przebieg `E2E iOS (Maestro)` (cel: 8/8 PASS + `wykonane.tsv`) | GitHub Actions | FF po I2 | nic |
+| po zielonym E2E | Prośba o zgodę na scalenie `claude/napar-app-audit-5u19j0` → `main` | Koordynator | zielone E2E 8/8 | zgoda na `main` + ew. weto `KO-002..004` + status `M1-020` |
 | po scaleniu `main` | Build TestFlight 1.0.0 + testy fizyczne `T1`–`T12` / protokół F | Właściciel | zgoda na TestFlight | testy fizyczne na telefonie |
 
 ## Czeka na właściciela
@@ -71,4 +72,5 @@
 | 2026-11-19 12:11 | F+F2 | Sesja F (`70b4d29`, 4 commity, verify 0: 118/118, 1289/1289) + recenzja F2 (**PRZYJĄĆ**, 0 P0/P1, 1 P2). | FF → `70b4d29`, E2E `44521826864` |
 | 2026-11-19 13:17 | G | Sesja G (`a5a4507`, verify 0: 118/118, 1291/1291) — naprawa selektorów zakładek iOS po `44521826864`. FF `claude/napar-app-audit-5u19j0` → `a5a4507`, start E2E `44532031189`. | Niezależna recenzja G2 |
 | 2026-11-19 13:23 | G2 | Recenzja G2 (`70b4d29..a5a4507`): **ODRZUCIĆ** (P0:1 nieuciekane `ekran:(tabs)/index` w `08-pelna-petla.yaml:49-50`, P1:1 kontrakt regex w `e2e-contract.test.ts`, P2:1 brak regresji `02` + wcięcia). | Zlecić Sesję H (`naprawy/H-maestro-regex`) |
-| 2026-11-19 13:36 | H+H2 | Sesja H (`e307853`, verify 0: 118/118, 1293/1293) + recenzja H2 (**PRZYJĄĆ Z UWAGAMI**: 0 P0, 0 P1, 3 P2). FF `claude/napar-app-audit-5u19j0` → `e307853`. | Czekać na wynik E2E `44532031189`, potem czysty run na `e307853` |
+| 2026-11-19 13:36 | H+H2 | Sesja H (`e307853`, verify 0: 118/118, 1293/1293) + recenzja H2 (**PRZYJĄĆ Z UWAGAMI**: 0 P0, 0 P1, 3 P2). FF `claude/napar-app-audit-5u19j0` → `e307853`. | Czekać na wynik E2E `44532031189` |
+| 2026-11-19 13:54 | CI | E2E `44532031189` (na `a5a4507`): **3/8 PASS** (`01`, `04`, `05` przeszły!); 5 FAIL z 3 przyczyn (`02` `hideKeyboard` → kaskada `06`/`07`; `03` `quick-add-caffeine-btn`; `08` `"E2E pelna petla"`). | Zlecić Sesję I (`naprawy/I-e2e-44532031189`) |
