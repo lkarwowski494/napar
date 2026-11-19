@@ -1,4 +1,4 @@
-# Koordynacja Napar — stan (aktualizacja 2026-11-19 18:10 UTC)
+# Koordynacja Napar — stan (aktualizacja 2026-11-19 18:52 UTC)
 
 ## Mandat (przepisuj bez zmian; zmienia go tylko właściciel)
 - Tryb decyzji: analogia — od 2026-11-19 10:30 UTC, słowa: „1. Tak 2. Dopracowanie aplikacji. Mysle ze powinnismy zaczac od napraw ktore wskazal audyt a nie zostaly jeszcze zrobione. 3. analogia”
@@ -12,10 +12,9 @@
 - Gałąź robocza: `claude/napar-app-audit-5u19j0` (HEAD `48b2bc4`); gałąź stanu: `koordynacja` (nigdy nie scalana do integracji ani `main`).
 
 ## Teraz (3–5 linii)
-- **Gałąź robocza `claude/napar-app-audit-5u19j0` na `48b2bc4`** (FF po przyjętej Sesji J i recenzji J2 **PRZYJĄĆ Z UWAGAMI**: 0 P0, 0 P1, 3 P2; `npm run verify` kod `0`, 118/118 pakietów, 1298/1298 testów).
-- **Wynik E2E `44575002549` (na `9ace404`):** **7/8 PASS** (`01`..`07` przeszły!). Jedyny FAIL (`08` na `Tap on "OK"`) ujawnił rzeczywisty błąd iOS w `app/(tabs)/index.tsx`: `<BrewModalsContainer>` wewnątrz `<ScrollView>` połykał pierwsze stuknięcie `finish-save-btn` przy otwartej klawiaturze. Naprawione w Sesji J (`48b2bc4`).
-- **W toku:** `E2E iOS (Maestro)` run **`44584722624`** na `claude/napar-app-audit-5u19j0` (`48b2bc4`, start 18:09 UTC, cel: **8/8 PASS** + artefakt `e2e-wykonane`).
-- Następny krok: odbiór wyniku E2E `44584722624` → przy **8/8 PASS** weryfikacja `wykonane.tsv` i prośba do właściciela o zgodę na scalenie `claude/napar-app-audit-5u19j0` → `main`.
+- **KAMIEŃ MILOWY OSIĄGNIĘTY:** `E2E iOS (Maestro)` run **`44584722624`** na `claude/napar-app-audit-5u19j0` (`48b2bc4`) zakończony **SUKCESEM — 8/8 PASS** (42m11s); zweryfikowano artefakt `e2e-wykonane` (`wykonane.tsv` z dokładnym SHA `48b2bc46cbfd7fdd61f6be413d0a45c3a327905c` i 8× `PASS`).
+- **`npm run verify` zielony:** kod `0` (`118/118` pakietów, `1298/1298` testów, bramka scenariuszy D-060 zielona, wszystkie recenzje niezależne B2/C2/D2/F2/H2/I2/J2 przyjęte z 0 P0 i 0 P1).
+- **STOP (zasada wspólna 12):** czekamy na wyraźną zgodę właściciela na scalenie `claude/napar-app-audit-5u19j0` (`48b2bc4`) → `main` (oraz ew. weto do `KO-002..004`, decyzję ws. `M1-020` i zgodę na posprzątanie gałęzi tymczasowych `naprawy/*`).
 
 ## Sesje
 | Litera | ID | Rola, tryb | Gałąź @ SHA | Kontekst % | Koszt USD | Stan |
@@ -42,17 +41,17 @@
 ## Plan 24 h (UTC)
 | Kiedy | Co | Kto (sesja/rola) | Zależy od | Od właściciela |
 |---|---|---|---|---|
-| 18:09–18:50 | Przebieg `E2E iOS (Maestro)` na `48b2bc4` (run `44584722624`, cel: **8/8 PASS**) | GitHub Actions | w toku | nic |
-| po zielonym E2E | Prośba o zgodę na scalenie `claude/napar-app-audit-5u19j0` → `main` | Koordynator | zielone E2E 8/8 | zgoda na `main` + ew. weto `KO-002..004` + status `M1-020` |
+| teraz | **STOP:** zgoda właściciela na scalenie `claude/napar-app-audit-5u19j0` (`48b2bc4`) → `main` | Właściciel | gotowe (verify 0 + E2E 8/8 PASS) | zgoda na `main` + ew. weto `KO-002..004` + status `M1-020` + zgoda na usunięcie `naprawy/*` |
+| po zgodzie | Scalenie `claude/napar-app-audit-5u19j0` → `main` + weryfikacja zielonego `CI` na `main` | Koordynator | zgoda właściciela | nic |
 | po scaleniu `main` | Build TestFlight 1.0.0 + testy fizyczne `T1`–`T12` / protokół F | Właściciel | zgoda na TestFlight | testy fizyczne na telefonie |
 
 ## Czeka na właściciela
+- **Działanie zewnętrzne (zasada 12 — STOP):** zgoda na scalenie `claude/napar-app-audit-5u19j0` (`48b2bc4`) → `main` (oraz ew. zgoda na usunięcie 9 tymczasowych gałęzi `naprawy/*`).
 - Do weta (tryb `analogia`, nie blokowało prac): `KO-002` (`support@apps4brew.com`), `KO-003` (`workflow_dispatch` w `ci.yml`), `KO-004` (Scope §3: usunięcie `tds-input`, karty kosztu, kalendarza 14-dniowego/ICS, ukrycie okna odgazowania; zamknięcie 12 pozycji §3 w `D-017..D-020`) — w `docs/koordynacja/decyzje.md`.
 - `[DO USTALENIA]`: treść brakującego zadania `M1-audytor-generalny-020` (brak w repo po usunięciu `audit/` wg D-009).
-- Działanie zewnętrzne (zasada 12): zgoda na scalenie `claude/napar-app-audit-5u19j0` → `main` (po zielonym E2E `44584722624`).
 
 ## Bramka scenariuszy (zasada 22)
-- Wdrożona i zielona statycznie na `48b2bc4`: `docs/jakosc/przypadki-uzycia.md` (27 PU: 7 A / 0 B / 20 F), `scripts/sprawdz-scenariusze.mjs`, `testID="ekran:<trasa>"` na wszystkich 9 ekranach `app/`, artefakt `e2e-wykonane` (`wykonane.tsv`) w `e2e-ios.yml`, `--build "$BUILD" --wykonane wykonane.tsv` w `testflight.yml`.
+- **ZIELONA statycznie i dynamicznie na `48b2bc4`:** `docs/jakosc/przypadki-uzycia.md` (27 PU: 7 A / 0 B / 20 F), `scripts/sprawdz-scenariusze.mjs`, `testID="ekran:<trasa>"` na wszystkich 9 ekranach `app/`, artefakt `e2e-wykonane` (`wykonane.tsv`: **8/8 PASS** z runu `44584722624`), `--build "$BUILD" --wykonane wykonane.tsv` w `testflight.yml`.
 
 ## Przypomnienia
 - Środowisko bez `send_later` / `list_triggers`; kontrola realizowana reaktywnie.
@@ -78,4 +77,5 @@
 | 2026-11-19 13:54 | CI | E2E `44532031189` (na `a5a4507`): **3/8 PASS** (`01`, `04`, `05` przeszły!); 5 FAIL z 3 przyczyn (`02` `hideKeyboard` → kaskada `06`/`07`; `03` `quick-add-caffeine-btn`; `08` `"E2E pelna petla"`). | Zlecić Sesję I (`naprawy/I-e2e-44532031189`) |
 | 2026-11-19 17:14 | I+I2 | Sesja I (`9ace404`, 8 plików, verify 0: 118/118, 1297/1297) + recenzja I2 (**PRZYJĄĆ**: 0 P0, 0 P1, 2 P2). FF `claude/napar-app-audit-5u19j0` → `9ace404`, start E2E `44575002549`. | Czekać na wynik E2E `44575002549` |
 | 2026-11-19 17:55 | CI | E2E `44575002549` (na `9ace404`): **7/8 PASS** (`01`..`07` przeszły!); jedyny FAIL: `08` (`Tap on "OK"`). | Zlecić Sesję J |
-| 2026-11-19 18:09 | J+J2 | Sesja J (`48b2bc4`, verify 0: 118/118, 1298/1298 — wyniesienie `BrewModalsContainer` poza `ScrollView`) + recenzja J2 (**PRZYJĄĆ Z UWAGAMI**: 0 P0, 0 P1, 3 P2). FF `claude/napar-app-audit-5u19j0` → `48b2bc4`, start E2E `44584722624`. | Czekać na wynik E2E `44584722624` (cel: 8/8 PASS) |
+| 2026-11-19 18:09 | J+J2 | Sesja J (`48b2bc4`, verify 0: 118/118, 1298/1298 — wyniesienie `BrewModalsContainer` poza `ScrollView`) + recenzja J2 (**PRZYJĄĆ Z UWAGAMI**: 0 P0, 0 P1, 3 P2). FF `claude/napar-app-audit-5u19j0` → `48b2bc4`, start E2E `44584722624`. | Czekać na wynik E2E `44584722624` |
+| 2026-11-19 18:51 | CI | **E2E `44584722624` (na `48b2bc4`): SUKCES — 8/8 PASS** (42m11s); artefakt `e2e-wykonane` (`wykonane.tsv`) zweryfikowany. | **STOP:** prośba do właściciela o zgodę na scalenie do `main` |
