@@ -112,7 +112,7 @@ Każde zdanie z faktem dziedzinowym w opisie PL i EN wskazuje twierdzenie ze sta
   `https://lkarwowski494.github.io/napar/privacy.html`
 * **Adres strony marketingowej:**
   `https://lkarwowski494.github.io/napar/`
-* **E-mail kontaktowy:** [DO USTALENIA: adres od właściciela] — DEC-07 a; ten sam adres w `SUPPORT_EMAIL` (`src/core/app-identity.ts`) i w `site/support.html`. Strona `support.html` ma ramkę kontaktu do odkomentowania.
+* **E-mail kontaktowy:** `support@apps4brew.com` — DEC-07 a (`KO-002`, `D-017`); ten sam adres w `SUPPORT_EMAIL` (`src/core/app-identity.ts`), `site/support.html` i `docs/wydanie/app-review-notes.md`.
 * **Szyfrowanie (*ITSAppUsesNonExemptEncryption*):** `false` (standardowe HTTPS bez niestandardowej kryptografii zastrzeżonej)
 
 ---
@@ -124,7 +124,7 @@ Deklaracja statusu przedsiębiorcy (trader) zgodnie z rozporządzeniem (UE) 2022
 * **Status podmiotu w App Store Connect:** Trader (Przedsiębiorca)
 * **Nazwa podmiotu prawnego:** Apps4Brew Studio
 * **Kraj rejestracji:** Polska (UE)
-* **Adres e-mail kontaktu handlowego:** [DO USTALENIA: adres od właściciela] (ten sam co e-mail kontaktowy w sekcji 3)
+* **Adres e-mail kontaktu handlowego:** `support@apps4brew.com` (ten sam co e-mail kontaktowy w sekcji 3)
 * **Kategoria usług:** Oprogramowanie użytkowe i narzędzia rzemieślnicze B2C
 
 ---

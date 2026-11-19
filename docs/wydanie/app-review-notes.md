@@ -16,7 +16,7 @@ Fakty pochodzą z kodu i dokumentów repozytorium:
 | tryb awaryjny po 3 nieudanych startach albo błędzie otwarcia bazy | `src/data/startup-guard.ts` (`SAFE_MODE_THRESHOLD = 3`), `app/_layout.tsx`, `src/components/SafeModeView.tsx` |
 | etykiety przycisków | słownik `translations.en` w `src/core/i18n.tsx`; „Finish & Save” w `src/components/brew/ProcedureModal.tsx` |
 
-Przed wysłaniem do przeglądu: wpisać adres kontaktowy właściciela w miejsce znacznika (DEC-07) i sprawdzić, że wersja w nagłówku bloku zgadza się z `app.json`.
+Przed wysłaniem do przeglądu: sprawdzić, że wersja w nagłówku bloku zgadza się z `app.json` (adres kontaktowy wpisany: DEC-07 / `KO-002`).
 
 ```text
 Napar 1.0.0 - notes for App Review
@@ -50,5 +50,5 @@ SAFE MODE
 If the app fails to start three times in a row or the database cannot be opened, it starts in safe mode instead of the normal screens. Safe mode lets the user export a rescue copy of the database and try a normal start again. It does not appear in normal use.
 
 CONTACT
-[DO USTALENIA: adres od właściciela]
+support@apps4brew.com
 ```

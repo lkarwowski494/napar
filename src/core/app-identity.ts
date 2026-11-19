@@ -29,10 +29,9 @@ export function privacyPolicyUrl(lang: 'pl' | 'en'): string {
   return lang === 'en' ? `${SITE_BASE_URL}en/privacy.html` : `${SITE_BASE_URL}privacy.html`;
 }
 
-// [DO USTALENIA: adres od właściciela] — DEC-07 a: działający adres e-mail właściciela, wpisany tu
-// i w site/support.html (miejsce oznaczone tym samym znacznikiem) oraz w docs/15-app-store.md.
-// Do tego czasu null: Ustawienia zamiast wiadomości e-mail otwierają stronę wsparcia (SUPPORT_URL).
-export const SUPPORT_EMAIL: string | null = null;
+// DEC-07 a (KO-002, D-017): działający adres e-mail kontaktu, wpisany tu, w site/support.html,
+// w docs/15-app-store.md oraz w docs/wydanie/app-review-notes.md.
+export const SUPPORT_EMAIL: string | null = 'support@apps4brew.com';
 
 export function supportMailtoUrl(email: string): string {
   return `mailto:${email}`;

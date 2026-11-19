@@ -1024,17 +1024,24 @@ describe('M1-audytor-generalny-023: adresy polityki, regulaminu i wsparcia z jed
     expect(scan(/apps4brew\.pl/i, files)).toEqual([]);
   });
 
-  test('10-wydanie-001: adres e-mail kontaktu ma jedno miejsce (SUPPORT_EMAIL); bez adresu od właściciela strona nie pokazuje żadnego e-maila', () => {
+  test('10-wydanie-001 (KO-002 / DEC-07): adres e-mail kontaktu ma jedno miejsce (SUPPORT_EMAIL) i jest wpisany spójnie na stronie oraz w dokumentacji wydania', () => {
     const identity = require('../src/core/app-identity');
-    expect(identity.SUPPORT_EMAIL).toBeNull();
-    expect(readFileSync(join(root, 'src/core/app-identity.ts'), 'utf8')).toContain('[DO USTALENIA: adres od właściciela]');
-    expect(scan(/[\w.+-]+@[\w-]+\.[a-z]{2,}/i, siteFiles)).toEqual([]);
-    expect(readFileSync(join(root, 'site/support.html'), 'utf8')).toContain('[DO USTALENIA: adres od właściciela]');
-    expect(readFileSync(join(root, 'docs/15-app-store.md'), 'utf8')).toContain('[DO USTALENIA: adres od właściciela]');
-    expect(identity.supportMailtoUrl('wsparcie@przyklad.test')).toBe('mailto:wsparcie@przyklad.test');
+    expect(identity.SUPPORT_EMAIL).toBe('support@apps4brew.com');
+    const expectedEmail = 'support@apps4brew.com';
+    const stalePlaceholder = ['adres od', 'właściciela'].join(' ');
+    expect(readFileSync(join(root, 'src/core/app-identity.ts'), 'utf8')).not.toContain(stalePlaceholder);
+    expect(readFileSync(join(root, 'site/support.html'), 'utf8')).toContain(`mailto:${expectedEmail}`);
+    expect(readFileSync(join(root, 'site/support.html'), 'utf8')).not.toContain(stalePlaceholder);
+    expect(readFileSync(join(root, 'docs/15-app-store.md'), 'utf8')).toContain(expectedEmail);
+    expect(readFileSync(join(root, 'docs/15-app-store.md'), 'utf8')).not.toContain(stalePlaceholder);
+    // Jedyny adres e-mail na stronach w site/ to SUPPORT_EMAIL
+    const allEmails = siteFiles.flatMap((f) => readFileSync(join(root, f), 'utf8').match(/[\w.+-]+@[\w-]+\.[a-z]{2,}/gi) ?? []);
+    expect(allEmails.length).toBeGreaterThan(0);
+    expect(new Set(allEmails)).toEqual(new Set([expectedEmail]));
+    expect(identity.supportMailtoUrl(expectedEmail)).toBe(`mailto:${expectedEmail}`);
   });
 
-  test('10-wydanie-001: adresy strony produktu tylko w app-identity.ts; Ustawienia otwierają politykę, regulamin i wsparcie z tych stałych', () => {
+  test('10-wydanie-001: adresy strony produktu tylko w app-identity.ts; Ustawienia otwierają politykę, regulamin i kontakt z tych stałych', () => {
     const identity = require('../src/core/app-identity');
     expect(scan(/github\.io|mailto:/, ['app/settings.tsx'])).toEqual([]);
     const { default: SettingsScreen } = require('../app/settings');
@@ -1056,7 +1063,11 @@ describe('M1-audytor-generalny-023: adresy polityki, regulaminu i wsparcia z jed
     press(/Regulamin/);
     press(/Kontakt i Wsparcie/);
     act(() => tree.unmount());
-    expect(spy.mock.calls.map((c: any[]) => c[0])).toEqual([identity.privacyPolicyUrl('pl'), identity.TERMS_URL, identity.SUPPORT_URL]);
+    expect(spy.mock.calls.map((c: any[]) => c[0])).toEqual([
+      identity.privacyPolicyUrl('pl'),
+      identity.TERMS_URL,
+      identity.supportMailtoUrl(identity.SUPPORT_EMAIL),
+    ]);
     expect(identity.privacyPolicyUrl('pl')).toBe('https://lkarwowski494.github.io/napar/privacy.html');
     expect(identity.TERMS_URL).toBe('https://lkarwowski494.github.io/napar/terms.html');
     expect(identity.SUPPORT_URL).toBe('https://lkarwowski494.github.io/napar/support.html');
@@ -2605,16 +2616,19 @@ describe('M1-audytor-generalny-040: deklaracje dostępności z dowodem; notatki 
     expect(notes).toMatch(/no account/i);
     expect(notes).toMatch(/Polish and English/);
     expect(notes).toMatch(/safe mode/i);
-    expect(notes).toContain('[DO USTALENIA: adres od właściciela]');
+    expect(notes).toContain('support@apps4brew.com');
+    expect(notes).not.toContain(['adres od', 'właściciela'].join(' '));
     expect(store()).toContain(NOTES);
   });
 
   test('10-wydanie-011: notatki bez zakazanych twierdzeń i bez wymyślonego adresu; zaprzeczenia zgodne z kodem', () => {
     const file = readFileSync(join(root, NOTES), 'utf8');
     // nazwę cudzej aplikacji (11-wzrost-007) pilnuje tests/brand-name.test.ts — skanuje też docs/wydanie/
-    for (const re of [/apple health|healthkit/i, /subscri|subskrypc|trial|paywall|premium|okres próbny/i, /\b35\b/, /[a-z0-9._-]+@[a-z0-9-]+\.[a-z]/i]) {
+    for (const re of [/apple health|healthkit/i, /subscri|subskrypc|trial|paywall|premium|okres próbny/i, /\b35\b/]) {
       expect([String(re), re.test(file)]).toEqual([String(re), false]);
     }
+    const foundEmails = file.match(/[a-z0-9._-]+@[a-z0-9-]+\.[a-z]+/gi) ?? [];
+    expect(new Set(foundEmails)).toEqual(new Set(['support@apps4brew.com']));
     const app = JSON.parse(readFileSync(join(root, 'app.json'), 'utf8')).expo;
     expect(app.ios.infoPlist.CFBundleLocalizations).toEqual(['pl', 'en']);
     expect(app.ios.infoPlist.NSCameraUsageDescription).toMatch(/QR/);

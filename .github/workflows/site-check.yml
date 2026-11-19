@@ -51,7 +51,7 @@ jobs:
           FILE=src/core/app-identity.ts
           EMAIL=$(sed -nE "s/^export const SUPPORT_EMAIL: string \| null = '([^']+)';/\1/p" "$FILE")
           if [ -z "$EMAIL" ]; then
-            echo "::error::SUPPORT_EMAIL w $FILE jest pusty [DO USTALENIA: adres od właściciela]"
+            echo "::error::SUPPORT_EMAIL w $FILE jest pusty"
             exit 1
           fi
           DOMAIN="${EMAIL#*@}"
