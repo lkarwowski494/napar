@@ -553,5 +553,35 @@ describe('Water Chemistry & Mineralization Module', () => {
     expect(geyser?.suitability).toBe('EXCELLENT');
     expect(geyser?.originCountry).toBe('USA');
   });
+
+  test('REJ-WODY: 5 zweryfikowanych wód butelkowanych ma TDS/GH/KH zgodne z odczytanymi etykietami z rejestr.json (2026-11-19)', () => {
+    const byId = new Map(BOTTLED_WATER_BENCHMARKS.map((w) => [w.id, w]));
+
+    expect(byId.get('muszynianka')).toMatchObject({
+      tdsPpm: 1954,
+      estimatedGhPpm: 1048,
+      estimatedKhPpm: 1221,
+    });
+    expect(byId.get('zywiec_zdroj')).toMatchObject({
+      tdsPpm: 213,
+      estimatedGhPpm: 112,
+      estimatedKhPpm: 99,
+    });
+    expect(byId.get('evian')).toMatchObject({
+      tdsPpm: 345,
+      estimatedGhPpm: 307,
+      estimatedKhPpm: 295,
+    });
+    expect(byId.get('highland_spring')).toMatchObject({
+      tdsPpm: 170,
+      estimatedGhPpm: 143,
+      estimatedKhPpm: 123,
+    });
+    expect(byId.get('spa_reine')).toMatchObject({
+      tdsPpm: 38,
+      estimatedGhPpm: 18,
+      estimatedKhPpm: 15,
+    });
+  });
 });
 

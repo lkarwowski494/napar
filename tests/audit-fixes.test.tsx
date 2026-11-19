@@ -833,7 +833,7 @@ describe('M1-audytor-generalny-018: wartoÅ›ci i etykiety zgodne z przeczytanym Å
     const { BOTTLED_WATER_BENCHMARKS } = require('../src/core/water-chemistry');
     const m = BOTTLED_WATER_BENCHMARKS.find((b: any) => b.id === 'muszynianka');
     expect(m.brandName).toBe('Muszynianka');
-    expect(m.tdsPpm).toBe(2000);
+    expect(m.tdsPpm).toBe(1954);
     const all = JSON.stringify(BOTTLED_WATER_BENCHMARKS);
     expect(all).not.toMatch(/WBC|World Barista Championships|Oficjalna woda|Official cupping/);
     expect(byId.get('WODA-MUSZYNIANKA-MINERALIZACJA')?.status).toBe('potwierdzone');
