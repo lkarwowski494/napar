@@ -1,0 +1,14 @@
+# Sesja A: Weryfikacja gałęzi audytowej i inwentarz niezakończonych napraw M1 — Napar
+Koordynator: `v1/default/jetski_remote_agents_3p/2f459540-3f1f-4d1d-b6a9-942b302be3a0` (raporty i pytania tylko do koordynatora). Gałąź stanu koordynatora: `koordynacja` (tylko do odczytu).
+
+1. Rola: `07-jakosc` w trybie `audit`. Prompt roli znajduje się w pliku `/home/antigravity/.gemini/jetski/brain/v1/default/jetski_remote_agents_3p/2f459540-3f1f-4d1d-b6a9-942b302be3a0/scratch/A-rola.md` — przeczytaj go i stosuj jego zasady.
+2. Start: utwórz czysty tymczasowy worktree lub pracuj w `/tmp/napar-sesja-a` na commicie `origin/claude/napar-app-audit-5u19j0` (`c836267`). NIE modyfikuj `/home/antigravity/lkarwowski494/napar` (tam jest `main`), NIE pisz na `koordynacja`, NIE pushuj nic. To zadanie jest wyłącznie diagnostyczno-audytowe (tylko odczyt + uruchomienie testów/bramek).
+3. Zadania (każde z kryterium „gotowe”):
+   1. **Uruchom pełną bramkę jakościową** na `c836267`: `npm ci` (jeśli brak `node_modules`) i `npm run verify` (wynik zapisz do pliku `/home/antigravity/.gemini/jetski/brain/v1/default/jetski_remote_agents_3p/2f459540-3f1f-4d1d-b6a9-942b302be3a0/scratch/A-verify.log`). Kryterium gotowe: dokładny kod wyjścia `npm run verify` oraz lista ewentualnych błędów / nieprzechodzących kroków.
+   2. **Inwentarz niezakończonych napraw po audycie M1** na `c836267`:
+      - Ustal, czego dotyczyło brakujące zadanie `M1-audytor-generalny-020` (sprawdź `docs/25-audyt-brd-qa-rel.md`, `git log`, `rejestr.json`, `docs/` — jeśli nie da się ustalić z repo, oznacz `[DO USTALENIA]`).
+      - Sprawdź wszystkie otwarte punkty w `docs/25-audyt-brd-qa-rel.md` (czy liczba otwartych KRYTYCZNYCH/WYSOKICH to 0, czy coś zostało), `rejestr.json` (lista wpisów ze statusem `otwarte` / `[DO USTALENIA]`), `docs/scope-contract.md` (§3 — które z 12 funkcji wymagają zmian kodu wg rekomendacji roli 03), `docs/wydanie/app-review-notes.md` (znaczniki do uzupełnienia), `docs/lokalizacja/jezyki.md` (`[DO USTALENIA]`), `docs/tylko-telefon.md` (T1–T12).
+      - Sprawdź stan pod kątem **bramki scenariuszy użytkownika (zasada wspólna 22, D-060)**: co już istnieje w `.maestro/` i `docs/przeplywy-uzytkownika.md`, a czego brakuje do `docs/jakosc/przypadki-uzytkownika.md` i `scripts/sprawdz-scenariusze.mjs`.
+   3. **Zapisz zwięzły raport** w `/home/antigravity/.gemini/jetski/brain/v1/default/jetski_remote_agents_3p/2f459540-3f1f-4d1d-b6a9-942b302be3a0/scratch/A-raport.md` z tabelą priorytetowych zadań naprawczych (P0/P1/P2), które zostały jeszcze do zrobienia.
+4. Zakazy: nie commitujesz i nie pushujesz na żadną gałąź, nie zmieniasz plików w repo `napar` ani `koordynacja`, nie uruchamiasz `AskUserQuestion`, nie pomijasz żadnego kroku `npm run verify`.
+5. Raport zwrotny do koordynatora: zwięzłe podsumowanie (≤ 15 linii) z: kodem wyjścia `npm run verify`, ścieżką do `A-raport.md` i `A-verify.log`, listą TOP 5 niezakończonych napraw po audycie M1.
