@@ -49,7 +49,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          git fetch --tags --force
           BUILD_BASE=$(node -p "require('./app.json').expo.ios.buildNumber")
           BUILD=$((BUILD_BASE + GITHUB_RUN_NUMBER))
           E2E_RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --commit "$GITHUB_SHA" --workflow e2e-ios.yml --status success --json databaseId --jq '.[0].databaseId')

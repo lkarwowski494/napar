@@ -73,9 +73,10 @@ describe('kontrakt bramki scenariuszy D-060: e2e-wykonane i pełny tryb w testfl
     expect(e2e).toMatch(/uses: actions\/upload-artifact@v4[\s\S]{0,160}name:\s*e2e-wykonane/);
   });
 
-  test('testflight.yml pobiera artefakt e2e-wykonane z zielonego e2e-ios.yml i uruchamia --build "$BUILD" --wykonane wykonane.tsv', () => {
+  test('testflight.yml pobiera artefakt e2e-wykonane z zielonego e2e-ios.yml i uruchamia --build "$BUILD" --wykonane wykonane.tsv (D2-P2: bez zbędnego git fetch --tags)', () => {
     const gate = tf.slice(tf.indexOf('  gate:'), tf.indexOf('  build:'));
-    expect(gate).toMatch(/git fetch --tags/);
+    expect(gate).toMatch(/fetch-depth:\s*0/);
+    expect(gate).not.toMatch(/git fetch --tags/);
     expect(gate).toMatch(/gh run list[^\n]*--workflow e2e-ios\.yml[^\n]*--status success/);
     expect(gate).toMatch(/gh run download[^\n]*-n e2e-wykonane/);
     expect(gate).toMatch(/node scripts\/sprawdz-scenariusze\.mjs --build "\$BUILD" --wykonane wykonane\.tsv/);
