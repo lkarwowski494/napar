@@ -149,7 +149,11 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           <Text style={styles.modalTitle}>{t.stash?.addTitle || 'Dodaj do Spiżarni'}</Text>
         </ModalHeader>
 
-        <ScrollView style={styles.formScroll}>
+        <ScrollView
+          style={styles.formScroll}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+        >
           {/* Typ: Kawa vs Herbata — widoczny wyłącznie gdy preferencja to 'both' */}
           {(!beveragePreference || beveragePreference === 'both') && (
             <View style={styles.typeSelectorRow}>

@@ -19,6 +19,9 @@ name: 03 Kofeina — szybki wpis V60
       id: "open-caffeine-from-workshop"
 - tapOn:
     id: "open-caffeine-from-workshop"
+- scrollUntilVisible:
+    element:
+      id: "quick-add-caffeine-btn"
 - tapOn:
     id: "quick-add-caffeine-btn"
 - tapOn:

@@ -18,14 +18,15 @@ name: 02 Spiżarnia — dodanie paczki i jej widoczność (wynik w danych)
 - tapOn:
     id: "bean-name-input"
 - inputText: "E2E Kenia"
-- hideKeyboard
+- swipe:
+    start: "50%, 40%"
+    end: "50%, 15%"
 - scrollUntilVisible:
     element:
       id: "bean-weight-input"
 - tapOn:
     id: "bean-weight-input"
 - inputText: "250"
-- hideKeyboard
 - tapOn:
     id: "save-bean-btn"
 - tapOn: "OK"

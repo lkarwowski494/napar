@@ -109,7 +109,12 @@ test('każdy selektor tekstowy scenariusza istnieje w słowniku PL, a każdy id 
     for (const m of body.matchAll(/^\s*-\s*(?:tapOn|assertVisible):\s*"([^"]+)"/gm)) {
       const sel = m[1];
       const tabMatch = sel.match(/^(.+), tab, \.\*$/);
-      const ok = plTexts.has(sel) || typed.has(sel) || (tabMatch !== null && plTabLabels.has(tabMatch[1]));
+      const wildcardTyped = sel.match(/^\.\*(.+)\.\*$/);
+      const ok =
+        plTexts.has(sel) ||
+        typed.has(sel) ||
+        (tabMatch !== null && plTabLabels.has(tabMatch[1])) ||
+        (wildcardTyped !== null && typed.has(wildcardTyped[1]));
       if (!ok) missing.push(`${f}: tekst „${sel}”`);
     }
     for (const sel of extractYamlIds(body)) {
@@ -191,5 +196,47 @@ test('02-spizarnia-dodaj-paczke.yaml przewija do bean-weight-input przed klikni�
   expect(scrollIdx).toBeGreaterThan(-1);
   expect(tapIdx).toBeGreaterThan(scrollIdx);
 });
+
+test('scenariusze Maestro nie używają gołego hideKeyboard (regresja #44532031189)', () => {
+  const violations: string[] = [];
+  for (const f of flows) {
+    const lines = fs.readFileSync(path.join(maestroDir, f), 'utf8').split('\n');
+    lines.forEach((line, idx) => {
+      if (/^\s*-\s*hideKeyboard\b/.test(line)) {
+        violations.push(`${f}:${idx + 1}: ${line.trim()}`);
+      }
+    });
+  }
+  expect(violations).toEqual([]);
+});
+
+test('03-kofeina-szybki-wpis.yaml przewija do quick-add-caffeine-btn przed kliknięciem (regresja #44532031189)', () => {
+  const body = fs.readFileSync(path.join(maestroDir, '03-kofeina-szybki-wpis.yaml'), 'utf8');
+  const { scrollIdx, tapIdx } = findScrollBeforeTap(body, 'quick-add-caffeine-btn');
+  expect(scrollIdx).toBeGreaterThan(-1);
+  expect(tapIdx).toBeGreaterThan(scrollIdx);
+});
+
+test('08-pelna-petla.yaml przewija do notatki w Dzienniku i dopasowuje cudzysłowy „...” z JournalSessionCard (regresja #44532031189)', () => {
+  const body = fs.readFileSync(path.join(maestroDir, '08-pelna-petla.yaml'), 'utf8');
+  const scrollMatch = /^\s*-\s*scrollUntilVisible:\s*\r?\n(?:[ \t]+(?!-\s)[^\r\n]*\r?\n)*?[ \t]+element:\s*\r?\n(?:[ \t]+(?!-\s)[^\r\n]*\r?\n)*?[ \t]+text:\s*["']([^"']+)["']/m.exec(body);
+  const assertMatch = /^\s*-\s*assertVisible:\s*["']([^"']*E2E pelna petla[^"']*)["']/m.exec(body);
+  expect(scrollMatch).not.toBeNull();
+  expect(assertMatch).not.toBeNull();
+  expect(assertMatch!.index).toBeGreaterThan(scrollMatch!.index);
+  // JournalSessionCard renderuje notatkę jako „{session.notes}” — selektor Maestro musi dopasować ten tekst jako regex.
+  const renderedNote = '„E2E pelna petla”';
+  expect(new RegExp(`^(?:${scrollMatch![1]})$`).test(renderedNote)).toBe(true);
+  expect(new RegExp(`^(?:${assertMatch![1]})$`).test(renderedNote)).toBe(true);
+});
+
+test('formularze modalne używane w E2E (BeanAddModal, BrewFinishModal) zamykają klawiaturę przy przewijaniu (regresja #44532031189)', () => {
+  for (const rel of ['src/components/beans/BeanAddModal.tsx', 'src/components/brew/BrewFinishModal.tsx']) {
+    const src = fs.readFileSync(path.join(root, rel), 'utf8');
+    expect(src).toMatch(/keyboardDismissMode=["']on-drag["']/);
+    expect(src).toMatch(/keyboardShouldPersistTaps=["']handled["']/);
+  }
+});
+
 
 

@@ -121,6 +121,8 @@ export function BrewFinishModal({
           </ModalHeader>
           <ScrollView
             showsVerticalScrollIndicator={false}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ paddingBottom: 24 }}
           >
             <Text style={styles.modalSub}>

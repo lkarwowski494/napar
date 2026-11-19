@@ -34,7 +34,6 @@ name: 08 Pełna pętla parzenie → ocena → zapis do Dziennika
 - tapOn:
     id: "finish-notes-input"
 - inputText: "E2E pelna petla"
-- hideKeyboard
 # powrót: (tabs)/index
 - tapOn:
     id: "finish-save-btn"
@@ -42,7 +41,11 @@ name: 08 Pełna pętla parzenie → ocena → zapis do Dziennika
 - tapOn: "Dziennik, tab, .*"
 - assertVisible:
     id: "journal-tab-sessions"
-- assertVisible: "E2E pelna petla"
+- scrollUntilVisible:
+    element:
+      text: ".*E2E pelna petla.*"
+    centerElement: true
+- assertVisible: ".*E2E pelna petla.*"
 - takeScreenshot: 08-pelna-petla
 # powrót: (tabs)/journal
 - tapOn: "Parzenie, tab, .*"

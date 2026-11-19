@@ -18,6 +18,7 @@ export interface MaestroCommand {
   inputText?: string;
   takeScreenshot?: string;
   scrollUntilVisible?: string;
+  swipe?: string;
   hideKeyboard?: boolean;
   back?: boolean;
   /** Polecenie spoza listy obsługiwanych — walidator je odrzuca. */
@@ -32,7 +33,7 @@ export interface MaestroFlow {
 }
 
 const FLAG_COMMANDS = ['launchApp', 'back', 'hideKeyboard'] as const;
-const TEXT_COMMANDS = ['assertVisible', 'assertNotVisible', 'tapOn', 'inputText', 'takeScreenshot', 'scrollUntilVisible'] as const;
+const TEXT_COMMANDS = ['assertVisible', 'assertNotVisible', 'tapOn', 'inputText', 'takeScreenshot', 'scrollUntilVisible', 'swipe'] as const;
 
 const unquote = (v: string) => v.trim().replace(/^["']|["']$/g, '');
 
@@ -54,6 +55,16 @@ export function parseMaestroYaml(content: string, rawPath: string = ''): Maestro
     const { key, inline, nested } = current;
     if ((FLAG_COMMANDS as readonly string[]).includes(key)) {
       commands.push({ [key]: true } as MaestroCommand);
+    } else if (key === 'swipe') {
+      const dir = nested.map((l) => l.match(/^direction:\s*(.+)$/)).find(Boolean);
+      const start = nested.map((l) => l.match(/^start:\s*(.+)$/)).find(Boolean);
+      const end = nested.map((l) => l.match(/^end:\s*(.+)$/)).find(Boolean);
+      const value = dir
+        ? unquote(dir[1])
+        : start && end
+          ? `${unquote(start[1])} -> ${unquote(end[1])}`
+          : '';
+      commands.push({ swipe: value });
     } else if ((TEXT_COMMANDS as readonly string[]).includes(key)) {
       let value = unquote(inline);
       if (!value) {

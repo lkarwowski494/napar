@@ -40,5 +40,9 @@ describe('BR-TEST-037: Maestro E2E Scenario Schema & Syntax Validation', () => {
     expect(() => validateMaestroFlowSyntax(noTarget)).toThrow(/Invalid tapOn target/);
     const nested = parseMaestroYaml('appId: pl.lukasz.napar\n---\n- tapOn:\n    id: "save-bean-btn"\n- hideKeyboard\n', 'ok.yaml');
     expect(nested.commands).toEqual([{ tapOn: 'save-bean-btn' }, { hideKeyboard: true }]);
+    const goodSwipe = parseMaestroYaml('appId: pl.lukasz.napar\n---\n- swipe:\n    start: "50%, 40%"\n    end: "50%, 15%"\n', 'ok-swipe.yaml');
+    expect(validateMaestroFlowSyntax(goodSwipe).valid).toBe(true);
+    const badSwipe = parseMaestroYaml('appId: pl.lukasz.napar\n---\n- swipe:\n    start: "50%, 40%"\n', 'zly-swipe.yaml');
+    expect(() => validateMaestroFlowSyntax(badSwipe)).toThrow(/Invalid swipe target/);
   });
 });
