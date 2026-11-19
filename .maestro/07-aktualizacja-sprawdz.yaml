@@ -6,6 +6,9 @@ name: 07 Po ponownej instalacji (bez deinstalacji) — paczka nadal jest w spiż
     arguments:
       AppleLanguages: "(pl)"
       AppleLocale: "pl_PL"
+- tapOn:
+    id: "onboarding-submit-btn"
+    optional: true
 - tapOn: "Spiżarnia"
 - assertVisible: "E2E Kenia"
 - takeScreenshot: 07-po-instalacji

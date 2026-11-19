@@ -19,4 +19,4 @@ Wykonuje właściciel na buildzie TestFlight przed każdym wysłaniem do App Rev
 | T11 | Dźwięk i wibracje | Ustawienia: wyłącz wibracje → parzenie i Gongfu | Brak wibracji; dźwięk zgodny z ustawieniem | | |
 | T12 | Bez sieci | Tryb samolotowy → pełne T1 | Wszystko działa offline | | |
 
-Otwarte dla E2E [DO USTALENIA]: czy `launchApp.arguments` (AppleLanguages) w Maestro ustawia język aplikacji na symulatorze iOS — potwierdzi pierwszy przebieg workflow „E2E iOS (Maestro)”; zapas: ustawienie języka symulatora w workflow (`defaults write -g AppleLanguages`).
+Potwierdzone dla E2E (przebieg `44506727938`, 2026-11-19): `launchApp.arguments` (`AppleLanguages=(pl)`, `AppleLocale=pl_PL`) wraz z `defaults write -g AppleLanguages` w `.github/workflows/e2e-ios.yml` uruchamia aplikację po polsku (zrzuty i hierarchia UI z `44506727938` pokazują ekran „Witaj w Naparze” / „Rozpocznij Rytuał”). Przyczyną porażki `44506727938` był brak zamknięcia modala onboardingu (`onboarding-submit-btn`) w scenariuszach `.maestro/*.yaml`, nie język symulatora.

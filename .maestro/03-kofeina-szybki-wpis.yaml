@@ -7,6 +7,9 @@ name: 03 Kofeina — szybki wpis V60
       AppleLanguages: "(pl)"
       AppleLocale: "pl_PL"
 - tapOn:
+    id: "onboarding-submit-btn"
+    optional: true
+- tapOn:
     id: "app-guide-got-it-btn"
     optional: true
 # Zakładka Kofeina jest ukryta (href: null) — wejście przez Dial-in i kartę kalkulatora kofeiny.

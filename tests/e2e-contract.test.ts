@@ -94,3 +94,14 @@ test('lista „tylko telefon” istnieje w repo', () => {
   const doc = path.join(root, 'docs', 'tylko-telefon.md');
   expect(fs.existsSync(doc)).toBe(true);
 });
+
+test('scenariusze Maestro zamykają OnboardingModal (onboarding-submit-btn) po czystym starcie (regresja #44506727938)', () => {
+  const start = fs.readFileSync(path.join(maestroDir, '01-start.yaml'), 'utf8');
+  expect(start).toMatch(/clearState:\s*true/);
+  expect(start).toMatch(/id:\s*"onboarding-submit-btn"/);
+  for (const f of flows) {
+    const body = fs.readFileSync(path.join(maestroDir, f), 'utf8');
+    expect(body).toMatch(/id:\s*"onboarding-submit-btn"/);
+  }
+});
+

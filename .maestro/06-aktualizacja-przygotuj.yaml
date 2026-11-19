@@ -6,6 +6,9 @@ name: 06 Przed ponowną instalacją — paczka z 02 jest w spiżarni
     arguments:
       AppleLanguages: "(pl)"
       AppleLocale: "pl_PL"
+- tapOn:
+    id: "onboarding-submit-btn"
+    optional: true
 - tapOn: "Spiżarnia"
 - assertVisible: "E2E Kenia"
 - takeScreenshot: 06-przed-instalacja

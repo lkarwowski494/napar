@@ -7,6 +7,9 @@ name: 04 Dziennik otwiera się
       AppleLanguages: "(pl)"
       AppleLocale: "pl_PL"
 - tapOn:
+    id: "onboarding-submit-btn"
+    optional: true
+- tapOn:
     id: "app-guide-got-it-btn"
     optional: true
 - tapOn: "Dziennik"

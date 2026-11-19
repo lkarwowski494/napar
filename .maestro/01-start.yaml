@@ -8,6 +8,8 @@ name: 01 Start aplikacji z paczką JS (czysty stan)
       AppleLanguages: "(pl)"
       AppleLocale: "pl_PL"
 - tapOn:
+    id: "onboarding-submit-btn"
+- tapOn:
     id: "app-guide-got-it-btn"
     optional: true
 - assertVisible: "Parzenie"
