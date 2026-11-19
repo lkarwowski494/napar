@@ -211,7 +211,7 @@ export default function JournalScreen() {
   });
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView testID="ekran:(tabs)/journal" style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.headerBox}>
         <Text style={styles.headerTitle}>{t.journal.title}</Text>
         <Text style={styles.headerSub}>

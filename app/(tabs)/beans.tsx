@@ -123,7 +123,7 @@ export default function BeansScreen() {
   });
 
   return (
-    <View style={styles.container}>
+    <View testID="ekran:(tabs)/beans" style={styles.container}>
 
       {/* Pasek filtrowania i akcji */}
       <BeanTopBar

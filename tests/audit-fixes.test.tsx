@@ -2764,4 +2764,37 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
     }
     act(() => tree.unmount());
   });
+
+  test('JAK-19-EKRAN: każdy ekran w app/ ma testID="ekran:<trasa>" na głównym kontenerze zgodny z przypadki-uzycia.md', () => {
+    const routes = [
+      '(tabs)/index',
+      '(tabs)/beans',
+      '(tabs)/caffeine',
+      '(tabs)/dialin',
+      '(tabs)/journal',
+      '(tabs)/settings',
+      'gongfu',
+      'recipe-builder',
+      'settings',
+    ];
+    for (const route of routes) {
+      const src = readFileSync(join(root, 'app', `${route}.tsx`), 'utf8');
+      expect(src).toContain(`ekran:${route}`);
+    }
+    // Weryfikacja w runtime dla współdzielonego ekranu Ustawień (settings vs (tabs)/settings)
+    const SettingsScreen = require('../app/settings').default;
+    const TabSettingsScreen = require('../app/(tabs)/settings').default;
+    let treeStandalone: any;
+    let treeTab: any;
+    act(() => {
+      treeStandalone = renderer.create(<SettingsScreen />);
+      treeTab = renderer.create(<TabSettingsScreen />);
+    });
+    expect(treeStandalone.root.findByProps({ testID: 'ekran:settings' })).toBeDefined();
+    expect(treeTab.root.findByProps({ testID: 'ekran:(tabs)/settings' })).toBeDefined();
+    act(() => {
+      treeStandalone.unmount();
+      treeTab.unmount();
+    });
+  });
 });

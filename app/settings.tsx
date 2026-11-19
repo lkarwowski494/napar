@@ -60,7 +60,9 @@ import {
   supportMailtoUrl,
 } from '../src/core/app-identity';
 
-export default function SettingsScreen() {
+export default function SettingsScreen({
+  screenTestID = 'ekran:settings',
+}: { screenTestID?: string } = {}) {
   const storeId = APP_STORE_ID;
   const supportEmail = SUPPORT_EMAIL;
   const { t, language, setLanguage } = useTranslation();
@@ -213,7 +215,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView testID={screenTestID} style={styles.container} contentContainerStyle={styles.content}>
 
       {/* Preferencje Aplikacji: Język, Rodzaj naparów, Jednostki, Dostępność, Filozofia */}
       <AppPreferencesCard

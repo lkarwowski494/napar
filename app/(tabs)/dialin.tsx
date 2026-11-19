@@ -81,7 +81,7 @@ export default function DialInScreen() {
   }, [selectedIssue]);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView testID="ekran:(tabs)/dialin" style={styles.container} contentContainerStyle={styles.content}>
       {/* Przełącznik zakładek */}
       <View style={styles.segmentBar}>
         <Pressable

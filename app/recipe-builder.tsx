@@ -237,7 +237,7 @@ export default function RecipeBuilderScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView testID="ekran:recipe-builder" style={styles.safeArea}>
       <ModalHeader
         onClose={handleClose}
         closeLabel={t.common.cancel}

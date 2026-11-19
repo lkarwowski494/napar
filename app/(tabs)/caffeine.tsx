@@ -157,7 +157,7 @@ export default function CaffeineScreen() {
   }, [overLimit, wasOverLimit, t.caffeine.overLimitWarning]);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView testID="ekran:(tabs)/caffeine" style={styles.container} contentContainerStyle={styles.content}>
       {/* Karta Stężenia Kofeiny Teraz */}
       <View style={styles.summaryCard}>
         <Text style={styles.summaryLabel}>

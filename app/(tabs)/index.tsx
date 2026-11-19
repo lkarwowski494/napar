@@ -86,7 +86,7 @@ export default function BrewScreen() {
     : t.brew.openStepsHint;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView testID="ekran:(tabs)/index" style={styles.container} contentContainerStyle={styles.content}>
       {/* Banery systemowe i Złote Zasady domeny */}
       <BrewBanners
         unitSystem={unitSystem}

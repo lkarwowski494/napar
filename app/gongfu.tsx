@@ -285,7 +285,7 @@ export default function GongfuScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView testID="ekran:gongfu" style={styles.safeArea}>
       <ModalHeader
         onClose={() => router.back()}
         closeLabel={t.common.close}

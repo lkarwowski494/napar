@@ -7,5 +7,5 @@ import React from 'react';
 import SettingsScreen from '../settings';
 
 export default function TabSettingsScreen() {
-  return <SettingsScreen />;
+  return <SettingsScreen screenTestID="ekran:(tabs)/settings" />;
 }
