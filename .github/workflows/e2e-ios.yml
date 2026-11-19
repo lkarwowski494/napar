@@ -191,6 +191,7 @@ jobs:
           run_maestro .maestro/03-kofeina-szybki-wpis.yaml
           run_maestro .maestro/04-dziennik.yaml
           run_maestro .maestro/05-gongfu.yaml
+          run_maestro .maestro/08-pelna-petla.yaml
           run_maestro .maestro/06-aktualizacja-przygotuj.yaml
           # Dane po ponownej instalacji tego samego buildu (bez deinstalacji): paczka z 02 ma przetrwać.
           if xcrun simctl install booted "$SIM_APP_PATH"; then

@@ -1,5 +1,6 @@
 appId: pl.lukasz.napar
 name: 01 Start aplikacji z paczką JS (czysty stan)
+# PU-001 · ekran:(tabs)/index
 ---
 - launchApp:
     clearState: true

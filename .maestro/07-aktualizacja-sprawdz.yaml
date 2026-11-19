@@ -1,5 +1,6 @@
 appId: pl.lukasz.napar
 name: 07 Po ponownej instalacji (bez deinstalacji) — paczka nadal jest w spiżarni
+# PU-007 · ekran:(tabs)/beans
 ---
 - launchApp:
     arguments:

@@ -1,5 +1,6 @@
 appId: pl.lukasz.napar
 name: 04 Dziennik otwiera się
+# PU-005 · ekran:(tabs)/journal
 ---
 - launchApp:
     arguments:

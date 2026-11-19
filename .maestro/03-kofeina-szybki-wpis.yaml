@@ -1,5 +1,6 @@
 appId: pl.lukasz.napar
 name: 03 Kofeina — szybki wpis V60
+# PU-004 · ekran:(tabs)/dialin · ekran:(tabs)/caffeine
 ---
 - launchApp:
     arguments:
@@ -20,3 +21,7 @@ name: 03 Kofeina — szybki wpis V60
 - tapOn:
     id: "caffeine-quick-v60"
 - takeScreenshot: 03-kofeina-szybki-wpis
+# powrót: (tabs)/caffeine
+- tapOn: "Dial-in"
+# powrót: (tabs)/dialin
+- tapOn: "Parzenie"

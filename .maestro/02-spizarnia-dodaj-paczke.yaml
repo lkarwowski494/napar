@@ -1,5 +1,6 @@
 appId: pl.lukasz.napar
 name: 02 Spiżarnia — dodanie paczki i jej widoczność (wynik w danych)
+# PU-003 · ekran:(tabs)/beans
 ---
 - launchApp:
     arguments:

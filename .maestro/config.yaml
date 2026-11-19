@@ -10,3 +10,4 @@ executionOrder:
     - 05-gongfu.yaml
     - 06-aktualizacja-przygotuj.yaml
     - 07-aktualizacja-sprawdz.yaml
+    - 08-pelna-petla.yaml

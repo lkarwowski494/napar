@@ -1,5 +1,6 @@
 appId: pl.lukasz.napar
 name: 05 Gongfu Cha — wejście z ekranu parzenia (herbata)
+# PU-006 · ekran:(tabs)/index · ekran:gongfu
 ---
 - launchApp:
     arguments:
@@ -16,3 +17,7 @@ name: 05 Gongfu Cha — wejście z ekranu parzenia (herbata)
     id: "gongfu-mode-btn"
 - assertVisible: "START INFUZJI"
 - takeScreenshot: 05-gongfu
+# powrót: gongfu
+# powrót: (tabs)/index
+- tapOn: "Zamknij"
+- assertVisible: "Parzenie"

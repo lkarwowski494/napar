@@ -1,5 +1,6 @@
 appId: pl.lukasz.napar
 name: 06 Przed ponowną instalacją — paczka z 02 jest w spiżarni
+# PU-007 · ekran:(tabs)/beans
 ---
 - launchApp:
     arguments:

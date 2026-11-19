@@ -1,0 +1,44 @@
+appId: pl.lukasz.napar
+name: 08 Pełna pętla parzenie → ocena → zapis do Dziennika
+# PU-002 · ekran:(tabs)/index · ekran:(tabs)/journal
+---
+- launchApp:
+    arguments:
+      AppleLanguages: "(pl)"
+      AppleLocale: "pl_PL"
+- tapOn:
+    id: "app-guide-got-it-btn"
+    optional: true
+- tapOn: "Parzenie"
+- tapOn:
+    id: "open-procedure-modal-btn"
+- tapOn:
+    id: "procedure-start-btn"
+- tapOn:
+    id: "procedure-pause-resume-btn"
+- tapOn:
+    id: "save-brew-btn"
+- assertVisible:
+    id: "star-rating-row"
+- tapOn:
+    id: "star-rating-row"
+- scrollUntilVisible:
+    element:
+      id: "finish-notes-input"
+- tapOn:
+    id: "finish-notes-input"
+- inputText: "E2E pelna petla"
+- hideKeyboard
+# powrót: (tabs)/index
+- tapOn:
+    id: "finish-save-btn"
+- tapOn: "OK"
+- tapOn: "Dziennik"
+- assertVisible:
+    id: "journal-tab-sessions"
+- assertVisible: "E2E pelna petla"
+- takeScreenshot: 08-pelna-petla
+# powrót: (tabs)/journal
+- tapOn: "Parzenie"
+- assertVisible:
+    id: "open-procedure-modal-btn"
