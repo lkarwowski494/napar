@@ -2637,3 +2637,11 @@ describe('M1-audytor-generalny-040: deklaracje dostępności z dowodem; notatki 
     expect(deps.filter((d) => /notifications|iap|purchases|storekit|healthkit/i.test(d))).toEqual([]);
   });
 });
+
+describe('KO-003 (WG-01): workflow_dispatch w ci.yml bez zmiany kontroli ani uprawnień', () => {
+  test('ci.yml pozwala na ręczne uruchomienie (workflow_dispatch) przy zachowaniu minimalnych uprawnień', () => {
+    const ci = readFileSync(join(root, '.github/workflows/ci.yml'), 'utf8');
+    expect(ci).toMatch(/^on:\s*\n[\s\S]*?^\s{2}workflow_dispatch:/m);
+    expect(ci).toMatch(/^permissions:\s*\n\s{2}contents:\s*read/m);
+  });
+});
