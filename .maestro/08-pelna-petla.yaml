@@ -12,7 +12,10 @@ name: 08 Pełna pętla parzenie → ocena → zapis do Dziennika
 - tapOn:
     id: "app-guide-got-it-btn"
     optional: true
-- tapOn: "Parzenie"
+- tapOn: "Parzenie, tab, .*"
+- scrollUntilVisible:
+    element:
+      id: "open-procedure-modal-btn"
 - tapOn:
     id: "open-procedure-modal-btn"
 - tapOn:
@@ -36,12 +39,12 @@ name: 08 Pełna pętla parzenie → ocena → zapis do Dziennika
 - tapOn:
     id: "finish-save-btn"
 - tapOn: "OK"
-- tapOn: "Dziennik"
+- tapOn: "Dziennik, tab, .*"
 - assertVisible:
     id: "journal-tab-sessions"
 - assertVisible: "E2E pelna petla"
 - takeScreenshot: 08-pelna-petla
 # powrót: (tabs)/journal
-- tapOn: "Parzenie"
+- tapOn: "Parzenie, tab, .*"
 - assertVisible:
-    id: "open-procedure-modal-btn"
+    id: "ekran:(tabs)/index"

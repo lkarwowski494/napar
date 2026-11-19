@@ -12,5 +12,5 @@ name: 01 Start aplikacji z paczką JS (czysty stan)
 - tapOn:
     id: "app-guide-got-it-btn"
     optional: true
-- assertVisible: "Parzenie"
+- assertVisible: "Parzenie, tab, .*"
 - takeScreenshot: 01-start

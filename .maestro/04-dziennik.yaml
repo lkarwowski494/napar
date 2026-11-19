@@ -12,5 +12,5 @@ name: 04 Dziennik otwiera się
 - tapOn:
     id: "app-guide-got-it-btn"
     optional: true
-- tapOn: "Dziennik"
+- tapOn: "Dziennik, tab, .*"
 - takeScreenshot: 04-dziennik

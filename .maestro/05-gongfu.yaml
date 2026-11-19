@@ -12,7 +12,7 @@ name: 05 Gongfu Cha — wejście z ekranu parzenia (herbata)
 - tapOn:
     id: "app-guide-got-it-btn"
     optional: true
-- tapOn: "Parzenie"
+- tapOn: "Parzenie, tab, .*"
 - tapOn:
     id: "beverage-toggle-tea"
     optional: true
@@ -23,4 +23,4 @@ name: 05 Gongfu Cha — wejście z ekranu parzenia (herbata)
 # powrót: gongfu
 # powrót: (tabs)/index
 - tapOn: "Zamknij"
-- assertVisible: "Parzenie"
+- assertVisible: "Parzenie, tab, .*"

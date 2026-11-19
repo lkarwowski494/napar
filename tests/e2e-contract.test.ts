@@ -29,8 +29,8 @@ function codeTestIds(): { ids: Set<string>; prefixes: Set<string> } {
         if (!['__tests__', 'node_modules'].includes(e.name)) walk(p);
       } else if (/\.tsx?$/.test(e.name)) {
         const src = fs.readFileSync(p, 'utf8');
-        for (const m of src.matchAll(/\b(?:testID|closeTestID|saveTestID)=["{`']+([A-Za-z0-9_-]+)/g)) ids.add(m[1]);
-        for (const m of src.matchAll(/\b(?:testID|closeTestID|saveTestID)=\{\s*`([A-Za-z0-9_-]+)\$\{/g)) prefixes.add(m[1]);
+        for (const m of src.matchAll(/\b(?:testID|closeTestID|saveTestID)=["{`']+([A-Za-z0-9_:/()-]+)/g)) ids.add(m[1]);
+        for (const m of src.matchAll(/\b(?:testID|closeTestID|saveTestID)=\{\s*`([A-Za-z0-9_:/()-]+)\$\{/g)) prefixes.add(m[1]);
       }
     }
   };
@@ -52,6 +52,7 @@ test('log Maestro trafia do CI także przy porażce, a zrzuty są artefaktem', (
 test('każdy selektor tekstowy scenariusza istnieje w słowniku PL, a każdy id istnieje jako testID', () => {
   const { ids, prefixes } = codeTestIds();
   const hasTestId = (id: string) => ids.has(id) || [...prefixes].some((p) => id.startsWith(p) && id.length > p.length);
+  const plTabLabels = new Set<string>(Object.values(translations.pl.tabs));
   const missing: string[] = [];
   const typed = new Set<string>();
   for (const f of flows) {
@@ -60,7 +61,10 @@ test('każdy selektor tekstowy scenariusza istnieje w słowniku PL, a każdy id 
   for (const f of flows) {
     const body = fs.readFileSync(path.join(maestroDir, f), 'utf8');
     for (const m of body.matchAll(/^\s*-\s*(?:tapOn|assertVisible):\s*"([^"]+)"/gm)) {
-      if (!plTexts.has(m[1]) && !typed.has(m[1])) missing.push(`${f}: tekst „${m[1]}”`);
+      const sel = m[1];
+      const tabMatch = sel.match(/^(.+), tab, \.\*$/);
+      const ok = plTexts.has(sel) || typed.has(sel) || (tabMatch !== null && plTabLabels.has(tabMatch[1]));
+      if (!ok) missing.push(`${f}: tekst „${sel}”`);
     }
     for (const m of body.matchAll(/id:\s*"([^"]+)"/g)) {
       if (!hasTestId(m[1])) missing.push(`${f}: id „${m[1]}”`);
@@ -77,7 +81,7 @@ test('scenariusze nie stukają w etykiety zakładek ukrytych z paska (href: null
   const bad: string[] = [];
   for (const f of flows) {
     const body = fs.readFileSync(path.join(maestroDir, f), 'utf8');
-    for (const label of hiddenLabels) if (new RegExp(`tapOn:\\s*"${label}"`).test(body)) bad.push(`${f}: ${label}`);
+    for (const label of hiddenLabels) if (new RegExp(`tapOn:\\s*"${label}(?:, tab, \\.\\*)?"`).test(body)) bad.push(`${f}: ${label}`);
   }
   expect(hidden.length).toBeGreaterThan(0);
   expect(bad).toEqual([]);
@@ -103,5 +107,29 @@ test('scenariusze Maestro zamykają OnboardingModal (onboarding-submit-btn) po c
     const body = fs.readFileSync(path.join(maestroDir, f), 'utf8');
     expect(body).toMatch(/id:\s*"onboarding-submit-btn"/);
   }
+});
+
+test('selektory zakładek dolnego paska dopasowują iOS accessibilityText „<etykieta>, tab, .*” (regresja #44521826864)', () => {
+  const tabLabels = Object.values(translations.pl.tabs);
+  const violations: string[] = [];
+  for (const f of flows) {
+    const lines = fs.readFileSync(path.join(maestroDir, f), 'utf8').split('\n');
+    lines.forEach((line, idx) => {
+      for (const label of tabLabels) {
+        if (new RegExp(`^\\s*-\\s*(tapOn|assertVisible):\\s*"${label}"\\s*$`).test(line)) {
+          violations.push(`${f}:${idx + 1}: ${line.trim()}`);
+        }
+      }
+    });
+  }
+  expect(violations).toEqual([]);
+});
+
+test('08-pelna-petla.yaml przewija do open-procedure-modal-btn przed kliknięciem (regresja #44521826864)', () => {
+  const body = fs.readFileSync(path.join(maestroDir, '08-pelna-petla.yaml'), 'utf8');
+  const scrollIdx = body.indexOf('scrollUntilVisible:\n    element:\n      id: "open-procedure-modal-btn"');
+  const tapIdx = body.indexOf('- tapOn:\n    id: "open-procedure-modal-btn"');
+  expect(scrollIdx).toBeGreaterThan(-1);
+  expect(tapIdx).toBeGreaterThan(scrollIdx);
 });
 
