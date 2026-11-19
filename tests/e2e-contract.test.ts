@@ -238,5 +238,11 @@ test('formularze modalne używane w E2E (BeanAddModal, BrewFinishModal) zamykaj�
   }
 });
 
-
-
+test('BrewModalsContainer jest poza ScrollView w app/(tabs)/index.tsx, aby ScrollView nie przechwytywał stuknięcia finish-save-btn przy otwartej klawiaturze (regresja #44575002549)', () => {
+  const src = fs.readFileSync(path.join(root, 'app/(tabs)/index.tsx'), 'utf8');
+  const scrollCloseIdx = src.lastIndexOf('</ScrollView>');
+  const modalsIdx = src.indexOf('<BrewModalsContainer');
+  expect(scrollCloseIdx).toBeGreaterThan(-1);
+  expect(modalsIdx).toBeGreaterThan(scrollCloseIdx);
+  expect(src).toMatch(/<ScrollView\b[^>]*keyboardShouldPersistTaps=["']handled["']/);
+});

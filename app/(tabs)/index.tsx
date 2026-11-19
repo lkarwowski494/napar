@@ -86,8 +86,14 @@ export default function BrewScreen() {
     : t.brew.openStepsHint;
 
   return (
-    <ScrollView testID="ekran:(tabs)/index" style={styles.container} contentContainerStyle={styles.content}>
-      {/* Banery systemowe i Złote Zasady domeny */}
+    <View style={styles.container}>
+      <ScrollView
+        testID="ekran:(tabs)/index"
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Banery systemowe i Złote Zasady domeny */}
       <BrewBanners
         unitSystem={unitSystem}
         corruptState={corruptState}
@@ -257,9 +263,11 @@ export default function BrewScreen() {
         <Text style={styles.openProcedureCtaSub}>{entryHint}</Text>
       </Pressable>
 
-      {/* Wszystkie modale obwodowe */}
+      </ScrollView>
+
+      {/* Wszystkie modale obwodowe (poza ScrollView, aby nie przechwytywał tapów przy otwartej klawiaturze) */}
       <BrewModalsContainer workflow={workflow} />
-    </ScrollView>
+    </View>
   );
 }
 
