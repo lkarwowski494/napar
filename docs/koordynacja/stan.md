@@ -25,7 +25,7 @@
 | B2 | `6bb4689cd0a936abc3d37d2154b2ca08` | recenzent (08 audit) | `naprawy/B-zakres-kontakt-ci` @ `1e88b1d` (odczyt) | — | — | przyjęta (11:11 UTC, PRZYJĄĆ) |
 | C | `6d79a347175718a536dd27bd68510345` | 07-jakosc, fix (JAK-19) | `naprawy/C-bramka-scenariuszy` @ `ea8f107` | — | — | przyjęta z uwagami (2 P1 → Sesja D) |
 | C2 | `a947d8befee927acd3688e5aba62ab61` | recenzent (07 audit) | `naprawy/C-bramka-scenariuszy` @ `ea8f107` (odczyt) | — | — | przyjęta (11:26 UTC, PRZYJĄĆ Z UWAGAMI) |
-| D | (startuje) | 07-jakosc, fix (C2 P1 + E2E 44506727938) | `naprawy/D-e2e-i-bramka` od `ea8f107` | — | — | zlecana (11:27 UTC) |
+| D | `73b8d32922840bcba788ba3e591daaca` | 07-jakosc, fix (C2 P1 + E2E 44506727938) | `naprawy/D-e2e-i-bramka` od `ea8f107` | — | — | w toku (11:27 UTC) |
 
 ## Plan 24 h (UTC)
 | Kiedy | Co | Kto (sesja/rola) | Zależy od | Od właściciela |
