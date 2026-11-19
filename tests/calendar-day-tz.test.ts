@@ -8,48 +8,11 @@
 // ============================================================================
 import * as fs from 'fs';
 import * as path from 'path';
-import { evaluateRestingWindow } from '../src/core/domain-rules';
 import { localISODate } from '../src/data/backup';
 import { generateActionIcsContent } from '../src/core/bpr-engine';
 
 /** Chwila w czasie lokalnym procesu (miesiąc 1–12). */
 const local = (y: number, m: number, d: number, h: number, min: number) => new Date(y, m - 1, d, h, min, 0, 0);
-
-describe('07-jakosc-008 · RD-07: dni od palenia liczone w lokalnych dniach kalendarzowych', () => {
-  it(`[TZ=${process.env.TZ ?? '(domyślna)'}] palenie 2026-11-05: 23:59 lokalnie 11.11 → dzień 6 (degassing), 00:01 lokalnie 12.11 → dzień 7 (peak)`, () => {
-    const before = evaluateRestingWindow('2026-11-05', local(2026, 11, 11, 23, 59));
-    const after = evaluateRestingWindow('2026-11-05', local(2026, 11, 12, 0, 1));
-    expect({ days: before.daysSinceRoast, stage: before.stage }).toEqual({ days: 6, stage: 'degassing' });
-    expect({ days: after.daysSinceRoast, stage: after.stage }).toEqual({ days: 7, stage: 'peak' });
-  });
-
-  it('granice 35/36 i 60/61 dni zmieniają się o lokalnej północy', () => {
-    expect(evaluateRestingWindow('2026-10-01', local(2026, 11, 5, 23, 59)).daysSinceRoast).toBe(35);
-    expect(evaluateRestingWindow('2026-10-01', local(2026, 11, 6, 0, 1)).stage).toBe('stable');
-    expect(evaluateRestingWindow('2026-09-01', local(2026, 10, 31, 23, 59)).stage).toBe('stable');
-    expect(evaluateRestingWindow('2026-09-01', local(2026, 11, 1, 0, 1)).daysSinceRoast).toBe(61);
-    expect(evaluateRestingWindow('2026-09-01', local(2026, 11, 1, 0, 1)).stage).toBe('aging');
-  });
-
-  it('przejście czasu (UE 25.10.2026, USA 1.11.2026, NZ 27.09.2026) nie przesuwa licznika dni', () => {
-    // 7 dni kalendarzowych przez każde z przejść, minutę po lokalnej północy
-    expect(evaluateRestingWindow('2026-10-20', local(2026, 10, 27, 0, 1)).daysSinceRoast).toBe(7);
-    expect(evaluateRestingWindow('2026-10-28', local(2026, 11, 4, 0, 1)).daysSinceRoast).toBe(7);
-    expect(evaluateRestingWindow('2026-09-24', local(2026, 10, 1, 0, 1)).daysSinceRoast).toBe(7);
-    // i minutę przed północą wciąż 6
-    expect(evaluateRestingWindow('2026-10-20', local(2026, 10, 26, 23, 59)).daysSinceRoast).toBe(6);
-  });
-
-  it('data palenia jako Date: liczy się jej lokalny dzień kalendarzowy', () => {
-    expect(evaluateRestingWindow(local(2026, 11, 5, 23, 30), local(2026, 11, 12, 0, 1)).daysSinceRoast).toBe(7);
-    expect(evaluateRestingWindow(local(2026, 11, 5, 0, 30), local(2026, 11, 11, 23, 59)).daysSinceRoast).toBe(6);
-  });
-
-  it('data palenia w przyszłości → 0; zła data kalendarzowa → komunikat o formacie', () => {
-    expect(evaluateRestingWindow('2026-11-20', local(2026, 11, 12, 0, 1)).daysSinceRoast).toBe(0);
-    expect(evaluateRestingWindow('2026-02-30', local(2026, 11, 12, 0, 1)).messageEn).toBe('Invalid roast date format');
-  });
-});
 
 describe('07-jakosc-008 · „dziś” w interfejsie to lokalna data (domyślna data palenia, kalendarz, ICS)', () => {
   afterEach(() => jest.useRealTimers());

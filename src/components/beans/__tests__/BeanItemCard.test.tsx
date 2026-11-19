@@ -51,7 +51,7 @@ describe('BeanItemCard Component', () => {
     expect(str).toContain('Jaśmin');
   });
 
-  test('TASK-P35-04-STU: badge wagi oraz resting badge posiadają accessibilityRole text i zlokalizowane etykiety a11y', () => {
+  test('TASK-P35-04-STU: badge wagi posiada accessibilityRole text i zlokalizowane etykiety a11y', () => {
     let treePl: any;
     act(() => {
       treePl = renderer.create(<BeanItemCard {...defaultProps} language="pl" />);
@@ -62,10 +62,6 @@ describe('BeanItemCard Component', () => {
     expect(weightPl.props.accessibilityLabel).toContain('Pozostała waga: 180g');
     expect(weightPl.props.accessibilityLabel).toContain('Waga początkowa: 250g');
 
-    const restingPl = treePl.root.findByProps({ testID: 'resting-badge-bean-101' });
-    expect(restingPl.props.accessibilityRole).toBe('text');
-    expect(restingPl.props.accessibilityLabel).toContain('Etap świeżości:');
-
     let treeEn: any;
     act(() => {
       treeEn = renderer.create(<BeanItemCard {...defaultProps} language="en" />);
@@ -75,10 +71,6 @@ describe('BeanItemCard Component', () => {
     expect(weightEn.props.accessibilityRole).toBe('text');
     expect(weightEn.props.accessibilityLabel).toContain('Remaining weight: 180g');
     expect(weightEn.props.accessibilityLabel).toContain('Initial weight: 250g');
-
-    const restingEn = treeEn.root.findByProps({ testID: 'resting-badge-bean-101' });
-    expect(restingEn.props.accessibilityRole).toBe('text');
-    expect(restingEn.props.accessibilityLabel).toContain('Resting stage:');
   });
 
   test('Obsługuje akcje ulubionych, edycji, archiwizacji i wyboru do parzenia', () => {

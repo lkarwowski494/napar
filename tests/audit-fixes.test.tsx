@@ -2677,4 +2677,41 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
     // Kalkulator EY w Warsztacie (F-05) zostaje
     expect(existsSync(join(root, 'src/components/dialin/ExtractionYieldTab.tsx'))).toBe(true);
   });
+
+  test('F-15 (opcja b): BeanItemCard nie wyświetla wskaźnika okna odgazowania; pole roastOrHarvestDate zostaje w schemacie bazy', () => {
+    const { BeanItemCard } = require('../src/components/beans/BeanItemCard');
+    const item = {
+      id: 'bean-f15',
+      name: 'Ethiopia Guji',
+      roasterOrProducer: 'Napar Roasters',
+      type: 'coffee' as const,
+      roastOrHarvestDate: '2026-11-10',
+      remainingWeightGrams: 200,
+      initialWeightGrams: 250,
+      isFavorite: false,
+      isArchived: false,
+      flavorNotes: [],
+      createdAt: '2026-11-11T10:00:00Z',
+      updatedAt: '2026-11-11T10:00:00Z',
+    };
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BeanItemCard
+          item={item}
+          unitSystem="metric"
+          onToggleFavorite={() => {}}
+          onToggleArchive={() => {}}
+          onSelectForBrew={() => {}}
+          onOpenEdit={() => {}}
+          language="pl"
+        />,
+      );
+    });
+    expect(tree.root.findAllByProps({ testID: 'resting-badge-bean-f15' })).toHaveLength(0);
+    expect(tree.root.findByProps({ testID: 'bean-weight-bean-f15' })).toBeDefined();
+    act(() => tree.unmount());
+    const schema = readFileSync(join(root, 'src/core/database-schema.ts'), 'utf8');
+    expect(schema).toContain('roastOrHarvestDate');
+  });
 });

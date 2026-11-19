@@ -4,7 +4,6 @@ import {
   calculateBrewRatio,
   calculateLiquidYield,
   calculateExtractionYield,
-  evaluateRestingWindow,
   estimateCoffeeCaffeineMg,
   estimateTotalLeafCaffeineMg,
   estimateTeaInfusionCaffeineMg,
@@ -69,73 +68,6 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       const result = calculateExtractionYield(250.0, 1.5, 15.0);
       expect(result.extractionYieldPercent).toBe(25.0);
       expect(result.rating).toBe('over');
-    });
-  });
-
-  describe('RD-07: Resting Window & Freshness (M1-audytor-generalny-032)', () => {
-    const baseDate = new Date('2026-10-15T12:00:00Z');
-
-    it('detects degassing phase (0-6 days)', () => {
-      const roastDate = new Date('2026-10-13T12:00:00Z'); // 2 days
-      const result = evaluateRestingWindow(roastDate, baseDate);
-      expect(result.stage).toBe('degassing');
-      expect(result.badgeColor).toBe('amber');
-
-      // Day 6 boundary
-      const day6Roast = new Date('2026-10-09T12:00:00Z'); // 6 days
-      expect(evaluateRestingWindow(day6Roast, baseDate).stage).toBe('degassing');
-
-      // Data z przyszłości (strefy czasowe / błąd) -> daysSinceRoast = 0, degassing
-      const futureRoast = new Date('2026-10-20T12:00:00Z');
-      const resFuture = evaluateRestingWindow(futureRoast, baseDate);
-      expect(resFuture.stage).toBe('degassing');
-      expect(resFuture.daysSinceRoast).toBe(0);
-      expect(Object.is(resFuture.daysSinceRoast, -0)).toBe(false);
-    });
-
-    it('detects peak flavor phase (7-35 days)', () => {
-      // Day 7 boundary
-      const day7Roast = new Date('2026-10-08T12:00:00Z'); // 7 days
-      expect(evaluateRestingWindow(day7Roast, baseDate).stage).toBe('peak');
-
-      const roastDate = new Date('2026-10-01T12:00:00Z'); // 14 days
-      const result = evaluateRestingWindow(roastDate, baseDate);
-      expect(result.stage).toBe('peak');
-      expect(result.badgeColor).toBe('green');
-
-      // Day 35 boundary
-      const day35Roast = new Date('2026-09-10T12:00:00Z'); // 35 days
-      expect(evaluateRestingWindow(day35Roast, baseDate).stage).toBe('peak');
-    });
-
-    it('detects stable phase (36-60 days)', () => {
-      // Day 36 boundary
-      const day36Roast = new Date('2026-09-09T12:00:00Z'); // 36 days
-      expect(evaluateRestingWindow(day36Roast, baseDate).stage).toBe('stable');
-
-      const roastDate = new Date('2026-08-30T12:00:00Z'); // ~46 days
-      const result = evaluateRestingWindow(roastDate, baseDate);
-      expect(result.stage).toBe('stable');
-      expect(result.badgeColor).toBe('blue');
-    });
-
-    it('detects aging phase (>60 days)', () => {
-      const roastDate = new Date('2026-06-01T12:00:00Z'); // >100 days
-      const result = evaluateRestingWindow(roastDate, baseDate);
-      expect(result.stage).toBe('aging');
-      expect(result.badgeColor).toBe('gray');
-    });
-
-    it('TASK-P16-03-ZAK: evaluateRestingWindow bezpiecznie obsługuje brak lub uszkodzony format daty', () => {
-      const empty = evaluateRestingWindow('');
-      expect(empty.daysSinceRoast).toBe(0);
-      expect(empty.badgeColor).toBe('gray');
-      expect(empty.messageEn).toContain('freshness unknown');
-
-      const corrupted = evaluateRestingWindow('invalid-date-string');
-      expect(corrupted.daysSinceRoast).toBe(0);
-      expect(corrupted.badgeColor).toBe('gray');
-      expect(corrupted.messageEn).toContain('Invalid roast date');
     });
   });
 
@@ -470,14 +402,7 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
     });
   });
 
-  describe('TASK-P28-03-ZAK: evaluateRestingWindow traktuje whitespace jako brak daty, a calculateLiquidYield chroni przed -0', () => {
-    it('zwraca brak daty palenia dla ciagu whitespace', () => {
-      const res = evaluateRestingWindow('   ');
-      expect(res.messagePl).toBe('Brak daty palenia — świeżość nieznana');
-      expect(res.messageEn).toBe('No roast date — freshness unknown');
-      expect(res.daysSinceRoast).toBe(0);
-    });
-
+  describe('TASK-P28-03-ZAK: calculateLiquidYield chroni przed -0', () => {
     it('gwarantuje scisle 0 bez -0 dla calculateLiquidYield', () => {
       // woda 30g, doza 15g, retencja 2.0 -> 30 - 30 = 0
       const yieldGrams = calculateLiquidYield(30, 15, 2.0);

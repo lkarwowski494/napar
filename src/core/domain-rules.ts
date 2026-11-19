@@ -10,14 +10,6 @@ export interface ExtractionYieldResult {
   descriptionEn?: string;
 }
 
-export interface RestingWindowResult {
-  daysSinceRoast: number;
-  stage: 'degassing' | 'peak' | 'stable' | 'aging';
-  messagePl: string;
-  messageEn?: string;
-  badgeColor: 'amber' | 'green' | 'blue' | 'gray';
-}
-
 export interface TasteDiagnosis {
   issue: string;
   issueEn?: string;
@@ -152,97 +144,6 @@ export function calculateExtractionYield(
     descriptionPl,
     descriptionEn,
   };
-}
-
-/**
- * 07-jakosc-008: numer lokalnego dnia kalendarzowego (dni od 1970-01-01, bez czasu i strefy).
- * „YYYY-MM-DD” to data z kalendarza użytkownika (nie północ UTC); Date i inne napisy — ich
- * lokalna data. Różnica dwóch numerów nie zależy od przejść czasu letniego. NaN = zła data.
- */
-function localCalendarDayNumber(input: Date | string): number {
-  if (typeof input === 'string') {
-    const m = input.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (m) {
-      const y = Number(m[1]);
-      const mo = Number(m[2]) - 1;
-      const d = Number(m[3]);
-      const utc = new Date(Date.UTC(y, mo, d));
-      if (utc.getUTCFullYear() !== y || utc.getUTCMonth() !== mo || utc.getUTCDate() !== d) return NaN;
-      return utc.getTime() / 86400000;
-    }
-  }
-  const date = new Date(input);
-  if (!Number.isFinite(date.getTime())) return NaN;
-  return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000;
-}
-
-/**
- * RD-07: Wskaźnik świeżości i okna degustacyjnego (Resting Window)
- * Lokalne dni kalendarzowe od daty palenia (07-jakosc-008):
- * 0-6: odgazowywanie CO2
- * 7-35: okno szczytowe (peak)
- * 36-60: stabilna dojrzałość
- * >60: utrata lotnych aromatów (aging)
- */
-export function evaluateRestingWindow(roastDateInput: Date | string, currentDateInput?: Date | string): RestingWindowResult {
-  if (!roastDateInput || (typeof roastDateInput === 'string' && !roastDateInput.trim())) {
-    return {
-      daysSinceRoast: 0,
-      stage: 'degassing',
-      messagePl: 'Brak daty palenia — świeżość nieznana',
-      messageEn: 'No roast date — freshness unknown',
-      badgeColor: 'gray',
-    };
-  }
-  const roastDay = localCalendarDayNumber(roastDateInput);
-  const nowDay = localCalendarDayNumber(currentDateInput ? currentDateInput : new Date());
-  if (!Number.isFinite(roastDay) || !Number.isFinite(nowDay)) {
-    return {
-      daysSinceRoast: 0,
-      stage: 'degassing',
-      messagePl: 'Nieprawidłowy format daty palenia',
-      messageEn: 'Invalid roast date format',
-      badgeColor: 'gray',
-    };
-  }
-
-  // Lokalne dni kalendarzowe (07-jakosc-008): etap zmienia się o północy użytkownika, nie o północy UTC.
-  const rawDays = nowDay - roastDay;
-  const daysSinceRoast = rawDays <= 0 ? 0 : rawDays;
-
-  if (daysSinceRoast <= 6) {
-    return {
-      daysSinceRoast,
-      stage: 'degassing',
-      messagePl: 'Zbyt świeża (Odgazowanie CO₂) — odczekaj do 7. dnia po wypale',
-      messageEn: 'Too fresh (CO₂ degassing) — wait until day 7 post-roast',
-      badgeColor: 'amber',
-    };
-  } else if (daysSinceRoast <= 35) {
-    return {
-      daysSinceRoast,
-      stage: 'peak',
-      messagePl: 'Szczyt smaku (Peak Flavor) — idealne okno ekstrakcji (7–35 dni)',
-      messageEn: 'Peak flavor — ideal extraction window (7–35 days)',
-      badgeColor: 'green',
-    };
-  } else if (daysSinceRoast <= 60) {
-    return {
-      daysSinceRoast,
-      stage: 'stable',
-      messagePl: 'Stabilna jakość ziaren (36–60 dni) — zmiel o 1 klik drobniej dla zachowania słodyczy',
-      messageEn: 'Stable bean quality (36–60 days) — grind 1 click finer to preserve sweetness',
-      badgeColor: 'blue',
-    };
-  } else {
-    return {
-      daysSinceRoast,
-      stage: 'aging',
-      messagePl: 'Ziarna tracą lotne aromaty (>60 dni) — zwiększ dozę lub zmiel o 1–2 kliki drobniej',
-      messageEn: 'Aromatics fading (>60 days) — increase dose or grind 1–2 clicks finer',
-      badgeColor: 'gray',
-    };
-  }
 }
 
 function parseNumeric(val: unknown): number {

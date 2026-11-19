@@ -6,7 +6,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { InventoryItem } from '../../core/database-schema';
-import { evaluateRestingWindow } from '../../core/domain-rules';
 import { formatDoseWeight } from '../../core/unit-converter';
 import { theme, withAlpha } from '../../core/theme';
 import { useTranslation } from '../../core/i18n';
@@ -37,10 +36,6 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
   const safeRemainingGrams = Object.is(rawRem, -0) || rawRem < 0 ? 0 : rawRem;
   const rawInit = typeof item.initialWeightGrams === 'number' ? item.initialWeightGrams : 0;
   const safeInitialGrams = Object.is(rawInit, -0) || rawInit < 0 ? 0 : rawInit;
-  const resting =
-    item.type === 'coffee' && item.roastOrHarvestDate
-      ? evaluateRestingWindow(item.roastOrHarvestDate)
-      : null;
 
   return (
     <View style={styles.itemCard}>
@@ -65,32 +60,6 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
           </Text>
         </Pressable>
       </View>
-
-      {/* Świeżość (Resting Window) */}
-      {resting && (
-        <View
-          testID={`resting-badge-${item.id}`}
-          style={[
-            styles.restingBadge,
-            resting.stage === 'peak' && styles.restingOptimal,
-            resting.stage === 'degassing' && styles.restingFresh,
-            resting.stage === 'aging' && styles.restingPast,
-          ]}
-          accessibilityRole="text"
-          accessibilityLabel={`${isEn ? 'Resting stage' : 'Etap świeżości'}: ${isEn ? (resting.messageEn || resting.messagePl) : resting.messagePl}`}
-        >
-          <Text
-            style={[
-              styles.restingText,
-              resting.stage === 'peak' && styles.restingOptimalText,
-              resting.stage === 'degassing' && styles.restingFreshText,
-              resting.stage === 'aging' && styles.restingPastText,
-            ]}
-          >
-            {language === 'en' ? (resting.messageEn || resting.messagePl) : resting.messagePl}
-          </Text>
-        </View>
-      )}
 
       {/* Szczegóły botaniczne */}
       <View style={styles.detailsRow}>
@@ -212,41 +181,6 @@ const styles = StyleSheet.create({
   },
   favIconActive: {
     color: theme.colors.favorite,
-  },
-  restingBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    marginBottom: 8,
-  },
-  restingOptimal: {
-    backgroundColor: theme.colors.emeraldMuted,
-    borderWidth: 1,
-    borderColor: withAlpha(theme.colors.emerald, 0.3),
-  },
-  restingFresh: {
-    backgroundColor: theme.colors.copperMuted,
-    borderWidth: 1,
-    borderColor: withAlpha(theme.colors.copper, 0.3),
-  },
-  restingPast: {
-    backgroundColor: withAlpha(theme.colors.neutralTint, 0.15),
-    borderWidth: 1,
-    borderColor: withAlpha(theme.colors.neutralTint, 0.3),
-  },
-  restingText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  restingOptimalText: {
-    color: theme.colors.emeraldLight, // 028: emerald jako tekst 3,33:1
-  },
-  restingFreshText: {
-    color: theme.colors.copper,
-  },
-  restingPastText: {
-    color: theme.colors.textMuted,
   },
   detailsRow: {
     flexDirection: 'row',
