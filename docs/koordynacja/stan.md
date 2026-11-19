@@ -1,4 +1,4 @@
-# Koordynacja Napar — stan (aktualizacja 2026-11-19 16:55 UTC)
+# Koordynacja Napar — stan (aktualizacja 2026-11-19 17:15 UTC)
 
 ## Mandat (przepisuj bez zmian; zmienia go tylko właściciel)
 - Tryb decyzji: analogia — od 2026-11-19 10:30 UTC, słowa: „1. Tak 2. Dopracowanie aplikacji. Mysle ze powinnismy zaczac od napraw ktore wskazal audyt a nie zostaly jeszcze zrobione. 3. analogia”
@@ -9,13 +9,13 @@
 - Pułapy kosztu: sesja 10 USD (próg STOP = 13 USD), doba 30 USD (ponad: bez nowych sesji) [OCENA — do kalibracji po pierwszych sesjach; środowisko Antigravity nie raportuje `cost_usd`, mierzymy czas]
 - Koordynator aktywny: `v1/default/jetski_remote_agents_3p/2f459540-3f1f-4d1d-b6a9-942b302be3a0` (od 2026-11-19 10:25 UTC)
 - Środowisko: Linux `6.12.105+`, Node `v24.22.3`, `gh` aktywny, repo `lkarwowski494/napar` (PUBLIC) + `lkarwowski494/prompts` (PRIVATE); brak Playwright i Xcode; delegowanie przez lokalne subagenty (`invoke_subagent`) — nazwany wyjątek od `create_session`.
-- Gałąź robocza: `claude/napar-app-audit-5u19j0` (HEAD `e307853`); gałąź stanu: `koordynacja` (nigdy nie scalana do integracji ani `main`).
+- Gałąź robocza: `claude/napar-app-audit-5u19j0` (HEAD `9ace404`); gałąź stanu: `koordynacja` (nigdy nie scalana do integracji ani `main`).
 
 ## Teraz (3–5 linii)
-- **Gałąź robocza `claude/napar-app-audit-5u19j0` na `e307853`** (`npm run verify` kod `0`, 118/118 pakietów, 1293/1293 testów).
-- **Wynik `E2E iOS (Maestro)` run `44532031189` (na `a5a4507`, 13:54 UTC):** **3/8 PASS** (`01`, `04`, `05` przeszły po raz pierwszy!); 5 oblało z 3 konkretnych przyczyn: `02` na `hideKeyboard` (kaskada na `06` i `07`), `03` na `quick-add-caffeine-btn`, `08` na asercji `"E2E pelna petla"` w Dzienniku.
-- **W toku:** **Sesja I (`07-jakosc`, fix)** na `naprawy/I-e2e-44532031189` (analiza artefaktu `maestro-zrzuty` z `44532031189` i naprawa wszystkich 3 przyczyn naraz).
-- Następny krok: odbiór Sesji I + recenzja I2 → FF `claude/napar-app-audit-5u19j0` → czysty run `E2E iOS (Maestro)` (cel: 8/8 PASS) → prośba do właściciela o zgodę na scalenie do `main`.
+- **Gałąź robocza `claude/napar-app-audit-5u19j0` na `9ace404`** (FF po przyjętej Sesji I i recenzji I2 **PRZYJĄĆ**: 0 P0, 0 P1, 2 P2; `npm run verify` kod `0`, 118/118 pakietów, 1297/1297 testów).
+- **Sesja I (`9ace404`) naprawiła wszystkie 3 przyczyny z runu `44532031189`:** `keyboardDismissMode="on-drag"` + `keyboardShouldPersistTaps="handled"` w `BeanAddModal`/`BrewFinishModal` + `swipe` zamiast `hideKeyboard` (`02`/`08`), `scrollUntilVisible` do `quick-add-caffeine-btn` (`03`), `scrollUntilVisible` + regex `.*E2E pelna petla.*` dla cudzysłowów `„...”` w Dzienniku (`08`), plus testy regresyjne TDD.
+- **W toku:** `E2E iOS (Maestro)` run **`44575002549`** na `claude/napar-app-audit-5u19j0` (`9ace404`, start 17:14 UTC, cel: 8/8 PASS + artefakt `e2e-wykonane`).
+- Następny krok: odbiór wyniku E2E `44575002549` → jeśli 8/8 PASS, prośba do właściciela o zgodę na scalenie `claude/napar-app-audit-5u19j0` → `main`.
 
 ## Sesje
 | Litera | ID | Rola, tryb | Gałąź @ SHA | Kontekst % | Koszt USD | Stan |
@@ -34,29 +34,29 @@
 | G2 | `0286e043107ba520ed3c6064585f98d8` | recenzent (07 audit) | `70b4d29..a5a4507` (odczyt) | — | — | zakończona (ODRZUCIĆ: P0:1, P1:1, P2:1) |
 | H | `85999b0b86dfd071a14f799315c15923` | 07-jakosc, fix (G2 P0/P1/P2) | `naprawy/H-maestro-regex` @ `e307853` | — | — | przyjęta i scalona FF (verify 0: 118/118, 1293/1293) |
 | H2 | `28bafec46b61008c225f4098681584a8` | recenzent (07 audit) | `a5a4507..e307853` (odczyt) | — | — | zakończona (PRZYJĄĆ Z UWAGAMI: 0 P0, 0 P1, 3 P2) |
-| I | `28f88aa27b0ddc9b661d49afb57eca77` | 07-jakosc, fix (E2E 44532031189) | `naprawy/I-e2e-44532031189` | — | — | w toku |
+| I | `28f88aa27b0ddc9b661d49afb57eca77` | 07-jakosc, fix (E2E 44532031189) | `naprawy/I-e2e-44532031189` @ `9ace404` | — | — | przyjęta i scalona FF (verify 0: 118/118, 1297/1297) |
+| I2 | `38528fe0629b0d2ae7fc39066d3c73ec` | recenzent (07+08 audit) | `e307853..9ace404` (odczyt) | — | — | zakończona (PRZYJĄĆ: 0 P0, 0 P1, 2 P2) |
 
 ## Plan 24 h (UTC)
 | Kiedy | Co | Kto (sesja/rola) | Zależy od | Od właściciela |
 |---|---|---|---|---|
-| 16:55–17:10 | Naprawa 3 przyczyn z E2E `44532031189` (`02`/`03`/`08`) + recenzja I2 | Sesja I + I2 | w toku | nic |
-| 17:10–17:50 | Czysty przebieg `E2E iOS (Maestro)` (cel: 8/8 PASS + `wykonane.tsv`) | GitHub Actions | FF po I2 | nic |
+| 17:14–17:55 | Przebieg `E2E iOS (Maestro)` na `9ace404` (run `44575002549`, cel: 8/8 PASS) | GitHub Actions | w toku | nic |
 | po zielonym E2E | Prośba o zgodę na scalenie `claude/napar-app-audit-5u19j0` → `main` | Koordynator | zielone E2E 8/8 | zgoda na `main` + ew. weto `KO-002..004` + status `M1-020` |
 | po scaleniu `main` | Build TestFlight 1.0.0 + testy fizyczne `T1`–`T12` / protokół F | Właściciel | zgoda na TestFlight | testy fizyczne na telefonie |
 
 ## Czeka na właściciela
 - Do weta (tryb `analogia`, nie blokowało prac): `KO-002` (`support@apps4brew.com`), `KO-003` (`workflow_dispatch` w `ci.yml`), `KO-004` (Scope §3: usunięcie `tds-input`, karty kosztu, kalendarza 14-dniowego/ICS, ukrycie okna odgazowania; zamknięcie 12 pozycji §3 w `D-017..D-020`) — w `docs/koordynacja/decyzje.md`.
 - `[DO USTALENIA]`: treść brakującego zadania `M1-audytor-generalny-020` (brak w repo po usunięciu `audit/` wg D-009).
-- Działanie zewnętrzne (zasada 12): zgoda na scalenie `claude/napar-app-audit-5u19j0` → `main` (po zielonym E2E).
+- Działanie zewnętrzne (zasada 12): zgoda na scalenie `claude/napar-app-audit-5u19j0` → `main` (po zielonym E2E `44575002549`).
 
 ## Bramka scenariuszy (zasada 22)
-- Wdrożona i zielona statycznie na `e307853`: `docs/jakosc/przypadki-uzycia.md` (27 PU: 7 A / 0 B / 20 F), `scripts/sprawdz-scenariusze.mjs`, `testID="ekran:<trasa>"` na wszystkich 9 ekranach `app/`, artefakt `e2e-wykonane` (`wykonane.tsv`) w `e2e-ios.yml`, `--build "$BUILD" --wykonane wykonane.tsv` w `testflight.yml`.
+- Wdrożona i zielona statycznie na `9ace404`: `docs/jakosc/przypadki-uzycia.md` (27 PU: 7 A / 0 B / 20 F), `scripts/sprawdz-scenariusze.mjs`, `testID="ekran:<trasa>"` na wszystkich 9 ekranach `app/`, artefakt `e2e-wykonane` (`wykonane.tsv`) w `e2e-ios.yml`, `--build "$BUILD" --wykonane wykonane.tsv` w `testflight.yml`.
 
 ## Przypomnienia
 - Środowisko bez `send_later` / `list_triggers`; kontrola realizowana reaktywnie.
 
 ## Pule numerów decyzji
-- `docs/decyzje.md`: zajęte `D-001`…`D-020` (na `e307853`); następny wolny: `D-021`; KO następny: `KO-005`.
+- `docs/decyzje.md`: zajęte `D-001`…`D-020` (na `9ace404`); następny wolny: `D-021`; KO następny: `KO-005`.
 
 ## Dziennik (najnowsze na dole; starsze niż 48 h do `dziennik-<RRRR-MM>.md`)
 | UTC | Sesja | Zdarzenie z dowodem (SHA, run, plik) | Następny krok |
@@ -74,3 +74,4 @@
 | 2026-11-19 13:23 | G2 | Recenzja G2 (`70b4d29..a5a4507`): **ODRZUCIĆ** (P0:1 nieuciekane `ekran:(tabs)/index` w `08-pelna-petla.yaml:49-50`, P1:1 kontrakt regex w `e2e-contract.test.ts`, P2:1 brak regresji `02` + wcięcia). | Zlecić Sesję H (`naprawy/H-maestro-regex`) |
 | 2026-11-19 13:36 | H+H2 | Sesja H (`e307853`, verify 0: 118/118, 1293/1293) + recenzja H2 (**PRZYJĄĆ Z UWAGAMI**: 0 P0, 0 P1, 3 P2). FF `claude/napar-app-audit-5u19j0` → `e307853`. | Czekać na wynik E2E `44532031189` |
 | 2026-11-19 13:54 | CI | E2E `44532031189` (na `a5a4507`): **3/8 PASS** (`01`, `04`, `05` przeszły!); 5 FAIL z 3 przyczyn (`02` `hideKeyboard` → kaskada `06`/`07`; `03` `quick-add-caffeine-btn`; `08` `"E2E pelna petla"`). | Zlecić Sesję I (`naprawy/I-e2e-44532031189`) |
+| 2026-11-19 17:14 | I+I2 | Sesja I (`9ace404`, 8 plików, verify 0: 118/118, 1297/1297) + recenzja I2 (**PRZYJĄĆ**: 0 P0, 0 P1, 2 P2). FF `claude/napar-app-audit-5u19j0` → `9ace404`, start E2E `44575002549`. | Czekać na wynik E2E `44575002549` (cel: 8/8 PASS) |
