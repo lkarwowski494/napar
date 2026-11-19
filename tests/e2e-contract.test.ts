@@ -29,13 +29,60 @@ function codeTestIds(): { ids: Set<string>; prefixes: Set<string> } {
         if (!['__tests__', 'node_modules'].includes(e.name)) walk(p);
       } else if (/\.tsx?$/.test(e.name)) {
         const src = fs.readFileSync(p, 'utf8');
-        for (const m of src.matchAll(/\b(?:testID|closeTestID|saveTestID)=["{`']+([A-Za-z0-9_:/()-]+)/g)) ids.add(m[1]);
+        for (const m of src.matchAll(/\b(?:testID|closeTestID|saveTestID)=(?:["']([A-Za-z0-9_:/()-]+)["']|\{\s*["'`]([A-Za-z0-9_:/()-]+)["'`]\s*\})/g)) {
+          ids.add(m[1] ?? m[2]);
+        }
         for (const m of src.matchAll(/\b(?:testID|closeTestID|saveTestID)=\{\s*`([A-Za-z0-9_:/()-]+)\$\{/g)) prefixes.add(m[1]);
       }
     }
   };
   ['app', 'src'].forEach((d) => walk(path.join(root, d)));
   return { ids, prefixes };
+}
+
+function extractYamlIds(body: string): string[] {
+  const out: string[] = [];
+  for (const m of body.matchAll(/^\s*id:\s*(?:"((?:[^"\\]|\\.)+)"|'([^']+)')\s*$/gm)) {
+    if (m[1] !== undefined) out.push(m[1].replace(/\\(.)/g, '$1'));
+    else if (m[2] !== undefined) out.push(m[2]);
+  }
+  return out;
+}
+
+function matchesMaestroId(sel: string, ids: Set<string>, prefixes: Set<string>): boolean {
+  let re: RegExp;
+  try {
+    re = new RegExp(`^(?:${sel})$`);
+  } catch {
+    return false;
+  }
+  for (const id of ids) {
+    if (re.test(id)) return true;
+  }
+  for (const p of prefixes) {
+    if (sel.startsWith(p) && sel.length > p.length && re.test(sel)) return true;
+  }
+  return false;
+}
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function findScrollBeforeTap(body: string, targetId: string): { scrollIdx: number; tapIdx: number } {
+  const idEsc = escapeRegExp(targetId);
+  const scrollMatch = new RegExp(
+    `^\\s*-\\s*scrollUntilVisible:\\s*\\r?\\n(?:[ \\t]+(?!-\\s)[^\\r\\n]*\\r?\\n)*?[ \\t]+element:\\s*\\r?\\n(?:[ \\t]+(?!-\\s)[^\\r\\n]*\\r?\\n)*?[ \\t]+id:\\s*["']${idEsc}["']`,
+    'm',
+  ).exec(body);
+  const tapMatch = new RegExp(
+    `^\\s*-\\s*tapOn:\\s*\\r?\\n(?:[ \\t]+(?!-\\s)[^\\r\\n]*\\r?\\n)*?[ \\t]+id:\\s*["']${idEsc}["']`,
+    'm',
+  ).exec(body);
+  return {
+    scrollIdx: scrollMatch ? scrollMatch.index : -1,
+    tapIdx: tapMatch ? tapMatch.index : -1,
+  };
 }
 
 test('build symulatora zawiera paczkę JS (Release albo FORCE_BUNDLING), nie Debug bez paczki', () => {
@@ -49,9 +96,8 @@ test('log Maestro trafia do CI także przy porażce, a zrzuty są artefaktem', (
   expect(wf).toMatch(/if: always\(\)[\s\S]{0,200}upload-artifact/);
 });
 
-test('każdy selektor tekstowy scenariusza istnieje w słowniku PL, a każdy id istnieje jako testID', () => {
+test('każdy selektor tekstowy scenariusza istnieje w słowniku PL, a każdy id (jako regex Maestro) dopasowuje rzeczywisty testID', () => {
   const { ids, prefixes } = codeTestIds();
-  const hasTestId = (id: string) => ids.has(id) || [...prefixes].some((p) => id.startsWith(p) && id.length > p.length);
   const plTabLabels = new Set<string>(Object.values(translations.pl.tabs));
   const missing: string[] = [];
   const typed = new Set<string>();
@@ -66,11 +112,18 @@ test('każdy selektor tekstowy scenariusza istnieje w słowniku PL, a każdy id 
       const ok = plTexts.has(sel) || typed.has(sel) || (tabMatch !== null && plTabLabels.has(tabMatch[1]));
       if (!ok) missing.push(`${f}: tekst „${sel}”`);
     }
-    for (const m of body.matchAll(/id:\s*"([^"]+)"/g)) {
-      if (!hasTestId(m[1])) missing.push(`${f}: id „${m[1]}”`);
+    for (const sel of extractYamlIds(body)) {
+      if (!matchesMaestroId(sel, ids, prefixes)) missing.push(`${f}: id „${sel}”`);
     }
   }
   expect(missing).toEqual([]);
+});
+
+test('walidator selektorów id traktuje id jako regex Maestro (nieuciekany ekran:(tabs)/index nie pasuje)', () => {
+  const { ids, prefixes } = codeTestIds();
+  expect(ids.has('ekran:(tabs)/index')).toBe(true);
+  expect(matchesMaestroId('ekran:(tabs)/index', ids, prefixes)).toBe(false);
+  expect(matchesMaestroId('ekran:\\(tabs\\)/index', ids, prefixes)).toBe(true);
 });
 
 test('scenariusze nie stukają w etykiety zakładek ukrytych z paska (href: null)', () => {
@@ -127,9 +180,16 @@ test('selektory zakładek dolnego paska dopasowują iOS accessibilityText „<et
 
 test('08-pelna-petla.yaml przewija do open-procedure-modal-btn przed kliknięciem (regresja #44521826864)', () => {
   const body = fs.readFileSync(path.join(maestroDir, '08-pelna-petla.yaml'), 'utf8');
-  const scrollIdx = body.indexOf('scrollUntilVisible:\n    element:\n      id: "open-procedure-modal-btn"');
-  const tapIdx = body.indexOf('- tapOn:\n    id: "open-procedure-modal-btn"');
+  const { scrollIdx, tapIdx } = findScrollBeforeTap(body, 'open-procedure-modal-btn');
   expect(scrollIdx).toBeGreaterThan(-1);
   expect(tapIdx).toBeGreaterThan(scrollIdx);
 });
+
+test('02-spizarnia-dodaj-paczke.yaml przewija do bean-weight-input przed kliknięciem', () => {
+  const body = fs.readFileSync(path.join(maestroDir, '02-spizarnia-dodaj-paczke.yaml'), 'utf8');
+  const { scrollIdx, tapIdx } = findScrollBeforeTap(body, 'bean-weight-input');
+  expect(scrollIdx).toBeGreaterThan(-1);
+  expect(tapIdx).toBeGreaterThan(scrollIdx);
+});
+
 

@@ -47,4 +47,4 @@ name: 08 Pełna pętla parzenie → ocena → zapis do Dziennika
 # powrót: (tabs)/journal
 - tapOn: "Parzenie, tab, .*"
 - assertVisible:
-    id: "ekran:(tabs)/index"
+    id: "ekran:\\(tabs\\)/index"
