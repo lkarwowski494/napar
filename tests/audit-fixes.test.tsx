@@ -2185,8 +2185,8 @@ describe('M1-audytor-generalny-038: kontrakt zakresu w formacie roli 03 ze ślad
       czytaj(p).split('\n').forEach((l, i) => {
         if (WZORCE.test(l) && !wiersze.some((w) => w.plik === p && l.includes(w.kotwica))) bledy.push(`${p}:${i + 1}: bez wiersza inwentarza`);
       });
-    // Elementy pętli głównej wskazane w audycie (03-zakres-006) mają wiersz.
-    for (const k of ['batch-chips-group', 'quick-rebrew-banner', 'favoriteRecipes', 'finish-cost-card', 'ProactiveCalendarCard', 'OnboardingModal'])
+    // Elementy pętli głównej wskazane w audycie (03-zakres-006) mają wiersz (finish-cost-card i ProactiveCalendarCard usunięte w D-020 / ZM-07, ZM-08).
+    for (const k of ['batch-chips-group', 'quick-rebrew-banner', 'favoriteRecipes', 'OnboardingModal'])
       if (!wiersze.some((w) => w.kotwica === k)) bledy.push(`${k}: element pętli bez wiersza`);
     // Funkcja z decyzją NIE nie ma kodu.
     for (const [id, w] of funkcje)
@@ -2643,7 +2643,7 @@ describe('KO-003 (WG-01): workflow_dispatch w ci.yml bez zmiany kontroli ani upr
   });
 });
 
-describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkownika (F-05, F-31)', () => {
+describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkownika (F-05, F-15, F-31, F-32)', () => {
   test('F-05 (opcja b) i F-31 (opcja a): BrewFinishModal nie renderuje tds-input ani finish-cost-card; cost-calculator.ts usunięty', () => {
     const { BrewFinishModal } = require('../src/components/brew/BrewFinishModal');
     let tree: any;

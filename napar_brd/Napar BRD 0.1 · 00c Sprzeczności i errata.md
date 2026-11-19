@@ -96,3 +96,8 @@ Identyfikacja potencjalnych kolizji pojęciowych, ryzyk interpretacyjnych wytycz
 | **H-01** | Jedna konkretna korekta jednego parametru po ocenie parzenia (Dial-in Doctor, C1) pomaga trafić następnym razem. | Filtru Coffee, „Co nowego” 5.0: Dial In przeniesiony do zapisu parzenia | hipoteza; BR do napisania (rola 01) |
 | **H-02** | Użytkownik chce zapisać własny przepis wieloetapowy i parzyć według niego jak według przepisu z biblioteki. | Timer.Coffee, opis w App Store: „Create & Share Recipes” | hipoteza; BR do napisania (rola 01) |
 | **H-03** | Nowy użytkownik szybciej dochodzi do pierwszego parzenia, gdy aplikacja pyta tylko o rodzaj napoju (kawa, herbata, oba). | Filtru Coffee, „Co nowego” 5.0: „Improved onboarding” | hipoteza; BR do napisania (rola 01) |
+| **H-04** | Kopia zapasowa danych użytkownika w iCloud Drive (część „iCloud Drive” z ER-05, Z-151, ZP-06; w 1.0 dane chronią kopie lokalne i eksport F-10). | ER-05 (2026-11-15), D-018 (2026-11-19) | odłożone (PÓŹNIEJ v1.2, F-38) |
+| **H-05** | Karta kosztu parzenia wobec kawiarni w oknie zapisu (bez BR, wartości domyślne bez danych użytkownika). | brak dowodu w linii bazowej; D-020 (2026-11-19) | odrzucona (NIE, F-31, ZM-07) |
+| **H-06** | Kalendarz 14 dni z harmonogramem akcji i eksportem `.ics` w Dzienniku (bez BR, inny rytm niż J-01). | brak dowodu w linii bazowej; D-020 (2026-11-19) | odrzucona (NIE, F-32, ZM-08) |
+| **H-07** | Udostępnienie wpisu dziennika jako notatki degustacyjnej (tekst). | Timer.Coffee, opis w App Store (Ź-03); D-018 (2026-11-19) | hipoteza; BR do napisania (rola 01, F-33) |
+| **H-08** | Link prośby o ocenę w App Store w Ustawieniach po nadaniu identyfikatora w sklepie. | D-018 (2026-11-19): zasila dowód R po wydaniu | hipoteza; BR do napisania (rola 01, F-41) |
