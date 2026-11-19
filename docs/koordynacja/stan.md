@@ -1,4 +1,4 @@
-# Koordynacja Napar — stan (aktualizacja 2026-11-19 13:24 UTC)
+# Koordynacja Napar — stan (aktualizacja 2026-11-19 13:36 UTC)
 
 ## Mandat (przepisuj bez zmian; zmienia go tylko właściciel)
 - Tryb decyzji: analogia — od 2026-11-19 10:30 UTC, słowa: „1. Tak 2. Dopracowanie aplikacji. Mysle ze powinnismy zaczac od napraw ktore wskazal audyt a nie zostaly jeszcze zrobione. 3. analogia”
@@ -9,13 +9,13 @@
 - Pułapy kosztu: sesja 10 USD (próg STOP = 13 USD), doba 30 USD (ponad: bez nowych sesji) [OCENA — do kalibracji po pierwszych sesjach; środowisko Antigravity nie raportuje `cost_usd`, mierzymy czas]
 - Koordynator aktywny: `v1/default/jetski_remote_agents_3p/2f459540-3f1f-4d1d-b6a9-942b302be3a0` (od 2026-11-19 10:25 UTC)
 - Środowisko: Linux `6.12.105+`, Node `v24.22.3`, `gh` aktywny, repo `lkarwowski494/napar` (PUBLIC) + `lkarwowski494/prompts` (PRIVATE); brak Playwright i Xcode; delegowanie przez lokalne subagenty (`invoke_subagent`) — nazwany wyjątek od `create_session`.
-- Gałąź robocza: `claude/napar-app-audit-5u19j0` (HEAD `a5a4507`); gałąź stanu: `koordynacja` (nigdy nie scalana do integracji ani `main`).
+- Gałąź robocza: `claude/napar-app-audit-5u19j0` (HEAD `e307853`); gałąź stanu: `koordynacja` (nigdy nie scalana do integracji ani `main`).
 
 ## Teraz (3–5 linii)
-- **Gałąź robocza `claude/napar-app-audit-5u19j0` na `a5a4507`** (`npm run verify` kod `0`, 118/118 pakietów, 1291/1291 testów).
-- **Niezależna recenzja G2 (`ODRZUCIĆ`, P0:1 / P1:1 / P2:1):** wykryła deterministyczny błąd P0 w `.maestro/08-pelna-petla.yaml:49-50` (`id: "ekran:(tabs)/index"` bez ucieczki nawiasów regex w Maestro) oraz luki w `tests/e2e-contract.test.ts`.
-- **W toku:** (1) `E2E iOS (Maestro)` run **`44532031189`** na `a5a4507` (start 13:17 UTC — zostawiamy do końca, by zebrać wyniki przepływów `01..07` i pierwszej części `08`), (2) **Sesja H (`07-jakosc`, fix)** na `naprawy/H-maestro-regex` naprawiająca P0/P1/P2 z G2.
-- Następny krok: odbiór Sesji H + recenzja H2 + odbiór wyników `44532031189` → FF i czysty run E2E → prośba do właściciela o zgodę na scalenie do `main`.
+- **Gałąź robocza `claude/napar-app-audit-5u19j0` na `e307853`** (FF po przyjętej Sesji H i recenzji H2 `PRZYJĄĆ Z UWAGAMI`: 0 P0, 0 P1, 3 P2; `npm run verify` kod `0`, 118/118 pakietów, 1293/1293 testów).
+- **Sesja H (`e307853`) naprawiła wszystkie znaleziska G2:** ucieknięto nawiasy regex `ekran:\\(tabs\\)/index` w `.maestro/08-pelna-petla.yaml:50`, zaktualizowano kontrakt `tests/e2e-contract.test.ts` do walidacji regex Maestro (TDD) oraz dodano regresyjny test przewijania dla `02-spizarnia-dodaj-paczke.yaml`.
+- **W toku:** `E2E iOS (Maestro)` run **`44532031189`** na `a5a4507` (start 13:17 UTC — kończy się ok. 13:55 UTC; zostawiamy do końca, by zobaczyć wyniki `01..07` i pierwszej części `08`).
+- Następny krok: odbiór wyników `44532031189` → jeśli `01..07` zielone (i tylko `08` padło na naprawionym już `ekran:(tabs)/index`), od razu uruchamiamy czysty run E2E na `e307853`; po zielonym E2E prośba do właściciela o zgodę na scalenie do `main`.
 
 ## Sesje
 | Litera | ID | Rola, tryb | Gałąź @ SHA | Kontekst % | Koszt USD | Stan |
@@ -32,14 +32,14 @@
 | F2 | `52fb202ab2270a4966c797f2fb411d96` | recenzent (08 audit) | `naprawy/F-a11y-ekrany-wody` @ `70b4d29` (odczyt) | — | — | przyjęta (PRZYJĄĆ: 0 P0, 0 P1, 1 P2) |
 | G | `b0cf6b75ad6c9858e7a68b94f8033441` | 07-jakosc, fix (E2E 44521826864) | `naprawy/G-e2e-44521826864` @ `a5a4507` | — | — | scalona FF, recenzja G2: ODRZUCIĆ (P0 → H) |
 | G2 | `0286e043107ba520ed3c6064585f98d8` | recenzent (07 audit) | `70b4d29..a5a4507` (odczyt) | — | — | zakończona (ODRZUCIĆ: P0:1, P1:1, P2:1) |
-| H | (w uruchomieniu) | 07-jakosc, fix (G2 P0/P1/P2) | `naprawy/H-maestro-regex` | — | — | w toku |
+| H | `85999b0b86dfd071a14f799315c15923` | 07-jakosc, fix (G2 P0/P1/P2) | `naprawy/H-maestro-regex` @ `e307853` | — | — | przyjęta i scalona FF (verify 0: 118/118, 1293/1293) |
+| H2 | `28bafec46b61008c225f4098681584a8` | recenzent (07 audit) | `a5a4507..e307853` (odczyt) | — | — | zakończona (PRZYJĄĆ Z UWAGAMI: 0 P0, 0 P1, 3 P2) |
 
 ## Plan 24 h (UTC)
 | Kiedy | Co | Kto (sesja/rola) | Zależy od | Od właściciela |
 |---|---|---|---|---|
-| 13:24–13:35 | Naprawa P0/P1/P2 z G2 (`naprawy/H-maestro-regex`) + recenzja H2 | Sesja H + H2 | w toku | nic |
 | 13:17–14:00 | Przebieg `E2E iOS (Maestro)` na `a5a4507` (run `44532031189`) | GitHub Actions | w toku | nic |
-| po H2 i 44532031189 | FF `claude/napar-app-audit-5u19j0` + czysty run E2E | Koordynator | koniec H2 i `44532031189` | nic |
+| po 44532031189 | Czysty przebieg `E2E iOS (Maestro)` na `e307853` (lub poprawka ew. innych błędów z `44532031189`) | Koordynator / GH Actions | koniec `44532031189` | nic |
 | po zielonym E2E | Prośba o zgodę na scalenie `claude/napar-app-audit-5u19j0` → `main` | Koordynator | zielone E2E | zgoda na `main` + ew. weto `KO-002..004` + status `M1-020` |
 | po scaleniu `main` | Build TestFlight 1.0.0 + testy fizyczne `T1`–`T12` / protokół F | Właściciel | zgoda na TestFlight | testy fizyczne na telefonie |
 
@@ -49,13 +49,13 @@
 - Działanie zewnętrzne (zasada 12): zgoda na scalenie `claude/napar-app-audit-5u19j0` → `main` (po zielonym E2E).
 
 ## Bramka scenariuszy (zasada 22)
-- Wdrożona i zielona statycznie na `a5a4507`: `docs/jakosc/przypadki-uzycia.md` (27 PU: 7 A / 0 B / 20 F), `scripts/sprawdz-scenariusze.mjs`, `testID="ekran:<trasa>"` na wszystkich 9 ekranach `app/`, artefakt `e2e-wykonane` (`wykonane.tsv`) w `e2e-ios.yml`, `--build "$BUILD" --wykonane wykonane.tsv` w `testflight.yml`.
+- Wdrożona i zielona statycznie na `e307853`: `docs/jakosc/przypadki-uzycia.md` (27 PU: 7 A / 0 B / 20 F), `scripts/sprawdz-scenariusze.mjs`, `testID="ekran:<trasa>"` na wszystkich 9 ekranach `app/`, artefakt `e2e-wykonane` (`wykonane.tsv`) w `e2e-ios.yml`, `--build "$BUILD" --wykonane wykonane.tsv` w `testflight.yml`.
 
 ## Przypomnienia
 - Środowisko bez `send_later` / `list_triggers`; kontrola realizowana reaktywnie.
 
 ## Pule numerów decyzji
-- `docs/decyzje.md`: zajęte `D-001`…`D-020` (na `a5a4507`); następny wolny: `D-021`; KO następny: `KO-005`.
+- `docs/decyzje.md`: zajęte `D-001`…`D-020` (na `e307853`); następny wolny: `D-021`; KO następny: `KO-005`.
 
 ## Dziennik (najnowsze na dole; starsze niż 48 h do `dziennik-<RRRR-MM>.md`)
 | UTC | Sesja | Zdarzenie z dowodem (SHA, run, plik) | Następny krok |
@@ -71,3 +71,4 @@
 | 2026-11-19 12:11 | F+F2 | Sesja F (`70b4d29`, 4 commity, verify 0: 118/118, 1289/1289) + recenzja F2 (**PRZYJĄĆ**, 0 P0/P1, 1 P2). | FF → `70b4d29`, E2E `44521826864` |
 | 2026-11-19 13:17 | G | Sesja G (`a5a4507`, verify 0: 118/118, 1291/1291) — naprawa selektorów zakładek iOS po `44521826864`. FF `claude/napar-app-audit-5u19j0` → `a5a4507`, start E2E `44532031189`. | Niezależna recenzja G2 |
 | 2026-11-19 13:23 | G2 | Recenzja G2 (`70b4d29..a5a4507`): **ODRZUCIĆ** (P0:1 nieuciekane `ekran:(tabs)/index` w `08-pelna-petla.yaml:49-50`, P1:1 kontrakt regex w `e2e-contract.test.ts`, P2:1 brak regresji `02` + wcięcia). | Zlecić Sesję H (`naprawy/H-maestro-regex`) |
+| 2026-11-19 13:36 | H+H2 | Sesja H (`e307853`, verify 0: 118/118, 1293/1293) + recenzja H2 (**PRZYJĄĆ Z UWAGAMI**: 0 P0, 0 P1, 3 P2). FF `claude/napar-app-audit-5u19j0` → `e307853`. | Czekać na wynik E2E `44532031189`, potem czysty run na `e307853` |
