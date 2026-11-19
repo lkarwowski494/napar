@@ -187,7 +187,7 @@ Gdy chcesz przejrzeć bazę wzorcowych receptur mistrzowskich, przefiltrować ul
 ### Przepływ 5: Spiżarnia Ziaren i Liści oraz Kompendium Wiedzy (`app/(tabs)/beans.tsx`)
 
 #### 1. Kiedy używasz
-Gdy kupujesz nową paczkę kawy specialty lub herbaty liściastej, chcesz śledzić jej okno odgazowania po wypale (*Resting Window*: degassing / peak / aging), sprawdzić ile gramów pozostało w paczce lub skorzystać z encyklopedii odmian botanicznych (`BeanCompendiumModal`).
+Gdy kupujesz nową paczkę kawy specialty lub herbaty liściastej, chcesz zapisać jej datę palenia, sprawdzić ile gramów pozostało w paczce lub skorzystać z encyklopedii odmian botanicznych (`BeanCompendiumModal`).
 
 #### 2. Sekwencja kroków (1 → 2 → 3 → 4)
 
@@ -205,8 +205,9 @@ Gdy kupujesz nową paczkę kawy specialty lub herbaty liściastej, chcesz śledz
                                      |
                                      v
 +-------------------------------------------------------------------------+
-| [3. WYNIK / PRZELICZENIE] Wyliczenie okna świeżości (Resting Window)    |
-| evaluateRestingWindow() -> Dzień po wypale, status Peak/Degassing/Aging |
+| [3. WYNIK / PRZELICZENIE] Zapis stanu paczki i pozostałej gramatury     |
+| Prezentacja pozostałej wagi (g) i metadanych (wskaźnik odgazowania      |
+| ukryty w 1.0 wg D-019 / ZM-06; data palenia zostaje w SQLite)           |
 +------------------------------------+------------------------------------+
                                      |
                                      v
@@ -218,7 +219,7 @@ Gdy kupujesz nową paczkę kawy specialty lub herbaty liściastej, chcesz śledz
 
 - **Wejście:** Wejście na zakładkę `Spiżarnia` w dolnym pasku nawigacji.
 - **Konfiguracja:** Wypełnienie formularza `BeanAddModal` ręcznie lub jednym kliknięciem z szablonu `BeanCompendiumModal`.
-- **Wynik/Przeliczenie:** Wyznaczenie statusu odgazowania (`evaluateRestingWindow`) i prezentacja pozostałej gramatury.
+- **Wynik/Przeliczenie:** Prezentacja pozostałej gramatury i zapisanych metadanych paczki (wskaźnik okna odgazowania ukryty w 1.0 wg D-019 / ZM-06).
 - **Egzekucja/Zapis:** Kliknięcie `Parz z tych ziaren` ustawia paczkę w `BrewContext` i przenosi na ekran parzenia.
 
 #### 3. Wskazanie tarć poznawczych (Friction Points)
