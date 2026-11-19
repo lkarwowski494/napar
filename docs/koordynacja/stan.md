@@ -20,7 +20,7 @@
 ## Sesje
 | Litera | ID | Rola, tryb | Gałąź @ SHA | Kontekst % | Koszt USD | Stan |
 |---|---|---|---|---|---|---|
-| A | (startuje) | 07-jakosc, audit | `claude/napar-app-audit-5u19j0` @ `c836267` (odczyt) | — | — | zlecana |
+| A | `5b8ef1c0509aa4bf52924a24527e5b17` | 07-jakosc, audit | `claude/napar-app-audit-5u19j0` @ `c836267` (odczyt) | — | — | w toku (10:35 UTC) |
 
 ## Plan 24 h (UTC)
 | Kiedy | Co | Kto (sesja/rola) | Zależy od | Od właściciela |
