@@ -23,7 +23,7 @@
 | A | `5b8ef1c0509aa4bf52924a24527e5b17` | 07-jakosc, audit | `claude/napar-app-audit-5u19j0` @ `c836267` (odczyt) | — | — | przyjęta (10:41 UTC) |
 | B | `af12d27faaab387fe6368f6fb597f910` | 08-programista, fix | `naprawy/B-zakres-kontakt-ci` @ `1e88b1d` | — | — | przyjęta (11:11 UTC) |
 | B2 | `6bb4689cd0a936abc3d37d2154b2ca08` | recenzent (08 audit) | `naprawy/B-zakres-kontakt-ci` @ `1e88b1d` (odczyt) | — | — | przyjęta (11:11 UTC, PRZYJĄĆ) |
-| C | (startuje) | 07-jakosc, fix (JAK-19) | `naprawy/C-bramka-scenariuszy` od `1e88b1d` | — | — | zlecana (11:13 UTC) |
+| C | `6d79a347175718a536dd27bd68510345` | 07-jakosc, fix (JAK-19) | `naprawy/C-bramka-scenariuszy` od `1e88b1d` | — | — | w toku (11:13 UTC) |
 
 ## Plan 24 h (UTC)
 | Kiedy | Co | Kto (sesja/rola) | Zależy od | Od właściciela |
