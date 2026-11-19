@@ -12,10 +12,10 @@
 - Gałąź robocza: `claude/napar-app-audit-5u19j0` (HEAD `3d12389`, czeka na koniec E2E `44517342406` przed FF do `70b4d29`); gałąź stanu: `koordynacja` (nigdy nie scalana do integracji ani `main`).
 
 ## Teraz (3–5 linii)
-- **Gałąź robocza `claude/napar-app-audit-5u19j0` na `70b4d29`** (FF po przyjętych Sesjach A–F i recenzjach B2, C2, D2, F2; `npm run verify` kod `0`, 118/118 pakietów, 1289/1289 testów).
-- **E2E iOS (Maestro):** oba przebiegi (`44517342406` na `3d12389` i `44521826864` na `70b4d29`) zakończyły się **`failure`** — po `onboarding-submit-btn` nadal nie widać zakładek (`Parzenie` / `Spiżarnia`).
-- **W toku:** **Sesja G** (`b0cf6b75ad6c9858e7a68b94f8033441`, `07-jakosc --tryb fix`) pobiera artefakty `maestro-zrzuty` z `44521826864` i naprawia przyczynę źródłową na gałęzi `naprawy/G-e2e-44521826864`.
-- Następny krok: odbiór Sesji G + recenzja G2 → FF `claude/napar-app-audit-5u19j0` → ponowne `E2E iOS (Maestro)`.
+- **Gałąź robocza `claude/napar-app-audit-5u19j0` na `a5a4507`** (FF po przyjętych Sesjach A–G; `npm run verify` kod `0`, 118/118 pakietów, 1291/1291 testów).
+- **Sesja G przyjęta (13:17 UTC):** z artefaktu `44521826864` ustalono przyczynę porażki E2E — `OnboardingModal` zamknął się, ale React Navigation na iOS wystawia zakładki jako `"<etykieta>, tab, <i of 6>"`, a `open-procedure-modal-btn` w `08` wymagał przewinięcia. Naprawione w `.maestro/01..08` + testy regresyjne w `tests/e2e-contract.test.ts` (`a5a4507`).
+- **W toku:** `E2E iOS (Maestro)` run **`44532031189`** na `claude/napar-app-audit-5u19j0` (`a5a4507`, start 13:17 UTC).
+- Następny krok: odbiór wyniku E2E `44532031189` → jeśli zielone, prośba do właściciela o zgodę na scalenie `claude/napar-app-audit-5u19j0` → `main`.
 
 ## Sesje
 | Litera | ID | Rola, tryb | Gałąź @ SHA | Kontekst % | Koszt USD | Stan |
@@ -28,9 +28,9 @@
 | D | `73b8d32922840bcba788ba3e591daaca` | 07-jakosc, fix (C2 P1 + E2E) | `naprawy/D-e2e-i-bramka` @ `3d12389` | — | — | przyjęta i scalona FF |
 | D2 | `b4f7bd1b6ecfabb86db3c8dc95b2d018` | recenzent (07 audit) | `naprawy/D-e2e-i-bramka` @ `3d12389` (odczyt) | — | — | przyjęta (PRZYJĄĆ Z UWAGAMI → F) |
 | E | `bd15eab873313e9321aaf92f4d9bd93a` | 06-tresci, fix (REJ-01) | `naprawy/E-tresci-rejestr` @ `00721e8` | — | — | przyjęta i scalona FF |
-| F | `a6c48698b90b7027fa6af21585848b53` | 08-programista, fix (D2, ekrany, wody) | `naprawy/F-a11y-ekrany-wody` @ `70b4d29` | — | — | przyjęta i scalona FF (13:03 UTC) |
+| F | `a6c48698b90b7027fa6af21585848b53` | 08-programista, fix (D2, ekrany, wody) | `naprawy/F-a11y-ekrany-wody` @ `70b4d29` | — | — | przyjęta i scalona FF |
 | F2 | `52fb202ab2270a4966c797f2fb411d96` | recenzent (08 audit) | `naprawy/F-a11y-ekrany-wody` @ `70b4d29` (odczyt) | — | — | przyjęta (PRZYJĄĆ: 0 P0, 0 P1, 1 P2) |
-| G | `b0cf6b75ad6c9858e7a68b94f8033441` | 07-jakosc, fix (E2E 44521826864) | `naprawy/G-e2e-44521826864` od `70b4d29` | — | — | w toku (13:03 UTC) |
+| G | `b0cf6b75ad6c9858e7a68b94f8033441` | 07-jakosc, fix (E2E 44521826864) | `naprawy/G-e2e-44521826864` @ `a5a4507` | — | — | przyjęta i scalona FF (13:17 UTC, verify 0) |
 
 ## Plan 24 h (UTC)
 | Kiedy | Co | Kto (sesja/rola) | Zależy od | Od właściciela |
