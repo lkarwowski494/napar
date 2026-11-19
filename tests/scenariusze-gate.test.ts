@@ -71,7 +71,7 @@ function makeFixture(opts?: {
       '|---|---|---|',
       '',
     ].join('\n');
-  const catPath = path.join(dir, 'docs', 'jakosc', 'przypadki-uzytkownika.md');
+  const catPath = path.join(dir, 'docs', 'jakosc', 'przypadki-uzycia.md');
   fs.mkdirSync(path.dirname(catPath), { recursive: true });
   fs.writeFileSync(catPath, catalog, 'utf8');
 

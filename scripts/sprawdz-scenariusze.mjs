@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 const arg = (n) => { const i = process.argv.indexOf(n); return i < 0 ? undefined : process.argv[i + 1] ?? ''; };
-const KATALOG = 'docs/jakosc/przypadki-uzytkownika.md';
+const KATALOG = 'docs/jakosc/przypadki-uzycia.md';
 const PROTOKOLY = 'docs/jakosc/test-fizyczny';
 const OSTATNI = 'docs/wydanie/ostatni-build.txt';
 const bledy = [];
