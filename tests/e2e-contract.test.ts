@@ -19,20 +19,23 @@ function strings(o: unknown, out: Set<string>): Set<string> {
 }
 const plTexts = strings(translations.pl, new Set<string>());
 
-function codeTestIds(): Set<string> {
+function codeTestIds(): { ids: Set<string>; prefixes: Set<string> } {
   const ids = new Set<string>();
+  const prefixes = new Set<string>();
   const walk = (dir: string) => {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
       const p = path.join(dir, e.name);
       if (e.isDirectory()) {
         if (!['__tests__', 'node_modules'].includes(e.name)) walk(p);
       } else if (/\.tsx?$/.test(e.name)) {
-        for (const m of fs.readFileSync(p, 'utf8').matchAll(/\b(?:testID|closeTestID|saveTestID)=["{`']+([A-Za-z0-9_-]+)/g)) ids.add(m[1]);
+        const src = fs.readFileSync(p, 'utf8');
+        for (const m of src.matchAll(/\b(?:testID|closeTestID|saveTestID)=["{`']+([A-Za-z0-9_-]+)/g)) ids.add(m[1]);
+        for (const m of src.matchAll(/\b(?:testID|closeTestID|saveTestID)=\{\s*`([A-Za-z0-9_-]+)\$\{/g)) prefixes.add(m[1]);
       }
     }
   };
   ['app', 'src'].forEach((d) => walk(path.join(root, d)));
-  return ids;
+  return { ids, prefixes };
 }
 
 test('build symulatora zawiera paczkę JS (Release albo FORCE_BUNDLING), nie Debug bez paczki', () => {
@@ -47,7 +50,8 @@ test('log Maestro trafia do CI także przy porażce, a zrzuty są artefaktem', (
 });
 
 test('każdy selektor tekstowy scenariusza istnieje w słowniku PL, a każdy id istnieje jako testID', () => {
-  const ids = codeTestIds();
+  const { ids, prefixes } = codeTestIds();
+  const hasTestId = (id: string) => ids.has(id) || [...prefixes].some((p) => id.startsWith(p) && id.length > p.length);
   const missing: string[] = [];
   const typed = new Set<string>();
   for (const f of flows) {
@@ -59,7 +63,7 @@ test('każdy selektor tekstowy scenariusza istnieje w słowniku PL, a każdy id 
       if (!plTexts.has(m[1]) && !typed.has(m[1])) missing.push(`${f}: tekst „${m[1]}”`);
     }
     for (const m of body.matchAll(/id:\s*"([^"]+)"/g)) {
-      if (!ids.has(m[1])) missing.push(`${f}: id „${m[1]}”`);
+      if (!hasTestId(m[1])) missing.push(`${f}: id „${m[1]}”`);
     }
   }
   expect(missing).toEqual([]);
