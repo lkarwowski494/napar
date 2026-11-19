@@ -9,19 +9,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { localISODate } from '../src/data/backup';
-import { generateActionIcsContent } from '../src/core/bpr-engine';
 
 /** Chwila w czasie lokalnym procesu (miesiąc 1–12). */
 const local = (y: number, m: number, d: number, h: number, min: number) => new Date(y, m - 1, d, h, min, 0, 0);
 
-describe('07-jakosc-008 · „dziś” w interfejsie to lokalna data (domyślna data palenia, kalendarz, ICS)', () => {
+describe('07-jakosc-008 · „dziś” w interfejsie to lokalna data (domyślna data palenia)', () => {
   afterEach(() => jest.useRealTimers());
 
-  it('minutę przed lokalną północą: localISODate i fallback ICS dają dzisiejszą lokalną datę', () => {
+  it('minutę przed lokalną północą: localISODate daje dzisiejszą lokalną datę', () => {
     jest.useFakeTimers().setSystemTime(local(2026, 11, 11, 23, 59));
     expect(localISODate()).toBe('2026-11-11');
-    const ics = generateActionIcsContent({ id: 'a', titlePl: 'x', dateIso: '' } as any, 'pl');
-    expect(ics).toContain('DTSTART:20261111T080000Z');
   });
 
   it('minutę po lokalnej północy: następny dzień', () => {

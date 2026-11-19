@@ -1,9 +1,7 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { Share } from 'react-native';
 import { AppGuideModal } from '../src/components/AppGuideModal';
 import { ProcedureModal } from '../src/components/brew/ProcedureModal';
-import { ProactiveCalendarCard } from '../src/components/journal/ProactiveCalendarCard';
 import SettingsTabScreen from '../app/(tabs)/settings';
 
 describe('BPR To-Be Components & Screens Coverage', () => {
@@ -147,60 +145,6 @@ describe('BPR To-Be Components & Screens Coverage', () => {
     expect(onPrevStep).toHaveBeenCalled();
     expect(onFinishAndSave).toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
-  });
-
-  it('renders ProactiveCalendarCard, filters schedule, exports .ics, and executes 1-Tap action', () => {
-    const shareSpy = jest
-      .spyOn(Share, 'share')
-      .mockResolvedValue({ action: 'sharedAction' } as any);
-    const onExecuteAction = jest.fn();
-
-    let tree: renderer.ReactTestRenderer;
-    act(() => {
-      tree = renderer.create(
-        <ProactiveCalendarCard
-          inventory={[
-            {
-              id: 'inv-1',
-              name: 'Ethiopia Peak',
-              type: 'coffee',
-              roastOrHarvestDate: '2026-10-05',
-              initialWeightGrams: 250,
-              remainingWeightGrams: 200,
-              flavorNotes: [],
-              isFavorite: true,
-              isArchived: false,
-              createdAt: '2026-10-05',
-              updatedAt: '2026-10-05',
-            },
-          ]}
-          sessions={[]}
-          referenceDateIso="2026-10-17T10:00:00.000Z"
-          language="pl"
-          onExecuteAction={onExecuteAction}
-        />
-      );
-    });
-
-    act(() => {
-      tree!.root.findByProps({ testID: 'schedule-filter-all' }).props.onPress();
-      tree!.root.findByProps({ testID: 'schedule-filter-upcoming' }).props.onPress();
-      tree!.root.findByProps({ testID: 'calendar-day-2026-10-17' }).props.onPress();
-    });
-
-    act(() => {
-      tree!.root.findByProps({ testID: 'calendar-clear-date-btn' }).props.onPress();
-      tree!.root
-        .findByProps({ testID: 'execute-action-btn-action-peak-now-inv-1' })
-        .props.onPress();
-      tree!.root
-        .findByProps({ testID: 'ics-export-btn-action-peak-now-inv-1' })
-        .props.onPress();
-    });
-
-    expect(onExecuteAction).toHaveBeenCalled();
-    expect(shareSpy).toHaveBeenCalled();
-    shareSpy.mockRestore();
   });
 
   it('renders SettingsTabScreen re-exported route from app/(tabs)/settings', () => {

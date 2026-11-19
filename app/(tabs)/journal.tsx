@@ -17,7 +17,7 @@ import { useRouter } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
 import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems, getUnitSystem } from '../../src/data/database';
-import { BrewSession, InventoryItem } from '../../src/core/database-schema';
+import { BrewSession } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { useTranslation, formatTemplate } from '../../src/core/i18n';
 import { formatTemperature } from '../../src/core/unit-converter';
@@ -25,10 +25,8 @@ import { confirmAction } from '../../src/platform/confirm';
 import { JournalIcon } from '../../src/components/icons/CraftIcons';
 import { JournalSessionCard } from '../../src/components/journal/JournalSessionCard';
 import { JournalAnalyticsView } from '../../src/components/journal/JournalAnalyticsView';
-import { ProactiveCalendarCard } from '../../src/components/journal/ProactiveCalendarCard';
 import { JournalFilterBar } from '../../src/components/journal/JournalFilterBar';
 import { useJournalAnalytics } from '../../src/hooks/useJournalAnalytics';
-import { ProactiveActionItem } from '../../src/core/bpr-engine';
 import { runSave } from '../../lib/save-feedback';
 
 export default function JournalScreen() {
@@ -56,7 +54,6 @@ export default function JournalScreen() {
     }
   });
   const [sessions, setSessions] = useState<BrewSession[]>([]);
-  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [viewMode, setViewMode] = useState<'sessions' | 'analytics'>('sessions');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterType, setFilterType] = useState<'all' | 'coffee' | 'tea' | 'high_rated'>('all');
@@ -83,8 +80,6 @@ export default function JournalScreen() {
     try {
       const data = getBrewSessions();
       setSessions(data);
-      const inv = getInventoryItems(true);
-      setInventoryItems(inv);
     } catch {
       // fallback
     }
@@ -106,41 +101,6 @@ export default function JournalScreen() {
         loadData();
       },
     });
-  };
-
-  const handleExecuteProactiveAction = (action: ProactiveActionItem) => {
-    try {
-      const userRecipes = getRecipes();
-      const allRecipes = [...userRecipes, ...MASTER_RECIPES];
-      let targetRecipe = allRecipes.find((r) => r.id === action.recipeId);
-      if (!targetRecipe && action.recommendedMethod) {
-        targetRecipe = allRecipes.find(
-          (r) => r.method.toLowerCase() === action.recommendedMethod!.toLowerCase()
-        );
-      }
-      if (!targetRecipe) {
-        targetRecipe = MASTER_RECIPES[0];
-      }
-      selectRecipe(targetRecipe);
-
-      if (action.inventoryItemId) {
-        const inventory = getInventoryItems(true);
-        const item = inventory.find((i) => i.id === action.inventoryItemId);
-        selectInventoryItem(item || null);
-      }
-
-      if (action.doseGrams) setDoseGrams(action.doseGrams);
-      if (action.waterGrams) setWaterGrams(action.waterGrams);
-      if (action.waterTempCelsius) setWaterTempCelsius(action.waterTempCelsius);
-
-      router.navigate('/');
-      Alert.alert(
-        t.journal.paramsLoadedTitle || (language === 'pl' ? 'Załadowano parametry parzenia' : 'Brew parameters loaded'),
-        language === 'en' ? (action.titleEn || action.titlePl) : action.titlePl
-      );
-    } catch {
-      router.navigate('/');
-    }
   };
 
   const handleBrewAgain = (session: BrewSession) => {
@@ -259,15 +219,6 @@ export default function JournalScreen() {
           {filteredSessions.length !== relevantSessions.length ? ` (${formatTemplate(t.journal.visibleCount, { count: filteredSessions.length })})` : ''}
         </Text>
       </View>
-
-
-      {/* 14-dniowy Proaktywny Kalendarz i Harmonogram Akcji 1-Tap (BPR Pillar 5) */}
-      <ProactiveCalendarCard
-        inventory={inventoryItems}
-        sessions={relevantSessions}
-        language={language}
-        onExecuteAction={handleExecuteProactiveAction}
-      />
 
       {/* Przełącznik Widoku: Sesje vs Analityka */}
       <View style={styles.viewModeRow}>

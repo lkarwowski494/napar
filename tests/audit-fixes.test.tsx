@@ -2714,4 +2714,15 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
     const schema = readFileSync(join(root, 'src/core/database-schema.ts'), 'utf8');
     expect(schema).toContain('roastOrHarvestDate');
   });
+
+  test('F-32 (opcja a): ProactiveCalendarCard i eksport .ics usunięte z Dziennika; parseStepDurationSeconds zostaje', () => {
+    expect(existsSync(join(root, 'src/components/journal/ProactiveCalendarCard.tsx'))).toBe(false);
+    const journalSrc = readFileSync(join(root, 'app/(tabs)/journal.tsx'), 'utf8');
+    expect(journalSrc).not.toContain('ProactiveCalendarCard');
+    const bpr = require('../src/core/bpr-engine');
+    expect(bpr.buildProactiveActionSchedule).toBeUndefined();
+    expect(bpr.buildFourteenDayCalendar).toBeUndefined();
+    expect(bpr.generateActionIcsContent).toBeUndefined();
+    expect(bpr.parseStepDurationSeconds('Odczekaj 45 sekund', 30)).toBe(45);
+  });
 });
