@@ -12,10 +12,10 @@
 - Gałąź robocza: `claude/napar-app-audit-5u19j0` (HEAD `3d12389`, czeka na koniec E2E `44517342406` przed FF do `70b4d29`); gałąź stanu: `koordynacja` (nigdy nie scalana do integracji ani `main`).
 
 ## Teraz (3–5 linii)
-- **Sesje A, B+B2, C+C2, D+D2, E, F+F2 wszystkie przyjęte** — najnowszy zweryfikowany commit to **`70b4d29`** na `origin/naprawy/F-a11y-ekrany-wody` (`npm run verify` kod `0`: 118/118 pakietów, 1289/1289 testów; recenzja F2: **PRZYJĄĆ**, 0 P0, 0 P1, 1 P2).
-- Łącznie od `c836267` dodano **20 zweryfikowanych commitów** (kontakt DEC-07, `workflow_dispatch` w `ci.yml`, Scope §3 `F-05`/`F-15`/`F-31`/`F-32` + `D-017..D-020` + `ZM-05..ZM-08`, bramka D-060 `przypadki-uzycia.md` + `sprawdz-scenariusze.mjs` + `wykonane.tsv`, naprawa onboardingu Maestro, przegląd 12 wpisów `rejestr.json`, naprawa VoiceOver/Maestro `star-rating-row`/`water-chips-row`, `testID="ekran:<trasa>"` na 9 ekranach, korekta 5 wód butelkowanych wg etykiet).
-- W toku: przebiegi `E2E iOS (Maestro)` — run **`44517342406`** na `claude/napar-app-audit-5u19j0` (`3d12389`) oraz run **`44521826864`** na `naprawy/F-a11y-ekrany-wody` (`70b4d29`).
-- Następny krok: po zakończeniu E2E `44517342406` — FF `claude/napar-app-audit-5u19j0` → `70b4d29`, uruchomienie finalnego E2E na `70b4d29` oraz prośba do właściciela o zgodę na scalenie do `main` (i ew. weto `KO-002..004` + status `M1-audytor-generalny-020`).
+- **Gałąź robocza `claude/napar-app-audit-5u19j0` na `70b4d29`** (FF po przyjętych Sesjach A–F i recenzjach B2, C2, D2, F2; `npm run verify` kod `0`, 118/118 pakietów, 1289/1289 testów).
+- **E2E iOS (Maestro):** oba przebiegi (`44517342406` na `3d12389` i `44521826864` na `70b4d29`) zakończyły się **`failure`** — po `onboarding-submit-btn` nadal nie widać zakładek (`Parzenie` / `Spiżarnia`).
+- **W toku:** **Sesja G** (`b0cf6b75ad6c9858e7a68b94f8033441`, `07-jakosc --tryb fix`) pobiera artefakty `maestro-zrzuty` z `44521826864` i naprawia przyczynę źródłową na gałęzi `naprawy/G-e2e-44521826864`.
+- Następny krok: odbiór Sesji G + recenzja G2 → FF `claude/napar-app-audit-5u19j0` → ponowne `E2E iOS (Maestro)`.
 
 ## Sesje
 | Litera | ID | Rola, tryb | Gałąź @ SHA | Kontekst % | Koszt USD | Stan |
@@ -27,9 +27,10 @@
 | C2 | `a947d8befee927acd3688e5aba62ab61` | recenzent (07 audit) | `naprawy/C-bramka-scenariuszy` @ `ea8f107` (odczyt) | — | — | przyjęta (PRZYJĄĆ Z UWAGAMI) |
 | D | `73b8d32922840bcba788ba3e591daaca` | 07-jakosc, fix (C2 P1 + E2E) | `naprawy/D-e2e-i-bramka` @ `3d12389` | — | — | przyjęta i scalona FF |
 | D2 | `b4f7bd1b6ecfabb86db3c8dc95b2d018` | recenzent (07 audit) | `naprawy/D-e2e-i-bramka` @ `3d12389` (odczyt) | — | — | przyjęta (PRZYJĄĆ Z UWAGAMI → F) |
-| E | `bd15eab873313e9321aaf92f4d9bd93a` | 06-tresci, fix (REJ-01) | `naprawy/E-tresci-rejestr` @ `00721e8` | — | — | przyjęta (11:54 UTC, verify 0) |
-| F | `a6c48698b90b7027fa6af21585848b53` | 08-programista, fix (D2, ekrany, wody) | `naprawy/F-a11y-ekrany-wody` @ `70b4d29` | — | — | przyjęta (12:11 UTC, verify 0; czeka na FF po E2E) |
-| F2 | `52fb202ab2270a4966c797f2fb411d96` | recenzent (08 audit) | `naprawy/F-a11y-ekrany-wody` @ `70b4d29` (odczyt) | — | — | przyjęta (12:11 UTC, PRZYJĄĆ: 0 P0, 0 P1, 1 P2) |
+| E | `bd15eab873313e9321aaf92f4d9bd93a` | 06-tresci, fix (REJ-01) | `naprawy/E-tresci-rejestr` @ `00721e8` | — | — | przyjęta i scalona FF |
+| F | `a6c48698b90b7027fa6af21585848b53` | 08-programista, fix (D2, ekrany, wody) | `naprawy/F-a11y-ekrany-wody` @ `70b4d29` | — | — | przyjęta i scalona FF (13:03 UTC) |
+| F2 | `52fb202ab2270a4966c797f2fb411d96` | recenzent (08 audit) | `naprawy/F-a11y-ekrany-wody` @ `70b4d29` (odczyt) | — | — | przyjęta (PRZYJĄĆ: 0 P0, 0 P1, 1 P2) |
+| G | `b0cf6b75ad6c9858e7a68b94f8033441` | 07-jakosc, fix (E2E 44521826864) | `naprawy/G-e2e-44521826864` od `70b4d29` | — | — | w toku (13:03 UTC) |
 
 ## Plan 24 h (UTC)
 | Kiedy | Co | Kto (sesja/rola) | Zależy od | Od właściciela |
