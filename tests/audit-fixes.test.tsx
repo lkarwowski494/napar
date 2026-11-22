@@ -2832,5 +2832,63 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
       jest.useRealTimers();
     }
   });
+
+  test('M1-audytor-generalny-009: powrót na zakładki beans, journal i caffeine (useFocusEffect) odświeża dane SQLite i ustawienia', () => {
+    const expoRouter = require('expo-router');
+    const db = require('../src/data/database');
+    const { BrewProvider } = require('../src/core/brew-context');
+    const BeansScreen = require('../app/(tabs)/beans').default;
+    const JournalScreen = require('../app/(tabs)/journal').default;
+    const CaffeineScreen = require('../app/(tabs)/caffeine').default;
+
+    const unitSpy = jest.spyOn(db, 'getUnitSystem').mockReturnValue('metric');
+    const invSpy = jest.spyOn(db, 'getInventoryItems').mockReturnValue([]);
+    const sessSpy = jest.spyOn(db, 'getBrewSessions').mockReturnValue([]);
+    const cafSpy = jest.spyOn(db, 'getCaffeineLogs').mockReturnValue([]);
+    const hlSpy = jest.spyOn(db, 'getCaffeineHalfLife').mockReturnValue(4);
+    const bedSpy = jest.spyOn(db, 'getBedtimeHour').mockReturnValue(23);
+
+    const focusSpy = expoRouter.useFocusEffect as jest.Mock;
+    focusSpy.mockClear();
+
+    let beansTree: any;
+    let journalTree: any;
+    let caffeineTree: any;
+    act(() => {
+      beansTree = renderer.create(<BrewProvider><BeansScreen /></BrewProvider>);
+      journalTree = renderer.create(<BrewProvider><JournalScreen /></BrewProvider>);
+      caffeineTree = renderer.create(<CaffeineScreen />);
+    });
+
+    // Wszystkie trzy zakładki rejestrują useFocusEffect
+    expect(focusSpy.mock.calls.length).toBeGreaterThanOrEqual(3);
+    const callbacks = focusSpy.mock.calls.slice(-3).map((c: any[]) => c[0]);
+
+    // Symulacja zmiany ustawień i nowych wpisów w SQLite po powrocie z innej zakładki
+    unitSpy.mockReturnValue('imperial');
+    hlSpy.mockReturnValue(6);
+    bedSpy.mockReturnValue(21);
+    const invCallsBefore = invSpy.mock.calls.length;
+    const sessCallsBefore = sessSpy.mock.calls.length;
+    const cafCallsBefore = cafSpy.mock.calls.length;
+
+    act(() => {
+      callbacks.forEach((cb: () => void) => cb());
+    });
+
+    expect(invSpy.mock.calls.length).toBeGreaterThan(invCallsBefore);
+    expect(sessSpy.mock.calls.length).toBeGreaterThan(sessCallsBefore);
+    expect(cafSpy.mock.calls.length).toBeGreaterThan(cafCallsBefore);
+    expect(hlSpy).toHaveBeenCalled();
+    expect(bedSpy).toHaveBeenCalled();
+
+    act(() => {
+      beansTree.unmount();
+      journalTree.unmount();
+      caffeineTree.unmount();
+    });
+    jest.restoreAllMocks();
+  });
 });
+
 

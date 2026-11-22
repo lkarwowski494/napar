@@ -72,6 +72,17 @@ jest.mock(
   { virtual: true }
 );
 
+jest.mock('expo-router', () => {
+  const actual = jest.requireActual('expo-router');
+  const React = require('react');
+  return {
+    ...actual,
+    useFocusEffect: jest.fn((effect) => {
+      React.useEffect(effect, [effect]);
+    }),
+  };
+});
+
 // Global deterministic locale mock for Jest across OS platforms (Linux CI, macOS, Windows)
 const OriginalDateTimeFormat = Intl.DateTimeFormat;
 Intl.DateTimeFormat = function (locales, options) {

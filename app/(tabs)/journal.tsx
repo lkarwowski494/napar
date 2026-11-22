@@ -3,7 +3,7 @@
 // Historia sesji, oceny sensoryczne, balans smaku, TDS i Extraction Yield
 // ============================================================================
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
   Alert,
   Share,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
 import { MASTER_RECIPES } from '../../src/core/recipes-data';
 import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems, getUnitSystem } from '../../src/data/database';
@@ -46,7 +46,7 @@ export default function JournalScreen() {
   const setWaterProfile = brewCtx?.setWaterProfile ?? (() => {});
   const beveragePreference = brewCtx?.beveragePreference ?? 'both';
   const { t, language } = useTranslation();
-  const [unitSystem] = useState<'metric' | 'imperial'>(() => {
+  const [unitSystem, setUnitSystem] = useState<'metric' | 'imperial'>(() => {
     try {
       return getUnitSystem();
     } catch {
@@ -76,18 +76,29 @@ export default function JournalScreen() {
 
   const analyticsData = useJournalAnalytics(relevantSessions);
 
-  const loadData = () => {
+  const loadData = useCallback(() => {
     try {
       const data = getBrewSessions();
       setSessions(data);
     } catch {
       // fallback
     }
-  };
+    try {
+      setUnitSystem(getUnitSystem());
+    } catch {
+      // fallback
+    }
+  }, []);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
+  );
 
   const handleDelete = (session: BrewSession) => {
     confirmAction({

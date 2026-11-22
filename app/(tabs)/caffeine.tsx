@@ -3,13 +3,14 @@
 // Kinetyka eliminacji (t1/2), szacunek kofeiny o porze snu (bez progu, DEC-05 a) i dobowy bilans EFSA
 // ============================================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
 } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import {
   getCaffeineLogs,
   logCaffeine,
@@ -37,7 +38,13 @@ import { announce } from '../../src/platform/announce';
 
 export default function CaffeineScreen() {
   const { t, language } = useTranslation();
-  const unitSystem = getUnitSystem();
+  const [unitSystem, setUnitSystem] = useState<'metric' | 'imperial'>(() => {
+    try {
+      return getUnitSystem();
+    } catch {
+      return 'metric';
+    }
+  });
   const [logs, setLogs] = useState<CaffeineLog[]>([]);
   const [bedtimeHour, setBedtimeHourState] = useState(() => {
     try {
@@ -81,7 +88,7 @@ export default function CaffeineScreen() {
     }
   };
 
-  const loadLogs = () => {
+  const loadLogs = useCallback(() => {
     try {
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
@@ -91,11 +98,32 @@ export default function CaffeineScreen() {
       // fallback to empty logs
       setLogs([]);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadLogs();
-  }, []);
+  }, [loadLogs]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadLogs();
+      try {
+        setUnitSystem(getUnitSystem());
+      } catch {
+        // fallback
+      }
+      try {
+        setBedtimeHourState(getBedtimeHour());
+      } catch {
+        // fallback
+      }
+      try {
+        setHalfLifeHoursState(getCaffeineHalfLife());
+      } catch {
+        // fallback
+      }
+    }, [loadLogs])
+  );
 
   const now = new Date();
 

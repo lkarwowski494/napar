@@ -3,7 +3,7 @@
 // Śledzenie świeżości (Resting Window), wagi w paczce i nut sensorycznych
 // ============================================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
 import { useTranslation } from '../../src/core/i18n';
 import {
@@ -33,7 +33,7 @@ export default function BeansScreen() {
   const router = useRouter();
   const { selectInventoryItem, beveragePreference } = useBrew();
   const { t } = useTranslation();
-  const [unitSystem] = useState<'metric' | 'imperial'>(() => {
+  const [unitSystem, setUnitSystem] = useState<'metric' | 'imperial'>(() => {
     try {
       return getUnitSystem();
     } catch {
@@ -59,18 +59,29 @@ export default function BeansScreen() {
     }
   }, [beveragePreference]);
 
-  const loadData = () => {
+  const loadData = useCallback(() => {
     try {
       const all = getInventoryItems(true);
       setItems(all);
     } catch {
       // fallback
     }
-  };
+    try {
+      setUnitSystem(getUnitSystem());
+    } catch {
+      // fallback
+    }
+  }, []);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
+  );
 
   const handleOpenAdd = () => {
     setPresetTemplate(null);
