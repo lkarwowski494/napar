@@ -2797,4 +2797,40 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
       treeTab.unmount();
     });
   });
+
+  test('M1-audytor-generalny-008: zmiana kroku na pauzie zeruje pausedRemainingMs i po wznowieniu odmierza pełny czas nowego kroku', () => {
+    jest.useFakeTimers();
+    try {
+      const steps = [
+        { stepNumber: 1, namePl: 'Bloom', nameEn: 'Bloom', durationSeconds: 30, targetWaterGrams: 50, instructionPl: 'A', instructionEn: 'A' },
+        { stepNumber: 2, namePl: 'Zalanie', nameEn: 'Pour', durationSeconds: 60, targetWaterGrams: 250, instructionPl: 'B', instructionEn: 'B' },
+      ];
+      let lastSnap: any = null;
+      const engine = new BrewTimerEngine(steps, { onTick: (s) => { lastSnap = s; } });
+
+      engine.start();
+      jest.advanceTimersByTime(10_000); // 20s pozostało w kroku 1
+      engine.pause();
+      expect(lastSnap.status).toBe('paused');
+
+      // Przejście do kroku 2 podczas pauzy i wznowienie -> musi odmierzać pełne 60s, nie 20s
+      engine.nextStep();
+      engine.resume();
+      expect(lastSnap.currentStepIndex).toBe(1);
+      expect(lastSnap.stepRemainingSeconds).toBe(60);
+
+      // Pauza w kroku 2 po 15s (45s pozostało), cofnięcie do kroku 1 i wznowienie -> pełne 30s
+      jest.advanceTimersByTime(15_000);
+      engine.pause();
+      engine.previousStep();
+      engine.resume();
+      expect(lastSnap.currentStepIndex).toBe(0);
+      expect(lastSnap.stepRemainingSeconds).toBe(30);
+
+      engine.destroy();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 });
+

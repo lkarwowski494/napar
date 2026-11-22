@@ -519,10 +519,10 @@ export class BrewTimerEngine {
     if (this.currentStepIndex < this.steps.length - 1) {
       this.currentStepIndex++;
       this.stepElapsedSeconds = 0;
+      this.pausedRemainingMs = null;
       const currentStep = this.getCurrentStep();
       if (currentStep && this.status === 'running') {
         this.stepEndAtMs = Date.now() + currentStep.durationSeconds * 1000;
-        this.pausedRemainingMs = null;
       }
       this.triggerHaptic('step');
       if (currentStep && this.callbacks.onStepChange) {
@@ -538,10 +538,10 @@ export class BrewTimerEngine {
     if (this.currentStepIndex > 0) {
       this.currentStepIndex--;
       this.stepElapsedSeconds = 0;
+      this.pausedRemainingMs = null;
       const currentStep = this.getCurrentStep();
       if (currentStep && this.status === 'running') {
         this.stepEndAtMs = Date.now() + currentStep.durationSeconds * 1000;
-        this.pausedRemainingMs = null;
       }
       if (currentStep && this.callbacks.onStepChange) {
         this.callbacks.onStepChange(this.currentStepIndex, currentStep);
