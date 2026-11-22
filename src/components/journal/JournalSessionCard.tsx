@@ -6,6 +6,7 @@ import { SensoryRadarChart } from '../../core/radar-chart';
 import { getWaterProfileName } from '../../core/water-chemistry';
 import { formatDoseWeight, formatWaterWeight, formatTemperature, formatDecimal } from '../../core/unit-converter';
 import { StarIcon } from '../icons/CraftIcons';
+import { localizeFlavorDescriptor } from '../../core/flavor-wheel-data';
 
 export interface JournalSessionCardProps {
   session: BrewSession;
@@ -154,7 +155,7 @@ export function JournalSessionCard({
         <View style={styles.tagsRow}>
           {session.flavorTags.map((tag, idx) => (
             <View key={idx} style={styles.tagChip}>
-              <Text style={styles.tagText}>{tag}</Text>
+              <Text style={styles.tagText}>{localizeFlavorDescriptor(tag, language)}</Text>
             </View>
           ))}
         </View>

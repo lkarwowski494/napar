@@ -4,6 +4,7 @@ import { theme } from '../../core/theme';
 import { formatTemplate } from '../../core/i18n';
 import { SensoryRadarChart, SensoryProfile } from '../../core/radar-chart';
 import { StarIcon, BrewIcon, DropletIcon, LightningIcon } from '../icons/CraftIcons';
+import { localizeFlavorDescriptor } from '../../core/flavor-wheel-data';
 
 export interface AnalyticsData {
   totalBrews: number;
@@ -21,9 +22,10 @@ export interface AnalyticsData {
 export interface JournalAnalyticsViewProps {
   analyticsData: AnalyticsData;
   t: any;
+  language?: 'pl' | 'en';
 }
 
-export function JournalAnalyticsView({ analyticsData, t }: JournalAnalyticsViewProps) {
+export function JournalAnalyticsView({ analyticsData, t, language = 'pl' }: JournalAnalyticsViewProps) {
   return (
     <View style={styles.analyticsContainer} testID="journal-analytics-view">
       {/* Karty podsumowania wolumenu */}
@@ -86,7 +88,7 @@ export function JournalAnalyticsView({ analyticsData, t }: JournalAnalyticsViewP
 
         {analyticsData.avgSensory && (
           <View style={{ alignItems: 'center', marginVertical: 12 }}>
-            <SensoryRadarChart profile={analyticsData.avgSensory} size={220} />
+            <SensoryRadarChart profile={analyticsData.avgSensory} size={220} language={language} />
             <View style={styles.sensoryScoresSummary}>
               <Text style={styles.sensoryScorePill}>
                 {`${t.sensory.acidity}: ${analyticsData.avgSensory.acidity}`}
@@ -116,7 +118,7 @@ export function JournalAnalyticsView({ analyticsData, t }: JournalAnalyticsViewP
             {analyticsData.topTags.map((tag) => (
               <View key={tag.tag} style={styles.tagBadge}>
                 <Text style={styles.tagBadgeText}>
-                  {`${tag.tag} (${tag.count})`}
+                  {`${localizeFlavorDescriptor(tag.tag, language)} (${tag.count})`}
                 </Text>
               </View>
             ))}

@@ -21,6 +21,7 @@ import { BrewSession } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { useTranslation, formatTemplate } from '../../src/core/i18n';
 import { formatTemperature } from '../../src/core/unit-converter';
+import { localizeFlavorDescriptor } from '../../src/core/flavor-wheel-data';
 import { confirmAction } from '../../src/platform/confirm';
 import { JournalIcon } from '../../src/components/icons/CraftIcons';
 import { JournalSessionCard } from '../../src/components/journal/JournalSessionCard';
@@ -178,7 +179,10 @@ export default function JournalScreen() {
     ];
     if (session.rating) lines.push(formatTemplate(j.shareRating, { rating: session.rating.toFixed(1) }));
     if (session.tasteBalance) lines.push(formatTemplate(j.shareBalance, { balance: session.tasteBalance }));
-    if (session.flavorTags && session.flavorTags.length > 0) lines.push(formatTemplate(j.shareFlavorTags, { tags: session.flavorTags.join(', ') }));
+    if (session.flavorTags && session.flavorTags.length > 0) {
+      const localizedTags = session.flavorTags.map((tag) => localizeFlavorDescriptor(tag, language));
+      lines.push(formatTemplate(j.shareFlavorTags, { tags: localizedTags.join(', ') }));
+    }
     if (session.notes) lines.push(formatTemplate(j.shareNotes, { notes: session.notes }));
     const shareMessage = `${lines.filter(Boolean).join('\n')}\n\n${j.shareFooter}`;
 
@@ -224,7 +228,11 @@ export default function JournalScreen() {
       const matchMethod = s.method.toLowerCase().includes(q);
       const matchBean = s.inventoryItemName?.toLowerCase().includes(q) ?? false;
       const matchNotes = s.notes?.toLowerCase().includes(q) ?? false;
-      const matchTags = s.flavorTags.some((tag) => tag.toLowerCase().includes(q));
+      const matchTags = s.flavorTags.some(
+        (tag) =>
+          tag.toLowerCase().includes(q) ||
+          localizeFlavorDescriptor(tag, language).toLowerCase().includes(q)
+      );
       return matchRecipe || matchMethod || matchBean || matchNotes || matchTags;
     }
 
@@ -322,7 +330,7 @@ export default function JournalScreen() {
 
       {/* Widok Analityki i Trendów (Brew Analytics) */}
       {viewMode === 'analytics' && (
-        <JournalAnalyticsView analyticsData={analyticsData} t={t} />
+        <JournalAnalyticsView analyticsData={analyticsData} t={t} language={language} />
       )}
     </ScrollView>
   );
