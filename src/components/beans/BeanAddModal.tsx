@@ -85,7 +85,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
     setProcess('');
     setRoastDate(localISODate());
     setRoastProfile('light');
-    setInitialWeight('250');
+    setInitialWeight(isImperial ? '8.8' : '250');
     setNotesStr('');
   };
 

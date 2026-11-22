@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 import { useTranslation } from '../../core/i18n';
+import { formatDecimal } from '../../core/unit-converter';
 
 interface BedtimeCurfewCardProps {
   bedtimeHour: number;
@@ -24,7 +25,7 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
   onHalfLifeChange,
   bedtimeMg,
 }) => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   return (
     <View style={styles.curfewCard}>
       <View style={styles.curfewHeader}>
@@ -71,7 +72,7 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
           >
             <Text style={styles.hourBtnText}>−</Text>
           </Pressable>
-          <Text style={styles.bedtimeHourText}>{halfLifeHours.toFixed(1)}h</Text>
+          <Text style={styles.bedtimeHourText}>{formatDecimal(halfLifeHours, 1, language)}h</Text>
           <Pressable
             testID="halflife-inc-btn"
             style={styles.hourBtn}

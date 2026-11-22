@@ -255,6 +255,7 @@ export default function SettingsScreen({
         bedtimeHour={bedtimeHour}
         onBedtimeChange={handleBedtimeChange}
         t={t}
+        language={language}
       />
 
       {/* Młynek Domowy (Domyślny młynek) */}

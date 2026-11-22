@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
-import { SCA_FLAVOR_WHEEL, FlavorCategory } from './flavor-wheel-data';
+import { SCA_FLAVOR_WHEEL, FlavorCategory, localizeFlavorDescriptor } from './flavor-wheel-data';
 import { theme, withAlpha } from './theme';
 import { readableTextOn } from './contrast';
 
@@ -37,18 +37,21 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
               : `Wybrane nuty (${selectedDescriptors.length}):`}
           </Text>
           <View style={styles.selectedChipsContainer}>
-            {selectedDescriptors.map((desc) => (
-              <Pressable
-                key={desc}
-                style={styles.activeChip}
-                onPress={() => onToggleDescriptor(desc)}
-                hitSlop={6}
-                accessibilityRole="button"
-                accessibilityLabel={isEn ? `Remove ${desc}` : `Usuń ${desc}`}
-              >
-                <Text style={styles.activeChipText}>{desc} ✕</Text>
-              </Pressable>
-            ))}
+            {selectedDescriptors.map((desc) => {
+              const displayLabel = localizeFlavorDescriptor(desc, language);
+              return (
+                <Pressable
+                  key={desc}
+                  style={styles.activeChip}
+                  onPress={() => onToggleDescriptor(desc)}
+                  hitSlop={6}
+                  accessibilityRole="button"
+                  accessibilityLabel={isEn ? `Remove ${displayLabel}` : `Usuń ${displayLabel}`}
+                >
+                  <Text style={styles.activeChipText}>{displayLabel} ✕</Text>
+                </Pressable>
+              );
+            })}
           </View>
         </View>
       )}
@@ -101,8 +104,9 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                 {subcategoryName}
               </Text>
               <View style={styles.descriptorsGrid}>
-                {sub.descriptors.map((desc) => {
+                {sub.descriptors.map((desc, idx) => {
                   const isSelected = selectedDescriptors.includes(desc);
+                  const displayLabel = isEn ? sub.descriptorsEn[idx] || desc : desc;
                   return (
                     <Pressable
                       key={desc}
@@ -116,7 +120,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                       onPress={() => onToggleDescriptor(desc)}
                       accessibilityRole="checkbox"
                       accessibilityState={{ checked: isSelected }}
-                      accessibilityLabel={desc}
+                      accessibilityLabel={displayLabel}
                     >
                       <Text
                         style={[
@@ -126,7 +130,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                           isSelected && { color: readableTextOn(activeCategory.color) },
                         ]}
                       >
-                        {desc}
+                        {displayLabel}
                       </Text>
                     </Pressable>
                   );

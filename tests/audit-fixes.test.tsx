@@ -3011,7 +3011,72 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
       }
     }
   });
+
+  test('M1-audytor-generalny-012: 61 deskryptorów SCA_FLAVOR_WHEEL ma pełne descriptorsEn i FlavorWheelPicker wyświetla EN', () => {
+    const { SCA_FLAVOR_WHEEL, localizeFlavorDescriptor } = require('../src/core/flavor-wheel-data');
+    const { FlavorWheelPicker } = require('../src/core/flavor-wheel-picker');
+
+    let total = 0;
+    for (const cat of SCA_FLAVOR_WHEEL) {
+      for (const sub of cat.subcategories) {
+        expect(sub.descriptorsEn.length).toBe(sub.descriptors.length);
+        sub.descriptorsEn.forEach((en: string) => {
+          expect(en.trim().length).toBeGreaterThan(0);
+          expect(en).not.toMatch(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/);
+        });
+        total += sub.descriptors.length;
+      }
+    }
+    expect(total).toBe(61);
+    expect(localizeFlavorDescriptor('Cytryna', 'en')).toBe('Lemon');
+    expect(localizeFlavorDescriptor('Cytryna', 'pl')).toBe('Cytryna');
+    expect(localizeFlavorDescriptor('Custom Note', 'en')).toBe('Custom Note');
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <FlavorWheelPicker selectedDescriptors={['Cytryna']} onToggleDescriptor={() => {}} language="en" />
+      );
+    });
+    const json = JSON.stringify(tree.toJSON());
+    expect(json).toContain('Lemon');
+    expect(json).not.toContain('Cytryna');
+    act(() => tree.unmount());
+  });
+
+  test('M1-audytor-generalny-012: BeanAddModal resetForm ustawia 8.8 w imperial oraz przecinek dziesiętny w PL', () => {
+    const { formatDecimal, formatDoseWeight, formatWaterWeight } = require('../src/core/unit-converter');
+    const { CaffeineSettingsCard } = require('../src/components/settings/CaffeineSettingsCard');
+
+    expect(formatDecimal(4.5, 1, 'pl')).toBe('4,5');
+    expect(formatDecimal(4.5, 1, 'en')).toBe('4.5');
+    expect(formatDoseWeight(15.5, 'metric', 'pl')).toBe('15,5g');
+    expect(formatDoseWeight(15.5, 'metric', 'en')).toBe('15.5g');
+    expect(formatWaterWeight(250, 'imperial', 'pl')).toContain(',');
+    expect(formatWaterWeight(250, 'imperial', 'en')).toContain('.');
+
+    const beanAddSrc = readFileSync(join(root, 'src/components/beans/BeanAddModal.tsx'), 'utf8');
+    expect(beanAddSrc).toContain("setInitialWeight(isImperial ? '8.8' : '250')");
+
+    let treePl: any;
+    let treeEn: any;
+    act(() => {
+      treePl = renderer.create(
+        <CaffeineSettingsCard halfLifeHours={4.5} onHalfLifeChange={() => {}} bedtimeHour={23} onBedtimeChange={() => {}} t={translations.pl} language="pl" />
+      );
+      treeEn = renderer.create(
+        <CaffeineSettingsCard halfLifeHours={4.5} onHalfLifeChange={() => {}} bedtimeHour={23} onBedtimeChange={() => {}} t={translations.en} language="en" />
+      );
+    });
+    expect(JSON.stringify(treePl.toJSON())).toContain('4,5');
+    expect(JSON.stringify(treeEn.toJSON())).toContain('4.5');
+    act(() => {
+      treePl.unmount();
+      treeEn.unmount();
+    });
+  });
 });
+
 
 
 

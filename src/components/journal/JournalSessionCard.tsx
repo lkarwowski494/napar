@@ -4,7 +4,7 @@ import { BrewSession } from '../../core/database-schema';
 import { theme, withAlpha } from '../../core/theme';
 import { SensoryRadarChart } from '../../core/radar-chart';
 import { getWaterProfileName } from '../../core/water-chemistry';
-import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../core/unit-converter';
+import { formatDoseWeight, formatWaterWeight, formatTemperature, formatDecimal } from '../../core/unit-converter';
 import { StarIcon } from '../icons/CraftIcons';
 
 export interface JournalSessionCardProps {
@@ -53,12 +53,12 @@ export function JournalSessionCard({
             accessibilityRole="text"
             accessibilityLabel={
               isEn
-                ? `Rating: ${session.rating.toFixed(1)} stars`
-                : `Ocena: ${session.rating.toFixed(1)} gwiazdek`
+                ? `Rating: ${formatDecimal(session.rating, 1, language)} stars`
+                : `Ocena: ${formatDecimal(session.rating, 1, language)} gwiazdek`
             }
           >
             <StarIcon size={12} color={theme.colors.copper} filled={true} />
-            <Text style={styles.ratingText}>{session.rating.toFixed(1)}</Text>
+            <Text style={styles.ratingText}>{formatDecimal(session.rating, 1, language)}</Text>
           </View>
         )}
       </View>
@@ -72,7 +72,7 @@ export function JournalSessionCard({
         <View style={styles.metricItem}>
           <Text style={styles.metricLabel}>{isEn ? 'DOSE / WATER' : 'DOZA / WODA'}</Text>
           <Text style={styles.metricVal}>
-            {formatDoseWeight(session.doseGrams, unitSystem)} / {formatWaterWeight(session.waterGrams, unitSystem)}
+            {formatDoseWeight(session.doseGrams, unitSystem, language)} / {formatWaterWeight(session.waterGrams, unitSystem, language)}
           </Text>
         </View>
         <View style={styles.metricItem}>
@@ -125,13 +125,13 @@ export function JournalSessionCard({
             accessibilityRole="text"
             accessibilityLabel={
               isEn
-                ? `Extraction yield: ${session.extractionYieldPercentage.toFixed(1)}%${session.tdsPercentage ? `, TDS: ${session.tdsPercentage}%` : ''}`
-                : `Uzysk ekstrakcji: ${session.extractionYieldPercentage.toFixed(1)}%${session.tdsPercentage ? `, TDS: ${session.tdsPercentage}%` : ''}`
+                ? `Extraction yield: ${formatDecimal(session.extractionYieldPercentage, 1, language)}%${session.tdsPercentage ? `, TDS: ${formatDecimal(session.tdsPercentage, 2, language)}%` : ''}`
+                : `Uzysk ekstrakcji: ${formatDecimal(session.extractionYieldPercentage, 1, language)}%${session.tdsPercentage ? `, TDS: ${formatDecimal(session.tdsPercentage, 2, language)}%` : ''}`
             }
           >
             <Text style={styles.eyText}>
-              EY: {session.extractionYieldPercentage.toFixed(1)}%
-              {session.tdsPercentage ? ` (TDS ${session.tdsPercentage}%)` : ''}
+              EY: {formatDecimal(session.extractionYieldPercentage, 1, language)}%
+              {session.tdsPercentage ? ` (TDS ${formatDecimal(session.tdsPercentage, 2, language)}%)` : ''}
             </Text>
           </View>
         )}

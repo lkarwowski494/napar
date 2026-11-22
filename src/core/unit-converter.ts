@@ -77,31 +77,49 @@ export function formatTemperature(celsius: number | string, unitSystem: UnitSyst
 }
 
 /**
+ * Formatuje liczbę dziesiętną z przecinkiem w PL i kropką w EN (M1-audytor-generalny-012)
+ */
+export function formatDecimal(val: number, decimals: number = 1, language: 'pl' | 'en' = 'en'): string {
+  const fixed = val.toFixed(decimals);
+  return language === 'pl' ? fixed.replace('.', ',') : fixed;
+}
+
+/**
  * Formatuje wagę suchą kawy / herbaty zgodnie z wybranym układem jednostek
  */
-export function formatDoseWeight(grams: number | string, unitSystem: UnitSystem = 'metric'): string {
+export function formatDoseWeight(
+  grams: number | string,
+  unitSystem: UnitSystem = 'metric',
+  language: 'pl' | 'en' = 'en'
+): string {
   const num = parseNumeric(grams);
   if (isNaN(num) || num < 0 || Object.is(num, -0)) {
     return unitSystem === 'imperial' ? '0 oz' : '0g';
   }
+  const formatNum = (n: number) => (language === 'pl' ? String(n).replace('.', ',') : String(n));
   if (unitSystem === 'imperial') {
-    return `${gramsToOunces(num)} oz`;
+    return `${formatNum(gramsToOunces(num))} oz`;
   }
-  return `${Number(num.toFixed(1))}g`;
+  return `${formatNum(Number(num.toFixed(1)))}g`;
 }
 
 /**
  * Formatuje wagę wody (g lub fl oz)
  */
-export function formatWaterWeight(grams: number | string, unitSystem: UnitSystem = 'metric'): string {
+export function formatWaterWeight(
+  grams: number | string,
+  unitSystem: UnitSystem = 'metric',
+  language: 'pl' | 'en' = 'en'
+): string {
   const num = parseNumeric(grams);
   if (isNaN(num) || num < 0 || Object.is(num, -0)) {
     return unitSystem === 'imperial' ? '0 fl oz' : '0g';
   }
+  const formatNum = (n: number) => (language === 'pl' ? String(n).replace('.', ',') : String(n));
   if (unitSystem === 'imperial') {
-    return `${mlToFluidOunces(num)} fl oz`;
+    return `${formatNum(mlToFluidOunces(num))} fl oz`;
   }
-  return `${Number(num.toFixed(1))}g`;
+  return `${formatNum(Number(num.toFixed(1)))}g`;
 }
 
 /**

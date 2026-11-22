@@ -12,6 +12,7 @@ import {
   formatDoseWeight,
   formatWaterWeight,
   formatTemperature,
+  formatDecimal,
   UnitSystem,
 } from '../../core/unit-converter';
 
@@ -52,8 +53,8 @@ export function BrewQuickPrepCard({
   const language = languageProp || contextLang;
   const safeDose = Number.isFinite(doseGrams) && doseGrams > 0 ? doseGrams : 15;
   const safeWater = Number.isFinite(waterGrams) && waterGrams > 0 ? waterGrams : 250;
-  const currentRatioNum = (safeWater / safeDose).toFixed(1);
-  const currentRatioVal = parseFloat(currentRatioNum);
+  const currentRatioVal = Number((safeWater / safeDose).toFixed(1));
+  const currentRatioNum = formatDecimal(safeWater / safeDose, 1, language);
 
   return (
     <View style={styles.card} testID="quick-prep-card">
@@ -136,7 +137,7 @@ export function BrewQuickPrepCard({
             >
               <Text style={styles.stepBtnText}>−</Text>
             </Pressable>
-            <Text style={styles.paramValue}>{formatDoseWeight(doseGrams, unitSystem)}</Text>
+            <Text style={styles.paramValue}>{formatDoseWeight(doseGrams, unitSystem, language)}</Text>
             <Pressable
               testID="dose-increase-btn"
               style={[styles.stepBtn, (disabled || doseGrams >= 1000) && styles.stepBtnDisabled]}
@@ -176,7 +177,7 @@ export function BrewQuickPrepCard({
               </Pressable>
             )}
             <Text style={styles.paramValueLarge}>
-              {formatWaterWeight(waterGrams, unitSystem)}
+              {formatWaterWeight(waterGrams, unitSystem, language)}
             </Text>
             {onWaterChange && (
               <Pressable

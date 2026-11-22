@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 import { CAFFEINE_HALF_LIFE_MIN_H, CAFFEINE_HALF_LIFE_MAX_H } from '../../core/domain-rules';
+import { formatDecimal } from '../../core/unit-converter';
 
 export interface CaffeineSettingsCardProps {
   halfLifeHours: number;
@@ -9,6 +10,7 @@ export interface CaffeineSettingsCardProps {
   bedtimeHour: number;
   onBedtimeChange: (newHour: number) => void;
   t: any;
+  language?: 'pl' | 'en';
 }
 
 export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
@@ -17,7 +19,9 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
   bedtimeHour,
   onBedtimeChange,
   t,
+  language = 'pl',
 }) => {
+  const formattedHalfLife = formatDecimal(halfLifeHours, 1, language);
   return (
     <View>
       <Text style={styles.sectionTitle}>
@@ -38,7 +42,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
             style={styles.stepperContainer}
             accessibilityRole="adjustable"
             accessibilityLabel={t.settings.caffeineHalfLifeTitle || 'Czas Półtrwania Kofeiny'}
-            accessibilityValue={{ min: CAFFEINE_HALF_LIFE_MIN_H, max: CAFFEINE_HALF_LIFE_MAX_H, now: halfLifeHours, text: `${halfLifeHours.toFixed(1)} h` }}
+            accessibilityValue={{ min: CAFFEINE_HALF_LIFE_MIN_H, max: CAFFEINE_HALF_LIFE_MAX_H, now: halfLifeHours, text: `${formattedHalfLife} h` }}
             accessibilityHint={t.settings.caffeineHalfLifeDesc || 'Dostosuj czas półtrwania kofeiny'}
           >
             <Pressable
@@ -51,7 +55,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
             >
               <Text style={styles.stepperBtnText}>−</Text>
             </Pressable>
-            <Text style={styles.stepperValueText}>{halfLifeHours.toFixed(1)}h</Text>
+            <Text style={styles.stepperValueText}>{formattedHalfLife}h</Text>
             <Pressable
               style={styles.stepperBtn}
               hitSlop={8}
