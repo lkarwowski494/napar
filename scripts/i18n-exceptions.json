@@ -124,8 +124,8 @@
   "teksty": [
     {
       "plik": "app/settings.tsx",
-      "tekst": "1.0.0 (Build 1)",
-      "powod": "numer wersji i kompilacji (liczby, nie tekst; źródło wersji poza zakresem 033)"
+      "tekst": "(Build )",
+      "powod": "format numeru wersji i kompilacji z EXPO_PUBLIC_BUILD_NUMBER / Constants.expoConfig (M1-024)"
     },
     {
       "plik": "app/settings.tsx",

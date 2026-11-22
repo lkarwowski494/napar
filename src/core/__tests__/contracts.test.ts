@@ -30,9 +30,11 @@ describe('System Contracts: Metadata, Versioning & Security', () => {
     expect(pkgVersion).toBeDefined();
     expect(appVersion).toBe(pkgVersion);
 
-    // Weryfikacja etykiety wersji w app/settings.tsx
+    // Weryfikacja dynamicznej etykiety wersji i buildu w app/settings.tsx (M1-024)
     const settingsCode = fs.readFileSync(path.join(rootDir, 'app/settings.tsx'), 'utf-8');
-    expect(settingsCode).toContain(`${pkgVersion} (Build 1)`);
+    expect(settingsCode).toContain('Constants?.expoConfig?.version');
+    expect(settingsCode).toContain('EXPO_PUBLIC_BUILD_NUMBER');
+    expect(settingsCode).toContain(`'${pkgVersion}'`);
   });
 
   test('Kontrakt Konfiguracji Expo: produkcyjne metadane, ciemny motyw, uprawnienia i zero-telemetria', () => {

@@ -74,6 +74,7 @@ const MESSAGES = {
     btnExportJson: 'Eksportuj ostatnią kopię JSON',
     btnRetry: 'Spróbuj uruchomić normalnie',
     btnResetDb: 'Zresetuj uszkodzoną bazę',
+    supportLabel: 'Wsparcie',
   },
   en: {
     badge: 'RESCUE MODE / SAFE MODE',
@@ -118,6 +119,7 @@ const MESSAGES = {
     btnExportJson: 'Export Latest JSON Backup',
     btnRetry: 'Try Normal Startup Again',
     btnResetDb: 'Reset Damaged Database',
+    supportLabel: 'Support',
   },
 };
 
@@ -300,7 +302,7 @@ export const SafeModeView: React.FC<SafeModeViewProps> = ({ onRetry, language, r
         </View>
 
         <Text testID="safe-mode-support-contact" style={styles.supportContact}>
-          {activeLang === 'pl' ? `Wsparcie: ${SUPPORT_EMAIL}` : `Support: ${SUPPORT_EMAIL}`}
+          {`${m.supportLabel}: ${SUPPORT_EMAIL}`}
         </Text>
       </ScrollView>
     </View>
