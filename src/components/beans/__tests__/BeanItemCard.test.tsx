@@ -120,4 +120,24 @@ describe('BeanItemCard Component', () => {
     const weightText = tree.root.findByProps({ testID: 'bean-weight-bean-101' });
     expect(weightText.props.children).toEqual(['0g', ' /', ' ', '0g']);
   });
+
+  test('M2-P3b: przycisk archiwizacji pustej paczki ma hitSlop zapewniający >= 44 pt wysokości', () => {
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BeanItemCard
+          {...defaultProps}
+          item={{
+            ...mockItem,
+            remainingWeightGrams: 0,
+            isArchived: false,
+          }}
+        />
+      );
+    });
+
+    const archiveEmptyBtn = tree.root.findByProps({ testID: 'bean-archive-empty-btn-bean-101' });
+    expect(archiveEmptyBtn.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 8, right: 8 });
+  });
 });
+

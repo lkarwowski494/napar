@@ -15,6 +15,7 @@ jest.mock('expo-sqlite', () => ({
 jest.mock('../../data/startup-guard', () => ({
   crashLoopGuard: {
     recordStartupAttempt: jest.fn().mockResolvedValue({ crashCount: 0, shouldEnterSafeMode: false }),
+    recordStartupFailureReason: jest.fn().mockResolvedValue(undefined),
     resetCrashCount: jest.fn().mockResolvedValue(undefined),
     recordRetry: jest.fn().mockResolvedValue(undefined),
   },
@@ -77,11 +78,16 @@ describe('RootLayout — tryb awaryjny', () => {
     return hit;
   }
 
-  afterEach(() => jest.restoreAllMocks());
+  afterEach(() => {
+    jest.restoreAllMocks();
+    guard.recordStartupFailureReason.mockClear();
+  });
 
-  it('strażnik zgłasza pętlę awarii → ekran trybu awaryjnego z opisem pętli', async () => {
+  it('strażnik zgłasza pętlę awarii → ekran trybu awaryjnego z opisem pętli bez otwierania SQLite', async () => {
     guard.recordStartupAttempt.mockResolvedValueOnce({ crashCount: 3, shouldEnterSafeMode: true });
+    const openSpy = jest.spyOn(db, 'openDatabaseAtStartup');
     const tree = await render();
+    expect(openSpy).not.toHaveBeenCalled();
     expect(text(tree)).toMatch(/kilka razy z rzędu|several times in a row/);
   });
 
@@ -94,19 +100,22 @@ describe('RootLayout — tryb awaryjny', () => {
   it('baza nowsza niż aplikacja → opis „nowsza wersja”; ponowna próba zostaje w trybie awaryjnym', async () => {
     jest.spyOn(db, 'openDatabaseAtStartup').mockReturnValue({ ok: false, reason: 'too-new', message: 'v99' });
     const tree = await render();
+    expect(guard.recordStartupFailureReason).toHaveBeenCalledWith('too-new');
     expect(text(tree)).toMatch(/nowsza wersja Napar|newer version of Napar/);
     const retry = findRetry(tree);
     await act(async () => {
       await retry.props.onPress();
     });
     expect(guard.recordRetry).toHaveBeenCalled();
+    expect(guard.recordStartupFailureReason).toHaveBeenCalledTimes(2);
     expect(text(tree)).toMatch(/nowsza wersja Napar|newer version of Napar/);
   });
 
-  it('M1-024: przy 3. starcie (shouldEnterSafeMode=true) powód too-new nie jest nadpisywany przez crash-loop', async () => {
-    guard.recordStartupAttempt.mockResolvedValueOnce({ crashCount: 3, shouldEnterSafeMode: true });
-    jest.spyOn(db, 'openDatabaseAtStartup').mockReturnValue({ ok: false, reason: 'too-new', message: 'v99' });
+  it('M1-024 / M2-P3b: przy 3. starcie (shouldEnterSafeMode=true) powód too-new jest zachowany bez wywołania openDatabaseAtStartup', async () => {
+    guard.recordStartupAttempt.mockResolvedValueOnce({ crashCount: 3, shouldEnterSafeMode: true, lastReason: 'too-new' });
+    const openSpy = jest.spyOn(db, 'openDatabaseAtStartup');
     const tree = await render();
+    expect(openSpy).not.toHaveBeenCalled();
     expect(text(tree)).toMatch(/nowsza wersja Napar|newer version of Napar/);
     expect(text(tree)).not.toMatch(/kilka razy z rzędu|several times in a row/);
   });

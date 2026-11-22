@@ -128,4 +128,41 @@ describe('Startup Crash Loop Guard (TASK-R12-01)', () => {
     expect(await crashLoopGuard.getCrashCount()).toBe(0);
     expect(await crashLoopGuard.isInSafeMode()).toBe(false);
   });
+
+  test('M2-P3b: recordStartupFailureReason zapamiętuje too-new do 3. startu i jest czyszczony przy sukcesie/resecie/retry', async () => {
+    const attempt1 = await crashLoopGuard.recordStartupAttempt();
+    expect(attempt1.lastReason).toBeUndefined();
+    await crashLoopGuard.recordStartupFailureReason('too-new');
+
+    const attempt2 = await crashLoopGuard.recordStartupAttempt();
+    expect(attempt2.crashCount).toBe(2);
+    expect(attempt2.shouldEnterSafeMode).toBe(false);
+    expect(attempt2.lastReason).toBe('too-new');
+
+    const attempt3 = await crashLoopGuard.recordStartupAttempt();
+    expect(attempt3.crashCount).toBe(3);
+    expect(attempt3.shouldEnterSafeMode).toBe(true);
+    expect(attempt3.lastReason).toBe('too-new');
+
+    await crashLoopGuard.recordRetry();
+    expect((await crashLoopGuard.readState()).lastReason).toBeUndefined();
+
+    await crashLoopGuard.recordStartupFailureReason('too-new');
+    await crashLoopGuard.recordStartupSuccess();
+    expect((await crashLoopGuard.readState()).lastReason).toBeUndefined();
+
+    await crashLoopGuard.recordStartupFailureReason('too-new');
+    await crashLoopGuard.resetCrashCount();
+    expect((await crashLoopGuard.readState()).lastReason).toBeUndefined();
+  });
+
+  test('M2-P3b: readState ignoruje nieprawidłowe wartości lastReason', async () => {
+    await FileSystem.writeAsStringAsync(
+      await crashLoopGuard.getGuardPath(),
+      JSON.stringify({ crash_count: 2, lastAttemptAt: new Date().toISOString(), lastReason: 'invalid-reason' })
+    );
+    const state = await crashLoopGuard.readState();
+    expect(state.lastReason).toBeUndefined();
+  });
 });
+

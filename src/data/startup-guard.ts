@@ -9,9 +9,16 @@ const GUARD_FILE = 'crash_count.json';
 /** Liczba startów z rzędu bez kamienia milowego, od której aplikacja startuje w trybie awaryjnym. */
 export const SAFE_MODE_THRESHOLD = 3;
 
+type LastStartupFailureReason = 'too-new' | 'database';
+
 interface GuardState {
   crash_count: number;
   lastAttemptAt: string;
+  lastReason?: LastStartupFailureReason;
+}
+
+function parseLastReason(raw: unknown): LastStartupFailureReason | undefined {
+  return raw === 'too-new' || raw === 'database' ? raw : undefined;
 }
 
 export const crashLoopGuard = {
@@ -48,9 +55,12 @@ export const crashLoopGuard = {
           ? parsed.lastAttemptAt
           : new Date().toISOString();
 
+      const lastReason = parseLastReason(parsed.lastReason);
+
       return {
         crash_count: crashCount,
         lastAttemptAt: validDate,
+        ...(lastReason ? { lastReason } : {}),
       };
     } catch {
       return { crash_count: 0, lastAttemptAt: new Date().toISOString() };
@@ -66,7 +76,11 @@ export const crashLoopGuard = {
     }
   },
 
-  async recordStartupAttempt(): Promise<{ crashCount: number; shouldEnterSafeMode: boolean }> {
+  async recordStartupAttempt(): Promise<{
+    crashCount: number;
+    shouldEnterSafeMode: boolean;
+    lastReason?: LastStartupFailureReason;
+  }> {
     const state = await this.readState();
     state.crash_count = Math.min(100, state.crash_count + 1);
     state.lastAttemptAt = new Date().toISOString();
@@ -76,7 +90,18 @@ export const crashLoopGuard = {
     return {
       crashCount: state.crash_count,
       shouldEnterSafeMode,
+      ...(state.lastReason ? { lastReason: state.lastReason } : {}),
     };
+  },
+
+  /**
+   * M1-024 / M2-P3b: zapamiętuje powód odmowy otwarcia bazy (np. `too-new`), aby przy 3. starcie
+   * (shouldEnterSafeMode=true) wyświetlić właściwy komunikat bez otwierania SQLite w trybie awaryjnym.
+   */
+  async recordStartupFailureReason(reason: LastStartupFailureReason): Promise<void> {
+    const state = await this.readState();
+    state.lastReason = reason;
+    await this.writeState(state);
   },
 
   async recordStartupSuccess(): Promise<void> {

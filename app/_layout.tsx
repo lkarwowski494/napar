@@ -99,18 +99,10 @@ export default function RootLayout() {
     let active = true;
     (async () => {
       try {
-        const { shouldEnterSafeMode } = await crashLoopGuard.recordStartupAttempt();
+        const { shouldEnterSafeMode, lastReason } = await crashLoopGuard.recordStartupAttempt();
         if (shouldEnterSafeMode) {
-          // M1-024: nie nadpisuj powodu `too-new` przez `crash-loop` przy 3. starcie
-          let reason: SafeModeReason = 'crash-loop';
-          try {
-            const probe = openDatabaseAtStartup();
-            if (!probe.ok && probe.reason === 'too-new') {
-              reason = 'too-new';
-            }
-          } catch {
-            // zostaje 'crash-loop'
-          }
+          // M1-024 / M2-P3b: nie otwieraj SQLite w Safe Mode; użyj zapamiętanego powodu `too-new` ze strażnika.
+          const reason: SafeModeReason = lastReason === 'too-new' ? 'too-new' : 'crash-loop';
           if (active) {
             setSafeReason(reason);
             setIsSafeMode(true);
@@ -118,9 +110,12 @@ export default function RootLayout() {
         } else {
           // M1-audytor-generalny-005: baza otwierana przed pierwszym ekranem; błąd kopii/migracji → tryb awaryjny.
           const opened = openDatabaseAtStartup();
-          if (!opened.ok && active) {
-            setSafeReason(opened.reason);
-            setIsSafeMode(true);
+          if (!opened.ok) {
+            await crashLoopGuard.recordStartupFailureReason(opened.reason);
+            if (active) {
+              setSafeReason(opened.reason);
+              setIsSafeMode(true);
+            }
           }
         }
       } catch {
@@ -139,6 +134,7 @@ export default function RootLayout() {
     await crashLoopGuard.recordRetry();
     const opened = openDatabaseAtStartup();
     if (!opened.ok) {
+      await crashLoopGuard.recordStartupFailureReason(opened.reason);
       setSafeReason(opened.reason);
       return;
     }
