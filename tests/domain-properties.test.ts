@@ -7,13 +7,18 @@ import fc from 'fast-check';
 import {
   calculateBrewRatio,
   calculateBrewWater,
+  calculateCaffeineDecay,
   calculateExtractionYield,
-
 } from '../src/core/domain-rules';
 import { wInKeep, roundTo } from '../src/core/unit-converter';
 
-// Setup deterministic seed if provided
-const seed = parseInt(process.env.PROP_SEED || '15926535', 10);
+// Setup deterministic seed if provided; handle PROP_SEED=random without producing NaN (M1-022)
+const rawPropSeed = process.env.PROP_SEED;
+const parsedPropSeed =
+  rawPropSeed === 'random'
+    ? Math.floor(Math.random() * 2147483647)
+    : Number.parseInt(rawPropSeed || '15926535', 10);
+const seed = Number.isFinite(parsedPropSeed) ? parsedPropSeed : 15926535;
 fc.configureGlobal({ seed, numRuns: 100 });
 
 describe('Domain Properties with fast-check (BR-TEST-006)', () => {
@@ -68,8 +73,7 @@ describe('Domain Properties with fast-check (BR-TEST-006)', () => {
     );
   });
 
-  test('Niezmiennik 5: Monotoniczność rozpadu kofeiny w organizmie', () => {
-    // C(t) = C0 * 0.5^(t / t_half)
+  test('Niezmiennik 5: Monotoniczność rozpadu kofeiny w organizmie (rzeczywista funkcja calculateCaffeineDecay)', () => {
     fc.assert(
       fc.property(
         fc.double({ min: 50.0, max: 400.0, noNaN: true }), // c0 (mg)
@@ -78,8 +82,8 @@ describe('Domain Properties with fast-check (BR-TEST-006)', () => {
         (c0, t1, dt) => {
           const t2 = t1 + dt;
           const halfLife = 5.0; // typowy czas półtrwania kofeiny
-          const c1 = c0 * Math.pow(0.5, t1 / halfLife);
-          const c2 = c0 * Math.pow(0.5, t2 / halfLife);
+          const c1 = calculateCaffeineDecay(c0, t1, halfLife);
+          const c2 = calculateCaffeineDecay(c0, t2, halfLife);
 
           expect(c2).toBeLessThan(c1);
           expect(c2).toBeGreaterThan(0);

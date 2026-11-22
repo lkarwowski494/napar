@@ -20,12 +20,8 @@ for app in "$APPS"/Xcode_"$MAJOR"*.app; do
     bestv="$v"
   fi
 done
-if [ -z "$best" ] && [ -d "$APPS/Xcode.app" ]; then
-  best="$APPS/Xcode.app"
-  bestv="default"
-fi
 if [ -z "$best" ]; then
-  echo "::error::Brak Xcode ${MAJOR}.x w ${APPS}. Dostępne:"
+  echo "::error::Brak Xcode ${MAJOR}.x w ${APPS} (nie dopuszczamy cichego zjazdu do niezweryfikowanego Xcode.app). Dostępne:"
   ls "$APPS" | grep -i xcode || echo "(żadnego)"
   exit 1
 fi

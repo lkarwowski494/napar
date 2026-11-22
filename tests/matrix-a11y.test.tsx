@@ -81,6 +81,8 @@ describe('Accessibility Matrix & Touch Targets (NFR-A11Y-001..008, RD-ENG-03)', 
 
     const input = tree!.root.findByProps({ accessibilityLabel: 'Doza kawy' });
     expect(input).toBeDefined();
+    const flatStyle = StyleSheet.flatten(input.props.style);
+    expect(flatStyle.minHeight).toBeGreaterThanOrEqual(44);
   });
 
   test('Empty state component provides readable title, description and accessible action', () => {
@@ -109,8 +111,8 @@ describe('Accessibility Matrix & Touch Targets (NFR-A11Y-001..008, RD-ENG-03)', 
     const btn = tree!.root.findByProps({ accessibilityRole: 'button' });
     expect(btn.props.accessibilityLabel).toBe('Wróć');
 
-    const style = btn.props.style || {};
-    const minHeight = style.minHeight || 44;
-    expect(minHeight).toBeGreaterThanOrEqual(44);
+    const flatStyle = StyleSheet.flatten(btn.props.style);
+    expect(flatStyle.minHeight).toBeGreaterThanOrEqual(44);
+    expect(flatStyle.minWidth).toBeGreaterThanOrEqual(44);
   });
 });
