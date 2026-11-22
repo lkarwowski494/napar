@@ -101,7 +101,20 @@ export default function RootLayout() {
       try {
         const { shouldEnterSafeMode } = await crashLoopGuard.recordStartupAttempt();
         if (shouldEnterSafeMode) {
-          if (active) setIsSafeMode(true);
+          // M1-024: nie nadpisuj powodu `too-new` przez `crash-loop` przy 3. starcie
+          let reason: SafeModeReason = 'crash-loop';
+          try {
+            const probe = openDatabaseAtStartup();
+            if (!probe.ok && probe.reason === 'too-new') {
+              reason = 'too-new';
+            }
+          } catch {
+            // zostaje 'crash-loop'
+          }
+          if (active) {
+            setSafeReason(reason);
+            setIsSafeMode(true);
+          }
         } else {
           // M1-audytor-generalny-005: baza otwierana przed pierwszym ekranem; błąd kopii/migracji → tryb awaryjny.
           const opened = openDatabaseAtStartup();

@@ -20,6 +20,7 @@ import { crashLoopGuard } from '../data/startup-guard';
 import { createRescueExport, resetDatabaseSafely, type RescueCounts } from '../core/rescue';
 import { deviceRescueContext, pathToUri } from '../data/rescue-expo';
 import { detectSystemLanguage } from '../core/i18n';
+import { SUPPORT_EMAIL } from '../core/app-identity';
 
 export type SafeModeReason = 'crash-loop' | 'database' | 'too-new';
 
@@ -297,6 +298,10 @@ export const SafeModeView: React.FC<SafeModeViewProps> = ({ onRetry, language, r
             <Text style={styles.btnDangerText}>{m.btnResetDb}</Text>
           </Pressable>
         </View>
+
+        <Text testID="safe-mode-support-contact" style={styles.supportContact}>
+          {activeLang === 'pl' ? `Wsparcie: ${SUPPORT_EMAIL}` : `Support: ${SUPPORT_EMAIL}`}
+        </Text>
       </ScrollView>
     </View>
   );
@@ -391,8 +396,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnDangerText: {
-    color: '#C0392B',
+    color: '#F87171', // M1-023: kontrast ~6.7:1 na #12100E (WCAG AA >= 4.5:1)
     fontSize: 14,
     fontWeight: '600',
+  },
+  supportContact: {
+    marginTop: 24,
+    color: '#B0A294',
+    fontSize: 13,
+    textAlign: 'center',
   },
 });

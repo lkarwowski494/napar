@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import * as Linking from 'expo-linking';
+import Constants from 'expo-constants';
 
 import {
   StyleSheet,
@@ -305,7 +306,15 @@ export default function SettingsScreen({
       <View style={styles.cardGroup}>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>{language === 'pl' ? 'Wersja' : 'Version'}</Text>
-          <Text style={styles.infoValue}>1.0.0 (Build 1)</Text>
+          <Text testID="settings-app-version" style={styles.infoValue}>
+            {`${Constants?.expoConfig?.version || '1.0.0'} (Build ${
+              process.env.EXPO_PUBLIC_BUILD_NUMBER ||
+              Constants?.expoConfig?.ios?.buildNumber ||
+              (Constants?.expoConfig?.android?.versionCode != null
+                ? String(Constants.expoConfig.android.versionCode)
+                : '1')
+            })`}
+          </Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.infoRow}>

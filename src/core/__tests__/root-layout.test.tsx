@@ -103,6 +103,14 @@ describe('RootLayout — tryb awaryjny', () => {
     expect(text(tree)).toMatch(/nowsza wersja Napar|newer version of Napar/);
   });
 
+  it('M1-024: przy 3. starcie (shouldEnterSafeMode=true) powód too-new nie jest nadpisywany przez crash-loop', async () => {
+    guard.recordStartupAttempt.mockResolvedValueOnce({ crashCount: 3, shouldEnterSafeMode: true });
+    jest.spyOn(db, 'openDatabaseAtStartup').mockReturnValue({ ok: false, reason: 'too-new', message: 'v99' });
+    const tree = await render();
+    expect(text(tree)).toMatch(/nowsza wersja Napar|newer version of Napar/);
+    expect(text(tree)).not.toMatch(/kilka razy z rzędu|several times in a row/);
+  });
+
   it('błąd bazy przy starcie → opis „nie mogła otworzyć bazy”; po naprawie ponowna próba startuje aplikację', async () => {
     const spy = jest.spyOn(db, 'openDatabaseAtStartup').mockReturnValue({ ok: false, reason: 'database', message: 'disk I/O' });
     const tree = await render();

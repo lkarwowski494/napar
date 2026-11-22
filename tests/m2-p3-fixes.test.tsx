@@ -141,3 +141,129 @@ describe('M2-P3 — lokalizacja tagów smakowych w dzienniku (P1 z M2-P2-R)', ()
     jest.restoreAllMocks();
   });
 });
+
+describe('M2-P3 — decyzje D-023, dostępność M1-023 i operacyjne M1-024', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const root = path.resolve(__dirname, '..');
+
+  test('D-023: open-procedure-modal-btn znajduje się na górze ScrollView przed BrewBanners, a BrewModalsContainer poza ScrollView', () => {
+    const src = fs.readFileSync(path.join(root, 'app/(tabs)/index.tsx'), 'utf8');
+    const ctaIdx = src.indexOf('testID="open-procedure-modal-btn"');
+    const bannersIdx = src.indexOf('<BrewBanners');
+    const scrollCloseIdx = src.indexOf('</ScrollView>');
+    const modalsIdx = src.indexOf('<BrewModalsContainer');
+    expect(ctaIdx).toBeGreaterThan(-1);
+    expect(bannersIdx).toBeGreaterThan(ctaIdx);
+    expect(scrollCloseIdx).toBeGreaterThan(-1);
+    expect(modalsIdx).toBeGreaterThan(scrollCloseIdx);
+  });
+
+  test('M1-023: archiveEmptyBtn i descriptorChip mają hitSlop >= 44pt oraz SafeModeView btnDangerText ma kontrast >= 4.5:1', () => {
+    const { BeanItemCard } = require('../src/components/beans/BeanItemCard');
+    const { FlavorWheelPicker } = require('../src/core/flavor-wheel-picker');
+    const { getContrastRatio } = require('../src/core/contrast');
+
+    let beanTree: renderer.ReactTestRenderer;
+    act(() => {
+      beanTree = renderer.create(
+        <BeanItemCard
+          item={{
+            id: 'empty-1',
+            name: 'Ethiopia',
+            roaster: 'Roaster',
+            beverageType: 'COFFEE',
+            initialWeightGrams: 250,
+            remainingWeightGrams: 0,
+            isFavorite: false,
+            isArchived: false,
+            flavorNotes: [],
+            createdAt: '2026-11-20T00:00:00.000Z',
+          }}
+          unitSystem="metric"
+          language="en"
+          t={translations.en}
+          onToggleFavorite={() => {}}
+          onSelectForBrew={() => {}}
+          onOpenEdit={() => {}}
+          onToggleArchive={() => {}}
+        />
+      );
+    });
+    const archiveEmptyBtn = beanTree!.root.findByProps({ testID: 'bean-archive-empty-btn-empty-1' });
+    expect(archiveEmptyBtn.props.hitSlop).toBeDefined();
+    expect(archiveEmptyBtn.props.hitSlop.top).toBeGreaterThanOrEqual(8);
+    expect(archiveEmptyBtn.props.hitSlop.bottom).toBeGreaterThanOrEqual(8);
+    act(() => beanTree!.unmount());
+
+    let pickerTree: renderer.ReactTestRenderer;
+    act(() => {
+      pickerTree = renderer.create(
+        <FlavorWheelPicker selectedDescriptors={[]} onToggleDescriptor={() => {}} language="en" />
+      );
+    });
+    const firstChip = pickerTree!.root.findAllByProps({ accessibilityRole: 'checkbox' })[0];
+    expect(firstChip.props.hitSlop).toBeDefined();
+    expect(firstChip.props.hitSlop.top).toBeGreaterThanOrEqual(8);
+    expect(firstChip.props.hitSlop.bottom).toBeGreaterThanOrEqual(8);
+    act(() => pickerTree!.unmount());
+
+    const safeModeSrc = fs.readFileSync(path.join(root, 'src/components/SafeModeView.tsx'), 'utf8');
+    const dangerMatch = safeModeSrc.match(/btnDangerText:\s*\{[^}]*color:\s*'([^']+)'/);
+    expect(dangerMatch).not.toBeNull();
+    expect(getContrastRatio(dangerMatch![1], '#12100E')).toBeGreaterThanOrEqual(4.5);
+
+    const htmlFiles = [
+      'site/index.html',
+      'site/support.html',
+      'site/privacy.html',
+      'site/terms.html',
+      'site/en/index.html',
+      'site/en/support.html',
+      'site/en/privacy.html',
+    ];
+    for (const rel of htmlFiles) {
+      const html = fs.readFileSync(path.join(root, rel), 'utf8');
+      const lightBlock = html.match(/@media\s*\(prefers-color-scheme:\s*light\)\s*\{([\s\S]*?)\n\s*\}/);
+      expect(lightBlock).not.toBeNull();
+      const goldMatch = lightBlock![1].match(/--accent-gold:\s*(#[0-9a-fA-F]{6})/);
+      expect(goldMatch).not.toBeNull();
+      expect(getContrastRatio(goldMatch![1], '#ffffff')).toBeGreaterThanOrEqual(4.5);
+      expect(getContrastRatio(goldMatch![1], '#f9f8f6')).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  test('M1-024: SafeModeView pokazuje SUPPORT_EMAIL, Settings czyta EXPO_PUBLIC_BUILD_NUMBER, a 15-app-store.md używa jawnych placeholderów ASC', () => {
+    const { SafeModeView } = require('../src/components/SafeModeView');
+    const { SUPPORT_EMAIL } = require('../src/core/app-identity');
+    const SettingsScreen = require('../app/settings').default;
+
+    let safeTree: renderer.ReactTestRenderer;
+    act(() => {
+      safeTree = renderer.create(<SafeModeView onRetry={() => {}} language="en" reason="too-new" />);
+    });
+    expect(JSON.stringify(safeTree!.toJSON())).toContain(SUPPORT_EMAIL);
+    act(() => safeTree!.unmount());
+
+    const prevBuild = process.env.EXPO_PUBLIC_BUILD_NUMBER;
+    process.env.EXPO_PUBLIC_BUILD_NUMBER = '42';
+    try {
+      let settingsTree: renderer.ReactTestRenderer;
+      act(() => {
+        settingsTree = renderer.create(<SettingsScreen />);
+      });
+      const versionNode = settingsTree!.root.findByProps({ testID: 'settings-app-version' });
+      expect(JSON.stringify(versionNode.props.children)).toContain('Build 42');
+      act(() => settingsTree!.unmount());
+    } finally {
+      if (prevBuild === undefined) delete process.env.EXPO_PUBLIC_BUILD_NUMBER;
+      else process.env.EXPO_PUBLIC_BUILD_NUMBER = prevBuild;
+    }
+
+    const appStoreDoc = fs.readFileSync(path.join(root, 'docs/15-app-store.md'), 'utf8');
+    expect(appStoreDoc).toContain('<ASC_KEY_ID>');
+    expect(appStoreDoc).toContain('<ASC_ISSUER_UUID>');
+    expect(appStoreDoc).not.toContain('2X9R4HXF34');
+    expect(appStoreDoc).not.toContain('69a6de70-');
+  });
+});
