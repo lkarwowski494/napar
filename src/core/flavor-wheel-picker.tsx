@@ -118,6 +118,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
                         },
                       ]}
                       onPress={() => onToggleDescriptor(desc)}
+                      hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
                       accessibilityRole="checkbox"
                       accessibilityState={{ checked: isSelected }}
                       accessibilityLabel={displayLabel}

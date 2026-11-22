@@ -86,8 +86,10 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             {t.stash?.archivePrompt || 'Paczka skończona (0 g). Przenieść do archiwum?'}
           </Text>
           <Pressable
+            testID={`bean-archive-empty-btn-${item.id}`}
             style={styles.archiveEmptyBtn}
             onPress={() => onToggleArchive(item)}
+            hitSlop={{ top: 10, bottom: 10, left: 8, right: 8 }}
             accessibilityRole="button"
             accessibilityLabel={isEn ? "Archive now" : "Archiwizuj teraz"}>
             <Text style={styles.archiveEmptyBtnText}>{isEn ? "Archive now" : "Archiwizuj teraz"}</Text>
