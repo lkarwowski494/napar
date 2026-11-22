@@ -3075,7 +3075,34 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
       treeEn.unmount();
     });
   });
+
+  test('M1-audytor-generalny-013: ostrzeżenie o solach spożywczych (food-grade / FCC) w WaterChemistryTab (PL i EN) oraz konsultacja lekarska w PL site/terms.html', () => {
+    const { WaterChemistryTab } = require('../src/components/dialin/WaterChemistryTab');
+    let treePl: any;
+    let treeEn: any;
+    act(() => {
+      treePl = renderer.create(<WaterChemistryTab language="pl" t={translations.pl} />);
+      treeEn = renderer.create(<WaterChemistryTab language="en" t={translations.en} />);
+    });
+    const plJson = JSON.stringify(treePl.toJSON());
+    const enJson = JSON.stringify(treeEn.toJSON());
+    expect(plJson).toContain('food-grade');
+    expect(plJson).toContain('MgSO₄·7H₂O');
+    expect(plJson).toContain('CaCl₂·2H₂O');
+    expect(enJson).toContain('food-grade');
+    expect(enJson).toContain('MgSO₄·7H₂O');
+    expect(enJson).toContain('CaCl₂·2H₂O');
+    act(() => {
+      treePl.unmount();
+      treeEn.unmount();
+    });
+
+    const termsHtml = readFileSync(join(root, 'site/terms.html'), 'utf8');
+    const plSection = termsHtml.split('<h2>4. Terms of Use')[0];
+    expect(plSection).toMatch(/skonsultuj się z lekarzem/i);
+  });
 });
+
 
 
 

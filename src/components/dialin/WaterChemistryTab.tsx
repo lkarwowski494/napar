@@ -224,6 +224,12 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
         </View>
       </View>
 
+      {/* OSTRZEŻENIE BEZPIECZEŃSTWA: WYŁĄCZNIE SOLE SPOŻYWCZE (M1-audytor-generalny-013) */}
+      <View style={styles.safetyWarningCard} testID="water-food-grade-warning">
+        <Text style={styles.safetyWarningTitle}>{t.water.foodGradeWarningTitle}</Text>
+        <Text style={styles.safetyWarningText}>{t.water.foodGradeWarningDesc}</Text>
+      </View>
+
       {/* DIAGNOZA SENSORYCZNA WODY */}
       <View style={styles.waterInfoCard} testID="water-diagnosis-card">
         <Text style={styles.waterInfoHeader}>{t.water.diagnosisHeader}</Text>
@@ -549,5 +555,24 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: theme.colors.textPrimary,
+  },
+  safetyWarningCard: {
+    marginTop: 12,
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.copper,
+    padding: 12,
+    gap: 4,
+  },
+  safetyWarningTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.copperLight,
+  },
+  safetyWarningText: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
   },
 });

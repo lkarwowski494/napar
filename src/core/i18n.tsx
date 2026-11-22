@@ -603,6 +603,8 @@ export const translations = {
       concentrateGhSub: 'GH {ppm} ppm (magnez)',
       dryMethodDesc: 'Ważenie suchych soli prosto do {liters}L wody:',
       optionalSalt: '{name} (opcja)',
+      foodGradeWarningTitle: 'Bezpieczeństwo — wyłącznie sole spożywcze (food-grade / FCC)',
+      foodGradeWarningDesc: 'Do remineralizacji wody używaj wyłącznie soli o czystości spożywczej (food-grade / FCC): soli Epsom (MgSO₄·7H₂O), chlorku wapnia (CaCl₂·2H₂O) oraz sody oczyszczonej (NaHCO₃). Nigdy nie używaj soli technicznych ani ogrodniczych.',
     },
     grinder: {
       title: 'Przelicznik Młynków (Grinder Dial-in)',
@@ -1338,6 +1340,8 @@ export const translations = {
       concentrateGhSub: 'GH {ppm} ppm (magnesium)',
       dryMethodDesc: 'Weigh dry salts directly into {liters}L of water:',
       optionalSalt: '{name} (optional)',
+      foodGradeWarningTitle: 'Safety — Food-Grade / FCC Salts Only',
+      foodGradeWarningDesc: 'Use only certified food-grade (FCC) salts for water remineralization: Epsom salt (MgSO₄·7H₂O), calcium chloride (CaCl₂·2H₂O), and baking soda (NaHCO₃). Never use technical or agricultural-grade salts.',
     },
     grinder: {
       title: 'Grinder Dial-in Converter',
