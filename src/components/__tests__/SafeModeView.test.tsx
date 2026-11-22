@@ -157,3 +157,67 @@ describe('SafeModeView — przyczyna trybu awaryjnego (M1-audytor-generalny-005)
     expect(JSON.stringify(tree.toJSON())).toContain(text);
   });
 });
+
+describe('SafeModeView — wybór najnowszej kopii JSON (M1-audytor-generalny-001)', () => {
+  const { Alert } = require('react-native');
+  const LegacyFS = require('expo-file-system/legacy');
+
+  beforeEach(() => {
+    jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    (Sharing.shareAsync as jest.Mock).mockClear();
+    (LegacyFS.getInfoAsync as jest.Mock).mockResolvedValue({ exists: true, isDirectory: true });
+  });
+
+  function pressExportJson(tree: any) {
+    const button = tree.root.findAll(
+      (n: any) =>
+        typeof n.props.onPress === 'function' &&
+        JSON.stringify(n.findAllByType(require('react-native').Text).map((t: any) => t.props.children)).includes(
+          'Eksportuj ostatnią kopię JSON'
+        )
+    )[0];
+    return button.props.onPress();
+  }
+
+  test('ignoruje state_corrupt_* i starsze napar-przed-importem-*, wybiera najnowszą kopię napar-* po dacie', async () => {
+    (LegacyFS.readDirectoryAsync as jest.Mock).mockResolvedValueOnce([
+      'state_corrupt_2026-11-19.json',
+      'napar-przed-importem-2026-01-01T10-00-00.json',
+      'napar-2026-11-19T12-00-00.json',
+    ]);
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<SafeModeView onRetry={jest.fn()} language="pl" />);
+    });
+
+    await renderer.act(async () => {
+      await pressExportJson(tree);
+    });
+
+    expect(Sharing.shareAsync).toHaveBeenCalledWith(
+      'file:///data/user/0/pl.lukasz.napar/files/Backup/napar-2026-11-19T12-00-00.json',
+      expect.objectContaining({ mimeType: 'application/json' })
+    );
+  });
+
+  test('gdy w katalogu Backup są tylko pliki state_corrupt_*, nie udostępnia ich i pokazuje komunikat o braku kopii', async () => {
+    (LegacyFS.readDirectoryAsync as jest.Mock).mockResolvedValueOnce([
+      'state_corrupt_2026-11-19.json',
+      'other-unrelated.json',
+    ]);
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<SafeModeView onRetry={jest.fn()} language="pl" />);
+    });
+
+    await renderer.act(async () => {
+      await pressExportJson(tree);
+    });
+
+    expect(Sharing.shareAsync).not.toHaveBeenCalled();
+    expect(Alert.alert).toHaveBeenCalledWith('Brak kopii', expect.any(String));
+  });
+});
+

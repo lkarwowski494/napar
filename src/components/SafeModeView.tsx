@@ -120,6 +120,37 @@ const MESSAGES = {
   },
 };
 
+const BACKUP_STAMP_RE =
+  /(\d{4}-\d{2}-\d{2})(?:[T-](\d{2})[-:]?(\d{2})[-:]?(\d{2}))?(?:-(\d{1,3}))?\.json$/;
+
+/**
+ * M1-audytor-generalny-001: wybiera najnowszą prawidłową kopię `napar-*.json` według znacznika czasu
+ * w nazwie (wykluczając `state_corrupt_*` i inne nieimportowalne pliki oraz bez porównywania
+ * leksykograficznego prefiksu `przed-importem` vs rok).
+ */
+export function selectLatestBackupJsonFile(files: string[]): string | null {
+  const candidates = files.filter((f) => f.startsWith('napar-') && f.endsWith('.json'));
+  if (candidates.length === 0) return null;
+
+  const sortKey = (name: string): string => {
+    const m = BACKUP_STAMP_RE.exec(name);
+    if (!m) return `0-${name}`;
+    const date = m[1];
+    const time = m[2] ? `${m[2]}${m[3]}${m[4]}` : '000000';
+    const seq = (m[5] ?? '1').padStart(3, '0');
+    const poolPriority = name.startsWith('napar-przed-') ? '0' : '1';
+    return `1-${date}-${time}-${seq}-${poolPriority}`;
+  };
+
+  candidates.sort((a, b) => {
+    const ka = sortKey(a);
+    const kb = sortKey(b);
+    return ka < kb ? 1 : ka > kb ? -1 : b.localeCompare(a);
+  });
+
+  return candidates[0];
+}
+
 export const SafeModeView: React.FC<SafeModeViewProps> = ({ onRetry, language, reason = 'crash-loop' }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
@@ -177,20 +208,20 @@ export const SafeModeView: React.FC<SafeModeViewProps> = ({ onRetry, language, r
       }
 
       const files = await FileSystem.readDirectoryAsync(backupDir);
-      const jsonFiles = files.filter((f) => f.endsWith('.json')).sort().reverse();
+      const latestName = selectLatestBackupJsonFile(files);
 
-      if (jsonFiles.length === 0) {
+      if (!latestName) {
         Alert.alert(m.noBackupTitle, m.noBackupFiles);
         return;
       }
 
-      const latestFile = `${backupDir}${jsonFiles[0]}`;
+      const latestFile = `${backupDir}${latestName}`;
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(latestFile, {
           mimeType: 'application/json',
           dialogTitle: m.jsonShareTitle,
         });
-        setStatusMessage(m.jsonExported(jsonFiles[0]));
+        setStatusMessage(m.jsonExported(latestName));
       } else {
         Alert.alert(m.noShareTitle, m.noShareDesc);
       }
