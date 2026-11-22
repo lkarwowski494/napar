@@ -30,9 +30,21 @@ describe('import-validation (M1-audytor-generalny-006)', () => {
 
   test('receptura, sesja i log: brak wymaganego pola i zły element listy', () => {
     expect(fieldOf(() => parseSavedRecipe({ id: 'r', name: 'n', beverageType: 'COFFEE', method: 'V60', doseGrams: 1, waterGrams: 1, waterTempCelsius: 90, stepsJson: '[]' }, 'customRecipes[0]'))).toBe('customRecipes[0].recommendedRatio');
-    expect(fieldOf(() => parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 1, waterGrams: 1, waterTempCelsius: 90, totalTimeSeconds: 1, flavorTags: ['a', 2], brewedAt: 'x' }, 'sessions[0]'))).toBe('sessions[0].flavorTags[1]');
+    expect(fieldOf(() => parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 1, waterGrams: 1, waterTempCelsius: 90, totalTimeSeconds: 1, flavorTags: ['a', 2], brewedAt: '2026-11-19T12:00:00Z' }, 'sessions[0]'))).toBe('sessions[0].flavorTags[1]');
     expect(fieldOf(() => parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 1, waterGrams: 1, waterTempCelsius: 90, totalTimeSeconds: 1 }, 'sessions[0]'))).toBe('sessions[0].brewedAt');
-    expect(fieldOf(() => parseCaffeineLog({ id: 'l', beverageName: 'n', beverageType: 'coffee', consumedAt: 'x', doseGrams: 1, caffeineMg: NaN }, 'caffeineLogs[0]'))).toBe('caffeineLogs[0].caffeineMg');
+    expect(fieldOf(() => parseCaffeineLog({ id: 'l', beverageName: 'n', beverageType: 'coffee', consumedAt: '2026-11-19T12:00:00Z', doseGrams: 1, caffeineMg: NaN }, 'caffeineLogs[0]'))).toBe('caffeineLogs[0].caffeineMg');
+  });
+
+  test('M1-audytor-generalny-006: niepoprawne daty ISO w imporcie są odrzucane', () => {
+    expect(fieldOf(() => parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 180, brewedAt: 'not-a-date' }, 'sessions[0]'))).toBe('sessions[0].brewedAt');
+    expect(fieldOf(() => parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 180, brewedAt: '   ' }, 'sessions[0]'))).toBe('sessions[0].brewedAt');
+    expect(fieldOf(() => parseCaffeineLog({ id: 'l', beverageName: 'Espresso', beverageType: 'coffee', consumedAt: 'bad-iso', doseGrams: 18, caffeineMg: 120 }, 'caffeineLogs[0]'))).toBe('caffeineLogs[0].consumedAt');
+    expect(fieldOf(() => parseInventoryItem({ id: 'a', name: 'n', type: 'coffee', initialWeightGrams: 250, remainingWeightGrams: 200, createdAt: 'invalid-date' }, 'inventory[0]'))).toBe('inventory[0].createdAt');
+    expect(fieldOf(() => parseSavedRecipe({ id: 'r', name: 'n', beverageType: 'COFFEE', method: 'V60', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, recommendedRatio: 16.7, stepsJson: '[]', createdAt: 'invalid-date' }, 'customRecipes[0]'))).toBe('customRecipes[0].createdAt');
+
+    const validInv = parseInventoryItem({ id: 'a', name: 'n', type: 'coffee', initialWeightGrams: 250, remainingWeightGrams: 200, createdAt: '2026-11-19T12:00:00Z', updatedAt: '' }, 'inventory[0]');
+    expect(validInv.createdAt).toBe('2026-11-19T12:00:00Z');
+    expect(validInv.updatedAt).toBe('');
   });
 
   test('kolekcje: sekcja nie-lista i brakujące sekcje', () => {
@@ -42,3 +54,4 @@ describe('import-validation (M1-audytor-generalny-006)', () => {
     expect(new ImportFieldError('a.b', 'liczby').message).toContain('„a.b”');
   });
 });
+

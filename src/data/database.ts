@@ -938,6 +938,12 @@ export function saveBrewSession(session: BrewSession): void {
     ? session.method.trim().slice(0, 50)
     : 'v60';
 
+  const rawBrewedAt = typeof session.brewedAt === 'string' ? session.brewedAt.trim() : '';
+  if (rawBrewedAt && Number.isNaN(Date.parse(rawBrewedAt))) {
+    throw new DataValidationError('brewedAt');
+  }
+  const safeBrewedAt = rawBrewedAt || new Date().toISOString();
+
   db.runSync(
     `INSERT INTO brew_sessions (
       id, recipe_id, recipe_name, inventory_item_id, inventory_item_name,
@@ -992,7 +998,7 @@ export function saveBrewSession(session: BrewSession): void {
       session.notes ?? null,
       session.infusionNumber ?? 1,
       session.sensory ? JSON.stringify(session.sensory) : null,
-      session.brewedAt || new Date().toISOString(),
+      safeBrewedAt,
     ]
   );
 }
@@ -1180,10 +1186,11 @@ export function logCaffeine(log: CaffeineLog): void {
       ? log.beverageName.trim()
       : 'Napar';
 
-  const safeConsumedAt =
-    typeof log.consumedAt === 'string' && log.consumedAt.trim()
-      ? log.consumedAt.trim()
-      : new Date().toISOString();
+  const rawConsumedAt = typeof log.consumedAt === 'string' ? log.consumedAt.trim() : '';
+  if (rawConsumedAt && Number.isNaN(Date.parse(rawConsumedAt))) {
+    throw new DataValidationError('consumedAt');
+  }
+  const safeConsumedAt = rawConsumedAt || new Date().toISOString();
 
   db.runSync(
     `INSERT INTO caffeine_logs (

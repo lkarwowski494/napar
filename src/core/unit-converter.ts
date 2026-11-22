@@ -185,5 +185,7 @@ export function formatTemperatureDelta(deltaCelsius: number, unitSystem: UnitSys
 
 /** M1-audytor-generalny-034: godzina (HH:MM) według języka aplikacji. */
 export function formatClockTime(iso: string, language: 'pl' | 'en'): string {
-  return new Date(iso).toLocaleTimeString(language === 'pl' ? 'pl-PL' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleTimeString(language === 'pl' ? 'pl-PL' : 'en-US', { hour: '2-digit', minute: '2-digit' });
 }

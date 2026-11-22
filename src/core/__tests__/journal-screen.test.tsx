@@ -390,6 +390,40 @@ describe('JournalScreen Integration', () => {
     getAppSetting.mockImplementation(() => null);
     getUnitSystem.mockReturnValue('metric');
   });
+
+  test('M1-audytor-generalny-006: uszkodzona data brewedAt nie powoduje Invalid Date w widoku ani w udostępnianiu', () => {
+    (getBrewSessions as jest.Mock).mockReturnValue([
+      {
+        id: 'sess-corrupt',
+        recipeName: 'V60 Corrupt Date',
+        beverageType: 'COFFEE',
+        method: 'V60',
+        doseGrams: 15,
+        waterGrams: 250,
+        waterTempCelsius: 93,
+        totalTimeSeconds: 180,
+        flavorTags: [],
+        brewedAt: 'not-a-date',
+      },
+    ]);
+    const shareSpy = jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' } as any);
+
+    let tree: any;
+    act(() => {
+      tree = renderer.create(
+        <BrewProvider>
+          <JournalScreen />
+        </BrewProvider>
+      );
+    });
+
+    expect(JSON.stringify(tree.toJSON())).not.toContain('Invalid Date');
+    act(() => {
+      tree.root.findByProps({ testID: 'share-session-btn-sess-corrupt' }).props.onPress();
+    });
+    expect(shareSpy.mock.calls[0][0].message).not.toContain('Invalid Date');
+    shareSpy.mockRestore();
+  });
 });
 
 function findPressableWithText(root: any, text: string) {

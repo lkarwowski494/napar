@@ -2297,5 +2297,33 @@ describe('Napar SQLite Database & Repositories', () => {
 
     expect(() => setAppSetting('bedtime_hour', '22')).toThrow('SQLITE_FULL');
   });
+
+  test('M1-audytor-generalny-006: saveBrewSession i logCaffeine odrzucają niepoprawne daty ISO', () => {
+    expect(() =>
+      saveBrewSession({
+        id: 'sess-bad-date',
+        beverageType: 'COFFEE',
+        method: 'V60',
+        doseGrams: 15,
+        waterGrams: 250,
+        waterTempCelsius: 93,
+        totalTimeSeconds: 180,
+        flavorTags: [],
+        brewedAt: 'not-a-date',
+      })
+    ).toThrow('brewedAt');
+
+    expect(() =>
+      logCaffeine({
+        id: 'caff-bad-date',
+        beverageName: 'Espresso',
+        beverageType: 'coffee',
+        consumedAt: 'not-a-date',
+        doseGrams: 18,
+        caffeineMg: 120,
+      })
+    ).toThrow('consumedAt');
+  });
 });
+
 

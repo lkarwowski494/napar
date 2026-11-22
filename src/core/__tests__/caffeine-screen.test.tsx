@@ -148,5 +148,28 @@ describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
     });
     expect(JSON.stringify(tree!.toJSON())).toContain('5.0 h');
   });
+
+  test('M1-audytor-generalny-006: uszkodzona data consumedAt z bazy nie powoduje NaN mg ani Invalid Date', () => {
+    (database.getCaffeineLogs as jest.Mock).mockReturnValue([
+      {
+        id: 'log-corrupt',
+        beverageName: 'Espresso',
+        beverageType: 'coffee',
+        consumedAt: 'not-a-date',
+        doseGrams: 18,
+        caffeineMg: 120,
+      },
+    ]);
+
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(<CaffeineScreen />);
+    });
+
+    const rendered = JSON.stringify(tree!.toJSON());
+    expect(rendered).not.toContain('NaN');
+    expect(rendered).not.toContain('Invalid Date');
+  });
 });
+
 

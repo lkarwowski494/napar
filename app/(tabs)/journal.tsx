@@ -179,6 +179,7 @@ export default function JournalScreen() {
 
   const formatDateTime = (iso: string) => {
     const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '—';
     const locale = language === 'pl' ? 'pl-PL' : 'en-US';
     return formatTemplate(t.journal.shareDateTime, {
       date: d.toLocaleDateString(locale),

@@ -225,5 +225,13 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatDoseWeight('18,5 g', 'metric')).toBe('18.5g');
       expect(formatWaterWeight('300,5 g', 'metric')).toBe('300.5g');
     });
+
+    test('M1-audytor-generalny-006: formatClockTime dla niepoprawnej daty nie zwraca Invalid Date', () => {
+      const { formatClockTime } = require('../unit-converter');
+      expect(formatClockTime('not-a-date', 'pl')).toBe('—');
+      expect(formatClockTime('not-a-date', 'en')).toBe('—');
+      expect(formatClockTime('2026-11-19T12:30:00Z', 'pl')).not.toBe('—');
+    });
   });
 });
+

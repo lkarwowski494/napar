@@ -40,6 +40,24 @@ function optStr(o: Obj, key: string, path: string): string | undefined {
   return v;
 }
 
+function isoDate(o: Obj, key: string, path: string): string {
+  const v = str(o, key, path).trim();
+  if (!v || Number.isNaN(Date.parse(v))) {
+    throw new ImportFieldError(`${path}.${key}`, 'poprawnej daty ISO');
+  }
+  return v;
+}
+
+function optIsoDate(o: Obj, key: string, path: string): string {
+  const v = optStr(o, key, path);
+  if (v === undefined || v.trim() === '') return '';
+  const trimmed = v.trim();
+  if (Number.isNaN(Date.parse(trimmed))) {
+    throw new ImportFieldError(`${path}.${key}`, 'poprawnej daty ISO');
+  }
+  return trimmed;
+}
+
 function num(o: Obj, key: string, path: string): number {
   const v = o[key];
   if (typeof v !== 'number' || !Number.isFinite(v)) throw new ImportFieldError(`${path}.${key}`, 'liczby');
@@ -102,8 +120,8 @@ export function parseInventoryItem(v: unknown, path: string): InventoryItem {
     isFavorite: optBool(o, 'isFavorite', path) ?? false,
     isArchived: optBool(o, 'isArchived', path) ?? false,
     // Brak dat paczki: zapis ustawia czas zapisu (saveInventoryItem: createdAt || now), więc '' = „brak”.
-    createdAt: optStr(o, 'createdAt', path) ?? '',
-    updatedAt: optStr(o, 'updatedAt', path) ?? '',
+    createdAt: optIsoDate(o, 'createdAt', path),
+    updatedAt: optIsoDate(o, 'updatedAt', path),
   };
 }
 
@@ -124,7 +142,7 @@ export function parseSavedRecipe(v: unknown, path: string): SavedRecipe {
     stepsJson: str(o, 'stepsJson', path),
     isCustom: optBool(o, 'isCustom', path) ?? true,
     isFavorite: optBool(o, 'isFavorite', path) ?? false,
-    createdAt: optStr(o, 'createdAt', path) ?? '',
+    createdAt: optIsoDate(o, 'createdAt', path),
   };
 }
 
@@ -165,7 +183,7 @@ export function parseBrewSession(v: unknown, path: string): BrewSession {
     notes: optStr(o, 'notes', path),
     infusionNumber: optNum(o, 'infusionNumber', path),
     sensory: parseSensory(o.sensory, `${path}.sensory`),
-    brewedAt: str(o, 'brewedAt', path),
+    brewedAt: isoDate(o, 'brewedAt', path),
   };
 }
 
@@ -176,7 +194,7 @@ export function parseCaffeineLog(v: unknown, path: string): CaffeineLog {
     brewSessionId: optStr(o, 'brewSessionId', path),
     beverageName: str(o, 'beverageName', path),
     beverageType: oneOf(o, 'beverageType', path, ['coffee', 'tea'] as const),
-    consumedAt: str(o, 'consumedAt', path),
+    consumedAt: isoDate(o, 'consumedAt', path),
     doseGrams: num(o, 'doseGrams', path),
     caffeineMg: num(o, 'caffeineMg', path),
   };

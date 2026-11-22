@@ -102,6 +102,7 @@ export default function CaffeineScreen() {
   // Obliczenie aktualnej ilości kofeiny w organizmie
   const currentTotalMg = logs.reduce((sum, item) => {
     const intakeTime = new Date(item.consumedAt).getTime();
+    if (Number.isNaN(intakeTime)) return sum;
     const hoursPassed = Math.max(0, (now.getTime() - intakeTime) / (1000 * 3600));
     return sum + calculateRemainingCaffeineMg(item.caffeineMg, hoursPassed, halfLifeHours);
   }, 0);
@@ -116,14 +117,17 @@ export default function CaffeineScreen() {
     targetBedtime.setDate(targetBedtime.getDate() + 1);
   }
 
-  const intakesForEvaluation = logs.map((item) => {
-    const intakeTime = new Date(item.consumedAt).getTime();
-    const hoursUntilBedtime = (targetBedtime.getTime() - intakeTime) / (1000 * 3600);
-    return {
-      doseMg: item.caffeineMg,
-      hoursUntilBedtime: Math.max(0, hoursUntilBedtime),
-    };
-  });
+  const intakesForEvaluation = logs
+    .map((item) => {
+      const intakeTime = new Date(item.consumedAt).getTime();
+      if (Number.isNaN(intakeTime)) return null;
+      const hoursUntilBedtime = (targetBedtime.getTime() - intakeTime) / (1000 * 3600);
+      return {
+        doseMg: item.caffeineMg,
+        hoursUntilBedtime: Math.max(0, hoursUntilBedtime),
+      };
+    })
+    .filter((x): x is { doseMg: number; hoursUntilBedtime: number } => x !== null);
 
   const bedtimeMg = estimateBedtimeCaffeineMg(intakesForEvaluation, halfLifeHours);
 
