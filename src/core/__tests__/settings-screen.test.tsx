@@ -445,7 +445,7 @@ describe('SettingsScreen Component', () => {
     let str = JSON.stringify(tree.toJSON());
     expect(str).toContain('Metabolizm Kofeiny & Sen (D-02)');
     expect(str).toContain('Czas Półtrwania Kofeiny (t₁/₂)');
-    expect(str).toContain('"4.0","h"'); // domyślny t½ 4 h [T:EFSA-T12-ZAKRES] (M1-audytor-generalny-017)
+    expect(str).toContain('"4,0","h"'); // domyślny t½ 4 h [T:EFSA-T12-ZAKRES] (M1-audytor-generalny-017)
     expect(str).toContain('Docelowa Godzina Snu');
     expect(str).toContain('23:00');
 

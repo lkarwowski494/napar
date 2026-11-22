@@ -168,11 +168,11 @@ describe('JournalSessionCard Component', () => {
 
     const ratingPl = treePl!.root.findByProps({ testID: 'session-rating-test-session-1' });
     expect(ratingPl.props.accessibilityRole).toBe('text');
-    expect(ratingPl.props.accessibilityLabel).toBe('Ocena: 4.8 gwiazdek');
+    expect(ratingPl.props.accessibilityLabel).toBe('Ocena: 4,8 gwiazdek');
 
     const eyPl = treePl!.root.findByProps({ testID: 'session-ey-test-session-1' });
     expect(eyPl.props.accessibilityRole).toBe('text');
-    expect(eyPl.props.accessibilityLabel).toBe('Uzysk ekstrakcji: 20.4%, TDS: 1.35%');
+    expect(eyPl.props.accessibilityLabel).toBe('Uzysk ekstrakcji: 20,4%, TDS: 1,35%');
 
     let treeEn: renderer.ReactTestRenderer;
     renderer.act(() => {

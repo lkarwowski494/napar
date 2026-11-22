@@ -1,6 +1,7 @@
 // Parser danych importu z unknown (M1-audytor-generalny-006; 08-programista-011)
 import {
   ImportFieldError,
+  isValidIsoDate,
   parseBrewSession,
   parseCaffeineLog,
   parseImportCollections,
@@ -74,6 +75,10 @@ describe('import-validation (M1-audytor-generalny-006)', () => {
   });
 
   test('M2-P1-R P2: regex ISO 8601 przed Date.parse oraz blokada kluczy prototypu i NaN/Infinity w settings', () => {
+    expect(isValidIsoDate('2026-11-19')).toBe(true);
+    expect(isValidIsoDate('2026-11-19T12:00:00Z')).toBe(true);
+    expect(isValidIsoDate('2026/11/19')).toBe(false);
+    expect(isValidIsoDate('2026-99-99')).toBe(false);
     // Odrzuca ciągi akceptowane przez luźny Date.parse ale niezgodne z ISO 8601
     expect(fieldOf(() => parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 180, brewedAt: '2026/11/19' }, 'sessions[0]'))).toBe('sessions[0].brewedAt');
     expect(fieldOf(() => parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 180, brewedAt: 'Nov 19, 2026' }, 'sessions[0]'))).toBe('sessions[0].brewedAt');

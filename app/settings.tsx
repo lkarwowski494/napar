@@ -215,9 +215,9 @@ export default function SettingsScreen({
     }
   };
 
-  const openExternalUrl = (url: string) => {
+  const guardExternalUrl = (open: () => unknown) => {
     try {
-      const openPromise = Linking.openURL(url);
+      const openPromise = open();
       if (openPromise && typeof (openPromise as Promise<unknown>).catch === 'function') {
         (openPromise as Promise<unknown>).catch(() => {
           Alert.alert(t.common.openLinkErrorTitle, t.common.openLinkErrorDesc);
@@ -320,7 +320,7 @@ export default function SettingsScreen({
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
-          onPress={() => openExternalUrl(privacyPolicyUrl(language === 'en' ? 'en' : 'pl'))}
+          onPress={() => guardExternalUrl(() => Linking.openURL(privacyPolicyUrl(language === 'en' ? 'en' : 'pl')))}
           accessibilityRole="link"
           accessibilityLabel={t.settings.privacyLabel || (language === 'pl' ? 'Polityka Prywatności' : 'Privacy Policy')}
         >
@@ -330,7 +330,7 @@ export default function SettingsScreen({
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
-          onPress={() => openExternalUrl(TERMS_URL)}
+          onPress={() => guardExternalUrl(() => Linking.openURL(TERMS_URL))}
           accessibilityRole="link"
           accessibilityLabel={t.settings.eulaLabel || (language === 'pl' ? 'Regulamin (EULA)' : 'Terms of Service (EULA)')}
         >
@@ -340,7 +340,7 @@ export default function SettingsScreen({
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
-          onPress={() => openExternalUrl(supportEmail ? supportMailtoUrl(supportEmail) : SUPPORT_URL)}
+          onPress={() => guardExternalUrl(() => Linking.openURL(supportEmail ? supportMailtoUrl(supportEmail) : SUPPORT_URL))}
           accessibilityRole="link"
           accessibilityLabel={language === 'pl' ? 'Kontakt i Wsparcie' : 'Contact & Support'}
         >
@@ -367,7 +367,7 @@ export default function SettingsScreen({
           <View style={styles.divider} />
           <Pressable
             style={styles.infoRow}
-            onPress={() => openExternalUrl(appStoreReviewUrl(storeId))}
+            onPress={() => guardExternalUrl(() => Linking.openURL(appStoreReviewUrl(storeId)))}
             accessibilityRole="link"
             accessibilityLabel={language === 'pl' ? 'Oceń w App Store' : 'Rate in App Store'}
           >

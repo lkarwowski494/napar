@@ -34,6 +34,7 @@ jest.mock('expo-router', () => ({
     push: mockPush,
     navigate: mockNavigate,
   }),
+  useFocusEffect: jest.fn(),
   Link: ({ children }: any) => children,
 }));
 

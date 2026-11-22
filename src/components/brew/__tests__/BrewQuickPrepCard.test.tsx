@@ -279,7 +279,7 @@ describe('BrewQuickPrepCard Component', () => {
 
     const badgePl = treePl.root.findByProps({ testID: 'current-ratio-badge' });
     expect(badgePl.props.accessibilityRole).toBe('text');
-    expect(badgePl.props.accessibilityLabel).toBe('Bieżąca proporcja 1 do 15.0');
+    expect(badgePl.props.accessibilityLabel).toBe('Bieżąca proporcja 1 do 15,0');
 
     let treeEn: any;
     act(() => {
@@ -314,9 +314,9 @@ describe('BrewQuickPrepCard Component', () => {
     });
 
     const badgeZero = treeZero.root.findByProps({ testID: 'current-ratio-badge' });
-    // 300 / 15 (fallback) = 20.0
-    expect(badgeZero.props.children).toBe('1 : 20.0');
-    expect(badgeZero.props.accessibilityLabel).toBe('Bieżąca proporcja 1 do 20.0');
+    // 300 / 15 (fallback) = 20,0
+    expect(badgeZero.props.children).toBe('1 : 20,0');
+    expect(badgeZero.props.accessibilityLabel).toBe('Bieżąca proporcja 1 do 20,0');
   });
 
   test('TASK-P39-01-ODK: steppery dozy i wody posiadaja testID, accessibilityState disabled i ograniczenia krancowe', () => {

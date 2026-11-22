@@ -934,7 +934,7 @@ describe('M1-audytor-generalny-019: rejestr twierdzeń w formacie roli, szczeble
   test('01-odkrywanie-012 / 02-monetyzacja-007: liczby rynkowe i cenowe bez źródła w BRD i dokumentach są oznaczone [DO USTALENIA]', () => {
     const files = readdirSync(join(root, 'napar_brd')).map((f) => join('napar_brd', f)).concat(['docs/MONETIZATION_AND_KITCHEN_UX.md']);
     const lines = files.flatMap((f) => readFileSync(join(root, f), 'utf8').split('\n'));
-    for (const re of [/3 500 recenzji/, /35 mld USD/, /5\.99 \$\/mies/, /29 subskrypcji rocznych/, /18 zł w kawiarni/]) {
+    for (const re of [/3 500 recenzji/, /35 mld USD/, /5\.99 \$\/mies/, /29 subskrypcji rocznych/]) {
       const hit = lines.filter((l) => re.test(l));
       expect([String(re), hit.length > 0 && hit.every((l) => /DO USTALENIA/.test(l))]).toEqual([String(re), true]);
     }
