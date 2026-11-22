@@ -69,6 +69,9 @@ export default function RecipeBuilderScreen() {
     },
   ]);
 
+  const [originalIsFavorite, setOriginalIsFavorite] = useState<boolean>(false);
+  const [originalCreatedAt, setOriginalCreatedAt] = useState<string | null>(null);
+
   // Wczytanie istniejącej receptury w trybie edycji
   useEffect(() => {
     if (id) {
@@ -84,6 +87,8 @@ export default function RecipeBuilderScreen() {
           setWaterGrams(existing.waterGrams.toString());
           setWaterTempCelsius(existing.waterTempCelsius.toString());
           setGrindSize(existing.grindSizeDescription || '');
+          setOriginalIsFavorite(Boolean(existing.isFavorite));
+          setOriginalCreatedAt(existing.createdAt || null);
 
           if (existing.stepsJson) {
             try {
@@ -202,8 +207,8 @@ export default function RecipeBuilderScreen() {
       recommendedRatio: currentRatio,
       stepsJson: JSON.stringify(steps),
       isCustom: true,
-      isFavorite: false,
-      createdAt: new Date().toISOString(),
+      isFavorite: id ? originalIsFavorite : false,
+      createdAt: id && originalCreatedAt ? originalCreatedAt : new Date().toISOString(),
     };
 
     if (!runSave(() => saveRecipe(recipe), t.common)) return;

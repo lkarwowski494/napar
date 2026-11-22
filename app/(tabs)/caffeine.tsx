@@ -26,6 +26,7 @@ import {
   calculateRemainingCaffeineMg,
   estimateBedtimeCaffeineMg,
   clampCaffeineHalfLifeHours,
+  DEFAULT_CAFFEINE_HALF_LIFE_H,
 } from '../../src/core/domain-rules';
 import { CaffeineCurveChart } from '../../src/core/caffeine-chart';
 import { theme } from '../../src/core/theme';
@@ -59,7 +60,7 @@ export default function CaffeineScreen() {
       return getCaffeineHalfLife();
     } catch (err) {
       // fallback to default half-life
-      return 5.0;
+      return DEFAULT_CAFFEINE_HALF_LIFE_H;
     }
   });
   const [showQuickAddModal, setShowQuickAddModal] = useState(false);

@@ -3121,7 +3121,63 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
     expect(banners).not.toMatch(/Peak:\s*7–35/i);
     expect(guide).not.toMatch(/Resting & Peak Window|Peak Window \(7–35|Peak \(7–35/i);
   });
+
+  test('M1-audytor-generalny-021: edycja receptury zachowuje isFavorite i createdAt; fallback halfLife w caffeine.tsx wynosi 4.0 h', () => {
+    const db = require('../src/data/database');
+    const expoRouter = require('expo-router');
+    const RecipeBuilderScreen = require('../app/recipe-builder').default;
+    const CaffeineScreen = require('../app/(tabs)/caffeine').default;
+
+    const existingCreatedAt = '2026-01-15T08:30:00.000Z';
+    jest.spyOn(expoRouter, 'useRouter').mockReturnValue({ back: jest.fn(), push: jest.fn(), replace: jest.fn() });
+    jest.spyOn(expoRouter, 'useLocalSearchParams').mockReturnValue({ id: 'custom-fav-1' });
+    jest.spyOn(db, 'getRecipeById').mockReturnValue({
+      id: 'custom-fav-1',
+      name: 'Ulubiony V60',
+      beverageType: 'COFFEE',
+      method: 'V60',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      recommendedRatio: 16.7,
+      stepsJson: JSON.stringify([{ stepNumber: 1, namePl: 'Bloom', targetWaterGrams: 50, durationSeconds: 45, instructionPl: 'Zalej' }]),
+      isCustom: true,
+      isFavorite: true,
+      createdAt: existingCreatedAt,
+    });
+    const saveSpy = jest.spyOn(db, 'saveRecipe').mockImplementation(() => undefined);
+
+    let builderTree: any;
+    act(() => {
+      builderTree = renderer.create(<RecipeBuilderScreen />);
+    });
+    const header = builderTree.root.find((n: any) => typeof n.props.onSave === 'function');
+    act(() => {
+      header.props.onSave();
+    });
+    expect(saveSpy).toHaveBeenCalled();
+    const saved = saveSpy.mock.calls[0][0];
+    expect(saved.isFavorite).toBe(true);
+    expect(saved.createdAt).toBe(existingCreatedAt);
+    act(() => builderTree.unmount());
+
+    // Fallback halfLife w caffeine.tsx: gdy getCaffeineHalfLife rzuca, używa DEFAULT_CAFFEINE_HALF_LIFE_H (4.0)
+    jest.spyOn(db, 'getCaffeineHalfLife').mockImplementation(() => {
+      throw new Error('db unavailable');
+    });
+    jest.spyOn(db, 'getCaffeineLogs').mockReturnValue([]);
+    let cafTree: any;
+    act(() => {
+      cafTree = renderer.create(<CaffeineScreen />);
+    });
+    const cafJson = JSON.stringify(cafTree.toJSON());
+    expect(cafJson).toContain('4,0');
+    expect(cafJson).not.toContain('5,0');
+    act(() => cafTree.unmount());
+    jest.restoreAllMocks();
+  });
 });
+
 
 
 
