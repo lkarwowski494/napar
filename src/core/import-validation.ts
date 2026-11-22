@@ -40,9 +40,15 @@ function optStr(o: Obj, key: string, path: string): string | undefined {
   return v;
 }
 
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2}))?$/;
+
+export function isValidIsoDate(v: string): boolean {
+  return ISO_DATE_RE.test(v) && !Number.isNaN(Date.parse(v));
+}
+
 function isoDate(o: Obj, key: string, path: string): string {
   const v = str(o, key, path).trim();
-  if (!v || Number.isNaN(Date.parse(v))) {
+  if (!isValidIsoDate(v)) {
     throw new ImportFieldError(`${path}.${key}`, 'poprawnej daty ISO');
   }
   return v;
@@ -52,7 +58,7 @@ function optIsoDate(o: Obj, key: string, path: string): string {
   const v = optStr(o, key, path);
   if (v === undefined || v.trim() === '') return '';
   const trimmed = v.trim();
-  if (Number.isNaN(Date.parse(trimmed))) {
+  if (!isValidIsoDate(trimmed)) {
     throw new ImportFieldError(`${path}.${key}`, 'poprawnej daty ISO');
   }
   return trimmed;
@@ -200,17 +206,26 @@ export function parseCaffeineLog(v: unknown, path: string): CaffeineLog {
   };
 }
 
+const FORBIDDEN_SETTING_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
 function parseSettings(v: unknown, field: string): Record<string, string> {
   if (v === undefined || v === null) return {};
   const o = obj(v, field);
   const out: Record<string, string> = {};
   for (const [k, val] of Object.entries(o)) {
     if (val === undefined || val === null) continue;
-    if (typeof val !== 'string' && typeof val !== 'number' && typeof val !== 'boolean') {
+    if (
+      (typeof val !== 'string' && typeof val !== 'number' && typeof val !== 'boolean') ||
+      (typeof val === 'number' && !Number.isFinite(val))
+    ) {
       throw new ImportFieldError(`${field}.${k}`, 'tekstu, liczby lub wartości tak/nie');
     }
     const cleanKey = k.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim();
-    if (cleanKey) out[cleanKey] = String(val);
+    if (!cleanKey) continue;
+    if (FORBIDDEN_SETTING_KEYS.has(cleanKey)) {
+      throw new ImportFieldError(`${field}.${k}`, 'dozwolonego klucza ustawień');
+    }
+    out[cleanKey] = String(val);
   }
   return out;
 }

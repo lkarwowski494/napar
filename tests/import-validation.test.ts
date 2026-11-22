@@ -72,6 +72,28 @@ describe('import-validation (M1-audytor-generalny-006)', () => {
     expect(fieldOf(() => parseImportCollections({ settings: 'bad' }))).toBe('settings');
     expect(fieldOf(() => parseImportCollections({ settings: { nested: { a: 1 } } }))).toBe('settings.nested');
   });
+
+  test('M2-P1-R P2: regex ISO 8601 przed Date.parse oraz blokada kluczy prototypu i NaN/Infinity w settings', () => {
+    // Odrzuca ciągi akceptowane przez luźny Date.parse ale niezgodne z ISO 8601
+    expect(fieldOf(() => parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 180, brewedAt: '2026/11/19' }, 'sessions[0]'))).toBe('sessions[0].brewedAt');
+    expect(fieldOf(() => parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 180, brewedAt: 'Nov 19, 2026' }, 'sessions[0]'))).toBe('sessions[0].brewedAt');
+    // Pasuje do regex, ale niepoprawna kalendarzowo (Date.parse -> NaN)
+    expect(fieldOf(() => parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 180, brewedAt: '2026-99-99' }, 'sessions[0]'))).toBe('sessions[0].brewedAt');
+    // Poprawne formaty ISO 8601 (sama data, Z, offset)
+    expect(parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 180, brewedAt: '2026-11-19' }, 'sessions[0]').brewedAt).toBe('2026-11-19');
+    expect(parseBrewSession({ id: 's', beverageType: 'COFFEE', method: 'V60', doseGrams: 15, waterGrams: 250, waterTempCelsius: 93, totalTimeSeconds: 180, brewedAt: '2026-11-19T12:00:00.123+02:00' }, 'sessions[0]').brewedAt).toBe('2026-11-19T12:00:00.123+02:00');
+
+    // Zakazane klucze w settings
+    const withProto = JSON.parse('{"settings":{"__proto__":"polluted"}}');
+    expect(fieldOf(() => parseImportCollections(withProto))).toBe('settings.__proto__');
+    expect(fieldOf(() => parseImportCollections({ settings: { constructor: 'bad' } }))).toBe('settings.constructor');
+    expect(fieldOf(() => parseImportCollections({ settings: { prototype: 'bad' } }))).toBe('settings.prototype');
+
+    // Nieskończone liczby w settings
+    expect(fieldOf(() => parseImportCollections({ settings: { bad_nan: Number.NaN } }))).toBe('settings.bad_nan');
+    expect(fieldOf(() => parseImportCollections({ settings: { bad_inf: Number.POSITIVE_INFINITY } }))).toBe('settings.bad_inf');
+  });
 });
+
 
 

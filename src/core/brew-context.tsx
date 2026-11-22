@@ -150,8 +150,13 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const setGrinderId = (id: string) => {
+    const prev = grinderId;
     setGrinderIdState(id);
-    setAppSetting('default_grinder', id);
+    try {
+      setAppSetting('default_grinder', id);
+    } catch {
+      setGrinderIdState(prev);
+    }
   };
 
   const grinderRecommendation = useMemo(() => {

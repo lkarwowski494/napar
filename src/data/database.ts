@@ -1,5 +1,5 @@
 import { saveCorruptState, parseAndValidateBackup, SCHEMA_VERSION as BACKUP_SCHEMA_VERSION } from './backup';
-import { parseImportCollections } from '../core/import-validation';
+import { parseImportCollections, isValidIsoDate } from '../core/import-validation';
 import { DataValidationError } from '../core/validation-error';
 
 export { DataValidationError };
@@ -939,7 +939,7 @@ export function saveBrewSession(session: BrewSession): void {
     : 'v60';
 
   const rawBrewedAt = typeof session.brewedAt === 'string' ? session.brewedAt.trim() : '';
-  if (rawBrewedAt && Number.isNaN(Date.parse(rawBrewedAt))) {
+  if (rawBrewedAt && !isValidIsoDate(rawBrewedAt)) {
     throw new DataValidationError('brewedAt');
   }
   const safeBrewedAt = rawBrewedAt || new Date().toISOString();
@@ -1187,7 +1187,7 @@ export function logCaffeine(log: CaffeineLog): void {
       : 'Napar';
 
   const rawConsumedAt = typeof log.consumedAt === 'string' ? log.consumedAt.trim() : '';
-  if (rawConsumedAt && Number.isNaN(Date.parse(rawConsumedAt))) {
+  if (rawConsumedAt && !isValidIsoDate(rawConsumedAt)) {
     throw new DataValidationError('consumedAt');
   }
   const safeConsumedAt = rawConsumedAt || new Date().toISOString();

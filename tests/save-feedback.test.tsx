@@ -146,3 +146,58 @@ test('trwała kontrola: zapisy i usunięcia danych w handlerach UI przechodzą p
   }
   expect(unguarded).toEqual([]);
 });
+
+describe('M2-P1-R P1: ochrona wywołań setAppSetting przed błędem SQLite', () => {
+  test('BrewProvider.setGrinderId cofa stan lokalny przy błędzie setAppSetting', () => {
+    const { BrewProvider, useBrew } = require('../src/core/brew-context');
+    const databaseModule = require('../src/data/database');
+    jest.spyOn(databaseModule, 'getAppSetting').mockReturnValue('comandante_c40');
+    jest.spyOn(databaseModule, 'setAppSetting').mockImplementation(() => {
+      throw new Error('SQLITE_FULL');
+    });
+
+    let brew: any;
+    const Grab = () => {
+      brew = useBrew();
+      return null;
+    };
+    renderer.act(() => {
+      renderer.create(
+        <BrewProvider>
+          <Grab />
+        </BrewProvider>
+      );
+    });
+    expect(brew.grinderId).toBe('comandante_c40');
+    expect(() => {
+      renderer.act(() => {
+        brew.setGrinderId('timemore_c2');
+      });
+    }).not.toThrow();
+    expect(brew.grinderId).toBe('comandante_c40');
+  });
+
+  test('app/settings.tsx chroni wszystkie zapisy ustawień przez runSave i nie zmienia stanu przy błędzie SQLite', () => {
+    const SettingsScreen = require('../app/settings').default;
+    const databaseModule = require('../src/data/database');
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    jest.spyOn(databaseModule, 'getUnitSystem').mockReturnValue('metric');
+    jest.spyOn(databaseModule, 'setUnitSystem').mockImplementation(() => {
+      throw new Error('SQLITE_READONLY');
+    });
+
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(<SettingsScreen />);
+    });
+    const prefsCard = tree!.root.findByProps({ unitSystem: 'metric' });
+    expect(() => {
+      renderer.act(() => {
+        prefsCard.props.onSelectUnitSystem('imperial');
+      });
+    }).not.toThrow();
+    expect(prefsCard.props.unitSystem).toBe('metric');
+    expect(alert).toHaveBeenCalledWith(texts.saveErrorTitle, texts.saveErrorDesc);
+  });
+});
+

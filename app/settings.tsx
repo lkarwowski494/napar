@@ -50,6 +50,7 @@ import { CaffeineSettingsCard } from '../src/components/settings/CaffeineSetting
 import { DataBackupCard } from '../src/components/settings/DataBackupCard';
 import { GrinderSelectionCard } from '../src/components/settings/GrinderSelectionCard';
 import { AppPreferencesCard } from '../src/components/settings/AppPreferencesCard';
+import { runSave } from '../lib/save-feedback';
 import {
   APP_STORE_ID,
   appStoreReviewUrl,
@@ -79,8 +80,8 @@ export default function SettingsScreen({
   });
 
   const handleSelectBeveragePreference = (pref: BeveragePreference) => {
+    if (!runSave(() => setBeveragePreference(pref), t.common)) return;
     setBeveragePreferenceState(pref);
-    setBeveragePreference(pref);
     if (brewCtx?.setBeveragePreference) {
       brewCtx.setBeveragePreference(pref);
     }
@@ -117,42 +118,42 @@ export default function SettingsScreen({
 
   const handleHalfLifeChange = (newHours: number) => {
     const clamped = clampCaffeineHalfLifeHours(newHours);
+    if (!runSave(() => setCaffeineHalfLife(clamped), t.common)) return;
     setHalfLifeHoursState(clamped);
-    setCaffeineHalfLife(clamped);
   };
 
   const handleBedtimeChange = (newHour: number) => {
     const clamped = Math.max(18, Math.min(28, newHour));
+    if (!runSave(() => setBedtimeHour(clamped), t.common)) return;
     setBedtimeHourState(clamped);
-    setBedtimeHour(clamped);
   };
 
   const handleSelectGrinder = (id: string) => {
+    if (!runSave(() => setAppSetting('default_grinder', id), t.common)) return;
     setSelectedGrinder(id);
-    setAppSetting('default_grinder', id);
   };
 
   const handleSelectUnitSystem = (unit: 'metric' | 'imperial') => {
+    if (!runSave(() => setUnitSystem(unit), t.common)) return;
     setUnitSystemState(unit);
-    setUnitSystem(unit);
   };
 
   const handleToggleVoiceAnnounce = () => {
     const next = !voiceAnnounce;
+    if (!runSave(() => setVoiceAnnounceEnabled(next), t.common)) return;
     setVoiceAnnounce(next);
-    setVoiceAnnounceEnabled(next);
   };
 
   const handleToggleHaptics = () => {
     const next = !haptics;
+    if (!runSave(() => setHapticsEnabled(next), t.common)) return;
     setHaptics(next);
-    setHapticsEnabled(next);
   };
 
   const handleToggleSound = () => {
     const next = !sound;
+    if (!runSave(() => setSoundEnabled(next), t.common)) return;
     setSound(next);
-    setSoundEnabled(next);
   };
 
   const handleExport = () => {
