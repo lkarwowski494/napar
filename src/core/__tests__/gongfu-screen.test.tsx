@@ -552,4 +552,72 @@ describe('GongfuScreen — zapis sesji jedną transakcją i komunikat przy błę
     expect(H.notificationAsync).not.toHaveBeenCalled();
     mockDb.settings.clear();
   });
+
+  // M1-audytor-generalny-005: edycja dozy liści i pojemności naczynia synchronizuje się z sesją i zapisem do SQLite.
+  test('M1-audytor-generalny-005: zmiana dozy na 5 g i naczynia na 150 ml zapisuje waterGrams=150 i kofeinę dla 5 g', () => {
+    const { estimateTeaInfusionCaffeineMg, estimateTotalLeafCaffeineMg } = require('../domain-rules');
+    const expectedCaffeine5g = estimateTeaInfusionCaffeineMg(estimateTotalLeafCaffeineMg(5), 1);
+    const txSpy = jest.spyOn(databaseModule, 'recordBrewSessionTransaction').mockImplementation(() => undefined);
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((_t, _m, buttons) => {
+      const saveBtn = buttons?.find((b) => b.style !== 'cancel');
+      saveBtn?.onPress?.();
+    });
+
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<GongfuScreen />);
+    });
+
+    const setup = tree.root.findByType(GongfuSessionSetup);
+    renderer.act(() => {
+      setup.props.onChangeLeafDose('5');
+      setup.props.onChangeVesselCapacity('150');
+    });
+
+    // Uruchom i dokończ infuzję #1
+    renderer.act(() => {
+      tree.root.findByProps({ testID: 'gongfu-start-btn' }).props.onPress();
+    });
+    renderer.act(() => {
+      jest.advanceTimersByTime(30000);
+    });
+
+    const recordBtn = tree.root.findAll(
+      (n: any) =>
+        typeof n.props.onPress === 'function' &&
+        n.findAll((c: any) => c.props.children === translations.pl.gongfu.nextInfusion).length > 0
+    )[0];
+    renderer.act(() => {
+      recordBtn.props.onPress();
+    });
+
+    // Sprawdź podgląd w historii przed zapisem
+    const history = tree.root.findByType(GongfuInfusionHistory);
+    expect(history.props.session.leafDoseGrams).toBe(5);
+    expect(history.props.session.vesselCapacityMl).toBe(150);
+    expect(history.props.session.totalCaffeineMg).toBe(expectedCaffeine5g);
+
+    // Zapisz sesję
+    const saveBtn = tree.root.findAll(
+      (n: any) =>
+        typeof n.props.onPress === 'function' &&
+        n.findAll((c: any) => c.props.children === translations.pl.common.save).length > 0
+    )[0];
+    renderer.act(() => {
+      saveBtn.props.onPress();
+    });
+
+    expect(txSpy).toHaveBeenCalledTimes(1);
+    const [savedSession, deduction, savedCaffeine] = txSpy.mock.calls[0];
+    expect(savedSession.doseGrams).toBe(5);
+    expect(savedSession.waterGrams).toBe(150);
+    expect(savedSession.caffeineContentMg).toBe(expectedCaffeine5g);
+    expect(deduction?.doseGrams).toBe(5);
+    expect(savedCaffeine?.doseGrams).toBe(5);
+    expect(savedCaffeine?.caffeineMg).toBe(expectedCaffeine5g);
+
+    txSpy.mockRestore();
+    alertSpy.mockRestore();
+  });
 });
+

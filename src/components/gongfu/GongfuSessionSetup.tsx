@@ -53,9 +53,9 @@ export const GongfuSessionSetup: React.FC<GongfuSessionSetupProps> = ({
 }) => {
   const isEn = language === 'en';
   const isImp = unitSystem === 'imperial';
-  const leafBase = parseFloat(leafDoseGrams) || 0;
-  const vesselBase = parseFloat(vesselCapacityMl) || 0;
-  const tempBase = parseFloat(waterTempCelsius) || 0;
+  const leafBase = parseFloat(leafDoseGrams.replace(',', '.')) || 0;
+  const vesselBase = parseFloat(vesselCapacityMl.replace(',', '.')) || 0;
+  const tempBase = parseFloat(waterTempCelsius.replace(',', '.')) || 0;
 
   const displayLeaf = isImp ? gramsToOunces(leafBase) : leafBase;
   const displayVessel = isImp ? mlToFluidOunces(vesselBase) : vesselBase;

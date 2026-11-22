@@ -19,7 +19,9 @@ import {
   createGongfuSession,
   recordGongfuInfusion,
   getRecommendedGongfuSteepSeconds,
+  estimateTotalLeafCaffeineMg,
 } from '../src/core/gongfu-session';
+import { estimateTeaInfusionCaffeineMg } from '../src/core/domain-rules';
 import {
   recordBrewSessionTransaction,
   getInventoryItems,
@@ -195,14 +197,85 @@ export default function GongfuScreen() {
     signalHaptic('light');
   };
 
+  const parsePositiveNumber = (raw: string): number => {
+    const n = parseFloat(raw.replace(',', '.'));
+    return Number.isFinite(n) && n > 0 ? n : NaN;
+  };
+
+  // M1-audytor-generalny-005: edycja parametrów w GongfuSessionSetup synchronizuje obiekt session
+  // (w tym przeliczenie kofeiny dla już zapisanych infuzji), żeby podgląd i zapis do SQLite były spójne.
+  const handleSelectTeaType = (nextType: GongfuTeaType) => {
+    setTeaType(nextType);
+    setSession((prev) => ({ ...prev, teaType: nextType, updatedAt: new Date().toISOString() }));
+  };
+
+  const handleChangeTeaName = (nextName: string) => {
+    setTeaName(nextName);
+    setSession((prev) => ({ ...prev, teaName: nextName, updatedAt: new Date().toISOString() }));
+  };
+
+  const handleChangeLeafDose = (nextDose: string) => {
+    setLeafDoseGrams(nextDose);
+    const parsed = parsePositiveNumber(nextDose);
+    if (!Number.isNaN(parsed)) {
+      setSession((prev) => {
+        const totalLeafCaffeine = estimateTotalLeafCaffeineMg(parsed);
+        const recalculatedInfusions = prev.infusions.map((inf) => ({
+          ...inf,
+          caffeineMg: estimateTeaInfusionCaffeineMg(totalLeafCaffeine, inf.infusionNumber),
+        }));
+        const totalCaffeineMg = Number(
+          recalculatedInfusions.reduce((sum, inf) => sum + inf.caffeineMg, 0).toFixed(1)
+        );
+        return {
+          ...prev,
+          leafDoseGrams: parsed,
+          infusions: recalculatedInfusions,
+          totalCaffeineMg,
+          updatedAt: new Date().toISOString(),
+        };
+      });
+    }
+  };
+
+  const handleChangeVesselCapacity = (nextVessel: string) => {
+    setVesselCapacityMl(nextVessel);
+    const parsed = parsePositiveNumber(nextVessel);
+    if (!Number.isNaN(parsed)) {
+      setSession((prev) => ({
+        ...prev,
+        vesselCapacityMl: parsed,
+        infusions: prev.infusions.map((inf) => ({ ...inf, waterGrams: parsed })),
+        updatedAt: new Date().toISOString(),
+      }));
+    }
+  };
+
+  const handleChangeWaterTemp = (nextTemp: string) => {
+    setWaterTempCelsius(nextTemp);
+    const parsed = parsePositiveNumber(nextTemp);
+    if (!Number.isNaN(parsed)) {
+      setSession((prev) => ({ ...prev, waterTempCelsius: parsed, updatedAt: new Date().toISOString() }));
+    }
+  };
+
   const handleRecordCurrentInfusion = () => {
     targetEndMsRef.current = null;
     const early = endedEarlySecondsRef.current;
     endedEarlySecondsRef.current = null;
     const actualSteep = early ?? (targetSeconds - remainingSeconds > 0 ? targetSeconds - remainingSeconds : targetSeconds);
-    const updated = recordGongfuInfusion(session, {
+    const parsedDose = parsePositiveNumber(leafDoseGrams);
+    const parsedVessel = parsePositiveNumber(vesselCapacityMl);
+    const parsedTemp = parsePositiveNumber(waterTempCelsius);
+    const syncedSession: GongfuSession = {
+      ...session,
+      leafDoseGrams: Number.isNaN(parsedDose) ? session.leafDoseGrams : parsedDose,
+      vesselCapacityMl: Number.isNaN(parsedVessel) ? session.vesselCapacityMl : parsedVessel,
+      waterTempCelsius: Number.isNaN(parsedTemp) ? session.waterTempCelsius : parsedTemp,
+    };
+    const updated = recordGongfuInfusion(syncedSession, {
       durationSeconds: actualSteep,
-      waterTempCelsius: parseFloat(waterTempCelsius) || 96,
+      waterTempCelsius: Number.isNaN(parsedTemp) ? syncedSession.waterTempCelsius : parsedTemp,
       tasteRating: currentRating,
       notes: currentNotes.trim() || undefined,
     });
@@ -229,6 +302,7 @@ export default function GongfuScreen() {
       onConfirm: () => {
         // M1-audytor-generalny-008: zła liczba blokuje zapis (DataValidationError → komunikat w runSave), bez 7 g / 96 °C.
         const doseNum = parseFloat(leafDoseGrams.replace(',', '.'));
+        const vesselNum = parseFloat(vesselCapacityMl.replace(',', '.'));
         const totalDuration = session.infusions.reduce((sum, inf) => sum + inf.durationSeconds, 0);
 
         // M1-audytor-generalny-007: sesja, log kofeiny i odliczenie wagi w jednej transakcji; błąd = komunikat, ekran zostaje.
@@ -239,7 +313,7 @@ export default function GongfuScreen() {
           beverageType: 'TEA',
           method: 'GONGFU',
           doseGrams: doseNum,
-          waterGrams: session.vesselCapacityMl,
+          waterGrams: vesselNum,
           waterTempCelsius: parseFloat(waterTempCelsius.replace(',', '.')),
           totalTimeSeconds: totalDuration,
           flavorTags: ['Gongfu Cha', formatTemplate(t.gongfu.infusionCountTag, { count: session.infusions.length })],
@@ -301,15 +375,15 @@ export default function GongfuScreen() {
       >
         <GongfuSessionSetup
           teaType={teaType}
-          onSelectTeaType={setTeaType}
+          onSelectTeaType={handleSelectTeaType}
           teaName={teaName}
-          onChangeTeaName={setTeaName}
+          onChangeTeaName={handleChangeTeaName}
           leafDoseGrams={leafDoseGrams}
-          onChangeLeafDose={setLeafDoseGrams}
+          onChangeLeafDose={handleChangeLeafDose}
           vesselCapacityMl={vesselCapacityMl}
-          onChangeVesselCapacity={setVesselCapacityMl}
+          onChangeVesselCapacity={handleChangeVesselCapacity}
           waterTempCelsius={waterTempCelsius}
-          onChangeWaterTemp={setWaterTempCelsius}
+          onChangeWaterTemp={handleChangeWaterTemp}
           unitSystem={unitSystem}
           language={language}
           t={t}

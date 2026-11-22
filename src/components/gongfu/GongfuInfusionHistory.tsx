@@ -25,7 +25,8 @@ export const GongfuInfusionHistory: React.FC<GongfuInfusionHistoryProps> = ({
   t,
 }) => {
   const isEn = language === 'en';
-  const leafDose = parseFloat(leafDoseGrams) || 7;
+  const parsedDose = parseFloat(leafDoseGrams.replace(',', '.'));
+  const leafDose = Number.isFinite(parsedDose) && parsedDose > 0 ? parsedDose : session.leafDoseGrams;
   const totalLeafCaffeine = estimateTotalLeafCaffeineMg(leafDose);
   const nextInfusionCaffeine = totalLeafCaffeine > 0
     ? estimateTeaInfusionCaffeineMg(totalLeafCaffeine, nextInfusionNum)
