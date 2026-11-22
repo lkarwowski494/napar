@@ -81,6 +81,7 @@ jest.mock('expo-router', () => ({
     back: jest.fn(),
     navigate: mockRouterNavigate,
   }),
+  useFocusEffect: jest.fn(),
 }));
 
 const findPressableWithText = (root: any, text: string) => {

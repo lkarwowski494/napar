@@ -2889,6 +2889,99 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
     });
     jest.restoreAllMocks();
   });
+
+  test('M1-audytor-generalny-010: AppErrorBoundary przechwytuje błąd renderowania, pokazuje kontakt i ponowienie oraz jest podpięty w _layout.tsx', () => {
+    const { AppErrorBoundary } = require('../src/components/AppErrorBoundary');
+    const { Text } = require('react-native');
+    const layoutSrc = readFileSync(join(root, 'app/_layout.tsx'), 'utf8');
+    expect(layoutSrc).toContain('AppErrorBoundary');
+
+    let shouldThrow = true;
+    const Boom = () => {
+      if (shouldThrow) throw new Error('boom');
+      return <Text testID="recovered-child">OK</Text>;
+    };
+
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      let tree: any;
+      act(() => {
+        tree = renderer.create(
+          <AppErrorBoundary language="pl">
+            <Boom />
+          </AppErrorBoundary>
+        );
+      });
+      const serialized = JSON.stringify(tree.toJSON());
+      expect(serialized).toContain('support@apps4brew.com');
+      expect(serialized).toContain(translations.pl.common.errorBoundaryTitle);
+
+      shouldThrow = false;
+      const retryBtn = tree.root.findByProps({ testID: 'error-boundary-retry-btn' });
+      act(() => {
+        retryBtn.props.onPress();
+      });
+      expect(tree.root.findByProps({ testID: 'recovered-child' })).toBeDefined();
+      act(() => tree.unmount());
+    } finally {
+      consoleSpy.mockRestore();
+    }
+  });
+
+  test('M1-audytor-generalny-010: Share.share i Linking.openURL obsługują odrzucone promisy przez Alert bez nieobsłużonego błędu', async () => {
+    const { Alert, Share } = require('react-native');
+    const Linking = require('expo-linking');
+    const { ShareRecipeModal } = require('../src/components/brew/ShareRecipeModal');
+    const { MASTER_RECIPES } = require('../src/core/recipes-data');
+    const SettingsScreen = require('../app/settings').default;
+
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    const shareSpy = jest.spyOn(Share, 'share').mockRejectedValue(new Error('share unavailable'));
+    const linkSpy = jest.spyOn(Linking, 'openURL').mockRejectedValue(new Error('cannot open url'));
+
+    let shareTree: any;
+    let settingsTree: any;
+    act(() => {
+      shareTree = renderer.create(
+        <ShareRecipeModal
+          visible
+          onClose={() => {}}
+          recipe={MASTER_RECIPES[0]}
+          shareUrl="napar://recipe/test"
+          waterTempCelsius={93}
+          unitSystem="metric"
+          t={translations.pl}
+          language="pl"
+        />
+      );
+      settingsTree = renderer.create(<SettingsScreen />);
+    });
+
+    const shareBtn = shareTree.root.findByProps({ testID: 'share-link-btn' });
+    await act(async () => {
+      shareBtn.props.onPress();
+      await Promise.resolve();
+    });
+    expect(shareSpy).toHaveBeenCalled();
+    expect(alertSpy).toHaveBeenCalledWith(translations.pl.common.shareErrorTitle, translations.pl.common.shareErrorDesc);
+
+    const privacyRow = settingsTree.root.findAll(
+      (n: any) => n.props.accessibilityRole === 'link' && typeof n.props.onPress === 'function'
+    )[0];
+    await act(async () => {
+      privacyRow.props.onPress();
+      await Promise.resolve();
+    });
+    expect(linkSpy).toHaveBeenCalled();
+    expect(alertSpy).toHaveBeenCalledWith(translations.pl.common.openLinkErrorTitle, translations.pl.common.openLinkErrorDesc);
+
+    act(() => {
+      shareTree.unmount();
+      settingsTree.unmount();
+    });
+    jest.restoreAllMocks();
+  });
 });
+
 
 

@@ -83,13 +83,22 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
               accessibilityLabel={t.brew.qrShareLink}
               accessibilityHint={t.brew.qrShareLinkHint}
               onPress={() => {
-                Share.share({
-                  title: recipe.name,
-                  message: language === 'en'
-                    ? `${recipe.name} — brew recipe in Napar:\n${shareUrl}`
-                    : `${recipe.name} — receptura parzenia w Napar:\n${shareUrl}`,
-                  url: shareUrl,
-                });
+                try {
+                  const sharePromise = Share.share({
+                    title: recipe.name,
+                    message: language === 'en'
+                      ? `${recipe.name} — brew recipe in Napar:\n${shareUrl}`
+                      : `${recipe.name} — receptura parzenia w Napar:\n${shareUrl}`,
+                    url: shareUrl,
+                  });
+                  if (sharePromise && typeof sharePromise.catch === 'function') {
+                    sharePromise.catch(() => {
+                      Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+                    });
+                  }
+                } catch {
+                  Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+                }
               }}
             >
               <Text style={styles.shareActionBtnText}>

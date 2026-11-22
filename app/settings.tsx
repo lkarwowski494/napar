@@ -215,6 +215,19 @@ export default function SettingsScreen({
     }
   };
 
+  const openExternalUrl = (url: string) => {
+    try {
+      const openPromise = Linking.openURL(url);
+      if (openPromise && typeof (openPromise as Promise<unknown>).catch === 'function') {
+        (openPromise as Promise<unknown>).catch(() => {
+          Alert.alert(t.common.openLinkErrorTitle, t.common.openLinkErrorDesc);
+        });
+      }
+    } catch {
+      Alert.alert(t.common.openLinkErrorTitle, t.common.openLinkErrorDesc);
+    }
+  };
+
   return (
     <ScrollView testID={screenTestID} style={styles.container} contentContainerStyle={styles.content}>
 
@@ -306,7 +319,7 @@ export default function SettingsScreen({
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
-          onPress={() => Linking.openURL(privacyPolicyUrl(language === 'en' ? 'en' : 'pl'))}
+          onPress={() => openExternalUrl(privacyPolicyUrl(language === 'en' ? 'en' : 'pl'))}
           accessibilityRole="link"
           accessibilityLabel={t.settings.privacyLabel || (language === 'pl' ? 'Polityka Prywatności' : 'Privacy Policy')}
         >
@@ -316,7 +329,7 @@ export default function SettingsScreen({
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
-          onPress={() => Linking.openURL(TERMS_URL)}
+          onPress={() => openExternalUrl(TERMS_URL)}
           accessibilityRole="link"
           accessibilityLabel={t.settings.eulaLabel || (language === 'pl' ? 'Regulamin (EULA)' : 'Terms of Service (EULA)')}
         >
@@ -326,7 +339,7 @@ export default function SettingsScreen({
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
-          onPress={() => Linking.openURL(supportEmail ? supportMailtoUrl(supportEmail) : SUPPORT_URL)}
+          onPress={() => openExternalUrl(supportEmail ? supportMailtoUrl(supportEmail) : SUPPORT_URL)}
           accessibilityRole="link"
           accessibilityLabel={language === 'pl' ? 'Kontakt i Wsparcie' : 'Contact & Support'}
         >
@@ -353,7 +366,7 @@ export default function SettingsScreen({
           <View style={styles.divider} />
           <Pressable
             style={styles.infoRow}
-            onPress={() => Linking.openURL(appStoreReviewUrl(storeId))}
+            onPress={() => openExternalUrl(appStoreReviewUrl(storeId))}
             accessibilityRole="link"
             accessibilityLabel={language === 'pl' ? 'Oceń w App Store' : 'Rate in App Store'}
           >

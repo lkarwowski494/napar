@@ -182,10 +182,19 @@ export default function JournalScreen() {
     if (session.notes) lines.push(formatTemplate(j.shareNotes, { notes: session.notes }));
     const shareMessage = `${lines.filter(Boolean).join('\n')}\n\n${j.shareFooter}`;
 
-    Share.share({
-      title: formatTemplate(j.shareTitle, { title }),
-      message: shareMessage,
-    });
+    try {
+      const sharePromise = Share.share({
+        title: formatTemplate(j.shareTitle, { title }),
+        message: shareMessage,
+      });
+      if (sharePromise && typeof sharePromise.catch === 'function') {
+        sharePromise.catch(() => {
+          Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+        });
+      }
+    } catch {
+      Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+    }
   };
 
   const formatDateTime = (iso: string) => {

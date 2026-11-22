@@ -13,6 +13,7 @@ import { BrewProvider } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
 import { crashLoopGuard, recordStartupSuccess } from '../src/data/startup-guard';
 import { SafeModeView, type SafeModeReason } from '../src/components/SafeModeView';
+import { AppErrorBoundary } from '../src/components/AppErrorBoundary';
 import { openDatabaseAtStartup, setDefaultUnitSystem } from '../src/data/database';
 import { regionUnitSystem } from '../lib/region-units';
 
@@ -150,13 +151,15 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <LanguageProvider>
-        <BrewProvider>
-          <StatusBar barStyle="light-content" />
-          <StartupSuccessNotifier />
-          <RootStack />
-        </BrewProvider>
-      </LanguageProvider>
+      <AppErrorBoundary>
+        <LanguageProvider>
+          <BrewProvider>
+            <StatusBar barStyle="light-content" />
+            <StartupSuccessNotifier />
+            <RootStack />
+          </BrewProvider>
+        </LanguageProvider>
+      </AppErrorBoundary>
     </SafeAreaProvider>
   );
 }
