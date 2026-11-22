@@ -51,3 +51,12 @@
   2. Wybór jednostek jest trwale zapamiętywany w lokalnej bazie danych SQLite (`app_settings`).
   3. Wszystkie ekrany aplikacji (Asystent Parzenia, Spiżarnia, Dziennik, Kalkulatory) respektują wybrany układ jednostek.
 * **Priorytet:** MUST | **Etap:** MVP
+
+### **BR-OCEN-001: Nieinwazyjna prośba o ocenę w App Store z ekranu Ustawień (F-41, M1-016)**
+* **Opis:** Użytkownik może dobrowolnie przejść do karty aplikacji w App Store w celu wystawienia oceny z poziomu ekranu Ustawień, bez natrętnych wyskakujących okien przerywających parzenie.
+* **Persona:** Michał (P1), Karolina (P2).
+* **Kryteria akceptacji:**
+  1. Link oceny w App Store (`appStoreReviewUrl`) jest widoczny w Ustawieniach wyłącznie po skonfigurowaniu poprawnego identyfikatora aplikacji w App Store (bez martwych linków w buildach przed publikacją).
+  2. Kliknięcie otwiera systemową kartę recenzji w App Store (`Linking.openURL`) z bezpieczną obsługą błędu, gdy sklep jest niedostępny.
+  3. Aplikacja nie przerywa sesji parzenia automatycznymi monitami o ocenę.
+* **Priorytet:** SHOULD | **Etap:** MVP

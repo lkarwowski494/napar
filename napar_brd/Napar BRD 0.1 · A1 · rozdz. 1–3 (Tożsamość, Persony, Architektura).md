@@ -71,3 +71,12 @@ Analiza ponad 3 500 recenzji czołowych aplikacji baristycznych i herbacianych w
   - *Profil:* Używa iPhone'a wyłącznie przez VoiceOver. Kocha dobrą kawę z ekspresu przelewowego Moccamaster i Aeropressu.
   - *Ból:* Aplikacje z zegarami graficznymi są całkowicie nieczytelne dla czytnika ekranu.
   - *Cel:* Pełna dostępność semantyczna, komunikaty głosowe o etapach parzenia i potwierdzenia haptyczne.
+
+---
+
+### **3.2 Kontekst fizyczny użycia — kuchnia (M1-016)**
+
+Aplikacja jest używana przede wszystkim przy blacie kuchennym, w trakcie aktywnego parzenia:
+- **Wrzątek (90–100 °C) i czajnik typu gooseneck:** jedna ręka użytkownika jest zajęta trzymaniem gorącego czajnika i kontrolowaniem strumienia wody — nie ma możliwości precyzyjnego celowania w małe ikony ani czytania długich opisów.
+- **Mokre ręce i para wodna:** ekran dotykowy może być wilgotny; cele dotykowe muszą mieć $\ge 44\,\text{pt}$ (w kluczowych kontrolkach stopera $\ge 48\text{–}56\,\text{pt}$), a główne CTA startu parzenia musi być widoczne bez przewijania.
+- **Praca obok wagi kuchennej:** telefon leży na blacie obok wagi z wyświetlaczem w gramach (lub uncjach) w odległości 40–100 cm od oczu — czas, cel masy wody i numer kroku muszą być czytelne z jednego spojrzenia (`tabular-nums`, kontrast $\ge 4,5:1$) przy zablokowanym wygaszaniu ekranu (`Awake Mode`) oraz z sygnałem dźwiękowym i haptycznym na pierwszym planie.

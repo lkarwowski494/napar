@@ -54,26 +54,26 @@
 ---
 
 ### **RD-05: Matematyka remineralizacji wody Barista Hustle i suchych soli**
-* **Poziom pewności:** **CHEMIA / STANDARD** (Matt Perger, Barista Hustle Water Recipes).
+* **Poziom pewności:** **CHEMIA / STANDARD** (Matt Perger, Barista Hustle Water Recipes, `[T:BH-WATER-2016]`).
 * **Definicja reguły:** Precyzyjne dozowanie minerałów do chemicznie czystej wody (destylowanej lub po odwróconej osmozie RO o przewodności $< 5\,\mu\text{S/cm}$):
-  1. **System Koncentratów Płynnych (Barista Hustle):**
-     - *Butelka Bufora (Buffer A):* Rozpuszczenie $1.68\,\text{g NaHCO}_3$ w $500\,\text{g}$ wody demineralizowanej.
-     - *Butelka Magnezu (Hardness B):* Rozpuszczenie $2.45\,\text{g MgSO}_4\cdot 7\text{H}_2\text{O}$ w $500\,\text{g}$ wody demineralizowanej.
+  1. **System Koncentratów Płynnych (Barista Hustle — poprawka M1-016, spójna z `src/core/water-chemistry.ts` i B2):**
+     - *Butelka Bufora (Buffer A):* Rozpuszczenie $1.68\,\text{g NaHCO}_3$ w **$1\,\text{L}$** wody demineralizowanej ($\approx 1000\,\text{ppm}$ jako $\text{CaCO}_3$; $1\,\text{g}$ koncentratu na $1\,\text{L}$ gotowej wody $= 1\,\text{ppm } KH$).
+     - *Butelka Magnezu (Hardness B):* Rozpuszczenie $2.45\,\text{g MgSO}_4\cdot 7\text{H}_2\text{O}$ w **$1\,\text{L}$** wody demineralizowanej ($\approx 1000\,\text{ppm}$ jako $\text{CaCO}_3$; $1\,\text{g}$ koncentratu na $1\,\text{L}$ gotowej wody $= 1\,\text{ppm } GH$).
      - *Wzór przeliczeniowy:*
-       $$\text{Masa Bufora A (g)} = \frac{KH_{\text{target}}}{2.0} \times V_{\text{woda (L)}}$$
-       $$\text{Masa Magnezu B (g)} = \frac{GH_{\text{target}}}{2.0} \times V_{\text{woda (L)}}$$
+       $$\text{Masa Bufora A (g)} = KH_{\text{target}} \times V_{\text{woda (L)}}$$
+       $$\text{Masa Magnezu B (g)} = GH_{\text{target}} \times V_{\text{woda (L)}}$$
   2. **Bezpośrednie odważanie soli suchych:**
      - $\text{Masa NaHCO}_3\text{ (g)} = KH_{\text{target}} \times 0.00168 \times V_{\text{woda (L)}}$
-     - $\text{Masa MgSO}_4\cdot 7\text{H}_2\text{O}\text{ (g)} = GH_{\text{target}} \times 0.002465 \times V_{\text{woda (L)}}$
+     - $\text{Masa MgSO}_4\cdot 7\text{H}_2\text{O}\text{ (g)} = GH_{\text{target}} \times 0.00245 \times V_{\text{woda (L)}}$
      - $\text{Masa CaCl}_2\cdot 2\text{H}_2\text{O}\text{ (g)} = GH_{\text{target}} \times 0.00147 \times V_{\text{woda (L)}}$
 * **Wektory testowe:**
   - *Wejście:* Receptura Barista Hustle 80/40 ($GH = 80$, $KH = 40$), Objętość $V = 1.0\,\text{L}$.
-    - *Bufor A:* $(40 / 2) \times 1 = 20.0\,\text{g}$.
-    - *Magnez B:* $(80 / 2) \times 1 = 40.0\,\text{g}$.
+    - *Bufor A:* $40 \times 1 = 40.0\,\text{g}$.
+    - *Magnez B:* $80 \times 1 = 80.0\,\text{g}$.
   - *Wejście:* Baniak 5L ($V = 5.0\,\text{L}$), Receptura 80/40:
-    - *Bufor A:* $100.0\,\text{g}$, *Magnez B:* $200.0\,\text{g}$.
+    - *Bufor A:* $200.0\,\text{g}$, *Magnez B:* $400.0\,\text{g}$.
     - *Suche NaHCO3:* $40 \times 0.00168 \times 5 = 0.336\,\text{g}$.
-    - *Suchy MgSO4:* $80 \times 0.002465 \times 5 = 0.986\,\text{g}$.
+    - *Suchy MgSO4:* $80 \times 0.00245 \times 5 = 0.980\,\text{g}$.
 
 ---
 

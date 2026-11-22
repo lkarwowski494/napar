@@ -40,3 +40,12 @@
   4. Chmura najczęstszych nut smakowych z hierarchicznego koła smaków SCA.
   5. Rozkład balansu w filiżance: zbalansowana, za kwaśna (niedoparzenie), za gorzka (przeparzenie), wodnista (kanałowanie/niski TDS).
 * **Priorytet:** SHOULD | **Etap:** MVP
+
+### **BR-DZIEN-006: Udostępnianie wpisu dziennika jako notatki degustacyjnej (F-33, M1-016)**
+* **Opis:** Użytkownik może udostępnić dowolny zapisany wpis z Dziennika jako czytelny tekst notatki degustacyjnej przez systemowy arkusz udostępniania (`Share.share`), bez konieczności zakładania konta ani korzystania z chmury.
+* **Persona:** Michał (P1), Karolina (P2).
+* **Kryteria akceptacji:**
+  1. Karta wpisu w Dzienniku zawiera przycisk udostępniania z etykietą dostępności i celem dotykowym $\ge 44\,\text{pt}$.
+  2. Udostępniany tekst jest generowany w aktywnym języku interfejsu (PL / EN), z temperaturą w wybranym układzie jednostek (°C / °F) oraz zlokalizowanymi tagami smakowymi z koła smaków SCA.
+  3. Udostępnianie działa w 100% lokalnie bez wysyłania danych na serwery zewnętrzne.
+* **Priorytet:** SHOULD | **Etap:** MVP

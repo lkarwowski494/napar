@@ -51,3 +51,14 @@ Większość początkujących domowych baristów rezygnuje z parzenia specialty 
 3. **Kolejne zalanie Gongfu jest wodniste:**
    - *Przyczyna:* Wyczerpywanie się substancji rozpuszczalnych.
    - *Rekomendacja:* Zwiększ czas kolejnego parzenia o +15–20 sekund.
+
+---
+
+### **BR-DIAL-001: Deterministyczny Dial-in Doctor — korekta jednego parametru (F-19, M1-016)**
+* **Opis:** Po ocenie smaku naparu (kwaśna, gorzka, wodnista/słaba, zbalansowana) w oknie zapisu parzenia oraz w zakładce Warsztat → Doctor, aplikacja podaje jedną konkretną, deterministyczną korektę kolejnego parzenia (mielenie, temperatura albo czas/proporcja), bez użycia LLM ani połączenia sieciowego.
+* **Persona:** Michał (P1), Karolina (P2).
+* **Kryteria akceptacji:**
+  1. W oknie zapisu sesji (`BrewFinishModal`) wybór balansu smaku natychmiast wyświetla jedną zwięzłą poradę korekcyjną w języku interfejsu (PL / EN) z temperaturą w aktywnych jednostkach (°C / °F).
+  2. Ekran główny Parzenie prezentuje stałe wskazówki korekcyjne (`BrewBanners`), a zakładka Warsztat → Doctor umożliwia pełną diagnozę dla kawy i herbaty w trybie offline.
+  3. Reguły są w 100% deterministyczne i powtarzalne (brak wywołań sieciowych i modeli generatywnych, zgodnie z ZP-05 i KILL-03).
+* **Priorytet:** MUST | **Etap:** MVP

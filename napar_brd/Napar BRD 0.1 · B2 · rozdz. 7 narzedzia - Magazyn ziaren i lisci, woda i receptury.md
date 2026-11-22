@@ -143,3 +143,12 @@
   3. Obsługa natywnego udostępniania systemowego iOS/Android (`Share.share`) oraz kopiowania linku do schowka.
   4. Wbudowany w asystencie modal importu z wklejaniem linku lub skanem QR, natychmiastowym podglądem parametrów i kroków oraz opcją jednoklikowego zapisu do lokalnej bazy danych SQLite użytkownika.
 * **Priorytet:** MUST | **Etap:** MVP
+
+### **BR-MAG-006: Kreator własnych przepisów wieloetapowych (F-22, M1-016)**
+* **Opis:** Użytkownik może tworzyć, edytować i duplikować własne receptury kawy i herbaty z pełną listą kroków (nazwa etapu, docelowa masa wody, czas trwania, instrukcja), a następnie parzyć według nich w asystencie tak samo jak według receptur z biblioteki bazowej.
+* **Persona:** Michał (P1), Karolina (P2).
+* **Kryteria akceptacji:**
+  1. Kreator jest dostępny z wyboru receptury na ekranie Parzenie (nowa receptura lub edycja istniejącej własnej receptury).
+  2. Użytkownik definiuje nazwę, metodę, rodzaj napoju, dozę, wodę, temperaturę oraz dowolną listę kroków parzenia; zapis zachowuje recepturę w lokalnej bazie SQLite (`recipes`) bez utraty flagi ulubionej i daty utworzenia przy edycji.
+  3. Zapisana receptura pojawia się natychmiast na liście wyboru przepisów i współpracuje z przelicznikiem proporcji, stoperem oraz udostępnianiem QR / linkiem.
+* **Priorytet:** MUST | **Etap:** MVP

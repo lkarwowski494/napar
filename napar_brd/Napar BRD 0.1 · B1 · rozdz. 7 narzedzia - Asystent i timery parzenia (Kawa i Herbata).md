@@ -61,3 +61,12 @@
   2. Asystent parzenia w czasie rzeczywistym przelicza optymalną grubość przemiału dla wybranej metody i receptury (na bazie docelowej wielkości cząstek w mikronach µm) i wyświetla rekomendowaną liczbę klików / nastawę (np. dla V60: 720 µm -> 24 kliki Comandante, 21 klików Timemore, 7.2 1Zpresso, 5.1 Fellow Ode).
   3. Kliknięcie w pigułkę młynka na ekranie głównym otwiera modal szybkiej zmiany młynka z podglądem przeliczenia dla wszystkich wspieranych modeli.
 * **Priorytet:** MUST | **Etap:** MVP
+
+### **BR-ONB-001: Pierwsze uruchomienie, preferencja napoju i przewodnik aplikacji (F-26, M1-016)**
+* **Opis:** Przy pierwszym uruchomieniu aplikacja zadaje jedno pytanie o preferowany napój („Kawa”, „Herbata” albo „Oba”), dostosowując domyślny widok ekranu Parzenie, Spiżarni i Dziennika bez tworzenia konta ani długiego kreatora. Użytkownik może później zmienić preferencję oraz ponownie otworzyć przewodnik „Jak działa aplikacja?” z ekranu Ustawień.
+* **Persona:** Michał (P1), Karolina (P2), Ewa (P4).
+* **Kryteria akceptacji:**
+  1. Przy pierwszym uruchomieniu wyświetla się modal z trzema opcjami wyboru napoju (`coffee`, `tea`, `both`) i przyciskiem zatwierdzenia prowadzącym bezpośrednio na ekran Parzenie.
+  2. Wybrana preferencja jest zapisywana lokalnie w SQLite (`app_settings`) i można ją w każdej chwili zmienić w Ustawieniach; w trybie „Oba” na ekranie Parzenie dostępny jest przełącznik Kawa / Herbata.
+  3. W Ustawieniach dostępny jest przycisk otwierający przewodnik „Jak działa aplikacja?” (`AppGuideModal`) w wybranym języku (PL / EN).
+* **Priorytet:** MUST | **Etap:** MVP
