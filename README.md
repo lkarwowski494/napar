@@ -23,10 +23,10 @@ Aplikacja mobilna dla miłośników kawy specialty i rzemieślniczej herbaty li�
    - **1-Tap Szybki Start (`BrewQuickPrepCard`):** Karta „Do drippera na wagę” z dużymi stepperami dozy (wysokość 44–52pt), wskaźnikiem wody, temperatury i natychmiastowym rozpoczęciem sesji poniżej 15 sekund.
    - **Batch Scaling (👥 Porcje 1–4 osób):** Automatyczne przeliczanie dozy i wody wraz z dynamiczną rekomendacją przemiału (`+2 kliki grubiej`).
    - **Kroki parzenia (`ProcedureModal`, jeden ekran prowadzenia — DEC-13 a):** „Pokaż kroki parzenia” otwiera bieżący krok na pełnym ekranie w stanie „gotowy”; stoper rusza dopiero po „Rozpocznij parzenie”. W trakcie: duży zegar kroku, korekty `-1 min` / `-10 s` / `+10 s` / `+1 min`, pauza i wznowienie, a po wstrzymaniu Reset i Zapisz.
-   - **Karta Degustacyjna & Dial-in Doctor (`BrewFinishModal`):** 1-klikowa autodiagnoza smaku (kwasowość, gorycz, wodnistość) z natychmiastową receptą ratunkową oraz podsumowaniem **Ekonomii Rzemiosła** (koszt domowy vs 18 zł w kawiarni specialty).
+   - **Karta Degustacyjna & Dial-in Doctor (`BrewFinishModal`):** 1-klikowa autodiagnoza smaku (kwasowość, gorycz, wodnistość) z natychmiastową receptą ratunkową oraz zapisem notatek sensorycznych.
    - **Wymiana Receptur Offline (Kody QR SVG & Deep Linki `napar://`):** Szybkie skanowanie aparatem i udostępnianie receptur w 100% offline.
 2. **🫘 Spiżarnia Ziaren & Liści (Stash) & Kompendium Wiedzy:**
-   - Śledzenie świeżości ziaren kawy (okno *Resting Window*: odgazowywanie CO₂, szczyt smaku *Peak*, stabilne okno, dojrzałe ziarna).
+   - Śledzenie daty palenia i liczby dni od wypału, wagi pozostałej w paczce oraz nut sensorycznych.
    - **✏️ Edycja Paczki & Szybkie Steppery Wagowe (BR-MAG-001):** Pełny modal edycji metadanych paczki (odmiana botaniczna, proces obróbki, data palenia, waga) oraz przyciski szybkiej korekty (`-15 g`, `-18 g`, `+15 g`, `0 g`).
    - **⚠️ Archiwizacja Pustych Paczek (BR-MAG-004):** Automatyczny baner na karcie paczki po osiągnięciu 0 g z 1-tap archiwizacją oraz trwałym usuwaniem z potwierdzeniem.
    - Dynamiczny ubytek wagi w paczce po każdym parzeniu.
@@ -141,7 +141,7 @@ napar/
 │   └── (tabs)/
 │       ├── _layout.tsx         # Dolny pasek 5 zakładek
 │       ├── index.tsx           # Zdekomponowany Asystent Parzenia Kitchen-Proof
-│       ├── beans.tsx           # Spiżarnia Ziaren i Liści (Resting Window, Edycja)
+│       ├── beans.tsx           # Spiżarnia Ziaren i Liści (Data palenia, waga, Edycja)
 │       ├── journal.tsx         # Dziennik Degustacji, Oceny, Analityka i Parz Ponownie
 │       ├── dialin.tsx          # Dial-in Doctor, Kalkulatory Ratio, TDS/EY i Chemia Wody
 │       └── caffeine.tsx        # Monitor Kofeiny, Wykres Kinetyki i Kalkulator Snu
@@ -151,19 +151,18 @@ napar/
 │   │       ├── BrewHeader.tsx           # Kliki młynka na samej górze, wybór receptury i ziarna
 │   │       ├── BrewQuickPrepCard.tsx    # Karta 1-Tap "Do drippera na wagę", steppery 44-52pt
 │   │       ├── ProcedureModal.tsx       # Jedyny ekran prowadzenia: bieżący krok, stoper ruszający po „Rozpocznij parzenie”
-│   │       └── BrewFinishModal.tsx      # Arkusz degustacyjny, Dial-in Doctor i ekonomia
+│   │       └── BrewFinishModal.tsx      # Arkusz degustacyjny i Dial-in Doctor
 │   └── core/                   # Czysta logika biznesowa i persystencja
 │       ├── domain-rules.ts     # Deterministyczne reguły RD-01…RD-30
 │       ├── recipes-data.ts     # 24 wzorcowe receptury specialty i herbaty
 │       ├── knowledge-data.ts   # Kompendium wiedzy o odmianach, obróbkach, terroir i herbatach
 │       ├── water-chemistry.ts  # Profile wody Barista Hustle / SCA, kalkulator mineralizacji
-│       ├── cost-calculator.ts  # Ekonomia rzemiosła: kalkulator kosztów parzenia vs kawiarnia
 │       ├── timer-audio.ts      # Dźwięki minutnika: dzwonek akustyczny A4 440Hz i haptyka
 │       ├── backup.ts           # Apps4Brew SEC-09: 10 rotacyjnych kopii JSON i safetyBackup
 │       ├── db-path.ts          # Zabezpieczenie ścieżki bazy SQLite (/Library/SQLite)
 │       ├── QrScannerModal.tsx  # Natywny skaner kodów QR receptur aparatem (expo-camera)
 │       ├── database-schema.ts  # DDL i schemat SQLite
-│       ├── database.ts         # Klient expo-sqlite, repozytoria i licencja Pro
+│       ├── database.ts         # Klient expo-sqlite i repozytoria danych lokalnych
 │       ├── grinder-converter.ts# Baza modeli młynków i konwersja mikronów
 │       ├── recipe-share.ts     # Kodowanie receptur QR SVG i Deep Links
 │       ├── unit-converter.ts   # Dwukierunkowa konwersja jednostek Metric/Imperial

@@ -3101,7 +3101,28 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
     const plSection = termsHtml.split('<h2>4. Terms of Use')[0];
     expect(plSection).toMatch(/skonsultuj się z lekarzem/i);
   });
+
+  test('M1-audytor-generalny-014: brak nieaktualnych obietnic (g/s, kalendarz/.ics, Ekonomia Rzemiosła, Peak 7–35 dni) w docs, site i UI', () => {
+    const appStoreDoc = readFileSync(join(root, 'docs/15-app-store.md'), 'utf8');
+    const siteIndex = readFileSync(join(root, 'site/index.html'), 'utf8');
+    const privacyPl = readFileSync(join(root, 'site/privacy.html'), 'utf8');
+    const privacyEn = readFileSync(join(root, 'site/en/privacy.html'), 'utf8');
+    const readme = readFileSync(join(root, 'README.md'), 'utf8');
+    const kitchenDoc = readFileSync(join(root, 'docs/MONETIZATION_AND_KITCHEN_UX.md'), 'utf8');
+    const banners = readFileSync(join(root, 'src/components/brew/BrewBanners.tsx'), 'utf8');
+    const guide = readFileSync(join(root, 'src/components/AppGuideModal.tsx'), 'utf8');
+
+    expect(appStoreDoc).not.toMatch(/tempa zalewania|pacing indicators/i);
+    expect(siteIndex).not.toMatch(/tempem zalewania|\(g\/s\)/i);
+    expect(privacyPl).not.toMatch(/wpisu do kalendarza|\.ics/i);
+    expect(privacyEn).not.toMatch(/calendar entry|\.ics/i);
+    expect(readme).not.toMatch(/cost-calculator\.ts|Ekonomi[ai] Rzemiosła|Resting Window|licencja Pro/i);
+    expect(kitchenDoc).not.toMatch(/~g\/s|Ekonomii Rzemiosła/i);
+    expect(banners).not.toMatch(/Peak:\s*7–35/i);
+    expect(guide).not.toMatch(/Resting & Peak Window|Peak Window \(7–35|Peak \(7–35/i);
+  });
 });
+
 
 
 

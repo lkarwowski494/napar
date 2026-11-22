@@ -37,7 +37,7 @@ Napar to rzemieślniczy asystent parzenia kawy specialty i herbaty tradycyjnej, 
 KLUCZOWE FUNKCJE:
 
 • PRECYZYJNY STOPER ZALEWANIA (POUR-OVER & DRIP)
-Wieloetapowy asystent prowadzący przez każdy etap parzenia: od blooming (preinfuzji), przez kolejne zalania, aż po spływ. Wizualny wskaźnik masy wody i tempa zalewania w czasie rzeczywistym.
+Wieloetapowy asystent prowadzący przez każdy etap parzenia: od blooming (preinfuzji), przez kolejne zalania, aż po spływ. Wizualny wskaźnik docelowej masy wody i postępu każdego etapu w czasie rzeczywistym.
 
 • CEREMONIA HERBATY GONGFU CHA
 Dedykowany tracker wielokrotnych infuzji dla herbat wulong, puerh, zielonych, białych i czarnych. Automatyczna progresja czasu kolejnych zalań i notatki sensoryczne dla każdego naparu.
@@ -67,7 +67,7 @@ Napar is an artisanal companion for specialty coffee and traditional tea brewing
 KEY FEATURES:
 
 • PRECISION POUR-OVER & DRIP TIMER
-Multi-step guidance for every brewing stage: blooming, pulse pours, continuous pours, and drawdown. Real-time target water weight and pacing indicators.
+Multi-step guidance for every brewing stage: blooming, pulse pours, continuous pours, and drawdown. Real-time target water weight and stage progress indicators.
 
 • TRADITIONAL GONGFU CHA TEA CEREMONY
 Dedicated multi-infusion tracker for oolongs, pu-erhs, green, white, and black teas. Automatic steep duration progression and per-infusion sensory tasting logs.

@@ -90,15 +90,15 @@ export function AppGuideModal({
   const tabsInfo = isEn
     ? [
         { key: 'brew', Icon: BrewIcon, name: 'Brew', desc: 'Causal 1 → 2 → 3 → 4 brewing flow & Procedure Assistant.' },
-        { key: 'stash', Icon: BeansIcon, name: 'Stash', desc: 'Coffee & tea freshness tracker (Resting & Peak Window).' },
-        { key: 'journal', Icon: JournalIcon, name: 'Journal', desc: '14-day Proactive Calendar, 1-Tap Action Feed & tasting history.' },
+        { key: 'stash', Icon: BeansIcon, name: 'Stash', desc: 'Coffee beans & tea leaves pantry: roast date, remaining weight, and tasting notes.' },
+        { key: 'journal', Icon: JournalIcon, name: 'Journal', desc: 'Tasting history, SCA sensory radar & analytics.' },
         { key: 'dialin', Icon: LabIcon, name: 'Dial-in', desc: 'Taste defect compass, Ratio, TDS/EY% & SCA Water Chemistry.' },
         { key: 'settings', Icon: SettingsIcon, name: 'Settings', desc: 'Units, grinder model, language, and 100% offline JSON/CSV backup.' },
       ]
     : [
         { key: 'brew', Icon: BrewIcon, name: 'Parzenie', desc: 'Główny proces przyczynowo-skutkowy 1 → 2 → 3 → 4 i Asystent Procedury.' },
-        { key: 'stash', Icon: BeansIcon, name: 'Spiżarnia', desc: 'Śledzenie świeżości ziaren po wypale (Resting & Peak Window) oraz herbat.' },
-        { key: 'journal', Icon: JournalIcon, name: 'Dziennik', desc: '14-dniowy Kalendarz, Harmonogram Akcji 1-Tap oraz historia i analityka.' },
+        { key: 'stash', Icon: BeansIcon, name: 'Spiżarnia', desc: 'Paczki kawy i herbaty: data palenia, pozostała waga i nuty smakowe.' },
+        { key: 'journal', Icon: JournalIcon, name: 'Dziennik', desc: 'Historia degustacji, radar sensoryczny SCA i analityka.' },
         { key: 'dialin', Icon: LabIcon, name: 'Warsztat', desc: 'Kompas korekty smaku Dial-in Doctor, Ratio, TDS/EY% i Woda SCA.' },
         { key: 'settings', Icon: SettingsIcon, name: 'Ustawienia', desc: 'Jednostki, młynek domowy, język oraz lokalna kopia zapasowa JSON/CSV.' },
       ];
@@ -136,8 +136,8 @@ export function AppGuideModal({
               </Text>
               <Text style={styles.goldenRulesText}>
                 {isEn
-                  ? '• Sour / thin cup → Grind finer (-2 clicks) or raise water temp (+2°C).\n• Bitter / dry cup → Grind coarser (+2 clicks) or lower water temp (-2°C).\n• Always use freshly roasted beans in their Peak Window (7–35 days post-roast).'
-                  : '• Napar za kwaśny / wodnisty → Zmiel drobniej (-2 kliki) lub podnieś temp. (+2°C).\n• Napar za gorzki / ściągający → Zmiel grubiej (+2 kliki) lub obniż temp. (-2°C).\n• Parz ziarna w oknie szczytu świeżości Peak (7–35 dni po wypale).'}
+                  ? '• Sour / thin cup → Grind finer (-2 clicks) or raise water temp (+2°C).\n• Bitter / dry cup → Grind coarser (+2 clicks) or lower water temp (-2°C).'
+                  : '• Napar za kwaśny / wodnisty → Zmiel drobniej (-2 kliki) lub podnieś temp. (+2°C).\n• Napar za gorzki / ściągający → Zmiel grubiej (+2 kliki) lub obniż temp. (-2°C).'}
               </Text>
             </View>
 

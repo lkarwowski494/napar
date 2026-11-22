@@ -36,7 +36,7 @@ Główny ekran parzenia (`app/(tabs)/index.tsx`) został zdekomponowany na wyspe
    - Batch scaling dla 1–4 osób (`1 os.`, `2 os.`, `3 os.`, `4 os.`) z automatycznym przeliczaniem klików mielenia (`+2 kliki grubiej`).
 3. `BrewActiveFocusTimer`:
    - **Widoczność z 1 metra**: gigantyczny stoper cyfrowy (64pt tabular-nums).
-   - Wskaźnik aktualnego etapu z celem wody i sugerowanym przepływem `~g/s`.
+   - Wskaźnik aktualnego etapu z docelową masą wody i czasem etapu.
    - Pigułki natychmiastowej korekty czasu w locie: `-10s` i `+10s`.
    - Wielkie kontrolki dotykowe brudnego kciuka: `PAUZA`, `DALEJ ▶`, `◀ WSTECZ`, `RESET`, `WZNÓW`, `ZAPISZ` (wysokość $\ge 52\,\text{pt}$).
 4. `BrewProAccordion`:
@@ -47,7 +47,6 @@ Główny ekran parzenia (`app/(tabs)/index.tsx`) został zdekomponowany na wyspe
    - Kompleksowy arkusz po zakończeniu zalewania: ocena gwiazdkowa (★), balans smaku (`Zbalansowana`, `Za kwaśna`, `Za gorzka`, `Wodnista`).
    - **Dial-in Doctor**: 1-klikowa diagnoza i konkretna recepta (np. *„Za kwaśna? Zmiel drobniej o 2 kliki lub podnieś temp o +2°C”*).
    - Wykres radarowy SCA Spider Graph & Koło Smaków.
-   - Karta **Ekonomii Rzemiosła** (koszt naparu domowego vs 18 zł w kawiarni specialty). *[DO USTALENIA 2026-11-14, M1-audytor-generalny-019: cena bez źródła i daty — 02-monetyzacja-007]*
 
 ---
 

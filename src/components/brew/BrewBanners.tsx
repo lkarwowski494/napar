@@ -60,8 +60,8 @@ export const BrewBanners: React.FC<BrewBannersProps> = ({
       <View style={styles.goldenRulesBanner} testID="golden-rules-banner">
         <Text style={styles.goldenRulesBannerText} numberOfLines={2}>
           {language === 'en'
-            ? `Golden Rules: Sour/thin → grind finer (2 clicks) or raise temp ${formatTemperatureDelta(2, unitSystem)} · Bitter/dry → grind coarser (2 clicks) · Peak: 7–35d.`
-            : `Złote Zasady: Kwaśna/płaska → drobniej o 2 kliki lub wyższa temp. o ${formatTemperatureDelta(2, unitSystem)} · Gorzka/sucha → grubiej o 2 kliki · Peak: 7–35 dni.`}
+            ? `Golden Rules: Sour/thin → grind finer (2 clicks) or raise temp ${formatTemperatureDelta(2, unitSystem)} · Bitter/dry → grind coarser (2 clicks).`
+            : `Złote Zasady: Kwaśna/płaska → drobniej o 2 kliki lub wyższa temp. o ${formatTemperatureDelta(2, unitSystem)} · Gorzka/sucha → grubiej o 2 kliki.`}
         </Text>
       </View>
     </>
