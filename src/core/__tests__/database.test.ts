@@ -119,6 +119,9 @@ const mockDb: any = {
       }
       return rows;
     }
+    if (query.includes('FROM app_settings')) {
+      return (Array.from(mockDb.settings.entries()) as Array<[string, string]>).map(([key, value]) => ({ key, value }));
+    }
     return [];
   }),
   runSync: jest.fn((query: string, params?: any[]) => {
@@ -853,9 +856,12 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(mockDb.caffeine.has('caff-del-test')).toBe(false);
   });
 
-  test('importDataJson walidacja błędów: niepoprawny JSON oraz version !== 1', () => {
+  test('importDataJson walidacja błędów: niepoprawny JSON, version > 1 oraz version !== 1', () => {
     expect(() => importDataJson('invalid json string :::')).toThrow();
     expect(() => importDataJson(JSON.stringify({ version: 2 }))).toThrow(
+      'Kopia pochodzi z nowszej wersji aplikacji (v2)'
+    );
+    expect(() => importDataJson(JSON.stringify({ version: 0 }))).toThrow(
       'Nieprawidłowy format pliku kopii zapasowej'
     );
   });
@@ -2324,6 +2330,25 @@ describe('Napar SQLite Database & Repositories', () => {
       })
     ).toThrow('consumedAt');
   });
+
+  test('M1-audytor-generalny-007: round-trip exportAllDataJson -> importDataJson przywraca app_settings', () => {
+    setAppSetting('caffeine_half_life', '6.5');
+    setAppSetting('bedtime_hour', '22');
+    setAppSetting('unit_system', 'imperial');
+
+    const exported = exportAllDataJson();
+    mockDb.settings.clear();
+    expect(getAppSetting('caffeine_half_life')).toBe('');
+    expect(getAppSetting('bedtime_hour')).toBe('');
+    expect(getAppSetting('unit_system')).toBe('');
+
+    importDataJson(exported);
+
+    expect(getAppSetting('caffeine_half_life')).toBe('6.5');
+    expect(getAppSetting('bedtime_hour')).toBe('22');
+    expect(getAppSetting('unit_system')).toBe('imperial');
+  });
 });
+
 
 

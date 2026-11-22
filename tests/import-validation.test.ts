@@ -50,8 +50,28 @@ describe('import-validation (M1-audytor-generalny-006)', () => {
   test('kolekcje: sekcja nie-lista i brakujące sekcje', () => {
     expect(fieldOf(() => parseImportCollections({ sessions: {} }))).toBe('sessions');
     const empty: ParsedImport = parseImportCollections({});
-    expect(empty).toEqual({ inventory: [], customRecipes: [], sessions: [], caffeineLogs: [] });
+    expect(empty).toEqual({ inventory: [], customRecipes: [], sessions: [], caffeineLogs: [], settings: {} });
     expect(new ImportFieldError('a.b', 'liczby').message).toContain('„a.b”');
   });
+
+  test('M1-audytor-generalny-007: walidacja sekcji settings przy imporcie', () => {
+    const parsed = parseImportCollections({
+      settings: {
+        caffeine_half_life: '5.5',
+        bedtime_hour: 22,
+        voice_announce_enabled: false,
+        empty_val: null,
+        '   ': 'ignored',
+      },
+    });
+    expect(parsed.settings).toEqual({
+      caffeine_half_life: '5.5',
+      bedtime_hour: '22',
+      voice_announce_enabled: 'false',
+    });
+    expect(fieldOf(() => parseImportCollections({ settings: 'bad' }))).toBe('settings');
+    expect(fieldOf(() => parseImportCollections({ settings: { nested: { a: 1 } } }))).toBe('settings.nested');
+  });
 });
+
 

@@ -200,11 +200,27 @@ export function parseCaffeineLog(v: unknown, path: string): CaffeineLog {
   };
 }
 
+function parseSettings(v: unknown, field: string): Record<string, string> {
+  if (v === undefined || v === null) return {};
+  const o = obj(v, field);
+  const out: Record<string, string> = {};
+  for (const [k, val] of Object.entries(o)) {
+    if (val === undefined || val === null) continue;
+    if (typeof val !== 'string' && typeof val !== 'number' && typeof val !== 'boolean') {
+      throw new ImportFieldError(`${field}.${k}`, 'tekstu, liczby lub wartości tak/nie');
+    }
+    const cleanKey = k.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim();
+    if (cleanKey) out[cleanKey] = String(val);
+  }
+  return out;
+}
+
 export interface ParsedImport {
   inventory: InventoryItem[];
   customRecipes: SavedRecipe[];
   sessions: BrewSession[];
   caffeineLogs: CaffeineLog[];
+  settings: Record<string, string>;
 }
 
 /** Dane kopii (sekcja state/payload albo plik version: 1) → typowane listy; pierwszy zły rekord przerywa całość. */
@@ -215,5 +231,6 @@ export function parseImportCollections(data: unknown): ParsedImport {
     customRecipes: list(o.customRecipes, 'customRecipes').map((x, i) => parseSavedRecipe(x, `customRecipes[${i}]`)),
     sessions: list(o.sessions, 'sessions').map((x, i) => parseBrewSession(x, `sessions[${i}]`)),
     caffeineLogs: list(o.caffeineLogs, 'caffeineLogs').map((x, i) => parseCaffeineLog(x, `caffeineLogs[${i}]`)),
+    settings: parseSettings(o.settings, 'settings'),
   };
 }

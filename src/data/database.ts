@@ -1326,7 +1326,13 @@ export function importDataJson(jsonStr: string): void {
       throw new Error(`Kopia pochodzi z nowszej wersji aplikacji (v${ver}). Zaktualizuj aplikację.`);
     }
     collections = root.payload;
-  } else if (root.version === 1) {
+  } else if (typeof root.version === 'number' && Number.isFinite(root.version)) {
+    if (root.version > 1) {
+      throw new Error(`Kopia pochodzi z nowszej wersji aplikacji (v${root.version}). Zaktualizuj aplikację.`);
+    }
+    if (root.version !== 1) {
+      throw new Error('Nieprawidłowy format pliku kopii zapasowej (version !== 1)');
+    }
     collections = root;
   } else {
     throw new Error('Nieprawidłowy format pliku kopii zapasowej (version !== 1)');
@@ -1338,6 +1344,7 @@ export function importDataJson(jsonStr: string): void {
   const safeCustomRecipes = data.customRecipes;
   const safeSessions = data.sessions;
   const safeCaffeineLogs = data.caffeineLogs;
+  const safeSettings = data.settings;
 
   try {
     runInTransactionSync(db, () => {
@@ -1360,6 +1367,9 @@ export function importDataJson(jsonStr: string): void {
         if (log && typeof log === 'object') {
           logCaffeine(log);
         }
+      }
+      for (const [key, value] of Object.entries(safeSettings)) {
+        setAppSetting(key, value);
       }
     });
   } catch (err: any) {
