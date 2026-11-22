@@ -26,6 +26,14 @@
 * **Keywords ($\le 100$ chars, comma-separated no spaces, no trademarks):**
   `pourover,filter,drip,timer,barista,recipe,brewing,extraction,infusion,gongfu` (73 chars)
 
+### Język angielski — Wielka Brytania (en-GB)
+* **Name ($\le 30$ chars):** `Napar: Coffee & Tea` (19 chars)
+* **Subtitle ($\le 30$ chars):** `Speciality Coffee & Tea Brew` (28 chars)
+* **Promotional Text ($\le 170$ chars):**
+  `Your artisanal coffee and tea brewing companion. Precise pour-over pacing, water mineralisation calc, and interval timer. 100% private, no trackers.` (152 chars)
+* **Keywords ($\le 100$ chars, comma-separated no spaces, no trademarks):**
+  `pourover,filter,drip,timer,barista,recipe,brewing,extraction,infusion,gongfu` (73 chars)
+
 ---
 
 ## 2. Opis (Description)
@@ -90,6 +98,36 @@ Health Disclaimer: Caffeine level estimates are for information only, apply to h
 Nominative Fair Use Notice: All product and company names, brewer types, and grinder models (such as V60, AeroPress, Chemex, Comandante, etc.) are trademarks or registered trademarks of their respective holders. Use of them does not imply any affiliation with or endorsement by them.
 ```
 
+### Description — English U.K. (en-GB, $\le 4000$ chars)
+```text
+Napar is an artisanal companion for speciality coffee and traditional tea brewing, crafted for home baristas and tea enthusiasts. Built 100% offline-first — your brew logs, custom recipes, and tasting notes remain strictly on your private device.
+
+KEY FEATURES:
+
+• PRECISION POUR-OVER & DRIP TIMER
+Multi-step guidance for every brewing stage: blooming, pulse pours, continuous pours, and drawdown. Real-time target water weight and stage progress indicators.
+
+• TRADITIONAL GONGFU CHA TEA CEREMONY
+Dedicated multi-infusion tracker for oolongs, pu-erhs, green, white, and black teas. Automatic steep duration progression and per-infusion sensory tasting logs.
+
+• BEAN & TEA LEAF PANTRY
+Keep track of your coffee beans and whole-leaf teas. Monitor roast dates and days since roast.
+
+• BARISTA TOOLS & WATER CHEMISTRY
+Professional dial-in calculators: bidirectional Brew Ratio calculator, TDS / Extraction Yield (EY%) calculation, and water mineralisation with concentrates following the Barista Hustle recipe (1.68 g baking soda and 2.45 g Epsom salt per 1 L).
+
+• CAFFEINE TRACKER
+Track your daily caffeine intake and an estimate of the caffeine in your body at bedtime from an elimination model with an adjustable half-life. It is an informational estimate, not a sleep assessment.
+
+• 100% PRIVATE & OFFLINE-FIRST
+No account creation, no cloud servers, no third-party trackers, and no advertisements. Full local JSON database backup/restore and CSV journal export.
+
+---
+Health Disclaimer: Caffeine level estimates are for information only, apply to healthy adults and come from a simple elimination model. They may be wrong during pregnancy, with liver disease, when taking medication, and for children and adolescents. They do not constitute medical advice or diagnosis. Check with a doctor in addition to using the app and before making medical decisions.
+
+Nominative Fair Use Notice: All product and company names, brewer types, and grinder models (such as V60, AeroPress, Chemex, Comandante, etc.) are trademarks or registered trademarks of their respective holders. Use of them does not imply any affiliation with or endorsement by them.
+```
+
 ---
 
 ### Twierdzenia dziedzinowe opisu (rejestr `rejestr.json`, M1-audytor-generalny-019)
@@ -119,9 +157,9 @@ Każde zdanie z faktem dziedzinowym w opisie PL i EN wskazuje twierdzenie ze sta
 
 ## 4. Digital Services Act (DSA Trader Status dla UE)
 
-Deklaracja statusu przedsiębiorcy (trader) zgodnie z rozporządzeniem (UE) 2022/2065 (Digital Services Act, art. 30). Wersja 1.0 jest bezpłatna i nie oferuje zakupów w aplikacji; czy status trader jest wymagany dla darmowej aplikacji, rozstrzyga rola 10 z właścicielem [DO USTALENIA]:
+Deklaracja statusu przedsiębiorcy (*Trader*) zgodnie z rozporządzeniem (UE) 2022/2065 (Digital Services Act, art. 30). Decyzja właściciela `D-022` (`DEC-02: b`, 2026-11-20): status **Trader** w UE jest potwierdzony i dane przedsiębiorcy są skonfigurowane w App Store Connect.
 
-* **Status podmiotu w App Store Connect:** Trader (Przedsiębiorca)
+* **Status podmiotu w App Store Connect:** Trader (Przedsiębiorca) — skonfigurowany w App Store Connect (`D-022`)
 * **Nazwa podmiotu prawnego:** Apps4Brew Studio
 * **Kraj rejestracji:** Polska (UE)
 * **Adres e-mail kontaktu handlowego:** `support@apps4brew.com` (ten sam co e-mail kontaktowy w sekcji 3)
@@ -195,10 +233,10 @@ Workflow wydawniczy `.github/workflows/testflight.yml` wymaga 4 poufnych paramet
 
 | Nazwa sekretu | Opis | Przykład wartości |
 | :--- | :--- | :--- |
-| `APPLE_TEAM_ID` | 10-znakowy identyfikator zespołu deweloperskiego Apple | `8NQ9GHY8GF` |
-| `ASC_KEY_ID` | Identyfikator klucza App Store Connect API | `2X9R4HXF34` |
-| `ASC_ISSUER_ID` | UUID wystawcy z App Store Connect | `69a6de70-…-47e3a6200fd6` |
-| `ASC_KEY_P8_BASE64` | Zawartość pliku `AuthKey_*.p8` zakodowana w Base64 | `LS0tLS1CRUdJTi...` |
+| `APPLE_TEAM_ID` | 10-znakowy identyfikator zespołu deweloperskiego Apple | `<APPLE_TEAM_ID>` |
+| `ASC_KEY_ID` | Identyfikator klucza App Store Connect API | `<ASC_KEY_ID>` |
+| `ASC_ISSUER_ID` | UUID wystawcy z App Store Connect | `<ASC_ISSUER_UUID>` |
+| `ASC_KEY_P8_BASE64` | Zawartość pliku `AuthKey_*.p8` zakodowana w Base64 | `<BASE64_AUTHKEY_P8>` |
 
 Warunek wysyłki (DEC-11 a, od 2026-11-15): zadanie `gate` w `testflight.yml` przepuszcza tylko commit z zielonym ostatnim przebiegiem `ci.yml` i `e2e-ios.yml` na tym samym SHA; każdy wysłany build ma wiersz w `docs/wydanie/dziennik.md`.
 

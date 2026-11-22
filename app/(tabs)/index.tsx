@@ -93,6 +93,19 @@ export default function BrewScreen() {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
+        {/* D-023 (DEC-04 b / ZM-09): główne CTA startu parzenia na górze ekranu — widoczne od razu w kuchni bez przewijania */}
+        <Pressable
+          testID="open-procedure-modal-btn"
+          style={styles.openProcedureCta}
+          onPress={() => setShowProcedureModal(true)}
+          accessibilityRole="button"
+          accessibilityLabel={entryLabel}
+          accessibilityHint={entryHint}
+        >
+          <Text style={styles.openProcedureCtaTitle}>{entryLabel}</Text>
+          <Text style={styles.openProcedureCtaSub}>{entryHint}</Text>
+        </Pressable>
+
         {/* Banery systemowe i Złote Zasady domeny */}
       <BrewBanners
         unitSystem={unitSystem}
@@ -238,30 +251,6 @@ export default function BrewScreen() {
           />
         </>
       )}
-
-      {/* KROK 4: Asystent Procedury Krok po Kroku */}
-      <View style={styles.bprStepLabelRow}>
-        <View style={styles.bprStepBadge}>
-          <Text style={styles.bprStepBadgeText}>4</Text>
-        </View>
-        <Text style={styles.bprStepTitle}>
-          {language === 'en'
-            ? 'STEP 4: STEP-BY-STEP PROCEDURE EXECUTION'
-            : 'KROK 4: ASYSTENT PROCEDURY KROK PO KROKU'}
-        </Text>
-      </View>
-
-      <Pressable
-        testID="open-procedure-modal-btn"
-        style={styles.openProcedureCta}
-        onPress={() => setShowProcedureModal(true)}
-        accessibilityRole="button"
-        accessibilityLabel={entryLabel}
-        accessibilityHint={entryHint}
-      >
-        <Text style={styles.openProcedureCtaTitle}>{entryLabel}</Text>
-        <Text style={styles.openProcedureCtaSub}>{entryHint}</Text>
-      </Pressable>
 
       </ScrollView>
 
