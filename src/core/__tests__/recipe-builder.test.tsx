@@ -580,4 +580,43 @@ describe('Custom Recipe Builder & Persistence', () => {
     mockSearchParams = {};
     mockDb.settings.clear();
   });
+
+  test('M1-audytor-generalny-004: błąd zapisu podczas duplikowania receptury pokazuje komunikat błędu i nie zamyka ekranu', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert');
+    mockBack.mockClear();
+
+    saveRecipe({
+      id: 'recipe-dup-fail',
+      name: 'Kalita Wave',
+      beverageType: 'COFFEE',
+      method: 'Kalita',
+      doseGrams: 15,
+      waterGrams: 250,
+      waterTempCelsius: 93,
+      recommendedRatio: 16.7,
+      stepsJson: '[]',
+      isCustom: true,
+      isFavorite: false,
+      createdAt: '2026-10-10T10:00:00Z',
+    });
+
+    mockSearchParams = { id: 'recipe-dup-fail' };
+    let tree: any;
+    renderer.act(() => {
+      tree = renderer.create(<RecipeBuilderScreen />);
+    });
+
+    mockDb.runSync.mockImplementationOnce(() => {
+      throw new Error('SQLITE_FULL');
+    });
+
+    renderer.act(() => {
+      findPressableWithText(tree.root, 'Duplikuj jako nową')?.props.onPress();
+    });
+
+    expect(alertSpy).toHaveBeenCalledWith('Nie udało się zapisać zmian', expect.any(String));
+    expect(mockBack).not.toHaveBeenCalled();
+    mockSearchParams = {};
+  });
 });
+

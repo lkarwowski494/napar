@@ -119,4 +119,34 @@ describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
 
     expect(tree!.toJSON()).toBeDefined();
   });
+
+  test('M1-audytor-generalny-004: błąd zapisu w setBedtimeHour i setCaffeineHalfLife cofa stan UI (rollback)', () => {
+    (database.setBedtimeHour as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('SQLITE_FULL');
+    });
+    (database.setCaffeineHalfLife as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('SQLITE_FULL');
+    });
+
+    let tree: renderer.ReactTestRenderer;
+    renderer.act(() => {
+      tree = renderer.create(<CaffeineScreen />);
+    });
+
+    const root = tree!.root;
+    const beforeBedtime = JSON.stringify(tree!.toJSON());
+    expect(beforeBedtime).toContain('23:00');
+    expect(beforeBedtime).toContain('5.0 h');
+
+    renderer.act(() => {
+      root.findByProps({ testID: 'bedtime-dec-btn' }).props.onPress();
+    });
+    expect(JSON.stringify(tree!.toJSON())).toContain('23:00');
+
+    renderer.act(() => {
+      root.findByProps({ testID: 'halflife-dec-btn' }).props.onPress();
+    });
+    expect(JSON.stringify(tree!.toJSON())).toContain('5.0 h');
+  });
 });
+

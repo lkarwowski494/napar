@@ -2289,4 +2289,13 @@ describe('Napar SQLite Database & Repositories', () => {
     expect(getAppSetting('\uFEFFapp_theme_mode')).toBe('dark');
     expect(getAppSetting('app_theme_mode')).toBe('dark');
   });
+
+  test('M1-audytor-generalny-004: setAppSetting propaguje błąd SQLite z db.runSync zamiast go połykać', () => {
+    mockDb.runSync.mockImplementationOnce(() => {
+      throw new Error('SQLITE_FULL: database or disk is full');
+    });
+
+    expect(() => setAppSetting('bedtime_hour', '22')).toThrow('SQLITE_FULL');
+  });
 });
+

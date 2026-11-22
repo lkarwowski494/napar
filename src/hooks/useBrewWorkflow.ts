@@ -348,7 +348,8 @@ export function useBrewWorkflow() {
   };
 
   const handleDuplicateRecipe = (r: AnyRecipe) => {
-    const cloned = duplicateRecipe(r);
+    let cloned: ReturnType<typeof duplicateRecipe> | undefined;
+    if (!runSave(() => { cloned = duplicateRecipe(r); }, t.common) || !cloned) return;
     refreshData();
     Alert.alert(
       t.brew.duplicateRecipe,

@@ -1510,19 +1510,15 @@ export function getAppSetting(key: string, defaultValue = ''): string {
 export function setAppSetting(key: string, value: string): void;
 export function setAppSetting(key: string, value: any): void;
 export function setAppSetting(key: string, value: any): void {
-  try {
-    if (!key || typeof key !== 'string') return;
-    const safeKey = key.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim();
-    if (!safeKey) return;
-    const safeValue = value === null || value === undefined ? '' : String(value);
-    const db = getDatabase();
-    db.runSync(
-      'INSERT INTO app_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
-      [safeKey, safeValue]
-    );
-  } catch {
-    // ignoruj błąd w środowisku testowym
-  }
+  if (!key || typeof key !== 'string') return;
+  const safeKey = key.replace(/\uFEFF/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim();
+  if (!safeKey) return;
+  const safeValue = value === null || value === undefined ? '' : String(value);
+  const db = getDatabase();
+  db.runSync(
+    'INSERT INTO app_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
+    [safeKey, safeValue]
+  );
 }
 
 // M1-audytor-generalny-034: domyślny system jednostek z regionu urządzenia (ustawiany przy starcie z app/_layout.tsx);

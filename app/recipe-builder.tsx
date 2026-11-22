@@ -230,7 +230,8 @@ export default function RecipeBuilderScreen() {
     if (!id) return;
     const existing = getRecipeById(id);
     if (!existing) return;
-    const cloned = duplicateRecipe(existing);
+    let cloned: ReturnType<typeof duplicateRecipe> | undefined;
+    if (!runSave(() => { cloned = duplicateRecipe(existing); }, t.common) || !cloned) return;
     announce(t.recipeBuilder.duplicateBtn);
     Alert.alert(t.recipeBuilder.duplicatedTitle, formatTemplate(t.recipeBuilder.duplicatedMsg, { name: cloned.name }));
     router.back();
