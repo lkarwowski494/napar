@@ -2981,7 +2981,38 @@ describe('KO-004 (Scope §3): uproszczenie interfejsu bez utraty danych użytkow
     });
     jest.restoreAllMocks();
   });
+
+  test('M1-audytor-generalny-011: każda wbudowana receptura i każdy jej krok ma pełny EN oraz zgodne kluczowe liczby (g/ml/°C) między PL a EN', () => {
+    const { MASTER_RECIPES } = require('../src/core/recipes-data');
+    const extractMetrics = (text: string) =>
+      (text.match(/\d+(?:[.,]\d+)?\s*(?:g|ml|°C)/gi) || []).map((m) =>
+        m.replace(/\s+/g, '').replace(',', '.').toLowerCase()
+      );
+
+    for (const recipe of MASTER_RECIPES) {
+      expect(typeof recipe.nameEn).toBe('string');
+      expect((recipe.nameEn || '').trim().length).toBeGreaterThan(0);
+      expect(typeof recipe.grindSettingDescriptionEn).toBe('string');
+      expect((recipe.grindSettingDescriptionEn || '').trim().length).toBeGreaterThan(0);
+
+      for (const step of recipe.steps) {
+        expect(typeof step.nameEn).toBe('string');
+        expect((step.nameEn || '').trim().length).toBeGreaterThan(0);
+        expect(typeof step.instructionEn).toBe('string');
+        expect((step.instructionEn || '').trim().length).toBeGreaterThan(0);
+
+        const plMetrics = extractMetrics(step.instructionPl);
+        const enMetrics = extractMetrics(step.instructionEn || '');
+        expect({ recipe: recipe.id, step: step.stepNumber, metrics: enMetrics }).toEqual({
+          recipe: recipe.id,
+          step: step.stepNumber,
+          metrics: plMetrics,
+        });
+      }
+    }
+  });
 });
+
 
 
 

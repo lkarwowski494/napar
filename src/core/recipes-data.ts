@@ -214,12 +214,12 @@ export const MASTER_RECIPES: MasterRecipe[] = [
     waterWeightGrams: 400.0,
     waterTemperatureCelsius: 94.0,
     grindSettingDescriptionPl: "Średnio-grubo (np. 24 kliki Comandante)",
-    grindSettingDescriptionEn: "Medium grind (e.g. 20-22 clicks on Comandante)",
+    grindSettingDescriptionEn: "Medium-coarse grind (e.g. 24 clicks on Comandante)",
     recommendedRatio: 16,
     steps: [
-      { stepNumber: 1, namePl: "Blooming (Preinfuzja)", nameEn: "Bloom", targetWaterGrams: 60.0, durationSeconds: 45, instructionPl: "Zalej 60g wody, równomiernie nasącz całe złoże kawy z płaskim dnem.", instructionEn: "Pour 60g in center to bloom coffee bed." },
-      { stepNumber: 2, namePl: "Drugie zalanie", nameEn: "Pulse 1", targetWaterGrams: 230.0, durationSeconds: 45, instructionPl: "Spokojnym ruchem spiralnym dolej wodę do 230g.", instructionEn: "Pour spiral up to 160g." },
-      { stepNumber: 3, namePl: "Trzecie zalanie (Finisz)", nameEn: "Pulse 2", targetWaterGrams: 400.0, durationSeconds: 60, instructionPl: "Uzupełnij do 400g, utrzymując stały poziom wody.", instructionEn: "Pour spiral up to 260g." },
+      { stepNumber: 1, namePl: "Blooming (Preinfuzja)", nameEn: "Bloom", targetWaterGrams: 60.0, durationSeconds: 45, instructionPl: "Zalej 60g wody, równomiernie nasącz całe złoże kawy z płaskim dnem.", instructionEn: "Pour 60g of water, evenly saturating the flat-bottom coffee bed." },
+      { stepNumber: 2, namePl: "Drugie zalanie", nameEn: "Second Pour", targetWaterGrams: 230.0, durationSeconds: 45, instructionPl: "Spokojnym ruchem spiralnym dolej wodę do 230g.", instructionEn: "Pour smoothly in a spiral up to 230g." },
+      { stepNumber: 3, namePl: "Trzecie zalanie (Finisz)", nameEn: "Third Pour (Finish)", targetWaterGrams: 400.0, durationSeconds: 60, instructionPl: "Uzupełnij do 400g, utrzymując stały poziom wody.", instructionEn: "Top up to 400g, maintaining a steady water level." },
     ],
   },
   {
@@ -254,8 +254,8 @@ export const MASTER_RECIPES: MasterRecipe[] = [
     grindSettingDescriptionEn: "Coarse cupping grind (70-75% passing 850µm sieve)",
     recommendedRatio: 16.67,
     steps: [
-      { stepNumber: 1, namePl: "Zalanie czaszy", nameEn: "Pouring & Crust Formation", targetWaterGrams: 200.0, durationSeconds: 240, instructionPl: "Zalej 200g wrzątku bezpośrednio na suchą kawę. Pozostaw na 4 minuty bez mieszania.", instructionEn: "Pour 200g boiling water (93°C) directly on grounds, wait 4 min." },
-      { stepNumber: 2, namePl: "Przełamanie kożucha (Break crust)", nameEn: "Break Crust & Evaluate Aroma", targetWaterGrams: 200.0, durationSeconds: 60, instructionPl: "Trzykrotnie przełam kożuch łyżką cuppingową, oceniając aromat.", instructionEn: "Break crust 3 times with spoon, evaluate wet aroma, skim foam." },
+      { stepNumber: 1, namePl: "Zalanie czaszy", nameEn: "Pouring & Crust Formation", targetWaterGrams: 200.0, durationSeconds: 240, instructionPl: "Zalej 200g gorącej wody (93°C) bezpośrednio na suchą kawę. Pozostaw na 4 minuty bez mieszania.", instructionEn: "Pour 200g hot water (93°C) directly on grounds, wait 4 minutes without stirring." },
+      { stepNumber: 2, namePl: "Przełamanie kożucha (Break crust)", nameEn: "Break Crust & Evaluate Aroma", targetWaterGrams: 200.0, durationSeconds: 60, instructionPl: "Trzykrotnie przełam kożuch łyżką cuppingową, oceniając aromat.", instructionEn: "Break crust 3 times with a cupping spoon, evaluate wet aroma, and skim foam." },
     ],
   },
   {
@@ -269,12 +269,12 @@ export const MASTER_RECIPES: MasterRecipe[] = [
     waterWeightGrams: 280.0,
     waterTemperatureCelsius: 90.0,
     grindSettingDescriptionPl: "Średnio-grubo (np. 25-27 klików Comandante)",
-    grindSettingDescriptionEn: "Medium-coarse grind (e.g. 24-26 clicks on Comandante)",
+    grindSettingDescriptionEn: "Medium-coarse grind (e.g. 25-27 clicks on Comandante)",
     recommendedRatio: 14,
     steps: [
-      { stepNumber: 1, namePl: "Preinfuzja (Zawór otwarty)", nameEn: "Open Valve Bloom & Pour", targetWaterGrams: 60.0, durationSeconds: 45, instructionPl: "Zawór otwarty: zalej 60g wody w 90°C ruchem spiralnym. Swobodna perkolacja budująca kwasowość.", instructionEn: "Valve OPEN. Pour 120g water at 90°C, wait for flow." },
-      { stepNumber: 2, namePl: "Zalanie perkolacyjne", nameEn: "Closed Valve Immersion", targetWaterGrams: 120.0, durationSeconds: 45, instructionPl: "Dolej kolejne 60g wody (do 120g łącznie) przy wciąż otwartym zaworze.", instructionEn: "CLOSE valve. Pour 120g water at 70°C, steep for 60s, then release." },
-      { stepNumber: 3, namePl: "Imersja (Zamknięcie zaworu)", nameEn: "", targetWaterGrams: 280.0, durationSeconds: 60, instructionPl: "Zamknij zawór Switcha! Zalej 160g wody (do 280g) w temp. 70-90°C. Maceracja przez 45s, a w 2:30 naciśnij dźwignię, aby spuścić napar.", instructionEn: "" },
+      { stepNumber: 1, namePl: "Preinfuzja (Zawór otwarty)", nameEn: "Bloom (Valve Open)", targetWaterGrams: 60.0, durationSeconds: 45, instructionPl: "Zawór otwarty: zalej 60g wody w 90°C ruchem spiralnym. Swobodna perkolacja budująca kwasowość.", instructionEn: "Valve OPEN: pour 60g of water at 90°C in a spiral motion. Free percolation to build acidity." },
+      { stepNumber: 2, namePl: "Zalanie perkolacyjne", nameEn: "Percolation Pour", targetWaterGrams: 120.0, durationSeconds: 45, instructionPl: "Dolej kolejne 60g wody (do 120g łącznie) przy wciąż otwartym zaworze.", instructionEn: "Pour another 60g of water (up to 120g total) with the valve still open." },
+      { stepNumber: 3, namePl: "Imersja (Zamknięcie zaworu)", nameEn: "Immersion (Valve Closed)", targetWaterGrams: 280.0, durationSeconds: 60, instructionPl: "Zamknij zawór Switcha! Zalej 160g wody (do 280g) w temp. 70-90°C. Maceracja przez 45s, a w 2:30 naciśnij dźwignię, aby spuścić napar.", instructionEn: "Close the Switch valve! Pour 160g of water (up to 280g) at 70-90°C. Steep for 45s, then press the lever at 2:30 to drain." },
     ],
   },
   {
@@ -288,12 +288,12 @@ export const MASTER_RECIPES: MasterRecipe[] = [
     waterWeightGrams: 200.0,
     waterTemperatureCelsius: 96.0,
     grindSettingDescriptionPl: "Średnio-drobno (np. 16-18 klików Comandante)",
-    grindSettingDescriptionEn: "Medium-fine grind (e.g. 15-17 clicks on Comandante)",
+    grindSettingDescriptionEn: "Medium-fine grind (e.g. 16-18 clicks on Comandante)",
     recommendedRatio: 14.3,
     steps: [
-      { stepNumber: 1, namePl: "Zalanie i mieszanie", nameEn: "Full Pour & Stir", targetWaterGrams: 200.0, durationSeconds: 30, instructionPl: "AeroPress tradycyjny (nie odwrócony). Zalej 200g wrzątku w 10 sekund i zamieszaj 3 razy ruchem prostoliniowym.", instructionEn: "Pour 200g water at 93°C, stir 3 times back and forth." },
-      { stepNumber: 2, namePl: "Podciśnienie i infuzja", nameEn: "Cap & Gentle Plunge", targetWaterGrams: 200.0, durationSeconds: 60, instructionPl: "Włóż tłok pod delikatnym kątem na 1 cm w cylinder, aby stworzyć próżnię i zapobiec kapaniu. Czekaj 60s.", instructionEn: "Insert plunger to create vacuum, wait 60s, plunge gently for 30s." },
-      { stepNumber: 3, namePl: "Mieszanie i przeciskanie", nameEn: "", targetWaterGrams: 200.0, durationSeconds: 30, instructionPl: "Zdejmij tłok, zamieszaj 3 razy, załóż tłok i spokojnie przeciskaj przez 30 sekund aż do delikatnego syknięcia.", instructionEn: "" },
+      { stepNumber: 1, namePl: "Zalanie i mieszanie", nameEn: "Full Pour & Stir", targetWaterGrams: 200.0, durationSeconds: 30, instructionPl: "AeroPress tradycyjny (nie odwrócony). Zalej 200g gorącej wody (96°C) w 10 sekund i zamieszaj 3 razy ruchem prostoliniowym.", instructionEn: "Standard AeroPress (not inverted). Pour 200g of hot water (96°C) in 10 seconds and stir 3 times back and forth." },
+      { stepNumber: 2, namePl: "Podciśnienie i infuzja", nameEn: "Vacuum Seal & Steep", targetWaterGrams: 200.0, durationSeconds: 60, instructionPl: "Włóż tłok pod delikatnym kątem na 1 cm w cylinder, aby stworzyć próżnię i zapobiec kapaniu. Czekaj 60s.", instructionEn: "Insert the plunger about 1 cm into the chamber at a slight angle to create a vacuum and stop dripping. Wait 60s." },
+      { stepNumber: 3, namePl: "Mieszanie i przeciskanie", nameEn: "Stir & Press", targetWaterGrams: 200.0, durationSeconds: 30, instructionPl: "Zdejmij tłok, zamieszaj 3 razy, załóż tłok i spokojnie przeciskaj przez 30 sekund aż do delikatnego syknięcia.", instructionEn: "Remove the plunger, stir 3 times, reinsert the plunger, and press gently for 30 seconds until a soft hiss." },
     ],
   },
   {
@@ -307,12 +307,12 @@ export const MASTER_RECIPES: MasterRecipe[] = [
     waterWeightGrams: 240.0,
     waterTemperatureCelsius: 93.0,
     grindSettingDescriptionPl: "Średnio mielona pod filtr Kalita/Wave (20-22 kliki Comandante)",
-    grindSettingDescriptionEn: "Medium grind with Kalita Wave or V60 filter",
+    grindSettingDescriptionEn: "Medium grind for Kalita/Wave filter (20-22 clicks on Comandante)",
     recommendedRatio: 15,
     steps: [
-      { stepNumber: 1, namePl: "Blooming (Preinfuzja)", nameEn: "Rapid Bloom", targetWaterGrams: 50.0, durationSeconds: 40, instructionPl: "Zalej 50g wody stabilnym strumieniem z wysokości 15 cm. Pozwól na równomierną ekspansję CO2.", instructionEn: "Pour 50g water rapidly, ensure full wetness." },
-      { stepNumber: 2, namePl: "Zalanie centralne", nameEn: "Continuous Pulse Pour", targetWaterGrams: 150.0, durationSeconds: 40, instructionPl: "Lej stabilnym, cienkim strumieniem prosto w środek złoża do 150g, wzbudzając drobinki.", instructionEn: "Pour 4 pulses of 50g each up to 250g." },
-      { stepNumber: 3, namePl: "Zalanie spiralne i finisz", nameEn: "", targetWaterGrams: 240.0, durationSeconds: 50, instructionPl: "Dolej do 240g łagodną spiralą od środka do krawędzi. Spokojny, równomierny spływ.", instructionEn: "" },
+      { stepNumber: 1, namePl: "Blooming (Preinfuzja)", nameEn: "Rapid Bloom", targetWaterGrams: 50.0, durationSeconds: 40, instructionPl: "Zalej 50g wody stabilnym strumieniem z wysokości 15 cm. Pozwól na równomierną ekspansję CO2.", instructionEn: "Pour 50g of water in a steady stream from 15 cm height. Allow even CO2 expansion." },
+      { stepNumber: 2, namePl: "Zalanie centralne", nameEn: "Center Pour", targetWaterGrams: 150.0, durationSeconds: 40, instructionPl: "Lej stabilnym, cienkim strumieniem prosto w środek złoża do 150g, wzbudzając drobinki.", instructionEn: "Pour in a steady, thin stream straight into the center of the bed up to 150g to agitate the grounds." },
+      { stepNumber: 3, namePl: "Zalanie spiralne i finisz", nameEn: "Spiral Pour & Finish", targetWaterGrams: 240.0, durationSeconds: 50, instructionPl: "Dolej do 240g łagodną spiralą od środka do krawędzi. Spokojny, równomierny spływ.", instructionEn: "Top up to 240g in a gentle spiral from center to edge. Calm, even drawdown." },
     ],
   },
   {
@@ -326,12 +326,12 @@ export const MASTER_RECIPES: MasterRecipe[] = [
     waterWeightGrams: 300.0,
     waterTemperatureCelsius: 94.0,
     grindSettingDescriptionPl: "Średnio-grubo (np. 24-26 klików Comandante)",
-    grindSettingDescriptionEn: "Medium-coarse grind (e.g. 22-24 clicks on Comandante)",
+    grindSettingDescriptionEn: "Medium-coarse grind (e.g. 24-26 clicks on Comandante)",
     recommendedRatio: 16.67,
     steps: [
-      { stepNumber: 1, namePl: "Woda najpierw (Water-First)", nameEn: "Water First & Coffee Addition", targetWaterGrams: 300.0, durationSeconds: 30, instructionPl: "Wlej najpierw 300g gorącej wody do zamkniętego drippera, a następnie wsyp zmieloną kawę na powierzchnię.", instructionEn: "Pour 250g boiling water first, then add grounds, stir gently." },
-      { stepNumber: 2, namePl: "Zanurzenie kożucha", nameEn: "Immersion & Drawdown", targetWaterGrams: 300.0, durationSeconds: 120, instructionPl: "Delikatnie zanurz suchy kożuch łyżką (bez energicznego bełtania). Przykryj pokrywką na 2 minuty.", instructionEn: "Cover and steep for 2 minutes, place on server to drain." },
-      { stepNumber: 3, namePl: "Przełamanie i spływ", nameEn: "", targetWaterGrams: 300.0, durationSeconds: 60, instructionPl: "Zamieszaj łyżką raz powierzchnię, postaw Clever Dripper na serwerze i pozwól na swobodny spływ grawitacyjny.", instructionEn: "" },
+      { stepNumber: 1, namePl: "Woda najpierw (Water-First)", nameEn: "Water First & Coffee Addition", targetWaterGrams: 300.0, durationSeconds: 30, instructionPl: "Wlej najpierw 300g gorącej wody do zamkniętego drippera, a następnie wsyp zmieloną kawę na powierzchnię.", instructionEn: "Pour 300g of hot water first into the closed dripper, then add the ground coffee on top." },
+      { stepNumber: 2, namePl: "Zanurzenie kożucha", nameEn: "Submerge Crust & Steep", targetWaterGrams: 300.0, durationSeconds: 120, instructionPl: "Delikatnie zanurz suchy kożuch łyżką (bez energicznego bełtania). Przykryj pokrywką na 2 minuty.", instructionEn: "Gently submerge the dry crust with a spoon (without vigorous stirring). Cover with the lid for 2 minutes." },
+      { stepNumber: 3, namePl: "Przełamanie i spływ", nameEn: "Break Crust & Drawdown", targetWaterGrams: 300.0, durationSeconds: 60, instructionPl: "Zamieszaj łyżką raz powierzchnię, postaw Clever Dripper na serwerze i pozwól na swobodny spływ grawitacyjny.", instructionEn: "Stir the surface once with a spoon, place the Clever Dripper on the server, and allow a free gravity drawdown." },
     ],
   },
   {
@@ -345,11 +345,11 @@ export const MASTER_RECIPES: MasterRecipe[] = [
     waterWeightGrams: 51.0,
     waterTemperatureCelsius: 93.0,
     grindSettingDescriptionPl: "Grubsze espresso niż klasyczne (szybki przepływ 14-18s, 6 barów)",
-    grindSettingDescriptionEn: "Coarser espresso grind, 6 bar pressure profile",
+    grindSettingDescriptionEn: "Coarser espresso grind (fast 14-18s flow, 6 bar pressure profile)",
     recommendedRatio: 3,
     steps: [
-      { stepNumber: 1, namePl: "Szybka preinfuzja", nameEn: "High Flow Shot", targetWaterGrams: 15.0, durationSeconds: 5, instructionPl: "Preinfuzja pod ciśnieniem 6 barów lub natychmiastowy przepływ — szybka penetracja całego złoża.", instructionEn: "Fast 15-18 second extraction yielding 40g with high extraction yield." },
-      { stepNumber: 2, namePl: "Wysoki przepływ turbo", nameEn: "", targetWaterGrams: 51.0, durationSeconds: 12, instructionPl: "Błyskawiczna ekstrakcja 51g naparu w 12-15 sekund o krystalicznej czystości owocowej i wyższym EY.", instructionEn: "" },
+      { stepNumber: 1, namePl: "Szybka preinfuzja", nameEn: "Fast Pre-infusion", targetWaterGrams: 15.0, durationSeconds: 5, instructionPl: "Preinfuzja pod ciśnieniem 6 barów lub natychmiastowy przepływ — szybka penetracja całego złoża.", instructionEn: "Pre-infusion at 6 bar or immediate flow — rapid saturation of the entire puck." },
+      { stepNumber: 2, namePl: "Wysoki przepływ turbo", nameEn: "High-Flow Turbo Extraction", targetWaterGrams: 51.0, durationSeconds: 12, instructionPl: "Błyskawiczna ekstrakcja 51g naparu w 12-15 sekund o krystalicznej czystości owocowej i wyższym EY.", instructionEn: "Rapid extraction of 51g of espresso in 12-15 seconds with crystalline fruit clarity and higher EY." },
     ],
   },
   {
@@ -404,7 +404,7 @@ export const MASTER_RECIPES: MasterRecipe[] = [
     recommendedRatio: 35,
     steps: [
       { stepNumber: 1, namePl: "Wstępna pasta", nameEn: "Initial Paste", targetWaterGrams: 20.0, durationSeconds: 20, instructionPl: "Wlej 20g wody o temp. 75°C do czarki chawan, powoli rozetrzyj puder chasenem na gładką pastę bez grudek.", instructionEn: "Pour 20g water at 75°C into chawan, whisk powder gently into a smooth paste without lumps." },
-      { stepNumber: 2, namePl: "Ubijanie piany (W-motion)", nameEn: "Whisking Foam (W-motion)", targetWaterGrams: 70.0, durationSeconds: 40, instructionPl: "Dolej pozostałe 50g wody (do 70g) i ubijaj energicznym ruchem nadgarstka w kształcie litery W do aksamitnej mikropiany.", instructionEn: "Add remaining 50g water and whisk rapidly in a W-pattern until velvet microfoam forms." },
+      { stepNumber: 2, namePl: "Ubijanie piany (W-motion)", nameEn: "Whisking Foam (W-motion)", targetWaterGrams: 70.0, durationSeconds: 40, instructionPl: "Dolej pozostałe 50g wody (do 70g) i ubijaj energicznym ruchem nadgarstka w kształcie litery W do aksamitnej mikropiany.", instructionEn: "Add remaining 50g water (to 70g) and whisk rapidly in a W-pattern until velvet microfoam forms." },
     ],
   },
   {
