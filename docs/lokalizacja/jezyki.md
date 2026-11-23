@@ -10,7 +10,7 @@ Utrzymanie: nowy tekst = klucz w `translations.pl` i `translations.en` (symetri�
 | Język | Stan | Powód (dowód) | Tłumaczenie | Drugi przegląd AI | Przegląd człowieka | Treści krytyczne | Zrzuty |
 |---|---|---|---|---|---|---|---|
 | pl | w wydaniu | język źródłowy; rynek główny | źródło | nie dotyczy | [DO USTALENIA] | źródło | [DO USTALENIA] |
-| en | w wydaniu | drugi język interfejsu od początku projektu | pochodzenie nieudokumentowane [DO USTALENIA] | [DO USTALENIA] | [DO USTALENIA] | [DO USTALENIA] | [DO USTALENIA] |
+| en | w wydaniu | drugi język interfejsu od początku projektu | pochodzenie nieudokumentowane [DO USTALENIA] | [DO USTALENIA] | przegląd właściciela (2026-11-23) | przegląd właściciela (2026-11-23) | [DO USTALENIA] |
 
 ## Kontrole (trwałe)
 

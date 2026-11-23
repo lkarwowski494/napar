@@ -895,19 +895,18 @@ describe('M1-audytor-generalny-018: wartości i etykiety zgodne z przeczytanym �
 describe('M1-audytor-generalny-019: rejestr twierdzeń w formacie roli, szczeble według BRD C4 §1, opis sklepu z ID (06-tresci-008, 06-tresci-014, 01-odkrywanie-005, 01-odkrywanie-012, 10-wydanie-006, 02-monetyzacja-007)', () => {
   const rejestr = JSON.parse(readFileSync(join(root, 'rejestr.json'), 'utf8'));
 
-  test('06-tresci-014: rejestr przechodzi walidator kontrole-tresci (źródła, szczeble, jedna wartość wielkości); przegląd człowieka jeszcze czeka', async () => {
+  test('06-tresci-014: rejestr przechodzi walidator kontrole-tresci (źródła, szczeble, jedna wartość wielkości, przegląd człowieka na krytycznych)', async () => {
     expect(Array.isArray(rejestr)).toBe(true);
     const { spawnSync } = require('node:child_process');
     const run = spawnSync(
       process.execPath,
-      ['--input-type=module', '-e', "import { sprawdzRejestr } from './scripts/kontrole-tresci.mjs'; import { readFileSync } from 'node:fs'; const u = []; const b = sprawdzRejestr(JSON.parse(readFileSync('rejestr.json', 'utf8')), [], { przedPrzegladem: true }, u); console.log(JSON.stringify({ b, u }));"],
+      ['--input-type=module', '-e', "import { sprawdzRejestr } from './scripts/kontrole-tresci.mjs'; import { readFileSync } from 'node:fs'; const u = []; const b = sprawdzRejestr(JSON.parse(readFileSync('rejestr.json', 'utf8')), [], {}, u); console.log(JSON.stringify({ b, u }));"],
       { cwd: root, encoding: 'utf8' },
     );
     expect(run.status).toBe(0);
     const { b: bledy, u: uwagi } = JSON.parse(run.stdout) as { b: string[]; u: string[] };
     expect(bledy).toEqual([]);
-    // Bez przeglądu człowieka każde potwierdzone twierdzenie krytyczne daje uwagę — po przeglądzie zmienić na przedPrzegladem: false.
-    expect(uwagi.every((u) => /krytyczne bez przeglądu człowieka/.test(u))).toBe(true);
+    expect(uwagi).toEqual([]);
     for (const t of rejestr) {
       expect([t.id, typeof t.twierdzenie, Array.isArray(t.zrodla), ['robocze', 'potwierdzone', 'otwarte', 'sprzeczne', 'wycofane'].includes(t.status), typeof t.krytyczne])
         .toEqual([t.id, 'string', true, true, 'boolean']);

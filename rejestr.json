@@ -21,8 +21,13 @@
     "status": "potwierdzone",
     "uproszczenie": null,
     "krytyczne": true,
-    "przeglad": null,
-    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)"
+    "przeglad": {
+      "kto": "wlasciciel",
+      "data": "2026-11-23",
+      "sha": "e3b0c44298fc",
+      "uwaga": "zatwierdzenie właściciela 2026-11-23 05:34 UTC"
+    },
+    "przeglad_status": "zatwierdzone przez właściciela 2026-11-23 05:34 UTC"
   },
   {
     "id": "EFSA-T12-ZAKRES",
@@ -45,8 +50,13 @@
     "status": "potwierdzone",
     "uproszczenie": "Aplikacja liczy eliminację jednym t½ (bez fazy wchłaniania) — uproszczenie nazwane w zastrzeżeniu ekranu Kofeina; zakres ustawienia 2–8 h równy zakresowi EFSA.",
     "krytyczne": true,
-    "przeglad": null,
-    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)",
+    "przeglad": {
+      "kto": "wlasciciel",
+      "data": "2026-11-23",
+      "sha": "e3b0c44298fc",
+      "uwaga": "zatwierdzenie właściciela 2026-11-23 05:34 UTC"
+    },
+    "przeglad_status": "zatwierdzone przez właściciela 2026-11-23 05:34 UTC",
     "wielkosc": "kofeina_t12_zakres_doroslych",
     "wartosc": "2–8 (średnio ok. 4)",
     "jednostka": "h"
@@ -71,8 +81,13 @@
     "status": "potwierdzone",
     "uproszczenie": null,
     "krytyczne": true,
-    "przeglad": null,
-    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)"
+    "przeglad": {
+      "kto": "wlasciciel",
+      "data": "2026-11-23",
+      "sha": "e3b0c44298fc",
+      "uwaga": "zatwierdzenie właściciela 2026-11-23 05:34 UTC"
+    },
+    "przeglad_status": "zatwierdzone przez właściciela 2026-11-23 05:34 UTC"
   },
   {
     "id": "APPLE-1.4.1-LEKARZ",
@@ -116,8 +131,13 @@
     "status": "potwierdzone",
     "uproszczenie": null,
     "krytyczne": true,
-    "przeglad": null,
-    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)"
+    "przeglad": {
+      "kto": "wlasciciel",
+      "data": "2026-11-23",
+      "sha": "e3b0c44298fc",
+      "uwaga": "zatwierdzenie właściciela 2026-11-23 05:34 UTC"
+    },
+    "przeglad_status": "zatwierdzone przez właściciela 2026-11-23 05:34 UTC"
   },
   {
     "id": "DRAKE-SLEEP-2013",
@@ -136,8 +156,13 @@
     "status": "potwierdzone",
     "uproszczenie": null,
     "krytyczne": true,
-    "przeglad": null,
-    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)"
+    "przeglad": {
+      "kto": "wlasciciel",
+      "data": "2026-11-23",
+      "sha": "e3b0c44298fc",
+      "uwaga": "zatwierdzenie właściciela 2026-11-23 05:34 UTC"
+    },
+    "przeglad_status": "zatwierdzone przez właściciela 2026-11-23 05:34 UTC"
   },
   {
     "id": "SEN-PROG-25MG",
@@ -169,8 +194,13 @@
     "status": "potwierdzone",
     "uproszczenie": null,
     "krytyczne": true,
-    "przeglad": null,
-    "przeglad_status": "czeka na przegląd człowieka (lista: audyt M1, role/06-tresci/fix-2026-11-14/lista-do-przegladu.md)"
+    "przeglad": {
+      "kto": "wlasciciel",
+      "data": "2026-11-23",
+      "sha": "e3b0c44298fc",
+      "uwaga": "zatwierdzenie właściciela 2026-11-23 05:34 UTC"
+    },
+    "przeglad_status": "zatwierdzone przez właściciela 2026-11-23 05:34 UTC"
   },
   {
     "id": "SCA-GOLDENCUP-EY",
