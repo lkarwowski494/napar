@@ -217,7 +217,7 @@ describe('DialInScreen UI with Water Chemistry', () => {
     expect(str).toContain('TDS (%)');
     // Domyślne wartości to water 250, dose 15, TDS 1.35
     // EY = (250 * 1.35) / 15 = 22.5%
-    expect(str).toContain('19.8');
+    expect(str).toContain('19,8');
     expect(str).toContain('Złote Okno SCA');
   });
 
@@ -255,7 +255,8 @@ describe('DialInScreen UI with Water Chemistry', () => {
     });
 
     str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('obniż temperaturę wody o 2-3°C');
+    expect(str).toContain('Gongfu Cha');
+    expect(str).toContain('3–5°C');
   });
 
   test('Własny profil mineralizacji wody (Custom GH/KH) w zakładce Woda SCA', () => {

@@ -16,12 +16,13 @@ import Svg, {
 } from 'react-native-svg';
 import { CaffeineLog } from './database-schema';
 import { calculateRemainingCaffeineMg, DEFAULT_CAFFEINE_HALF_LIFE_H } from './domain-rules';
+import { normalizeBedtimeHourNumber } from './unit-converter';
 import { theme } from './theme';
 import { useTranslation, formatTemplate } from './i18n';
 
 interface CaffeineChartProps {
   logs: CaffeineLog[];
-  bedtimeHour: number; // np. 23 (23:00)
+  bedtimeHour: number; // np. 23 (23:00) lub 25 (01:00)
   halfLifeHours?: number; // domyślnie DEFAULT_CAFFEINE_HALF_LIFE_H (4 h, EFSA)
 }
 
@@ -42,26 +43,34 @@ export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
   const innerWidth = chartWidth - paddingLeft - paddingRight;
   const innerHeight = chartHeight - paddingTop - paddingBottom;
 
-  // Przedział czasu: 24 godziny od 06:00 dzisiaj do 06:00 jutro
+  // Przedział czasu: 24 godziny od 06:00 dzisiaj do 06:00 jutro (kalendarzowo, odpornie na DST)
   const startHour = 6;
   const totalHours = 24;
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = new Date();
+  const baseY = now.getFullYear();
+  const baseM = now.getMonth();
+  const baseD = now.getDate();
+  const chartStartDate = new Date(baseY, baseM, baseD, startHour, 0, 0, 0);
+  const chartEndDate = new Date(baseY, baseM, baseD, startHour + totalHours, 0, 0, 0);
+  const chartSpanMs = Math.max(1, chartEndDate.getTime() - chartStartDate.getTime());
 
-  // Wylicz stężenie kofeiny w każdym punkcie czasowym (co 30 min = 48 punktów)
+  // Wylicz stężenie kofeiny w każdym punkcie czasowym (co 30 min = 49 punktów)
   const pointsCount = 49;
   const dataPoints: { hourOffset: number; mg: number }[] = [];
   let maxMg = 50; // minimalna skala osi Y
 
   for (let i = 0; i < pointsCount; i++) {
     const hourOffset = startHour + (i / (pointsCount - 1)) * totalHours;
-    const pointDate = new Date(today.getTime() + hourOffset * 3600 * 1000);
+    const wholeHour = Math.floor(hourOffset);
+    const minutes = Math.round((hourOffset - wholeHour) * 60);
+    const pointDate = new Date(baseY, baseM, baseD, wholeHour, minutes, 0, 0);
 
     let sumMg = 0;
     for (const log of logs) {
-      const intakeDate = new Date(log.consumedAt);
-      const hoursPassed = (pointDate.getTime() - intakeDate.getTime()) / (3600 * 1000);
+      const intakeMs = new Date(log.consumedAt).getTime();
+      if (Number.isNaN(intakeMs)) continue;
+      const hoursPassed = (pointDate.getTime() - intakeMs) / (3600 * 1000);
       if (hoursPassed >= 0) {
         sumMg += calculateRemainingCaffeineMg(log.caffeineMg, hoursPassed, halfLifeHours);
       }
@@ -113,6 +122,7 @@ export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
     bedtimeOffset += 24;
   }
   const bedtimeX = getX(bedtimeOffset);
+  const bedtimeNearRightEdge = bedtimeX > paddingLeft + innerWidth - 48;
 
   return (
     <View style={styles.chartContainer}>
@@ -152,13 +162,14 @@ export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
               strokeWidth="1.2"
             />
             <SvgText
-              x={bedtimeX - 10}
+              x={bedtimeNearRightEdge ? bedtimeX - 6 : bedtimeX + 4}
               y={paddingTop + 10}
               fill={theme.colors.statusStable}
               fontSize="9"
               fontWeight="700"
+              textAnchor={bedtimeNearRightEdge ? 'end' : 'start'}
             >
-              {formatTemplate(t.caffeine.chartBedtimeMarker, { hour: bedtimeHour })}
+              {formatTemplate(t.caffeine.chartBedtimeMarker, { hour: normalizeBedtimeHourNumber(bedtimeHour) })}
             </SvgText>
           </>
         )}
@@ -176,13 +187,13 @@ export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
           strokeLinejoin="round"
         />
 
-        {/* Kropki spożytych dawek */}
+        {/* Kropki spożytych dawek (wyłącznie mieszczących się w oknie osi 06:00–06:00) */}
         {logs.map((log) => {
-          const logDate = new Date(log.consumedAt);
-          let hourOffset = logDate.getHours() + logDate.getMinutes() / 60;
-          if (hourOffset < startHour) hourOffset += 24;
-          if (hourOffset >= startHour && hourOffset <= startHour + totalHours) {
-            const x = getX(hourOffset);
+          const logMs = new Date(log.consumedAt).getTime();
+          if (Number.isNaN(logMs)) return null;
+          if (logMs >= chartStartDate.getTime() && logMs <= chartEndDate.getTime()) {
+            const fraction = (logMs - chartStartDate.getTime()) / chartSpanMs;
+            const x = paddingLeft + fraction * innerWidth;
             return (
               <Circle
                 key={log.id}

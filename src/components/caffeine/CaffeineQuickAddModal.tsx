@@ -33,7 +33,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
   const tc = (isEn ? translations.en : translations.pl).caffeine;
 
   return (
-    <Modal visible={visible} animationType="fade" transparent={true}>
+    <Modal visible={visible} animationType="fade" transparent={true} onRequestClose={onClose}>
       <View style={styles.modalOverlay} testID="caffeine-quick-modal">
         <View style={styles.modalCard}>
           <ModalHeader
@@ -63,7 +63,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
                   onPress={() => onSelectOption(isEn ? 'Filter Coffee (V60 / Drip)' : 'Kawa przelewowa (V60 / Drip)', 'coffee', 18, v60Mg)}
                 >
                   <Text style={styles.quickOptionName}>{tc.quickFilterLabel}</Text>
-                  <Text style={styles.quickOptionMg}>~{v60Mg} mg ({formatDoseWeight(18, unitSystem)})</Text>
+                  <Text style={styles.quickOptionMg}>~{v60Mg} mg ({formatDoseWeight(18, unitSystem, language)})</Text>
                 </Pressable>
 
                 <Pressable
@@ -75,7 +75,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
                   onPress={() => onSelectOption(isEn ? 'Double Espresso' : 'Podwójne Espresso', 'coffee', 18, doubleEspressoMg)}
                 >
                   <Text style={styles.quickOptionName}>{tc.quickDoubleEspressoLabel}</Text>
-                  <Text style={styles.quickOptionMg}>~{doubleEspressoMg} mg ({formatDoseWeight(18, unitSystem)})</Text>
+                  <Text style={styles.quickOptionMg}>~{doubleEspressoMg} mg ({formatDoseWeight(18, unitSystem, language)})</Text>
                 </Pressable>
 
                 <Pressable
@@ -87,7 +87,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
                   onPress={() => onSelectOption(isEn ? 'Single Espresso' : 'Pojedyncze Espresso', 'coffee', 9, singleEspressoMg)}
                 >
                   <Text style={styles.quickOptionName}>{tc.quickSingleEspressoLabel}</Text>
-                  <Text style={styles.quickOptionMg}>~{singleEspressoMg} mg ({formatDoseWeight(9, unitSystem)})</Text>
+                  <Text style={styles.quickOptionMg}>~{singleEspressoMg} mg ({formatDoseWeight(9, unitSystem, language)})</Text>
                 </Pressable>
 
                 <Pressable
@@ -99,7 +99,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
                   onPress={() => onSelectOption('AeroPress', 'coffee', 15, aeropressMg)}
                 >
                   <Text style={styles.quickOptionName}>AeroPress</Text>
-                  <Text style={styles.quickOptionMg}>~{aeropressMg} mg ({formatDoseWeight(15, unitSystem)})</Text>
+                  <Text style={styles.quickOptionMg}>~{aeropressMg} mg ({formatDoseWeight(15, unitSystem, language)})</Text>
                 </Pressable>
               </>
             );
@@ -115,7 +115,7 @@ export const CaffeineQuickAddModal: React.FC<CaffeineQuickAddModalProps> = ({
             onPress={() => onSelectOption(isEn ? 'Artisan Loose Tea' : 'Herbata Gongfu / Liściasta', 'tea', 5, 45)}
           >
             <Text style={styles.quickOptionName}>{tc.quickLooseTeaLabel}</Text>
-            <Text style={styles.quickOptionMg}>~45 mg ({formatDoseWeight(5, unitSystem)})</Text>
+            <Text style={styles.quickOptionMg}>~45 mg ({formatDoseWeight(5, unitSystem, language)})</Text>
           </Pressable>
         </View>
       </View>

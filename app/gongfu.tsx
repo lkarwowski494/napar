@@ -193,7 +193,17 @@ export default function GongfuScreen() {
   const handleAdjustTime = (delta: number) => {
     const updated = Math.max(3, targetSeconds + delta);
     setTargetSeconds(updated);
-    setRemainingSeconds(updated);
+    if (isPaused) {
+      const baseLeftMs = pausedLeftMsRef.current ?? remainingSeconds * 1000;
+      const nextLeftMs = Math.max(1000, baseLeftMs + delta * 1000);
+      pausedLeftMsRef.current = nextLeftMs;
+      setRemainingSeconds(Math.ceil(nextLeftMs / 1000));
+    } else if (isSteeping && targetEndMsRef.current) {
+      targetEndMsRef.current = Math.max(Date.now() + 1000, targetEndMsRef.current + delta * 1000);
+      setRemainingSeconds(Math.max(1, Math.ceil((targetEndMsRef.current - Date.now()) / 1000)));
+    } else {
+      setRemainingSeconds(updated);
+    }
     signalHaptic('light');
   };
 

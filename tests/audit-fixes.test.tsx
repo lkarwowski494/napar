@@ -1491,6 +1491,9 @@ describe('M1-audytor-generalny-031: każdy element dotykowy ma rolę i etykietę
       tree = renderer.create(<Caffeine />);
     });
     expect(tree!.root.findAll((n) => n.props.testID === 'caffeine-over-limit')).toHaveLength(0);
+    act(() => {
+      tree!.unmount();
+    });
     spy.mockRestore();
   });
 });
@@ -1660,9 +1663,13 @@ describe('M1-audytor-generalny-033: interfejs EN bez polskich tekstów; kontrola
     ];
     const spy = jest.spyOn(db, 'getCaffeineLogs').mockReturnValue(logs);
     const Caffeine = require('../app/(tabs)/caffeine').default;
-    expect(polishIn(renderEn(<Caffeine />))).toEqual([]);
+    const caffWithLogs = renderEn(<Caffeine />);
+    expect(polishIn(caffWithLogs)).toEqual([]);
+    act(() => caffWithLogs.unmount());
     spy.mockReturnValue([]);
-    expect(polishIn(renderEn(<Caffeine />))).toEqual([]);
+    const caffEmpty = renderEn(<Caffeine />);
+    expect(polishIn(caffEmpty)).toEqual([]);
+    act(() => caffEmpty.unmount());
     spy.mockRestore();
     const { CaffeineQuickAddModal } = require('../src/components/caffeine/CaffeineQuickAddModal');
     expect(polishIn(renderEn(<CaffeineQuickAddModal visible unitSystem="metric" language="en" onClose={() => {}} onSelectOption={() => {}} />))).toEqual([]);

@@ -25,6 +25,7 @@ export interface GrinderSelectModalProps {
   onSelectGrinder: (grinderId: string) => void;
   recipe: MasterRecipe | SavedRecipe;
   t: any;
+  language?: 'pl' | 'en';
 }
 
 export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
@@ -34,13 +35,14 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
   onSelectGrinder,
   recipe,
   t,
+  language = 'pl',
 }) => {
   if (!visible) return null;
 
   const recLabel = t?.grinder?.recommendationLabel || (t?.common?.save ? 'Rekomendacja:' : 'Recommendation:');
 
   return (
-    <Modal visible={visible} animationType="slide">
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <ModalHeader
           onClose={onClose}
@@ -59,7 +61,8 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
           <Text style={styles.modalSub}>{t.brew.grinderModalDesc}</Text>
           {SUPPORTED_GRINDERS.map((grinder) => {
             const isSelected = grinderId === grinder.id;
-            const rec = getRecommendedGrindForRecipe(recipe, grinder.id);
+            const rec = getRecommendedGrindForRecipe(recipe, grinder.id, language);
+            const displayName = rec.grinderName;
             return (
               <Pressable
                 key={grinder.id}
@@ -74,7 +77,7 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
                 }}
                 accessibilityRole="radio"
                 accessibilityState={{ selected: isSelected }}
-                accessibilityLabel={`${grinder.name}, ${rec.formatted}`}
+                accessibilityLabel={`${displayName}, ${rec.formatted}`}
                 accessibilityHint={isSelected ? (t?.common?.selected || 'Wybrany młynek') : (t?.common?.select || 'Wybierz ten młynek')}
               >
                 <View style={{ flex: 1 }}>
@@ -87,7 +90,7 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
                       },
                     ]}
                   >
-                    {grinder.name}
+                    {displayName}
                   </Text>
                   <Text style={styles.grinderItemRecommendation}>
                     {recLabel} {rec.formatted} ({rec.microns} µm)

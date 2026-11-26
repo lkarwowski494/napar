@@ -116,12 +116,12 @@ describe('Common UI Components (S1..S16)', () => {
       });
       expect(onChangeNumber).toHaveBeenCalledWith(100);
 
-      // Wpisanie pustego tekstu
+      // Wpisanie pustego tekstu przy min=10 powinno ograniczyć do min (10)
       renderer.act(() => {
         textInput.props.onChangeText('');
         textInput.props.onBlur({ nativeEvent: {} });
       });
-      expect(onChangeNumber).toHaveBeenCalledWith(0);
+      expect(onChangeNumber).toHaveBeenCalledWith(10);
     });
   });
 

@@ -171,6 +171,7 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         onSelectGrinder={setGrinderId}
         recipe={recipe}
         t={t}
+        language={language}
       />
 
       {/* Modal Udostępniania Receptury (Offline QR) */}

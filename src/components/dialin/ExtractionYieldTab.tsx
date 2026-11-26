@@ -1,8 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
 import { calculateExtractionYield, calculateLiquidYield } from '../../core/domain-rules';
-import { parseLocaleFloat } from '../../core/unit-converter';
+import { parseLocaleFloat, formatDecimal } from '../../core/unit-converter';
 import { theme, withAlpha } from '../../core/theme';
+
+const EY_DEFAULTS = {
+  pourover: { water: '250', dose: '15', tds: '1.35' },
+  espresso: { water: '36', dose: '18', tds: '9.5' },
+} as const;
 
 export interface ExtractionYieldTabProps {
   language: string;
@@ -11,9 +16,26 @@ export interface ExtractionYieldTabProps {
 
 export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language, t }) => {
   const [methodMode, setMethodMode] = useState<'pourover' | 'espresso'>('pourover');
-  const [eyWater, setEyWater] = useState('250');
-  const [eyDose, setEyDose] = useState('15');
-  const [eyTds, setEyTds] = useState('1.35');
+  const [eyWater, setEyWater] = useState<string>(EY_DEFAULTS.pourover.water);
+  const [eyDose, setEyDose] = useState<string>(EY_DEFAULTS.pourover.dose);
+  const [eyTds, setEyTds] = useState<string>(EY_DEFAULTS.pourover.tds);
+
+  const handleModeChange = (nextMode: 'pourover' | 'espresso') => {
+    if (nextMode === methodMode) return;
+    const prevDefaults = EY_DEFAULTS[methodMode];
+    const nextDefaults = EY_DEFAULTS[nextMode];
+    // Zamień wartości domyślne tylko gdy użytkownik nie wpisał własnych pomiarów
+    if (
+      eyWater.trim() === prevDefaults.water &&
+      eyDose.trim() === prevDefaults.dose &&
+      eyTds.trim() === prevDefaults.tds
+    ) {
+      setEyWater(nextDefaults.water);
+      setEyDose(nextDefaults.dose);
+      setEyTds(nextDefaults.tds);
+    }
+    setMethodMode(nextMode);
+  };
 
   const eyResult = useMemo(() => {
     const w = parseLocaleFloat(eyWater);
@@ -31,6 +53,8 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
     return null;
   }, [eyWater, eyDose, eyTds, methodMode]);
 
+  const activePlaceholders = EY_DEFAULTS[methodMode];
+
   return (
     <View>
       <Text style={styles.sectionHeader}>{t.dialin.eyTitle || 'Kalkulator Wydajności Ekstrakcji (EY%)'}</Text>
@@ -47,7 +71,7 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
             accessibilityState={{ selected: methodMode === 'pourover' }}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={[styles.modeBtn, methodMode === 'pourover' && styles.modeBtnActive]}
-            onPress={() => setMethodMode('pourover')}
+            onPress={() => handleModeChange('pourover')}
           >
             <Text style={[styles.modeBtnText, methodMode === 'pourover' && styles.modeBtnTextActive]}>
               {t?.dialin?.eyPouroverMode || 'Przelew (Pour-over)'}
@@ -60,7 +84,7 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
             accessibilityState={{ selected: methodMode === 'espresso' }}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={[styles.modeBtn, methodMode === 'espresso' && styles.modeBtnActive]}
-            onPress={() => setMethodMode('espresso')}
+            onPress={() => handleModeChange('espresso')}
           >
             <Text style={[styles.modeBtnText, methodMode === 'espresso' && styles.modeBtnTextActive]}>
               {t?.dialin?.eyEspressoMode || 'Espresso'}
@@ -80,7 +104,7 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
               keyboardType="decimal-pad"
               value={eyWater}
               onChangeText={setEyWater}
-              placeholder="250"
+              placeholder={activePlaceholders.water}
               placeholderTextColor={theme.colors.textMuted}
             />
           </View>
@@ -91,7 +115,7 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
               keyboardType="decimal-pad"
               value={eyDose}
               onChangeText={setEyDose}
-              placeholder="15"
+              placeholder={activePlaceholders.dose}
               placeholderTextColor={theme.colors.textMuted}
             />
           </View>
@@ -105,7 +129,7 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
           keyboardType="decimal-pad"
           value={eyTds}
           onChangeText={setEyTds}
-          placeholder="1.35"
+          placeholder={activePlaceholders.tds}
           placeholderTextColor={theme.colors.textMuted}
         />
 
@@ -113,7 +137,7 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
           <View style={styles.eyResultBox}>
             <Text style={styles.resultLabel}>{t.dialin.eyResultLabel}</Text>
             <Text style={styles.eyLargeNumber}>
-              {eyResult.extractionYieldPercent}%
+              {formatDecimal(eyResult.extractionYieldPercent, 1, language)}%
             </Text>
 
             {/* Ocena SCA (18–22% EY) dotyczy naparu przelewowego; dla espresso tylko wynik EY (M1-audytor-generalny-018, 06-tresci-011) */}

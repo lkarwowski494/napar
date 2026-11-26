@@ -101,7 +101,7 @@ export default function DialInScreen() {
         list = diagnoseExtractionTaste({ isWatery: true });
         break;
       case 'astringent_tea':
-        list = diagnoseExtractionTaste({ isAstringent: true });
+        list = diagnoseExtractionTaste({ isAstringent: true, beverageType: 'TEA' });
         break;
       default:
         list = diagnoseExtractionTaste({});

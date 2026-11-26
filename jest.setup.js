@@ -36,6 +36,7 @@ jest.mock('expo-file-system/legacy', () => {
 // importowane z głównego modułu rzucają w SDK 57; kod aplikacji importuje teraz 'expo-file-system/legacy'.
 
 jest.mock('expo-audio', () => ({
+  setAudioModeAsync: jest.fn().mockResolvedValue(undefined),
   createAudioPlayer: jest.fn(() => ({
     play: jest.fn(),
     pause: jest.fn(),

@@ -434,7 +434,7 @@ describe('Partia D1 — DEEP-003 & DEEP-004: Polski przecinek + BrewRatioTab imp
       inputs[1].props.onChangeText('15');
       inputs[2].props.onChangeText('1,35');
     });
-    expect(JSON.stringify(tree!.toJSON())).toContain('19.8');
+    expect(JSON.stringify(tree!.toJSON())).toContain('19,8');
   });
 
   test('WaterChemistryTab realnie przelicza połowę minerałów dla "0,5" L i pozwala na 0 ppm KH bez nadpisania na 40', () => {

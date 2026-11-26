@@ -7,7 +7,11 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 import { useTranslation } from '../../core/i18n';
-import { formatDecimal } from '../../core/unit-converter';
+import {
+  formatDecimal,
+  formatBedtimeHour,
+  normalizeBedtimeHourNumber,
+} from '../../core/unit-converter';
 
 interface BedtimeCurfewCardProps {
   bedtimeHour: number;
@@ -41,7 +45,7 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
           >
             <Text style={styles.hourBtnText}>−</Text>
           </Pressable>
-          <Text style={styles.bedtimeHourText}>{`${bedtimeHour}:00`}</Text>
+          <Text style={styles.bedtimeHourText}>{formatBedtimeHour(bedtimeHour)}</Text>
           <Pressable
             testID="bedtime-inc-btn"
             style={styles.hourBtn}
@@ -88,7 +92,9 @@ export const BedtimeCurfewCard: React.FC<BedtimeCurfewCardProps> = ({
 
       <View style={styles.estimateBox} testID="bedtime-estimate">
         <Text style={styles.estimateText}>
-          {t.caffeine.bedtimeEstimate.replace('{hour}', String(bedtimeHour)).replace('{mg}', String(bedtimeMg))}
+          {t.caffeine.bedtimeEstimate
+            .replace('{hour}', normalizeBedtimeHourNumber(bedtimeHour))
+            .replace('{mg}', String(bedtimeMg))}
         </Text>
       </View>
 

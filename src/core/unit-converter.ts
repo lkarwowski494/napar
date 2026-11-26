@@ -170,7 +170,7 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
   const safePrev = typeof prevBase === 'number' && Number.isFinite(prevBase) ? (Object.is(prevBase, -0) ? 0 : prevBase) : 0;
   if (typeof txt !== 'string') return safePrev;
   const clean = txt.replace(/[\x00-\x1F\x7F\uFEFF]/g, '').trim().replace(/,/g, '.');
-  const m = clean.match(/^[+-]?\d+(?:\.\d+)?/);
+  const m = clean.match(/^[+-]?(?:\d+(?:\.\d+)?|\.\d+)/);
   if (!m) return safePrev;
   const xIn = parseFloat(m[0]);
   if (isNaN(xIn) || !isFinite(xIn)) {
@@ -179,7 +179,7 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
   if (Object.is(xIn, -0)) return 0;
 
   // Współczynniki konwersji jednostek
-  const u = typeof unit === 'string' ? unit.toLowerCase() : '';
+  const u = typeof unit === 'string' ? unit.toLowerCase().trim() : '';
   let cu = 1;
   const isFahrenheit = u === '°f' || u === 'f';
 
@@ -193,17 +193,25 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
     cu = 1;
   }
 
+  // Dla jednostek metrycznych (bez konwersji skali) nie tłumimy drobnych korekt użytkownika
+  if (cu === 1 && !isFahrenheit) {
+    return roundTo(xIn, 2);
+  }
+
   if (prevBase !== undefined && Number.isFinite(prevBase) && prevBase > 0) {
     if (isFahrenheit) {
-      const fPrev = roundTo((prevBase * 9) / 5 + 32, 1);
-      if (roundTo(xIn, 1) === fPrev) {
+      const fPrev1 = roundTo((prevBase * 9) / 5 + 32, 1);
+      const fPrevInt = Math.round((prevBase * 9) / 5 + 32);
+      const hasDecimal = /\.\d+/.test(m[0]);
+      if (roundTo(xIn, 1) === fPrev1 || (!hasDecimal && Math.round(xIn) === fPrevInt)) {
         return prevBase;
       }
       return roundTo(((xIn - 32) * 5) / 9, 2);
     } else {
+      const hasTwoPlusDecimals = /\.\d{2,}/.test(m[0]);
       const fPrev1 = roundTo(prevBase * cu, 1);
       const fPrev2 = roundTo(prevBase * cu, 2);
-      if (roundTo(xIn, 1) === fPrev1 || roundTo(xIn, 2) === fPrev2) {
+      if ((!hasTwoPlusDecimals && roundTo(xIn, 1) === fPrev1) || roundTo(xIn, 2) === fPrev2) {
         return prevBase;
       }
       return roundTo(xIn / cu, 2);
@@ -215,6 +223,22 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
     return roundTo(((xIn - 32) * 5) / 9, 2);
   }
   return roundTo(xIn / cu, 2);
+}
+
+/**
+ * Normalizuje godzinę snu (np. 24 -> "00", 25 -> "01") do 2-cyfrowego zapisu zegarowego 00..23.
+ */
+export function normalizeBedtimeHourNumber(hour: number): string {
+  const safe = Number.isFinite(hour) ? Math.floor(hour) : 23;
+  const normalized = ((safe % 24) + 24) % 24;
+  return String(normalized).padStart(2, '0');
+}
+
+/**
+ * Formatuje godzinę snu w standardowym zapisie HH:00 (00:00..23:00 zamiast 24:00..28:00).
+ */
+export function formatBedtimeHour(hour: number): string {
+  return `${normalizeBedtimeHourNumber(hour)}:00`;
 }
 
 /**

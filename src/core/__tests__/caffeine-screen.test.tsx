@@ -20,29 +20,47 @@ jest.mock('../../data/database', () => ({
 }));
 
 describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const safeTodayConsumedAt = new Date(
+    Math.max(todayStart.getTime() + 60_000, Date.now() - 2 * 3600 * 1000)
+  ).toISOString();
   const mockLogs: CaffeineLog[] = [
     {
       id: 'log-1',
       beverageName: 'V60 Kenia Nyeri',
       beverageType: 'coffee',
-      consumedAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(), // 2h temu
+      consumedAt: safeTodayConsumedAt,
       doseGrams: 15,
       caffeineMg: 120,
     },
   ];
+
+  let activeTree: renderer.ReactTestRenderer | null = null;
+  const renderScreen = () => {
+    renderer.act(() => {
+      activeTree = renderer.create(<CaffeineScreen />);
+    });
+    return activeTree!;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
     (database.getCaffeineLogs as jest.Mock).mockReturnValue(mockLogs);
   });
 
-  test('Renderuje ekran kofeiny z aktywną dawką, wykresem kinetyki i historią', () => {
-    let tree: renderer.ReactTestRenderer;
-    renderer.act(() => {
-      tree = renderer.create(<CaffeineScreen />);
-    });
+  afterEach(() => {
+    if (activeTree) {
+      renderer.act(() => {
+        activeTree!.unmount();
+      });
+      activeTree = null;
+    }
+  });
 
-    const root = tree!.root;
+  test('Renderuje ekran kofeiny z aktywną dawką, wykresem kinetyki i historią', () => {
+    const tree = renderScreen();
+    const root = tree.root;
     expect(root.findByProps({ testID: 'bedtime-dec-btn' })).toBeDefined();
     expect(root.findByProps({ testID: 'bedtime-inc-btn' })).toBeDefined();
     expect(root.findByProps({ testID: 'halflife-dec-btn' })).toBeDefined();
@@ -52,12 +70,8 @@ describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
   });
 
   test('Koryguje docelową godzinę snu i zapisuje w bazie', () => {
-    let tree: renderer.ReactTestRenderer;
-    renderer.act(() => {
-      tree = renderer.create(<CaffeineScreen />);
-    });
-
-    const root = tree!.root;
+    const tree = renderScreen();
+    const root = tree.root;
     const decBtn = root.findByProps({ testID: 'bedtime-dec-btn' });
     const incBtn = root.findByProps({ testID: 'bedtime-inc-btn' });
 
@@ -73,12 +87,8 @@ describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
   });
 
   test('Koryguje czas półtrwania kofeiny (t1/2) i zapisuje w bazie', () => {
-    let tree: renderer.ReactTestRenderer;
-    renderer.act(() => {
-      tree = renderer.create(<CaffeineScreen />);
-    });
-
-    const root = tree!.root;
+    const tree = renderScreen();
+    const root = tree.root;
     const decBtn = root.findByProps({ testID: 'halflife-dec-btn' });
     const incBtn = root.findByProps({ testID: 'halflife-inc-btn' });
 
@@ -94,12 +104,8 @@ describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
   });
 
   test('Usuwa wpis kofeiny z historii i odświeża listę', () => {
-    let tree: renderer.ReactTestRenderer;
-    renderer.act(() => {
-      tree = renderer.create(<CaffeineScreen />);
-    });
-
-    const root = tree!.root;
+    const tree = renderScreen();
+    const root = tree.root;
     const deleteBtn = root.findByProps({ testID: 'delete-caffeine-log-log-1' });
 
     renderer.act(() => {
@@ -112,12 +118,8 @@ describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
   test('Renderuje stan pusty gdy brak wpisów w danym dniu', () => {
     (database.getCaffeineLogs as jest.Mock).mockReturnValue([]);
 
-    let tree: renderer.ReactTestRenderer;
-    renderer.act(() => {
-      tree = renderer.create(<CaffeineScreen />);
-    });
-
-    expect(tree!.toJSON()).toBeDefined();
+    const tree = renderScreen();
+    expect(tree.toJSON()).toBeDefined();
   });
 
   test('M1-audytor-generalny-004: błąd zapisu w setBedtimeHour i setCaffeineHalfLife cofa stan UI (rollback)', () => {
@@ -128,25 +130,21 @@ describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
       throw new Error('SQLITE_FULL');
     });
 
-    let tree: renderer.ReactTestRenderer;
-    renderer.act(() => {
-      tree = renderer.create(<CaffeineScreen />);
-    });
-
-    const root = tree!.root;
-    const beforeBedtime = JSON.stringify(tree!.toJSON());
+    const tree = renderScreen();
+    const root = tree.root;
+    const beforeBedtime = JSON.stringify(tree.toJSON());
     expect(beforeBedtime).toContain('23:00');
     expect(beforeBedtime).toContain('5.0 h');
 
     renderer.act(() => {
       root.findByProps({ testID: 'bedtime-dec-btn' }).props.onPress();
     });
-    expect(JSON.stringify(tree!.toJSON())).toContain('23:00');
+    expect(JSON.stringify(tree.toJSON())).toContain('23:00');
 
     renderer.act(() => {
       root.findByProps({ testID: 'halflife-dec-btn' }).props.onPress();
     });
-    expect(JSON.stringify(tree!.toJSON())).toContain('5.0 h');
+    expect(JSON.stringify(tree.toJSON())).toContain('5.0 h');
   });
 
   test('M1-audytor-generalny-006: uszkodzona data consumedAt z bazy nie powoduje NaN mg ani Invalid Date', () => {
@@ -161,12 +159,8 @@ describe('CaffeineScreen (Caffeine & Sleep Curfew)', () => {
       },
     ]);
 
-    let tree: renderer.ReactTestRenderer;
-    renderer.act(() => {
-      tree = renderer.create(<CaffeineScreen />);
-    });
-
-    const rendered = JSON.stringify(tree!.toJSON());
+    const tree = renderScreen();
+    const rendered = JSON.stringify(tree.toJSON());
     expect(rendered).not.toContain('NaN');
     expect(rendered).not.toContain('Invalid Date');
   });

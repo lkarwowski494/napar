@@ -8,8 +8,31 @@ import {
   NativeSyntheticEvent,
   TextInputFocusEventData,
 } from 'react-native';
-import { wInKeep, roundTo } from '../../core/unit-converter';
+import {
+  wInKeep,
+  roundTo,
+  celsiusToFahrenheit,
+  gramsToOunces,
+  mlToFluidOunces,
+} from '../../core/unit-converter';
 import { theme } from '../../core/theme';
+
+function formatBaseToUnitDisplay(baseVal: number, unit: string): string {
+  const u = typeof unit === 'string' ? unit.toLowerCase().trim() : '';
+  if (u === '°f' || u === 'f') {
+    return String(celsiusToFahrenheit(baseVal));
+  }
+  if (u === 'oz') {
+    return String(gramsToOunces(baseVal));
+  }
+  if (u === 'fl oz' || u === 'floz') {
+    return String(mlToFluidOunces(baseVal));
+  }
+  if (u === 'lb' || u === 'lbs') {
+    return String(roundTo(baseVal * 2.20462262185, 1));
+  }
+  return String(baseVal);
+}
 
 export interface NumInputProps extends Omit<TextInputProps, 'value' | 'onChangeText'> {
   value?: number | string;
@@ -48,7 +71,7 @@ export const NumInput: React.FC<NumInputProps> = ({
 
   // Synchronizacja gdy wartość z zewnątrz zmieni się w trakcie gdy pole nie jest edytowane
   useEffect(() => {
-    if (!isEditing) {
+    if (!isEditing && value !== undefined) {
       const init = formatInitial(value);
       setRawText(init);
       textRef.current = init;
@@ -67,29 +90,36 @@ export const NumInput: React.FC<NumInputProps> = ({
     setIsEditing(true);
   };
 
+  const clampValue = (n: number): number => {
+    let clamped = n;
+    if (min !== undefined && clamped < min) {
+      clamped = min;
+    }
+    if (max !== undefined && clamped > max) {
+      clamped = max;
+    }
+    return clamped;
+  };
+
   const handleBlur = (e: any) => {
     setIsEditing(false);
     const trimmed = textRef.current.trim();
     if (trimmed === '') {
-      textRef.current = '0';
-      setRawText('0');
-      if (onChangeNumber) onChangeNumber(0);
+      const emptyVal = clampValue(0);
+      const displayStr = formatBaseToUnitDisplay(emptyVal, unit);
+      textRef.current = displayStr;
+      setRawText(displayStr);
+      if (onChangeNumber) onChangeNumber(emptyVal);
       if (onBlur) onBlur(e);
       return;
     }
 
     // RD-ENG-01: Użyj wInKeep z propem stored i unit
-    let parsed = wInKeep(trimmed, unit, stored);
+    const parsed = clampValue(wInKeep(trimmed, unit, stored));
+    const displayStr = formatBaseToUnitDisplay(parsed, unit);
+    textRef.current = displayStr;
+    setRawText(displayStr);
 
-    // Ograniczenie min / max jeśli zdefiniowane
-    if (min !== undefined && parsed < min) {
-      parsed = min;
-    }
-    if (max !== undefined && parsed > max) {
-      parsed = max;
-    }
-
-    setRawText(String(parsed));
     if (onChangeNumber) {
       onChangeNumber(parsed);
     }

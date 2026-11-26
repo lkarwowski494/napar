@@ -144,11 +144,13 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     parseSetting: (text: string) => {
       // Jeśli format 7.5 -> 75 klików * 20um
       const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
-      const num = parseFloat(str) || 7.5;
-      if (num < 15) {
-        return num * 10 * 20.0;
+      const m = str.match(/\d+(?:\.\d+)?/);
+      const num = m ? parseFloat(m[0]) : 7.5;
+      const safe = Number.isFinite(num) && num > 0 ? num : 7.5;
+      if (safe < 15) {
+        return safe * 10 * 20.0;
       }
-      return num * 20.0;
+      return safe * 20.0;
     },
   },
   {
@@ -171,9 +173,11 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     parseSetting: (text: string) => {
       const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
       let sub = 0;
-      if (str.includes('⅓') || str.includes('1/3')) sub = 1;
-      else if (str.includes('⅔') || str.includes('2/3')) sub = 2;
-      const num = parseInt(str.replace(/[^0-9]/g, ''), 10) || 5;
+      if (str.includes('⅓') || /\b1\s*\/\s*3\b/.test(str)) sub = 1;
+      else if (str.includes('⅔') || /\b2\s*\/\s*3\b/.test(str)) sub = 2;
+      const cleaned = str.replace(/[⅓⅔]/g, '').replace(/\b[12]\s*\/\s*3\b/g, '').trim();
+      const match = cleaned.match(/\d+/);
+      const num = match ? parseInt(match[0], 10) : 5;
       const clicks = (num - 1) * 3 + 1 + sub;
       return 200 + clicks * 40.0;
     },
@@ -245,19 +249,22 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     burrTypeEn: 'Black Fusion (47mm conical)',
     stepMicrons: 10.0,
     minSetting: 10,
-    maxSetting: 50,
+    maxSetting: 250,
     micronsPerSettingOffset: 0,
     formatSetting: (clicks: number, lang = 'pl') => {
-      const major = Math.floor(clicks / 10);
-      const minor = Math.round(clicks % 10);
+      // Kinu M47: 50 klików na 1 pełny obrót (10 µm / klik)
+      const safeClicks = Object.is(Math.round(clicks), -0) ? 0 : Math.round(clicks);
+      const rotations = (safeClicks / 50).toFixed(1);
       const unitRot = lang === 'en' ? 'rotations' : 'obrotu';
       const unitClick = lang === 'en' ? 'clicks' : 'klików';
-      return `${major}.${minor} ${unitRot} (${clicks} ${unitClick})`;
+      return `${rotations} ${unitRot} (${safeClicks} ${unitClick})`;
     },
     parseSetting: (text: string) => {
       const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
-      const num = parseFloat(str) || 3.5;
-      return num < 10 ? num * 10 * 10.0 : num * 10.0;
+      const m = str.match(/\d+(?:\.\d+)?/);
+      const num = m ? parseFloat(m[0]) : 1.5;
+      const safe = Number.isFinite(num) && num > 0 ? num : 1.5;
+      return safe < 10 ? safe * 50 * 10.0 : safe * 10.0;
     },
   },
   {
@@ -295,9 +302,18 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
       return `${rot}.${sub}.${click} (${clicks} ${unit})`;
     },
     parseSetting: (text: string) => {
-      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
-      const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 50;
-      return num * 8.4;
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.').trim();
+      const dotted = str.match(/(\d+)\.(\d+)\.(\d+)/);
+      if (dotted) {
+        const rot = parseInt(dotted[1], 10);
+        const sub = parseInt(dotted[2], 10);
+        const click = parseInt(dotted[3], 10);
+        return (rot * 90 + sub * 10 + click) * 8.4;
+      }
+      const m = str.match(/\d+(?:\.\d+)?/);
+      const num = m ? parseFloat(m[0]) : 50;
+      const safe = Number.isFinite(num) && num > 0 ? num : 50;
+      return safe * 8.4;
     },
   },
   {
@@ -318,9 +334,18 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
       return `${rot}.${sub}.${click} (${clicks} ${unit})`;
     },
     parseSetting: (text: string) => {
-      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.');
-      const num = parseFloat(str.replace(/[^0-9.]/g, '')) || 45;
-      return num * 12.2;
+      const str = (typeof text === 'string' ? text : String(text || '')).replace(',', '.').trim();
+      const dotted = str.match(/(\d+)\.(\d+)\.(\d+)/);
+      if (dotted) {
+        const rot = parseInt(dotted[1], 10);
+        const sub = parseInt(dotted[2], 10);
+        const click = parseInt(dotted[3], 10);
+        return (rot * 60 + sub * 10 + click) * 12.2;
+      }
+      const m = str.match(/\d+(?:\.\d+)?/);
+      const num = m ? parseFloat(m[0]) : 45;
+      const safe = Number.isFinite(num) && num > 0 ? num : 45;
+      return safe * 12.2;
     },
   },
   {
@@ -591,6 +616,7 @@ export function getRecipeMicrons(recipe?: {
   method?: string;
   grindSettingDescriptionPl?: string;
   grindSettingDescriptionEn?: string;
+  grindSizeDescription?: string;
   grind_size_description?: string;
 } | null): number {
   if (!recipe || typeof recipe !== 'object') {
@@ -602,6 +628,8 @@ export function getRecipeMicrons(recipe?: {
       ? (recipe as any).grindSettingDescriptionPl
       : typeof (recipe as any).grindSettingDescriptionEn === 'string'
       ? (recipe as any).grindSettingDescriptionEn
+      : typeof (recipe as any).grindSizeDescription === 'string'
+      ? (recipe as any).grindSizeDescription
       : typeof (recipe as any).grind_size_description === 'string'
       ? (recipe as any).grind_size_description
       : ''
@@ -792,8 +820,6 @@ export function getRecipeMicrons(recipe?: {
     return 720;
   }
   if (
-    desc.includes('drobno') ||
-    desc.includes('fine') ||
     method === 'AEROPRESS' ||
     method.includes('AEROPRESS') ||
     method.includes('DELTER') ||
@@ -971,6 +997,10 @@ export function getRecipeMicrons(recipe?: {
   ) {
     return 1150;
   }
+  if (desc.includes('drobno') || desc.includes('fine')) {
+    if (desc.includes('16') || desc.includes('18')) return 520;
+    return 560;
+  }
   return 720;
 }
 
@@ -978,7 +1008,13 @@ export function getRecipeMicrons(recipe?: {
  * Zwraca rekomendację nastawy dla konkretnego młynka i receptury
  */
 export function getRecommendedGrindForRecipe(
-  recipe: { method?: string; grindSettingDescriptionPl?: string; grindSettingDescriptionEn?: string; grind_size_description?: string } | null | undefined,
+  recipe: {
+    method?: string;
+    grindSettingDescriptionPl?: string;
+    grindSettingDescriptionEn?: string;
+    grindSizeDescription?: string;
+    grind_size_description?: string;
+  } | null | undefined,
   grinderId: string,
   language = 'pl'
 ): { formatted: string; rawValue: number; grinderName: string; microns: number } {

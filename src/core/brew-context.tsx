@@ -96,8 +96,11 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // M1-audytor-generalny-033 (09-lokalizacja-002): język interfejsu — jedno źródło dla zapowiedzi,
   // nastawy młynka i opisu mielenia (także gdy język pochodzi z systemu, bez zapisanego app_language).
   const { language: uiLanguage } = useTranslation();
+  // Zapowiedzi VoiceOver i opis mielenia czytają język z ref (unikamy przestarzałych domknięć).
+  const uiLanguageRef = useRef(uiLanguage);
+  uiLanguageRef.current = uiLanguage;
   const masterGrind = (r: MasterRecipe) =>
-    uiLanguage === 'en' ? r.grindSettingDescriptionEn || r.grindSettingDescriptionPl : r.grindSettingDescriptionPl;
+    uiLanguageRef.current === 'en' ? r.grindSettingDescriptionEn || r.grindSettingDescriptionPl : r.grindSettingDescriptionPl;
   const [beveragePreference, setBeveragePreferenceState] = useState<BeveragePreference>(() => {
     try {
       return typeof getBeveragePreference === 'function' ? getBeveragePreference() : 'both';
@@ -194,9 +197,6 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [snapshot, setSnapshot] = useState<TimerSnapshot>(defaultInitialSnapshot);
   const engineRef = useRef<BrewTimerEngine | null>(null);
-  // Zapowiedzi VoiceOver czytają język z ref (silnik stopera tworzony raz na zestaw kroków).
-  const uiLanguageRef = useRef(uiLanguage);
-  uiLanguageRef.current = uiLanguage;
 
   useEffect(() => {
     const engine = new BrewTimerEngine(scaledSteps, {
@@ -358,8 +358,9 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let eyPercent: number | undefined;
     if (data.tdsPercentage && data.tdsPercentage > 0) {
       try {
+        const isEspressoLike = (method || '').trim().toLowerCase().includes('espresso');
         const beverageWeightGrams =
-          bevType === 'COFFEE' && method !== 'espresso'
+          bevType === 'COFFEE' && !isEspressoLike
             ? calculateLiquidYield(waterGrams, doseGrams)
             : waterGrams;
         const ey = calculateExtractionYield(beverageWeightGrams, data.tdsPercentage, doseGrams);
@@ -371,7 +372,16 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     let caffeineMg: number | undefined;
     if (bevType === 'COFFEE') {
-      caffeineMg = estimateCoffeeCaffeineMg(doseGrams);
+      const mUpper = (method || '').trim().toUpperCase();
+      const caffeineMethod: 'filter' | 'espresso' | 'immersion' | 'cold_brew' =
+        mUpper.includes('ESPRESSO') || mUpper.includes('MOKA') || mUpper.includes('FLAIR') || mUpper.includes('ROBOT') || mUpper.includes('LEVER')
+          ? 'espresso'
+          : mUpper.includes('COLD') || mUpper.includes('MIZUDASHI') || mUpper.includes('TODDY') || mUpper.includes('NITRO')
+          ? 'cold_brew'
+          : mUpper.includes('FRENCH') || mUpper.includes('AEROPRESS') || mUpper.includes('CLEVER') || mUpper.includes('SWITCH') || mUpper.includes('CUPPING') || mUpper.includes('PRASKA')
+          ? 'immersion'
+          : 'filter';
+      caffeineMg = estimateCoffeeCaffeineMg(doseGrams, 'arabica', caffeineMethod);
     } else {
       caffeineMg = estimateTeaInfusionCaffeineMg(estimateTotalLeafCaffeineMg(doseGrams), 1);
     }

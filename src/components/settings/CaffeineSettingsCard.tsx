@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { theme } from '../../core/theme';
 import { CAFFEINE_HALF_LIFE_MIN_H, CAFFEINE_HALF_LIFE_MAX_H } from '../../core/domain-rules';
-import { formatDecimal } from '../../core/unit-converter';
+import { formatDecimal, formatBedtimeHour } from '../../core/unit-converter';
 
 export interface CaffeineSettingsCardProps {
   halfLifeHours: number;
@@ -22,6 +22,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
   language = 'pl',
 }) => {
   const formattedHalfLife = formatDecimal(halfLifeHours, 1, language);
+  const formattedBedtime = formatBedtimeHour(bedtimeHour);
   return (
     <View>
       <Text style={styles.sectionTitle}>
@@ -85,7 +86,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
             style={styles.stepperContainer}
             accessibilityRole="adjustable"
             accessibilityLabel={t.settings.bedtimeHourTitle || 'Docelowa Godzina Snu'}
-            accessibilityValue={{ min: 18, max: 28, now: bedtimeHour, text: `${bedtimeHour}:00` }}
+            accessibilityValue={{ min: 18, max: 28, now: bedtimeHour, text: formattedBedtime }}
             accessibilityHint={t.settings.bedtimeHourDesc || 'Dostosuj docelową godzinę snu'}
           >
             <Pressable
@@ -98,7 +99,7 @@ export const CaffeineSettingsCard: React.FC<CaffeineSettingsCardProps> = ({
             >
               <Text style={styles.stepperBtnText}>−</Text>
             </Pressable>
-            <Text style={styles.stepperValueText}>{`${bedtimeHour}:00`}</Text>
+            <Text style={styles.stepperValueText}>{formattedBedtime}</Text>
             <Pressable
               style={styles.stepperBtn}
               hitSlop={8}
