@@ -117,7 +117,40 @@ describe('Partia D2: Audio (duckOthers, wyścig async) i BrewTimerEngine', () =>
     expect(subRemove).toHaveBeenCalledTimes(1);
     expect(playerRemove).toHaveBeenCalledTimes(1);
 
-    // Test wyścigu: stopTimerChime() w trakcie oczekiwania na setAudioModeAsync blokuje uruchomienie playera
+    // Test 1: Asynchroniczny listener -> stopTimerChime() czyści activeSub, timeout i player
+    const asyncSubRemove = jest.fn();
+    const asyncPlayerRemove = jest.fn();
+    createPlayerMock.mockImplementationOnce(() => ({
+      play: jest.fn(),
+      pause: jest.fn(),
+      remove: asyncPlayerRemove,
+      addListener: jest.fn(() => ({ remove: asyncSubRemove })),
+    }));
+    expect(await timerAudio.playTimerChime()).toBe(true);
+    timerAudio.stopTimerChime();
+    expect(asyncSubRemove).toHaveBeenCalledTimes(1);
+    expect(asyncPlayerRemove).toHaveBeenCalledTimes(1);
+
+    // Test 2: Asynchroniczny didJustFinish -> cleanup() usuwa localTimer, sub i player (idempotentnie)
+    let savedCb: ((s: any) => void) | null = null;
+    const delayedSubRemove = jest.fn();
+    const delayedPlayerRemove = jest.fn();
+    createPlayerMock.mockImplementationOnce(() => ({
+      play: jest.fn(),
+      pause: jest.fn(),
+      remove: delayedPlayerRemove,
+      addListener: jest.fn((_ev: string, cb: (s: any) => void) => {
+        savedCb = cb;
+        return { remove: delayedSubRemove };
+      }),
+    }));
+    expect(await timerAudio.playTimerChime()).toBe(true);
+    savedCb!({ didJustFinish: true });
+    savedCb!({ didJustFinish: true }); // idempotentne
+    expect(delayedSubRemove).toHaveBeenCalledTimes(1);
+    expect(delayedPlayerRemove).toHaveBeenCalledTimes(1);
+
+    // Test 3: Wyścig — stopTimerChime() w trakcie oczekiwania na setAudioModeAsync blokuje uruchomienie playera
     await jest.isolateModulesAsync(async () => {
       const freshAudio = require('../src/platform/timer-audio');
       let resolveMode!: () => void;
