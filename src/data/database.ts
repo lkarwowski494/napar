@@ -309,23 +309,26 @@ function seedMasterRecipes(db: SQLite.SQLiteDatabase): void {
   `);
 
   try {
-    for (const r of MASTER_RECIPES) {
-      insertStmt.executeSync({
-        $id: r.id,
-        $name: r.name,
-        $beverageType: r.type,
-        $method: r.method,
-        $author: r.author,
-        $description: `${r.name} (${r.author})`,
-        $doseG: r.coffeeOrTeaDoseGrams,
-        $waterG: r.waterWeightGrams,
-        $waterTempC: r.waterTemperatureCelsius,
-        $grindSize: r.grindSettingDescriptionPl,
-        $ratio: r.recommendedRatio,
-        $stepsJson: JSON.stringify(r.steps),
-        $createdAt: new Date().toISOString(),
-      });
-    }
+    const nowIso = new Date().toISOString();
+    runInTransactionSync(db, () => {
+      for (const r of MASTER_RECIPES) {
+        insertStmt.executeSync({
+          $id: r.id,
+          $name: r.name,
+          $beverageType: r.type,
+          $method: r.method,
+          $author: r.author,
+          $description: `${r.name} (${r.author})`,
+          $doseG: r.coffeeOrTeaDoseGrams,
+          $waterG: r.waterWeightGrams,
+          $waterTempC: r.waterTemperatureCelsius,
+          $grindSize: r.grindSettingDescriptionPl,
+          $ratio: r.recommendedRatio,
+          $stepsJson: JSON.stringify(r.steps),
+          $createdAt: nowIso,
+        });
+      }
+    });
   } finally {
     insertStmt.finalizeSync();
   }

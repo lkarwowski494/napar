@@ -172,4 +172,22 @@ describe('Partia D1 — DEEP-002: SQLite FOREIGN KEY na prawdziwym SQLite (PRAGM
       sqlite.__closeAll();
     }
   });
+
+  test('initDatabase dosiewa brakującą recepturę bazową nawet gdy COUNT(*) >= MASTER_RECIPES.length', () => {
+    const { db, sqlite } = loadDatabase();
+    try {
+      const target = db.getRecipes()[0];
+      const rawDb = db.getDatabase();
+      rawDb.runSync('DELETE FROM recipes WHERE id = ?', [target.id]);
+      rawDb.runSync(
+        `INSERT INTO recipes (id, name, beverage_type, method, dose_g, water_g, water_temp_c, recommended_ratio, steps_json, is_custom, is_favorite, created_at)
+         VALUES ('legacy-master-placeholder', 'Legacy', 'COFFEE', 'V60', 15, 250, 93, 16.6, '[]', 0, 0, '2026-01-01T00:00:00.000Z')`
+      );
+      expect(db.getRecipeById(target.id)).toBeNull();
+      db.initDatabase(rawDb);
+      expect(db.getRecipeById(target.id)).not.toBeNull();
+    } finally {
+      sqlite.__closeAll();
+    }
+  });
 });

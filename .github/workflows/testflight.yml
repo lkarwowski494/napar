@@ -62,7 +62,7 @@ jobs:
           if [ -n "$INPUT_BUILD_NUMBER" ]; then
             BUILD="$INPUT_BUILD_NUMBER"
           else
-            PROTO_BUILD=$(node -e "const fs=require('fs');const d='docs/jakosc/test-fizyczny';const nums=fs.existsSync(d)?fs.readdirSync(d).map(f=>Number(f.replace(/\.md$/,''))).filter(Number.isInteger):[];console.log(nums.length?Math.max(...nums):'');")
+            PROTO_BUILD=$(node -e "const fs=require('fs');const d='docs/jakosc/test-fizyczny';const nums=fs.existsSync(d)?fs.readdirSync(d).filter(f=>/^\d+\.md$/.test(f)).map(f=>Number(f.slice(0,-3))):[];console.log(nums.length?Math.max(...nums):'');")
             if [ -n "$PROTO_BUILD" ] && [ "$PROTO_BUILD" -gt "$BUILD_BASE" ]; then
               BUILD="$PROTO_BUILD"
             else
@@ -237,15 +237,15 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             COMPILER_INDEX_STORE_ENABLE=NO \
-            2>&1 | tee /tmp/xcodebuild-archive.log
-          ARCHIVE_RC=${PIPESTATUS[0]}
+            > /tmp/xcodebuild-archive.log 2>&1
+          ARCHIVE_RC=$?
           set -e
           grep -E "^(===|CompileC|Ld |Touch |RegisterExecutionPolicyException|\*\* ARCHIVE|error:|warning:.*\berror\b)" /tmp/xcodebuild-archive.log || true
 
           if [ "$ARCHIVE_RC" -ne 0 ] || [ ! -d "$RUNNER_TEMP/$APP_SCHEME.xcarchive/Products/Applications/$APP_SCHEME.app" ]; then
             echo "::error::Archiwum .xcarchive nie powiodło się (exit=$ARCHIVE_RC) — ostatnie 80 linii logu:"
             tail -80 /tmp/xcodebuild-archive.log
-            exit "${ARCHIVE_RC:-1}"
+            exit $((ARCHIVE_RC != 0 ? ARCHIVE_RC : 1))
           fi
           test -s "$SOURCEMAP_FILE" || echo "::warning::Brak mapy źródeł JS ($SOURCEMAP_FILE) — stos JS z raportu awarii nie da się zmapować"
 

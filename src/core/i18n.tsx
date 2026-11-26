@@ -736,6 +736,8 @@ export const translations = {
       jsonExportModalDesc: 'Poniższy kod JSON zawiera wszystkie Twoje wpisy ze spiżarni, historię parzeń oraz logi kofeiny. Możesz go skopiować i bezpiecznie zapisać:',
       jsonImportModalTitle: 'Importuj Dane JSON',
       jsonImportModalDesc: 'Wklej poniżej treść pliku JSON z kopią zapasową aplikacji Napar:',
+      importSuccessTitle: 'Sukces!',
+      importSuccessDesc: 'Dane zostały pomyślnie zaimportowane do Twojej lokalnej bazy.',
     },
     onboarding: {
       welcomeEyebrow: 'APPS4CRAFT STUDIO · 100% OFFLINE',
@@ -1466,6 +1468,8 @@ export const translations = {
       jsonExportModalDesc: 'The JSON below contains all your stash entries, brew history and caffeine logs. You can copy it and store it safely:',
       jsonImportModalTitle: 'Import JSON Data',
       jsonImportModalDesc: 'Paste the contents of a Napar JSON backup file below:',
+      importSuccessTitle: 'Success!',
+      importSuccessDesc: 'Data successfully imported to your local database.',
     },
     onboarding: {
       welcomeEyebrow: 'APPS4CRAFT STUDIO · 100% OFFLINE',

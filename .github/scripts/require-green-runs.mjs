@@ -49,7 +49,7 @@ function resolveDocsOnlyAncestors(targetSha) {
         stdio: ['ignore', 'pipe', 'ignore'],
       }).trim();
       const files = diff ? diff.split('\n').filter(Boolean) : [];
-      if (files.length > 0 && files.every((f) => f.startsWith('docs/jakosc/'))) {
+      if (files.every((f) => f.startsWith('docs/jakosc/'))) {
         eligible.push(anc);
       } else {
         break;

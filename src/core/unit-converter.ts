@@ -15,7 +15,7 @@ export function parseLocaleFloat(val: unknown): number {
   }
   if (typeof val === 'string') {
     const clean = val.replace(/[\x00-\x1F\x7F\uFEFF]/g, '').trim().replace(/,/g, '.');
-    const m = clean.match(/^[+-]?\d+(?:\.\d+)?/);
+    const m = clean.match(/^[+-]?(?:\d+(?:\.\d+)?|\.\d+)/);
     if (!m) return NaN;
     const num = parseFloat(m[0]);
     if (!Number.isFinite(num)) return NaN;

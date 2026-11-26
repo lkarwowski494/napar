@@ -79,7 +79,6 @@ export const JsonImportModal: React.FC<JsonImportModalProps> = ({
   const textValue = jsonText !== undefined ? jsonText : (importJsonText || '');
   const handleChangeText = onChangeJsonText || onChangeImportJsonText || (() => {});
   const handleConfirm = onConfirmImport || onImport || (() => {});
-  if (!visible) return null;
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose} onDismiss={onDismiss}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>

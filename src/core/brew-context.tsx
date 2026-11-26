@@ -278,21 +278,31 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // ignore
     }
     try {
-      if (typeof getRecipeById === 'function' && recipe?.id) {
+      const currentIsTea = 'beverageType' in recipe ? recipe.beverageType === 'TEA' : recipe.type === 'TEA';
+      const prefConflicts =
+        (nextPref === 'coffee' && currentIsTea) || (nextPref === 'tea' && !currentIsTea);
+      if (prefConflicts) {
+        const fallback = nextPref === 'tea' ? defaultTeaRecipe : defaultCoffeeRecipe;
+        selectRecipe(fallback);
+      } else if (typeof getRecipeById === 'function' && recipe?.id && !('steps' in recipe)) {
         const freshRecipe = getRecipeById(recipe.id);
-        if (freshRecipe) {
-          setRecipe(freshRecipe);
-        } else if ('isCustom' in recipe && recipe.isCustom) {
+        if (!freshRecipe && recipe.isCustom) {
           const fallback = nextPref === 'tea' ? defaultTeaRecipe : defaultCoffeeRecipe;
-          setRecipe(fallback);
-          setDoseGrams(fallback.coffeeOrTeaDoseGrams);
-          setWaterGrams(fallback.waterWeightGrams);
-          setWaterTempCelsius(fallback.waterTemperatureCelsius);
-          setGrindSetting(
-            uiLanguageRef.current === 'en'
-              ? fallback.grindSettingDescriptionEn || fallback.grindSettingDescriptionPl
-              : fallback.grindSettingDescriptionPl
-          );
+          selectRecipe(fallback);
+        } else if (freshRecipe) {
+          const changed =
+            freshRecipe.name !== recipe.name ||
+            freshRecipe.doseGrams !== recipe.doseGrams ||
+            freshRecipe.waterGrams !== recipe.waterGrams ||
+            freshRecipe.waterTempCelsius !== recipe.waterTempCelsius ||
+            freshRecipe.grindSizeDescription !== recipe.grindSizeDescription ||
+            freshRecipe.recommendedRatio !== recipe.recommendedRatio ||
+            freshRecipe.stepsJson !== recipe.stepsJson ||
+            freshRecipe.method !== recipe.method ||
+            freshRecipe.beverageType !== recipe.beverageType;
+          if (changed) {
+            selectRecipe(freshRecipe);
+          }
         }
       }
     } catch {

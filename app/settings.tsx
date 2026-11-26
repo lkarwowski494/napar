@@ -44,7 +44,7 @@ import { useBrew } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
 import { AppGuideModal } from '../src/components/AppGuideModal';
 import { clampCaffeineHalfLifeHours } from '../src/core/domain-rules';
-import { useTranslation } from '../src/core/i18n';
+import { useTranslation, translations } from '../src/core/i18n';
 import { safetyBackup } from '../src/data/backup';
 import { JsonExportModal, JsonImportModal } from '../src/components/settings/JsonBackupModals';
 import { CsvExportModal } from '../src/components/settings/CsvExportModal';
@@ -119,7 +119,8 @@ export default function SettingsScreen({
   const [exportedCsvText, setExportedCsvText] = useState('');
 
   // DEEP-005: ponowne wczytanie wszystkich ustawień z SQLite po imporcie kopii albo powrocie na ekran.
-  const reloadSettingsFromDb = useCallback((syncLanguage = false) => {
+  const reloadSettingsFromDb = useCallback((syncLanguage = false): 'pl' | 'en' => {
+    let effectiveLang: 'pl' | 'en' = language;
     try {
       setBeveragePreferenceState(getBeveragePreference());
     } catch {
@@ -164,13 +165,15 @@ export default function SettingsScreen({
       try {
         const storedLang = getAppSetting('app_language', '');
         if (storedLang === 'pl' || storedLang === 'en') {
+          effectiveLang = storedLang;
           setLanguage(storedLang);
         }
       } catch {
         // safe fallback
       }
     }
-  }, [setLanguage]);
+    return effectiveLang;
+  }, [language, setLanguage]);
 
   const useFocusEffectSafe =
     typeof ExpoRouter.useFocusEffect === 'function'
@@ -273,14 +276,12 @@ export default function SettingsScreen({
       await safetyBackup('import', buildBackupState());
 
       importDataJson(importJsonText.trim());
-      reloadSettingsFromDb(true);
+      const effectiveLang = reloadSettingsFromDb(true);
       brewCtx?.reloadFromDatabase?.();
       setShowImportModal(false);
       setImportJsonText('');
-      Alert.alert(
-        language === 'pl' ? 'Sukces!' : 'Success!',
-        language === 'pl' ? 'Dane zostały pomyślnie zaimportowane do Twojej lokalnej bazy.' : 'Data successfully imported to your local database.'
-      );
+      const nextT = translations[effectiveLang] || translations.en;
+      Alert.alert(nextT.settings.importSuccessTitle, nextT.settings.importSuccessDesc);
     } catch (e: any) {
       Alert.alert(
         language === 'pl' ? 'Nie udało się zaimportować' : 'Import failed',
