@@ -355,10 +355,16 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const sessionId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const nowIso = new Date().toISOString();
 
+    const mUpper = (method || '').trim().toUpperCase();
+    const isEspressoLike =
+      mUpper.includes('ESPRESSO') ||
+      mUpper.includes('FLAIR') ||
+      mUpper.includes('ROBOT') ||
+      (!mUpper.includes('CLEVER') && mUpper.includes('LEVER'));
+
     let eyPercent: number | undefined;
     if (data.tdsPercentage && data.tdsPercentage > 0) {
       try {
-        const isEspressoLike = (method || '').trim().toLowerCase().includes('espresso');
         const beverageWeightGrams =
           bevType === 'COFFEE' && !isEspressoLike
             ? calculateLiquidYield(waterGrams, doseGrams)
@@ -372,14 +378,18 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     let caffeineMg: number | undefined;
     if (bevType === 'COFFEE') {
-      const mUpper = (method || '').trim().toUpperCase();
       const caffeineMethod: 'filter' | 'espresso' | 'immersion' | 'cold_brew' =
-        mUpper.includes('ESPRESSO') || mUpper.includes('MOKA') || mUpper.includes('FLAIR') || mUpper.includes('ROBOT') || mUpper.includes('LEVER')
+        mUpper.includes('CLEVER') ||
+        mUpper.includes('FRENCH') ||
+        mUpper.includes('AEROPRESS') ||
+        mUpper.includes('SWITCH') ||
+        mUpper.includes('CUPPING') ||
+        mUpper.includes('PRASKA')
+          ? 'immersion'
+          : isEspressoLike || mUpper.includes('MOKA')
           ? 'espresso'
           : mUpper.includes('COLD') || mUpper.includes('MIZUDASHI') || mUpper.includes('TODDY') || mUpper.includes('NITRO')
           ? 'cold_brew'
-          : mUpper.includes('FRENCH') || mUpper.includes('AEROPRESS') || mUpper.includes('CLEVER') || mUpper.includes('SWITCH') || mUpper.includes('CUPPING') || mUpper.includes('PRASKA')
-          ? 'immersion'
           : 'filter';
       caffeineMg = estimateCoffeeCaffeineMg(doseGrams, 'arabica', caffeineMethod);
     } else {

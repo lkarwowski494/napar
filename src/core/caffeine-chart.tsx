@@ -48,9 +48,18 @@ export const CaffeineCurveChart: React.FC<CaffeineChartProps> = ({
   const totalHours = 24;
 
   const now = new Date();
-  const baseY = now.getFullYear();
-  const baseM = now.getMonth();
-  const baseD = now.getDate();
+  const anchorDate = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getHours() < startHour ? now.getDate() - 1 : now.getDate(),
+    0,
+    0,
+    0,
+    0
+  );
+  const baseY = anchorDate.getFullYear();
+  const baseM = anchorDate.getMonth();
+  const baseD = anchorDate.getDate();
   const chartStartDate = new Date(baseY, baseM, baseD, startHour, 0, 0, 0);
   const chartEndDate = new Date(baseY, baseM, baseD, startHour + totalHours, 0, 0, 0);
   const chartSpanMs = Math.max(1, chartEndDate.getTime() - chartStartDate.getTime());

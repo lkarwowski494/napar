@@ -252,9 +252,9 @@ export const SUPPORTED_GRINDERS: GrinderModel[] = [
     maxSetting: 250,
     micronsPerSettingOffset: 0,
     formatSetting: (clicks: number, lang = 'pl') => {
-      // Kinu M47: 50 klików na 1 pełny obrót (10 µm / klik)
+      // Kinu M47: 50 klików na 1 pełny obrót (10 µm / klik, 0.02 obrotu / klik)
       const safeClicks = Object.is(Math.round(clicks), -0) ? 0 : Math.round(clicks);
-      const rotations = (safeClicks / 50).toFixed(1);
+      const rotations = (safeClicks / 50).toFixed(2);
       const unitRot = lang === 'en' ? 'rotations' : 'obrotu';
       const unitClick = lang === 'en' ? 'clicks' : 'klików';
       return `${rotations} ${unitRot} (${safeClicks} ${unitClick})`;

@@ -12,6 +12,7 @@ let soundInstance: AudioPlayer | null = null;
 let cleanupTimer: any = null;
 let activeSub: { remove?: () => void } | null = null;
 let audioModeConfigured = false;
+let playToken = 0;
 
 // Gentle short acoustic chime tone encoded as valid RIFF WAV with PCM samples (880Hz kitchen chime)
 export const CHIME_AUDIO_DATA_URI =
@@ -21,6 +22,7 @@ export const CHIME_AUDIO_DATA_URI =
  * Stops any actively playing timer chime and safely disposes audio resources.
  */
 export function stopTimerChime(): void {
+  playToken++;
   if (cleanupTimer) {
     clearTimeout(cleanupTimer);
     cleanupTimer = null;
@@ -52,6 +54,7 @@ export async function playTimerChime(): Promise<boolean> {
   if (!getSoundEnabled()) return false;
   try {
     stopTimerChime();
+    const myToken = ++playToken;
 
     // Konfiguracja sesji audio: ścisza (duckOthers) zamiast pauzować muzykę/podcasty w tle (iOS/Android)
     if (!audioModeConfigured && typeof setAudioModeAsync === 'function') {
@@ -67,16 +70,28 @@ export async function playTimerChime(): Promise<boolean> {
       }
     }
 
+    // Jeśli w trakcie await wywołano stopTimerChime() lub nowsze playTimerChime(), nie uruchamiamy przestarzałego dźwięku
+    if (myToken !== playToken) {
+      return false;
+    }
+
     const player = createAudioPlayer(CHIME_AUDIO_DATA_URI);
     player.play();
     soundInstance = player;
 
     let sub: { remove?: () => void } | null = null;
+    let localTimer: any = null;
+    let cleaned = false;
 
     const cleanup = () => {
-      if (cleanupTimer) {
-        clearTimeout(cleanupTimer);
-        cleanupTimer = null;
+      if (cleaned) return;
+      cleaned = true;
+      if (localTimer) {
+        clearTimeout(localTimer);
+        if (cleanupTimer === localTimer) {
+          cleanupTimer = null;
+        }
+        localTimer = null;
       }
       if (sub && typeof sub.remove === 'function') {
         try {
@@ -101,18 +116,32 @@ export async function playTimerChime(): Promise<boolean> {
 
     if (typeof (player as any).addListener === 'function') {
       try {
-        sub = (player as any).addListener('playbackStatusUpdate', (status: any) => {
+        const addedSub = (player as any).addListener('playbackStatusUpdate', (status: any) => {
           if (status?.didJustFinish) {
             cleanup();
           }
         });
-        activeSub = sub;
+        if (cleaned) {
+          if (addedSub && typeof addedSub.remove === 'function') {
+            try {
+              addedSub.remove();
+            } catch {
+              // safe fallback
+            }
+          }
+        } else {
+          sub = addedSub;
+          activeSub = addedSub;
+        }
       } catch {
         // fallback
       }
     }
 
-    cleanupTimer = setTimeout(cleanup, 1500);
+    if (!cleaned) {
+      localTimer = setTimeout(cleanup, 1500);
+      cleanupTimer = localTimer;
+    }
     return true;
   } catch {
     return false;

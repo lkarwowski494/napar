@@ -66,9 +66,10 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
       {/* Przyciski korekty czasu +/- 5s */}
       <View style={styles.adjustRow}>
         <Pressable
+          testID="gongfu-adjust-minus-btn"
           style={styles.adjustBtn}
           onPress={() => onAdjustTime(-5)}
-          disabled={isSteeping}
+          disabled={isSteeping || steepFinished}
           accessibilityRole="button"
           accessibilityLabel={t.gongfu.subSeconds}
         >
@@ -78,9 +79,10 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
           {isSteeping ? t.gongfu.steepingInProgress : formatTemplate(t.gongfu.targetSeconds, { seconds: targetSeconds })}
         </Text>
         <Pressable
+          testID="gongfu-adjust-plus-btn"
           style={styles.adjustBtn}
           onPress={() => onAdjustTime(5)}
-          disabled={isSteeping}
+          disabled={isSteeping || steepFinished}
           accessibilityRole="button"
           accessibilityLabel={t.gongfu.addSeconds}
         >
@@ -145,6 +147,7 @@ export const GongfuActiveInfusion: React.FC<GongfuActiveInfusionProps> = ({
             placeholder={t.gongfu.infusionNotesPlaceholder}
           />
           <Pressable
+            testID="gongfu-record-btn"
             style={styles.recordNextBtn}
             onPress={onRecordCurrentInfusion}
             accessibilityRole="button"

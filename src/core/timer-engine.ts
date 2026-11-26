@@ -565,14 +565,23 @@ export class BrewTimerEngine {
     if (!currentStep) return;
     const newDuration = Math.max(this.stepElapsedSeconds + 1, currentStep.durationSeconds + deltaSeconds);
     currentStep.durationSeconds = newDuration;
-    this.lastWarningKey = null;
+    let newRemainingSec = Math.max(1, newDuration - this.stepElapsedSeconds);
     if (this.status === 'running') {
-      const remSec = Math.max(1, currentStep.durationSeconds - this.stepElapsedSeconds);
-      this.stepEndAtMs = Date.now() + remSec * 1000;
+      this.stepEndAtMs = Date.now() + newRemainingSec * 1000;
       this.pausedRemainingMs = null;
     } else if (this.status === 'paused' && this.pausedRemainingMs !== null) {
       const maxAllowedMs = Math.max(1000, (newDuration - this.stepElapsedSeconds) * 1000);
       this.pausedRemainingMs = Math.min(maxAllowedMs, Math.max(1000, this.pausedRemainingMs + deltaSeconds * 1000));
+      newRemainingSec = Math.ceil(this.pausedRemainingMs / 1000);
+    }
+    if (newRemainingSec > 3) {
+      this.lastWarningKey = null;
+      this.chimePlayedForStep = null;
+    } else {
+      const currentKey = `${this.currentStepIndex}:${newRemainingSec}`;
+      if (this.lastWarningKey !== currentKey) {
+        this.lastWarningKey = null;
+      }
     }
     this.notifyTick();
   }

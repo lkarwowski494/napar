@@ -39,7 +39,7 @@ export const GrinderSelectModal: React.FC<GrinderSelectModalProps> = ({
 }) => {
   if (!visible) return null;
 
-  const recLabel = t?.grinder?.recommendationLabel || (t?.common?.save ? 'Rekomendacja:' : 'Recommendation:');
+  const recLabel = t?.grinder?.recommendationLabel || '';
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>

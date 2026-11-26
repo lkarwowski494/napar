@@ -93,10 +93,17 @@ export default function CaffeineScreen() {
 
   const loadLogs = useCallback(() => {
     try {
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-      // 48h okno: wczorajsze późne dawki wciąż mogą być aktywne w organizmie dzisiaj
-      const windowStart = new Date(todayStart.getTime() - 24 * 3600 * 1000);
+      const nowDate = new Date();
+      // 48h okno kalendarzowe (odporne na DST): wczorajsze późne dawki wciąż mogą być aktywne dzisiaj
+      const windowStart = new Date(
+        nowDate.getFullYear(),
+        nowDate.getMonth(),
+        nowDate.getDate() - 1,
+        0,
+        0,
+        0,
+        0
+      );
       const data = getCaffeineLogs(windowStart.toISOString());
       setLogs(data);
       setNowMs(Date.now());

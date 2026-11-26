@@ -191,17 +191,28 @@ export default function GongfuScreen() {
   };
 
   const handleAdjustTime = (delta: number) => {
-    const updated = Math.max(3, targetSeconds + delta);
-    setTargetSeconds(updated);
+    if (steepFinished) return;
     if (isPaused) {
       const baseLeftMs = pausedLeftMsRef.current ?? remainingSeconds * 1000;
+      const elapsedMs = Math.max(0, targetSeconds * 1000 - baseLeftMs);
       const nextLeftMs = Math.max(1000, baseLeftMs + delta * 1000);
-      pausedLeftMsRef.current = nextLeftMs;
-      setRemainingSeconds(Math.ceil(nextLeftMs / 1000));
+      const nextTarget = Math.max(3, Math.round((elapsedMs + nextLeftMs) / 1000));
+      const syncedLeftMs = Math.max(1000, nextTarget * 1000 - elapsedMs);
+      pausedLeftMsRef.current = syncedLeftMs;
+      setTargetSeconds(nextTarget);
+      setRemainingSeconds(Math.ceil(syncedLeftMs / 1000));
     } else if (isSteeping && targetEndMsRef.current) {
-      targetEndMsRef.current = Math.max(Date.now() + 1000, targetEndMsRef.current + delta * 1000);
-      setRemainingSeconds(Math.max(1, Math.ceil((targetEndMsRef.current - Date.now()) / 1000)));
+      const baseLeftMs = Math.max(0, targetEndMsRef.current - Date.now());
+      const elapsedMs = Math.max(0, targetSeconds * 1000 - baseLeftMs);
+      const nextLeftMs = Math.max(1000, baseLeftMs + delta * 1000);
+      const nextTarget = Math.max(3, Math.round((elapsedMs + nextLeftMs) / 1000));
+      const syncedLeftMs = Math.max(1000, nextTarget * 1000 - elapsedMs);
+      targetEndMsRef.current = Date.now() + syncedLeftMs;
+      setTargetSeconds(nextTarget);
+      setRemainingSeconds(Math.ceil(syncedLeftMs / 1000));
     } else {
+      const updated = Math.max(3, targetSeconds + delta);
+      setTargetSeconds(updated);
       setRemainingSeconds(updated);
     }
     signalHaptic('light');
