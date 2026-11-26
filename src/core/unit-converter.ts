@@ -5,7 +5,10 @@
 
 export type UnitSystem = 'metric' | 'imperial';
 
-function parseNumeric(val: unknown): number {
+/**
+ * Parsuje liczbę z wejścia użytkownika obsługując polski przecinek dziesiętny (DEEP-003).
+ */
+export function parseLocaleFloat(val: unknown): number {
   if (typeof val === 'number') {
     if (!Number.isFinite(val)) return NaN;
     return Object.is(val, -0) ? 0 : val;
@@ -20,6 +23,8 @@ function parseNumeric(val: unknown): number {
   }
   return NaN;
 }
+
+const parseNumeric = parseLocaleFloat;
 
 /**
  * Przelicza stopnie Celsjusza na Fahrenheita
@@ -42,12 +47,22 @@ export function gramsToOunces(g: number | string): number {
 }
 
 /**
- * Przelicza uncje wagowe (oz) na gramy
+ * Przelicza uncje wagowe (oz) na gramy (zaokrąglone do pełnego grama)
  */
 export function ouncesToGrams(oz: number | string): number {
   const numOz = parseNumeric(oz);
   if (isNaN(numOz) || numOz <= 0) return 0;
   const res = Math.round(numOz / 0.03527396195);
+  return Object.is(res, -0) ? 0 : res;
+}
+
+/**
+ * Przelicza uncje wagowe (oz) na gramy z precyzją dziesiętną (DEEP-004)
+ */
+export function ouncesToGramsExact(oz: number | string): number {
+  const numOz = parseNumeric(oz);
+  if (isNaN(numOz) || numOz <= 0) return 0;
+  const res = Number((numOz / 0.03527396195).toFixed(2));
   return Object.is(res, -0) ? 0 : res;
 }
 
@@ -58,6 +73,16 @@ export function mlToFluidOunces(ml: number | string): number {
   const numMl = parseNumeric(ml);
   if (isNaN(numMl) || numMl <= 0) return 0;
   const res = parseFloat((numMl * 0.0338140227).toFixed(2));
+  return Object.is(res, -0) ? 0 : res;
+}
+
+/**
+ * Przelicza uncje objętościowe (fl oz) na mililitry / gramy wody (DEEP-004)
+ */
+export function fluidOuncesToMl(flOz: number | string): number {
+  const numFlOz = parseNumeric(flOz);
+  if (isNaN(numFlOz) || numFlOz <= 0) return 0;
+  const res = Number((numFlOz / 0.0338140227).toFixed(1));
   return Object.is(res, -0) ? 0 : res;
 }
 
@@ -79,7 +104,7 @@ export function formatTemperature(celsius: number | string, unitSystem: UnitSyst
 /**
  * Formatuje liczbę dziesiętną z przecinkiem w PL i kropką w EN (M1-audytor-generalny-012)
  */
-export function formatDecimal(val: number, decimals: number = 1, language: 'pl' | 'en' = 'en'): string {
+export function formatDecimal(val: number, decimals: number = 1, language: string = 'en'): string {
   const fixed = val.toFixed(decimals);
   return language === 'pl' ? fixed.replace('.', ',') : fixed;
 }
@@ -90,7 +115,7 @@ export function formatDecimal(val: number, decimals: number = 1, language: 'pl' 
 export function formatDoseWeight(
   grams: number | string,
   unitSystem: UnitSystem = 'metric',
-  language: 'pl' | 'en' = 'en'
+  language: string = 'en'
 ): string {
   const num = parseNumeric(grams);
   if (isNaN(num) || num < 0 || Object.is(num, -0)) {
@@ -109,7 +134,7 @@ export function formatDoseWeight(
 export function formatWaterWeight(
   grams: number | string,
   unitSystem: UnitSystem = 'metric',
-  language: 'pl' | 'en' = 'en'
+  language: string = 'en'
 ): string {
   const num = parseNumeric(grams);
   if (isNaN(num) || num < 0 || Object.is(num, -0)) {

@@ -21,6 +21,7 @@ interface BrewModalsContainerProps {
 export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workflow }) => {
   const {
     recipe,
+    scaledSteps,
     snapshot,
     isRunning,
     unitSystem,
@@ -28,6 +29,7 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     pauseTimer,
     resumeTimer,
     adjustStepDuration,
+    resetCurrentStep,
     previousStep,
     nextStep,
     resetTimer,
@@ -76,8 +78,12 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     t,
   } = workflow;
 
+  // DEEP-001: używamy scaledSteps (parsowanych z stepsJson dla SavedRecipe i przeskalowanych do wody/porcji),
+  // zamiast sprawdzać 'steps' in recipe (co psuło każdą recepturę wczytaną z SQLite do „KROK 1 Z 1”).
   const stepsList =
-    'steps' in recipe && Array.isArray(recipe.steps)
+    Array.isArray(scaledSteps) && scaledSteps.length > 0
+      ? scaledSteps
+      : 'steps' in recipe && Array.isArray(recipe.steps) && recipe.steps.length > 0
       ? recipe.steps
       : snapshot.currentStep
       ? [snapshot.currentStep]
@@ -109,18 +115,20 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         }}
         onAdjustTimeSeconds={(deltaSec) => adjustStepDuration(deltaSec)}
         onResetCurrentStep={(parsedSec) => {
-          const delta = parsedSec - snapshot.stepRemainingSeconds;
-          if (delta !== 0) {
-            adjustStepDuration(delta);
+          if (typeof resetCurrentStep === 'function') {
+            resetCurrentStep(parsedSec);
+          } else {
+            const delta = parsedSec - snapshot.stepRemainingSeconds;
+            if (delta !== 0) {
+              adjustStepDuration(delta);
+            }
           }
         }}
         onPrevStep={() => {
           previousStep();
-          if (!isRunning) resumeTimer();
         }}
         onNextStep={() => {
           nextStep();
-          if (!isRunning) resumeTimer();
         }}
         onFinishAndSave={() => {
           setShowProcedureModal(false);

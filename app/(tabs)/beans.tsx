@@ -31,7 +31,7 @@ import { runSave } from '../../lib/save-feedback';
 
 export default function BeansScreen() {
   const router = useRouter();
-  const { selectInventoryItem, beveragePreference } = useBrew();
+  const { selectInventoryItem, beveragePreference, reloadFromDatabase } = useBrew();
   const { t } = useTranslation();
   const [unitSystem, setUnitSystem] = useState<'metric' | 'imperial'>(() => {
     try {
@@ -117,11 +117,17 @@ export default function BeansScreen() {
     };
     if (!runSave(() => saveInventoryItem(updated), t.common)) return;
     loadData();
+    reloadFromDatabase?.();
   };
 
   const handleSelectForBrew = (item: InventoryItem) => {
     selectInventoryItem(item);
     router.navigate('/(tabs)');
+  };
+
+  const handleInventoryMutated = () => {
+    loadData();
+    reloadFromDatabase?.();
   };
 
   // Filtrowanie listy
@@ -190,7 +196,7 @@ export default function BeansScreen() {
           setShowCompendium(true);
         }}
         presetTemplate={presetTemplate}
-        onSaved={loadData}
+        onSaved={handleInventoryMutated}
       />
 
       {/* Modal edycji paczki (BR-MAG-001 & BR-MAG-004) */}
@@ -202,8 +208,8 @@ export default function BeansScreen() {
           setEditingItem(null);
         }}
         beveragePreference={beveragePreference}
-        onSaved={loadData}
-        onDeleted={loadData}
+        onSaved={handleInventoryMutated}
+        onDeleted={handleInventoryMutated}
       />
 
       {/* Modal: Kompendium Wiedzy (BR-WIEDZA-001 & BR-WIEDZA-002) */}

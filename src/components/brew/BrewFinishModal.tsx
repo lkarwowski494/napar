@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { theme, withAlpha } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
-import { formatTemperatureDelta, UnitSystem } from '../../core/unit-converter';
+import { formatTemperatureDelta, UnitSystem, parseLocaleFloat } from '../../core/unit-converter';
 import {
   SensoryProfile,
   SensoryRadarChart,
@@ -101,7 +101,7 @@ export function BrewFinishModal({
       : 0;
   const safeWater = Number.isFinite(rawWater) && rawWater > 0 && !Object.is(rawWater, -0) ? Math.min(50000, Math.round(rawWater)) : 0;
 
-  const rawRating = typeof rating === 'number' ? rating : (typeof rating === 'string' ? parseFloat(rating) : 0);
+  const rawRating = typeof rating === 'number' ? rating : (typeof rating === 'string' ? parseLocaleFloat(rating) : 0);
   const safeRating = Number.isFinite(rawRating) && rawRating > 0 && !Object.is(rawRating, -0) ? Math.max(0, Math.min(5, Math.floor(rawRating))) : 0;
 
   return (

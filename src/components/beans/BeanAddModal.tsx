@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
 import { saveInventoryItem, getUnitSystem } from '../../data/database';
-import { ouncesToGrams } from '../../core/unit-converter';
+import { ouncesToGrams, parseLocaleFloat } from '../../core/unit-converter';
 import { localISODate } from '../../data/backup';
 import { InventoryItem } from '../../core/database-schema';
 import { KnowledgeTemplate } from './BeanCompendiumModal';
@@ -94,7 +94,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
       Alert.alert(t.common?.error || 'Błąd', t.stash?.nameError || 'Podaj nazwę kawy lub herbaty.');
       return;
     }
-    const parsedWeight = parseFloat(initialWeight);
+    const parsedWeight = parseLocaleFloat(initialWeight);
     const safeParsed = Number.isFinite(parsedWeight) && parsedWeight > 0 ? parsedWeight : (isImperial ? 8.8 : 250);
     const convertedWeight = isImperial ? ouncesToGrams(safeParsed) : safeParsed;
     const rawWeightClamped = Math.floor(Math.max(1, Math.min(100000, convertedWeight)));

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
 import { calculateExtractionYield, calculateLiquidYield } from '../../core/domain-rules';
+import { parseLocaleFloat } from '../../core/unit-converter';
 import { theme, withAlpha } from '../../core/theme';
 
 export interface ExtractionYieldTabProps {
@@ -15,9 +16,9 @@ export const ExtractionYieldTab: React.FC<ExtractionYieldTabProps> = ({ language
   const [eyTds, setEyTds] = useState('1.35');
 
   const eyResult = useMemo(() => {
-    const w = parseFloat(eyWater);
-    const d = parseFloat(eyDose);
-    const tds = parseFloat(eyTds);
+    const w = parseLocaleFloat(eyWater);
+    const d = parseLocaleFloat(eyDose);
+    const tds = parseLocaleFloat(eyTds);
     if (!isNaN(w) && !isNaN(d) && !isNaN(tds) && w > 0 && d > 0 && tds > 0) {
       try {
         const beverageWeightGrams =

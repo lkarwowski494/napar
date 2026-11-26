@@ -566,6 +566,23 @@ export class BrewTimerEngine {
     this.notifyTick();
   }
 
+  public resetCurrentStep(durationSeconds?: number): void {
+    const currentStep = this.getCurrentStep();
+    if (!currentStep) return;
+    if (typeof durationSeconds === 'number' && Number.isFinite(durationSeconds) && durationSeconds > 0) {
+      currentStep.durationSeconds = Math.max(1, Math.round(durationSeconds));
+    }
+    this.stepElapsedSeconds = 0;
+    if (this.status === 'running') {
+      this.stepEndAtMs = Date.now() + currentStep.durationSeconds * 1000;
+      this.pausedRemainingMs = null;
+    } else if (this.status === 'paused') {
+      this.pausedRemainingMs = currentStep.durationSeconds * 1000;
+      this.stepEndAtMs = null;
+    }
+    this.notifyTick();
+  }
+
   public finish(): void {
     this.removeAppStateListener();
     this.clearInterval();

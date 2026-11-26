@@ -477,10 +477,10 @@ describe('DialInScreen UI with Water Chemistry', () => {
       waterInput.props.onChangeText('500');
     });
 
-    // 500 / 16.6 = 30.1g dozy, yield = 500 - 30.1 * 2 = 439.8g
+    // 500 / 16.6 = 30,1g dozy, yield = 500 - 30,1 * 2 = 439,8g (PL przecinek)
     str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('30.1g');
-    expect(str).toContain('439.8');
+    expect(str).toContain('30,1g');
+    expect(str).toContain('439,8');
 
     // Wybierz preset Gongfu 1:20
     const gongfuPreset = findPressableWithText(tree.root, '1:20 (Gongfu)');

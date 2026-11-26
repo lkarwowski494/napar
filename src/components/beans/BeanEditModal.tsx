@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme, withAlpha } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
 import { saveInventoryItem, deleteInventoryItem, getUnitSystem } from '../../data/database';
-import { gramsToOunces, ouncesToGrams, roundTo } from '../../core/unit-converter';
+import { gramsToOunces, ouncesToGrams, roundTo, parseLocaleFloat } from '../../core/unit-converter';
 import { InventoryItem } from '../../core/database-schema';
 import { runSave } from '../../../lib/save-feedback';
 import { ModalHeader } from '../ui';
@@ -77,7 +77,8 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
   }, [item]);
 
   const handleAdjustRemainingWeight = (delta: number) => {
-    const cur = parseFloat(editRemainingWeight) || 0;
+    const parsedCur = parseLocaleFloat(editRemainingWeight);
+    const cur = Number.isFinite(parsedCur) ? parsedCur : 0;
     const next = Math.max(0, Math.min(100000, cur + delta));
     const safeNext = Object.is(next, -0) ? 0 : next;
     setEditRemainingWeight(safeNext.toString());
@@ -89,13 +90,13 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
       Alert.alert(t.common?.error || 'Błąd', t.stash?.nameError || 'Podaj nazwę kawy lub herbaty.');
       return;
     }
-    const parsedInit = parseFloat(editInitialWeight);
+    const parsedInit = parseLocaleFloat(editInitialWeight);
     const safeParsedInit = Number.isFinite(parsedInit) && parsedInit > 0 ? parsedInit : (isImperial ? 8.8 : 250);
     const convertedInit = isImperial ? ouncesToGrams(safeParsedInit) : safeParsedInit;
     const clampedInit = Math.floor(Math.max(1, Math.min(100000, convertedInit)));
     const initW = Object.is(clampedInit, -0) ? 250 : clampedInit;
 
-    const parsedRem = parseFloat(editRemainingWeight);
+    const parsedRem = parseLocaleFloat(editRemainingWeight);
     const safeParsedRem = Number.isFinite(parsedRem) && parsedRem >= 0 ? parsedRem : 0;
     const convertedRem = isImperial ? ouncesToGrams(safeParsedRem) : safeParsedRem;
     const clampedRem = Math.floor(Math.max(0, Math.min(100000, convertedRem)));

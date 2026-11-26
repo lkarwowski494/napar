@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import * as ExpoRouter from 'expo-router';
 import { useBrew } from '../core/brew-context';
 import {
   getRecipes,
@@ -50,9 +50,15 @@ export function isRecipeTea(recipe: AnyRecipe): boolean {
 }
 
 export function useBrewWorkflow() {
-  const router = useRouter();
+  const router = ExpoRouter.useRouter();
   const { t, language } = useTranslation();
-  const unitSystem = getUnitSystem();
+  const [unitSystem, setUnitSystemState] = useState<'metric' | 'imperial'>(() => {
+    try {
+      return getUnitSystem();
+    } catch {
+      return 'metric';
+    }
+  });
 
   const brew = useBrew();
   const {
@@ -62,6 +68,7 @@ export function useBrewWorkflow() {
     waterGrams,
     waterTempCelsius,
     grindSetting,
+    scaledSteps,
     snapshot,
     selectRecipe,
     selectInventoryItem,
@@ -76,6 +83,7 @@ export function useBrewWorkflow() {
     nextStep,
     previousStep,
     adjustStepDuration,
+    resetCurrentStep,
     finishAndSaveSession,
     waterProfile,
     setWaterProfile,
@@ -84,10 +92,12 @@ export function useBrewWorkflow() {
     grinderRecommendation,
     beveragePreference,
     setBeveragePreference,
+    dataVersion,
   } = brew;
 
   const [allRecipes, setAllRecipes] = useState<AnyRecipe[]>(MASTER_RECIPES);
   const [allInventory, setAllInventory] = useState<InventoryItem[]>([]);
+  const [recentSessionsTick, setRecentSessionsTick] = useState<number>(0);
 
   // Modals / Inline Card Visibility
   const [showRecipeModal, setShowRecipeModal] = useState(false);
@@ -182,11 +192,30 @@ export function useBrewWorkflow() {
     } catch {
       // fallback
     }
+    try {
+      setUnitSystemState(getUnitSystem());
+    } catch {
+      // fallback
+    }
+    setRecentSessionsTick((v) => v + 1);
   }, []);
 
   useEffect(() => {
     refreshData();
-  }, [refreshData]);
+  }, [refreshData, dataVersion]);
+
+  const useFocusEffectSafe =
+    typeof ExpoRouter.useFocusEffect === 'function'
+      ? ExpoRouter.useFocusEffect
+      : (cb: () => void) => {
+          useEffect(cb, [cb]);
+        };
+
+  useFocusEffectSafe(
+    useCallback(() => {
+      refreshData();
+    }, [refreshData])
+  );
 
   const handleSelectRecipe = useCallback(
     (r: AnyRecipe) => {
@@ -231,6 +260,7 @@ export function useBrewWorkflow() {
   };
 
   const recentFiveStarSession = useMemo(() => {
+    void recentSessionsTick;
     try {
       const sessions = getBrewSessions();
       if (!sessions || sessions.length === 0) return null;
@@ -244,7 +274,7 @@ export function useBrewWorkflow() {
     } catch {
       return null;
     }
-  }, [beveragePreference]);
+  }, [beveragePreference, recentSessionsTick]);
 
   const handleQuickReBrew = (s: BrewSession) => {
     const foundRecipe = allRecipes.find((r) => r.name === s.recipeName);
@@ -327,6 +357,7 @@ export function useBrewWorkflow() {
     setServings(n);
     const scaling = calculateBatchScaling(baseDose, baseWater, n);
     setDoseGrams(scaling.scaledDoseGrams);
+    setWaterGrams(scaling.scaledWaterGrams);
   };
 
   const handleResetWithConfirm = () => {
@@ -392,7 +423,13 @@ export function useBrewWorkflow() {
     );
     if (!saved) return;
     setShowFinishModal(false);
+    setRating(5);
+    setTasteBalance('balanced');
+    setNotes('');
+    setSelectedTags([]);
+    setSensoryProfile(DEFAULT_SENSORY_PROFILE);
     resetTimer();
+    refreshData();
     Alert.alert(t.brew.savedSessionTitle || 'Zapisano!', t.brew.savedSessionDesc || 'Sesja parzenia została utrwalona w Twoim Dzienniku.');
   };
 
@@ -427,6 +464,7 @@ export function useBrewWorkflow() {
     language,
     unitSystem,
     recipe,
+    scaledSteps,
     selectedInventoryItem,
     doseGrams,
     waterGrams,
@@ -444,6 +482,7 @@ export function useBrewWorkflow() {
     nextStep,
     previousStep,
     adjustStepDuration,
+    resetCurrentStep,
     waterProfile,
     setWaterProfile,
     grinderId,

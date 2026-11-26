@@ -21,7 +21,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
 import { RecipeStep } from '../../core/recipes-data';
 import { parseStepDurationSeconds } from '../../core/bpr-engine';
-import { formatWaterWeight } from '../../core/unit-converter';
+import { formatWaterWeight, parseLocaleFloat } from '../../core/unit-converter';
 import { translations } from '../../core/i18n';
 import type { TimerStatus } from '../../core/timer-engine';
 import { ModalHeader } from '../ui';
@@ -130,7 +130,7 @@ export function ProcedureModal({
   }
 
   const formatClock = (sec: number | string) => {
-    const rawVal = typeof sec === 'number' ? sec : (typeof sec === 'string' ? parseFloat(sec) : NaN);
+    const rawVal = typeof sec === 'number' ? sec : (typeof sec === 'string' ? parseLocaleFloat(sec) : NaN);
     if (!Number.isFinite(rawVal) || rawVal <= 0 || Object.is(rawVal, -0)) return '00:00';
     const clamped = Math.min(86400, Math.max(0, Math.round(rawVal)));
     const m = Math.floor(clamped / 60);
@@ -148,7 +148,7 @@ export function ProcedureModal({
     : `Całkowity czas parzenia: ${formatClock(totalElapsedSeconds)}`;
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={false}>
+    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
       <SafeAreaView
         style={styles.container}
         edges={['top', 'bottom', 'left', 'right']}
@@ -227,7 +227,7 @@ export function ProcedureModal({
                   : 'ZALEJ DO WAGI NA WADZE:'}
               </Text>
               <Text style={styles.targetWaterValue} testID="procedure-target-water">
-                {formatWaterWeight(currentStep.targetWaterGrams, unitSystem)}
+                {formatWaterWeight(currentStep.targetWaterGrams, unitSystem, language)}
               </Text>
             </View>
 

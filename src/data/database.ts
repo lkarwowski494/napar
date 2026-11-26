@@ -22,6 +22,7 @@ import {
 } from '../core/database-schema';
 import { MASTER_RECIPES } from '../core/recipes-data';
 import { CAFFEINE_HALF_LIFE_MIN_H, CAFFEINE_HALF_LIFE_MAX_H, DEFAULT_CAFFEINE_HALF_LIFE_H, clampCaffeineHalfLifeHours } from '../core/domain-rules';
+import { parseLocaleFloat } from '../core/unit-converter';
 
 export interface InventoryRow {
   id: string;
@@ -275,11 +276,8 @@ export function initDatabase(db?: SQLite.SQLiteDatabase): void {
     }
   }
 
-  // Sprawdź czy tabela recipes ma dane początkowe z master recipes lub wymaga uzupełnienia
-  const countRow = targetDb.getFirstSync<{ count: number }>(
-    'SELECT COUNT(*) as count FROM recipes WHERE is_custom = 0'
-  );
-  if (!countRow || countRow.count < MASTER_RECIPES.length) {
+  // Zawsze synchronizuj receptury bazowe (idempotentny upsert zachowuje is_favorite) — DEEP-002
+  if (typeof targetDb.prepareSync === 'function') {
     seedMasterRecipes(targetDb);
   }
 }
@@ -696,6 +694,11 @@ export function deleteRecipe(id: string): void {
   const safeId = rawId.replace(/[\x00-\x1F\x7F]/g, '').trim();
   if (!safeId) return;
   const db = getDatabase();
+  const existing = db.getFirstSync<{ is_custom: number }>(
+    'SELECT is_custom FROM recipes WHERE id = ?',
+    [safeId]
+  );
+  if (!existing || !existing.is_custom) return;
   runInTransactionSync(db, () => {
     db.runSync('UPDATE brew_sessions SET recipe_id = NULL WHERE recipe_id = ?', [safeId]);
     db.runSync('DELETE FROM recipes WHERE id = ? AND is_custom = 1', [safeId]);
@@ -846,12 +849,12 @@ function mapRowToRecipe(row: RecipeRow): SavedRecipe {
 
 export function getBrewSessions(limit?: number, offset?: number): BrewSession[] {
   const db = getDatabase();
-  const rawOffset = typeof offset === 'number' ? offset : (typeof offset === 'string' ? parseFloat(offset) : NaN);
+  const rawOffset = typeof offset === 'number' ? offset : (typeof offset === 'string' ? parseLocaleFloat(offset) : NaN);
   const safeOffset = Number.isFinite(rawOffset) && rawOffset > 0 ? Math.floor(rawOffset) : 0;
   const normalizedOffset = Object.is(safeOffset, -0) ? 0 : safeOffset;
 
   if (limit !== undefined) {
-    const rawLimit = typeof limit === 'number' ? limit : (typeof limit === 'string' ? parseFloat(limit) : NaN);
+    const rawLimit = typeof limit === 'number' ? limit : (typeof limit === 'string' ? parseLocaleFloat(limit) : NaN);
     if (!Number.isFinite(rawLimit) || rawLimit <= 0) {
       return [];
     }
@@ -880,39 +883,39 @@ export function saveBrewSession(session: BrewSession): void {
   if (!session || typeof session !== 'object') return;
   const db = getDatabase();
 
-  const rawDose = typeof session.doseGrams === 'number' ? session.doseGrams : (typeof (session as any).doseGrams === 'string' ? parseFloat((session as any).doseGrams.replace(',', '.')) : NaN);
+  const rawDose = typeof session.doseGrams === 'number' ? session.doseGrams : (typeof (session as any).doseGrams === 'string' ? parseLocaleFloat((session as any).doseGrams) : NaN);
   // M1-audytor-generalny-008: zła albo brakująca liczba blokuje zapis zamiast zamieniać się na 15 / 250 / 92.
   if (!Number.isFinite(rawDose) || rawDose <= 0) throw new DataValidationError('doseGrams');
   const dose = Number(Math.min(1000, Math.max(1, rawDose)).toFixed(1));
 
-  const rawWater = typeof session.waterGrams === 'number' ? session.waterGrams : (typeof (session as any).waterGrams === 'string' ? parseFloat((session as any).waterGrams.replace(',', '.')) : NaN);
+  const rawWater = typeof session.waterGrams === 'number' ? session.waterGrams : (typeof (session as any).waterGrams === 'string' ? parseLocaleFloat((session as any).waterGrams) : NaN);
   if (!Number.isFinite(rawWater) || rawWater <= 0) throw new DataValidationError('waterGrams');
   const water = Number(Math.min(50000, Math.max(10, rawWater)).toFixed(1));
 
   const isColdBrew = (session.method && /cold|ice|zimn/i.test(session.method)) || (session.recipeName && /cold|ice|zimn/i.test(session.recipeName));
-  const rawTemp = typeof session.waterTempCelsius === 'number' ? session.waterTempCelsius : (typeof (session as any).waterTempCelsius === 'string' ? parseFloat((session as any).waterTempCelsius.replace(',', '.')) : NaN);
+  const rawTemp = typeof session.waterTempCelsius === 'number' ? session.waterTempCelsius : (typeof (session as any).waterTempCelsius === 'string' ? parseLocaleFloat((session as any).waterTempCelsius) : NaN);
   if (!(Number.isFinite(rawTemp) && (rawTemp > 0 || (isColdBrew && rawTemp === 0)))) {
     throw new DataValidationError('waterTempCelsius');
   }
   const temp = Math.min(100, Math.max(0, Math.round(rawTemp))) || 0;
 
-  const rawTotalTime = typeof session.totalTimeSeconds === 'number' ? session.totalTimeSeconds : (typeof (session as any).totalTimeSeconds === 'string' ? parseFloat((session as any).totalTimeSeconds.replace(',', '.')) : NaN);
+  const rawTotalTime = typeof session.totalTimeSeconds === 'number' ? session.totalTimeSeconds : (typeof (session as any).totalTimeSeconds === 'string' ? parseLocaleFloat((session as any).totalTimeSeconds) : NaN);
   const safeTotalTime = Number.isFinite(rawTotalTime) && rawTotalTime >= 0 ? Math.round(rawTotalTime) : 0;
   const totalTime = Object.is(safeTotalTime, -0) ? 0 : safeTotalTime;
 
-  const rawRating = typeof session.rating === 'number' ? session.rating : (typeof (session as any).rating === 'string' ? parseFloat((session as any).rating.replace(',', '.')) : NaN);
+  const rawRating = typeof session.rating === 'number' ? session.rating : (typeof (session as any).rating === 'string' ? parseLocaleFloat((session as any).rating) : NaN);
   const safeRating = Number.isFinite(rawRating) && rawRating >= 0 && rawRating <= 5 ? Number(rawRating.toFixed(1)) : null;
   const sanitizedRating = safeRating != null && Object.is(safeRating, -0) ? 0 : safeRating;
 
-  const rawTds = typeof session.tdsPercentage === 'number' ? session.tdsPercentage : (typeof (session as any).tdsPercentage === 'string' ? parseFloat((session as any).tdsPercentage.replace(',', '.')) : NaN);
+  const rawTds = typeof session.tdsPercentage === 'number' ? session.tdsPercentage : (typeof (session as any).tdsPercentage === 'string' ? parseLocaleFloat((session as any).tdsPercentage) : NaN);
   const safeTds = Number.isFinite(rawTds) && rawTds >= 0 ? Number(rawTds.toFixed(2)) : null;
   const sanitizedTds = safeTds != null && Object.is(safeTds, -0) ? 0 : safeTds;
 
-  const rawEy = typeof session.extractionYieldPercentage === 'number' ? session.extractionYieldPercentage : (typeof (session as any).extractionYieldPercentage === 'string' ? parseFloat((session as any).extractionYieldPercentage.replace(',', '.')) : NaN);
+  const rawEy = typeof session.extractionYieldPercentage === 'number' ? session.extractionYieldPercentage : (typeof (session as any).extractionYieldPercentage === 'string' ? parseLocaleFloat((session as any).extractionYieldPercentage) : NaN);
   const safeEy = Number.isFinite(rawEy) && rawEy >= 0 ? Number(rawEy.toFixed(2)) : null;
   const sanitizedEy = safeEy != null && Object.is(safeEy, -0) ? 0 : safeEy;
 
-  const rawCaffeine = typeof session.caffeineContentMg === 'number' ? session.caffeineContentMg : (typeof (session as any).caffeineContentMg === 'string' ? parseFloat((session as any).caffeineContentMg.replace(',', '.')) : NaN);
+  const rawCaffeine = typeof session.caffeineContentMg === 'number' ? session.caffeineContentMg : (typeof (session as any).caffeineContentMg === 'string' ? parseLocaleFloat((session as any).caffeineContentMg) : NaN);
   const safeCaffeine = Number.isFinite(rawCaffeine) && rawCaffeine >= 0 ? Number(rawCaffeine.toFixed(1)) : null;
   const sanitizedCaffeine = safeCaffeine != null && Object.is(safeCaffeine, -0) ? 0 : safeCaffeine;
 
@@ -924,8 +927,19 @@ export function saveBrewSession(session: BrewSession): void {
     : [];
 
   const safeId = typeof session.id === 'string' && session.id.trim() ? session.id.trim() : `sess_${Date.now()}`;
-  const safeRecipeId = typeof session.recipeId === 'string' && session.recipeId.trim() ? session.recipeId.trim() : null;
-  const safeInventoryItemId = typeof session.inventoryItemId === 'string' && session.inventoryItemId.trim() ? session.inventoryItemId.trim() : null;
+  const candidateRecipeId = typeof session.recipeId === 'string' && session.recipeId.trim() ? session.recipeId.trim() : null;
+  const candidateInventoryItemId = typeof session.inventoryItemId === 'string' && session.inventoryItemId.trim() ? session.inventoryItemId.trim() : null;
+  // DEEP-002: weryfikacja istnienia kluczy obcych przed INSERT (chroni przed SQLITE_CONSTRAINT_FOREIGNKEY
+  // przy imporcie osieroconej kopii albo zapisie sesji ze świeżo usuniętą paczką/recepturą; nazwy zostają zachowane).
+  const safeRecipeId =
+    candidateRecipeId && db.getFirstSync<{ id?: string }>('SELECT id FROM recipes WHERE id = ?', [candidateRecipeId])
+      ? candidateRecipeId
+      : null;
+  const safeInventoryItemId =
+    candidateInventoryItemId &&
+    db.getFirstSync<{ id?: string }>('SELECT id FROM inventory_items WHERE id = ?', [candidateInventoryItemId])
+      ? candidateInventoryItemId
+      : null;
   const safeRecipeName = typeof session.recipeName === 'string' && session.recipeName.trim()
     ? session.recipeName.trim().slice(0, 200)
     : 'Napar';
@@ -1034,7 +1048,7 @@ export function recordBrewSessionTransaction(
     if (inventoryDeduction && inventoryDeduction.itemId) {
       const rawDose = typeof inventoryDeduction.doseGrams === 'number'
         ? inventoryDeduction.doseGrams
-        : (typeof inventoryDeduction.doseGrams === 'string' ? parseFloat(inventoryDeduction.doseGrams) : NaN);
+        : (typeof inventoryDeduction.doseGrams === 'string' ? parseLocaleFloat(inventoryDeduction.doseGrams) : NaN);
       if (Number.isFinite(rawDose) && rawDose > 0 && !Object.is(rawDose, -0)) {
         deductInventoryWeight(inventoryDeduction.itemId, rawDose);
       }
@@ -1161,7 +1175,7 @@ export function logCaffeine(log: CaffeineLog): void {
     typeof log.doseGrams === 'number'
       ? log.doseGrams
       : typeof log.doseGrams === 'string'
-      ? parseFloat(log.doseGrams)
+      ? parseLocaleFloat(log.doseGrams)
       : 0;
   let safeDose = Number.isFinite(parsedDose) && parsedDose >= 0 ? parsedDose : 0;
   if (Object.is(safeDose, -0)) safeDose = 0;
@@ -1170,7 +1184,7 @@ export function logCaffeine(log: CaffeineLog): void {
     typeof log.caffeineMg === 'number'
       ? log.caffeineMg
       : typeof log.caffeineMg === 'string'
-      ? parseFloat(log.caffeineMg)
+      ? parseLocaleFloat(log.caffeineMg)
       : 0;
   let safeCaffeine = Number.isFinite(parsedCaffeine) && parsedCaffeine >= 0 ? parsedCaffeine : 0;
   if (Object.is(safeCaffeine, -0)) safeCaffeine = 0;
@@ -1192,6 +1206,17 @@ export function logCaffeine(log: CaffeineLog): void {
   }
   const safeConsumedAt = rawConsumedAt || new Date().toISOString();
 
+  // DEEP-002: puste/białe brewSessionId lub osierocony klucz obcy nie mogą powodować SQLITE_CONSTRAINT_FOREIGNKEY.
+  const candidateSessionId =
+    typeof log.brewSessionId === 'string' && log.brewSessionId.trim()
+      ? log.brewSessionId.trim()
+      : null;
+  const safeBrewSessionId =
+    candidateSessionId &&
+    db.getFirstSync<{ id?: string }>('SELECT id FROM brew_sessions WHERE id = ?', [candidateSessionId])
+      ? candidateSessionId
+      : null;
+
   db.runSync(
     `INSERT INTO caffeine_logs (
       id, brew_session_id, beverage_name, beverage_type, consumed_at, dose_g, caffeine_mg
@@ -1205,7 +1230,7 @@ export function logCaffeine(log: CaffeineLog): void {
       caffeine_mg = excluded.caffeine_mg`,
     [
       safeId,
-      log.brewSessionId ?? null,
+      safeBrewSessionId,
       safeBeverageName,
       safeBeverageType,
       safeConsumedAt,
@@ -1583,7 +1608,7 @@ export function setSoundEnabled(enabled: boolean): void {
 }
 
 export function getCaffeineHalfLife(): number {
-  const val = parseFloat(getAppSetting('caffeine_half_life_hours', String(DEFAULT_CAFFEINE_HALF_LIFE_H)));
+  const val = parseLocaleFloat(getAppSetting('caffeine_half_life_hours', String(DEFAULT_CAFFEINE_HALF_LIFE_H)));
   if (isNaN(val) || val < CAFFEINE_HALF_LIFE_MIN_H || val > CAFFEINE_HALF_LIFE_MAX_H) {
     return DEFAULT_CAFFEINE_HALF_LIFE_H;
   }

@@ -5,6 +5,9 @@ import {
   Pressable,
   Modal,
   TextInput,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
@@ -23,8 +26,9 @@ export const JsonExportModal: React.FC<JsonExportModalProps> = ({
   exportedJsonText,
 }) => {
   const { t } = useTranslation();
+  if (!visible) return null;
   return (
-    <Modal visible={visible} animationType="slide">
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <ModalHeader
           onClose={onClose}
@@ -50,6 +54,7 @@ export const JsonExportModal: React.FC<JsonExportModalProps> = ({
 export interface JsonImportModalProps {
   visible: boolean;
   onClose: () => void;
+  onDismiss?: () => void;
   importJsonText?: string;
   jsonText?: string;
   onChangeImportJsonText?: (text: string) => void;
@@ -62,6 +67,7 @@ export interface JsonImportModalProps {
 export const JsonImportModal: React.FC<JsonImportModalProps> = ({
   visible,
   onClose,
+  onDismiss,
   importJsonText,
   jsonText,
   onChangeImportJsonText,
@@ -73,36 +79,69 @@ export const JsonImportModal: React.FC<JsonImportModalProps> = ({
   const textValue = jsonText !== undefined ? jsonText : (importJsonText || '');
   const handleChangeText = onChangeJsonText || onChangeImportJsonText || (() => {});
   const handleConfirm = onConfirmImport || onImport || (() => {});
+  if (!visible) return null;
   return (
-    <Modal visible={visible} animationType="slide">
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose} onDismiss={onDismiss}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
-        <ModalHeader
-          onClose={onClose}
-          closeLabel={t.common.cancel}
-          style={styles.modalHeader}
+        <KeyboardAvoidingView
+          style={styles.flexOne}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <Text style={styles.modalTitle}>{t.settings.jsonImportModalTitle}</Text>
-        </ModalHeader>
-        <Text style={styles.modalSub}>
-          {t.settings.jsonImportModalDesc}
-        </Text>
-        <TextInput
-          style={styles.jsonTextInput}
-          multiline
-          placeholder='{"version": 1, ...}'
-          placeholderTextColor={theme.colors.textMuted}
-          value={textValue}
-          onChangeText={handleChangeText}
-        />
-        <Pressable style={styles.submitImportBtn} onPress={handleConfirm} accessibilityRole="button" accessibilityLabel={t.settings.importReplaceBtn}>
-          <Text style={styles.submitImportBtnText}>{t.settings.importReplaceBtn}</Text>
-        </Pressable>
+          <ModalHeader
+            onClose={onClose}
+            closeLabel={t.common.cancel}
+            onSave={handleConfirm}
+            saveLabel={t.common.save}
+            saveTestID="json-import-header-submit-btn"
+            style={styles.modalHeader}
+          >
+            <Text style={styles.modalTitle}>{t.settings.jsonImportModalTitle}</Text>
+          </ModalHeader>
+          <ScrollView
+            style={styles.flexOne}
+            contentContainerStyle={styles.scrollContent}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+          >
+            <Text style={styles.modalSub}>
+              {t.settings.jsonImportModalDesc}
+            </Text>
+            <TextInput
+              testID="json-import-input"
+              style={styles.jsonTextInput}
+              multiline
+              autoCapitalize="none"
+              autoCorrect={false}
+              spellCheck={false}
+              autoComplete="off"
+              placeholder='{"version": 1, ...}'
+              placeholderTextColor={theme.colors.textMuted}
+              value={textValue}
+              onChangeText={handleChangeText}
+            />
+            <Pressable
+              testID="json-import-submit-btn"
+              style={styles.submitImportBtn}
+              onPress={handleConfirm}
+              accessibilityRole="button"
+              accessibilityLabel={t.settings.importReplaceBtn}
+            >
+              <Text style={styles.submitImportBtnText}>{t.settings.importReplaceBtn}</Text>
+            </Pressable>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  flexOne: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.bg,
@@ -130,6 +169,7 @@ const styles = StyleSheet.create({
   },
   jsonTextInput: {
     flex: 1,
+    minHeight: 180,
     backgroundColor: theme.colors.bgCard,
     borderWidth: 1,
     borderColor: theme.colors.borderStrong,

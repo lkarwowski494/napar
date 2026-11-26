@@ -3,8 +3,9 @@
 // ZP-02, ZP-06, ZP-07, ZP-08, ZP-10: 100% offline, zero-login, darmowy eksport JSON
 // ============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import * as Linking from 'expo-linking';
+import * as ExpoRouter from 'expo-router';
 import Constants from 'expo-constants';
 
 import {
@@ -117,6 +118,73 @@ export default function SettingsScreen({
   const [importJsonText, setImportJsonText] = useState('');
   const [exportedCsvText, setExportedCsvText] = useState('');
 
+  // DEEP-005: ponowne wczytanie wszystkich ustawień z SQLite po imporcie kopii albo powrocie na ekran.
+  const reloadSettingsFromDb = useCallback((syncLanguage = false) => {
+    try {
+      setBeveragePreferenceState(getBeveragePreference());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setSelectedGrinder(getAppSetting('default_grinder', 'comandante_c40'));
+    } catch {
+      // safe fallback
+    }
+    try {
+      setUnitSystemState(getUnitSystem());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setVoiceAnnounce(getVoiceAnnounceEnabled());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setHaptics(getHapticsEnabled());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setSound(getSoundEnabled());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setHalfLifeHoursState(getCaffeineHalfLife());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setBedtimeHourState(getBedtimeHour());
+    } catch {
+      // safe fallback
+    }
+    if (syncLanguage) {
+      try {
+        const storedLang = getAppSetting('app_language', '');
+        if (storedLang === 'pl' || storedLang === 'en') {
+          setLanguage(storedLang);
+        }
+      } catch {
+        // safe fallback
+      }
+    }
+  }, [setLanguage]);
+
+  const useFocusEffectSafe =
+    typeof ExpoRouter.useFocusEffect === 'function'
+      ? ExpoRouter.useFocusEffect
+      : (cb: () => void) => {
+          useEffect(cb, [cb]);
+        };
+
+  useFocusEffectSafe(
+    useCallback(() => {
+      reloadSettingsFromDb(false);
+    }, [reloadSettingsFromDb])
+  );
+
   const handleHalfLifeChange = (newHours: number) => {
     const clamped = clampCaffeineHalfLifeHours(newHours);
     if (!runSave(() => setCaffeineHalfLife(clamped), t.common)) return;
@@ -132,6 +200,9 @@ export default function SettingsScreen({
   const handleSelectGrinder = (id: string) => {
     if (!runSave(() => setAppSetting('default_grinder', id), t.common)) return;
     setSelectedGrinder(id);
+    if (brewCtx?.setGrinderId) {
+      brewCtx.setGrinderId(id);
+    }
   };
 
   const handleSelectUnitSystem = (unit: 'metric' | 'imperial') => {
@@ -202,6 +273,8 @@ export default function SettingsScreen({
       await safetyBackup('import', buildBackupState());
 
       importDataJson(importJsonText.trim());
+      reloadSettingsFromDb(true);
+      brewCtx?.reloadFromDatabase?.();
       setShowImportModal(false);
       setImportJsonText('');
       Alert.alert(

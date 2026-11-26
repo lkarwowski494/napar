@@ -3,6 +3,8 @@
 // Deterministic formulas for extraction, kinetics, water, and grind adjustments.
 // ============================================================================
 
+import { parseLocaleFloat } from './unit-converter';
+
 export interface ExtractionYieldResult {
   extractionYieldPercent: number;
   rating: 'under' | 'ideal' | 'over';
@@ -54,8 +56,8 @@ export function calculateBrewDose(waterGrams: number, ratio: number, maxDoseGram
  * Zabezpieczenie przed astronomicznymi wartościami poprzez clamp maxRatio (domyślnie 100.0)
  */
 export function calculateBrewRatio(doseGrams: number, waterGrams: number, maxRatio = 100.0): number {
-  const parsedDose = typeof doseGrams === 'number' ? doseGrams : parseFloat(String(doseGrams));
-  const parsedWater = typeof waterGrams === 'number' ? waterGrams : parseFloat(String(waterGrams));
+  const parsedDose = parseNumeric(doseGrams);
+  const parsedWater = parseNumeric(waterGrams);
   if (!Number.isFinite(parsedDose) || !Number.isFinite(parsedWater) || parsedDose <= 0 || parsedWater <= 0) {
     return 0;
   }
@@ -76,9 +78,9 @@ export function calculateLiquidYield(
   retentionFactor = 2.0,
   maxRetentionFactor = 10.0
 ): number {
-  const parsedWater = typeof waterGrams === 'number' ? waterGrams : parseFloat(String(waterGrams));
-  const parsedDose = typeof doseGrams === 'number' ? doseGrams : parseFloat(String(doseGrams));
-  const parsedRetention = typeof retentionFactor === 'number' ? retentionFactor : parseFloat(String(retentionFactor));
+  const parsedWater = parseNumeric(waterGrams);
+  const parsedDose = parseNumeric(doseGrams);
+  const parsedRetention = parseNumeric(retentionFactor);
   if (!Number.isFinite(parsedWater) || !Number.isFinite(parsedDose) || !Number.isFinite(parsedRetention) || parsedWater <= 0 || parsedDose <= 0 || parsedRetention < 0) {
     throw new Error('Nieprawidłowe parametry wyliczania uzysku');
   }
@@ -104,9 +106,9 @@ export function calculateExtractionYield(
   maxBeverageGrams = 50000.0,
   maxEyPercent?: number
 ): ExtractionYieldResult {
-  const parsedBev = typeof beverageWeightGrams === 'number' ? beverageWeightGrams : parseFloat(String(beverageWeightGrams));
-  const parsedTds = typeof tdsPercent === 'number' ? tdsPercent : parseFloat(String(tdsPercent));
-  const parsedDose = typeof doseGrams === 'number' ? doseGrams : parseFloat(String(doseGrams));
+  const parsedBev = parseNumeric(beverageWeightGrams);
+  const parsedTds = parseNumeric(tdsPercent);
+  const parsedDose = parseNumeric(doseGrams);
   if (!Number.isFinite(parsedBev) || !Number.isFinite(parsedTds) || !Number.isFinite(parsedDose) || parsedBev <= 0 || parsedTds <= 0 || parsedDose <= 0) {
     throw new Error('Parametry ekstrakcji muszą być większe od zera');
   }
@@ -146,21 +148,7 @@ export function calculateExtractionYield(
   };
 }
 
-function parseNumeric(val: unknown): number {
-  if (typeof val === 'number') {
-    if (!Number.isFinite(val)) return NaN;
-    return Object.is(val, -0) ? 0 : val;
-  }
-  if (typeof val === 'string') {
-    const clean = val.replace(/[\x00-\x1F\x7F\uFEFF]/g, '').trim().replace(/,/g, '.');
-    const m = clean.match(/^[+-]?\d+(?:\.\d+)?/);
-    if (!m) return NaN;
-    const num = parseFloat(m[0]);
-    if (!Number.isFinite(num)) return NaN;
-    return Object.is(num, -0) ? 0 : num;
-  }
-  return NaN;
-}
+const parseNumeric = parseLocaleFloat;
 
 /**
  * RD-17 & RD-18: Estymacja dawki kofeiny w filiżance kawy: doza [g] × zawartość [mg/g] × wydajność metody.
