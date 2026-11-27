@@ -34,6 +34,7 @@ concurrency:
 env:
   MAESTRO_DRIVER_STARTUP_TIMEOUT: '480000'
   MAESTRO_CLI_NO_ANALYTICS: '1'
+  MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED: 'true'
   APP_SCHEME: 'Napar'
   BUNDLE_ID: 'pl.lukasz.napar'
 
@@ -185,12 +186,12 @@ jobs:
           run_maestro() {
             local flow="$1"
             echo "::group::Uruchamianie $flow"
-            guard 600 "maestro $flow" maestro test --test-output-dir /tmp/maestro-out "$flow" > /tmp/maestro.log 2>&1
+            guard 360 "maestro $flow" maestro test --test-output-dir /tmp/maestro-out "$flow" > /tmp/maestro.log 2>&1
             local rc=$?
-            if [ $rc -ne 0 ] && grep -qE "iOS driver not ready in time|deviceInfo failed" /tmp/maestro.log; then
-              echo "::warning::Wykryto awarię sterownika XCUITest. Ponawianie 1x po resecie..."
+            if [ $rc -ne 0 ] && grep -qE "iOS driver not ready in time|deviceInfo failed|guard timeout" /tmp/maestro.log; then
+              echo "::warning::Wykryto awarię lub zawieszenie sterownika XCUITest. Ponawianie 1x po resecie..."
               sleep 5
-              guard 600 "maestro retry $flow" maestro test --test-output-dir /tmp/maestro-out "$flow" > /tmp/maestro.log 2>&1
+              guard 360 "maestro retry $flow" maestro test --test-output-dir /tmp/maestro-out "$flow" > /tmp/maestro.log 2>&1
               rc=$?
             fi
             cat /tmp/maestro.log
