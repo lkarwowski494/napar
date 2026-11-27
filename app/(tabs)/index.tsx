@@ -15,6 +15,8 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { theme } from '../../src/core/theme';
+import { formatDoseWeight, formatWaterWeight } from '../../src/core/unit-converter';
+import { toggleRecipeFavorite } from '../../src/data/database';
 import { StarIcon } from '../../src/components/icons/CraftIcons';
 import { useBrewWorkflow } from '../../src/hooks/useBrewWorkflow';
 import { BrewBanners } from '../../src/components/brew/BrewBanners';
@@ -157,6 +159,9 @@ export default function BrewScreen() {
         onCategoryFilterChange={setRecipeCategoryFilter}
         onSelectRecipe={handleSelectRecipe}
         onToggleFavorite={(id) => {
+          if (typeof toggleRecipeFavorite === 'function') {
+            toggleRecipeFavorite(id);
+          }
           refreshData();
         }}
         onDuplicateRecipe={handleDuplicateRecipe}
@@ -193,6 +198,9 @@ export default function BrewScreen() {
         inventory={allInventory}
         selectedItem={selectedInventoryItem}
         onSelectItem={workflow.selectInventoryItem}
+        unitSystem={unitSystem}
+        language={language}
+        t={t}
       />
 
       {/* 1-Tap Quick Re-Brew (Bleary-Eyed Barista Shortcut) */}
@@ -216,7 +224,9 @@ export default function BrewScreen() {
               {language === 'en' ? 'REPEAT LAST BREW (1-TAP)' : 'POWTÓRZ OSTATNI NAPAR (1-TAP)'}
             </Text>
             <Text style={styles.reBrewTitle} numberOfLines={1}>
-              {recentFiveStarSession.recipeName || recentFiveStarSession.method} · {recentFiveStarSession.doseGrams}g / {recentFiveStarSession.waterGrams}g
+              {recentFiveStarSession.recipeName || recentFiveStarSession.method} ·{' '}
+              {formatDoseWeight(recentFiveStarSession.doseGrams, unitSystem, language)} /{' '}
+              {formatWaterWeight(recentFiveStarSession.waterGrams, unitSystem, language)}
             </Text>
           </View>
           <Text style={styles.reBrewArrow}>→</Text>

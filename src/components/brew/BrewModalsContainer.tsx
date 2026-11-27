@@ -3,13 +3,13 @@
 // Encapsulates modal dialogues outside the core inline interaction loop
 // ============================================================================
 
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
+import { Platform } from 'react-native';
 import { ProcedureModal } from './ProcedureModal';
 import { BrewFinishModal } from './BrewFinishModal';
 import { GrinderSelectModal } from './GrinderSelectModal';
 import { ShareRecipeModal } from './ShareRecipeModal';
 import { ImportRecipeModal } from './ImportRecipeModal';
-import { InventorySelectModal } from './InventorySelectModal';
 import { QrScannerModal } from '../../core/QrScannerModal';
 import { OnboardingModal } from '../OnboardingModal';
 import { useBrewWorkflow } from '../../hooks/useBrewWorkflow';
@@ -49,11 +49,6 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     setShowImportModal,
     showQrScanner,
     setShowQrScanner,
-    showInventoryModal,
-    setShowInventoryModal,
-    allInventory,
-    selectedInventoryItem,
-    selectInventoryItem,
     showOnboarding,
     handleCompleteOnboarding,
     waterGrams,
@@ -77,6 +72,14 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     handleScanQrRecipe,
     t,
   } = workflow;
+
+  // Bezpieczne przełączenie ProcedureModal -> BrewFinishModal na iOS (UIKit odrzuca jednoczesną prezentację 2 modali)
+  const pendingFinishModalRef = useRef(false);
+  const handleProcedureDismiss = useCallback(() => {
+    if (!pendingFinishModalRef.current) return;
+    pendingFinishModalRef.current = false;
+    setShowFinishModal(true);
+  }, [setShowFinishModal]);
 
   // DEEP-001: używamy scaledSteps (parsowanych z stepsJson dla SavedRecipe i przeskalowanych do wody/porcji),
   // zamiast sprawdzać 'steps' in recipe (co psuło każdą recepturę wczytaną z SQLite do „KROK 1 Z 1”).
@@ -131,17 +134,27 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
           nextStep();
         }}
         onFinishAndSave={() => {
-          setShowProcedureModal(false);
           pauseTimer();
-          setShowFinishModal(true);
+          if (Platform.OS === 'ios' && showProcedureModal) {
+            pendingFinishModalRef.current = true;
+            setShowProcedureModal(false);
+          } else {
+            setShowProcedureModal(false);
+            setShowFinishModal(true);
+          }
         }}
-        onClose={() => setShowProcedureModal(false)}
+        onClose={() => {
+          pendingFinishModalRef.current = false;
+          setShowProcedureModal(false);
+        }}
+        onDismiss={handleProcedureDismiss}
       />
 
       {/* Modal Podsumowania Parzenia (Karta Degustacyjna & Dial-in Doctor) */}
       <BrewFinishModal
         visible={showFinishModal}
         unitSystem={unitSystem}
+        language={language}
         totalElapsedSeconds={snapshot.totalElapsedSeconds}
         waterGrams={waterGrams}
         rating={rating}
@@ -207,17 +220,6 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         t={t}
         language={language}
       />
-
-      {/* Modal Wyboru Pozycji ze Spiżarni */}
-      <InventorySelectModal
-        visible={showInventoryModal}
-        onClose={() => setShowInventoryModal(false)}
-        inventory={allInventory}
-        selectedItem={selectedInventoryItem}
-        onSelectItem={(item) => selectInventoryItem(item)}
-        t={t}
-      />
-
 
       {/* Onboarding Modal */}
       <OnboardingModal

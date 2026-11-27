@@ -8,6 +8,8 @@ import {
   Modal,
   TextInput,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme, withAlpha } from '../../core/theme';
@@ -169,7 +171,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={false}>
+    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <ModalHeader
           onClose={onClose}
@@ -184,7 +186,15 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
           <Text style={styles.modalHeaderSub}>{t.stash.editSubtitle}</Text>
         </ModalHeader>
 
-        <ScrollView style={styles.formScroll}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+        <ScrollView
+          style={styles.formScroll}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+        >
           {/* Typ: Kawa vs Herbata — widoczny wyłącznie gdy preferencja to 'both' */}
           {(!beveragePreference || beveragePreference === 'both') && (
             <View style={styles.typeSelectorRow}>
@@ -316,7 +326,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             />
             <View style={styles.weightQuickButtonsRow}>
               <Pressable
-                testID="quick-weight-minus-18"
+                testID="quick-weight-minus-15"
                 style={styles.quickWeightBtn}
                 onPress={() => handleAdjustRemainingWeight(isImperial ? -0.5 : -15)}
                 accessibilityRole="button"
@@ -334,7 +344,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 <Text style={styles.quickWeightBtnText}>{isImperial ? '-0.6 oz' : '-18 g'}</Text>
               </Pressable>
               <Pressable
-                testID="quick-weight-minus-18"
+                testID="quick-weight-plus-15"
                 style={styles.quickWeightBtn}
                 onPress={() => handleAdjustRemainingWeight(isImperial ? 0.5 : 15)}
                 accessibilityRole="button"
@@ -343,6 +353,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
                 <Text style={styles.quickWeightBtnText}>{isImperial ? '+0.5 oz' : '+15 g'}</Text>
               </Pressable>
               <Pressable
+                testID="quick-weight-zero"
                 style={[styles.quickWeightBtn, styles.quickWeightZeroBtn]}
                 onPress={() => setEditRemainingWeight('0')}
                 accessibilityRole="button"
@@ -404,6 +415,7 @@ export const BeanEditModal: React.FC<BeanEditModalProps> = ({
             <Text style={styles.deletePackText}>{t.stash.deletePackFromStash}</Text>
           </Pressable>
         </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </Modal>
   );

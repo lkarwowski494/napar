@@ -3,13 +3,14 @@
 // Śledzenie świeżości (Resting Window), wagi w paczce i nut sensorycznych
 // ============================================================================
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   Pressable,
+  Platform,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useBrew } from '../../src/core/brew-context';
@@ -46,6 +47,8 @@ export default function BeansScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showCompendium, setShowCompendium] = useState(false);
   const [presetTemplate, setPresetTemplate] = useState<KnowledgeTemplate | null>(null);
+  const pendingOpenCompendiumRef = useRef(false);
+  const pendingOpenAddRef = useRef(false);
 
   // Stan edycji paczki (BR-MAG-001 & BR-MAG-004)
   const [showEditModal, setShowEditModal] = useState(false);
@@ -90,8 +93,13 @@ export default function BeansScreen() {
 
   const handleUseKnowledgeTemplate = (template: KnowledgeTemplate) => {
     setPresetTemplate({ ...template });
-    setShowCompendium(false);
-    setShowAddModal(true);
+    if (Platform.OS === 'ios' && showCompendium) {
+      pendingOpenAddRef.current = true;
+      setShowCompendium(false);
+    } else {
+      setShowCompendium(false);
+      setShowAddModal(true);
+    }
   };
 
   const handleOpenEdit = (item: InventoryItem) => {
@@ -189,11 +197,25 @@ export default function BeansScreen() {
       {/* Modal dodawania nowej paczki */}
       <BeanAddModal
         visible={showAddModal}
-        onClose={() => setShowAddModal(false)}
+        onClose={() => {
+          pendingOpenCompendiumRef.current = false;
+          setShowAddModal(false);
+        }}
+        onDismiss={() => {
+          if (pendingOpenCompendiumRef.current) {
+            pendingOpenCompendiumRef.current = false;
+            setShowCompendium(true);
+          }
+        }}
         beveragePreference={beveragePreference}
         onOpenCompendium={() => {
-          setShowAddModal(false);
-          setShowCompendium(true);
+          if (Platform.OS === 'ios' && showAddModal) {
+            pendingOpenCompendiumRef.current = true;
+            setShowAddModal(false);
+          } else {
+            setShowAddModal(false);
+            setShowCompendium(true);
+          }
         }}
         presetTemplate={presetTemplate}
         onSaved={handleInventoryMutated}
@@ -215,7 +237,16 @@ export default function BeansScreen() {
       {/* Modal: Kompendium Wiedzy (BR-WIEDZA-001 & BR-WIEDZA-002) */}
       <BeanCompendiumModal
         visible={showCompendium}
-        onClose={() => setShowCompendium(false)}
+        onClose={() => {
+          pendingOpenAddRef.current = false;
+          setShowCompendium(false);
+        }}
+        onDismiss={() => {
+          if (pendingOpenAddRef.current) {
+            pendingOpenAddRef.current = false;
+            setShowAddModal(true);
+          }
+        }}
         beveragePreference={beveragePreference}
         onUseTemplate={handleUseKnowledgeTemplate}
       />

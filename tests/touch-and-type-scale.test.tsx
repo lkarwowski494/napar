@@ -79,9 +79,15 @@ describe('M1-audytor-generalny-029: cyfry stoperów przy dużej czcionce (04-stu
 const root = path.join(__dirname, '..');
 const FILES = [
   'src/components/brew/BrewFinishModal.tsx',
+  'src/components/brew/BrewQuickPrepCard.tsx',
   'src/components/settings/AppPreferencesCard.tsx',
   'src/components/beans/BeanEditModal.tsx',
+  'src/components/beans/BeanTopBar.tsx',
+  'src/components/beans/BeanItemCard.tsx',
+  'src/components/journal/JournalFilterBar.tsx',
+  'src/components/journal/JournalSessionCard.tsx',
   'src/components/gongfu/GongfuActiveInfusion.tsx',
+  'src/core/flavor-wheel-picker.tsx',
 ];
 
 /** Otwierające tagi <Pressable …> z uwzględnieniem nawiasów klamrowych (onPress={() => …}). */

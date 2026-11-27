@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Modal,
   TextInput,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
@@ -15,6 +16,7 @@ export interface CsvExportModalProps {
   onClose: () => void;
   title: string;
   csvText: string;
+  onShareFile?: () => void;
 }
 
 export const CsvExportModal: React.FC<CsvExportModalProps> = ({
@@ -22,10 +24,12 @@ export const CsvExportModal: React.FC<CsvExportModalProps> = ({
   onClose,
   title,
   csvText,
+  onShareFile,
 }) => {
   const { t } = useTranslation();
+  if (!visible) return null;
   return (
-    <Modal visible={visible} animationType="slide">
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <ModalHeader
           onClose={onClose}
@@ -37,10 +41,22 @@ export const CsvExportModal: React.FC<CsvExportModalProps> = ({
         <Text style={styles.modalSub}>
           {t.settings.csvModalDesc}
         </Text>
+        {onShareFile && (
+          <Pressable
+            testID="share-csv-file-btn"
+            style={styles.shareFileBtn}
+            onPress={onShareFile}
+            accessibilityRole="button"
+            accessibilityLabel={t.settings.shareCsvFileBtn}
+          >
+            <Text style={styles.shareFileBtnText}>{t.settings.shareCsvFileBtn}</Text>
+          </Pressable>
+        )}
         <TextInput
           style={styles.jsonTextInput}
           multiline
           editable={false}
+          selectTextOnFocus
           value={csvText}
         />
       </SafeAreaView>
@@ -71,8 +87,23 @@ const styles = StyleSheet.create({
   modalSub: {
     fontSize: 13,
     color: theme.colors.textSecondary,
-    marginBottom: 16,
+    marginBottom: 12,
     lineHeight: 18,
+  },
+  shareFileBtn: {
+    minHeight: 44,
+    backgroundColor: theme.colors.copper,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  shareFileBtnText: {
+    color: theme.colors.onAccent,
+    fontSize: 15,
+    fontWeight: '700',
   },
   jsonTextInput: {
     flex: 1,

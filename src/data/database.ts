@@ -708,6 +708,21 @@ export function deleteRecipe(id: string): void {
   });
 }
 
+export function toggleRecipeFavorite(id: string): boolean {
+  const rawId = typeof id === 'string' ? id : (typeof id === 'number' && Number.isFinite(id) ? String(id) : '');
+  const safeId = rawId.replace(/[\x00-\x1F\x7F]/g, '').trim();
+  if (!safeId) return false;
+  const db = getDatabase();
+  const existing = db.getFirstSync<{ is_favorite: number }>(
+    'SELECT is_favorite FROM recipes WHERE id = ?',
+    [safeId]
+  );
+  if (!existing) return false;
+  const next = existing.is_favorite ? 0 : 1;
+  db.runSync('UPDATE recipes SET is_favorite = ? WHERE id = ?', [next, safeId]);
+  return next === 1;
+}
+
 export function duplicateRecipe(
   recipe: {
     id: string;

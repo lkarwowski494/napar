@@ -56,3 +56,16 @@ test('appName w każdym słowniku i18n i nazwa pod ikoną w każdym pliku expo.l
   );
   expect(wrong).toEqual([]);
 });
+
+test('stara nazwa studia „APPS4CRAFT” nie występuje w słownikach i18n ani na stronie site/', () => {
+  const hits: string[] = [];
+  for (const target of ['src/core/i18n.tsx', 'site']) {
+    for (const f of walk(path.join(root, target))) {
+      const rel = path.relative(root, f);
+      fs.readFileSync(f, 'utf8').split('\n').forEach((line, i) => {
+        if (/apps4craft/i.test(line)) hits.push(`${rel}:${i + 1}`);
+      });
+    }
+  }
+  expect(hits).toEqual([]);
+});

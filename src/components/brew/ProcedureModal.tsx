@@ -49,6 +49,7 @@ export interface ProcedureModalProps {
   onNextStep: () => void;
   onFinishAndSave: () => void;
   onClose: () => void;
+  onDismiss?: () => void;
   t?: any;
 }
 
@@ -73,6 +74,7 @@ export function ProcedureModal({
   onNextStep,
   onFinishAndSave,
   onClose,
+  onDismiss,
 }: ProcedureModalProps) {
   const cleanLang = typeof language === 'string' ? language.trim().toLowerCase() : 'pl';
   const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
@@ -148,7 +150,7 @@ export function ProcedureModal({
     : `Całkowity czas parzenia: ${formatClock(totalElapsedSeconds)}`;
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose} onDismiss={onDismiss}>
       <SafeAreaView
         style={styles.container}
         edges={['top', 'bottom', 'left', 'right']}

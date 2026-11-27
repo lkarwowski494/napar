@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { theme, withAlpha } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
-import { formatTemperatureDelta, UnitSystem, parseLocaleFloat } from '../../core/unit-converter';
+import { formatTemperatureDelta, formatWaterWeight, UnitSystem, parseLocaleFloat } from '../../core/unit-converter';
 import {
   SensoryProfile,
   SensoryRadarChart,
@@ -105,7 +105,7 @@ export function BrewFinishModal({
   const safeRating = Number.isFinite(rawRating) && rawRating > 0 && !Object.is(rawRating, -0) ? Math.max(0, Math.min(5, Math.floor(rawRating))) : 0;
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={true}>
+    <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onSkip}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <ModalHeader
@@ -126,9 +126,9 @@ export function BrewFinishModal({
             contentContainerStyle={{ paddingBottom: 24 }}
           >
             <Text style={styles.modalSub}>
-              {(t.brew?.finishTimeWater || (language === 'pl' ? 'Czas: {time} · Woda: {water}g' : 'Time: {time} · Water: {water}g'))
+              {(t.brew?.finishTimeWater || (language === 'pl' ? 'Czas: {time} · Woda: {water}' : 'Time: {time} · Water: {water}'))
                 .replace('{time}', formatTime(totalElapsedSeconds))
-                .replace('{water}', String(safeWater))}
+                .replace('{water}', formatWaterWeight(safeWater, unitSystem, language))}
             </Text>
 
             {/* Ocena w gwiazdkach */}
@@ -250,10 +250,11 @@ export function BrewFinishModal({
             <Text style={styles.sectionSub}>
               {t.sensory.subtitle}
             </Text>
-            <SensoryRadarChart profile={sensoryProfile} size={190} />
+            <SensoryRadarChart profile={sensoryProfile} size={190} language={language} />
             <SensoryScoreEditor
               profile={sensoryProfile}
               onChange={onChangeSensoryProfile}
+              language={language}
             />
 
             {/* Hierarchiczne Koło Smaków SCA */}

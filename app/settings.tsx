@@ -3,7 +3,7 @@
 // ZP-02, ZP-06, ZP-07, ZP-08, ZP-10: 100% offline, zero-login, darmowy eksport JSON
 // ============================================================================
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import * as Linking from 'expo-linking';
 import * as ExpoRouter from 'expo-router';
 import Constants from 'expo-constants';
@@ -45,9 +45,17 @@ import { theme } from '../src/core/theme';
 import { AppGuideModal } from '../src/components/AppGuideModal';
 import { clampCaffeineHalfLifeHours } from '../src/core/domain-rules';
 import { useTranslation, translations } from '../src/core/i18n';
-import { safetyBackup } from '../src/data/backup';
+import {
+  safetyBackup,
+  listBackupFiles,
+  readBackupFile,
+  localISODate,
+  type BackupFileEntry,
+} from '../src/data/backup';
+import { shareTextAsFile } from '../src/platform/file-export';
 import { JsonExportModal, JsonImportModal } from '../src/components/settings/JsonBackupModals';
 import { CsvExportModal } from '../src/components/settings/CsvExportModal';
+import { OssLicensesModal } from '../src/components/settings/OssLicensesModal';
 import { CaffeineSettingsCard } from '../src/components/settings/CaffeineSettingsCard';
 import { DataBackupCard } from '../src/components/settings/DataBackupCard';
 import { GrinderSelectionCard } from '../src/components/settings/GrinderSelectionCard';
@@ -59,6 +67,7 @@ import {
   privacyPolicyUrl,
   TERMS_URL,
   SUPPORT_URL,
+  LICENSES_URL,
   SUPPORT_EMAIL,
   supportMailtoUrl,
 } from '../src/core/app-identity';
@@ -113,10 +122,46 @@ export default function SettingsScreen({
   const [showCsvModal, setShowCsvModal] = useState(false);
   // M1-audytor-generalny-031 (04-studio-projektowe-008): przewodnik po aplikacji dostępny z Ustawień
   const [showGuide, setShowGuide] = useState(false);
+  const [showOssLicenses, setShowOssLicenses] = useState(false);
   const [csvModalTitle, setCsvModalTitle] = useState('');
+  const [csvFilePrefix, setCsvFilePrefix] = useState<'napar-sessions' | 'napar-stash'>('napar-sessions');
   const [exportedJsonText, setExportedJsonText] = useState('');
   const [importJsonText, setImportJsonText] = useState('');
   const [exportedCsvText, setExportedCsvText] = useState('');
+  const [backupFiles, setBackupFiles] = useState<BackupFileEntry[]>([]);
+  const [loadedBackupFileName, setLoadedBackupFileName] = useState<string | null>(null);
+  const isMountedRef = useRef(true);
+  const backupFilesRef = useRef<BackupFileEntry[]>([]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const refreshBackupFiles = useCallback(async () => {
+    try {
+      if (typeof listBackupFiles === 'function') {
+        const files = await listBackupFiles();
+        const nextFiles = Array.isArray(files) ? files : [];
+        if (!isMountedRef.current) return;
+        const prev = backupFilesRef.current;
+        const changed =
+          prev.length !== nextFiles.length ||
+          nextFiles.some((f, idx) => prev[idx]?.path !== f.path || prev[idx]?.name !== f.name);
+        if (changed) {
+          backupFilesRef.current = nextFiles;
+          setBackupFiles(nextFiles);
+        }
+      }
+    } catch {
+      if (isMountedRef.current && backupFilesRef.current.length > 0) {
+        backupFilesRef.current = [];
+        setBackupFiles([]);
+      }
+    }
+  }, []);
 
   // DEEP-005: ponowne wczytanie wszystkich ustawień z SQLite po imporcie kopii albo powrocie na ekran.
   const reloadSettingsFromDb = useCallback((syncLanguage = false): 'pl' | 'en' => {
@@ -241,10 +286,33 @@ export default function SettingsScreen({
     }
   };
 
+  const handleShareJsonFile = async () => {
+    try {
+      const dateStr = typeof localISODate === 'function' ? localISODate() : 'backup';
+      const result = await shareTextAsFile(
+        `napar-backup-${dateStr}.json`,
+        exportedJsonText,
+        'application/json',
+        'public.json'
+      );
+      if (!result.ok) {
+        Alert.alert(
+          t.common.shareErrorTitle,
+          result.reason === 'unavailable'
+            ? t.settings.shareUnavailableDesc
+            : t.common.shareErrorDesc
+        );
+      }
+    } catch {
+      Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+    }
+  };
+
   const handleExportSessionsCsv = () => {
     try {
       const csv = exportSessionsCsv();
       setExportedCsvText(csv);
+      setCsvFilePrefix('napar-sessions');
       setCsvModalTitle(language === 'pl' ? 'Eksport Dziennika (CSV)' : 'Journal Export (CSV)');
       setShowCsvModal(true);
     } catch (e: any) {
@@ -256,10 +324,53 @@ export default function SettingsScreen({
     try {
       const csv = exportInventoryCsv();
       setExportedCsvText(csv);
+      setCsvFilePrefix('napar-stash');
       setCsvModalTitle(language === 'pl' ? 'Eksport Spiżarni (CSV)' : 'Stash Export (CSV)');
       setShowCsvModal(true);
     } catch (e: any) {
       Alert.alert(t.settings.exportErrorTitle, e?.message || t.settings.exportErrorDesc);
+    }
+  };
+
+  const handleShareCsvFile = async () => {
+    try {
+      const dateStr = typeof localISODate === 'function' ? localISODate() : 'export';
+      const result = await shareTextAsFile(
+        `${csvFilePrefix}-${dateStr}.csv`,
+        exportedCsvText,
+        'text/csv',
+        'public.comma-separated-values-text'
+      );
+      if (!result.ok) {
+        Alert.alert(
+          t.common.shareErrorTitle,
+          result.reason === 'unavailable'
+            ? t.settings.shareUnavailableDesc
+            : t.common.shareErrorDesc
+        );
+      }
+    } catch {
+      Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+    }
+  };
+
+  const handleOpenImportModal = () => {
+    setLoadedBackupFileName(null);
+    setShowImportModal(true);
+    return refreshBackupFiles();
+  };
+
+  const handleSelectBackupFile = async (file: BackupFileEntry) => {
+    try {
+      const content = typeof readBackupFile === 'function' ? await readBackupFile(file.path) : null;
+      if (content === null) {
+        Alert.alert(t.common.error, t.settings.importFileReadError);
+        return;
+      }
+      setImportJsonText(content);
+      setLoadedBackupFileName(file.name);
+    } catch {
+      Alert.alert(t.common.error, t.settings.importFileReadError);
     }
   };
 
@@ -280,6 +391,7 @@ export default function SettingsScreen({
       brewCtx?.reloadFromDatabase?.();
       setShowImportModal(false);
       setImportJsonText('');
+      setLoadedBackupFileName(null);
       const nextT = translations[effectiveLang] || translations.en;
       Alert.alert(nextT.settings.importSuccessTitle, nextT.settings.importSuccessDesc);
     } catch (e: any) {
@@ -344,7 +456,7 @@ export default function SettingsScreen({
       {/* Kopia Zapasowa & Eksport (ZP-02, ZP-06, ZP-07, ZP-08, ZP-10) */}
       <DataBackupCard
         onExportJson={handleExport}
-        onOpenImportJson={() => setShowImportModal(true)}
+        onOpenImportJson={handleOpenImportModal}
         onExportSessionsCsv={handleExportSessionsCsv}
         onExportInventoryCsv={handleExportInventoryCsv}
         t={t}
@@ -354,17 +466,28 @@ export default function SettingsScreen({
       <JsonExportModal
         visible={showExportModal}
         exportedJsonText={exportedJsonText}
+        onShareFile={handleShareJsonFile}
         onClose={() => setShowExportModal(false)}
       />
 
       <JsonImportModal
         visible={showImportModal}
         jsonText={importJsonText}
-        onChangeJsonText={setImportJsonText}
+        onChangeJsonText={(text) => {
+          setImportJsonText(text);
+          if (loadedBackupFileName) setLoadedBackupFileName(null);
+        }}
         onConfirmImport={handleImport}
+        backupFiles={backupFiles}
+        onSelectBackupFile={handleSelectBackupFile}
+        onRefreshBackupFiles={() => {
+          void refreshBackupFiles();
+        }}
+        loadedFileName={loadedBackupFileName}
         onClose={() => {
           setShowImportModal(false);
           setImportJsonText('');
+          setLoadedBackupFileName(null);
         }}
       />
 
@@ -372,6 +495,7 @@ export default function SettingsScreen({
         visible={showCsvModal}
         title={csvModalTitle}
         csvText={exportedCsvText}
+        onShareFile={handleShareCsvFile}
         onClose={() => setShowCsvModal(false)}
       />
 
@@ -400,6 +524,17 @@ export default function SettingsScreen({
           <Text style={styles.infoLabel}>{language === 'pl' ? 'Zgodność licencyjna' : 'License'}</Text>
           <Text style={styles.infoValue}>{t.settings.licenseValue}</Text>
         </View>
+        <View style={styles.divider} />
+        <Pressable
+          testID="settings-open-licenses-btn"
+          style={styles.infoRow}
+          onPress={() => setShowOssLicenses(true)}
+          accessibilityRole="button"
+          accessibilityLabel={t.settings.ossLicensesLabel}
+        >
+          <Text style={styles.infoLabel}>{t.settings.ossLicensesLabel}</Text>
+          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>›</Text>
+        </Pressable>
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
@@ -461,6 +596,11 @@ export default function SettingsScreen({
         )}
       </View>
       <AppGuideModal visible={showGuide} onClose={() => setShowGuide(false)} language={language} />
+      <OssLicensesModal
+        visible={showOssLicenses}
+        onClose={() => setShowOssLicenses(false)}
+        onOpenWebLink={() => guardExternalUrl(() => Linking.openURL(LICENSES_URL))}
+      />
     </ScrollView>
   );
 }

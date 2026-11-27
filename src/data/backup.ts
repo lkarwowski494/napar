@@ -267,6 +267,66 @@ export async function dismissCorruptState(fileName: string): Promise<void> {
   }
 }
 
+export interface BackupFileEntry {
+  name: string;
+  path: string;
+  source: 'backup' | 'documents';
+}
+
+/**
+ * DEEP-030: Listuje lokalne pliki kopii .json z katalogu Backup/ oraz głównego katalogu
+ * Dokumentów aplikacji (widocznego w aplikacji Pliki na iOS: Na moim iPhonie -> Napar).
+ */
+export async function listBackupFiles(): Promise<BackupFileEntry[]> {
+  const docDir = (FileSystem as any).documentDirectory;
+  if (!docDir) return [];
+  const results: BackupFileEntry[] = [];
+  const seen = new Set<string>();
+
+  const scanDir = async (dirPath: string, source: 'backup' | 'documents') => {
+    try {
+      const info = await FileSystem.getInfoAsync(dirPath);
+      if (!info.exists) return;
+      const files = await FileSystem.readDirectoryAsync(dirPath);
+      for (const name of files) {
+        if (
+          typeof name === 'string' &&
+          name.toLowerCase().endsWith('.json') &&
+          !name.endsWith('.tmp') &&
+          !name.startsWith('state_corrupt_')
+        ) {
+          const fullPath = `${dirPath}${name}`;
+          if (!seen.has(fullPath)) {
+            seen.add(fullPath);
+            results.push({ name, path: fullPath, source });
+          }
+        }
+      }
+    } catch {
+      // Ignoruj niedostępny katalog
+    }
+  };
+
+  await scanDir(`${docDir}${AUTO_DIR}`, 'backup');
+  await scanDir(docDir, 'documents');
+
+  return results.sort((a, b) => (a.name < b.name ? 1 : a.name > b.name ? -1 : 0));
+}
+
+/**
+ * DEEP-030: Odczytuje treść wskazanego pliku kopii .json z pamięci urządzenia.
+ */
+export async function readBackupFile(filePath: string): Promise<string | null> {
+  if (!filePath || typeof filePath !== 'string') {
+    return null;
+  }
+  try {
+    return await FileSystem.readAsStringAsync(filePath);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Waliduje poprawność schematu pliku kopii zapasowej.
  */

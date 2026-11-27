@@ -134,6 +134,7 @@ Wszystkie 12 pozycji §3 z 2026-11-15 zostało rozstrzygniętych 2026-11-19 wed�
 | element | `app/settings.tsx` | `CaffeineSettingsCard` | półtrwanie i pora snu | F-17 |
 | link | `app/settings.tsx` | `privacyPolicyUrl` | polityka prywatności | prawne (D-007) |
 | link | `app/settings.tsx` | `TERMS_URL` | regulamin | prawne (D-007) |
+| link | `app/settings.tsx` | `LICENSES_URL` | licencje open-source (OSS) | prawne (D-007) |
 | link | `app/settings.tsx` | `supportMailtoUrl` | kontakt | prawne (D-007) |
 | link | `app/settings.tsx` | `appStoreReviewUrl` | ocena w App Store | F-41 |
 | trasa | `app/(tabs)/settings.tsx` | `SettingsScreen` | zakładka Ustawienia (ten sam ekran co `app/settings.tsx`) | techniczne |
@@ -142,6 +143,7 @@ Wszystkie 12 pozycji §3 z 2026-11-15 zostało rozstrzygniętych 2026-11-19 wed�
 | element | `src/components/settings/AppPreferencesCard.tsx` | `beverage-preference-radiogroup` | preferencja napoju | F-26 |
 | element | `src/components/settings/AppPreferencesCard.tsx` | `toggle-voice-btn` | głos i dźwięk, wibracje | F-13 |
 | element | `src/components/settings/DataBackupCard.tsx` | `export-csv-sessions-btn` | eksport CSV | F-10 |
+| udostępnianie | `src/platform/file-export.ts` | `from 'expo-sharing'` | eksport plików JSON/CSV przez systemowy arkusz udostępniania | F-10 |
 | ekran | `app/_layout.tsx` | `SafeModeView` | tryb awaryjny | F-10 |
 | udostępnianie | `src/components/SafeModeView.tsx` | `from 'expo-sharing'` | eksport danych w trybie awaryjnym | F-10 |
 ---

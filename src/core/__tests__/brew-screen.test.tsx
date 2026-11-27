@@ -1767,6 +1767,11 @@ function pressById(tree: any, testID: string) {
   const target = tree.root.findAll((n: any) => n.props.testID === testID && typeof n.props.onPress === 'function')[0];
   if (!target) throw new Error(`Brak przycisku ${testID}`);
   target.props.onPress();
+  if (testID === 'save-brew-btn' || testID === 'procedure-finish-save-btn') {
+    tree.root
+      .findAll((n: any) => typeof n.props?.onDismiss === 'function')
+      .forEach((n: any) => n.props.onDismiss());
+  }
 }
 
 function openSteps(tree: any) {

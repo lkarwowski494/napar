@@ -7,7 +7,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { theme, withAlpha } from '../../core/theme';
-import { formatTemperature, UnitSystem } from '../../core/unit-converter';
+import { formatDoseWeight, formatTemperature, UnitSystem } from '../../core/unit-converter';
 import { useTranslation, formatTemplate } from '../../core/i18n';
 import { InventoryItem } from '../../core/database-schema';
 import {
@@ -58,7 +58,7 @@ export function BrewHeader({
   onOpenShareModal,
   onNavigateToGongfu,
 }: BrewHeaderProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   const isTea =
     'beverageType' in recipe
@@ -140,6 +140,7 @@ export function BrewHeader({
               const isSelected = recipe.id === fav.id;
               const favDose =
                 'doseGrams' in fav ? fav.doseGrams : fav.coffeeOrTeaDoseGrams;
+              const formattedDose = formatDoseWeight(favDose, unitSystem, language);
               return (
                 <Pressable
                   key={fav.id}
@@ -154,7 +155,7 @@ export function BrewHeader({
                     selected: isSelected,
                     ...(isRunning ? { disabled: true } : {}),
                   }}
-                  accessibilityLabel={formatTemplate(t.brew.favoriteRecipeA11y, { name: fav.name, method: fav.method, dose: favDose })}
+                  accessibilityLabel={formatTemplate(t.brew.favoriteRecipeA11y, { name: fav.name, method: fav.method, dose: formattedDose })}
                 >
                   <Text
                     style={[
@@ -166,7 +167,7 @@ export function BrewHeader({
                     {fav.name}
                   </Text>
                   <Text style={styles.favoriteChipSub}>
-                    {fav.method} · {favDose}g
+                    {fav.method} · {formattedDose}
                   </Text>
                 </Pressable>
               );
@@ -232,7 +233,10 @@ export function BrewHeader({
           accessibilityLabel={t.brew.stashPillA11y}
           accessibilityHint={
             selectedInventoryItem
-              ? formatTemplate(t.brew.stashPillHint, { name: selectedInventoryItem.name, weight: selectedInventoryItem.remainingWeightGrams })
+              ? formatTemplate(t.brew.stashPillHint, {
+                  name: selectedInventoryItem.name,
+                  weight: formatDoseWeight(selectedInventoryItem.remainingWeightGrams, unitSystem, language),
+                })
               : undefined
           }
         >
@@ -242,7 +246,9 @@ export function BrewHeader({
           </Text>
           <Text style={styles.selectorSub}>
             {selectedInventoryItem
-              ? formatTemplate(t.brew.stashPillRemaining, { weight: selectedInventoryItem.remainingWeightGrams })
+              ? formatTemplate(t.brew.stashPillRemaining, {
+                  weight: formatDoseWeight(selectedInventoryItem.remainingWeightGrams, unitSystem, language),
+                })
               : t.brew.stashPillDefaultDose}
           </Text>
         </Pressable>

@@ -16,13 +16,17 @@ export function appStoreReviewUrl(id: string): string {
 // ============================================================================
 
 // Strony sprawdzane przez .github/workflows/site-check.yml (po jednej w linii, względem SITE_BASE_URL):
+// site-check: en/index.html
 // site-check: privacy.html
 // site-check: en/privacy.html
 // site-check: terms.html
 // site-check: support.html
+// site-check: en/support.html
+// site-check: licenses.html
 export const SITE_BASE_URL = 'https://lkarwowski494.github.io/napar/';
 export const TERMS_URL = `${SITE_BASE_URL}terms.html`;
 export const SUPPORT_URL = `${SITE_BASE_URL}support.html`;
+export const LICENSES_URL = `${SITE_BASE_URL}licenses.html`;
 
 /** Polityka prywatności w języku interfejsu: PL w katalogu głównym, EN w en/ (10-wydanie-010). */
 export function privacyPolicyUrl(lang: 'pl' | 'en'): string {

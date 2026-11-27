@@ -385,7 +385,7 @@ describe('JournalScreen Integration', () => {
     const text = `${title}\n${message}`;
     expect(text).not.toMatch(/[ąćęłńóśźż]/i);
     expect(text).not.toMatch(/\b(Doza|Woda|Czas|Ziarno|Ocena|Balans|Nuty|Notatki|Data|Parz|Notatka| o )\b/);
-    expect(text).toMatch(/Dose: 15g \| Water: 250g \| Temp: 199(\.4)?°F/);
+    expect(text).toMatch(/Dose: 0\.53 oz \| Water: 8\.45 fl oz \| Temp: 199(\.4)?°F/);
     expect(text).not.toMatch(/°C/);
     expect(title).toBe('V60 Hoffmann · Tasting note');
     getAppSetting.mockImplementation(() => null);

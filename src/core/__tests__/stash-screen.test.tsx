@@ -99,6 +99,14 @@ const findPressableWithText = (root: any, text: string) => {
   return curr;
 };
 
+const flushModalDismiss = (tree: any) => {
+  renderer.act(() => {
+    tree.root
+      .findAll((n: any) => typeof n.props?.onDismiss === 'function')
+      .forEach((n: any) => n.props.onDismiss());
+  });
+};
+
 describe('BeansScreen (Stash & Inventory)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -428,6 +436,7 @@ describe('BeansScreen (Stash & Inventory)', () => {
     renderer.act(() => {
       useBtn.props.onPress();
     });
+    flushModalDismiss(tree);
 
     // Po kliknięciu powinien otworzyć się modal dodawania z wypełnionymi danymi
     str = JSON.stringify(tree.toJSON());
@@ -449,6 +458,7 @@ describe('BeansScreen (Stash & Inventory)', () => {
     renderer.act(() => {
       promptBtn.props.onPress();
     });
+    flushModalDismiss(tree);
 
     // Z powrotem w kompendium
     expect(JSON.stringify(tree.toJSON())).toContain('Kompendium Wiedzy');
@@ -825,6 +835,7 @@ describe('BeansScreen (Stash & Inventory)', () => {
     renderer.act(() => {
       useVarietyBtn.props.onPress();
     });
+    flushModalDismiss(tree);
 
     expect(JSON.stringify(tree.toJSON())).toContain('Dodaj do Spiżarni');
 
@@ -847,6 +858,7 @@ describe('BeansScreen (Stash & Inventory)', () => {
     renderer.act(() => {
       useTerroirBtn.props.onPress();
     });
+    flushModalDismiss(tree);
 
     expect(JSON.stringify(tree.toJSON())).toContain('Dodaj do Spiżarni');
   });
@@ -884,6 +896,7 @@ describe('BeansScreen (Stash & Inventory)', () => {
     renderer.act(() => {
       useVarietyBtn.props.onPress();
     });
+    flushModalDismiss(tree);
     expect(tree.root.findAllByProps({ testID: 'plan-annual-btn' })).toHaveLength(0);
     expect(tree.root.findAllByProps({ testID: 'bean-name-input' }).length).toBeGreaterThan(0);
 

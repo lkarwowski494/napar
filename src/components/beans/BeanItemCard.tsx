@@ -8,7 +8,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { InventoryItem } from '../../core/database-schema';
 import { formatDoseWeight } from '../../core/unit-converter';
 import { theme, withAlpha } from '../../core/theme';
-import { useTranslation } from '../../core/i18n';
+import { useTranslation, formatTemplate } from '../../core/i18n';
 
 interface BeanItemCardProps {
   item: InventoryItem;
@@ -18,6 +18,25 @@ interface BeanItemCardProps {
   onSelectForBrew: (item: InventoryItem) => void;
   onOpenEdit: (item: InventoryItem) => void;
   language?: 'pl' | 'en';
+}
+
+export function computeDaysSinceLocalDate(dateStr?: string, nowDate: Date = new Date()): number | null {
+  if (!dateStr) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateStr.trim());
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const parsed = new Date(year, month - 1, day);
+  if (
+    parsed.getFullYear() !== year ||
+    parsed.getMonth() !== month - 1 ||
+    parsed.getDate() !== day
+  ) {
+    return null;
+  }
+  const today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+  return Math.round((today.getTime() - parsed.getTime()) / 86_400_000);
 }
 
 export const BeanItemCard: React.FC<BeanItemCardProps> = ({
@@ -37,6 +56,38 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
   const rawInit = typeof item.initialWeightGrams === 'number' ? item.initialWeightGrams : 0;
   const safeInitialGrams = Object.is(rawInit, -0) || rawInit < 0 ? 0 : rawInit;
 
+  const trimmedDate = item.roastOrHarvestDate?.trim() || '';
+  const daysSince = computeDaysSinceLocalDate(trimmedDate);
+  const dateLabel = trimmedDate
+    ? formatTemplate(
+        item.type === 'tea' ? t.stash.harvestDateLabel : t.stash.roastDateLabel,
+        { date: trimmedDate }
+      )
+    : null;
+  const daysAgeLabel =
+    daysSince !== null && daysSince >= 0
+      ? daysSince === 0
+        ? t.stash.today
+        : formatTemplate(t.stash.daysAgo, { days: daysSince })
+      : null;
+  const freshnessStage =
+    item.type === 'coffee' && daysSince !== null && daysSince >= 0
+      ? daysSince <= 3
+        ? 'resting'
+        : daysSince <= 35
+          ? 'peak'
+          : 'aged'
+      : null;
+  const freshnessLabel =
+    freshnessStage === 'resting'
+      ? t.stash.freshnessResting
+      : freshnessStage === 'peak'
+        ? t.stash.freshnessPeak
+        : freshnessStage === 'aged'
+          ? t.stash.freshnessAged
+          : null;
+  const hasRating = typeof item.rating === 'number' && Number.isFinite(item.rating) && item.rating > 0;
+
   return (
     <View style={styles.itemCard}>
       <View style={styles.itemHeader}>
@@ -49,11 +100,11 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
         <Pressable
           testID={`bean-fav-btn-${item.id}`}
           onPress={() => onToggleFavorite(item)}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={{ padding: 4 }}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          style={styles.favBtn}
           accessibilityRole="button"
           accessibilityState={{ selected: Boolean(item.isFavorite) }}
-          accessibilityLabel={item.isFavorite ? (t.stash?.favoriteRemove || 'Usuń z ulubionych') : (t.stash?.favoriteAdd || 'Dodaj do ulubionych')}
+          accessibilityLabel={item.isFavorite ? t.stash.favoriteRemove : t.stash.favoriteAdd}
         >
           <Text style={[styles.favIcon, item.isFavorite && styles.favIconActive]}>
             {item.isFavorite ? '★' : '☆'}
@@ -66,7 +117,43 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
         {item.origin && <Text style={styles.detailTag}>{item.origin}</Text>}
         {item.variety && <Text style={styles.detailTag}>{item.variety}</Text>}
         {item.process && <Text style={styles.detailTag}>{item.process}</Text>}
+        {hasRating && (
+          <Text testID={`bean-rating-${item.id}`} style={styles.ratingBadge}>
+            {formatTemplate(t.stash.packRatingBadge, { rating: item.rating })}
+          </Text>
+        )}
       </View>
+
+      {/* Data palenia/zbioru, dni od wypału i odznaka świeżości (DEEP-029) */}
+      {dateLabel && (
+        <View style={styles.freshnessRow} testID={`bean-freshness-${item.id}`}>
+          <Text style={styles.roastDateText}>
+            {daysAgeLabel ? `${dateLabel} · ${daysAgeLabel}` : dateLabel}
+          </Text>
+          {freshnessLabel && (
+            <View
+              testID={`bean-freshness-badge-${item.id}`}
+              style={[
+                styles.freshnessBadge,
+                freshnessStage === 'resting' && styles.freshnessBadgeResting,
+                freshnessStage === 'peak' && styles.freshnessBadgePeak,
+                freshnessStage === 'aged' && styles.freshnessBadgeAged,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.freshnessBadgeText,
+                  freshnessStage === 'resting' && styles.freshnessTextResting,
+                  freshnessStage === 'peak' && styles.freshnessTextPeak,
+                  freshnessStage === 'aged' && styles.freshnessTextAged,
+                ]}
+              >
+                {freshnessLabel}
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
 
       {/* Nuty sensoryczne */}
       {item.flavorNotes && item.flavorNotes.length > 0 && (
@@ -105,10 +192,10 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             testID={`bean-weight-${item.id}`}
             style={styles.weightValue}
             accessibilityRole="text"
-            accessibilityLabel={`${isEn ? 'Remaining weight' : 'Pozostała waga'}: ${formatDoseWeight(safeRemainingGrams, unitSystem)}, ${isEn ? 'Initial weight' : 'Waga początkowa'}: ${formatDoseWeight(safeInitialGrams, unitSystem)}`}
+            accessibilityLabel={`${isEn ? 'Remaining weight' : 'Pozostała waga'}: ${formatDoseWeight(safeRemainingGrams, unitSystem, language)}, ${isEn ? 'Initial weight' : 'Waga początkowa'}: ${formatDoseWeight(safeInitialGrams, unitSystem, language)}`}
           >
-            {formatDoseWeight(safeRemainingGrams, unitSystem)} /{' '}
-            {formatDoseWeight(safeInitialGrams, unitSystem)}
+            {formatDoseWeight(safeRemainingGrams, unitSystem, language)} /{' '}
+            {formatDoseWeight(safeInitialGrams, unitSystem, language)}
           </Text>
         </View>
 
@@ -118,7 +205,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
               testID={`bean-brew-btn-${item.id}`}
               style={styles.brewActionBtn}
               onPress={() => onSelectForBrew(item)}
-              hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
+              hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
               accessibilityRole="button"
               accessibilityLabel={isEn ? "Brew with these beans" : "Parz z tych ziaren"}
             >
@@ -129,7 +216,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             testID={`bean-edit-btn-${item.id}`}
             style={styles.editActionBtn}
             onPress={() => onOpenEdit(item)}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
             accessibilityRole="button"
             accessibilityLabel={isEn ? "Edit item" : "Edytuj paczkę"}>
             <Text style={styles.editActionText}>{isEn ? "Edit" : "Edytuj"}</Text>
@@ -138,7 +225,7 @@ export const BeanItemCard: React.FC<BeanItemCardProps> = ({
             testID={`bean-archive-btn-${item.id}`}
             style={styles.archiveActionBtn}
             onPress={() => onToggleArchive(item)}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
             accessibilityRole="button"
             accessibilityLabel={item.isArchived ? (isEn ? "Restore item" : "Przywróć z archiwum") : (isEn ? "Archive item" : "Archiwizuj paczkę")}>
             <Text style={styles.archiveActionText}>
@@ -177,6 +264,14 @@ const styles = StyleSheet.create({
     marginTop: 2,
     fontWeight: '500',
   },
+  favBtn: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -8,
+    marginRight: -8,
+  },
   favIcon: {
     fontSize: 20,
     color: theme.colors.textMuted,
@@ -197,6 +292,58 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
+  },
+  ratingBadge: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.rating,
+    backgroundColor: withAlpha(theme.colors.rating, 0.14),
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+  },
+  freshnessRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  roastDateText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    fontWeight: '500',
+  },
+  freshnessBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  freshnessBadgeResting: {
+    backgroundColor: withAlpha(theme.colors.copper, 0.12),
+    borderColor: withAlpha(theme.colors.copper, 0.35),
+  },
+  freshnessBadgePeak: {
+    backgroundColor: withAlpha(theme.colors.successBright, 0.12),
+    borderColor: withAlpha(theme.colors.successBright, 0.35),
+  },
+  freshnessBadgeAged: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderColor: theme.colors.borderStrong,
+  },
+  freshnessBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  freshnessTextResting: {
+    color: theme.colors.copperLight,
+  },
+  freshnessTextPeak: {
+    color: theme.colors.successBright,
+  },
+  freshnessTextAged: {
+    color: theme.colors.textMuted,
   },
   flavorRow: {
     flexDirection: 'row',
@@ -236,8 +383,10 @@ const styles = StyleSheet.create({
   },
   archiveEmptyBtn: {
     backgroundColor: theme.colors.danger,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    minHeight: 44,
+    justifyContent: 'center',
     borderRadius: 6,
     marginLeft: 8,
   },
@@ -271,9 +420,9 @@ const styles = StyleSheet.create({
   brewActionBtn: {
     backgroundColor: theme.colors.copper,
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 6,
-    minHeight: 36,
+    minHeight: 44,
     justifyContent: 'center',
   },
   brewActionText: {
@@ -283,7 +432,9 @@ const styles = StyleSheet.create({
   },
   editActionBtn: {
     paddingHorizontal: 8,
-    paddingVertical: 6,
+    paddingVertical: 8,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   editActionText: {
     color: theme.colors.textSecondary,
@@ -292,7 +443,9 @@ const styles = StyleSheet.create({
   },
   archiveActionBtn: {
     paddingHorizontal: 8,
-    paddingVertical: 6,
+    paddingVertical: 8,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   archiveActionText: {
     color: theme.colors.textMuted,
