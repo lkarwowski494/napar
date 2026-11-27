@@ -47,6 +47,11 @@ export interface OssLicensesModalProps {
   onOpenWebLink?: () => void;
 }
 
+export const MIT_LICENSE_NOTICE = {
+  title: 'MIT License',
+  text: 'Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the inclusion of the copyright and permission notice. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.',
+} as const;
+
 export const OssLicensesModal: React.FC<OssLicensesModalProps> = ({
   visible,
   onClose,
@@ -78,6 +83,11 @@ export const OssLicensesModal: React.FC<OssLicensesModalProps> = ({
               <Text style={styles.pkgLicense}>{pkg.license}</Text>
             </View>
           ))}
+
+          <View style={styles.licenseNoticeBox} testID="oss-mit-notice">
+            <Text style={styles.licenseNoticeTitle}>{MIT_LICENSE_NOTICE.title}</Text>
+            <Text style={styles.licenseNoticeText}>{MIT_LICENSE_NOTICE.text}</Text>
+          </View>
 
           {onOpenWebLink && (
             <Pressable
@@ -158,6 +168,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: theme.colors.copperLight,
+  },
+  licenseNoticeBox: {
+    marginTop: 8,
+    backgroundColor: theme.colors.bgCard,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.sm,
+    padding: 12,
+  },
+  licenseNoticeTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginBottom: 4,
+  },
+  licenseNoticeText: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+    lineHeight: 16,
   },
   webLinkBtn: {
     minHeight: 44,

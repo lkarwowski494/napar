@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import { Share, Alert, ScrollView, Platform } from 'react-native';
+import { Share, Alert, ScrollView, Platform, Modal } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 
@@ -25,6 +25,7 @@ import { ShareRecipeModal } from '../src/components/brew/ShareRecipeModal';
 import { BrewFinishModal } from '../src/components/brew/BrewFinishModal';
 import { BrewHeader } from '../src/components/brew/BrewHeader';
 import { BrewModalsContainer } from '../src/components/brew/BrewModalsContainer';
+import { ProcedureModal } from '../src/components/brew/ProcedureModal';
 import { RecipeSelectModal } from '../src/components/brew/RecipeSelectModal';
 import { InventorySelectModal } from '../src/components/brew/InventorySelectModal';
 import { FlavorWheelPicker } from '../src/core/flavor-wheel-picker';
@@ -80,6 +81,9 @@ describe('DEEP-029 (opcja a): Data palenia, dni od wypału, świeżość i ocena
     const ref = new Date(2026, 10, 26, 23, 55, 0);
     expect(computeDaysSinceLocalDate('2026-11-26', ref)).toBe(0);
     expect(computeDaysSinceLocalDate('2026-11-16', ref)).toBe(10);
+    expect(computeDaysSinceLocalDate('2026-11-26T08:00:00Z', ref)).toBe(0);
+    expect(computeDaysSinceLocalDate('2026-11-2699', ref)).toBeNull();
+    expect(computeDaysSinceLocalDate('2026-11-26xyz', ref)).toBeNull();
     expect(computeDaysSinceLocalDate('2026-02-30', ref)).toBeNull();
     expect(computeDaysSinceLocalDate('invalid', ref)).toBeNull();
     expect(computeDaysSinceLocalDate(undefined, ref)).toBeNull();
@@ -200,15 +204,16 @@ describe('DEEP-030 (opcja a): Realny eksport plików Share Sheet i import z loka
     );
   });
 
-  test('shareTextAsFile obsługuje brak dostępności Sharing i pustą nazwę pliku', async () => {
-    jest.spyOn(FileSystem, 'writeAsStringAsync').mockResolvedValue(undefined);
+  test('shareTextAsFile obsługuje brak dostępności Sharing, sprząta plik tymczasowy i odrzuca nazwy z samych kropek', async () => {
+    const writeSpy = jest.spyOn(FileSystem, 'writeAsStringAsync').mockResolvedValue(undefined);
+    const deleteSpy = jest.spyOn(FileSystem, 'deleteAsync').mockResolvedValue(undefined);
     (Sharing.isAvailableAsync as jest.Mock).mockReset().mockResolvedValue(false);
     const shareMock = (Sharing.shareAsync as jest.Mock).mockReset().mockResolvedValue(undefined);
 
-    const res = await shareTextAsFile('', 'a,b', 'text/csv', 'public.comma-separated-values-text');
-    expect(res.ok).toBe(false);
-    expect(res.reason).toBe('unavailable');
-    expect(res.fileUri).toContain('napar-export.txt');
+    const res = await shareTextAsFile('..', 'a,b', 'text/csv', 'public.comma-separated-values-text');
+    expect(res).toEqual({ ok: false, reason: 'unavailable' });
+    expect(writeSpy).toHaveBeenCalledWith(expect.stringContaining('/napar-export.txt'), 'a,b');
+    expect(deleteSpy).toHaveBeenCalledWith(expect.stringContaining('/napar-export.txt'), { idempotent: true });
     expect(shareMock).not.toHaveBeenCalled();
   });
 
@@ -344,6 +349,51 @@ describe('D3: Ulubione receptury, brak fake clipboard, brak duplikatu modala, lo
     const favTab = tree.root.findByProps({ testID: 'subset-filter-favorites' });
     act(() => favTab.props.onPress());
     expect(tree.root.findByProps({ testID: 'favorites-empty-state' })).toBeDefined();
+    // Przy niepustym wyszukiwaniu pokazujemy stan braku wyników wyszukiwania zamiast komunikatu o braku ulubionych
+    const searchInput = tree.root.findByProps({ testID: 'recipe-search-input' });
+    act(() => searchInput.props.onChangeText('zzzz-nieistnieje'));
+    expect(tree.root.findAllByProps({ testID: 'favorites-empty-state' })).toHaveLength(0);
+    expect(tree.root.findByProps({ testID: 'no-search-results-state' })).toBeDefined();
+    act(() => tree.unmount());
+  });
+
+  test('ProcedureModal zachowuje zamontowany komponent Modal z onDismiss przy przejściu visible: true -> false (regresja iOS P0)', () => {
+    const onDismiss = jest.fn();
+    const baseProps = {
+      recipeName: 'V60 Test',
+      steps: MASTER_RECIPES[0].steps,
+      currentStepIndex: 0,
+      isRunning: false,
+      status: 'paused' as const,
+      stepRemainingSeconds: 30,
+      totalElapsedSeconds: 60,
+      unitSystem: 'metric' as const,
+      language: 'pl',
+      t: translations.pl,
+      onPauseResume: jest.fn(),
+      onAdjustTimeSeconds: jest.fn(),
+      onResetCurrentStep: jest.fn(),
+      onPrevStep: jest.fn(),
+      onNextStep: jest.fn(),
+      onFinishAndSave: jest.fn(),
+      onClose: jest.fn(),
+      onDismiss,
+    };
+
+    let tree!: renderer.ReactTestRenderer;
+    act(() => {
+      tree = renderer.create(<ProcedureModal {...baseProps} visible={true} />);
+    });
+    expect(tree.root.findByType(Modal).props.visible).toBe(true);
+
+    act(() => {
+      tree.update(<ProcedureModal {...baseProps} visible={false} />);
+    });
+    const modal = tree.root.findByType(Modal);
+    expect(modal.props.visible).toBe(false);
+    expect(modal.props.onDismiss).toBe(onDismiss);
+    act(() => modal.props.onDismiss());
+    expect(onDismiss).toHaveBeenCalledTimes(1);
     act(() => tree.unmount());
   });
 
@@ -572,6 +622,8 @@ describe('D3: Ulubione receptury, brak fake clipboard, brak duplikatu modala, lo
     expect(BUNDLED_OSS_LICENSES.length).toBeGreaterThanOrEqual(15);
     expect(text).toContain('react-native');
     expect(text).toContain('expo-sharing');
+    expect(tree.root.findByProps({ testID: 'oss-mit-notice' })).toBeDefined();
+    expect(text).toContain('Permission is hereby granted, free of charge');
     const webBtn = tree.root.findByProps({ testID: 'oss-licenses-web-link' });
     act(() => webBtn.props.onPress());
     expect(onOpenWebLink).toHaveBeenCalledTimes(1);

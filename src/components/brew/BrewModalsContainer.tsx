@@ -70,16 +70,21 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     setNotes,
     handleFinishSave,
     handleScanQrRecipe,
+    requestOpenFinishModal,
+    handleProcedureClose,
+    handleProcedureDismiss: workflowProcedureDismiss,
     t,
   } = workflow;
 
   // Bezpieczne przełączenie ProcedureModal -> BrewFinishModal na iOS (UIKit odrzuca jednoczesną prezentację 2 modali)
-  const pendingFinishModalRef = useRef(false);
-  const handleProcedureDismiss = useCallback(() => {
-    if (!pendingFinishModalRef.current) return;
-    pendingFinishModalRef.current = false;
+  const localPendingFinishRef = useRef(false);
+  const handleLocalProcedureDismiss = useCallback(() => {
+    if (!localPendingFinishRef.current) return;
+    localPendingFinishRef.current = false;
     setShowFinishModal(true);
   }, [setShowFinishModal]);
+
+  const onProcedureDismiss = workflowProcedureDismiss ?? handleLocalProcedureDismiss;
 
   // DEEP-001: używamy scaledSteps (parsowanych z stepsJson dla SavedRecipe i przeskalowanych do wody/porcji),
   // zamiast sprawdzać 'steps' in recipe (co psuło każdą recepturę wczytaną z SQLite do „KROK 1 Z 1”).
@@ -135,8 +140,10 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         }}
         onFinishAndSave={() => {
           pauseTimer();
-          if (Platform.OS === 'ios' && showProcedureModal) {
-            pendingFinishModalRef.current = true;
+          if (typeof requestOpenFinishModal === 'function') {
+            requestOpenFinishModal();
+          } else if (Platform.OS === 'ios' && showProcedureModal) {
+            localPendingFinishRef.current = true;
             setShowProcedureModal(false);
           } else {
             setShowProcedureModal(false);
@@ -144,10 +151,14 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
           }
         }}
         onClose={() => {
-          pendingFinishModalRef.current = false;
-          setShowProcedureModal(false);
+          localPendingFinishRef.current = false;
+          if (typeof handleProcedureClose === 'function') {
+            handleProcedureClose();
+          } else {
+            setShowProcedureModal(false);
+          }
         }}
-        onDismiss={handleProcedureDismiss}
+        onDismiss={onProcedureDismiss}
       />
 
       {/* Modal Podsumowania Parzenia (Karta Degustacyjna & Dial-in Doctor) */}

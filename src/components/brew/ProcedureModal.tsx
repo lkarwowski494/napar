@@ -127,10 +127,6 @@ export function ProcedureModal({
     );
   }, [stepRemainingSeconds, boundedIdx, parsedDurationSec]);
 
-  if (!visible) {
-    return null;
-  }
-
   const formatClock = (sec: number | string) => {
     const rawVal = typeof sec === 'number' ? sec : (typeof sec === 'string' ? parseLocaleFloat(sec) : NaN);
     if (!Number.isFinite(rawVal) || rawVal <= 0 || Object.is(rawVal, -0)) return '00:00';

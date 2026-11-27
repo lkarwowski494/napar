@@ -22,7 +22,7 @@ interface BeanItemCardProps {
 
 export function computeDaysSinceLocalDate(dateStr?: string, nowDate: Date = new Date()): number | null {
   if (!dateStr) return null;
-  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateStr.trim());
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:$|[T\s])/.exec(dateStr.trim());
   if (!match) return null;
   const year = Number(match[1]);
   const month = Number(match[2]);
@@ -35,8 +35,9 @@ export function computeDaysSinceLocalDate(dateStr?: string, nowDate: Date = new 
   ) {
     return null;
   }
-  const today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
-  return Math.round((today.getTime() - parsed.getTime()) / 86_400_000);
+  const todayUtc = Date.UTC(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+  const parsedUtc = Date.UTC(year, month - 1, day);
+  return Math.round((todayUtc - parsedUtc) / 86_400_000);
 }
 
 export const BeanItemCard: React.FC<BeanItemCardProps> = ({
@@ -397,8 +398,10 @@ const styles = StyleSheet.create({
   },
   itemFooter: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
     paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
@@ -414,6 +417,7 @@ const styles = StyleSheet.create({
   },
   actionsRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     gap: 8,
   },

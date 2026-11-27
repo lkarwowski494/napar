@@ -198,6 +198,11 @@ describe('SettingsScreen Component', () => {
     await renderer.act(async () => {
       await submitBtn.props.onPress();
     });
+    renderer.act(() => {
+      tree.root
+        .findAll((n: any) => typeof n.props?.onDismiss === 'function')
+        .forEach((n: any) => n.props.onDismiss());
+    });
 
     expect(importSpy).toHaveBeenCalledWith('{"version": 1, "test": true}');
     expect(alertSpy).toHaveBeenCalledWith(

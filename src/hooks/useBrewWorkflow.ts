@@ -4,8 +4,8 @@
 // 100% Strictly Typed, Zero `any`
 // ============================================================================
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Alert } from 'react-native';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { Alert, Platform } from 'react-native';
 import * as ExpoRouter from 'expo-router';
 import { useBrew } from '../core/brew-context';
 import {
@@ -398,14 +398,39 @@ export function useBrewWorkflow() {
     }
   }, [allInventory, selectedInventoryItem, selectInventoryItem]);
 
-  useEffect(() => {
-    if (snapshot.status === 'finished') {
-      // Przegląd p4 (P1, po M1-audytor-generalny-025): najpierw zamknij ekran kroków — iOS nie pokaże
-      // okna oceny jako drugiego modalu z tego samego kontrolera i parzenia nie dałoby się zapisać.
+  const showProcedureModalRef = useRef(showProcedureModal);
+  showProcedureModalRef.current = showProcedureModal;
+  const pendingFinishModalRef = useRef(false);
+
+  const requestOpenFinishModal = useCallback(() => {
+    if (Platform.OS === 'ios' && showProcedureModalRef.current) {
+      pendingFinishModalRef.current = true;
+      setShowProcedureModal(false);
+    } else {
+      pendingFinishModalRef.current = false;
       setShowProcedureModal(false);
       setShowFinishModal(true);
     }
-  }, [snapshot.status]);
+  }, []);
+
+  const handleProcedureClose = useCallback(() => {
+    pendingFinishModalRef.current = false;
+    setShowProcedureModal(false);
+  }, []);
+
+  const handleProcedureDismiss = useCallback(() => {
+    if (!pendingFinishModalRef.current) return;
+    pendingFinishModalRef.current = false;
+    setShowFinishModal(true);
+  }, []);
+
+  useEffect(() => {
+    if (snapshot.status === 'finished') {
+      // Przegląd p4 + D3 P1: na iOS zamykamy ekran kroków i czekamy na onDismiss zanim otworzymy BrewFinishModal,
+      // aby UIKit nie odrzucił jednoczesnej prezentacji dwóch modali.
+      requestOpenFinishModal();
+    }
+  }, [snapshot.status, requestOpenFinishModal]);
 
   const handleFinishSave = () => {
     // M1-audytor-generalny-007: przy błędzie zapisu okno zakończenia zostaje otwarte z ocenami i notatkami.
@@ -540,6 +565,9 @@ export function useBrewWorkflow() {
     batchScaling,
     handleResetWithConfirm,
     handleFinishSave,
+    requestOpenFinishModal,
+    handleProcedureClose,
+    handleProcedureDismiss,
     isRunning,
     isPaused,
     refreshData,

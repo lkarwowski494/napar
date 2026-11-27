@@ -15,6 +15,7 @@ import {
   Alert,
   View,
   Text,
+  Platform,
 } from 'react-native';
 import {
   exportAllDataJson,
@@ -132,6 +133,9 @@ export default function SettingsScreen({
   const [loadedBackupFileName, setLoadedBackupFileName] = useState<string | null>(null);
   const isMountedRef = useRef(true);
   const backupFilesRef = useRef<BackupFileEntry[]>([]);
+  const isSharingRef = useRef(false);
+  const isImportingRef = useRef(false);
+  const pendingImportAlertRef = useRef<{ title: string; desc: string } | null>(null);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -287,6 +291,8 @@ export default function SettingsScreen({
   };
 
   const handleShareJsonFile = async () => {
+    if (isSharingRef.current) return;
+    isSharingRef.current = true;
     try {
       const dateStr = typeof localISODate === 'function' ? localISODate() : 'backup';
       const result = await shareTextAsFile(
@@ -295,6 +301,7 @@ export default function SettingsScreen({
         'application/json',
         'public.json'
       );
+      if (!isMountedRef.current) return;
       if (!result.ok) {
         Alert.alert(
           t.common.shareErrorTitle,
@@ -304,7 +311,11 @@ export default function SettingsScreen({
         );
       }
     } catch {
-      Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+      if (isMountedRef.current) {
+        Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+      }
+    } finally {
+      isSharingRef.current = false;
     }
   };
 
@@ -333,6 +344,8 @@ export default function SettingsScreen({
   };
 
   const handleShareCsvFile = async () => {
+    if (isSharingRef.current) return;
+    isSharingRef.current = true;
     try {
       const dateStr = typeof localISODate === 'function' ? localISODate() : 'export';
       const result = await shareTextAsFile(
@@ -341,6 +354,7 @@ export default function SettingsScreen({
         'text/csv',
         'public.comma-separated-values-text'
       );
+      if (!isMountedRef.current) return;
       if (!result.ok) {
         Alert.alert(
           t.common.shareErrorTitle,
@@ -350,11 +364,16 @@ export default function SettingsScreen({
         );
       }
     } catch {
-      Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+      if (isMountedRef.current) {
+        Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+      }
+    } finally {
+      isSharingRef.current = false;
     }
   };
 
   const handleOpenImportModal = () => {
+    pendingImportAlertRef.current = null;
     setLoadedBackupFileName(null);
     setShowImportModal(true);
     return refreshBackupFiles();
@@ -363,6 +382,7 @@ export default function SettingsScreen({
   const handleSelectBackupFile = async (file: BackupFileEntry) => {
     try {
       const content = typeof readBackupFile === 'function' ? await readBackupFile(file.path) : null;
+      if (!isMountedRef.current) return;
       if (content === null) {
         Alert.alert(t.common.error, t.settings.importFileReadError);
         return;
@@ -370,11 +390,24 @@ export default function SettingsScreen({
       setImportJsonText(content);
       setLoadedBackupFileName(file.name);
     } catch {
-      Alert.alert(t.common.error, t.settings.importFileReadError);
+      if (isMountedRef.current) {
+        Alert.alert(t.common.error, t.settings.importFileReadError);
+      }
     }
   };
 
+  const handleImportModalDismiss = useCallback(() => {
+    const pending = pendingImportAlertRef.current;
+    if (!pending) return;
+    pendingImportAlertRef.current = null;
+    if (isMountedRef.current) {
+      Alert.alert(pending.title, pending.desc);
+    }
+  }, []);
+
   const handleImport = async () => {
+    if (isImportingRef.current) return;
+    isImportingRef.current = true;
     try {
       if (!importJsonText.trim()) {
         Alert.alert(
@@ -385,20 +418,33 @@ export default function SettingsScreen({
       }
       // Apps4Brew SEC-09 & BR-TEST-022: Tworzenie kopii bezpieczeństwa przed niszczącym importem
       await safetyBackup('import', buildBackupState());
+      if (!isMountedRef.current) return;
 
       importDataJson(importJsonText.trim());
       const effectiveLang = reloadSettingsFromDb(true);
       brewCtx?.reloadFromDatabase?.();
+      const nextT = translations[effectiveLang] || translations.en;
+      if (Platform.OS === 'ios') {
+        pendingImportAlertRef.current = {
+          title: nextT.settings.importSuccessTitle,
+          desc: nextT.settings.importSuccessDesc,
+        };
+      }
       setShowImportModal(false);
       setImportJsonText('');
       setLoadedBackupFileName(null);
-      const nextT = translations[effectiveLang] || translations.en;
-      Alert.alert(nextT.settings.importSuccessTitle, nextT.settings.importSuccessDesc);
+      if (Platform.OS !== 'ios') {
+        Alert.alert(nextT.settings.importSuccessTitle, nextT.settings.importSuccessDesc);
+      }
     } catch (e: any) {
-      Alert.alert(
-        language === 'pl' ? 'Nie udało się zaimportować' : 'Import failed',
-        e?.message || (language === 'pl' ? 'Niepoprawny format danych JSON.' : 'Invalid JSON data format.')
-      );
+      if (isMountedRef.current) {
+        Alert.alert(
+          language === 'pl' ? 'Nie udało się zaimportować' : 'Import failed',
+          e?.message || (language === 'pl' ? 'Niepoprawny format danych JSON.' : 'Invalid JSON data format.')
+        );
+      }
+    } finally {
+      isImportingRef.current = false;
     }
   };
 
@@ -484,7 +530,9 @@ export default function SettingsScreen({
           void refreshBackupFiles();
         }}
         loadedFileName={loadedBackupFileName}
+        onDismiss={handleImportModalDismiss}
         onClose={() => {
+          pendingImportAlertRef.current = null;
           setShowImportModal(false);
           setImportJsonText('');
           setLoadedBackupFileName(null);

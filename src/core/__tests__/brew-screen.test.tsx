@@ -1835,6 +1835,11 @@ describe('M1-audytor-generalny-025 (przegląd p4): koniec parzenia na ekranie kr
       });
     }
     expect(tree.root.findByType(ProcedureModal).props.visible).toBe(false);
+    act(() => {
+      tree.root
+        .findAll((n: any) => typeof n.props?.onDismiss === 'function')
+        .forEach((n: any) => n.props.onDismiss());
+    });
     expect(tree.root.findByType(BrewFinishModal).props.visible).toBe(true);
     const save = tree.root.findAll((n: any) => n.props.testID === 'finish-save-btn' && n.props.onPress);
     expect(save.length).toBeGreaterThan(0);

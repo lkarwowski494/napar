@@ -433,10 +433,17 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
           </View>
 
           {/* Pusty stan zakładki Ulubione */}
-          {subsetFilter === 'FAVORITES' && displayedRecipes.length === 0 && (
+          {subsetFilter === 'FAVORITES' && displayedRecipes.length === 0 && !searchQuery.trim() && (
             <View testID="favorites-empty-state" style={styles.emptyStateBox}>
               <Text style={styles.emptyStateText}>
                 {t?.brew?.favoritesEmpty}
+              </Text>
+            </View>
+          )}
+          {displayedRecipes.length === 0 && searchQuery.trim().length > 0 && (
+            <View testID="no-search-results-state" style={styles.emptyStateBox}>
+              <Text style={styles.emptyStateText}>
+                {t?.brew?.noSearchResults}
               </Text>
             </View>
           )}

@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { theme } from '../../src/core/theme';
 import { formatDoseWeight, formatWaterWeight } from '../../src/core/unit-converter';
 import { toggleRecipeFavorite } from '../../src/data/database';
+import { runSave } from '../../lib/save-feedback';
 import { StarIcon } from '../../src/components/icons/CraftIcons';
 import { useBrewWorkflow } from '../../src/hooks/useBrewWorkflow';
 import { BrewBanners } from '../../src/components/brew/BrewBanners';
@@ -160,7 +161,7 @@ export default function BrewScreen() {
         onSelectRecipe={handleSelectRecipe}
         onToggleFavorite={(id) => {
           if (typeof toggleRecipeFavorite === 'function') {
-            toggleRecipeFavorite(id);
+            if (!runSave(() => toggleRecipeFavorite(id), t.common)) return;
           }
           refreshData();
         }}

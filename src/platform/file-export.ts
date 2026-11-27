@@ -23,17 +23,24 @@ export async function shareTextAsFile(
   mimeType: string,
   uti: string
 ): Promise<ShareFileResult> {
-  const baseDir = FileSystem.cacheDirectory || FileSystem.documentDirectory;
-  if (!baseDir) {
+  const rawBaseDir = FileSystem.cacheDirectory || FileSystem.documentDirectory;
+  if (!rawBaseDir) {
     return { ok: false, reason: 'no_directory' };
   }
-  const safeName = (filename || 'napar-export.txt').replace(/[^a-zA-Z0-9._-]/g, '_');
+  const baseDir = rawBaseDir.endsWith('/') ? rawBaseDir : `${rawBaseDir}/`;
+  const cleaned = (filename || '').replace(/[^a-zA-Z0-9._-]/g, '_');
+  const safeName = !cleaned || /^\.+$/.test(cleaned) ? 'napar-export.txt' : cleaned;
   const fileUri = `${baseDir}${safeName}`;
   await FileSystem.writeAsStringAsync(fileUri, content);
 
   const available = await Sharing.isAvailableAsync();
   if (!available) {
-    return { ok: false, reason: 'unavailable', fileUri };
+    try {
+      await FileSystem.deleteAsync(fileUri, { idempotent: true });
+    } catch {
+      // Ignoruj błąd czyszczenia pliku tymczasowego
+    }
+    return { ok: false, reason: 'unavailable' };
   }
 
   await Sharing.shareAsync(fileUri, {
