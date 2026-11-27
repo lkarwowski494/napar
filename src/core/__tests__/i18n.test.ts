@@ -83,6 +83,18 @@ describe('i18n System', () => {
     expect(Object.keys(translations.pl.favorites).sort()).toEqual(
       Object.keys(translations.en.favorites).sort()
     );
+    expect(Object.keys(translations.pl.journal).sort()).toEqual(
+      Object.keys(translations.en.journal).sort()
+    );
+    expect(Object.keys(translations.pl.sensory).sort()).toEqual(
+      Object.keys(translations.en.sensory).sort()
+    );
+    expect(Object.keys(translations.pl.batch).sort()).toEqual(
+      Object.keys(translations.en.batch).sort()
+    );
+    expect(Object.keys(translations.pl.onboarding).sort()).toEqual(
+      Object.keys(translations.en.onboarding).sort()
+    );
   });
 
   test('TASK-P6-09-LOK: Klucze stepperów kofeiny i snu są zdefiniowane w PL i EN', () => {
@@ -103,6 +115,8 @@ describe('i18n System', () => {
   test('Nazwa aplikacji to Napar po polsku i po angielsku (11-wzrost-007)', () => {
     expect(translations.pl.appName).toBe('Napar');
     expect(translations.en.appName).toBe('Napar');
+    expect(translations.pl.appTagline.length).toBeGreaterThan(0);
+    expect(translations.en.appTagline.length).toBeGreaterThan(0);
   });
 
   test('Klucze parzenia zawierają instrukcje dla minutnika', () => {

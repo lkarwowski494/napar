@@ -58,6 +58,10 @@ describe('SettingsScreen Component', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   test('Renderuje ekran ustawień z filozofią Apps4Brew i sekcją językową', () => {
     let tree: any;
     renderer.act(() => {
@@ -170,8 +174,8 @@ describe('SettingsScreen Component', () => {
     const openImportBtn = findPressableWithText(tree.root, 'Importuj Kopię z Pliku JSON');
     expect(openImportBtn).toBeTruthy();
 
-    renderer.act(() => {
-      openImportBtn.props.onPress();
+    await renderer.act(async () => {
+      await openImportBtn.props.onPress();
     });
 
     let str = JSON.stringify(tree.toJSON());
@@ -197,6 +201,11 @@ describe('SettingsScreen Component', () => {
 
     await renderer.act(async () => {
       await submitBtn.props.onPress();
+    });
+    renderer.act(() => {
+      tree.root
+        .findAll((n: any) => typeof n.props?.onDismiss === 'function')
+        .forEach((n: any) => n.props.onDismiss());
     });
 
     expect(importSpy).toHaveBeenCalledWith('{"version": 1, "test": true}');
@@ -272,8 +281,8 @@ describe('SettingsScreen Component', () => {
     });
 
     // Otwórz modal importu
-    renderer.act(() => {
-      findPressableWithText(tree.root, 'Importuj Kopię z Pliku JSON')?.props.onPress();
+    await renderer.act(async () => {
+      await findPressableWithText(tree.root, 'Importuj Kopię z Pliku JSON')?.props.onPress();
     });
 
     // Wpisz niepoprawny JSON
@@ -290,7 +299,7 @@ describe('SettingsScreen Component', () => {
     expect(alertSpy).toHaveBeenCalledWith('Nie udało się zaimportować', 'Niepoprawny format danych JSON.');
   });
 
-  test('Obsługa błędów eksportu JSON i CSV oraz zamykanie modalu importu', () => {
+  test('Obsługa błędów eksportu JSON i CSV oraz zamykanie modalu importu', async () => {
     const alertSpy = jest.spyOn(Alert, 'alert');
 
     // 1. Błąd eksportu JSON
@@ -331,8 +340,8 @@ describe('SettingsScreen Component', () => {
     expect(alertSpy).toHaveBeenCalledWith('Nie udało się wyeksportować', 'Błąd odczytu spiżarni');
 
     // 4. Zamknięcie modalu importu przyciskiem "Anuluj"
-    renderer.act(() => {
-      findPressableWithText(tree.root, 'Importuj Kopię z Pliku JSON')?.props.onPress();
+    await renderer.act(async () => {
+      await findPressableWithText(tree.root, 'Importuj Kopię z Pliku JSON')?.props.onPress();
     });
     const cancelBtn = findPressableWithText(tree.root, 'Anuluj');
     expect(cancelBtn).toBeTruthy();

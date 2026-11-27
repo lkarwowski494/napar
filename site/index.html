@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Napar — Kawa Specialty & Herbata Rzemieślnicza | Apps4Brew Studio</title>
+  <title>Napar — Kawa Specialty &amp; Herbata Rzemieślnicza | Apps4Brew Studio</title>
   <meta name="description" content="Napar — rzemieślniczy asystent parzenia kawy specialty i herbaty gongfu. 100% offline, zero śledzenia, precyzyjne wagi, stopery zalewań i analiza kofeiny.">
+  <link rel="alternate" hreflang="en" href="en/index.html">
   <style>
     :root {
       --bg: #121214;
       --card-bg: #1c1c1f;
       --accent: #c86a28;
       --accent-gold: #e5a96a;
+      --on-accent: #121214;
       --text: #f4efea;
       --text-muted: #a09c96;
       --border: #2e2e34;
@@ -21,6 +23,7 @@
         --card-bg: #ffffff;
         --accent: #9a4712;
         --accent-gold: #8c4712;
+        --on-accent: #ffffff;
         --text: #1a1a1c;
         --text-muted: #595652;
         --border: #e2dfda;
@@ -107,7 +110,7 @@
     }
     .btn-primary {
       background-color: var(--accent);
-      color: #ffffff;
+      color: var(--on-accent);
     }
     .btn-secondary {
       background-color: var(--card-bg);
@@ -153,11 +156,11 @@
         <p>Precyzyjny stoper wieloetapowy z celem masy wody, odporny na wygaszenie ekranu telefonu dzięki synchronizacji znaczników czasu.</p>
       </div>
       <div class="card">
-        <h3>Gongfu Cha & Wielokrotne Napary</h3>
+        <h3>Gongfu Cha &amp; Wielokrotne Napary</h3>
         <p>Dedykowany moduł dla herbaty tradycyjnej z rejestracją kolejnych parzeń, zmianą czasów ekstrakcji i profili smakowych.</p>
       </div>
       <div class="card">
-        <h3>100% Offline & Twoje Dane</h3>
+        <h3>100% Offline &amp; Twoje Dane</h3>
         <p>Wszystkie dane zapisywane w lokalnej bazie SQLite. Darmowy eksport do czytelnego JSON i CSV. Brak analityki, brak kont w chmurze.</p>
       </div>
     </div>
@@ -168,7 +171,10 @@
     <p>
       <a href="index.html">Strona Główna</a> |
       <a href="privacy.html">Polityka Prywatności</a> |
-      <a href="support.html">Wsparcie Techniczne</a>
+      <a href="terms.html">Regulamin (EULA)</a> |
+      <a href="support.html">Wsparcie Techniczne</a> |
+      <a href="licenses.html">Licencje OSS</a> |
+      <a href="en/index.html">English</a>
     </p>
   </footer>
 </body>

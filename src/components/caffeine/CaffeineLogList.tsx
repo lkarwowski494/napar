@@ -51,7 +51,10 @@ export const CaffeineLogList: React.FC<CaffeineLogListProps> = ({
               <View style={{ flex: 1 }}>
                 <Text style={styles.logName}>{item.beverageName}</Text>
                 <Text style={styles.logMeta}>
-                  {formatTemplate(t.caffeine.logItemMeta, { time: timeStr, dose: formatDoseWeight(item.doseGrams, unitSystem) })}
+                  {formatTemplate(t.caffeine.logItemMeta, {
+                    time: timeStr,
+                    dose: formatDoseWeight(item.doseGrams, unitSystem, language),
+                  })}
                 </Text>
               </View>
               <Text style={styles.logMg}>{Math.round(item.caffeineMg)} mg</Text>

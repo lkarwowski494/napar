@@ -95,7 +95,12 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
       </ScrollView>
 
       {/* Deskryptory wybranej kategorii (Poziom 2 i 3) */}
-      <View style={styles.descriptorsContainer}>
+      <ScrollView
+        testID="flavor-wheel-descriptors-scroll"
+        nestedScrollEnabled
+        style={styles.descriptorsContainer}
+        contentContainerStyle={styles.descriptorsContent}
+      >
         {activeCategory.subcategories.map((sub) => {
           const subcategoryName = isEn ? sub.nameEn || sub.namePl : sub.namePl;
           return (
@@ -140,7 +145,7 @@ export const FlavorWheelPicker: React.FC<FlavorWheelPickerProps> = ({
             </View>
           );
         })}
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -161,14 +166,16 @@ const styles = StyleSheet.create({
   selectedChipsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 8,
   },
   activeChip: {
+    minHeight: 36,
+    justifyContent: 'center',
     backgroundColor: theme.colors.copperMuted,
     borderColor: theme.colors.copper,
     borderWidth: 1,
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderRadius: theme.borderRadius.sm,
   },
   activeChipText: {
@@ -180,8 +187,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   categoryTab: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
@@ -196,10 +205,12 @@ const styles = StyleSheet.create({
   descriptorsContainer: {
     backgroundColor: theme.colors.bgCardSecondary,
     borderRadius: theme.borderRadius.md,
-    padding: 12,
     borderWidth: 1,
     borderColor: theme.colors.border,
     maxHeight: 220,
+  },
+  descriptorsContent: {
+    padding: 12,
   },
   subcategoryBlock: {
     marginBottom: 10,
@@ -214,14 +225,16 @@ const styles = StyleSheet.create({
   descriptorsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 8,
   },
   descriptorChip: {
+    minHeight: 44,
+    justifyContent: 'center',
     backgroundColor: theme.colors.bgCard,
     borderWidth: 1,
     borderColor: theme.colors.borderStrong,
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: theme.borderRadius.sm,
   },
   descriptorText: {

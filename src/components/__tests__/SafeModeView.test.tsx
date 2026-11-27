@@ -75,7 +75,12 @@ describe('SafeModeView — kopia ratunkowa i reset (M1-audytor-generalny-004)', 
 
   beforeEach(() => {
     jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    (Alert.alert as jest.Mock).mockClear();
     (Sharing.shareAsync as jest.Mock).mockClear();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   function pressByText(tree: any, text: string) {
@@ -164,8 +169,13 @@ describe('SafeModeView — wybór najnowszej kopii JSON (M1-audytor-generalny-00
 
   beforeEach(() => {
     jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    (Alert.alert as jest.Mock).mockClear();
     (Sharing.shareAsync as jest.Mock).mockClear();
     (LegacyFS.getInfoAsync as jest.Mock).mockResolvedValue({ exists: true, isDirectory: true });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   function pressExportJson(tree: any) {

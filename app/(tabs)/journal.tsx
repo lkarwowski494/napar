@@ -20,7 +20,7 @@ import { getBrewSessions, deleteBrewSession, getRecipes, getInventoryItems, getU
 import { BrewSession } from '../../src/core/database-schema';
 import { theme } from '../../src/core/theme';
 import { useTranslation, formatTemplate } from '../../src/core/i18n';
-import { formatTemperature } from '../../src/core/unit-converter';
+import { formatDoseWeight, formatWaterWeight, formatTemperature } from '../../src/core/unit-converter';
 import { localizeFlavorDescriptor } from '../../src/core/flavor-wheel-data';
 import { confirmAction } from '../../src/platform/confirm';
 import { JournalIcon } from '../../src/components/icons/CraftIcons';
@@ -170,8 +170,8 @@ export default function JournalScreen() {
       formatTemplate(j.shareDate, { date: formatDateTime(session.brewedAt) }),
       session.inventoryItemName ? formatTemplate(j.shareBean, { name: session.inventoryItemName }) : '',
       formatTemplate(j.shareParams, {
-        dose: `${session.doseGrams}g`,
-        water: `${session.waterGrams}g`,
+        dose: formatDoseWeight(session.doseGrams, unitSystem, language),
+        water: formatWaterWeight(session.waterGrams, unitSystem, language),
         temp: formatTemperature(session.waterTempCelsius, unitSystem),
       }),
       formatTemplate(j.shareBrewTime, { time: formatSeconds(session.totalTimeSeconds) }) +

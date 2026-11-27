@@ -238,7 +238,7 @@ describe('Grinder Dial-in Converter Module', () => {
     expect(kUltra.parseSetting('3,5')).toBe(700);
 
     const kinu = SUPPORTED_GRINDERS.find((g) => g.id === 'kinu_m47')!;
-    expect(kinu.parseSetting('3,5')).toBe(350);
+    expect(kinu.parseSetting('3,5')).toBe(1750);
   });
 
   test('TASK-P18-08-PRO: getRecommendedGrindForRecipe wspiera język angielski i jest odporne na niepoprawny format metody', () => {

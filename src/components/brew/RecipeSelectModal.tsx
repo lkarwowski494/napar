@@ -99,6 +99,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
   const isEn =
     t?.common?.close === 'Close' ||
     (typeof t?.brew?.recipe === 'string' && t?.brew?.recipe.toLowerCase() === 'recipe');
+  const resolvedLang: 'pl' | 'en' = (['pl', 'en'] as const)[Number(isEn)];
 
   const renderRecipeCard = (r: any) => {
     const recipeName = r?.name || '';
@@ -191,12 +192,14 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
         <Text style={styles.recipeOptionDetails}>
           {formatDoseWeight(
             'doseGrams' in r ? r.doseGrams : r.coffeeOrTeaDoseGrams,
-            unitSystem
+            unitSystem,
+            resolvedLang
           )}
           {doseUnitText}
           {formatWaterWeight(
             'waterGrams' in r ? r.waterGrams : r.waterWeightGrams,
-            unitSystem
+            unitSystem,
+            resolvedLang
           )}
           {waterUnitText}
           {formatTemperature(
@@ -429,6 +432,22 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
             </Pressable>
           </View>
 
+          {/* Pusty stan zakładki Ulubione */}
+          {subsetFilter === 'FAVORITES' && displayedRecipes.length === 0 && !searchQuery.trim() && (
+            <View testID="favorites-empty-state" style={styles.emptyStateBox}>
+              <Text style={styles.emptyStateText}>
+                {t?.brew?.favoritesEmpty}
+              </Text>
+            </View>
+          )}
+          {displayedRecipes.length === 0 && searchQuery.trim().length > 0 && (
+            <View testID="no-search-results-state" style={styles.emptyStateBox}>
+              <Text style={styles.emptyStateText}>
+                {t?.brew?.noSearchResults}
+              </Text>
+            </View>
+          )}
+
           {/* Zwijana kategoria 1: Kawa Specialty */}
           {coffeeGroup.length > 0 && (
             <View style={styles.categoryGroupSection}>
@@ -484,7 +503,7 @@ export const RecipeSelectModal: React.FC<RecipeSelectModalProps> = ({
   }
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={false}>
+    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         {innerContent}
       </SafeAreaView>
@@ -534,7 +553,7 @@ const styles = StyleSheet.create({
   },
   recipeFilterTab: {
     flex: 1,
-    minHeight: 36,
+    minHeight: 44,
     paddingVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
@@ -563,6 +582,8 @@ const styles = StyleSheet.create({
   },
   addCustomRecipeBtn: {
     flex: 2,
+    minHeight: 44,
+    justifyContent: 'center',
     backgroundColor: theme.colors.copper,
     paddingVertical: 12,
     borderRadius: theme.borderRadius.sm,
@@ -575,6 +596,8 @@ const styles = StyleSheet.create({
   },
   gongfuModalBtn: {
     flex: 1.5,
+    minHeight: 44,
+    justifyContent: 'center',
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
     borderColor: theme.colors.successBright,
@@ -589,6 +612,8 @@ const styles = StyleSheet.create({
   },
   importRecipeModalBtn: {
     flex: 1.5,
+    minHeight: 44,
+    justifyContent: 'center',
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
     borderColor: theme.colors.copper,
@@ -603,6 +628,7 @@ const styles = StyleSheet.create({
   },
   scanQrModalBtn: {
     width: 44,
+    minHeight: 44,
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
     borderColor: theme.colors.border,
@@ -646,8 +672,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   favToggleBtn: {
-    padding: 4,
-    marginLeft: 6,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 2,
   },
   favToggleIcon: {
     fontSize: 20,
@@ -657,12 +686,18 @@ const styles = StyleSheet.create({
     color: theme.colors.rating,
   },
   duplicateRecipeBtn: {
-    padding: 6,
-    marginLeft: 6,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 2,
   },
   editRecipeBtn: {
-    padding: 6,
-    marginLeft: 6,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 2,
   },
   recipeOptionAuthor: {
     fontSize: 13,
@@ -672,6 +707,21 @@ const styles = StyleSheet.create({
   recipeOptionDetails: {
     fontSize: 12,
     color: theme.colors.textMuted,
+  },
+  emptyStateBox: {
+    backgroundColor: theme.colors.bgCardSecondary,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    padding: 16,
+    marginBottom: 14,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 19,
   },
   searchBox: {
     marginBottom: 10,
@@ -684,16 +734,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.borderStrong,
     paddingHorizontal: 12,
-    paddingRight: 36,
+    paddingRight: 44,
     paddingVertical: 10,
     fontSize: 13,
     color: theme.colors.textPrimary,
   },
   clearSearchBtn: {
     position: 'absolute',
-    right: 10,
-    minWidth: 24,
-    minHeight: 24,
+    right: 2,
+    minWidth: 44,
+    minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -709,7 +759,9 @@ const styles = StyleSheet.create({
   },
   subsetChip: {
     flex: 1,
-    paddingVertical: 7,
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingVertical: 8,
     paddingHorizontal: 8,
     borderRadius: theme.borderRadius.sm,
     backgroundColor: theme.colors.bgCardSecondary,
@@ -737,6 +789,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    minHeight: 44,
     backgroundColor: theme.colors.bgCardSecondary,
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,

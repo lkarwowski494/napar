@@ -83,7 +83,16 @@ const mockSessions = [
 
 describe('JournalScreen Integration', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
+    const db = require('../../data/database');
     (getBrewSessions as jest.Mock).mockReturnValue(mockSessions);
+    db.getAppSetting.mockImplementation(() => null);
+    db.getUnitSystem.mockReturnValue('metric');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   test('Renderuje sesje parzenia z wykrytym Spider Graph sensoryki', () => {
@@ -385,7 +394,7 @@ describe('JournalScreen Integration', () => {
     const text = `${title}\n${message}`;
     expect(text).not.toMatch(/[ąćęłńóśźż]/i);
     expect(text).not.toMatch(/\b(Doza|Woda|Czas|Ziarno|Ocena|Balans|Nuty|Notatki|Data|Parz|Notatka| o )\b/);
-    expect(text).toMatch(/Dose: 15g \| Water: 250g \| Temp: 199(\.4)?°F/);
+    expect(text).toMatch(/Dose: 0\.53 oz \| Water: 8\.45 fl oz \| Temp: 199(\.4)?°F/);
     expect(text).not.toMatch(/°C/);
     expect(title).toBe('V60 Hoffmann · Tasting note');
     getAppSetting.mockImplementation(() => null);

@@ -8,7 +8,7 @@ import {
   calculateWaterMinerals,
 
 } from '../water-chemistry';
-import { BrewTimerEngine } from '../timer-engine';
+import { BrewTimerEngine, remainingTimerSec } from '../timer-engine';
 import {
   convertMicronsToGrinder,
 
@@ -262,7 +262,7 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
     }
   });
 
-  test('Chaos 11: Fuzzing formatCost, formatRelativeDays, calculateDoseForBeverageYield i metod BrewTimerEngine (TASK-P65-12-NIE)', () => {
+  test('Chaos 11: Fuzzing remainingTimerSec i BrewTimerEngine.getSnapshot na uszkodzonych wejściach', () => {
     const corruptInputs = [
       -100000, -1, -0, 0, 0.0001, 15.5, 250, 10000, NaN, Infinity, -Infinity,
       '', '   ', '\uFEFF15.5', '185,5', '3.50 zł', 'invalid', null, undefined,
@@ -270,104 +270,21 @@ describe('Chaos & Mutation: Corrupted Backup Payloads & Malformed JSON', () => {
     ];
 
     for (const val of corruptInputs) {
-      // 4. BrewTimerEngine static methods
-      const dur = BrewTimerEngine.calculateTotalRecipeDuration(val as any);
-      expect(typeof dur).toBe('number');
-      expect(Number.isFinite(dur)).toBe(true);
-      expect(dur).toBeGreaterThanOrEqual(0);
-      expect(Object.is(dur, -0)).toBe(false);
+      const rem = remainingTimerSec(val as any, val as any);
+      expect(typeof rem).toBe('number');
+      expect(Number.isFinite(rem)).toBe(true);
+      expect(rem).toBeGreaterThanOrEqual(0);
+      expect(Object.is(rem, -0)).toBe(false);
 
-      const water = BrewTimerEngine.calculateTotalTargetWater(val as any);
-      expect(typeof water).toBe('number');
-      expect(Number.isFinite(water)).toBe(true);
-      expect(water).toBeGreaterThanOrEqual(0);
-      expect(Object.is(water, -0)).toBe(false);
-    }
-  });
-
-  test('Chaos 13: Fuzzing groupActionsByDate, filterBackupEnvelope, findKnowledgeItemById, calculateWaterBlend, getGrindSettingsOverview, formatFlowRate, calculateRemainingRecipeTime, calculateEspressoFlowRate (TASK-P70-12-NIE)', () => {
-    const corruptInputs = [
-      -100000, -1, -0, 0, 0.0001, 1.33, 15.5, 250, 10000, NaN, Infinity, -Infinity,
-      '', '   ', '\uFEFFtest', '36,0', '1.33 g/s', 'invalid', null, undefined,
-      true, false, {}, [], () => {},
-    ];
-
-    for (const val of corruptInputs) {
-      // 7. calculateRemainingRecipeTime
-      const remTime = BrewTimerEngine.calculateRemainingRecipeTime(val as any, val as any, val as any);
-      expect(typeof remTime).toBe('number');
-      expect(remTime).toBeGreaterThanOrEqual(0);
-      expect(Number.isFinite(remTime)).toBe(true);
-    }
-  });
-
-  test('Chaos 14: Fuzzing filterInventoryItems, getActionScheduleCounts, diffBackupEnvelopes, getKnowledgeSummaryCounts, calculateHardnessRatio, filterGrinders, formatExtractionYield, calculateStepWaterIncrement, evaluateBrewMatrix (TASK-P73-12-NIE)', () => {
-    const corruptInputs = [
-      -100000, -1, -0, 0, 0.0001, 1.33, 15.5, 250, 10000, NaN, Infinity, -Infinity,
-      '', '   ', '\uFEFFtest', '20,5%', '1.5', 'invalid', null, undefined,
-      true, false, {}, [], () => {},
-    ];
-
-    for (const val of corruptInputs) {
-      // 9. calculateStepWaterIncrement
-      const stepWater = BrewTimerEngine.calculateStepWaterIncrement(val as any, val as any);
-      expect(typeof stepWater).toBe('number');
-      expect(stepWater).toBeGreaterThanOrEqual(0);
-      expect(Number.isFinite(stepWater)).toBe(true);
-    }
-  });
-
-  test('Chaos 15: Fuzzing evaluateEspressoRatio, calculateWaterDilution, estimateGrindFinesRisk, formatTdsPercentage, getTeaBrewingGuide, mergeBackupEnvelopes, BrewTimerEngine.calculateTotalTargetWater (TASK-P75-12-NIE)', () => {
-    const corruptInputs = [
-      -100000, -1, -0, 0, 0.0001, 1.35, 18.0, 36.0, 250, 10000, NaN, Infinity, -Infinity,
-      '', '   ', '\uFEFFtest', '1,35%', '18,5', 'invalid', null, undefined,
-      true, false, {}, [], () => {},
-    ];
-
-    for (const val of corruptInputs) {
-      // 7. BrewTimerEngine.calculateTotalTargetWater & calculateRemainingWaterToPour
-      const totalWater = BrewTimerEngine.calculateTotalTargetWater(val as any);
-      expect(typeof totalWater).toBe('number');
-      expect(totalWater).toBeGreaterThanOrEqual(0);
-      expect(Number.isFinite(totalWater)).toBe(true);
-
-      const remWater = BrewTimerEngine.calculateRemainingWaterToPour(val as any, val as any);
-      expect(typeof remWater).toBe('number');
-      expect(remWater).toBeGreaterThanOrEqual(0);
-      expect(Number.isFinite(remWater)).toBe(true);
-    }
-  });
-
-  test('Chaos 16: Fuzzing evaluateColdBrewRatio, estimateWaterTdsFromHardness, calculateGrinderAdjustment, formatWaterHardness, BrewTimerEngine.calculateWaterPourProgress, getCoffeeVarietyGuide, searchProactiveActions, getBackupRecordCounts, calculateInventorySummary (TASK-P77-12-NIE)', () => {
-    const corruptInputs = [
-      -100000, -1, -0, 0, 0.0001, 10.0, 50.0, 150, 720, 2000, 10000, NaN, Infinity, -Infinity,
-      '', '   ', '\uFEFFtest', '10 °dH', '150,5 ppm', 'invalid', null, undefined,
-      true, false, {}, [], () => {},
-    ];
-
-    for (const val of corruptInputs) {
-      // 5. BrewTimerEngine.calculateWaterPourProgress
-      const pourProgress = BrewTimerEngine.calculateWaterPourProgress(val as any, val as any);
-      expect(typeof pourProgress).toBe('number');
-      expect(pourProgress).toBeGreaterThanOrEqual(0);
-      expect(pourProgress).toBeLessThanOrEqual(100);
-    }
-  });
-
-  test('Chaos 17: Fuzzing evaluatePourOverRatio, evaluateWaterAlkalinity, estimateGrindDistribution, formatParticleSize, getCoffeeProcessGuide, BrewTimerEngine.calculateStepTimeWindow, extractSearchSnippet, isBackupEmpty, getProactiveActionById, getLowStockInventoryItems (TASK-P80-12-NIE)', () => {
-    const corruptInputs = [
-      -100000, -1, -0, 0, 0.0001, 15.0, 40.0, 150, 750, 2000, 10000, NaN, Infinity, -Infinity,
-      '', '   ', '\uFEFFtest', '750 µm', '0.75 mm', '40 ppm', 'invalid', null, undefined,
-      true, false, {}, [], () => {},
-    ];
-
-    for (const val of corruptInputs) {
-      // 6. BrewTimerEngine.calculateStepTimeWindow
-      const timeWindow = BrewTimerEngine.calculateStepTimeWindow(val as any, val as any);
-      expect(typeof timeWindow).toBe('object');
-      expect(typeof timeWindow.isValidStep).toBe('boolean');
-      expect(typeof timeWindow.startSecond).toBe('number');
-      expect(typeof timeWindow.durationSeconds).toBe('number');
+      const engine = new BrewTimerEngine([
+        { stepNumber: 1, namePl: 'S1', targetWaterGrams: val as any, durationSeconds: val as any, instructionPl: '' },
+      ]);
+      const snap = engine.getSnapshot();
+      expect(Number.isFinite(snap.stepRemainingSeconds)).toBe(true);
+      expect(Number.isFinite(snap.stepProgress)).toBe(true);
+      expect(Number.isFinite(snap.recommendedPourRate)).toBe(true);
+      expect(Number.isFinite(snap.currentWaterGrams)).toBe(true);
+      engine.destroy();
     }
   });
 });

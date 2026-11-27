@@ -6,6 +6,7 @@ import {
   calculateWaterMinerals,
   diagnoseWaterSensoryImpact,
 } from '../../core/water-chemistry';
+import { parseLocaleFloat } from '../../core/unit-converter';
 import { theme } from '../../core/theme';
 import { formatTemplate } from '../../core/i18n';
 
@@ -25,12 +26,15 @@ export const WaterChemistryTab: React.FC<WaterChemistryTabProps> = ({ language, 
     WATER_RECIPES.find((r) => r.id === selectedWaterRecipeId) || WATER_RECIPES[0];
 
   const waterCalc = useMemo(() => {
-    const vol = parseFloat(waterVolumeInput) || 1.0;
+    const parsedVol = parseLocaleFloat(waterVolumeInput);
+    const vol = Number.isFinite(parsedVol) && parsedVol > 0 ? parsedVol : 1.0;
+    const parsedGh = parseLocaleFloat(customGhInput);
+    const parsedKh = parseLocaleFloat(customKhInput);
     const gh = isCustomWater
-      ? parseFloat(customGhInput) || 80
+      ? (Number.isFinite(parsedGh) && parsedGh >= 0 ? parsedGh : 80)
       : selectedRecipeObj.targetGhPpm;
     const kh = isCustomWater
-      ? parseFloat(customKhInput) || 40
+      ? (Number.isFinite(parsedKh) && parsedKh >= 0 ? parsedKh : 40)
       : selectedRecipeObj.targetKhPpm;
     return calculateWaterMinerals(vol, gh, kh);
   }, [

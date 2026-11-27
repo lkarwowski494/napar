@@ -61,24 +61,53 @@ function stripTsNonCode(filePath, content) {
       return;
     }
 
-    // 2. Skip first argument (string title) of describe, test, it
-    if (
-      ts.isCallExpression(node) &&
-      ts.isIdentifier(node.expression) &&
-      ['describe', 'test', 'it'].includes(node.expression.text)
-    ) {
-      const args = node.arguments;
-      if (args.length > 0 && ts.isStringLiteral(args[0])) {
-        // visit remaining arguments only
-        for (let i = 1; i < args.length; i++) {
-          visit(args[i]);
+    // 2. Skip first argument (string or template title) of describe/test/it (including .only/.skip/.todo/.each)
+    if (ts.isCallExpression(node)) {
+      const expr = node.expression;
+      const isDirectTestCall =
+        ts.isIdentifier(expr) && ['describe', 'test', 'it'].includes(expr.text);
+      const isMemberTestCall =
+        ts.isPropertyAccessExpression(expr) &&
+        ts.isIdentifier(expr.expression) &&
+        ['describe', 'test', 'it'].includes(expr.expression.text) &&
+        ['only', 'skip', 'todo', 'concurrent', 'failing'].includes(expr.name.text);
+      const isEachInnerCall =
+        ts.isCallExpression(expr) &&
+        ts.isPropertyAccessExpression(expr.expression) &&
+        ts.isIdentifier(expr.expression.expression) &&
+        ['describe', 'test', 'it'].includes(expr.expression.expression.text) &&
+        expr.expression.name.text === 'each';
+
+      if (isDirectTestCall || isMemberTestCall || isEachInnerCall) {
+        const args = node.arguments;
+        if (
+          args.length > 0 &&
+          (ts.isStringLiteral(args[0]) ||
+            ts.isNoSubstitutionTemplateLiteral(args[0]) ||
+            ts.isTemplateExpression(args[0]))
+        ) {
+          if (isEachInnerCall) {
+            // Visit the .each(...) data arguments so test inputs still count as executable code
+            for (const eachArg of expr.arguments) {
+              visit(eachArg);
+            }
+          }
+          // Visit remaining arguments only (skip title)
+          for (let i = 1; i < args.length; i++) {
+            visit(args[i]);
+          }
+          return;
         }
-        return;
       }
     }
 
     // Append identifier or literal text
-    if (ts.isIdentifier(node) || ts.isStringLiteral(node) || ts.isNumericLiteral(node)) {
+    if (
+      ts.isIdentifier(node) ||
+      ts.isStringLiteral(node) ||
+      ts.isNoSubstitutionTemplateLiteral(node) ||
+      ts.isNumericLiteral(node)
+    ) {
       cleaned += ' ' + node.text;
     }
 
@@ -105,18 +134,28 @@ for (const tf of testFiles) {
 const items = [];
 
 // Category 1: EKRAN (Routes in app/)
+function extractDefaultExportName(filePath) {
+  const src = readFileSync(filePath, 'utf-8');
+  const m = src.match(/export\s+default\s+function\s+([A-Za-z0-9_]+)/);
+  if (m) return m[1];
+  const m2 = src.match(/export\s+default\s+([A-Za-z0-9_]+)\s*;/);
+  return m2 ? m2[1] : null;
+}
+
 for (const af of appFiles) {
   const rel = relative(join(root, 'app'), af).replace(/\\/g, '/').replace(/\.tsx?$/, '');
   const baseName = af.split(/[\\/]/).pop().replace(/\.tsx?$/, '');
+  const componentName = extractDefaultExportName(af);
+  const screenSuffixName = `${baseName.charAt(0).toUpperCase()}${baseName.slice(1)}Screen`;
   items.push({
     category: 'EKRAN',
     name: `/${rel}`,
     file: relative(root, af).replace(/\\/g, '/'),
     matcher: (code) =>
-      code.includes(rel) ||
       code.includes(`/${rel}`) ||
-      code.includes(baseName) ||
-      code.includes(`${baseName}Screen`),
+      code.includes(`ekran:${rel}`) ||
+      (componentName ? new RegExp(`\\b${componentName}\\b`).test(code) : false) ||
+      new RegExp(`\\b${screenSuffixName}\\b`).test(code),
   });
 }
 
@@ -142,14 +181,23 @@ if (existsSync(i18nFile)) {
                 keyName
               );
             const category = isUi ? 'UI' : 'TEKST';
+            const keyRe = new RegExp(`\\b${keyName}\\b`);
+            const literalVal =
+              ts.isStringLiteral(prop.initializer) || ts.isNoSubstitutionTemplateLiteral(prop.initializer)
+                ? prop.initializer.text.trim()
+                : '';
+            const section = prefix ? prefix.split('.')[0] : '';
+            const plSectionRe = section ? new RegExp(`\\btranslations\\s+pl\\s+${section}\\b`) : null;
+            const enSectionRe = section ? new RegExp(`\\btranslations\\s+en\\s+${section}\\b`) : null;
             items.push({
               category,
               name: fullKey,
               file: 'src/core/i18n.tsx',
               matcher: (code) =>
-                code.includes(keyName) ||
+                keyRe.test(code) ||
                 code.includes(fullKey) ||
-                code.includes(prefix),
+                (literalVal.length >= 4 && code.includes(literalVal)) ||
+                Boolean(plSectionRe && enSectionRe && plSectionRe.test(code) && enSectionRe.test(code)),
             });
           }
         }
@@ -258,8 +306,15 @@ const exceptionsPath = join(root, 'tests', 'matrix-exceptions.json');
 let exceptions = {};
 if (existsSync(exceptionsPath)) {
   try {
-    exceptions = JSON.parse(readFileSync(exceptionsPath, 'utf-8'));
-  } catch {}
+    const parsed = JSON.parse(readFileSync(exceptionsPath, 'utf-8'));
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new Error('matrix-exceptions.json must be a JSON object');
+    }
+    exceptions = parsed;
+  } catch (err) {
+    console.error(`[test-matrix] BŁĄD: Nieprawidłowy plik ${exceptionsPath}: ${err instanceof Error ? err.message : String(err)}`);
+    process.exit(1);
+  }
 }
 
 // Check for empty exception reasons
@@ -376,9 +431,15 @@ if (results.length > 300) {
 }
 
 const matrixDocPath = join(root, 'docs', '22-macierz-testow.md');
+let docDrift = false;
 if (!isCheckMode) {
   writeFileSync(matrixDocPath, md, 'utf-8');
   console.log(`[test-matrix] Zaktualizowano ${matrixDocPath}`);
+} else {
+  const existing = existsSync(matrixDocPath) ? readFileSync(matrixDocPath, 'utf-8') : '';
+  if (existing !== md) {
+    docDrift = true;
+  }
 }
 console.log(
   `[test-matrix] Wyniki: ${items.length - missingCount}/${items.length} elementów (${
@@ -402,5 +463,9 @@ if (missingCount > 0) {
 
 if (isCheckMode && missingCount > 0) {
   console.error(`[test-matrix] BŁĄD BRAMKI: Wykryto ${missingCount} nieprzetestowanych elementów!`);
+  process.exit(1);
+}
+if (isCheckMode && docDrift) {
+  console.error('[test-matrix] BŁĄD BRAMKI: docs/22-macierz-testow.md jest nieaktualny — uruchom: node scripts/test-matrix.mjs');
   process.exit(1);
 }

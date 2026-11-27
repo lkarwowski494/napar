@@ -90,6 +90,28 @@ for (const sf of program.getSourceFiles()) {
       });
       declToUnit.set(node, key);
       if (node !== stmt) declToUnit.set(stmt, key);
+
+      // Rejestruj również metody klas (statyczne i instancyjne), aby martwe metody nie chowały się za osiągalną klasą.
+      if (ts.isClassDeclaration(stmt)) {
+        for (const member of stmt.members) {
+          if (ts.isMethodDeclaration(member) && ts.isIdentifier(member.name)) {
+            const mName = member.name.text;
+            const mKey = `${rel(f)}#${name}.${mName}`;
+            const mStart = sf.getLineAndCharacterOfPosition(member.getStart(sf)).line + 1;
+            const mEnd = sf.getLineAndCharacterOfPosition(member.getEnd()).line + 1;
+            const isStatic = !!member.modifiers?.some((m) => m.kind === ts.SyntaxKind.StaticKeyword);
+            units.set(mKey, {
+              file: rel(f),
+              name: `${name}.${mName}`,
+              kind: isStatic ? 'metoda statyczna' : 'metoda',
+              exported: isExported(stmt),
+              line: mStart,
+              lines: mEnd - mStart + 1,
+            });
+            declToUnit.set(member, mKey);
+          }
+        }
+      }
     }
     // Instrukcje z efektem ubocznym na poziomie modułu (np. `declare global`) traktujemy jak korzeń.
   }

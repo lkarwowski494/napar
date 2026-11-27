@@ -3,6 +3,8 @@
 // Deterministic formulas for extraction, kinetics, water, and grind adjustments.
 // ============================================================================
 
+import { parseLocaleFloat } from './unit-converter';
+
 export interface ExtractionYieldResult {
   extractionYieldPercent: number;
   rating: 'under' | 'ideal' | 'over';
@@ -54,15 +56,14 @@ export function calculateBrewDose(waterGrams: number, ratio: number, maxDoseGram
  * Zabezpieczenie przed astronomicznymi wartościami poprzez clamp maxRatio (domyślnie 100.0)
  */
 export function calculateBrewRatio(doseGrams: number, waterGrams: number, maxRatio = 100.0): number {
-  const parsedDose = typeof doseGrams === 'number' ? doseGrams : parseFloat(String(doseGrams));
-  const parsedWater = typeof waterGrams === 'number' ? waterGrams : parseFloat(String(waterGrams));
+  const parsedDose = parseNumeric(doseGrams);
+  const parsedWater = parseNumeric(waterGrams);
   if (!Number.isFinite(parsedDose) || !Number.isFinite(parsedWater) || parsedDose <= 0 || parsedWater <= 0) {
     return 0;
   }
   const ratio = parsedWater / parsedDose;
   const safeMaxRatio = Number.isFinite(maxRatio) && maxRatio > 0 ? maxRatio : 100.0;
-  let clamped = Math.min(ratio, safeMaxRatio);
-  if (Object.is(clamped, -0) || clamped <= 0) clamped = 0;
+  const clamped = Math.min(ratio, safeMaxRatio);
   return Number(clamped.toFixed(1));
 }
 
@@ -76,9 +77,9 @@ export function calculateLiquidYield(
   retentionFactor = 2.0,
   maxRetentionFactor = 10.0
 ): number {
-  const parsedWater = typeof waterGrams === 'number' ? waterGrams : parseFloat(String(waterGrams));
-  const parsedDose = typeof doseGrams === 'number' ? doseGrams : parseFloat(String(doseGrams));
-  const parsedRetention = typeof retentionFactor === 'number' ? retentionFactor : parseFloat(String(retentionFactor));
+  const parsedWater = parseNumeric(waterGrams);
+  const parsedDose = parseNumeric(doseGrams);
+  const parsedRetention = parseNumeric(retentionFactor);
   if (!Number.isFinite(parsedWater) || !Number.isFinite(parsedDose) || !Number.isFinite(parsedRetention) || parsedWater <= 0 || parsedDose <= 0 || parsedRetention < 0) {
     throw new Error('Nieprawidłowe parametry wyliczania uzysku');
   }
@@ -86,8 +87,7 @@ export function calculateLiquidYield(
     ? Math.min(parsedRetention, maxRetentionFactor)
     : parsedRetention;
   const retained = parsedDose * safeRetention;
-  let yieldGrams = Math.max(0, parsedWater - retained);
-  if (Object.is(yieldGrams, -0)) yieldGrams = 0;
+  const yieldGrams = Math.max(0, parsedWater - retained);
   return Number(yieldGrams.toFixed(1));
 }
 
@@ -104,9 +104,9 @@ export function calculateExtractionYield(
   maxBeverageGrams = 50000.0,
   maxEyPercent?: number
 ): ExtractionYieldResult {
-  const parsedBev = typeof beverageWeightGrams === 'number' ? beverageWeightGrams : parseFloat(String(beverageWeightGrams));
-  const parsedTds = typeof tdsPercent === 'number' ? tdsPercent : parseFloat(String(tdsPercent));
-  const parsedDose = typeof doseGrams === 'number' ? doseGrams : parseFloat(String(doseGrams));
+  const parsedBev = parseNumeric(beverageWeightGrams);
+  const parsedTds = parseNumeric(tdsPercent);
+  const parsedDose = parseNumeric(doseGrams);
   if (!Number.isFinite(parsedBev) || !Number.isFinite(parsedTds) || !Number.isFinite(parsedDose) || parsedBev <= 0 || parsedTds <= 0 || parsedDose <= 0) {
     throw new Error('Parametry ekstrakcji muszą być większe od zera');
   }
@@ -117,8 +117,7 @@ export function calculateExtractionYield(
   if (Number.isFinite(maxEyPercent) && (maxEyPercent as number) > 0) {
     rawEy = Math.min(maxEyPercent as number, rawEy);
   }
-  let ey = Number(rawEy.toFixed(2));
-  if (Object.is(ey, -0)) ey = 0;
+  const ey = Number(rawEy.toFixed(2));
 
   let rating: 'under' | 'ideal' | 'over';
   let descriptionPl: string;
@@ -146,21 +145,7 @@ export function calculateExtractionYield(
   };
 }
 
-function parseNumeric(val: unknown): number {
-  if (typeof val === 'number') {
-    if (!Number.isFinite(val)) return NaN;
-    return Object.is(val, -0) ? 0 : val;
-  }
-  if (typeof val === 'string') {
-    const clean = val.replace(/[\x00-\x1F\x7F\uFEFF]/g, '').trim().replace(/,/g, '.');
-    const m = clean.match(/^[+-]?\d+(?:\.\d+)?/);
-    if (!m) return NaN;
-    const num = parseFloat(m[0]);
-    if (!Number.isFinite(num)) return NaN;
-    return Object.is(num, -0) ? 0 : num;
-  }
-  return NaN;
-}
+const parseNumeric = parseLocaleFloat;
 
 /**
  * RD-17 & RD-18: Estymacja dawki kofeiny w filiżance kawy: doza [g] × zawartość [mg/g] × wydajność metody.
@@ -188,8 +173,7 @@ export function estimateCoffeeCaffeineMg(
   if (normalizedMethod === 'cold_brew') extractionEfficiency = 0.92;
 
   const totalMg = safeDose * baseRatePerGram * extractionEfficiency;
-  const result = Number(totalMg.toFixed(1));
-  return Object.is(result, -0) ? 0 : result;
+  return Number(totalMg.toFixed(1));
 }
 
 /**
@@ -199,8 +183,7 @@ export function estimateTotalLeafCaffeineMg(leafDoseGrams: number | string): num
   const parsedDose = parseNumeric(leafDoseGrams);
   if (isNaN(parsedDose) || parsedDose <= 0) return 0;
   const safeDose = Math.min(1000, parsedDose);
-  const result = Number((safeDose * 1000 * 0.03).toFixed(1));
-  return Object.is(result, -0) ? 0 : result;
+  return Number((safeDose * 1000 * 0.03).toFixed(1));
 }
 
 /**
@@ -212,8 +195,7 @@ export function estimateTeaInfusionCaffeineMg(totalLeafCaffeineMg: number | stri
   const parsedInfusion = parseNumeric(infusionNumber);
   if (isNaN(parsedTotal) || isNaN(parsedInfusion) || parsedTotal <= 0 || parsedInfusion <= 0) return 0;
   const fraction = 0.40 * Math.pow(0.55, parsedInfusion - 1);
-  const result = Number((parsedTotal * fraction).toFixed(1));
-  return Object.is(result, -0) ? 0 : result;
+  return Number((parsedTotal * fraction).toFixed(1));
 }
 
 /**
@@ -254,9 +236,7 @@ export function calculateRemainingCaffeineMg(
     return 0;
   }
   const remaining = parsedDose * Math.pow(0.5, parsedHours / parsedHalfLife);
-  let result = Number(remaining.toFixed(1));
-  if (Object.is(result, -0) || result <= 0) result = 0;
-  return result;
+  return Number(remaining.toFixed(1));
 }
 
 /**
@@ -268,32 +248,21 @@ export function estimateBedtimeCaffeineMg(
   intakes: Array<{ doseMg: number; hoursUntilBedtime: number }>,
   halfLifeHours = DEFAULT_CAFFEINE_HALF_LIFE_H
 ): number {
-  const validIntakes = Array.isArray(intakes) ? intakes.filter(Boolean) : [];
+  if (!Array.isArray(intakes) || intakes.length === 0) return 0;
   const halfLife = Number.isFinite(halfLifeHours) && halfLifeHours > 0 ? Math.min(24, halfLifeHours) : DEFAULT_CAFFEINE_HALF_LIFE_H;
 
   let totalRemaining = 0;
-  for (const intake of validIntakes) {
+  for (const intake of intakes) {
     if (intake && typeof intake === 'object') {
       const parsedHours = parseNumeric(intake.hoursUntilBedtime);
       const parsedDose = parseNumeric(intake.doseMg);
-      if (!isNaN(parsedHours) && parsedHours >= 0 && !isNaN(parsedDose) && parsedDose > 0) {
+      if (parsedHours >= 0 && parsedDose > 0) {
         totalRemaining += calculateRemainingCaffeineMg(parsedDose, parsedHours, halfLife);
       }
     }
   }
 
-  const result = Number(totalRemaining.toFixed(1));
-  return Object.is(result, -0) || result < 0 ? 0 : result;
-}
-
-export interface TasteDiagnosis {
-  issue: string;
-  issueEn?: string;
-  recommendationPl: string;
-  recommendationEn?: string;
-  grindAdjustment?: 'finer' | 'coarser';
-  tempAdjustment?: 'higher' | 'lower';
-  steepTimeAdjustmentSeconds?: number;
+  return Number(totalRemaining.toFixed(1));
 }
 
 /**
@@ -490,8 +459,6 @@ export function calculateCaffeineDecay(
   ) {
     return 0;
   }
-  let res = Number((pInitial * Math.pow(0.5, pElapsed / pHalfLife)).toFixed(4));
-  if (Object.is(res, -0) || res < 0) res = 0;
-  return res;
+  return Number((pInitial * Math.pow(0.5, pElapsed / pHalfLife)).toFixed(4));
 }
 

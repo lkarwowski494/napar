@@ -1471,9 +1471,11 @@ describe('M1-audytor-generalny-031: każdy element dotykowy ma rolę i etykietę
   test('04-studio-projektowe-009: powyżej 400 mg dziennie jest tekst ostrzeżenia z rolą alert, nie tylko kolor paska', () => {
     const db = require('../src/data/database');
     const now = Date.now();
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
     const logs = [
-      { id: 'a', beverageName: 'Espresso', beverageType: 'coffee', consumedAt: new Date(now - 3600e3).toISOString(), doseGrams: 18, caffeineMg: 250 },
-      { id: 'b', beverageName: 'V60', beverageType: 'coffee', consumedAt: new Date(now - 1800e3).toISOString(), doseGrams: 15, caffeineMg: 200 },
+      { id: 'a', beverageName: 'Espresso', beverageType: 'coffee', consumedAt: new Date(Math.max(todayStart.getTime(), now - 3600e3)).toISOString(), doseGrams: 18, caffeineMg: 250 },
+      { id: 'b', beverageName: 'V60', beverageType: 'coffee', consumedAt: new Date(Math.max(todayStart.getTime(), now - 1800e3)).toISOString(), doseGrams: 15, caffeineMg: 200 },
     ];
     const spy = jest.spyOn(db, 'getCaffeineLogs').mockReturnValue(logs);
     const Caffeine = require('../app/(tabs)/caffeine').default;
@@ -1491,6 +1493,9 @@ describe('M1-audytor-generalny-031: każdy element dotykowy ma rolę i etykietę
       tree = renderer.create(<Caffeine />);
     });
     expect(tree!.root.findAll((n) => n.props.testID === 'caffeine-over-limit')).toHaveLength(0);
+    act(() => {
+      tree!.unmount();
+    });
     spy.mockRestore();
   });
 });
@@ -1655,14 +1660,20 @@ describe('M1-audytor-generalny-033: interfejs EN bez polskich tekstów; kontrola
 
   test('09-lokalizacja-001: ekran kofeiny z listą porcji i oknem szybkiego dodania w EN bez polskich tekstów', () => {
     const now = Date.now();
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
     const logs = [
-      { id: 'c1', beverageName: 'Espresso', beverageType: 'coffee', consumedAt: new Date(now - 3600e3).toISOString(), doseGrams: 18, caffeineMg: 120 },
+      { id: 'c1', beverageName: 'Espresso', beverageType: 'coffee', consumedAt: new Date(Math.max(todayStart.getTime(), now - 3600e3)).toISOString(), doseGrams: 18, caffeineMg: 120 },
     ];
     const spy = jest.spyOn(db, 'getCaffeineLogs').mockReturnValue(logs);
     const Caffeine = require('../app/(tabs)/caffeine').default;
-    expect(polishIn(renderEn(<Caffeine />))).toEqual([]);
+    const caffWithLogs = renderEn(<Caffeine />);
+    expect(polishIn(caffWithLogs)).toEqual([]);
+    act(() => caffWithLogs.unmount());
     spy.mockReturnValue([]);
-    expect(polishIn(renderEn(<Caffeine />))).toEqual([]);
+    const caffEmpty = renderEn(<Caffeine />);
+    expect(polishIn(caffEmpty)).toEqual([]);
+    act(() => caffEmpty.unmount());
     spy.mockRestore();
     const { CaffeineQuickAddModal } = require('../src/components/caffeine/CaffeineQuickAddModal');
     expect(polishIn(renderEn(<CaffeineQuickAddModal visible unitSystem="metric" language="en" onClose={() => {}} onSelectOption={() => {}} />))).toEqual([]);

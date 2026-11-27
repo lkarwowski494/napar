@@ -18,6 +18,8 @@ import { getRecipeById, saveRecipe, deleteRecipe, duplicateRecipe, getUnitSystem
 import { SavedRecipe } from '../src/core/database-schema';
 import { RecipeStep } from '../src/core/recipes-data';
 import { calculateBrewRatio } from '../src/core/domain-rules';
+import { parseLocaleFloat } from '../src/core/unit-converter';
+import { useBrew } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
 import { confirmAction } from '../src/platform/confirm';
 import { announce } from '../src/platform/announce';
@@ -32,6 +34,12 @@ export default function RecipeBuilderScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { t, language } = useTranslation();
+  let brewCtx: ReturnType<typeof useBrew> | null = null;
+  try {
+    brewCtx = useBrew();
+  } catch {
+    brewCtx = null;
+  }
   const [unitSystem] = useState<'metric' | 'imperial'>(() => {
     try {
       return getUnitSystem();
@@ -107,8 +115,10 @@ export default function RecipeBuilderScreen() {
     }
   }, [id]);
 
-  const doseNum = parseFloat(doseGrams) || 15;
-  const waterNum = parseFloat(waterGrams) || 250;
+  const parsedDose = parseLocaleFloat(doseGrams);
+  const parsedWater = parseLocaleFloat(waterGrams);
+  const doseNum = Number.isFinite(parsedDose) && parsedDose > 0 ? parsedDose : 15;
+  const waterNum = Number.isFinite(parsedWater) && parsedWater > 0 ? parsedWater : 250;
   const currentRatio = calculateBrewRatio(doseNum, waterNum);
 
   const handleAddStep = () => {
@@ -199,10 +209,10 @@ export default function RecipeBuilderScreen() {
       method: method.trim() || 'Manual Drip',
       author: author.trim() || undefined,
       description: description.trim() || undefined,
-      doseGrams: parseFloat(doseGrams.replace(',', '.')),
-      waterGrams: parseFloat(waterGrams.replace(',', '.')),
+      doseGrams: parseLocaleFloat(doseGrams),
+      waterGrams: parseLocaleFloat(waterGrams),
       // M1-audytor-generalny-008: bez 93 °C / 15 g / 250 g w miejsce złej liczby; saveRecipe zgłasza błąd walidacji.
-      waterTempCelsius: parseFloat(waterTempCelsius.replace(',', '.')),
+      waterTempCelsius: parseLocaleFloat(waterTempCelsius),
       grindSizeDescription: grindSize.trim() || undefined,
       recommendedRatio: currentRatio,
       stepsJson: JSON.stringify(steps),
@@ -212,6 +222,7 @@ export default function RecipeBuilderScreen() {
     };
 
     if (!runSave(() => saveRecipe(recipe), t.common)) return;
+    brewCtx?.reloadFromDatabase?.();
     announce(t.recipeBuilder.saveRecipeBtn);
     router.back();
   };
@@ -225,6 +236,7 @@ export default function RecipeBuilderScreen() {
       destructive: true,
       onConfirm: () => {
         if (!runSave(() => deleteRecipe(id), t.common)) return;
+        brewCtx?.reloadFromDatabase?.();
         announce(t.common.delete);
         router.back();
       },

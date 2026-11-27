@@ -108,7 +108,7 @@ export function AppGuideModal({
   }
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={true}>
+    <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onClose}>
       <View style={styles.overlay} testID="app-guide-modal">
         <SafeAreaView style={styles.sheet} edges={['top', 'bottom', 'left', 'right']}>
           <ModalHeader

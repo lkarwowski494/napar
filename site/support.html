@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wsparcie Techniczne & FAQ — Napar | Apps4Brew Studio</title>
+  <title>Wsparcie Techniczne &amp; FAQ — Napar | Apps4Brew Studio</title>
   <meta name="description" content="Oficjalna strona wsparcia technicznego aplikacji Napar. Odpowiedzi na często zadawane pytania (FAQ), kopie zapasowe, odzyskiwanie danych i kontakt.">
+  <link rel="alternate" hreflang="en" href="en/support.html">
   <style>
     :root {
       --bg: #121214;
@@ -81,6 +82,10 @@
       margin-top: 0;
       color: var(--accent-gold);
     }
+    a, .contact-box a {
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
     footer {
       text-align: center;
       padding: 40px 24px;
@@ -106,12 +111,12 @@
 
     <div class="faq-item">
       <h3>Jak utworzyć kopię zapasową moich danych?</h3>
-      <p>Przejdź do zakładki <strong>Ustawienia</strong> i wybierz <em>Eksportuj Kopię Zapasową (JSON)</em>. Otrzymasz kompletny, czytelny plik JSON ze wszystkimi Twoimi recepturami, spiżarnią ziaren i historią parzeń, który możesz zapisać w aplikacji Pliki, wysłać mailem lub zarchiwizować w chmurze iCloud Drive.</p>
+      <p>Przejdź do zakładki <strong>Ustawienia</strong> i wybierz <em>Eksportuj Kopię Zapasową (JSON)</em>, a następnie kliknij <em>Zapisz / Udostępnij plik (.json)</em>. Systemowy arkusz udostępniania iOS pozwoli zapisać plik w aplikacji Pliki, iCloud Drive lub wysłać przez AirDrop (w oknie dostępny jest też podgląd tekstu do ręcznego skopiowania).</p>
     </div>
 
     <div class="faq-item">
       <h3>Co się stanie, jeśli zmienię telefon?</h3>
-      <p>Przed zmianą telefonu wykonaj eksport kopii zapasowej JSON na starym urządzeniu. Na nowym telefonie zainstaluj aplikację Napar, wejdź w <strong>Ustawienia</strong> &rarr; <em>Importuj Kopię z Pliku JSON</em>, wklej zawartość pliku lub wczytaj plik, a Twoje dane zostaną natychmiast odtworzone.</p>
+      <p>Przed zmianą telefonu zapisz plik kopii zapasowej <code>.json</code> na starym urządzeniu. Na nowym telefonie zainstaluj aplikację Napar, skopiuj plik do folderu <strong>Na moim iPhonie → Napar</strong> w aplikacji Pliki i wejdź w <strong>Ustawienia</strong> &rarr; <em>Importuj Kopię z Pliku JSON</em>, aby wybrać plik jednym dotknięciem (albo wklej zawartość JSON ręcznie).</p>
     </div>
 
     <div class="faq-item">
@@ -140,7 +145,10 @@
     <p>
       <a href="index.html">Strona Główna</a> |
       <a href="privacy.html">Polityka Prywatności</a> |
-      <a href="support.html">Wsparcie Techniczne</a>
+      <a href="terms.html">Regulamin (EULA)</a> |
+      <a href="support.html">Wsparcie Techniczne</a> |
+      <a href="licenses.html">Licencje OSS</a> |
+      <a href="en/support.html">English</a>
     </p>
   </footer>
 </body>

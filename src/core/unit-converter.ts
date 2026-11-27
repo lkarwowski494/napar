@@ -5,14 +5,17 @@
 
 export type UnitSystem = 'metric' | 'imperial';
 
-function parseNumeric(val: unknown): number {
+/**
+ * Parsuje liczbę z wejścia użytkownika obsługując polski przecinek dziesiętny (DEEP-003).
+ */
+export function parseLocaleFloat(val: unknown): number {
   if (typeof val === 'number') {
     if (!Number.isFinite(val)) return NaN;
     return Object.is(val, -0) ? 0 : val;
   }
   if (typeof val === 'string') {
     const clean = val.replace(/[\x00-\x1F\x7F\uFEFF]/g, '').trim().replace(/,/g, '.');
-    const m = clean.match(/^[+-]?\d+(?:\.\d+)?/);
+    const m = clean.match(/^[+-]?(?:\d+(?:\.\d+)?|\.\d+)/);
     if (!m) return NaN;
     const num = parseFloat(m[0]);
     if (!Number.isFinite(num)) return NaN;
@@ -20,6 +23,8 @@ function parseNumeric(val: unknown): number {
   }
   return NaN;
 }
+
+const parseNumeric = parseLocaleFloat;
 
 /**
  * Przelicza stopnie Celsjusza na Fahrenheita
@@ -37,18 +42,25 @@ export function celsiusToFahrenheit(c: number | string): number {
 export function gramsToOunces(g: number | string): number {
   const numG = parseNumeric(g);
   if (isNaN(numG) || numG <= 0) return 0;
-  const res = parseFloat((numG * 0.03527396195).toFixed(2));
-  return Object.is(res, -0) ? 0 : res;
+  return parseFloat((numG * 0.03527396195).toFixed(2));
 }
 
 /**
- * Przelicza uncje wagowe (oz) na gramy
+ * Przelicza uncje wagowe (oz) na gramy (zaokrąglone do pełnego grama)
  */
 export function ouncesToGrams(oz: number | string): number {
   const numOz = parseNumeric(oz);
   if (isNaN(numOz) || numOz <= 0) return 0;
-  const res = Math.round(numOz / 0.03527396195);
-  return Object.is(res, -0) ? 0 : res;
+  return Math.round(numOz / 0.03527396195);
+}
+
+/**
+ * Przelicza uncje wagowe (oz) na gramy z precyzją dziesiętną (DEEP-004)
+ */
+export function ouncesToGramsExact(oz: number | string): number {
+  const numOz = parseNumeric(oz);
+  if (isNaN(numOz) || numOz <= 0) return 0;
+  return Number((numOz / 0.03527396195).toFixed(2));
 }
 
 /**
@@ -57,8 +69,16 @@ export function ouncesToGrams(oz: number | string): number {
 export function mlToFluidOunces(ml: number | string): number {
   const numMl = parseNumeric(ml);
   if (isNaN(numMl) || numMl <= 0) return 0;
-  const res = parseFloat((numMl * 0.0338140227).toFixed(2));
-  return Object.is(res, -0) ? 0 : res;
+  return parseFloat((numMl * 0.0338140227).toFixed(2));
+}
+
+/**
+ * Przelicza uncje objętościowe (fl oz) na mililitry / gramy wody (DEEP-004)
+ */
+export function fluidOuncesToMl(flOz: number | string): number {
+  const numFlOz = parseNumeric(flOz);
+  if (isNaN(numFlOz) || numFlOz <= 0) return 0;
+  return Number((numFlOz / 0.0338140227).toFixed(1));
 }
 
 /**
@@ -79,7 +99,7 @@ export function formatTemperature(celsius: number | string, unitSystem: UnitSyst
 /**
  * Formatuje liczbę dziesiętną z przecinkiem w PL i kropką w EN (M1-audytor-generalny-012)
  */
-export function formatDecimal(val: number, decimals: number = 1, language: 'pl' | 'en' = 'en'): string {
+export function formatDecimal(val: number, decimals: number = 1, language: string = 'en'): string {
   const fixed = val.toFixed(decimals);
   return language === 'pl' ? fixed.replace('.', ',') : fixed;
 }
@@ -90,10 +110,10 @@ export function formatDecimal(val: number, decimals: number = 1, language: 'pl' 
 export function formatDoseWeight(
   grams: number | string,
   unitSystem: UnitSystem = 'metric',
-  language: 'pl' | 'en' = 'en'
+  language: string = 'en'
 ): string {
   const num = parseNumeric(grams);
-  if (isNaN(num) || num < 0 || Object.is(num, -0)) {
+  if (isNaN(num) || num <= 0) {
     return unitSystem === 'imperial' ? '0 oz' : '0g';
   }
   const formatNum = (n: number) => (language === 'pl' ? String(n).replace('.', ',') : String(n));
@@ -109,10 +129,10 @@ export function formatDoseWeight(
 export function formatWaterWeight(
   grams: number | string,
   unitSystem: UnitSystem = 'metric',
-  language: 'pl' | 'en' = 'en'
+  language: string = 'en'
 ): string {
   const num = parseNumeric(grams);
-  if (isNaN(num) || num < 0 || Object.is(num, -0)) {
+  if (isNaN(num) || num <= 0) {
     return unitSystem === 'imperial' ? '0 fl oz' : '0g';
   }
   const formatNum = (n: number) => (language === 'pl' ? String(n).replace('.', ',') : String(n));
@@ -131,9 +151,8 @@ export function roundTo(val: number, decimals: number): number {
   const numDec = parseNumeric(decimals);
   const safeDec = Math.max(0, Math.min(10, Math.floor(isNaN(numDec) ? 0 : numDec)));
   const factor = Math.pow(10, safeDec);
-  let res = Math.round(num * factor) / factor;
-  if (Object.is(res, -0) || res === 0) res = 0;
-  return res;
+  const res = Math.round(num * factor) / factor;
+  return Object.is(res, -0) ? 0 : res;
 }
 
 /**
@@ -145,16 +164,16 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
   const safePrev = typeof prevBase === 'number' && Number.isFinite(prevBase) ? (Object.is(prevBase, -0) ? 0 : prevBase) : 0;
   if (typeof txt !== 'string') return safePrev;
   const clean = txt.replace(/[\x00-\x1F\x7F\uFEFF]/g, '').trim().replace(/,/g, '.');
-  const m = clean.match(/^[+-]?\d+(?:\.\d+)?/);
+  const m = clean.match(/^[+-]?(?:\d+(?:\.\d+)?|\.\d+)/);
   if (!m) return safePrev;
   const xIn = parseFloat(m[0]);
-  if (isNaN(xIn) || !isFinite(xIn)) {
+  if (!Number.isFinite(xIn)) {
     return safePrev;
   }
   if (Object.is(xIn, -0)) return 0;
 
   // Współczynniki konwersji jednostek
-  const u = typeof unit === 'string' ? unit.toLowerCase() : '';
+  const u = typeof unit === 'string' ? unit.toLowerCase().trim() : '';
   let cu = 1;
   const isFahrenheit = u === '°f' || u === 'f';
 
@@ -168,17 +187,25 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
     cu = 1;
   }
 
+  // Dla jednostek metrycznych (bez konwersji skali) nie tłumimy drobnych korekt użytkownika
+  if (cu === 1 && !isFahrenheit) {
+    return roundTo(xIn, 2);
+  }
+
   if (prevBase !== undefined && Number.isFinite(prevBase) && prevBase > 0) {
     if (isFahrenheit) {
-      const fPrev = roundTo((prevBase * 9) / 5 + 32, 1);
-      if (roundTo(xIn, 1) === fPrev) {
+      const fPrev1 = roundTo((prevBase * 9) / 5 + 32, 1);
+      const fPrevInt = Math.round((prevBase * 9) / 5 + 32);
+      const hasDecimal = /\.\d+/.test(m[0]);
+      if (roundTo(xIn, 1) === fPrev1 || (!hasDecimal && Math.round(xIn) === fPrevInt)) {
         return prevBase;
       }
       return roundTo(((xIn - 32) * 5) / 9, 2);
     } else {
+      const hasTwoPlusDecimals = /\.\d{2,}/.test(m[0]);
       const fPrev1 = roundTo(prevBase * cu, 1);
       const fPrev2 = roundTo(prevBase * cu, 2);
-      if (roundTo(xIn, 1) === fPrev1 || roundTo(xIn, 2) === fPrev2) {
+      if ((!hasTwoPlusDecimals && roundTo(xIn, 1) === fPrev1) || roundTo(xIn, 2) === fPrev2) {
         return prevBase;
       }
       return roundTo(xIn / cu, 2);
@@ -190,6 +217,22 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
     return roundTo(((xIn - 32) * 5) / 9, 2);
   }
   return roundTo(xIn / cu, 2);
+}
+
+/**
+ * Normalizuje godzinę snu (np. 24 -> "00", 25 -> "01") do 2-cyfrowego zapisu zegarowego 00..23.
+ */
+export function normalizeBedtimeHourNumber(hour: number): string {
+  const safe = Number.isFinite(hour) ? Math.floor(hour) : 23;
+  const normalized = ((safe % 24) + 24) % 24;
+  return String(normalized).padStart(2, '0');
+}
+
+/**
+ * Formatuje godzinę snu w standardowym zapisie HH:00 (00:00..23:00 zamiast 24:00..28:00).
+ */
+export function formatBedtimeHour(hour: number): string {
+  return `${normalizeBedtimeHourNumber(hour)}:00`;
 }
 
 /**

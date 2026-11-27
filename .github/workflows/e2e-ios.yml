@@ -34,6 +34,7 @@ concurrency:
 env:
   MAESTRO_DRIVER_STARTUP_TIMEOUT: '480000'
   MAESTRO_CLI_NO_ANALYTICS: '1'
+  MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED: 'true'
   APP_SCHEME: 'Napar'
   BUNDLE_ID: 'pl.lukasz.napar'
 
@@ -45,12 +46,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
 
       - name: Setup Node 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm
@@ -61,9 +62,19 @@ jobs:
       - name: Install JS dependencies
         run: npm ci
 
-      - name: Install Maestro CLI
+      - name: Install Maestro CLI (pinned release + SHA-256)
+        env:
+          MAESTRO_RELEASE_TAG: 'cli-2.12.1'
+          MAESTRO_ZIP_SHA256: '54dbb0716425626604973cbb374c585ca30272375d9ce15177a1152765ddd9d7'
         run: |
-          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          ARCHIVE="/tmp/maestro-${MAESTRO_RELEASE_TAG}.zip"
+          curl -fsSL "https://github.com/mobile-dev-inc/Maestro/releases/download/${MAESTRO_RELEASE_TAG}/maestro.zip" -o "$ARCHIVE"
+          echo "${MAESTRO_ZIP_SHA256}  ${ARCHIVE}" | shasum -a 256 -c -
+          rm -rf "$HOME/.maestro" /tmp/maestro-unpack
+          mkdir -p /tmp/maestro-unpack
+          unzip -q "$ARCHIVE" -d /tmp/maestro-unpack
+          mv /tmp/maestro-unpack/maestro "$HOME/.maestro"
+          rm -rf "$ARCHIVE" /tmp/maestro-unpack
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
 
       - name: Prebuild native iOS project
@@ -84,7 +95,7 @@ jobs:
           echo "SIM_APP_PATH=$(pwd)/$APP_PATH" >> "$GITHUB_ENV"
 
       - name: Cache & Save Simulator App Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ios-sim-app
           path: ios/build/Build/Products/Release-iphonesimulator/Napar.app
@@ -175,12 +186,12 @@ jobs:
           run_maestro() {
             local flow="$1"
             echo "::group::Uruchamianie $flow"
-            guard 600 "maestro $flow" maestro test --test-output-dir /tmp/maestro-out "$flow" > /tmp/maestro.log 2>&1
+            guard 360 "maestro $flow" maestro test --test-output-dir /tmp/maestro-out "$flow" > /tmp/maestro.log 2>&1
             local rc=$?
-            if [ $rc -ne 0 ] && grep -qE "iOS driver not ready in time|deviceInfo failed" /tmp/maestro.log; then
-              echo "::warning::Wykryto awarię sterownika XCUITest. Ponawianie 1x po resecie..."
+            if [ $rc -ne 0 ] && grep -qE "iOS driver not ready in time|deviceInfo failed|guard timeout" /tmp/maestro.log; then
+              echo "::warning::Wykryto awarię lub zawieszenie sterownika XCUITest. Ponawianie 1x po resecie..."
               sleep 5
-              guard 600 "maestro retry $flow" maestro test --test-output-dir /tmp/maestro-out "$flow" > /tmp/maestro.log 2>&1
+              guard 360 "maestro retry $flow" maestro test --test-output-dir /tmp/maestro-out "$flow" > /tmp/maestro.log 2>&1
               rc=$?
             fi
             cat /tmp/maestro.log
@@ -211,7 +222,7 @@ jobs:
 
       - name: Zapisz wynik scenariuszy E2E (wykonane.tsv)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: e2e-wykonane
           path: /tmp/maestro-wykonane/wykonane.tsv
@@ -220,7 +231,7 @@ jobs:
 
       - name: Zrzuty i logi scenariuszy Maestro
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: maestro-zrzuty
           path: /tmp/maestro-out

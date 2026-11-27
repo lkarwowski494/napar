@@ -1,7 +1,8 @@
-// tests/jest-after-env.js — Twarde oblewanie testu przy ostrzeżeniach act() i console.error (BR-TEST-017, BR-TEST-018)
+// tests/jest-after-env.js — Twarde oblewanie testu przy ostrzeżeniach act(), console.error i console.warn (BR-TEST-017, BR-TEST-018)
 const { seed } = require('./prop-seed');
 
 const originalError = console.error;
+const originalWarn = console.warn;
 
 beforeAll(() => {
   if (!process.env.SUPPRESS_SEED_LOG) {
@@ -25,6 +26,12 @@ console.error = function (...args) {
   // Twarde oblewanie testu przy nieoczekiwanym console.error (jeśli nie jest szpiegowany)
   originalError.apply(console, args);
   throw new Error(`[BR-TEST-017] Wykryto nieoczekiwany console.error w trakcie testu:\n${msg}`);
+};
+
+console.warn = function (...args) {
+  const msg = args.map((a) => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
+  originalWarn.apply(console, args);
+  throw new Error(`[BR-TEST-018] Wykryto nieoczekiwany console.warn w trakcie testu:\n${msg}`);
 };
 
 afterEach(() => {

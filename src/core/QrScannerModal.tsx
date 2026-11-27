@@ -63,7 +63,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({
   if (!visible) return null;
 
   return (
-    <Modal visible={visible} animationType="slide">
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={styles.container}>
         <ModalHeader
           onClose={onClose}

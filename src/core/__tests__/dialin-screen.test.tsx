@@ -217,7 +217,7 @@ describe('DialInScreen UI with Water Chemistry', () => {
     expect(str).toContain('TDS (%)');
     // Domyślne wartości to water 250, dose 15, TDS 1.35
     // EY = (250 * 1.35) / 15 = 22.5%
-    expect(str).toContain('19.8');
+    expect(str).toContain('19,8');
     expect(str).toContain('Złote Okno SCA');
   });
 
@@ -255,7 +255,8 @@ describe('DialInScreen UI with Water Chemistry', () => {
     });
 
     str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('obniż temperaturę wody o 2-3°C');
+    expect(str).toContain('Gongfu Cha');
+    expect(str).toContain('3–5°C');
   });
 
   test('Własny profil mineralizacji wody (Custom GH/KH) w zakładce Woda SCA', () => {
@@ -477,10 +478,10 @@ describe('DialInScreen UI with Water Chemistry', () => {
       waterInput.props.onChangeText('500');
     });
 
-    // 500 / 16.6 = 30.1g dozy, yield = 500 - 30.1 * 2 = 439.8g
+    // 500 / 16.6 = 30,1g dozy, yield = 500 - 30,1 * 2 = 439,8g (PL przecinek)
     str = JSON.stringify(tree.toJSON());
-    expect(str).toContain('30.1g');
-    expect(str).toContain('439.8');
+    expect(str).toContain('30,1g');
+    expect(str).toContain('439,8');
 
     // Wybierz preset Gongfu 1:20
     const gongfuPreset = findPressableWithText(tree.root, '1:20 (Gongfu)');

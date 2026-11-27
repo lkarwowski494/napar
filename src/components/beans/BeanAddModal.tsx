@@ -8,12 +8,14 @@ import {
   Modal,
   TextInput,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
 import { useTranslation, formatTemplate } from '../../core/i18n';
 import { saveInventoryItem, getUnitSystem } from '../../data/database';
-import { ouncesToGrams } from '../../core/unit-converter';
+import { ouncesToGrams, parseLocaleFloat } from '../../core/unit-converter';
 import { localISODate } from '../../data/backup';
 import { InventoryItem } from '../../core/database-schema';
 import { KnowledgeTemplate } from './BeanCompendiumModal';
@@ -23,6 +25,7 @@ import { ModalHeader } from '../ui';
 export interface BeanAddModalProps {
   visible: boolean;
   onClose: () => void;
+  onDismiss?: () => void;
   beveragePreference?: 'coffee' | 'tea' | 'both';
   onOpenCompendium: () => void;
   presetTemplate?: KnowledgeTemplate | null;
@@ -32,6 +35,7 @@ export interface BeanAddModalProps {
 export const BeanAddModal: React.FC<BeanAddModalProps> = ({
   visible,
   onClose,
+  onDismiss,
   beveragePreference,
   onOpenCompendium,
   presetTemplate,
@@ -94,7 +98,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
       Alert.alert(t.common?.error || 'Błąd', t.stash?.nameError || 'Podaj nazwę kawy lub herbaty.');
       return;
     }
-    const parsedWeight = parseFloat(initialWeight);
+    const parsedWeight = parseLocaleFloat(initialWeight);
     const safeParsed = Number.isFinite(parsedWeight) && parsedWeight > 0 ? parsedWeight : (isImperial ? 8.8 : 250);
     const convertedWeight = isImperial ? ouncesToGrams(safeParsed) : safeParsed;
     const rawWeightClamped = Math.floor(Math.max(1, Math.min(100000, convertedWeight)));
@@ -133,7 +137,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={false}>
+    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose} onDismiss={onDismiss}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <ModalHeader
           onClose={onClose}
@@ -149,6 +153,10 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
           <Text style={styles.modalTitle}>{t.stash?.addTitle || 'Dodaj do Spiżarni'}</Text>
         </ModalHeader>
 
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
         <ScrollView
           style={styles.formScroll}
           keyboardDismissMode="on-drag"
@@ -308,6 +316,7 @@ export const BeanAddModal: React.FC<BeanAddModalProps> = ({
             maxLength={500}
           />
         </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </Modal>
   );

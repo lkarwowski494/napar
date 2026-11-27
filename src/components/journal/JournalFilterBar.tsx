@@ -84,12 +84,12 @@ const styles = StyleSheet.create({
   },
   filterChip: {
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.bgCardSecondary,
     borderWidth: 1,
     borderColor: theme.colors.borderStrong,
-    minHeight: 36,
+    minHeight: 44,
     justifyContent: 'center',
   },
   filterChipActive: {

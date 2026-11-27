@@ -583,5 +583,112 @@ describe('Water Chemistry & Mineralization Module', () => {
       estimatedKhPpm: 15,
     });
   });
+
+  test('D4 Stryker: ścisłe brzegi calculateWaterMinerals (w tym CaCl2), 7 gałęzi diagnoseWaterSensoryImpact PL/EN i wyszukiwanie', () => {
+    // dryCalciumChlorideCaCl2Grams: 80 * 0.00147 * 5 = 0.588
+    const minerals = calculateWaterMinerals(' 5,0 ', ' 80 ', ' 40 ');
+    expect(minerals.dryCalciumChlorideCaCl2Grams).toBe(0.588);
+    expect(minerals.baseWaterGrams).toBe(4400);
+
+    // rawBaseWater === 0 boundary (vol=1 -> 1000g, gh=500 + kh=500 -> 0 base water)
+    const zeroBase = calculateWaterMinerals(1, 500, 500);
+    expect(zeroBase.baseWaterGrams).toBe(0);
+
+    // Exact 0 GH & KH preserved (not turned into fallback)
+    const zeroMin = calculateWaterMinerals(1, 0, 0);
+    expect(zeroMin.targetGhPpm).toBe(0);
+    expect(zeroMin.targetKhPpm).toBe(0);
+
+    // Exact diagnostic boundaries (1000, 75, 20, 35, 150)
+    expect(diagnoseWaterSensoryImpact(1000, 40).problemPl).toContain('Ciężka, sucha gorycz');
+    expect(diagnoseWaterSensoryImpact(80, 1000).problemPl).toContain('Płaski napar');
+    expect(diagnoseWaterSensoryImpact(80, 75).problemPl).toContain('Golden Zone');
+    expect(diagnoseWaterSensoryImpact(80, 20).problemPl).toContain('Golden Zone');
+    expect(diagnoseWaterSensoryImpact(35, 40).problemPl).toContain('Golden Zone');
+    expect(diagnoseWaterSensoryImpact(150, 40).problemPl).toContain('Golden Zone');
+
+    // Full PL/EN field assertions across all 8 return branches
+    const branches = [
+      diagnoseWaterSensoryImpact(null as any, 40),
+      diagnoseWaterSensoryImpact(-5, 40),
+      diagnoseWaterSensoryImpact(1001, 40),
+      diagnoseWaterSensoryImpact(80, 76),
+      diagnoseWaterSensoryImpact(80, 19),
+      diagnoseWaterSensoryImpact(34, 40),
+      diagnoseWaterSensoryImpact(151, 40),
+      diagnoseWaterSensoryImpact(80, 40),
+    ];
+    for (const d of branches) {
+      expect(d.problemPl.length).toBeGreaterThan(10);
+      expect(d.problemEn.length).toBeGreaterThan(10);
+      expect(d.causePl.length).toBeGreaterThan(10);
+      expect(d.causeEn.length).toBeGreaterThan(10);
+      expect(d.recommendationPl.length).toBeGreaterThan(10);
+      expect(d.recommendationEn.length).toBeGreaterThan(10);
+    }
+    expect(branches[0].causeEn).toContain('boolean');
+    expect(branches[0].recommendationPl).toContain('GH');
+    expect(branches[0].recommendationEn).toContain('GH');
+    expect(branches[1].causePl).toContain('skończonymi');
+    expect(branches[1].causeEn).toContain('finite');
+    expect(branches[1].recommendationPl).toContain('GH');
+    expect(branches[1].recommendationEn).toContain('GH');
+    expect(branches[2].causeEn).toContain('1000 ppm');
+    expect(branches[2].recommendationPl).toContain('RO');
+    expect(branches[2].recommendationEn).toContain('RO');
+    expect(branches[3].problemEn).toContain('Flat brew');
+    expect(branches[3].causeEn).toContain('75 ppm');
+    expect(branches[3].recommendationPl).toContain('35–45');
+    expect(branches[3].recommendationEn).toContain('35-45');
+    expect(branches[4].problemEn).toContain('Sharp');
+    expect(branches[4].causePl).toContain('20 ppm');
+    expect(branches[4].causeEn).toContain('20 ppm');
+    expect(branches[4].recommendationEn).toContain('NaHCO3');
+    expect(branches[5].problemEn).toContain('Thin body');
+    expect(branches[5].causeEn).toContain('35 ppm');
+    expect(branches[5].recommendationPl).toContain('Epsom');
+    expect(branches[5].recommendationEn).toContain('Epsom');
+    expect(branches[6].problemEn).toContain('Heavy dry bitterness');
+    expect(branches[6].causePl).toContain('150 ppm');
+    expect(branches[6].causeEn).toContain('150 ppm');
+    expect(branches[6].recommendationPl).toContain('RO');
+    expect(branches[6].recommendationEn).toContain('RO');
+    expect(branches[7].problemEn).toContain('Golden Zone');
+    expect(branches[7].causePl).toContain('SCA');
+    expect(branches[7].causeEn).toContain('SCA');
+    expect(branches[7].recommendationPl).toContain('zbalansowana');
+    expect(branches[7].recommendationEn).toContain('dialed in');
+
+    // Lookups: diacritics, substrings, token matching, 2-char token exclusion
+    expect(findWaterRecipeById('górska woda')?.id).toBe('tea_gongfu_rock_puerh');
+    expect(findWaterRecipeById('herbata szlachetna')?.id).toBe('tea_delicate');
+    expect(findWaterRecipeById('artisan tea water')?.id).toBe('tea_delicate');
+    expect(findWaterRecipeById('scott_rao')?.id).toBe('scott_rao_wonder');
+    expect(findWaterRecipeById('moj profil Standard SCA (Specialty Coffee) 2026')?.id).toBe('sca_standard');
+    expect(findWaterRecipeById('my SCA Standard Water 2026')?.id).toBe('sca_standard');
+
+    expect(findBottledWaterById('niegazowany')?.id).toBe('zywiec_zdroj');
+    expect(findBottledWaterById('woda zdroj 1.5l')?.id).toBe('zywiec_zdroj');
+    expect(findBottledWaterById('woda kryształ 1.5l')?.id).toBe('zywiecki_krysztal');
+    expect(findBottledWaterById('woda volvic 1.5l')?.id).toBe('volvic');
+    expect(findBottledWaterById('reine')?.id).toBe('spa_reine');
+    expect(findBottledWaterById('zz')?.id).toBeUndefined();
+    expect(findBottledWaterById('aa bb cc')).toBeUndefined();
+
+    // getWaterProfileName edge cases
+    expect(getWaterProfileName('sca_standard', 123 as any)).toBe('Standard SCA (Specialty Coffee)');
+    expect(getWaterProfileName('  volvic  ', 'en')).toBe('Volvic');
+
+    // Pass 2: multi-space aliases, NFD ASCII matching on Polish diacritics, 3-char token ('spa')
+    expect(findWaterRecipeById('scott   rao')?.id).toBe('scott_rao_wonder');
+    expect(findWaterRecipeById('gorska woda')?.id).toBe('tea_gongfu_rock_puerh');
+    expect(findWaterRecipeById('Standard SCA')?.id).toBe('sca_standard');
+    expect(findBottledWaterById('  highland   spring  ')?.id).toBe('highland_spring');
+    expect(findBottledWaterById('spa   reine')?.id).toBe('spa_reine');
+    expect(findBottledWaterById('aqua_panna')?.id).toBe('aqua_panna');
+    expect(findBottledWaterById('woda spa 1.5l')?.id).toBe('spa_reine');
+    expect(findBottledWaterById('źródlana')).toBeUndefined();
+    expect(ppmCaCO3ToDegreesDH('  35,696  ')).toBeCloseTo(2.0, 3);
+  });
 });
 

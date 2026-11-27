@@ -41,7 +41,7 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
   language = 'pl',
 }) => {
   return (
-    <Modal visible={visible} animationType="slide">
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <ModalHeader
           onClose={onClose}
@@ -65,15 +65,28 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
             {recipe.method} ·{' '}
             {formatDoseWeight(
               'doseGrams' in recipe ? recipe.doseGrams : recipe.coffeeOrTeaDoseGrams,
-              unitSystem
+              unitSystem,
+              language
             )}{' '}
             /{' '}
             {formatWaterWeight(
               'waterGrams' in recipe ? recipe.waterGrams : recipe.waterWeightGrams,
-              unitSystem
+              unitSystem,
+              language
             )}{' '}
             · {formatTemperature(waterTempCelsius, unitSystem)}
           </Text>
+
+          <View style={styles.urlBox}>
+            <Text
+              selectable
+              testID="share-recipe-url-text"
+              style={styles.urlText}
+              numberOfLines={2}
+            >
+              {shareUrl}
+            </Text>
+          </View>
 
           <View style={styles.shareButtonsRow}>
             <Pressable
@@ -113,7 +126,20 @@ export const ShareRecipeModal: React.FC<ShareRecipeModalProps> = ({
               accessibilityLabel={t.brew.qrCopyLink}
               accessibilityHint={t.brew.qrCopyLinkHint}
               onPress={() => {
-                Alert.alert(t.brew?.qrCopied || 'Link receptury', shareUrl);
+                try {
+                  const sharePromise = Share.share({
+                    title: recipe.name,
+                    message: shareUrl,
+                    url: shareUrl,
+                  });
+                  if (sharePromise && typeof sharePromise.catch === 'function') {
+                    sharePromise.catch(() => {
+                      Alert.alert(t.brew.qrCopied, shareUrl);
+                    });
+                  }
+                } catch {
+                  Alert.alert(t.brew.qrCopied, shareUrl);
+                }
               }}
             >
               <Text style={styles.shareActionBtnTextSecondary}>
@@ -176,8 +202,23 @@ const styles = StyleSheet.create({
   shareRecipeDetails: {
     fontSize: 14,
     color: theme.colors.textSecondary,
-    marginBottom: 24,
+    marginBottom: 16,
     textAlign: 'center',
+  },
+  urlBox: {
+    width: '100%',
+    backgroundColor: theme.colors.bgCard,
+    borderWidth: 1,
+    borderColor: theme.colors.borderStrong,
+    borderRadius: theme.borderRadius.md,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 16,
+  },
+  urlText: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    fontFamily: theme.typography.monospace,
   },
   shareButtonsRow: {
     flexDirection: 'row',
@@ -186,6 +227,8 @@ const styles = StyleSheet.create({
   },
   shareActionBtn: {
     flex: 1,
+    minHeight: 44,
+    justifyContent: 'center',
     backgroundColor: theme.colors.copper,
     paddingVertical: 14,
     borderRadius: theme.borderRadius.md,

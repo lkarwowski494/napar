@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
 import {
   calculateBrewWater,
   calculateBrewDose,
   calculateLiquidYield,
 } from '../../core/domain-rules';
-import { formatDoseWeight, formatWaterWeight } from '../../core/unit-converter';
+import {
+  formatDoseWeight,
+  formatWaterWeight,
+  gramsToOunces,
+  mlToFluidOunces,
+  ouncesToGramsExact,
+  fluidOuncesToMl,
+  parseLocaleFloat,
+} from '../../core/unit-converter';
 import { theme } from '../../core/theme';
 import { formatTemplate } from '../../core/i18n';
 import { GrinderConverterCard } from './GrinderConverterCard';
@@ -17,6 +25,14 @@ export interface BrewRatioTabProps {
   beveragePreference: 'coffee' | 'tea' | 'both';
 }
 
+function computeCupYield(waterGrams: number, doseGrams: number, ratio: number): number {
+  // Espresso (ratio <= 3.0) określa docelową masę naparu w filiżance (nie wody przed absorpcją).
+  if (ratio <= 3.0) {
+    return Number(waterGrams.toFixed(1));
+  }
+  return calculateLiquidYield(waterGrams, doseGrams);
+}
+
 export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
   language,
   t,
@@ -25,8 +41,8 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
 }) => {
   const isImperial = unitSystem === 'imperial';
   const [calcDirection, setCalcDirection] = useState<'doseToWater' | 'waterToDose'>('doseToWater');
-  const [doseInput, setDoseInput] = useState('18');
-  const [waterInput, setWaterInput] = useState('300');
+  const [doseInput, setDoseInput] = useState(() => (isImperial ? String(gramsToOunces(18)) : '18'));
+  const [waterInput, setWaterInput] = useState(() => (isImperial ? String(mlToFluidOunces(300)) : '300'));
   const [ratioVal, setRatioVal] = useState(16.6);
   const [waterCalcResult, setWaterCalcResult] = useState<number>(() =>
     calculateBrewWater(18, 16.6)
@@ -35,44 +51,76 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
     calculateBrewDose(300, 16.6)
   );
   const [yieldResult, setYieldResult] = useState<number>(() =>
-    calculateLiquidYield(300, 18)
+    computeCupYield(calculateBrewWater(18, 16.6), 18, 16.6)
   );
+
+  const toDoseGrams = (rawVal: number) => (isImperial ? ouncesToGramsExact(rawVal) : rawVal);
+  const toWaterGrams = (rawVal: number) => (isImperial ? fluidOuncesToMl(rawVal) : rawVal);
+
+  useEffect(() => {
+    const nextDose = isImperial ? String(gramsToOunces(18)) : '18';
+    const nextWater = isImperial ? String(mlToFluidOunces(300)) : '300';
+    setDoseInput(nextDose);
+    setWaterInput(nextWater);
+    if (calcDirection === 'doseToWater') {
+      const w = calculateBrewWater(18, ratioVal);
+      setWaterCalcResult(w);
+      setYieldResult(computeCupYield(w, 18, ratioVal));
+    } else {
+      const d = calculateBrewDose(300, ratioVal);
+      setDoseCalcResult(d);
+      setYieldResult(computeCupYield(300, d, ratioVal));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isImperial]);
 
   const handleDoseChange = (text: string) => {
     setDoseInput(text);
-    const d = parseFloat(text);
-    if (!isNaN(d) && d > 0) {
-      const w = calculateBrewWater(d, ratioVal);
-      setWaterCalcResult(w);
-      setYieldResult(calculateLiquidYield(w, d));
+    const parsed = parseLocaleFloat(text);
+    if (!isNaN(parsed) && parsed > 0) {
+      const d = toDoseGrams(parsed);
+      if (d > 0) {
+        const w = calculateBrewWater(d, ratioVal);
+        setWaterCalcResult(w);
+        setYieldResult(computeCupYield(w, d, ratioVal));
+      }
     }
   };
 
   const handleWaterChange = (text: string) => {
     setWaterInput(text);
-    const w = parseFloat(text);
-    if (!isNaN(w) && w > 0) {
-      const d = calculateBrewDose(w, ratioVal);
-      setDoseCalcResult(d);
-      setYieldResult(calculateLiquidYield(w, d));
+    const parsed = parseLocaleFloat(text);
+    if (!isNaN(parsed) && parsed > 0) {
+      const w = toWaterGrams(parsed);
+      if (w > 0) {
+        const d = calculateBrewDose(w, ratioVal);
+        setDoseCalcResult(d);
+        setYieldResult(computeCupYield(w, d, ratioVal));
+      }
     }
   };
 
   const handleRatioSelect = (newRatio: number) => {
     setRatioVal(newRatio);
     if (calcDirection === 'doseToWater') {
-      const d = parseFloat(doseInput);
-      if (!isNaN(d) && d > 0) {
-        const w = calculateBrewWater(d, newRatio);
-        setWaterCalcResult(w);
-        setYieldResult(calculateLiquidYield(w, d));
+      const parsed = parseLocaleFloat(doseInput);
+      if (!isNaN(parsed) && parsed > 0) {
+        const d = toDoseGrams(parsed);
+        if (d > 0) {
+          const w = calculateBrewWater(d, newRatio);
+          setWaterCalcResult(w);
+          setYieldResult(computeCupYield(w, d, newRatio));
+        }
       }
     } else {
-      const w = parseFloat(waterInput);
-      if (!isNaN(w) && w > 0) {
-        const d = calculateBrewDose(w, newRatio);
-        setDoseCalcResult(d);
-        setYieldResult(calculateLiquidYield(w, d));
+      const parsed = parseLocaleFloat(waterInput);
+      if (!isNaN(parsed) && parsed > 0) {
+        const w = toWaterGrams(parsed);
+        if (w > 0) {
+          const d = calculateBrewDose(w, newRatio);
+          setDoseCalcResult(d);
+          setYieldResult(computeCupYield(w, d, newRatio));
+        }
       }
     }
   };
@@ -80,18 +128,24 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
   const handleDirectionChange = (dir: 'doseToWater' | 'waterToDose') => {
     setCalcDirection(dir);
     if (dir === 'doseToWater') {
-      const d = parseFloat(doseInput);
-      if (!isNaN(d) && d > 0) {
-        const w = calculateBrewWater(d, ratioVal);
-        setWaterCalcResult(w);
-        setYieldResult(calculateLiquidYield(w, d));
+      const parsed = parseLocaleFloat(doseInput);
+      if (!isNaN(parsed) && parsed > 0) {
+        const d = toDoseGrams(parsed);
+        if (d > 0) {
+          const w = calculateBrewWater(d, ratioVal);
+          setWaterCalcResult(w);
+          setYieldResult(computeCupYield(w, d, ratioVal));
+        }
       }
     } else {
-      const w = parseFloat(waterInput);
-      if (!isNaN(w) && w > 0) {
-        const d = calculateBrewDose(w, ratioVal);
-        setDoseCalcResult(d);
-        setYieldResult(calculateLiquidYield(w, d));
+      const parsed = parseLocaleFloat(waterInput);
+      if (!isNaN(parsed) && parsed > 0) {
+        const w = toWaterGrams(parsed);
+        if (w > 0) {
+          const d = calculateBrewDose(w, ratioVal);
+          setDoseCalcResult(d);
+          setYieldResult(computeCupYield(w, d, ratioVal));
+        }
       }
     }
   };
@@ -157,10 +211,10 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
               testID="dose-input"
               accessibilityLabel={t.dialin.doseInputLabel || 'Doza suchej kawy / herbaty'}
               style={styles.calcInput}
-              keyboardType="numeric"
+              keyboardType="decimal-pad"
               value={doseInput}
               onChangeText={handleDoseChange}
-              placeholder="18"
+              placeholder={isImperial ? '0.63' : '18'}
               placeholderTextColor={theme.colors.textMuted}
             />
           </>
@@ -171,10 +225,10 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
               testID="water-input"
               accessibilityLabel={t.dialin.waterInputLabel || 'Docelowa objętość wody'}
               style={styles.calcInput}
-              keyboardType="numeric"
+              keyboardType="decimal-pad"
               value={waterInput}
               onChangeText={handleWaterChange}
-              placeholder="300"
+              placeholder={isImperial ? '10.14' : '300'}
               placeholderTextColor={theme.colors.textMuted}
             />
           </>
@@ -227,18 +281,20 @@ export const BrewRatioTab: React.FC<BrewRatioTabProps> = ({
               testID={calcDirection === 'doseToWater' ? 'calculated-water-output' : 'calculated-dose-output'}
             >
               {calcDirection === 'doseToWater'
-                ? formatWaterWeight(waterCalcResult, unitSystem)
-                : formatDoseWeight(doseCalcResult, unitSystem)}
+                ? formatWaterWeight(waterCalcResult, unitSystem, language)
+                : formatDoseWeight(doseCalcResult, unitSystem, language)}
             </Text>
           </View>
           <View style={styles.resultItem}>
             <Text style={styles.resultLabel}>{t.dialin.calculatedYield || 'UZYSK W FILIŻANCE'}</Text>
             <Text style={styles.resultValSecondary} testID="calculated-yield-output">
-              {formatWaterWeight(yieldResult, unitSystem)}
+              {formatWaterWeight(yieldResult, unitSystem, language)}
             </Text>
-            <Text style={styles.resultNote}>
-              {t.dialin.absorptionNote || 'Po absorpcji 2.0g/g przez ciastko'}
-            </Text>
+            {ratioVal > 3.0 && (
+              <Text style={styles.resultNote}>
+                {t.dialin.absorptionNote || 'Po absorpcji 2.0g/g przez ciastko'}
+              </Text>
+            )}
           </View>
         </View>
       </View>

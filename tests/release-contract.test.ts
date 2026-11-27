@@ -48,7 +48,7 @@ describe('testflight.yml archiwizuje mapę źródeł JS i dSYM z buildem', () =>
     const start = tf.indexOf('- name: Archive Hermes sourcemaps and dSYM symbols');
     expect(start).toBeGreaterThan(-1);
     const step = tf.slice(start, tf.indexOf('- name:', start + 10));
-    expect(step).toMatch(/uses: actions\/upload-artifact@v4/);
+    expect(step).toMatch(/uses: actions\/upload-artifact@[0-9a-f]{40}/);
     expect(step).toMatch(/runner\.temp \}\}\/sourcemaps\/main\.jsbundle\.map/);
     expect(step).toMatch(/\.xcarchive\/dSYMs/);
     expect(step).toMatch(/retention-days: \d+/);
@@ -70,7 +70,7 @@ describe('kontrakt bramki scenariuszy D-060: e2e-wykonane i pełny tryb w testfl
     expect(e2e).toMatch(/\$GITHUB_SHA/);
     expect(e2e).toMatch(/\\tPASS/);
     expect(e2e).toMatch(/\\tFAIL/);
-    expect(e2e).toMatch(/uses: actions\/upload-artifact@v4[\s\S]{0,160}name:\s*e2e-wykonane/);
+    expect(e2e).toMatch(/uses: actions\/upload-artifact@[0-9a-f]{40}[\s\S]{0,180}name:\s*e2e-wykonane/);
   });
 
   test('testflight.yml pobiera artefakt e2e-wykonane z zielonego e2e-ios.yml i uruchamia --build "$BUILD" --wykonane wykonane.tsv (D2-P2: bez zbędnego git fetch --tags)', () => {

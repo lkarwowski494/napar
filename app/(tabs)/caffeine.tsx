@@ -89,12 +89,24 @@ export default function CaffeineScreen() {
     }
   };
 
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
+
   const loadLogs = useCallback(() => {
     try {
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-      const data = getCaffeineLogs(todayStart.toISOString());
+      const nowDate = new Date();
+      // 48h okno kalendarzowe (odporne na DST): wczorajsze późne dawki wciąż mogą być aktywne dzisiaj
+      const windowStart = new Date(
+        nowDate.getFullYear(),
+        nowDate.getMonth(),
+        nowDate.getDate() - 1,
+        0,
+        0,
+        0,
+        0
+      );
+      const data = getCaffeineLogs(windowStart.toISOString());
       setLogs(data);
+      setNowMs(Date.now());
     } catch (err) {
       // fallback to empty logs
       setLogs([]);
@@ -103,6 +115,13 @@ export default function CaffeineScreen() {
 
   useEffect(() => {
     loadLogs();
+    const intervalId = setInterval(() => {
+      setNowMs(Date.now());
+    }, 60_000);
+    if (typeof (intervalId as any)?.unref === 'function') {
+      (intervalId as any).unref();
+    }
+    return () => clearInterval(intervalId);
   }, [loadLogs]);
 
   useFocusEffect(
@@ -126,9 +145,24 @@ export default function CaffeineScreen() {
     }, [loadLogs])
   );
 
-  const now = new Date();
+  const now = new Date(nowMs);
+  const todayStartMs = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    0,
+    0,
+    0,
+    0
+  ).getTime();
 
-  // Obliczenie aktualnej ilości kofeiny w organizmie
+  // Dzisiejsze wpisy do dziennego limitu EFSA i listy historii (uszkodzone daty zachowujemy, by można było je usunąć)
+  const todayLogs = logs.filter((item) => {
+    const intakeTime = new Date(item.consumedAt).getTime();
+    return Number.isNaN(intakeTime) || intakeTime >= todayStartMs;
+  });
+
+  // Obliczenie aktualnej ilości kofeiny w organizmie (z pełnego okna 48h)
   const currentTotalMg = logs.reduce((sum, item) => {
     const intakeTime = new Date(item.consumedAt).getTime();
     if (Number.isNaN(intakeTime)) return sum;
@@ -137,11 +171,15 @@ export default function CaffeineScreen() {
   }, 0);
 
   // Całkowita spożyta dzisiaj kofeina
-  const totalConsumedTodayMg = logs.reduce((sum, item) => sum + item.caffeineMg, 0);
+  const totalConsumedTodayMg = todayLogs.reduce((sum, item) => sum + item.caffeineMg, 0);
 
-  // Predykcja na godzinę snu (np. 23:00)
-  const targetBedtime = new Date();
-  targetBedtime.setHours(bedtimeHour, 0, 0, 0);
+  // Predykcja na godzinę snu (np. 23:00 lub 01:00 gdy bedtimeHour=25 — bezpiecznie po północy i na przejściach DST)
+  const targetBedtime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  if (bedtimeHour >= 24 && now.getHours() < 6) {
+    targetBedtime.setHours(bedtimeHour - 24, 0, 0, 0);
+  } else {
+    targetBedtime.setHours(bedtimeHour, 0, 0, 0);
+  }
   if (targetBedtime.getTime() < now.getTime()) {
     targetBedtime.setDate(targetBedtime.getDate() + 1);
   }
@@ -252,7 +290,7 @@ export default function CaffeineScreen() {
 
       {/* Historia dzisiejszych dawek */}
       <CaffeineLogList
-        logs={logs}
+        logs={todayLogs}
         unitSystem={unitSystem}
         onQuickAddPress={() => {
           setShowQuickAddModal(true);

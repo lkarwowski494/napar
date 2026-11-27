@@ -3,8 +3,9 @@
 // ZP-02, ZP-06, ZP-07, ZP-08, ZP-10: 100% offline, zero-login, darmowy eksport JSON
 // ============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import * as Linking from 'expo-linking';
+import * as ExpoRouter from 'expo-router';
 import Constants from 'expo-constants';
 
 import {
@@ -14,6 +15,7 @@ import {
   Alert,
   View,
   Text,
+  Platform,
 } from 'react-native';
 import {
   exportAllDataJson,
@@ -43,10 +45,18 @@ import { useBrew } from '../src/core/brew-context';
 import { theme } from '../src/core/theme';
 import { AppGuideModal } from '../src/components/AppGuideModal';
 import { clampCaffeineHalfLifeHours } from '../src/core/domain-rules';
-import { useTranslation } from '../src/core/i18n';
-import { safetyBackup } from '../src/data/backup';
+import { useTranslation, translations } from '../src/core/i18n';
+import {
+  safetyBackup,
+  listBackupFiles,
+  readBackupFile,
+  localISODate,
+  type BackupFileEntry,
+} from '../src/data/backup';
+import { shareTextAsFile } from '../src/platform/file-export';
 import { JsonExportModal, JsonImportModal } from '../src/components/settings/JsonBackupModals';
 import { CsvExportModal } from '../src/components/settings/CsvExportModal';
+import { OssLicensesModal } from '../src/components/settings/OssLicensesModal';
 import { CaffeineSettingsCard } from '../src/components/settings/CaffeineSettingsCard';
 import { DataBackupCard } from '../src/components/settings/DataBackupCard';
 import { GrinderSelectionCard } from '../src/components/settings/GrinderSelectionCard';
@@ -58,6 +68,7 @@ import {
   privacyPolicyUrl,
   TERMS_URL,
   SUPPORT_URL,
+  LICENSES_URL,
   SUPPORT_EMAIL,
   supportMailtoUrl,
 } from '../src/core/app-identity';
@@ -112,10 +123,119 @@ export default function SettingsScreen({
   const [showCsvModal, setShowCsvModal] = useState(false);
   // M1-audytor-generalny-031 (04-studio-projektowe-008): przewodnik po aplikacji dostępny z Ustawień
   const [showGuide, setShowGuide] = useState(false);
+  const [showOssLicenses, setShowOssLicenses] = useState(false);
   const [csvModalTitle, setCsvModalTitle] = useState('');
+  const [csvFilePrefix, setCsvFilePrefix] = useState<'napar-sessions' | 'napar-stash'>('napar-sessions');
   const [exportedJsonText, setExportedJsonText] = useState('');
   const [importJsonText, setImportJsonText] = useState('');
   const [exportedCsvText, setExportedCsvText] = useState('');
+  const [backupFiles, setBackupFiles] = useState<BackupFileEntry[]>([]);
+  const [loadedBackupFileName, setLoadedBackupFileName] = useState<string | null>(null);
+  const isMountedRef = useRef(true);
+  const backupFilesRef = useRef<BackupFileEntry[]>([]);
+  const isSharingRef = useRef(false);
+  const isImportingRef = useRef(false);
+  const pendingImportAlertRef = useRef<{ title: string; desc: string } | null>(null);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const refreshBackupFiles = useCallback(async () => {
+    try {
+      if (typeof listBackupFiles === 'function') {
+        const files = await listBackupFiles();
+        const nextFiles = Array.isArray(files) ? files : [];
+        if (!isMountedRef.current) return;
+        const prev = backupFilesRef.current;
+        const changed =
+          prev.length !== nextFiles.length ||
+          nextFiles.some((f, idx) => prev[idx]?.path !== f.path || prev[idx]?.name !== f.name);
+        if (changed) {
+          backupFilesRef.current = nextFiles;
+          setBackupFiles(nextFiles);
+        }
+      }
+    } catch {
+      if (isMountedRef.current && backupFilesRef.current.length > 0) {
+        backupFilesRef.current = [];
+        setBackupFiles([]);
+      }
+    }
+  }, []);
+
+  // DEEP-005: ponowne wczytanie wszystkich ustawień z SQLite po imporcie kopii albo powrocie na ekran.
+  const reloadSettingsFromDb = useCallback((syncLanguage = false): 'pl' | 'en' => {
+    let effectiveLang: 'pl' | 'en' = language;
+    try {
+      setBeveragePreferenceState(getBeveragePreference());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setSelectedGrinder(getAppSetting('default_grinder', 'comandante_c40'));
+    } catch {
+      // safe fallback
+    }
+    try {
+      setUnitSystemState(getUnitSystem());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setVoiceAnnounce(getVoiceAnnounceEnabled());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setHaptics(getHapticsEnabled());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setSound(getSoundEnabled());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setHalfLifeHoursState(getCaffeineHalfLife());
+    } catch {
+      // safe fallback
+    }
+    try {
+      setBedtimeHourState(getBedtimeHour());
+    } catch {
+      // safe fallback
+    }
+    if (syncLanguage) {
+      try {
+        const storedLang = getAppSetting('app_language', '');
+        if (storedLang === 'pl' || storedLang === 'en') {
+          effectiveLang = storedLang;
+          setLanguage(storedLang);
+        }
+      } catch {
+        // safe fallback
+      }
+    }
+    return effectiveLang;
+  }, [language, setLanguage]);
+
+  const useFocusEffectSafe =
+    typeof ExpoRouter.useFocusEffect === 'function'
+      ? ExpoRouter.useFocusEffect
+      : (cb: () => void) => {
+          useEffect(cb, [cb]);
+        };
+
+  useFocusEffectSafe(
+    useCallback(() => {
+      reloadSettingsFromDb(false);
+    }, [reloadSettingsFromDb])
+  );
 
   const handleHalfLifeChange = (newHours: number) => {
     const clamped = clampCaffeineHalfLifeHours(newHours);
@@ -132,6 +252,9 @@ export default function SettingsScreen({
   const handleSelectGrinder = (id: string) => {
     if (!runSave(() => setAppSetting('default_grinder', id), t.common)) return;
     setSelectedGrinder(id);
+    if (brewCtx?.setGrinderId) {
+      brewCtx.setGrinderId(id);
+    }
   };
 
   const handleSelectUnitSystem = (unit: 'metric' | 'imperial') => {
@@ -167,10 +290,40 @@ export default function SettingsScreen({
     }
   };
 
+  const handleShareJsonFile = async () => {
+    if (isSharingRef.current) return;
+    isSharingRef.current = true;
+    try {
+      const dateStr = typeof localISODate === 'function' ? localISODate() : 'backup';
+      const result = await shareTextAsFile(
+        `napar-backup-${dateStr}.json`,
+        exportedJsonText,
+        'application/json',
+        'public.json'
+      );
+      if (!isMountedRef.current) return;
+      if (!result.ok) {
+        Alert.alert(
+          t.common.shareErrorTitle,
+          result.reason === 'unavailable'
+            ? t.settings.shareUnavailableDesc
+            : t.common.shareErrorDesc
+        );
+      }
+    } catch {
+      if (isMountedRef.current) {
+        Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+      }
+    } finally {
+      isSharingRef.current = false;
+    }
+  };
+
   const handleExportSessionsCsv = () => {
     try {
       const csv = exportSessionsCsv();
       setExportedCsvText(csv);
+      setCsvFilePrefix('napar-sessions');
       setCsvModalTitle(language === 'pl' ? 'Eksport Dziennika (CSV)' : 'Journal Export (CSV)');
       setShowCsvModal(true);
     } catch (e: any) {
@@ -182,6 +335,7 @@ export default function SettingsScreen({
     try {
       const csv = exportInventoryCsv();
       setExportedCsvText(csv);
+      setCsvFilePrefix('napar-stash');
       setCsvModalTitle(language === 'pl' ? 'Eksport Spiżarni (CSV)' : 'Stash Export (CSV)');
       setShowCsvModal(true);
     } catch (e: any) {
@@ -189,7 +343,71 @@ export default function SettingsScreen({
     }
   };
 
+  const handleShareCsvFile = async () => {
+    if (isSharingRef.current) return;
+    isSharingRef.current = true;
+    try {
+      const dateStr = typeof localISODate === 'function' ? localISODate() : 'export';
+      const result = await shareTextAsFile(
+        `${csvFilePrefix}-${dateStr}.csv`,
+        exportedCsvText,
+        'text/csv',
+        'public.comma-separated-values-text'
+      );
+      if (!isMountedRef.current) return;
+      if (!result.ok) {
+        Alert.alert(
+          t.common.shareErrorTitle,
+          result.reason === 'unavailable'
+            ? t.settings.shareUnavailableDesc
+            : t.common.shareErrorDesc
+        );
+      }
+    } catch {
+      if (isMountedRef.current) {
+        Alert.alert(t.common.shareErrorTitle, t.common.shareErrorDesc);
+      }
+    } finally {
+      isSharingRef.current = false;
+    }
+  };
+
+  const handleOpenImportModal = () => {
+    pendingImportAlertRef.current = null;
+    setLoadedBackupFileName(null);
+    setShowImportModal(true);
+    return refreshBackupFiles();
+  };
+
+  const handleSelectBackupFile = async (file: BackupFileEntry) => {
+    try {
+      const content = typeof readBackupFile === 'function' ? await readBackupFile(file.path) : null;
+      if (!isMountedRef.current) return;
+      if (content === null) {
+        Alert.alert(t.common.error, t.settings.importFileReadError);
+        return;
+      }
+      setImportJsonText(content);
+      setLoadedBackupFileName(file.name);
+    } catch {
+      if (isMountedRef.current) {
+        Alert.alert(t.common.error, t.settings.importFileReadError);
+      }
+    }
+  };
+
+  const handleImportModalDismiss = useCallback(() => {
+    const pending = pendingImportAlertRef.current;
+    if (!pending) return;
+    pendingImportAlertRef.current = null;
+    if (isMountedRef.current) {
+      Alert.alert(pending.title, pending.desc);
+    }
+  }, []);
+
   const handleImport = async () => {
+    if (isImportingRef.current) return;
+    isImportingRef.current = true;
     try {
       if (!importJsonText.trim()) {
         Alert.alert(
@@ -200,19 +418,33 @@ export default function SettingsScreen({
       }
       // Apps4Brew SEC-09 & BR-TEST-022: Tworzenie kopii bezpieczeństwa przed niszczącym importem
       await safetyBackup('import', buildBackupState());
+      if (!isMountedRef.current) return;
 
       importDataJson(importJsonText.trim());
+      const effectiveLang = reloadSettingsFromDb(true);
+      brewCtx?.reloadFromDatabase?.();
+      const nextT = translations[effectiveLang] || translations.en;
+      if (Platform.OS === 'ios') {
+        pendingImportAlertRef.current = {
+          title: nextT.settings.importSuccessTitle,
+          desc: nextT.settings.importSuccessDesc,
+        };
+      }
       setShowImportModal(false);
       setImportJsonText('');
-      Alert.alert(
-        language === 'pl' ? 'Sukces!' : 'Success!',
-        language === 'pl' ? 'Dane zostały pomyślnie zaimportowane do Twojej lokalnej bazy.' : 'Data successfully imported to your local database.'
-      );
+      setLoadedBackupFileName(null);
+      if (Platform.OS !== 'ios') {
+        Alert.alert(nextT.settings.importSuccessTitle, nextT.settings.importSuccessDesc);
+      }
     } catch (e: any) {
-      Alert.alert(
-        language === 'pl' ? 'Nie udało się zaimportować' : 'Import failed',
-        e?.message || (language === 'pl' ? 'Niepoprawny format danych JSON.' : 'Invalid JSON data format.')
-      );
+      if (isMountedRef.current) {
+        Alert.alert(
+          language === 'pl' ? 'Nie udało się zaimportować' : 'Import failed',
+          e?.message || (language === 'pl' ? 'Niepoprawny format danych JSON.' : 'Invalid JSON data format.')
+        );
+      }
+    } finally {
+      isImportingRef.current = false;
     }
   };
 
@@ -270,7 +502,7 @@ export default function SettingsScreen({
       {/* Kopia Zapasowa & Eksport (ZP-02, ZP-06, ZP-07, ZP-08, ZP-10) */}
       <DataBackupCard
         onExportJson={handleExport}
-        onOpenImportJson={() => setShowImportModal(true)}
+        onOpenImportJson={handleOpenImportModal}
         onExportSessionsCsv={handleExportSessionsCsv}
         onExportInventoryCsv={handleExportInventoryCsv}
         t={t}
@@ -280,17 +512,30 @@ export default function SettingsScreen({
       <JsonExportModal
         visible={showExportModal}
         exportedJsonText={exportedJsonText}
+        onShareFile={handleShareJsonFile}
         onClose={() => setShowExportModal(false)}
       />
 
       <JsonImportModal
         visible={showImportModal}
         jsonText={importJsonText}
-        onChangeJsonText={setImportJsonText}
+        onChangeJsonText={(text) => {
+          setImportJsonText(text);
+          if (loadedBackupFileName) setLoadedBackupFileName(null);
+        }}
         onConfirmImport={handleImport}
+        backupFiles={backupFiles}
+        onSelectBackupFile={handleSelectBackupFile}
+        onRefreshBackupFiles={() => {
+          void refreshBackupFiles();
+        }}
+        loadedFileName={loadedBackupFileName}
+        onDismiss={handleImportModalDismiss}
         onClose={() => {
+          pendingImportAlertRef.current = null;
           setShowImportModal(false);
           setImportJsonText('');
+          setLoadedBackupFileName(null);
         }}
       />
 
@@ -298,6 +543,7 @@ export default function SettingsScreen({
         visible={showCsvModal}
         title={csvModalTitle}
         csvText={exportedCsvText}
+        onShareFile={handleShareCsvFile}
         onClose={() => setShowCsvModal(false)}
       />
 
@@ -326,6 +572,17 @@ export default function SettingsScreen({
           <Text style={styles.infoLabel}>{language === 'pl' ? 'Zgodność licencyjna' : 'License'}</Text>
           <Text style={styles.infoValue}>{t.settings.licenseValue}</Text>
         </View>
+        <View style={styles.divider} />
+        <Pressable
+          testID="settings-open-licenses-btn"
+          style={styles.infoRow}
+          onPress={() => setShowOssLicenses(true)}
+          accessibilityRole="button"
+          accessibilityLabel={t.settings.ossLicensesLabel}
+        >
+          <Text style={styles.infoLabel}>{t.settings.ossLicensesLabel}</Text>
+          <Text style={[styles.infoValue, { color: theme.colors.copper }]}>›</Text>
+        </Pressable>
         <View style={styles.divider} />
         <Pressable
           style={styles.infoRow}
@@ -387,6 +644,11 @@ export default function SettingsScreen({
         )}
       </View>
       <AppGuideModal visible={showGuide} onClose={() => setShowGuide(false)} language={language} />
+      <OssLicensesModal
+        visible={showOssLicenses}
+        onClose={() => setShowOssLicenses(false)}
+        onOpenWebLink={() => guardExternalUrl(() => Linking.openURL(LICENSES_URL))}
+      />
     </ScrollView>
   );
 }

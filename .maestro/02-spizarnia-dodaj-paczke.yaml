@@ -13,6 +13,8 @@ name: 02 Spiżarnia — dodanie paczki i jej widoczność (wynik w danych)
     id: "app-guide-got-it-btn"
     optional: true
 - tapOn: "Spiżarnia, tab, .*"
+- assertVisible:
+    id: "ekran:\\(tabs\\)/beans"
 - tapOn:
     id: "beans-add-button"
 - tapOn:

@@ -50,7 +50,7 @@ export const ImportRecipeModal: React.FC<ImportRecipeModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} animationType="slide">
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <ModalHeader
           onClose={onClose}

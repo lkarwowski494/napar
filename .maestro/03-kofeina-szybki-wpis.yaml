@@ -14,20 +14,35 @@ name: 03 Kofeina — szybki wpis V60
     optional: true
 # Zakładka Kofeina jest ukryta (href: null) — wejście przez Dial-in i kartę kalkulatora kofeiny.
 - tapOn: "Dial-in, tab, .*"
+- assertVisible:
+    id: "ekran:\\(tabs\\)/dialin"
 - scrollUntilVisible:
     element:
       id: "open-caffeine-from-workshop"
 - tapOn:
     id: "open-caffeine-from-workshop"
+- assertVisible:
+    id: "ekran:\\(tabs\\)/caffeine"
 - scrollUntilVisible:
     element:
       id: "quick-add-caffeine-btn"
+    centerElement: true
 - tapOn:
     id: "quick-add-caffeine-btn"
 - tapOn:
     id: "caffeine-quick-v60"
+- scrollUntilVisible:
+    element:
+      id: "delete-caffeine-log-.*"
+    centerElement: true
+- assertVisible:
+    id: "delete-caffeine-log-.*"
 - takeScreenshot: 03-kofeina-szybki-wpis
 # powrót: (tabs)/caffeine
 - tapOn: "Dial-in, tab, .*"
+- assertVisible:
+    id: "ekran:\\(tabs\\)/dialin"
 # powrót: (tabs)/dialin
 - tapOn: "Parzenie, tab, .*"
+- assertVisible:
+    id: "ekran:\\(tabs\\)/index"

@@ -3,7 +3,7 @@
 // Deterministyczny kompas sensoryczny, dwukierunkowe Ratio i TDS / EY%
 // ============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import * as ExpoRouter from 'expo-router';
 import { diagnoseExtractionTaste } from '../../src/core/domain-rules';
 import { CaffeineIcon } from '../../src/components/icons/CraftIcons';
 import { theme } from '../../src/core/theme';
@@ -23,15 +23,48 @@ import { ExtractionYieldTab } from '../../src/components/dialin/ExtractionYieldT
 import { BrewRatioTab } from '../../src/components/dialin/BrewRatioTab';
 
 export default function DialInScreen() {
-  const router = useRouter();
+  const router = ExpoRouter.useRouter();
   const { t, language } = useTranslation();
-  const unitSystem = getUnitSystem();
+  const [unitSystem, setUnitSystemState] = useState<'metric' | 'imperial'>(() => {
+    try {
+      return getUnitSystem();
+    } catch {
+      return 'metric';
+    }
+  });
   let brewCtx: ReturnType<typeof useBrew> | null = null;
   try {
     brewCtx = useBrew();
   } catch {
     brewCtx = null;
   }
+  const dataVersion = brewCtx?.dataVersion ?? 0;
+
+  const refreshUnitSystem = useCallback(() => {
+    try {
+      setUnitSystemState(getUnitSystem());
+    } catch {
+      // fallback
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshUnitSystem();
+  }, [refreshUnitSystem, dataVersion]);
+
+  const useFocusEffectSafe =
+    typeof ExpoRouter.useFocusEffect === 'function'
+      ? ExpoRouter.useFocusEffect
+      : (cb: () => void) => {
+          useEffect(cb, [cb]);
+        };
+
+  useFocusEffectSafe(
+    useCallback(() => {
+      refreshUnitSystem();
+    }, [refreshUnitSystem])
+  );
+
   const beveragePreference = brewCtx?.beveragePreference ?? (() => {
     try {
       return getBeveragePreference();
@@ -68,7 +101,7 @@ export default function DialInScreen() {
         list = diagnoseExtractionTaste({ isWatery: true });
         break;
       case 'astringent_tea':
-        list = diagnoseExtractionTaste({ isAstringent: true });
+        list = diagnoseExtractionTaste({ isAstringent: true, beverageType: 'TEA' });
         break;
       default:
         list = diagnoseExtractionTaste({});

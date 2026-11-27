@@ -3,12 +3,12 @@
 // Bridges recipes, inventory, timer engine, and session logging
 // ============================================================================
 
-import React, { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { MasterRecipe, RecipeStep, MASTER_RECIPES } from './recipes-data';
 import { InventoryItem, SavedRecipe, BrewSession, CaffeineLog, SensoryProfile } from './database-schema';
 import { BrewTimerEngine, TimerSnapshot } from './timer-engine';
 import { announceStep, announceCountdown, announceFinish } from '../platform/announce';
-import { recordBrewSessionTransaction, getAppSetting, setAppSetting, getVoiceAnnounceEnabled, getHapticsEnabled, getSoundEnabled, BeveragePreference, getBeveragePreference, setBeveragePreference as setBeveragePreferenceDb, buildBackupState } from '../data/database';
+import { recordBrewSessionTransaction, getAppSetting, setAppSetting, getVoiceAnnounceEnabled, getHapticsEnabled, getSoundEnabled, BeveragePreference, getBeveragePreference, setBeveragePreference as setBeveragePreferenceDb, buildBackupState, getInventoryItemById, getRecipeById } from '../data/database';
 import { autoBackup } from '../data/backup';
 import {
   calculateExtractionYield,
@@ -31,6 +31,8 @@ export interface BrewContextType {
   snapshot: TimerSnapshot;
   beveragePreference: BeveragePreference;
   setBeveragePreference: (pref: BeveragePreference) => void;
+  dataVersion: number;
+  reloadFromDatabase: () => void;
   // Actions
   selectRecipe: (recipe: SavedRecipe | MasterRecipe) => void;
   selectInventoryItem: (item: InventoryItem | null) => void;
@@ -50,6 +52,7 @@ export interface BrewContextType {
   nextStep: () => void;
   previousStep: () => void;
   adjustStepDuration: (deltaSeconds: number) => void;
+  resetCurrentStep: (durationSeconds?: number) => void;
   finishAndSaveSession: (sessionData: {
     rating?: number;
     flavorTags?: string[];
@@ -93,8 +96,11 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // M1-audytor-generalny-033 (09-lokalizacja-002): język interfejsu — jedno źródło dla zapowiedzi,
   // nastawy młynka i opisu mielenia (także gdy język pochodzi z systemu, bez zapisanego app_language).
   const { language: uiLanguage } = useTranslation();
+  // Zapowiedzi VoiceOver i opis mielenia czytają język z ref (unikamy przestarzałych domknięć).
+  const uiLanguageRef = useRef(uiLanguage);
+  uiLanguageRef.current = uiLanguage;
   const masterGrind = (r: MasterRecipe) =>
-    uiLanguage === 'en' ? r.grindSettingDescriptionEn || r.grindSettingDescriptionPl : r.grindSettingDescriptionPl;
+    uiLanguageRef.current === 'en' ? r.grindSettingDescriptionEn || r.grindSettingDescriptionPl : r.grindSettingDescriptionPl;
   const [beveragePreference, setBeveragePreferenceState] = useState<BeveragePreference>(() => {
     try {
       return typeof getBeveragePreference === 'function' ? getBeveragePreference() : 'both';
@@ -126,6 +132,7 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [grinderId, setGrinderIdState] = useState<string>(() => {
     return getAppSetting('default_grinder', 'comandante_c40');
   });
+  const [dataVersion, setDataVersion] = useState<number>(0);
 
   const handleSetBeveragePreference = (pref: BeveragePreference) => {
     setBeveragePreferenceState(pref);
@@ -190,9 +197,6 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [snapshot, setSnapshot] = useState<TimerSnapshot>(defaultInitialSnapshot);
   const engineRef = useRef<BrewTimerEngine | null>(null);
-  // Zapowiedzi VoiceOver czytają język z ref (silnik stopera tworzony raz na zestaw kroków).
-  const uiLanguageRef = useRef(uiLanguage);
-  uiLanguageRef.current = uiLanguage;
 
   useEffect(() => {
     const engine = new BrewTimerEngine(scaledSteps, {
@@ -250,6 +254,63 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setGrindSetting(g);
   };
 
+  const reloadFromDatabase = useCallback(() => {
+    let nextPref: BeveragePreference = beveragePreference;
+    try {
+      if (typeof getBeveragePreference === 'function') {
+        nextPref = getBeveragePreference();
+        setBeveragePreferenceState(nextPref);
+      }
+    } catch {
+      // ignore
+    }
+    try {
+      setGrinderIdState(getAppSetting('default_grinder', 'comandante_c40'));
+    } catch {
+      // ignore
+    }
+    try {
+      if (typeof getInventoryItemById === 'function' && selectedInventoryItem?.id) {
+        const freshItem = getInventoryItemById(selectedInventoryItem.id);
+        setSelectedInventoryItem(freshItem && !freshItem.isArchived ? freshItem : null);
+      }
+    } catch {
+      // ignore
+    }
+    try {
+      const currentIsTea = 'beverageType' in recipe ? recipe.beverageType === 'TEA' : recipe.type === 'TEA';
+      const prefConflicts =
+        (nextPref === 'coffee' && currentIsTea) || (nextPref === 'tea' && !currentIsTea);
+      if (prefConflicts) {
+        const fallback = nextPref === 'tea' ? defaultTeaRecipe : defaultCoffeeRecipe;
+        selectRecipe(fallback);
+      } else if (typeof getRecipeById === 'function' && recipe?.id && !('steps' in recipe)) {
+        const freshRecipe = getRecipeById(recipe.id);
+        if (!freshRecipe && recipe.isCustom) {
+          const fallback = nextPref === 'tea' ? defaultTeaRecipe : defaultCoffeeRecipe;
+          selectRecipe(fallback);
+        } else if (freshRecipe) {
+          const changed =
+            freshRecipe.name !== recipe.name ||
+            freshRecipe.doseGrams !== recipe.doseGrams ||
+            freshRecipe.waterGrams !== recipe.waterGrams ||
+            freshRecipe.waterTempCelsius !== recipe.waterTempCelsius ||
+            freshRecipe.grindSizeDescription !== recipe.grindSizeDescription ||
+            freshRecipe.recommendedRatio !== recipe.recommendedRatio ||
+            freshRecipe.stepsJson !== recipe.stepsJson ||
+            freshRecipe.method !== recipe.method ||
+            freshRecipe.beverageType !== recipe.beverageType;
+          if (changed) {
+            selectRecipe(freshRecipe);
+          }
+        }
+      }
+    } catch {
+      // ignore
+    }
+    setDataVersion((v) => v + 1);
+  }, [beveragePreference, selectedInventoryItem, recipe]);
+
   const handleSetDoseGrams = (d: number) => {
     setDoseGrams(d);
     const ratio = 'recommendedRatio' in recipe ? recipe.recommendedRatio : 16.0;
@@ -273,6 +334,9 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const adjustStepDuration = (deltaSeconds: number) => {
     engineRef.current?.adjustStepDuration(deltaSeconds);
   };
+  const resetCurrentStep = (durationSeconds?: number) => {
+    engineRef.current?.resetCurrentStep(durationSeconds);
+  };
 
   const finishAndSaveSession = (data: {
     rating?: number;
@@ -291,11 +355,18 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const sessionId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const nowIso = new Date().toISOString();
 
+    const mUpper = (method || '').trim().toUpperCase();
+    const isEspressoLike =
+      mUpper.includes('ESPRESSO') ||
+      mUpper.includes('FLAIR') ||
+      mUpper.includes('ROBOT') ||
+      (!mUpper.includes('CLEVER') && mUpper.includes('LEVER'));
+
     let eyPercent: number | undefined;
     if (data.tdsPercentage && data.tdsPercentage > 0) {
       try {
         const beverageWeightGrams =
-          bevType === 'COFFEE' && method !== 'espresso'
+          bevType === 'COFFEE' && !isEspressoLike
             ? calculateLiquidYield(waterGrams, doseGrams)
             : waterGrams;
         const ey = calculateExtractionYield(beverageWeightGrams, data.tdsPercentage, doseGrams);
@@ -307,7 +378,20 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     let caffeineMg: number | undefined;
     if (bevType === 'COFFEE') {
-      caffeineMg = estimateCoffeeCaffeineMg(doseGrams);
+      const caffeineMethod: 'filter' | 'espresso' | 'immersion' | 'cold_brew' =
+        mUpper.includes('CLEVER') ||
+        mUpper.includes('FRENCH') ||
+        mUpper.includes('AEROPRESS') ||
+        mUpper.includes('SWITCH') ||
+        mUpper.includes('CUPPING') ||
+        mUpper.includes('PRASKA')
+          ? 'immersion'
+          : isEspressoLike || mUpper.includes('MOKA')
+          ? 'espresso'
+          : mUpper.includes('COLD') || mUpper.includes('MIZUDASHI') || mUpper.includes('TODDY') || mUpper.includes('NITRO')
+          ? 'cold_brew'
+          : 'filter';
+      caffeineMg = estimateCoffeeCaffeineMg(doseGrams, 'arabica', caffeineMethod);
     } else {
       caffeineMg = estimateTeaInfusionCaffeineMg(estimateTotalLeafCaffeineMg(doseGrams), 1);
     }
@@ -358,6 +442,15 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     recordBrewSessionTransaction(session, inventoryDeduction, caffeineLog);
 
+    if (selectedInventoryItem?.id && typeof getInventoryItemById === 'function') {
+      try {
+        const refreshed = getInventoryItemById(selectedInventoryItem.id);
+        setSelectedInventoryItem(refreshed);
+      } catch {
+        // safe fallback
+      }
+    }
+
     // Apps4Brew SEC-09: Automatyczna rotacja 10 kopii JSON w tle (Zadanie N5)
     try {
       void autoBackup(buildBackupState());
@@ -397,9 +490,12 @@ export const BrewProvider: React.FC<{ children: React.ReactNode }> = ({ children
         nextStep,
         previousStep,
         adjustStepDuration,
+        resetCurrentStep,
         finishAndSaveSession,
         beveragePreference,
         setBeveragePreference: handleSetBeveragePreference,
+        dataVersion,
+        reloadFromDatabase,
       }}
     >
       {children}

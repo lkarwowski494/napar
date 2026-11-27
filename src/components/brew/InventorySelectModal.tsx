@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../../core/theme';
 import { InventoryItem } from '../../core/database-schema';
+import { formatDoseWeight, type UnitSystem } from '../../core/unit-converter';
 import { ModalHeader } from '../ui';
 
 export interface InventorySelectModalProps {
@@ -19,6 +20,8 @@ export interface InventorySelectModalProps {
   selectedItem: InventoryItem | null;
   onSelectItem: (item: InventoryItem | null) => void;
   inline?: boolean;
+  unitSystem?: UnitSystem;
+  language?: 'pl' | 'en';
   t?: any;
 }
 
@@ -29,12 +32,19 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
   selectedItem,
   onSelectItem,
   inline = false,
+  unitSystem = 'metric',
+  language,
   t,
 }) => {
   if (!inline && !visible) return null;
 
   const isUnassignedSelected = selectedItem === null;
-  const isEn = t?.common?.close === 'Close' || (typeof t?.brew?.recipe === 'string' && t?.brew?.recipe.toLowerCase() === 'recipe');
+  const isEn =
+    language === 'en' ||
+    (!language &&
+      (t?.common?.close === 'Close' ||
+        (typeof t?.brew?.recipe === 'string' && t?.brew?.recipe.toLowerCase() === 'recipe')));
+  const resolvedLang: 'pl' | 'en' = (['pl', 'en'] as const)[Number(isEn)];
   const safeInventory = (Array.isArray(inventory) ? inventory : []).filter(
     (item): item is InventoryItem => item !== null && typeof item === 'object' && typeof item.id === 'string'
   );
@@ -90,12 +100,14 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
           const isItemSelected = selectedItem?.id === item.id;
           const remGrams = typeof item.remainingWeightGrams === 'number' && Number.isFinite(item.remainingWeightGrams) ? item.remainingWeightGrams : 0;
           const initGrams = typeof item.initialWeightGrams === 'number' && Number.isFinite(item.initialWeightGrams) ? item.initialWeightGrams : 0;
+          const remLabel = formatDoseWeight(remGrams, unitSystem, resolvedLang);
+          const initLabel = formatDoseWeight(initGrams, unitSystem, resolvedLang);
           return (
             <Pressable
               key={item.id}
               testID={`inventory-option-${item.id}`}
               accessibilityRole="radio"
-              accessibilityLabel={`${item.name || ''}, ${item.roasterOrProducer || ''}, ${isEn ? 'remaining' : 'pozostało'} ${remGrams}g`}
+              accessibilityLabel={`${item.name || ''}, ${item.roasterOrProducer || ''}, ${isEn ? 'remaining' : 'pozostało'} ${remLabel}`}
               accessibilityHint={isEn ? 'Selects this stash item for brewing' : 'Wybiera tę pozycję ze spiżarni do zaparzenia'}
               accessibilityState={{ selected: isItemSelected }}
               style={[
@@ -112,7 +124,7 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
                 {item.roasterOrProducer || (isEn ? 'Roastery' : 'Palarnia')} · {item.origin || ''}
               </Text>
               <Text style={styles.recipeOptionDetails}>
-                {isEn ? `Remaining: ${remGrams}g of ${initGrams}g` : `Pozostało: ${remGrams}g z ${initGrams}g`}
+                {isEn ? `Remaining: ${remLabel} of ${initLabel}` : `Pozostało: ${remLabel} z ${initLabel}`}
               </Text>
             </Pressable>
           );
@@ -132,7 +144,7 @@ export const InventorySelectModal: React.FC<InventorySelectModalProps> = ({
   }
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={false}>
+    <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
       <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom', 'left', 'right']}>
         {innerContent}
       </SafeAreaView>

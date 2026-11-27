@@ -3,13 +3,13 @@
 // Encapsulates modal dialogues outside the core inline interaction loop
 // ============================================================================
 
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
+import { Platform } from 'react-native';
 import { ProcedureModal } from './ProcedureModal';
 import { BrewFinishModal } from './BrewFinishModal';
 import { GrinderSelectModal } from './GrinderSelectModal';
 import { ShareRecipeModal } from './ShareRecipeModal';
 import { ImportRecipeModal } from './ImportRecipeModal';
-import { InventorySelectModal } from './InventorySelectModal';
 import { QrScannerModal } from '../../core/QrScannerModal';
 import { OnboardingModal } from '../OnboardingModal';
 import { useBrewWorkflow } from '../../hooks/useBrewWorkflow';
@@ -21,6 +21,7 @@ interface BrewModalsContainerProps {
 export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workflow }) => {
   const {
     recipe,
+    scaledSteps,
     snapshot,
     isRunning,
     unitSystem,
@@ -28,6 +29,7 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     pauseTimer,
     resumeTimer,
     adjustStepDuration,
+    resetCurrentStep,
     previousStep,
     nextStep,
     resetTimer,
@@ -47,11 +49,6 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     setShowImportModal,
     showQrScanner,
     setShowQrScanner,
-    showInventoryModal,
-    setShowInventoryModal,
-    allInventory,
-    selectedInventoryItem,
-    selectInventoryItem,
     showOnboarding,
     handleCompleteOnboarding,
     waterGrams,
@@ -73,11 +70,28 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
     setNotes,
     handleFinishSave,
     handleScanQrRecipe,
+    requestOpenFinishModal,
+    handleProcedureClose,
+    handleProcedureDismiss: workflowProcedureDismiss,
     t,
   } = workflow;
 
+  // Bezpieczne przełączenie ProcedureModal -> BrewFinishModal na iOS (UIKit odrzuca jednoczesną prezentację 2 modali)
+  const localPendingFinishRef = useRef(false);
+  const handleLocalProcedureDismiss = useCallback(() => {
+    if (!localPendingFinishRef.current) return;
+    localPendingFinishRef.current = false;
+    setShowFinishModal(true);
+  }, [setShowFinishModal]);
+
+  const onProcedureDismiss = workflowProcedureDismiss ?? handleLocalProcedureDismiss;
+
+  // DEEP-001: używamy scaledSteps (parsowanych z stepsJson dla SavedRecipe i przeskalowanych do wody/porcji),
+  // zamiast sprawdzać 'steps' in recipe (co psuło każdą recepturę wczytaną z SQLite do „KROK 1 Z 1”).
   const stepsList =
-    'steps' in recipe && Array.isArray(recipe.steps)
+    Array.isArray(scaledSteps) && scaledSteps.length > 0
+      ? scaledSteps
+      : 'steps' in recipe && Array.isArray(recipe.steps) && recipe.steps.length > 0
       ? recipe.steps
       : snapshot.currentStep
       ? [snapshot.currentStep]
@@ -109,31 +123,49 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         }}
         onAdjustTimeSeconds={(deltaSec) => adjustStepDuration(deltaSec)}
         onResetCurrentStep={(parsedSec) => {
-          const delta = parsedSec - snapshot.stepRemainingSeconds;
-          if (delta !== 0) {
-            adjustStepDuration(delta);
+          if (typeof resetCurrentStep === 'function') {
+            resetCurrentStep(parsedSec);
+          } else {
+            const delta = parsedSec - snapshot.stepRemainingSeconds;
+            if (delta !== 0) {
+              adjustStepDuration(delta);
+            }
           }
         }}
         onPrevStep={() => {
           previousStep();
-          if (!isRunning) resumeTimer();
         }}
         onNextStep={() => {
           nextStep();
-          if (!isRunning) resumeTimer();
         }}
         onFinishAndSave={() => {
-          setShowProcedureModal(false);
           pauseTimer();
-          setShowFinishModal(true);
+          if (typeof requestOpenFinishModal === 'function') {
+            requestOpenFinishModal();
+          } else if (Platform.OS === 'ios' && showProcedureModal) {
+            localPendingFinishRef.current = true;
+            setShowProcedureModal(false);
+          } else {
+            setShowProcedureModal(false);
+            setShowFinishModal(true);
+          }
         }}
-        onClose={() => setShowProcedureModal(false)}
+        onClose={() => {
+          localPendingFinishRef.current = false;
+          if (typeof handleProcedureClose === 'function') {
+            handleProcedureClose();
+          } else {
+            setShowProcedureModal(false);
+          }
+        }}
+        onDismiss={onProcedureDismiss}
       />
 
       {/* Modal Podsumowania Parzenia (Karta Degustacyjna & Dial-in Doctor) */}
       <BrewFinishModal
         visible={showFinishModal}
         unitSystem={unitSystem}
+        language={language}
         totalElapsedSeconds={snapshot.totalElapsedSeconds}
         waterGrams={waterGrams}
         rating={rating}
@@ -163,6 +195,7 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         onSelectGrinder={setGrinderId}
         recipe={recipe}
         t={t}
+        language={language}
       />
 
       {/* Modal Udostępniania Receptury (Offline QR) */}
@@ -198,17 +231,6 @@ export const BrewModalsContainer: React.FC<BrewModalsContainerProps> = ({ workfl
         t={t}
         language={language}
       />
-
-      {/* Modal Wyboru Pozycji ze Spiżarni */}
-      <InventorySelectModal
-        visible={showInventoryModal}
-        onClose={() => setShowInventoryModal(false)}
-        inventory={allInventory}
-        selectedItem={selectedInventoryItem}
-        onSelectItem={(item) => selectInventoryItem(item)}
-        t={t}
-      />
-
 
       {/* Onboarding Modal */}
       <OnboardingModal

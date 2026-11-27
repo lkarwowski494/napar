@@ -500,4 +500,157 @@ describe('Napar Domain Rules (RD-01…RD-30)', () => {
       expect(Object.is(calculateCaffeineDecay(0, 5), -0)).toBe(false);
     });
   });
+
+  describe('D4 Stryker: ścisłe brzegi, clampy, clampCaffeineHalfLifeHours i pełne komunikaty PL/EN', () => {
+    it('clampCaffeineHalfLifeHours przycina zakres 2.0–8.0 h i zaokrągla do 0.1', () => {
+      const { clampCaffeineHalfLifeHours } = require('../domain-rules');
+      expect(clampCaffeineHalfLifeHours(1.0)).toBe(2.0);
+      expect(clampCaffeineHalfLifeHours(2.0)).toBe(2.0);
+      expect(clampCaffeineHalfLifeHours(4.56)).toBe(4.6);
+      expect(clampCaffeineHalfLifeHours(8.0)).toBe(8.0);
+      expect(clampCaffeineHalfLifeHours(12.0)).toBe(8.0);
+    });
+
+    it('calculateExtractionYield: ścisłe granice 18.0% i 22.0% oraz pełne opisy PL/EN i błędy', () => {
+      const under = calculateExtractionYield(179.9, 1.0, 10);
+      expect(under.rating).toBe('under');
+      expect(under.descriptionPl).toContain('Niedoparzenie');
+      expect(under.descriptionEn).toContain('Under-extracted');
+
+      const idealLow = calculateExtractionYield(180.0, 1.0, 10);
+      expect(idealLow.extractionYieldPercent).toBe(18.0);
+      expect(idealLow.rating).toBe('ideal');
+      expect(idealLow.descriptionPl).toContain('Zrównoważona ekstrakcja');
+      expect(idealLow.descriptionEn).toContain('Balanced Golden Cup');
+
+      const idealHigh = calculateExtractionYield(220.0, 1.0, 10);
+      expect(idealHigh.extractionYieldPercent).toBe(22.0);
+      expect(idealHigh.rating).toBe('ideal');
+
+      const over = calculateExtractionYield(220.1, 1.0, 10);
+      expect(over.rating).toBe('over');
+      expect(over.descriptionPl).toContain('Przeparzenie');
+      expect(over.descriptionEn).toContain('Over-extracted');
+
+      // Nieprawidłowe limity (<= 0) nie ucinają wyniku
+      const noClamp = calculateExtractionYield(200, 1.5, 10, 0, 0, 0);
+      expect(noClamp.extractionYieldPercent).toBe(30.0);
+
+      expect(() => calculateExtractionYield(0, 1, 10)).toThrow('Parametry ekstrakcji muszą być większe od zera');
+      expect(() => calculateBrewWater(0, 16)).toThrow('Doza i ratio muszą być większe od zera');
+      expect(() => calculateBrewDose(0, 16)).toThrow('Woda i ratio muszą być większe od zera');
+      expect(() => calculateLiquidYield(0, 15)).toThrow('Nieprawidłowe parametry wyliczania uzysku');
+      expect(calculateLiquidYield(200, 10, 12, 0)).toBe(80.0);
+    });
+
+    it('kofeina i metabolizm: ścisłe brzegi 0, domyślne parametry, białe znaki i błędy wejścia', () => {
+      expect(estimateCoffeeCaffeineMg(15)).toBe(158.4);
+      expect(estimateCoffeeCaffeineMg(15, '  robusta  ' as any, '  espresso  ' as any)).toBe(247.5);
+      expect(estimateCoffeeCaffeineMg(15, 'arabica', null as any)).toBe(158.4);
+      expect(estimateTotalLeafCaffeineMg(-5)).toBe(0);
+      expect(estimateTotalLeafCaffeineMg(2000)).toBe(30000);
+      expect(estimateTeaInfusionCaffeineMg(-10, 1)).toBe(0);
+      expect(calculateRemainingCaffeineMg(100, 0, 4)).toBe(100.0);
+      expect(calculateRemainingCaffeineMg(-10, 2, 4)).toBe(0);
+      expect(calculateRemainingCaffeineMg(100, 2, -4)).toBe(0);
+      expect(calculateCaffeineDecay(-10, 2, 4)).toBe(0);
+      expect(calculateCaffeineDecay(100, 0, 4)).toBe(100);
+      expect(estimateBedtimeCaffeineMg([{ doseMg: 100, hoursUntilBedtime: 0 }], 0)).toBe(100.0);
+      expect(estimateBedtimeCaffeineMg([{ doseMg: 0, hoursUntilBedtime: 2 }, { doseMg: 100, hoursUntilBedtime: -1 }], 4)).toBe(0);
+    });
+
+    it('diagnoseExtractionTaste i diagnoseTeaTaste zwracają pełne komunikaty PL/EN i korekty dla wszystkich wariantów', () => {
+      const coffeeAll = diagnoseExtractionTaste({
+        isSour: true,
+        isBitter: true,
+        isWatery: true,
+        isTooIntense: true,
+      });
+      expect(coffeeAll).toHaveLength(4);
+      expect(coffeeAll[0]).toMatchObject({
+        issue: 'Zbyt kwaśna (Niedoparzenie)',
+        issueEn: 'Too sour (Under-extracted)',
+        grindAdjustment: 'finer',
+        tempAdjustment: 'higher',
+      });
+      expect(coffeeAll[0].recommendationPl).toContain('Zmiel drobniej');
+      expect(coffeeAll[0].recommendationEn).toContain('Grind finer');
+
+      expect(coffeeAll[1]).toMatchObject({
+        issue: 'Gorzka / sucha w ustach (Przeparzenie)',
+        issueEn: 'Bitter / dry mouthfeel (Over-extracted)',
+        grindAdjustment: 'coarser',
+        tempAdjustment: 'lower',
+      });
+      expect(coffeeAll[1].recommendationPl).toContain('Zmiel grubiej');
+      expect(coffeeAll[1].recommendationEn).toContain('Grind coarser');
+
+      expect(coffeeAll[2]).toMatchObject({
+        issue: expect.stringContaining('Płaska / rozwodniona'),
+        issueEn: expect.stringContaining('Flat / watery'),
+      });
+      expect(coffeeAll[2].recommendationPl).toContain('Zwiększ dozę');
+      expect(coffeeAll[2].recommendationEn).toContain('Increase coffee dose');
+
+      expect(coffeeAll[3]).toMatchObject({
+        issue: expect.stringContaining('Zbyt ciężka'),
+        issueEn: expect.stringContaining('Too heavy'),
+      });
+      expect(coffeeAll[3].recommendationPl).toContain('Wydłuż ratio');
+      expect(coffeeAll[3].recommendationEn).toContain('Lengthen brew ratio');
+
+      const teaAll = diagnoseExtractionTaste({
+        beverageType: 'TEA',
+        isScalded: true,
+        isAstringent: true,
+        isWatery: true,
+      });
+      expect(teaAll).toHaveLength(3);
+      expect(teaAll[0]).toMatchObject({
+        issue: expect.stringContaining('Poparzone liście'),
+        issueEn: expect.stringContaining('Scalded leaves'),
+        tempAdjustment: 'lower',
+        steepTimeAdjustmentSeconds: -5,
+      });
+      expect(teaAll[0].recommendationPl).toContain('70–80°C');
+      expect(teaAll[0].recommendationEn).toContain('70-80°C');
+
+      expect(teaAll[1]).toMatchObject({
+        issue: expect.stringContaining('Nadmierna ściągająca cierpkość'),
+        issueEn: expect.stringContaining('Excessive astringent bitterness'),
+        tempAdjustment: 'lower',
+        steepTimeAdjustmentSeconds: -10,
+      });
+      expect(teaAll[1].recommendationPl).toContain('Skróć czas');
+      expect(teaAll[1].recommendationEn).toContain('Shorten steep time');
+
+      expect(teaAll[2]).toMatchObject({
+        issue: expect.stringContaining('Zbyt wodnisty'),
+        issueEn: expect.stringContaining('Too watery'),
+        tempAdjustment: 'higher',
+        steepTimeAdjustmentSeconds: 15,
+      });
+      expect(teaAll[2].recommendationPl).toContain('Wydłuż czas');
+      expect(teaAll[2].recommendationEn).toContain('Lengthen steep time');
+    });
+
+    it('calculateBatchScaling: brzegi 1/2/3/4 porcje, nieprawidłowe wejścia i komunikaty PL/EN', () => {
+      expect(() => calculateBatchScaling(0, 250, 1)).toThrow('Doza bazowa i woda muszą być liczbami większymi od zera');
+      expect(() => calculateBatchScaling(15, 0, 1)).toThrow('Doza bazowa i woda muszą być liczbami większymi od zera');
+
+      const r1 = calculateBatchScaling(15, 250, 1, 0, 0);
+      expect(r1.scaledDoseGrams).toBe(15);
+      expect(r1.scaledWaterGrams).toBe(250);
+      expect(r1.recommendationPl).toContain('Domyślne mielenie');
+      expect(r1.recommendationEn).toContain('Default grind setting');
+
+      const r2 = calculateBatchScaling(15, 250, 2);
+      expect(r2.recommendationEn).toContain('+2 clicks coarser');
+
+      const r3 = calculateBatchScaling(15, 250, 3);
+      expect(r3.grindAdjustmentClicks).toBe(4);
+      expect(r3.recommendationPl).toContain('3 os.');
+      expect(r3.recommendationEn).toContain('3 servings');
+    });
+  });
 });

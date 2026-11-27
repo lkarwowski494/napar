@@ -29,14 +29,15 @@ describe('Bezpieczeństwo publicznego repozytorium i potoku CI/CD (NFR-SEC)', ()
           expect(runPart).not.toMatch(/\$\{\{\s*github\.head_ref/);
         }
       }
-      // 5. Dozwolone wyłącznie oficjalne akcje actions/* lub przypięte po 40-znakowym SHA
+      // 5. Wszystkie akcje muszą być przypięte po 40-znakowym SHA (ochrona przed podmianą tagu)
       const usesMatches = [...content.matchAll(/uses:\s*([^\s#]+)/g)];
       for (const m of usesMatches) {
         const action = m[1];
-        const isOfficial = action.startsWith('actions/');
         const isPinnedSha = /@[0-9a-f]{40}$/.test(action);
-        expect(isOfficial || isPinnedSha).toBe(true);
+        expect(isPinnedSha).toBe(true);
       }
+      // 6. Zakaz nieprzypiętego ubuntu-latest
+      expect(content).not.toMatch(/runs-on:\s*ubuntu-latest/);
     }
   });
 

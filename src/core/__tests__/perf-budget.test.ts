@@ -19,7 +19,7 @@ import {
 
 } from '../water-chemistry';
 import { normSearch,    } from '../search-utils';
-import { BrewTimerEngine, StepTimeWindow, ActiveStepSnapshot, CumulativeWaterPoint } from '../timer-engine';
+import { BrewTimerEngine, remainingTimerSec } from '../timer-engine';
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(() => ({
@@ -169,243 +169,26 @@ describe('Performance Budgets: Real-Time Mathematics & Domain Processing', () =>
     expect(ms).toBeLessThan(80);
   });
 
-  test('Budżet 9: calculateRemainingRecipeTime wykonuje 10 000 kalkulacji w czasie poniżej 50 ms (TASK-P70-10-WYD)', () => {
+  test('Budżet 9: remainingTimerSec i BrewTimerEngine.getSnapshot wykonują 10 000 kalkulacji w czasie poniżej 80 ms', () => {
     const steps = [
-      { id: '1', name: 'Bloom', durationSeconds: 45, waterGrams: 50 },
-      { id: '2', name: 'Pour 1', durationSeconds: 30, waterGrams: 150 },
-      { id: '3', name: 'Pour 2', durationSeconds: 30, waterGrams: 250 },
-      { id: '4', name: 'Drawdown', durationSeconds: 45, waterGrams: 250 },
-    ] as any[];
+      { stepNumber: 1, namePl: 'Preinfuzja', durationSeconds: 30, targetWaterGrams: 50, instructionPl: '' },
+      { stepNumber: 2, namePl: 'Zalanie 1', durationSeconds: 45, targetWaterGrams: 150, instructionPl: '' },
+      { stepNumber: 3, namePl: 'Zalanie 2', durationSeconds: 60, targetWaterGrams: 250, instructionPl: '' },
+    ];
+    const engine = new BrewTimerEngine(steps);
+    const snap = engine.getSnapshot();
+    expect(snap.totalSteps).toBe(3);
+    expect(snap.stepRemainingSeconds).toBe(30);
+    expect(remainingTimerSec(100_000, 70_000)).toBe(30);
 
     const ms = measureCpuMs(() => {
       for (let i = 0; i < 10000; i++) {
-        const stepIdx = i % 4;
-        const elapsed = (i * 3) % 45;
-        BrewTimerEngine.calculateRemainingRecipeTime(steps, stepIdx, elapsed);
+        remainingTimerSec(100_000 + i, 70_000);
+        engine.getSnapshot();
       }
     });
 
-    expect(ms).toBeLessThan(50);
-  });
-
-  test('Budżet 10: calculateStepWaterIncrement wykonuje 10 000 kalkulacji w czasie poniżej 50 ms (TASK-P72-10-WYD)', () => {
-    const steps = [
-      { id: '1', name: 'Bloom', targetWaterGrams: 50 },
-      { id: '2', name: 'Pour 1', targetWaterGrams: 150 },
-      { id: '3', name: 'Pour 2', targetWaterGrams: 250 },
-      { id: '4', name: 'Drawdown', targetWaterGrams: 250 },
-    ] as any[];
-
-    // 1. Poprawność biznesowa
-    expect(BrewTimerEngine.calculateStepWaterIncrement(steps, 0)).toBe(50);
-    expect(BrewTimerEngine.calculateStepWaterIncrement(steps, 1)).toBe(100);
-    expect(BrewTimerEngine.calculateStepWaterIncrement(steps, 2)).toBe(100);
-    expect(BrewTimerEngine.calculateStepWaterIncrement(steps, 3)).toBe(0);
-    expect(BrewTimerEngine.calculateStepWaterIncrement(null, 0)).toBe(0);
-    expect(BrewTimerEngine.calculateStepWaterIncrement(steps, 99)).toBe(0);
-
-    // 2. Budżet wydajnościowy
-    const ms = measureCpuMs(() => {
-      for (let i = 0; i < 10000; i++) {
-        const stepIdx = i % 4;
-        BrewTimerEngine.calculateStepWaterIncrement(steps, stepIdx);
-      }
-    });
-
-    expect(ms).toBeLessThan(50);
-  });
-
-  test('Budżet 11: calculateRemainingWaterToPour wykonuje 10 000 kalkulacji w czasie poniżej 50 ms (TASK-P75-10-WYD)', () => {
-    const steps = [
-      { id: '1', name: 'Bloom', targetWaterGrams: 50 },
-      { id: '2', name: 'Pour 1', targetWaterGrams: 150 },
-      { id: '3', name: 'Pour 2', targetWaterGrams: 250 },
-      { id: '4', name: 'Drawdown', targetWaterGrams: 250 },
-    ] as any[];
-
-    // 1. Poprawność biznesowa
-    expect(BrewTimerEngine.calculateRemainingWaterToPour(steps, 0)).toBe(250);
-    expect(BrewTimerEngine.calculateRemainingWaterToPour(steps, 100)).toBe(150);
-    expect(BrewTimerEngine.calculateRemainingWaterToPour(steps, 250)).toBe(0);
-    expect(BrewTimerEngine.calculateRemainingWaterToPour(steps, 300)).toBe(0);
-    expect(BrewTimerEngine.calculateRemainingWaterToPour(null, 100)).toBe(0);
-    expect(BrewTimerEngine.calculateRemainingWaterToPour(steps, -50)).toBe(250);
-
-    // 2. Budżet wydajnościowy
-    const ms = measureCpuMs(() => {
-      for (let i = 0; i < 10000; i++) {
-        const poured = (i * 7) % 350;
-        BrewTimerEngine.calculateRemainingWaterToPour(steps, poured);
-      }
-    });
-
-    expect(ms).toBeLessThan(50);
-  });
-
-  test('Budżet 12: calculateWaterPourProgress wykonuje 10 000 kalkulacji w czasie poniżej 50 ms (TASK-P77-10-WYD)', () => {
-    const steps = [
-      { id: '1', name: 'Bloom', targetWaterGrams: 50 },
-      { id: '2', name: 'Pour 1', targetWaterGrams: 150 },
-      { id: '3', name: 'Pour 2', targetWaterGrams: 250 },
-      { id: '4', name: 'Drawdown', targetWaterGrams: 250 },
-    ] as any[];
-
-    // 1. Poprawność biznesowa
-    expect(BrewTimerEngine.calculateWaterPourProgress(steps, 0)).toBe(0);
-    expect(BrewTimerEngine.calculateWaterPourProgress(steps, 125)).toBe(50);
-    expect(BrewTimerEngine.calculateWaterPourProgress(steps, 250)).toBe(100);
-    expect(BrewTimerEngine.calculateWaterPourProgress(steps, 300)).toBe(100);
-    expect(BrewTimerEngine.calculateWaterPourProgress(null, 100)).toBe(0);
-    expect(BrewTimerEngine.calculateWaterPourProgress(steps, -50)).toBe(0);
-
-    // 2. Budżet wydajnościowy
-    const ms = measureCpuMs(() => {
-      for (let i = 0; i < 10000; i++) {
-        const poured = (i * 7) % 350;
-        BrewTimerEngine.calculateWaterPourProgress(steps, poured);
-      }
-    });
-
-    expect(ms).toBeLessThan(50);
-  });
-
-  test('Budżet 13: calculateStepTimeWindow wylicza okno czasowe kroku w czasie poniżej 50 ms (TASK-P79-10-WYD)', () => {
-    const steps = [
-      { stepNumber: 1, namePl: 'Preinfuzja', durationSeconds: 30, targetWaterGrams: 50 },
-      { stepNumber: 2, namePl: 'Zalanie 1', durationSeconds: 45, targetWaterGrams: 150 },
-      { stepNumber: 3, namePl: 'Zalanie 2', durationSeconds: 60, targetWaterGrams: 250 },
-    ] as any[];
-
-    // 1. Poprawność biznesowa
-    const win0: StepTimeWindow = BrewTimerEngine.calculateStepTimeWindow(steps, 0);
-    expect(win0.stepIndex).toBe(0);
-    expect(win0.startSecond).toBe(0);
-    expect(win0.endSecond).toBe(30);
-    expect(win0.durationSeconds).toBe(30);
-    expect(win0.isValidStep).toBe(true);
-
-    const win1 = BrewTimerEngine.calculateStepTimeWindow(steps, 1);
-    expect(win1.startSecond).toBe(30);
-    expect(win1.endSecond).toBe(75);
-    expect(win1.durationSeconds).toBe(45);
-    expect(win1.isValidStep).toBe(true);
-
-    const win2 = BrewTimerEngine.calculateStepTimeWindow(steps, 2);
-    expect(win2.startSecond).toBe(75);
-    expect(win2.endSecond).toBe(135);
-    expect(win2.durationSeconds).toBe(60);
-    expect(win2.isValidStep).toBe(true);
-
-    // Kroki poza zakresem i nullish
-    const winInvalid = BrewTimerEngine.calculateStepTimeWindow(steps, 99);
-    expect(winInvalid.isValidStep).toBe(false);
-    expect(winInvalid.durationSeconds).toBe(0);
-
-    const winNull = BrewTimerEngine.calculateStepTimeWindow(null, 0);
-    expect(winNull.isValidStep).toBe(false);
-
-    // 2. Budżet wydajnościowy
-    const ms = measureCpuMs(() => {
-      for (let i = 0; i < 10000; i++) {
-        BrewTimerEngine.calculateStepTimeWindow(steps, i % 3);
-      }
-    });
-
-    expect(ms).toBeLessThan(50);
-  });
-
-  test('Budżet 14: getActiveStepSnapshot wyznacza stan aktywnego kroku w czasie poniżej 50 ms (TASK-P82-10-WYD)', () => {
-    const steps = [
-      { stepNumber: 1, namePl: 'Preinfuzja', durationSeconds: 30, targetWaterGrams: 50 },
-      { stepNumber: 2, namePl: 'Zalanie 1', durationSeconds: 45, targetWaterGrams: 150 },
-      { stepNumber: 3, namePl: 'Zalanie 2', durationSeconds: 60, targetWaterGrams: 250 },
-    ] as any[];
-
-    // 1. Poprawność biznesowa
-    // Przy t = 10s -> Krok 0 (Preinfuzja), upłynęło 10s, zostało 20s, ~33.3%
-    const snap10: ActiveStepSnapshot = BrewTimerEngine.getActiveStepSnapshot(steps, 10);
-    expect(snap10.stepIndex).toBe(0);
-    expect(snap10.stepElapsedSeconds).toBe(10);
-    expect(snap10.stepRemainingSeconds).toBe(20);
-    expect(snap10.stepProgressPercent).toBeCloseTo(33.3, 0);
-    expect(snap10.isFinished).toBe(false);
-
-    // Przy t = 50s -> Krok 1 (Zalanie 1: start 30s, dur 45s), upłynęło 20s w kroku, zostało 25s
-    const snap50 = BrewTimerEngine.getActiveStepSnapshot(steps, 50);
-    expect(snap50.stepIndex).toBe(1);
-    expect(snap50.stepElapsedSeconds).toBe(20);
-    expect(snap50.stepRemainingSeconds).toBe(25);
-    expect(snap50.isFinished).toBe(false);
-
-    // Przy t = 200s (poza czasem całego parzenia 135s) -> Zakończone
-    const snapEnd = BrewTimerEngine.getActiveStepSnapshot(steps, 200);
-    expect(snapEnd.stepIndex).toBe(2);
-    expect(snapEnd.isFinished).toBe(true);
-    expect(snapEnd.stepProgressPercent).toBe(100);
-
-    // Wartości brzegowe i null
-    const snapNull = BrewTimerEngine.getActiveStepSnapshot(null, 15);
-    expect(snapNull.isFinished).toBe(true);
-    expect(snapNull.step).toBeNull();
-
-    // 2. Budżet wydajnościowy
-    const ms = measureCpuMs(() => {
-      for (let i = 0; i < 10000; i++) {
-        BrewTimerEngine.getActiveStepSnapshot(steps, (i * 3) % 200);
-      }
-    });
-
-    expect(ms).toBeLessThan(100);
-  });
-
-  test('Budżet 15: calculateCumulativeWaterSchedule generuje harmonogram narastania wody w czasie poniżej 50 ms (TASK-P84-10-WYD)', () => {
-    const steps = [
-      { stepNumber: 1, namePl: 'Preinfuzja', durationSeconds: 30, targetWaterGrams: 50 },
-      { stepNumber: 2, namePl: 'Oczekiwanie / pauza', durationSeconds: 15, targetWaterGrams: 50 },
-      { stepNumber: 3, namePl: 'Główne zalanie', durationSeconds: 45, targetWaterGrams: 250 },
-    ] as any[];
-
-    // 1. Poprawność biznesowa
-    const schedule: CumulativeWaterPoint[] = BrewTimerEngine.calculateCumulativeWaterSchedule(steps);
-    expect(schedule.length).toBe(3);
-
-    // Krok 1 (Preinfuzja): czas 30s, woda 50g, pourRate = 50 / 30 ≈ 1.7 g/s, isPourStep = true
-    expect(schedule[0].stepIndex).toBe(0);
-    expect(schedule[0].stepNumber).toBe(1);
-    expect(schedule[0].timeSecond).toBe(30);
-    expect(schedule[0].waterGrams).toBe(50);
-    expect(schedule[0].pourRateGramsPerSecond).toBe(1.7);
-    expect(schedule[0].isPourStep).toBe(true);
-
-    // Krok 2 (Pauza): czas 45s (30+15), woda 50g, pourRate = 0 g/s, isPourStep = false
-    expect(schedule[1].stepIndex).toBe(1);
-    expect(schedule[1].timeSecond).toBe(45);
-    expect(schedule[1].waterGrams).toBe(50);
-    expect(schedule[1].pourRateGramsPerSecond).toBe(0);
-    expect(schedule[1].isPourStep).toBe(false);
-
-    // Krok 3 (Główne zalanie): czas 90s (45+45), woda 250g, delta 200g / 45s ≈ 4.4 g/s, isPourStep = true
-    expect(schedule[2].stepIndex).toBe(2);
-    expect(schedule[2].timeSecond).toBe(90);
-    expect(schedule[2].waterGrams).toBe(250);
-    expect(schedule[2].pourRateGramsPerSecond).toBe(4.4);
-    expect(schedule[2].isPourStep).toBe(true);
-
-    // Wartości brzegowe i null
-    const schedNull = BrewTimerEngine.calculateCumulativeWaterSchedule(null);
-    expect(Array.isArray(schedNull)).toBe(true);
-    expect(schedNull.length).toBe(0);
-
-    const schedEmpty = BrewTimerEngine.calculateCumulativeWaterSchedule([]);
-    expect(schedEmpty.length).toBe(0);
-
-    // 2. Budżet wydajnościowy: 10 000 wywołań < 80 ms
-    const ms = measureCpuMs(() => {
-      for (let i = 0; i < 10000; i++) {
-        BrewTimerEngine.calculateCumulativeWaterSchedule(steps);
-      }
-    });
-
+    engine.destroy();
     expect(ms).toBeLessThan(80);
   });
 });

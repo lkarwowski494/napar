@@ -3,6 +3,10 @@ name: Build & Upload to TestFlight (iOS)
 on:
   workflow_dispatch:
     inputs:
+      build_number:
+        description: 'Numer buildu (opcjonalnie; domyślnie najwyższy protokół z docs/jakosc/test-fizyczny/ lub buildNumber + run_number)'
+        required: false
+        default: ''
       notes:
         description: 'Notatka do wydania (opcjonalnie)'
         required: false
@@ -25,16 +29,18 @@ env:
 
 jobs:
   gate:
-    # M1-audytor-generalny-036 (DEC-11 a): wysyłka tylko przy zielonym CI i E2E na tym samym commicie.
+    # M1-audytor-generalny-036 (DEC-11 a) + DEEP-006: wysyłka przy zielonym CI na GITHUB_SHA i E2E na kodowo tożsamym SHA.
     name: CI i E2E zielone na tym SHA
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       actions: read
       contents: read
+    outputs:
+      build_number: ${{ steps.scenarios.outputs.build_number }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -45,15 +51,46 @@ jobs:
         run: node .github/scripts/require-green-runs.mjs "$GITHUB_REPOSITORY" "$GITHUB_SHA"
 
       - name: Bramka scenariuszy użytkownika (D-060)
+        id: scenarios
         env:
           GH_TOKEN: ${{ github.token }}
+          INPUT_BUILD_NUMBER: ${{ inputs.build_number }}
         run: |
           set -euo pipefail
           BUILD_BASE=$(node -p "require('./app.json').expo.ios.buildNumber")
-          BUILD=$((BUILD_BASE + GITHUB_RUN_NUMBER))
-          E2E_RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --commit "$GITHUB_SHA" --workflow e2e-ios.yml --status success --json databaseId --jq '.[0].databaseId')
+          # DEEP-006: numer buildu nie zależy od zmiennego GITHUB_RUN_NUMBER, gdy podano input lub przygotowano protokół F.
+          if [ -n "$INPUT_BUILD_NUMBER" ]; then
+            BUILD="$INPUT_BUILD_NUMBER"
+          else
+            PROTO_BUILD=$(node -e "const fs=require('fs');const d='docs/jakosc/test-fizyczny';const nums=fs.existsSync(d)?fs.readdirSync(d).filter(f=>/^\d+\.md$/.test(f)).map(f=>Number(f.slice(0,-3))):[];console.log(nums.length?Math.max(...nums):'');")
+            if [ -n "$PROTO_BUILD" ] && [ "$PROTO_BUILD" -gt "$BUILD_BASE" ]; then
+              BUILD="$PROTO_BUILD"
+            else
+              BUILD=$((BUILD_BASE + GITHUB_RUN_NUMBER))
+            fi
+          fi
+          if ! [[ "$BUILD" =~ ^[0-9]+$ ]]; then
+            echo "::error::Nieprawidłowy numer buildu: '$BUILD'"
+            exit 1
+          fi
+          echo "build_number=$BUILD" >> "$GITHUB_OUTPUT"
+
+          # DEEP-006: dopasuj SHA E2E do logiki sprawdz-scenariusze.mjs (dopuszczalna różnica wyłącznie w docs/jakosc/).
+          E2E_RUN_ID=""
+          for CAND in $(git rev-list --first-parent -n 20 "$GITHUB_SHA"); do
+            if [ "$CAND" != "$GITHUB_SHA" ]; then
+              NON_DOCS=$(git diff --name-only "$CAND" "$GITHUB_SHA" | grep -v '^docs/jakosc/' || true)
+              if [ -n "$NON_DOCS" ]; then
+                break
+              fi
+            fi
+            E2E_RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --commit "$CAND" --workflow e2e-ios.yml --status success --json databaseId --jq '.[0].databaseId')
+            if [ -n "$E2E_RUN_ID" ] && [ "$E2E_RUN_ID" != "null" ]; then
+              break
+            fi
+          done
           if [ -z "$E2E_RUN_ID" ] || [ "$E2E_RUN_ID" = "null" ]; then
-            echo "::error::Brak zielonego przebiegu e2e-ios.yml na $GITHUB_SHA"
+            echo "::error::Brak zielonego przebiegu e2e-ios.yml na $GITHUB_SHA (ani na przodku różniącym się tylko docs/jakosc/)"
             exit 1
           fi
           gh run download "$E2E_RUN_ID" --repo "$GITHUB_REPOSITORY" -n e2e-wykonane
@@ -72,21 +109,23 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Verify commit is on origin/main
         run: |
-          git fetch origin main --depth=50
+          if ! git show-ref --verify --quiet refs/remotes/origin/main; then
+            git fetch origin main:refs/remotes/origin/main
+          fi
           if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
             echo "::error::Commit $GITHUB_SHA nie jest przodkiem gałęzi origin/main!"
             exit 1
           fi
 
       - name: Setup Node 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm
@@ -118,6 +157,8 @@ jobs:
 
       - name: Compute & set monotonic build number
         id: ver
+        env:
+          GATE_BUILD_NUMBER: ${{ needs.gate.outputs.build_number }}
         run: |
           VERSION=$(node -p "require('./app.json').expo.version")
           if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
@@ -125,7 +166,7 @@ jobs:
             exit 1
           fi
           BUILD_BASE=$(node -p "require('./app.json').expo.ios.buildNumber")
-          BUILD_NUMBER=$((BUILD_BASE + GITHUB_RUN_NUMBER))
+          BUILD_NUMBER="${GATE_BUILD_NUMBER:-$((BUILD_BASE + GITHUB_RUN_NUMBER))}"
           if ! [[ "$BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
             echo "::error::Nieprawidłowy numer buildu: '$BUILD_NUMBER'"
             exit 1
@@ -141,7 +182,7 @@ jobs:
 
       - name: Cache CocoaPods
         id: pods-cache
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: |
             ios/Pods
@@ -184,6 +225,7 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p "$(dirname "$SOURCEMAP_FILE")"
+          set +e
           xcodebuild archive \
             -workspace "ios/$APP_SCHEME.xcworkspace" \
             -scheme "$APP_SCHEME" \
@@ -195,12 +237,15 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             COMPILER_INDEX_STORE_ENABLE=NO \
-            2>&1 | tee /tmp/xcodebuild-archive.log | grep -E "^(===|CompileC|Ld |Touch |RegisterExecutionPolicyException|*\* ARCHIVE|error:|warning:.*\berror\b)" || true
+            > /tmp/xcodebuild-archive.log 2>&1
+          ARCHIVE_RC=$?
+          set -e
+          grep -E "^(===|CompileC|Ld |Touch |RegisterExecutionPolicyException|\*\* ARCHIVE|error:|warning:.*\berror\b)" /tmp/xcodebuild-archive.log || true
 
-          if [ ! -d "$RUNNER_TEMP/$APP_SCHEME.xcarchive/Products/Applications/$APP_SCHEME.app" ]; then
-            echo "::error::Archiwum .xcarchive nie powstało — ostatnie 80 linii logu:"
+          if [ "$ARCHIVE_RC" -ne 0 ] || [ ! -d "$RUNNER_TEMP/$APP_SCHEME.xcarchive/Products/Applications/$APP_SCHEME.app" ]; then
+            echo "::error::Archiwum .xcarchive nie powiodło się (exit=$ARCHIVE_RC) — ostatnie 80 linii logu:"
             tail -80 /tmp/xcodebuild-archive.log
-            exit 1
+            exit $((ARCHIVE_RC != 0 ? ARCHIVE_RC : 1))
           fi
           test -s "$SOURCEMAP_FILE" || echo "::warning::Brak mapy źródeł JS ($SOURCEMAP_FILE) — stos JS z raportu awarii nie da się zmapować"
 
@@ -316,7 +361,7 @@ jobs:
 
       - name: Archive Hermes sourcemaps and dSYM symbols
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: hermes-sourcemaps-dsym-${{ github.run_number }}
           path: |
@@ -326,7 +371,7 @@ jobs:
 
       - name: Upload scrubbed logs on failure only (retention 1 day)
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: testflight-xcodebuild-logs-${{ github.run_number }}
           path: /tmp/xcodebuild-*.log
@@ -336,13 +381,13 @@ jobs:
     name: Create Git Tag
     needs: build
     if: success()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 1
 
@@ -356,7 +401,11 @@ jobs:
             exit 1
           fi
           TAG="v${VERSION}-b${BUILD}"
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "::error::Tag ${TAG} już istnieje w origin — odmowa nadpisania tagu wydania!"
+            exit 1
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -f "$TAG" "$GITHUB_SHA"
-          git push origin "$TAG" --force
+          git tag "$TAG" "$GITHUB_SHA"
+          git push origin "refs/tags/${TAG}"

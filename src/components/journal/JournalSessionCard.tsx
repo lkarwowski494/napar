@@ -193,8 +193,9 @@ export function JournalSessionCard({
 
           <Pressable
             testID={`delete-session-btn-${session.id}`}
+            style={styles.deleteBtn}
             onPress={() => onDelete(session)}
-            hitSlop={{ top: 10, bottom: 10, left: 8, right: 8 }}
+            hitSlop={6}
             accessibilityRole="button"
             accessibilityLabel={`${isEn ? 'Delete session' : 'Usuń sesję'}: ${session.recipeName || session.method}`}
           >
@@ -329,8 +330,10 @@ const styles = StyleSheet.create({
   },
   cardFooter: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
     paddingTop: 10,
@@ -342,14 +345,15 @@ const styles = StyleSheet.create({
   },
   cardActionsRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     gap: 6,
   },
   cardActionBtn: {
     backgroundColor: theme.colors.copperMuted,
     paddingHorizontal: 10,
-    paddingVertical: 6,
-    minHeight: 36,
+    paddingVertical: 8,
+    minHeight: 44,
     justifyContent: 'center',
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
@@ -369,11 +373,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: theme.colors.textSecondary,
   },
+  deleteBtn: {
+    minHeight: 44,
+    paddingHorizontal: 8,
+    justifyContent: 'center',
+  },
   deleteText: {
     fontSize: 12,
     color: theme.colors.danger,
     fontWeight: '600',
-    marginLeft: 4,
   },
   sensoryChartWrapper: {
     alignItems: 'center',

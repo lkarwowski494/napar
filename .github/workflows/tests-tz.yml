@@ -16,7 +16,7 @@ concurrency:
 jobs:
   test-tz:
     name: Jest across Timezones (Single Loop Job)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
 
     env:
@@ -25,12 +25,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
 
       - name: Setup Node 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm
@@ -42,5 +42,5 @@ jobs:
         run: |
           for tz in UTC Europe/Warsaw America/New_York America/Los_Angeles Asia/Tokyo Pacific/Auckland Pacific/Honolulu; do
             echo "=== Uruchamianie w strefie TZ=$tz ($(TZ=$tz date)) ==="
-            TZ=$tz npx jest tests/ --runInBand
+            TZ=$tz npx jest tests/ src/core/__tests__/unit-converter.test.ts --runInBand
           done

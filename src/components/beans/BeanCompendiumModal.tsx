@@ -31,6 +31,7 @@ export interface KnowledgeTemplate {
 export interface BeanCompendiumModalProps {
   visible: boolean;
   onClose: () => void;
+  onDismiss?: () => void;
   beveragePreference?: 'coffee' | 'tea' | 'both';
   onUseTemplate: (template: KnowledgeTemplate) => void;
 }
@@ -38,6 +39,7 @@ export interface BeanCompendiumModalProps {
 export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
   visible,
   onClose,
+  onDismiss,
   beveragePreference,
   onUseTemplate,
 }) => {
@@ -62,7 +64,7 @@ export const BeanCompendiumModal: React.FC<BeanCompendiumModalProps> = ({
   const filteredTeas = searchTeaCategories(compendiumSearch);
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose} onDismiss={onDismiss}>
       <SafeAreaView style={styles.compendiumModalContainer} edges={['top', 'bottom', 'left', 'right']}>
         <ModalHeader
           onClose={onClose}
