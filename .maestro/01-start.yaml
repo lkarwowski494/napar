@@ -13,4 +13,6 @@ name: 01 Start aplikacji z paczką JS (czysty stan)
     id: "app-guide-got-it-btn"
     optional: true
 - assertVisible: "Parzenie, tab, .*"
+- assertVisible:
+    id: "ekran:\\(tabs\\)/index"
 - takeScreenshot: 01-start

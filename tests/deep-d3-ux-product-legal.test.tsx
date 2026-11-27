@@ -184,6 +184,10 @@ describe('DEEP-029 (opcja a): Data palenia, dni od wypału, świeżość i ocena
 });
 
 describe('DEEP-030 (opcja a): Realny eksport plików Share Sheet i import z lokalnych plików JSON', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
   });
@@ -300,6 +304,10 @@ describe('DEEP-030 (opcja a): Realny eksport plików Share Sheet i import z loka
 });
 
 describe('D3: Ulubione receptury, brak fake clipboard, brak duplikatu modala, lokalizacja i a11y', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
   });

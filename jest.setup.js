@@ -101,20 +101,6 @@ Intl.DateTimeFormat.supportedLocalesOf = OriginalDateTimeFormat.supportedLocales
   ? OriginalDateTimeFormat.supportedLocalesOf.bind(OriginalDateTimeFormat)
   : undefined;
 
-// Strict console.error and console.warn interceptor (BR-TEST-018 / FAZA 5.2)
-const origError = console.error;
-const origWarn = console.warn;
-
-console.error = function (...args) {
-  const msg = args.map((a) => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
-  origError.apply(console, args);
-  throw new Error(`[STRICT CONSOLE.ERROR] Wykryto nieoczekiwany console.error w trakcie testu:\n${msg}`);
-};
-
-console.warn = function (...args) {
-  const msg = args.map((a) => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
-  origWarn.apply(console, args);
-  throw new Error(`[STRICT CONSOLE.WARN] Wykryto nieoczekiwany console.warn w trakcie testu:\n${msg}`);
-};
+// Strict console.error & console.warn interception lives in tests/jest-after-env.js (BR-TEST-017, BR-TEST-018)
 
 

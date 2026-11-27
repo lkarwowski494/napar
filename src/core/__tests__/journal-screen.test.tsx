@@ -83,7 +83,16 @@ const mockSessions = [
 
 describe('JournalScreen Integration', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(Share, 'share').mockImplementation(() => Promise.resolve({ action: 'sharedAction' } as any));
+    const db = require('../../data/database');
     (getBrewSessions as jest.Mock).mockReturnValue(mockSessions);
+    db.getAppSetting.mockImplementation(() => null);
+    db.getUnitSystem.mockReturnValue('metric');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   test('Renderuje sesje parzenia z wykrytym Spider Graph sensoryki', () => {

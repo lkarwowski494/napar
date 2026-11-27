@@ -11,6 +11,11 @@ describe('QrScannerModal Component (Zadanie N6)', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
+    (ExpoCamera.useCameraPermissions as jest.Mock).mockReturnValue([
+      { granted: true, canAskAgain: true, status: 'granted' },
+      jest.fn().mockResolvedValue({ granted: true }),
+      jest.fn(),
+    ]);
   });
 
   afterEach(() => {

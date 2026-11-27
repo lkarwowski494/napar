@@ -232,6 +232,126 @@ describe('Unit Converter (DEC-21 Metric / Imperial)', () => {
       expect(formatClockTime('not-a-date', 'en')).toBe('—');
       expect(formatClockTime('2026-11-19T12:30:00Z', 'pl')).not.toBe('—');
     });
+
+    test('D4 Stryker: pełne pokrycie parseLocaleFloat, exact konwersji, formatDecimal, bedtime, delta i wInKeep', () => {
+      const {
+        parseLocaleFloat,
+        ouncesToGramsExact,
+        fluidOuncesToMl,
+        formatDecimal,
+        normalizeBedtimeHourNumber,
+        formatBedtimeHour,
+        formatTemperatureDelta,
+        formatClockTime,
+      } = require('../unit-converter');
+
+      // parseLocaleFloat: BOM/control chars, leading dot, signs, anchored start, -0, Infinity, non-string
+      expect(parseLocaleFloat('\uFEFF 12,5 ')).toBe(12.5);
+      expect(parseLocaleFloat('.5')).toBe(0.5);
+      expect(parseLocaleFloat('+.5')).toBe(0.5);
+      expect(parseLocaleFloat('-3,25')).toBe(-3.25);
+      expect(Number.isNaN(parseLocaleFloat('abc 12'))).toBe(true);
+      expect(Object.is(parseLocaleFloat(-0), 0)).toBe(true);
+      expect(Object.is(parseLocaleFloat('-0'), 0)).toBe(true);
+      expect(Number.isNaN(parseLocaleFloat(Infinity))).toBe(true);
+      expect(Number.isNaN(parseLocaleFloat({}))).toBe(true);
+
+      // 0 boundary for grams/oz/ml/fl oz
+      expect(gramsToOunces(0)).toBe(0);
+      expect(ouncesToGrams(0)).toBe(0);
+      expect(mlToFluidOunces(0)).toBe(0);
+
+      // ouncesToGramsExact & fluidOuncesToMl
+      expect(ouncesToGramsExact(1)).toBe(28.35);
+      expect(ouncesToGramsExact('0,53 oz')).toBe(15.03);
+      expect(ouncesToGramsExact(0)).toBe(0);
+      expect(ouncesToGramsExact(-1)).toBe(0);
+      expect(ouncesToGramsExact(NaN)).toBe(0);
+
+      expect(fluidOuncesToMl(10)).toBe(295.7);
+      expect(fluidOuncesToMl('8,45 fl oz')).toBe(249.9);
+      expect(fluidOuncesToMl(0)).toBe(0);
+      expect(fluidOuncesToMl(-2)).toBe(0);
+      expect(fluidOuncesToMl(NaN)).toBe(0);
+
+      // formatDecimal
+      expect(formatDecimal(1.5)).toBe('1.5');
+      expect(formatDecimal(1.5, 2, 'en')).toBe('1.50');
+      expect(formatDecimal(1.5, 1, 'pl')).toBe('1,5');
+      expect(formatDecimal(12.345, 2, 'pl')).toBe('12,35');
+
+      // formatDoseWeight & formatWaterWeight PL commas and 0 boundaries
+      expect(formatDoseWeight(15.3, 'metric', 'pl')).toBe('15,3g');
+      expect(formatDoseWeight(15, 'imperial', 'pl')).toBe('0,53 oz');
+      expect(formatDoseWeight(0, 'metric', 'pl')).toBe('0g');
+      expect(formatDoseWeight(0, 'imperial', 'pl')).toBe('0 oz');
+      expect(formatWaterWeight(250.5, 'metric', 'pl')).toBe('250,5g');
+      expect(formatWaterWeight(250, 'imperial', 'pl')).toBe('8,45 fl oz');
+      expect(formatWaterWeight(0, 'metric', 'pl')).toBe('0g');
+      expect(formatWaterWeight(0, 'imperial', 'pl')).toBe('0 fl oz');
+
+      // roundTo edge cases
+      expect(roundTo(1.2345, -1)).toBe(1);
+      expect(roundTo(1.2345, NaN as any)).toBe(1);
+      expect(roundTo(1.234567890123, 20)).toBe(1.2345678901);
+      expect(Object.is(roundTo(-0.001, 2), 0)).toBe(true);
+
+      // wInKeep edge cases (non-string, -0 prevBase, anchored regex, trimmed unit, F/°F int vs decimal, 2-decimal oz, no prevBase)
+      expect(wInKeep(null as any, 'g', 15)).toBe(15);
+      expect(Object.is(wInKeep(null as any, 'g', -0), 0)).toBe(true);
+      expect(wInKeep('abc 12', 'g', 15)).toBe(15);
+      expect(wInKeep('\uFEFF .5 ', 'g')).toBe(0.5);
+      expect(wInKeep('1.0', '  OZ  ', 15)).toBe(28.35);
+      expect(wInKeep('10', 'oz')).toBe(283.5);
+      expect(wInKeep('10', 'oz', 0)).toBe(283.5);
+      expect(wInKeep('0.53', 'oz', 15)).toBe(15);
+      expect(wInKeep('0.54', 'oz', 15)).toBe(15.31);
+      expect(wInKeep('199', 'F', 93)).toBe(93);
+      expect(wInKeep('199.0', 'F', 93)).toBe(92.78);
+      expect(wInKeep('199.4', 'f', 93)).toBe(93);
+      expect(wInKeep('212', 'F')).toBe(100);
+      expect(wInKeep('15.1', 'g', 15)).toBe(15.1);
+
+      // normalizeBedtimeHourNumber & formatBedtimeHour
+      expect(normalizeBedtimeHourNumber(24)).toBe('00');
+      expect(normalizeBedtimeHourNumber(25)).toBe('01');
+      expect(normalizeBedtimeHourNumber(-1)).toBe('23');
+      expect(normalizeBedtimeHourNumber(5.9)).toBe('05');
+      expect(normalizeBedtimeHourNumber(NaN)).toBe('23');
+      expect(formatBedtimeHour(24)).toBe('00:00');
+      expect(formatBedtimeHour(7)).toBe('07:00');
+
+      // formatTemperatureDelta
+      expect(formatTemperatureDelta(2)).toBe('2°C');
+      expect(formatTemperatureDelta(2, 'metric')).toBe('2°C');
+      expect(formatTemperatureDelta(2, 'imperial')).toBe('4°F');
+      expect(formatTemperatureDelta(-3, 'imperial')).toBe('-5°F');
+
+      // formatClockTime locale selection
+      const spy = jest.spyOn(Date.prototype, 'toLocaleTimeString').mockReturnValue('12:30');
+      expect(formatClockTime('2026-11-19T12:30:00Z', 'pl')).toBe('12:30');
+      expect(spy).toHaveBeenLastCalledWith('pl-PL', { hour: '2-digit', minute: '2-digit' });
+      expect(formatClockTime('2026-11-19T12:30:00Z', 'en')).toBe('12:30');
+      expect(spy).toHaveBeenLastCalledWith('en-US', { hour: '2-digit', minute: '2-digit' });
+      spy.mockRestore();
+
+      // celsiusToFahrenheit -0 check
+      expect(Object.is(celsiusToFahrenheit(-17.78), 0)).toBe(true);
+      expect(formatTemperature(-0.1, 'metric')).toBe('0°C');
+
+      // Pass 2: multi-digit leading-dot decimals, overflow to Infinity, wInKeep metric non-drift & Fahrenheit decimals
+      expect(parseLocaleFloat('.25')).toBe(0.25);
+      expect(Number.isNaN(parseLocaleFloat('9'.repeat(350)))).toBe(true);
+      expect(wInKeep('.25', 'g')).toBe(0.25);
+      expect(wInKeep('+15', 'g')).toBe(15);
+      expect(wInKeep('9'.repeat(350), 'g', 15)).toBe(15);
+      expect(wInKeep('15.04', 'g', 15)).toBe(15.04);
+      expect(wInKeep('15', 'ml', 15)).toBe(15);
+      expect(wInKeep('100', '°F', -5)).toBe(37.78);
+      expect(wInKeep('0.5', 'oz', NaN)).toBe(14.17);
+      expect(wInKeep('199.05', '°F', 93)).toBe(92.81);
+      expect(wInKeep('200.0', '°F', 93)).toBe(93.33);
+    });
   });
 });
 

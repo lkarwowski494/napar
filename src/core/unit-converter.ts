@@ -42,8 +42,7 @@ export function celsiusToFahrenheit(c: number | string): number {
 export function gramsToOunces(g: number | string): number {
   const numG = parseNumeric(g);
   if (isNaN(numG) || numG <= 0) return 0;
-  const res = parseFloat((numG * 0.03527396195).toFixed(2));
-  return Object.is(res, -0) ? 0 : res;
+  return parseFloat((numG * 0.03527396195).toFixed(2));
 }
 
 /**
@@ -52,8 +51,7 @@ export function gramsToOunces(g: number | string): number {
 export function ouncesToGrams(oz: number | string): number {
   const numOz = parseNumeric(oz);
   if (isNaN(numOz) || numOz <= 0) return 0;
-  const res = Math.round(numOz / 0.03527396195);
-  return Object.is(res, -0) ? 0 : res;
+  return Math.round(numOz / 0.03527396195);
 }
 
 /**
@@ -62,8 +60,7 @@ export function ouncesToGrams(oz: number | string): number {
 export function ouncesToGramsExact(oz: number | string): number {
   const numOz = parseNumeric(oz);
   if (isNaN(numOz) || numOz <= 0) return 0;
-  const res = Number((numOz / 0.03527396195).toFixed(2));
-  return Object.is(res, -0) ? 0 : res;
+  return Number((numOz / 0.03527396195).toFixed(2));
 }
 
 /**
@@ -72,8 +69,7 @@ export function ouncesToGramsExact(oz: number | string): number {
 export function mlToFluidOunces(ml: number | string): number {
   const numMl = parseNumeric(ml);
   if (isNaN(numMl) || numMl <= 0) return 0;
-  const res = parseFloat((numMl * 0.0338140227).toFixed(2));
-  return Object.is(res, -0) ? 0 : res;
+  return parseFloat((numMl * 0.0338140227).toFixed(2));
 }
 
 /**
@@ -82,8 +78,7 @@ export function mlToFluidOunces(ml: number | string): number {
 export function fluidOuncesToMl(flOz: number | string): number {
   const numFlOz = parseNumeric(flOz);
   if (isNaN(numFlOz) || numFlOz <= 0) return 0;
-  const res = Number((numFlOz / 0.0338140227).toFixed(1));
-  return Object.is(res, -0) ? 0 : res;
+  return Number((numFlOz / 0.0338140227).toFixed(1));
 }
 
 /**
@@ -118,7 +113,7 @@ export function formatDoseWeight(
   language: string = 'en'
 ): string {
   const num = parseNumeric(grams);
-  if (isNaN(num) || num < 0 || Object.is(num, -0)) {
+  if (isNaN(num) || num <= 0) {
     return unitSystem === 'imperial' ? '0 oz' : '0g';
   }
   const formatNum = (n: number) => (language === 'pl' ? String(n).replace('.', ',') : String(n));
@@ -137,7 +132,7 @@ export function formatWaterWeight(
   language: string = 'en'
 ): string {
   const num = parseNumeric(grams);
-  if (isNaN(num) || num < 0 || Object.is(num, -0)) {
+  if (isNaN(num) || num <= 0) {
     return unitSystem === 'imperial' ? '0 fl oz' : '0g';
   }
   const formatNum = (n: number) => (language === 'pl' ? String(n).replace('.', ',') : String(n));
@@ -156,9 +151,8 @@ export function roundTo(val: number, decimals: number): number {
   const numDec = parseNumeric(decimals);
   const safeDec = Math.max(0, Math.min(10, Math.floor(isNaN(numDec) ? 0 : numDec)));
   const factor = Math.pow(10, safeDec);
-  let res = Math.round(num * factor) / factor;
-  if (Object.is(res, -0) || res === 0) res = 0;
-  return res;
+  const res = Math.round(num * factor) / factor;
+  return Object.is(res, -0) ? 0 : res;
 }
 
 /**
@@ -173,7 +167,7 @@ export function wInKeep(txt: string, unit: string, prevBase?: number): number {
   const m = clean.match(/^[+-]?(?:\d+(?:\.\d+)?|\.\d+)/);
   if (!m) return safePrev;
   const xIn = parseFloat(m[0]);
-  if (isNaN(xIn) || !isFinite(xIn)) {
+  if (!Number.isFinite(xIn)) {
     return safePrev;
   }
   if (Object.is(xIn, -0)) return 0;

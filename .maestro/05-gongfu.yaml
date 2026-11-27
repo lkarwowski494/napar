@@ -18,9 +18,13 @@ name: 05 Gongfu Cha — wejście z ekranu parzenia (herbata)
     optional: true
 - tapOn:
     id: "gongfu-mode-btn"
+- assertVisible:
+    id: "ekran:gongfu"
 - assertVisible: "START INFUZJI"
 - takeScreenshot: 05-gongfu
 # powrót: gongfu
 # powrót: (tabs)/index
 - tapOn: "Zamknij"
 - assertVisible: "Parzenie, tab, .*"
+- assertVisible:
+    id: "ekran:\\(tabs\\)/index"

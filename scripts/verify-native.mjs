@@ -402,7 +402,10 @@ try {
       'check:matrix',
       'check:corpus',
       'check:licenses',
+      'check:reachability',
       'check:native',
+      'check:scenariusze',
+      'check:tresci',
       'test:coverage',
       'check',
       'verify',
@@ -795,8 +798,7 @@ try {
       // Orientacja pionowa i pełny ekran
       if (appJson.ios?.supportsTablet === false) {
         check(
-          /<key>UIRequiresFullScreen<\/key>\s*<true\/>/.test(plist) ||
-            appJson.ios?.requireFullScreen === true,
+          /<key>UIRequiresFullScreen<\/key>\s*<true\/>/.test(plist),
           'Info.plist musi mieć UIRequiresFullScreen = true przy supportsTablet: false'
         );
         check(

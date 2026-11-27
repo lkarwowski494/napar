@@ -3,6 +3,8 @@
 // Matematyka remineralizacji wody dla kawy specialty i herbaty (SCA & Barista Hustle) [T:SCA-WATER-STD] [T:BH-WATER-2016] [T:HENDON-WATER-2015]
 // ============================================================================
 
+import { parseLocaleFloat } from './unit-converter';
+
 export interface WaterRecipe {
   id: string;
   namePl: string;
@@ -228,10 +230,10 @@ export function getWaterProfileName(id: string, language: 'pl' | 'en' | string =
   const cleanId = id.trim();
   if (!cleanId) return '';
   const cleanLang = typeof language === 'string' ? language.trim().toLowerCase() : 'pl';
-  const isEn = cleanLang === 'en' || cleanLang.startsWith('en');
+  const isEn = cleanLang.startsWith('en');
   const recipe = findWaterRecipeById(cleanId);
   if (recipe) {
-    return isEn ? (recipe.nameEn || recipe.namePl) : (recipe.namePl || recipe.nameEn);
+    return isEn ? recipe.nameEn : recipe.namePl;
   }
   const bottled = findBottledWaterById(cleanId);
   if (bottled) {
@@ -265,49 +267,31 @@ export function calculateWaterMinerals(
   targetGh: number | string,
   targetKh: number | string
 ): WaterCalculationResult {
-  const rawVol =
-    typeof waterVolumeLiters !== 'number' && typeof waterVolumeLiters !== 'string'
-      ? NaN
-      : (typeof waterVolumeLiters === 'string' ? parseFloat(waterVolumeLiters.trim().replace(/,/g, '.')) : waterVolumeLiters);
-  const rawGh =
-    typeof targetGh !== 'number' && typeof targetGh !== 'string'
-      ? NaN
-      : (typeof targetGh === 'string' ? parseFloat(targetGh.trim().replace(/,/g, '.')) : targetGh);
-  const rawKh =
-    typeof targetKh !== 'number' && typeof targetKh !== 'string'
-      ? NaN
-      : (typeof targetKh === 'string' ? parseFloat(targetKh.trim().replace(/,/g, '.')) : targetKh);
-  let vol = Number.isFinite(rawVol) && rawVol > 0 && !Object.is(rawVol, -0) ? Math.max(0.1, Math.min(1000.0, rawVol)) : 1.0;
-  if (Object.is(vol, -0)) vol = 1.0;
-  let gh = Number.isFinite(rawGh) && rawGh >= 0 && !Object.is(rawGh, -0) ? Math.max(0, Math.min(5000, rawGh)) : 0;
-  let kh = Number.isFinite(rawKh) && rawKh >= 0 && !Object.is(rawKh, -0) ? Math.max(0, Math.min(5000, rawKh)) : 0;
-  if (Object.is(gh, -0)) gh = 0;
-  if (Object.is(kh, -0)) kh = 0;
+  const rawVol = parseLocaleFloat(waterVolumeLiters);
+  const rawGh = parseLocaleFloat(targetGh);
+  const rawKh = parseLocaleFloat(targetKh);
+  const vol = rawVol > 0 ? Math.max(0.1, Math.min(1000.0, rawVol)) : 1.0;
+  const gh = rawGh >= 0 ? Math.max(0, Math.min(5000, rawGh)) : 0;
+  const kh = rawKh >= 0 ? Math.max(0, Math.min(5000, rawKh)) : 0;
 
   // Koncentraty Barista Hustle [T:BH-WATER-2016]: 1,68 g NaHCO3 i 2,45 g soli Epsom, każda w 1 L wody
   // demineralizowanej = 1000 ppm (jako CaCO3), więc 1 g koncentratu w 1 L gotowej wody = 1 ppm KH/GH.
-  let concentrateBuffer = Number((kh * vol).toFixed(1));
-  let concentrateHardness = Number((gh * vol).toFixed(1));
-  if (Object.is(concentrateBuffer, -0) || concentrateBuffer < 0 || !Number.isFinite(concentrateBuffer)) concentrateBuffer = 0;
-  if (Object.is(concentrateHardness, -0) || concentrateHardness < 0 || !Number.isFinite(concentrateHardness)) concentrateHardness = 0;
+  const concentrateBuffer = Number((kh * vol).toFixed(1));
+  const concentrateHardness = Number((gh * vol).toFixed(1));
 
   // Waga suchych soli do bezpośredniego rozpuszczenia:
   // NaHCO3: 1 ppm KH = 0.00168 g NaHCO3 na 1L
-  let dryNaHCO3 = Number((kh * 0.00168 * vol).toFixed(3));
-  if (Object.is(dryNaHCO3, -0) || dryNaHCO3 < 0 || !Number.isFinite(dryNaHCO3)) dryNaHCO3 = 0;
+  const dryNaHCO3 = Number((kh * 0.00168 * vol).toFixed(3));
 
   // MgSO4*7H2O: 2,45 g na 1 L = 1000 ppm GH, czyli 0.00245 g na 1 ppm na 1 L [T:BH-WATER-2016] (M1-audytor-generalny-018)
-  let dryMgSO4 = Number((gh * 0.00245 * vol).toFixed(3));
-  if (Object.is(dryMgSO4, -0) || dryMgSO4 < 0 || !Number.isFinite(dryMgSO4)) dryMgSO4 = 0;
+  const dryMgSO4 = Number((gh * 0.00245 * vol).toFixed(3));
 
   // CaCl2*2H2O (wapń): 1 ppm GH = 0.00147 g na 1L
-  let dryCaCl2 = Number((gh * 0.00147 * vol).toFixed(3));
-  if (Object.is(dryCaCl2, -0) || dryCaCl2 < 0 || !Number.isFinite(dryCaCl2)) dryCaCl2 = 0;
+  const dryCaCl2 = Number((gh * 0.00147 * vol).toFixed(3));
 
   const totalWaterGrams = vol * 1000;
   const rawBaseWater = totalWaterGrams - concentrateBuffer - concentrateHardness;
-  let baseWater = rawBaseWater <= 0 || !Number.isFinite(rawBaseWater) ? 0 : Number(rawBaseWater.toFixed(1));
-  if (Object.is(baseWater, -0)) baseWater = 0;
+  const baseWater = rawBaseWater <= 0 ? 0 : Number(rawBaseWater.toFixed(1));
 
   return {
     waterVolumeLiters: vol,
@@ -355,12 +339,8 @@ export function diagnoseWaterSensoryImpact(
       recommendationEn: 'Enter valid positive numerical values for GH hardness and KH buffer.',
     };
   }
-  const rawGh = typeof ghPpm === 'string' ? parseFloat(ghPpm.trim().replace(/,/g, '.')) : Number(ghPpm);
-  const rawKh = typeof khPpm === 'string' ? parseFloat(khPpm.trim().replace(/,/g, '.')) : Number(khPpm);
-  let safeGh = Number.isFinite(rawGh) ? rawGh : NaN;
-  let safeKh = Number.isFinite(rawKh) ? rawKh : NaN;
-  if (Object.is(safeGh, -0)) safeGh = 0;
-  if (Object.is(safeKh, -0)) safeKh = 0;
+  const safeGh = parseLocaleFloat(ghPpm);
+  const safeKh = parseLocaleFloat(khPpm);
 
   if (!Number.isFinite(safeGh) || !Number.isFinite(safeKh) || safeGh < 0 || safeKh < 0) {
     return {
@@ -442,13 +422,10 @@ export function diagnoseWaterSensoryImpact(
  * Konwertuje twardość z ppm CaCO3 na stopnie niemieckie dH (1 dH = 17.848 ppm CaCO3)
  */
 export function ppmCaCO3ToDegreesDH(ppm: number | string): number {
-  if (typeof ppm !== 'number' && typeof ppm !== 'string') return 0;
-  const numPpm = typeof ppm === 'string' ? parseFloat(ppm.trim().replace(/,/g, '.')) : ppm;
-  if (!Number.isFinite(numPpm) || numPpm <= 0 || Object.is(numPpm, -0)) return 0;
+  const numPpm = parseLocaleFloat(ppm);
+  if (!(numPpm > 0)) return 0;
   const safePpm = Math.min(10000, numPpm);
-  let result = Number((safePpm / 17.848).toFixed(4));
-  if (Object.is(result, -0)) result = 0;
-  return result;
+  return Number((safePpm / 17.848).toFixed(4));
 }
 
 const RECIPE_ALIASES: Record<string, string> = {
@@ -485,32 +462,23 @@ export function findWaterRecipeById(id: string): WaterRecipe | undefined {
   const cleanId = id.trim().toLowerCase();
   if (!cleanId) return undefined;
   const underscoreId = cleanId.replace(/-/g, '_');
-  const hyphenId = cleanId.replace(/_/g, '-');
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
   const aliasId = RECIPE_ALIASES[normId] || RECIPE_ALIASES[normId.replace(/[\s_-]+/g, '')];
   if (aliasId) {
-    const directMatch = WATER_RECIPES.find((r) => r.id === aliasId);
-    if (directMatch) return directMatch;
+    return WATER_RECIPES.find((r) => r.id === aliasId);
   }
 
   return WATER_RECIPES.find((r) => {
-    if (!r || typeof r !== 'object') return false;
-    if (typeof r.id === 'string') {
-      const rIdLower = r.id.toLowerCase();
-      if (rIdLower === cleanId || rIdLower === underscoreId || rIdLower === hyphenId) return true;
-    }
-    if (typeof r.namePl === 'string') {
-      const plClean = r.namePl.toLowerCase();
-      const plNorm = r.namePl.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      if (plClean === cleanId || plNorm === normId || plClean.includes(cleanId) || cleanId.includes(plClean)) return true;
-    }
-    if (typeof r.nameEn === 'string') {
-      const enClean = r.nameEn.toLowerCase();
-      const enNorm = r.nameEn.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      if (enClean === cleanId || enNorm === normId || enClean.includes(cleanId) || cleanId.includes(enClean)) return true;
-    }
-    return false;
+    const rIdLower = r.id.toLowerCase();
+    if (rIdLower === cleanId || rIdLower === underscoreId) return true;
+
+    const plClean = r.namePl.toLowerCase();
+    const plNorm = plClean.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (plClean.includes(cleanId) || plNorm.includes(normId) || cleanId.includes(plClean)) return true;
+
+    const enClean = r.nameEn.toLowerCase();
+    return enClean.includes(cleanId) || cleanId.includes(enClean);
   });
 }
 
@@ -559,28 +527,22 @@ export function findBottledWaterById(id: string): BottledWaterProfile | undefine
   const cleanId = id.trim().toLowerCase();
   if (!cleanId) return undefined;
   const underscoreId = cleanId.replace(/-/g, '_');
-  const hyphenId = cleanId.replace(/_/g, '-');
   const normId = cleanId.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
   const aliasId = BOTTLED_ALIASES[normId] || BOTTLED_ALIASES[normId.replace(/[\s_-]+/g, '')];
   if (aliasId) {
-    const directMatch = BOTTLED_WATER_BENCHMARKS.find((w) => w.id === aliasId);
-    if (directMatch) return directMatch;
+    return BOTTLED_WATER_BENCHMARKS.find((w) => w.id === aliasId);
   }
 
   return BOTTLED_WATER_BENCHMARKS.find((w) => {
-    if (!w || typeof w !== 'object') return false;
-    if (typeof w.id === 'string') {
-      const wIdLower = w.id.toLowerCase();
-      if (wIdLower === cleanId || wIdLower === underscoreId || wIdLower === hyphenId) return true;
-    }
-    if (typeof w.brandName === 'string') {
-      const brandClean = w.brandName.toLowerCase();
-      const brandNorm = w.brandName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      if (brandClean === cleanId || brandNorm === normId || brandClean.includes(cleanId) || cleanId.includes(brandClean)) return true;
-      const tokens = brandNorm.split(/[\s/(),-]+/).filter(Boolean);
-      if (tokens.some((tok) => tok === normId || (tok.length >= 3 && cleanId.includes(tok)))) return true;
-    }
-    return false;
+    const wIdLower = w.id.toLowerCase();
+    if (wIdLower === cleanId || wIdLower === underscoreId) return true;
+
+    const brandClean = w.brandName.toLowerCase();
+    const brandNorm = brandClean.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (brandClean.includes(cleanId) || brandNorm.includes(normId) || cleanId.includes(brandClean)) return true;
+
+    const tokens = brandNorm.split(/[\s/(),-]+/).filter(Boolean);
+    return tokens.some((tok) => tok === normId || (tok.length >= 3 && cleanId.includes(tok)));
   });
 }

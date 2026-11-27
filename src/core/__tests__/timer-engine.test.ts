@@ -143,13 +143,11 @@ describe('BrewTimerEngine', () => {
     engine.destroy();
   });
 
-  test('setSteps, setCallbacks, setHapticsEnabled, setSoundEnabled oraz reset()', () => {
-    const engine = new BrewTimerEngine(testSteps);
+  test('setHapticsEnabled, setSoundEnabled oraz reset()', () => {
+    const onTick = jest.fn();
+    const engine = new BrewTimerEngine(testSteps, { onTick });
     engine.setHapticsEnabled(false);
     engine.setSoundEnabled(false);
-
-    const onTick = jest.fn();
-    engine.setCallbacks({ onTick });
 
     engine.start();
     expect(onTick).toHaveBeenCalled();
@@ -157,19 +155,6 @@ describe('BrewTimerEngine', () => {
     engine.reset();
     expect(engine.getSnapshot().status).toBe('idle');
     expect(engine.getSnapshot().totalElapsedSeconds).toBe(0);
-
-    const newSteps: RecipeStep[] = [
-      {
-        stepNumber: 1,
-        namePl: 'Pojedynczy Krok',
-        targetWaterGrams: 100,
-        durationSeconds: 40,
-        instructionPl: 'Zalej',
-      },
-    ];
-    engine.setSteps(newSteps);
-    expect(engine.getSnapshot().totalSteps).toBe(1);
-    expect(engine.getSnapshot().currentStep?.namePl).toBe('Pojedynczy Krok');
 
     engine.destroy();
   });
@@ -376,42 +361,335 @@ describe('BrewTimerEngine', () => {
       engine.destroy();
     });
 
-    test('TASK-P65-10-WYD: calculateTotalRecipeDuration i calculateTotalTargetWater wyliczają metryki bez alokacji', () => {
-      expect(BrewTimerEngine.calculateTotalRecipeDuration(testSteps)).toBe(90);
-      expect(BrewTimerEngine.calculateTotalTargetWater(testSteps)).toBe(250.0);
+    test('D4 Stryker: pełna weryfikacja cyklu życia, audio, haptyki, keepAwake, AppState, resetCurrentStep i korekt', () => {
+      const timerPlatform = require('../../platform/timer-platform');
+      const playChimeSpy = jest.spyOn(timerAudioModule, 'playTimerChime').mockResolvedValue(true);
+      const stopChimeSpy = jest.spyOn(timerAudioModule, 'stopTimerChime').mockImplementation(() => {});
+      const hapticSpy = jest.spyOn(timerPlatform, 'triggerTimerHaptic').mockImplementation(() => {});
+      const activateAwakeSpy = jest.spyOn(timerPlatform, 'activateTimerKeepAwake').mockImplementation(() => {});
+      const deactivateAwakeSpy = jest.spyOn(timerPlatform, 'deactivateTimerKeepAwake').mockImplementation(() => {});
+      const removeSubMock = jest.fn();
+      let appActiveCb: (() => void) | null = null;
+      const appListenerSpy = jest.spyOn(timerPlatform, 'addAppActiveListener').mockImplementation((cb: any) => {
+        appActiveCb = cb;
+        return { remove: removeSubMock };
+      });
 
-      // Edge cases & null safety
-      expect(BrewTimerEngine.calculateTotalRecipeDuration(null)).toBe(0);
-      expect(BrewTimerEngine.calculateTotalRecipeDuration(undefined)).toBe(0);
-      expect(BrewTimerEngine.calculateTotalRecipeDuration([])).toBe(0);
-      expect(BrewTimerEngine.calculateTotalTargetWater(null)).toBe(0);
-      expect(BrewTimerEngine.calculateTotalTargetWater([])).toBe(0);
+      const onTick = jest.fn();
+      const onStepChange = jest.fn();
+      const onWarning = jest.fn();
+      const onFinish = jest.fn();
+      const engine = new BrewTimerEngine(testSteps, { onTick, onStepChange, onWarning, onFinish });
 
-      const invalidSteps: any[] = [
-        { durationSeconds: NaN, targetWaterGrams: -50 },
-        { durationSeconds: -15, targetWaterGrams: NaN },
-        { durationSeconds: 45.8, targetWaterGrams: 300.25 },
-        { durationSeconds: 10, targetWaterGrams: 100 },
-      ];
-      expect(BrewTimerEngine.calculateTotalRecipeDuration(invalidSteps)).toBe(55); // floor(45.8) + 10 = 55
-      expect(BrewTimerEngine.calculateTotalTargetWater(invalidSteps)).toBe(300.3); // max rounded to 1 decimal place
+      // pause/resume/syncWithRealTime/previousStep are no-ops in idle
+      engine.pause();
+      engine.resume();
+      engine.syncWithRealTime();
+      engine.previousStep();
+      expect(engine.getSnapshot().status).toBe('idle');
+      expect(engine.getSnapshot().isLastStep).toBe(false);
+      expect(onTick).not.toHaveBeenCalled();
+
+      // start activates keepAwake, registers AppState listener, triggers start haptic & stepChange
+      engine.start();
+      expect(activateAwakeSpy).toHaveBeenCalledTimes(1);
+      expect(appListenerSpy).toHaveBeenCalledTimes(1);
+      expect(hapticSpy).toHaveBeenCalledWith('start');
+      expect(onStepChange).toHaveBeenCalledTimes(1);
+
+      // calling start() while already running is a no-op
+      engine.start();
+      expect(activateAwakeSpy).toHaveBeenCalledTimes(1);
+      expect(onStepChange).toHaveBeenCalledTimes(1);
+
+      // 250ms tick with no whole-second change does NOT emit redundant onTick
+      const ticksAfterStart = onTick.mock.calls.length;
+      jest.advanceTimersByTime(250);
+      expect(onTick.mock.calls.length).toBe(ticksAfterStart);
+
+      // Advance 15s (halfway through 30s step -> progress = 0.5, currentWaterGrams = 25)
+      jest.advanceTimersByTime(14750);
+      const midSnap = engine.getSnapshot();
+      expect(midSnap.stepElapsedSeconds).toBe(15);
+      expect(midSnap.stepProgress).toBeCloseTo(0.5, 2);
+      expect(midSnap.currentWaterGrams).toBe(25);
+      expect(midSnap.totalElapsedSeconds).toBe(15);
+
+      // AppState callback triggers syncWithRealTime while running
+      jest.setSystemTime(Date.now() + 2000);
+      appActiveCb!();
+      expect(engine.getSnapshot().stepElapsedSeconds).toBe(17);
+
+      // Pause saves pausedTotalElapsedMs, deactivates keepAwake, removes listener
+      engine.pause();
+      expect(deactivateAwakeSpy).toHaveBeenCalledTimes(1);
+      expect(removeSubMock).toHaveBeenCalledTimes(1);
+      const ticksAfterPause = onTick.mock.calls.length;
+      // Calling pause() again is no-op; AppState cb while paused is no-op
+      engine.pause();
+      expect(onTick.mock.calls.length).toBe(ticksAfterPause);
+      appActiveCb!();
+      expect(engine.getSnapshot().stepElapsedSeconds).toBe(17);
+
+      // Idle 10s while paused -> resume preserves totalElapsedSeconds accurately
+      jest.advanceTimersByTime(10000);
+      engine.resume();
+      jest.advanceTimersByTime(3000);
+      expect(engine.getSnapshot().totalElapsedSeconds).toBe(20);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(10);
+
+      // adjustStepDuration while running: -7s -> 3s remaining, triggers warning on next tick
+      engine.adjustStepDuration(-7);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(3);
+      jest.advanceTimersByTime(1000); // 2s left -> warning & chime once
+      expect(onWarning).toHaveBeenCalledWith(2);
+      expect(hapticSpy).toHaveBeenCalledWith('warning');
+      expect(playChimeSpy).toHaveBeenCalledTimes(1);
+      jest.advanceTimersByTime(1000); // 1s left -> warning fired again, chime NOT repeated for same step
+      expect(onWarning).toHaveBeenCalledWith(1);
+      expect(playChimeSpy).toHaveBeenCalledTimes(1);
+
+      // adjustStepDuration back up (>3s) resets chimePlayedForStep/lastWarningKey
+      engine.adjustStepDuration(10);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(11);
+      // Adjust down to 2s and test <=3 branch
+      engine.adjustStepDuration(-9);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(2);
+
+      // resetCurrentStep while running with custom duration & invalid duration
+      engine.resetCurrentStep(20);
+      expect(engine.getSnapshot().currentStep?.durationSeconds).toBe(20);
+      expect(engine.getSnapshot().stepElapsedSeconds).toBe(0);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(20);
+      engine.resetCurrentStep(-5);
+      expect(engine.getSnapshot().currentStep?.durationSeconds).toBe(20);
+      jest.advanceTimersByTime(5000);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(15);
+
+      // resetCurrentStep while paused updates pausedRemainingMs
+      engine.pause();
+      engine.resetCurrentStep(25);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(25);
+      engine.resume();
+      jest.advanceTimersByTime(5000);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(20);
+
+      // nextStep & previousStep while running update stepEndAtMs & fire callbacks
+      onStepChange.mockClear();
+      hapticSpy.mockClear();
+      engine.nextStep();
+      expect(engine.getSnapshot().currentStepIndex).toBe(1);
+      expect(engine.getSnapshot().isLastStep).toBe(true);
+      expect(hapticSpy).toHaveBeenCalledWith('step');
+      expect(onStepChange).toHaveBeenCalledWith(1, expect.objectContaining({ namePl: 'Główne zalanie' }));
+      jest.advanceTimersByTime(5000);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(55);
+
+      onStepChange.mockClear();
+      engine.previousStep();
+      expect(engine.getSnapshot().currentStepIndex).toBe(0);
+      expect(onStepChange).toHaveBeenCalledWith(0, expect.objectContaining({ namePl: 'Preinfuzja' }));
+      jest.advanceTimersByTime(5000);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(20);
+
+      // Auto-advance into step 1 fires step haptic & onStepChange
+      hapticSpy.mockClear();
+      onStepChange.mockClear();
+      jest.advanceTimersByTime(25000);
+      expect(engine.getSnapshot().currentStepIndex).toBe(1);
+      expect(hapticSpy).toHaveBeenCalledWith('step');
+      expect(onStepChange).toHaveBeenCalledWith(1, expect.objectContaining({ namePl: 'Główne zalanie' }));
+
+      // Finish triggers finish haptic, sound chime, deactivateKeepAwake, onFinish
+      hapticSpy.mockClear();
+      playChimeSpy.mockClear();
+      engine.finish();
+      expect(engine.getSnapshot().status).toBe('finished');
+      expect(hapticSpy).toHaveBeenCalledWith('finish');
+      expect(playChimeSpy).toHaveBeenCalledTimes(1);
+      expect(onFinish).toHaveBeenCalledTimes(1);
+
+      // Restart from finished resets step index & elapsed to 0
+      engine.setHapticsEnabled(false);
+      engine.setSoundEnabled(false);
+      hapticSpy.mockClear();
+      playChimeSpy.mockClear();
+      engine.start();
+      expect(engine.getSnapshot().status).toBe('running');
+      expect(engine.getSnapshot().currentStepIndex).toBe(0);
+      expect(engine.getSnapshot().totalElapsedSeconds).toBe(0);
+      expect(hapticSpy).not.toHaveBeenCalled();
+      engine.finish();
+      expect(playChimeSpy).not.toHaveBeenCalled();
+
+      // Empty engine resetCurrentStep is safe no-op
+      const empty = new BrewTimerEngine([]);
+      expect(() => empty.resetCurrentStep(10)).not.toThrow();
+
+      // Reset & destroy call stopTimerChime and deactivateKeepAwake
+      stopChimeSpy.mockClear();
+      engine.reset();
+      expect(stopChimeSpy).toHaveBeenCalledTimes(1);
+      engine.destroy();
+      expect(stopChimeSpy).toHaveBeenCalledTimes(2);
+
+      playChimeSpy.mockRestore();
+      stopChimeSpy.mockRestore();
+      hapticSpy.mockRestore();
+      activateAwakeSpy.mockRestore();
+      deactivateAwakeSpy.mockRestore();
+      appListenerSpy.mockRestore();
     });
 
-    test('TASK-P70-10-WYD: calculateRemainingRecipeTime wylicza pozostały czas procedury bez alokacji', () => {
-      // testSteps: 30s + 60s = 90s
-      // Krok 0, upłynęło 10s -> (30 - 10) + 60 = 80s
-      expect(BrewTimerEngine.calculateRemainingRecipeTime(testSteps, 0, 10)).toBe(80);
-      // Krok 0, upłynęło 30s -> 0 + 60 = 60s
-      expect(BrewTimerEngine.calculateRemainingRecipeTime(testSteps, 0, 30)).toBe(60);
-      // Krok 1, upłynęło 15s -> 60 - 15 = 45s
-      expect(BrewTimerEngine.calculateRemainingRecipeTime(testSteps, 1, 15)).toBe(45);
-      // Krok poza zakresem -> 0s
-      expect(BrewTimerEngine.calculateRemainingRecipeTime(testSteps, 2, 0)).toBe(0);
+    test('D4 Stryker (pass 2): clearInterval, removeSub, deactivateKeepAwake, notifyTick, clampowanie korekt i ostrzeżenie po korekcie', () => {
+      const timerPlatform = require('../../platform/timer-platform');
+      const playChimeSpy = jest.spyOn(timerAudioModule, 'playTimerChime').mockResolvedValue(true);
+      const deactivateAwakeSpy = jest.spyOn(timerPlatform, 'deactivateTimerKeepAwake').mockImplementation(() => {});
+      const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+      const removeSubMock = jest.fn();
+      const appListenerSpy = jest.spyOn(timerPlatform, 'addAppActiveListener').mockImplementation(() => ({
+        remove: removeSubMock,
+      }));
 
-      // Null safety & edge cases
-      expect(BrewTimerEngine.calculateRemainingRecipeTime(null, 0, 0)).toBe(0);
-      expect(BrewTimerEngine.calculateRemainingRecipeTime([], 0, 0)).toBe(0);
-      expect(BrewTimerEngine.calculateRemainingRecipeTime(testSteps, -1, -5)).toBe(90);
+      const onTick = jest.fn();
+      const onWarning = jest.fn();
+      const engine = new BrewTimerEngine(testSteps, { onTick, onWarning });
+
+      // 1. Synchronous notifyTick on adjustStepDuration / resetCurrentStep / nextStep / previousStep / reset / finish
+      engine.start();
+      jest.advanceTimersByTime(10000); // 10s elapsed, 20s remaining
+
+      // Clamp adjustStepDuration below elapsed + 1 -> durationSeconds === 11 (not 9), remaining === 1
+      onTick.mockClear();
+      engine.adjustStepDuration(-100);
+      expect(onTick).toHaveBeenCalledTimes(1);
+      expect(engine.getSnapshot().currentStep?.durationSeconds).toBe(11);
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(1);
+
+      // Pause -> adjustStepDuration(+20) & adjustStepDuration(-100) clamp pausedRemainingMs
+      onTick.mockClear();
+      engine.pause();
+      expect(onTick).toHaveBeenCalledTimes(1);
+      expect(clearIntervalSpy).toHaveBeenCalled();
+
+      engine.adjustStepDuration(20); // duration=31, remaining=21
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(21);
+      engine.adjustStepDuration(-100); // clamped to remaining=1s
+      expect(engine.getSnapshot().stepRemainingSeconds).toBe(1);
+      engine.resume();
+      jest.advanceTimersByTime(1000);
+      expect(engine.getSnapshot().currentStepIndex).toBe(1);
+
+      // 2. Warning key re-arming when adjusting inside <=3s and back above >3s
+      engine.reset();
+      expect(removeSubMock).toHaveBeenCalled();
+      expect(deactivateAwakeSpy).toHaveBeenCalled();
+      onTick.mockClear();
+      engine.resetCurrentStep(0); // invalid 0 -> unchanged (11s)
+      expect(onTick).toHaveBeenCalledTimes(1);
+      expect(engine.getSnapshot().currentStep?.durationSeconds).toBe(11);
+      engine.resetCurrentStep(10); // idle resetCurrentStep
+      expect(engine.getSnapshot().currentStep?.durationSeconds).toBe(10);
+
+      playChimeSpy.mockClear();
+      onWarning.mockClear();
+      engine.start();
+      jest.advanceTimersByTime(8000); // 2s left -> warning(2) & chime #1
+      expect(onWarning).toHaveBeenCalledWith(2);
+      expect(playChimeSpy).toHaveBeenCalledTimes(1);
+
+      // Adjust +1s -> 3s remaining (<= 3, key changes from 0:2 to 0:3 -> re-arms warning)
+      onWarning.mockClear();
+      engine.adjustStepDuration(1);
+      engine.syncWithRealTime();
+      expect(onWarning).toHaveBeenCalledWith(3);
+
+      // Adjust +5s -> 8s remaining (> 3 -> resets chimePlayedForStep so chime fires again at <=3s)
+      engine.adjustStepDuration(5);
+      jest.advanceTimersByTime(5000); // now 3s left -> chime #2!
+      expect(playChimeSpy).toHaveBeenCalledTimes(2);
+
+      // 3. nextStep / previousStep while paused emit notifyTick and do NOT start ticking
+      engine.pause();
+      onTick.mockClear();
+      engine.nextStep();
+      expect(onTick).toHaveBeenCalledTimes(1);
+      expect(engine.getSnapshot().currentStepIndex).toBe(1);
+      onTick.mockClear();
+      engine.previousStep();
+      expect(onTick).toHaveBeenCalledTimes(1);
+      expect(engine.getSnapshot().currentStepIndex).toBe(0);
+
+      // 4. finish() clears interval, removes listener, deactivates keepAwake, emits notifyTick
+      engine.resume();
+      clearIntervalSpy.mockClear();
+      removeSubMock.mockClear();
+      deactivateAwakeSpy.mockClear();
+      onTick.mockClear();
+      engine.finish();
+      expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+      expect(removeSubMock).toHaveBeenCalledTimes(1);
+      expect(deactivateAwakeSpy).toHaveBeenCalledTimes(1);
+      expect(onTick).toHaveBeenCalledTimes(1);
+
+      // 5. reset() while running clears interval, removes listener, deactivates keepAwake, emits notifyTick
+      engine.start();
+      clearIntervalSpy.mockClear();
+      removeSubMock.mockClear();
+      deactivateAwakeSpy.mockClear();
+      onTick.mockClear();
+      engine.reset();
+      expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+      expect(removeSubMock).toHaveBeenCalledTimes(1);
+      expect(deactivateAwakeSpy).toHaveBeenCalledTimes(1);
+      expect(onTick).toHaveBeenCalledTimes(1);
+
+      // resetCurrentStep with NaN, Infinity, non-number leaves duration unchanged
+      const durBefore = engine.getSnapshot().currentStep?.durationSeconds;
+      engine.resetCurrentStep(NaN);
+      engine.resetCurrentStep(Infinity);
+      engine.resetCurrentStep('20' as any);
+      expect(engine.getSnapshot().currentStep?.durationSeconds).toBe(durBefore);
+
+      // adjustStepDuration(0) at same warning second keeps lastWarningKey (does NOT re-fire warning)
+      engine.resetCurrentStep(10);
+      engine.start();
+      onWarning.mockClear();
+      jest.advanceTimersByTime(8000); // 3s i 2s -> 2 wywołania onWarning
+      expect(onWarning).toHaveBeenCalledTimes(2);
+      engine.adjustStepDuration(0);
+      engine.syncWithRealTime();
+      expect(onWarning).toHaveBeenCalledTimes(2);
+
+      // 6. destroy() while running clears interval, removes listener, deactivates keepAwake
+      clearIntervalSpy.mockClear();
+      removeSubMock.mockClear();
+      deactivateAwakeSpy.mockClear();
+      engine.destroy();
+      expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+      expect(removeSubMock).toHaveBeenCalledTimes(1);
+      expect(deactivateAwakeSpy).toHaveBeenCalledTimes(1);
+
+      // 6. getSnapshot edge cases: zero water & zero duration
+      const edgeEngine = new BrewTimerEngine([
+        { stepNumber: 1, namePl: 'S1', targetWaterGrams: 0, durationSeconds: 0, instructionPl: '' },
+        { stepNumber: 2, namePl: 'S2', targetWaterGrams: 0, durationSeconds: 10, instructionPl: '' },
+      ]);
+      const s0 = edgeEngine.getSnapshot();
+      expect(s0.previousWaterGrams).toBe(0);
+      expect(s0.targetWaterGrams).toBe(0);
+      expect(s0.stepRemainingSeconds).toBe(1);
+      expect(s0.recommendedPourRate).toBe(0);
+      edgeEngine.nextStep();
+      const s1 = edgeEngine.getSnapshot();
+      expect(s1.previousWaterGrams).toBe(0);
+      expect(s1.recommendedPourRate).toBe(0);
+      edgeEngine.destroy();
+
+      playChimeSpy.mockRestore();
+      deactivateAwakeSpy.mockRestore();
+      clearIntervalSpy.mockRestore();
+      appListenerSpy.mockRestore();
     });
   });
 });

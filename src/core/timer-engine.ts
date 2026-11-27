@@ -38,32 +38,6 @@ export interface TimerCallbacks {
   onFinish?: () => void;
 }
 
-export interface StepTimeWindow {
-  stepIndex: number;
-  startSecond: number;
-  endSecond: number;
-  durationSeconds: number;
-  isValidStep: boolean;
-}
-
-export interface ActiveStepSnapshot {
-  stepIndex: number;
-  step: RecipeStep | null;
-  stepElapsedSeconds: number;
-  stepRemainingSeconds: number;
-  stepProgressPercent: number;
-  isFinished: boolean;
-}
-
-export interface CumulativeWaterPoint {
-  stepIndex: number;
-  stepNumber: number;
-  timeSecond: number;
-  waterGrams: number;
-  pourRateGramsPerSecond: number;
-  isPourStep: boolean;
-}
-
 /**
  * RD-ENG-06 & NFR-PERF-004: Wyliczanie czasu timera odporne na uśpienie w tle
  * r = max(0, ceil((endAtMs - nowMs) / 1000))
@@ -95,326 +69,8 @@ export class BrewTimerEngine {
   private lastWarningKey: string | null = null;
   private chimePlayedForStep: number | null = null;
 
-  /**
-   * Oblicza sumaryczny czas trwania receptury w sekundach bez alokacji stanu silnika.
-   */
-  public static calculateTotalRecipeDuration(steps?: RecipeStep[] | null): number {
-    if (!Array.isArray(steps) || steps.length === 0) return 0;
-    let total = 0;
-    for (const step of steps) {
-      if (step && Number.isFinite(step.durationSeconds) && step.durationSeconds > 0) {
-        total += Math.floor(step.durationSeconds);
-      }
-    }
-    return Math.min(86400, Math.max(0, total));
-  }
-
-  /**
-   * Oblicza maksymalną / docelową objętość wody w recepturze (g) bez alokacji stanu silnika.
-   */
-  public static calculateTotalTargetWater(steps?: RecipeStep[] | null): number {
-    if (!Array.isArray(steps) || steps.length === 0) return 0;
-    let maxWater = 0;
-    for (const step of steps) {
-      if (step && Number.isFinite(step.targetWaterGrams) && step.targetWaterGrams > 0) {
-        if (step.targetWaterGrams > maxWater) {
-          maxWater = step.targetWaterGrams;
-        }
-      }
-    }
-    return Number(maxWater.toFixed(1));
-  }
-
-  /**
-   * Oblicza szacowany pozostały czas trwania procedury (w sekundach)
-   * na podstawie bieżącego kroku, upływu czasu w tym kroku oraz przyszłych kroków.
-   */
-  public static calculateRemainingRecipeTime(
-    steps?: RecipeStep[] | null,
-    currentStepIndex = 0,
-    currentStepElapsedSeconds = 0
-  ): number {
-    if (!Array.isArray(steps) || steps.length === 0) return 0;
-
-    const safeIndex =
-      Number.isFinite(currentStepIndex) && currentStepIndex >= 0
-        ? Math.floor(currentStepIndex)
-        : 0;
-
-    if (safeIndex >= steps.length) return 0;
-
-    const safeElapsed =
-      Number.isFinite(currentStepElapsedSeconds) && currentStepElapsedSeconds >= 0
-        ? Math.floor(currentStepElapsedSeconds)
-        : 0;
-
-    let remaining = 0;
-    for (let i = safeIndex; i < steps.length; i++) {
-      const step = steps[i];
-      if (!step || !Number.isFinite(step.durationSeconds) || step.durationSeconds <= 0) continue;
-      const stepDur = Math.floor(step.durationSeconds);
-      if (i === safeIndex) {
-        remaining += Math.max(0, stepDur - safeElapsed);
-      } else {
-        remaining += stepDur;
-      }
-    }
-
-    return Math.min(86400, Math.max(0, remaining));
-  }
-
-  /**
-   * Oblicza inkrementalną objętość wody do dolania w danym kroku (g).
-   * Jeśli receptura używa kumulacyjnych wartości targetWaterGrams, odejmuje wodę z poprzedniego kroku.
-   */
-  public static calculateStepWaterIncrement(
-    steps?: RecipeStep[] | null,
-    stepIndex = 0
-  ): number {
-    if (!Array.isArray(steps) || steps.length === 0) return 0;
-    const safeIndex =
-      Number.isFinite(stepIndex) && stepIndex >= 0 ? Math.floor(stepIndex) : 0;
-    if (safeIndex >= steps.length) return 0;
-
-    const currentStep = steps[safeIndex];
-    if (
-      !currentStep ||
-      !Number.isFinite(currentStep.targetWaterGrams) ||
-      (currentStep.targetWaterGrams as number) <= 0
-    ) {
-      return 0;
-    }
-
-    const currentWater = currentStep.targetWaterGrams as number;
-    if (safeIndex === 0) {
-      return Number(currentWater.toFixed(1));
-    }
-
-    let prevWater = 0;
-    for (let i = safeIndex - 1; i >= 0; i--) {
-      const prevStep = steps[i];
-      if (
-        prevStep &&
-        Number.isFinite(prevStep.targetWaterGrams) &&
-        (prevStep.targetWaterGrams as number) > 0
-      ) {
-        prevWater = prevStep.targetWaterGrams as number;
-        break;
-      }
-    }
-
-    const delta = currentWater >= prevWater ? currentWater - prevWater : currentWater;
-    return Number(Math.max(0, delta).toFixed(1));
-  }
-
-  /**
-   * Oblicza pozostałą do dolania objętość wody (g) w stosunku do docelowej całkowitej objętości receptury.
-   */
-  public static calculateRemainingWaterToPour(
-    steps?: RecipeStep[] | null,
-    currentWaterGrams: number = 0
-  ): number {
-    const total = BrewTimerEngine.calculateTotalTargetWater(steps);
-    const poured =
-      Number.isFinite(currentWaterGrams) && currentWaterGrams > 0 && !Object.is(currentWaterGrams, -0)
-        ? currentWaterGrams
-        : 0;
-    return Number(Math.max(0, total - poured).toFixed(1));
-  }
-
-  /**
-   * Oblicza postęp nalewania wody w procentach (0 - 100%) z zaokrągleniem do 1 miejsca po przecinku.
-   * W przypadku braku kroków lub zerowej objętości docelowej zwraca 0.
-   */
-  public static calculateWaterPourProgress(
-    steps?: RecipeStep[] | null,
-    currentWaterGrams: number = 0
-  ): number {
-    const total = BrewTimerEngine.calculateTotalTargetWater(steps);
-    if (total <= 0) return 0;
-    const poured =
-      Number.isFinite(currentWaterGrams) && currentWaterGrams > 0 && !Object.is(currentWaterGrams, -0)
-        ? currentWaterGrams
-        : 0;
-    const progress = Math.min(100, (poured / total) * 100);
-    const rounded = Number(progress.toFixed(1));
-    return Object.is(rounded, -0) ? 0 : rounded;
-  }
-
-  /**
-   * Wylicza bezwzględne okno czasowe (początek, koniec, czas trwania w sekundach)
-   * dla wskazanego kroku receptury w osi czasu całego parzenia.
-   */
-  public static calculateStepTimeWindow(
-    steps?: RecipeStep[] | null,
-    stepIndex: number = 0
-  ): StepTimeWindow {
-    if (!Array.isArray(steps) || steps.length === 0 || stepIndex < 0 || stepIndex >= steps.length) {
-      return {
-        stepIndex: Math.max(0, stepIndex || 0),
-        startSecond: 0,
-        endSecond: 0,
-        durationSeconds: 0,
-        isValidStep: false,
-      };
-    }
-
-    let startSecond = 0;
-    for (let i = 0; i < stepIndex; i++) {
-      const d = steps[i]?.durationSeconds;
-      if (typeof d === 'number' && Number.isFinite(d) && d > 0 && !Object.is(d, -0)) {
-        startSecond += Math.floor(d);
-      }
-    }
-
-    const currentStep = steps[stepIndex];
-    const durRaw = currentStep?.durationSeconds;
-    const durationSeconds =
-      typeof durRaw === 'number' && Number.isFinite(durRaw) && durRaw > 0 && !Object.is(durRaw, -0)
-        ? Math.floor(durRaw)
-        : 0;
-
-    return {
-      stepIndex,
-      startSecond,
-      endSecond: startSecond + durationSeconds,
-      durationSeconds,
-      isValidStep: true,
-    };
-  }
-
-  /**
-   * Wyznacza migawkę aktywnego kroku (indeks, upływ czasu w kroku, pozostały czas, % postępu)
-   * na podstawie łącznego czasu trwania dotychczasowego parzenia (elapsedSeconds).
-   */
-  public static getActiveStepSnapshot(
-    steps?: RecipeStep[] | null,
-    elapsedSeconds: number = 0
-  ): ActiveStepSnapshot {
-    if (!Array.isArray(steps) || steps.length === 0) {
-      return {
-        stepIndex: 0,
-        step: null,
-        stepElapsedSeconds: 0,
-        stepRemainingSeconds: 0,
-        stepProgressPercent: 0,
-        isFinished: true,
-      };
-    }
-
-    const safeElapsed =
-      typeof elapsedSeconds === 'number' && Number.isFinite(elapsedSeconds) && elapsedSeconds > 0 && !Object.is(elapsedSeconds, -0)
-        ? Math.floor(elapsedSeconds)
-        : 0;
-
-    let accumulated = 0;
-    for (let i = 0; i < steps.length; i++) {
-      const step = steps[i];
-      const dur =
-        typeof step?.durationSeconds === 'number' && Number.isFinite(step.durationSeconds) && step.durationSeconds > 0 && !Object.is(step.durationSeconds, -0)
-          ? Math.floor(step.durationSeconds)
-          : 0;
-
-      if (safeElapsed < accumulated + dur) {
-        const stepElapsed = safeElapsed - accumulated;
-        const stepRemaining = Math.max(0, dur - stepElapsed);
-        const percent = dur > 0 ? Number(((stepElapsed / dur) * 100).toFixed(1)) : 100;
-        return {
-          stepIndex: i,
-          step,
-          stepElapsedSeconds: stepElapsed,
-          stepRemainingSeconds: stepRemaining,
-          stepProgressPercent: percent,
-          isFinished: false,
-        };
-      }
-
-      accumulated += dur;
-    }
-
-    // Parzenie dobiegło końca
-    const lastIndex = steps.length - 1;
-    const lastStep = steps[lastIndex];
-    const lastDur =
-      typeof lastStep?.durationSeconds === 'number' && Number.isFinite(lastStep.durationSeconds) && lastStep.durationSeconds > 0
-        ? Math.floor(lastStep.durationSeconds)
-        : 0;
-
-    return {
-      stepIndex: lastIndex,
-      step: lastStep,
-      stepElapsedSeconds: lastDur,
-      stepRemainingSeconds: 0,
-      stepProgressPercent: 100,
-      isFinished: true,
-    };
-  }
-
-  /**
-   * Generuje harmonogram narastania wody w osi czasu całego parzenia.
-   * Dla każdego kroku wyznacza bezwzględny czas zakończenia, skumulowaną wodę,
-   * zalecaną prędkość nalewania (g/s) oraz informację, czy krok wymaga dolania wody.
-   */
-  public static calculateCumulativeWaterSchedule(
-    steps?: RecipeStep[] | null
-  ): CumulativeWaterPoint[] {
-    if (!Array.isArray(steps) || steps.length === 0) {
-      return [];
-    }
-
-    const schedule: CumulativeWaterPoint[] = [];
-    let accumulatedTime = 0;
-    let prevWater = 0;
-
-    for (let i = 0; i < steps.length; i++) {
-      const step = steps[i];
-      const durRaw = step?.durationSeconds;
-      const duration =
-        typeof durRaw === 'number' && durRaw > 0 && Number.isFinite(durRaw)
-          ? Math.floor(durRaw)
-          : 0;
-
-      const waterRaw = step?.targetWaterGrams;
-      const rawWater =
-        typeof waterRaw === 'number' && waterRaw >= 0 && Number.isFinite(waterRaw) && !Object.is(waterRaw, -0)
-          ? Math.round(waterRaw * 10) / 10
-          : prevWater;
-
-      const waterGrams = Math.max(prevWater, rawWater);
-      accumulatedTime += duration;
-
-      const deltaWater = Math.max(0, waterGrams - prevWater);
-      const isPourStep = deltaWater > 0;
-      const pourRateGramsPerSecond =
-        duration > 0 && isPourStep ? Math.round((deltaWater / duration) * 10) / 10 : 0;
-
-      schedule.push({
-        stepIndex: i,
-        stepNumber: typeof step?.stepNumber === 'number' ? step.stepNumber : i + 1,
-        timeSecond: accumulatedTime,
-        waterGrams,
-        pourRateGramsPerSecond,
-        isPourStep,
-      });
-
-      prevWater = waterGrams;
-    }
-
-    return schedule;
-  }
-
-
   constructor(steps: RecipeStep[], callbacks: TimerCallbacks = {}) {
     this.steps = steps.map((s) => ({ ...s }));
-    this.callbacks = callbacks;
-  }
-
-  public setSteps(steps: RecipeStep[]): void {
-    this.steps = steps.map((s) => ({ ...s }));
-    this.reset();
-  }
-
-  public setCallbacks(callbacks: TimerCallbacks): void {
     this.callbacks = callbacks;
   }
 
@@ -451,10 +107,7 @@ export class BrewTimerEngine {
 
     const currentStep = this.getCurrentStep();
     const durationMs = currentStep ? currentStep.durationSeconds * 1000 : 0;
-    const msLeft =
-      this.pausedRemainingMs !== null
-        ? this.pausedRemainingMs
-        : Math.max(0, durationMs - this.stepElapsedSeconds * 1000);
+    const msLeft = this.pausedRemainingMs !== null ? this.pausedRemainingMs : durationMs;
 
     this.stepEndAtMs = now + msLeft;
     this.pausedRemainingMs = null;
@@ -694,11 +347,9 @@ export class BrewTimerEngine {
 
     while (this.status === 'running') {
       const currentStep = this.getCurrentStep();
-      if (!currentStep) break;
+      if (!currentStep || this.stepEndAtMs === null) break;
 
-      const remaining = this.stepEndAtMs !== null
-        ? remainingTimerSec(this.stepEndAtMs, now)
-        : Math.max(0, currentStep.durationSeconds - this.stepElapsedSeconds);
+      const remaining = remainingTimerSec(this.stepEndAtMs, now);
 
       if (remaining > 0) {
         this.stepElapsedSeconds = Math.max(0, currentStep.durationSeconds - remaining);
@@ -733,7 +384,7 @@ export class BrewTimerEngine {
         this.chimePlayedForStep = null;
         const nextStep = this.getCurrentStep();
         const nextDurationMs = nextStep ? nextStep.durationSeconds * 1000 : 0;
-        this.stepEndAtMs = (this.stepEndAtMs !== null ? this.stepEndAtMs : now) + nextDurationMs;
+        this.stepEndAtMs = this.stepEndAtMs + nextDurationMs;
         this.stepElapsedSeconds = 0;
         if (nextStep) {
           landedStep = { index: this.currentStepIndex, step: nextStep };
@@ -774,9 +425,7 @@ export class BrewTimerEngine {
     // Dynamiczne obliczanie zalecanego tempa nalewania (g/s)
     const deltaWater = Math.max(0, targetWater - prevWater);
     const recommendedPourRate =
-      duration > 0 && deltaWater > 0
-        ? Number((deltaWater / duration).toFixed(1))
-        : 0;
+      deltaWater > 0 ? Number((deltaWater / duration).toFixed(1)) : 0;
 
     // Szacowana woda w danej sekundzie
     const currentEstimatedWater = Math.round(prevWater + deltaWater * progress);

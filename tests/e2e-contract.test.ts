@@ -246,3 +246,12 @@ test('BrewModalsContainer jest poza ScrollView w app/(tabs)/index.tsx, aby Scrol
   expect(modalsIdx).toBeGreaterThan(scrollCloseIdx);
   expect(src).toMatch(/<ScrollView\b[^>]*keyboardShouldPersistTaps=["']handled["']/);
 });
+
+test('każdy scenariusz Maestro ma realne assertVisible (w tym ekran:<trasa>) oraz obsługuje app-guide-got-it-btn', () => {
+  for (const f of flows) {
+    const body = fs.readFileSync(path.join(maestroDir, f), 'utf8');
+    expect(body).toMatch(/^\s*-\s*assertVisible:/m);
+    expect(body).toMatch(/id:\s*"ekran:/);
+    expect(body).toMatch(/id:\s*"app-guide-got-it-btn"/);
+  }
+});

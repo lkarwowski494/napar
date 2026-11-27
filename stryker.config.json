@@ -23,6 +23,17 @@
     "low": 90,
     "break": 90
   },
+  "disableTypeChecks": false,
+  "ignoreStatic": true,
+  "ignorePatterns": [
+    "coverage",
+    "reports",
+    "ios",
+    "android",
+    "site",
+    "docs",
+    ".maestro"
+  ],
   "concurrency": 2,
   "timeoutMS": 10000
 }

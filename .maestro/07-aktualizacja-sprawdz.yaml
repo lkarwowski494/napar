@@ -9,6 +9,11 @@ name: 07 Po ponownej instalacji (bez deinstalacji) — paczka nadal jest w spiż
 - tapOn:
     id: "onboarding-submit-btn"
     optional: true
+- tapOn:
+    id: "app-guide-got-it-btn"
+    optional: true
 - tapOn: "Spiżarnia, tab, .*"
+- assertVisible:
+    id: "ekran:\\(tabs\\)/beans"
 - assertVisible: "E2E Kenia"
 - takeScreenshot: 07-po-instalacji

@@ -13,4 +13,10 @@ name: 04 Dziennik otwiera się
     id: "app-guide-got-it-btn"
     optional: true
 - tapOn: "Dziennik, tab, .*"
+- assertVisible:
+    id: "ekran:\\(tabs\\)/journal"
+- assertVisible:
+    id: "journal-tab-sessions"
+- assertVisible:
+    id: "journal-tab-analytics"
 - takeScreenshot: 04-dziennik

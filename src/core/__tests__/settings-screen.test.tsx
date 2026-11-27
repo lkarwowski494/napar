@@ -58,6 +58,10 @@ describe('SettingsScreen Component', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   test('Renderuje ekran ustawień z filozofią Apps4Brew i sekcją językową', () => {
     let tree: any;
     renderer.act(() => {

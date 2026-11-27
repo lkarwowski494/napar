@@ -1,8 +1,11 @@
 // jest.mutation.config.js — Dedykowana konfiguracja Jest dla Stryker Mutation Testing (BR-TEST-032)
-// Wybiera wyłącznie szybkie testy domenowe, wyklucza testy RNTL, widokowe i perf-budget
+// Wybiera wyłącznie szybkie testy domenowe w lekkim środowisku node (bez narzutu jest-expo/ios)
 module.exports = {
-  preset: 'jest-expo/ios',
-  setupFiles: ['./jest.setup.js'],
+  testEnvironment: 'node',
+  transform: {
+    '^.+\\.[jt]sx?$': 'babel-jest',
+  },
+  setupFiles: ['./jest.mutation.setup.js'],
   setupFilesAfterEnv: ['./tests/jest-after-env.js'],
   testMatch: [
     '<rootDir>/src/core/__tests__/unit-converter.test.ts',
@@ -10,12 +13,10 @@ module.exports = {
     '<rootDir>/src/core/__tests__/domain-rules.test.ts',
     '<rootDir>/src/core/__tests__/timer-engine.test.ts',
     '<rootDir>/tests/domain-properties.test.ts',
+    '<rootDir>/tests/oracle-coffee.test.ts',
   ],
   testPathIgnorePatterns: [
     '/node_modules/',
     'perf-budget.test.ts',
-  ],
-  transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|standard-navigation)',
   ],
 };
