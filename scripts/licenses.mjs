@@ -54,10 +54,16 @@ export function evaluateSpdxExpression(expr) {
     while (pos < tokens.length && tokens[pos].toUpperCase() === 'OR') {
       pos++;
       const right = parseAnd();
-      left = left.allowed ? left : right.allowed ? right : {
-        allowed: false,
-        reason: `${left.reason}; ${right.reason}`,
-      };
+      if (left.syntaxError) {
+        left = left;
+      } else if (right.syntaxError) {
+        left = right;
+      } else {
+        left = left.allowed ? left : right.allowed ? right : {
+          allowed: false,
+          reason: `${left.reason}; ${right.reason}`,
+        };
+      }
     }
     return left;
   }
@@ -67,7 +73,11 @@ export function evaluateSpdxExpression(expr) {
     while (pos < tokens.length && tokens[pos].toUpperCase() === 'AND') {
       pos++;
       const right = parsePrimary();
-      if (!left.allowed) {
+      if (left.syntaxError) {
+        left = left;
+      } else if (right.syntaxError) {
+        left = right;
+      } else if (!left.allowed) {
         left = left;
       } else if (!right.allowed) {
         left = right;
@@ -78,23 +88,33 @@ export function evaluateSpdxExpression(expr) {
     return left;
   }
 
+  const RESERVED_TOKENS = new Set(['(', ')', 'OR', 'AND', 'WITH']);
+
   function parsePrimary() {
     if (pos >= tokens.length) {
-      return { allowed: false, reason: 'Unexpected end of SPDX expression' };
+      return { allowed: false, syntaxError: true, reason: 'Unexpected end of SPDX expression' };
     }
     if (tokens[pos] === '(') {
       pos++;
       const inner = parseOr();
+      if (inner.syntaxError) return inner;
       if (tokens[pos] !== ')') {
-        return { allowed: false, reason: 'Unclosed parenthesis in SPDX expression' };
+        return { allowed: false, syntaxError: true, reason: 'Unclosed parenthesis in SPDX expression' };
       }
       pos++;
       return inner;
     }
     const id = tokens[pos++];
+    if (RESERVED_TOKENS.has(id.toUpperCase())) {
+      return { allowed: false, syntaxError: true, reason: `Unexpected token "${id}" in SPDX expression` };
+    }
     // Consume optional "WITH <exception>"
-    if (pos + 1 < tokens.length && tokens[pos].toUpperCase() === 'WITH') {
-      pos += 2;
+    if (pos < tokens.length && tokens[pos].toUpperCase() === 'WITH') {
+      pos++;
+      if (pos >= tokens.length || RESERVED_TOKENS.has(tokens[pos].toUpperCase())) {
+        return { allowed: false, syntaxError: true, reason: 'Missing or invalid SPDX exception after WITH' };
+      }
+      pos++;
     }
     if (PROHIBITED_LICENSES.some((rx) => rx.test(id))) {
       return { allowed: false, reason: `Prohibited copyleft license: ${id}` };
@@ -106,6 +126,9 @@ export function evaluateSpdxExpression(expr) {
   }
 
   const res = parseOr();
+  if (res.syntaxError) {
+    return { allowed: false, reason: res.reason };
+  }
   if (pos !== tokens.length) {
     return { allowed: false, reason: `Malformed SPDX expression near "${tokens[pos]}"` };
   }
@@ -159,7 +182,7 @@ export function checkProductionLicenses(projectRoot = root) {
 
   // 2. Scan full transitive non-dev dependency graph from package-lock.json + cross-check node_modules
   for (const [pkgKey, lockMeta] of Object.entries(lockPackages)) {
-    if (!pkgKey || lockMeta.dev) continue;
+    if (!pkgKey || lockMeta.dev || lockMeta.devOptional) continue;
 
     const displayName = pkgKey.replace(/^node_modules\//, '');
     const isOptional = Boolean(lockMeta.optional);

@@ -63,6 +63,13 @@ describe('D4: Skrypty weryfikujące (kontrole-tresci, licenses, verify-native, t
       { cwd: root, encoding: 'utf8' }
     );
     expect(okRun.status).toBe(0);
+
+    const conflictRun = spawnSync(
+      process.execPath,
+      [path.join(root, 'scripts', 'kontrole-tresci.mjs'), 'rejestr.json', 'README.md', '--tylko-rejestr'],
+      { cwd: root, encoding: 'utf8' }
+    );
+    expect(conflictRun.status).toBe(2);
   });
 
   test('scripts/licenses.mjs poprawnie ocenia wyrażenia SPDX (OR / AND / nawiasy) i nie ma fałszywego fallbacku MIT', () => {
@@ -81,9 +88,14 @@ describe('D4: Skrypty weryfikujące (kontrole-tresci, licenses, verify-native, t
            ['(MIT OR CC0-1.0)', true],
            ['(BSD-3-Clause OR GPL-2.0)', true],
            ['MIT AND Apache-2.0', true],
+           ['Apache-2.0 WITH LLVM-exception', true],
            ['GPL-3.0', false],
            ['(GPL-3.0 OR LGPL-2.1)', false],
            ['MIT AND GPL-3.0', false],
+           ['MIT OR', false],
+           ['MIT OR (', false],
+           ['MIT WITH )', false],
+           ['MIT WITH', false],
            ['UNLICENSED', false],
            ['', false],
            ['CUSTOM-PROPRIETARY', false],

@@ -26,10 +26,15 @@ name: 03 Kofeina — szybki wpis V60
 - scrollUntilVisible:
     element:
       id: "quick-add-caffeine-btn"
+    centerElement: true
 - tapOn:
     id: "quick-add-caffeine-btn"
 - tapOn:
     id: "caffeine-quick-v60"
+- scrollUntilVisible:
+    element:
+      id: "delete-caffeine-log-.*"
+    centerElement: true
 - assertVisible:
     id: "delete-caffeine-log-.*"
 - takeScreenshot: 03-kofeina-szybki-wpis

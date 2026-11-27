@@ -113,7 +113,7 @@ const pliki = (p) => statSync(p).isDirectory() ? readdirSync(p).sort().flatMap((
 export function main(argv) {
   const a = { _: [] };
   for (let i = 0; i < argv.length; i++) ['--inwentarz', '--przed-przegladem', '--skroty', '--tylko-rejestr'].includes(argv[i]) ? (a[argv[i].slice(2)] = true) : argv[i].startsWith('--') ? (a[argv[i].slice(2)] = argv[++i]) : a._.push(argv[i]);
-  if (a._.length < 1 || (!a['tylko-rejestr'] && a._.length < 2)) { console.error('Użycie: node kontrole-tresci.mjs <rejestr.json> (<plik|katalog>... | --tylko-rejestr) [opcje z nagłówka]'); return 2; }
+  if (a._.length < 1 || (!a['tylko-rejestr'] && a._.length < 2) || (a['tylko-rejestr'] && a._.length > 1)) { console.error('Użycie: node kontrole-tresci.mjs <rejestr.json> (<plik|katalog>... | --tylko-rejestr) [opcje z nagłówka]'); return 2; }
   const rejestr = JSON.parse(readFileSync(a._[0], 'utf8'));
   const uwagi = [], uzycia = [], bledy = sprawdzRejestr(rejestr, a.konfiguracja ? JSON.parse(readFileSync(a.konfiguracja, 'utf8')) : [], { przedPrzegladem: a['przed-przegladem'], przeglad: a.przeglad }, uwagi);
   const plikiDocelowe = a['tylko-rejestr'] ? [] : a._.slice(1).flatMap(pliki);
